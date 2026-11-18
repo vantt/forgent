@@ -124,25 +124,6 @@ test('with no tier list either, a capability with no prefer pool is refused with
   assert.match(result.refused.detail, /coding:no-pool-declared/);
 });
 
-test('a capability gets the same family and model inside herdr and headless; only the transport differs', () => {
-  // claude used to be split into a cli executor and a pane-only one, so a pool that named the
-  // pane one ran claude inside herdr and fell to the next family headless.
-  // A pool that puts claude first (the coding discovery row).
-  for (const capability of ['coding:discover']) {
-    for (const rigor of ['low', 'standard', 'high', 'critical']) {
-      const unitAsk = { unit: { id: 'u', capability, writes: [], rigor }, role: 'producer' };
-      const pane = bind(unitAsk, { runnerConfig, session: { herdrPresent: true } });
-      const cli = bind(unitAsk, { runnerConfig, session: headless });
-      assert.ok(!pane.refused && !cli.refused, `${capability}/${rigor}: ${JSON.stringify(pane.refused ?? cli.refused)}`);
-      assert.equal(pane.executor, 'claude', `${capability}/${rigor}`);
-      assert.equal(cli.executor, pane.executor, `${capability}/${rigor}`);
-      assert.equal(cli.model, pane.model, `${capability}/${rigor}`);
-      assert.equal(pane.invocation, 'claude-herdr-bwrap', `${capability}/${rigor}`);
-      assertRunnable(cli, `${capability}/${rigor} headless`);
-    }
-  }
-});
-
 test('every invocation that declares a login store reads the store its command logs in', () => {
   for (const [executorId, entry] of Object.entries(executors)) {
     for (const inv of entry.invocations ?? []) {

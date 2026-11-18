@@ -15,9 +15,14 @@ import {
   SeatBindingError,
   SEAT_BINDING_TIMEOUT_MS,
 } from '../../src/seat-binding/client.mjs';
-import { golden, caseInput } from './golden-cases.helper.mjs';
+import { bind as facadeBind, explainSeat } from '../../src/runner/execution/bind.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { MODEL_POLICY_TIERS } from '../../src/runner/dispatch/config.mjs';
 import { enterHotLock } from '../../src/holder-lock/hot-guard.mjs';
+
+seedFileLocalBwrapRegistry();
+seedStubAgentClis('pi');
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const HOST_BIN = process.env.FGOS_HOST_BIN;
@@ -37,21 +42,42 @@ function script(name, body) {
 
 const expectCode = (fn, code) => assert.throws(fn, (err) => err instanceof SeatBindingError && err.code === code, code);
 
-test('the real host answers a bind with the decision and its own version', () => {
-  const client = createSeatBindingClient({ hostBin: HOST_BIN });
-  const out = client.bindSeat(golden.base);
-  assert.equal(typeof out.ok, 'boolean');
-  assert.equal(out.protocol, 1);
-  assert.match(out.hostVersion, /^\d+\.\d+\.\d+/);
-  assert.equal(out.bindingInput.protocol, 1);
+const SEAT_RUNNER = {
+  defaults: { tier: 'standard' },
+  modelPolicies: { alpha: { standard: 'alpha-m' } },
+  capabilities: { 'docs:write': { prefer: [{ executor: 'alpha' }] } },
+  executors: {
+    alpha: {
+      kind: 'agent',
+      providerModel: 'alpha',
+      invocations: [{ id: 'alpha-cli', via: 'cli', adapter: 'cli-spawn', command: 'pi', confinement: { backend: 'bwrap' } }],
+    },
+  },
+};
+const SEAT_ASK = { unit: { id: 'u', capability: 'docs:write', writes: [] }, role: 'producer' };
+
+test('the facade round trip: a seat binds through the real host with its own version, and the explain answer carries the walk in one call', () => {
+  const bound = facadeBind(SEAT_ASK, { runnerConfig: SEAT_RUNNER, session: {} });
+  assert.equal(bound.executor, 'alpha');
+  assert.equal(bound.model, 'alpha-m');
+  assert.match(bound.bindingInput.hostVersion, /^\d+\.\d+\.\d+/);
+  const explained = explainSeat(SEAT_ASK, { runnerConfig: SEAT_RUNNER, session: {} });
+  assert.equal(explained.binding.executor, 'alpha');
+  assert.ok(explained.walk.length >= 1);
+  assert.ok(Array.isArray(explained.ranked?.candidates));
 });
 
-test('a refused seat comes back as a result carrying its refusal, not as an exception', () => {
-  const refusal = golden.cases.find((c) => c.name.startsWith('a hard pin on a family with no cell'));
-  const out = createSeatBindingClient({ hostBin: HOST_BIN }).bindSeat(caseInput(refusal));
-  assert.equal(out.ok, false);
-  assert.equal(out.refusal.reason, 'tier-cell-missing');
-  assert.ok(out.hostVersion);
+test('a refused seat comes back as a binding carrying its refusal, not as an exception', () => {
+  const refused = facadeBind(SEAT_ASK, { runnerConfig: { ...SEAT_RUNNER, capabilities: { 'docs:write': { prefer: [{ executor: 'ghost' }] } } }, session: {} });
+  assert.equal(typeof refused.refused?.reason, 'string');
+  assert.equal(typeof refused.refused?.detail, 'string');
+});
+
+test('the real host answers digest and preflight over the run snapshot it is sent', () => {
+  const client = createSeatBindingClient({ hostBin: HOST_BIN });
+  assert.match(client.digest({ runner: SEAT_RUNNER }), /^sha256:[0-9a-f]{64}$/);
+  assert.equal(client.digest({ runner: SEAT_RUNNER }), client.digest({ runner: { ...SEAT_RUNNER, executors: {} } }), 'the digest reads only the seat config slice');
+  assert.deepEqual(client.preflight({ runner: SEAT_RUNNER, session: {} }), {});
 });
 
 test('the tier ladder the host answers is the one the Node config loader reads, six tiers weakest first', () => {
@@ -62,31 +88,41 @@ test('the tier ladder the host answers is the one the Node config loader reads, 
 });
 
 test('a request the contract rejects throws seat-binding-route-rejected', () => {
-  expectCode(() => createSeatBindingClient({ hostBin: HOST_BIN }).bindSeat({ ask: 'not an ask' }), 'seat-binding-route-rejected');
+  expectCode(() => createSeatBindingClient({ hostBin: HOST_BIN }).bind({ ask: 'not an ask', runner: SEAT_RUNNER }), 'seat-binding-route-rejected');
+});
+
+test('a derivation the host refuses as a model error throws seat-binding-failed carrying the failure', () => {
+  const ask = { ...SEAT_ASK, overrides: [{ tier: 'no-such-tier' }] };
+  assert.throws(() => createSeatBindingClient({ hostBin: HOST_BIN }).bind({ ask, runner: SEAT_RUNNER }), (err) => err instanceof SeatBindingError && err.code === 'seat-binding-failed' && err.failure.name === 'RunnerConfigError');
 });
 
 test('a host that does not know the route throws host-version-mismatch', () => {
   const old = script('old-host.sh', `echo 'fgos: unknown verb "internal". Usage: fgos <command> [args...]' >&2\nexit 4`);
   expectCode(() => createSeatBindingClient({ hostBin: old }).tierLadder(), 'host-version-mismatch');
-  expectCode(() => createSeatBindingClient({ hostBin: old }).bindSeat(golden.base), 'host-version-mismatch');
+  expectCode(() => createSeatBindingClient({ hostBin: old }).bind({ ask: SEAT_ASK, runner: SEAT_RUNNER }), 'host-version-mismatch');
   // A request larger than the pipe buffer: the old host exits unread, so writing it fails with EPIPE.
-  expectCode(() => createSeatBindingClient({ hostBin: old }).bindSeat({ ...golden.base, padding: 'x'.repeat(1 << 20) }), 'host-version-mismatch');
+  expectCode(() => createSeatBindingClient({ hostBin: old }).bind({ ask: SEAT_ASK, runner: { ...SEAT_RUNNER, padding: 'x'.repeat(1 << 20) } }), 'host-version-mismatch');
+});
+
+test('an older host that answers a usage error for the protocol or the op throws host-version-mismatch', () => {
+  const usage = script('usage-host.sh', `cat >/dev/null\necho '{"v":1,"protocol":1,"hostVersion":"1","op":"explain","result":"error","code":"usage","message":"unknown operation explain"}'\nexit 2`);
+  expectCode(() => createSeatBindingClient({ hostBin: usage }).explain({ ask: SEAT_ASK, runner: SEAT_RUNNER }), 'host-version-mismatch');
 });
 
 test('a host speaking another protocol throws host-version-mismatch', () => {
-  const other = script('other-protocol.sh', `cat >/dev/null\necho '{"v":1,"protocol":2,"hostVersion":"9.9.9","op":"ladder","result":"ok","ladder":{"vocabulary":[]}}'`);
+  const other = script('other-protocol.sh', `cat >/dev/null\necho '{"v":1,"protocol":1,"hostVersion":"9.9.9","op":"ladder","result":"ok","ladder":{"vocabulary":[]}}'`);
   expectCode(() => createSeatBindingClient({ hostBin: other }).tierLadder(), 'host-version-mismatch');
 });
 
 test('output that is not the route contract throws seat-binding-route-bad-output', () => {
   const garbage = script('garbage.sh', `cat >/dev/null\necho 'not json at all'`);
   const silent = script('silent.sh', `cat >/dev/null\nexit 1`);
-  const wrongOp = script('wrong-op.sh', `cat >/dev/null\necho '{"v":1,"protocol":1,"hostVersion":"1","op":"bind","result":"ok"}'`);
-  const noDecision = script('no-decision.sh', `cat >/dev/null\necho '{"v":1,"protocol":1,"hostVersion":"1","op":"bind","result":"ok"}'`);
+  const wrongOp = script('wrong-op.sh', `cat >/dev/null\necho '{"v":2,"protocol":2,"hostVersion":"1","op":"bind","result":"ok"}'`);
+  const noDecision = script('no-decision.sh', `cat >/dev/null\necho '{"v":2,"protocol":2,"hostVersion":"1","op":"bind","result":"ok"}'`);
   for (const [bin, call] of [[garbage, 'tierLadder'], [silent, 'tierLadder'], [wrongOp, 'tierLadder']]) {
     expectCode(() => createSeatBindingClient({ hostBin: bin })[call](), 'seat-binding-route-bad-output');
   }
-  expectCode(() => createSeatBindingClient({ hostBin: noDecision }).bindSeat(golden.base), 'seat-binding-route-bad-output');
+  expectCode(() => createSeatBindingClient({ hostBin: noDecision }).bind({ ask: SEAT_ASK, runner: SEAT_RUNNER }), 'seat-binding-route-bad-output');
 });
 
 test('a host that does not answer in time is killed and throws seat-binding-route-timeout', () => {
@@ -121,7 +157,7 @@ test('a process inside the hot mutex never execs the host: seat-binding-in-lock'
   const leaveHotLock = enterHotLock();
   try {
     expectCode(() => createSeatBindingClient({ hostBin: host }).tierLadder(), 'seat-binding-in-lock');
-    expectCode(() => createSeatBindingClient({ hostBin: host }).bindSeat(golden.base), 'seat-binding-in-lock');
+    expectCode(() => createSeatBindingClient({ hostBin: host }).bind({ ask: SEAT_ASK, runner: SEAT_RUNNER }), 'seat-binding-in-lock');
   } finally {
     leaveHotLock();
   }
@@ -131,14 +167,14 @@ test('a process inside the hot mutex never execs the host: seat-binding-in-lock'
 test('every client call is exactly one host exec: a bind costs one, a refused bind costs one, a call in the hot mutex costs none', () => {
   const counter = path.join(scratch, 'exec-count');
   fs.rmSync(counter, { force: true });
-  const host = script('counting-host.sh', `echo x >> '${counter}'\ncat >/dev/null\necho '{"v":1,"protocol":1,"hostVersion":"1","op":"ladder","result":"ok","ladder":{"vocabulary":[]}}'`);
+  const host = script('counting-host.sh', `echo x >> '${counter}'\ncat >/dev/null\necho '{"v":2,"protocol":2,"hostVersion":"1","op":"ladder","result":"ok","ladder":{"vocabulary":[]}}'`);
   const client = createSeatBindingClient({ hostBin: host });
   const execs = () => (fs.existsSync(counter) ? fs.readFileSync(counter, 'utf8').trim().split('\n').length : 0);
   client.tierLadder();
   assert.equal(execs(), 1);
   client.tierLadder();
   assert.equal(execs(), 2);
-  expectCode(() => client.bindSeat(golden.base), 'seat-binding-route-bad-output');
+  expectCode(() => client.bind({ ask: SEAT_ASK, runner: SEAT_RUNNER }), 'seat-binding-route-bad-output');
   assert.equal(execs(), 3, 'a bind the host answers badly is still one exec, never retried');
   const leaveHotLock = enterHotLock();
   try {
@@ -155,7 +191,7 @@ function activatedProject() {
   fs.mkdirSync(path.join(release, 'bin'), { recursive: true });
   fs.writeFileSync(path.join(release, 'manifest.json'), JSON.stringify({ components: { legacyNode: { root: '.' } } }));
   const host = path.join(release, 'bin', 'fgos');
-  fs.writeFileSync(host, `#!/bin/sh\ncat >/dev/null\necho '{"v":1,"protocol":1,"hostVersion":"activation-fixture","op":"ladder","result":"ok","ladder":{"vocabulary":["nano"]}}'\n`, { mode: 0o755 });
+  fs.writeFileSync(host, `#!/bin/sh\ncat >/dev/null\necho '{"v":2,"protocol":2,"hostVersion":"activation-fixture","op":"ladder","result":"ok","ladder":{"vocabulary":["nano"]}}'\n`, { mode: 0o755 });
   fs.mkdirSync(path.join(project, '.fgos', 'installation'), { recursive: true });
   fs.writeFileSync(path.join(project, '.fgos', 'installation', 'activation.json'), JSON.stringify({ status: 'ready', releasePath: release }));
   return { project, release, host };

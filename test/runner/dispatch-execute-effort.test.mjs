@@ -19,7 +19,6 @@ import { bindableExecute } from '../helpers/work-seat-config.mjs';
 import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
-import { bind } from '../../src/runner/execution/bind.mjs';
 import { runUnitWithPort as runUnit } from '../helpers/run-unit-with-port.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
@@ -177,37 +176,6 @@ console.log('All good');
   assert.deepEqual(result.policy.launch.modelDrift.map((w) => w.code), ['model-reported-different']);
   assert.equal(result.reasoningEffort, undefined);
   assert.equal(result.modelWarnings, undefined);
-});
-
-const bindConfig = () => ({
-  modelPolicies: { openai: { standard: 'gpt-std' }, claude: { standard: 'sonnet' } },
-  defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
-  capabilities: { 'docs:write': { prefer: [{ executor: 'codex' }], rigor: 'standard', tier: 'standard' } },
-  executors: {
-    codex: { kind: 'agent', providerModel: 'openai', allowCrossProvider: true, invocations: [{ id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'codex', args: ['exec', '{prompt}'] }] },
-    claude: { kind: 'agent', supports: { reasoningEffort: ['low', 'medium', 'high'] }, invocations: [{ id: 'claude-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: 'claude', args: ['-p', '{prompt}'] }] },
-  },
-});
-const unitAsk = (overrides) => ({ unit: { id: 'u1', capability: 'docs:write', writes: ['README.md'] }, role: 'producer', overrides });
-
-test('bind() takes a reasoningEffort override and records where it came from', () => {
-  const bound = bind(unitAsk([{ reasoningEffort: 'high', origin: 'human-cli' }]), { runnerConfig: bindConfig(), session: {} });
-  assert.equal(bound.executor, 'codex');
-  assert.equal(bound.reasoningEffort, 'high');
-  assert.deepEqual(bound.provenance.reasoningEffort, { value: 'high', source: 'override:human-cli' });
-  const plain = bind(unitAsk([]), { runnerConfig: bindConfig(), session: {} });
-  assert.equal(plain.reasoningEffort, null);
-  assert.deepEqual(plain.provenance.reasoningEffort, { value: null, source: 'invocation-default' });
-});
-
-test('bind() refuses an effort outside the vocabulary or outside what the bound executor declares', () => {
-  const bad = bind(unitAsk([{ reasoningEffort: 'turbo', origin: 'human-cli' }]), { runnerConfig: bindConfig(), session: {} });
-  assert.equal(bad.refused.reason, 'reasoning-effort');
-  assert.match(bad.refused.detail, /invalid reasoningEffort "turbo"/);
-  const locked = bind(unitAsk([{ executor: 'claude', reasoningEffort: 'max', origin: 'human-cli' }]), { runnerConfig: bindConfig(), session: {} });
-  assert.equal(locked.refused.reason, 'effort-unsupported');
-  assert.match(locked.refused.detail, /invocation "claude-cli" cannot render effort max; it renders \[low, medium, high\]/);
-  assert.deepEqual(locked.refused.rendered, ['low', 'medium', 'high']);
 });
 
 test('fgos run with an effort override renders it into the CLI the bound executor spawns', async () => {

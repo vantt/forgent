@@ -19,7 +19,8 @@ import { deriveOperationCapability } from '../operation-capability.mjs';
 import { SEAT_ROLES, effectiveRigorOf } from '../execution/seat-resolver.mjs';
 import { capabilityRigorOf, hasOwnPreferPool, registeredCapabilityOf } from '../execution/capability-config.mjs';
 import { isReadOnlyAssignment } from './assignment.mjs';
-import { bindWorkSeat } from '../execution/bind.mjs';
+import { bindWorkSeat, viaSeatRoute } from '../execution/bind.mjs';
+import { plan as routePlan } from '../../seat-binding/client.mjs';
 
 /** The source Seat Binding recorded for one field of a bound seat, carried over as it is. */
 function bindingSource(binding, field) {
@@ -363,6 +364,9 @@ const TOOL_ANSWERS = {
  *   tool?: {mechanism: string, reasonCode: string, stale?: true, mcpTool?: string, command?: string,
  *   providers: {executorId: string, status: string}[]}}}
  */
+// Declared twin of the host's `plan` op for the selectors that are not binding ones (an executor id, an assignment,
+// a Work hint): the twin reads no host, spawns nothing, and goes away when those selectors move to the host
+// (retiredBy: S6a). The `--for` selector no longer comes through here.
 export function purposeSeatOf(cfg, purpose, { repoRoot } = {}) {
   const named = lookupExecutor(cfg, purpose);
   if (named.configured || !purpose) return named;
@@ -566,12 +570,27 @@ export function compileDispatchPlan(
   }
 
   if (!executorId && purpose) {
-    const answer = purposeSeatOf(cfg, purpose, { repoRoot });
-    const answered = planOfPurposeAnswer(shell, purpose, answer);
-    if (answered) return answered;
-    resolved = answer;
-    seatBinding = answer.binding;
-    executorId = answer.executorId ?? undefined;
+    // The binding selectors (`--for`, `--needs-soul`) are the host route's `plan` op: the purpose's seat, its tool
+    // providers and its mechanism are decided there, never re-derived here.
+    const answer = viaSeatRoute(() => routePlan({ runner: cfg, for: purpose, needsSoul, hasLiveTaskAccess, ...(repoRoot ? { repoRoot } : {}) }));
+    if (answer.providers || answer.mechanism === 'unavailable' || !answer.executorId) {
+      return planOf(shell, {
+        mechanism: answer.mechanism,
+        executorId: answer.executorId ?? null,
+        capability: purpose,
+        reasonCodes: answer.reasonCodes,
+        configured: answer.configured,
+        ...(answer.mcpTool ? { mcpTool: answer.mcpTool } : {}),
+        ...(answer.command ? { command: answer.command } : {}),
+        ...(answer.stale ? { stale: answer.stale } : {}),
+        ...(answer.providers ? { providers: answer.providers } : {}),
+        ...(answer.blockedReason !== undefined ? { blockedReason: answer.blockedReason } : {}),
+      });
+    }
+    // An executor registered under the purpose's own name is that executor; any other one is the seat the host bound.
+    const named = lookupExecutor(cfg, purpose);
+    executorId = answer.executorId;
+    resolved = named.configured ? named : { ...lookupExecutor(cfg, executorId), bindingSource: 'seat-binding' };
   }
 
   if (!executorId) {

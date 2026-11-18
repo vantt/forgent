@@ -1,8 +1,8 @@
 {
-  "sha": "a2aa1e9d956ed8adf4969e7a6e401d1bd2231f73",
-  "files": 612,
-  "tests": 7967,
-  "rustTests": 3060,
+  "sha": "8ab107a2c683210c0f84525da13b24923660986c",
+  "files": 622,
+  "tests": 7991,
+  "rustTests": 3104,
   "wallSeconds": 625,
   "cpuSeconds": 6199,
   "fileCpu": {
@@ -318,7 +318,6 @@
     "test/runner/execution/run-sync.test.mjs": 25.3,
     "test/runner/execution/run-verify-pin.test.mjs": 39.5,
     "test/runner/execution/seat-ledger.test.mjs": 0.5,
-    "test/runner/execution/seat-policy.test.mjs": 0.4,
     "test/runner/execution/seat-resolver.test.mjs": 0.3,
     "test/runner/execution/tier-fallback.test.mjs": 1.8,
     "test/runner/execution/unit-run-outcome.test.mjs": 0.3,

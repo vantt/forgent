@@ -962,11 +962,10 @@
         "\\bbindingTasteOf\\("
       ],
       "allowed": [
-        "src/runner/execution/seat-policy.mjs",
         "src/runner/dispatch/config.mjs",
         "src/setup/seat-binding-checks.mjs"
       ],
-      "reason": "reading prefer here never picks an executor: seat-policy builds the crate slice, the load validator checks the named executors exist, and the seat-binding checks decide which capabilities to dry-bind and then ask bind()"
+      "reason": "reading prefer here never picks an executor: the load validator checks the named executors exist, and the seat-binding checks decide which capabilities to dry-bind and then ask bind()"
     },
     {
       "job": "the purpose chooser outside bind() is gone: ask purposeSeatOf in src/runner/dispatch/plan.mjs",
@@ -1683,7 +1682,6 @@
     "src/git/recovery.mjs": "infra",
     "src/runner/dispatch/executor-governance.mjs": "infra",
     "src/runner/dispatch/work-item-input.mjs": "infra",
-    "src/runner/dispatch/shipped-catalog.mjs": "infra",
-    "src/runner/execution/seat-policy.mjs": "infra"
+    "src/runner/dispatch/shipped-catalog.mjs": "infra"
   }
 }

@@ -7,7 +7,7 @@
 // hard: a provider limit on it ends the seat (run.mjs) instead of rotating or walking away.
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/**.
 
-import { accountQuarantineOf } from './bind.mjs';
+import { preflightOf } from './bind.mjs';
 import { configPinnedToAccount } from '../dispatch/provider-account-probe.mjs';
 import { legacyStateKey } from '../dispatch/llm-accounts.mjs';
 import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
@@ -44,8 +44,8 @@ export function runnerConfigForBinding(runnerConfig, bound) {
 export function assertPinnedAccountsUsable(pins, { runnerConfig, runtimeDir, what }) {
   for (const { account } of pins) {
     if (!account) continue;
-    const until = accountQuarantineOf(runnerConfig, account, { runtimeDir });
-    if (until === null) continue;
+    const until = preflightOf(runnerConfig, { pin: account, accounts: { runtimeDir } }).pinQuarantinedUntil;
+    if (until === undefined || until === null) continue;
     const waits = until === Number.MAX_SAFE_INTEGER ? 'with no end time (cleared by hand)' : `until ${new Date(until).toISOString()}`;
     throw new RunnerConfigError(`${what}: account "${account.pool}/${account.id}" is quarantined ${waits}; pin another account, or wait`);
   }

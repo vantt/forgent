@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { runUnitWithPort as runUnit } from '../../helpers/run-unit-with-port.mjs';
 import { resolveGitRoots, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { loadRunnerConfigForDir, runnerOriginsOf } from '../../../src/runner/dispatch/config.mjs';
-import { seatConfigDigestOf } from '../../../src/runner/execution/seat-policy.mjs';
+import { digest as seatConfigDigest } from '../../../src/seat-binding/client.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 
 // posture filtering consults the machine backend registry; keep it file-local
@@ -226,7 +226,7 @@ async function mutatingGateFixture({ writeUnitJson = true, corrupt = false, twoC
     worktree: fs.realpathSync(worktreeDir),
   };
   // What a bind records: the digest of the seat config it was bound under.
-  const configDigest = seatConfigDigestOf(loadRunnerConfigForDir(repoRoot)).digest;
+  const configDigest = seatConfigDigest({ runner: loadRunnerConfigForDir(repoRoot) });
   if (attempts) record.bindings = { 'producer/1': attempts(unitRunId, configDigest) };
   if (bindings) record.bindings = bindings(unitRunId, configDigest);
   if (writeUnitJson) {
@@ -314,7 +314,7 @@ test('mutating gate: a config committed after the bind refuses the write, whatev
   committed.runner.defaults.tier = 'advanced';
   committed.runner.modelPolicies.node.advanced = 'node-adv';
   writeProjectConfig(repoRoot, committed);
-  assert.notEqual(seatConfigDigestOf(loadRunnerConfigForDir(repoRoot)).digest, configDigest);
+  assert.notEqual(seatConfigDigest({ runner: loadRunnerConfigForDir(repoRoot) }), configDigest);
   await assert.rejects(() => run(assignment), (err) => err.code === 'binding-replay-config-mismatch');
 });
 

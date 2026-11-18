@@ -42,7 +42,7 @@ import crypto from 'node:crypto';
 import { createGitInspect, gitPortOptions } from '../../git/inspect.mjs';
 import { inspectEntries, inspectPath } from '../../util/git-paths.mjs';
 import { bind } from '../execution/bind.mjs';
-import { seatConfigDigestOf } from '../execution/seat-policy.mjs';
+import { digest as seatConfigDigest } from '../../seat-binding/client.mjs';
 import { walkStateOf } from '../execution/account-rotation.mjs';
 import { bindSeatOf } from '../execution/seat-resolver.mjs';
 import { legacyStateKey } from './llm-accounts.mjs';
@@ -306,7 +306,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
       );
     }
     const committed = opts.committedRunnerConfig ?? loadRunnerConfigForDir(root);
-    if (seatConfigDigestOf(committed).digest !== boundDigest) {
+    if (seatConfigDigest({ runner: committed }) !== boundDigest) {
       throw new RunnerConfigError(
         `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" was bound under a different seat config than the committed one -- refused`,
         { code: 'binding-replay-config-mismatch' },

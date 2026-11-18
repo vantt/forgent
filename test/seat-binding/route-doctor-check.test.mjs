@@ -17,11 +17,11 @@ test('the row is registered in the doctor registry', () => {
   assert.ok(DOCTOR_CHECKS.some((check) => check.id === 'seat-binding-route'));
 });
 
-test('the row passes on a host that answers ladder at protocol 1', () => {
+test('the row passes on a host that answers ladder at protocol 2', () => {
   assert.ok(HOST_BIN && fs.existsSync(HOST_BIN), `set FGOS_HOST_BIN to a host built from this checkout: ${HOST_BIN}`);
   const result = checkSeatBindingRoute(process.cwd(), { hostBin: HOST_BIN });
   assert.equal(result.passed, true, result.message);
-  assert.match(result.message, /protocol 1, hostVersion \d/);
+  assert.match(result.message, /protocol 2, hostVersion \d/);
 });
 
 test('the row fails on a host that has no seat-binding route', () => {

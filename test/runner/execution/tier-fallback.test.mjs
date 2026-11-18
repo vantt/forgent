@@ -45,19 +45,6 @@ function config({ prefer = FAMILIES, tier, tierFallback, modelPolicies = {}, llm
 const ask = { unit: { id: 'u', capability: 'docs:write', writes: [] }, role: 'producer', readOnly: true };
 const ctx = (runnerConfig) => ({ runnerConfig, session: { headless: true } });
 
-test('explaining a seat with the fallback walk off still ranks every candidate and walks no chain', () => {
-  const cfg = config({
-    modelPolicies: { alpha: cells('alpha', ['alpha-m@alpha', 'alpha-via-router@router']) },
-    llmAccounts: { router: { r1: { credentialStore: { alpha: '/nonexistent/r1' } } } },
-  });
-  const full = explainSeat(ask, ctx(cfg));
-  const bare = explainSeat(ask, ctx(cfg), { chain: false });
-  assert.deepEqual(bare.ranked.candidates, full.ranked.candidates);
-  assert.deepEqual(bare.walk, []);
-  assert.deepEqual(bare.binding, full.binding);
-  assert.ok(full.walk.length > 1);
-});
-
 test('the executor model is no longer a fallthrough for a missing cell', () => {
   const cfg = config({ prefer: ['alpha'] });
   delete cfg.modelPolicies.alpha.standard;
