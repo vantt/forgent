@@ -29,7 +29,8 @@ function fixture(t) {
   writeCensus({ 'src/door.mjs': digest('export const a = 1;\n') });
   git('add', '.'); git('commit', '-q', '-m', 'baseline');
   const hook = () => spawnSync(process.execPath, [HOOK], { cwd: repo, encoding: 'utf8' });
-  return { git, write, writeCensus, hook };
+  const hookIn = (cwd) => spawnSync(process.execPath, [HOOK], { cwd, encoding: 'utf8' });
+  return { git, write, writeCensus, hook, hookIn, repo };
 }
 
 test('a staged product file whose census digest changed is refused until the regenerated census is staged', (t) => {
@@ -101,4 +102,56 @@ test('a committing checkout whose scanner predates the census check is not refus
   git('add', 'src/door.mjs');
   const result = hook();
   assert.equal(result.status, 0, result.stderr);
+});
+
+// The refusal guards commits that publish to the trunk directly; a linked worktree's commit is gated
+// and its census regenerated when it lands.
+const stageDrift = (cwd, text) => {
+  fs.writeFileSync(path.join(cwd, 'src/door.mjs'), text);
+  execFileSync('git', ['-C', cwd, 'add', 'src/door.mjs']);
+};
+
+test('census drift in a linked worktree on a non-trunk branch commits', (t) => {
+  const { git, hookIn, repo } = fixture(t);
+  const linked = `${repo}-linked`;
+  t.after(() => fs.rmSync(linked, { recursive: true, force: true }));
+  git('worktree', 'add', '-q', '-b', 'feature/x', linked);
+  stageDrift(linked, 'export const a = 5;\n');
+  assert.equal(hookIn(linked).status, 0);
+});
+
+test('census drift in a detached linked worktree commits', (t) => {
+  const { git, hookIn, repo } = fixture(t);
+  const detached = `${repo}-detached`;
+  t.after(() => fs.rmSync(detached, { recursive: true, force: true }));
+  git('worktree', 'add', '-q', '--detach', detached);
+  stageDrift(detached, 'export const a = 6;\n');
+  assert.equal(hookIn(detached).status, 0);
+});
+
+test('census drift in the main checkout on a non-trunk branch is refused', (t) => {
+  const { git, hook, repo } = fixture(t);
+  git('checkout', '-q', '-b', 'feature/x');
+  stageDrift(repo, 'export const a = 7;\n');
+  assert.equal(hook().status, 1);
+});
+
+test('census drift in the main checkout on a detached HEAD is refused', (t) => {
+  const { git, hook, repo } = fixture(t);
+  git('checkout', '-q', '--detach');
+  stageDrift(repo, 'export const a = 8;\n');
+  assert.equal(hook().status, 1);
+});
+
+test('a linked worktree with the trunk named by origin/HEAD checked out is refused', (t) => {
+  const { git, hookIn, repo } = fixture(t);
+  git('branch', 'trunk');
+  git('update-ref', 'refs/remotes/origin/trunk', 'trunk');
+  git('symbolic-ref', 'refs/remotes/origin/HEAD', 'refs/remotes/origin/trunk');
+  const linked = `${repo}-trunk`;
+  t.after(() => fs.rmSync(linked, { recursive: true, force: true }));
+  git('worktree', 'add', '-q', linked, 'trunk');
+  fs.writeFileSync(path.join(linked, 'src/door.mjs'), 'export const a = 9;\n');
+  execFileSync('git', ['-C', linked, 'add', 'src/door.mjs']);
+  assert.equal(hookIn(linked).status, 1);
 });

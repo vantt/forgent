@@ -421,10 +421,30 @@ function staleWorktreeIndexRefusal(committingToplevel) {
 // file the one-door scan judges. A commit that stages such a file without the regenerated census would
 // leave main's census stale, so the staged digests are compared with the staged census: no scan, no
 // build. Commits touching nothing the scan judges, or a repository without a census, pass untouched.
+// The refusal applies only to a commit that publishes to the trunk directly: one made in the main checkout
+// (any HEAD, detached included) or with the trunk checked out. A commit in a linked worktree on another
+// branch or detached passes, because that work is gated and its census regenerated when it lands. The
+// trunk is read here in three lines (origin/HEAD, else a local main or master, else main) rather than
+// imported: the hook is a standalone script that must also run in a probe tree without the source modules.
 async function censusDriftRefusal(committingToplevel) {
   const git = (args) => execFileSync('git', args, {
     cwd: committingToplevel, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'],
   });
+  const gitDir = (flag) => path.resolve(committingToplevel, git(['rev-parse', flag]).trim());
+  if (gitDir('--git-dir') !== gitDir('--git-common-dir')) {
+    let branch = '';
+    try { branch = git(['symbolic-ref', '--short', '-q', 'HEAD']).trim(); } catch { /* detached HEAD */ }
+    let trunk = 'main';
+    try {
+      const remote = git(['symbolic-ref', '-q', 'refs/remotes/origin/HEAD']).trim();
+      if (remote.startsWith('refs/remotes/origin/')) trunk = remote.slice('refs/remotes/origin/'.length);
+    } catch {
+      trunk = ['main', 'master'].find((name) => {
+        try { git(['show-ref', '--verify', '--quiet', `refs/heads/${name}`]); return true; } catch { return false; }
+      }) ?? 'main';
+    }
+    if (!branch || branch !== trunk) return null;
+  }
   // The committing checkout's own scanner judges its own census: a branch that changes the scan's rules
   // regenerates the census with them, so main's scanner would see drift that is not there. A checkout
   // without one (a probe tree) falls back to the hook's own; a copied hook with neither has nothing to judge by.
