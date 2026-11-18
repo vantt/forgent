@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0-rc.11] - 2026-11-18
+
 - New `fgos head start <persona> --name <name>` and `fgos head rotate <persona> --name <name>` (the noun `head` is provisional): start the long-lived confined head session of a persona, or front the one that holds the role, and ask for its replacement by a successor; from inside a confined head both go through its request socket. Exit codes: 0 done, 2 refused, 3 rotation already in progress, 4 malformed call.
 - A run that ran its verify command keeps the command, exit status, pass or fail and duration in its record: `verify` in the unit settlement, `unit-summary.json` and the `fgos run --json` result, where it used to say only `{ran:false}`.
 - `fgos dispatch inspect --attention --since <time>` lists the runs that need a person across every worktree of the project, one line each with the reason and the next command; it reads only and writes nothing.
