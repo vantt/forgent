@@ -436,6 +436,15 @@ inside its home; fgOS renews this login at the source before a run. Check with
 `fgos config check`, then `fgos doctor`: `confined-pane-accounts` should say each
 claude invocation "has its 1 credential file(s)".
 
+Quota belongs to the provider account, not to a directory: two login directories signed
+in as the same Anthropic account spend the same quota. So keep the account of your main
+session (or of a long-lived secretary head) out of the pools that panes draw from. To
+reserve one, put it in its own pool that no tier cell names, and point the persona at
+that pool (see the persona and account-pool rules in the
+[seat-binding spec](../platform/seat-binding/spec.md)). With only one account, panes
+and your main session share quota; a renewal of that login can then affect the main
+session, and a doctor warning reports this risk. fgOS still runs in that setup.
+
 ### 5.4. Run from inside the project
 
 Run `fgos workflow start ...` (and `workflow status`, `answer`, `resume`) from
