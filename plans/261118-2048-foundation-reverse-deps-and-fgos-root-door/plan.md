@@ -22,6 +22,10 @@ footprint:
   - src/verbs/events/rebuild.mjs
   - src/util/host-bin.mjs
   - src/util/host-bin-path.mjs
+  - src/runner/session.mjs
+  - src/convention/convention-client.mjs
+  - scripts/doc-health.mjs
+  - docs/platform/component-boundary.md
   - src/config/facade.mjs
   - src/state/store.mjs
   - src/state/porting-store.mjs
@@ -133,10 +137,10 @@ art with file:line evidence: [phase 01](phase-01-facts-and-prior-art.md) (done w
 | 1 | [Facts and prior art](phase-01-facts-and-prior-art.md) | - | plans/261118-2048-foundation-reverse-deps-and-fgos-root-door/phase-01-facts-and-prior-art.md | 1 | done |
 | 2 | [StoreError leaf moves to T0](phase-02-store-error-leaf.md) | 1 | src/state/store-error.mjs, src/util/store-error.mjs, src/runner/worktree.mjs, src/runner/dispatch/cli.mjs, src/state/store.mjs, src/runner/main-checkout-reset-guard.mjs, bin/fgos.mjs, test/architecture.test.mjs, test/cli/exit-code-table.test.mjs, test/observe/invocation-fault-log.test.mjs, docs/architecture-manifest.json | 2 | draft |
 | 3 | [Identity rebuild takes the main .fgos from the rebuild door](phase-03-identity-rebuild-root.md) | 2 | src/identity/directory-store.mjs, src/verbs/events/rebuild.mjs, test/event-store/verbs.test.mjs, docs/architecture-manifest.json | 3 | draft |
-| 4 | [Host binary lookup without a Git root](phase-04-host-bin-without-git.md) | 3 | src/util/host-bin.mjs, test/util/host-bin.test.mjs, docs/architecture-manifest.json | 4 | draft |
+| 4 | [Host binary lookup without a Git root](phase-04-host-bin-without-git.md) | 3 | src/util/host-bin.mjs, src/observe/friction-client.mjs, src/runner/session.mjs, src/convention/convention-client.mjs, scripts/doc-health.mjs, test/util/host-bin.test.mjs, docs/architecture-manifest.json | 4 | draft |
 | 5 | [One join door for a project .fgos](phase-05-one-fgos-join-door.md) | 4 | every footprint path of this plan except src/setup/registrations.mjs (listed in the phase file) | 5 | draft |
 | 6 | [Setup registrations through the door](phase-06-setup-registrations.md) | 5 | src/setup/registrations.mjs, docs/architecture-manifest.json | 6 | draft |
-| 7 | [Integration, docs and full gate](phase-07-integration.md) | 6 | plans/261118-2048-foundation-reverse-deps-and-fgos-root-door/reports/integration.md, docs/platform/event-store/spec.md, packages/event-store/contracts/consumers.v1.json, docs/backlog.md | 7 | draft |
+| 7 | [Integration, docs and full gate](phase-07-integration.md) | 6 | plans/261118-2048-foundation-reverse-deps-and-fgos-root-door/reports/integration.md, docs/platform/event-store/spec.md, docs/platform/component-boundary.md, packages/event-store/contracts/consumers.v1.json, docs/backlog.md | 7 | draft |
 
 Phases 2-5 are serial because each rewrites `docs/architecture-manifest.json` and phases 2 and 5 rewrite
 `test/architecture.test.mjs`; the architecture test fails on a stale exception (`test/architecture.test.mjs:261-264`),

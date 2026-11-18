@@ -20,6 +20,13 @@ variable. A T0 leaf cannot ask Git, and the layer below cannot be made to know t
   `resolveHostBin` without `FGOS_HOST_BIN`, so the walk-up form above is the one to build. The `nativeHelperExe`
   fallback applies only if the implementer finds new evidence; record it in the phase commit if so.
 - Regenerate the Git mutation census and commit it with the phase.
+- Fact check (lead, on `ba9d302ec`): `invokeHost` (`src/util/host-bin.mjs:62`) also calls `resolveMainCheckoutRoot`, to
+  compute the `--dir` of a default `dirScope: 'main-checkout'` call, so dropping the `paths.mjs` import needs it too.
+  Decided form (no new mechanism): `invokeHost` passes `path.resolve(dir)` as `--dir` and loses the `dirScope`
+  option; the two default-scope callers, `src/observe/friction-client.mjs:64` (T3) and `src/runner/session.mjs:14`
+  (T7, forced edit), resolve the main checkout themselves with `resolveMainCheckoutRoot(dir) || dir` (T2, below
+  them); the `dirScope: 'caller'` callers (`src/convention/convention-client.mjs:21,35`, `scripts/doc-health.mjs:193`)
+  drop the option. Answers stay byte-identical.
 - Manifest: delete the `tierExceptions` row `host-bin.mjs -> paths.mjs`. The list is now `[]`; keep the key with an
   empty array (the test reads it), unless the test is changed to treat a missing key as empty in the same commit.
 - `src/util/host-bin-path.mjs` stays the bootstrap reader (it runs before any door can load); its debt reason in the

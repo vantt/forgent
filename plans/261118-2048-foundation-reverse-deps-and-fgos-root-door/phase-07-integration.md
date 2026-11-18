@@ -13,6 +13,7 @@ Wave 7. Depends on 6. Capability `code:test`. Effort 0.25d.
      The same paragraph has two stale sentences (reports/validation-261118-2104-validate-and-red-team.md, R7); fix them while editing it.
    - No `CHANGELOG.md` line: nothing a user of fgOS sees changes (phase 4 changes only an unsupported channel; if
      validating chose the `nativeHelperExe` step, still internal).
+   - `docs/platform/component-boundary.md:1041` names `src/state/fgos-file-registry.mjs`; update to the `src/util/` path.
    - `docs/backlog.md` row `p-zs23zde4mh`: status and a link to this plan and its integration report.
 4. Write `reports/integration.md` in this plan directory: what moved, the before/after `git grep` counts (36 files to
    2 allowed, 5 Work debt and 2 home joins owned by the global directory door), net lines (Node, tests), the HARDEN criterion status (met for T0-T6 and T9; Work residue
