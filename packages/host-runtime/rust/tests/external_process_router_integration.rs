@@ -23,7 +23,7 @@ use fgos_host_runtime::contracts::{
 use fgos_host_runtime::invocation_service::{
     InMemoryEventSink, InvocationService, InvocationTerminalState,
 };
-use fgos_host_runtime::operation_provider_router::{select, RouterPolicy, SelectionInput};
+use fgos_host_runtime::operation_provider_router::{select, SelectionInput};
 use fgos_host_runtime::providers::external_process::{
     ExternalManifest, ExternalProcessConfig, ExternalProcessLinker, ExternalProcessProviderAdapter,
     LinkerError, COMPONENT_PROTOCOL_VERSION, FIXTURE_OPERATION_ID, FIXTURE_PROVIDER_ID,
@@ -268,7 +268,6 @@ async fn test_fixture_echo_resolves_only_to_builtin_provider() {
             outcome_contract_version: "1.0.0",
             host_kind: "test",
             invocation_mode: "sync",
-            policy: RouterPolicy,
         },
         &snapshot,
     )

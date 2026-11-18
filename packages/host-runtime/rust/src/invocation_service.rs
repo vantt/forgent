@@ -12,7 +12,7 @@ use crate::contracts::{
     ContractRef, HostInvocation, OperationId, ProviderDescriptor, ProviderError, ProviderOutcome,
     RegistrySnapshot,
 };
-use crate::operation_provider_router::{select, RouterPolicy, SelectionInput, SelectionRefused};
+use crate::operation_provider_router::{select, SelectionInput, SelectionRefused};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::future::Future;
@@ -590,7 +590,6 @@ impl InvocationService {
             outcome_contract_version: admitted.operation.outcome_contract.version(),
             host_kind: &invocation.host_kind,
             invocation_mode: "sync",
-            policy: RouterPolicy,
         };
 
         let selected_provider = match select(selection_input, &self.snapshot) {

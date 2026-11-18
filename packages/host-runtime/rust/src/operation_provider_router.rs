@@ -21,13 +21,6 @@
 
 use crate::contracts::{OperationId, ProviderDescriptor, RegistrySnapshot};
 
-/// Extensible router policy placeholder for R1.
-///
-/// In R1, this is an empty placeholder struct, extensible in later phases,
-/// and never referenced by selection logic yet.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub struct RouterPolicy;
-
 /// Normalized input parameters required for provider selection.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SelectionInput<'a> {
@@ -36,7 +29,6 @@ pub struct SelectionInput<'a> {
     pub outcome_contract_version: &'a str,
     pub host_kind: &'a str,
     pub invocation_mode: &'a str,
-    pub policy: RouterPolicy,
 }
 
 /// Refusal reason when provider selection cannot be satisfied.
@@ -169,7 +161,6 @@ mod tests {
                 outcome_contract_version: "1.0.0",
                 host_kind: "cli",
                 invocation_mode: "sync",
-                policy: RouterPolicy,
             };
             let result = select(input, snapshot);
             assert!(matches!(
@@ -290,7 +281,6 @@ mod tests {
                 outcome_contract_version: "1.0.0",
                 host_kind: "cli",
                 invocation_mode: "sync",
-                policy: RouterPolicy,
             };
             let result = select(input, &snapshot);
             assert!(matches!(
@@ -316,7 +306,6 @@ mod tests {
                 outcome_contract_version: "1.0.0",
                 host_kind: "cli",
                 invocation_mode: "sync",
-                policy: RouterPolicy,
             };
             let result = select(input, snapshot);
             assert!(matches!(
@@ -330,7 +319,6 @@ mod tests {
                 outcome_contract_version: "2.0.0",
                 host_kind: "cli",
                 invocation_mode: "sync",
-                policy: RouterPolicy,
             };
             let result2 = select(input2, snapshot);
             assert!(matches!(
@@ -352,7 +340,6 @@ mod tests {
                 outcome_contract_version: "1.0.0",
                 host_kind: "disallowed-host-kind",
                 invocation_mode: "sync",
-                policy: RouterPolicy,
             };
             let result = select(input, snapshot);
             assert!(matches!(
@@ -374,7 +361,6 @@ mod tests {
                 outcome_contract_version: "1.0.0",
                 host_kind: "cli",
                 invocation_mode: "wrong-invocation-mode",
-                policy: RouterPolicy,
             };
             let result = select(input, snapshot);
             assert!(matches!(
@@ -396,7 +382,6 @@ mod tests {
                 outcome_contract_version: "1.0.0",
                 host_kind: "cli",
                 invocation_mode: "sync",
-                policy: RouterPolicy,
             };
             let result = select(input, snapshot);
             assert!(result.is_ok());
@@ -526,7 +511,6 @@ mod tests {
                     outcome_contract_version: "1.0.0",
                     host_kind: "cli",
                     invocation_mode: "sync",
-                    policy: RouterPolicy,
                 };
                 let input_b = SelectionInput {
                     operation: OperationId::parse(op_name).unwrap(),
@@ -534,7 +518,6 @@ mod tests {
                     outcome_contract_version: "1.0.0",
                     host_kind: "cli",
                     invocation_mode: "sync",
-                    policy: RouterPolicy,
                 };
 
                 let res_a = select(input_a, &snap_a).expect("select on snap_a");

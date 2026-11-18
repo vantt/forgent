@@ -20,7 +20,7 @@ pub use invocation_service::{
     EventSink, InMemoryEventSink, InvocationControl, InvocationLifecycleRecord, InvocationService,
     InvocationTerminalState, NoopEventSink, OperationProvider,
 };
-pub use operation_provider_router::{select, RouterPolicy, SelectionInput, SelectionRefused};
+pub use operation_provider_router::{select, SelectionInput, SelectionRefused};
 pub use providers::external_process::*;
 pub use registry::build_snapshot;
 

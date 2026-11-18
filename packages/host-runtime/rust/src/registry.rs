@@ -27,10 +27,7 @@ use crate::catalog::CATALOG;
 /// an operation -- it returns `AmbiguousBinding` regardless, so a declared
 /// replacement is accepted at link time but not actually honored at
 /// selection time yet. Kernel §6 names an "authorizing policy" as part of
-/// replacement resolution, and this phase's own `RouterPolicy` is
-/// deliberately an empty, unreferenced placeholder (`operation_provider_router.rs`
-/// R4: "never referenced by selection logic yet") -- replacement resolution
-/// needs that policy machinery, which is out of R1 scope per this phase's
+/// replacement resolution; that machinery is out of R1 scope per this phase's
 /// own R6 test list (only "duplicate binding fails linking" is required;
 /// no "replacement resolution succeeds" case is named). Phase 06 or later
 /// owns making `select` actually resolve a declared replacement.
