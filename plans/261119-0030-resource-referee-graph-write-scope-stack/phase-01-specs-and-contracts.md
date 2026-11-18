@@ -25,7 +25,7 @@ contracts, and settles the facts the later phases depend on. Step zero (decision
 4. Write the `resource-referee` spec and `resource-referee.v1.json`: claims and the explicit `readOnly` marker, the closed catalog of checks with parameters (v1: no cycles, no dangling edges, claims declared, facts not truncated, declared layers valid, alone-in-layer, maximum layer width), the floor, finding classes (blocking, advisory), stable finding codes, verdict derivation (`accept`, `accept-with-advice`, `reject`), policy replace semantics with the verdict echoing the policy path and sha256, and the rule that the package holds no default policy. Check the five guards of `case-admission.mjs` and the rules of plan-contract section 4 against the catalog and list any it cannot express; a numeric-attribute check is out of v1 because no plan table carries a size or risk column.
 5. Fix the numeric `limits` in both contracts (decision 7 gives the starting values), the pair-comparison cap and the emitted-pairs cap, and specify the shared input reader of decision 23.
 6. Run the old and the new overlap rule over every current plan table and record any plan that flips; the plan-check rule is the same as the new one, so none is expected.
-7. Record in `reports/facts.md` the door's name decision and the owner's answer on names (Owner question 1), then add the three packages and the moved `write-scope` to `docs/platform/component-boundary.md`. The reading map is updated in phase 9.
+7. Record in `reports/facts.md` the names of decision 26 and re-confirm the door's name `fgos resource-check` against the verb tables, then add the three packages and the moved `write-scope` to `docs/platform/component-boundary.md`. The reading map is updated in phase 9.
 
 ## Verify
 

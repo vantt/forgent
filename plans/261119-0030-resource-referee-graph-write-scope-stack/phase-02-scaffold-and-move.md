@@ -1,8 +1,7 @@
 # Phase 2: Workspace scaffold and write-scope move
 
 One phase owns the workspace manifest edges so later phases never edit `Cargo.toml` or a crate
-manifest (phase 7b adds the `apps/fgos` edges and regenerates `Cargo.lock` once more, in a later wave). It commits in its own linked worktree (decision 14). The names it creates follow the owner's
-answer to Owner question 1; if that is open, the names in `plan.md` apply.
+manifest (phase 7b adds the `apps/fgos` edges and regenerates `Cargo.lock` once more, in a later wave). It commits in its own linked worktree (decision 14). The names it creates are those of decision 26.
 
 ## Inputs
 

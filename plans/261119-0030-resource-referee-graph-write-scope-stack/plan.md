@@ -100,7 +100,7 @@ calls the three packages, and prints the verdict. Policy content belongs to each
   safe package name. `referee` is not free: it is a seat name (`seat: 'referee', role: 'judge'`) in the
   debate pattern of `test/runner/execution/patterns/catalog.test.mjs:676,692,2135`; an earlier search
   skipped `test/` and wrongly reported no hits. `graph` is also the name of a Work verb
-  (`src/cli/command-registry.mjs:1103`, `command-routes.json:622`). Both are an owner question below.
+  (`src/cli/command-registry.mjs:1103`, `command-routes.json:622`). Both are settled in decision 26.
 - `plan-vocabulary.v1.json` (read by the check script, the Rust portfolio reader and the Node
   resolver) is the working pattern for a data contract shared by JS and Rust.
 - The addon is accepted by `combinedAbiMatches` in `src/native/door.mjs:36-38`, which lists each
@@ -152,8 +152,10 @@ fgOS output must hash the same on every rebuild.
    views and says whether the fan-out verifier's exit code can change; the CHANGELOG names the effect on
    the decompose gate (it stays advisory) and on the verifier.
 9. In `graph`, "layer" is the neutral word; the planner adapter maps layer to the plan's "wave".
-10. Working name of the planner door: `fgos referee --plan <dir> | --units <file.json>`; phase 1
-    confirms it against the existing verb names and the owner's answer on names.
+10. The planner door is `fgos resource-check --plan <dir> | --units <file.json>`. The first working
+    name, `fgos referee`, was dropped because `referee` is already a seat name in the execution
+    catalog (decision 26); `fgos check` is a Work verb, and `resource-check` is not used anywhere.
+    Phase 1 re-confirms it against the verb tables.
 11. The door takes `--policy <file>`. The shipped default policy is structural only and needs no
     extra data. A hot-file list or any project rule is data in the policy file a project supplies;
     this repository's own policy file is `packages/supervision/contracts/plan-referee-policy.v1.json`.
@@ -221,6 +223,12 @@ fgOS output must hash the same on every rebuild.
     facts cited in the phases, re-run the plan check and the overlap measurement, then start.
 25. Phase 7 is split: phase 7 (addon bindings and ABI) and phase 7b (door, policy, verb tables), which
     run in the same wave; Work adapters depend on phase 7 only, discovery on phase 7b.
+26. Names (planner decision, reversible until phase 2 starts; the owner may object). The packages keep
+    the names the owner chose: `write-scope`, `graph`, `resource-referee`. The compound names do not
+    collide with the seat `referee` (role `judge`, `test/runner/execution/patterns/catalog.test.mjs:676`)
+    or, for `graph`, with the Work verb `fgos graph` (`src/cli/command-registry.mjs:1103`): the specs and
+    the reading map say how each differs. Only the planner verb changes, to `fgos resource-check`
+    (decision 10), because the bare word `referee` is the one that collides.
 
 ## Acceptance criteria
 
@@ -232,7 +240,7 @@ fgOS output must hash the same on every rebuild.
    `overlaps` in `packages/supervision/rust/src/portfolio.rs`, `pathsOverlap` in
    `src/report/capability-plan-lint.mjs`, `footprintOverlapAmong` in `src/state/graph-metrics.mjs`.
    Proof: phases 6 and 8, one owning test each.
-3. `fgos referee --plan <dir> --json` on a hand-built bad plan whose same-wave phases share a directory
+3. `fgos resource-check --plan <dir> --json` on a hand-built bad plan whose same-wave phases share a directory
    exits non-zero and names the pair, the shared paths and the rule; on a hand-built good plan it exits
    zero. Proof: the wiring test in phase 7b (running the door on this plan is a smoke check only).
 4. `fgos conflicts` reports a pair whose footprints are `src/state/` and `src/state/frontier.mjs`.
@@ -245,7 +253,7 @@ fgOS output must hash the same on every rebuild.
    both generated skill surfaces carry it. Proof: `npm run build:skills` leaves no diff.
 8. `cargo test --workspace`, `npm test` and `node scripts/plan-contract-check.mjs --all` are green,
    run one after the other, in phase 10.
-9. `fgos referee` rejects a plan with a phase that has no footprint and a footprint entry that does
+9. `fgos resource-check` rejects a plan with a phase that has no footprint and a footprint entry that does
    not canonicalize, and refuses input beyond the contract `limits`, a symlinked or non-regular file,
    by name without quoting file content. Proof: phase 5 owns the rules, phase 7b one wiring case.
 10. Work adapters call `graph` and the referee in process through the native addon, and an addon
@@ -267,7 +275,7 @@ fgOS output must hash the same on every rebuild.
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Specs, boundary rows and contracts](phase-01-specs-and-contracts.md) | - | docs/platform/write-scope, docs/platform/graph, docs/platform/resource-referee, docs/platform/component-boundary.md, packages/graph/contracts, packages/resource-referee/contracts, plans/261119-0030-resource-referee-graph-write-scope-stack/reports | 1 | ready |
-| 2 | [Workspace scaffold and write-scope move](phase-02-scaffold-and-move.md) | - | Cargo.toml, Cargo.lock, packages/write-scope, packages/git/write-scope, packages/git/rust/Cargo.toml, packages/git/node-addon/Cargo.toml, packages/supervision/rust/Cargo.toml, packages/graph/rust, packages/resource-referee/rust, docs/platform/git/spec.md, test/workflow/propose-classify.test.mjs | 1 | draft |
+| 2 | [Workspace scaffold and write-scope move](phase-02-scaffold-and-move.md) | - | Cargo.toml, Cargo.lock, packages/write-scope, packages/git/write-scope, packages/git/rust/Cargo.toml, packages/git/node-addon/Cargo.toml, packages/supervision/rust/Cargo.toml, packages/graph/rust, packages/resource-referee/rust, docs/platform/git/spec.md, test/workflow/propose-classify.test.mjs | 1 | ready |
 | 3 | [write-scope: colliding pairs in a set](phase-03-write-scope-pairs.md) | 1, 2 | docs/platform/write-scope, packages/write-scope, test/git/write-scope-parity.test.mjs, test/runner/write-scope.test.mjs | 2 | ready |
 | 4 | [graph crate and recorded evidence](phase-04-graph-crate.md) | 1, 2 | docs/platform/graph, packages/graph/rust | 2 | ready |
 | 5 | [resource-referee crate](phase-05-resource-referee-crate.md) | 1, 3, 4 | docs/platform/resource-referee, packages/resource-referee/rust | 3 | ready |
@@ -304,9 +312,8 @@ Measured with the plan check's own overlap rule against every `ready` or `runnin
   `scripts/plan-contract-check.mjs`, `docs/architecture-manifest.json`, `core/skills`, the generated
   skill surfaces, `CHANGELOG.md`, `docs/reading-map.md`, the census) and sit in waves 4 to 6. Phase 2
   moved `apps/fgos/Cargo.toml` to phase 7b for this reason.
-  Phases 1 and 3 to 7 are `ready`; phase 2 stays `draft` only until Owner question 1 is answered,
-  because it creates the crate names. The plan stays `draft` as a whole: the check compares
-  frontmatter, and Owner question 2 is open.
+  Phases 1 to 7 are `ready`. The plan stays `draft` as a whole: the check compares frontmatter, and
+  the owner question below is open.
 
 `blockedBy` is a plan-level field. The check script does not honour it when it looks for overlaps:
 `activeOverlaps` in `scripts/plan-contract-check.mjs:149-157` flags any two `ready` or `running`
@@ -334,21 +341,7 @@ Found while reviewing; each is a duplicate or a candidate of the same kind and i
 
 ## Owner questions
 
-1. **Names that already mean something.**
-   - *What is happening:* the package name `resource-referee` and the verb `fgos referee` were chosen
-     on the claim that "referee" had no uses in the repository. That claim was wrong: it is a seat
-     name (role `judge`) in the debate pattern of the execution catalog, and `graph` is already a Work
-     verb.
-   - *Cause:* the earlier search skipped `test/`; verified by
-     `test/runner/execution/patterns/catalog.test.mjs:676,692,2135` and
-     `src/cli/command-registry.mjs:1103`.
-   - *Options:* (a) keep both names and have each spec say how it differs from the existing use; cost:
-     a reader meets two meanings of each word. (b) rename the verb only, for example
-     `fgos resource-check`, and keep the packages; cost: one more name decision, none in code yet.
-     (c) rename the package too; cost: phase 2 scaffolds every manifest, so it is free until phase 2 starts.
-   - *Recommendation:* (b): the compound package names do not collide, the bare verb word does.
-   - *Scope of the answer:* it fixes names in phases 1, 2 and 7b only; it does not reopen decisions 1 to 6.
-2. **Order against `owner-question-store`.**
+1. **Order against `owner-question-store`.**
    - *What is happening:* that P1 plan is `ready`; against its remaining phases only phases 7b, 8, 9 and
      10 overlap (waves 4 to 6); the check still reports an overlap because its frontmatter lists the files
      of its four finished phases.
@@ -487,8 +480,8 @@ execution catalog, the census size 1468, the staging helper `test/helpers/git-ad
 | 8 | Soundness is lexical only (security) | Medium | Accept | Decision 22 |
 | 9 | Work per input unbounded; limits had no numbers (security) | Medium | Accept | Decision 7 |
 | 10 | Stricter advisories change a gate and a verifier silently (security) | Medium | Accept | Decision 8, phase 8 |
-| 11 | `referee` is an existing seat name; earlier search skipped `test/` (security) | Medium | Accept | Facts, Owner question 1 |
-| 12 | New package `graph` shares a name with the Work verb (scope) | Medium | Accept | Facts, Owner question 1 |
+| 11 | `referee` is an existing seat name; earlier search skipped `test/` (security) | Medium | Accept | Facts, decision 26 |
+| 12 | New package `graph` shares a name with the Work verb (scope) | Medium | Accept | Facts, decision 26 |
 | 13 | One malformed footprint cell stalls the supervisor silently (assumption, failure) | Medium | Accept | Decision 17, phase 6 |
 | 14 | Door-versus-script parity compares the packages with themselves (failure) | Medium | Accept | Decision 20, phases 4, 8 |
 | 15 | A deliberately red census gate hides real failures (failure, assumption) | Medium | Accept | Decision 14 |
