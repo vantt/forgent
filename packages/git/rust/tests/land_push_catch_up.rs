@@ -441,3 +441,30 @@ fn recovery_deletes_the_temporary_push_branch_a_crash_after_the_push_left() {
     );
     assert_eq!(git(&f.main, &["for-each-ref", temp]), "");
 }
+
+#[test]
+fn recovery_keeps_a_push_branch_that_points_at_another_commit_and_still_settles() {
+    let f = Fixture::new();
+    let (grant, _bare) = remote(&f);
+    let s = prepare(&f, "cut");
+    f.driver
+        .push_land_candidate(
+            &f.repo,
+            &s,
+            &grant,
+            &name("refs/heads/trunk"),
+            "fixture",
+            &StopAt("land-push-after-transfer"),
+        )
+        .unwrap_err();
+    let temp = "refs/heads/fgos-land-push-cut";
+    git(&f.main, &["update-ref", temp, &f.request.target]);
+    drop(s);
+    let recovered = recover(&f);
+    assert_eq!(
+        recovered["recovered"],
+        serde_json::json!(["cut"]),
+        "{recovered}"
+    );
+    assert_eq!(git(&f.main, &["rev-parse", temp]), f.request.target);
+}

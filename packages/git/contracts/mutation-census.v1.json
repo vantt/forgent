@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5ad1ef6ff76f92d65be6c117663109d4bd5bab7bde2996e70cbe673baf29cfae",
+  "payloadDigest": "6a8dde9fa12c35922868c05c97a134d72e1f23349d4d173c31f5e4d99bc3d7d4",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -481,7 +481,7 @@
     "packages/git/rust/src/incidents.rs": "f91693bd549c0f13f7122789e0cb2ba9e742abfaca11e656af5a65a876a896bb",
     "packages/git/rust/src/inspect.rs": "f01f4b4709058650ef9643c8331aa20ab69eef7353abca9769eacb8b829fa2e7",
     "packages/git/rust/src/invocation_root.rs": "854396e23b8c00d76c6560d3682fa4c940dc7050280dae10eae1b7af3ff85463",
-    "packages/git/rust/src/land.rs": "7449f77b4849611f03a75505dda7c016540b6f3d8cf2fee6e2c97d47f1caee74",
+    "packages/git/rust/src/land.rs": "1649e3c2df528da970a3e91555fd1aff57aa16269e6aa75fb851a1ab5ad3e2ee",
     "packages/git/rust/src/lib.rs": "010873f17c49d92524323192302cc5629ca18853acada70447a5e2ca2dc2f7d6",
     "packages/git/rust/src/native_lock.rs": "49758dea6b6d2f2abae425b31b937817b8c15174a83bf10ce33dd9046cc5139a",
     "packages/git/rust/src/objects.rs": "835dcdc093cbbdad82eb25b82fd28df9de6942789751a57b571f24e389cf23ec",
@@ -507,7 +507,7 @@
     "packages/git/rust/tests/inspect.rs": "0ed24f791864c48e054f7e439ad180e9c2215ee5da3e9484bb51cb7449806edb",
     "packages/git/rust/tests/land.rs": "f2d3469f1f0f426ae3f583d1c233ddb82d94fec6a56975433464a3c438f203dc",
     "packages/git/rust/tests/land_crash_matrix.rs": "0148d9a4fb453073ecf71cb30e03c54ce969805814239de065126a8c53519ffe",
-    "packages/git/rust/tests/land_push_catch_up.rs": "2b0d9da7824ad91a47fc5371e7181172359debb1dcb69523ca19c6324d4d6a43",
+    "packages/git/rust/tests/land_push_catch_up.rs": "d6b36dfbbfb24103a87b4b7a11b2ac831b220c148b8b6bb489cede952992e591",
     "packages/git/rust/tests/publication.rs": "d754ac10b144d351c2f65a98b3e3d6d80dbe2daee2ea18c661281584d7e5f6e0",
     "packages/git/rust/tests/publication_children.rs": "a86f79095fdab68f88d110cc71f2aee484bf2480a9e7456d3c997786c321fcf7",
     "packages/git/rust/tests/recovery_matrix.rs": "1b6e20d9b292a1dd1083119db19b02e3b739444acde1cb3064be0eaeec34b1b8",
