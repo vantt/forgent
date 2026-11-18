@@ -6,7 +6,8 @@ use common::{git, Fixture};
 use fgos_checkout::{
     create_claim_worktree, create_dispatch_worktree, create_verify_checkout, create_worktree,
     list_leftovers, reclaim_orphaned_checkout, record, refresh_unstarted_branch,
-    remove_dispatch_worktree, remove_worktree, Context, ErrorKind, WorkCreate, WorkRemove,
+    remove_dispatch_worktree, remove_worktree, resync_claim_worktree, Context, ErrorKind,
+    WorkCreate, WorkRemove,
 };
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -126,6 +127,16 @@ fn a_worktree_admin_hold_another_holder_keeps_is_refused_as_lock_held_with_its_h
     assert_eq!(error.kind, ErrorKind::LockHeld, "{error}");
     assert_eq!(error.details["timedOut"], true);
     assert_eq!(error.details["lock"], "worktree-admin");
+    let holders: Vec<u64> = error.details["holders"]
+        .as_array()
+        .expect("the refusal lists its holders")
+        .iter()
+        .filter_map(|p| p.as_u64())
+        .collect();
+    assert!(
+        holders.contains(&u64::from(std::process::id())),
+        "holders {holders:?} must include the holding pid"
+    );
     assert!(
         error
             .message
@@ -416,5 +427,114 @@ fn leftovers_list_every_fgw_branch_with_its_commits_ahead_and_optionally_its_tip
     assert!(
         bad.message.starts_with("listing \"fgw/\" branches failed:"),
         "{bad}"
+    );
+}
+
+/// A commit on `branch`'s history that adds the tracked file `.fgos/events.jsonl`, made in a throwaway detached
+/// checkout; the branch ref is then moved onto it from outside, as a merge landing elsewhere does.
+fn advance_branch_with_tracked_fgos(f: &Fixture, branch: &str) {
+    let detached = f.root.join("detached");
+    let tip = git(&f.repo, &["rev-parse", branch]);
+    git(
+        &f.repo,
+        &[
+            "worktree",
+            "add",
+            "-q",
+            "--detach",
+            detached.to_str().unwrap(),
+            &tip,
+        ],
+    );
+    fs::create_dir_all(detached.join(".fgos")).unwrap();
+    fs::write(detached.join(".fgos/events.jsonl"), "{\"seq\":1}\n").unwrap();
+    git(&detached, &["add", "-f", ".fgos/events.jsonl"]);
+    git(&detached, &["commit", "-qm", "tracked .fgos"]);
+    let new_tip = git(&detached, &["rev-parse", "HEAD"]);
+    git(
+        &f.repo,
+        &[
+            "update-ref",
+            &format!("refs/heads/{branch}"),
+            &new_tip,
+            &tip,
+        ],
+    );
+    git(
+        &f.repo,
+        &["worktree", "remove", "--force", detached.to_str().unwrap()],
+    );
+}
+
+#[test]
+fn a_live_unstarted_checkout_is_fast_forwarded_with_its_branch_and_a_resync_after_it_does_nothing()
+{
+    let f = Fixture::new();
+    let first = create_claim_worktree(&work(&f, "a1")).unwrap();
+    let moved = advance_trunk(&f, "two\n");
+    let report = refresh_unstarted_branch(&ctx(&f), "fgw/a1", "trunk", Some(&first.path)).unwrap();
+    assert!(report.refreshed, "{report:?}");
+    assert_eq!(report.to.as_deref(), Some(moved.as_str()));
+    assert_eq!(git(&first.path, &["rev-parse", "HEAD"]), moved);
+    assert_eq!(
+        fs::read_to_string(first.path.join("README")).unwrap(),
+        "two\n"
+    );
+    let resync = resync_claim_worktree(&ctx(&f), &first.path, "fgw/a1").unwrap();
+    assert!(!resync.resynced, "the checkout is already at the tip");
+}
+
+#[test]
+fn a_claim_resync_does_nothing_when_the_checkout_is_at_its_branch_tip() {
+    let f = Fixture::new();
+    let first = create_claim_worktree(&work(&f, "a1")).unwrap();
+    let resync = resync_claim_worktree(&ctx(&f), &first.path, "fgw/a1").unwrap();
+    assert!(!resync.resynced);
+    assert_eq!((resync.from, resync.to), (None, None));
+}
+
+#[test]
+fn a_claim_resync_refuses_a_branch_rewritten_to_history_that_does_not_contain_the_checkout() {
+    let f = Fixture::new();
+    let first = create_claim_worktree(&work(&f, "a1")).unwrap();
+    git(
+        &first.path,
+        &["commit", "-q", "--allow-empty", "-m", "decisions"],
+    );
+    let synced = git(&first.path, &["rev-parse", "HEAD"]);
+    let base = git(&f.repo, &["rev-parse", "trunk"]);
+    // A sibling of the checkout's commit, not a descendant of it: a rewrite, not a forward merge.
+    let tree = git(&f.repo, &["rev-parse", "trunk^{tree}"]);
+    let sibling = git(
+        &f.repo,
+        &["commit-tree", &tree, "-p", &base, "-m", "sibling"],
+    );
+    git(
+        &f.repo,
+        &["update-ref", "refs/heads/fgw/a1", &sibling, &synced],
+    );
+    let error = resync_claim_worktree(&ctx(&f), &first.path, "fgw/a1").unwrap_err();
+    assert_eq!(error.kind, ErrorKind::Worktree);
+    assert!(error.message.contains("is not an ancestor"), "{error}");
+    assert_eq!(error.details["branchTip"], sibling);
+    assert_eq!(error.details["lastSynced"], synced);
+    assert_eq!(git(&first.path, &["rev-parse", "HEAD"]), sibling);
+    assert!(git(&first.path, &["status", "--porcelain"]).is_empty());
+}
+
+#[test]
+fn a_claim_resync_leaves_no_fgos_directory_behind_when_the_new_tip_tracks_one() {
+    let f = Fixture::new();
+    let first = create_claim_worktree(&work(&f, "a1")).unwrap();
+    git(
+        &first.path,
+        &["commit", "-q", "--allow-empty", "-m", "decisions"],
+    );
+    advance_branch_with_tracked_fgos(&f, "fgw/a1");
+    let resync = resync_claim_worktree(&ctx(&f), &first.path, "fgw/a1").unwrap();
+    assert!(resync.resynced);
+    assert!(
+        !first.path.join(".fgos").exists(),
+        "the reset must not resurrect .fgos/ on disk"
     );
 }

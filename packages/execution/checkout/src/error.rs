@@ -60,6 +60,45 @@ impl Error {
     pub(crate) fn git(error: fgos_git::OperationError) -> Self {
         Self::new(ErrorKind::Git, error.cause)
     }
+    /// The Git port's `worktree-admin-held` refusal as `LockHeld`, worded and detailed as Node's lock-held error
+    /// (`lock`, `label`, `holders`, `timedOut`); any other Git refusal as `Git`.
+    pub(crate) fn git_or_lock_held(error: fgos_git::OperationError, wait_ms: u64) -> Self {
+        if error.cause != "worktree-admin-held" {
+            return Self::git(error);
+        }
+        let holders = error
+            .detail
+            .as_ref()
+            .and_then(|d| d.get("holders").cloned())
+            .unwrap_or_else(|| serde_json::Value::Array(Vec::new()));
+        let pids: Vec<String> = holders
+            .as_array()
+            .map(|a| {
+                a.iter()
+                    .filter_map(|p| p.as_u64())
+                    .map(|p| p.to_string())
+                    .collect()
+            })
+            .unwrap_or_default();
+        let named = if pids.is_empty() {
+            String::new()
+        } else {
+            format!(" (pid {})", pids.join(", "))
+        };
+        let waited = if wait_ms > 0 {
+            format!(" after waiting {wait_ms} ms")
+        } else {
+            String::new()
+        };
+        Self::new(
+            ErrorKind::LockHeld,
+            format!("worktree admin is held by another process{named}{waited}"),
+        )
+        .detail("lock", "worktree-admin")
+        .detail("label", "worktree admin")
+        .detail("holders", holders)
+        .detail("timedOut", wait_ms > 0)
+    }
     pub(crate) fn at(mut self, path: &std::path::Path) -> Self {
         self.worktree_path = Some(path.to_path_buf());
         self

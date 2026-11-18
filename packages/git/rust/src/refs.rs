@@ -626,7 +626,7 @@ impl GitDriver {
             .iter()
             .find(|h| h.as_ref().name() == "dispatch-cwd")
             .map(|h| h.as_ref().path().to_owned());
-        let scope = acquire_worktree_admin(repo, held)?;
+        let scope = acquire_worktree_admin(repo, held, Wait::Ms(5000))?;
         let admin = scope.handle("worktree-admin").expect("acquired");
         let before = self.checkouts(repo)?;
         let mut used = vec![];
@@ -988,34 +988,64 @@ pub(crate) fn adopt_worktree_admin<'a>(
         scope.validate().map_err(failure)?;
         return Ok(scope);
     }
-    acquire_admin(repo, scope)
+    acquire_admin(repo, scope, Wait::Ms(5000))
 }
 
 /// Refs, Land, Remote and their recovery take worktree-admin themselves; a
 /// held 40 (or anything above it) is a `lock-order-violation` (§5 Refs row).
-pub(crate) fn acquire_worktree_admin<'a>(
+/// The one door to the worktree-admin hold: `wait` is how long to wait for a
+/// holder, and a hold another process keeps for the whole wait is a `Busy`
+/// refusal `worktree-admin-held` whose `detail` names `lock`, `holders` (pids)
+/// and `timedOut`.
+pub fn acquire_worktree_admin<'a>(
     repo: &RepoHandle,
     held: Vec<BorrowedHandle<'a>>,
+    wait: Wait,
 ) -> Result<LockScope<'a>> {
     require_lock_scope_platform()?;
-    acquire_admin(repo, LockScope::seeded(held).map_err(failure)?)
+    acquire_admin(repo, LockScope::seeded(held).map_err(failure)?, wait)
 }
 
-fn acquire_admin<'a>(repo: &RepoHandle, mut scope: LockScope<'a>) -> Result<LockScope<'a>> {
+fn acquire_admin<'a>(
+    repo: &RepoHandle,
+    mut scope: LockScope<'a>,
+    wait: Wait,
+) -> Result<LockScope<'a>> {
     scope
         .assert_can_acquire("worktree-admin")
         .map_err(failure)?;
-    let params = BTreeMap::from([(
-        "fgosDir".into(),
-        repo.trusted_main_root()
-            .join(".fgos")
-            .to_string_lossy()
-            .into_owned(),
-    )]);
-    scope
-        .acquire("worktree-admin", &params, Wait::Ms(5000))
-        .map_err(failure)?;
-    Ok(scope)
+    let fgos_dir = repo.trusted_main_root().join(".fgos");
+    let params = BTreeMap::from([("fgosDir".into(), fgos_dir.to_string_lossy().into_owned())]);
+    match scope.acquire("worktree-admin", &params, wait) {
+        Ok(_) => Ok(scope),
+        Err(fgos_holder_lock::ScopeError::Acquire(acquire))
+            if matches!(
+                *acquire,
+                fgos_holder_lock::Acquire::Held { .. } | fgos_holder_lock::Acquire::Timeout { .. }
+            ) =>
+        {
+            Err(worktree_admin_held(&fgos_dir, wait))
+        }
+        Err(other) => Err(failure(other)),
+    }
+}
+
+fn worktree_admin_held(fgos_dir: &Path, wait: Wait) -> OperationError {
+    let resource = fgos_holder_lock::Resource::new(
+        "worktree-admin",
+        fgos_dir.join("locks/worktree-admin.lock"),
+    );
+    let pids: Vec<u32> = match fgos_holder_lock::holders(&resource) {
+        Ok(fgos_holder_lock::HoldersList::List(tuples)) => tuples.iter().map(|t| t.pid.0).collect(),
+        _ => Vec::new(),
+    };
+    let mut error = busy("worktree-admin-held");
+    error.detail = Some(Box::new(serde_json::json!({
+        "lock": "worktree-admin",
+        "holders": pids,
+        "timedOut": !matches!(wait, Wait::Try),
+    })));
+    error
 }
 #[cfg(unix)]
 /// The `dispatch-cwd` lease file of a checkout, keyed exactly as the lock registry's
@@ -1112,7 +1142,7 @@ impl GitDriver {
         {
             return self.recover_main_checkout_catch_up(repo, held, writer, id);
         }
-        let mut scope = acquire_worktree_admin(repo, held)?;
+        let mut scope = acquire_worktree_admin(repo, held, Wait::Ms(5000))?;
         crate::recovery::leaf(&mut scope, repo)?;
         let chain = wal.inspect(id)?;
         let i = chain.intent();

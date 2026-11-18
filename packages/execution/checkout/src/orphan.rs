@@ -16,21 +16,25 @@ pub struct Reclaimed {
     pub path: Option<PathBuf>,
 }
 
+/// The registered checkout of `refs/heads/<branch>` among `rows`, resolved through the filesystem.
+fn checkout_in(rows: &[fgos_git::WorktreeFact], branch: &str) -> Option<PathBuf> {
+    let want = format!("refs/heads/{branch}");
+    rows.iter()
+        .find(|row| row.branch.as_ref().is_some_and(|b| b.as_str() == want))
+        .map(|row| {
+            PathBuf::from(realpath_or_self(Path::new(
+                &String::from_utf8_lossy(&row.path).into_owned(),
+            )))
+        })
+}
+
 /// The registered checkout of `refs/heads/<branch>`, resolved through the filesystem.
 pub(crate) fn checkout_path_for(
     driver: &GitDriver,
     repo: &RepoHandle,
     branch: &str,
 ) -> Result<Option<PathBuf>> {
-    let want = format!("refs/heads/{branch}");
-    Ok(git::worktrees(driver, repo)?
-        .into_iter()
-        .find(|row| row.branch.as_ref().is_some_and(|b| b.as_str() == want))
-        .map(|row| {
-            PathBuf::from(realpath_or_self(Path::new(
-                &String::from_utf8_lossy(&row.path).into_owned(),
-            )))
-        }))
+    Ok(checkout_in(&git::worktrees(driver, repo)?, branch))
 }
 
 fn uncommitted(branch: &str, orphan: &Path) -> Error {
@@ -92,16 +96,7 @@ pub fn reclaim_orphaned_checkout(
     let driver = ctx.driver()?;
     let main = ctx.main(&driver)?;
     let rows = listing(&driver, &main, branch)?;
-    let want = format!("refs/heads/{branch}");
-    let Some(orphan) = rows
-        .iter()
-        .find(|row| row.branch.as_ref().is_some_and(|b| b.as_str() == want))
-        .map(|row| {
-            PathBuf::from(realpath_or_self(Path::new(
-                &String::from_utf8_lossy(&row.path).into_owned(),
-            )))
-        })
-    else {
+    let Some(orphan) = checkout_in(&rows, branch) else {
         return Ok(Reclaimed {
             reclaimed: false,
             path: None,
@@ -166,16 +161,7 @@ pub(crate) fn relocate_orphaned_checkout(
     let driver = ctx.driver()?;
     let main = ctx.main(&driver)?;
     let rows = listing(&driver, &main, branch)?;
-    let want = format!("refs/heads/{branch}");
-    let Some(orphan) = rows
-        .iter()
-        .find(|row| row.branch.as_ref().is_some_and(|b| b.as_str() == want))
-        .map(|row| {
-            PathBuf::from(realpath_or_self(Path::new(
-                &String::from_utf8_lossy(&row.path).into_owned(),
-            )))
-        })
-    else {
+    let Some(orphan) = checkout_in(&rows, branch) else {
         return Ok(false);
     };
     if !orphan.exists() {

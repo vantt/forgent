@@ -92,7 +92,18 @@ Notes for the wrapper:
   request has no field for them; the lease is taken, never waited for.
 - `createVerifyCheckout` and `createWorktree` take `wait_ms` default 30000 as `repo-locks.mjs` does.
 
-### Backlog rows found (RUL104: ported as is)
+### Fix round: one door for the worktree-admin lock
+- `fgos_git::acquire_worktree_admin(repo, held, wait)` is now the single `pub` door (re-exported from lib.rs); the private `acquire_admin` takes the same `wait`. Every caller passes `Wait::Ms(5000)` (refs x3, land x7, remote x1) and the adopt path keeps 5000. A hold another process keeps for the whole wait is a `Busy` refusal `worktree-admin-held` whose detail carries `lock`, `holders` (pids) and `timedOut`; the checkout crate maps it to `LockHeld` with Node's wording.
+- The checkout crate no longer seeds a LockScope or builds the lock path: `with_admin` calls the Git door with the caller's wait (default 30000 = `DEFAULT_WORKTREE_ADMIN_WAIT_MS` in repo-locks.mjs) and lends that hold to `create_worktree`. The hold must stay explicit: `create_worktree` takes it itself only with the fixed 5000 ms, so the caller's wait would be lost if it were dropped. The hold spans only the `create_worktree` call.
+- `remote.rs` (outside the write scope) also called the old pub(crate) signature; its one call line was updated to compile (listed in needsWrites).
+
+## Fix round: Node parity
+- Reuse path: any driver/main/resolve/register failure removes the mkdtemp dir and raises Worktree `git worktree add failed for branch ...` with `{branch, worktreePath}`; a lock-held refusal passes through as before.
+- Claim resync: an unreadable HEAD reflog or checkout facts now gives Node's `could not read its own HEAD reflog` Worktree refusal with `{branch, worktreePath}`.
+- `orphan.rs`: the two duplicated lookups use one `checkout_in` that `checkout_path_for` also uses.
+- The lock-held test asserts the holder pid is in `holders`.
+
+## Backlog rows found (RUL104: ported as is)
 - `createWorktree` cleanup-after-provision failure swallows a failing forced removal (kept; Node did too).
 - The Rust copy of the dispatch reset duplicates Node `resetDispatchWorktree`; retire the Node one when S7 moves `loop.mjs:87`.
 - Windows: the custody lease and the borrowed worktree-admin hold are unix-only in the Git port, so every create/remove here refuses on Windows exactly where `acquire_checkout_custody` already does; `cargo check` for both non-linux targets passes.
@@ -129,18 +140,17 @@ Crate tests are `packages/execution/checkout/tests/work.rs` (W:) and `checkout.r
 | listLeftovers: aheadCount 0, positive, empty (3 cases) | W: leftovers_list_every_fgw_branch_with_its_commits_ahead_and_optionally_its_tip; N: shape with tip |
 | createVerifyCheckout checks out a root branch at its tip | W: a_verify_checkout_is_detached_at_the_commit_and_removal_takes_back_what_a_run_built_there; N |
 | createClaimWorktree reattaches to the live checkout | W: a_claim_reattaches_to_its_standing_checkout_and_brings_it_to_the_branch_tip; N: reused true |
-| refreshUnstartedBranch already-current; refreshUnstartedBranch with a live checkout (Node function deleted) | W: a_claim_moves_a_never_started_branch_onto_its_base..., a_branch_with_commits_of_its_own_is_not_refreshed. The live-checkout fast-forward variant has no crate owner (backlog below) |
+| refreshUnstartedBranch already-current; refreshUnstartedBranch with a live checkout (Node function deleted) | W: a_claim_moves_a_never_started_branch_onto_its_base..., a_branch_with_commits_of_its_own_is_not_refreshed. The live-checkout fast-forward variant: W: a_live_unstarted_checkout_is_fast_forwarded_with_its_branch_and_a_resync_after_it_does_nothing |
 | a new checkout receives every ignored skill directory (called provisionSkillRoots) | C: provisioning_installs_copies_skills_runs_setup_with_the_main_root_and_records_it |
 | createWorktree runs the configured worktreeSetup commands / runs nothing extra | C: same test; W: a_failed_setup_removes_the_registered_checkout_and_reports_the_failing_command |
-| resyncClaimWorktree no-op at tip; resyncClaimWorktree re-strips .fgos/ | resync behaviour: C: resync_moves_a_branch_checkout_to_the_new_tip_and_carries_staged_work; the re-strip has no crate owner (backlog) |
-| resyncWorktree x8 (no-op, diverged, nothing staged, reapply staged, real conflict, stray dirt, .fgos re-strip, orphaned patch, other branch's patch) | C: resync_moves_..., resync_refuses_stray_changes_beyond_what_is_staged; no-op, diverged, conflict patch preserved, orphaned-patch and .fgos cases have no crate owner (backlog). The Node function had no caller |
+| resyncClaimWorktree no-op at tip; resyncClaimWorktree re-strips .fgos/ | resync behaviour: C: resync_moves_a_branch_checkout_to_the_new_tip_and_carries_staged_work; no-op at tip: W: a_claim_resync_does_nothing_when_the_checkout_is_at_its_branch_tip; re-strip: W: a_claim_resync_leaves_no_fgos_directory_behind_when_the_new_tip_tracks_one |
+| resyncWorktree x8 (no-op, diverged, nothing staged, reapply staged, real conflict, stray dirt, .fgos re-strip, orphaned patch, other branch's patch) | C: resync_moves_..., resync_refuses_stray_changes_beyond_what_is_staged; other branch: C: resync_with_nothing_staged_resets_cleanly_to_the_new_tip; diverged: C: resync_refuses_a_branch_rewritten_to_history_that_does_not_contain_the_checkout (claim form: W: a_claim_resync_refuses_a_branch_rewritten_to_history_that_does_not_contain_the_checkout); conflict with the patch kept: C: resync_refuses_a_staged_change_that_conflicts_with_the_new_tip_and_keeps_the_patch; orphaned patch and another branch's patch ignored: C: resync_refuses_while_a_patch_an_earlier_run_left_for_this_branch_is_unresolved; .fgos re-strip: C: resync_leaves_no_fgos_directory_behind_when_the_new_tip_tracks_one. The Node function had no caller |
 | resyncWorktree without a branch refuses a detached checkout | behaviour removed with the Node function; its checkedOutBranch half is kept as a new Node test |
 | worktree-callsite-wrapper: createClaimWorktree passthrough; createVerifyCheckout exact commit detached; createDispatchWorktree passthrough; removeDispatchWorktree silent; removeDispatchWorktree logs and swallows | W: a_claim_..., a_verify_checkout_is_detached..., a_dispatch_cleanup_resets_what_a_failed_round_left_then_removes_and_never_fails; N: log lines and the never-throw path. Kept in that file: the kept-open checkout case, which no crate test covers |
 
 Changed, not retired: two cases (`worktree.test.mjs` broken-dependency cases) asserted a `SyntaxError` from a malformed `package.json`; the crate reports `Error: <path>/package.json is not valid JSON: ...`, so they now assert a plain `Error` with that message (no caller inspects the class, census). A raw npm install failure likewise becomes a plain `Error` (message kept, `status`/`stderr` fields no longer carried).
 
 ## Backlog rows found (RUL104: ported as is)
-- Crate has no test for: the live-checkout fast-forward refresh; resync no-op at tip, diverged-branch refusal, conflict with the patch preserved, orphaned-patch refusal, `.fgos/` re-strip after a resync. The Node cases were retired with the Node functions; the behaviours need crate cases (owner: phase 01 resync).
 - `createClaimWorktree` now asserts the worktree-admin lock order up front, also on the reattach path that never takes it (Node asserted only on the create path). A scope already holding a higher-rank lock now fails earlier. No caller in `src` or `bin` passes such a scope.
 - `test/runner/worktree-admin-multiprocess.test.mjs` still carries a single-process held-worktree-admin case that the new wiring test also owns; retire one when that file is in a scope.
 - `repo-locks.mjs` still owns `addWorktreeSync` for the Land path (debt row), and the name `WORKTREE_ADMIN` is duplicated locally in `worktree.mjs`; both go when Land moves.
@@ -159,4 +169,4 @@ Debug-profile addon, ext4 tmp, machine load average about 7, a fresh temp repo, 
 
 Status: DONE_WITH_CONCERNS
 Summary: the addon namespace, the wrappers, the doors row and the wiring test are in; the Node cases the crate owns are retired with the table above.
-Concerns: steady-state createWorktree is about 28% slower (debug build); the census needs regeneration; loop.test.mjs could not be run here (EROFS); six resync/refresh behaviours lost their Node proof with no crate owner yet.
+Concerns: steady-state createWorktree is about 28% slower (debug build); the census needs regeneration; loop.test.mjs could not be run here (EROFS).

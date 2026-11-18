@@ -631,7 +631,11 @@ impl GitDriver {
                 _ => return Err(recovery("land-recovery-required")),
             };
             filesystem.checkpoint("land-intent").map_err(failure)?;
-            let admin = crate::refs::acquire_worktree_admin(repo, held(&session.slot)?)?;
+            let admin = crate::refs::acquire_worktree_admin(
+                repo,
+                held(&session.slot)?,
+                fgos_holder_lock::Wait::Ms(5000),
+            )?;
             for (suffix, oid) in [
                 ("", &view.candidate),
                 ("/source", &req.source),
@@ -703,7 +707,11 @@ impl GitDriver {
         {
             return Err(failure("land-verification-mismatch"));
         }
-        let mut scope = crate::refs::acquire_worktree_admin(repo, held(&session.slot)?)?;
+        let mut scope = crate::refs::acquire_worktree_admin(
+            repo,
+            held(&session.slot)?,
+            fgos_holder_lock::Wait::Ms(5000),
+        )?;
         scope
             .acquire("main-checkout", &params(repo), Wait::Ms(wait_ms))
             .map_err(failure)?;
@@ -1032,7 +1040,8 @@ impl GitDriver {
         }
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
-        let mut scope = crate::refs::acquire_worktree_admin(repo, held)?;
+        let mut scope =
+            crate::refs::acquire_worktree_admin(repo, held, fgos_holder_lock::Wait::Ms(5000))?;
         scope
             .acquire("main-checkout", &params(repo), Wait::Ms(5000))
             .map_err(failure)?;
@@ -1286,7 +1295,8 @@ impl GitDriver {
         };
         let operation_repo = self.checkout_repository(&main)?;
         let repo = &operation_repo;
-        let mut scope = crate::refs::acquire_worktree_admin(repo, held)?;
+        let mut scope =
+            crate::refs::acquire_worktree_admin(repo, held, fgos_holder_lock::Wait::Ms(5000))?;
         scope
             .acquire("main-checkout", &params(repo), Wait::Ms(5000))
             .map_err(failure)?;
@@ -1671,7 +1681,11 @@ impl GitDriver {
         p.insert("ref".into(), slot_key(&req.destination));
         slot.acquire("merge-slot", &p, Wait::Ms(0))
             .map_err(failure)?;
-        let mut scope = crate::refs::acquire_worktree_admin(repo, held(&slot)?)?;
+        let mut scope = crate::refs::acquire_worktree_admin(
+            repo,
+            held(&slot)?,
+            fgos_holder_lock::Wait::Ms(5000),
+        )?;
         scope
             .acquire("main-checkout", &params(repo), Wait::Ms(5000))
             .map_err(failure)?;
@@ -1972,7 +1986,11 @@ impl GitDriver {
             p.insert("ref".into(), slot_key(intent.resource_set.first().unwrap()));
             slot.acquire("merge-slot", &p, Wait::Ms(0))
                 .map_err(failure)?;
-            let scope = crate::refs::acquire_worktree_admin(repo, held(&slot)?)?;
+            let scope = crate::refs::acquire_worktree_admin(
+                repo,
+                held(&slot)?,
+                fgos_holder_lock::Wait::Ms(5000),
+            )?;
             let authority = Authority {
                 scope: &scope,
                 binding: intent.authority_binding.clone(),
@@ -2040,7 +2058,11 @@ impl GitDriver {
         filesystem
             .checkpoint("land-cleanup-candidate")
             .map_err(failure)?;
-        let scope = crate::refs::acquire_worktree_admin(repo, held(&slot)?)?;
+        let scope = crate::refs::acquire_worktree_admin(
+            repo,
+            held(&slot)?,
+            fgos_holder_lock::Wait::Ms(5000),
+        )?;
         let cleanup = || -> Result<()> {
             for (suffix, oid) in [
                 ("source", &payload.candidate.source),

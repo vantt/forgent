@@ -4,7 +4,7 @@ mod common;
 use common::{git, Fixture};
 use fgos_checkout::{create, record, remove, resync, ErrorKind, Provision, ResyncRequest};
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 fn record_of(f: &Fixture, path: &Path) -> Option<record::Record> {
     record::read(&f.state, path)
@@ -348,5 +348,125 @@ fn resync_refuses_stray_changes_beyond_what_is_staged() {
             .message
             .contains("stray uncommitted changes beyond what's staged"),
         "{error}"
+    );
+}
+
+/// A branch checkout of `branch` created through the door, with the request that resyncs it.
+fn followed(f: &Fixture, name: &str, branch: &str) -> (PathBuf, ResyncRequest) {
+    let mut request = f.request(name, Provision::None);
+    request.branch = Some(branch.into());
+    let path = create(&request).unwrap().handle.path;
+    let resync_request = ResyncRequest {
+        repo_root: f.repo.clone(),
+        state_root: f.state.clone(),
+        writer: "fixture".into(),
+        worktree: path.clone(),
+        branch: Some(branch.into()),
+    };
+    (path, resync_request)
+}
+
+fn advance_branch(f: &Fixture, branch: &str, file: &str, text: &str) -> String {
+    fs::write(f.repo.join(file), text).unwrap();
+    git(&f.repo, &["add", file]);
+    git(&f.repo, &["commit", "-qm", text.trim()]);
+    git(
+        &f.repo,
+        &["update-ref", &format!("refs/heads/{branch}"), "trunk"],
+    );
+    git(&f.repo, &["rev-parse", "trunk"])
+}
+
+fn patch_dir(f: &Fixture) -> PathBuf {
+    f.repo.join(".git/fgos-resync-patches")
+}
+
+#[test]
+fn resync_refuses_a_branch_rewritten_to_history_that_does_not_contain_the_checkout() {
+    let f = Fixture::new();
+    let (path, request) = followed(&f, "diverged", "div");
+    git(&path, &["commit", "-q", "--allow-empty", "-m", "decisions"]);
+    let synced = git(&path, &["rev-parse", "HEAD"]);
+    let base = git(&f.repo, &["rev-parse", "trunk"]);
+    let tree = git(&f.repo, &["rev-parse", "trunk^{tree}"]);
+    let sibling = git(
+        &f.repo,
+        &["commit-tree", &tree, "-p", &base, "-m", "sibling"],
+    );
+    git(
+        &f.repo,
+        &["update-ref", "refs/heads/div", &sibling, &synced],
+    );
+    let error = resync(&request).unwrap_err();
+    assert!(error.message.contains("is not an ancestor"), "{error}");
+    assert!(git(&path, &["status", "--porcelain"]).is_empty());
+}
+
+#[test]
+fn resync_with_nothing_staged_resets_cleanly_to_the_new_tip() {
+    let f = Fixture::new();
+    let (path, request) = followed(&f, "plain", "plainb");
+    let tip = advance_branch(&f, "plainb", "later", "later\n");
+    let done = resync(&request).unwrap();
+    assert!(done.resynced && !done.reapplied, "{done:?}");
+    assert_eq!(git(&path, &["rev-parse", "HEAD"]), tip);
+    assert_eq!(fs::read_to_string(path.join("later")).unwrap(), "later\n");
+}
+
+#[test]
+fn resync_refuses_a_staged_change_that_conflicts_with_the_new_tip_and_keeps_the_patch() {
+    let f = Fixture::new();
+    let (path, request) = followed(&f, "conflict", "conf");
+    fs::write(path.join("README"), "staged-from-checkout\n").unwrap();
+    git(&path, &["add", "README"]);
+    fs::write(f.repo.join("README"), "external\n").unwrap();
+    git(&f.repo, &["commit", "-qam", "external"]);
+    git(&f.repo, &["update-ref", "refs/heads/conf", "trunk"]);
+    let before = fs::read_dir(patch_dir(&f)).map_or(0, |d| d.count());
+    let error = resync(&request).unwrap_err();
+    assert!(error.message.contains("reapply refused"), "{error}");
+    let kept: Vec<_> = fs::read_dir(patch_dir(&f)).unwrap().flatten().collect();
+    assert_eq!(kept.len(), before + 1, "exactly one patch is preserved");
+    let patch = fs::read_to_string(kept[0].path()).unwrap();
+    assert!(patch.contains("README"), "{patch}");
+    assert!(patch.contains("staged-from-checkout"), "{patch}");
+}
+
+#[test]
+fn resync_refuses_while_a_patch_an_earlier_run_left_for_this_branch_is_unresolved() {
+    let f = Fixture::new();
+    let (path, request) = followed(&f, "orphan", "orph");
+    advance_branch(&f, "orph", "later", "later\n");
+    fs::create_dir_all(patch_dir(&f)).unwrap();
+    let stranded = patch_dir(&f).join("orph-1700000000000.patch");
+    fs::write(&stranded, "diff --git a/stranded b/stranded\n").unwrap();
+    let other = patch_dir(&f).join("someone-else-1700000000000.patch");
+    fs::write(&other, "diff --git a/x b/x\n").unwrap();
+    let error = resync(&request).unwrap_err();
+    assert!(
+        error.message.contains(stranded.to_str().unwrap()),
+        "{error}"
+    );
+    assert!(!path.join("later").exists(), "the checkout is not touched");
+    assert!(stranded.exists(), "the stranded patch is kept for review");
+    fs::remove_file(&stranded).unwrap();
+    // A patch of another branch never blocks this one.
+    assert!(resync(&request).unwrap().resynced);
+    assert_eq!(fs::read_to_string(path.join("later")).unwrap(), "later\n");
+}
+
+#[test]
+fn resync_leaves_no_fgos_directory_behind_when_the_new_tip_tracks_one() {
+    let f = Fixture::new();
+    let (path, request) = followed(&f, "restrip", "strip");
+    fs::create_dir_all(f.repo.join(".fgos")).unwrap();
+    fs::write(f.repo.join(".fgos/events.jsonl"), "{\"seq\":1}\n").unwrap();
+    git(&f.repo, &["add", "-f", ".fgos/events.jsonl"]);
+    git(&f.repo, &["commit", "-qm", "tracked .fgos"]);
+    git(&f.repo, &["update-ref", "refs/heads/strip", "trunk"]);
+    assert!(resync(&request).unwrap().resynced);
+    assert!(
+        !path.join(".fgos").exists(),
+        "the reset must not resurrect .fgos/"
     );
 }

@@ -109,6 +109,16 @@ fn register(
     })
 }
 
+/// Node's `git worktree add failed` refusal for the checkout of `branch` at `path`.
+fn add_failed(path: &Path, branch: &str, error: &Error) -> Error {
+    Error::worktree(format!(
+        "git worktree add failed for branch \"{branch}\": {}",
+        error.message
+    ))
+    .detail("branch", branch)
+    .detail("worktreePath", path.display().to_string())
+}
+
 /// Create (or reuse, when the branch exists) the checkout of work item `id`. An existing clean checkout of the
 /// branch is moved to the new directory, never destroyed; a dirty one refuses. Returns the real path.
 pub fn create_worktree(request: &WorkCreate) -> Result<WorkCreated> {
@@ -120,8 +130,16 @@ pub fn create_worktree(request: &WorkCreate) -> Result<WorkCreated> {
         .unwrap_or_else(default_base_dir);
     let path = make_temp_dir(&base_dir, &format!("{}-", request.id))?;
     let wait_ms = request.wait_ms.unwrap_or(DEFAULT_ADMIN_WAIT_MS);
-    let driver = ctx.driver()?;
-    let main = ctx.main(&driver)?;
+    // The directory just made is ours: any failure from here to registration removes it.
+    let fail = |error: Error| {
+        let _ = fs::remove_dir(&path);
+        if error.kind == ErrorKind::LockHeld {
+            return error;
+        }
+        add_failed(&path, &branch, &error)
+    };
+    let driver = ctx.driver().map_err(fail)?;
+    let main = ctx.main(&driver).map_err(fail)?;
     let reused = git::branch_exists(&driver, &main, &branch);
     let mut relocated = false;
     if reused {
@@ -137,7 +155,8 @@ pub fn create_worktree(request: &WorkCreate) -> Result<WorkCreated> {
         let base = if reused {
             // The existing branch is checked out exactly as it stands.
             Some(
-                git::resolve_commit(&driver, &main, &format!("refs/heads/{branch}"))?
+                git::resolve_commit(&driver, &main, &format!("refs/heads/{branch}"))
+                    .map_err(fail)?
                     .as_str()
                     .to_owned(),
             )
@@ -147,19 +166,7 @@ pub fn create_worktree(request: &WorkCreate) -> Result<WorkCreated> {
                 .clone()
                 .or_else(|| request.start_sha.clone())
         };
-        if let Err(error) = register(ctx, wait_ms, &path, Some(&branch), base.as_deref()) {
-            let _ = fs::remove_dir(&path);
-            if error.kind == ErrorKind::LockHeld {
-                return Err(error);
-            }
-            let shown = path.display().to_string();
-            return Err(Error::worktree(format!(
-                "git worktree add failed for branch \"{branch}\": {}",
-                error.message
-            ))
-            .detail("branch", branch.clone())
-            .detail("worktreePath", shown));
-        }
+        register(ctx, wait_ms, &path, Some(&branch), base.as_deref()).map_err(fail)?;
     }
     if let Err(error) = provision::provision(&path, &ctx.repo_root, &ctx.state_root, false) {
         // Registered by now: only a forced removal leaves no dangling administrative entry.

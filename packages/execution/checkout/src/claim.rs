@@ -85,11 +85,11 @@ pub fn resync_claim_worktree(
         e.detail("branch", branch)
             .detail("worktreePath", shown.clone())
     };
-    let facts = git::checkout_facts(&driver, &checkout, None)?;
-    let Some(last_text) = facts["lastSynced"]
-        .as_str()
+    // An unreadable reflog and an unreadable checkout answer alike: no sync point to trust.
+    let Some(last_text) = git::checkout_facts(&driver, &checkout, None)
+        .ok()
+        .and_then(|facts| facts["lastSynced"].as_str().map(str::to_owned))
         .filter(|s| !s.is_empty())
-        .map(str::to_owned)
     else {
         return Err(detail(Error::worktree(format!(
             "refusing to resync claim worktree \"{shown}\" on \"{branch}\" — could not read its own HEAD reflog to determine what commit it was last synced to. Inspect \"{shown}\" by hand before claiming \"{branch}\" again."
