@@ -52,56 +52,6 @@ function declareExecutor(cwd, id, fields) {
   writeProjectConfig(cwd, cfg);
 }
 
-// Tool executors are a project's own choice, never a standard value: a project that declares none is inactive. The
-// declared ones are probed live: a cli tool on PATH, an mcp tool by its scanTarget on disk.
-
-test('tool-registry-configured passes as inactive on a fresh project: the standard declares no tool executor', () => {
-  const cwd = mkTemp('fgos-tool-registry-inactive-');
-  initializeWorkRepository(cwd);
-  const { passed, message } = checkById('tool-registry-configured').check(cwd);
-  assert.equal(passed, true, message);
-  assert.match(message, /^inactive/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('tool-registry-configured passes as full when every declared tool is found live', () => {
-  const cwd = mkTemp('fgos-tool-registry-full-');
-  initializeWorkRepository(cwd);
-  declareExecutor(cwd, 'echo-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: process.execPath, args: [] }] });
-  const { passed, message } = checkById('tool-registry-configured').check(cwd);
-  assert.equal(passed, true, message);
-  assert.match(message, /^full — 1\/1/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('tool-registry-configured fails as degraded naming each status when a declared tool is missing, stale or cannot be probed', () => {
-  const cwd = mkTemp('fgos-tool-registry-degraded-');
-  initializeWorkRepository(cwd);
-  declareExecutor(cwd, 'gone-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: 'fgos-no-such-tool-binary', args: [] }] });
-  declareExecutor(cwd, 'no-target-tool', { kind: 'tool', for: ['other-capability'], invocations: [{ via: 'mcp', command: 'mcp:t' }] });
-  declareExecutor(cwd, 'stale-tool', { kind: 'tool', for: ['third-capability'], scanTarget: '.stale-index', invocations: [{ via: 'mcp', command: 'mcp:s' }] });
-  fs.mkdirSync(path.join(cwd, '.stale-index'));
-  // An index is stale only against a HEAD that resolves.
-  execFileSync('git', ['commit', '--allow-empty', '-q', '-m', 'seed'], { cwd });
-  fs.writeFileSync(path.join(cwd, '.stale-index', 'meta.json'), JSON.stringify({ lastCommit: '0'.repeat(40) }));
-  const { passed, message } = checkById('tool-registry-configured').check(cwd);
-  assert.equal(passed, false, 'a declared tool that is not there must fail the check');
-  assert.match(message, /^degraded — 0\/3 tool\(s\) present \(1 stale, 1 missing, 1 cannot be probed\)/);
-  assert.match(message, /fgos dispatch decide --for/);
-  assert.doesNotMatch(message, /fgos tool/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('tool-registry-configured counts a tool serving two capabilities once', () => {
-  const cwd = mkTemp('fgos-tool-registry-two-for-');
-  initializeWorkRepository(cwd);
-  declareExecutor(cwd, 'two-tool', { kind: 'tool', for: ['one-capability', 'two-capability'], invocations: [{ via: 'cli', command: process.execPath, args: [] }] });
-  const { passed, message } = checkById('tool-registry-configured').check(cwd);
-  assert.equal(passed, true, message);
-  assert.match(message, /^full — 1\/1/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
 test('executor-profile-warnings warns, without failing, that a prefer on a tool-served capability is ignored', () => {
   const cwd = mkTemp('fgos-tool-prefer-ignored-');
   initializeWorkRepository(cwd);

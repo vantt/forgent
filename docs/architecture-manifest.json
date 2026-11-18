@@ -1162,7 +1162,7 @@
       "debt": [
         {
           "path": "src/setup/registrations.mjs",
-          "reason": "the bodies of the rows and fixes of the layers Node still owns, keyed by id (bridge:S5, S6a, S6b, S7 in the registry); each step removes its own"
+          "reason": "the bodies of the rows and fixes of the layers Node still owns, keyed by id (bridge:S6a, S6b, S7 in the registry); each step removes its own"
         },
         {
           "path": "src/setup/checks.mjs",
@@ -1536,7 +1536,6 @@
     "src/setup/agy-permissions.mjs": "infra",
     "src/setup/run-supervisor-checks.mjs": "infra",
     "src/setup/terminal-control-checks.mjs": "infra",
-    "src/setup/omp-natives-checks.mjs": "infra",
     "src/setup/agent-cli-trust.mjs": "infra",
     "src/setup/blind-steps-proven-pools.mjs": "use-case",
     "src/setup/workflow-catalog-reader.mjs": "use-case",

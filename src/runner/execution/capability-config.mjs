@@ -94,9 +94,6 @@ export const capabilityVerifyOf = (runner, capability) => exactEntryOf(runner, c
 /** The exact entry's `confinement`, raw. */
 export const capabilityConfinementOf = (runner, capability) => exactEntryOf(runner, capability)?.confinement;
 
-/** The exact entry's `serves`, raw. */
-export const capabilityServesOf = (runner, name) => exactEntryOf(runner, name)?.serves;
-
 /** The exact entry's `prefer`, raw (a string, a list or undefined). */
 export const preferOf = (runner, capability) => exactEntryOf(runner, capability)?.prefer;
 

@@ -6,7 +6,7 @@
 // row can also read a layer through a function the list does not name (a note says so when there is no list).
 
 /** The order of the steps; a later step removes its layers later. */
-export const STEP_ORDER = ['S5', 'S6a', 'S6b', 'S7'];
+export const STEP_ORDER = ['S6a', 'S6b', 'S7'];
 
 /**
  * Failures of the bridged entries. Each `entries` item is `{ kind, id, owner, judge?, note? }`; `layers` maps a

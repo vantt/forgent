@@ -8,8 +8,6 @@ import { writeAccountsFile, writeGlobalConfig, writeRawGlobalConfig } from '../h
 import { seedStubAgentClis, stubAgentCliDir } from '../helpers/agent-clis.mjs';
 import {
   checkTrustStoreWritable,
-  checkExecutorConfinement,
-  checkInvocationGitWriteGrants,
   checkConfinedPaneAccounts,
   DOCTOR_CHECKS,
   checkHerdrExecutorKinds,
@@ -23,8 +21,7 @@ seedStubAgentClis('codex', 'omp', 'pi', 'agy');
 // Each one exists because its absence was measured, not imagined: without herdr
 // there is no transport at all; without a readable trust store every dispatch into
 // a fresh worktree stops at a folder dialog; and a bypass executor missing its
-// confinement is the one configuration this phase refuses outright, so doctor
-// should say so on a machine where it slipped in some other way.
+// confinement is the one configuration this phase refuses outright.
 
 test('checkTrustStoreWritable passes for a readable store and fails by name for a broken one', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doctor-trust-'));
@@ -51,52 +48,6 @@ test('checkTrustStoreWritable passes for a readable store and fails by name for 
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
-});
-
-test('checkExecutorConfinement passes when no invocation declares bypass', () => {
-  const r = checkExecutorConfinement({ executors: { a: { kind: 'agent' }, b: { kind: 'agent', invocations: [{ id: 'cli', via: 'cli', permissionMode: 'ask' }] } } });
-  assert.equal(r.passed, true);
-});
-
-test('checkExecutorConfinement passes for a fully confined bypass executor', () => {
-  const r = checkExecutorConfinement({
-    executors: { a: { kind: 'agent', invocations: [{ id: 'cli', via: 'cli', permissionMode: 'bypass' }], confinement: { privateHome: true, isolatedSession: true, ownWorktree: true } } },
-  });
-  assert.equal(r.passed, true);
-});
-
-test('checkExecutorConfinement passes for a bypass executor with normalized controls', () => {
-  const r = checkExecutorConfinement({
-    executors: {
-      a: {
-        kind: 'agent',
-        invocations: [{ id: 'cli', via: 'cli', permissionMode: 'bypass' }],
-        confinement: {
-          contract: 'confinement-policy.v1',
-          controls: { home: 'private', session: 'isolated', workspace: 'own' },
-        },
-      },
-    },
-  });
-  assert.equal(r.passed, true);
-});
-
-test('checkExecutorConfinement fails and names the executor and the missing flags', () => {
-  const r = checkExecutorConfinement({
-    executors: {
-      safe: { kind: 'agent', invocations: [{ id: 'cli', via: 'cli', permissionMode: 'ask' }] },
-      risky: { kind: 'agent', invocations: [{ id: 'cli', via: 'cli', permissionMode: 'bypass' }], confinement: { privateHome: true } },
-    },
-  });
-  assert.equal(r.passed, false);
-  assert.match(r.message, /risky/, 'the offending executor is named');
-  assert.match(r.message, /isolatedSession/, 'the missing flags are named');
-  assert.doesNotMatch(r.message, /safe/, 'a compliant executor is not dragged into the message');
-});
-
-test('checkExecutorConfinement tolerates a config with no executors at all', () => {
-  assert.equal(checkExecutorConfinement({}).passed, true);
-  assert.equal(checkExecutorConfinement({ executors: {} }).passed, true);
 });
 
 // herdr owns the list of agent kinds it can start and the version of each
@@ -378,25 +329,3 @@ test('checkConfinedPaneAccounts looks providers and accounts up by own property,
   } finally { fs.rmSync(home, { recursive: true, force: true }); }
 });
 
-test('checkInvocationGitWriteGrants passes when no executor or invocation grants git add/commit', () => {
-  const r = checkInvocationGitWriteGrants({
-    executor: { command: 'claude', args: ['-p', '{prompt}', '--permission-mode', 'acceptEdits'] },
-    executors: { a: { invocations: [{ id: 'x', args: ['--allowedTools', 'Bash(rg:*)'] }] } },
-  });
-  assert.equal(r.passed, true);
-  assert.doesNotMatch(r.message, /warning/);
-});
-
-test('checkInvocationGitWriteGrants warns, naming each executor and invocation that still grants git add/commit (bare or rtk-wrapped)', () => {
-  const r = checkInvocationGitWriteGrants({
-    executor: { command: 'claude', args: ['--allowedTools', 'Bash(git add:*),Bash(git commit:*)'] },
-    executors: {
-      claude: { invocations: [{ id: 'claude-cli', args: ['--allowedTools', 'Bash(rtk git commit:*)'] }, { id: 'clean', args: ['--allowedTools', 'Bash(rg:*)'] }] },
-    },
-  });
-  assert.equal(r.passed, true, 'a warning never fails doctor');
-  assert.match(r.message, /^warning: /);
-  assert.match(r.message, /executor,/);
-  assert.match(r.message, /executors\.claude\.invocations\.claude-cli/);
-  assert.doesNotMatch(r.message, /clean/);
-});

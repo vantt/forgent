@@ -589,34 +589,6 @@ test('findWorkflowStageOperationProblems fails when a step\'s operations is not 
   assert.ok(problemsNonArray.some((p) => p.includes('coding.feature.discovery.operations: must be an array of operation objects')));
 });
 
-test('doctor check runner-generated-paths accepts the standard\'s empty list or a well-formed one and flags a malformed one', () => {
-  const tmpDir = mkTempDir();
-  const fgosDir = path.join(tmpDir, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
-  const write = (runner) => writeProjectConfig(tmpDir, { runner });
-  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-generated-paths');
-  assert.ok(check, 'runner-generated-paths doctor check must be registered');
-
-  const standard = check.check(tmpDir);
-  assert.equal(standard.passed, true);
-  assert.match(standard.message, /valid \(0 mapping/);
-
-  write({ generatedPaths: [{ from: 'core/skills/**', also: ['.agents/skills/**'] }] });
-  const valid = check.check(tmpDir);
-  assert.equal(valid.passed, true);
-  assert.match(valid.message, /valid/);
-
-  write({ generatedPaths: [{ from: '**', also: ['x'] }] });
-  const bare = check.check(tmpDir);
-  assert.equal(bare.passed, false);
-  assert.match(bare.message, /generatedPaths\[0\]\.from/);
-
-  write({ generatedPaths: [{ from: 'core', also: ['x'], extra: true }] });
-  const unknownKey = check.check(tmpDir);
-  assert.equal(unknownKey.passed, false);
-  assert.match(unknownKey.message, /unknown key "extra"|config-schema/);
-});
-
 test('doctor check runner-patterns-config: passes on the standard', () => {
   const tmpDir = mkTempDir();
   const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
@@ -1202,12 +1174,12 @@ test('the order the bodies register in is the order the registry runs them in', 
   assert.deepEqual(REGISTERED_FIX_IDS, fixes.map((fix) => fix.id).filter((id) => !FIXES_RUN_IN_RUST.includes(id)));
 });
 
-test('the registry gives 58 rows and 24 fixes to Rust and 52 rows and 5 fixes to the bridge, as measured', () => {
+test('the registry gives 65 rows and 24 fixes to Rust and 45 rows and 5 fixes to the bridge, as measured', () => {
   const { rows, fixes } = registryEntries();
   const bridged = (list) => list.filter((entry) => entry.owner.startsWith('bridge:'));
   const byStep = (step) => bridged(rows).filter((row) => row.owner === `bridge:${step}`).length;
-  assert.deepEqual(['S5', 'S6a', 'S6b', 'S7'].map(byStep), [8, 30, 6, 8]);
-  assert.equal(rows.length - bridged(rows).length, 58);
+  assert.deepEqual(['S6a', 'S6b', 'S7'].map(byStep), [31, 6, 8]);
+  assert.equal(rows.length - bridged(rows).length, 65);
   assert.equal(bridged(fixes).length, 5);
   assert.equal(fixes.length - bridged(fixes).length, 24);
 });
@@ -1215,7 +1187,7 @@ test('the registry gives 58 rows and 24 fixes to Rust and 52 rows and 5 fixes to
 test('an owner is rust:<component> or bridge:<step>, and a bridged one names the step that removes it', () => {
   const { rows, fixes } = registryEntries();
   for (const { id, owner } of [...rows, ...fixes]) {
-    assert.match(owner, /^(rust:[a-z][a-z-]*|bridge:(S5|S6a|S6b|S7))$/, `${id}: ${owner}`);
+    assert.match(owner, /^(rust:[a-z][a-z-]*|bridge:(S6a|S6b|S7))$/, `${id}: ${owner}`);
   }
 });
 

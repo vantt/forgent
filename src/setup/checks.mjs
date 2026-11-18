@@ -19,6 +19,5 @@ export {
   integrationScriptPath,
   mainCheckoutHookWired,
   checkConfinementHerdrMaturity,
-  checkAgySubHomesConfigured,
   checkRunnerPatternsConfig,
 } from './registrations.mjs';

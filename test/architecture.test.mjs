@@ -2024,8 +2024,8 @@ test('doctor registry: a label before a layer, a layer with no step, a row with 
   assert.deepEqual(bridgeFailures([entry('early', 'bridge:S6b', ['src/state/store.mjs'])], layers), ['row early: labelled bridge:S6b but reads src/state/store.mjs, which stays in Node until S7']);
   assert.deepEqual(bridgeFailures([entry('unlisted', 'bridge:S7', ['src/state/other.mjs'])], layers), ['row unlisted: reads src/state/other.mjs, which has no step in layers']);
   assert.deepEqual(bridgeFailures([entry('silent', 'bridge:S7')], layers), ['row silent: reads no recorded layer and gives no note saying why']);
-  assert.deepEqual(bridgeFailures([entry('odd', 'bridge:S3', [])], layers), ['row odd: bridge:S3 names no step (S5, S6a, S6b, S7)']);
-  assert.deepEqual(bridgeFailures([], { 'src/gone.mjs': 'S5', 'src/state/store.mjs': 'S9' }, (module) => module !== 'src/gone.mjs'), ['layer src/gone.mjs: no such file (drop it from layers)', 'layer src/state/store.mjs: S9 names no step (S5, S6a, S6b, S7)']);
+  assert.deepEqual(bridgeFailures([entry('odd', 'bridge:S3', [])], layers), ['row odd: bridge:S3 names no step (S6a, S6b, S7)']);
+  assert.deepEqual(bridgeFailures([], { 'src/gone.mjs': 'S6a', 'src/state/store.mjs': 'S9' }, (module) => module !== 'src/gone.mjs'), ['layer src/gone.mjs: no such file (drop it from layers)', 'layer src/state/store.mjs: S9 names no step (S6a, S6b, S7)']);
 });
 
 test('door rows of the doctor registry, the Node rows bridge and Node from the packaging verbs reject a second path and accept their own', () => {

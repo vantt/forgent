@@ -43,7 +43,6 @@ import {
   checkLlmAccountsShape,
 } from './model-pool-checks.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
-import { checkAgySubHomesConfigured } from './agy-permissions.mjs';
 import { BUILTIN_POLICY_IDS, validateConfinementPolicyShape, normalizeLegacyConfinement } from '../runner/dispatch/confinement/policies.mjs';
 import {
   resolveMachineBackendRegistryPath,
@@ -56,7 +55,7 @@ import {
 import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
 import { readAttemptOwnershipMarker, canonicalRoot, listKeptCredentialHomes, settleHeldCredentialHomes, judgeConfinementOrphans, removeConfinementOrphans, CREDENTIAL_KEEP_MAX_ATTEMPTS } from '../runner/dispatch/confinement/cleanup.mjs';
 
-import { MODEL_POLICY_TIERS, validateGeneratedPathsShape, validateRunnerLoopsShape, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, validateRunnerLoopsShape, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
@@ -64,7 +63,7 @@ import { deepEqual } from '../runner/execution/patterns/catalog-entries.mjs';
 import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_PATH, formatRetiredKeySentence } from '../runner/execution/patterns/retired-keys.mjs';
 import { isCommandAvailable, resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import {
-  capabilityConfinementOf, capabilityNamesOf, capabilityServesOf, catalogOf, hasCapabilityEntry, ownMinCheckersOf,
+  capabilityConfinementOf, capabilityNamesOf, catalogOf, hasCapabilityEntry, ownMinCheckersOf,
 } from '../runner/execution/capability-config.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork } from '../state/store.mjs';
@@ -72,7 +71,7 @@ import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { postLandDrift } from '../state/postland-drift.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { getDomain, resolveDomainName, effectiveStep, domainSteps, skillForStep } from '../state/domain-registry.mjs';
-import { toolProvidersOf, unservedToolAbilityOf } from '../runner/dispatch/tool-providers.mjs';
+import { unservedToolAbilityOf } from '../runner/dispatch/tool-providers.mjs';
 import { checkConfig, ConfigDoorError, globalFgosDir, readConfig, readMachineConfig, readProjectConfigSource } from '../config/facade.mjs';
 import { parseYaml } from '../util/yaml.mjs';
 import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
@@ -88,9 +87,7 @@ import { createSeatBindingClient, PROTOCOL as SEAT_BINDING_PROTOCOL, resolveSeat
 import { checkSeatBindingDryBind } from './seat-binding-checks.mjs';
 import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, checkRunSupervisorConfig } from './run-supervisor-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
-import { checkOmpNativesPresent, ompExecutorsOf } from './omp-natives-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
-export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
 
 /** A refusal of the door (a file that is unusable, a request it cannot serve) or a process that cannot load the addon at all: the failures a row reports as its own failure, with the door's message, instead of ending the run. */
 const isConfigDoorFailure = (err) => err instanceof ConfigDoorError || (typeof err?.code === 'string' && err.code.startsWith('git-addon-'));
@@ -314,18 +311,6 @@ export function integrationScriptPath() {
   }
   const canonical = path.join(mainCheckout, 'scripts', 'fgos-shell-integration.sh');
   return fs.existsSync(canonical) ? canonical : executingCopy;
-}
-
-// The schema states each entry's keys and types; the owner's validator keeps the rule that a source scope opens with a
-// literal directory. The bounds and cumulative-checker rules of runner.loops are checked by runner-patterns-config.
-export function checkRunnerGeneratedPathsConfig(cwd) {
-  const generatedPaths = effectiveSection(cwd, 'runner').generatedPaths ?? [];
-  try {
-    validateGeneratedPathsShape(generatedPaths, 'runner');
-  } catch (err) {
-    return { passed: false, message: err.message };
-  }
-  return { passed: true, message: `runner.generatedPaths is valid (${generatedPaths.length} mapping(s))` };
 }
 
 // The retired runner.patterns keys a legacy JSON config document still holds, as data (empty when none).
@@ -761,36 +746,6 @@ export function checkAgentTypeNamesUnique(cwd, { projectTiersOnly = false, insta
   };
 }
 
-// Posture of the tools the config declares (`kind: "tool"` executors, read through `toolProvidersOf`, the same
-// live probe `fgos dispatch decide --for` answers from): inactive when none is declared, full when every one is
-// present, degraded when any is stale, missing or cannot be probed. Degraded fails the check: a declared tool
-// that is not there is a real gap, unlike a project that declares none.
-function checkToolRegistryConfigured(cwd) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  if (mainCheckout === null) {
-    return { passed: true, message: 'not inside a git checkout — nothing to check' };
-  }
-  // One tool executor serving several capabilities is one tool: its status is the same for each.
-  const providers = [...new Map(toolProvidersOf(effectiveSection(mainCheckout, 'runner'), { repoRoot: mainCheckout }).map((p) => [p.executorId, p])).values()];
-  if (providers.length === 0) {
-    return { passed: true, message: 'inactive — no tool-capable executors declared (declare one under runner.executors with fgos config set)' };
-  }
-  const count = (status) => providers.filter((provider) => provider.status === status).length;
-  const present = count('present');
-  if (present === providers.length) {
-    return { passed: true, message: `full — ${present}/${providers.length} tool(s) present` };
-  }
-  return {
-    passed: false,
-    message: `degraded — ${present}/${providers.length} tool(s) present (${count('stale')} stale, ${count('missing')} missing, ${count('unknown')} cannot be probed) — install the missing tool, or reindex the stale one; fgos dispatch decide --for <capability> shows the answer a dispatch gets`,
-  };
-}
-
-registerCheck({
-  id: 'runner-generated-paths',
-  check: (cwd) => checkRunnerGeneratedPathsConfig(cwd),
-});
-
 registerCheck({
   id: 'runner-patterns-config',
   check: (cwd, run) => checkRunnerPatternsConfig(cwd, run),
@@ -844,22 +799,6 @@ registerCheck({
 registerCheck({
   id: 'agent-type-names-unique',
   check: (cwd) => checkAgentTypeNamesUnique(cwd, { projectTiersOnly: true }),
-});
-
-registerCheck({
-  id: 'tool-registry-configured',
-  check: (cwd) => checkToolRegistryConfigured(cwd),
-});
-
-registerCheck({
-  id: 'agy-sub-homes-configured',
-  // The merged config (project + global): the credential homes of the declared gemini accounts live in
-  // the global one, and a confined invocation runs as one of those accounts.
-  check: (cwd) => {
-    let config = null;
-    try { config = { runner: loadRunnerConfigForDir(cwd) }; } catch { /* fall back to the project file */ }
-    return checkAgySubHomesConfigured(cwd, { config });
-  },
 });
 
 let cachedBwrapResult = null;
@@ -1285,44 +1224,6 @@ registerCheck({
   check: (cwd) => checkWorkflowCapabilitiesConfigured(cwd),
 });
 
-// I19 (core/skills/_shared/capability-matching.md): `serves` is optional, and the schema refuses a malformed one,
-// but two capabilities that declare the identical attribute set are permanently tied (capability-matching.md's
-// "Ties and misses" rule) and silently degrade Q1 steering with no error anywhere else. `review`'s presence is
-// already covered generically by the standard (which always supplies it).
-function normalizeServesForComparison(serves) {
-  return JSON.stringify(Object.fromEntries(Object.entries(serves).sort(([a], [b]) => a.localeCompare(b))));
-}
-
-function checkCapabilityServesValid(cwd) {
-  const runner = effectiveSection(cwd, 'runner');
-  const servesByName = new Map();
-  for (const name of capabilityNamesOf(runner)) {
-    const serves = capabilityServesOf(runner, name);
-    if (serves !== undefined) servesByName.set(name, serves);
-  }
-  const seenBySignature = new Map();
-  for (const [name, serves] of servesByName) {
-    const signature = normalizeServesForComparison(serves);
-    const priorName = seenBySignature.get(signature);
-    if (priorName) {
-      return {
-        passed: false,
-        message: `"${priorName}" and "${name}" declare the identical "serves" attribute set -- capability matching can never distinguish them`,
-      };
-    }
-    seenBySignature.set(signature, name);
-  }
-  return {
-    passed: true,
-    message: `${servesByName.size} capability entr${servesByName.size === 1 ? 'y declares' : 'ies declare'} a valid "serves" attribute set, none identical`,
-  };
-}
-
-registerCheck({
-  id: 'capability-serves-valid',
-  check: (cwd) => checkCapabilityServesValid(cwd),
-});
-
 // A present-but-unusable `ceiling` is the misconfiguration that actually
 // bites, and it fails SILENTLY: `hasWorkerSlotRoom` treats anything that is
 // not a positive integer as "no ceiling configured" and allows every claim,
@@ -1514,61 +1415,6 @@ export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = un
   return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no confined invocation reads a login store' };
 }
 
-/** Second reading of the config door's own C5 invariant. Names the executor and
- * the specific flags, because "confinement incomplete" leaves a reader hunting
- * through three booleans for the one that is false. */
-export function checkExecutorConfinement(runnerCfg = {}) {
-  const offenders = [];
-  for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
-    for (const inv of executor?.invocations ?? []) {
-      if (inv?.permissionMode !== 'bypass') continue;
-      const c = inv.confinement ?? executor.confinement ?? {};
-      const missing = [];
-      if (!(c.privateHome === true || c.controls?.home === 'private')) missing.push('privateHome');
-      if (!(c.isolatedSession === true || c.controls?.session === 'isolated')) missing.push('isolatedSession');
-      if (!(c.ownWorktree === true || c.controls?.workspace === 'own')) missing.push('ownWorktree');
-      if (missing.length > 0) offenders.push(`${id}/${inv.id ?? '?'} (missing ${missing.join(', ')})`);
-    }
-  }
-  if (offenders.length === 0) {
-    return { passed: true, message: 'every invocation declaring bypass also declares full confinement' };
-  }
-  return {
-    passed: false,
-    message: `invocations declare "permissionMode": "bypass" without full confinement: ${offenders.join('; ')}`,
-  };
-}
-
-/** A worker holds no git write grant: the runner commits what it leaves in the
- * worktree. A config that still grants `git add`/`git commit` (bare or
- * `rtk`-wrapped) through an allowlist predates that rule and lets an unconfined
- * worker move branch refs; named per executor/invocation so the fix is a
- * one-line edit. Reported as a warning, never auto-removed from a user's file. */
-const GIT_WRITE_GRANT = /\bgit (add|commit)\b/;
-
-function grantsGitWrite(args) {
-  if (!Array.isArray(args)) return false;
-  const at = args.indexOf('--allowedTools');
-  return at !== -1 && typeof args[at + 1] === 'string' && GIT_WRITE_GRANT.test(args[at + 1]);
-}
-
-export function checkInvocationGitWriteGrants(runnerCfg = {}) {
-  const offenders = [];
-  if (grantsGitWrite(runnerCfg.executor?.args)) offenders.push('executor');
-  for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
-    for (const invocation of executor?.invocations ?? []) {
-      if (grantsGitWrite(invocation?.args)) offenders.push(`executors.${id}.invocations.${invocation.id ?? '?'}`);
-    }
-  }
-  if (offenders.length === 0) {
-    return { passed: true, message: 'no executor or invocation grants git add/git commit to a worker' };
-  }
-  return {
-    passed: true,
-    message: `warning: ${offenders.join(', ')} still grant git add/git commit in --allowedTools; workers no longer commit (the runner does) -- remove the grant`,
-  };
-}
-
 /** What herdr says it can start and which integration hooks it has, asked through the
  * terminal-control port. `null` for either when herdr cannot be asked or its text cannot be
  * read: absence is already `terminal-control`'s business, and reporting it twice helps nobody. */
@@ -1658,19 +1504,6 @@ registerCheck({
 registerCheck({
   id: 'terminal-allocations',
   check: (cwd) => checkTerminalAllocations(cwd),
-});
-
-registerCheck({
-  id: 'omp-natives-present',
-  check: (cwd) => {
-    let ompExecutors = null;
-    try {
-      ompExecutors = ompExecutorsOf(loadRunnerConfigForDir(cwd));
-    } catch {
-      // An unreadable runner config is its own row's failure; here it only means no executor is known to run omp.
-    }
-    return checkOmpNativesPresent({ ompExecutors });
-  },
 });
 
 registerCheck({
@@ -1766,30 +1599,6 @@ registerCheck({
   check: (cwd) => checkBlindStepsUseProvenPools(cwd, {
     loadRunnerConfig: loadRunnerConfigForDir,
   }),
-});
-
-registerCheck({
-  id: 'executor-confinement',
-  check: (cwd) => {
-    try {
-      return checkExecutorConfinement(loadRunnerConfigForDir(cwd));
-    } catch (err) {
-      // A directory with no loadable runner config is not a confinement problem;
-      // saying otherwise would make doctor cry wolf everywhere fgOS is not set up.
-      return { passed: true, message: `runner config not loadable here, confinement not evaluated: ${err.message}` };
-    }
-  },
-});
-
-registerCheck({
-  id: 'invocation-git-write-grants',
-  check: (cwd) => {
-    try {
-      return checkInvocationGitWriteGrants(loadRunnerConfigForDir(cwd));
-    } catch (err) {
-      return { passed: true, message: `runner config not loadable here, git write grants not evaluated: ${err.message}` };
-    }
-  },
 });
 
 // ─── Confinement Authority (Phase 01 R7, docs/platform/agent-confinement/README.md) ─

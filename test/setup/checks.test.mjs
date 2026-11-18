@@ -46,7 +46,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
-      'tool-registry-configured',
       'provider-capacity-state',
       'run-supervisor-route',
       'runtime-socket-dir',
@@ -66,11 +65,8 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       'workflow-case-bindings',
       'agent-type-names-unique',
       'domain-registry-compiled',
-      'capability-serves-valid',
-      'agy-sub-homes-configured',
       // Phase 01 group D: the three preconditions for an interactive dispatch.
       'terminal-control',
-      'omp-natives-present',
       'terminal-allocations',
       'trust-store-readable',
       // Phase 07 (herdr-trust-supervisor R3): codex-toml/agy trust stores had
@@ -80,8 +76,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       'agent-cli-project-trusted',
       'seat-binding-dry-bind',
       'blind-steps-use-proven-pools',
-      'executor-confinement',
-      'invocation-git-write-grants',
       'herdr-executor-kinds',
       // Phase 06 (executor-policy-dispatch-seams): legacy policy-shaped
       // executor/capability warnings, named with their migration target.
@@ -98,7 +92,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       'confinement-strict-readiness',
       'operation-prompt-templates-valid',
       'runner-patterns-config',
-      'runner-generated-paths',
       'executor-family-unique',
       'executor-skills-installed',
       'tier-fallback',
@@ -463,55 +456,6 @@ test('work-step-vocabulary lists every violating id, not just the first', () => 
   assert.match(message, /bad-one/);
   assert.match(message, /bad-two/);
   fs.rmSync(dir, { recursive: true, force: true });
-});
-
-// ─── capability-serves-valid (I19, core/skills/_shared/capability-matching.md) ───
-
-test('capability-serves-valid passes on the standard alone (serves on every curated slot, none identical)', () => {
-  const cwd = mkTemp('doctor-serves-ok-');
-  const { passed, message } = checkById('capability-serves-valid').check(cwd);
-  assert.equal(passed, true, message);
-  assert.match(message, /valid "serves" attribute set, none identical/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('capability-serves-valid is a no-op pass on a config with no "serves" anywhere (an entry without one stays valid)', () => {
-  const cwd = mkTemp('doctor-serves-none-declared-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, ({ runner: { capabilities: { advise: {}, execute: {}, review: {} } } }));
-  const { passed, message } = checkById('capability-serves-valid').check(cwd);
-  assert.equal(passed, true, message);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
-test('capability-serves-valid fails when a "serves" value has an unknown key or wrong type', () => {
-  for (const badServes of [{ notARealKey: 'change' }, { mutates: 'yes' }, { outputKind: 42 }, { size: 'heavy' }, { rigor: 'high' }]) {
-    const cwd = mkTemp('doctor-serves-malformed-');
-    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    writeProjectConfig(cwd, ({ runner: { capabilities: { review: {}, execute: { serves: badServes } } } }));
-    const { passed, message } = checkById('capability-serves-valid').check(cwd);
-    assert.equal(passed, false, `serves: ${JSON.stringify(badServes)}`);
-    assert.match(message, /invalid "serves"|config-schema .*runner\.capabilities\.execute\.serves/);
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test('capability-serves-valid fails when two entries declare the identical "serves" attribute set', () => {
-  const cwd = mkTemp('doctor-serves-duplicate-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, ({
-      runner: {
-        capabilities: {
-          review: { serves: { outputKind: 'finding', mutates: false } },
-          'docs:review': { serves: { outputKind: 'finding', mutates: false } },
-        },
-      },
-    }),
-  );
-  const { passed, message } = checkById('capability-serves-valid').check(cwd);
-  assert.equal(passed, false);
-  assert.match(message, /declare the identical "serves" attribute set/);
-  fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 test('provider-capacity-state doctor check reports quarantine without clearing it', () => {

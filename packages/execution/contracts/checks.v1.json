@@ -1,6 +1,6 @@
 {
  "version": "checks.v1",
- "about": "Golden vectors of the doctor rows that read the runner config or the machine it names: generated paths, executor confinement, git write grants, capability serves sets, omp natives, agy sub-HOMEs and the tool registry posture. A vector is { name, row, runner?, machine?, expect }; expect is { passed, message }, recorded from the Node judges by scripts/checks-vectors.mjs (a vector marked handRecorded states an answer written from reading the Node body, which reads the live machine). machine describes what a row reads of the machine: omp (null: not installed; { output } or { exit }: what omp --version does), env, files, dirs, platform, arch, pathCommands; paths begin with $ROOT, the directory the machine is built under, and $ROOT/home is the home.",
+ "about": "Golden vectors of the doctor rows that read the runner config or the machine it names: generated paths, executor confinement, git write grants, capability serves sets, omp natives, agy sub-HOMEs and the tool registry posture. A vector is { name, row, runner?, machine?, expect }; expect is { passed, message }, the sentence each row shows (first recorded from the Node judges before they were deleted; the Rust judges are the owner now, and a change to one is a change to its vector). machine describes what a row reads of the machine: omp (null: not installed; { output } or { exit }: what omp --version does), env, files, dirs, platform, arch, pathCommands; paths begin with $ROOT, the directory the machine is built under, and $ROOT/home is the home.",
  "vectors": [
   {
    "name": "generated paths: none declared is valid with no mappings",
@@ -339,7 +339,6 @@
    "row": "tool-registry-configured",
    "runner": {"executors":{"x":{"kind":"agent"}}},
    "machine": {},
-   "handRecorded": true,
    "expect": {"passed":true,"message":"inactive — no tool-capable executors declared (declare one under runner.executors with fgos config set)"}
   },
   {
@@ -347,7 +346,6 @@
    "row": "tool-registry-configured",
    "runner": {"executors":{"a":{"kind":"tool","for":["p","q"],"invocations":[{"via":"cli","command":"a"}]}}},
    "machine": {"pathCommands":["a"]},
-   "handRecorded": true,
    "expect": {"passed":true,"message":"full — 1/1 tool(s) present"}
   },
   {
@@ -355,7 +353,6 @@
    "row": "tool-registry-configured",
    "runner": {"executors":{"a":{"kind":"tool","for":["p","q"],"invocations":[{"via":"cli","command":"a"}]},"b":{"kind":"tool","for":["p"],"invocations":[{"via":"cli","command":"b"}]}}},
    "machine": {"pathCommands":["a"]},
-   "handRecorded": true,
    "expect": {"passed":false,"message":"degraded — 1/2 tool(s) present (0 stale, 1 missing, 0 cannot be probed) — install the missing tool, or reindex the stale one; fgos dispatch decide --for <capability> shows the answer a dispatch gets"}
   }
  ]

@@ -14,7 +14,7 @@ import {
   runHostDoctor,
   spawnSync,
 } from './helpers/setup-checks-harness.mjs';
-import { checkAgySubHomesConfigured, findAgySubHomes } from '../../src/setup/agy-permissions.mjs';
+import { findAgySubHomes } from '../../src/setup/agy-permissions.mjs';
 
 function agySettingsPath(homeDir) {
   return path.join(homeDir, '.gemini', 'antigravity-cli', 'settings.json');
@@ -104,62 +104,4 @@ test('findAgySubHomes discovers agy sub-HOMEs across single and multi-executor c
       path.resolve('/home/fakeuser/.agy-homes/single-acc'),
     ].sort(),
   );
-});
-
-test('checkAgySubHomesConfigured passes when every referenced sub-HOME exists, whether an executor or a gemini account names it', () => {
-  const tempBase = mkTemp('agy-sub-pass-');
-  const home1 = path.join(tempBase, 'home1');
-  const home2 = path.join(tempBase, 'home2');
-  fs.mkdirSync(home1, { recursive: true });
-  fs.mkdirSync(home2, { recursive: true });
-
-  const config = {
-    runner: {
-      executors: { gemini: { invocations: [{ id: 'agy-1', command: 'agy', env: { HOME: home1 } }] } },
-      llmAccounts: { gemini: { second: { credentialStore: { agy: home2 } } } },
-    },
-  };
-
-  const res = checkAgySubHomesConfigured('/dummy', { config });
-  assert.equal(res.passed, true);
-  assert.match(res.message, /all 2 agy sub-HOME\(s\) exist/);
-  // The home holds no settings.json: a run passes its settings per invocation, so none is demanded.
-
-  fs.rmSync(tempBase, { recursive: true, force: true });
-});
-
-test('checkAgySubHomesConfigured fails when a referenced sub-HOME does not exist', () => {
-  const tempBase = mkTemp('agy-sub-missing-');
-  const homeOk = path.join(tempBase, 'homeOk');
-  const homeMissing = path.join(tempBase, 'homeMissing');
-  fs.mkdirSync(homeOk, { recursive: true });
-
-  const config = {
-    runner: {
-      executors: { gemini: { invocations: [{ id: 'agy-1', command: 'agy', env: { HOME: homeOk } }] } },
-      llmAccounts: { gemini: { gone: { credentialStore: { agy: homeMissing } } } },
-    },
-  };
-
-  const res = checkAgySubHomesConfigured('/dummy', { config });
-  assert.equal(res.passed, false);
-  assert.match(res.message, /not a directory/);
-  assert.ok(res.message.includes(homeMissing));
-  assert.ok(!res.message.includes(homeOk));
-
-  fs.rmSync(tempBase, { recursive: true, force: true });
-});
-
-test('checkAgySubHomesConfigured passes when no agy sub-HOMEs are referenced in config', () => {
-  const config = {
-    runner: {
-      executors: {
-        claude: { invocations: [{ id: 'claude-cli', via: 'cli', command: 'claude' }]},
-      },
-    },
-  };
-
-  const res = checkAgySubHomesConfigured('/dummy', { config });
-  assert.equal(res.passed, true);
-  assert.match(res.message, /no agy sub-HOMEs referenced/);
 });

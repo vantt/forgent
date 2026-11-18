@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import {
   catalogOf, capabilityNamesOf, hasCapabilityEntry, registeredCapabilityOf,
   capabilityPersonaOf, capabilityRigorOf, minCheckersOf, ownMinCheckersOf, capabilityVerifyOf,
-  capabilityConfinementOf, capabilityServesOf, capabilityDescriptionOf, preferOf,
+  capabilityConfinementOf, capabilityDescriptionOf, preferOf,
   hasOwnPreferPool, bindingTasteOf,
 } from '../../../src/runner/execution/capability-config.mjs';
 
@@ -130,12 +130,10 @@ test('an empty minCheckers list is defined and clears; the own read ignores the 
   assert.deepEqual(ownMinCheckersOf(runner, 'code:debug'), []);
 });
 
-test('verify, confinement, serves and description are read raw from the exact entry', () => {
+test('verify, confinement and description are read raw from the exact entry', () => {
   assert.equal(capabilityVerifyOf(runner, 'code:implement'), 'npm test');
   assert.equal(capabilityVerifyOf(runner, 'code:review'), undefined, 'no prefix fallback');
   assert.deepEqual(capabilityConfinementOf(runner, 'review'), { mode: 'required' });
-  assert.deepEqual(capabilityServesOf(runner, 'impact-analysis'), ['gitnexus']);
-  assert.equal(capabilityServesOf(runner, 'review'), undefined);
   assert.equal(capabilityDescriptionOf(runner, 'code:implement'), 'implement');
   assert.equal(capabilityDescriptionOf(runner, 'code:debug'), 'code work', 'the prefix entry describes a name whose own entry has none');
   assert.equal(capabilityDescriptionOf(runner, 'review'), null);

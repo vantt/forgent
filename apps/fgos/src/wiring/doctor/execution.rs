@@ -23,7 +23,6 @@ use fgos_execution::decide::{load_checked_runner, DecideFailure, LoadedRunner, W
 use fgos_execution::tools::tool_posture;
 use serde_json::{json, Value};
 use std::cell::OnceCell;
-use std::ffi::OsStr;
 use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -172,7 +171,7 @@ struct HostOmp {
 impl OmpHost for HostOmp {
     fn omp_version_output(&self) -> Result<String, String> {
         match fgos_process::spawn::run_bounded(
-            OsStr::new("omp"),
+            "omp",
             ["--version"],
             &self.env,
             None,

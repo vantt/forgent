@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "8c516a1323520cbb246c4068cd792c37bc84105f201b43f781c0fcc2916d929a",
+  "payloadDigest": "1ec6c747b5f5750c0450bbd68fca78aa8010d8b84d297e9e95b73f490cb99914",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -100,7 +100,7 @@
     "apps/fgos/src/wiring/doctor/bridge.rs": "f88bdc7742bcef98e0012f8209150b63eb198d1caea6729937e7a4d5275e689a",
     "apps/fgos/src/wiring/doctor/config.rs": "a956ab079d6c7a634df6fd1f9246317135f7cf96a6da2eb1e6f873a1eba1fcec",
     "apps/fgos/src/wiring/doctor/event_store.rs": "61c66e050710eb6ea4aa2f8cb4643bdf91f8cd63bb482f1674de4614edf46e34",
-    "apps/fgos/src/wiring/doctor/execution.rs": "140756e01072955072aadf9a9872245adb25611c8f011fac80e27981d5c28d59",
+    "apps/fgos/src/wiring/doctor/execution.rs": "42788ceaba0547d73b7bfa0b23e358d5f7190e89d3bdee3fcccc4ca63b877701",
     "apps/fgos/src/wiring/doctor/git.rs": "6005888e2f001b67929d65669376e062819ef687f2b70697b607df12f10a5eba",
     "apps/fgos/src/wiring/doctor/holder_lock.rs": "1c1c2e7ee193dd50f01b161e8198de7ec93193ca48f20533694e44a83818dc58",
     "apps/fgos/src/wiring/doctor/identity.rs": "40499cf62343b256decce7c1905cee1bc2f2a5f07e9d7b389f824d8c44de273f",
@@ -423,7 +423,7 @@
     "packages/execution/rust/src/accounts.rs": "4281e003014072f28d7fa044dd282045d930f472c87b1553b677a635351880bb",
     "packages/execution/rust/src/agents.rs": "dffa2143d373326f72cfa5e2b2b8abc534a700e0a5fc2a563d626a699ed3c912",
     "packages/execution/rust/src/bind.rs": "d7fb27369f25c55bc579526fed48438961e3ef670eee71a2ca0cd6995309af42",
-    "packages/execution/rust/src/checks.rs": "7e1144f458bdbea7cb25744a8bdd1e3da6ebddf228ab1910a7652e4ccb51918a",
+    "packages/execution/rust/src/checks.rs": "1ef71cae97834a257ed8b262bae28d6d6077d2ed8ce7502a90a81e9412c55dd5",
     "packages/execution/rust/src/decide.rs": "9a83b4ab77f66a382d94d64516ff31f68654a69ca1d41047003794fa0a4008f3",
     "packages/execution/rust/src/executor_model.rs": "a4e49dd6e4b5bbf010509181d9ff3eceb93f637cce3a791cdc5943aef803aba8",
     "packages/execution/rust/src/explain.rs": "6cd4cf858fc9f7134e47115a471162cec50c72751e2defa5bffd0a5bfb37a304",
@@ -967,7 +967,6 @@
     "scripts/check-hook-registrations-guarded.mjs": "a1e096999674b75b07f6d539997f7e471288a556dc0dbf597d27a9dfb9d804e5",
     "scripts/check-locked-decisions-heading-drift.mjs": "fa87a9f833b12c43cf60322aac482a8bd5e5e7cb889868ed4592816efc80b7f8",
     "scripts/check-undefined-names.mjs": "245c88e83a247f7c83e53bc71d5fe59a9848e8c919fee3e95acfa6edda8b100a",
-    "scripts/checks-vectors.mjs": "3b4144dc245400a3158511b8492d68aeafda09803a2a64f200ed009d9e5a0875",
     "scripts/ci-asset-server.mjs": "2de382cc02067014690b358d4c939149bf0c1b7977071896d9b12137526ff32a",
     "scripts/ci-external-consumer.sh": "aabec414125ada7a812586174c53a116af29a96f9b6e6c0e218adc58fd47c5a9",
     "scripts/ci-setup-bwrap.sh": "04e07490fff85c7e2116f4fe8b9b78f300a4ee488c6475e37aadbaf1c15de9ce",
@@ -1210,7 +1209,7 @@
     "src/runner/execution/account-pin.mjs": "7c9e08246a52b3a19a7fe81e3346e12e0c9e7d43a2ae629318ed9e55fa901d9e",
     "src/runner/execution/account-rotation.mjs": "3f7263e6d0a291ce33aa9c44381138a6ca436f20543565ef857c8f7936388cbe",
     "src/runner/execution/bind.mjs": "cc295f0ffa4e49013ab39519163fd6a49c0d7b1dd371e69cf42bcfe1f45467da",
-    "src/runner/execution/capability-config.mjs": "080196a7484b32d0f4e667403a559129c24c9232948cc2c187dd60dcf8dc7d0f",
+    "src/runner/execution/capability-config.mjs": "043feefd0e107c98cc798d7e5727947e1e8a7f9607ea9b103ce874e34011092a",
     "src/runner/execution/case-admission-port.mjs": "9039951a11acbf69cb549239387cc32ae00617b3ae65bd4682908389b01cdebf",
     "src/runner/execution/case-run-paths.mjs": "4beb8229fa90709bea11c6260c4aee23a99b224a9e6314e69ec74696b86e3ce3",
     "src/runner/execution/commit-unit-work.mjs": "d8853dc5d42a53fa2578304de8ef38d55f04e4c9250a4185999a9d7b1f86a158",
@@ -1279,10 +1278,10 @@
     "src/session-rotation/rotate.mjs": "5e88871207e3df22c7177912bc96cc83761b095fcc9de01ff9f341d516fc87b0",
     "src/setup/agent-cli-trust.mjs": "c42fb3fcb298d53609dcf76893366e45cd2007ab3c0b52a9446f8740b9a8600b",
     "src/setup/agent-hooks.mjs": "b83709854a81b6ea10edd2418be6fb78431f2c194686ab2aa17b44e2703dc4aa",
-    "src/setup/agy-permissions.mjs": "2db5b7aca28256982cf47a8fb9334bbbcd9a9155c0c21fdd8332d8a5a3bbdcdb",
+    "src/setup/agy-permissions.mjs": "09951c187dec7082caee5a1695dd81320eda7ea962ca41ff8bb785f103f87397",
     "src/setup/bin-discovery.mjs": "b5302797ac763fecb24608818bdc8bf37850e0cd5d7a9d98ae677e1f3e684633",
     "src/setup/blind-steps-proven-pools.mjs": "127a0dd8c91755e35f9a1aaa145e4478513dc6fd50e78e967d8762cc89ee3b93",
-    "src/setup/checks.mjs": "7d3ca717d068cf3b2c60552f64a28a3434b0fe158f8e0d9b9b59a782b41832a6",
+    "src/setup/checks.mjs": "07ce696e12fe5a6fc531c9b53735f8a10d75930415acf3e543b447252c28bc52",
     "src/setup/doctor-bridge.mjs": "b9f19285a3cc0c7d006cdd8b928e5c4e0c731d2ce846a44e86ac5308c6eb7fc8",
     "src/setup/executor-profile-warnings.mjs": "8bfa55dd9bd27f37cb7db305d5437d4530082028443dbdc9753bf897087895ff",
     "src/setup/git-hooks.mjs": "4a85ffcf4b6a9da44e620bf4cf340a37642f74701f300c5840546958b6525195",
@@ -1291,8 +1290,7 @@
     "src/setup/instruction-registry.mjs": "0cbf5776e960d58318eb359db934bf692106c57c84fad18319ddef3fce9a6d87",
     "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
     "src/setup/model-pool-checks.mjs": "2e7570e565313df19a151d79aa6bd5ad7f1deed21ea273c61767014869e0eb28",
-    "src/setup/omp-natives-checks.mjs": "a45c5a8a540b1ed467f0b57a367cb756baaadcd417a124190daaced501c86b33",
-    "src/setup/registrations.mjs": "16aca95e297bd8bbe3015af1fd2c253e735d38aa39a47052bd909d3c95789b77",
+    "src/setup/registrations.mjs": "d170467ba8e6b80725ddb6999c48c7006e857f390ef45c9894688e8360bf3d9c",
     "src/setup/run-supervisor-checks.mjs": "31942f9b9dec0bdd009c05199f2fc1a2afe7e6b18f58c50c94d7aa18b0ad0421",
     "src/setup/seat-binding-checks.mjs": "ab0ff541e60c8e5340e87063839f954d970d889159c2aa40ac41992accd2a894",
     "src/setup/session-keep-declared.mjs": "de88967dc8c6dd6a7c460ddf264a07aa13c4c7ee3a458a07ba6be3830e52864e",
@@ -1415,16 +1413,7 @@
     "src/workflow/units-source.mjs": "e4376a8f38d0a55f2e132aa6a094b552e8117eb46b6a4d8b03b00da32d6bb2b4",
     "scripts/lib/git-one-door-declarations.v1.json": "3ff089b6fdbb59c6e58f912603ba8a3e2bae612a1ecebe94e6bc95db590e30d7"
   },
-  "sites": [
-    {
-      "path": "apps/fgos/src/wiring/doctor/execution.rs",
-      "line": 174,
-      "spawn": "Command::new <- packages/process/rust/src/spawn.rs:141",
-      "binary": "? OsStr::new(\"omp\")",
-      "siteId": "omp_version_output:537e34c4465f0df3357a5aa128e39cbf323bf23995024bc2e7f8929c6b8ba62b",
-      "family": "unresolved-binary"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
@@ -3550,6 +3539,14 @@
       "path": "packages/process/rust/src/spawn.rs",
       "line": 141,
       "spawn": "Command::new",
+      "binary": "omp",
+      "class": "argv-runner",
+      "resolvedAt": "apps/fgos/src/wiring/doctor/execution.rs:173"
+    },
+    {
+      "path": "packages/process/rust/src/spawn.rs",
+      "line": 141,
+      "spawn": "Command::new",
       "binary": "ssh",
       "class": "argv-runner",
       "resolvedAt": "packages/identity/rust/src/signing.rs:187"
@@ -4307,41 +4304,41 @@
     {
       "path": "src/setup/doctor-bridge.mjs",
       "line": 78,
-      "spawn": "runBridged -> src/setup/registrations.mjs:252",
+      "spawn": "runBridged -> src/setup/registrations.mjs:249",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2204,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:873",
+      "line": 2013,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:812",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2251,
+      "line": 2060,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:834",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2291,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:873",
+      "line": 2100,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:812",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2298,
+      "line": 2107,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:525",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2465,
+      "line": 2274,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:160",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

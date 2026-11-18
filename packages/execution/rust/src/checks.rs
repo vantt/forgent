@@ -4,7 +4,7 @@
 //!
 //! Rows: `runner-generated-paths`, `executor-confinement`, `invocation-git-write-grants`,
 //! `capability-serves-valid`, `omp-natives-present`, `agy-sub-homes-configured`, `tool-registry-configured`.
-//! Every message is the sentence the Node judge printed; the vectors of `packages/execution/contracts/checks.v1.json`
+//! Every message is the sentence the Node judge printed before it was deleted; the vectors of `packages/execution/contracts/checks.v1.json`
 //! state them. A message that starts with `warning:` is a warning, anything else passes; `passed: false` fails.
 
 use crate::runner_check::validate_generated_paths_shape;
