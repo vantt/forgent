@@ -57,3 +57,12 @@ role is one short invocation; run state (claims, running, settle) through the Ev
 Drive real plans with today's tools (ak:plan plans, `fgos workflow propose|start`, `fgos run --case ... --pattern
 solo`), by hand, and record every friction (`fgos friction record`) and the measures from the prototype's spec §13.3.
 Findings feed this draft. Tracked separately as its own small plan when started.
+
+## Moved out: supervisor liveness, no-progress and pace detection
+
+Owner 2026-11-18 (through the secretary): the supervisor observation that
+`plans/reports/audit-261117-1545-supervisor-watcher-audit.md` section D assigned to this draft (leader liveness,
+two ticks without progress, adaptive pace) moves to the operations measurement plan `plans/261118-0936-ops-metrics`.
+Scope there is detection only, shown in the attention view (`fgos dispatch inspect --attention`); no alerts while
+mailbox stays deferred. This draft no longer owns it. The seven measures of the prototype's spec §13.3 are computed
+by that plan as well.
