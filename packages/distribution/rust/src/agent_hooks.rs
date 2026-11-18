@@ -57,7 +57,7 @@ const SESSION_REGISTER_TIMEOUT_SEC: u64 = 10;
 /// A rotation hook's stop waits for the supervisor's `session answered` reply, which may take its 60 s verb bound.
 const ROTATION_STOP_TIMEOUT_SEC: u64 = 80;
 const ROTATION_START_TIMEOUT_SEC: u64 = 10;
-/// The receipt hook reads one cache file and prints; a stop also reads the transcript.
+/// The receipt hook reads one cache file and prints; a stop also reads the end of the transcript.
 const QUESTIONS_TIMEOUT_SEC: u64 = 10;
 const AGY_ALLOW: &str = r#"{"decision":"allow"}"#;
 
@@ -624,8 +624,8 @@ pub fn hook_rows(root: &Path, mailbox_timeout: u64) -> Vec<HookRow> {
         .args(args)
         .timeout(timeout)
     };
-    // The receipt hook of an answered owner question: guarded like the rotation hook, its stdout reaches the session
-    // (a prompt's context line, a stop's block object). It prints nothing for a session with no answer to tell.
+    // The receipt hook of an answered owner question on Claude Code: guarded like the rotation hook, its stdout reaches
+    // the session (a prompt's context line, a stop's block object). It prints nothing for a session with no answer.
     let claude_questions = |args: &'static str, hook_event: &'static str| {
         HookRow::new(
             "claude",
@@ -745,6 +745,16 @@ pub fn hook_rows(root: &Path, mailbox_timeout: u64) -> Vec<HookRow> {
         )
         .args("--cli codex --event post-tool-use")
         .timeout(mailbox_timeout),
+        // Codex has a Stop block of the same shape; the plain form, like the mailbox rows, since Codex runs the command
+        // through the user's shell. It has no prompt event whose output reaches the session, so it gets this row only.
+        HookRow::new(
+            "codex",
+            KIND_QUESTIONS,
+            "Stop",
+            shim_command(root, "hook questions --cli codex --event stop"),
+        )
+        .args("--cli codex --event stop")
+        .timeout(QUESTIONS_TIMEOUT_SEC),
         HookRow::new(
             "agy",
             KIND_DISPATCH,

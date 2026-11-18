@@ -1,8 +1,9 @@
 //! `fgos hook questions` as a process: two sessions each get only the answers to their own questions, a stop blocks
-//! once and passes when `stop_hook_active` is set or the notice is already in the transcript, the hook writes no
-//! file, and a session whose question was acked is told nothing. The rule behind who is told (the session or one of
-//! its `head:` roles, rotation included) is owned by the module's unit tests; this file proves the wiring of the
-//! binary over the view `.fgos/cache/questions.json`.
+//! (Claude Code, and Codex through the thread its payload names) and passes when the notice is already in the
+//! transcript, the hook writes no file, and a session whose question was acked is told nothing. The rule behind who is
+//! told (the session or one of its `head:` roles, rotation included) and the stop cases (`stop_hook_active`, notices
+//! already shown) are owned by the module's unit tests; this file proves the wiring of the binary over the view
+//! `.fgos/cache/questions.json`.
 #![cfg(target_os = "linux")]
 
 use serde_json::{json, Value};
@@ -47,7 +48,9 @@ impl Scene {
         .unwrap();
     }
 
-    fn fgos(&self, session: &str, args: &[&str]) -> Command {
+    /// The binary run with the session environment of `var` (`FGOS_SESSION_ID` for Claude Code's tool process; a
+    /// Codex hook process carries none).
+    fn fgos_with(&self, var: Option<(&str, &str)>, args: &[&str]) -> Command {
         let mut command = Command::new(PathBuf::from(env!("CARGO_BIN_EXE_fgos")));
         command
             .current_dir(self.root.join("project"))
@@ -55,9 +58,15 @@ impl Scene {
             .env("HOME", self.root.join("home"))
             .env("PATH", std::env::var_os("PATH").unwrap_or_default())
             .env("FGOS_STATE_ROOT", self.root.join("state"))
-            .env("FGOS_SESSION_ID", session)
             .args(args);
+        if let Some((name, value)) = var {
+            command.env(name, value);
+        }
         command
+    }
+
+    fn fgos(&self, session: &str, args: &[&str]) -> Command {
+        self.fgos_with(Some(("FGOS_SESSION_ID", session)), args)
     }
 
     /// The Identity id of the session the environment names (machine id, slash, the environment's id).
@@ -72,8 +81,14 @@ impl Scene {
     }
 
     fn run(&self, session: &str, event: &str, stdin: &str) -> Output {
-        let mut child = self
-            .fgos(session, &["hook", "questions", "--event", event])
+        self.spawn(
+            self.fgos(session, &["hook", "questions", "--event", event]),
+            stdin,
+        )
+    }
+
+    fn spawn(&self, mut command: Command, stdin: &str) -> Output {
+        let mut child = command
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
@@ -152,19 +167,17 @@ fn each_session_is_told_only_the_answers_to_its_own_questions_and_the_hook_write
 }
 
 #[test]
-fn a_stop_blocks_once_passes_when_the_hook_is_active_or_the_notice_is_in_the_transcript_and_a_missing_view_prints_nothing(
-) {
+fn a_stop_blocks_until_the_notice_is_in_the_transcript_and_a_missing_view_prints_nothing() {
     let scene = Scene::new("stop");
     let id_a = scene.identity_of(SESSION_A);
     scene.write_view(vec![question("q-a", "answered", &id_a, "miu")]);
     let transcript = scene.root.join("transcript.jsonl");
     fs::write(&transcript, "{\"type\":\"user\"}\n").unwrap();
-    let payload = |active: bool| {
-        json!({ "stop_hook_active": active, "transcript_path": transcript }).to_string()
-    };
+    let payload = json!({ "hook_event_name": "Stop", "stop_hook_active": false, "transcript_path": transcript })
+        .to_string();
     let before = scene.tree();
 
-    let blocked = scene.run(SESSION_A, "stop", &payload(false));
+    let blocked = scene.run(SESSION_A, "stop", &payload);
     assert!(blocked.status.success(), "{blocked:?}");
     let doc: Value = serde_json::from_str(out(&blocked).trim()).unwrap();
     assert_eq!(doc["decision"], "block");
@@ -172,8 +185,6 @@ fn a_stop_blocks_once_passes_when_the_hook_is_active_or_the_notice_is_in_the_tra
         .as_str()
         .unwrap()
         .contains("fgos questions ack q-a"));
-    assert!(out(&scene.run(SESSION_A, "stop", &payload(true))).is_empty());
-    assert!(out(&scene.run(SESSION_B, "stop", &payload(false))).is_empty());
 
     // The notice was shown on the prompt, so the transcript holds its line: the stop passes.
     fs::write(
@@ -181,7 +192,7 @@ fn a_stop_blocks_once_passes_when_the_hook_is_active_or_the_notice_is_in_the_tra
         "{\"context\":\"owner answered q-a: write it back, then: fgos questions ack q-a\"}\n",
     )
     .unwrap();
-    assert!(out(&scene.run(SESSION_A, "stop", &payload(false))).is_empty());
+    assert!(out(&scene.run(SESSION_A, "stop", &payload)).is_empty());
     let before = {
         let mut tree = before;
         tree.insert(transcript.clone(), fs::read(&transcript).unwrap());
@@ -192,6 +203,46 @@ fn a_stop_blocks_once_passes_when_the_hook_is_active_or_the_notice_is_in_the_tra
     fs::remove_file(scene.view_path()).unwrap();
     let none = scene.run(SESSION_A, "user-prompt-submit", "");
     assert!(none.status.success() && out(&none).is_empty());
+}
+
+#[test]
+fn a_codex_stop_names_its_session_in_the_payload_not_in_the_hook_process_environment() {
+    let scene = Scene::new("codex");
+    let thread = "00000000-0000-4000-8000-0000000000dd";
+    let id = {
+        let out = scene
+            .fgos_with(
+                Some(("CODEX_THREAD_ID", thread)),
+                &["identity", "session", "--json"],
+            )
+            .output()
+            .unwrap();
+        let doc: Value = serde_json::from_slice(&out.stdout).unwrap();
+        doc["data"]["id"].as_str().unwrap().to_owned()
+    };
+    scene.write_view(vec![question("q-c", "answered", &id, "cdx")]);
+    let transcript = scene.root.join("transcript.jsonl");
+    fs::write(&transcript, "{}\n").unwrap();
+    let stop = |session: &str| {
+        let payload = json!({ "hook_event_name": "Stop", "session_id": session,
+                              "stop_hook_active": false, "transcript_path": transcript })
+        .to_string();
+        scene.spawn(
+            scene.fgos_with(
+                None,
+                &["hook", "questions", "--cli", "codex", "--event", "stop"],
+            ),
+            &payload,
+        )
+    };
+    let blocked = stop(thread);
+    let doc: Value = serde_json::from_str(out(&blocked).trim()).unwrap();
+    assert_eq!(doc["decision"], "block");
+    assert!(doc["reason"]
+        .as_str()
+        .unwrap()
+        .contains("fgos questions ack q-c"));
+    assert!(out(&stop("00000000-0000-4000-8000-0000000000ee")).is_empty());
 }
 
 #[test]

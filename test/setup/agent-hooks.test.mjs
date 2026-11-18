@@ -644,23 +644,31 @@ test('the hook table is the only source of each CLI\'s rows', () => {
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
-test('setup writes the questions receipt hook for Claude Code only, on UserPromptSubmit and Stop, and doctor fails a file without it', () => {
+// The Node mirror and this case retire together once the Rust door is the only writer of hook files.
+test('setup writes the questions receipt hook for Claude Code (prompt and stop) and Codex (stop), not agy, and doctor fails a file without it', () => {
   const repoRoot = mkTempDir('agent-hooks-questions-');
   mockRunnableShim(repoRoot);
   installAllAgentHooks(repoRoot);
   const rows = agentHookRows(repoRoot).filter((row) => row.kind === 'questions');
-  assert.deepEqual(rows.map((row) => `${row.cli} ${row.event} ${row.args}`), ['claude UserPromptSubmit --event user-prompt-submit', 'claude Stop --event stop']);
+  assert.deepEqual(rows.map((row) => `${row.cli} ${row.event} ${row.args}`), ['claude UserPromptSubmit --event user-prompt-submit', 'claude Stop --event stop', 'codex Stop --cli codex --event stop']);
   const claude = readFile(repoRoot, 'claude');
-  const questions = (event) => claude.hooks[event].filter((entry) => entry.hooks[0].command.includes('hook questions'));
-  assert.deepEqual(questions('UserPromptSubmit').map((entry) => entry.hooks[0].command), [rows[0].command]);
-  assert.deepEqual(questions('Stop').map((entry) => entry.hooks[0].command), [rows[1].command]);
-  for (const cli of ['codex', 'agy']) assert.ok(!JSON.stringify(readFile(repoRoot, cli)).includes('hook questions'), cli);
+  const questions = (file, event) => file.hooks[event].filter((entry) => entry.hooks[0].command.includes('hook questions'));
+  assert.deepEqual(questions(claude, 'UserPromptSubmit').map((entry) => entry.hooks[0].command), [rows[0].command]);
+  assert.deepEqual(questions(claude, 'Stop').map((entry) => entry.hooks[0].command), [rows[1].command]);
+  assert.deepEqual(questions(readFile(repoRoot, 'codex'), 'Stop').map((entry) => entry.hooks[0].command), [rows[2].command]);
+  assert.ok(!JSON.stringify(readFile(repoRoot, 'agy')).includes('hook questions'));
   assert.equal(checkClaudeHook(repoRoot).passed, true);
-  // A file that lost the rows is not wired: the Claude Code doctor row judges every row of the table.
+  assert.equal(checkCodexHook(repoRoot).passed, true);
+  // A file that lost the rows is not wired: the doctor row of each CLI judges every row of the table.
   const file = path.join(repoRoot, '.claude', 'settings.json');
   for (const event of ['UserPromptSubmit', 'Stop']) claude.hooks[event] = claude.hooks[event].filter((entry) => !entry.hooks[0].command.includes('hook questions'));
   fs.writeFileSync(file, JSON.stringify(claude));
   assert.equal(checkClaudeHook(repoRoot).passed, false);
+  const codexFile = path.join(repoRoot, '.codex', 'hooks.json');
+  const codex = readFile(repoRoot, 'codex');
+  codex.hooks.Stop = codex.hooks.Stop.filter((entry) => !entry.hooks[0].command.includes('hook questions'));
+  fs.writeFileSync(codexFile, JSON.stringify(codex));
+  assert.equal(checkCodexHook(repoRoot).passed, false);
 });
 
 test('setup writes a SessionStart registration row for Claude Code, Codex and agy, none for omp and pi, and doctor accepts it', () => {
@@ -713,7 +721,10 @@ test('mailbox rows install Stop and PostToolUse for Claude Code and Codex and no
   assert.equal(claude.hooks.PostToolUse[0].matcher, '*');
   const shim = path.join(fs.realpathSync(repoRoot), '.fgos', 'installation', 'bin', 'fgos');
   const codex = readFile(repoRoot, 'codex');
-  assert.deepEqual(codex.hooks.Stop, [{ hooks: [{ type: 'command', command: `'${shim}' hook mailbox --cli codex --event stop`, timeout: 10 }] }]);
+  assert.deepEqual(codex.hooks.Stop, [
+    { hooks: [{ type: 'command', command: `'${shim}' hook mailbox --cli codex --event stop`, timeout: 10 }] },
+    { hooks: [{ type: 'command', command: `'${shim}' hook questions --cli codex --event stop`, timeout: 10 }] },
+  ]);
   assert.deepEqual(codex.hooks.PostToolUse, [{ hooks: [{ type: 'command', command: `'${shim}' hook mailbox --cli codex --event post-tool-use`, timeout: 10 }] }]);
   assert.ok(!JSON.stringify(readFile(repoRoot, 'agy')).includes('hook mailbox'));
   // The rows' timeout comes from the standard's hook budget, so no config may raise the budget past it:
@@ -799,7 +810,8 @@ test('mailbox rows install only when the project opts in, and opting out removes
   assert.deepEqual(after.hooks.Stop.map((entry) => entry.hooks[0].command), [agentHookRows(repoRoot).find((r) => r.cli === 'claude' && r.kind === 'session-rotation' && r.event === 'Stop').command, agentHookRows(repoRoot).find((r) => r.cli === 'claude' && r.kind === 'questions' && r.event === 'Stop').command, userOwn]);
   assert.equal(after.hooks.PostToolUse, undefined, 'an event left empty by our removal is dropped');
   assert.equal(after.hooks.PreToolUse.length, 3, 'the guards stay');
-  assert.equal(readFile(repoRoot, 'codex').hooks.Stop, undefined);
+  // Codex keeps the questions row, which does not follow the mailbox opt-in either.
+  assert.deepEqual(readFile(repoRoot, 'codex').hooks.Stop.map((entry) => entry.hooks[0].command), [agentHookRows(repoRoot).find((r) => r.cli === 'codex' && r.kind === 'questions').command]);
   assert.equal(checkClaudeHook(repoRoot).passed, true);
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
@@ -960,8 +972,8 @@ test('command is kind recognises its own entries with cli and event and never a 
   const stop = readFile(repoRoot, 'codex').hooks.Stop;
   const ours = agentHookRows(repoRoot).find((r) => r.cli === 'codex' && r.event === 'Stop').command;
   assert.equal(stop[0].hooks[0].command, ours, 'our moved command is replaced in place');
-  assert.deepEqual(stop.slice(1).map((e) => e.hooks[0].command), userHooks, 'user hooks stay as they were');
-  assert.equal(stop.length, 4, 'nothing duplicated');
+  assert.deepEqual(stop.slice(1, 1 + userHooks.length).map((e) => e.hooks[0].command), userHooks, 'user hooks stay as they were');
+  assert.equal(stop.length, 5, 'nothing duplicated: ours is the mailbox row in place and the questions row after the user hooks');
   fs.rmSync(base, { recursive: true, force: true });
 });
 
@@ -999,7 +1011,7 @@ test('a command whose tail merely reads like ours is not owned', () => {
   installCodexHook(repoRoot);
   const stop = readFile(repoRoot, 'codex').hooks.Stop;
   assert.deepEqual(stop.slice(0, 2).map((e) => e.hooks[0].command), lookalikes);
-  assert.equal(stop.length, 3, 'ours was added beside them');
+  assert.equal(stop.length, 4, 'ours (the mailbox and questions rows) were added beside them');
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 

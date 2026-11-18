@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "47f9b5999372016fc601c63b25d147e82c8facd76dae4af79f2c02ea798e0b1a",
+  "payloadDigest": "afe73a26e2a1dabe70f740d1ccd9a4d2a7bff02b3840763764e56f7af137b4a3",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -140,7 +140,7 @@
     "apps/fgos/src/wiring/observe_sources/plan_text.rs": "a71317e73180193a53d3e7f9b4b19ad18aef8c989a6e8981ba41108e1b1438c3",
     "apps/fgos/src/wiring/observe_sources/tests/mod.rs": "31dc722689a7c618888f6c58ab36abe54ee9a23cfda6c18ce9b9472e3b68e688",
     "apps/fgos/src/wiring/questions.rs": "0616da2649838c4db9c26b6c8e585fb37781579649b7b51b351d97ee943f140a",
-    "apps/fgos/src/wiring/questions_hook.rs": "c795918fae4885e7b594f97d76d361fd0246878d38b0d892abaec784d8345bdf",
+    "apps/fgos/src/wiring/questions_hook.rs": "707fe50b85e8bad1eb7b8b2dc93bccdae8d9abaf0c5ab6bfe6c0664109bf9444",
     "apps/fgos/src/wiring/questions_hook_unsupported.rs": "a95f0cf73750cc8878fb8ee62c0506e4f19473d8d8721e36eb274315370bf195",
     "apps/fgos/src/wiring/run_dirs.rs": "8248bf1a45d37e2ca03315dea11489b6b90362a47479244a10a7c71648e90f60",
     "apps/fgos/src/wiring/seat_binding.rs": "9eb8ef8e81b7314cab1d579a3e7312aa413c268405271db2d3dc64f0cfe7b1b3",
@@ -156,7 +156,7 @@
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "a35e94cd71509b6fb9de91bf771a0b65a8dbb9e495c5aefefb633b9f3a880643",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
-    "apps/fgos/tests/questions_hook.rs": "2760c0ebccc3d7256080d050b5793efe1dd7041f8a7025fe01deafa36a958197",
+    "apps/fgos/tests/questions_hook.rs": "1c206c5633a8ec75345fdcc4debd1efe30f8aa996aa48e00e3963c426061f5a2",
     "apps/fgos/tests/questions_verb.rs": "b0ccc8a1c82bbf81b7ad84eecfdcf4a2e3c350eb297cf6749645b4ee1a3296dd",
     "apps/fgos/tests/windows_borrow.rs": "4e77453a5386cf512a22db39e6a529e163c7dc930d8795c93ef05e60ba19c7b9",
     "apps/fgos/tests/windows_doctor_lock_rows.rs": "943ba00e7be5382a532ad47bfa38f6fef888428910e5f70ee18518edeb1eeb63",
@@ -327,7 +327,7 @@
     "packages/convention/rust/tests/golden.rs": "441f8301cc35be9151f492d151eac4cfe7fe4c589045c1b8ae9d1ac21119f2df",
     "packages/distribution/rust/examples/print-workspace-shim.rs": "767a8d526d1b030dd4327509a63c9e194ed03fe2ae5a2a263682cd62724dc6d4",
     "packages/distribution/rust/src/agent_config.rs": "8d80110436c199e7e57e694ba2435b27c2cfa90a4f64ab3c51ca8ad3ce1e5ba0",
-    "packages/distribution/rust/src/agent_hooks.rs": "7fa8c469cf377325288baa6681b9374bf4874cd5554af278eaaf1d491ad88e8e",
+    "packages/distribution/rust/src/agent_hooks.rs": "1a3fed20925f88ca9e473b9f318e7b1ac1746dcc9f05d3cd202874c6eba9d019",
     "packages/distribution/rust/src/bin_cache.rs": "61732e61ebfcda7d6ea52c34c05603b23655b57212616b9c26214f51525bab2c",
     "packages/distribution/rust/src/canonical.rs": "1ed17ee314cadcd425f25919740a7d80b7596871986c9940094fdd2cf4b7542a",
     "packages/distribution/rust/src/coexistence.rs": "6d9ad8ed722734b4a2c6151dcf4a87f64d1cc37354d3b40754d3f95038684c9e",
@@ -817,7 +817,7 @@
     "packages/process/rust/tests/spawn_mapped.rs": "0f6fe2829371478458a8773ce4e3927abf76d3ba12e142e88690aa195dbb33f1",
     "packages/process/rust/tests/windows_job_domain.rs": "ef875f367c2bd361ba1e9743eb021bedfd7fac299781cc650e72fe06d6ba419c",
     "packages/process/rust/tests/windows_spawn.rs": "ac45d3b618d92790e926c41e7910f95f46440aab35ce1100e7f16c7a6b73fa97",
-    "packages/questions/rust/src/caller.rs": "09ee368095bfee3472ac75196e797adda350725f0f70b314a0817e01d6676b68",
+    "packages/questions/rust/src/caller.rs": "3f414a0989b20b241000992b9846f5160a2cc4a9dd21a40279938882200c21c5",
     "packages/questions/rust/src/lib.rs": "834be7b677ea6f1bfaf234c72bc725836f3d38dbcd87c932b5e6a985b293702b",
     "packages/questions/rust/src/record.rs": "d910e3c486f18e67ced0ed20af3fee25d344f408bb01efd37ec3dc222961099f",
     "packages/questions/rust/src/refcheck.rs": "6830335fdb3765da40df1de503d815a2a0211c009bba7a41e70cef873d515403",
@@ -1343,7 +1343,7 @@
     "src/session-rotation/handoff-store.mjs": "3d1385774aa7c09573a6e298f82e7bf75d55beb436d9caa7c266cc1735c46128",
     "src/session-rotation/rotate.mjs": "933fb64dc09eaf6ac214ed305ef11236b7750455b1b2f9879da017d6ec124f64",
     "src/setup/agent-cli-trust.mjs": "c42fb3fcb298d53609dcf76893366e45cd2007ab3c0b52a9446f8740b9a8600b",
-    "src/setup/agent-hooks.mjs": "b5f3f74acba848c720e3880ec69db81fe948b4ff457fcc6029816dffa0b8be20",
+    "src/setup/agent-hooks.mjs": "850a6660bf2588d850190e9ed5e45369d0d30e467568462b478dd6327fddffac",
     "src/setup/agy-permissions.mjs": "09951c187dec7082caee5a1695dd81320eda7ea962ca41ff8bb785f103f87397",
     "src/setup/bin-discovery.mjs": "b5302797ac763fecb24608818bdc8bf37850e0cd5d7a9d98ae677e1f3e684633",
     "src/setup/blind-steps-proven-pools.mjs": "127a0dd8c91755e35f9a1aaa145e4478513dc6fd50e78e967d8762cc89ee3b93",
@@ -3633,7 +3633,7 @@
       "spawn": "Command::new",
       "binary": ".fgos",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1585"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1595"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3641,7 +3641,7 @@
       "spawn": "Command::new",
       "binary": "bin",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1585"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1595"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3665,7 +3665,7 @@
       "spawn": "Command::new",
       "binary": "fgos",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1585"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1595"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
@@ -3673,7 +3673,7 @@
       "spawn": "Command::new",
       "binary": "installation",
       "class": "argv-runner",
-      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1585"
+      "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1595"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",

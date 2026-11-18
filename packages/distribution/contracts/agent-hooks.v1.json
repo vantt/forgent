@@ -137,6 +137,15 @@
         "matcher": null,
         "command": "'<ROOT>/.fgos/installation/bin/fgos' hook mailbox --cli codex --event post-tool-use",
         "timeout": 10
+      },
+      {
+        "cli": "codex",
+        "kind": "questions",
+        "args": "--cli codex --event stop",
+        "event": "Stop",
+        "matcher": null,
+        "command": "'<ROOT>/.fgos/installation/bin/fgos' hook questions --cli codex --event stop",
+        "timeout": 10
       }
     ],
     "agy": [

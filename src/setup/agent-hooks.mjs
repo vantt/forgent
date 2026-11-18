@@ -209,7 +209,7 @@ const claudeRotationRow = (args, event, timeout) => ({
   command: `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" hook ${HOOK_KINDS.ROTATION} ${args} || true`, timeout,
 });
 
-// The receipt hook of an answered owner question: Claude Code only, guarded like the rotation hook.
+// The receipt hook of an answered owner question on Claude Code, guarded like the rotation hook (Codex has a plain Stop row).
 const QUESTIONS_TIMEOUT_SEC = 10;
 const claudeQuestionsRow = (args, event) => ({
   cli: 'claude', kind: HOOK_KINDS.QUESTIONS, args, event, matcher: null,
@@ -250,6 +250,7 @@ const hookRows = (repoRoot) => [
   // the head position (measured at V5). A missing shim therefore shows an error on each call.
   { cli: 'codex', kind: HOOK_KINDS.MAILBOX, args: '--cli codex --event stop', event: 'Stop', matcher: null, command: shimCommand(repoRoot, 'hook mailbox --cli codex --event stop'), timeout: mailboxHookTimeoutSec() },
   { cli: 'codex', kind: HOOK_KINDS.MAILBOX, args: '--cli codex --event post-tool-use', event: 'PostToolUse', matcher: null, command: shimCommand(repoRoot, 'hook mailbox --cli codex --event post-tool-use'), timeout: mailboxHookTimeoutSec() },
+  { cli: 'codex', kind: HOOK_KINDS.QUESTIONS, args: '--cli codex --event stop', event: 'Stop', matcher: null, command: shimCommand(repoRoot, 'hook questions --cli codex --event stop'), timeout: QUESTIONS_TIMEOUT_SEC },
   { cli: 'agy', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', group: 'fgos-dispatch-guard', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide --format=agy'), timeout: 10 },
   { cli: 'agy', kind: HOOK_KINDS.DECISION, event: 'PreToolUse', group: 'fgos-decision-guard', matcher: 'ask.*|AskUserQuestion', command: shimCommand(repoRoot, 'hook decision-question --format=agy'), timeout: 10 },
   { cli: 'agy', kind: HOOK_KINDS.DELETE_GUARD, event: 'PreToolUse', group: 'fgos-delete-guard', matcher: 'run_command', command: wrappedDeleteGuard(repoRoot, `${HOOK_KINDS.DELETE_GUARD} --format=agy`, AGY_ALLOW), ownedPattern: wrappedGuardPattern(' --format=agy'), timeout: 10 },
