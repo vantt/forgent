@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Operations measurement: one observe contract for writing and querying, run facts, friction, attention detections"
-status: running
+status: done
 priority: P1
 blockedBy: []
 footprint:
@@ -149,7 +149,7 @@ their consumers. A detection the supervisor plan adds later (pace, OM-D10), or o
 | 14 | [Attention detections as definitions](phase-14-attention-detections.md) | 7, 8, 11 | src/runner/dispatch/attention-view.mjs, src/verbs/dispatch/inspect.mjs, core/attention/**, core/config-standard/dispatch.yaml, core/config-schema/dispatch.schema.yaml, packages/config/contracts/fixtures/**, test/runner/dispatch-runtime-inspect.test.mjs | 5 | done |
 | 15 | [Driving measures as definitions](phase-15-driving-measures.md) | 7, 8, 11 | domains/coding/observe/**, apps/fgos/tests/driving_definitions.rs, test/fixtures/observe/driving/** | 5 | done |
 | 17 | [Query grammar for the supervisor's definitions](phase-17-grammar-for-supervisor-definitions.md) | 5, 7 | packages/observe/rust/src/query/**, packages/observe/rust/src/definition/**, packages/observe/rust/src/metrics_cli/query.rs, packages/observe/rust/tests/query_*.rs, packages/observe/rust/tests/definition_*.rs, test/fixtures/observe/query/** | 5 | done |
-| 16 | [Docs, backlog, doctor and integration gate](phase-16-docs-and-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17 | docs/platform/observe/**, docs/backlog.md, CHANGELOG.md, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/observe.rs | 6 | running |
+| 16 | [Docs, backlog, doctor and integration gate](phase-16-docs-and-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17 | docs/platform/observe/**, docs/backlog.md, CHANGELOG.md, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/observe.rs | 6 | done |
 
 Contract reading check (planner), after the independent validation of 2026-11-18
 (`reports/validation-261118-plan-review.md`):
@@ -204,13 +204,13 @@ lanes. Two steps wait on outside events; a short lead finishes them:
    backed up under `.fgos/runtime/tmp/friction-shards-backup-20261118/`, but the pre-commit guard refuses any staged
    deletion under `.fgos/` (also in the main checkout); removing it needs an owner decision on that guard (supervisor,
    2026-11-18 22:0x).
-2. **CHANGELOG.** Gate: plan 261118-1455 (S6a worktree door) is done, so `CHANGELOG.md` can rejoin this footprint. Add
+2. **CHANGELOG.** Done 2026-11-18 22:1x by the supervisor (owner: close the plan). Gate was: plan 261118-1455 (S6a worktree door) is done, so `CHANGELOG.md` can rejoin this footprint. Add
    `[Unreleased]` lines for phases 14-17: `fgos dispatch inspect --attention` head-gone / plan-no-progress rows and
    `dispatch.attention.planNoProgressMinutes`; driving-measure definitions under `domains/coding/observe/definitions`;
    the phase 17 query forms (prefix, any, anchor after, without.latest, window own, k/within from a param, max:end,
    min:ts); doctor rows `observe-write-health` and `observe-friction-migrated`.
 
-Then mark phase 16 and the plan `done`.
+Then mark phase 16 and the plan `done`. Done 2026-11-18.
 
 ## Owner questions
 
