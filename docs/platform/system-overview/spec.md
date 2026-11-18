@@ -50,6 +50,7 @@ coverage: partial
 - distillery — vùng học từ reference sources: index feature từng nguồn, so sánh chéo, porting log; spec: ../distillery/spec.md (partial — chỉ phủ porting lifecycle, xem Open Gaps trong spec đó)
 - distill-skill — skill portable vận hành vòng học (init/add/delta/seal/check); spec: chưa có (harvest sẽ viết)
 - convention — nguồn quy tắc máy-chạy được cho sinh/kiểm tên và vị trí repository-relative, không sở hữu state hay sức khoẻ thân tài liệu; trạng thái implemented; spec: `docs/platform/convention/spec.md`
+- supervision — điều phối plan của một project không cần người ngồi canh: watcher Rust không LLM chạy theo timer, supervisor LLM được đánh thức qua một cửa `fgos supervisor wake`, một lead cho mỗi plan, bể lane theo máy và một cửa hạ cánh `fgos land`; trạng thái planned (chưa có crate, verb hay timer); spec: [../supervision/spec.md](../supervision/spec.md)
 
 ## Shared Entities
 
