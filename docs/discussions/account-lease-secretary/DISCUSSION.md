@@ -6,7 +6,7 @@ topic: backlog row p-mnymjukvqd (seat-binding / accounts)
 shaper: lead:ACCOUNT-SHAPE (claude-mkz3@fg-server2), opened by head:secretary-miu
 opened: 2026-11-18 18:08
 domain: platform (seat binding, runner accounts); không có domains/<domain>/AGENTS.md riêng
-open owner questions: QUESTIONS.md (Q1 đã trả lời B; Q2 chặn đặt tài khoản thật vào pool pane; Q3, Q4 có mặc định)
+open owner questions: QUESTIONS.md (Q1 đã trả lời B; Q2 đã trả lời (tetcu, anhdvh, van.tran), còn chờ chủ dự án đăng nhập từng thư mục; Q3, Q4 có mặc định)
 ```
 
 ## Hand-off cho planner
@@ -19,12 +19,12 @@ open owner questions: QUESTIONS.md (Q1 đã trả lời B; Q2 chặn đặt tài
   2. `fgos dispatch explain` cho một ghế pane bất kỳ không bao giờ liệt kê tài khoản của Miu trong walk.
   3. Một lần khởi động thật của một pane claude lease đúng một tài khoản của pool pane; một lần khởi động thật của Miu (đường đã chọn ở Q1) chạy đúng tài khoản của Miu và không tiêu quota pane.
   4. Hết quota pool pane: bằng chứng thật (hoặc ca vàng của crate) rằng ghế đổi tài khoản, rồi đổi family, rồi từ chối theo tên; Miu vẫn chạy.
-- **Open points that block only some parts.** Q1 đã trả lời B nên task `miu-start` không còn bị chặn bởi owner. Q2 chặn bước đặt số tài khoản thật vào pool pane (task `pane-pool`). Q3 và Q4 có mặc định, không chặn.
+- **Open points that block only some parts.** Q1 đã trả lời B nên task `miu-start` không còn bị chặn bởi owner. Q2 đã trả lời; task `pane-pool` còn chờ chủ dự án tự đăng nhập ba thư mục (agent không đăng nhập hộ). Q3 và Q4 có mặc định, không chặn.
 - **Source ids.** p-mnymjukvqd; quyết định 86 Q2 (docs/platform/agent-confinement/spec.md mục 4 của danh sách store); RUL102, RUL105, RUL106 (docs/platform/runner/subcomponents/h-6979005beaf7/spec.md); D-ADR0072 (docs/platform/seat-binding/spec.md).
 
 ## 1. Trạng thái hiện tại
 
-Việc khảo sát xong, thiết kế chốt, còn hai câu hỏi cho chủ dự án (Q1, Q2) chỉ chặn từng phần. Phát hiện quan trọng nhất: **pane hiện đang dùng chung quota với Miu**, vì pool `claude` duy nhất trên máy này có một tài khoản `vantt` mà login của nó là cùng một tài khoản Anthropic với login mặc định trong `~/.claude` (hai login khác thư mục, cùng một tài khoản). Cần thêm tài khoản khác và tắt tài khoản này khỏi pool pane. Người chỉ có một tài khoản Claude thì không có gì để tách: pane và phiên chính chung quota, và fgOS vẫn phải chạy được cho họ. Đường "config thuần" làm được ngay; đường để Miu khởi động tin cậy qua `fgos head start` cần một chút code Rust nhỏ (Q1).
+Việc khảo sát xong, thiết kế chốt, Q1 và Q2 đã được chủ dự án trả lời; còn Q3, Q4 có mặc định, và việc đăng nhập ba thư mục là của chủ dự án. Phát hiện quan trọng nhất: **pane hiện đang dùng chung quota với Miu**, vì pool `claude` duy nhất trên máy này có một tài khoản `vantt` mà login của nó là cùng một tài khoản Anthropic với login mặc định trong `~/.claude` (hai login khác thư mục, cùng một tài khoản). Cần thêm tài khoản khác và tắt tài khoản này khỏi pool pane. Người chỉ có một tài khoản Claude thì không có gì để tách: pane và phiên chính chung quota, và fgOS vẫn phải chạy được cho họ. Đường "config thuần" làm được ngay; đường để Miu khởi động tin cậy qua `fgos head start` cần một chút code Rust nhỏ (Q1).
 
 ## 2. Mục tiêu và đề bài
 
@@ -61,6 +61,7 @@ Id cục bộ của phiên shaping; planner mint D-ADR qua `fgos identity mint d
 | OD2 | Mọi tài khoản Claude khác ở thư mục login riêng ngoài home mặc định, chỉ xuất hiện trong pool của pane | chủ dự án 2026-11-18 |
 | OD3 | Tài khoản của Miu không bao giờ bị pane làm cạn | chủ dự án 2026-11-18 |
 | OD4 | Miu bật lần đầu bằng `fgos head start secretary --name miu` (không bằng `claude` tay) để các lần refresh tự rotate theo ngưỡng; tài khoản của Miu và các Miu kế nhiệm ở pool riêng `claude-miu`, không lẫn pool pane | chủ dự án 2026-11-18 18:32 (Q1 = B) |
+| OD5 | Pool pane gồm ba tài khoản `tetcu`, `anhdvh`, `van.tran`, mỗi cái một thư mục `~/.fgos/private/claude-<id>`; `claude/vantt` rời pool pane (tắt) khi ít nhất một trong ba đã đăng nhập và qua probe, và trở thành tài khoản của Miu trong pool `claude-miu` | chủ dự án 2026-11-18 (Q2) + SD2 |
 | SD1 | Dùng nhà của cơ chế có sẵn: `llmAccounts` + cờ `disabled` + lease/quarantine/walk hiện tại. Không thêm cơ chế lease mới | F1, F10 (L10, tenet một cửa) |
 | SD2 | Tài khoản `claude/vantt` hiện có là tài khoản của Miu về mặt quota (F3): ra khỏi pool pane ngay khi pool có ít nhất một tài khoản khác. Cho tới lúc đó pane vẫn chung quota với Miu | F3 |
 | SD3 | Thêm một hàng doctor **cảnh báo, không bao giờ từ chối hay fail**, khi một store của `llmAccounts` có đường thật (realpath) trùng thư mục login mặc định của chính CLI đó, nêu rủi ro gia hạn (F15); dùng bảng `CLI_LOGIN_HOMES` có sẵn. Không từ chối cứng, vì người chỉ có một tài khoản Claude (login ở `~/.claude`) vẫn phải dùng được fgOS (chủ dự án 2026-11-18 18:22) | F11, F15, tenet "một cửa cần guard máy móc", ranh giới sứ mệnh (fgOS phục vụ project khác) |
@@ -74,6 +75,8 @@ Id cục bộ của phiên shaping; planner mint D-ADR qua `fgos identity mint d
 - 2026-11-18 18:22 — Chủ dự án: người chỉ có một tài khoản Claude không được bị chặn ⇒ guard tầng 2 thành cảnh báo (SD3).
 - 2026-11-18 18:30 — Chủ dự án: lần đầu bật tay được, các lần refresh phải tự động; tìm ra rotate tự động chỉ áp cho head từ `head start` (F16).
 - 2026-11-18 18:32 — Q1 trả lời B (OD4).
+
+- 2026-11-18 18:40 — Q2 trả lời: `tetcu`, `anhdvh`, `van.tran` (OD5).
 
 ## 6. Thiết kế đã chốt {#design}
 
