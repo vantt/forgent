@@ -290,3 +290,37 @@ fn a_path_that_is_not_a_canonical_literal_is_refused() {
         assert_eq!(error.cause, "invalid-literal-path", "{bad:?}");
     }
 }
+
+#[test]
+fn a_merge_header_counts_against_the_commit_bound_so_a_cut_walk_is_never_called_complete() {
+    let f = fixture("bound-merge");
+    commit(&f.root, &[("plans/p", "1")], T0);
+    git(&f.root, &["checkout", "-q", "-b", "side"]);
+    commit(&f.root, &[("plans/s", "1")], T0 + 10);
+    git(&f.root, &["checkout", "-q", "main"]);
+    commit(&f.root, &[("plans/m", "1")], T0 + 20);
+    git(&f.root, &["merge", "-q", "--no-ff", "side", "-m", "merge"]);
+    let b = commit(&f.root, &[("plans/p", "2")], T0 + 40);
+    let tip = f.oid(&b);
+    let mut req = request(std::slice::from_ref(&tip), &["plans"]);
+    req.max_commits = 2;
+    let found = f.driver.walk_changes(&f.repo, &req).unwrap();
+    assert!(found.truncated, "older matching commits remain");
+    assert!(found.commits.len() <= 2);
+    req.max_commits = 1000;
+    let all = f.driver.walk_changes(&f.repo, &req).unwrap();
+    assert!(!all.truncated);
+}
+
+#[test]
+fn an_older_commit_behind_a_newer_one_with_a_skewed_date_is_still_found_by_instant() {
+    let f = fixture("skew");
+    let old = commit(&f.root, &[("plans/p", "1")], T0 + 1000);
+    commit(&f.root, &[("other/o", "1")], T0 - 10_000_000);
+    let new = commit(&f.root, &[("plans/p", "2")], T0 + 2000);
+    let tip = f.oid(&new);
+    let mut req = request(std::slice::from_ref(&tip), &["plans"]);
+    req.since = Some(Since::Instant(T0 + 500));
+    let found = f.driver.walk_changes(&f.repo, &req).unwrap();
+    assert_eq!(oids(&found), [new.as_str(), old.as_str()]);
+}
