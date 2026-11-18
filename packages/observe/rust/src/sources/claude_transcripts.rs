@@ -1,7 +1,7 @@
 //! Claude Code transcripts observation source (Lane A2 - Phase F2).
 
 use crate::{Observation, ObservationSource, SourceError, Subject, SubjectKind, Window};
-use fgos_host_runtime::civil_time::parse_iso_prefix_secs;
+use fgos_host_runtime::civil_time::{parse_iso_prefix_secs, parse_rfc3339_millis};
 use serde::Deserialize;
 use serde_json::Value;
 
@@ -38,7 +38,7 @@ struct FastUsage {
     cache_creation_input_tokens: Option<u64>,
     cache_read_input_tokens: Option<u64>,
 }
-use std::collections::HashSet;
+use std::collections::{BTreeMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
@@ -128,12 +128,37 @@ pub fn encode_project_dir(path: &Path) -> String {
     encoded
 }
 
-impl ObservationSource for ClaudeTranscriptsSource {
-    fn source_id(&self) -> &'static str {
-        "claude-transcripts"
+/// One deduplicated assistant message with its usage, as read from a transcript.
+pub(crate) struct Message {
+    pub ts: String,
+    pub ms: i64,
+    pub session_id: String,
+    pub model: String,
+    pub input_tokens: u64,
+    pub output_tokens: u64,
+    pub cache_read: u64,
+    pub cache_creation: u64,
+}
+
+impl ClaudeTranscriptsSource {
+    /// Every usage message of this project's transcripts inside the window, oldest first.
+    pub(crate) fn scan(&self, root: &Path, w: &Window) -> Result<Vec<Message>, SourceError> {
+        self.scan_with_activity(root, w, None)
     }
 
-    fn observations(&self, root: &Path, w: &Window) -> Result<Vec<Observation>, SourceError> {
+    /// Like `scan`; when `activity` is given it also receives, per session, the newest instant of every
+    /// timestamped transcript line in the given activity window (prompts and tool results included, not only usage lines).
+    pub(crate) fn scan_with_activity(
+        &self,
+        root: &Path,
+        w: &Window,
+        mut activity: Option<(&mut BTreeMap<String, i64>, crate::time::ParsedWindow)>,
+    ) -> Result<Vec<Message>, SourceError> {
+        let window =
+            crate::time::ParsedWindow::parse(w).map_err(|message| SourceError::ReadFailed {
+                source_id: "claude-transcripts",
+                message,
+            })?;
         let Some(claude_dir) = fgos_identity::cli_dirs::claude_config_dir(
             std::env::var_os("HOME").as_deref(),
             std::env::var_os("CLAUDE_CONFIG_DIR").as_deref(),
@@ -177,7 +202,7 @@ impl ObservationSource for ClaudeTranscriptsSource {
             }
         }
 
-        let mut observations = Vec::new();
+        let mut messages = Vec::new();
         let mut seen_message_ids: HashSet<String> = HashSet::new();
 
         for proj_dir in matching_dirs {
@@ -225,7 +250,7 @@ impl ObservationSource for ClaudeTranscriptsSource {
                         Err(_) => continue,
                     };
                     let line = line.trim();
-                    if line.is_empty() || !line.contains("\"usage\"") {
+                    if line.is_empty() || (activity.is_none() && !line.contains("\"usage\"")) {
                         continue;
                     }
 
@@ -234,45 +259,37 @@ impl ObservationSource for ClaudeTranscriptsSource {
                         Err(_) => continue,
                     };
 
-                    let msg = match &parsed.message {
-                        Some(m) => m,
-                        None => continue,
-                    };
-
-                    let usage = match &msg.usage {
-                        Some(u) => u,
-                        None => continue,
-                    };
-
                     // Check cwd of record
-                    let record_cwd = parsed.cwd.or(msg.cwd);
+                    let record_cwd = parsed.cwd.or(parsed.message.as_ref().and_then(|m| m.cwd));
                     if let Some(rcwd) = record_cwd {
                         let path_rcwd = Path::new(rcwd);
-                        let is_valid = valid_cwds.iter().any(|v| path_rcwd.starts_with(v));
-                        if !is_valid {
+                        if !valid_cwds.iter().any(|v| path_rcwd.starts_with(v)) {
                             continue;
                         }
                     }
 
-                    // Check timestamp before message id allocation
-                    let ts_str = match parsed.timestamp {
-                        Some(t) => t,
-                        None => match msg.timestamp {
-                            Some(t) => t,
-                            None => continue,
-                        },
+                    let Some(ts_str) = parsed
+                        .timestamp
+                        .or(parsed.message.as_ref().and_then(|m| m.timestamp))
+                    else {
+                        continue;
                     };
+                    let Some(ms) = parse_rfc3339_millis(ts_str) else {
+                        continue;
+                    };
+                    if !window.contains(ms) {
+                        continue;
+                    }
+                    let session_id = parsed.session_id_camel.or(parsed.session_id).unwrap_or("");
+                    if let Some((activity, _)) =
+                        activity.as_mut().filter(|(_, only)| only.contains(ms))
+                    {
+                        let slot = activity.entry(session_id.to_owned()).or_insert(ms);
+                        *slot = (*slot).max(ms);
+                    }
 
-                    if let Some(since) = &w.since {
-                        if ts_str < since.as_str() {
-                            continue;
-                        }
-                    }
-                    if let Some(until) = &w.until {
-                        if ts_str > until.as_str() {
-                            continue;
-                        }
-                    }
+                    let Some(msg) = &parsed.message else { continue };
+                    let Some(usage) = &msg.usage else { continue };
 
                     // Dedupe by message.id
                     let msg_id = match msg.id {
@@ -284,43 +301,55 @@ impl ObservationSource for ClaudeTranscriptsSource {
                         continue;
                     }
                     seen_message_ids.insert(msg_id.to_string());
-                    let ts = ts_str.to_string();
-                    let session_id = parsed
-                        .session_id_camel
-                        .or(parsed.session_id)
-                        .unwrap_or("")
-                        .to_string();
-
-                    let model = msg.model.unwrap_or("unknown").to_string();
-
-                    let input_tokens = usage.input_tokens.unwrap_or(0);
-                    let output_tokens = usage.output_tokens.unwrap_or(0);
-                    let cache_read = usage.cache_read_input_tokens.unwrap_or(0);
-                    let cache_creation = usage.cache_creation_input_tokens.unwrap_or(0);
-                    let mut attrs = serde_json::Map::new();
-                    attrs.insert("sessionId".to_string(), Value::String(session_id));
-                    attrs.insert("model".to_string(), Value::String(model));
-                    attrs.insert("input_tokens".to_string(), Value::from(input_tokens));
-                    attrs.insert("output_tokens".to_string(), Value::from(output_tokens));
-                    attrs.insert("cache_read".to_string(), Value::from(cache_read));
-                    attrs.insert("cache_creation".to_string(), Value::from(cache_creation));
-
-                    observations.push(Observation {
-                        ts,
-                        subject: Subject {
-                            kind: SubjectKind::Case,
-                            id: "".to_string(), // subject: case: (assigned in F4 based on time window)
-                        },
-                        kind: "llm.usage".to_string(),
-                        attrs,
-                        source: "claude-transcripts",
+                    messages.push(Message {
+                        ts: ts_str.to_string(),
+                        ms,
+                        session_id: session_id.to_string(),
+                        model: msg.model.unwrap_or("unknown").to_string(),
+                        input_tokens: usage.input_tokens.unwrap_or(0),
+                        output_tokens: usage.output_tokens.unwrap_or(0),
+                        cache_read: usage.cache_read_input_tokens.unwrap_or(0),
+                        cache_creation: usage.cache_creation_input_tokens.unwrap_or(0),
                     });
                 }
             }
         }
 
-        observations.sort_by(|a, b| a.ts.cmp(&b.ts));
-        Ok(observations)
+        messages.sort_by_key(|m| m.ms);
+        Ok(messages)
+    }
+}
+
+impl ObservationSource for ClaudeTranscriptsSource {
+    fn source_id(&self) -> &'static str {
+        "claude-transcripts"
+    }
+
+    fn observations(&self, root: &Path, w: &Window) -> Result<Vec<Observation>, SourceError> {
+        Ok(self
+            .scan(root, w)?
+            .into_iter()
+            .map(|m| {
+                let mut attrs = serde_json::Map::new();
+                attrs.insert("sessionId".to_string(), Value::String(m.session_id));
+                attrs.insert("model".to_string(), Value::String(m.model));
+                attrs.insert("input_tokens".to_string(), Value::from(m.input_tokens));
+                attrs.insert("output_tokens".to_string(), Value::from(m.output_tokens));
+                attrs.insert("cache_read".to_string(), Value::from(m.cache_read));
+                attrs.insert("cache_creation".to_string(), Value::from(m.cache_creation));
+                Observation {
+                    ts: m.ts,
+                    subject: Subject {
+                        kind: SubjectKind::Case,
+                        // Assigned later from the time window.
+                        id: String::new(),
+                    },
+                    kind: "llm.usage".to_string(),
+                    attrs,
+                    source: "claude-transcripts",
+                }
+            })
+            .collect())
     }
 }
 

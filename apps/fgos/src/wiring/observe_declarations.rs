@@ -6,7 +6,10 @@ use std::path::Path;
 
 /// Every declaration a crate embeds with `include_str!`. Each owner adds its own entry next to its kinds.
 pub fn embedded_declarations() -> Vec<EmbeddedDeclaration> {
-    vec![fgos_observe::record::store::HEALTH_DECLARATION]
+    vec![
+        fgos_observe::record::store::HEALTH_DECLARATION,
+        fgos_observe::sources::transcript_records::TRANSCRIPT_DECLARATION,
+    ]
 }
 
 /// The merged registry: the embedded list, the payload's `observe/kinds` files and the project's own.

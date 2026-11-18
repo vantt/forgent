@@ -2,3 +2,4 @@
 pub mod claude_transcripts;
 pub mod invocation_faults;
 pub mod repo;
+pub mod transcript_records;

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "366937e3125dc447ba85b9f68f1856fae2f4cc05741de1432052d2ff66fbdb42",
+  "payloadDigest": "d06c7ad4de345d8816d4b4a88c48ad38c4d74de90d1b1aa0e3ed8621700c89a4",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -128,7 +128,7 @@
     "apps/fgos/src/wiring/mailbox_verbs_unsupported.rs": "8f4ceadc33463deea690b89514b083d529675f2200052f2c67d151613eed7021",
     "apps/fgos/src/wiring/metrics_sources.rs": "504e2c72b52a5da8d8d23a862403d47986811234809f364ee6006c6957f6c583",
     "apps/fgos/src/wiring/mod.rs": "4d11ae9141bb1830fbb1e850b5266b21aa80e0549eba1d0893b4a2b8dae00a43",
-    "apps/fgos/src/wiring/observe_declarations.rs": "ab315c8c644828d55dcb175c14fd9a8dc04774111d07678d791fb40ebf80ba68",
+    "apps/fgos/src/wiring/observe_declarations.rs": "b3c078d72175ac4140cc84d73cf1dcac4371e8d0e38e600362323bf7c925f17e",
     "apps/fgos/src/wiring/run_dirs.rs": "8248bf1a45d37e2ca03315dea11489b6b90362a47479244a10a7c71648e90f60",
     "apps/fgos/src/wiring/seat_binding.rs": "9de2b706063e64896a44b5266526efdc7b78ce266495f3604a792295b22e2f1d",
     "apps/fgos/src/wiring/session.rs": "f2569bef9f072e959f14673c2d2929e2b0b001540a4e147fd5e59082b2e64b43",
@@ -715,10 +715,11 @@
     "packages/observe/rust/src/record/types/mod.rs": "3b6f359d389f514f8a314ee7dfcf22749d647ba895ba73f732527588257d5db6",
     "packages/observe/rust/src/scorecard.rs": "7ab39f13b71181f19895103a9e02b064a3623f5920e5ec81f28bc952d58811d6",
     "packages/observe/rust/src/shard.rs": "25003542f00889387093a320483a73365e0eb34b70ba8e01c8b56bda3e44406a",
-    "packages/observe/rust/src/sources/claude_transcripts.rs": "df894bf10f230653aa0dd04cd2905e11d3f4c692eb755edbc27d227718dd7b8e",
+    "packages/observe/rust/src/sources/claude_transcripts.rs": "feeff439e20b3244754bc4197103295dd81c30b573bf1bbab9c586f5001bc81b",
     "packages/observe/rust/src/sources/invocation_faults.rs": "69571bae82fc4e1b5e7f3bf49de54420bf4293cb5b216e1415140543c5d044bf",
-    "packages/observe/rust/src/sources/mod.rs": "5c0fc4344ce4ede07cc8a8725d6333858099755c84c9ae923c22f3e5e9f3df30",
+    "packages/observe/rust/src/sources/mod.rs": "d55c1afd37e1824093baca449560939917b632e42b5862cd682d54f69f34ffce",
     "packages/observe/rust/src/sources/repo.rs": "e38d69ef663b95a5e85bfa3a71ac67d9d10fc2cdca21d9559754596487569e4e",
+    "packages/observe/rust/src/sources/transcript_records.rs": "20af3ce17e7fddd8c54912d6f44362f6a3cd5d294091cae8fbd2db984e2c01ab",
     "packages/observe/rust/src/store_lock.rs": "a09ed4da37f2490536d2ebdb8401b31e2999769ced01f8712d25eb9752045c61",
     "packages/observe/rust/src/time.rs": "24ee18cf30022073f78c34a24c1e3b90e72d71468943ff818a30ab26c818e47f",
     "packages/observe/rust/tests/boundary_test.rs": "78ca21efaaf719c27c298639c79365c5ed4a491c041d665785e010c495f5cb0f",
@@ -729,6 +730,7 @@
     "packages/observe/rust/tests/record_registry_test.rs": "dd50e176c5b6fc481ec3ac4f6009d3830cbcf1bcc942061e35b2c18cc81fdd1b",
     "packages/observe/rust/tests/store_door.rs": "01c8eb1dedaa61e2145de18addafcb05ee9f9ac6752e7e544946751404fff779",
     "packages/observe/rust/tests/store_lock_multiprocess.rs": "dc1e0c6aa40f8e76b2e8767cb88d1a18ed891e2a84da6c617acd64b17975a772",
+    "packages/observe/rust/tests/transcript_records_test.rs": "c15983675d2e293e9e74eecc2f80c77db20c4686a7e48c42d7a7099ac73d8eea",
     "packages/process/rust/src/containment/linux.rs": "aa8be35421f9ca2d9a67f238d3add9ff255330101b1fa697cb8636ffc9e5835c",
     "packages/process/rust/src/containment/macos.rs": "dd4706d6e62d29f1982bab7f785e9003865c8585e51716c5503daca29ca1c35b",
     "packages/process/rust/src/containment/mod.rs": "e61fa14ab71ddf1536850f6062d819033a8ab063ecc8a313debaebc479630111",
@@ -3264,42 +3266,42 @@
     },
     {
       "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
-      "line": 398,
+      "line": 427,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
-      "line": 399,
+      "line": 428,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
-      "line": 404,
+      "line": 433,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
-      "line": 410,
+      "line": 439,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
-      "line": 415,
+      "line": 444,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/observe/rust/src/sources/claude_transcripts.rs",
-      "line": 422,
+      "line": 451,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
