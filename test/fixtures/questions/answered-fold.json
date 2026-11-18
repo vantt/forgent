@@ -1,0 +1,251 @@
+{
+ "now": "2026-11-18T12:00:00Z",
+ "expectedAnswered": [
+  "q-pending-1",
+  "q-pending-2"
+ ],
+ "events": [
+  {
+   "event_type": "questions.asked",
+   "payload": {
+    "id": "q-open",
+    "askedAt": "2026-11-18T01:00:00.000Z",
+    "asker": {
+     "sessionId": "m-1/s0",
+     "handle": "h0",
+     "roles": [
+      "head:coder-x",
+      "work:tsk-1"
+     ],
+     "persona": "coder",
+     "pane": "p0",
+     "machine": "m-1"
+    },
+    "stage": "planning",
+    "ref": {
+     "value": "plan:p0",
+     "branch": "work",
+     "commit": "abcdef1"
+    },
+    "headline": "h",
+    "blocks": "b",
+    "parts": {
+     "what": "w",
+     "cause": "c",
+     "options": [],
+     "recommendation": "",
+     "scope": {
+      "allows": "x",
+      "forbids": "y"
+     }
+    },
+    "migrated": false
+   }
+  },
+  {
+   "event_type": "questions.asked",
+   "payload": {
+    "id": "q-pending-1",
+    "askedAt": "2026-11-18T01:01:00.000Z",
+    "asker": {
+     "sessionId": "m-1/s1",
+     "handle": "h1",
+     "roles": [
+      "head:coder-x",
+      "work:tsk-1"
+     ],
+     "persona": "coder",
+     "pane": "p1",
+     "machine": "m-1"
+    },
+    "stage": "planning",
+    "ref": {
+     "value": "plan:p1",
+     "branch": "work",
+     "commit": "abcdef1"
+    },
+    "headline": "h",
+    "blocks": "b",
+    "parts": {
+     "what": "w",
+     "cause": "c",
+     "options": [],
+     "recommendation": "",
+     "scope": {
+      "allows": "x",
+      "forbids": "y"
+     }
+    },
+    "migrated": false
+   }
+  },
+  {
+   "event_type": "questions.asked",
+   "payload": {
+    "id": "q-acked",
+    "askedAt": "2026-11-18T01:02:00.000Z",
+    "asker": {
+     "sessionId": "m-1/s2",
+     "handle": "h2",
+     "roles": [
+      "head:coder-x",
+      "work:tsk-1"
+     ],
+     "persona": "coder",
+     "pane": "p2",
+     "machine": "m-1"
+    },
+    "stage": "planning",
+    "ref": {
+     "value": "plan:p2",
+     "branch": "work",
+     "commit": "abcdef1"
+    },
+    "headline": "h",
+    "blocks": "b",
+    "parts": {
+     "what": "w",
+     "cause": "c",
+     "options": [],
+     "recommendation": "",
+     "scope": {
+      "allows": "x",
+      "forbids": "y"
+     }
+    },
+    "migrated": false
+   }
+  },
+  {
+   "event_type": "questions.asked",
+   "payload": {
+    "id": "q-cancelled",
+    "askedAt": "2026-11-18T01:03:00.000Z",
+    "asker": {
+     "sessionId": "m-1/s3",
+     "handle": "h3",
+     "roles": [
+      "head:coder-x",
+      "work:tsk-1"
+     ],
+     "persona": "coder",
+     "pane": "p3",
+     "machine": "m-1"
+    },
+    "stage": "planning",
+    "ref": {
+     "value": "plan:p3",
+     "branch": "work",
+     "commit": "abcdef1"
+    },
+    "headline": "h",
+    "blocks": "b",
+    "parts": {
+     "what": "w",
+     "cause": "c",
+     "options": [],
+     "recommendation": "",
+     "scope": {
+      "allows": "x",
+      "forbids": "y"
+     }
+    },
+    "migrated": false
+   }
+  },
+  {
+   "event_type": "questions.asked",
+   "payload": {
+    "id": "q-pending-2",
+    "askedAt": "2026-11-18T01:04:00.000Z",
+    "asker": {
+     "sessionId": "m-1/s4",
+     "handle": "h4",
+     "roles": [
+      "head:coder-x",
+      "work:tsk-1"
+     ],
+     "persona": "coder",
+     "pane": "p4",
+     "machine": "m-1"
+    },
+    "stage": "planning",
+    "ref": {
+     "value": "plan:p4",
+     "branch": "work",
+     "commit": "abcdef1"
+    },
+    "headline": "h",
+    "blocks": "b",
+    "parts": {
+     "what": "w",
+     "cause": "c",
+     "options": [],
+     "recommendation": "",
+     "scope": {
+      "allows": "x",
+      "forbids": "y"
+     }
+    },
+    "migrated": false
+   }
+  },
+  {
+   "event_type": "questions.answered",
+   "payload": {
+    "id": "q-pending-1",
+    "text": "yes",
+    "by": "owner",
+    "via": "secretary",
+    "answeredAt": "2026-11-18T02:01:00.000Z"
+   }
+  },
+  {
+   "event_type": "questions.answered",
+   "payload": {
+    "id": "q-acked",
+    "text": "yes",
+    "by": "owner",
+    "via": "secretary",
+    "answeredAt": "2026-11-18T02:02:00.000Z"
+   }
+  },
+  {
+   "event_type": "questions.answered",
+   "payload": {
+    "id": "q-cancelled",
+    "text": "yes",
+    "by": "owner",
+    "via": "secretary",
+    "answeredAt": "2026-11-18T02:03:00.000Z"
+   }
+  },
+  {
+   "event_type": "questions.answered",
+   "payload": {
+    "id": "q-pending-2",
+    "text": "yes",
+    "by": "owner",
+    "via": "secretary",
+    "answeredAt": "2026-11-18T02:04:00.000Z"
+   }
+  },
+  {
+   "event_type": "questions.acked",
+   "payload": {
+    "id": "q-acked",
+    "by": "h2",
+    "at": "2026-11-18T03:00:00.000Z"
+   }
+  },
+  {
+   "event_type": "questions.cancelled",
+   "payload": {
+    "id": "q-cancelled",
+    "by": "h3",
+    "reason": "owner changed course",
+    "at": "2026-11-18T03:01:00.000Z"
+   }
+  }
+ ]
+}

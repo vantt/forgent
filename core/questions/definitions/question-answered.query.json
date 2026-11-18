@@ -1,0 +1,32 @@
+{
+  "name": "question-answered",
+  "requires": [
+    "fgos.question.answered",
+    "fgos.question.acked",
+    "fgos.question.cancelled"
+  ],
+  "query": {
+    "kind": ["fgos.question.answered"],
+    "without": [
+      { "kind": ["fgos.question.acked"], "on": "question", "within": "3650d" },
+      { "kind": ["fgos.question.cancelled"], "on": "question", "within": "3650d" }
+    ],
+    "by": [
+      "subject.id",
+      "fgos.question.asker.role",
+      "fgos.question.asker.session",
+      "fgos.question.asker.handle",
+      "fgos.question.asker.persona",
+      "fgos.question.origin_ref",
+      "fgos.question.answered_at",
+      "fgos.question.asker.pane",
+      "fgos.question.asker.machine"
+    ],
+    "agg": ["count"]
+  },
+  "row": {
+    "kind": "question-answered",
+    "reason": "An answered question has not been acknowledged by its asker and is not cancelled.",
+    "nextCommand": "fgos questions show <subject.id>"
+  }
+}
