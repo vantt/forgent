@@ -5,7 +5,9 @@
 //!
 //! - Claude Code: the writer is session identity's (from the environment
 //!   or the registry only, never a pid fallback), and the head comes from
-//!   the session file under the shared config-directory resolver.
+//!   the session file under the shared config-directory resolver; a head
+//!   session attempt whose session file is missing takes the head position
+//!   when the payload names its writer.
 //! - Codex, pi and omp: the writer is the payload's `session_id` (their
 //!   hooks see no session variable), and the head is the direct head
 //!   position whose executable the adapter names.
@@ -33,6 +35,9 @@ pub struct HookEnv {
     /// The session id the entry's own environment names, if any
     /// (`FGOS_SESSION_ID`, `CODEX_THREAD_ID`, `CLAUDE_CODE_SESSION_ID`).
     pub session_env: Option<String>,
+    /// Whether the environment is a head session attempt's
+    /// (`FGOS_HEAD_REQUEST_SOCKET` and a runner attempt id).
+    pub head_attempt: bool,
 }
 
 /// The variable a confined head's sandbox names its request socket by
@@ -82,9 +87,10 @@ impl HookEnv {
     /// attempt id is never its writer, so the payload's `session_id` is the
     /// head's CLI session.
     fn from_lookup(fgos_dir: &Path, lookup: &dyn Fn(&str) -> Option<String>) -> Self {
+        let head_attempt = is_head_attempt(lookup);
         let (session_writer, session_env) = match head_cli_session(lookup) {
             Some(id) => (WriterKey::new(id.clone()).ok(), Some(id)),
-            None if is_head_attempt(lookup) => (None, None),
+            None if head_attempt => (None, None),
             None => {
                 let identity = resolve_current(Some(fgos_dir));
                 let writer = match (identity.id, identity.source) {
@@ -104,6 +110,7 @@ impl HookEnv {
             claude_config_dir: lookup("CLAUDE_CONFIG_DIR").map(OsString::from),
             session_writer,
             session_env,
+            head_attempt,
         }
     }
 }
@@ -119,9 +126,19 @@ pub fn resolver_for<'a>(
         Adapter::Claude => {
             let writer = env.session_writer.clone().ok_or(NoHead::NoWriter)?;
             let sessions = claude_config_dir(env.home.as_deref(), env.claude_config_dir.as_deref())
-                .ok_or(NoHead::NoSessionFile)?
-                .join("sessions");
-            let head = claude_head::find_head(&sessions, ancestry, facts, &writer, hook)?;
+                .map(|dir| dir.join("sessions"));
+            let found = match sessions {
+                Some(dir) => claude_head::find_head(&dir, ancestry, facts, &writer, hook),
+                None => Err(NoHead::NoSessionFile),
+            };
+            // A confined head's sandbox keeps Claude Code from writing its
+            // session file; only such a head falls back to its payload.
+            let head = match found {
+                Err(NoHead::NoSessionFile) if env.head_attempt => {
+                    claude_head::find_confined_head(payload, ancestry, facts, &writer)?
+                }
+                found => found?,
+            };
             Ok(Resolved { writer, head })
         }
         Adapter::Codex | Adapter::Pi | Adapter::Omp => {
@@ -183,6 +200,7 @@ mod tests {
             (head.session_writer.clone(), head.session_env.clone()),
             (None, None)
         );
+        assert!(head.head_attempt);
         let payload = br#"{"session_id":"codex-thread-1"}"#;
         assert_eq!(
             payload_writer(payload, head.session_env.as_deref())
@@ -198,6 +216,7 @@ mod tests {
             &env(&codex[..1]),
         );
         assert_eq!(worker.session_env.as_deref(), Some("att-cmd_1"));
+        assert!(!worker.head_attempt);
         assert!(payload_writer(payload, worker.session_env.as_deref()).is_err());
     }
 }

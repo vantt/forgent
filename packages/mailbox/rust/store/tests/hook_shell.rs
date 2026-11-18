@@ -894,6 +894,86 @@ fn the_caller_check_runs_again_just_before_hold_1_with_the_adapters_facts() {
 }
 
 #[test]
+fn a_confined_head_with_no_session_file_is_bound_by_its_hook_and_its_mail_carries_its_head_name() {
+    use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
+    let fgos = TempFgos::new("shell-confined-head");
+    let record = fgos.record();
+    // A peer head, bound by its own first call.
+    let peer = Head::spawn();
+    let (peer_stdin, peer_writer) = payload(files::POST_TOOL_USE);
+    call(
+        &record,
+        &peer,
+        peer.ancestry(),
+        &peer_stdin,
+        &mut Vec::new(),
+        T0,
+    );
+    let peer_name = read_state(&record)
+        .binding(&peer_writer)
+        .unwrap()
+        .name
+        .as_str()
+        .to_string();
+
+    // The confined head: its config directory has no session file of it.
+    let head = Head::spawn();
+    let own = "00000000-0000-4000-8000-0000000000c1";
+    let mut value = fixture(Adapter::Claude, files::POST_TOOL_USE);
+    value["session_id"] = own.into();
+    let stdin = serde_json::to_vec(&value).unwrap();
+    let config = fgos.scratch().join("confined-home");
+    std::fs::create_dir_all(config.join("sessions")).unwrap();
+    let env = HookEnv {
+        home: None,
+        claude_config_dir: Some(config.into_os_string()),
+        session_writer: Some(WriterKey::new(own).unwrap()),
+        session_env: Some(own.to_string()),
+        head_attempt: true,
+    };
+    let facts = TestedClis::embedded().facts(Adapter::Claude).unwrap();
+    let limits = limits();
+    let hook = hook_limits();
+    let resolve = resolver_for(Adapter::Claude, facts, &env, &hook.hook);
+    let clock = || T0;
+    let ancestry = || Some(head.ancestry());
+    let input = ShellInput {
+        adapter: Adapter::Claude,
+        event: HookEvent::PostToolUse,
+        project: "forgent",
+        fgos_dir: record.paths().fgos_dir(),
+        limits: &limits,
+        hook: &hook,
+        tested: TestedClis::embedded(),
+        clock: &clock,
+        ancestry: &ancestry,
+        resolve: &resolve,
+        handle_of: &|_, _, _| None,
+        gate: WriteGate::new(),
+    };
+    let outcome = run(input, &mut &stdin[..], &mut Vec::new());
+
+    // Bound to a new generation: the entry then asks Identity to bind it.
+    let bound = outcome.bound.expect("the confined head is bound");
+    assert_eq!(bound.writer.as_str(), own);
+    assert!(bound.registered.is_some());
+    let name = read_state(&record)
+        .binding(&bound.writer)
+        .unwrap()
+        .name
+        .as_str()
+        .to_string();
+    assert!(name.starts_with("forgent-claude-"), "{name}");
+
+    record
+        .send(send_req(own, &peer_name, "hello"), Wait::Try, T0, &limits)
+        .unwrap();
+    let inbox = read_state(&record).inbox(&peer_writer);
+    assert_eq!(inbox.len(), 1);
+    assert_eq!(inbox[0].from_label, name);
+}
+
+#[test]
 fn a_codex_entry_whose_environment_names_another_session_than_its_payload_is_quiet() {
     use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
     let fgos = TempFgos::new("shell-codex-env");
@@ -906,6 +986,7 @@ fn a_codex_entry_whose_environment_names_another_session_than_its_payload_is_qui
         claude_config_dir: None,
         session_writer: None,
         session_env: Some("00000000-0000-4000-8000-00000000ffff".to_string()),
+        head_attempt: false,
     };
     let resolve = resolver_for(Adapter::Codex, facts, &env, &hook.hook);
     let limits = limits();

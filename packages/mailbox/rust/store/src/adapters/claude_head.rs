@@ -15,7 +15,14 @@
 //! directory; a same-user process is outside the guard anyway (spec §6.1).
 //! Whether Claude Code writes its session file under a custom
 //! `CLAUDE_CONFIG_DIR` was not measured.
-use crate::adapters::AdapterFacts;
+//!
+//! A confined head (a head session attempt, spec §6.1) can have no session
+//! file at all: its sandbox mounts the host's sessions directory read-only
+//! over its own, so Claude Code's write of `<pid>.json` fails. For that head
+//! only, [`find_confined_head`] takes the head position without the file,
+//! and the payload's `session_id` must name the writer its environment
+//! gave.
+use crate::adapters::{payload_head, AdapterFacts};
 use crate::head::{head_position, is_complete, Ancestry, NoHead};
 use crate::hook::{HeadFacts, HookCallLimits};
 use crate::record::read_regular_capped;
@@ -64,6 +71,20 @@ pub fn find_head(
         own_suffix,
         handle: None,
     })
+}
+
+/// The head of a confined head session attempt whose session file cannot
+/// exist: the record at the topology's head position, accepted only when the
+/// hook payload names `writer` (the CLI session its environment gave). The
+/// head names no own suffix, so its short name draws one.
+pub fn find_confined_head(
+    payload: &[u8],
+    ancestry: &Ancestry,
+    facts: &AdapterFacts,
+    writer: &WriterKey,
+) -> Result<HeadFacts, NoHead> {
+    payload_head::payload_writer(payload, Some(writer.as_str()))?;
+    payload_head::find_head(ancestry, facts)
 }
 
 fn read_session_file(path: &Path, hook: &HookCallLimits) -> Result<Value, NoHead> {

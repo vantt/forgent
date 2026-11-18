@@ -408,6 +408,7 @@ fn the_claude_sessions_directory_follows_the_shared_config_dir_resolver() {
         claude_config_dir: config.map(|p| p.as_os_str().to_owned()),
         session_writer: Some(writer()),
         session_env: None,
+        head_attempt: false,
     };
 
     let with_config = env(Some(&dir.scratch().join("home")), Some(&custom));
@@ -427,6 +428,62 @@ fn the_claude_sessions_directory_follows_the_shared_config_dir_resolver() {
 }
 
 #[test]
+fn a_confined_head_whose_session_file_cannot_exist_takes_its_head_position_when_the_payload_names_its_writer(
+) {
+    use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
+    let dir = TempFgos::new("head-finder-confined");
+    let (_child, pid, hop) = claude_head();
+    // The sandbox mounts the host's sessions directory over the head's own,
+    // so no `<pid>.json` of the head exists there.
+    let config = dir.scratch().join("confined-home");
+    std::fs::create_dir_all(config.join("sessions")).unwrap();
+    let facts = facts(Adapter::Claude);
+    let hook = hook_limits().hook;
+    let env = |head_attempt: bool| HookEnv {
+        home: None,
+        claude_config_dir: Some(config.as_os_str().to_owned()),
+        session_writer: Some(writer()),
+        session_env: Some(WRITER.to_string()),
+        head_attempt,
+    };
+    let own = format!(r#"{{"session_id":"{WRITER}"}}"#);
+
+    let confined = env(true);
+    let resolve = resolver_for(Adapter::Claude, &facts, &confined, &hook);
+    let resolved = resolve(own.as_bytes(), &hop).unwrap();
+    assert_eq!(resolved.writer, writer());
+    assert_eq!(resolved.head.record, record_of(pid));
+    assert_eq!(resolved.head.own_suffix, None);
+    // The payload must name the writer its environment gave.
+    let other = r#"{"session_id":"00000000-0000-4000-8000-00000000ffff"}"#;
+    assert_eq!(
+        resolve(other.as_bytes(), &hop).unwrap_err(),
+        NoHead::WriterMismatch
+    );
+    assert_eq!(resolve(b"{}", &hop).unwrap_err(), NoHead::NoWriter);
+    // The head position is still judged: a tool's shell is no head.
+    let shell = std::fs::canonicalize("/bin/sh").unwrap();
+    let tool = ancestry(
+        record_of(std::process::id()),
+        shell.to_str().unwrap(),
+        "bash",
+        Some(record_of(pid)),
+    );
+    assert_eq!(
+        resolve(own.as_bytes(), &tool).unwrap_err(),
+        NoHead::WrongTopology
+    );
+
+    // Any other session with no session file has no head, as before.
+    let plain = env(false);
+    let resolve = resolver_for(Adapter::Claude, &facts, &plain, &hook);
+    assert_eq!(
+        resolve(own.as_bytes(), &hop).unwrap_err(),
+        NoHead::NoSessionFile
+    );
+}
+
+#[test]
 fn a_codex_pi_or_omp_entry_resolves_its_writer_from_the_payload_and_its_head_at_the_direct_position(
 ) {
     use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
@@ -436,6 +493,7 @@ fn a_codex_pi_or_omp_entry_resolves_its_writer_from_the_payload_and_its_head_at_
         claude_config_dir: None,
         session_writer: None,
         session_env: None,
+        head_attempt: false,
     };
     let child = spawn("sleep", &["30"]);
     let record = record_of(child.0.id());
