@@ -12,7 +12,9 @@ bốn câu của brief (cost, time, failure rate, friction).
 Vòng 2: Q1 đã trả lời (OM-D2: đo token trước, tiền hoãn tới khi có hạ tầng giá). Q3/Q4 rút lại vì thiếu bối cảnh,
 hỏi lại thành Q5 (ngưỡng "plan đứng yên") và Q6 (nghĩa của "pace"). Q2 còn mở; chủ dự án xin danh sách bảy thước đo.
 OM-D3 (Rust cho phần mới) đổi chỗ đặt code ở §6 A, C, E; mở Q7 (reader câu hỏi đang là Node).
-Vòng 3: chủ dự án hỏi friction được ghi nhận, phân loại, gom nhóm thế nào — đề xuất ở §6 D, chờ phản hồi. Các phần không phụ thuộc chúng (nguồn token/duration/account, khoá plan/phase, chiều
+Vòng 3: chủ dự án hỏi friction được ghi nhận, phân loại, gom nhóm thế nào — đề xuất ở §6 D.
+Vòng 4: chủ dự án đặt khung ba tầng (OM-D4): contract ghi/truy vấn trước hết, tích hợp sau, lưu trữ tự do. §6.0 mới;
+friction (§6 D) trở thành một loại sự kiện trong contract chung. Mở Q8 (chuẩn tên). Các phần không phụ thuộc chúng (nguồn token/duration/account, khoá plan/phase, chiều
 `--by`, friction) shape tiếp được.
 
 ## 2. Mục tiêu & đề bài
@@ -55,6 +57,7 @@ phạm vi.
 | OM-D1 | Phát hiện liveness / no-progress / pace của supervisor thuộc plan này; chỉ phát hiện, hiện trong `fgos dispatch inspect --attention`; không cảnh báo khi mailbox còn hoãn; plan portfolio-driving ghi đã chuyển | chủ dự án qua secretary | 2026-11-18 |
 | OM-D2 | Cost đo bằng token theo model/provider/account/plan/phase trước; tiền (bảng giá, tiền ước tính) hoãn vì chưa có tool/hạ tầng nào lo giá — không build trong plan này | chủ dự án, Q1 | 2026-11-18 |
 | OM-D3 | Mọi phần viết MỚI của plan này viết bằng Rust khi làm được mà không ảnh hưởng phần đang có; Node chỉ còn là caller mỏng nếu cần. Không viết lại phần đã land chỉ để đổi ngôn ngữ | chủ dự án qua secretary | 2026-11-18 |
+| OM-D4 | Ba tầng, thứ tự ưu tiên: (1) contract công khai ghi + truy vấn — phổ quát, chuẩn, ít đổi, ghi được mọi thứ khi cần, đọc được mọi kiểu khi cần — phải tốt và chuẩn sớm; (2) cơ chế tích hợp với agent và hạ tầng — quan sát nhiều nơi, nhiều khoảnh khắc mà không làm giảm hiệu quả hay làm sai agent/tiến trình, phát triển dần; (3) lưu trữ bên trong — tự do đổi, chấp nhận chi phí migration | chủ dự án | 2026-11-18 |
 
 ## 5. Q&A log
 
@@ -69,15 +72,51 @@ phạm vi.
   giờ, không đổi phần đã land → OM-D3.
 - 2026-11-18 ~11:00 — Chủ dự án: friction (bất tiện, chưa hoàn hảo, tréo ngoe, bug, không ổn định) ghi nhận tình
   huống thế nào, tự ghi nhận ra sao, phân loại và gom nhóm thế nào? → đề xuất §6 D.
+- 2026-11-18 ~11:20 — Chủ dự án: việc này có ba phần — (1) contract công khai ghi/truy vấn, phổ quát, chuẩn, ít đổi;
+  (2) tích hợp với agent và hạ tầng, quan sát nhiều nơi mà không làm chậm/sai; (3) lưu trữ bên trong, đổi được. Ưu
+  tiên làm thật tốt (1) trước → OM-D4, §6.0.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Nháp vòng 1 — chưa chốt; các chỗ phụ thuộc câu hỏi mở được đánh dấu.
+Nháp vòng 4 — chưa chốt. Khung ba tầng theo OM-D4; A–E bên dưới là nội dung đầu tiên đi qua khung đó.
 
-Năm khối, đi từ dưới lên. Mọi dữ kiện mới sinh ở nơi đang sở hữu bản ghi; Observe chỉ đọc. Ngôn ngữ (OM-D3):
-logic mới (parser usage theo CLI, mọi phép gộp, `metrics plans`, đọc thời điểm câu hỏi, phát hiện liveness/đứng
-yên/pace) viết Rust; sửa Node chỉ ở chỗ đã là Node và phải đổi để nối dây: writer `unit-summary.mjs` chép thêm field,
-cờ `--plan/--phase` của `fgos run`/`workflow start`, `attention-view.mjs` gọi phần phát hiện Rust.
+### 6.0 Ba tầng (OM-D4)
+
+**Tầng 1 — contract công khai: ghi và truy vấn (làm tốt nhất, sớm nhất).** Một hình bản ghi cho mọi số đo và sự
+kiện, dùng chung cho ghi và đọc. Điểm xuất phát có sẵn: `observe.observation.v1`
+(`packages/observe/contracts/observe.observation.v1.json`, `contract.rs:57`: `ts, subject{kind,id}, kind, attrs,
+source`) — hiện chỉ là hình nội bộ phía đọc, `subject.kind` đóng (5 giá trị thời Work), `attrs` không kiểu, không
+phân biệt số đo với chiều. Năm store hiện có (friction, case, eval, snapshot, invocation-faults) mỗi cái một hình
+riêng. Đề xuất v2 (để bàn):
+- `kind`: tên dạng chấm từ một registry (`run.settled`, `friction.recorded`, `question.asked`, `plan.status`...);
+  thêm kind = thêm dòng registry, không đổi schema.
+- `ts`, tuỳ chọn `endTs` → một bản ghi có thể là khoảng thời gian (span), nên "thời gian phase" là truy vấn, không
+  phải code riêng.
+- `subject {kind,id}` mở theo registry (run, unit, plan, phase, backlog, session, head, account, provider...) và
+  `refs[]` liên kết sang subject khác (plan, phase, dòng backlog, session) — đây là cái làm "cost theo plan",
+  "friction theo plan" thành một phép nối chung, không phải field riêng từng chỗ.
+- `measures {tên: số}` có đơn vị (token, ms, count) tách khỏi `attrs {tên: chuỗi|bool}` là chiều để lọc/nhóm.
+- `origin`: ai phát (component, writer session, host, release).
+- Tên attr/measure theo một registry semantic convention; chỗ nào chuẩn ngoài đã có tên thì dùng tên đó (Q8).
+- Tiến hoá chỉ cộng thêm; `v` của envelope chỉ đổi khi phá vỡ.
+Truy vấn: một verb chung (`fgos metrics query`, mở rộng họ `metrics`, không họ mới): `--kind`, `--where k=v`,
+`--ref plan:<dir>`, `--since/--until`, `--by <attrs>`, `--bucket day|week`, `--agg count|sum|p50|p90|max <measure>`.
+Truy vấn thấy hai loại nguồn như nhau: sự kiện đã ghi qua cửa ghi, và sự kiện *chiếu* từ bản ghi do component khác
+sở hữu (run result, unit summary, lịch sử git của plan, câu hỏi) qua `ObservationSource` — không chép sự thật của
+chỗ khác vào store (một nguồn sự thật). Các verb hiện có (`metrics runs`, `discussions`, `friction rank`...) về sau
+là preset trên truy vấn chung (L10, từng bước).
+
+**Tầng 2 — tích hợp với agent và hạ tầng (tốt = quan sát nhiều nơi, nhiều lúc, không làm chậm hay làm sai agent và
+tiến trình; cải thiện dần).** Cửa ghi: API Rust trong `fgos-observe` + `fgos observe`-style CLI qua host; mọi lần ghi
+là phụ, có hạn thời gian, lỗi ghi không bao giờ đổi kết quả của việc chính (đã là luật "kênh phụ best-effort" của
+D-ADR0037, lỗi vào `invocation-faults`). Các kênh: settlement của runner, điểm phát hiện trong code, fragment skill
+cho agent, claim của worker, hook của harness (Stop, statusline sidecar — đã đo ở `spike-rotation.md`), và về sau
+OTLP: Claude Code và Codex có xuất OpenTelemetry (token, cost, request) — contract tầng 1 khớp tên chuẩn thì nhận
+được kênh này rẻ (cần kiểm cụ thể trong phase khảo sát).
+
+**Tầng 3 — lưu trữ bên trong (tự do đổi, chấp nhận chi phí migration).** Hôm nay: shard JSONL theo writer dưới
+`.fgos/observe/<store>/` + lock của holder-lock (§3 spec). Tầng 1 không lộ chi tiết này; đổi sau (gộp store, index,
+SQLite view theo L3 "truth ở JSONL, db là view") không đổi contract.
 
 **A. Bản ghi run đủ dữ kiện (Execution, contract `unit-summary.read.v3`, thêm field tuỳ chọn như `verify`).**
 Mỗi attempt trong `unit-summary.json` thêm: `accountId` (từ selection mà `run.mjs:866` đã đọc), `durationMs` (từ
@@ -106,7 +145,9 @@ có (`.fgos/runtime/tmp/sec/run-phase.sh`) và skill driving truyền cờ này.
 - Thời gian chờ chủ dự án: câu hỏi (QUESTIONS.md, mục câu hỏi của plan, gate) mang `asked`/`answered` thời điểm;
   reader câu hỏi hiện là Node (`src/portfolio/open-questions.mjs`, 115 dòng) — cách tách theo Q7.
 
-**D. Friction: ghi nhận, phân loại, gom nhóm (Observe, Rust).** Đang bàn (vòng 3, câu hỏi của chủ dự án).
+**D. Friction: ghi nhận, phân loại, gom nhóm (Observe, Rust).** Đang bàn. Theo §6.0, friction là kind
+`friction.recorded` / `friction.resolved` của contract chung; `kind`, `layer`, `errorClass`, `disposition` là attr
+trong registry; gom nhóm là truy vấn `--by errorClass --bucket week`.
 - *Ranh giới:* friction là ghi nhận nhẹ một tình huống bất tiện / chưa hoàn hảo / tréo ngoe / bug / không ổn định,
   trước khi nó thành dòng backlog. Lỗi run (hỏng, provider limit, treo) đã nằm trong bản ghi run: không chép sang
   friction; xu hướng bất ổn đọc thẳng từ `metrics runs --by provider --bucket week` (một nguồn).
@@ -166,6 +207,11 @@ flowchart LR
 ## 7. Danh mục hạng mục / task {#tasks}
 
 Nháp — planner sẽ chia phase theo plan contract.
+
+### observe-contract {#task-observe-contract}
+§6.0 tầng 1: contract v2 (bản ghi, registry kind/subject/attr/measure, truy vấn) + một cửa ghi + verb truy vấn, đi
+trước mọi task khác; nguồn chiếu hiện có (run, unit summary) và store friction chuyển qua nó. Verify: golden fixture
+ghi→truy vấn ở `cargo test -p fgos-observe`.
 
 ### usage-survey {#task-usage-survey}
 Khảo sát mỗi CLI (claude, codex, pi, omp, agy, gemini...) in token/tiền ở đâu. §6 A. Verify: báo cáo kèm mẫu đầu ra thật.
