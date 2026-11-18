@@ -7,6 +7,7 @@ import { test } from 'node:test';
 import os from 'node:os';
 import { moveMachineKeysTo, writeAccountsFile, writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
+import { credentialSourceForCli, providerAccountInventory } from '../../src/runner/dispatch/provider-capacity.mjs';
 
 // The executors these checks judge name these CLIs; a CLI the machine lacks is skipped, so each is stated installed.
 seedStubAgentClis('claude', 'codex', 'omp', 'pi', 'agy', 'odd');
@@ -161,10 +162,15 @@ test('llm-accounts-default-login-home warns for a store on a default login home 
       fs.mkdirSync(path.join(fake, '.fgos'), { recursive: true });
       for (const d of ['private-login', '.claude', '.codex']) fs.mkdirSync(path.join(fake, d), { recursive: true });
       fs.symlinkSync(path.join(fake, '.claude'), path.join(fake, 'linked-login'));
-      writeProjectConfig(dir, { runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, modelPolicies: { claude: { standard: 'sonnet' } } } });
-      writeAccountsFile(path.join(fake, '.fgos'), { llmAccounts: build(fake) });
+      const runner = { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, modelPolicies: { claude: { standard: 'sonnet' } } };
+      const llmAccounts = build(fake);
+      writeProjectConfig(dir, { runner });
+      writeAccountsFile(path.join(fake, '.fgos'), { llmAccounts });
       moveMachineKeysTo(dir, fake);
-      return withHome(fake, () => ({ row: checkById('llm-accounts-default-login-home').check(dir), shape: checkById('llm-accounts-shape').check(dir) }));
+      // The inventory every lease and bind reads, over the same pools: read-only, no state or login file is touched.
+      const executors = { 'fx-claude': { kind: 'agent', providerModel: 'claude', invocations: [{ id: 'claude-cli', via: 'cli', adapter: 'cli-spawn', command: 'claude', args: ['{prompt}'], credentialStore: { use: 'claude', files: ['.credentials.json'] } }] } };
+      const inventory = providerAccountInventory({ ...runner, executors, llmAccounts });
+      return withHome(fake, () => ({ row: checkById('llm-accounts-default-login-home').check(dir), shape: checkById('llm-accounts-shape').check(dir), inventory, home: fake }));
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
       fs.rmSync(fake, { recursive: true, force: true });
@@ -182,7 +188,11 @@ test('llm-accounts-default-login-home warns for a store on a default login home 
   assert.match(warned.row.message, /runner\.llmAccounts\.claude\.onDefault\.credentialStore\.claude/);
   assert.match(warned.row.message, /runner\.llmAccounts\.openai\.onCodex\.credentialStore\.codex/);
   assert.doesNotMatch(warned.row.message, /onPrivate/);
-  assert.equal(warned.shape.passed, true, 'the pool with a default-home store still resolves: nothing refuses it');
+  assert.equal(warned.shape.passed, true);
+  const onDefault = warned.inventory.claude.accounts.onDefault;
+  assert.equal(onDefault.disabled, false, 'the account on the default login home is offered, not disabled');
+  assert.equal(onDefault.unusableFor, undefined, 'the account on the default login home is not skipped for its CLI');
+  assert.equal(credentialSourceForCli(onDefault, 'claude')?.home, path.join(warned.home, '.claude'), 'the pool still resolves its account to the default-home store');
 
   const linked = inFakeHome((h) => ({ claude: { viaLink: { credentialStore: { claude: path.join(h, 'linked-login') } } } }));
   assert.match(linked.row.message, /^warning: .*viaLink/);
