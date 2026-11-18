@@ -168,7 +168,7 @@ pub fn shard_path(root: &Path, store: &str) -> io::Result<PathBuf> {
 /// opened descriptor is checked again. Windows opens through
 /// `fgos_durable_file::open_no_reparse`, which refuses a reparse point at the
 /// leaf; the metadata check before it is the same early refusal as on Unix.
-fn open_regular(path: &Path, options: &mut OpenOptions) -> io::Result<File> {
+pub(crate) fn open_regular(path: &Path, options: &mut OpenOptions) -> io::Result<File> {
     match fs::symlink_metadata(path) {
         Ok(metadata) if !metadata.file_type().is_file() => return Err(not_regular(path)),
         Ok(_) => {}

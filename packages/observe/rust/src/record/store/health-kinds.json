@@ -1,0 +1,26 @@
+{
+  "contract": "observe-kinds.v1",
+  "attrs": {
+    "fgos.observe.health.last_error": { "type": "string" }
+  },
+  "measures": {
+    "fgos.observe.health.accepted": { "unit": "count", "aggs": ["sum", "max"] },
+    "fgos.observe.health.written": { "unit": "count", "aggs": ["sum", "max"] },
+    "fgos.observe.health.duplicates": { "unit": "count", "aggs": ["sum", "max"] },
+    "fgos.observe.health.rejected": { "unit": "count", "aggs": ["sum", "max"] },
+    "fgos.observe.health.errors": { "unit": "count", "aggs": ["sum", "max"] }
+  },
+  "kinds": {
+    "fgos.observe.health": {
+      "subjects": ["session"],
+      "attrs": ["fgos.observe.health.last_error"],
+      "measures": [
+        "fgos.observe.health.accepted",
+        "fgos.observe.health.written",
+        "fgos.observe.health.duplicates",
+        "fgos.observe.health.rejected",
+        "fgos.observe.health.errors"
+      ]
+    }
+  }
+}
