@@ -23,10 +23,18 @@ footprint:
   - packages/git/rust/src/store_admission.rs
   - packages/git/contracts/mutation-census.v1.json
   - packages/identity/**
-  - packages/mailbox/rust/store/src/hook/resolve.rs
-  - packages/run-supervisor/contracts/head-request.v1.json
   - packages/run-supervisor/rust/**
   - packages/distribution/contracts/doctor-registry.v1.json
+  - packages/session-host/**
+  - packages/run-supervisor/contracts/**
+  - core/config-standard/sessionRotation.yaml
+  - core/config-schema/sessionRotation.schema.yaml
+  - apps/fgos/src/wiring/session_rotation_hook.rs
+  - apps/fgos/src/wiring/mailbox_identity.rs
+  - packages/mailbox/rust/**
+  - docs/platform/agent-confinement/**
+  - docs/platform/agent-mailbox/spec.md
+  - docs/platform/run-supervisor/**
   - src/**
   - bin/fgos.mjs
   - test/**
@@ -48,6 +56,9 @@ footprint:
 base: 554082bab6dd5216309a227d5388953e0e36effc
 source:
   - p-g2iprtzptz
+  - p-zgbqe2bpig
+  - p-ktnvgs2ozm
+  - p-cymvjb6nrc
   - plans/261118-0947-session-verb-for-agent-sessions/reports/scan-261118-0947-session-worktree-verbs.md
   - docs/discussions/secretary-miu/DISCUSSION.md
 created: 2026-11-18
@@ -102,6 +113,15 @@ suffices).
 5. `node scripts/plan-contract-check.mjs --plan plans/261118-0947-session-verb-for-agent-sessions` prints ok.
 6. `npm test` and `cargo test --workspace` green on the combined tree; `cargo clippy --workspace -- -D warnings` clean.
 7. `CHANGELOG.md` `[Unreleased]` names the verb change; backlog `p-g2iprtzptz` is done, `p-5x37olszki` closed as obsolete.
+8. A launched secretary head (owner decision 2026-11-18: raise the grants): edits `docs/backlog.md` and the other files
+   its skill writes, sends mail, reaches its peers' sockets, and `fgos identity session` resolves it as its `head:` role;
+   a path outside its grant stays read-only (phase 7 tests plus one live check on fg-server2).
+9. A manual `fgos session rotate` records `rotation: manual` in log, handoff and `latest.json`, and its handoff carries
+   the last assistant message, open questions and the secretary portfolio; `sessionRotation.personas.secretary.reload`
+   is non-empty (phase 8).
+10. The context window of the secretary head's model is proven and written down; if it is not 1M, the rotation measure
+    uses the per-model window and a 200k-model test crosses soft (phase 9). Backlog `p-zgbqe2bpig`, `p-ktnvgs2ozm`,
+    `p-cymvjb6nrc` are done (or the last closed as not a bug with its proof).
 
 ## Non-goals
 
@@ -129,9 +149,15 @@ suffices).
 | 3 | [Host drops the session worktree verb](phase-03-host-drops-session-verb.md) | 1, 2 | apps/fgos/src/wiring/session.rs, apps/fgos/src/main.rs, apps/fgos/src/routing.rs, apps/fgos/src/cli_projector.rs, apps/fgos/tests/**, packages/host-runtime/**, packages/holder-lock/contracts/lock-registry.v1.json, docs/platform/holder-lock/spec.md, packages/git/rust/src/store_admission.rs, packages/git/contracts/mutation-census.v1.json, docs/platform/git/spec.md, src/cli/command-registry.mjs, test/rust-host/**, test/util/host-bin.test.mjs, test/cli/fgos-manifest.test.mjs | 2 | draft |
 | 4 | [Identity stops reading sessions.json](phase-04-identity-drops-registry.md) | 3 | packages/identity/**, packages/mailbox/rust/store/src/hook/resolve.rs, src/util/session-identity.mjs, src/git/inspect.mjs, src/observe/invocation-fault-log.mjs, src/runner/dispatch/**, src/runner/merge.mjs, src/state/**, bin/fgos.mjs, apps/fgos/src/wiring/mailbox_verbs.rs, apps/fgos/src/wiring/doctor/identity.rs, apps/fgos/src/cli_projector.rs, apps/fgos/tests/**, src/cli/command-registry.mjs, packages/host-runtime/contracts/**, test/util/session-identity.test.mjs, test/git/**, test/state/**, docs/platform/identity/spec.md | 3 | draft |
 | 5 | [Rename `fgos head` to `fgos session`](phase-05-rename-head-to-session.md) | 4 | src/cli/command-registry.mjs, packages/host-runtime/contracts/**, bin/fgos.mjs, test/cli/**, src/session-host/**, src/session-rotation/**, test/session-host/**, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/**, core/skills/**, domains/coding/skills/**, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/**, docs/platform/session-host/spec.md | 4 | draft |
-| 6 | [Integration, docs and full gate](phase-06-integration.md) | 1, 2, 3, 4, 5 | CHANGELOG.md, docs/reading-map.md, docs/backlog.md, plans/261118-0947-session-verb-for-agent-sessions/reports/integration.md | 5 | draft |
+| 6 | [Integration, docs and full gate](phase-06-integration.md) | 1, 2, 3, 4, 5, 7, 8, 9 | CHANGELOG.md, docs/reading-map.md, docs/backlog.md, plans/261118-0947-session-verb-for-agent-sessions/reports/integration.md | 8 | draft |
+| 7 | [The secretary head gets the grants its role needs](phase-07-secretary-head-grants.md) | 5 | src/session-host/**, src/runner/dispatch/confinement/**, packages/run-supervisor/rust/**, packages/run-supervisor/contracts/**, packages/identity/**, packages/mailbox/rust/**, apps/fgos/src/wiring/mailbox_identity.rs, core/skills/fgos-secretary/**, test/session-host/**, test/runner/**, test/session-identity/**, docs/platform/agent-confinement/**, docs/platform/agent-mailbox/spec.md, docs/platform/run-supervisor/**, docs/platform/session-host/spec.md, plans/261118-0947-session-verb-for-agent-sessions/reports/phase-07.md | 5 | draft |
+| 8 | [A manual rotation says so and hands off real context](phase-08-manual-rotation-handoff.md) | 7 | bin/fgos.mjs, src/session-host/**, src/session-rotation/**, packages/session-host/**, apps/fgos/src/wiring/session_rotation_hook.rs, core/config-standard/sessionRotation.yaml, core/config-schema/sessionRotation.schema.yaml, test/session-host/**, test/session-rotation/**, docs/platform/session-host/spec.md | 6 | draft |
+| 9 | [Rotation measures against the model's real window](phase-09-rotation-window-per-model.md) | 8 | packages/session-host/rust/**, core/config-standard/sessionRotation.yaml, core/config-schema/sessionRotation.schema.yaml, test/session-rotation/**, plans/261118-0947-session-verb-for-agent-sessions/reports/phase-09.md | 7 | draft |
 
-**Waves.** 1: phases 1, 2 (disjoint: Node/runner vs gateway). 2: phase 3. 3: phase 4. 4: phase 5. 5: phase 6.
+**Waves.** 1: phases 1, 2 (disjoint: Node/runner vs gateway). 2: phase 3. 3: phase 4. 4: phase 5. 5: phase 7. 6: phase 8. 7: phase 9. 8: phase 6.
+Phases 7-9 (added 2026-11-18 21:4x by the supervisor for the owner: backlog rows found on Miu's rotations, all in the
+files phase 5 renames) run after the rename, serial because they share `src/session-host/**`, the session-host crate and
+the rotation config; 7 first (HIGH, owner decision: raise the secretary head's grants). Phase 6 integrates all of them.
 Serial reasons: phase 3 deletes the host verb the Node readers of phase 1 still call, so 1 lands first; the gateway of
 phase 2 shells the verb, so it lands first too. Phase 4 changes `resolve_current`'s signature, which `session.rs`
 calls until phase 3 deletes it. Phase 5 needs the name `session` free (phase 3) and shares the command registry,
