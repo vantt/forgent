@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1c0819d9405e14d36ef496ee7406918ed4c67e1da6a24b832517a8aabd306ac9",
+  "payloadDigest": "9c70cf16eff739a4def5da83e895dc60994d93534c1cbe4df6612fe2510605f5",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -432,7 +432,7 @@
     "packages/event-store/rust/tests/walk_certified.rs": "5dcea368cef656e692996410ac26e203ee8ba9d202e4096f3bd7f74925af7eb6",
     "packages/execution/rust/src/accounts.rs": "4281e003014072f28d7fa044dd282045d930f472c87b1553b677a635351880bb",
     "packages/execution/rust/src/agents.rs": "dffa2143d373326f72cfa5e2b2b8abc534a700e0a5fc2a563d626a699ed3c912",
-    "packages/execution/rust/src/bind.rs": "d7fb27369f25c55bc579526fed48438961e3ef670eee71a2ca0cd6995309af42",
+    "packages/execution/rust/src/bind.rs": "184535a938751d05fa820facdc2bed07a7f73dd5ce8345894bcc520e4a3d28c3",
     "packages/execution/rust/src/checks.rs": "ab40569f5e4e9ece9ed8ab4c4fb092f7149c79aa0091419ad901b66e07a52a9e",
     "packages/execution/rust/src/decide.rs": "6e9dab7435cc5b5291794fe7012fe30eaaedcda0e1d7218ca784310cd56e5e0d",
     "packages/execution/rust/src/executor_model.rs": "a4e49dd6e4b5bbf010509181d9ff3eceb93f637cce3a791cdc5943aef803aba8",
@@ -874,7 +874,7 @@
     "packages/seat-binding/rust/src/lib.rs": "ce5d60decfffa172ad071fd094fa12af485c7818c82c60a3e23b5abf13b9f88f",
     "packages/seat-binding/rust/src/model.rs": "696b10268d1950a1564d58dd85c326a15a55d674945d9c6854174b99c00a1262",
     "packages/seat-binding/rust/src/policy.rs": "4fa5dfc8f7500d855e3b9d7c1a47ae35c1877fd4e8def205f1dc841a22abd521",
-    "packages/seat-binding/rust/src/rank.rs": "7f7aeb81c53d4bf4930ca8ccd8d61b53ac076c6e9e13c2c83f9c226d6622c590",
+    "packages/seat-binding/rust/src/rank.rs": "463dba7ec6cb3464bc1f0094c90c22a4660183d6a975057e9a80c78dd292c810",
     "packages/seat-binding/rust/src/tier.rs": "8c13a47153cb90274751bca8b36b5d20e349c50dacbcf06631c65195c73fe24c",
     "packages/seat-binding/rust/tests/golden.rs": "3536ea649db21c346bd59829b33aa461e05e902d4f603ad15bc8db79d71eb561",
     "packages/secrets/rust/src/declaration.rs": "cb491b78ab3b8d337740747e03abce6e6c6be8190f898ef45f7e5e9f541c7d64",

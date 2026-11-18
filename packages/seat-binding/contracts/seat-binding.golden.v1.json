@@ -4281,6 +4281,43 @@
       }
     },
     {
+      "name": "a persona pool named like a walked family with no account refuses pool-unusable and never runs on the executor's own login",
+      "patch": {
+        "ask": {
+          "capability": "misc:thing",
+          "seat": "x",
+          "role": "producer",
+          "persona": "miu"
+        },
+        "config": {
+          "personas": {
+            "miu": {
+              "pool": "claude",
+              "prefer": [
+                "claude"
+              ]
+            }
+          },
+          "tierFallback": {
+            "standard": [
+              "claude"
+            ]
+          }
+        },
+        "accountView": {
+          "pools": {
+            "claude": null
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "refusal": {
+          "reason": "pool-unusable"
+        }
+      }
+    },
+    {
       "name": "a role entry that names a pool is a config error naming the line",
       "patch": {
         "config": {
