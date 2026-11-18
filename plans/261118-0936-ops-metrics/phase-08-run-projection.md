@@ -46,3 +46,7 @@
 
 ## Rollback
 Revert the phase commit.
+
+## Carried from the phase 1 review
+- `RecordSource::kinds()` is documented as checked by the registry, but no check exists yet. Add the check (every
+  stated kind is declared) where the sources are registered, with its test.

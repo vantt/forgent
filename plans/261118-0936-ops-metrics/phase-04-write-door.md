@@ -35,3 +35,9 @@ Layer 1 write side, with the layer 2 safety rule: the write door is fail-open an
 
 ## Rollback
 Revert the phase commit.
+
+## Carried from the phase 1 review
+- A malformed or colliding file under `.fgos/observe/kinds` fails the whole registry load today
+  (`record/registry/discover.rs`, `merge.rs`). The write door must stay fail-open: a registry load failure is counted
+  and the write is dropped or rejected, never raised to the caller (§6.0.1).
+- `validate.rs` accepts a `detail` without a redaction stamp. The write door refuses or redacts an unstamped `detail`.
