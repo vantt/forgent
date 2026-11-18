@@ -546,3 +546,83 @@ fn two_concurrent_lands_into_one_target_serialize() {
     }
     assert!(first_result.is_ok() || second_result.is_ok());
 }
+
+#[test]
+fn a_branch_edit_of_a_regenerated_file_outside_the_footprint_refuses() {
+    let f = Fixture::new();
+    f.topic(
+        "topic",
+        &[("a", "incoming\n"), ("census.txt", "hand-edited\n")],
+    );
+    let cfg = LandConfig {
+        gates: vec![gate("true")],
+        regenerate: Some(Regenerate {
+            run: "cp src.txt census.txt".into(),
+            files: vec!["census.txt".into()],
+        }),
+    };
+    let mut cmd = branch("topic");
+    cmd.footprint = Some(vec!["a".into()]);
+    let before = f.remote_tip();
+    let refusal = f.land(&cmd, &cfg).unwrap_err();
+    assert_eq!(refusal.code, "land-outside-footprint");
+    assert_eq!(refusal.detail, "census.txt");
+    assert_eq!(f.remote_tip(), before);
+}
+
+#[test]
+fn a_gate_that_edits_a_tracked_candidate_file_refuses_with_nothing_pushed() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    let remote_before = f.remote_tip();
+    let local_before = f.local_tip();
+    let refusal = f
+        .land(&branch("topic"), &config(vec![gate("echo gated > b")]))
+        .unwrap_err();
+    assert_eq!(refusal.code, "land-candidate-dirty");
+    assert!(refusal.detail.contains('b'), "{refusal}");
+    assert_eq!(f.remote_tip(), remote_before);
+    assert_eq!(f.local_tip(), local_before);
+}
+
+#[test]
+fn a_paths_land_whose_hook_changes_the_commit_refuses_with_nothing_pushed() {
+    use std::os::unix::fs::PermissionsExt;
+    let f = Fixture::new();
+    let hooks = f.temp.join("hooks");
+    fs::create_dir(&hooks).unwrap();
+    let hook = hooks.join("pre-commit");
+    fs::write(&hook, "#!/bin/sh\nprintf hook > c\ngit add c\n").unwrap();
+    fs::set_permissions(&hook, fs::Permissions::from_mode(0o755)).unwrap();
+    git(
+        &f.main,
+        &["config", "core.hooksPath", hooks.to_str().unwrap()],
+    );
+    let before = f.remote_tip();
+    fs::write(f.main.join("a"), "landed\n").unwrap();
+    let refusal = f
+        .land(&paths(&["a"]), &config(vec![gate("true")]))
+        .unwrap_err();
+    assert_eq!(refusal.code, "land-commit-contract-violation");
+    assert!(refusal.detail.contains(&f.local_tip()), "{refusal}");
+    assert_eq!(f.remote_tip(), before);
+}
+
+#[test]
+fn a_paths_land_into_a_target_the_main_checkout_is_not_on_refuses() {
+    let f = Fixture::new();
+    git(&f.main, &["branch", "other"]);
+    git(&f.main, &["push", "-q", "origin", "other"]);
+    let other_before = git(&f.remote, &["rev-parse", "refs/heads/other"]);
+    let trunk_before = f.local_tip();
+    fs::write(f.main.join("a"), "landed\n").unwrap();
+    let mut cmd = paths(&["a"]);
+    cmd.target = Some("other".into());
+    let refusal = f.land(&cmd, &config(vec![gate("true")])).unwrap_err();
+    assert_eq!(refusal.code, "land-target-not-checked-out");
+    assert_eq!(
+        git(&f.remote, &["rev-parse", "refs/heads/other"]),
+        other_before
+    );
+    assert_eq!(f.local_tip(), trunk_before);
+}
