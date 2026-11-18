@@ -23,6 +23,7 @@ struct World {
     missing: RefCell<Vec<String>>,
     raised: RefCell<BTreeMap<String, RaisedEvent>>,
     wakes: RefCell<Vec<String>>,
+    handled: RefCell<Vec<String>>,
     notified: RefCell<Vec<String>>,
     fetches: RefCell<u32>,
     refreshes: RefCell<u32>,
@@ -122,7 +123,16 @@ impl EventSink for World {
         Ok(Raised::New)
     }
     fn unhandled(&self) -> Result<Vec<RaisedEvent>, QueueError> {
-        Ok(Vec::new())
+        let handled = self.handled.borrow();
+        let mut open: Vec<RaisedEvent> = self
+            .raised
+            .borrow()
+            .values()
+            .filter(|e| !handled.contains(&e.id))
+            .cloned()
+            .collect();
+        open.sort_by(|a, b| a.ts.cmp(&b.ts));
+        Ok(open)
     }
 }
 
@@ -184,19 +194,56 @@ fn a_row_raises_once_and_a_second_tick_runs_no_second_action() {
     assert_eq!((first.raised, first.wakes), (1, 1));
     at(&w, 1700);
     let second = run(&w, None, &s);
-    assert_eq!((second.raised, second.duplicate, second.wakes), (0, 1, 0));
-    assert_eq!(w.wakes.borrow().len(), 1);
+    assert_eq!((second.raised, second.duplicate), (0, 1));
+    assert_eq!(second.wakes, 1, "only the recovery wake, no second action");
+    assert_eq!(w.wakes.borrow().len(), 2);
+}
+
+#[test]
+fn an_unhandled_event_from_an_earlier_tick_gets_one_recovery_wake_with_the_oldest() {
+    let w = World::default();
+    at(&w, 1000);
+    w.rows.borrow_mut().push(row("late", "p2", "t2"));
+    let first = run(&w, None, &settings(Action::WakeSupervisor));
+    assert_eq!((first.raised, first.wakes), (1, 1));
+    // The wake did not mark the event handled; an older event arrives on tick 2.
+    let s = settings(Action::None);
+    w.rows.borrow_mut().push(row("old", "p1", "t1"));
+    at(&w, 1700);
+    let second = run(&w, None, &s);
+    assert_eq!((second.raised, second.wakes), (1, 1));
+    assert_eq!(
+        *w.wakes.borrow(),
+        vec!["late p2".to_owned(), "old p1".to_owned()]
+    );
+    w.handled.borrow_mut().extend(
+        w.raised
+            .borrow()
+            .values()
+            .map(|e| e.id.clone())
+            .collect::<Vec<_>>(),
+    );
+    at(&w, 2400);
+    assert_eq!(run(&w, None, &s).wakes, 0);
 }
 
 #[test]
 fn the_same_projection_row_over_three_ticks_raises_one_event_and_one_action() {
     let w = World::default();
     w.rows.borrow_mut().push(row("plan-ready", "p1", "t1"));
+    w.pace_rows.borrow_mut().push(row("active", "x", "t"));
     let s = settings(Action::Notify);
     for now in [1000, 1100, 1200] {
         at(&w, now);
-        run(&w, None, &s);
+        assert_eq!(run(&w, None, &s).mode, Mode::Active);
     }
+    let def_runs = w
+        .runs
+        .borrow()
+        .iter()
+        .filter(|(d, _)| d == &[DEF.to_owned()])
+        .count();
+    assert_eq!(def_runs, 3);
     assert_eq!(w.raised.borrow().len(), 1);
     assert_eq!(w.notified.borrow().len(), 1);
 }
@@ -213,7 +260,7 @@ fn a_late_commit_inside_the_lookback_is_asked_for() {
     run(&w, None, &settings(Action::None));
     let runs = w.runs.borrow();
     let (_, since) = runs.iter().find(|(d, _)| d == &[DEF.to_owned()]).unwrap();
-    assert_eq!(*since, Some(1600 - 300));
+    assert_eq!(*since, Some(1000 - 300));
     assert_eq!(w.raised.borrow().len(), 1);
 }
 
@@ -234,9 +281,17 @@ fn a_missing_state_raises_rows_in_the_window_once_and_the_next_tick_nothing_new(
         .unwrap();
     assert_eq!(runs.1, Some(5000 - 300));
     drop(runs);
+    w.pace_rows.borrow_mut().push(row("active", "x", "t"));
     at(&w, 5060);
     let second = run(&w, None, &s);
-    assert_eq!(second.raised, 0);
+    assert_eq!((second.raised, second.duplicate), (0, 1));
+    let def_runs = w
+        .runs
+        .borrow()
+        .iter()
+        .filter(|(d, _)| d == &[DEF.to_owned()])
+        .count();
+    assert_eq!(def_runs, 2);
 }
 
 #[test]
@@ -400,4 +455,26 @@ fn the_span_carries_exactly_the_declared_attr_and_measure_names() {
     let measures: Vec<String> = span.measures.iter().map(|(k, _)| (*k).to_owned()).collect();
     assert_eq!(attrs, names("attrs"));
     assert_eq!(measures, names("measures"));
+}
+
+#[test]
+fn an_edge_between_an_idle_tick_and_the_next_full_tick_is_raised_with_no_lookback() {
+    let w = World::default();
+    *w.state.borrow_mut() = Some(State {
+        last_tick: Some(1000),
+        last_full_tick: Some(1000),
+    });
+    let mut s = settings(Action::None);
+    s.lookback_sec = 0;
+    at(&w, 1100);
+    assert_eq!(run(&w, None, &s).mode, Mode::Idle);
+    w.rows
+        .borrow_mut()
+        .push(row("plan-ready", "p1", "t-between"));
+    at(&w, 1700);
+    let full = run(&w, None, &s);
+    assert_eq!((full.mode, full.raised), (Mode::Active, 1));
+    let runs = w.runs.borrow();
+    let (_, since) = runs.iter().find(|(d, _)| d == &[DEF.to_owned()]).unwrap();
+    assert_eq!(*since, Some(1000));
 }
