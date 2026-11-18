@@ -12,7 +12,7 @@ Step 0: re-grep every line below. Other plans touch `doctor-registry.v1.json` an
 - `plans/261118-1045-project-supervisor/reports/spike-timer-head-start.md` (phase 2): the service environment a timer needs so the watcher can start the supervisor head. If it is missing, stop with `BLOCKED`.
 
 ## Footprint
-`packages/distribution/rust/src/timer.rs`, `apps/fgos/src/wiring/doctor/mailbox.rs`, `apps/fgos/src/wiring/doctor/mod.rs`, `packages/distribution/contracts/doctor-registry.v1.json`, `docs/platform/packaging-distribution/spec.md`.
+`packages/distribution/rust/src/timer.rs`, `apps/fgos/src/wiring/uninstall.rs` (its schedule-id test lists every timer; added 2026-11-18), `apps/fgos/src/wiring/doctor/mailbox.rs`, `apps/fgos/src/wiring/doctor/mod.rs`, `packages/distribution/contracts/doctor-registry.v1.json`, `docs/platform/packaging-distribution/spec.md`.
 
 ## Steps
 1. Add `Schedule::WatcherTick`; grow `ALL` to three. Fill every `match` table: name `watcher-tick`, marker `fgos-managed: watcher-timer`, stem prefix `fgos-watcher`, texts that say the timer wakes the watcher, which decides nothing.
