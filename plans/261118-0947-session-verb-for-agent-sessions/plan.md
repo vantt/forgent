@@ -160,5 +160,8 @@ wanted instead.
 
 ## Validation Log
 
+- 2026-11-18 owner approved the plan. `plan-contract-check` (run with the staged addon) passes every rule but one: footprint
+  overlap with the still-`ready` secretary plan; the check does not count `blockedBy`. Status stays `draft` and turns
+  `ready` when the secretary plan is `done` and the check prints ok.
 - 2026-11-18 planner: scan report written; owner answered SV-1, SV-7; owner rule "new code in Rust" folded into SV-10 and leader rules; plan status `draft` until the owner approves and
   the two blocking plans land.
