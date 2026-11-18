@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "617ff2126032b45315228d534e278fe3395d319090857cdff19fdc0a1835a776",
+  "payloadDigest": "e359498e62278d578a4baf83918f397ba2ac5c788ec1361c957b925680146174",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -146,7 +146,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "ac931eff813a4df469d63cc6789838f5cfdcd11a99c47438b43d28d4a2e63500",
+    "bin/fgos.mjs": "3cbad3dc871777e260a91c4a391fc730570ad4b8635b36576a97b54460ff3ff1",
     "core/skills/_shared/capability-catalog.md": "5b53b25182fc2834519869b19d3076dd2635f4eec889966eaa3425d82537b49a",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -1229,7 +1229,7 @@
     "src/session-host/client.mjs": "39c4a0a4b6f07b7c85eee7fe83327f2c85c89e666c0e604e0114b86a87e5336b",
     "src/session-host/head-grants.mjs": "030b092e60719c02a0fed76f10d2063575934a04d91afbb005c9f109a08f827b",
     "src/session-host/head-request-client.mjs": "a5944d2066ac4d4b67b1a9bffb88ccd0dfd360f4d7aea8379cc753abdabbc1bc",
-    "src/session-host/head-request.mjs": "15e0d3a0577f99b69763a0437936e4180dd3ae25f6bdfa909378934fa8957c9e",
+    "src/session-host/head-request.mjs": "59e9c52f4933fb9e96b43fd41fecf3c216f12c5a36e73da425a3f634d8821055",
     "src/session-host/head-start.mjs": "6d9b9ec2cbbcde6e2f1fe339725ac72fcb8759b6a7bf8f7dc2e8fbf3ed5d533f",
     "src/session-rotation/handoff-store.mjs": "0fdd8f18a406b5c2e1797c331e6bdf5ce72c3ed67a9daef28df5bb3b884aa133",
     "src/session-rotation/rotate.mjs": "5e88871207e3df22c7177912bc96cc83761b095fcc9de01ff9f341d516fc87b0",

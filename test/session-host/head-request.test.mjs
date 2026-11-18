@@ -113,6 +113,18 @@ test('the payload entry runs head start in the project of its envelope and repor
   assert.equal((await runHeadRequest({ runDir, request: { verb: 'head start', args: {} } }, ports)).line.code, 'envelope-invalid');
 });
 
+test('a confined start or rotation never resolves the project root, an unconfined one resolves it through the resolver', async () => {
+  let calls = 0;
+  const projectRoot = () => { calls += 1; return '/p'; };
+  const request = async () => ({ started: true, key: 'k' });
+  const confined = { FGOS_CONFINED: '1', [HEAD_REQUEST_SOCKET_ENV]: '/s' };
+  await startHead({ persona: 'planner', name: 'x', projectRoot }, { env: confined, request });
+  await rotateHead({ persona: 'planner', name: 'x', reason: 'soft', projectRoot }, { env: confined, request });
+  assert.equal(calls, 0);
+  await assert.rejects(startHead({ persona: 'Bad Persona', name: 'x', projectRoot }, { env: {}, request }), (err) => err.code === 'bad-persona');
+  await assert.rejects(rotateHead({ persona: 'planner', name: 'x', reason: 'never', projectRoot }, { env: {}, request }), (err) => err.code === 'bad-reason');
+});
+
 test('rotateHead is one branch: confined asks for head rotate through the socket, anyone else calls the one rotation entry', async () => {
   const asked = [];
   const request = async (args, options) => { asked.push({ args, socketPath: options.socketPath }); return { started: true, pid: 7 }; };

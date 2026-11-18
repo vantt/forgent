@@ -19,19 +19,22 @@ import { headRoleOf, startHeadSession } from './head-start.mjs';
 import { markSuccessorAnswered, requestRotation, rotationHolds } from '../session-rotation/rotate.mjs';
 
 const confined = (env) => env[CONFINED_MARKER_ENV] === '1';
+// `projectRoot` is a path or a function that finds it; only the unconfined branch resolves it, because the lookup probes
+// git and writes under the state root, which a sandbox keeps read-only.
+const rootOf = (projectRoot) => (typeof projectRoot === 'function' ? projectRoot() : projectRoot);
 
 /**
  * The one door to start a head, whoever asks. A confined session (`FGOS_CONFINED=1`, which the launch door sets in
  * every sandboxed agent) sends the request through its socket; anyone else calls `startHeadSession` directly. The
  * confinement fact is that marker alone, never the socket variable or a masked path: a confined worker has no socket
- * and is refused `no-request-socket`. `args` is `{ persona, name, beside?, projectRoot? }`; `projectRoot` is used only
+ * and is refused `no-request-socket`. `args` is `{ persona, name, beside?, projectRoot? }`; `projectRoot` (a path or a resolver function) is used only
  * outside the sandbox (the supervisor starts a confined caller's head in its own project).
  */
 export async function startHead({ persona, name, beside = null, projectRoot } = {}, { env = process.env, ports = {}, request = requestHeadStart } = {}) {
   if (confined(env)) {
     return request({ persona, name, ...(beside ? { beside } : {}) }, { socketPath: env[HEAD_REQUEST_SOCKET_ENV] });
   }
-  return startHeadSession({ persona, name, beside, projectRoot }, ports);
+  return startHeadSession({ persona, name, beside, projectRoot: rootOf(projectRoot) }, ports);
 }
 
 /**
@@ -42,7 +45,7 @@ export async function rotateHead({ persona, name, reason, stopFacts, projectRoot
   if (confined(env)) {
     return request({ persona, name, reason, ...(stopFacts ? { stopFacts } : {}) }, { socketPath: env[HEAD_REQUEST_SOCKET_ENV] });
   }
-  return requestRotation({ persona, name, reason, stopFacts, projectRoot }, ports);
+  return requestRotation({ persona, name, reason, stopFacts, projectRoot: rootOf(projectRoot) }, ports);
 }
 
 // ---- the payload entry the supervisor's route child runs ------------------------------------------

@@ -3472,7 +3472,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const name = requireField(flags.name, `head ${sub} requires --name <name>`);
       const { startHead, rotateHead } = await import('../src/session-host/head-request.mjs');
       const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
-      const projectRoot = resolveGitRoots(process.cwd()).worktreeRoot;
+      // A resolver, not a path: startHead and rotateHead call it only when the caller is not confined.
+      const projectRoot = () => resolveGitRoots(process.cwd()).worktreeRoot;
       const refused = (err) => {
         const category = HEAD_ARGUMENT_CODES.has(err.code) ? 'validation' : err.code === 'rotation-in-progress' ? 'conflict' : 'precondition';
         return new StoreError(category, `${err.code ?? 'head-refused'}: ${err.message}`);
