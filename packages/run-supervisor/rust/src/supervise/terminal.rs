@@ -30,6 +30,8 @@ use fgos_agent_protocol::terminal::{
     REASON_NEEDS_SETUP, REASON_RESULT_UNREADABLE,
 };
 use fgos_agent_protocol::BlockedReason;
+use fgos_identity::directory::register_writer;
+use fgos_identity::resolve::{HeadRef, WriterKey};
 use fgos_process::facts::{self, ProcTuple};
 use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, ProcId};
 use fgos_session_host::direct::OsDirect;
@@ -84,6 +86,16 @@ struct Plan {
     exit: Option<String>,
     brief: String,
     adapter: Terminal,
+    /// A session attempt (a head session): the role it holds and the writer id it registers under. It has no
+    /// result to wait for; it lives until its domain, its carrier or a cancel ends it.
+    session: Option<SessionPlan>,
+}
+
+/// What the envelope's `session` object and `identity` say about a session attempt.
+struct SessionPlan {
+    role: String,
+    writer_id: String,
+    cwd: PathBuf,
 }
 
 impl Plan {
@@ -139,8 +151,31 @@ impl Plan {
                 .map(String::from),
             brief: brief.trim_end().to_string(),
             adapter,
+            session: session_plan(envelope)?,
         })
     }
+}
+
+fn session_plan(envelope: &Value) -> Result<Option<SessionPlan>, Refusal> {
+    if envelope["session"].is_null() {
+        return Ok(None);
+    }
+    let invalid = |why: &str| Refusal {
+        exit: EXIT_ENVELOPE_INVALID,
+        code: "envelope-invalid",
+        why: why.to_string(),
+    };
+    let text = |v: &Value, what: &str| {
+        v.as_str()
+            .filter(|s| !s.is_empty())
+            .map(String::from)
+            .ok_or_else(|| invalid(&format!("envelope field {what} missing")))
+    };
+    Ok(Some(SessionPlan {
+        role: text(&envelope["session"]["role"], "session.role")?,
+        writer_id: text(&envelope["identity"]["writerId"], "identity.writerId")?,
+        cwd: PathBuf::from(text(&envelope["cwd"], "cwd")?),
+    }))
 }
 
 /// The attempt's listening socket; the path is removed when this goes.
@@ -844,6 +879,38 @@ pub(super) fn run(
     super::finish(envelope, run_dir, watch, locks, false, &end)
 }
 
+/// Registers a session attempt in Identity under its role, from outside the sandbox: Identity stays the only
+/// authority for who holds a role, and the supervisor only transports the fact that this attempt is that session.
+/// The head is the gate, which lives exactly as long as the attempt's domain. A role a live session still holds
+/// (a rotation successor starting before its predecessor ended) registers the session without it; any other
+/// refusal is one log line and the attempt goes on.
+fn register_session(session: &SessionPlan, gate: &ProcTuple) {
+    let state_root = fgos_holder_lock::state_root::state_root().0;
+    let key = WriterKey {
+        source: "FGOS_SESSION_ID",
+        value: &session.writer_id,
+    };
+    let head = HeadRef {
+        pid: gate.pid.0,
+        start_time: gate.start_time.clone(),
+    };
+    let register = |roles: &[String]| {
+        register_writer(&state_root, Some(&session.cwd), &key, &head, roles, false)
+    };
+    let refused = match register(std::slice::from_ref(&session.role)) {
+        Ok(_) => return,
+        Err(refusal) if refusal.reason == "role-held" => match register(&[]) {
+            Ok(_) => return,
+            Err(refusal) => refusal,
+        },
+        Err(refusal) => refusal,
+    };
+    eprintln!(
+        "fgos internal supervise: session {} was not registered for {}: {}: {}",
+        session.writer_id, session.role, refused.reason, refused.detail
+    );
+}
+
 /// The stop an unreadable result ends in: the contract's cause and the receipt reason it names.
 const UNREADABLE_STOP: (&str, &str) = ("cancel", REASON_RESULT_UNREADABLE);
 
@@ -894,6 +961,9 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
     if io.sup.finished() {
         return;
     }
+    if let Some(session) = &plan.session {
+        register_session(session, &io.sup.gate);
+    }
 
     let readiness = adapter.await_ready(&mut io, READY_MS);
     if io.sup.finished() {
@@ -923,6 +993,15 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
     // Once, and the connection stays open: the gate reads an early close as a dead supervisor.
     if write_frame(&mut io.sup.go, &json!({"type": "BRIEF_DELIVERED"})).is_err() {
         io.sup.link.channel_open = false;
+    }
+
+    // A session attempt has no result: nothing the screen shows ends it, only its domain, its carrier, a
+    // cancel request or the hard ceiling.
+    if plan.session.is_some() {
+        while !io.sup.finished() {
+            io.pause(WORK_POLL_MS);
+        }
+        return;
     }
 
     let started = Instant::now();

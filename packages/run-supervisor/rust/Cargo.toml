@@ -8,8 +8,9 @@ rust-version.workspace = true
 fgos-durable-file = { path = "../../durable-file/rust" }
 fgos-canonical-json = { path = "../../canonical-json/rust" }
 fgos-process = { path = "../../process/rust" }
-# The one ISO-8601 UTC clock; the library without its host provider.
-fgos-identity = { path = "../../identity/rust", default-features = false }
+# The one ISO-8601 UTC clock, and the session directory a head session registers its role in; the library
+# without its host provider.
+fgos-identity = { path = "../../identity/rust", default-features = false, features = ["directory"] }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
 fgos-agent-protocol = { path = "../../agent-protocol/rust" }
 fgos-terminal-control = { path = "../../terminal-control/rust" }

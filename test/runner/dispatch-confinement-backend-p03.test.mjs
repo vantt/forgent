@@ -1267,3 +1267,26 @@ test('a workspace-write producer in a linked worktree cannot write git metadata;
     fs.rmSync(base, { recursive: true, force: true });
   }
 });
+
+test('assessBwrap: a workspace-paths grant is supported under host-write-denied and covered', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-ws-paths-grant-'));
+  try {
+    fs.mkdirSync(path.join(tmp, 'run'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'plans'));
+    const assessed = assessBwrap({
+      dispatchId: 'disp_ws_paths',
+      invocation: { command: 'agent', args: [], env: {} },
+      context: { cwd: tmp, repoRoot: tmp, runDir: path.join(tmp, 'run'), fgosDir: tmp },
+      requirement: {
+        mode: 'required', policyId: 'host-write-denied', policy: {
+          controls: { hostWrite: 'deny', hostRead: 'allow', networkEgress: 'allow', process: 'host', home: 'host', session: 'shared', workspace: 'shared' },
+          grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }, { resource: 'workspace-paths', access: 'read-write', scope: 'dispatch', paths: ['plans'] }],
+        },
+      },
+    }, { id: 'bwrap', config: { type: 'bwrap' } });
+    assert.ok(!assessed.mismatches.some((m) => /workspace-paths/.test(m.detail)), JSON.stringify(assessed.mismatches));
+    assert.equal(assessed.coverage['grant:workspace-paths'], 'satisfied');
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});

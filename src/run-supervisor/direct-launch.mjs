@@ -155,9 +155,12 @@ export function withIdentityEnv(env, identity) {
   return { ...out, ...Object.fromEntries(set) };
 }
 
-/** The steps an attempt runs after its receipt, in order: the one list the envelope and the intent both carry. */
-function attemptSteps({ runDir, host, stepEnv, extraSteps = [] }) {
-  return ['settle-attempt', 'finalize-home', ...extraSteps].map((stepId) => ({
+/**
+ * The steps an attempt runs after its receipt, in order: the one list the envelope and the intent both carry.
+ * A session attempt (a head session) is not a unit of work and holds no run control token, so it has nothing to settle.
+ */
+function attemptSteps({ runDir, host, stepEnv, extraSteps = [], session = false }) {
+  return [...(session ? [] : ['settle-attempt']), 'finalize-home', ...extraSteps].map((stepId) => ({
     stepId,
     hostBin: host.hostBin,
     payloadRoot: host.payloadRoot,
@@ -175,7 +178,7 @@ function attemptSteps({ runDir, host, stepEnv, extraSteps = [] }) {
  * A terminal attempt publishes it again with `pane` (`{slot: {key, groupKey}, endpointEnv}`) right before its
  * pane is allocated, so adopt can release that pane by its key.
  */
-export function writeAttemptIntent({ runDir, attemptId, unitRunId, terminal, cwd, host, stepEnv, pane = null }) {
+export function writeAttemptIntent({ runDir, attemptId, unitRunId, terminal, cwd, host, stepEnv, pane = null, session = false }) {
   const paths = attemptPaths(runDir, attemptId);
   publishMutableProjection(path.join(paths.runDir, 'attempt-intent.json'), {
     v: 1,
@@ -185,7 +188,7 @@ export function writeAttemptIntent({ runDir, attemptId, unitRunId, terminal, cwd
     host: terminal ? 'terminal' : 'direct',
     cwd,
     launch: { capture: { stdout: paths.stdout, stderr: paths.stderr }, outboxDir: paths.outboxDir },
-    steps: attemptSteps({ runDir: paths.runDir, host, stepEnv, extraSteps: terminal ? ['cleanup-trust'] : [] }),
+    steps: attemptSteps({ runDir: paths.runDir, host, stepEnv, extraSteps: terminal ? ['cleanup-trust'] : [], session }),
     sideFile: paths.sideFile,
     ...(terminal && pane ? { terminal: { slot: pane.slot, endpointEnv: pane.endpointEnv } } : {}),
   });
@@ -200,9 +203,13 @@ export function removeAttemptIntent(runDir) {
  * Build the envelope v3 body (without digest) of one attempt.
  * `attemptId` is minted by the controller and equals the launch command id; `runDir` is the absolute
  * attempt directory (`runs/<NN>`); `attempt` is `prepareConfinementForLaunch(...).attempt`.
+ * `session` (`{role, verbs, requestSocketPath?}`, terminal only) makes it a session attempt: no soft deadline, no idle
+ * limit, no `settle-attempt` step, and `ceilingMs` (required, instead of the round-timeout ceiling) bounds it.
  */
-export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile, cwdLeaseOwner, identity, terminal = null, extraSteps = [] }) {
-  if (2 + extraSteps.length > MAX_ATTEMPT_STEPS) throw new DispatchError('too-many-steps', `an attempt runs at most ${MAX_ATTEMPT_STEPS} steps`, { runDir });
+export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile, cwdLeaseOwner, identity, terminal = null, extraSteps = [], session = null, ceilingMs = null }) {
+  if (session && !terminal) throw new DispatchError('session-needs-terminal', 'a session attempt runs in a pane', { runDir });
+  if (session && !(Number.isInteger(ceilingMs) && ceilingMs > 0)) throw new DispatchError('session-needs-ceiling', 'a session attempt names its hard ceiling in milliseconds', { runDir });
+  if ((session ? 1 : 2) + extraSteps.length > MAX_ATTEMPT_STEPS) throw new DispatchError('too-many-steps', `an attempt runs at most ${MAX_ATTEMPT_STEPS} steps`, { runDir });
   const paths = attemptPaths(runDir, attemptId);
   const confined = Array.isArray(attempt.bwrapPrefix);
   const placement = terminal ? 'terminal' : 'direct';
@@ -230,16 +237,16 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
     },
     containment: { preferred: confined ? 'linux-gate' : (process.platform === 'win32' ? 'windows-job' : process.platform === 'darwin' ? 'macos-tree' : 'linux-pgroup'), ...(confined ? { bwrapPrefix: [attempt.bwrapExecutable, ...attempt.bwrapPrefix] } : {}) },
     deadlines: {
-      softAt: timeoutMs ? boottimeAfter(timeoutMs) : null,
-      idleMs: idleTimeoutMs || null,
-      hardCeiling: boottimeAfter((timeoutMs || ATTEMPT_STEP_TIMEOUT_MS) + gateKillGraceMs + HARD_CEILING_SLACK_MS),
+      softAt: !session && timeoutMs ? boottimeAfter(timeoutMs) : null,
+      idleMs: session ? null : idleTimeoutMs || null,
+      hardCeiling: boottimeAfter((session ? ceilingMs : (timeoutMs || ATTEMPT_STEP_TIMEOUT_MS)) + gateKillGraceMs + HARD_CEILING_SLACK_MS),
       gateKillGraceMs,
       killWaitMs,
     },
     agentProtocol: { cli },
     identity,
     steps: [
-      ...attemptSteps({ runDir, host, stepEnv, extraSteps }),
+      ...attemptSteps({ runDir, host, stepEnv, extraSteps, session: Boolean(session) }),
       ...(terminal ? [{ stepId: 'release-slot', builtin: true, disposition: { onSuccess: 'close', onFailure: 'retain' } }] : []),
     ],
     sideFile: paths.sideFile,
@@ -248,6 +255,7 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
       slot: { key: attemptId, groupKey: terminal.groupKey },
       terminal: { socketPath: terminal.socketPath, exitCommand: terminal.exitCommand ?? null, orphanSettleMs: terminal.orphanSettleMs, ...(terminal.retainFailedPaneMs !== undefined ? { retainFailedPaneMs: terminal.retainFailedPaneMs } : {}) },
     } : {}),
+    ...(session ? { session } : {}),
     ...(cwdLeaseFile ? { cwdLeaseFile, ...(cwdLeaseOwner ? { cwdLeaseOwner } : {}) } : {}),
   };
 }

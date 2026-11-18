@@ -574,6 +574,42 @@ export function resolveConfinementResources({
     });
   }
 
+  // 2b. workspace-paths: named paths of the project root, each bound on its own and nothing else of the root.
+  if (grantsByResource.has('workspace-paths')) {
+    const grant = grantsByResource.get('workspace-paths');
+    const root = context.repoRoot || context.cwd;
+    if (!root) {
+      throw new ConfinementResourceError('confinement-grant-invalid', 'workspace-paths requires context.repoRoot or context.cwd.');
+    }
+    if (!Array.isArray(grant.paths) || grant.paths.length === 0) {
+      throw new ConfinementResourceError('confinement-grant-invalid', 'workspace-paths requires a non-empty "paths" array.');
+    }
+    for (const rel of grant.paths) {
+      if (typeof rel !== 'string' || !rel.trim() || path.isAbsolute(rel) || rel.split(/[\\/]/).includes('..')) {
+        throw new ConfinementResourceError('confinement-grant-invalid', `workspace-paths entry ${JSON.stringify(rel)} must be a path relative to the project root, without "..".`);
+      }
+      const target = path.join(root, rel);
+      const seen = fs.lstatSync(target, { throwIfNoEntry: false });
+      if (!seen) {
+        throw new ConfinementResourceError('workspace-path-missing', `workspace-paths entry "${rel}" does not exist under ${root}; create it before the session starts.`);
+      }
+      if (seen.isSymbolicLink()) {
+        throw new ConfinementResourceError('confinement-grant-invalid', `workspace-paths entry "${rel}" is a symbolic link; name the real path.`);
+      }
+      const { hostTarget } = canonicalizeAndVerifySubpath(target, root, 'workspace-paths');
+      resolved.push({
+        resource: 'workspace-paths',
+        identity: `workspace-paths:${rel}`,
+        hostTarget,
+        executionTarget: { location: 'host', path: hostTarget },
+        delivery: 'mount',
+        collect: 'none',
+        access: grant.access,
+        allocation: 'existing',
+      });
+    }
+  }
+
   // 3. workspace-git-metadata
   if (grantsByResource.has('workspace-git-metadata')) {
     const grant = grantsByResource.get('workspace-git-metadata');

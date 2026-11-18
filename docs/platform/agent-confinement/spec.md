@@ -433,7 +433,7 @@ backend, generic composition cho mọi tổ hợp control, hoặc đổi tên ex
 | Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |
 | Invocation override | Contract đích giữ shape/partial-order; default v1 từ chối config override, dùng policy ID/capability khác — trừ một override duy nhất, `{ controls: { hostRead: 'blind' } }` (§9.2) |
 | `hostWrite` | `deny` qua bwrap, hoặc `allow` khi explicit `unconfined` |
-| Write grant | run-output, private-home khi cần; workspace/git-metadata cho workspace-write theo readiness |
+| Write grant | run-output, private-home khi cần; workspace/git-metadata cho workspace-write theo readiness; `workspace-paths` (`access: read-write`, thêm khoá `paths`) cho session head dưới `host-write-denied` |
 | Read grant | `executor-credentials` khi policy của dispatch yêu cầu |
 | `home` | host mặc định; private resource khi provider cần; home private nếu policy thực sự yêu cầu và đã prove |
 | `session`, `workspace` | effective value là `shared`; legacy `isolated/own` được normalize nhưng chưa di dời enforcement ở slice đầu |
@@ -441,6 +441,8 @@ backend, generic composition cho mọi tổ hợp control, hoặc đổi tên ex
 | `networkEgress`, `process` | effective value là `allow`, `host`; request `deny/filtered/isolated` bị `unsupported` |
 | Resource delivery/collect | host direct/mount; copy/remote/workspace-change chưa hỗ trợ |
 | Backend | Linux bwrap; backend khác trả `unsupported` có lý do |
+
+**Grant `workspace-paths`.** `{ resource: 'workspace-paths', access: 'read-write', scope: 'dispatch', paths: [...] }`: mỗi phần tử của `paths` là một đường dẫn tương đối so với root của project (`context.repoRoot`), được bind ghi riêng (`--bind`); phần còn lại của root vẫn chỉ đọc. Shape bị từ chối theo tên khi `paths` rỗng, là đường dẫn tuyệt đối, chứa `..` hoặc ký tự glob; resolver từ chối đường dẫn không tồn tại (`workspace-path-missing`) hoặc là symlink (`confinement-grant-invalid`). Chỉ session head dùng grant này; bảng grant theo role nằm ở `src/session-host/head-grants.mjs`.
 
 Việc parser hiểu một field không có nghĩa backend đã support field đó. Default
 phải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua.

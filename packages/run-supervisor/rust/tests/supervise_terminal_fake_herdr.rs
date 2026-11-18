@@ -35,7 +35,7 @@ fn terminal_run_with(
     grace_ms: u64,
     tune: impl FnOnce(&mut RunOpts),
 ) -> SupRun {
-    terminal_run_shaped(name, herdr, agent_script, grace_ms, tune, |_| {})
+    terminal_run_shaped(name, herdr, agent_script, grace_ms, tune, |_| {}, |_| {})
 }
 
 /// `terminal_run_with` that also lets a test set a field of the envelope's `terminal` section.
@@ -46,6 +46,7 @@ fn terminal_run_shaped(
     grace_ms: u64,
     tune: impl FnOnce(&mut RunOpts),
     shape_terminal: impl FnOnce(&mut Value),
+    shape_envelope: impl FnOnce(&mut Value),
 ) -> SupRun {
     let dir = std::env::temp_dir().join(format!("fgos-sup-{name}-{}", std::process::id()));
     let mut opts = RunOpts::agent(0);
@@ -70,6 +71,7 @@ fn terminal_run_shaped(
         e["slot"] = json!({"key": attempt_id, "groupKey": "g"});
         e["terminal"] = json!({"socketPath": socket, "exitCommand": null, "orphanSettleMs": 300});
         shape_terminal(&mut e["terminal"]);
+        shape_envelope(e);
         e["identity"] = json!({"writerId": format!("att-{attempt_id}"), "parentWriterId": null});
         e["launch"]["command"] = json!("/bin/sh");
         e["launch"]["args"] = json!(["-c", script]);
@@ -192,6 +194,7 @@ fn a_pane_whose_shell_never_becomes_ready_ends_as_not_started_and_the_steps_stil
         3_000,
         |_| {},
         |terminal| terminal["shellReadyTimeoutMs"] = json!(2_000),
+        |_| {},
     );
     let supervisor = run.start_with_env(&herdr.env());
 
@@ -367,6 +370,70 @@ fn a_brief_the_pane_refuses_because_its_shell_holds_the_foreground_ends_the_atte
     assert!(
         log.contains("pane answered foreground group "),
         "the pane's answer is in the refusal: {log}"
+    );
+}
+
+#[test]
+fn a_session_attempt_holds_its_role_through_a_blocked_screen_and_ends_only_when_its_pane_goes() {
+    let herdr = FakeHerdr::new("session");
+    let mut run = terminal_run_shaped(
+        "tsession",
+        &herdr,
+        "sleep 600",
+        500,
+        |_| {},
+        |_| {},
+        |envelope| {
+            envelope["session"] = json!({"role": "head:planner-probe", "verbs": []});
+            // A session has no settle step: the answer of a head is not a result.
+            envelope["steps"].as_array_mut().unwrap().remove(0);
+        },
+    );
+    let state_root = herdr.state_root.clone();
+    fs::write(state_root.join("machine-id"), "fg-abc234\n").unwrap();
+    let supervisor = run.start_with_env(&herdr.env());
+
+    brief_taken(&herdr, &run);
+    let resolve = || {
+        fgos_identity::directory::resolve(
+            &state_root,
+            "head:planner-probe",
+            &fgos_process::facts::judge_here,
+            None,
+        )
+    };
+    wait_until(STEP, "the session to hold its role in Identity", || {
+        resolve().is_ok()
+    });
+    // The brief is delivered once the agent shows work; nothing on disk marks it, so give the protocol time.
+    std::thread::sleep(Duration::from_secs(4));
+    // A permission dialog all day is what a head shows; on a worker it would end the attempt as blocked.
+    herdr.set_explain(Verdict::Blocked);
+    std::thread::sleep(Duration::from_secs(3));
+    assert!(
+        run.json("receipt.json").is_none(),
+        "a blocked screen does not end a session attempt: {}",
+        run.log()
+    );
+    assert!(
+        resolve()
+            .expect("still holds the role")
+            .id
+            .ends_with(&format!("/att-{}", run.attempt_id)),
+        "the role is held by the attempt's writer id"
+    );
+
+    herdr.set_flag("gone", true);
+    let (code, line) = finish(supervisor, LIMIT);
+    assert_eq!(code, 0, "{}", run.log());
+    assert_eq!(line["outcome"], "carrier-lost");
+    assert_eq!(
+        run.json("steps/release-slot.json").unwrap()["detail"]["disposition"],
+        "retain"
+    );
+    assert!(
+        run.json("steps/settle-attempt.json").is_none(),
+        "no settle step runs for a session"
     );
 }
 

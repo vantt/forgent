@@ -12,7 +12,7 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 import { acquireSync, createLockScope, spawnWithLocks } from '../../src/holder-lock/index.mjs';
 import { computeSha256Digest } from '../../src/native/proof-helpers.mjs';
 import { readSettledResult } from '../../src/runner/dispatch/run-result.mjs';
-import { attemptGateCommand, attemptPaths, attemptStepEnv, awaitSettledResult, buildEnvelope, captureTail, prepareAttemptFiles, waitForBinding, withIdentityEnv, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
+import { attemptGateCommand, attemptPaths, writeAttemptIntent, attemptStepEnv, awaitSettledResult, buildEnvelope, captureTail, prepareAttemptFiles, waitForBinding, withIdentityEnv, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
 import { BIN_FGOS, bwrapUsable, createProject, killToken, readJson, startRun, waitUntil } from './support/direct-harness.mjs';
 import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -114,6 +114,36 @@ test('every envelope deadline carries a string bootId on every platform', (t) =>
     assert.equal(typeof at.bootId, 'string', `${name}.bootId`);
     assert.notEqual(at.bootId, '', `${name}.bootId`);
   }
+});
+
+test('a session envelope has no soft deadline, no idle limit and no settle step, and the intent carries the same steps', (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-envelope-session-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const runDir = path.join(dir, 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const host = { hostBin: '/h/fgos', payloadRoot: '/h/payload' };
+  const stepEnv = { PATH: '/bin', FGOS_STATE_ROOT: '/state' };
+  const base = {
+    attemptId: 'att-1', unitRunId: 'unit-1', runDir, host, cwd: dir, mutating: false,
+    attempt: { command: '/bin/agent', args: [], env: { PATH: '/bin' }, bwrapPrefix: ['--unshare-pid', '--'], bwrapExecutable: '/usr/bin/bwrap' },
+    timeoutMs: 60_000, idleTimeoutMs: 1_200_000, cli: 'claude', stepEnv, gateKillGraceMs: 1000, killWaitMs: 1000,
+    terminal: { socketPath: '/run/s.sock', exitCommand: null, orphanSettleMs: 1, briefPath: '/b.md', outboxDir: '/o', groupKey: 'g' }, extraSteps: ['cleanup-trust'],
+  };
+  const session = { role: 'head:planner-probe', verbs: [] };
+  const worker = buildEnvelope(base);
+  const head = buildEnvelope({ ...base, session, ceilingMs: 7 * 86_400_000 });
+  assert.deepEqual(head.session, session);
+  assert.equal(head.deadlines.softAt, null);
+  assert.equal(head.deadlines.idleMs, null);
+  assert.ok(head.deadlines.hardCeiling.boottimeNs - worker.deadlines.hardCeiling.boottimeNs > 6 * 86_400_000 * 1e6, 'the caller\'s ceiling bounds it, not the round timeout');
+  assert.deepEqual(head.steps.map((step) => step.stepId), ['finalize-home', 'cleanup-trust', 'release-slot']);
+  assert.deepEqual(worker.steps.map((step) => step.stepId), ['settle-attempt', 'finalize-home', 'cleanup-trust', 'release-slot']);
+  assert.equal('session' in worker, false);
+  writeAttemptIntent({ runDir, attemptId: 'att-1', unitRunId: 'unit-1', terminal: true, cwd: dir, host, stepEnv, session: true });
+  const intent = JSON.parse(fs.readFileSync(path.join(runDir, 'attempt-intent.json'), 'utf8'));
+  assert.deepEqual(intent.steps.map((step) => step.stepId), ['finalize-home', 'cleanup-trust']);
+  assert.throws(() => buildEnvelope({ ...base, terminal: null, extraSteps: [], session, ceilingMs: 1000 }), (err) => err.code === 'session-needs-terminal');
+  assert.throws(() => buildEnvelope({ ...base, session }), (err) => err.code === 'session-needs-ceiling');
 });
 
 test('the attempt writer id replaces whatever the controller carried, in the launch env and in the side-file env', (t) => {

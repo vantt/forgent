@@ -17,6 +17,7 @@ import {
   resolveConfinementPolicy,
   ConfinementPolicyError,
 } from '../../src/runner/dispatch/confinement/policies.mjs';
+import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
 import {
   validateBackendInstanceConfigShape,
   validateBackendRegistryShape,
@@ -711,5 +712,52 @@ test('a posture is carried only when the registered backend executable exists: a
     assert.equal(carries(bin, bin), false, 'a directory is not an executable');
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// ─── workspace-paths: named paths of the project root, bound writable one by one ─────
+
+const pathsPolicy = (paths) => ({
+  ...BUILTIN_POLICIES['host-write-denied'],
+  grants: [...BUILTIN_POLICIES['host-write-denied'].grants, { resource: 'workspace-paths', access: 'read-write', scope: 'dispatch', ...(paths === undefined ? {} : { paths }) }],
+});
+
+test('workspace-paths: the shape takes project-relative paths and refuses empty, absolute, climbing and glob entries by name', () => {
+  validateConfinementPolicyShape(pathsPolicy(['plans', 'docs/backlog.md']));
+  assert.throws(() => validateConfinementPolicyShape(pathsPolicy()), /"paths" must be a non-empty array/);
+  assert.throws(() => validateConfinementPolicyShape(pathsPolicy([])), /"paths" must be a non-empty array/);
+  assert.throws(() => validateConfinementPolicyShape(pathsPolicy(['/etc'])), /is absolute/);
+  assert.throws(() => validateConfinementPolicyShape(pathsPolicy(['plans/../src'])), /climbs out/);
+  assert.throws(() => validateConfinementPolicyShape(pathsPolicy(['plans/**'])), /glob character/);
+  // `paths` belongs to no other resource.
+  assert.throws(() => validateConfinementPolicyShape({
+    ...BUILTIN_POLICIES['host-write-denied'],
+    grants: [{ resource: 'private-home', access: 'read-write', scope: 'dispatch', paths: ['x'] }],
+  }), /unknown key "paths"/);
+});
+
+test('workspace-paths: the resolver binds one writable entry per path and refuses a missing path and a symlink', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-ws-paths-'));
+  try {
+    fs.mkdirSync(path.join(root, 'plans'));
+    fs.mkdirSync(path.join(root, 'docs'));
+    fs.writeFileSync(path.join(root, 'docs', 'backlog.md'), '# b\n');
+    fs.symlinkSync(path.join(root, 'docs'), path.join(root, 'link'));
+    const resolve = (paths) => resolveConfinementResources({
+      dispatchId: 'd-1',
+      context: { repoRoot: root },
+      grants: [{ resource: 'workspace-paths', access: 'read-write', scope: 'dispatch', paths }],
+    });
+    const real = fs.realpathSync(root);
+    const bound = resolve(['plans', 'docs/backlog.md']);
+    assert.deepEqual(bound.filter((r) => r.resource === 'workspace-paths').map((r) => [r.resource, r.hostTarget, r.access]), [
+      ['workspace-paths', path.join(real, 'plans'), 'read-write'],
+      ['workspace-paths', path.join(real, 'docs', 'backlog.md'), 'read-write'],
+    ]);
+    assert.throws(() => resolve(['nope']), (err) => err.code === 'workspace-path-missing');
+    assert.throws(() => resolve(['link']), /symbolic link/);
+    assert.throws(() => resolve(['../x']), (err) => err.code === 'confinement-grant-invalid');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
   }
 });

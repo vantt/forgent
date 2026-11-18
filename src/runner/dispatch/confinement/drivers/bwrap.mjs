@@ -420,7 +420,7 @@ export function assessBwrap(request, backend) {
   const policyId = request.requirement?.policyId;
   const isWorkspaceWrite = policyId === 'workspace-write';
 
-  const allowedResources = new Set(['run-output', 'private-home', 'executor-credentials']);
+  const allowedResources = new Set(['run-output', 'private-home', 'executor-credentials', 'workspace-paths']);
   if (isWorkspaceWrite) {
     allowedResources.add('workspace');
     allowedResources.add('workspace-git-metadata');
