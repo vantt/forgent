@@ -9,6 +9,7 @@ Wave 6. Depends on 5 and on plan 261118-1847 (account lease) being done, because
 - Swap its three hand joins (`registrations.mjs:176, 330, 2291` on base `5fd22aa1d`; re-grep on the current base) to
   `fgosDirFromRoot` from `src/util/fgos-file-registry.mjs`.
 - Manifest: delete its debt entry from the "join .fgos onto a project root" row.
+- Regenerate the Git mutation census and commit it with the phase.
 
 ## Proof
 

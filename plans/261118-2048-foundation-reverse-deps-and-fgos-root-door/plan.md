@@ -167,18 +167,25 @@ Capability per phase: 1 `code:review`; 2-6 `code:implement`; 7 `code:test`.
 |---|---|---|
 | 261118-1847 account lease (running) | `src/setup/registrations.mjs` (and `test/setup/**`, `llm-accounts.mjs`, which this plan does not touch) | registrations: phase 6 waits for 1847 done and adds the path to this footprint then. `llm-accounts.mjs` keeps its home join under the global door. The frontmatter names exact dispatch and test files, no prefix that covers a 1847 path |
 | 261118-0936 ops-metrics (running, phase 16 only) | none (its footprint is its plan dir, `friction.rs`, `docs/platform/observe/**`) | - |
-| 261118-0947 session verb (draft until 1847 is done) | catch-all `src/**`, `test/**`, `docs/architecture-manifest.json`; concretely `src/runner/worktree.mjs` (comment lines), `src/git/inspect.mjs`, `test/util/host-bin.test.mjs`, `test/architecture.test.mjs` | land this plan before 0947 leaves draft (it waits on 1847, which leaves a window of about the 2.35 days needed); otherwise run after 0947 phase 4. Never both active: their footprints overlap |
+| 261118-0947 session verb (lead started; plan draft until 1847 is done) | catch-all `src/**`, `test/**`, `docs/architecture-manifest.json`; concretely `src/runner/worktree.mjs` (comment lines), `src/git/inspect.mjs`, `test/util/host-bin.test.mjs`, `test/architecture.test.mjs` | supervisor ruling 2026-11-18 21:01 (board log): 0947 is not interrupted; phases 2-7 start when 0947 is done. Phases 2-5 re-grep their file lists on the base they start from |
 | 261118-1341 S6a execution tier (draft) | `src/runner/dispatch/**`, `src/runner/execution/**`, `src/workflow/**`, `src/setup/**`, `head-start.mjs`, `rotate.mjs`, `bin/fgos.mjs` | phase 5 edits there are one-line join/import swaps; S6a rebases. S6a moving `payload-root.mjs` is unaffected (this plan does not import it) |
 | 261118-1045 supervisor (draft) | `src/runner/dispatch/assignment-runner.mjs` | one join swap; whichever lands second rebases |
 | 261118-1455 S6a worktree door | done | - |
 
 The supervisor sets `ready` after the contract check and decides landing order.
 
+## Generated files
+
+Not counted as footprint overlap, never hand-merged, regenerated on every rebase (same rule as plans 1341 and 1847):
+- `packages/git/contracts/mutation-census.v1.json`: it pins a digest of every scanned file. Each code phase runs
+  `node scripts/git-one-door-scan.mjs --write-census` and commits the result with the phase;
+- `test/suite-baseline.json`, when phase 3 or 4 adds a test case.
+
 ## Risk map
 
 | Risk | Level | Proof point (validating) |
 |---|---|---|
-| Phase 4 drops the main-checkout step of `resolveHostBin`; a Node process started outside the Rust host, from a linked worktree, with no `FGOS_HOST_BIN`, then finds no host | medium | list every production way the payload starts without the host (`scripts/*hook*.mjs`, `.githooks/*`, herdr launchers, `bin/fgos.mjs` direct) and show each either has `FGOS_HOST_BIN` (`apps/fgos/src/legacy_exec.rs:265` sets it for every host child) or runs in the main checkout; if one does not, phase 4 uses `nativeHelperExe(nativeDoor())` (`src/native/door.mjs`, T0) as the second step instead, still no new mechanism |
+| Phase 4 drops the main-checkout step of `resolveHostBin`; a Node process started outside the Rust host, from a linked worktree, with no `FGOS_HOST_BIN`, then finds no host | low (validated: no production path reaches it, reports/validation-261118-2104-validate-and-red-team.md) | list every production way the payload starts without the host (`scripts/*hook*.mjs`, `.githooks/*`, herdr launchers, `bin/fgos.mjs` direct) and show each either has `FGOS_HOST_BIN` (`apps/fgos/src/legacy_exec.rs:265` sets it for every host child) or runs in the main checkout; if one does not, phase 4 uses `nativeHelperExe(nativeDoor())` (`src/native/door.mjs`, T0) as the second step instead, still no new mechanism |
 | `fgosDirFromRoot` resolves the root (`path.resolve`) where `path.join(root, '.fgos')` did not; a caller passing a relative root changes its answer | low | for each of the 29 swapped sites, show the root comes from a resolver (absolute) or a test fixture under a temp dir |
 | The new door pattern is too wide (scripts, Rust, shell) or too narrow (a call split over lines) | low | run `checkDoors` on the branch: every hit is the leaf, an allowed file with reason, or Work debt; pattern and exclusions written in phase 5 |
 | Moving `fgos-file-registry.mjs` out of `src/state` changes the A4 guard result (`test/architecture.test.mjs:871-985`) | low | A4 tests green; the guard's Work regex `/(^|\/)state\//` no longer matches the leaves, which is the point |
@@ -210,6 +217,12 @@ GitNexus impact analysis: `fgos dispatch decide --for impact-analysis` answered 
   `fgos-git` or `fgos-config`) would make the same rule hold there; evidence: `git grep -lE 'join\("\.fgos"\)' -- '*.rs'`.
 - The HARDEN criterion text "`.fgos` lookup: T1" is stale: the root door is at T2 (`src/runner/paths.mjs`) and the
   join leaf lands at T0. The closed HARDEN plan is not edited here; the integration report records it.
+
+## Validation
+
+Validated and red-teamed 2026-11-18 21:04: [report](reports/validation-261118-2104-validate-and-red-team.md). All five proof points
+checked. Three mechanical gaps were found and patched into the phases: the census digests, the manifest `files` map
+and door row, and the spec field list.
 
 ## Owner questions
 

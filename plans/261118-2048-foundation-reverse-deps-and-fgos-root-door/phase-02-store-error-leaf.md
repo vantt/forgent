@@ -18,7 +18,10 @@ of the same class sits in `src/runner/dispatch/cli.mjs:10`.
   `test/observe/invocation-fault-log.test.mjs`, `test/architecture.test.mjs` (if it names the path).
 - `src/runner/worktree.mjs` imports `StoreError` from `../util/store-error.mjs`, not from `../state/store.mjs`.
 - `src/runner/dispatch/cli.mjs` deletes its local `class StoreError` and imports the leaf (A4 allows `src/util`).
-- Manifest: delete the `tierExceptions` row `worktree.mjs -> store.mjs`.
+- Manifest: delete the `tierExceptions` row `worktree.mjs -> store.mjs`, and rename the `files` layer-map key
+  `src/state/store-error.mjs` to `src/util/store-error.mjs` (layer stays `kernel`).
+- Regenerate the Git mutation census (`node scripts/git-one-door-scan.mjs --write-census`) and commit it with the
+  phase (plan section "Generated files").
 - `test/architecture.test.mjs`: delete the `WORK_LAYER_EDGE_ALLOWLIST` entry. The constant is then empty; delete it,
   its `continue` check and the "each allowed edge still exists" loop (`:913-917`, `:934`, `:978-985`), since the
   mechanism has no member left (retiring code of a removed mechanism, design principle 8). The A4 tests themselves

@@ -9,8 +9,8 @@ Wave 7. Depends on 6. Capability `code:test`. Effort 0.25d.
    say so in the report.
 2. Plan acceptance criteria 1-6, each with the command and its output.
 3. Docs, only where a fact changed:
-   - `docs/platform/event-store/spec.md` (or the consumers contract, whichever documents the rebuild context): the
-     `fgosDir` field from phase 3.
+   - `docs/platform/event-store/spec.md:970-971`: add the `fgosDir` field from phase 3 to the rebuild context list.
+     The same paragraph has two stale sentences (reports/validation-261118-2104-validate-and-red-team.md, R7); fix them while editing it.
    - No `CHANGELOG.md` line: nothing a user of fgOS sees changes (phase 4 changes only an unsupported channel; if
      validating chose the `nativeHelperExe` step, still internal).
    - `docs/backlog.md` row `p-zs23zde4mh`: status and a link to this plan and its integration report.

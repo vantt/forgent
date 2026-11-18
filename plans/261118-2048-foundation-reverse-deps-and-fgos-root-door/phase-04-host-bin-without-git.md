@@ -16,10 +16,10 @@ variable. A T0 leaf cannot ask Git, and the layer below cannot be made to know t
   `.fgos/installation` at or above `dir`, through the existing `resolveActiveHostBin` of `src/util/host-bin-path.mjs`
   (a `.fgos` path argument still names its project, as the current test pins). It no longer imports
   `src/runner/paths.mjs`.
-- If validating's proof point (plan risk map, row 1) finds a production start of the payload that runs from a linked
-  worktree without `FGOS_HOST_BIN`, the second step is instead `nativeHelperExe(nativeDoor())` from
-  `src/native/door.mjs` (T0: the verified host of the release whose addon this payload loaded), then the activation
-  walk. Either form adds no mechanism; validating records which one holds and why.
+- Validation (reports/validation-261118-2104-validate-and-red-team.md, proof point 1) found no production start of the payload that reaches
+  `resolveHostBin` without `FGOS_HOST_BIN`, so the walk-up form above is the one to build. The `nativeHelperExe`
+  fallback applies only if the implementer finds new evidence; record it in the phase commit if so.
+- Regenerate the Git mutation census and commit it with the phase.
 - Manifest: delete the `tierExceptions` row `host-bin.mjs -> paths.mjs`. The list is now `[]`; keep the key with an
   empty array (the test reads it), unless the test is changed to treat a missing key as empty in the same commit.
 - `src/util/host-bin-path.mjs` stays the bootstrap reader (it runs before any door can load); its debt reason in the
@@ -41,4 +41,4 @@ The removed main-checkout behaviour had no test (checked: no linked-worktree cas
 
 ## Risk and rollback
 
-Medium (behaviour change on unsupported channels). Rollback: revert the commit; the exception row returns with it.
+Low after validation (behaviour change on unsupported channels only). Rollback: revert the commit; the exception row returns with it.

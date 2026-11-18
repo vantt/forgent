@@ -20,8 +20,9 @@ not look it up (design principle 2).
 - The Work consumers (`src/state/store.mjs`, `src/state/porting-store.mjs`) are not edited; the extra context field is
   ignored by them.
 - Manifest: delete the `tierExceptions` row `directory-store.mjs -> runtime-coordination.mjs`.
-- If `docs/platform/event-store/spec.md` (or `packages/event-store/contracts/consumers.v1.json`) documents the rebuild
-  context fields, add `fgosDir` there in phase 7; validating checks which holds it.
+- `docs/platform/event-store/spec.md:970-971` lists the rebuild context fields (checked at validation); phase 7 adds
+  `fgosDir` there. The consumers contract carries no context fields.
+- Regenerate the Git mutation census and commit it with the phase.
 
 ## Proof
 

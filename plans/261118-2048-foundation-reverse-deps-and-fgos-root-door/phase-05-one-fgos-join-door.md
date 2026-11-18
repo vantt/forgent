@@ -43,6 +43,9 @@ written by hand in 36 files because its one function, `fgosDirFromRoot`, sits in
    `src/runner/dispatch/config.mjs:160,336` build display text; they swap too, so no hand join is left to copy.
 4. **Manifest.**
    - Delete the file override `"src/state/fgos-file-registry.mjs": 0` from `tiers` (now tier 0 by directory).
+   - Rename the `files` layer-map key `src/state/fgos-file-registry.mjs` to `src/util/fgos-file-registry.mjs` (layer
+     stays `kernel`), and the same path in the `allowed` list of the door row "record a malformed call (twin)".
+   - `git grep -n "state/fgos-file-registry" -- docs/architecture-manifest.json src bin scripts test` is empty after.
    - Add one row to `doors`:
      - `job`: "join .fgos onto a project root"; `kind`: "door";
      - `patterns`: `path\.join\((?!\s*(?:home|homeDir|os\.homedir\(\))\b)[^)]*'\.fgos'` and
@@ -59,6 +62,8 @@ written by hand in 36 files because its one function, `fgosDirFromRoot`, sits in
        function, so every tier uses the same answer".
    - Run `checkDoors` and fix any other hit the pattern finds (a hit in `apps/` or `packages/` would mean the pattern
      is too wide: narrow it, do not allow the file).
+
+5. Regenerate the Git mutation census and commit it with the phase.
 
 ## Proof
 
