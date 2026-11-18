@@ -13,8 +13,8 @@
 //! duplicate window of spec §5.2), instead of being marked offered and lost.
 use super::breaker::Breaker;
 use super::{
-    begin, finish, render_reply, Adapter, Begun, Claimed, HeadFacts, HookCall, HookEvent,
-    HookLimits, QuietReason, SenderOf,
+    begin, finish, render_reply, Adapter, Begun, Claimed, HandleOf, HeadFacts, HookCall, HookEvent,
+    HookLimits, QuietReason,
 };
 use crate::adapters::TestedClis;
 use crate::head::{caller_is_head, Ancestry, NoHead};
@@ -59,8 +59,8 @@ pub struct ShellInput<'a> {
     /// again just before hold 1, for the caller check.
     pub ancestry: &'a dyn Fn() -> Option<Ancestry>,
     pub resolve: &'a Resolver<'a>,
-    /// Reads a sender's handle and role for a frame header (see [`SenderOf`]).
-    pub sender_of: &'a SenderOf<'a>,
+    /// Reads a sender's handle for a frame header (see [`HandleOf`]).
+    pub handle_of: &'a HandleOf<'a>,
     /// Shared with the budget watchdog: the shell writes stdout only after
     /// it moved the gate from idle to writing, and the watchdog ends the
     /// process only after it moved it from idle to done.
@@ -324,7 +324,7 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
             limits: input.limits,
             clock: input.clock,
             gate: &input.gate,
-            sender_of: input.sender_of,
+            handle_of: input.handle_of,
         },
         &claimed,
         &sizes,
@@ -343,7 +343,7 @@ pub(crate) struct Emit<'a> {
     pub limits: &'a Limits,
     pub clock: &'a dyn Fn() -> Timestamp,
     pub gate: &'a WriteGate,
-    pub sender_of: &'a SenderOf<'a>,
+    pub handle_of: &'a HandleOf<'a>,
 }
 
 /// What the write and the finish did.
@@ -379,7 +379,7 @@ pub(crate) fn emit_and_finish(
     let reply = render_reply(
         claimed,
         &|id| bodies.get(id).cloned(),
-        emit.sender_of,
+        emit.handle_of,
         emit.limits,
     );
     if !write_reply(emit.gate, stdout, &reply.stdout) {

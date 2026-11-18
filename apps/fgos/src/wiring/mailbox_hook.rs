@@ -16,7 +16,7 @@
 //! only after the caller check, and takes the mailbox lock with nothing
 //! else held: this process holds no other `LockScope` at any point.
 use super::mailbox_config::{is_config_reason, project_mailbox, CrossMachine};
-use super::mailbox_identity::{ensure_registered, refresh_registered, sender_of, state_root};
+use super::mailbox_identity::{ensure_registered, refresh_registered, session_of, state_root};
 use fgos_event_store::layout::Layout;
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::ancestry::ancestry_of;
@@ -129,8 +129,8 @@ fn run(args: &[OsString]) {
     let resolve = resolver_for(adapter, facts, &env, &loaded.hook.hook);
     let project = super::mailbox_root::project_name(&fgos_dir);
     let ancestry = || ancestry_of(std::process::id());
-    let sender_of = |key: &WriterKey, cli: &Cli, head: Option<&fgos_process::facts::Record>| {
-        sender_of(identity_root.as_deref(), key, cli, head)
+    let handle_of = |key: &WriterKey, cli: &Cli, head: Option<&fgos_process::facts::Record>| {
+        session_of(identity_root.as_deref()?, key, cli, head).map(|info| info.handle)
     };
     let input = ShellInput {
         adapter,
@@ -143,7 +143,7 @@ fn run(args: &[OsString]) {
         clock: &now,
         ancestry: &ancestry,
         resolve: &resolve,
-        sender_of: &sender_of,
+        handle_of: &handle_of,
         gate: gate.clone(),
     };
     let gate_idle = gate;

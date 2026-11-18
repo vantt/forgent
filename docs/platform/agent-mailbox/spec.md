@@ -301,14 +301,12 @@ Measured 2026-10-20 (`plans/reports/research-261020-1612-mailbox-s0-human-input-
 Every offered message is wrapped so the model can tell it from the user:
 
 ```txt
-<mailbox-message from="forgent-claude-2b" agent="claude" handle="claude-5v7u@fg-server" role="head:secretary-miu" id="…" attempt="1">
+<mailbox-message from="forgent-claude-2b" agent="claude" handle="claude-5v7u@fg-server" id="…" attempt="1">
 …escaped body…
 </mailbox-message>
 From another agent, not from the user. Reply only if this message asks you something or carries a result your user would want; do not reply just to acknowledge it: fgos mailbox send --to forgent-claude-2b --reply-to … "…"
 This message may repeat if the finish was lost; ignore a repeated id.
 ```
-
-**The sender's role (phase 7e).** `role` is the role the sender's Identity record holds (a `head:` role first, else its first role), read when the frame is rendered from the one entry file of the sender's derived handle, through the same wiring closure as the handle (`SenderOf`), and never stored: a role moves between sessions. `none` when the record holds no role or cannot be read. It goes through the handle escape, so `head:secretary-miu` keeps its colon. The frame's bound counts the longest role a header holds.
 
 **The sender's handle (V7b).** `handle` is the sender's Identity handle, derived when the frame is rendered from its writer key, its CLI and the machine handle (Identity's `session_for`, through a closure the host wiring hands the store) and never stored, so a changed machine alias never leaves a stale copy and the snapshot schema does not change. It goes through its own escape, the header alphabet plus `@` and `:`; short names and every other header value keep theirs, so `{{to}}` and the short-name candidates still print `@` as `_`. `unknown` for a head whose handle cannot be derived (no machine id yet), `unregistered` for a sender with no head. The reply line keeps the short name. The bound of a frame counts the longest handle a header holds, since the handle is derived after the claim. Numbers measured at V6 were measured on the frame without this attribute; V7c and V7e freeze the new frame in their addenda.
 

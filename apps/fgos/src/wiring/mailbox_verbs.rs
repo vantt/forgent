@@ -19,7 +19,7 @@
 use super::mailbox_body;
 use super::mailbox_config::project_mailbox;
 use super::mailbox_identity::{
-    address, handle_conflicts, identified, is_alias, sender_of, session_of, state_root, Addressed,
+    address, handle_conflicts, identified, is_alias, session_of, state_root, Addressed,
 };
 use super::mailbox_remote;
 use crate::exit_codes;
@@ -828,11 +828,11 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 return failed(record_error_text("caller-unknown"), *json, warning);
             };
             let root = state_root();
-            let sender_of =
+            let handle_of =
                 |key: &WriterKey,
                  cli: &fgos_mailbox_core::Cli,
                  head: Option<&fgos_process::facts::Record>| {
-                    sender_of(root.as_deref(), key, cli, head)
+                    session_of(root.as_deref()?, key, cli, head).map(|info| info.handle)
                 };
             let mut stdout = std::io::stdout().lock();
             match verbs::inbox_claim(
@@ -841,7 +841,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 Wait::Ms(loaded.hook.verbs.lock_wait_ms),
                 &now,
                 &loaded.limits,
-                &sender_of,
+                &handle_of,
                 &mut stdout,
             ) {
                 Ok(done) => MailboxAnswer {

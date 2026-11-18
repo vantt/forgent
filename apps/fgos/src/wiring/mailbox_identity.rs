@@ -28,7 +28,6 @@ use fgos_identity::session::cli_of;
 use fgos_identity::{session_for, Candidate, Liveness as IdentityLiveness, SessionInfo};
 use fgos_mailbox::hook::resolve::HEAD_REQUEST_SOCKET_ENV;
 use fgos_mailbox::hook::shell::BoundHead;
-use fgos_mailbox::hook::Sender;
 use fgos_mailbox::verbs::HeadView;
 use fgos_mailbox_core::{AliasCandidate, AliasRefusal, Cli, Liveness, WriterKey};
 use fgos_process::facts::{judge_here, Record};
@@ -81,33 +80,6 @@ pub fn session_of(
     session_for(state_root, &key, head.as_ref())
         .ok()
         .map(|session| session.info)
-}
-
-/// Who sent a message, for its frame header: the handle Identity derives for
-/// the sender ([`session_of`]) and the role its Identity record holds (a
-/// `head:` role first, else its first role), read from the one entry file of
-/// that handle. `None` when no handle can be derived.
-pub fn sender_of(
-    state_root: Option<&Path>,
-    key: &WriterKey,
-    cli: &Cli,
-    head: Option<&Record>,
-) -> Option<Sender> {
-    let root = state_root?;
-    let info = session_of(root, key, cli, head)?;
-    let roles = by_handle(root, &info.handle, &judge_here)
-        .filter(|listed| listed.id == info.id)
-        .map(|listed| listed.roles)
-        .unwrap_or_default();
-    let role = roles
-        .iter()
-        .find(|role| role.starts_with("head:"))
-        .or(roles.first())
-        .cloned();
-    Some(Sender {
-        handle: Some(info.handle),
-        role,
-    })
 }
 
 /// Identity's reference to a head process: its pid and start time, when the

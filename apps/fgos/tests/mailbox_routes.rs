@@ -1487,7 +1487,7 @@ fn injected(out: &Output) -> String {
 }
 
 #[test]
-fn the_record_a_head_registers_from_its_hook_finds_it_by_its_pane_and_its_frames_name_the_senders_role(
+fn the_record_a_head_registers_from_its_hook_finds_it_by_its_pane_and_its_frames_name_the_senders_handle(
 ) {
     let scene = Scene::new("ident-ids");
     let root = identity_root(&scene);
@@ -1528,7 +1528,7 @@ fn the_record_a_head_registers_from_its_hook_finds_it_by_its_pane_and_its_frames
         "{sent:?}"
     );
 
-    // Another head holding a role sends: the frame names the sender by that role, read from its record.
+    // Another head holding a role sends: the frame names the sender by its handle.
     const SENDER: &str = "00000000-0000-4000-8000-0000000000ab";
     let _sender_head = CodexHead::start(&scene, SENDER);
     let sender = register_identity(&root, "CODEX_THREAD_ID", SENDER, &["head:secretary-miu"]);
@@ -1542,9 +1542,7 @@ fn the_record_a_head_registers_from_its_hook_finds_it_by_its_pane_and_its_frames
     let out = scene.claude_hook("post-tool-use", &post_tool_use());
     let context = injected(&out);
     assert!(
-        context.contains(&format!(
-            " handle=\"{sender}\" role=\"head:secretary-miu\" "
-        )),
+        context.contains(&format!(" handle=\"{sender}\" ")),
         "{context}"
     );
     assert!(context.contains("| from the secretary"), "{context}");

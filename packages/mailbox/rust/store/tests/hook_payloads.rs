@@ -14,7 +14,7 @@ use common::{
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::hook::{
     begin, finish, render_reply, Adapter, Begun, Claimed, HeadFacts, HookCall, HookEvent,
-    HookLimits, QuietReason, Sender,
+    HookLimits, QuietReason,
 };
 use fgos_mailbox_core::Cli;
 use fgos_mailbox_core::{
@@ -888,7 +888,7 @@ fn a_codex_binding_that_already_holds_stop_blocks_answers_stop_channel_off_and_k
 }
 
 #[test]
-fn a_frame_shows_the_handle_and_role_read_at_render_from_the_senders_key_cli_and_stored_head() {
+fn a_frame_shows_the_handle_read_at_render_from_the_senders_key_cli_and_stored_head() {
     let mut drain = Drain::registered(Adapter::Claude);
     // A peer whose binding stores a real head process of its own.
     let now = drain.tick();
@@ -913,30 +913,24 @@ fn a_frame_shows_the_handle_and_role_read_at_render_from_the_senders_key_cli_and
     drain.send("peer", "hello", false);
     let claimed = take(drain.hook(HookEvent::PostToolUse, files::POST_TOOL_USE));
     // The derivation gets the head the binding stores, as Identity's door takes it.
-    let sender_of = |key: &WriterKey, cli: &Cli, head: Option<&Record>| {
+    let handle_of = |key: &WriterKey, cli: &Cli, head: Option<&Record>| {
         assert_eq!(
             head,
             Some(&peer_head),
             "the sender's stored head reaches the derivation"
         );
-        Some(Sender {
-            handle: Some(format!("{}-{}@fg-test", cli.as_str(), key.as_str())),
-            role: Some("head:secretary-miu".to_string()),
-        })
+        Some(format!("{}-{}@fg-test", cli.as_str(), key.as_str()))
     };
 
-    let reply = render_reply(&claimed, &|_| None, &sender_of, &limits());
+    let reply = render_reply(&claimed, &|_| None, &handle_of, &limits());
 
     let context = context_of(&reply.stdout);
     assert!(
-        context.contains(" handle=\"codex-peer@fg-test\" role=\"head:secretary-miu\" "),
+        context.contains(" handle=\"codex-peer@fg-test\" "),
         "{context}"
     );
     let snapshot = serde_json::to_string(&drain.state).unwrap();
-    assert!(
-        !snapshot.contains("@fg-test") && !snapshot.contains("secretary-miu"),
-        "the handle and the role are never stored"
-    );
+    assert!(!snapshot.contains("@fg-test"), "the handle is never stored");
 }
 
 fn pointer_of(begun: Begun) -> fgos_mailbox::hook::PointerOnly {
