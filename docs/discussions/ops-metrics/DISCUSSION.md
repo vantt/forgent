@@ -11,7 +11,8 @@ nghĩa của tầng trên, chạy qua truy vấn chung, Observe không biết ch
 
 Đang mở (QUESTIONS.md): Q2 (thước đo nào có nguồn trong plan này), Q5 (ngưỡng "plan đứng yên"), Q6 (nghĩa "pace"),
 Q7 (reader câu hỏi Node → Rust), Q8 (bộ tên gốc theo OpenTelemetry). Friction (§6 D) chờ chủ dự án xem năm loại
-`kind`. Việc tiếp: chi tiết contract tầng 1 (§6.0) — hình bản ghi, registry, ngữ pháp truy vấn.
+`kind`. Đã học skillstation (báo cáo research-261118-1017), đưa 8 bài học vào §6.0. Việc tiếp: chi tiết contract tầng 1 —
+hình bản ghi, registry, ngữ pháp truy vấn.
 
 ## 2. Mục tiêu & đề bài
 
@@ -74,6 +75,8 @@ phạm vi.
   tiên làm thật tốt (1) trước → OM-D4, §6.0.
 - 2026-11-18 ~11:35 — Chủ dự án: bảy thước đo là khái niệm của tầng trên (chỗ cần quan sát), không cố định trong tầng
   Observe → OM-D5.
+- 2026-11-18 ~11:45 — Chủ dự án: học repo vantt/skillstation (nhiều kỹ thuật quan sát) → báo cáo research, bài học
+  vào §6.0.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -97,7 +100,14 @@ riêng. Đề xuất v2 (để bàn):
 - `measures {tên: số}` có đơn vị (token, ms, count) tách khỏi `attrs {tên: chuỗi|bool}` là chiều để lọc/nhóm.
 - `origin`: ai phát (component, writer session, host, release).
 - Tên attr/measure theo một registry semantic convention; chỗ nào chuẩn ngoài đã có tên thì dùng tên đó (Q8).
-- Tiến hoá chỉ cộng thêm; `v` của envelope chỉ đổi khi phá vỡ.
+- Tiến hoá chỉ cộng thêm; `v` của envelope chỉ đổi khi phá vỡ; thêm kind/attr = một dòng registry + fixture, không
+  bump (học từ skillstation, nhưng mở qua registry thay vì enum đóng).
+- `basis`: biết bằng cách nào (code quan sát, agent báo, transcript, chủ dự án trả lời, suy ra).
+- `id` tất định cho mọi nguồn chiếu/nhập lại → chạy lại không đếm trùng.
+- envelope mang revision config/release để gắn số đo với cấu hình sinh ra nó; không chứa nội dung tự do mặc định,
+  detail có trần độ dài, có dấu phiên bản che (redaction).
+- số đo suy ra dưới cỡ mẫu tối thiểu trả `insufficient`, không ra số gây hiểu sai.
+Nguồn bài học: `plans/reports/research-261118-1017-skillstation-observability-lessons.md`.
 Tầng 1 không chứa khái niệm của bên dùng (OM-D5): không "plan", "lead time", "bảy thước đo" cứng trong code Observe —
 plan, phase chỉ là loại subject/ref trong registry. Bên dùng khai báo định nghĩa của mình (một file định nghĩa truy vấn
 có tên, nằm ở chỗ của bên dùng) và chạy nó qua truy vấn chung.
@@ -111,7 +121,8 @@ là preset trên truy vấn chung (L10, từng bước).
 **Tầng 2 — tích hợp với agent và hạ tầng (tốt = quan sát nhiều nơi, nhiều lúc, không làm chậm hay làm sai agent và
 tiến trình; cải thiện dần).** Cửa ghi: API Rust trong `fgos-observe` + `fgos observe`-style CLI qua host; mọi lần ghi
 là phụ, có hạn thời gian, lỗi ghi không bao giờ đổi kết quả của việc chính (đã là luật "kênh phụ best-effort" của
-D-ADR0037, lỗi vào `invocation-faults`). Các kênh: settlement của runner, điểm phát hiện trong code, fragment skill
+D-ADR0037, lỗi vào `invocation-faults`); thêm bộ đếm sức khoẻ (accepted, dropped, rejected, errors, lỗi cuối) đọc
+được qua truy vấn, như recorder của skillstation (`internal/telemetry/recorder.go:92-125`). Các kênh: settlement của runner, điểm phát hiện trong code, fragment skill
 cho agent, claim của worker, hook của harness (Stop, statusline sidecar — đã đo ở `spike-rotation.md`), và về sau
 OTLP: Claude Code và Codex có xuất OpenTelemetry (token, cost, request) — contract tầng 1 khớp tên chuẩn thì nhận
 được kênh này rẻ (cần kiểm cụ thể trong phase khảo sát).
