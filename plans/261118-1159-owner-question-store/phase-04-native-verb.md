@@ -33,11 +33,14 @@ See the phase table in `plan.md`, row 4.
 
 ## Steps
 0. Re-grep every input. S5 phases 10-12 and session-verb phases 3-5 change `main.rs`, `routing.rs` and the registry.
-1. Register `fgos_questions::OBSERVE_KINDS` in `observe_declarations.rs`.
+1. Register `fgos_questions::OBSERVE_KINDS` in `observe_declarations.rs`, and the question record source in
+   `metrics_sources.rs`. Wire the crate's `QuestionLog` port to `StoreLogDoor::open_stream` (`identity_log.rs:56`).
 2. Add the bridge request `work-questions` to `doctor-bridge.v1.json`, `bridge.rs` and `doctor-bridge.mjs`.
    - Gates come from `readCaseProjection`; that code moves out of `open-questions.mjs`.
    - `fgos ask` items come from the Work view's awaiting-human items.
    - The request is bounded, using the bridge's own deadline pattern.
+   - Its answer is a new line kind `data` (one JSON line with a prefix) in the bridge contract, beside the row and
+     refusal lines.
 3. Write `apps/fgos/src/wiring/questions.rs` with sub-verbs `list` (the default), `show`, `ask`, `answer`, `ack` and
    `cancel`.
    - The text list prints "needs you: N" first. Then each row on one line, in QP-21 order (`blocks`, priority, age):

@@ -18,11 +18,11 @@ See the phase table in `plan.md`, row 7.
 ## Steps
 0. Re-grep the inputs. Session-verb phase 2 changed the gateway.
 1. Add `GET /v1/questions`, which shells `fgos questions --json` and returns its store and `work` sections.
-2. Add `POST /v1/questions/{id}/answer`, body `{option?, text?}`, shelling `fgos questions answer <id> … --via
-   gateway:<caller>`, with the authenticated `Caller`.
+2. Add `POST /v1/questions/{id}/answer`, body `{option?, text?}`, shelling `fgos questions answer <id> …` with the
+   gateway's existing `--source gateway:<caller>` (`gateway.rs:447,952`), the way its work routes do.
    - `fgos gateway start` spawns the gateway detached, so it is reparented away from any agent CLI. Its children
      therefore pass the ancestry owner rule (QP-16).
-   - The verb accepts `--via gateway:<name>` only from a caller that passes that rule. Write a test for it.
+   - The verb accepts `--source gateway:<name>` only from a caller with no agent ancestor. Write a test for it.
    - In step 0, confirm the detach (`fgos gateway start`). If the detach is not true, stop with `NEEDS_CONTEXT`.
 3. Do not add an MCP binding. Record that choice in the API yaml's description.
 4. Change `NeedsAnswer.tsx` so it renders `/v1/questions` only, and drop its own `listWork` call.
@@ -34,7 +34,7 @@ See the phase table in `plan.md`, row 7.
    - The screen leads with a "needs you" count.
 5. Update the API yaml and the S04 spec.
 6. Tests:
-   - a gateway test answers a question, records `via: gateway:<caller>`, and gets the refusal on a second answer;
+   - a gateway test answers a question, records `via` as `gateway:<caller>`, and gets the refusal on a second answer;
    - `NeedsAnswer.test.tsx` shows all three groups with no duplicates and the recommended option preselected.
 
 ## Verify

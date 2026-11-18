@@ -23,11 +23,12 @@ See the phase table in `plan.md`, row 6.
    manifest.
 2. Write `wiring/questions_hook.rs`, which writes nothing:
    - Resolve the session id and the `head:` role. If there is neither, print nothing.
-   - Read the store fold for answered questions where the asker is this session or holds the same `head:` role, and
-     that have no ack.
+   - Read only `.fgos/cache/questions.json` (QP-23). Take the answered questions with no ack whose asker is this
+     session or holds the same `head:` role. If the view is missing, print nothing.
    - On `UserPromptSubmit`, print one line per question:
      `owner answered <id> (<ref>, asked by <handle>): <option/text>; write it back to <ref>, then: fgos questions ack <id>`.
-   - On `Stop` with `stop_hook_active` false, block once and give all those lines as the reason. With
+   - On `Stop` with `stop_hook_active` false, block once only for the questions whose notice line (it holds the id)
+     is not yet in the transcript at `transcript_path`. Give their lines as the reason. Otherwise pass. With
      `stop_hook_active` true, pass.
    - Always exit 0. Any error prints nothing.
 3. Add the rows in `agent_hooks.rs` and the Node mirror:
@@ -37,7 +38,7 @@ See the phase table in `plan.md`, row 6.
 4. Extend the existing `*-hook-wired` doctor judgments so they expect the new rows. Do not add a new row.
 5. Write `apps/fgos/tests/questions_hook.rs` (acceptance 5), with two sessions and one rotation:
    - each session gets only its own lines;
-   - `Stop` blocks once and passes when `stop_hook_active` is set;
+   - `Stop` blocks once, passes when `stop_hook_active` is set, and passes once the notice is in the transcript;
    - the hook writes no file (assert that the directory is unchanged);
    - after `ack`, the session gets nothing.
    Extend the setup test that owns the hook rows.

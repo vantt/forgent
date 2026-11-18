@@ -22,7 +22,8 @@ an open question gets its id through that plan's planner (message it, or the sec
 ## Steps
 0. Re-grep the open questions.
 1. Ask each open `QUESTIONS.md` row again with `fgos questions ask --migrated --ref discussion:<topic>#Q<n> --input …`.
-   Build the input so it passes QP-19, using `headline` and `blocks` from the row. Add the `q-` id to a new `qid`
+   Write `headline` and `blocks` from the row. Options and the recommendation may stay empty for a migrated question
+   (QP-19), so nothing is invented. Add the `q-` id to a new `qid`
    column.
 2. Ask each open draft-plan question again with `--ref plan:<dir>`, and send its planner the id.
 3. Change the skills so they say the following:

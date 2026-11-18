@@ -15,8 +15,9 @@ Waits for ops-metrics phase 7 (the definition runner, `fgos metrics query --def`
 
 ## Steps
 0. Re-grep the landed definition format.
-1. Write `core/questions/definitions/question-answered.query.json`. It selects `fgos.question.answered` records that
-   have no `fgos.question.acked` record for the same subject (an anti-join), with these attrs:
+1. Write `core/questions/definitions/question-answered.query.json`. It selects `fgos.question.answered` records from the
+   question record source (QP-8) that have no `fgos.question.acked` record for the same subject (an anti-join), with
+   these attrs:
    - asker role
    - session id
    - handle
@@ -24,7 +25,9 @@ Waits for ops-metrics phase 7 (the definition runner, `fgos metrics query --def`
    - origin ref
    - answeredAt
    - pane
-2. Write fixture records under `test/fixtures/questions/observe/`: three answered questions, one of them acked.
+   - asker.machine (the watcher acts only on its own machine, QP-12)
+2. Write a fixture under `test/fixtures/questions/`: a fold with three answered questions, one of them acked, fed
+   through the record source.
 3. Write `packages/questions/rust/tests/definition_question_answered.rs`. It runs the definition through the runner
    and checks for two rows with their attrs.
 

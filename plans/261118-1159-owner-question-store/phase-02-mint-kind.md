@@ -1,4 +1,4 @@
-# Phase 2: Mint kind `question`
+# Phase 2: Mint kind `question`, agent ancestry check
 
 Waits for session-verb phase 4, which rewrites `packages/identity/**`.
 
@@ -15,6 +15,7 @@ Waits for session-verb phase 4, which rewrites `packages/identity/**`.
 
 ## Footprint
 - `packages/identity/rust/src/mint.rs`
+- `packages/identity/rust/src/resolve.rs`
 - `packages/identity/rust/tests/**`
 - `packages/identity/contracts/identity.write.v1.json`
 - `docs/platform/identity/spec.md`
@@ -25,6 +26,12 @@ Waits for session-verb phase 4, which rewrites `packages/identity/**`.
 1. Add `RandomKind::Question` with prefix `q`, using the same body as the other random kinds and no network.
 2. Add `question` to `Kind::parse`, `Kind::name`, `KIND_NAMES`, the write contract, `id-minting.md` and spec §4a.
 3. Extend the existing test that owns the random kinds so it covers `question`.
+4. In `resolve.rs`, add `pub fn agent_in_ancestry(tree: &dyn ProcessTree, from_pid: Option<u32>) -> Option<&'static str>`
+   (QP-16). It walks parents with the existing `ProcessTree` (as `pi_family_cli` does, bounded by `MAX_WALK`). It
+   returns the first kernel command name in the agent CLI list: claude, codex, agy, pi, omp. Keep that list as one
+   constant beside Identity's CLI table, so the names have one home, and never read env.
+5. Test it in the resolve tests over a fake tree: an agent grandparent, no agent, an unreadable tree (returns `None`,
+   so the rule fails open as a mistake guard), and a tree that ignores env.
 
 ## Verify
 - `cargo test -p fgos-identity` is green.

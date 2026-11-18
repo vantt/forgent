@@ -38,7 +38,7 @@ every running or ready plan.
 2. Add the Questions row to `component-boundary.md`, and add the holder row for the `questions` scope to
    `governance.md`.
 3. Write `packages/questions/contracts/question-event-streams.v1.json`. It declares four types, each `scope: project`,
-   `schemaVersion: 1`, `sealOnWrite: false`. Their payloads:
+   `schemaVersion: 1`, `sealOnWrite: true` (QP-2). The `asker` of `question.asked` also carries `machine`. Their payloads:
    - `question.asked`: `{id, askedAt, asker{sessionId, handle, roles, persona?, pane?}, stage, ref{value, branch,
      commit}, headline, blocks, parts{what, cause, options[{label, does, gain, harm, cost, recommended?}],
      recommendation, scope{allows, forbids}}, migrated, supersedes?}`
@@ -58,7 +58,10 @@ every running or ready plan.
    - `question-not-open`
    - `answer-not-owner`
    - `not-asker`
-6. Write `packages/questions/rust/observe-kinds.json`. It declares `fgos.question.asked`, `answered`, `acked` and
+   - the Event Store refusals the verbs pass through, such as `event-store-unsupported-platform` and the store's lock
+     timeout, each with its exit category
+6. In the spec, state the Linux-only limit (QP-2) and the per-machine view `.fgos/cache/questions.json` (QP-23).
+7. Write `packages/questions/rust/observe-kinds.json`. It declares `fgos.question.asked`, `answered`, `acked` and
    `cancelled`, with the question id as subject and the OQ-D6 attrs.
 
 ## Verify
