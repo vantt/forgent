@@ -63,3 +63,6 @@ Revert the merge commit. Old friction shards stay until this phase is green.
   `[Unreleased]`.
 - The doctor row `observe-host-resolvable` runs `friction rank --limit 1`, which now runs the query engine; confirm
   its cost is still fine.
+- Acceptance 5 needs the live friction store migrated: after the release with phase 13 is installed, run
+  `fgos friction migrate --to-records` once in each project that has `.fgos/observe/friction/` (main checkout first),
+  record the in/out counts here, and keep the old shards until this phase's gate passes.
