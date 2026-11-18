@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Account lease for the secretary: Miu on her own pool, every other Claude account in the pane pool, a doctor warn for a store on a CLI's default login home"
-status: ready
+status: running
 priority: P1
 blockedBy: []
 footprint:
@@ -100,7 +100,7 @@ true/false).
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Facts and prior art](phase-01-facts-and-prior-art.md) | - | plans/261118-1847-account-lease-secretary/reports/phase-01-facts.md | 1 | draft |
+| 1 | [Facts and prior art](phase-01-facts-and-prior-art.md) | - | plans/261118-1847-account-lease-secretary/reports/phase-01-facts.md | 1 | done |
 | 2 | [Pane pool and Miu pool on the owner machines](phase-02-pane-pool-and-guide.md) | 1 | docs/how-to/install-fgos-in-a-project-and-use-doctor.md, plans/261118-1847-account-lease-secretary/reports/phase-02-machine.md | 2 | draft |
 | 3 | [Doctor warn for a store on a default login home](phase-03-default-home-warn.md) | 1 | src/runner/dispatch/llm-accounts.mjs, src/setup/registrations.mjs, packages/distribution/contracts/doctor-registry.v1.json, test/setup/model-pool-checks.test.mjs, docs/platform/agent-confinement/spec.md | 2 | draft |
 | 4 | [Persona pool key in seat binding](phase-04-persona-pool-key.md) | 1 | packages/seat-binding/rust/src/**, packages/seat-binding/rust/tests/golden.rs, packages/seat-binding/contracts/seat-binding.golden.v1.json, core/config-schema/runner.schema.yaml, test/runner/runner-schema-vocabulary.test.mjs, docs/platform/seat-binding/spec.md | 2 | draft |
