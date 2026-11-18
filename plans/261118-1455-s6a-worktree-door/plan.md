@@ -37,6 +37,10 @@ footprint:
   - docs/platform/git/spec.md
   - packages/git/rust/src/refs.rs
   - packages/git/rust/src/land.rs
+  - packages/git/rust/src/remote.rs
+  - packages/git/rust/src/lib.rs
+  - src/runner/merge.mjs
+  - test/runner/merge-target-slot-multiprocess.test.mjs
   - docs/reading-map.md
   - scripts/lib/git-one-door-declarations.v1.json
   - test/cli/fgos-workflow-propose.test.mjs
@@ -175,3 +179,4 @@ Rust wrote because phase 01 keeps Node's record path, key and shape.
   F1, F2, F9, F11 ([report](../reports/red-team-261118-1442-s6a-plan-red-team.md)).
 - 2026-11-18 lead:S6A-LAND: S5 (`261115-2328`) is `done` on main (586765804). Status stays `draft`: plan-contract-check refuses `ready` while the footprint overlaps the active plan `261118-0936-ops-metrics`; turn `ready` when ops-metrics closes or the overlap is cleared.
 - 2026-11-18 lead:WORKTREE-DOOR: footprint widened to `packages/git/rust/src/refs.rs` and `land.rs` (callers only), approved by lead:OPC as Git reviewer: `acquire_worktree_admin(repo, held, wait)` becomes the one public worktree-admin door; `fgos-checkout` calls it instead of seeding its own scope. Also widened for gate consequences of the deletion: `docs/reading-map.md`, `scripts/lib/git-one-door-declarations.v1.json` (two configured setup-command shell sites), `test/cli/fgos-workflow-propose.test.mjs`, `test/cli/subcommand-flag-drift.test.mjs`.
+- 2026-11-18 lead:WORKTREE-DOOR: footprint widened again with lead:OPC approval: `remote.rs` and `lib.rs` of fgos-git (one more admin-door caller, the re-export), `src/runner/merge.mjs` and `test/runner/merge-target-slot-multiprocess.test.mjs` (the Git door names a busy worktree admin `worktree-admin-held`; merge maps it to lock-held).
