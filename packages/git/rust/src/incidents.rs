@@ -2,8 +2,9 @@
 //! Git rows. Repository trust, the journal and Recovery policy stay in the driver; this module composes what the
 //! driver reports into one answer and one recovery pass, so the host and the Node addon serve the same bytes.
 //!
-//! Reading changes nothing. Recovery settles an interrupted Land, ScopedCommit or remote transfer through the
-//! driver's `reconcile_operation`, under each kind's own locks, and never deletes a worktree, a lock or a ref.
+//! Reading changes nothing. Recovery settles an interrupted Land, ScopedCommit, remote transfer or main-checkout
+//! catch-up through the driver's `reconcile_operation`, under each kind's own locks, and never deletes a worktree, a
+//! lock or a ref.
 use crate::invocation_root::{read_repo_facts, realpath_or_self, RepoFacts};
 use crate::wal::{self, Wal};
 use crate::{plain_path, GitDriver, OperationError, RepoHandle, ResolveRepo, WorktreeIssue};
@@ -479,6 +480,7 @@ pub fn recover_git_operations(
             operation["kind"]
                 .as_str()
                 .is_some_and(|kind| RECOVERABLE_KINDS.contains(&kind))
+                || is_main_checkout_catch_up(operation, &repo)
         })
         .collect();
     let mut settled = Vec::new();
@@ -500,6 +502,15 @@ pub fn recover_git_operations(
         }
     }
     Ok(recovered(settled, kept, merge_head(&driver, &repo)))
+}
+
+/// A main-checkout catch-up journals as `RefUpdate` under its own binding; it is settled here too, since no other
+/// door recovers it.
+fn is_main_checkout_catch_up(operation: &Value, repo: &RepoHandle) -> bool {
+    operation["repoIdentity"].as_str().is_some_and(|identity| {
+        crate::land::catch_up_binding(identity, repo)
+            .is_ok_and(|binding| operation["intent"]["authorityBinding"] == binding.as_str())
+    })
 }
 
 fn recovered(settled: Vec<String>, kept: Vec<Kept>, merge: Option<String>) -> GitRecovered {

@@ -39,8 +39,14 @@ fn prepare(f: &Fixture, id: &str) -> LandSession {
         .unwrap()
 }
 fn push(f: &Fixture, s: &LandSession, grant: &RemoteGrant) -> Result<Receipt> {
-    f.driver
-        .push_land_candidate(&f.repo, s, grant, &name("refs/heads/trunk"), "fixture")
+    f.driver.push_land_candidate(
+        &f.repo,
+        s,
+        grant,
+        &name("refs/heads/trunk"),
+        "fixture",
+        &wal::OsFileSystem,
+    )
 }
 /// A commit on top of trunk touching `file`, left on its own branch; trunk is unchanged.
 fn commit_ahead(f: &Fixture, branch: &str, file: &str) -> String {
@@ -52,6 +58,14 @@ fn commit_ahead(f: &Fixture, branch: &str, file: &str) -> String {
     tip
 }
 fn catch_up(f: &Fixture, old: &str, id: &str) -> Result<Receipt> {
+    catch_up_with(f, old, id, &wal::OsFileSystem)
+}
+fn catch_up_with<F: wal::FileSystem>(
+    f: &Fixture,
+    old: &str,
+    id: &str,
+    filesystem: &F,
+) -> Result<Receipt> {
     f.driver.catch_up_main_checkout(
         &f.repo,
         vec![],
@@ -60,7 +74,28 @@ fn catch_up(f: &Fixture, old: &str, id: &str) -> Result<Receipt> {
         &name("refs/remotes/origin/trunk"),
         "fixture",
         id,
+        filesystem,
     )
+}
+/// Fails the door at one named production boundary, as a crash there would leave it.
+struct StopAt(&'static str);
+impl wal::FileSystem for StopAt {
+    fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+        if step == self.0 {
+            Err(std::io::Error::other("interrupted at production boundary"))
+        } else {
+            Ok(())
+        }
+    }
+}
+fn recover(f: &Fixture) -> serde_json::Value {
+    serde_json::to_value(
+        fgos_git::incidents::recover_git_operations(&f.temp.join("state"), &f.main, &|_| {
+            "fixture".to_owned()
+        })
+        .unwrap(),
+    )
+    .unwrap()
 }
 
 #[test]
@@ -88,6 +123,50 @@ fn land_pushes_its_candidate_while_alive_then_publishes() {
         .unwrap();
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), candidate);
     assert_eq!(git(&bare, &["rev-parse", "refs/heads/trunk"]), candidate);
+}
+
+#[test]
+fn a_push_branch_moved_before_the_transfer_is_refused_and_nothing_is_sent() {
+    let f = Fixture::new();
+    let (grant, bare) = remote(&f);
+    let s = prepare(&f, "moved-source");
+    let before = git(&bare, &["rev-parse", "refs/heads/trunk"]);
+    /// Another writer moves the push branch after it was created, before the transfer reads it.
+    struct Swap(PathBuf, String);
+    impl wal::FileSystem for Swap {
+        fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+            if step == "land-push-source" {
+                git(
+                    &self.0,
+                    &[
+                        "update-ref",
+                        "refs/heads/fgos-land-push-moved-source",
+                        &self.1,
+                    ],
+                );
+            }
+            Ok(())
+        }
+    }
+    let swap = Swap(f.main.clone(), f.request.source.clone());
+    let error = f
+        .driver
+        .push_land_candidate(
+            &f.repo,
+            &s,
+            &grant,
+            &name("refs/heads/trunk"),
+            "fixture",
+            &swap,
+        )
+        .unwrap_err();
+    assert_eq!(error.cause, "land-push-source-moved");
+    assert_eq!(
+        git(&bare, &["rev-parse", "refs/heads/trunk"]),
+        before,
+        "the replacement commit is never sent"
+    );
+    drop(s);
 }
 
 #[test]
@@ -248,4 +327,51 @@ fn catch_up_refuses_a_stale_expected_old() {
     let error = catch_up(&f, &f.request.source, "stale").unwrap_err();
     assert_eq!(error.cause, "compare-and-swap-stale");
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), f.request.target);
+}
+
+#[test]
+fn catch_up_interrupted_after_its_cas_is_finished_by_the_recovery_door() {
+    let f = Fixture::new();
+    let tip = commit_ahead(&f, "ahead", "c");
+    git(&f.main, &["update-ref", "refs/remotes/origin/trunk", &tip]);
+    catch_up_with(
+        &f,
+        &f.request.target,
+        "cut",
+        &StopAt("catch-up-before-read-tree"),
+    )
+    .unwrap_err();
+    assert_eq!(git(&f.main, &["rev-parse", "refs/heads/trunk"]), tip);
+    assert_eq!(fs::read_to_string(f.main.join("c")).unwrap(), "base\n");
+    let recovered = recover(&f);
+    assert_eq!(
+        recovered["recovered"],
+        serde_json::json!(["cut"]),
+        "{recovered}"
+    );
+    assert_eq!(fs::read_to_string(f.main.join("c")).unwrap(), "ahead\n");
+    assert_eq!(
+        git(&f.main, &["status", "--porcelain", "--untracked-files=no"]),
+        ""
+    );
+    // The settled chain no longer blocks the ref: the next catch-up moves it on.
+    let later = commit_ahead(&f, "later", "d");
+    git(
+        &f.main,
+        &["update-ref", "refs/remotes/origin/trunk", &later],
+    );
+    catch_up(&f, &tip, "after-cut").unwrap();
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), later);
+}
+
+#[test]
+fn catch_up_interrupted_before_its_cas_settles_as_not_moved_and_a_retry_succeeds() {
+    let f = Fixture::new();
+    let tip = commit_ahead(&f, "ahead", "c");
+    git(&f.main, &["update-ref", "refs/remotes/origin/trunk", &tip]);
+    catch_up_with(&f, &f.request.target, "cut", &StopAt("catch-up-before-cas")).unwrap_err();
+    assert_eq!(recover(&f)["recovered"], serde_json::json!(["cut"]));
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), f.request.target);
+    catch_up(&f, &f.request.target, "retry").unwrap();
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), tip);
 }
