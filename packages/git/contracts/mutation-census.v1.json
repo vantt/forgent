@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "5c7c2b9f4742af5033b282d2a42ffa75b5047c67a875b0d2ff9186d1c7c0eeaa",
+  "payloadDigest": "c359d52772149165928da75e6e0fbbc8ae7e21993421b547e6fa43c0bf585717",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -63,7 +63,9 @@
     ".agents/skills/fgos-researching/SKILL.md": "81f94ec67b7cafe77a809e786b00f304c505a52cade46ec75a5be2b3ed996e93",
     ".agents/skills/fgos-routing/SKILL.md": "cd1143c3ff1cd01159ae8b06a62c56fd2a6a38ee89437964d66fb41be55c49d5",
     ".agents/skills/fgos-run/SKILL.md": "04c3ddb332589b9bb5c3bd4ebd30acdb812e2603915a229e07c84e0d3ef919e2",
+    ".agents/skills/fgos-secretary/SKILL.md": "d3b53ad91baa9a89b93b891b9f5343373a2b89c71811784fc5c177a45ae49584",
     ".agents/skills/fgos-shaping/SKILL.md": "1b9f420203702fe29a1dc24ff4d494b4c7f5b1f1ebfa6e37df191ce14e18904c",
+    ".agents/skills/handoff/SKILL.md": "884e6947e309ba2475186cb728fe82095b62247ac3701f013cc290d8171b0120",
     ".agents/skills/instruction-audit/SKILL.md": "0269219bf0ecffddabc89246be5e5a9e9376512bf43a42c1a38535457395dcc5",
     ".agents/skills/instruction-audit/references/lane-prompts.md": "adac8362adbb7eb04c163fbcf3cdb16aa566e61a6f4a6a9351c07d4fc4d08d52",
     ".agents/skills/instruction-audit/references/report-template.md": "9d3b7abfd876d88e8a6a7e1820ea6a2aaf02472a75a69603921344fa0db699d6",
@@ -177,7 +179,9 @@
     "core/skills/fgos-researching/SKILL.md": "26a8d7e2f909f53fad478a98ba010cb85ef0de7d405516f1b01d6a7967e061dc",
     "core/skills/fgos-routing/SKILL.md": "61aeab18845185ab3e729e1996f063442e184bb442545221f42f531e5628bd4d",
     "core/skills/fgos-run/SKILL.md": "7f8a0d3be342c8c6a2a83c832d5751ab6ed309fde1dd2293cc3bf645f18da690",
+    "core/skills/fgos-secretary/SKILL.md": "b9c5d97606de660f42a9eb6459cd8236a9bf4b0fa91f5526b248b1049b4ed747",
     "core/skills/fgos-shaping/SKILL.md": "6d912615a22293754a51238ad089cd1732af4b6e5fb83d8251a200dde7fc1e86",
+    "core/skills/handoff/SKILL.md": "4f448dd339c7e53214ef3db84aec9ab7921515433ea33088e08fed04b7f51a25",
     "core/skills/instruction-audit/SKILL.md": "79448c61fd11621ea5dcd6d76f533a715b275378e0c476d982be4f56a8fc55b6",
     "core/skills/instruction-audit/references/lane-prompts.md": "7768d7562c9d45d2c40fb5602ed542c7711df2d31978351c1751f801ac6de112",
     "core/skills/instruction-audit/references/report-template.md": "c1f2f637b2ba40ec03b3a6a99c65a9ca851283d20e03140b3bec45f08f222b24",
