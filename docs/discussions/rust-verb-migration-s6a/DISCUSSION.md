@@ -1,6 +1,46 @@
 # DISCUSSION: S6a of the Rust verb migration (Execution: runner core, dispatch, run, worktree)
 
-discussion: open
+## Hand-off
+
+```text
+discussion: settled
+source: program plan plans/261114-2051-rust-verb-migration-program/plan.md row S6a; plan
+  plans/261118-0947-session-verb-for-agent-sessions (on hold for this shaping); owner answers
+  2026-11-18 (D1-D5, QUESTIONS.md Q1-Q4)
+outcome: tier 5 (Execution) runs in Rust and its Node code is deleted: `fgos run`, the dispatch subs
+  probe-account, probe-session, reconcile, inspect, show-run, watch, recover, the Node side of the run
+  supervisor, and `fgos worktree` / `resync-worktree` as the one checkout door (create, provisioning by
+  default with --bare, remove, resync, leftovers, orphan reclaim); Work's create*/remove* in
+  src/runner/worktree.mjs become thin addon wrappers (D5); every doors row retiredBy S6a closes; the 30
+  bridge:S6a doctor rows plus seat-binding-route run in Rust.
+constraints:
+  - starts only after S5 (plans/261115-2328-execution-read-door) phases 11 and 12 land
+  - new code in Rust; one door per job (L10, design principles 1, 2, 7); delete each Node path in the
+    change that replaces it; one proof per behaviour, tests move to their Rust owner
+  - the worktree door is in S6a's first wave; plan 0947 is blocked only by that phase (D1)
+  - `fgos worktree create` keeps its name and argv (plan 1045 P10 forwards it); provisioning stays the
+    default, `--bare` is new (D2) and gets a CHANGELOG line
+  - plan 1045 P6 lands first on the Node launchers; S6a ports its `lanes` envelope field (D4)
+  - payload-root.mjs moves to the lowest shared layer before src/run-supervisor is deleted
+  - parity runner restored from history for the moved doctor rows; S4 doctor fixtures stay
+non-goals: fgos-runner and the Work loop (S7, D3); fgos workflow (S6b); deleting `fgos session`,
+  sessions.json and renaming head (plan 0947, D1); head-request.v1.json verb renames (0947 P5, 1045
+  P10, 1159 P8 sequence among themselves); branch/ref/trunk/dirty helpers of src/runner/worktree.mjs (S7)
+acceptance:
+  - command-routes show run, dispatch (all subs), worktree, resync-worktree native; no legacy-cli row
+    for them
+  - src/runner/execution, src/runner/dispatch, src/run-supervisor, src/verbs/{worktree,dispatch} gone;
+    the lifecycle part of src/runner/worktree.mjs gone, wrappers call the addon
+  - a session-style checkout works through `fgos worktree create --bare` and `remove`, so plan 0947
+    can delete session.rs
+  - doors rows naming S6a in retiredBy closed; doctor-registry has no bridge:S6a owner
+  - npm test and cargo test --workspace green
+open for the planner: where the Rust checkout engine lives (packages/git beside GitDriver, or an
+  Execution module calling it), by design principles 2 and 7
+sibling edits: program plan row S6a drops fgos-runner and gains the checkout part of
+  src/runner/worktree.mjs, row S7 gains fgos-runner; plan 0947 blockedBy gains S6a's worktree phase and
+  its phase 4 footprint gains packages/mailbox/rust/store/src/hook/resolve.rs
+```
 
 Source: program plan `plans/261114-2051-rust-verb-migration-program/plan.md` row S6a; owner hold of
 plan `plans/261118-0947-session-verb-for-agent-sessions` (2026-11-18 13:10, commit 5f307a2f0) until this
@@ -14,7 +54,7 @@ keeps the session-verb retirement and the `head` -> `session` rename, S6a builds
 `--bare` opts out. D3: `fgos-runner` moves to S7. D4: plan 1045 P6 lands first, S6a ports its `lanes`
 field. D5: S6a moves the checkout lifecycle of `src/runner/worktree.mjs` into Rust, Work keeps thin
 wrappers and its branch helpers. Left for the planner: where the Rust checkout engine lives (§3).
-Waiting: owner confirmation to mark `discussion: settled`.
+Owner confirmed settled 2026-11-18 13:50; handed to the secretary for a planner.
 
 ## 2. Mục tiêu & đề bài
 
@@ -65,6 +105,7 @@ lands; its phases 11 (doctor rows) and 12 (doors, close) are still pending.
 - 2026-11-18 13:34 owner asked whether `fgos-runner` is `fgos run`; shaper: no, `fgos run` runs one Unit (Execution), `fgos-runner` is the Work-frontier loop. Q2: owner (a) -> D3.
 - 2026-11-18 13:38 Q3 (order against 1045 P6): owner (a) -> D4.
 - 2026-11-18 13:42 Q4 (`src/runner/worktree.mjs` scope): owner (a) -> D5. All owner questions answered.
+- 2026-11-18 13:50 owner: "ok, chốt settled đi" -> discussion: settled.
 
 ## 6. Thiết kế đã chốt {#design}
 
