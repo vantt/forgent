@@ -250,9 +250,12 @@ Every Node test of a retired path is deleted in the phase that deletes the path;
 
 ## Owner questions
 
-None open. D1-D5 answered 2026-11-18. P1-P12 are decided from evidence; P5 (native `fgos run` exec's a Node peer
-for Workflow admission until S6b) is the one an owner may want to see: say so if a standalone write run must work with
-no Node at all before S6b, which would pull Workflow admission into S6a (D3/"Work last" against it).
+None open. D1-D5 answered 2026-11-18. P1-P12 are decided from evidence.
+
+- **P5 answered 2026-11-18 by the owner (via head:secretary-miu): option A.** A native standalone `fgos run` that asks
+  for the Workflow port still execs the Node peer entry (`src/workflow/admission-peer.mjs`, through
+  `components.legacyNode.entry`) for Workflow admission until S6b. Workflow admission does **not** move into S6a; S6b
+  retires the peer when Workflow is Rust. A run the port is never asked for spawns no Node.
 
 ## Risks and rollback
 
@@ -314,3 +317,4 @@ before their cutover phase.
 - 2026-11-18 planner: plan written against `0981437d2`; status `draft` until S5 phases 11 and 12 land and phase 00 re-reads the census.
 - 2026-11-18 planner: `scripts/plan-contract-check.mjs --plan` (main checkout's script with its staged addon env, plan path absolute) prints `ok`.
 - 2026-11-18 planner: design forks P1-P4 checked with kongming counsel (one reply; adopted, with P5 added from `run-request.mjs:356`).
+- 2026-11-18 lead:S6A-LAND: owner answered P5 = A (Owner questions); sibling edits applied to the program plan `261114-2051` rows S6a/S7 and to plan `261118-0947` (`blockedBy`, phase 4 footprint). Status stays `draft` until S5 phases 11 and 12 land.

@@ -6,6 +6,7 @@ priority: P1
 blockedBy:
   - 261117-1856-secretary-session-spine
   - 261115-2328-execution-read-door
+  - 261118-1341-s6a-execution-tier-rust
 footprint:
   - plans/261118-0947-session-verb-for-agent-sessions/**
   - apps/fgos/src/wiring/session.rs
@@ -22,6 +23,7 @@ footprint:
   - packages/git/rust/src/store_admission.rs
   - packages/git/contracts/mutation-census.v1.json
   - packages/identity/**
+  - packages/mailbox/rust/store/src/hook/resolve.rs
   - packages/run-supervisor/contracts/head-request.v1.json
   - packages/run-supervisor/rust/**
   - packages/distribution/contracts/doctor-registry.v1.json
@@ -52,6 +54,8 @@ created: 2026-11-18
 ---
 
 > **Hold (owner 2026-11-18 13:10, option A):** no phase starts until the S6a shaping (fgos worktree to Rust) settles; the rename needs phase 3, which is the session-worktree retirement, so the worktree work is done once with S6a.
+
+> **Blocked by S6a phase 1 only (2026-11-18):** `blockedBy` lists plan `261118-1341-s6a-execution-tier-rust` because plan-contract `blockedBy` holds plan names only; the real wait is that plan's phase 1 (one worktree door in Rust, `fgos worktree create --bare` and `remove` native). Phase 1 lands on main by itself, so this plan may start once it has landed, not when all of S6a closes. Plan `261118-1045-project-supervisor` is not in `blockedBy`: its P6 is a landing gate, not a start dependency.
 
 # Give `fgos session` back to agent sessions
 
@@ -125,7 +129,7 @@ suffices).
 | 1 | [Node readers stop reading the session registry](phase-01-node-readers.md) | - | src/runner/session.mjs, src/runner/merge.mjs, src/verbs/merge/approve.mjs, src/state/postland-drift.mjs, src/state/graph-harness.mjs, src/setup/registrations.mjs, packages/distribution/contracts/doctor-registry.v1.json, bin/fgos.mjs, test/cli/**, test/runner/session.test.mjs, test/verbs/merge/**, test/setup/checks.test.mjs, test/state/**, test/architecture.test.mjs, docs/architecture-manifest.json, docs/platform/runner/** | 1 | draft |
 | 2 | [Gateway session routes refuse](phase-02-gateway-routes-refuse.md) | - | apps/fgos-gateway/**, docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml | 1 | draft |
 | 3 | [Host drops the session worktree verb](phase-03-host-drops-session-verb.md) | 1, 2 | apps/fgos/src/wiring/session.rs, apps/fgos/src/main.rs, apps/fgos/src/routing.rs, apps/fgos/tests/**, packages/host-runtime/**, packages/holder-lock/contracts/lock-registry.v1.json, docs/platform/holder-lock/spec.md, packages/git/rust/src/store_admission.rs, packages/git/contracts/mutation-census.v1.json, docs/platform/git/spec.md, src/cli/command-registry.mjs, test/rust-host/**, test/util/host-bin.test.mjs | 2 | draft |
-| 4 | [Identity stops reading sessions.json](phase-04-identity-drops-registry.md) | 3 | packages/identity/**, src/util/session-identity.mjs, src/git/inspect.mjs, src/observe/invocation-fault-log.mjs, src/runner/dispatch/**, src/runner/merge.mjs, src/state/**, bin/fgos.mjs, apps/fgos/src/wiring/mailbox_verbs.rs, apps/fgos/src/wiring/doctor/identity.rs, apps/fgos/src/cli_projector.rs, apps/fgos/tests/**, src/cli/command-registry.mjs, packages/host-runtime/contracts/**, test/util/session-identity.test.mjs, test/git/**, test/state/**, docs/platform/identity/spec.md | 3 | draft |
+| 4 | [Identity stops reading sessions.json](phase-04-identity-drops-registry.md) | 3 | packages/identity/**, packages/mailbox/rust/store/src/hook/resolve.rs, src/util/session-identity.mjs, src/git/inspect.mjs, src/observe/invocation-fault-log.mjs, src/runner/dispatch/**, src/runner/merge.mjs, src/state/**, bin/fgos.mjs, apps/fgos/src/wiring/mailbox_verbs.rs, apps/fgos/src/wiring/doctor/identity.rs, apps/fgos/src/cli_projector.rs, apps/fgos/tests/**, src/cli/command-registry.mjs, packages/host-runtime/contracts/**, test/util/session-identity.test.mjs, test/git/**, test/state/**, docs/platform/identity/spec.md | 3 | draft |
 | 5 | [Rename `fgos head` to `fgos session`](phase-05-rename-head-to-session.md) | 4 | src/cli/command-registry.mjs, packages/host-runtime/contracts/**, bin/fgos.mjs, test/cli/**, src/session-host/**, src/session-rotation/**, test/session-host/**, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/**, core/skills/**, domains/coding/skills/**, .agents/skills/**, .claude/skills/**, plugins/fgOS/skills/**, docs/platform/session-host/spec.md | 4 | draft |
 | 6 | [Integration, docs and full gate](phase-06-integration.md) | 1, 2, 3, 4, 5 | CHANGELOG.md, docs/reading-map.md, docs/backlog.md, plans/261118-0947-session-verb-for-agent-sessions/reports/integration.md | 5 | draft |
 
