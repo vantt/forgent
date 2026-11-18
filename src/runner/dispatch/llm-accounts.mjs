@@ -222,6 +222,31 @@ const CLI_LOGIN_HOMES = Object.freeze([
 const plainValues = (value) => (isPlainObject(value) ? Object.values(value) : []);
 
 /**
+ * The account stores that sit on their CLI's own default login home: `runner.llmAccounts.<pool>.<account>.credentialStore.<cli>`
+ * whose expanded real path equals that CLI's login home under `homeDir` or the value of its home variable in `env`
+ * (a link to it is the same directory). Reads paths only, never a login file. A store that does not expand is not a hit.
+ *
+ * @returns {{pool: string, account: string, cli: string, key: string}[]}
+ */
+export function defaultLoginHomeStores(runnerConfig, { homeDir = os.homedir(), env = process.env } = {}) {
+  const real = (value) => { try { return fs.realpathSync(value); } catch { return path.resolve(value); } };
+  const hits = [];
+  for (const [pool, accounts] of Object.entries(isPlainObject(runnerConfig?.llmAccounts) ? runnerConfig.llmAccounts : {})) {
+    for (const [account, entry] of Object.entries(isPlainObject(accounts) ? accounts : {})) {
+      for (const [cli, store] of Object.entries(isPlainObject(entry?.credentialStore) ? entry.credentialStore : {})) {
+        const expanded = expandCredentialHome(store);
+        if (!expanded) continue;
+        const defaults = CLI_LOGIN_HOMES.filter((home) => home.cli === cli)
+          .flatMap(({ env: name, dir }) => [path.join(homeDir, dir), name && env[name]])
+          .map((value) => expandCredentialHome(value)).filter(Boolean).map(real);
+        if (defaults.includes(real(expanded))) hits.push({ pool, account, cli, key: `runner.llmAccounts.${pool}.${account}.credentialStore.${cli}` });
+      }
+    }
+  }
+  return hits;
+}
+
+/**
  * Every login directory this machine names: each store of the account inventory (`runner.llmAccounts`)
  * expanded as the lease expands it, each agent CLI's default login home and the value of its
  * home variable in `env`, and each executor's `credentialStore.homeEnv` value, read from the config the lease

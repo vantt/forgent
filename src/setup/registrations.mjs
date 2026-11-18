@@ -27,6 +27,7 @@ import { fileURLToPath } from 'node:url';
 import { domainCatalog } from '../util/domain-dirs.mjs';
 import { checkCompiledDomains } from '../util/domain-compile.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
+import { defaultLoginHomeStores } from '../runner/dispatch/llm-accounts.mjs';
 import { checkSessionKeepDeclared } from './session-keep-declared.mjs';
 import { INSTALL_ROOT, agentShapeProblem, findAgentDuplicates, readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
 import { isWithinDir } from '../runner/dispatch/assignment-layout.mjs';
@@ -776,6 +777,28 @@ registerCheck({
 registerCheck({
   id: 'llm-accounts-shape',
   check: (cwd) => checkLlmAccountsShape(cwd),
+});
+
+// A store on a CLI's own default login home can be renewed by a pane and make the provider revoke the real refresh
+// token (decision 86 Q2). The owner ruled it warns and never refuses, so a single-account user still runs.
+export function checkLlmAccountsDefaultLoginHome(cwd) {
+  let runnerConfig;
+  try {
+    runnerConfig = loadRunnerConfigForDir(cwd);
+  } catch (err) {
+    return { passed: true, message: `runner config not loadable here, not evaluated: ${err.message}` };
+  }
+  const hits = defaultLoginHomeStores(runnerConfig);
+  if (hits.length === 0) return { passed: true, message: 'no runner.llmAccounts store sits on its CLI default login home' };
+  return {
+    passed: true,
+    message: `warning: stores on a default login home: ${hits.map((h) => h.key).join(', ')}; a pane renewing a copy of that login can make the provider revoke the real refresh token and log out your own sessions -- log in a second directory (CLAUDE_CONFIG_DIR=<own dir> claude /login, or the CLI's own home variable) and point the key at it`,
+  };
+}
+
+registerCheck({
+  id: 'llm-accounts-default-login-home',
+  check: (cwd) => checkLlmAccountsDefaultLoginHome(cwd),
 });
 
 // The definition tiers of a shipped release cannot change after build, so `npm test` judges them

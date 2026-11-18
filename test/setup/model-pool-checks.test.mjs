@@ -151,6 +151,47 @@ test('llm-accounts-shape passes on a valid global inventory and fails on one in 
   assert.match(alias.message, /family "openai"/);
 });
 
+test('llm-accounts-default-login-home warns for a store on a default login home of any CLI, never a private one, and never stops the account resolving', () => {
+  // The row reads the user's home, which `withHome` points at the fake home, so the stores are built under it.
+  const inFakeHome = (build) => {
+    const dir = mkTemp('model-pool-check-');
+    const fake = mkTemp('model-pool-check-home-');
+    try {
+      fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+      fs.mkdirSync(path.join(fake, '.fgos'), { recursive: true });
+      for (const d of ['private-login', '.claude', '.codex']) fs.mkdirSync(path.join(fake, d), { recursive: true });
+      fs.symlinkSync(path.join(fake, '.claude'), path.join(fake, 'linked-login'));
+      writeProjectConfig(dir, { runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } }, modelPolicies: { claude: { standard: 'sonnet' } } } });
+      writeAccountsFile(path.join(fake, '.fgos'), { llmAccounts: build(fake) });
+      moveMachineKeysTo(dir, fake);
+      return withHome(fake, () => ({ row: checkById('llm-accounts-default-login-home').check(dir), shape: checkById('llm-accounts-shape').check(dir) }));
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+      fs.rmSync(fake, { recursive: true, force: true });
+    }
+  };
+  const warned = inFakeHome((h) => ({
+    claude: {
+      onDefault: { credentialStore: { claude: path.join(h, '.claude') } },
+      onPrivate: { credentialStore: { claude: path.join(h, 'private-login') } },
+    },
+    openai: { onCodex: { credentialStore: { codex: path.join(h, '.codex') } } },
+  }));
+  assert.equal(warned.row.passed, true, 'a warn row never fails');
+  assert.match(warned.row.message, /^warning: /);
+  assert.match(warned.row.message, /runner\.llmAccounts\.claude\.onDefault\.credentialStore\.claude/);
+  assert.match(warned.row.message, /runner\.llmAccounts\.openai\.onCodex\.credentialStore\.codex/);
+  assert.doesNotMatch(warned.row.message, /onPrivate/);
+  assert.equal(warned.shape.passed, true, 'the pool with a default-home store still resolves: nothing refuses it');
+
+  const linked = inFakeHome((h) => ({ claude: { viaLink: { credentialStore: { claude: path.join(h, 'linked-login') } } } }));
+  assert.match(linked.row.message, /^warning: .*viaLink/);
+
+  const clean = inFakeHome((h) => ({ claude: { onPrivate: { credentialStore: { claude: path.join(h, 'private-login') } } } }));
+  assert.equal(clean.row.passed, true);
+  assert.doesNotMatch(clean.row.message, /warning/);
+});
+
 test('tier-fallback passes the list of the standard, passes a served list of all six tiers, and warns about a family the walk would skip', () => {
   // The standard declares the walk order of every tier.
   const none = runCheck('tier-fallback', {});
