@@ -4,6 +4,12 @@
 use fgos_observe::record::registry::{load_registry, EmbeddedDeclaration, Registry, RegistryError};
 use std::path::Path;
 
+/// The kinds and attrs the owner-question record source projects, declared by `fgos-questions`.
+const QUESTIONS_DECLARATION: EmbeddedDeclaration = EmbeddedDeclaration {
+    label: "fgos-questions",
+    json: fgos_questions::record::OBSERVE_KINDS,
+};
+
 /// Every declaration a crate embeds with `include_str!`. Each owner adds its own entry next to its kinds.
 pub fn embedded_declarations() -> Vec<EmbeddedDeclaration> {
     vec![
@@ -12,6 +18,7 @@ pub fn embedded_declarations() -> Vec<EmbeddedDeclaration> {
         fgos_observe::sources::transcript_records::TRANSCRIPT_DECLARATION,
         fgos_run_result::RUN_DECLARATION,
         super::observe_sources::SOURCES_DECLARATION,
+        QUESTIONS_DECLARATION,
     ]
 }
 
@@ -39,5 +46,7 @@ mod tests {
             .kind(fgos_observe::friction::RECORDED_KIND)
             .is_some());
         assert!(registry.has_subject_kind("work"));
+        assert!(registry.has_subject_kind("question"));
+        assert!(registry.kind("fgos.question.answered").is_some());
     }
 }

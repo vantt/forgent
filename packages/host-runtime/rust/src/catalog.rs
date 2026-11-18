@@ -322,6 +322,28 @@ pub const CATALOG: &[OperationDescriptor] = &[
         streaming_mode: StreamingMode::None,
     },
     OperationDescriptor {
+        operation_id: OperationId::from_static("questions.read"),
+        owning_component_id: Cow::Borrowed("questions"),
+        request_contract: ContractRef::from_static("questions.read.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("questions.read.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("questions.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("questions.write"),
+        owning_component_id: Cow::Borrowed("questions"),
+        request_contract: ContractRef::from_static("questions.write.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("questions.write.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("questions.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
         operation_id: OperationId::from_static("doctor.run"),
         owning_component_id: Cow::Borrowed("packaging"),
         request_contract: ContractRef::from_static("doctor.run.request", "1.0.0"),
@@ -419,7 +441,7 @@ mod tests {
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
         // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run and the init run, the dispatch decide and explain, and the agents list.
-        assert_eq!(CATALOG.len(), 36);
+        assert_eq!(CATALOG.len(), 38);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -457,6 +479,8 @@ mod tests {
         assert!(ids.contains(&"dispatch.decide"));
         assert!(ids.contains(&"dispatch.explain"));
         assert!(ids.contains(&"agents.list"));
+        assert!(ids.contains(&"questions.read"));
+        assert!(ids.contains(&"questions.write"));
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips

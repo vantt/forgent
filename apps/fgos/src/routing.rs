@@ -92,7 +92,20 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("dispatch", wiring::dispatch_decide::AVAILABLE_SUBCOMMANDS),
     ("agents", wiring::agents::AVAILABLE_SUBCOMMANDS),
     ("worktree", wiring::worktree::AVAILABLE_SUBCOMMANDS),
+    ("questions", wiring::questions::AVAILABLE_SUBCOMMANDS),
 ];
+
+/// The sub-command a verb runs when the call names none, by selector.
+pub static DEFAULT_SUBCOMMANDS: &[(&str, &str)] =
+    &[("questions", wiring::questions::DEFAULT_SUBCOMMAND)];
+
+/// The sub-command `selector` runs when the call names none.
+pub fn default_subcommand(selector: &str) -> Option<&'static str> {
+    DEFAULT_SUBCOMMANDS
+        .iter()
+        .find(|(name, _)| *name == selector)
+        .map(|(_, sub)| *sub)
+}
 
 /// The operation a `legacy-cli` selector runs for the first positionals it serves natively. The route table gives
 /// one only to a verb that is native whole, so a verb served in part names its operation here: `dispatch` serves
@@ -361,14 +374,17 @@ pub fn check_call(
                     record: !NODE_SUB_VERB_WORDING.contains(&name),
                 })
             }
-            None => {
-                return Err(CallFault {
-                    class: ARG_PARSE,
-                    message: sub_verb_refusal(name, available, None),
-                    sub: None,
-                    record: !NODE_SUB_VERB_WORDING.contains(&name),
-                })
-            }
+            None => match default_subcommand(selector) {
+                Some(sub) => served_sub = Some(sub.to_owned()),
+                None => {
+                    return Err(CallFault {
+                        class: ARG_PARSE,
+                        message: sub_verb_refusal(name, available, None),
+                        sub: None,
+                        record: !NODE_SUB_VERB_WORDING.contains(&name),
+                    })
+                }
+            },
         }
     }
     match unknown_flag(route, call) {
@@ -415,7 +431,9 @@ const GLOBAL_FLAGS: [&str; 3] = ["dir", "json", "help"];
 /// The first flag before a bare `--` that the route's registry projection does not list. The name is the whole
 /// token after `--`, as the shared parser reads it (`--dir=/x` is the flag `dir=/x`).
 fn unknown_flag(route: &CommandRouteDescriptor, call: &Call) -> Option<String> {
-    let sub = call.sub_word();
+    let sub = call
+        .sub_word()
+        .or_else(|| default_subcommand(&route.selector));
     let accepted: &Vec<String> = match (&route.subcommand_flags, &route.accepted_flags) {
         (Some(by_sub), _) => by_sub.get(sub?)?,
         (None, Some(flags)) => flags,

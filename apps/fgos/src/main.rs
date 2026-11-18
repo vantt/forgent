@@ -37,6 +37,14 @@ fn native_invocation_reads_stdin(op_id: &str, cli_args: &[std::ffi::OsString]) -
             _ => false,
         },
         "observe.friction" => cli_args.iter().any(|a| a == "--detail-stdin"),
+        // `questions ask --input -` carries the question on stdin.
+        "questions.write" => {
+            use fgos_host_runtime::cli_args::{FlagScalar, FlagValue};
+            let call = Call::new(cli_args);
+            call.sub_word() == Some("ask")
+                && call.parsed().flag("input")
+                    == Some(&FlagValue::One(FlagScalar::Str("-".to_owned())))
+        }
         _ => false,
     }
 }
@@ -146,6 +154,8 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::events::STATUS_DESCRIPTOR,
     wiring::events::SEAL_DESCRIPTOR,
     wiring::events::EXPORT_DESCRIPTOR,
+    wiring::questions::READ_DESCRIPTOR,
+    wiring::questions::WRITE_DESCRIPTOR,
     wiring::git_incidents::STATUS_DESCRIPTOR,
     wiring::git_incidents::RECOVER_DESCRIPTOR,
     wiring::lock_status::DESCRIPTOR,
@@ -367,6 +377,14 @@ fn main() {
         service.register_provider(Arc::new(wiring::events::EventsProvider::for_descriptor(
             descriptor,
         )));
+    }
+    for descriptor in [
+        wiring::questions::READ_DESCRIPTOR,
+        wiring::questions::WRITE_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(
+            wiring::questions::QuestionsProvider::for_descriptor(descriptor),
+        ));
     }
     for descriptor in [
         wiring::git_incidents::STATUS_DESCRIPTOR,

@@ -2332,7 +2332,7 @@
           ]
         },
         "mint": {
-          "description": "A new id that travels between machines (docs/platform/identity/spec.md, section 4a). `work` gives `tsk-<10 base32>` and `backlog` gives `p-<10 base32>`, random and written nowhere. `d-adr` gives the next `D-ADR####` and `decision-file` the next `####`, claimed from the counter ref `refs/fgos/seq/<kind>` on the project's origin (the repository's own ref without one) so two machines never get the same number; run it in the repository. Prints {kind, id, number?}. A claim needs the network: exit 65 [sequence-unreachable] claims nothing, [sequence-contended] after 5 refused claims in a row. `--release <number>` gives a sequence number back, only while it is still the counter's tip.",
+          "description": "A new id that travels between machines (docs/platform/identity/spec.md, section 4a). `work` gives `tsk-<10 base32>`, `backlog` gives `p-<10 base32>` and `question` gives a `q-` id for an owner question, random and written nowhere. `d-adr` gives the next `D-ADR####` and `decision-file` the next `####`, claimed from the counter ref `refs/fgos/seq/<kind>` on the project's origin (the repository's own ref without one) so two machines never get the same number; run it in the repository. Prints {kind, id, number?}. A claim needs the network: exit 65 [sequence-unreachable] claims nothing, [sequence-contended] after 5 refused claims in a row. `--release <number>` gives a sequence number back, only while it is still the counter's tip.",
           "parameters": {
             "type": "object",
             "properties": {
@@ -2343,7 +2343,8 @@
                   "work",
                   "backlog",
                   "d-adr",
-                  "decision-file"
+                  "decision-file",
+                  "question"
                 ]
               },
               "release": {
@@ -3020,29 +3021,193 @@
     },
     {
       "name": "questions",
-      "invoke": "fgos questions --open",
-      "description": "Read-only: every open owner question across the three stage places in one batch, grouped by topic. A discussion question (docs/discussions/<topic>/QUESTIONS.md), a draft plan's owner-questions section, and an open Workflow gate each carry {topic, stage: discussion|plan|execution, ref, question, answerDoor}; answerDoor is the command or place that answers it in its own stage. Default output is a text batch; `--json` returns the items. Never writes.",
+      "invoke": "fgos questions [list|show|ask|answer|ack|cancel]",
+      "description": "The owner-question store: what waits for the owner, asked, answered, acknowledged or cancelled through four events of one Event Store stream. A call with no sub-command is `list`. Native Rust host command.",
       "parameters": {
         "type": "object",
         "properties": {
-          "open": {
-            "type": "boolean",
-            "description": "List the open questions (the only mode today)."
-          },
-          "json": {
-            "type": "boolean",
-            "description": "Return the items as JSON instead of the text batch."
+          "sub": {
+            "type": "string",
+            "description": "Sub-verb (positional); its own flags are under subcommands.<sub>.parameters.",
+            "enum": [
+              "list",
+              "show",
+              "ask",
+              "answer",
+              "ack",
+              "cancel"
+            ]
           }
         },
+        "positional": [
+          "sub"
+        ],
         "required": [
-          "open"
+          "sub"
         ]
       },
       "examples": [
-        "fgos questions --open",
-        "fgos questions --open --json"
+        "fgos questions",
+        "fgos questions show q-abc",
+        "fgos questions answer q-abc --option A"
       ],
-      "touchesState": false,
+      "subcommands": {
+        "list": {
+          "description": "The open questions, one line each (id, headline, recommended option, what it blocks, age, answer command) behind a \"needs you: N\" count, then the open Workflow gates and `fgos ask` items. When the Work layer cannot be read the list says `work-sources: unavailable <reason>` and still exits 0. The default sub-command.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "all": {
+                "type": "boolean",
+                "description": "Every question, whatever its state."
+              },
+              "answered": {
+                "type": "boolean",
+                "description": "Only the answered questions that were not yet acknowledged."
+              }
+            },
+            "required": []
+          },
+          "examples": [
+            "fgos questions list",
+            "fgos questions list --all --json"
+          ]
+        },
+        "show": {
+          "description": "One question: the five parts, the cost of each option, the recommended mark, the asker, the state and any conflicting answer.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The question id (positional)."
+              }
+            },
+            "positional": [
+              "id"
+            ],
+            "required": [
+              "id"
+            ]
+          },
+          "examples": [
+            "fgos questions show q-abc"
+          ]
+        },
+        "ask": {
+          "description": "Ask the owner one question: checks the shape and the ref, takes the asker from Identity, mints the id and appends `questions.asked`; prints the id. The input is the JSON of questions-input.v1.json from a file or stdin.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "type": "string",
+                "description": "The question as JSON from this file, or \"-\" for stdin."
+              },
+              "ref": {
+                "type": "string",
+                "description": "Where it comes from: discussion:<topic>#Q<n>, plan:<dir>[#phase-<nn>] or case:<runId>[#<gate>]; replaces the `ref` of the input."
+              },
+              "migrated": {
+                "type": "boolean",
+                "description": "The question moved here from an older place."
+              },
+              "supersedes": {
+                "type": "string",
+                "description": "The id of an open or answered question this one replaces; it is cancelled with reason superseded:<new id>."
+              }
+            },
+            "required": [
+              "input"
+            ]
+          },
+          "examples": [
+            "fgos questions ask --input question.json --ref plan:261118-1159-owner-question-store",
+            "fgos questions ask --input - < question.json"
+          ]
+        },
+        "answer": {
+          "description": "Answer a question once, as the owner (refused when an agent CLI is among the caller's process ancestors, outside the secretary route).",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The question id (positional)."
+              },
+              "option": {
+                "type": "string",
+                "description": "The label of the chosen option."
+              },
+              "text": {
+                "type": "string",
+                "description": "A free-text answer, alone or with --option."
+              },
+              "source": {
+                "type": "string",
+                "description": "The route of the answer: secretary or gateway:<caller>; kept with the answer."
+              }
+            },
+            "positional": [
+              "id"
+            ],
+            "required": [
+              "id"
+            ]
+          },
+          "examples": [
+            "fgos questions answer q-abc --option A",
+            "fgos questions answer q-abc --text \"yes, but only for docs\""
+          ]
+        },
+        "ack": {
+          "description": "The asker confirms it received the answer.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The question id (positional)."
+              }
+            },
+            "positional": [
+              "id"
+            ],
+            "required": [
+              "id"
+            ]
+          },
+          "examples": [
+            "fgos questions ack q-abc"
+          ]
+        },
+        "cancel": {
+          "description": "The asker withdraws an open or answered question.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The question id (positional)."
+              },
+              "reason": {
+                "type": "string",
+                "description": "Why it is withdrawn."
+              }
+            },
+            "positional": [
+              "id"
+            ],
+            "required": [
+              "id",
+              "reason"
+            ]
+          },
+          "examples": [
+            "fgos questions cancel q-abc --reason \"no longer blocks anything\""
+          ]
+        }
+      },
+      "touchesState": true,
       "externalEffect": false,
       "paginated": false,
       "deprecated": null

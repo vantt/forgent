@@ -26,6 +26,7 @@ fgos-execution = { path = "../../packages/execution/rust" }
 fgos-mailbox = { path = "../../packages/mailbox/rust/store" }
 fgos-mailbox-core = { path = "../../packages/mailbox/rust/core" }
 fgos-durable-file = { path = "../../packages/durable-file/rust" }
+fgos-questions = { path = "../../packages/questions/rust" }
 # The YAML door: the skill guard reads a skill file's frontmatter version through it.
 fgos-yaml-doc = { path = "../../packages/yaml-doc/rust" }
 tokio = { workspace = true }
