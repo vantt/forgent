@@ -1,6 +1,7 @@
 {
   "name": "plan-no-progress",
   "requires": ["fgos.plan.status", "fgos.plan.activity", "fgos.run.attempt"],
+  "window": "own",
   "query": {
     "kind": ["fgos.plan.status"],
     "where": [
@@ -11,10 +12,11 @@
       { "field": "fgos.plan.to", "op": "eq", "value": "running" }
     ],
     "without": [
-      { "kind": ["fgos.plan.activity", "fgos.run.attempt"], "on": "plan", "within": "60m" }
+      { "kind": ["fgos.plan.activity", "fgos.run.attempt"], "on": "plan", "within": { "param": "minutes", "unit": "m" } }
     ],
     "by": ["subject.id"],
     "agg": ["count", "max:ts"]
   },
+  "params": { "minutes": { "configKey": "dispatch.attention.planNoProgressMinutes" } },
   "row": { "kind": "plan-no-progress", "reason": "a running plan has had no commit, board entry or run attempt within the no-progress window", "nextCommand": "fgos supervisor plans" }
 }

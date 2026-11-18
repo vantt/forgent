@@ -336,6 +336,34 @@ fn a_config_backed_parameter_is_resolved_by_the_composition_root_and_an_unset_ke
 }
 
 #[test]
+fn a_config_backed_parameter_sets_an_anti_join_span_and_an_unset_key_is_unmeasured() {
+    let root = project("config-within", true);
+    let defs = root.join("definitions");
+    std::fs::create_dir_all(&defs).unwrap();
+    write_definition(&defs, "plan-no-progress", |d| {
+        d["query"]["without"][0]["within"] = json!({ "param": "minutes", "unit": "m" });
+        d["params"] =
+            json!({ "minutes": { "configKey": "dispatch.attention.planNoProgressMinutes" } });
+    });
+    let answer_with = |config: Vec<(&'static str, f64)>| {
+        let all = query(
+            &root,
+            &["--def", defs.to_str().unwrap(), "--now", NOW],
+            &TestEnvironment { config },
+        );
+        answer(&all, "plan-no-progress").clone()
+    };
+    let key = "dispatch.attention.planNoProgressMinutes";
+    // 60 minutes reproduces the literal `60m` answer; a span long enough to reach B's activity clears it.
+    assert_eq!(groups(&answer_with(vec![(key, 60.0)]), "subject.id"), ["B"]);
+    assert!(groups(&answer_with(vec![(key, 100_000.0)]), "subject.id").is_empty());
+    assert_eq!(
+        answer_with(vec![])["unmeasured"],
+        "config-unset: dispatch.attention.planNoProgressMinutes"
+    );
+}
+
+#[test]
 fn a_definition_that_owns_its_window_keeps_its_bounds_when_the_caller_windows_the_run() {
     let text = |name: &str, window: &str| {
         format!(

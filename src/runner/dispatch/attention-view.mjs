@@ -28,20 +28,20 @@ function settledAttention(l, terminal) {
 
 // Rows of the named detections (`core/attention/definitions`), as the host's one `metrics query --def` call answers
 // them. The definition file owns the kind, the reason and the next command (its `row` template); the group names the
-// subject and `max:ts` the instant. A definition the host could not measure, or that errored, yields no row and is
-// listed in `unmeasured` so a silent gap never reads as "nothing needs a person".
-function definitionRows(answer, sinceMs, nowMs) {
+// subject. A row is a detection made now, so its instant is the observation, never the record time it grouped: a plan
+// that went running before the window and has stalled since is late now (a `window: own` definition reaches back past
+// `since` on purpose). A definition the host could not measure, or that errored, yields no row and is listed in
+// `unmeasured` so a silent gap never reads as "nothing needs a person".
+function definitionRows(answer, nowMs) {
   const rows = [], unmeasured = [];
   for (const def of answer?.definitions ?? []) {
     if (def.unmeasured || def.error) { unmeasured.push({ name: def.name, reason: def.unmeasured ?? def.error }); continue; }
     if (!def.row) continue;
     for (const r of def.rows ?? []) {
       if (r.insufficient) continue;
-      const subject = r.group?.['origin.host'] ?? r.group?.['subject.id'] ?? def.name;
-      const atMs = toMs(r.aggs?.['max:ts']) ?? nowMs;
-      if (atMs < sinceMs) continue;
+      const subject = r.group?.['subject.id'] ?? def.name;
       const { kind, reason, nextCommand } = def.row;
-      rows.push({ subject, assignmentId: null, worktree: null, kind, reason, nextCommand, line: `${kind} ${subject} ${reason} -> ${nextCommand}`, atMs });
+      rows.push({ subject, assignmentId: null, worktree: null, kind, reason, nextCommand, line: `${kind} ${subject} ${reason} -> ${nextCommand}`, atMs: nowMs });
     }
   }
   return { rows, unmeasured };
@@ -101,7 +101,7 @@ export function attentionView(root, { since }, { now = () => new Date().toISOStr
     const worktree = l.run.cwd ? workspace(l.run.cwd).root : null;
     rows.push({ runId: l.run.runId, subject: l.run.runId, assignmentId: l.assignmentId ?? null, worktree, kind: found.kind, reason: found.reason, nextCommand, line: `${found.kind} ${l.run.runId} ${worktree ?? '-'} ${found.reason} -> ${nextCommand}`, atMs });
   }
-  const detected = definitions ? definitionRows(definitions({ since: new Date(sinceMs).toISOString(), now: observedAt }), sinceMs, nowMs) : { rows: [], unmeasured: [] };
+  const detected = definitions ? definitionRows(definitions({ since: new Date(sinceMs).toISOString(), now: observedAt }), nowMs) : { rows: [], unmeasured: [] };
   rows.push(...detected.rows);
   rows.sort((a, b) => a.atMs - b.atMs || a.subject.localeCompare(b.subject));
   const out = rows.map(({ atMs, ...row }) => row);

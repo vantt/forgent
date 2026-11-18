@@ -358,8 +358,60 @@ pub enum Anchor {
     After,
 }
 
+/// The span of an anti-join: a literal duration (`"30m"`), or `{"param": "<name>", "unit": "m"}`, whose amount is the
+/// caller's parameter (like `Factor::Param`) counted in `unit` (`s`, `m`, `h`, `d` or `w`). A parameter amount is a
+/// finite number at or above zero; a fraction is rounded to the millisecond.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(untagged)]
+pub enum Within {
+    Literal(String),
+    Param { param: String, unit: String },
+}
+
+impl Within {
+    /// How the span reads in an error: the literal, or `{param}<unit>`.
+    pub fn label(&self) -> String {
+        match self {
+            Within::Literal(text) => text.clone(),
+            Within::Param { param, unit } => format!("{{{param}}}{unit}"),
+        }
+    }
+}
+
+impl From<&str> for Within {
+    fn from(text: &str) -> Self {
+        Within::Literal(text.to_owned())
+    }
+}
+
+impl<'de> Deserialize<'de> for Within {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        use serde::de::Error;
+        #[derive(Deserialize)]
+        #[serde(deny_unknown_fields)]
+        struct ParamRef {
+            param: String,
+            unit: String,
+        }
+        let value = serde_json::Value::deserialize(d)?;
+        if let Some(text) = value.as_str() {
+            return Ok(Within::Literal(text.to_owned()));
+        }
+        serde_json::from_value::<ParamRef>(value)
+            .map(|p| Within::Param {
+                param: p.param,
+                unit: p.unit,
+            })
+            .map_err(|e| {
+                D::Error::custom(format!(
+                    "within is a duration or {{\"param\": \"<name>\", \"unit\": \"m\"}}: {e}"
+                ))
+            })
+    }
+}
+
 /// An anti-join: drop a record when a record of `kind` matches `where`, shares `ref <on>:<id>` (when `on` is set),
-/// and falls inside the `within` window.
+/// and falls inside the `within` window (see `Within`).
 ///
 /// With `latest`, only the newest record of `kind` (sharing the ref, when `on` is set) from `within` before the
 /// record's `ts` up to that `ts` is looked at, and the record is dropped when that one matches `where`. It reads the
@@ -374,7 +426,7 @@ pub struct Without {
     pub where_: Vec<Filter>,
     #[serde(default)]
     pub on: Option<String>,
-    pub within: String,
+    pub within: Within,
     #[serde(default)]
     pub anchor: Anchor,
     #[serde(default)]

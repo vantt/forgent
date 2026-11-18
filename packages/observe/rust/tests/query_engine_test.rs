@@ -550,6 +550,45 @@ fn without_drops_a_record_that_has_a_match_in_the_window_from_now_or_from_the_re
     assert!(ask(&q("now", "45m")).rows.is_empty());
 }
 
+#[test]
+fn within_can_be_a_parameter_counted_in_a_unit_and_round_trips() {
+    let q = query(
+        r#"{"kind":["fgos.supervisor.wake"],"by":["fgos.supervisor.trigger"],
+            "without":[{"kind":["fgos.watcher.tick"],"where":[{"field":"fgos.plans.running","op":"gt","value":0}],
+                        "within":{"param":"minutes","unit":"m"}}]}"#,
+    );
+    let back: Query = serde_json::from_value(serde_json::to_value(&q).unwrap()).unwrap();
+    assert_eq!(back, q, "the param form serializes back to itself");
+    let wakes = |minutes: f64| ask_at(&q, NOW, &[("minutes", minutes)]).unwrap().rows.len();
+    // The same answers as the literal look-backs from 12:00: 5 minutes sees no busy tick, 45 reaches 11:20.
+    assert_eq!(wakes(5.0), 2);
+    assert_eq!(wakes(45.0), 0);
+    assert_eq!(
+        ask_at(&q, NOW, &[]),
+        Err(QueryError::MissingParam {
+            name: "minutes".into()
+        })
+    );
+    assert!(matches!(
+        ask_at(&q, NOW, &[("minutes", -1.0)]),
+        Err(QueryError::Invalid { .. })
+    ));
+    let bad_unit = query(
+        r#"{"kind":["fgos.supervisor.wake"],"without":[{"kind":["fgos.watcher.tick"],"within":{"param":"minutes","unit":"y"}}]}"#,
+    );
+    assert!(matches!(
+        ask_at(&bad_unit, NOW, &[("minutes", 5.0)]),
+        Err(QueryError::Invalid { .. })
+    ));
+    assert!(
+        serde_json::from_str::<Query>(
+            r#"{"kind":["k"],"without":[{"kind":["k"],"within":{"param":"minutes"}}]}"#
+        )
+        .is_err(),
+        "a param span names its unit"
+    );
+}
+
 /// Heads with a role: a live lead head and a live worker head. The fixture's h3 is live without a role.
 const ROLE_HEADS: &[&str] = &[
     r#"{"v":2,"id":"head-r1","kind":"fgos.head.state","ts":"2026-11-18T11:00:00Z","subject":{"kind":"head","id":"h4"},"attrs":{"fgos.head.state":"live","fgos.head.role":"head:lead-ops"},"basis":"observed","origin":{"source":"fixture"}}"#,

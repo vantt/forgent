@@ -5,6 +5,8 @@
 //! it brings in are walked on their own, so a transition is recorded once, at the commit that made it. A root commit
 //! has nothing to compare with and records nothing.
 //!
+//! A record's subject is the plan, `plan:plans/<dir>`, the id a run attempt's plan ref carries.
+//!
 //! `fgos.plan.status` covers only plans under the plan contract (`contract: plan-v1` in the commit's front matter),
 //! and only the contract's values (`status` draft|ready|running|done|withdrawn, `priority` P0..P3). A plan created
 //! at a status, or brought under the contract by the commit, records a transition from none: attr `fgos.plan.from`
@@ -139,10 +141,16 @@ fn origin() -> Origin {
     }
 }
 
+/// A plan's id is its repository directory, `plans/<dir>`: the form a run attempt's plan ref carries, so one plan is
+/// one id on every kind.
+fn plan_id(dir: &str) -> String {
+    format!("plans/{dir}")
+}
+
 fn plan_subject(dir: &str) -> SubjectRef {
     SubjectRef {
         kind: "plan".to_owned(),
-        id: dir.to_owned(),
+        id: plan_id(dir),
     }
 }
 
@@ -244,7 +252,7 @@ pub fn status_transitions(
         }
         out.push(record(
             format!(
-                "plan-status:{dir}:{change}:{}:{to}:{author_ms}",
+                "plan-status:plans/{dir}:{change}:{}:{to}:{author_ms}",
                 from.unwrap_or("")
             ),
             PLAN_STATUS_KIND,
@@ -361,7 +369,7 @@ fn commit_records(
             }
             for (dir, plan_file_changed) in dirs {
                 out.push(record(
-                    format!("plan-activity:commit:{dir}:{sha}"),
+                    format!("plan-activity:commit:plans/{dir}:{sha}"),
                     PLAN_ACTIVITY_KIND,
                     ts.clone(),
                     &dir,
@@ -558,7 +566,7 @@ fn board_log_records(root: &Path, since: Option<i64>) -> Vec<Record> {
             let digest = Sha256::digest(line.as_bytes());
             let line_id: String = digest.iter().take(4).map(|b| format!("{b:02x}")).collect();
             out.push(record(
-                format!("plan-activity:board-log:{dir}:{stamp}:{line_id}"),
+                format!("plan-activity:board-log:plans/{dir}:{stamp}:{line_id}"),
                 PLAN_ACTIVITY_KIND,
                 ts.clone(),
                 dir,

@@ -135,7 +135,7 @@ fn a_plan_going_draft_ready_running_done_with_one_priority_change_gives_four_tra
     assert!(records
         .iter()
         .filter(|r| r.kind == "fgos.plan.status")
-        .all(|r| r.subject.id == dir));
+        .all(|r| r.subject.id == format!("plans/{dir}")));
     assert_eq!(
         status_triples(&records),
         [
@@ -168,6 +168,11 @@ fn a_plan_going_draft_ready_running_done_with_one_priority_change_gives_four_tra
     ids.sort();
     ids_again.sort();
     assert_eq!(ids, ids_again, "ids are deterministic");
+    let status_id = format!("plan-status:plans/{dir}:");
+    assert!(records
+        .iter()
+        .filter(|r| r.kind == "fgos.plan.status")
+        .all(|r| r.id.starts_with(&status_id)));
     let _ = std::fs::remove_dir_all(&repo);
 }
 
@@ -204,7 +209,7 @@ fn only_plans_under_the_contract_with_contract_values_record_status() {
     assert_eq!(
         records
             .iter()
-            .filter(|r| r.kind == "fgos.plan.activity" && r.subject.id == legacy)
+            .filter(|r| r.kind == "fgos.plan.activity" && r.subject.id == format!("plans/{legacy}"))
             .count(),
         2,
         "a legacy plan still has activity"
@@ -298,7 +303,7 @@ fn the_board_log_lines_naming_an_existing_plan_dir_are_activity() {
         .filter(|r| attr(r, "fgos.plan.activity.source") == Some("board-log"))
         .collect();
     assert_eq!(logged.len(), 1);
-    assert_eq!(logged[0].subject.id, dir);
+    assert_eq!(logged[0].subject.id, format!("plans/{dir}"));
     assert_eq!(attr(logged[0], "fgos.board.lane"), Some("OPS"));
     let _ = std::fs::remove_dir_all(&repo);
 }
