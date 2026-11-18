@@ -44,7 +44,7 @@ fgOS coordinates the plans of the project it runs on with no person sitting by. 
 ### Owns
 - The portfolio reader: plans as read from frontmatter on the trunk tip (status, priority, blockedBy, footprint, source). Plan frontmatter itself is owned by the plan contract.
 - The event queue and its `handled` flag, over the Event Store.
-- The watcher tick, its definitions (`core/watcher/definitions/`) and pace rows (`core/watcher/pace/`).
+- The watcher tick, its definitions (planned: core/watcher/definitions/) and pace rows (planned: core/watcher/pace/).
 - The wake door and the supervisor verbs.
 - The discussion source (`discussion: <state>` marker, emitting `fgos.discussion.status`).
 - The landing use case (`fgos land`), including the footprint bound and the generated-file regeneration.
