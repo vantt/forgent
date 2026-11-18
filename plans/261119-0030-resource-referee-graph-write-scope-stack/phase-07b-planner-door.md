@@ -14,10 +14,11 @@ the verdict. The rules it applies are its own data, not the referee's. It runs b
 
 ## Files it may write
 
-`apps/fgos/src/**` (one small hunk in `main.rs`, the adapter in its own module), `packages/host-runtime/contracts/*`, `packages/supervision/contracts/plan-referee-policy.v1.json`, `src/cli/command-registry.mjs` (the descriptions of the Work verbs whose meaning changes, and the new verb), and the verb-table test files above. The mutation census is not touched.
+`apps/fgos/Cargo.toml` (edges to `supervision`, `write-scope`, `graph` and `resource-referee`, workspace crates only) and `Cargo.lock` (regenerated once for those edges), `apps/fgos/src/**` (one small hunk in `main.rs`, the adapter in its own module), `packages/host-runtime/contracts/*`, `packages/supervision/contracts/plan-referee-policy.v1.json`, `src/cli/command-registry.mjs` (the descriptions of the Work verbs whose meaning changes, and the new verb), and the verb-table test files above. The mutation census is not touched.
 
 ## Steps
 
+0. Add the four path dependencies to `apps/fgos/Cargo.toml` and regenerate `Cargo.lock`; no external crate is added. Run `cargo build -p fgos --locked` afterwards.
 1. Write the one shared input reader of decision 23 (open without following symlinks, regular file only, size cap, content-free errors) and apply it to the plan directory, `plan.md`, units files and policy files.
 2. Write this repository's plan policy as data beside `plan-vocabulary.v1.json`: the floor plus declared waves valid, hot files alone in their wave (the list of hot files is data in this file), maximum wave width. The plan contract text is the source of every rule; there is no phase size rule because the table has no size column. Also write the shipped default policy: structural only, no hot-file list.
 3. Add the verb (`--plan <dir>` reads the phase table through the portfolio reader; `--units <file.json>` takes the neutral shape; `--policy <file>` is explicit and replaces the default). A footprint entry that does not canonicalize is refused naming the node and the entry. The verdict echoes the policy path and sha256. Output through the standard envelope; exit non-zero on `reject`, zero with the findings otherwise. `--help` names who should call it and when.
