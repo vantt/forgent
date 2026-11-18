@@ -375,3 +375,69 @@ fn catch_up_interrupted_before_its_cas_settles_as_not_moved_and_a_retry_succeeds
     catch_up(&f, &f.request.target, "retry").unwrap();
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), tip);
 }
+
+/// Moves the remote-tracking ref at one production boundary, as a fetch landing there would.
+struct FetchAt {
+    step: &'static str,
+    main: PathBuf,
+    moved_to: String,
+}
+impl wal::FileSystem for FetchAt {
+    fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+        if step == self.step {
+            git(
+                &self.main,
+                &["update-ref", "refs/remotes/origin/trunk", &self.moved_to],
+            );
+        }
+        Ok(())
+    }
+}
+
+#[test]
+fn catch_up_ignores_a_remote_tracking_ref_moved_after_the_swap() {
+    let f = Fixture::new();
+    let tip = commit_ahead(&f, "ahead", "c");
+    let newer = commit_ahead(&f, "newer", "d");
+    git(&f.main, &["update-ref", "refs/remotes/origin/trunk", &tip]);
+    let fetch = FetchAt {
+        step: "catch-up-before-read-tree",
+        main: f.main.clone(),
+        moved_to: newer.clone(),
+    };
+    catch_up_with(&f, &f.request.target, "cut", &fetch).unwrap();
+    assert_eq!(git(&f.main, &["rev-parse", "refs/heads/trunk"]), tip);
+    assert_eq!(
+        git(&f.main, &["rev-parse", "refs/remotes/origin/trunk"]),
+        newer
+    );
+}
+
+#[test]
+fn recovery_deletes_the_temporary_push_branch_a_crash_after_the_push_left() {
+    let f = Fixture::new();
+    let (grant, bare) = remote(&f);
+    let s = prepare(&f, "cut");
+    let err = f
+        .driver
+        .push_land_candidate(
+            &f.repo,
+            &s,
+            &grant,
+            &name("refs/heads/trunk"),
+            "fixture",
+            &StopAt("land-push-after-transfer"),
+        )
+        .unwrap_err();
+    let _ = (err, bare);
+    let temp = "refs/heads/fgos-land-push-cut";
+    assert!(!git(&f.main, &["for-each-ref", temp]).is_empty());
+    drop(s);
+    let recovered = recover(&f);
+    assert_eq!(
+        recovered["recovered"],
+        serde_json::json!(["cut"]),
+        "{recovered}"
+    );
+    assert_eq!(git(&f.main, &["for-each-ref", temp]), "");
+}
