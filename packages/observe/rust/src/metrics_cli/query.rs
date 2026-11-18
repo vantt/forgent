@@ -8,7 +8,8 @@
 //! A condition is `field=value`, `field!=value`, `field=a|b` (in), `field<n`, `field>n` or `field?` (exists), or
 //! the JSON object a definition file holds. `--having`, `--join` and `--without` take that JSON object.
 //! `--def <file|dir>` runs the named definitions in it and returns every definition's rows in one answer; a
-//! definition takes no other query flag. `--now <rfc3339>` fixes the clock.
+//! definition takes no other query flag but `--since`/`--until`, which window every definition it runs.
+//! `--now <rfc3339>` fixes the clock.
 
 use super::{parse_flags, RecordEnvironment};
 use crate::contract::{ObserveRequest, RecordSource, SourceError, Window};
@@ -288,7 +289,7 @@ pub fn dispatch_query(req: &ObserveRequest, env: &dyn RecordEnvironment) -> Resu
     if !definitions.is_empty() {
         let other = VALUE_FLAGS
             .iter()
-            .filter(|f| !matches!(**f, "--def" | "--now"))
+            .filter(|f| !matches!(**f, "--def" | "--now" | "--since" | "--until"))
             .find(|f| flags.value(f).is_some());
         if let Some(other) = other {
             return Err(format!(
@@ -314,7 +315,8 @@ pub fn dispatch_query(req: &ObserveRequest, env: &dyn RecordEnvironment) -> Resu
 
     if !definitions.is_empty() {
         let paths: Vec<&Path> = definitions.iter().map(Path::new).collect();
-        let loaded = definition::load(&paths).map_err(|e| format!("metrics query: {e}"))?;
+        let mut loaded = definition::load(&paths).map_err(|e| format!("metrics query: {e}"))?;
+        definition::window(&mut loaded, flags.value("--since"), flags.value("--until"));
         let resolver = Resolver {
             env,
             root: &req.root,

@@ -307,6 +307,33 @@ fn a_config_backed_parameter_is_resolved_by_the_composition_root_and_an_unset_ke
 }
 
 #[test]
+fn since_and_until_window_every_definition_run_and_a_relative_since_counts_from_now() {
+    let root = project("window", true);
+    let defs = root.join("definitions");
+    std::fs::create_dir_all(&defs).unwrap();
+    write_definition(&defs, "head-gone", |_| {});
+    write_definition(&defs, "owner-wait", |_| {});
+    let env = TestEnvironment { config: vec![] };
+    let run = |window: &[&str]| {
+        let mut args = vec!["--def", defs.to_str().unwrap(), "--now", NOW];
+        args.extend_from_slice(window);
+        let all = query(&root, &args, &env);
+        (
+            groups(answer(&all, "head-gone"), "subject.id"),
+            groups(answer(&all, "owner-wait"), "ref:question"),
+        )
+    };
+    // Unbounded, q1 is asked and answered; from 09:15 its asking falls outside, so only q2 pairs up.
+    assert_eq!(run(&[]).1, ["q1", "q2"]);
+    let absolute = run(&["--since", "2026-11-18T09:15:00Z"]);
+    assert_eq!(absolute, (vec!["h1".to_owned()], vec!["q2".to_owned()]));
+    assert_eq!(run(&["--since", "-165m"]), absolute);
+    // Until 10:30, q2's answer, h1's going and h3's return are outside: only q1 pairs up and h3 is the head gone.
+    let until = run(&["--until", "2026-11-18T10:30:00Z"]);
+    assert_eq!(until, (vec!["h3".to_owned()], vec!["q1".to_owned()]));
+}
+
+#[test]
 fn the_grammar_flags_run_one_query_and_a_definition_takes_no_other_flag() {
     let root = project("flags", true);
     let env = TestEnvironment { config: vec![] };

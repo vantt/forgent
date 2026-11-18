@@ -308,7 +308,7 @@ export const COMMAND_REGISTRY = [
             'min-sample': { type: 'string', description: 'A group with fewer records is reported insufficient.' },
             param: { type: 'string', description: 'name=value for a having parameter. Repeatable.' },
             query: { type: 'string', description: 'A whole query as JSON from this file, or "-" for stdin; flags add to it.' },
-            def: { type: 'string', description: 'A definition file, or a directory of *.query.json files. Repeatable; takes no other query flag but --now.' },
+            def: { type: 'string', description: 'A definition file, or a directory of *.query.json files. Repeatable; takes no other query flag but --now and --since/--until, which window every definition it runs.' },
             now: { type: 'string', description: 'RFC 3339 instant used as the clock.' },
           },
           required: [],

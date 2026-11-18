@@ -273,6 +273,18 @@ pub fn run_definition(def: &Definition, env: &Environment<'_>) -> DefinitionResu
     }
 }
 
+/// Sets the run's window on every definition: a given bound replaces the definition's own, an absent one leaves it.
+pub fn window(defs: &mut [Definition], since: Option<&str>, until: Option<&str>) {
+    for def in defs {
+        if let Some(since) = since {
+            def.query.since = Some(since.to_owned());
+        }
+        if let Some(until) = until {
+            def.query.until = Some(until.to_owned());
+        }
+    }
+}
+
 /// Every definition's answer, in the order given.
 pub fn run_definitions(defs: &[Definition], env: &Environment<'_>) -> Vec<DefinitionResult> {
     defs.iter().map(|d| run_definition(d, env)).collect()

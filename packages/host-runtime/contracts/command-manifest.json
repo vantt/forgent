@@ -531,7 +531,7 @@
               },
               "def": {
                 "type": "string",
-                "description": "A definition file, or a directory of *.query.json files. Repeatable; takes no other query flag but --now."
+                "description": "A definition file, or a directory of *.query.json files. Repeatable; takes no other query flag but --now and --since/--until, which window every definition it runs."
               },
               "now": {
                 "type": "string",
