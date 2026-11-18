@@ -408,7 +408,7 @@ fn the_claude_sessions_directory_follows_the_shared_config_dir_resolver() {
         claude_config_dir: config.map(|p| p.as_os_str().to_owned()),
         session_writer: Some(writer()),
         session_env: None,
-        head_attempt: false,
+        head_gate: None,
     };
 
     let with_config = env(Some(&dir.scratch().join("home")), Some(&custom));
@@ -428,8 +428,9 @@ fn the_claude_sessions_directory_follows_the_shared_config_dir_resolver() {
 }
 
 #[test]
-fn a_confined_head_whose_session_file_cannot_exist_takes_its_head_position_when_the_payload_names_its_writer(
+fn a_confined_head_whose_session_file_cannot_exist_is_the_gates_child_whose_payload_names_its_writer(
 ) {
+    use fgos_identity::resolve::HeadRef;
     use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
     let dir = TempFgos::new("head-finder-confined");
     let (_child, pid, hop) = claude_head();
@@ -439,16 +440,22 @@ fn a_confined_head_whose_session_file_cannot_exist_takes_its_head_position_when_
     std::fs::create_dir_all(config.join("sessions")).unwrap();
     let facts = facts(Adapter::Claude);
     let hook = hook_limits().hook;
-    let env = |head_attempt: bool| HookEnv {
+    let env = |head_gate: Option<HeadRef>| HookEnv {
         home: None,
         claude_config_dir: Some(config.as_os_str().to_owned()),
         session_writer: Some(writer()),
         session_env: Some(WRITER.to_string()),
-        head_attempt,
+        head_gate,
     };
     let own = format!(r#"{{"session_id":"{WRITER}"}}"#);
+    // The head is the gate's direct child: here the test process is the gate.
+    let me = record_of(std::process::id());
+    let gate = HeadRef {
+        pid: std::process::id(),
+        start_time: me.start_time.clone().unwrap(),
+    };
 
-    let confined = env(true);
+    let confined = env(Some(gate));
     let resolve = resolver_for(Adapter::Claude, &facts, &confined, &hook);
     let resolved = resolve(own.as_bytes(), &hop).unwrap();
     assert_eq!(resolved.writer, writer());
@@ -474,8 +481,23 @@ fn a_confined_head_whose_session_file_cannot_exist_takes_its_head_position_when_
         NoHead::WrongTopology
     );
 
+    // An agent nested under the head (a `claude -p` its tool started) inherits the head's environment, but its
+    // parent is not the gate: it is never taken for the head.
+    let tool_shell = spawn("/bin/sh", &["-c", "sleep 30; :"]);
+    let nested = child_of(tool_shell.0.id());
+    let under_tool = ancestry(
+        record_of(std::process::id()),
+        shell.to_str().unwrap(),
+        "/bin/sh",
+        Some(record_of(nested)),
+    );
+    assert_eq!(
+        resolve(own.as_bytes(), &under_tool).unwrap_err(),
+        NoHead::WrongTopology
+    );
+
     // Any other session with no session file has no head, as before.
-    let plain = env(false);
+    let plain = env(None);
     let resolve = resolver_for(Adapter::Claude, &facts, &plain, &hook);
     assert_eq!(
         resolve(own.as_bytes(), &hop).unwrap_err(),
@@ -493,7 +515,7 @@ fn a_codex_pi_or_omp_entry_resolves_its_writer_from_the_payload_and_its_head_at_
         claude_config_dir: None,
         session_writer: None,
         session_env: None,
-        head_attempt: false,
+        head_gate: None,
     };
     let child = spawn("sleep", &["30"]);
     let record = record_of(child.0.id());

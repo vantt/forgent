@@ -944,6 +944,80 @@ fn a_bind_from_outside_the_head_of_an_unregistered_attempt_with_an_attempt_key_o
     let _ = fs::remove_dir_all(root);
 }
 
+/// The first child of `parent`, waited for.
+fn child_of(parent: u32) -> u32 {
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+    loop {
+        for entry in fs::read_dir("/proc").unwrap().flatten() {
+            let Some(pid) = entry
+                .file_name()
+                .to_str()
+                .and_then(|n| n.parse::<u32>().ok())
+            else {
+                continue;
+            };
+            if fgos_process::facts::relation_of(ProcId(pid)).is_some_and(|r| r.parent == parent) {
+                return pid;
+            }
+        }
+        assert!(
+            std::time::Instant::now() < deadline,
+            "no child of {parent} appeared"
+        );
+        std::thread::sleep(std::time::Duration::from_millis(20));
+    }
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn a_bind_from_an_agent_nested_under_the_gates_agent_is_refused_and_the_head_keeps_its_roles() {
+    let root = machine_root();
+    let me = std::process::id();
+    let gate = head_of(me);
+    let role = vec!["head:secretary-miu".to_string()];
+    let attempt = attempt_key("att-cmd_6");
+    directory::register_writer(&root, None, &attempt, &gate, &role, false).unwrap();
+    // The gate the attempt's hooks check their agent against.
+    assert_eq!(
+        directory::attempt_gate(&root, &attempt).as_ref(),
+        Some(&gate)
+    );
+    // The gate's agent (a `sh`) whose hook (a `sleep`) runs directly under it binds.
+    let mut agent = std::process::Command::new("/bin/sh")
+        .args(["-c", "sleep 30; :"])
+        .spawn()
+        .unwrap();
+    let hook = child_of(agent.id());
+    let bound =
+        directory::bind_agent_session(&root, None, &attempt, &claude_key("uuid-head"), &gate, hook)
+            .unwrap();
+    // A second `sh` started under the gate's agent, as a tool would start `claude -p`, inherits the attempt's
+    // environment; its own hook asks to bind its session.
+    let mut nested_tree = std::process::Command::new("/bin/sh")
+        .args(["-c", "/bin/sh -c 'sleep 30; :'; :"])
+        .spawn()
+        .unwrap();
+    let nested = child_of(nested_tree.id());
+    let nested_hook = child_of(nested);
+    let refusal = directory::bind_agent_session(
+        &root,
+        None,
+        &attempt,
+        &claude_key("uuid-nested"),
+        &gate,
+        nested_hook,
+    )
+    .unwrap_err();
+    assert_eq!(refusal.reason, "agent-not-gate-child", "{}", refusal.detail);
+    let holder = directory::resolve(&root, "head:secretary-miu", &judge(&[]), None).unwrap();
+    assert_eq!(holder.id, bound.id, "the head keeps its roles");
+    for child in [&mut agent, &mut nested_tree] {
+        let _ = child.kill();
+        let _ = child.wait();
+    }
+    let _ = fs::remove_dir_all(root);
+}
+
 #[test]
 fn a_second_bind_on_the_same_live_head_moves_the_roles_to_the_new_session_and_retires_the_old_one()
 {

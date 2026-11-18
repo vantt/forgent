@@ -115,12 +115,20 @@ fn run(args: &[OsString]) {
     let Some(facts) = tested.facts(adapter) else {
         return;
     };
-    let env = HookEnv::from_process(&fgos_dir);
+    // HOME is set (checked first), so Identity's state root resolves here.
+    let identity_root = state_root();
+    // A confined head's gate, which its head must be the direct child of.
+    let gate_of = |attempt: &str| {
+        let key = fgos_identity::WriterKey {
+            source: fgos_identity::resolve::ENV_ORDER[0],
+            value: attempt,
+        };
+        fgos_identity::directory::attempt_gate(identity_root.as_deref()?, &key)
+    };
+    let env = HookEnv::from_process(&fgos_dir, &gate_of);
     let resolve = resolver_for(adapter, facts, &env, &loaded.hook.hook);
     let project = super::mailbox_root::project_name(&fgos_dir);
     let ancestry = || ancestry_of(std::process::id());
-    // HOME is set (checked first), so Identity's state root resolves here.
-    let identity_root = state_root();
     let handle_of = |key: &WriterKey, cli: &Cli, head: Option<&fgos_process::facts::Record>| {
         session_of(identity_root.as_deref()?, key, cli, head).map(|info| info.handle)
     };

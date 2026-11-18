@@ -929,7 +929,15 @@ fn a_confined_head_with_no_session_file_is_bound_by_its_hook_and_its_mail_carrie
         claude_config_dir: Some(config.into_os_string()),
         session_writer: Some(WriterKey::new(own).unwrap()),
         session_env: Some(own.to_string()),
-        head_attempt: true,
+        // The head is the gate's direct child: here the test process is the gate.
+        head_gate: Some(fgos_identity::resolve::HeadRef {
+            pid: std::process::id(),
+            start_time: identity_of(ProcId(std::process::id()))
+                .unwrap()
+                .to_record()
+                .start_time
+                .unwrap(),
+        }),
     };
     let facts = TestedClis::embedded().facts(Adapter::Claude).unwrap();
     let limits = limits();
@@ -986,7 +994,7 @@ fn a_codex_entry_whose_environment_names_another_session_than_its_payload_is_qui
         claude_config_dir: None,
         session_writer: None,
         session_env: Some("00000000-0000-4000-8000-00000000ffff".to_string()),
-        head_attempt: false,
+        head_gate: None,
     };
     let resolve = resolver_for(Adapter::Codex, facts, &env, &hook.hook);
     let limits = limits();

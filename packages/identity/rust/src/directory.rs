@@ -611,6 +611,59 @@ fn under_head_in(
     Ok(record)
 }
 
+/// Refused `agent-not-gate-child` when the caller's agent process is not `gate`'s direct child. The gate starts
+/// exactly one process, the agent; the caller's agent process is the nearest process on its way up that runs the
+/// program the gate started (the kernel's command name). Any process between the caller and the gate's child that runs
+/// that same program is an agent nested under the gate's agent, and the caller is its, not the attempt's. A caller
+/// that is the gate or its child, or a platform that cannot read command names, passes.
+fn agent_is_gate_child(tree: &dyn ProcessTree, caller_pid: u32, gate: u32) -> Result<(), Refusal> {
+    let mut between = Vec::new();
+    let mut pid = caller_pid;
+    for _ in 0..MAX_ANCESTRY_WALK {
+        if pid == gate {
+            return Ok(());
+        }
+        let Some(stat) = tree.stat(pid) else {
+            return Ok(());
+        };
+        if stat.ppid == gate {
+            let Some(program) = tree.comm(pid) else {
+                return Ok(());
+            };
+            return match between
+                .iter()
+                .find(|&&p| tree.comm(p).as_deref() == Some(program.as_str()))
+            {
+                Some(nested) => Err(refused(
+                    "agent-not-gate-child",
+                    format!(
+                        "process {caller_pid} runs under the agent {nested} ({program}), which runs under the gate's own agent {pid}, not as the gate {gate}'s child"
+                    ),
+                )),
+                None => Ok(()),
+            };
+        }
+        between.push(pid);
+        pid = stat.ppid;
+    }
+    Ok(())
+}
+
+/// The gate of the runner attempt `attempt` as Identity holds it: the head of the attempt's live entry. `None` when the
+/// attempt has no live entry or the directory cannot be read.
+pub fn attempt_gate(state_root: &Path, attempt: &WriterKey) -> Option<HeadRef> {
+    let own = session_for(state_root, attempt, None).ok()?;
+    let rows = scan(state_root, &judge_here).ok()?.rows;
+    let row = rows
+        .iter()
+        .find(|row| row.verdict != Verdict::Dead && row.entry.id == own.info.id)?;
+    let record = Record::from_json(row.entry.liveness.as_ref()?);
+    Some(HeadRef {
+        pid: record.pid?.0,
+        start_time: record.start_time?,
+    })
+}
+
 /// Upper bound on parent hops when a caller is checked against a head, so a cyclic table stops.
 const MAX_ANCESTRY_WALK: usize = 4096;
 
@@ -631,8 +684,11 @@ fn refused(reason: &'static str, detail: String) -> Refusal {
 /// Refused `invalid-writer-key` when `agent` is not a CLI session variable's key (an attempt id is never an agent
 /// session), `head-not-live` when the head is not running with its start time, `caller-not-under-head` when
 /// `caller_pid` (the process that asks, as the kernel names it) is neither the head nor one of its descendants,
-/// `attempt-not-registered` when the attempt has no live entry on that head, and `session-in-use` when the agent's id
-/// is already a live session on another head. Every other rule is [`register`]'s.
+/// `agent-not-gate-child` when the caller's agent process is not the head's direct child (an agent nested under the
+/// head's own agent, such as a `claude -p` its tool started, inherits the attempt's environment but is never the
+/// attempt's agent: binding it would move the head's roles to a short-lived session), `attempt-not-registered` when
+/// the attempt has no live entry on that head, and `session-in-use` when the agent's id is already a live session on
+/// another head. Every other rule is [`register`]'s.
 pub fn bind_agent_session(
     state_root: &Path,
     clone_dir: Option<&Path>,
@@ -674,6 +730,7 @@ fn bind_agent_session_in(
         ));
     }
     let record = under_head_in(head, caller_pid, tree)?;
+    agent_is_gate_child(tree, caller_pid, head.pid)?;
     let own = session_for(state_root, attempt, None)?;
     let rows = scan(state_root, &judge_here)?.rows;
     let live_on_head = |row: &&Row| row.verdict != Verdict::Dead && on_head(&row.entry, head);
