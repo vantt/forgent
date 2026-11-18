@@ -11,7 +11,8 @@ bốn câu của brief (cost, time, failure rate, friction).
 
 Vòng 2: Q1 đã trả lời (OM-D2: đo token trước, tiền hoãn tới khi có hạ tầng giá). Q3/Q4 rút lại vì thiếu bối cảnh,
 hỏi lại thành Q5 (ngưỡng "plan đứng yên") và Q6 (nghĩa của "pace"). Q2 còn mở; chủ dự án xin danh sách bảy thước đo.
-OM-D3 (Rust cho phần mới) đổi chỗ đặt code ở §6 A, C, E; mở Q7 (reader câu hỏi đang là Node). Các phần không phụ thuộc chúng (nguồn token/duration/account, khoá plan/phase, chiều
+OM-D3 (Rust cho phần mới) đổi chỗ đặt code ở §6 A, C, E; mở Q7 (reader câu hỏi đang là Node).
+Vòng 3: chủ dự án hỏi friction được ghi nhận, phân loại, gom nhóm thế nào — đề xuất ở §6 D, chờ phản hồi. Các phần không phụ thuộc chúng (nguồn token/duration/account, khoá plan/phase, chiều
 `--by`, friction) shape tiếp được.
 
 ## 2. Mục tiêu & đề bài
@@ -44,6 +45,7 @@ phạm vi.
 | V12 | "Pace" (R9) nghĩa là gì khi chỉ phát hiện | **mở → Q6** | audit R9: nhịp tick thích ứng — là hành vi, không phải tín hiệu |
 | V13 | Ngưỡng no-progress | **mở → Q5** | audit R7 "hai tick không tiến"; trên main supervisor là LLM head, không có tick đếm được |
 | V14 | Attention view chỉ có row gắn run | rõ | `attention-view.mjs:44-82`: row giả định `runId`, sort dòng 79; contract `attention-view` v1 |
+| V16 | Friction ghi gì, ai ghi, phân loại và gom thế nào | đang bàn | 762 record, 21 chữ ký, layer: docs 284, verification 249, state 221 — gần hết từ writer tự động thời Work; trial 11-17 ghi `--layer skill` bị từ chối (`friction.rs:13,79`) nên tự ghi friction `layer-not-published`; `rank` gom theo subject (`friction.rs:350-398`) |
 | V15 | Retention run dir (p-tslryr3buq) xoá mất lịch sử đo | ghi chú | plan này không phụ thuộc run dir sống mãi: snapshot đo theo plan phải còn sau prune — xem §6 E |
 
 ## 4. Quyết định đã chốt
@@ -65,6 +67,8 @@ phạm vi.
   trước → OM-D2. Q2: xin liệt kê bảy thước đo. Q3, Q4: hỏi không có bối cảnh → rút, hỏi lại thành Q5, Q6.
 - 2026-11-18 ~10:45 — Chủ dự án (qua secretary): phần viết mới viết Rust khi được, Node chỉ caller mỏng; áp dụng từ
   giờ, không đổi phần đã land → OM-D3.
+- 2026-11-18 ~11:00 — Chủ dự án: friction (bất tiện, chưa hoàn hảo, tréo ngoe, bug, không ổn định) ghi nhận tình
+  huống thế nào, tự ghi nhận ra sao, phân loại và gom nhóm thế nào? → đề xuất §6 D.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -102,9 +106,26 @@ có (`.fgos/runtime/tmp/sec/run-phase.sh`) và skill driving truyền cờ này.
 - Thời gian chờ chủ dự án: câu hỏi (QUESTIONS.md, mục câu hỏi của plan, gate) mang `asked`/`answered` thời điểm;
   reader câu hỏi hiện là Node (`src/portfolio/open-questions.mjs`, 115 dòng) — cách tách theo Q7.
 
-**D. Friction (Observe).** Kind subject `plan` (p-7nqygnztum) và `backlog`, qua cửa convention; `friction list|rank
---bucket week` cho xu hướng; `friction show plan:<dir>`; resolve bằng `--reason filed:<p-id>` để triage nối friction
-→ dòng backlog. Skill shaping/planning/driving ghi friction (sửa skill nguồn, build lại render).
+**D. Friction: ghi nhận, phân loại, gom nhóm (Observe, Rust).** Đang bàn (vòng 3, câu hỏi của chủ dự án).
+- *Ranh giới:* friction là ghi nhận nhẹ một tình huống bất tiện / chưa hoàn hảo / tréo ngoe / bug / không ổn định,
+  trước khi nó thành dòng backlog. Lỗi run (hỏng, provider limit, treo) đã nằm trong bản ghi run: không chép sang
+  friction; xu hướng bất ổn đọc thẳng từ `metrics runs --by provider --bucket week` (một nguồn).
+- *Ba kênh ghi:* (1) code tự phát hiện — các điểm đang ghi (merge, verify-miss, cửa retrospective, lỗi gọi CLI) và
+  điểm mới ghi thẳng qua API Rust của `fgos-observe`; (2) agent tự báo — fragment chung
+  `core/skills/_shared/friction-capture.md` nói khi nào ghi (phải đi đường vòng, luật tréo nhau, thiếu công cụ, doc
+  sai, phải chờ/thử lại), mọi skill shaping/planning/driving/lead trỏ tới; worker trong sandbox báo trong claim
+  (`agentClaim.frictions[]`) và runner ghi lúc settle, subject là run + plan; (3) chủ dự án nói "bất tiện" —
+  secretary ghi.
+- *Phân loại hai trục + chữ ký:* `kind` mới (bug | instability | missing | awkward | doc) = loại gì; `layer` = ở đâu,
+  danh sách hiện tại là của thời Work (verification, state, docs...) và từ chối `skill` — thay bằng danh sách theo
+  component/tầng hiện có (skill, tool, runner, workflow, git, provider, config, docs...); `errorClass` = chữ ký ổn
+  định kebab-case, cùng một vấn đề cùng một chữ ký; `disposition` (advisory/blocked/parked/halted) = mức nặng.
+- *Gom nhóm:* `friction rank` hôm nay xếp theo subject (2 × số record chưa settle) nên không thấy một vấn đề lặp ở
+  nhiều plan; đổi sang gom theo chữ ký: số lần, số plan/session khác nhau, lần đầu/lần cuối, `--bucket week`.
+  `friction classes` liệt kê chữ ký đã có để người ghi dùng lại; ghi chữ ký mới thì báo chữ ký gần giống.
+- *Vòng đời:* triage mở dòng backlog từ một chữ ký → `friction resolve --class <slug> --reason filed:<p-id>` settle cả
+  nhóm → chữ ký xuất hiện lại sau ngày fix hiện thành "tái phát" trong `rank`.
+- Subject kind `plan` (p-7nqygnztum) và `backlog`, qua cửa convention.
 
 **E. Attention view (Node `attention-view.mjs`, contract v2: row không bắt buộc `runId`).** Ba kind row mới, chỉ
 phát hiện:
