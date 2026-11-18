@@ -38,3 +38,4 @@
 
 ## Rollback
 `git revert` the phase commit.
+- Lead decision 2026-11-18: rotation from a confined head goes through the phase-12b request socket as verb `head rotate` (same contract, same route into the rotation executor); this phase owns adding it.

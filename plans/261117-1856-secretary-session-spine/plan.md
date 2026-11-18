@@ -75,6 +75,13 @@ footprint:
   - src/run-supervisor/**
   - test/run-supervisor/**
   - src/runner/dispatch/herdr-round.mjs
+  - src/runner/dispatch/assignment-runner.mjs
+  - src/runner/dispatch/session-attempt.mjs
+  - src/runner/dispatch/confinement/policies.mjs
+  - src/runner/dispatch/confinement/resources.mjs
+  - src/runner/dispatch/confinement/drivers/bwrap.mjs
+  - test/runner/dispatch-confinement-policies.test.mjs
+  - docs/platform/agent-confinement/spec.md
   - src/runner/dispatch/cli.mjs
   - src/runner/dispatch/terminal-slot.mjs
   - test/runner/dispatch-terminal-slot.test.mjs
@@ -197,6 +204,9 @@ answered `unavailable / tool.missing`, so the blast radius below is from `rg`, a
   `docs/discussions/**`. The grant schema in `core/config-standard`/`core/config-schema` and the other verbs (`land`,
   backlog row, answering `QUESTIONS.md` and plan questions) are a follow-up plan. The role name stays
   `head:<persona>-<name>`.
+  Rotation runs inside the confined head, so phase 14 adds a second verb `head rotate` to the same request contract
+  and route (one door into the rotation executor), not a second socket. Until the grant follow-up, the head ceiling
+  is the constant `HEAD_HARD_CEILING_MS` (7 days); rotation keeps real sessions far shorter.
 
 ## Acceptance criteria
 
@@ -263,26 +273,29 @@ answered `unavailable / tool.missing`, so the blast radius below is from `rg`, a
 | 9 | [Session Host crate, route, client and the shared opening-text delivery](phase-09-session-host-crate.md) | 1, 5 | packages/session-host/rust/**, Cargo.toml, Cargo.lock, apps/fgos/Cargo.toml, apps/fgos/src/main.rs, src/session-host/client.mjs, test/session-host/client.test.mjs, docs/architecture-manifest.json | 3 | done |
 | 10 | [Domain registry names the domains that exist](phase-10-domain-registry.md) | 7 | src/state/domain-registry.mjs, test/state/**, test/intake/**, core/skills/fgos-clarifying/**, plugins/fgOS/skills/**, .agents/skills/**, .claude/skills/** | 3 | done |
 | 11 | [Worker attempts placed through the host port](phase-11-worker-placement.md) | 9 | packages/run-supervisor/**, Cargo.lock, src/run-supervisor/**, test/run-supervisor/**, src/runner/dispatch/herdr-round.mjs, src/runner/dispatch/cli.mjs, src/runner/dispatch/terminal-slot.mjs, test/runner/dispatch-terminal-slot.test.mjs | 4 | done |
-| 12 | [Head-start use case and Identity registration at SessionStart](phase-12-head-start.md) | 3, 6, 9, 11 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, packages/distribution/rust/src/agent_hooks.rs, packages/distribution/rust/tests/goldens/agent-hooks-vectors.json, src/setup/agent-hooks.mjs, packages/distribution/contracts/agent-hooks.v1.json, test/setup/agent-hooks.test.mjs, .claude/settings.json | 5 | ready |
+| 12 | [Head sessions start confined, through the worker's seat door](phase-12-head-start.md) | 3, 6, 9, 11 | src/session-host/head-start.mjs, src/session-host/head-grants.mjs, test/session-host/head-start.test.mjs, src/session-host/client.mjs, test/session-host/client.test.mjs, packages/session-host/rust/src/route.rs, packages/session-host/rust/src/host.rs, packages/session-host/contracts/**, src/runner/dispatch/assignment-runner.mjs, src/runner/dispatch/session-attempt.mjs, src/runner/dispatch/herdr-round.mjs, src/runner/dispatch/confinement/policies.mjs, src/runner/dispatch/confinement/resources.mjs, test/runner/dispatch-confinement-policies.test.mjs, docs/platform/agent-confinement/spec.md, src/run-supervisor/direct-launch.mjs, test/run-supervisor/direct-cutover.test.mjs, packages/run-supervisor/contracts/envelope.v3.json, packages/run-supervisor/contracts/attempt-intent.v1.json, packages/run-supervisor/contracts/worker-env-allowlist.v1.json, packages/run-supervisor/rust/Cargo.toml, packages/run-supervisor/rust/src/supervise.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs, Cargo.lock, docs/architecture-manifest.json, plans/261117-1856-secretary-session-spine/reports/phase-12-head-start.md | 5 | ready |
+| 12b | [One request socket per head session and the verb head start](phase-12b-head-request-socket.md) | 12 | packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/contracts/internal-route.run-supervisor.v1.json, packages/run-supervisor/contracts/envelope.v3.json, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/lib.rs, packages/run-supervisor/rust/src/route.rs, packages/run-supervisor/rust/src/attempt_step.rs, packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_request.rs, src/session-host/head-request.mjs, test/session-host/head-request.test.mjs, src/runner/dispatch/session-attempt.mjs, src/runner/dispatch/confinement/drivers/bwrap.mjs, test/run-supervisor/bwrap-driver.test.mjs, plans/261117-1856-secretary-session-spine/reports/phase-12b-head-request-socket.md | 6 | ready |
 | 13 | [Owner-question reader over the three stage places](phase-13-owner-questions.md) | 7 | src/portfolio/**, test/portfolio/**, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, bin/fgos.mjs, test/cli/questions-verb.test.mjs, docs/architecture-manifest.json, scripts/plan-contract-check.mjs | 4 | done |
 | 14 | [Rotation executor: two-step replacement](phase-14-rotation-executor.md) | 2, 8, 12 | src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs, docs/platform/session-host/spec.md | 6 | ready |
-| 15 | [Head verb binding: start and rotate](phase-15-head-verb.md) | 12, 13, 14 | src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, bin/fgos.mjs, test/cli/head-verb.test.mjs, docs/platform/session-host/spec.md | 7 | ready |
+| 15 | [Head verb binding: start and rotate](phase-15-head-verb.md) | 12, 12b, 13, 14 | src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, bin/fgos.mjs, test/cli/head-verb.test.mjs, docs/platform/session-host/spec.md | 7 | ready |
 | 16 | [Secretary persona, secretary skill and /handoff skill](phase-16-secretary-and-handoff-skills.md) | 3, 7, 13, 15 | core/agents/secretary.yaml, core/skills/fgos-secretary/**, core/skills/handoff/**, .claude/agents/**, plugins/fgOS/skills/**, .agents/skills/**, .claude/skills/** | 8 | ready |
 | 17 | [Rotation hooks, doctor row and install wiring](phase-17-rotation-hooks.md) | 14, 15 | src/session-rotation/hook.mjs, bin/fgos.mjs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/distribution/rust/src/agent_hooks.rs, packages/distribution/rust/tests/goldens/agent-hooks-vectors.json, src/setup/agent-hooks.mjs, packages/distribution/contracts/agent-hooks.v1.json, packages/distribution/contracts/doctor-registry.v1.json, test/setup/agent-hooks.test.mjs, .claude/settings.json | 8 | ready |
 | 18 | [Integration, live checks and full gate](phase-18-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 | CHANGELOG.md, docs/reading-map.md, docs/platform/run-supervisor/spec.md, packages/git/contracts/mutation-census.v1.json, plans/261117-1856-secretary-session-spine/reports/integration.md | 9 | ready |
 
-**Waves.** 1: phases 1-4. 2: 5-8. 3: 9-10. 4: 11, 13. 5: 12. 6: 14. 7: 15. 8: 16-17. 9: 18. Layers stay serial: the port
+**Waves.** 1: phases 1-4. 2: 5-8. 3: 9-10. 4: 11, 13. 5: 12. 6: 12b, 14. 7: 15. 8: 16-17. 9: 18. Layers stay serial: the port
 contract (1) lands before the crate (9), the crate before its two consumers (11, then 12, which also needs 11's seat
-preparation door), the head-start use case before rotation (14), and the verb (15) before anything whose text names it (16, 17).
+preparation door), the confined head launch (12) before its request socket (12b) and rotation (14), and the verb (15, which
+calls 12b's `startHead`) before anything whose text names it (16, 17).
 
 **Hot files and why they do not collide.** `docs/architecture-manifest.json`: phases 8 (W2), 9 (W3), 13 (W4), one per
-wave, each adds its own `src/` directory. `Cargo.lock`: 9 (W3), 11 (W4). Command registry, manifest, routes and `bin/fgos.mjs`: 13 (W4), 15 (W7), 17 (W8)
+wave, each adds its own `src/` directory, and 12 (W5) adds its two modules. `Cargo.lock`: 9 (W3), 11 (W4), 12 (W5). Command registry, manifest, routes and `bin/fgos.mjs`: 13 (W4), 15 (W7), 17 (W8)
 (the stale DISCUSSION.md comment at `bin/fgos.mjs:1816` is fixed by phase 15, not phase 4). Skill renders: 4, 7, 10, 16 in
-waves 1, 2, 3, 8. Hook table (`agent_hooks.rs`, its golden vectors, the Node mirror, `agent-hooks.v1.json`) and `.claude/settings.json`: 12 (W5), 17 (W8).
-`src/session-rotation/**`: 8 (W2), 14 `rotate.mjs` (W6), 17 `hook.mjs` (W8). `src/runner/dispatch/herdr-round.mjs`: 11 (W4) only.
+waves 1, 2, 3, 8. Hook table (`agent_hooks.rs`, its golden vectors, the Node mirror, `agent-hooks.v1.json`) and `.claude/settings.json`: 17 (W8) only (12 registers the head role from the run supervisor, not a hook).
+`src/session-rotation/**`: 8 (W2), 14 `rotate.mjs` (W6), 17 `hook.mjs` (W8). `src/runner/dispatch/herdr-round.mjs`: 11 (W4), 12 (W5). `src/runner/dispatch/session-attempt.mjs`: 12 (W5), 12b (W6).
 `core/skills/fgos-clarifying/**`: 7 (W2), 10 (W3). `docs/platform/session-host/spec.md`: 1 (W1), 14 (W6), 15 (W7); phases 9, 11 and
 12 write their spec additions into their phase report and phase 14 folds them in (they do not write the spec).
-`packages/run-supervisor/rust/src/supervise/terminal.rs`: 11 (W4) only; 9 moves nothing out of it (validation session 1).
+`packages/run-supervisor/rust/src/supervise/terminal.rs` and `envelope.v3.json`: 11 (W4), 12 (W5), 12b (W6); 9 moves nothing out of it (validation session 1).
+`docs/platform/run-supervisor/spec.md`: 18 only; 12 and 12b write their additions into their reports.
 `apps/fgos/src/main.rs`: 9 (W3) only.
 Mutation census: regenerated per commit, owned by 18.
 
