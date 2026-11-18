@@ -29,11 +29,17 @@ pub fn vocabulary() -> &'static Vocabulary {
                 .as_array()
                 .expect("plan-vocabulary.v1.json lists are arrays")
                 .iter()
-                .map(|v| v.as_str().expect("vocabulary entries are strings").to_string())
+                .map(|v| {
+                    v.as_str()
+                        .expect("vocabulary entries are strings")
+                        .to_string()
+                })
                 .collect()
         };
         let number = |key: &str| -> usize {
-            json["headName"][key].as_u64().expect("headName limits are numbers") as usize
+            json["headName"][key]
+                .as_u64()
+                .expect("headName limits are numbers") as usize
         };
         Vocabulary {
             statuses: list("statuses"),
@@ -103,7 +109,9 @@ pub fn read_plan(dir: &str, text: &str) -> Result<Plan, PlanRefusal> {
     let doc = parse(front.as_bytes(), Profile::Tool, dir)
         .map_err(|e| PlanRefusal::FrontmatterMissing(format!("{dir}: {e:?}")))?;
     let Value::Map(entries) = doc.value() else {
-        return Err(PlanRefusal::FrontmatterMissing(format!("{dir}: frontmatter is not a mapping")));
+        return Err(PlanRefusal::FrontmatterMissing(format!(
+            "{dir}: frontmatter is not a mapping"
+        )));
     };
     let get = |key: &str| entries.iter().find(|(k, _)| k == key).map(|(_, v)| v);
     let scalar = |key: &str| match get(key) {
@@ -166,7 +174,13 @@ fn split_frontmatter(text: &str) -> Option<(&str, &str)> {
 /// Orders plans by priority, then `created`, then directory name.
 pub fn order(plans: &mut [Plan]) {
     let vocab = vocabulary();
-    let rank = |p: &Plan| vocab.priorities.iter().position(|x| *x == p.priority).unwrap_or(usize::MAX);
+    let rank = |p: &Plan| {
+        vocab
+            .priorities
+            .iter()
+            .position(|x| *x == p.priority)
+            .unwrap_or(usize::MAX)
+    };
     plans.sort_by(|a, b| {
         rank(a)
             .cmp(&rank(b))
@@ -223,7 +237,9 @@ fn cut(text: &str, max: usize) -> &str {
 pub fn head_name(project_handle: &str, dir: &str) -> String {
     let vocab = vocabulary();
     let prefix = cut(project_handle, vocab.head_name_project_prefix).trim_end_matches('-');
-    let room = vocab.head_name_max.saturating_sub(prefix.chars().count() + 1);
+    let room = vocab
+        .head_name_max
+        .saturating_sub(prefix.chars().count() + 1);
     format!("{prefix}-{}", cut(dir, room))
 }
 
@@ -283,7 +299,9 @@ fn plain(cell: &str) -> String {
     while let Some(open) = rest.find('[') {
         let after = &rest[open + 1..];
         match after.find("](").and_then(|close| {
-            after[close + 2..].find(')').map(|end| (close, close + 2 + end))
+            after[close + 2..]
+                .find(')')
+                .map(|end| (close, close + 2 + end))
         }) {
             Some((close, end)) if !after[..close].contains('[') => {
                 out.push_str(&rest[..open]);
@@ -305,7 +323,9 @@ fn id_list(cell: &str) -> Vec<String> {
     plain(cell)
         .split([',', ';'])
         .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty() && !matches!(s.to_lowercase().as_str(), "-" | "none" | "—" | "n/a"))
+        .filter(|s| {
+            !s.is_empty() && !matches!(s.to_lowercase().as_str(), "-" | "none" | "—" | "n/a")
+        })
         .collect()
 }
 
@@ -334,12 +354,20 @@ fn read_phase_table(body: &str) -> Vec<Phase> {
         }
         let header: Vec<String> = cells(lines[i])
             .iter()
-            .map(|h| h.to_lowercase().chars().filter(|c| c.is_ascii_lowercase()).collect())
+            .map(|h| {
+                h.to_lowercase()
+                    .chars()
+                    .filter(|c| c.is_ascii_lowercase())
+                    .collect()
+            })
             .collect();
         if header.iter().any(|h| h == "footprint") {
             let at = |name: &str| header.iter().position(|h| h == name);
             let cell = |row: &[String], name: &str| {
-                at(name).and_then(|n| row.get(n)).cloned().unwrap_or_default()
+                at(name)
+                    .and_then(|n| row.get(n))
+                    .cloned()
+                    .unwrap_or_default()
             };
             return lines[i + 1..j]
                 .iter()
