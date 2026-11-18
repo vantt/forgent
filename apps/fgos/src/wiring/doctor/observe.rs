@@ -2,7 +2,7 @@
 //! doctor run (the store creates it on its first write), and the stores are read, not touched. The two pointer rows
 //! (write health, friction migration) only warn and name the verb that shows or settles what they count.
 
-use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult};
+use fgos_distribution::doctor::{timed, FixResult, RowOutcome, RowResult};
 use fgos_host_runtime::civil_time::{format_unix_millis_rfc3339, parse_rfc3339_millis};
 use fgos_observe::contract::{RecordSource, Window};
 use fgos_observe::record::store::HealthSource;
@@ -36,6 +36,7 @@ pub const GROUP: super::Rows = super::Rows {
 
 fn row(passed: bool, message: String) -> RowOutcome {
     RowOutcome::Judged(RowResult {
+        elapsed_ms: None,
         passed,
         status: None,
         message: Some(message),
@@ -148,15 +149,17 @@ fn now_millis() -> i64 {
 pub fn judge_rows(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
     let host = std::env::current_exe().unwrap_or_else(|_| PathBuf::from("fgos"));
     ids.iter()
-        .map(|id| match *id {
-            "observe-dir-writable" => dir_writable_row(root),
-            "observe-host-resolvable" => host_resolvable_row(root, &host),
-            "observe-write-health" => write_health_row(root, now_millis()),
-            "observe-friction-migrated" => friction_migrated_row(root),
-            other => RowOutcome::Unavailable {
-                message: format!("no observe row {other}"),
-                next: "run fgos doctor again".to_owned(),
-            },
+        .map(|id| {
+            timed(|| match *id {
+                "observe-dir-writable" => dir_writable_row(root),
+                "observe-host-resolvable" => host_resolvable_row(root, &host),
+                "observe-write-health" => write_health_row(root, now_millis()),
+                "observe-friction-migrated" => friction_migrated_row(root),
+                other => RowOutcome::Unavailable {
+                    message: format!("no observe row {other}"),
+                    next: "run fgos doctor again".to_owned(),
+                },
+            })
         })
         .collect()
 }

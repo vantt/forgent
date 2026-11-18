@@ -3,7 +3,7 @@
 //! creation of the lock directories. The crate decides every fact; this file words them for the report.
 
 use super::{judged, Rows};
-use fgos_distribution::doctor::{FixResult, RowOutcome};
+use fgos_distribution::doctor::{timed, FixResult, RowOutcome};
 use fgos_holder_lock::borrow_vectors::{self, RunError};
 use fgos_holder_lock::port::{self, Guarantee, Level};
 use fgos_holder_lock::semantics::two_process_probe;
@@ -34,11 +34,13 @@ const MAX_LISTED: usize = 5;
 
 fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
     ids.iter()
-        .map(|id| match *id {
-            "lock-kernel-semantics" => kernel_semantics(&lock_dirs(root)),
-            "lock-borrow-vectors" => borrow_vectors_row(),
-            "lock-holders" => holders_pointer(),
-            other => unreachable!("holder-lock group asked for row {other}"),
+        .map(|id| {
+            timed(|| match *id {
+                "lock-kernel-semantics" => kernel_semantics(&lock_dirs(root)),
+                "lock-borrow-vectors" => borrow_vectors_row(),
+                "lock-holders" => holders_pointer(),
+                other => unreachable!("holder-lock group asked for row {other}"),
+            })
         })
         .collect()
 }

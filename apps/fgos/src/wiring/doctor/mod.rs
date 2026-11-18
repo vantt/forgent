@@ -192,6 +192,7 @@ pub(crate) fn config_read_text(error: fgos_config::event_store::ReadError) -> St
 /// engine.
 pub(crate) fn judged(passed: bool, message: impl Into<String>) -> RowOutcome {
     RowOutcome::Judged(doctor::RowResult {
+        elapsed_ms: None,
         passed,
         status: None,
         message: Some(message.into()),

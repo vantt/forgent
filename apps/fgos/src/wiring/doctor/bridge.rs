@@ -872,6 +872,11 @@ mod contract_tests {
                         "{name}"
                     );
                     assert_eq!(body.get("detail"), result.detail.as_ref(), "{name}");
+                    assert_eq!(
+                        body.get("elapsedMs").and_then(|m| m.as_u64()),
+                        result.elapsed_ms,
+                        "{name}"
+                    );
                 }
                 Line::Fix(fix) => {
                     assert_eq!(body["id"], fix.id.as_str(), "{name}");
