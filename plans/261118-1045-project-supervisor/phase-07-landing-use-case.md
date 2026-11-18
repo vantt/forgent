@@ -23,7 +23,7 @@ Step 0 first: re-grep every item. A finding that changes a plan decision stops t
 - Fixture helpers for a repo with a bare remote: `packages/git/rust/tests/land.rs`, `refs_remote.rs` and `tests/support`.
 
 ## Footprint
-`packages/supervision/rust/src/land.rs`, `packages/supervision/rust/tests/land.rs`, `scripts/lib/git-one-door-declarations.v1.json` (the gate runner's `sh -c` site; added 2026-11-18).
+`packages/supervision/rust/src/land.rs`, `packages/supervision/rust/tests/land.rs`, `scripts/lib/git-one-door-declarations.v1.json` (the gate runner's `sh -c` site; added 2026-11-18), and for the merge-slot door a `--paths` land holds (lead:OPC review, 2026-11-18): `packages/git/rust/src/land.rs`, `packages/git/rust/tests/land.rs`, `docs/platform/git/spec.md`, `docs/platform/supervision/spec.md`.
 
 ## Steps
 1. Types: `LandCommand { branch: Option<String>, paths: Option<Vec<String>>, tests: Vec<String>, footprint: Option<Vec<String>>, target: Option<String>, message, squash }` (exactly one of `branch`/`paths`; `footprint` is the caller's plan footprint, given by the host for a lead); `LandConfig { gates: Vec<Gate>, regenerate: Option<Regenerate> }`, `Gate { run, when: Vec<glob> }`; `LandOutcome { main_sha, landed_paths, retries, gates_run }`; `LandRefusal { code, detail }`.
