@@ -34,10 +34,8 @@ use fgos_identity::directory::register_writer;
 use fgos_identity::resolve::{HeadRef, WriterKey, ENV_ORDER};
 use fgos_process::facts::{self, ProcTuple};
 use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, ProcId};
-use fgos_session_host::direct::OsDirect;
 use fgos_session_host::{
     HostKind, LaunchAnswer, PaneIo, Placement, RefusalKind, SendFailure, SessionHost,
-    DEFAULT_GRACE_MS,
 };
 use fgos_terminal_control::core::{Core, Want};
 use fgos_terminal_control::port::{ExpectedProcess, LaunchSpec, PaneState, ProcessIdentity};
@@ -757,12 +755,7 @@ pub(super) fn run(
     let spec = launch_spec(&plan, run_dir).map_err(Refusal::internal)?;
 
     // The `launched` marker is durable before `launch` returns; only then may a GO exist.
-    let direct = OsDirect::in_state_root();
-    let session_host = SessionHost {
-        panes: &core,
-        direct: &direct,
-        grace_ms: DEFAULT_GRACE_MS,
-    };
+    let session_host = SessionHost { panes: &core };
     let placement = Placement {
         host: HostKind::Terminal,
         key: plan.key.clone(),

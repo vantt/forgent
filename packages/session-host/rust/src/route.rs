@@ -2,8 +2,7 @@
 //! JSON request on stdin, one JSON line out. A port answer, a refusal included, exits 0: the route
 //! decides nothing, it only carries the host's answer.
 
-use crate::direct::OsDirect;
-use crate::host::{SessionHost, DEFAULT_GRACE_MS};
+use crate::host::SessionHost;
 use crate::types::*;
 use fgos_terminal_control::port::LaunchSpec;
 use fgos_terminal_control::route::{
@@ -36,15 +35,6 @@ fn whole<T: DeserializeOwned>(request: &Value, name: &str) -> Result<T, String> 
         .get(name)
         .ok_or_else(|| format!("request.{name} is missing"))?;
     serde_json::from_value(value.clone()).map_err(|e| format!("request.{name}: {e}"))
-}
-
-fn milliseconds(envelope: &Value, name: &str, default: u64) -> Result<u64, String> {
-    match envelope.get(name).filter(|v| !v.is_null()) {
-        None => Ok(default),
-        Some(v) => v
-            .as_u64()
-            .ok_or_else(|| format!("{name} needs a non-negative integer")),
-    }
 }
 
 fn run(op: &str, host: &SessionHost, envelope: &Value) -> Result<(String, Value), String> {
@@ -165,21 +155,12 @@ pub fn main(args: &[String]) -> i32 {
         None | Some("herdr") => {}
         Some(other) => return usage(&format!("unknown driver {other}")),
     }
-    let grace_ms = match milliseconds(&envelope, "graceMs", DEFAULT_GRACE_MS) {
-        Ok(ms) => ms,
-        Err(message) => return usage(&message),
-    };
     let parts = match CoreParts::from_envelope(&envelope, started) {
         Ok(p) => p,
         Err(refusal) => return error(refusal.code, &refusal.message, EXIT_USAGE),
     };
     let core = parts.core();
-    let direct = OsDirect::in_state_root();
-    let host = SessionHost {
-        panes: &core,
-        direct: &direct,
-        grace_ms,
-    };
+    let host = SessionHost { panes: &core };
     match run(op, &host, &envelope) {
         Ok((result, mut fields)) => {
             fields["op"] = json!(op);

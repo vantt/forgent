@@ -7,14 +7,13 @@
 //! is the agent protocol's port over a pane by key, so one delivery step types every opening text
 //! and every worker brief. `route` is the `fgos internal session-host` door.
 
-pub mod direct;
 pub mod host;
 pub mod pane_io;
 pub mod panes;
 pub mod route;
 pub mod types;
 
-pub use host::{SessionHost, DEFAULT_GRACE_MS};
+pub use host::SessionHost;
 pub use pane_io::{PaneIo, SendFailure};
 pub use panes::Panes;
 pub use types::*;

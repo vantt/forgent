@@ -1,7 +1,6 @@
 //! The four operations, over the adapters. This is the one place that chooses between them and
 //! names a refusal; Terminal Control and the process door only carry the calls.
 
-use crate::direct::Screenless;
 use crate::panes::Panes;
 use crate::types::*;
 use fgos_terminal_control::core::Want;
@@ -10,13 +9,8 @@ use fgos_terminal_control::port::{
     Refusal as PaneRefusal, ReleaseOutcome, Slot,
 };
 
-/// How long a screenless process gets to leave after SIGTERM before it is killed.
-pub const DEFAULT_GRACE_MS: u64 = 10_000;
-
 pub struct SessionHost<'a> {
     pub panes: &'a dyn Panes,
-    pub direct: &'a dyn Screenless,
-    pub grace_ms: u64,
 }
 
 fn from_pane(refusal: PaneRefusal) -> Refusal {
@@ -86,12 +80,6 @@ impl SessionHost<'_> {
         if !valid_key(&request.key) {
             return Err(bad_key(&request.key));
         }
-        if request.host != HostKind::Terminal {
-            return Err(Refusal::unsupported(
-                RefusalCode::HostUnsupportedHere,
-                "a screenless host has no slot to open",
-            ));
-        }
         let key = request.key.as_str();
         let placement = Placement {
             host: request.host,
@@ -152,12 +140,6 @@ impl SessionHost<'_> {
         if !valid_key(&placement.key) {
             return LaunchAnswer::Refused(bad_key(&placement.key));
         }
-        if placement.host != HostKind::Terminal {
-            return LaunchAnswer::Refused(Refusal::unsupported(
-                RefusalCode::HostUnsupportedHere,
-                "a screenless host has no slot to launch into",
-            ));
-        }
         match self.panes.launch(&placement.key, spec) {
             Ok(LaunchOutcome::Launched(identity)) => LaunchAnswer::Launched(identity),
             Ok(LaunchOutcome::NotStarted { reason }) => LaunchAnswer::NotStarted { reason },
@@ -172,47 +154,31 @@ impl SessionHost<'_> {
                 detail: Some(format!("`{}` is not a valid key", placement.key)),
             };
         }
-        match placement.host {
-            HostKind::Terminal => {
-                let seen = self.panes.inspect(
-                    &placement.key,
-                    Want {
-                        foreground: false,
-                        activity: false,
-                        detail: false,
-                    },
-                );
-                AliveAnswer {
-                    result: match seen.pane {
-                        PaneState::Live => Liveness::Live,
-                        PaneState::Gone => Liveness::Gone,
-                        PaneState::Unknown => Liveness::Unknown,
-                    },
-                    detail: None,
-                }
-            }
-            HostKind::Direct => AliveAnswer {
-                result: self.direct.liveness(&placement.key),
-                detail: None,
+        let seen = self.panes.inspect(
+            &placement.key,
+            Want {
+                foreground: false,
+                activity: false,
+                detail: false,
             },
+        );
+        AliveAnswer {
+            result: match seen.pane {
+                PaneState::Live => Liveness::Live,
+                PaneState::Gone => Liveness::Gone,
+                PaneState::Unknown => Liveness::Unknown,
+            },
+            detail: None,
         }
     }
 
     pub fn front(&self, placement: &Placement) -> FrontAnswer {
-        match placement.host {
-            HostKind::Direct => FrontAnswer::Refused(Refusal::unsupported(
-                RefusalCode::HostUnsupportedHere,
-                "a screenless host has nothing to bring to the front",
-            )),
-            HostKind::Terminal => {
-                if !valid_key(&placement.key) {
-                    return FrontAnswer::Refused(bad_key(&placement.key));
-                }
-                match self.panes.focus(&placement.key) {
-                    Ok(()) => FrontAnswer::Fronted,
-                    Err(r) => FrontAnswer::Refused(from_pane(r)),
-                }
-            }
+        if !valid_key(&placement.key) {
+            return FrontAnswer::Refused(bad_key(&placement.key));
+        }
+        match self.panes.focus(&placement.key) {
+            Ok(()) => FrontAnswer::Fronted,
+            Err(r) => FrontAnswer::Refused(from_pane(r)),
         }
     }
 
@@ -220,10 +186,7 @@ impl SessionHost<'_> {
         if !valid_key(&placement.key) {
             return RetireAnswer::Refused(bad_key(&placement.key));
         }
-        match placement.host {
-            HostKind::Terminal => self.retire_terminal(&placement.key, disposition),
-            HostKind::Direct => self.retire_direct(&placement.key, disposition),
-        }
+        self.retire_terminal(&placement.key, disposition)
     }
 
     fn retire_terminal(&self, key: &str, disposition: Retirement) -> RetireAnswer {
@@ -250,31 +213,5 @@ impl SessionHost<'_> {
             }
             Err(r) => RetireAnswer::Refused(from_pane(r)),
         }
-    }
-
-    fn retire_direct(&self, key: &str, disposition: Retirement) -> RetireAnswer {
-        // Retain keeps the session as it is: nothing is signalled.
-        if disposition == Retirement::Retain {
-            return RetireAnswer::Retired;
-        }
-        let unknown = |detail: String| {
-            RetireAnswer::Refused(Refusal::unknown(RefusalCode::PlacementUnknown, detail))
-        };
-        if self.direct.liveness(key) == Liveness::Gone {
-            self.direct.forget(key);
-            return RetireAnswer::Retired;
-        }
-        // The ask, the grace and the kill belong to the shared primitive behind `end`.
-        match self.direct.end(key, self.grace_ms) {
-            Ok(Liveness::Gone) => {
-                self.direct.forget(key);
-                return RetireAnswer::Retired;
-            }
-            Ok(_) => {}
-            Err(e) => return unknown(e),
-        }
-        unknown(format!(
-            "`{key}` is still not judged gone after the grace; its handle is kept"
-        ))
     }
 }

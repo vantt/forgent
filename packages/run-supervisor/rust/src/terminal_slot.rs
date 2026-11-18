@@ -12,10 +12,8 @@ use std::cell::RefCell;
 use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use fgos_session_host::direct::OsDirect;
 use fgos_session_host::{
     HostKind, Panes, Placement, RefusalKind, RetireAnswer, Retirement, SessionHost,
-    DEFAULT_GRACE_MS,
 };
 use fgos_terminal_control::core::{Core, CoreConfig, Want};
 use fgos_terminal_control::driver::herdr::{HerdrConfig, HerdrDriver};
@@ -254,12 +252,7 @@ pub fn release(
         until,
         kept: RefCell::new(None),
     };
-    let direct = OsDirect::in_state_root();
-    let host = SessionHost {
-        panes: &panes,
-        direct: &direct,
-        grace_ms: DEFAULT_GRACE_MS,
-    };
+    let host = SessionHost { panes: &panes };
     let placement = Placement {
         host: HostKind::Terminal,
         key: key.to_string(),

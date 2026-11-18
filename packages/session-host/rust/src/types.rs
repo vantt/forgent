@@ -9,7 +9,6 @@ use std::collections::BTreeMap;
 #[serde(rename_all = "lowercase")]
 pub enum HostKind {
     Terminal,
-    Direct,
 }
 
 /// Where a session runs. `display` is written to the screen only, never read back.

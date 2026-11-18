@@ -1,8 +1,7 @@
 // client.mjs -- thin Node client of `fgos internal session-host`.
 //
 // One process per operation: the request goes to the host binary on stdin, one JSON line comes
-// back. Every decision (which adapter, which refusal, SIGTERM before
-// the grace and SIGKILL after it) lives in the Rust crate; this module only carries the call. A
+// back. Every decision (which adapter, which refusal) lives in the Rust crate; this module only carries the call. A
 // port refusal (`unsupported`, `unknown`) is returned as the route gave it, never thrown.
 
 import { spawn, spawnSync } from 'node:child_process';
@@ -116,12 +115,12 @@ function spawnAsync(bin, argv, input, timeoutMs) {
 }
 
 /**
- * createSessionHost({ hostBin, herdrBin, env, config, timeoutMs, graceMs }) ->
+ * createSessionHost({ hostBin, herdrBin, env, config, timeoutMs }) ->
  *   { open, launch, alive, front, retire, openAsync, retireAsync }
  *
  * `hostBin` defaults to the active release's host (resolved on first call). `herdrBin`, `env` and `config`
  * are the terminal driver's, as for Terminal Control (`config` the core settings the route accepts:
- * minCols, minRows, maxPanesPerTab, policy, ...). `graceMs` is how long a screenless process gets to leave after SIGTERM.
+ * minCols, minRows, maxPanesPerTab, policy, ...).
  *
  *   open(request)            -> { result: 'placed', placement } | refusal   (a slot, nothing started in it)
  *   launch(placement, spec)  -> { result: 'launched', identity } | { result: 'not-started', reason } | refusal
@@ -135,13 +134,12 @@ function spawnAsync(bin, argv, input, timeoutMs) {
  * under by this client, or `{ groupKey }`; a close of a key whose group is unknown is refused (rejected)
  * instead of running outside the queue. Another group, and `retain`, do not wait.
  */
-export function createSessionHost({ hostBin, herdrBin, env, config, timeoutMs = DEFAULT_TIMEOUT_MS, graceMs } = {}) {
+export function createSessionHost({ hostBin, herdrBin, env, config, timeoutMs = DEFAULT_TIMEOUT_MS } = {}) {
   const prepare = (op, request, extra) => {
     const body = { v: PROTOCOL, driver: 'herdr', timeoutMs, request, ...extra };
     if (herdrBin) body.herdrBin = herdrBin;
     if (env) body.env = env;
     if (config) body.config = config;
-    if (graceMs !== undefined) body.graceMs = graceMs;
     const bin = hostBin ?? activeHostBin();
     return {
       bin,

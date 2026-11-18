@@ -7,7 +7,5 @@ rust-version.workspace = true
 [dependencies]
 fgos-agent-protocol = { path = "../../agent-protocol/rust" }
 fgos-terminal-control = { path = "../../terminal-control/rust" }
-fgos-process = { path = "../../process/rust" }
-fgos-holder-lock = { path = "../../holder-lock/rust" }
 serde = { workspace = true }
 serde_json = { workspace = true }

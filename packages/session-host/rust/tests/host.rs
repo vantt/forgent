@@ -1,6 +1,5 @@
 //! The Session Host's owning proofs, over a fake Terminal Control core and a fake process door.
 
-use fgos_session_host::direct::Screenless;
 use fgos_session_host::*;
 use fgos_terminal_control::core::Want;
 use fgos_terminal_control::port::{
@@ -98,46 +97,8 @@ impl Panes for FakePanes {
     }
 }
 
-#[derive(Default)]
-struct DirectLog {
-    live: bool,
-    ignores_term: bool,
-    calls: Vec<&'static str>,
-}
-
-#[derive(Default)]
-struct FakeDirect(RefCell<DirectLog>);
-
-impl Screenless for FakeDirect {
-    fn liveness(&self, _key: &str) -> Liveness {
-        if self.0.borrow().live {
-            Liveness::Live
-        } else {
-            Liveness::Gone
-        }
-    }
-
-    fn end(&self, _key: &str, _grace_ms: u64) -> Result<Liveness, String> {
-        let mut log = self.0.borrow_mut();
-        log.calls.push("term");
-        if log.ignores_term {
-            log.calls.push("kill");
-        }
-        log.live = false;
-        Ok(Liveness::Gone)
-    }
-
-    fn forget(&self, _key: &str) {
-        self.0.borrow_mut().calls.push("forget");
-    }
-}
-
-fn host<'a>(panes: &'a FakePanes, direct: &'a FakeDirect) -> SessionHost<'a> {
-    SessionHost {
-        panes,
-        direct,
-        grace_ms: 150,
-    }
+fn host(panes: &FakePanes) -> SessionHost<'_> {
+    SessionHost { panes }
 }
 
 fn placement(kind: HostKind, key: &str) -> Placement {
@@ -150,14 +111,11 @@ fn placement(kind: HostKind, key: &str) -> Placement {
 
 #[test]
 fn an_open_beside_a_placement_allocates_in_that_placements_group() {
-    let (panes, direct) = (FakePanes::default(), FakeDirect::default());
+    let panes = FakePanes::default();
     panes.0.borrow_mut().live.insert("first".into());
     let mut r = open_request("second");
     r.beside = Some("first".into());
-    assert!(matches!(
-        host(&panes, &direct).open(&r),
-        OpenAnswer::Opened { .. }
-    ));
+    assert!(matches!(host(&panes).open(&r), OpenAnswer::Opened { .. }));
     assert_eq!(panes.0.borrow().allocated[0].group_key, "run-1");
 
     // beside a placement that is not there, or without the group it belongs to, is refused before a pane opens.
@@ -169,14 +127,14 @@ fn an_open_beside_a_placement_allocates_in_that_placements_group() {
     missing.key = "third".into();
     missing.beside = Some("nowhere".into());
     assert_eq!(
-        refused(host(&panes, &direct).open(&missing)),
+        refused(host(&panes).open(&missing)),
         RefusalCode::PlacementUnknown
     );
     let mut ungrouped = r.clone();
     ungrouped.key = "fourth".into();
     ungrouped.group_key = None;
     assert_eq!(
-        refused(host(&panes, &direct).open(&ungrouped)),
+        refused(host(&panes).open(&ungrouped)),
         RefusalCode::PlacementUnknown
     );
     assert_eq!(panes.0.borrow().allocated.len(), 1);
@@ -184,8 +142,8 @@ fn an_open_beside_a_placement_allocates_in_that_placements_group() {
 
 #[test]
 fn alive_front_and_retire_answer_for_a_terminal_placement() {
-    let (panes, direct) = (FakePanes::default(), FakeDirect::default());
-    let h = host(&panes, &direct);
+    let panes = FakePanes::default();
+    let h = host(&panes);
     let p = placement(HostKind::Terminal, "att-1");
     assert_eq!(h.alive(&p).result, Liveness::Gone);
     h.open(&open_request("att-1"));
@@ -195,47 +153,6 @@ fn alive_front_and_retire_answer_for_a_terminal_placement() {
     assert_eq!(h.retire(&p, Retirement::Retain), RetireAnswer::Retired);
     assert_eq!(panes.0.borrow().released[0].1, Disposition::Retain);
     assert_eq!(h.alive(&p).result, Liveness::Gone);
-}
-
-#[test]
-fn a_screenless_placement_cannot_be_fronted() {
-    let (panes, direct) = (FakePanes::default(), FakeDirect::default());
-    let refused = host(&panes, &direct).front(&placement(HostKind::Direct, "w-1"));
-    match refused {
-        FrontAnswer::Refused(r) => assert_eq!(r.result, RefusalKind::Unsupported),
-        other => panic!("{other:?}"),
-    }
-}
-
-#[test]
-fn retiring_a_direct_session_asks_first_and_kills_only_after_the_grace() {
-    let (panes, direct) = (FakePanes::default(), FakeDirect::default());
-    let h = host(&panes, &direct);
-    let p = placement(HostKind::Direct, "w-1");
-    direct.0.borrow_mut().live = true;
-    assert_eq!(h.retire(&p, Retirement::Close), RetireAnswer::Retired);
-    assert_eq!(direct.0.borrow().calls, vec!["term", "forget"]);
-
-    let stubborn = FakeDirect::default();
-    let h = host(&panes, &stubborn);
-    stubborn.0.borrow_mut().live = true;
-    stubborn.0.borrow_mut().ignores_term = true;
-    assert_eq!(
-        h.retire(&placement(HostKind::Direct, "w-2"), Retirement::Close),
-        RetireAnswer::Retired
-    );
-    assert_eq!(stubborn.0.borrow().calls, vec!["term", "kill", "forget"]);
-}
-
-#[test]
-fn retiring_a_direct_session_that_is_already_gone_answers_retired() {
-    let (panes, direct) = (FakePanes::default(), FakeDirect::default());
-    let h = host(&panes, &direct);
-    assert_eq!(
-        h.retire(&placement(HostKind::Direct, "w-9"), Retirement::Close),
-        RetireAnswer::Retired
-    );
-    assert!(!direct.0.borrow().calls.contains(&"term"));
 }
 
 fn open_request(key: &str) -> OpenRequest {
@@ -253,8 +170,8 @@ fn open_request(key: &str) -> OpenRequest {
 
 #[test]
 fn open_allocates_a_slot_and_launch_starts_the_command_in_it_returning_the_identity() {
-    let (panes, direct) = (FakePanes::default(), FakeDirect::default());
-    let h = host(&panes, &direct);
+    let panes = FakePanes::default();
+    let h = host(&panes);
     match h.open(&open_request("att-1")) {
         OpenAnswer::Opened { placement: p, slot } => {
             assert_eq!(p, placement(HostKind::Terminal, "att-1"));
@@ -292,23 +209,13 @@ fn open_allocates_a_slot_and_launch_starts_the_command_in_it_returning_the_ident
 }
 
 #[test]
-fn open_and_launch_refuse_a_screenless_placement_and_a_bad_key() {
-    let (panes, direct) = (FakePanes::default(), FakeDirect::default());
-    let h = host(&panes, &direct);
-    let mut direct_open = open_request("att-1");
-    direct_open.host = HostKind::Direct;
-    let refused = |answer: OpenAnswer| match answer {
-        OpenAnswer::Refused(r) => r.code,
+fn open_and_launch_refuse_a_bad_key() {
+    let panes = FakePanes::default();
+    let h = host(&panes);
+    match h.open(&open_request("bad key")) {
+        OpenAnswer::Refused(r) => assert_eq!(r.code, RefusalCode::PlacementUnknown),
         other => panic!("expected a refusal, got {other:?}"),
-    };
-    assert_eq!(
-        refused(h.open(&direct_open)),
-        RefusalCode::HostUnsupportedHere
-    );
-    assert_eq!(
-        refused(h.open(&open_request("bad key"))),
-        RefusalCode::PlacementUnknown
-    );
+    }
     let spec = LaunchSpec {
         command: "x".into(),
         args: vec![],
@@ -316,11 +223,9 @@ fn open_and_launch_refuse_a_screenless_placement_and_a_bad_key() {
         env: Default::default(),
         expect: None,
     };
-    for placed in [
-        placement(HostKind::Direct, "att-1"),
-        placement(HostKind::Terminal, "bad key"),
-    ] {
-        assert!(matches!(h.launch(&placed, &spec), LaunchAnswer::Refused(_)));
-    }
+    assert!(matches!(
+        h.launch(&placement(HostKind::Terminal, "bad key"), &spec),
+        LaunchAnswer::Refused(_)
+    ));
     assert!(panes.0.borrow().allocated.is_empty() && panes.0.borrow().launched.is_empty());
 }

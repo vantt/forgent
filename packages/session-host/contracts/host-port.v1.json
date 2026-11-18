@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "session-host/host-port.v1.json",
   "title": "Session Host port, version 1",
-  "description": "The one port that places an agent session: open then launch (the controller builds its command only after the slot exists), alive, front, retire. A session is started by its controller (the run supervisor) through open and launch; there is no single start operation. Adapters: terminal (Terminal Control), direct (screenless prepared command). Spec: docs/platform/session-host/spec.md.",
+  "description": "The one port that places an agent session: open then launch (the controller builds its command only after the slot exists), alive, front, retire. A session is started by its controller (the run supervisor) through open and launch; there is no single start operation. Adapter: terminal (Terminal Control) only; the run supervisor owns every screenless launch. Spec: docs/platform/session-host/spec.md.",
   "contract": { "id": "session-host-port", "version": 1 },
   "$defs": {
     "key": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$", "description": "Same key shape as terminal-control; for a run the attempt id, for a head session <persona>-<name>." },
-    "host": { "enum": ["terminal", "direct"] },
+    "host": { "enum": ["terminal"] },
     "display": { "type": "object", "description": "Terminal Control display fields; written to the screen only, never read back.", "additionalProperties": true },
     "placement": {
       "type": "object",
@@ -71,7 +71,7 @@
         { "$ref": "#/$defs/refusal" }
       ] },
       "rules": [
-        "terminal only: Terminal Control allocate and nothing else; nothing is started in the slot. host direct answers unsupported / host-unsupported-here.",
+        "terminal only: Terminal Control allocate and nothing else; nothing is started in the slot.",
         "a key that already has a live placement answers that placement and allocates nothing."
       ]
     },
@@ -84,8 +84,7 @@
       ] },
       "rules": [
         "terminal only: Terminal Control launch into the slot open allocated for the placement's key; the launched marker is durable before the answer, so the caller may let the process run on once it has the identity.",
-        "not-started: nothing was proven to run; the slot is kept and never launched into again.",
-        "host direct answers unsupported / host-unsupported-here: a screenless host has no slot to launch into."
+        "not-started: nothing was proven to run; the slot is kept and never launched into again."
       ]
     },
     "alive": {
@@ -96,7 +95,7 @@
     "front": {
       "request": { "type": "object", "required": ["placement"], "additionalProperties": false, "properties": { "placement": { "$ref": "#/$defs/placement" } } },
       "answer": { "oneOf": [ { "type": "object", "required": ["result"], "additionalProperties": false, "properties": { "result": { "const": "fronted" } } }, { "$ref": "#/$defs/refusal" } ] },
-      "rules": ["terminal: the focus operation of Terminal Control.", "direct and any screenless host: unsupported."]
+      "rules": ["terminal: the focus operation of Terminal Control."]
     },
     "retire": {
       "request": { "type": "object", "required": ["placement", "disposition"], "additionalProperties": false, "properties": { "placement": { "$ref": "#/$defs/placement" }, "disposition": { "enum": ["close", "retain"] } } },
