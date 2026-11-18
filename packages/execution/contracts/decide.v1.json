@@ -8,8 +8,7 @@
    "fact": "decide",
    "runner": {},
    "args": {},
-   "expect": {"error":{"name":"RunnerConfigError","message":"usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]"}},
-   "nativeExpect": {"error":{"name":"RunnerConfigError","message":"usage: fgos dispatch decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]"}}
+   "expect": {"error":{"name":"RunnerConfigError","message":"usage: fgos dispatch decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]"}}
   },
   {
    "name": "decide: an agent executor named with live task access runs in process with its agent type",

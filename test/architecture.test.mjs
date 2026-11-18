@@ -2002,10 +2002,11 @@ test('door check: a seat composition or a second call of the ranking function ou
   for (const text of ['function resolvePersona() {}\n', 'const launchViewOf = () => 1;\n', 'export function familyKeyed() {}\n', 'function executorFacts() {}\n', 'const seatConfigOf = 1;\n', 'function accountViewOf() {}\n']) {
     assert.equal(doorHits(row, 'src/runner/seeded.mjs', text).length, 1, text);
   }
-  for (const text of ['fn resolve_persona() {}\n', 'fn launch_view_of() {}\n', 'let out = fgos_seat_binding::bind(&input);\n']) {
+  for (const text of ['fn resolve_persona() {}\n', 'fn launch_view_of() {}\n', 'let out = fgos_seat_binding::bind(&input);\n', 'use fgos_seat_binding::bind;\n', 'use fgos_seat_binding::{BindInput, bind};\n']) {
     assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', text).length, 1, text);
     assert.deepEqual(doorHits(row, owner, text), [], text);
   }
+  assert.deepEqual(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'use fgos_seat_binding::{BindInput, BindOutput};\n'), []);
   assert.deepEqual(doorHits(row, 'src/runner/seeded.mjs', '// function resolvePersona() {}\n'), []);
 });
 
@@ -2029,7 +2030,7 @@ test('door check: a Node or Rust twin of an executor derivation fails outside it
     assert.equal(doorHits(row, 'src/runner/seeded.mjs', text).length, 1, text);
   }
   assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'fn family_of() {}\n').length, 1);
-  assert.deepEqual(doorHits(row, 'packages/execution/rust/src/seeded.rs', 'pub fn family_of() {}\n'), []);
+  assert.deepEqual(doorHits(row, 'packages/execution/rust/src/executor_model.rs', 'pub fn family_of() {}\n'), []);
   assert.deepEqual(doorHits(row, 'src/runner/dispatch/provider-adapter.mjs', 'export function familyOf() {}\n'), []);
 });
 

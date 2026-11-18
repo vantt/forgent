@@ -38,6 +38,8 @@ project without other work in between (recipe: `docs/how-to/measure-a-real-case.
 background in `docs/how-to/install-fgos-in-a-project-and-use-doctor.md`).
 
 ```bash
+cargo build --release -p fgos -p fgctl
+node scripts/build-rust-distribution.mjs --out <release-dir>
 fgctl stage --from <release-dir-or-archive>
 fgctl upgrade --from <release-dir-or-archive>     # in each project root
 fgctl status                                      # active release is the new one
