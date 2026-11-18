@@ -6,10 +6,12 @@ use serde::Serialize;
 /// Env variables tried in order; the first usable value wins.
 pub const ENV_ORDER: [&str; 4] = [
     "FGOS_SESSION_ID",
-    "CODEX_THREAD_ID",
+    CODEX_THREAD_VAR,
     PI_SESSION_VAR,
     "CLAUDE_CODE_SESSION_ID",
 ];
+/// The variable a Codex session exports; a Codex hook payload carries the same value as `session_id`.
+pub const CODEX_THREAD_VAR: &str = "CODEX_THREAD_ID";
 /// The one variable both pi and omp export for a session. Its name cannot say
 /// which of the two it is, so the CLI is read from the process ancestry
 /// ([`pi_family_cli`]).

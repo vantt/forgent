@@ -198,7 +198,7 @@ fn caller_of(adapter: Adapter, session: Option<String>) -> Option<Caller> {
         Adapter::Codex => PayloadKeyCaller {
             state_root,
             pid,
-            source: "CODEX_THREAD_ID",
+            source: fgos_identity::resolve::CODEX_THREAD_VAR,
             value: session?,
         }
         .caller(),
