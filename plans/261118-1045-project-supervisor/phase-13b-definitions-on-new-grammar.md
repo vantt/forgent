@@ -10,7 +10,9 @@ This phase rewrites the pending definitions on those features. Data files and th
   Step 0 re-reads the landed operator and field names in `packages/observe/rust/src/{query,definition,metrics_cli}`
   and stops with `NEEDS_CONTEXT` if a feature differs from the request file.
 - Also waits for the kinds the rewritten definitions read: `fgos.head.state` with its role attr (ops-metrics phase
-  11) for `lead-ended` and `watcher-active`.
+  11) for `lead-ended` and `watcher-active`. Agreed with lead:OPS-METRICS on 2026-11-18: the attr is `fgos.head.role`
+  (`head:<persona>-<name>` or `lead:<LANE>`); `fgos.plan.status` covers only `contract: plan-v1` plans, dedupes rebased
+  copies across branches, and emits a creation transition (from absent) for a plan born at a status.
 - The README's pending table and phase 13's spec (`phase-13-trigger-definitions.md`) for the behaviour each must have.
 
 ## Footprint

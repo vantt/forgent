@@ -30,6 +30,9 @@ at 60 s, so a long verb must not run inside the request.
   `docs/platform/session-host/spec.md` section 3.
 - The `retired` signal: ops-metrics phase 11's landed `fgos.head.state` source
   (`rg -n "retired" apps/fgos/src/wiring/observe_sources`). Step 0 reads what it derives `retired` from.
+  Agreed with lead:OPS-METRICS on 2026-11-18: `retired` is the field `retiredAt` (RFC 3339) in the head's
+  `placement.json` under `.fgos/runtime/session-rotation/<persona>-<name>/`, and the record's ts is `retiredAt`.
+  `session stop` writes exactly that field.
 - Owner-question store: `fgos questions ack|cancel <id>` accepts the asker, any session holding the same `head:` role
   (the successor the supervisor starts with the asker's persona and name), or any head when the asker held no head
   role (its QP-4). No `answers:` role, no `--for` flag.
