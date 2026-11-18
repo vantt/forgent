@@ -425,7 +425,9 @@ export function assessBwrap(request, backend) {
   const policyId = request.requirement?.policyId;
   const isWorkspaceWrite = policyId === 'workspace-write';
 
-  const allowedResources = new Set(['run-output', 'private-home', 'executor-credentials', 'workspace-paths', MAILBOX_RECORD_RESOURCE]);
+  const allowedResources = new Set(['run-output', 'private-home', 'executor-credentials', 'workspace-paths']);
+  // The mailbox record is a head session's grant only (session-attempt.mjs requirementOf): no other launch binds it.
+  if (request.assignmentLaunchContext?.kind === 'session') allowedResources.add(MAILBOX_RECORD_RESOURCE);
   if (isWorkspaceWrite) {
     allowedResources.add('workspace');
     allowedResources.add('workspace-git-metadata');
@@ -639,14 +641,11 @@ export function prepareBwrapSync(plan, request, backend) {
         }
       }
 
-      // A parent shell (resources.mjs fileGrantParents): a tmpfs over the directory, its other entries bound back
-      // read-only; the granted entries inside it are bound after it as ordinary mounts.
-      if (res.delivery === 'shell') {
-        bwrapArgs.push('--tmpfs', res.executionTarget.path);
-        for (const entry of res.kept ?? []) {
-          if (entry.symlink !== undefined) bwrapArgs.push('--symlink', entry.symlink, entry.path);
-          else bwrapArgs.push('--ro-bind', entry.path, entry.path);
-        }
+      // The parent of a granted file (resources.mjs fileGrantParents): bound read-write from the host, then every
+      // other entry it held at launch bound back read-only over it, in this order.
+      if (res.delivery === 'parent') {
+        bwrapArgs.push('--bind', res.hostTarget, res.executionTarget.path);
+        for (const entry of res.kept ?? []) bwrapArgs.push('--ro-bind', entry.path, entry.path);
         return;
       }
 
@@ -680,12 +679,12 @@ export function prepareBwrapSync(plan, request, backend) {
     // every hidden root, the masks, a blind dispatch's own directory read-only, the mounts inside a hidden root
     // (outbox, own home, the program and its install directories), and last the masks made read-only.
     const insideMasked = (res) => [...hidden, ...(own ? [own] : [])].some((h) => res.executionTarget?.path && isInsideRoot(res.executionTarget.path, h.executionTarget.path));
-    // Parent shells first: a tmpfs over a directory hides every mount made in it before.
-    const shellsFirst = (list) => [...list.filter((r) => r.delivery === 'shell'), ...list.filter((r) => r.delivery !== 'shell')];
-    shellsFirst(mounts.filter((r) => !insideMasked(r))).forEach(materialize);
+    // Parents of granted files first: a bind over a directory hides every mount made in it before.
+    const parentsFirst = (list) => [...list.filter((r) => r.delivery === 'parent'), ...list.filter((r) => r.delivery !== 'parent')];
+    parentsFirst(mounts.filter((r) => !insideMasked(r))).forEach(materialize);
     for (const h of hidden) bwrapArgs.push('--tmpfs', h.executionTarget.path);
     if (own) bwrapArgs.push('--ro-bind', own.hostTarget, own.executionTarget.path);
-    shellsFirst(mounts.filter(insideMasked)).forEach(materialize);
+    parentsFirst(mounts.filter(insideMasked)).forEach(materialize);
     bindAttemptFiles();
     for (const h of hidden) bwrapArgs.push('--remount-ro', h.executionTarget.path);
 

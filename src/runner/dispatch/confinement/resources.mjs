@@ -42,22 +42,72 @@ export const BLIND_HIDDEN_ROOTS = Object.freeze([
 ]);
 
 /**
+ * `rel` under `root` as one real path: `root` is resolved once, and every component below it that exists must be what
+ * it names, never a symbolic link, so a link at the target or at any directory between them cannot redirect a grant
+ * elsewhere (`runtime/mailbox -> ..` would grant all of `.fgos`, `docs -> .` the whole project). Returns the real
+ * root and the path; refuses `confinement-grant-invalid` by name.
+ */
+function unredirectedPath(root, rel, label) {
+  const realRoot = fs.realpathSync(root);
+  let at = realRoot;
+  for (const part of rel.split(/[\\/]+/).filter(Boolean)) {
+    at = path.join(at, part);
+    if (fs.lstatSync(at, { throwIfNoEntry: false })?.isSymbolicLink()) {
+      throw new ConfinementResourceError('confinement-grant-invalid', `${label}: "${path.relative(realRoot, at)}" under ${realRoot} is a symbolic link; a grant names real paths only.`);
+    }
+  }
+  return { realRoot, real: at };
+}
+
+/** Makes the directory `rel` of `realRoot` one component at a time, refusing a link or a non-directory on the way. */
+function ensureRealDir(realRoot, rel, mode, label) {
+  let at = realRoot;
+  for (const part of rel.split('/')) {
+    at = path.join(at, part);
+    try {
+      fs.mkdirSync(at, { mode });
+    } catch (err) {
+      if (err.code !== 'EEXIST') throw err;
+    }
+    const seen = fs.lstatSync(at);
+    if (seen.isSymbolicLink() || !seen.isDirectory()) {
+      throw new ConfinementResourceError('confinement-grant-invalid', `${label}: ${at} is not a real directory; a grant names real paths only.`);
+    }
+  }
+  return at;
+}
+
+/**
  * What a mailbox-record grant binds, created when missing so the bind can be made: the lock file of the holder-lock
  * registry's `mailbox` row (an existing inode, opened and flocked in place; the lock file is never replaced) and the
  * mailbox runtime directory (owned by packages/mailbox/rust/store/src/record/paths.rs), where the record is written
- * by temp file and rename. A `.fgos` that cannot take them refuses the grant by name.
+ * by temp file and rename. Exactly those two real paths of the real `.fgos`: a symbolic link at either or at any
+ * directory between them refuses the grant, and nothing is created through one. A `.fgos` that cannot take them
+ * refuses the grant by name.
  */
 function mailboxRecordPaths(fgosDir) {
-  const lock = resolveLock('mailbox', { fgosDir }).v3Path;
-  const dir = path.join(path.resolve(fgosDir), 'runtime', 'mailbox');
+  const label = MAILBOX_RECORD_RESOURCE;
+  const lockRel = path.relative(path.resolve(fgosDir), resolveLock('mailbox', { fgosDir }).v3Path).split(path.sep).join('/');
+  const dirRel = 'runtime/mailbox';
   try {
-    fs.mkdirSync(path.dirname(lock), { recursive: true });
-    fs.closeSync(fs.openSync(lock, fs.constants.O_RDWR | fs.constants.O_CREAT, 0o644));
-    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+    const { realRoot, real: lock } = unredirectedPath(fgosDir, lockRel, label);
+    unredirectedPath(fgosDir, dirRel, label);
+    ensureRealDir(realRoot, path.posix.dirname(lockRel), 0o755, label);
+    try {
+      fs.closeSync(fs.openSync(lock, fs.constants.O_RDWR | fs.constants.O_CREAT | fs.constants.O_NOFOLLOW, 0o644));
+    } catch (err) {
+      if (err.code === 'ELOOP') throw new ConfinementResourceError('confinement-grant-invalid', `${label}: ${lock} is a symbolic link; a grant names real paths only.`);
+      throw err;
+    }
+    if (!fs.lstatSync(lock).isFile()) {
+      throw new ConfinementResourceError('confinement-grant-invalid', `${label}: ${lock} is not a regular file.`);
+    }
+    const dir = ensureRealDir(realRoot, dirRel, 0o700, label);
+    return [{ kind: 'lock', hostPath: lock }, { kind: 'record', hostPath: dir }];
   } catch (err) {
+    if (err instanceof ConfinementResourceError) throw err;
     throw new ConfinementResourceError('mailbox-record-unavailable', `the mailbox record under ${fgosDir} cannot be prepared: ${err.message}`);
   }
-  return [{ kind: 'lock', hostPath: lock }, { kind: 'record', hostPath: dir }];
 }
 
 /** The directory Claude Code keeps one control socket per open session in (`<pid>.sock`). */
@@ -374,36 +424,47 @@ export function isInsideRoot(target, root) {
 }
 
 /**
- * The parent shells of the file entries of a workspace-paths grant. A file bound on its own cannot be replaced
- * atomically: an editor writes its temp file beside the target and renames it over, and both fail in a read-only
- * parent. So the parent of a granted file becomes a tmpfs (`delivery: 'shell'`), every other entry it holds on the host
- * is bound back read-only (a symlink is recreated as one), and the granted entries are bound writable after it. A temp
- * file then lands on the tmpfs; the rename over the bound file fails busy and the editor writes in place. New names in
- * the parent live only in the sandbox, and entries the host adds later are not seen until the next launch. A file whose
- * parent is itself a granted directory (or lies in one) needs no shell. Shallow parents come first, so a deeper shell
- * is made over the read-only entry its parent bound back.
+ * The parents of the file entries of a workspace-paths grant. A file bound on its own cannot be replaced atomically
+ * (an editor writes its temp file beside the target and renames it over, and both fail in a read-only parent), and a
+ * bind pins the inode: when Git replaces the file on the host (a pull or a merge), a long-lived session would keep
+ * reading the old content and writing a deleted file. So the parent of a granted file is bound read-write from the
+ * host (`delivery: 'parent'`), where its names resolve live, and every other entry it holds at launch is bound back
+ * read-only after it (`kept`, dotfiles included): such an entry cannot be written, and renaming or removing a mount
+ * point fails busy, so an editor writing the granted file in place or by rename works and no existing non-granted
+ * entry changes. The granted file itself gets no bind of its own.
+ *
+ * Accepted trade-offs: a name created in that parent after launch, by the session or by Git on the host, is writable
+ * in the session; and an entry bound back read-only is pinned by inode, so after a host rewrite the session reads it
+ * stale until its next launch (reads only). A parent holding a symbolic link is refused: a link cannot be bound over
+ * (a mount follows it), so it would stay removable. A file whose parent is a granted directory, or lies in one, needs
+ * no parent bind. Shallow parents come first, so a deeper parent is bound over the read-only entry its parent bound back.
  */
-function fileGrantParents(entries) {
+function fileGrantParents(entries, realRoot) {
   const dirs = entries.filter((e) => !e.isFile).map((e) => e.hostTarget);
   const granted = new Set(entries.map((e) => e.hostTarget));
   const parents = [...new Set(entries.filter((e) => e.isFile).map((e) => path.dirname(e.hostTarget)))]
     .filter((parent) => !dirs.some((dir) => isInsideRoot(parent, dir)))
     .sort((a, b) => a.split(path.sep).length - b.split(path.sep).length || a.localeCompare(b));
   return parents.map((parent) => {
+    const rel = path.relative(realRoot, parent) || '.';
     const kept = fs.readdirSync(parent, { withFileTypes: true })
       .map((dirent) => path.join(parent, dirent.name))
       .filter((entry) => !granted.has(entry))
       .sort()
-      .map((entry) => (fs.lstatSync(entry).isSymbolicLink() ? { path: entry, symlink: fs.readlinkSync(entry) } : { path: entry }));
-    const rel = path.relative(entries[0].declaredRoot, parent) || '.';
+      .map((entry) => {
+        if (fs.lstatSync(entry).isSymbolicLink()) {
+          throw new ConfinementResourceError('confinement-grant-invalid', `workspace-paths: "${path.relative(realRoot, entry)}" beside a granted file is a symbolic link, which a read-only bind cannot pin; remove it or grant its directory.`);
+        }
+        return { path: entry };
+      });
     return {
       resource: 'workspace-paths',
       identity: `workspace-paths-parent:${rel}`,
       hostTarget: parent,
       executionTarget: { location: 'host', path: parent },
-      delivery: 'shell',
+      delivery: 'parent',
       collect: 'none',
-      access: 'read',
+      access: 'read-write',
       allocation: 'existing',
       kept,
     };
@@ -654,12 +715,14 @@ export function resolveConfinementResources({
       if (seen.isSymbolicLink()) {
         throw new ConfinementResourceError('confinement-grant-invalid', `workspace-paths entry "${rel}" is a symbolic link; name the real path.`);
       }
-      const { hostTarget, declaredRoot } = canonicalizeAndVerifySubpath(target, root, 'workspace-paths');
-      entries.push({ rel, hostTarget, declaredRoot, isFile: !seen.isDirectory() });
+      const { real: hostTarget } = unredirectedPath(root, rel, 'workspace-paths');
+      canonicalizeAndVerifySubpath(hostTarget, root, 'workspace-paths');
+      entries.push({ rel, hostTarget, isFile: !seen.isDirectory() });
     }
-    // The parent shells go first: each one is a tmpfs over its directory, and a mount made before it would vanish.
-    resolved.push(...fileGrantParents(entries));
-    for (const { rel, hostTarget } of entries) {
+    // The parents go first: a bind over a directory hides every mount made in it before.
+    resolved.push(...fileGrantParents(entries, fs.realpathSync(root)));
+    // A granted file gets no bind of its own: its parent or a granted directory holding it makes it writable by name.
+    for (const { rel, hostTarget } of entries.filter((e) => !e.isFile)) {
       resolved.push({
         resource: 'workspace-paths',
         identity: `workspace-paths:${rel}`,
@@ -680,8 +743,7 @@ export function resolveConfinementResources({
     if (!context.fgosDir) {
       throw new ConfinementResourceError('confinement-grant-invalid', `${MAILBOX_RECORD_RESOURCE} requires context.fgosDir.`);
     }
-    for (const { kind, hostPath } of mailboxRecordPaths(context.fgosDir)) {
-      const { hostTarget } = canonicalizeAndVerifySubpath(hostPath, context.fgosDir, MAILBOX_RECORD_RESOURCE);
+    for (const { kind, hostPath: hostTarget } of mailboxRecordPaths(context.fgosDir)) {
       resolved.push({
         resource: MAILBOX_RECORD_RESOURCE,
         identity: `${MAILBOX_RECORD_RESOURCE}:${kind}`,

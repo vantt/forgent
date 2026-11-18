@@ -21,7 +21,7 @@ use fgos_event_store::layout::Layout;
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::ancestry::ancestry_of;
 use fgos_mailbox::hook::outcome_log;
-use fgos_mailbox::hook::resolve::{resolver_for, HookEnv};
+use fgos_mailbox::hook::resolve::{resolver_for, HookEnv, HEAD_REQUEST_SOCKET_ENV};
 use fgos_mailbox::hook::shell::{self, GateState, ShellInput, WriteGate};
 use fgos_mailbox::hook::{Adapter, HookEvent};
 use fgos_mailbox::record::Paths;
@@ -150,30 +150,52 @@ fn run(args: &[OsString]) {
     if gate_idle.state() == GateState::Idle {
         start_sync(&fgos_dir, &paths, &cross);
     }
-    // Make sure Identity knows the head: on the call that bound it to a new
-    // generation (quiet by construction), and again on a later quiet call
-    // while the latest outcome says Identity had no machine id yet, so a
-    // machine id minted after the head started still registers it. The
-    // write gate must be idle, so the watchdog still covers the step;
-    // steady calls otherwise never touch Identity.
+    // Make sure Identity knows the head (see `ensure_identity`). The write
+    // gate must be idle, so the watchdog still covers the step.
     let Some((head, cli)) = outcome.bound.as_ref().zip(adapter.cli()) else {
         return;
     };
-    let retry = || outcome_log::latest_reason(&paths).as_deref() == Some(IDENT_NO_MACHINE_ID);
-    if gate_idle.state() != GateState::Idle || (head.registered.is_none() && !retry()) {
+    let confined = std::env::var_os(HEAD_REQUEST_SOCKET_ENV).is_some_and(|path| !path.is_empty());
+    let latest = || outcome_log::latest_reason(&paths);
+    if gate_idle.state() != GateState::Idle
+        || !ensure_identity(head.registered.is_some(), confined, latest)
+    {
         return;
     }
     let Some(root) = identity_root.as_deref() else {
         return;
     };
     match ensure_registered(root, fgos_dir.parent(), &cli, head) {
-        None if head.registered.is_none() => outcome_log::clear(&paths),
+        // A retry that now holds clears the outcome it left.
+        None if latest().is_some_and(|reason| reason.starts_with(IDENT_PREFIX)) => {
+            outcome_log::clear(&paths)
+        }
         None => {}
         Some(reason) => {
             outcome_log::record_reason(&paths, adapter, event, &reason, now());
         }
     }
 }
+
+/// Whether this call makes sure Identity knows its head: on the call that
+/// bound it to a new generation (quiet by construction); inside a confined
+/// head on every later call until its bind holds, because a busy or failed
+/// `head bind session` leaves the head unbound and its role on the attempt
+/// (`ensure_registered` first reads Identity's directory, so a bound head
+/// costs one read-only scan and no request); and otherwise again on a later
+/// quiet call while the latest outcome says Identity had no machine id yet,
+/// so a machine id minted after the head started still registers it.
+/// Steady calls of an unconfined head never touch Identity.
+fn ensure_identity(
+    newly_bound: bool,
+    confined_head: bool,
+    latest_reason: impl FnOnce() -> Option<String>,
+) -> bool {
+    newly_bound || confined_head || latest_reason().as_deref() == Some(IDENT_NO_MACHINE_ID)
+}
+
+/// The prefix of every outcome `ensure_registered` leaves.
+const IDENT_PREFIX: &str = "ident:";
 
 /// Starts the one detached `hook mailbox-sync` child when mail may cross
 /// machines and the last child that took mail started longer ago than the
@@ -222,3 +244,25 @@ fn start_sync(fgos_dir: &Path, paths: &Paths, cross: &CrossMachine) {
 /// The outcome a registering call leaves when Identity has no machine id
 /// yet (`ensure_registered`'s reason for Identity's `machine-id-missing`).
 const IDENT_NO_MACHINE_ID: &str = "ident:machine-id-missing";
+
+#[cfg(test)]
+mod tests {
+    use super::{ensure_identity, IDENT_NO_MACHINE_ID};
+
+    #[test]
+    fn a_confined_head_retries_its_identity_bind_on_every_later_call_and_an_unconfined_head_only_after_a_missing_machine_id(
+    ) {
+        let none = || None;
+        let busy = || Some("ident:busy".to_string());
+        let no_machine = || Some(IDENT_NO_MACHINE_ID.to_string());
+        // A new generation always makes sure.
+        assert!(ensure_identity(true, false, none));
+        // A confined head whose bind was busy, refused, or whose outcome another head overwrote, tries again.
+        assert!(ensure_identity(false, true, busy));
+        assert!(ensure_identity(false, true, none));
+        // An unconfined steady call leaves Identity alone unless the machine id was missing.
+        assert!(!ensure_identity(false, false, none));
+        assert!(!ensure_identity(false, false, busy));
+        assert!(ensure_identity(false, false, no_machine));
+    }
+}

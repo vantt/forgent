@@ -48,9 +48,7 @@ pub const HEAD_REQUEST_SOCKET_ENV: &str = "FGOS_HEAD_REQUEST_SOCKET";
 /// does an unconfined head; every other runner attempt (a worker) stays its
 /// attempt id and is never registered.
 pub fn head_cli_session(lookup: &dyn Fn(&str) -> Option<String>) -> Option<String> {
-    lookup(HEAD_REQUEST_SOCKET_ENV).filter(|socket| !socket.is_empty())?;
-    let attempt = lookup(ENV_ORDER[0])?;
-    if !fgos_identity::is_attempt_writer_id(attempt.trim()) {
+    if !is_head_attempt(lookup) {
         return None;
     }
     ENV_ORDER[1..].iter().find_map(|source| {
@@ -64,13 +62,29 @@ pub fn head_cli_session(lookup: &dyn Fn(&str) -> Option<String>) -> Option<Strin
     })
 }
 
+/// Whether `lookup` is the environment of a head session attempt: it carries
+/// the head request socket and names a runner attempt in `FGOS_SESSION_ID`.
+fn is_head_attempt(lookup: &dyn Fn(&str) -> Option<String>) -> bool {
+    lookup(HEAD_REQUEST_SOCKET_ENV).is_some_and(|socket| !socket.is_empty())
+        && lookup(ENV_ORDER[0]).is_some_and(|id| fgos_identity::is_attempt_writer_id(id.trim()))
+}
+
 impl HookEnv {
     /// The calling process's environment; `fgos_dir` is the record's
     /// `.fgos` directory, where session identity's registry lives.
     pub fn from_process(fgos_dir: &Path) -> Self {
-        let lookup = |name: &str| std::env::var(name).ok();
-        let (session_writer, session_env) = match head_cli_session(&lookup) {
+        Self::from_lookup(fgos_dir, &|name: &str| std::env::var(name).ok())
+    }
+
+    /// [`HookEnv::from_process`] over `lookup`. A head session attempt
+    /// whose CLI names its session only in the hook payload (a Codex hook
+    /// sees no session variable) has no session of its environment: the
+    /// attempt id is never its writer, so the payload's `session_id` is the
+    /// head's CLI session.
+    fn from_lookup(fgos_dir: &Path, lookup: &dyn Fn(&str) -> Option<String>) -> Self {
+        let (session_writer, session_env) = match head_cli_session(lookup) {
             Some(id) => (WriterKey::new(id.clone()).ok(), Some(id)),
+            None if is_head_attempt(lookup) => (None, None),
             None => {
                 let identity = resolve_current(Some(fgos_dir));
                 let writer = match (identity.id, identity.source) {
@@ -81,13 +95,13 @@ impl HookEnv {
                 };
                 (
                     writer,
-                    env_identity(&lookup, None).map(|identity| identity.id.to_string()),
+                    env_identity(lookup, None).map(|identity| identity.id.to_string()),
                 )
             }
         };
         Self {
-            home: std::env::var_os("HOME"),
-            claude_config_dir: std::env::var_os("CLAUDE_CONFIG_DIR"),
+            home: lookup("HOME").map(OsString::from),
+            claude_config_dir: lookup("CLAUDE_CONFIG_DIR").map(OsString::from),
             session_writer,
             session_env,
         }
@@ -121,7 +135,8 @@ pub fn resolver_for<'a>(
 
 #[cfg(test)]
 mod tests {
-    use super::{head_cli_session, HEAD_REQUEST_SOCKET_ENV};
+    use super::{head_cli_session, HookEnv, HEAD_REQUEST_SOCKET_ENV};
+    use crate::adapters::payload_head::payload_writer;
 
     fn env<'a>(pairs: &'a [(&'static str, &'static str)]) -> impl Fn(&str) -> Option<String> + 'a {
         move |key| {
@@ -154,5 +169,35 @@ mod tests {
             (HEAD_REQUEST_SOCKET_ENV, "/s"),
         ];
         assert_eq!(head_cli_session(&env(&bare)), None);
+    }
+
+    #[test]
+    fn a_head_session_attempt_whose_cli_names_its_session_only_in_the_payload_takes_the_payloads_session(
+    ) {
+        let codex = [
+            ("FGOS_SESSION_ID", "att-cmd_1"),
+            (HEAD_REQUEST_SOCKET_ENV, "/run/user/1/s.sock"),
+        ];
+        let head = HookEnv::from_lookup(std::path::Path::new("/nonexistent/.fgos"), &env(&codex));
+        assert_eq!(
+            (head.session_writer.clone(), head.session_env.clone()),
+            (None, None)
+        );
+        let payload = br#"{"session_id":"codex-thread-1"}"#;
+        assert_eq!(
+            payload_writer(payload, head.session_env.as_deref())
+                .ok()
+                .as_ref()
+                .map(|writer| writer.as_str()),
+            Some("codex-thread-1")
+        );
+        // The falsifier: a worker attempt (no head request socket) keeps its attempt id as its session, so the
+        // payload's session is refused as another writer's.
+        let worker = HookEnv::from_lookup(
+            std::path::Path::new("/nonexistent/.fgos"),
+            &env(&codex[..1]),
+        );
+        assert_eq!(worker.session_env.as_deref(), Some("att-cmd_1"));
+        assert!(payload_writer(payload, worker.session_env.as_deref()).is_err());
     }
 }

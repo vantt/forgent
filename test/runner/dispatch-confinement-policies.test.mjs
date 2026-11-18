@@ -738,7 +738,7 @@ test('workspace-paths: the shape takes project-relative paths and refuses empty,
   }), /unknown key "paths"/);
 });
 
-test('workspace-paths: the resolver binds one writable entry per path, shells the parent of a granted file, and refuses a missing path and a symlink', () => {
+test('workspace-paths: the resolver binds a granted directory, binds the parent of a granted file read-write with its other entries bound back read-only, and refuses a missing path and any symbolic link on the way', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-ws-paths-'));
   try {
     fs.mkdirSync(path.join(root, 'plans'));
@@ -747,7 +747,7 @@ test('workspace-paths: the resolver binds one writable entry per path, shells th
     fs.writeFileSync(path.join(root, 'docs', 'backlog.md'), '# b\n');
     fs.writeFileSync(path.join(root, 'docs', 'other.md'), 'o\n');
     fs.writeFileSync(path.join(root, 'docs', '.hidden'), 'h\n');
-    fs.symlinkSync('other.md', path.join(root, 'docs', 'see'));
+    fs.writeFileSync(path.join(root, 'top.md'), 't\n');
     fs.symlinkSync(path.join(root, 'docs'), path.join(root, 'link'));
     const resolve = (paths) => resolveConfinementResources({
       dispatchId: 'd-1',
@@ -757,25 +757,30 @@ test('workspace-paths: the resolver binds one writable entry per path, shells th
     const real = fs.realpathSync(root);
     const docs = path.join(real, 'docs');
     const bound = resolve(['plans', 'docs/backlog.md', 'docs/discussions']).filter((r) => r.resource === 'workspace-paths');
-    // A file cannot be replaced atomically on its own: its parent is a shell (a tmpfs with every other entry bound back
-    // read-only, a symlink as a symlink, dotfiles included), made before the mounts it would hide.
+    // The parent of a granted file is bound read-write (its names resolve live on the host) before the mounts it would
+    // hide; every other entry it holds, dotfiles included, is bound back read-only; the file gets no bind of its own.
     assert.deepEqual(bound.map((r) => [r.delivery, r.hostTarget, r.access]), [
-      ['shell', docs, 'read'],
+      ['parent', docs, 'read-write'],
       ['mount', path.join(real, 'plans'), 'read-write'],
-      ['mount', path.join(docs, 'backlog.md'), 'read-write'],
       ['mount', path.join(docs, 'discussions'), 'read-write'],
     ]);
     assert.deepEqual(bound[0].kept, [
       { path: path.join(docs, '.hidden') },
       { path: path.join(docs, 'other.md') },
-      { path: path.join(docs, 'see'), symlink: 'other.md' },
       { path: path.join(docs, 'sub') },
     ]);
-    // A file inside a granted directory is writable already: no shell.
-    assert.ok(!resolve(['docs', 'docs/backlog.md']).some((r) => r.delivery === 'shell'));
+    // A file inside a granted directory is writable by name already: no parent, no bind of its own.
+    assert.deepEqual(resolve(['docs', 'docs/backlog.md']).filter((r) => r.resource === 'workspace-paths').map((r) => [r.delivery, r.hostTarget]), [['mount', docs]]);
     assert.throws(() => resolve(['nope']), (err) => err.code === 'workspace-path-missing');
     assert.throws(() => resolve(['link']), /symbolic link/);
     assert.throws(() => resolve(['../x']), (err) => err.code === 'confinement-grant-invalid');
+    // A redirected directory on the way (here one that names the project root) would bind its target's parent: refused.
+    fs.symlinkSync('.', path.join(root, 'up'));
+    assert.throws(() => resolve(['up/top.md']), (err) => err.code === 'confinement-grant-invalid' && /"up" .* symbolic link/.test(err.message));
+    assert.throws(() => resolve(['link/backlog.md']), (err) => err.code === 'confinement-grant-invalid');
+    // A symbolic link beside a granted file cannot be pinned read-only (a mount follows it): refused, not left writable.
+    fs.symlinkSync('other.md', path.join(root, 'docs', 'see'));
+    assert.throws(() => resolve(['docs/backlog.md']), (err) => err.code === 'confinement-grant-invalid' && /docs\/see/.test(err.message));
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
@@ -803,6 +808,40 @@ test('a mailbox-record grant binds exactly the mailbox lock file and the mailbox
       context: { cwd: base, repoRoot: base },
       grants: [{ resource: 'mailbox-record', access: 'read-write', scope: 'dispatch' }],
     }), { code: 'confinement-grant-invalid' });
+  } finally {
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});
+
+test('a mailbox-record grant refuses a symbolic link at its targets or on the way, so it never grants more of .fgos', () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mailbox-link-'));
+  try {
+    const fgosDir = path.join(base, '.fgos');
+    const grant = () => resolveConfinementResources({
+      dispatchId: 'disp_mailbox_link',
+      context: { cwd: base, repoRoot: base, fgosDir },
+      grants: [{ resource: 'mailbox-record', access: 'read-write', scope: 'dispatch' }],
+    });
+    const refused = (err) => err.code === 'confinement-grant-invalid' && /symbolic link|not a real directory/.test(err.message);
+    // runtime/mailbox -> .. would grant all of .fgos.
+    fs.mkdirSync(path.join(fgosDir, 'runtime'), { recursive: true });
+    fs.symlinkSync('..', path.join(fgosDir, 'runtime', 'mailbox'));
+    assert.throws(grant, refused);
+    fs.unlinkSync(path.join(fgosDir, 'runtime', 'mailbox'));
+    // locks/mailbox.lock -> ../config.yaml would grant the config.
+    fs.writeFileSync(path.join(fgosDir, 'config.yaml'), 'k: v\n');
+    fs.mkdirSync(path.join(fgosDir, 'locks'));
+    fs.symlinkSync('../config.yaml', path.join(fgosDir, 'locks', 'mailbox.lock'));
+    assert.throws(grant, refused);
+    // A redirected directory on the way: locks -> runtime.
+    fs.rmSync(path.join(fgosDir, 'locks'), { recursive: true });
+    fs.symlinkSync('runtime', path.join(fgosDir, 'locks'));
+    assert.throws(grant, refused);
+    assert.ok(!fs.existsSync(path.join(fgosDir, 'runtime', 'mailbox.lock')), 'nothing was created through the link');
+    assert.equal(fs.readFileSync(path.join(fgosDir, 'config.yaml'), 'utf8'), 'k: v\n');
+    // The falsifier: real paths are granted.
+    fs.unlinkSync(path.join(fgosDir, 'locks'));
+    assert.equal(grant().filter((r) => r.resource === 'mailbox-record').length, 2);
   } finally {
     fs.rmSync(base, { recursive: true, force: true });
   }

@@ -1270,7 +1270,7 @@ test('a workspace-write producer in a linked worktree cannot write git metadata;
   }
 });
 
-/** A project with a docs directory: the granted backlog and discussions, other files, a subdirectory and a symlink. */
+/** A project with a docs directory: the granted backlog and discussions, other files, a dotfile and a subdirectory. */
 function docsProject(base) {
   fs.mkdirSync(path.join(base, 'docs', 'discussions'), { recursive: true });
   fs.mkdirSync(path.join(base, 'docs', 'sub'));
@@ -1278,37 +1278,51 @@ function docsProject(base) {
   fs.writeFileSync(path.join(base, 'docs', 'backlog.md'), 'old\n');
   fs.writeFileSync(path.join(base, 'docs', 'other.md'), 'keep\n');
   fs.writeFileSync(path.join(base, 'docs', '.hidden'), 'keep\n');
-  fs.symlinkSync('other.md', path.join(base, 'docs', 'link'));
   fs.mkdirSync(path.join(base, '.fgos'));
 }
 
-test('a launched secretary shape replaces docs/backlog.md through a temp file, takes the mailbox lock and writes the record, and every other docs and .fgos path stays read-only', async (t) => {
+/** Waits until `file` exists, polling; refuses after `ms`. */
+async function waitFor(file, ms = 20000) {
+  for (const start = Date.now(); !fs.existsSync(file); ) {
+    if (Date.now() - start > ms) throw new Error(`${file} never appeared`);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+}
+
+test('a launched secretary shape replaces docs/backlog.md through a temp file, follows a host-side replace of it, takes the mailbox lock and writes the record, and every other docs and .fgos path stays read-only', async (t) => {
   if (!HAS_WORKING_BWRAP) return t.skip('no working bwrap on this machine');
   // Outside /tmp: the sandbox mounts a private tmpfs there.
   const base = fs.mkdtempSync(path.join(fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir(), 'fgos-secretary-shape-'));
   try {
     docsProject(base);
     const fgosDir = path.join(base, '.fgos');
+    const backlog = path.join(base, 'docs', 'backlog.md');
     const headGrants = requirementOf(grantOf('head:secretary-miu')).policy.grants.filter((g) => ['workspace-paths', 'mailbox-record'].includes(g.resource));
     assert.deepEqual(headGrants.map((g) => g.resource), ['workspace-paths', 'mailbox-record']);
     const resources = resolveConfinementResources({ dispatchId: 'disp_secretary', context: { cwd: base, repoRoot: base, fgosDir }, grants: headGrants });
     const plan = { contract: 'confinement-plan.v1', dispatchId: 'disp_secretary', decision: 'execute', coverage: {}, resources };
     const record = '.fgos/runtime/mailbox/record';
     const script = [
-      // The editor's atomic write: a temp file beside the target, a rename over it, in place when the rename fails.
-      'printf "new\\n" > docs/backlog.md.tmp.2',
-      '{ mv -f docs/backlog.md.tmp.2 docs/backlog.md 2>/dev/null || cat docs/backlog.md.tmp.2 > docs/backlog.md; }',
+      // The editor's atomic write: a temp file beside the target, renamed over it.
+      'printf "new\\n" > docs/backlog.md.tmp.2 && mv -f docs/backlog.md.tmp.2 docs/backlog.md',
       'echo d > docs/discussions/new.md',
       'echo p > plans/p.md',
-      '[ -L docs/link ] && [ "$(cat docs/.hidden)" = keep ]',
+      '[ "$(cat docs/.hidden)" = keep ]',
+      // A non-granted sibling: no write, no removal, no rename; nor anything under a non-granted subdirectory.
       '! (echo x >> docs/other.md) 2>/dev/null',
       '! rm -f docs/other.md 2>/dev/null',
+      '! mv docs/other.md docs/moved.md 2>/dev/null',
       '! (echo x > docs/sub/x.md) 2>/dev/null',
       // The mailbox: its lock opened read-write (O_CREAT), its record replaced by temp file and rename; nothing else of .fgos.
       '(exec 3<>.fgos/locks/mailbox.lock)',
       `mkdir -p ${record} && echo s > ${record}/snapshot.json.tmp && mv ${record}/snapshot.json.tmp ${record}/snapshot.json`,
       '! (exec 4<>.fgos/locks/other.lock) 2>/dev/null',
       '! (echo x > .fgos/stray) 2>/dev/null',
+      // Hand over to the host, which replaces the backlog as Git does (a new file renamed over it), and wait for it.
+      'echo > plans/ready',
+      'while [ ! -e plans/go ]; do sleep 0.02; done',
+      '[ "$(cat docs/backlog.md)" = host ]',
+      'printf "host\\nhead\\n" > docs/backlog.md.tmp.3 && mv -f docs/backlog.md.tmp.3 docs/backlog.md',
     ].join(' && ');
     const prepared = await prepareBwrap(plan, {
       dispatchId: 'disp_secretary',
@@ -1316,10 +1330,19 @@ test('a launched secretary shape replaces docs/backlog.md through a temp file, t
       invocation: { command: 'sh', args: ['-c', script], env: { PATH: process.env.PATH } },
       context: { cwd: base, runDir: base },
     }, { id: 'bwrap', type: 'bwrap', config: {} });
-    const run = cp.spawnSync(prepared.invocation.command, prepared.invocation.args, { cwd: base, env: prepared.invocation.env, encoding: 'utf8' });
-    assert.equal(run.status, 0, `${run.stderr}${run.stdout}`);
-    assert.equal(fs.readFileSync(path.join(base, 'docs', 'backlog.md'), 'utf8'), 'new\n', 'the host backlog changed');
-    assert.ok(!fs.existsSync(path.join(base, 'docs', 'backlog.md.tmp.2')), 'the temp file stayed in the sandbox');
+    const child = cp.spawn(prepared.invocation.command, prepared.invocation.args, { cwd: base, env: prepared.invocation.env, stdio: ['ignore', 'pipe', 'pipe'] });
+    let output = '';
+    child.stdout.on('data', (chunk) => { output += chunk; });
+    child.stderr.on('data', (chunk) => { output += chunk; });
+    const exited = new Promise((resolve) => child.on('close', resolve));
+    await Promise.race([waitFor(path.join(base, 'plans', 'ready')), exited.then((code) => { throw new Error(`the sandbox ended early (${code}): ${output}`); })]);
+    assert.equal(fs.readFileSync(backlog, 'utf8'), 'new\n', 'the head\'s rename landed on the host');
+    fs.writeFileSync(`${backlog}.git-tmp`, 'host\n');
+    fs.renameSync(`${backlog}.git-tmp`, backlog);
+    fs.writeFileSync(path.join(base, 'plans', 'go'), '');
+    assert.equal(await exited, 0, output);
+    assert.equal(fs.readFileSync(backlog, 'utf8'), 'host\nhead\n', 'the head read the replaced file and its next write landed in it');
+    assert.deepEqual(fs.readdirSync(path.join(base, 'docs')).sort(), ['.hidden', 'backlog.md', 'discussions', 'other.md', 'sub']);
     assert.equal(fs.readFileSync(path.join(base, 'docs', 'other.md'), 'utf8'), 'keep\n');
     assert.ok(fs.existsSync(path.join(base, 'docs', 'discussions', 'new.md')));
     assert.ok(fs.existsSync(path.join(base, 'plans', 'p.md')));
@@ -1363,6 +1386,26 @@ test('assessBwrap: a workspace-paths grant is supported under host-write-denied 
       },
     }, { id: 'bwrap', config: { type: 'bwrap' } });
     assert.ok(refused.mismatches.some((m) => m.code === 'workspace-path-missing' && /gone/.test(m.detail)), JSON.stringify(refused.mismatches));
+
+    // The mailbox record is a head session's grant only: refused for any other launch under the same policy.
+    const withMailbox = (assignmentLaunchContext) => assessBwrap({
+      dispatchId: 'disp_mailbox_grant',
+      invocation: { command: 'agent', args: [], env: {} },
+      context: { cwd: tmp, repoRoot: tmp, runDir: path.join(tmp, 'run'), fgosDir: tmp },
+      ...(assignmentLaunchContext ? { assignmentLaunchContext } : {}),
+      requirement: {
+        mode: 'required', policyId: 'host-write-denied', policy: {
+          controls: { hostWrite: 'deny', hostRead: 'allow', networkEgress: 'allow', process: 'host', home: 'host', session: 'shared', workspace: 'shared' },
+          grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }, { resource: 'mailbox-record', access: 'read-write', scope: 'dispatch', optional: false }],
+        },
+      },
+    }, { id: 'bwrap', config: { type: 'bwrap' } });
+    assert.equal(withMailbox({ kind: 'session' }).coverage['grant:mailbox-record'], 'satisfied');
+    for (const other of [null, { kind: 'assignment' }]) {
+      const worker = withMailbox(other);
+      assert.equal(worker.coverage['grant:mailbox-record'], 'unsatisfied');
+      assert.ok(worker.mismatches.some((m) => m.code === 'confinement-grant-invalid' && /mailbox-record/.test(m.detail)), JSON.stringify(worker.mismatches));
+    }
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

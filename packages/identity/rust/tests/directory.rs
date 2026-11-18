@@ -943,3 +943,46 @@ fn a_bind_from_outside_the_head_of_an_unregistered_attempt_with_an_attempt_key_o
     other.wait().unwrap();
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn a_second_bind_on_the_same_live_head_moves_the_roles_to_the_new_session_and_retires_the_old_one()
+{
+    let root = machine_root();
+    let me = std::process::id();
+    let gate = head_of(me);
+    let role = vec!["head:secretary-miu".to_string()];
+    let attempt = attempt_key("att-cmd_4");
+    directory::register_writer(&root, None, &attempt, &gate, &role, false).unwrap();
+    let first =
+        directory::bind_agent_session(&root, None, &attempt, &claude_key("uuid-a"), &gate, me)
+            .unwrap();
+    // The CLI started a new session on the same process (e.g. after `/clear`), and its hook binds again.
+    let second =
+        directory::bind_agent_session(&root, None, &attempt, &claude_key("uuid-b"), &gate, me)
+            .unwrap();
+    assert_eq!(second.id, "fg-abc234/uuid-b");
+    assert_eq!(
+        second.roles, role,
+        "the roles left the session bound before"
+    );
+    let holder = directory::resolve(&root, "head:secretary-miu", &judge(&[]), None).unwrap();
+    assert_eq!(holder.id, second.id);
+    assert_eq!(
+        directory::resolve(&root, &first.handle, &judge(&[]), None)
+            .unwrap_err()
+            .reason,
+        "not-found",
+        "the session bound before is retired"
+    );
+    let now = directory::attempt_session(&root, &attempt, Some(&gate), &judge(&[]))
+        .unwrap()
+        .unwrap();
+    assert_eq!(now.id, second.id);
+    let again =
+        directory::register_attempt_roles(&root, None, &attempt, &gate, &role, false).unwrap();
+    assert_eq!(
+        again.id, second.id,
+        "a later role registration lands on the current binding"
+    );
+    let _ = fs::remove_dir_all(root);
+}

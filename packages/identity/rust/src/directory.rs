@@ -687,8 +687,42 @@ fn bind_agent_session_in(
             ),
         ));
     }
-    let roles = attempt_row.entry.roles.clone();
-    register_session(state_root, session, Some(record), clone_dir, &roles, true)
+    // A second bind on the same live head (the CLI started a new session, e.g. after `/clear`) moves the roles from
+    // the session bound before and retires that entry, so the head has one current binding.
+    let previous: Vec<&Row> = rows
+        .iter()
+        .filter(live_on_head)
+        .filter(|row| !is_attempt_entry(&row.entry) && row.entry.id != session.info.id)
+        .collect();
+    let mut roles = attempt_row.entry.roles.clone();
+    roles.extend(
+        previous
+            .iter()
+            .flat_map(|row| row.entry.roles.iter().cloned()),
+    );
+    roles.sort();
+    roles.dedup();
+    let listed = register_session(state_root, session, Some(record), clone_dir, &roles, true)?;
+    for row in previous {
+        remove(state_root, &row.file)?;
+    }
+    Ok(listed)
+}
+
+/// The one agent session currently bound on `head` among `rows`: the live entry on that head that is not an attempt
+/// entry and was registered last ([`bind_agent_session`] retires the one before it, so a second one is only left by a
+/// bind that stopped between its two writes). Ties break on the id, so the answer never depends on the scan order.
+fn current_binding<'r>(rows: &'r [Row], head: &HeadRef) -> Option<&'r Row> {
+    rows.iter()
+        .filter(|row| {
+            row.verdict != Verdict::Dead
+                && !is_attempt_entry(&row.entry)
+                && on_head(&row.entry, head)
+        })
+        .max_by(|a, b| {
+            (a.entry.registered_at.as_str(), a.entry.id.as_str())
+                .cmp(&(b.entry.registered_at.as_str(), b.entry.id.as_str()))
+        })
 }
 
 /// The session the attempt of writer key `attempt` is now: the agent session bound to it on `head`
@@ -702,17 +736,11 @@ pub fn attempt_session(
 ) -> Result<Option<Listed>, Refusal> {
     let own = session_for(state_root, attempt, None)?;
     let rows = scan(state_root, judge)?.rows;
-    let live = |row: &&Row| row.verdict != Verdict::Dead;
-    let bound = head.and_then(|head| {
-        rows.iter()
-            .filter(live)
-            .find(|row| !is_attempt_entry(&row.entry) && on_head(&row.entry, head))
-    });
+    let bound = head.and_then(|head| current_binding(&rows, head));
     Ok(bound
         .or_else(|| {
             rows.iter()
-                .filter(live)
-                .find(|row| row.entry.id == own.info.id)
+                .find(|row| row.verdict != Verdict::Dead && row.entry.id == own.info.id)
         })
         .map(|row| Listed::of(&row.entry, row.verdict)))
 }
@@ -727,12 +755,10 @@ pub fn register_attempt_roles(
     roles: &[String],
     take: bool,
 ) -> Result<Listed, Refusal> {
-    let bound = scan(state_root, &judge_here)?.rows.into_iter().find(|row| {
-        row.verdict != Verdict::Dead && !is_attempt_entry(&row.entry) && on_head(&row.entry, head)
-    });
-    match bound {
+    let rows = scan(state_root, &judge_here)?.rows;
+    match current_binding(&rows, head) {
         Some(row) => {
-            let mut entry = row.entry;
+            let mut entry = row.entry.clone();
             entry.roles = roles.to_vec();
             register(state_root, entry, take, &judge_here)
         }
