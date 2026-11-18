@@ -80,7 +80,7 @@ export function withMachine(machine = {}, fn) {
 function launchFactsOf(runner, session) {
   ensureScriptAddon();
   const unit = { id: 'executor-model-vector', capability: 'execute', writes: [] };
-  const { launchView } = explainSeat({ unit, role: 'producer' }, { runnerConfig: runner, session: { headless: true, ...session } }, { chain: false });
+  const { launchView } = explainSeat({ unit, role: 'producer' }, { runnerConfig: runner, session: { headless: true, ...session } });
   if (!launchView) throw new Error('the seat was refused before a launch view was built');
   return launchView.executors;
 }

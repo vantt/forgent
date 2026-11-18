@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "43486edb8b0fcc4b023610452500b70069a29bb799a3a597a90726688702abb9",
+  "payloadDigest": "4806a2e586f74fa785519695275118c1817f34bfb0306141330f984bac1f856a",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1218,7 +1218,7 @@
     "src/runner/worker-log.mjs": "c5b978ff9fa7533a62213c77cf7b6241d7b10e43d9fd5cf07f15209b7335a793",
     "src/runner/worktree.mjs": "91d59e6cfb9c9753846dd573c4cfe8e19834514a31c88772c7c54d949113afbd",
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
-    "src/seat-binding/client.mjs": "c67306053e1e5878f2c69b40a253fd9bc5f69011d562d33159232db5e117cb11",
+    "src/seat-binding/client.mjs": "49bc74e484f4057063d6d0233615edb5e5c1cf8a9957b7b82fedc2b422736a4f",
     "src/session-host/client.mjs": "39c4a0a4b6f07b7c85eee7fe83327f2c85c89e666c0e604e0114b86a87e5336b",
     "src/session-host/head-grants.mjs": "030b092e60719c02a0fed76f10d2063575934a04d91afbb005c9f109a08f827b",
     "src/session-host/head-request-client.mjs": "a5944d2066ac4d4b67b1a9bffb88ccd0dfd360f4d7aea8379cc753abdabbc1bc",
@@ -1232,7 +1232,7 @@
     "src/setup/agent-hooks.mjs": "b8cc0592f2b625213629bed03754d128691792e9c41077d0e22a3df12e714647",
     "src/setup/agy-permissions.mjs": "f2370eb0e40de31783ab33ebdfd6d452369b014f78786c9d2338653f0d1e7ed4",
     "src/setup/bin-discovery.mjs": "b5302797ac763fecb24608818bdc8bf37850e0cd5d7a9d98ae677e1f3e684633",
-    "src/setup/blind-steps-proven-pools.mjs": "b3da45e89da558eaa65990245ef6a39d7534b67be4e40e68544324734dc6dd66",
+    "src/setup/blind-steps-proven-pools.mjs": "127a0dd8c91755e35f9a1aaa145e4478513dc6fd50e78e967d8762cc89ee3b93",
     "src/setup/checks.mjs": "7d3ca717d068cf3b2c60552f64a28a3434b0fe158f8e0d9b9b59a782b41832a6",
     "src/setup/doctor-bridge.mjs": "225d26e8234a585bc62b68b5c0ff35b8610d82a3607fe2f066f030475b289e1f",
     "src/setup/executor-profile-warnings.mjs": "2622afc99f6efe7f3425c3bc83f39d9730c03af3a48c444a63aad57179e6e441",
@@ -4140,15 +4140,15 @@
     },
     {
       "path": "src/seat-binding/client.mjs",
-      "line": 160,
-      "spawn": "run -> src/seat-binding/client.mjs:150",
+      "line": 154,
+      "spawn": "run -> src/seat-binding/client.mjs:144",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/seat-binding/client.mjs",
-      "line": 166,
-      "spawn": "run -> src/seat-binding/client.mjs:150",
+      "line": 160,
+      "spawn": "run -> src/seat-binding/client.mjs:144",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
@@ -4211,7 +4211,7 @@
     {
       "path": "src/setup/registrations.mjs",
       "line": 2479,
-      "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:166",
+      "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:160",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },

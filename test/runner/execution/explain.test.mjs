@@ -110,7 +110,7 @@ test('explain carries a refusal instead of a binding', () => {
 test('explain on the committed config agrees with bind() for every capability', () => {
   const runnerConfig = loadRunnerConfigForDir(committedConfigDir());
   for (const capability of Object.keys(runnerConfig.capabilities)) {
-    for (const session of [headless]) {
+    for (const session of [headless, { headless: true, herdrPresent: true }]) {
       const explained = explainCapability(runnerConfig, { capability, session });
       const bound = bind({ unit: { id: 'explain', capability, writes: [] }, role: 'producer' }, { runnerConfig, session });
       if (bound.refused) {

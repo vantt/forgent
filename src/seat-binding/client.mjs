@@ -132,12 +132,6 @@ export function createSeatBindingClient({ hostBin, cwd, fgosDir, payloadRoot, ti
     return found;
   };
 
-  const callEnv = (body) => {
-    const env = routeEnv();
-    if (body?.session?.herdrPresent === false) delete env.HERDR_ENV;
-    return env;
-  };
-
   const call = (op, body) => {
     if (hotLockDepth() > 0) {
       throw new SeatBindingError(
@@ -149,7 +143,7 @@ export function createSeatBindingClient({ hostBin, cwd, fgosDir, payloadRoot, ti
     const sent = session === undefined ? rest : { ...rest, session: { headless: session.headless === true, hasNativeAgent: session.hasNativeAgent === true, postureAtLaunch: session.postureAtLaunch === true, ...(session.pathEnv ? { pathEnv: session.pathEnv } : {}), ...(typeof session.herdrPresent === 'boolean' ? { herdrPresent: session.herdrPresent } : {}) } };
     const run = (hostPath) => spawnSync(hostPath, ['internal', 'seat-binding', op, '--protocol', String(PROTOCOL)], {
       input: JSON.stringify({ v: PROTOCOL, ...sent }),
-      env: callEnv(body),
+      env: routeEnv(),
       encoding: 'utf8',
       maxBuffer: MAX_OUTPUT_BYTES,
       timeout: timeoutMs,
