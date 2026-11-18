@@ -215,8 +215,9 @@ impl NodeBridge {
         }
     }
 
-    /// The same bridge with its own deadline for the `work-questions` read.
-    #[allow(dead_code)] // The deadline test of the questions verb sets it; production keeps the default.
+    /// The same bridge with its own deadline for the `work-questions` read; only the deadline test sets it, production
+    /// keeps the default.
+    #[cfg(test)]
     pub fn with_work_questions_deadline(mut self, deadline: Duration) -> Self {
         self.work_questions_deadline = deadline;
         self

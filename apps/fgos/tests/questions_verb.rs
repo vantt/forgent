@@ -270,7 +270,8 @@ fn the_retired_open_flag_is_an_unknown_flag_and_an_unknown_sub_command_is_refuse
 }
 
 #[test]
-fn a_question_is_asked_shown_answered_and_acknowledged_through_the_binary() {
+fn a_question_is_asked_and_shown_through_the_binary_and_answered_and_acknowledged_when_no_agent_cli_is_an_ancestor(
+) {
     let scene = Scene::new("round-trip", BRIDGE_WITH_WORK);
     let id = scene.ask();
 
@@ -289,7 +290,9 @@ fn a_question_is_asked_shown_answered_and_acknowledged_through_the_binary() {
 
     let answered = scene.run(&["questions", "answer", &id, "--option", "A"], b"");
     if under_an_agent() {
-        // The owner rule refuses an agent CLI among the caller's ancestors, and the refusal keeps its code.
+        // The answer step needs an owner caller: the process tree of this run decides, and the owner rule itself
+        // (an agent in the ancestry is refused as `answer-not-owner`) is proved in the crate with a stubbed caller
+        // (`store_usecases.rs`), the refusal's exit category in the wiring unit test.
         assert_eq!(answered.status.code(), Some(2), "{answered:?}");
         assert!(
             stderr(&answered).contains("[answer-not-owner]"),

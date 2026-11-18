@@ -172,23 +172,6 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::worktree::RESYNC_DESCRIPTOR,
 ];
 
-/// The host catalog with the operations the composition root's own wiring serves: the shared catalog
-/// (`fgos_host_runtime::CATALOG`) and the questions operations, which this wiring declares next to the provider
-/// that serves them.
-fn composition_catalog() -> fgos_host_runtime::OperationCatalog {
-    static CATALOG_WITH_WIRING: std::sync::OnceLock<Vec<fgos_host_runtime::OperationDescriptor>> =
-        std::sync::OnceLock::new();
-    CATALOG_WITH_WIRING
-        .get_or_init(|| {
-            CATALOG
-                .iter()
-                .cloned()
-                .chain(wiring::questions::CATALOG_ENTRIES)
-                .collect()
-        })
-        .as_slice()
-}
-
 /// The legacy payload root of the running release, for the verbs that read what it ships (its skills, its scripts).
 fn active_payload_root() -> Result<std::path::PathBuf, String> {
     legacy_exec::resolve_payload().map(|payload| payload.root)
@@ -323,11 +306,7 @@ fn main() {
     }
 
     // Composition root: build snapshot and InvocationService.
-    let snapshot = build_snapshot(
-        composition_catalog(),
-        COMPOSITION_PROVIDERS,
-        "fgos-composition-root-v1",
-    );
+    let snapshot = build_snapshot(CATALOG, COMPOSITION_PROVIDERS, "fgos-composition-root-v1");
     let service = InvocationService::new(snapshot);
     service.register_provider(Arc::new(fgos_distribution::BuildShowProvider::new()));
     service.register_provider(Arc::new(fgos_work_state::GateBypassShowProvider::new()));

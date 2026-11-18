@@ -91,7 +91,7 @@ test('an item parked by `fgos ask` is listed with its question and the command t
   }]);
 });
 
-test('the work-questions request answers one data line and an end line, and a failed read is one refusal line', async () => {
+test('the work-questions request reaches the reader, and a failed read is one refusal line', async () => {
   assert.deepEqual(parseRequest('{"phase":"work-questions","ids":[],"dir":"/p"}'), { phase: 'work-questions', ids: [], dir: '/p' });
   assert.throws(() => parseRequest('{"phase":"work-questions","ids":["a"],"dir":"/p"}'), /no list of ids/);
 
@@ -101,8 +101,8 @@ test('the work-questions request answers one data line and an end line, and a fa
   assert.equal(code, 0);
   assert.equal(lines.length, 2);
   assert.ok(lines.every((l) => l.startsWith(RESULT_PREFIX)));
-  assert.deepEqual(JSON.parse(lines[0].slice(RESULT_PREFIX.length)), { kind: 'data', data: { gates: [], asks: [], dir: '/p' } });
-  assert.deepEqual(JSON.parse(lines[1].slice(RESULT_PREFIX.length)), { kind: 'end', count: 1, nodeVersion: 'v0' });
+  // The bytes of the data and end lines are owned by the doctor-bridge contract vectors; this proves only that the request reaches the reader.
+  assert.deepEqual(lines.map((l) => JSON.parse(l.slice(RESULT_PREFIX.length)).kind), ['data', 'end']);
 
   const refused = [];
   const failed = await serve('{"phase":"work-questions","ids":[],"dir":"/p"}', { write: (l) => refused.push(l), workQuestions: async () => { throw new Error('corrupt-log'); } });

@@ -16,10 +16,9 @@ use std::sync::OnceLock;
 
 use fgos_host_runtime::civil_time::parse_rfc3339_millis;
 use fgos_host_runtime::{
-    CategorisedRefusal, ContractRef, EventSink, HostInvocation, InvocationControl,
-    OperationDescriptor, OperationEffect, OperationId, OperationIdempotency, OperationProvider,
-    OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle, ProviderOutcome,
-    StreamingMode, VerbAnswer,
+    CategorisedRefusal, ContractRef, EventSink, HostInvocation, InvocationControl, OperationId,
+    OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
+    ProviderOutcome, VerbAnswer,
 };
 use fgos_identity::shared::EntryLog;
 use fgos_questions::caller::{CallerSource, IdentityCaller};
@@ -77,47 +76,6 @@ pub const WRITE_DESCRIPTOR: ProviderDescriptor = descriptor(
     "questions.write.request",
     "questions.write.outcome",
 );
-
-const fn catalog_entry(
-    id: &'static str,
-    request: &'static str,
-    outcome: &'static str,
-    effect: OperationEffect,
-    idempotency: OperationIdempotency,
-    policy: &'static str,
-) -> OperationDescriptor {
-    OperationDescriptor {
-        operation_id: OperationId::from_static(id),
-        owning_component_id: Cow::Borrowed("questions"),
-        request_contract: ContractRef::from_static(request, "1.0.0"),
-        outcome_contract: ContractRef::from_static(outcome, "1.0.0"),
-        effect,
-        idempotency,
-        authority_policy_id: Cow::Borrowed(policy),
-        allowed_host_kinds: &["cli"],
-        streaming_mode: StreamingMode::None,
-    }
-}
-
-/// The operations this module serves, in the shape of the host catalog's entries.
-pub const CATALOG_ENTRIES: [OperationDescriptor; 2] = [
-    catalog_entry(
-        READ_OPERATION_ID,
-        "questions.read.request",
-        "questions.read.outcome",
-        OperationEffect::Read,
-        OperationIdempotency::Safe,
-        "questions.read",
-    ),
-    catalog_entry(
-        WRITE_OPERATION_ID,
-        "questions.write.request",
-        "questions.write.outcome",
-        OperationEffect::Write,
-        OperationIdempotency::None,
-        "questions.write",
-    ),
-];
 
 /// The operation a call of `sub` runs.
 pub fn operation_for(sub: &str) -> &'static str {
@@ -343,17 +301,47 @@ fn answer_command(question: &Question) -> String {
     }
 }
 
-/// Questions in the order the owner should read them: by what they block, then the oldest first. A question
-/// the store holds carries no plan priority, so the order has no such key.
-fn ordered(mut questions: Vec<Question>) -> Vec<Question> {
-    questions.sort_by(|a, b| {
-        (&a.asked.blocks, &a.asked.asked_at, &a.asked.id).cmp(&(
-            &b.asked.blocks,
-            &b.asked.asked_at,
-            &b.asked.id,
-        ))
+/// The plan directory a question's ref names (`plan:<dir>` or `plan:<dir>#phase-<nn>`).
+fn plan_dir(reference: &str) -> Option<&str> {
+    let dir = reference.strip_prefix("plan:")?.split('#').next()?;
+    (!dir.is_empty() && !dir.contains(['/', '\\']) && dir != "..").then_some(dir)
+}
+
+/// The rank of a plan priority (`P0` before `P1` ...); a priority that is not `P<n>` ranks with none.
+fn priority_rank(priority: &str) -> Option<u32> {
+    priority.strip_prefix('P')?.parse().ok()
+}
+
+/// The priority the plan a question's ref names holds in its front matter, read under `root`.
+fn plan_priority(root: &Path, reference: &str) -> Option<String> {
+    let path = root
+        .join("plans")
+        .join(plan_dir(reference)?)
+        .join("plan.md");
+    let text = std::fs::read_to_string(path).ok()?;
+    super::observe_sources::plan_text::plan_fields(&text).priority
+}
+
+/// Questions in the order the owner should read them: by the priority of the plan the question's ref names, then
+/// the oldest first. A question with no plan ref, or whose plan has no readable priority, follows all that have one.
+/// What a question blocks is free text, so it is no sort key.
+fn ordered(
+    mut questions: Vec<Question>,
+    priority_of: impl Fn(&str) -> Option<String>,
+) -> Vec<Question> {
+    let mut keyed: Vec<(u32, Question)> = questions
+        .drain(..)
+        .map(|q| {
+            let rank = priority_of(&q.asked.origin.value)
+                .and_then(|p| priority_rank(&p))
+                .unwrap_or(u32::MAX);
+            (rank, q)
+        })
+        .collect();
+    keyed.sort_by(|(ra, a), (rb, b)| {
+        (ra, &a.asked.asked_at, &a.asked.id).cmp(&(rb, &b.asked.asked_at, &b.asked.id))
     });
-    questions
+    keyed.into_iter().map(|(_, q)| q).collect()
 }
 
 fn state_word(state: State) -> &'static str {
@@ -493,16 +481,28 @@ pub type WorkSection = Result<Value, String>;
 
 /// Reads the Work section through the doctor bridge. The reason of a failure is one line.
 pub fn read_work_section(root: &Path) -> WorkSection {
+    let main = match fgos_git::main_checkout_root(root) {
+        Ok(Some(main)) => main,
+        Ok(None) => return Err("not inside a repository".to_owned()),
+        Err(error) => return Err(one_line(&error.cause)),
+    };
     super::doctor::bridge::NodeBridge::new()
-        .work_questions(root)
+        .work_questions(&main)
         .map_err(|fault| one_line(&fault.message()))
 }
 
+/// How many items of the Work section wait for the owner: the `fgos ask` items and the open gates of a case. A case
+/// whose ledger cannot be read comes as a gate with no step (`workflow:<runId>`, no `#`): it is listed for the owner to
+/// look at, but is no question to answer, so it does not count.
 fn work_count(section: &Value) -> usize {
-    ["gates", "asks"]
-        .iter()
-        .map(|key| section[key].as_array().map_or(0, Vec::len))
-        .sum()
+    let asks = section["asks"].as_array().map_or(0, Vec::len);
+    let gates = section["gates"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|gate| gate["ref"].as_str().is_some_and(|r| r.contains('#')))
+        .count();
+    asks + gates
 }
 
 /// The first `max` characters of `text`, marked when cut: a parked item's question is its whole five-part text.
@@ -629,7 +629,9 @@ pub fn answer(
             } else {
                 Some((env.work)(checkout))
             };
-            let rows = ordered(value.questions);
+            let rows = ordered(value.questions, |reference| {
+                plan_priority(checkout, reference)
+            });
             let waiting_in_work = match &work {
                 Some(Ok(section)) => work_count(section),
                 _ => 0,
@@ -835,6 +837,19 @@ mod tests {
     }
 
     #[test]
+    fn an_unreadable_case_is_listed_but_not_counted_as_waiting_for_the_owner() {
+        let section = json!({
+            "gates": [
+                { "ref": "workflow:r1#s1", "question": "q", "answerDoor": "d" },
+                { "ref": "workflow:r2", "question": "unreadable workflow case: x", "answerDoor": "d" }
+            ],
+            "asks": [{ "ref": "work:t", "title": "T", "question": "q", "answerDoor": "d" }]
+        });
+        assert_eq!(work_count(&section), 2);
+        assert_eq!(work_lines(&section).len(), 3);
+    }
+
+    #[test]
     fn an_age_is_the_largest_whole_unit() {
         let now = parse_rfc3339_millis("2026-11-19T12:00:00.000Z").unwrap();
         assert_eq!(age("2026-11-19T11:56:00.000Z", now), "4m");
@@ -844,16 +859,79 @@ mod tests {
     }
 
     #[test]
-    fn the_catalog_entries_match_the_provider_descriptors() {
-        for (entry, provider) in CATALOG_ENTRIES
-            .iter()
-            .zip([READ_DESCRIPTOR, WRITE_DESCRIPTOR])
-        {
-            assert_eq!(entry.operation_id, provider.operation_id);
+    fn the_host_catalog_declares_the_operations_the_providers_serve() {
+        for provider in [READ_DESCRIPTOR, WRITE_DESCRIPTOR] {
+            let entry = fgos_host_runtime::CATALOG
+                .iter()
+                .find(|entry| entry.operation_id == provider.operation_id)
+                .expect("declared in the host catalog");
             assert_eq!(entry.request_contract, provider.request_contract);
             assert_eq!(entry.outcome_contract, provider.outcome_contract);
+            assert_eq!(entry.owning_component_id, "questions");
         }
         assert_eq!(operation_for("list"), READ_OPERATION_ID);
         assert_eq!(operation_for("answer"), WRITE_OPERATION_ID);
+    }
+
+    fn question(id: &str, reference: &str, asked_at: &str) -> Question {
+        let asked = serde_json::from_value(json!({
+            "id": id, "askedAt": asked_at, "stage": "s", "headline": "h", "blocks": "zzz free text",
+            "ref": { "value": reference, "branch": "b", "commit": "c" },
+            "asker": { "sessionId": "s", "handle": "a", "roles": [], "machine": "m" },
+            "parts": {
+                "what": "w", "cause": "c", "options": [], "recommendation": "r",
+                "scope": { "allows": "a", "forbids": "f" }
+            },
+            "migrated": false
+        }))
+        .expect("asked shape");
+        Question {
+            state: State::Open,
+            asked,
+            answer: None,
+            conflicts: Vec::new(),
+            acked: None,
+            cancelled: None,
+        }
+    }
+
+    #[test]
+    fn questions_list_by_plan_priority_then_oldest_first_and_unprioritised_last() {
+        let priority = |reference: &str| match plan_dir(reference)? {
+            "a" => Some("P2".to_owned()),
+            "b" | "c" => Some("P0".to_owned()),
+            _ => None,
+        };
+        let sorted = ordered(
+            vec![
+                question("q1", "discussion:x#Q1", "2026-11-01T00:00:00.000Z"),
+                question("q2", "plan:a", "2026-11-01T00:00:00.000Z"),
+                question("q3", "plan:c#phase-02", "2026-11-03T00:00:00.000Z"),
+                question("q4", "plan:b", "2026-11-02T00:00:00.000Z"),
+            ],
+            priority,
+        );
+        let ids: Vec<&str> = sorted.iter().map(|q| q.asked.id.as_str()).collect();
+        assert_eq!(ids, ["q4", "q3", "q2", "q1"]);
+    }
+
+    #[test]
+    fn a_plan_priority_is_read_from_the_plan_front_matter_under_the_root() {
+        let dir = std::env::temp_dir().join(format!("fgos-qs-prio-{}", std::process::id()));
+        let plan = dir.join("plans").join("p1");
+        std::fs::create_dir_all(&plan).unwrap();
+        std::fs::write(
+            plan.join("plan.md"),
+            "---\ncontract: plan-v1\npriority: P1\n---\n",
+        )
+        .unwrap();
+        assert_eq!(
+            plan_priority(&dir, "plan:p1#phase-01").as_deref(),
+            Some("P1")
+        );
+        assert_eq!(plan_priority(&dir, "plan:missing"), None);
+        assert_eq!(plan_priority(&dir, "plan:../x"), None);
+        assert_eq!(plan_priority(&dir, "case:r1"), None);
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 }
