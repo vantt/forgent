@@ -28,6 +28,10 @@ footprint:
   - docs/backlog.md
   - packages/distribution/contracts/doctor-registry.v1.json
   - apps/fgos/src/wiring/doctor/observe.rs
+  - apps/fgos/src/wiring/doctor/mod.rs
+  - test/setup/registrations.test.mjs
+  - docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
+  - packages/observe/rust/src/friction.rs
 base: ebff368da7c1d1d705c2ec386dd53d5b20544cd4
 source:
   - docs/discussions/ops-metrics/DISCUSSION.md
