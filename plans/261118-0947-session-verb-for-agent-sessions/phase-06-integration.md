@@ -12,6 +12,9 @@ See the phase table footprint in plan.md.
 1. Merge the phase branches in wave order onto one integration branch.
 2. CHANGELOG `[Unreleased]`: `fgos session` now starts and rotates agent head sessions (was `fgos head`, which is gone); the per-session worktree verbs (`session start|end|list|gc`) are retired, use `fgos worktree create|remove`; leftover `.fgos/sessions.json` and `<tmp>/fgos-sessions` are inert and may be deleted; `fgos identity` drops `--fgos-dir`; gateway `/v1/sessions*` answer 501; doctor row `leaf-notify-drift` removed; the secretary head can write its files, send mail and reach peers; a manual rotation is logged `manual` and hands off context; rotation window per model (if phase 9 changed it).
 3. `docs/platform/agent-confinement/spec.md` (~445) says `fgos session` where it named head verbs (left by phase 5).
+   Old `head <x>` verb names left in comments/descriptions by phase 5 (outside its footprint): `envelope.v3.json`,
+   `rotation-files.v1.json`, `src/setup/agent-hooks.mjs`, `src/runner/dispatch/confinement/resources.mjs`, run-supervisor
+   and identity specs: reword to `session <x>`.
    reading-map: drop the `session.rs` line; point the head-session line at `fgos session`.
 4. Backlog: `p-g2iprtzptz` done (link this plan); `p-5x37olszki` closed obsolete; `p-xkkoaq6eoh` text no longer cites `fgos session`; `p-zgbqe2bpig`, `p-ktnvgs2ozm`, `p-cymvjb6nrc` done (or the last closed with its proof).
 5. Run every acceptance criterion and the full gate; write `reports/integration.md` with the commands and results.
