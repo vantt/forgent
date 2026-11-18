@@ -94,6 +94,7 @@ import { adoptRun } from '../../run-supervisor/client.mjs';
 import { register as registerDeliveredAttempt, unregister as unregisterDeliveredAttempt, beginLaunch as beginAttemptLaunch, endLaunch as endAttemptLaunch } from '../../run-supervisor/cancel-registry.mjs';
 import { attemptPaths } from '../../run-supervisor/direct-launch.mjs';
 import { watchWritesOutsideWorkspace } from '../../run-supervisor/stray-writes.mjs';
+import { controlDelivery } from './confinement/bypass-pairing.mjs';
 import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, PANE_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
 import { resolveHerdrBin, workLabelOf, herdrEndpointEnv } from './terminal-slot.mjs';
 import { retainFailedPaneMsOf } from '../../terminal-control/config.mjs';
@@ -1080,6 +1081,11 @@ export async function prepareAttemptSeat(attempt, seat, hooks = {}) {
       beside: seat.beside,
       beforeAllocate: attempt.intentWritten ? (pane) => publishAttemptIntent(attempt, pane) : undefined,
       effectiveContract,
+      controlsDelivered: controlDelivery({
+        launchKind: seat.assignmentLaunchContext?.kind,
+        requirement: prepResult.preparedInvocation.requirement,
+        backend: prepResult.preparedInvocation.backend,
+      }),
     });
   }
 

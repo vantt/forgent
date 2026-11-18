@@ -12,6 +12,7 @@ import os from "node:os";
 import {
   assessAndPrepare,
   buildConfinementAttestation,
+  ownWorktreeUnavailable,
 } from "../../src/runner/dispatch/confinement/authority.mjs";
 import {
   buildConfinementRequest,
@@ -152,6 +153,16 @@ test("R3: Authority preparation refuses ownWorktree in repo root with own-worktr
   );
 
   fs.rmSync(rootDir, { recursive: true, force: true });
+});
+
+test("only a head session under a required write-denied backend may declare ownWorktree in the main checkout", () => {
+  const denied = { mode: "required", policy: { controls: { hostWrite: "deny" } } };
+  const request = (kind, requirement) => ({ context: { cwd: "/repo", repoRoot: "/repo" }, requirement, ...(kind ? { assignmentLaunchContext: { kind } } : {}) });
+  assert.equal(ownWorktreeUnavailable(request(), true), true, "a worker in the repo root is refused");
+  assert.equal(ownWorktreeUnavailable(request("session", denied), true), false);
+  assert.equal(ownWorktreeUnavailable(request("session", { mode: "unconfined" }), true), true, "no backend, no exemption");
+  assert.equal(ownWorktreeUnavailable(request("session", { mode: "required", policy: { controls: { hostWrite: "allow" } } }), true), true);
+  assert.equal(ownWorktreeUnavailable(request("session", denied), false), false);
 });
 
 test("R3: herdr-spawn attestation includes herdr-partial-maturity mismatch and evidence", async () => {

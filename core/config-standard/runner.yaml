@@ -63,6 +63,31 @@ runner:
             kind: claude
             trustStore:
               kind: claude-json
+        # The secretary head's pane: the leads' permission mode (it never asks). The three flags are the declared
+        # posture the bypass pairing demands; for a head the required bwrap backend delivers them. `runner.personas.secretary` pins it.
+        - id: claude-herdr-bypass-bwrap
+          via: cli
+          adapter: herdr-spawn
+          command: claude
+          args: ["--model", "{model}", "--dangerously-skip-permissions"]
+          permissionMode: bypass
+          credentialStore:
+            use: claude
+            homeEnv: CLAUDE_CONFIG_DIR
+            sessionDir: projects
+            files: [".credentials.json"]
+          env:
+            CLAUDE_CODE_FORCE_SESSION_PERSISTENCE: "1"
+          confinement:
+            backend: bwrap
+            privateHome: true
+            isolatedSession: true
+            ownWorktree: true
+          interactiveMode:
+            exitCommand: "/exit"
+            kind: claude
+            trustStore:
+              kind: claude-json
     glm:
       kind: agent
       description: "GLM 5.3 (z-ai/glm-5.3) through the pi CLI and OpenRouter, headless. Replaces the claude-CLI-through-gateway route."
@@ -486,6 +511,13 @@ runner:
   roles:
     red-team:
       prefer: [xai, claude, openai]
+  # @fgos:doc Per-persona tier and executor taste, for every capability, by bare persona name.
+  personas:
+    # The secretary head runs in the leads' permission mode, so a peer's message to it is not held for approval.
+    secretary:
+      prefer:
+        - executor: claude
+          invocation: claude-herdr-bypass-bwrap
   # @fgos:doc The model each family uses at each tier, by family then tier.
   # @fgos:doc Tier ladder, weakest first:
   # @fgos:doc nano: mechanical, no reasoning; self-check: only recognizes or transforms by pattern?; e.g. classify, extract, format, route, vote

@@ -46,6 +46,9 @@ import { stopProcessesInside } from './stop-processes-inside.mjs';
  * never turn into "recursively delete some path someone passed in". */
 const MARKER = '.fgos-worker-home';
 
+/** The settings a claude config directory needs so a bypass launch does not stop at its one-time acceptance screen. */
+export const BYPASS_ACCEPTANCE_SETTINGS = Object.freeze({ skipDangerousModePermissionPrompt: true });
+
 export class WorkerHomeError extends Error {
   constructor(code, message, details = {}) {
     super(message);
@@ -142,9 +145,7 @@ export function createWorkerHome(baseDir, { runId, sourceHome, workspacePath, re
     provisioned.push('.claude.json (onboarding + workspace trust)');
 
     if (permissionMode === 'bypass') {
-      fs.writeFileSync(path.join(claudeDir, 'settings.json'), `${JSON.stringify({
-        skipDangerousModePermissionPrompt: true,
-      }, null, 2)}\n`);
+      fs.writeFileSync(path.join(claudeDir, 'settings.json'), `${JSON.stringify(BYPASS_ACCEPTANCE_SETTINGS, null, 2)}\n`);
       provisioned.push('.claude/settings.json (bypass acceptance)');
     }
   } catch (err) {

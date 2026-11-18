@@ -798,6 +798,10 @@ Private home nhận một **bản chép** của login, bị xoá sau dispatch. H
 
 **Chưa chứng minh:** sự kiện nào khiến thread trong sự cố chạy lại dưới `workspace-write` (giả thuyết mạnh nhất: daemon-updater thay 0.160.1 bằng 0.162.1 giữa run, chính việc thay thế làm ngắt turn, và thread được mở lại không mang `-s`). Tắt daemon loại bỏ cả nhánh này; ghi `sandbox_mode = "danger-full-access"` vào `config.toml` của private home là lớp phòng thủ thứ hai chưa làm (file đó do bước gieo trust ghi, và driver bwrap không được rẽ nhánh theo provider). Đường `codex exec` (`codex-cli-bwrap`) không dùng daemon nên không đổi.
 
+### 13.4 Bypass chỉ trong sandbox của head (quyết định của owner, 2026-11-19)
+
+Head thư ký (`head:secretary-*`) chạy claude cùng permission mode với các lead (`--dangerously-skip-permissions`), để SendMessage của peer tới nó không bị giữ chờ duyệt. Invocation `claude-herdr-bypass-bwrap` khai `permissionMode: bypass` cùng ba cờ `privateHome`, `isolatedSession`, `ownWorktree`; một quy tắc ghép (`evaluateBypassPairing`) vẫn là cửa duy nhất xét khai báo. Việc giao các control đó do `controlDelivery` (`bypass-pairing.mjs`) xét: khi confinement `required` có backend, backend giao home riêng và session, nên launch không tạo worker home hay worker session phía host; riêng một launch kiểu `session` mà policy `hostWrite: deny` thì được chạy ở main checkout (workspace của nó được giữ bởi policy và grant, không bởi worktree). Một worker ở repo root vẫn bị từ chối `own-worktree-unavailable`. Cờ chấp nhận bypass (`skipDangerousModePermissionPrompt`) được ghi vào thư mục config riêng của head, không bao giờ vào thư mục của operator. Chỉ persona `secretary` chọn invocation này (`runner.personas.secretary.prefer` trong standard); persona khác giữ pane hỏi trước khi làm.
+
 ### Tồn đọng mở (Open Deferred Items):
 
 - **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-out) thay vì `unknown`/`omitted`. Cần phân biệt rõ cờ thừa kế trong phase tiếp theo.

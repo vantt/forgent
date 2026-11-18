@@ -28,7 +28,8 @@ import { createRoundTerminalControl, portKey, slotDisplay, refusalError, herdrEn
 import { createSessionHost } from '../../session-host/client.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { writeVisibility } from './visibility-session.mjs';
-import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-home.mjs';
+import { createWorkerHome, removeWorkerHome, redactWorkerHome, BYPASS_ACCEPTANCE_SETTINGS } from './worker-home.mjs';
+import { replaceDurably } from '../../native/door.mjs';
 import {
   seedTrust, seedClaudeConfigTrust, operatorClaudeStorePath, seedCodexTrust, seedAgyTrust, defaultAgySettingsPath,
   seedCodexHookTrust, trustRoots,
@@ -128,7 +129,7 @@ function openRound({ runDir, workId, tier, model, agentName }) {
  * (confinement/bypass-pairing.mjs), so both entry points refuse an
  * incomplete pairing identically.
  */
-export async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin }) {
+export async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin, delivery = null }) {
   const normalized = confinement ? normalizeLegacyConfinement(confinement, `executor.${round.workId}.confinement`) : null;
   const effectiveConfinement = normalized ?? confinement;
 
@@ -161,10 +162,14 @@ export async function establishConfinement({ confinement, round, fullEnv, cwd, r
   // Checked next, because it is the one flag that is already true or already
   // false before anything is provisioned: a worker confined to its own
   // worktree cannot be running in the checkout it was told to stay out of.
-  if (hasOwnWorktree && repoRoot && path.resolve(cwd) === path.resolve(repoRoot)) {
+  if (hasOwnWorktree && repoRoot && !delivery?.rootWorkspaceAllowed && path.resolve(cwd) === path.resolve(repoRoot)) {
     throw round.fail('invalid-config', 'own-worktree-unavailable',
       `executor for work "${round.workId}" refused: confinement declares ownWorktree, but this dispatch runs in the repo root itself (${path.resolve(cwd)}) rather than a worktree of its own.`);
   }
+
+  // A required backend delivers the home and the session itself (`controlDelivery`), so none of the host-side
+  // measures below, which deliver them for a launch without one, is taken.
+  if (delivery?.backendDelivers) return { workerHomePath: null, sessionEnv: fullEnv, confined: true, status: 'confined' };
 
   let workerHomePath = null;
   try {
@@ -316,6 +321,31 @@ export function trustStorePaths({ trustStore, fullEnv, workerEnv, accountSource 
 }
 
 /**
+ * A bypass launch of claude stops at a one-time acceptance screen unless its config directory says it was
+ * accepted. Written only into a private config directory (never the operator's own), merged into what is there.
+ * An unreadable settings file refuses the launch by name: guessing over it could drop the person's own settings.
+ */
+function seedBypassAcceptance({ permissionMode, trustStore, round, fullEnv, attemptEnv }) {
+  if (permissionMode !== 'bypass' || trustStore?.kind !== 'claude-json') return;
+  const dir = attemptEnv?.CLAUDE_CONFIG_DIR;
+  if (!dir || dir === fullEnv?.CLAUDE_CONFIG_DIR) {
+    round.note({ bypassAcceptanceSkipped: 'no-private-config-dir' });
+    return;
+  }
+  const file = path.join(dir, 'settings.json');
+  let current = {};
+  try {
+    current = JSON.parse(fs.readFileSync(file, 'utf8'));
+    if (current === null || typeof current !== 'object' || Array.isArray(current)) throw new Error('not an object');
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw round.fail('invalid-config', 'bypass-acceptance-unseedable', `${file} cannot be merged with the bypass acceptance: ${err.message}`);
+    current = {};
+  }
+  fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+  replaceDurably(dir, 'settings.json', `${JSON.stringify({ ...current, ...BYPASS_ACCEPTANCE_SETTINGS }, null, 2)}\n`, 0o600);
+}
+
+/**
  * What typed at the agent: `inline` is the default so a person watching the pane sees the full brief in
  * the TUI conversation; `file-pointer` types a one-line pointer to `brief-<round>.md` on disk. The text
  * is written to a file the supervisor reads, so the same bytes reach the agent whoever delivers them.
@@ -392,9 +422,10 @@ export function closeLivePane(host, key) {
  * `{ seeded, store }` (`store` is `{ root, target }` or null when no entry was needed). The caller owns what it
  * returns: `workerHomePath` is its to remove, a codex or agy trust entry is taken back by `cleanup-trust`.
  */
-export async function prepareSeat({ binding, round, runDir, cwd, repoRoot, fullEnv, herdrBin, attemptEnv = null }) {
+export async function prepareSeat({ binding, round, runDir, cwd, repoRoot, fullEnv, herdrBin, attemptEnv = null, delivery = null }) {
   const { command, args = [], env = {}, confinement, permissionMode, trustStore, trustAlso, trustAccountSource } = binding;
-  const confined = await establishConfinement({ confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin });
+  const confined = await establishConfinement({ confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin, delivery });
+  seedBypassAcceptance({ permissionMode, trustStore, round, fullEnv, attemptEnv });
   round.note({ confinement: { status: confined.status, confined: confined.confined } });
   // A confined run with a private home needs no seeding: that home is provisioned with the workspace
   // already trusted, so writing to the operator's own store for a directory only the seat will ever
@@ -433,7 +464,7 @@ export async function prepareTerminalAttempt(ctx) {
     attemptId, runDir: rawRunDir, cwd, repoRoot, prompt, workId, tier, model, runId,
     herdrBin, fullEnv, confinement, permissionMode, agentKind, delivery = 'inline',
     trustStore, trustAccountSource, trustAlso, attemptEnv, dispatchBatchKey, dispatchBatchSize, anchorPaneId, terminalConfig, workLabel,
-    beforeAllocate, opening = 'brief', beside,
+    beforeAllocate, opening = 'brief', beside, controlsDelivered = null,
   } = ctx;
   const roundNumber = 1;
   const runDir = path.resolve(rawRunDir);
@@ -482,7 +513,7 @@ export async function prepareTerminalAttempt(ctx) {
 
   const { workerHomePath, sessionEnv } = await prepareSeat({
     binding: { confinement, permissionMode, trustStore, trustAlso, trustAccountSource },
-    round, runDir, cwd, repoRoot, fullEnv, herdrBin, attemptEnv,
+    round, runDir, cwd, repoRoot, fullEnv, herdrBin, attemptEnv, delivery: controlsDelivered,
   });
   // The seat's trust entry and private home exist from here on: everything below runs in the try, so a
   // failure anywhere before the handover (a terminal config that cannot build a control included) gives

@@ -27,7 +27,7 @@ import {
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 import { CONFINED_MARKER_ENV } from "../../../config/facade.mjs";
 import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
-import { evaluateBypassPairing } from "./bypass-pairing.mjs";
+import { controlDelivery, evaluateBypassPairing } from "./bypass-pairing.mjs";
 import { OWNERSHIP_MARKER_FILE, CREDENTIAL_HOME_KEPT, CREDENTIAL_HOME_HELD, CREDENTIAL_KEEP_MAX_ATTEMPTS, ATTEMPT_HOME_MARKER_CONTRACT, countCredentialKeep, readAttemptHomeRecord, removeAttemptHome, keepSessionTranscript, describeAttemptHome, settleHeldCredentialHomes, MAX_HOME_MARKER_BYTES } from "./cleanup.mjs";
 import { writeBackRenewedCredential } from "../provider-credential-renewal.mjs";
 import {
@@ -431,6 +431,22 @@ function claimsMatchCoverage(claims, coverage) {
   return Object.keys(claims).every((key) => key in coverage);
 }
 
+/** The backend a request runs under: the one it names, else the required mode's default. */
+const effectiveBackendOf = (request) => request.backendId ?? (request.requirement?.mode === "required" ? "bwrap" : null);
+
+/**
+ * Whether a declared ownWorktree cannot be honoured: the dispatch runs in the repo root itself. A head session
+ * under a required backend that denies host writes is the exception (`controlDelivery`).
+ */
+export function ownWorktreeUnavailable(request, hasOwnWorktree) {
+  if (!hasOwnWorktree || !request.context?.repoRoot) return false;
+  const { rootWorkspaceAllowed } = controlDelivery({
+    launchKind: request.assignmentLaunchContext?.kind, requirement: request.requirement, backend: effectiveBackendOf(request),
+  });
+  if (rootWorkspaceAllowed) return false;
+  return path.resolve(request.context.cwd) === path.resolve(request.context.repoRoot);
+}
+
 /**
  * Confinement assessment and preparation: the one pipeline that refuses a launch the policy cannot
  * enforce and prepares the sandbox. `prepareConfinementForLaunch` runs it for every launch.
@@ -468,17 +484,13 @@ export async function assessAndPrepare(request, opts = {}) {
       { details: { reason: "bypass-confinement-incomplete", dispatchId: request.dispatchId, executorId: request.executorId, confinement: invocationConfinement } });
   }
 
-  if (
-    hasOwnWorktree &&
-    request.context?.repoRoot &&
-    path.resolve(request.context.cwd) === path.resolve(request.context.repoRoot)
-  ) {
+  if (ownWorktreeUnavailable(request, hasOwnWorktree)) {
     refuseLaunch(request, "invalid-config",
       `executor for work "${workLabel}" refused: confinement declares ownWorktree, but this dispatch runs in the repo root itself (${path.resolve(request.context.cwd)}) rather than a worktree of its own.`,
       { details: { reason: "own-worktree-unavailable", dispatchId: request.dispatchId, executorId: request.executorId, cwd: request.context.cwd, repoRoot: request.context.repoRoot, confinement: invocationConfinement } });
   }
 
-  const effectiveBackendId = request.backendId ?? (isRequired ? 'bwrap' : null);
+  const effectiveBackendId = effectiveBackendOf(request);
   if (reqMode !== 'unconfined' && effectiveBackendId) return prepareBackend(request, effectiveBackendId);
 
   let backendPlan = null;
