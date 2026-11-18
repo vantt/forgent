@@ -458,21 +458,33 @@ pub fn run(query: &Query, ctx: &QueryContext) -> Result<QueryResult, QueryError>
     }
 
     // Anti-joins drop a record that has a matching record in the window, or, with `latest`, whose newest record in
-    // the window matches. With `on`, the pool is indexed by ref id.
+    // the window matches. The pool, and with `on` each ref id's list of it, is sorted by (ts, id) once, so each
+    // record binary-searches its window instead of scanning the pool.
     for (w, conds, within, back_from_now) in &withouts {
         let kinds: BTreeSet<&str> = w.kind.iter().map(String::as_str).collect();
         let mut pool: Vec<Item> = items_of(&kinds);
         if !w.latest {
             pool.retain(|r| holds(r, conds));
         }
+        pool.sort_by(|a, b| (a.ts, &a.rec.id).cmp(&(b.ts, &b.rec.id)));
+        // Indices are pushed in pool order, so every list is sorted too; a record carrying the same id twice is
+        // pushed twice in a row and kept once.
         let mut by_ref: HashMap<&str, Vec<usize>> = HashMap::new();
         if let Some(on) = &w.on {
             for (idx, r) in pool.iter().enumerate() {
                 for id in r.ref_ids(on) {
-                    by_ref.entry(id).or_default().push(idx);
+                    let list = by_ref.entry(id).or_default();
+                    if list.last() != Some(&idx) {
+                        list.push(idx);
+                    }
                 }
             }
         }
+        let all: Vec<usize> = if w.on.is_none() {
+            (0..pool.len()).collect()
+        } else {
+            Vec::new()
+        };
         let mut kept = Vec::with_capacity(primary.len());
         for p in primary {
             let back_from_record = || {
@@ -489,23 +501,25 @@ pub fn run(query: &Query, ctx: &QueryContext) -> Result<QueryResult, QueryError>
                     p.ts.saturating_add(*within).min(ctx.now_millis),
                 ),
             };
-            let candidates: Vec<&Item> = match &w.on {
+            let lists: Vec<&[usize]> = match &w.on {
                 Some(on) => p
                     .ref_ids(on)
-                    .flat_map(|id| by_ref.get(id).into_iter().flatten().copied())
-                    .collect::<BTreeSet<usize>>()
-                    .into_iter()
-                    .map(|idx| &pool[idx])
+                    .filter_map(|id| by_ref.get(id).map(Vec::as_slice))
                     .collect(),
-                None => pool.iter().collect(),
+                None => vec![all.as_slice()],
             };
-            let mut inside = candidates.into_iter().filter(|r| (lo..=hi).contains(&r.ts));
             let found = if w.latest {
-                inside
-                    .max_by(|a, b| a.ts.cmp(&b.ts).then_with(|| a.rec.id.cmp(&b.rec.id)))
+                lists
+                    .into_iter()
+                    .filter_map(|list| last_at_or_before(list, |&i| pool[i].ts, hi))
+                    .map(|&i| &pool[i])
+                    .filter(|r| r.ts >= lo)
+                    .max_by(|a, b| (a.ts, &a.rec.id).cmp(&(b.ts, &b.rec.id)))
                     .is_some_and(|r| holds(r, conds))
             } else {
-                inside.next().is_some()
+                lists.into_iter().any(|list| {
+                    first_at_or_after(list, |&i| pool[i].ts, lo).is_some_and(|&i| pool[i].ts <= hi)
+                })
             };
             if !found {
                 kept.push(p);
@@ -576,4 +590,42 @@ pub fn run(query: &Query, ctx: &QueryContext) -> Result<QueryResult, QueryError>
         skipped,
         unmeasured: None,
     })
+}
+
+/// The last entry of a list sorted by `ts` whose `ts` is at or before `hi`.
+fn last_at_or_before<T>(sorted: &[T], ts: impl Fn(&T) -> i64, hi: i64) -> Option<&T> {
+    let after = sorted.partition_point(|x| ts(x) <= hi);
+    after.checked_sub(1).map(|at| &sorted[at])
+}
+
+/// The first entry of a list sorted by `ts` whose `ts` is at or after `lo`.
+fn first_at_or_after<T>(sorted: &[T], ts: impl Fn(&T) -> i64, lo: i64) -> Option<&T> {
+    sorted.get(sorted.partition_point(|x| ts(x) < lo))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{first_at_or_after, last_at_or_before};
+    use std::cell::Cell;
+
+    #[test]
+    fn a_window_search_reads_a_logarithmic_number_of_entries_not_the_whole_list() {
+        let list: Vec<i64> = (0..1_000_000).map(|n| n * 10).collect();
+        let reads = Cell::new(0usize);
+        let ts = |x: &i64| {
+            reads.set(reads.get() + 1);
+            *x
+        };
+        assert_eq!(last_at_or_before(&list, ts, 5_005), Some(&5_000));
+        assert_eq!(first_at_or_after(&list, ts, 5_005), Some(&5_010));
+        // Two binary searches over a million entries: about 2 x 20 reads.
+        assert!(reads.get() <= 2 * 21, "read {} entries", reads.get());
+        assert_eq!(last_at_or_before(&list, |x| *x, -1), None);
+        assert_eq!(first_at_or_after(&list, |x| *x, 10_000_000), None);
+        assert_eq!(last_at_or_before(&list, |x| *x, 0), Some(&0));
+        assert_eq!(
+            first_at_or_after(&list, |x| *x, 9_999_990),
+            Some(&9_999_990)
+        );
+    }
 }

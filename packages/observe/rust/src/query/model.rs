@@ -363,7 +363,9 @@ pub enum Anchor {
 ///
 /// With `latest`, only the newest record of `kind` (sharing the ref, when `on` is set) from `within` before the
 /// record's `ts` up to that `ts` is looked at, and the record is dropped when that one matches `where`. It reads the
-/// state in force at the record, so it takes `anchor: record` only; `now` and `after` are refused.
+/// state in force at the record, so it takes `anchor: record` only; `now` and `after` are refused. The latest window is
+/// `[ts - within, ts]`, both ends included, so it holds the record itself when the record is of a `kind` here.
+/// Records at the same instant are ordered by id: the one with the largest id is the newest.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Without {

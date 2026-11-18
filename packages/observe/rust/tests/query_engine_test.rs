@@ -673,6 +673,48 @@ fn a_latest_without_drops_a_record_only_when_the_newest_record_in_force_at_it_ma
 }
 
 #[test]
+fn an_anti_join_window_includes_both_ends_and_latest_breaks_a_tie_by_the_largest_id() {
+    let busy = r#"{"field":"fgos.plans.running","op":"gt","value":0}"#;
+    let wakes = |latest: bool, within: &str, extra: &[&str]| {
+        let q = query(&format!(
+            r#"{{"kind":["fgos.supervisor.wake"],"by":["fgos.supervisor.trigger"],
+                "without":[{{"kind":["fgos.watcher.tick"],"latest":{latest},"within":"{within}","anchor":"record",
+                             "where":[{busy}]}}]}}"#
+        ));
+        groups(
+            &ask_with(&q, NOW, &[], extra).unwrap(),
+            "fgos.supervisor.trigger",
+        )
+    };
+    // wake-1 at 11:00: busy tick-0 and idle tick-2 share 11:00, and tick-2's larger id makes it the newest, so the
+    // wake stays. wake-2 at 11:50: the newest is busy tick-1 at 11:20, so it goes.
+    assert_eq!(wakes(true, "1h", &[]), ["head-gone"]);
+    // An idle tick at exactly 11:50 is in the window's upper end, so it is newest and wake-2 stays.
+    let idle_at_wake = r#"{"v":2,"id":"tick-at-wake","kind":"fgos.watcher.tick","ts":"2026-11-18T11:50:00Z","subject":{"kind":"session","id":"watcher"},"measures":{"fgos.watcher.interval":300,"fgos.plans.ready":0,"fgos.plans.running":0},"basis":"observed","origin":{"source":"fixture","host":"alpha"}}"#;
+    assert_eq!(
+        wakes(true, "1h", &[idle_at_wake]),
+        ["head-gone", "plan-no-progress"]
+    );
+    // A plain anti-join reaches the busy 11:20 tick from wake-2 at exactly 30 minutes back, not at 29; busy tick-0
+    // sits at wake-1's own instant and drops it either way.
+    assert!(wakes(false, "30m", &[]).is_empty());
+    assert_eq!(wakes(false, "29m", &[]), ["plan-no-progress"]);
+
+    // A latest anti-join over the primary's own kind sees the primary itself: busy tick-1 is its own newest and
+    // goes; busy tick-0 stays because idle tick-2 at the same instant has the larger id.
+    let ticks = query(&format!(
+        r#"{{"kind":["fgos.watcher.tick"],"agg":["count","max:ts"],
+            "without":[{{"kind":["fgos.watcher.tick"],"latest":true,"within":"1h","anchor":"record",
+                         "where":[{busy}]}}]}}"#
+    ));
+    let row = ask_with(&ticks, NOW, &[], &[]).unwrap().rows.remove(0);
+    assert_eq!(
+        (row.count, row.aggs["max:ts"]),
+        (2, Some(AggValue::Instant(instant("2026-11-18T11:00:00Z"))))
+    );
+}
+
+#[test]
 fn the_factor_k_can_be_a_parameter_the_caller_fills() {
     let mut q = definition("watcher-overdue");
     q.where_.push(

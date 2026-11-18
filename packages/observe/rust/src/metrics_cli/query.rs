@@ -90,28 +90,34 @@ fn parse_cond(text: &str) -> Result<Filter, String> {
     if let Some(field) = text.strip_suffix('?') {
         return Ok(cond(field, Op::Exists, None));
     }
-    // The prefix is text as written, never read as a number.
-    if let Some((field, value)) = text.split_once("^=") {
-        return Ok(cond(field, Op::Prefix, Some(json!(value))));
-    }
-    if let Some((field, value)) = text.split_once("!=") {
-        return Ok(cond(field, Op::Ne, Some(scalar(value))));
-    }
-    if let Some((field, value)) = text.split_once('=') {
-        return Ok(if value.contains('|') {
-            cond(
+    // Split at the earliest operator, so a value may itself hold one: `x=a^=b` is an eq on `x`.
+    let split = text.char_indices().find_map(|(at, c)| {
+        let rest = &text[at..];
+        let op = if rest.starts_with("^=") {
+            ("^=", Op::Prefix)
+        } else if rest.starts_with("!=") {
+            ("!=", Op::Ne)
+        } else {
+            match c {
+                '=' => ("=", Op::Eq),
+                '<' => ("<", Op::Lt),
+                '>' => (">", Op::Gt),
+                _ => return None,
+            }
+        };
+        Some((&text[..at], op.1, &rest[op.0.len()..]))
+    });
+    if let Some((field, op, value)) = split {
+        return Ok(match op {
+            // The prefix is text as written, never read as a number.
+            Op::Prefix => cond(field, op, Some(json!(value))),
+            Op::Eq if value.contains('|') => cond(
                 field,
                 Op::In,
                 Some(Value::Array(value.split('|').map(scalar).collect())),
-            )
-        } else {
-            cond(field, Op::Eq, Some(scalar(value)))
+            ),
+            _ => cond(field, op, Some(scalar(value))),
         });
-    }
-    for (symbol, op) in [('<', Op::Lt), ('>', Op::Gt)] {
-        if let Some((field, value)) = text.split_once(symbol) {
-            return Ok(cond(field, op, Some(scalar(value))));
-        }
     }
     Err(format!(
         "invalid condition {text}: expected field=value, field!=value, field^=text, field=a|b, field<n, field>n, field? or a JSON object"
@@ -480,6 +486,19 @@ mod tests {
             ("fgos.head.role".into(), Op::Prefix, json!("head:lead-"))
         );
         assert_eq!(prefix("x^=12").2, json!("12"));
+    }
+
+    #[test]
+    fn a_condition_splits_at_its_earliest_operator_so_the_value_may_hold_another() {
+        let parts = |text: &str| match parse_cond(text).unwrap() {
+            Filter::Cond(c) => (c.field, c.op, c.value.unwrap()),
+            other => panic!("not a condition: {other:?}"),
+        };
+        assert_eq!(parts("x=a^=b"), ("x".into(), Op::Eq, json!("a^=b")));
+        assert_eq!(parts("x=a!=b"), ("x".into(), Op::Eq, json!("a!=b")));
+        assert_eq!(parts("x^=a=b"), ("x".into(), Op::Prefix, json!("a=b")));
+        assert_eq!(parts("x!=a<b"), ("x".into(), Op::Ne, json!("a<b")));
+        assert_eq!(parts("x<a=b"), ("x".into(), Op::Lt, json!("a=b")));
     }
 
     #[test]
