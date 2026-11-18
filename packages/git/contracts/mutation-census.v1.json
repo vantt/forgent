@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "73c1bb3e7d67fba41136bbf9f5a09fa8fc9ffe0f38a7398c74715fb8a7632587",
+  "payloadDigest": "edfc5f701221b87e07af2bc39d1f0a4f89921af4d1a1f62ee65125d3176ded53",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1464,18 +1464,9 @@
     "src/workflow/store.mjs": "a22836f4560658fff5a76463157607e368201b01f6f6fff0c2554730aa40e908",
     "src/workflow/unit-handoff.mjs": "27869bc0d550081fb69724f2064161498d64c524389d12b04f2125e9ea151720",
     "src/workflow/units-source.mjs": "e4376a8f38d0a55f2e132aa6a094b552e8117eb46b6a4d8b03b00da32d6bb2b4",
-    "scripts/lib/git-one-door-declarations.v1.json": "aef53267edf8f1a66e7fa295d4029f1cf86b55a0bd52cf81779c41aa3cb86b51"
+    "scripts/lib/git-one-door-declarations.v1.json": "7a8d566f6eec39deb0db223e9d95c79a6c2a66240b75c4cb83cf9839bc850f71"
   },
-  "sites": [
-    {
-      "path": "packages/supervision/rust/src/land.rs",
-      "line": 137,
-      "spawn": "Command::new",
-      "binary": "sh",
-      "siteId": "run:f956953ff77a52d61188c8ea0703843d119b8c4aa1b683e7ca42dfd9626eb2a5",
-      "family": "unresolved-binary"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
@@ -3859,6 +3850,17 @@
       "spawn": "Command::new",
       "binary": "? internal_harness()",
       "class": "rust-test"
+    },
+    {
+      "path": "packages/supervision/rust/src/land.rs",
+      "line": 137,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "siteId": "run:f956953ff77a52d61188c8ea0703843d119b8c4aa1b683e7ca42dfd9626eb2a5",
+      "family": "unresolved-binary",
+      "class": "configured-binary",
+      "reason": "a land.gates command line from the trusted main checkout's project config (land.schema.yaml, x-fgos-sensitivity: command), run through the POSIX shell's -c operand in the candidate checkout, like worktreeSetup.commands; the scanner's Rust path classifies a shell only by a literal",
+      "retireWhen": "the scanner's Rust path classifies a shell whose script operand is configuration data as configured-binary, or land gates stop running through a shell"
     },
     {
       "path": "packages/supervision/rust/src/notify.rs",
