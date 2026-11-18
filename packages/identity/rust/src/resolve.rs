@@ -209,6 +209,30 @@ pub fn pi_family_cli(tree: &dyn ProcessTree, from_pid: Option<u32>) -> &'static 
     "pi"
 }
 
+/// Kernel command names of the agent CLIs, the one list [`agent_in_ancestry`]
+/// reads.
+pub const AGENT_CLI_COMMS: [&str; 5] = ["claude", "codex", "agy", "pi", "omp"];
+
+/// The first agent CLI (by kernel command name) among `from_pid` and its
+/// ancestors, bounded by `MAX_WALK`. Reads only the process table, never env.
+/// `None` when no agent is found, there is no pid, or the table is unreadable,
+/// so a rule built on it fails open as a mistake guard.
+pub fn agent_in_ancestry(tree: &dyn ProcessTree, from_pid: Option<u32>) -> Option<&'static str> {
+    let mut pid = from_pid?;
+    for _ in 0..MAX_WALK {
+        if let Some(comm) = tree.comm(pid) {
+            if let Some(name) = AGENT_CLI_COMMS.iter().find(|n| **n == comm) {
+                return Some(name);
+            }
+        }
+        match tree.stat(pid) {
+            Some(stat) if stat.ppid != 0 && pid != 1 => pid = stat.ppid,
+            _ => break,
+        }
+    }
+    None
+}
+
 /// The ancestry-derived CLI for an id from `env_var`; `None` when the variable
 /// alone names the CLI.
 pub fn ancestry_cli(

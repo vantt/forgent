@@ -451,3 +451,28 @@ fn a_hook_carried_pi_key_with_a_head_pid_gives_the_handle_the_env_path_gives_tha
     );
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn an_agent_cli_in_the_ancestry_is_found_by_command_name_and_never_by_env() {
+    use fgos_identity::resolve::agent_in_ancestry;
+    let tree = Named(vec![
+        (30, 20, "bash"),
+        (20, 15, "node"),
+        (15, 10, "claude"),
+        (10, 1, "zsh"),
+        (1, 0, "init"),
+    ]);
+    assert_eq!(agent_in_ancestry(&tree, Some(30)), Some("claude"));
+    assert_eq!(agent_in_ancestry(&tree, Some(15)), Some("claude"));
+    assert_eq!(agent_in_ancestry(&tree, Some(10)), None);
+    assert_eq!(agent_in_ancestry(&tree, None), None);
+    assert_eq!(agent_in_ancestry(&tree, Some(999)), None);
+    let headless = Named(vec![(30, 10, "bash"), (10, 1, "cron"), (1, 0, "init")]);
+    assert_eq!(agent_in_ancestry(&headless, Some(30)), None);
+    // An unreadable table fails open.
+    assert_eq!(agent_in_ancestry(&Lone, Some(30)), None);
+    assert_eq!(
+        agent_in_ancestry(&Named(vec![(5, 6, "a"), (6, 5, "b")]), Some(5)),
+        None
+    );
+}

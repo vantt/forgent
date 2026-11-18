@@ -75,7 +75,7 @@
       "additionalProperties": false,
       "required": ["kind"],
       "properties": {
-        "kind": { "enum": ["work", "backlog", "d-adr", "decision-file"] },
+        "kind": { "enum": ["work", "backlog", "d-adr", "decision-file", "question"] },
         "release": { "type": "integer", "minimum": 1 }
       }
     }
