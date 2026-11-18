@@ -20,5 +20,7 @@ Manual session rotation for the current head session.
    fgos head rotate <persona> --name <name>
    ```
 
-3. Tell the person what happened: the successor started and answered and this session retires, or the failure reason
-   and that this session stays alive (a failed rotation never ends the old session).
+3. Tell the person what the command reported: either the rotation was requested and runs in the background (a successor
+   starts beside this session; this session retires only after the successor answers, and stays alive if it never
+   does), or the refusal reason and that nothing changed. Never claim the successor answered: the command returns
+   before that happens.
