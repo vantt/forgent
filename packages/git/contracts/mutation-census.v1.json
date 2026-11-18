@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "50ab7a586466638b3178b9fa78d4729ae602aaf5c517b2590708cb2f7bab46d5",
+  "payloadDigest": "12b4c77200b6ecc83bce76663b077904a7f845dea79c848e593ccfd277247985",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -587,7 +587,7 @@
     "packages/identity/rust/tests/directory.rs": "731a1d87ab20b475ebbcbef7439bc669b7c2d961005b719702876e3ce9b79a25",
     "packages/identity/rust/tests/golden.rs": "b594f241c63185fa4eb274e8779211f0bba6528bced8109945c0043e3efc082a",
     "packages/identity/rust/tests/machine.rs": "8198639cd6b66d41b7976e8ae68835530c79b25db1f84f1a235609fc59c3d4c7",
-    "packages/identity/rust/tests/mint.rs": "8635a08355876a291504983d222a4613b6a01d0681290e29ec6d6475b5591d0c",
+    "packages/identity/rust/tests/mint.rs": "4877f605825bff0b3397b327eae37bfd7602b4efbe6e7aa44a8a68cc0525edf4",
     "packages/identity/rust/tests/project.rs": "25a1b4cc6ac4f0c3986487e3faa5d80af82260d079a9aecbc537722a422eed02",
     "packages/identity/rust/tests/register_current.rs": "25d3f540487726d1e5ccb9d115c388b3187f869a27beaff68c7ad39a988189ea",
     "packages/identity/rust/tests/session.rs": "26976cd4a1eee82c16b0e7bab2fdb695e7a4e6699f0cfc3643c8f4548fc06449",
@@ -3227,7 +3227,7 @@
     },
     {
       "path": "packages/identity/rust/tests/mint.rs",
-      "line": 355,
+      "line": 358,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
