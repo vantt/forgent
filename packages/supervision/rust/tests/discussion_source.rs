@@ -50,6 +50,7 @@ impl Fixture {
             &["commit", "-q", "--allow-empty", "-m", "root"],
             Some("2026-11-01T00:00:00Z"),
         );
+        remote_default(&path);
         path
     }
 
@@ -74,6 +75,24 @@ impl Drop for Fixture {
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.base);
     }
+}
+
+/// A fetched `origin/main` named by `origin/HEAD`: the Git door's remote-default trunk.
+fn remote_default(repo: &Path) {
+    git(
+        repo,
+        &["update-ref", "refs/remotes/origin/main", "HEAD"],
+        None,
+    );
+    git(
+        repo,
+        &[
+            "symbolic-ref",
+            "refs/remotes/origin/HEAD",
+            "refs/remotes/origin/main",
+        ],
+        None,
+    );
 }
 
 fn commit_file(repo: &Path, path: &str, text: &str, date: &str) {
@@ -175,17 +194,20 @@ fn a_side_branch_not_merged_to_main_gives_no_record() {
 }
 
 #[test]
-fn a_checked_out_unmerged_side_branch_that_descends_from_main_is_not_the_trunk() {
+fn a_checked_out_side_branch_is_never_read_as_the_trunk_when_no_remote_head_names_one() {
     let f = Fixture::new("side-checked-out");
     let repo = f.init("repo");
+    git(
+        &repo,
+        &["symbolic-ref", "--delete", "refs/remotes/origin/HEAD"],
+        None,
+    );
     commit_file(&repo, D1, "discussion: draft\n", "2026-11-02T00:00:00Z");
     git(&repo, &["checkout", "-q", "-b", "side"], None);
     commit_file(&repo, D1, "discussion: settled\n", "2026-11-03T00:00:00Z");
+    // The Git door can only name the attached side branch: that trunk is not trusted, so nothing is emitted.
     let records = f.source(&repo).records(&Window::default()).unwrap();
-    assert_eq!(
-        flips(&records),
-        [(D1.into(), "none".into(), "draft".into())]
-    );
+    assert_eq!(flips(&records), []);
 }
 
 #[test]
@@ -294,6 +316,7 @@ fn a_discussion_first_committed_in_the_root_commit_goes_from_none_to_its_state()
         &["commit", "-q", "-m", "root"],
         Some("2026-11-02T00:00:00Z"),
     );
+    remote_default(&repo);
     let records = f.source(&repo).records(&Window::default()).unwrap();
     assert_eq!(
         flips(&records),

@@ -177,11 +177,42 @@ fn page<T>(
     })
 }
 
-#[derive(Debug, Serialize)]
-#[serde(tag = "kind", content = "value", rename_all = "camelCase")]
+/// The trunk answer. A known trunk names where it came from, so a caller that must not trust the
+/// main checkout's attached branch (it can be a side branch) can treat `AttachedHead` as unknown.
+#[derive(Debug)]
 pub enum TrunkFact {
-    Known(RefName),
+    Known { trunk: RefName, source: TrunkSource },
     Unknown(TrunkUnknown),
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum TrunkSource {
+    Explicit,
+    RemoteDefault,
+    AttachedHead,
+}
+/// `{kind: "known", value: <ref>, source}` or `{kind: "unknown", value: <reason>}`.
+impl Serialize for TrunkFact {
+    fn serialize<S: serde::Serializer>(
+        &self,
+        serializer: S,
+    ) -> std::result::Result<S::Ok, S::Error> {
+        use serde::ser::SerializeMap;
+        let known = matches!(self, Self::Known { .. });
+        let mut map = serializer.serialize_map(Some(if known { 3 } else { 2 }))?;
+        match self {
+            Self::Known { trunk, source } => {
+                map.serialize_entry("kind", "known")?;
+                map.serialize_entry("value", trunk)?;
+                map.serialize_entry("source", source)?;
+            }
+            Self::Unknown(reason) => {
+                map.serialize_entry("kind", "unknown")?;
+                map.serialize_entry("value", reason)?;
+            }
+        }
+        map.end()
+    }
 }
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "kebab-case")]
@@ -241,7 +272,10 @@ impl GitDriver {
     ) -> Result<TrunkFact> {
         if let Some(target) = explicit {
             return Ok(match self.resolve_ref(repo, target)? {
-                RefValue::Direct(_) => TrunkFact::Known(target.clone()),
+                RefValue::Direct(_) => TrunkFact::Known {
+                    trunk: target.clone(),
+                    source: TrunkSource::Explicit,
+                },
                 _ => TrunkFact::Unknown(TrunkUnknown::TargetAbsent),
             });
         }
@@ -268,9 +302,10 @@ impl GitDriver {
             return Ok(TrunkFact::Unknown(TrunkUnknown::RemoteDefaultAmbiguous));
         }
         if let Some(target) = defaults.into_iter().next() {
-            return Ok(TrunkFact::Known(
-                RefName::parse(&target).map_err(|_| failure("invalid-ref"))?,
-            ));
+            return Ok(TrunkFact::Known {
+                trunk: RefName::parse(&target).map_err(|_| failure("invalid-ref"))?,
+                source: TrunkSource::RemoteDefault,
+            });
         }
         let main = match self.resolve_repo(repo.trusted_main_root(), repo.trusted_main_root())? {
             ResolveRepo::Repository(r) => r,
@@ -278,7 +313,10 @@ impl GitDriver {
         };
         Ok(match self.resolve_head(&main)? {
             HeadFact::Attached { target, .. } if target.as_str().starts_with("refs/heads/") => {
-                TrunkFact::Known(target)
+                TrunkFact::Known {
+                    trunk: target,
+                    source: TrunkSource::AttachedHead,
+                }
             }
             _ => TrunkFact::Unknown(TrunkUnknown::MissingTarget),
         })

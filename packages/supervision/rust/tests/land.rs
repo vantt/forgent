@@ -672,3 +672,20 @@ fn a_paths_land_refuses_busy_while_a_land_of_its_target_holds_the_merge_slot() {
     assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "landed\n");
     drop(session);
 }
+
+#[test]
+fn with_no_target_and_no_remote_head_a_main_checkout_on_a_side_branch_refuses_target_unknown() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    git(&f.main, &["checkout", "-qb", "side"]);
+    let (remote_before, side_before) = (
+        f.remote_tip(),
+        git(&f.main, &["rev-parse", "refs/heads/side"]),
+    );
+    let mut cmd = branch("topic");
+    cmd.target = None;
+    let refusal = f.land(&cmd, &config(vec![gate("true")])).unwrap_err();
+    assert_eq!(refusal.code, "land-target-unknown", "{refusal}");
+    assert_eq!(f.remote_tip(), remote_before);
+    assert_eq!(git(&f.main, &["rev-parse", "refs/heads/side"]), side_before);
+}

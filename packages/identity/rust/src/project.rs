@@ -138,7 +138,7 @@ pub fn mint(root: &Path, handle: &str, replace: bool) -> Result<Option<Project>,
 /// Whether the remote's default branch, as last fetched, tracks the file.
 /// A repository with no remote default branch answers `false`.
 pub fn remote_tracks(driver: &GitDriver, repo: &RepoHandle) -> Result<bool, OperationError> {
-    let TrunkFact::Known(trunk) = driver.resolve_trunk(repo, None)? else {
+    let TrunkFact::Known { trunk, .. } = driver.resolve_trunk(repo, None)? else {
         return Ok(false);
     };
     if !trunk.as_str().starts_with("refs/remotes/") {

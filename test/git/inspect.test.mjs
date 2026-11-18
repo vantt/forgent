@@ -28,7 +28,7 @@ test('Inspect marshals real byte paths, explicit absence, reads, pages and snaps
     assert.equal(port.resolveRepo().trustedMainRoot, repoPath);
     assert.equal(port.resolveRef({ name: 'refs/heads/trunk' }).oid, second);
     assert.deepEqual(port.resolveRef({ name: 'refs/heads/absent' }), { kind: 'absent' });
-    assert.deepEqual(port.resolveTrunk(), { kind: 'known', value: 'refs/heads/trunk' });
+    assert.deepEqual(port.resolveTrunk(), { kind: 'known', value: 'refs/heads/trunk', source: 'attached-head' });
     assert.deepEqual(port.ancestry({ ancestor: first, descendant: second }), { answer: 'yes' });
     assert.deepEqual(port.ancestry({ ancestor: second, descendant: first }), { answer: 'no' });
     assert.deepEqual(port.compareContent({ before: first, after: second }), { equal: false });
