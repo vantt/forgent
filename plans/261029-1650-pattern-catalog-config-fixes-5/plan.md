@@ -1,7 +1,8 @@
 ---
 title: "Pattern catalog config fixes, fifth round"
 description: "Owner choice 2a and 3a (board line 12beb2eb0): doctor names file and line of a catalog error, and the two round-four Lows"
-status: pending
+status: done
+closedNote: "Implemented (d8ddc485e, 11cef5907, 69d33700b); HARDEN review PASS 2026-10-29 18:48, plans/reports/review-261029-1846-harden-review-config-fixes-round-five.md."
 ---
 
 # Pattern catalog config fixes, fifth round

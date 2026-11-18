@@ -1,7 +1,8 @@
 ---
 title: "HARDEN T9 sub-plan: Host & Surface (CLI arms, main(), Rust host routing, gateway, dashboard, doctor/setup surface)"
 description: "Step 4 of the HARDEN per-layer loop for T9: the accepted findings of the T9 arbitration and owner decision 81 split into twelve phases, four proposed Unit-contract phases awaiting owner approval, one close; plus the cross-layer authority audit (decisions 82, 83): every AU finding placed, nine fix phases for closed layers (one proposed); bottom-up by layer, one writer per bin/fgos.mjs range, merged with the packaging sub-plan queue; Work arms untouched."
-status: pending
+status: done
+closedNote: "Closed 2026-11-14: plans/reports/closing-261113-1947-harden-t9-host-surface.md (DONE_WITH_CONCERNS), commit 3ee10a3fa; board log 2026-11-14 12:33 closes P16."
 priority: P1
 effort: ~25.5d of lead work (26 phases, P01 landed); ~14d critical path with the proposed phases (P02 -> P03 -> P04 -> P05 -> P06 -> P21 -> P07 -> P09 -> P23 -> P10 -> P16), ~10.75d without them; widest group 5 leads
 branch: main (plan only; each phase runs on its own track branch `harden/t9-pNN-<slug>` in its own linked worktree from origin/main)

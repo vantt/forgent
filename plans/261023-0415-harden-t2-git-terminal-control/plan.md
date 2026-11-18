@@ -1,7 +1,8 @@
 ---
 title: "HARDEN T2 sub-plan: Git and terminal-control fixed, folded and made true, doctor 10+3 → 6+2"
 description: "Implementation sub-plan for HARDEN layer T2: red tests first, the one remote door (scp origins, ssh user names), Worktree/Refs WAL compaction, the Git and terminal-control correctness fixes, Git cost and the Land wait in Rust, one-port-at-a-time Git consolidation, terminal-control deletes, doctor folded, census-gated drain deletes, specs; conditional phases for owner questions Q1, Q2 and Q3 A1–A5; then verify, re-measure and land on both machines."
-status: pending
+status: done
+closedNote: "Closed by decision 28 (parent plan 261021-1118 row 03, closed 10-24): plans/reports/closing-261023-2228-harden-t2-git-terminal-control.md, main 084da2df7; conditional phases 10-16 not triggered."
 priority: P1
 effort: "~9d lead time for phases 1–9 and 17 (P1 1d, P2 1d, P3 ∥ P4 1.5d, P5 2d, P6 ∥ P2–P5 2d, P7 ∥ P8 1d, P9 0.5d, P17 1d); conditional phases 10–16 add 0.5–3d each only if the owner answers yes"
 branch: main (plan only; work runs on track branch harden/t2-git-terminal-control, one linked worktree per phase lead)
@@ -105,13 +106,13 @@ After T2:
 | 7 | [Doctor: Git 10 → 6, terminal 3 → 2, one `inspectGit` per run](phase-07-doctor.md) | ∥ 8 | 5, 6 | −45 / 0 / −10 |
 | 8 | [Census-gated drain deletes, Q3 spec sentence, Q4 Node arms](phase-08-census-gated-deletes.md) | ∥ 7 | 5; census-gated slices also need both censuses | −12 / −110 (−20 without the census slices) / −40 |
 | 9 | [Contracts, specs, reading map, CHANGELOG](phase-09-contracts-specs-docs.md) | after 7 and 8 | 7, 8 | 0 / 0 / 0 |
-| 10 | [Conditional Q1: fewer fsyncs on a worktree add](phase-10-conditional-q1-worktree-pin-fsync.md) | only if Q1 = (a) | 9 | 0 / ±15 / +10 |
-| 11 | [Conditional Q2: last pane access behind the port](phase-11-conditional-q2-terminal-port-moves.md) | only if Q2 = (a) | 9 | −120 / +90 / ±0 |
-| 12 | [Conditional A1: retained-chain count and age in the journal row](phase-12-conditional-a1-journal-retention.md) | only if A1 picked | 9 | +5 / +10 / +5 |
-| 13 | [Conditional A2: one repository handle per process](phase-13-conditional-a2-repo-handle.md) | only if A2 picked | 9 | 0 / +40 / +15 |
-| 14 | [Conditional A3: cause catalogue](phase-14-conditional-a3-cause-catalogue.md) | only if A3 picked; alone, last | 9 | 0 / large / +20 |
-| 15 | [Conditional A4: `PATH` out of the floor key](phase-15-conditional-a4-floor-key-path.md) | only if A4 picked | 9 (after 13 if both run) | 0 / ±10 / +5 |
-| 16 | [Conditional A5: herdr capability cache per incarnation](phase-16-conditional-a5-capability-cache.md) | only if A5 picked | 9 (after 11 if both run) | 0 / +40 / +10 |
+| 10 | [Conditional Q1: fewer fsyncs on a worktree add](phase-10-conditional-q1-worktree-pin-fsync.md) | not triggered | 9 | 0 / ±15 / +10 |
+| 11 | [Conditional Q2: last pane access behind the port](phase-11-conditional-q2-terminal-port-moves.md) | not triggered | 9 | −120 / +90 / ±0 |
+| 12 | [Conditional A1: retained-chain count and age in the journal row](phase-12-conditional-a1-journal-retention.md) | not triggered | 9 | +5 / +10 / +5 |
+| 13 | [Conditional A2: one repository handle per process](phase-13-conditional-a2-repo-handle.md) | not triggered | 9 | 0 / +40 / +15 |
+| 14 | [Conditional A3: cause catalogue](phase-14-conditional-a3-cause-catalogue.md) | not triggered | 9 | 0 / large / +20 |
+| 15 | [Conditional A4: `PATH` out of the floor key](phase-15-conditional-a4-floor-key-path.md) | not triggered | 9 (after 13 if both run) | 0 / ±10 / +5 |
+| 16 | [Conditional A5: herdr capability cache per incarnation](phase-16-conditional-a5-capability-cache.md) | not triggered | 9 (after 11 if both run) | 0 / +40 / +10 |
 | 17 | [Close: verify, re-measure, land both machines, rollback, report](phase-17-close-verify-land.md) | last | 9 and every conditional phase that the owner said yes to before 17 starts | 0 / 0 / 0 |
 
 **Sum of the estimates for phases 1–9** <!-- Updated: Red Team 2026-10-23 - one owner per file delta; floors shown -->:

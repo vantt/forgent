@@ -1,7 +1,8 @@
 ---
 title: "HARDEN T8 sub-plan: Skill/Domain (skills, render surfaces, domain doctrine and registry)"
 description: "Step 4 of the HARDEN per-layer loop for T8: the 25 accepted findings of the T8 arbitration and owner decision 79 (Q1 a, Q2 probe, Q3 b, Q4 a, Q5 kit-agnostic, Q7 a, Q8 a) split into twelve phases plus a close, one writer per hot file, seven leads in the widest group, net size below zero in every language, self-landing on fg-server2 and a Vietnamese owner-machine guide."
-status: pending
+status: done
+closedNote: "AU-21 decided (decision 83, landed 75978e0fa), AU-22 decided (decision 85 Q2, landed 86647c9b9): plans/reports/decision-261118-1308-harden-owner-questions.md."
 priority: P1
 effort: ~9.5d of lead work; ~4.5d critical path (P01 -> P02 -> P03 edit -> P11 -> P12 -> P13); widest group 7 leads
 branch: main (plan only; each phase runs on its own track branch `harden/t8-pNN-<slug>` in its own linked worktree from origin/main)

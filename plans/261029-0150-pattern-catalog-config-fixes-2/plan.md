@@ -1,7 +1,8 @@
 ---
 title: "Pattern catalog config fixes, second round"
 description: "Fixes for the HARDEN re-check of the first fix round: plans/reports/review-261029-0136-harden-recheck-pattern-catalog-config-fixes.md"
-status: pending
+status: done
+closedNote: "Implemented; HARDEN re-check PASS 2026-10-29 10:40 (commit 3aa9859f3, plans/reports/review-261029-1022-harden-recheck-config-fixes-round-two.md); Lows F1-F5 carried by round four."
 ---
 
 # Pattern catalog config fixes, second round

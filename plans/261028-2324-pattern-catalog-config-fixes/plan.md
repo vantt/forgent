@@ -1,7 +1,8 @@
 ---
 title: "Pattern catalog Part A: fixes from the HARDEN config review"
 description: "Core fixes for the retired-key mechanism, the conversion and the doctor row, from plans/reports/review-261028-2257-harden-review-pattern-catalog-config.md"
-status: pending
+status: done
+closedNote: "Implemented and reviewed: round one fixes landed; HARDEN re-check plans/reports/review-261029-0136-harden-recheck-pattern-catalog-config-fixes.md found follow-ups, carried by round two."
 ---
 
 # Pattern catalog Part A: fixes from the HARDEN config review

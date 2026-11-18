@@ -1,7 +1,8 @@
 ---
 title: "HARDEN T6 sub-plan: Workflow (guide and case)"
 description: "Step 4 of the HARDEN per-layer loop for T6: the accepted findings of the T6 arbitration and owner decision 71 (1a 2a 3a 4a 5b 6a 7a) split into fifteen sub-phases with one writer per hot file, plus a final wave of five (16-20, owner decision 73), six parallel leads in the widest wave, net size below zero, self-landing on fg-server2 and a Vietnamese owner-machine guide."
-status: pending
+status: running
+closedNote: "Open only on phase 20 step 2 (plain-run retention), waiting for the owner; phase 17 landed 6b45c34c5; size miss accepted by decision 73 (plans/reports/decision-261118-1308-harden-owner-questions.md)."
 priority: P1
 effort: ~8d lead time (wave 0 ≈ 1d; P03 1d; wave 2 ≈ 2d; wave 3 ≈ 1.5d; P13 1.5d; P14 0.5d; P15 1d) + final wave ~1d wide (phases 16-20, five leads in parallel; 20 step 2 waits for the owner)
 branch: main (plan only; each phase runs on its own track branch `harden/t6-pNN-<slug>` in its own linked worktree from origin/main)

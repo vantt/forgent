@@ -1,7 +1,8 @@
 ---
 title: "Pattern catalog config fixes, fourth round"
 description: "Fixes for the HARDEN review of the third round: plans/reports/review-261029-1230-harden-review-config-fixes-round-three.md, plus the round-two Lows F1 to F5 that review reports as still open"
-status: pending
+status: done
+closedNote: "Implemented (ce1bb5c1e..c4f8530ea); HARDEN review PASS 2026-10-29 15:54, plans/reports/review-261029-1547-harden-review-config-fixes-round-four.md; three Lows carried by round five."
 ---
 
 # Pattern catalog config fixes, fourth round

@@ -1,7 +1,8 @@
 ---
 title: "HARDEN T1 sub-plan: the in-process holder-lock and identity doors, fences deleted, hot mutex fixed, doctor 9 → 5"
 description: "Implementation sub-plan for HARDEN layer T1: red tests first, the Linux/macOS holderLock door on the combined addon with the red-team's three constraints, the Node cutover fences deleted, the hot-mutex and leaf-crate defects fixed, nine doctor rows merged into five and the specs rewritten, the identity door and one depth counter after SEAT (T0's post-SEAT carry list folded in), then verify, re-measure and land on both machines."
-status: pending
+status: done
+closedNote: "Closed 2026-10-22: plans/reports/closing-261022-2003-harden-t1-holder-lock-identity-door.md; landed on the owner machine at main 7833d5df1 (board log 2026-10-23 01:40)."
 priority: P1
 effort: ~8d lead time across 7 phases (P1 ≈ 1d, P2 ≈ 2d, P3 ∥ P4 ≈ 1.5d, P5 ≈ 1d, P6 ≈ 1d, P7 ≈ 1d) on track branch `harden/t1-holder-lock-identity-door`
 branch: main (plan only; the work runs on the track branch, one linked worktree per phase lead)

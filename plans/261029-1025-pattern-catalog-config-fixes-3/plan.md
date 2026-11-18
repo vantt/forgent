@@ -1,7 +1,8 @@
 ---
 title: "Pattern catalog config fixes, third round"
 description: "The items the first two rounds left open from the HARDEN review: M3 and L3 to L6 of plans/reports/review-261028-2257-harden-review-pattern-catalog-config.md"
-status: pending
+status: done
+closedNote: "Implemented (53e8a1e68); HARDEN review plans/reports/review-261029-1230-harden-review-config-fixes-round-three.md verdict CHANGES, leftovers carried by round four."
 ---
 
 # Pattern catalog config fixes, third round

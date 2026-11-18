@@ -1,7 +1,8 @@
 ---
 title: "HARDEN T0 sub-plan: one process-facts door, durable and canonical doors, seven Highs fixed, Node shrunk"
 description: "Implementation sub-plan for HARDEN layer T0: a T0-owned in-process door to fgos-process, durable-file and canonical-json; red tests first for the seven High defects; every Node liveness, signal, durable-write and canonical-JSON copy moved onto the door and deleted; specs updated; independent verification and landing on both machines."
-status: pending
+status: done
+closedNote: "Closed 2026-10-21: plans/reports/closing-261021-2213-harden-t0-process-facts-door.md; landed on both machines (board log 2026-10-22 03:12, post-SEAT carry list closed in 469d4a94b)."
 priority: P1
 effort: ~7d lead time across 8 phases (P1 ∥ P2 ≈ 1.5d, P3 ∥ P4 ≈ 1.5d, P5 ≈ 1d, P6 ≈ 1d, P7 ≈ 0.5d after SEAT, P8 ≈ 1d) plus the wait on owner question OQ-1 and on SEAT
 branch: main (plan only; the work runs on track branch `harden/t0-process-facts-door`, one linked worktree per phase lead)

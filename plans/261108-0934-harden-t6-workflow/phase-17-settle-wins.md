@@ -1,7 +1,8 @@
 ---
 phase: 17
 title: "Settle wins: a settled Unit run is never given back as not-started by another process's hold; a real settle supersedes a not-started release already on the ledger"
-status: pending
+status: done
+closedNote: "Landed 2026-11-08 6b45c34c5 (evidence: plans/reports/decision-261118-1308-harden-owner-questions.md)."
 depends_on: ["01-15 on main (T6 as closed 2026-11-08)"]
 parallel: "final wave, with 16, 18, 19 and 20 step 1 (disjoint files)"
 effort: ~0.5d
