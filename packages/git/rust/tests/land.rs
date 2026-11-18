@@ -219,6 +219,50 @@ fn slot_excludes_same_destination_through_verification() {
     drop(s);
 }
 #[test]
+fn a_held_merge_slot_excludes_a_land_of_its_target_and_a_live_land_excludes_the_slot() {
+    let f = Fixture::new();
+    let dest = fgos_git::RefName::parse(&f.request.destination).unwrap();
+    let slot = f.driver.acquire_merge_slot(&f.repo, &dest, 0).unwrap();
+    assert!(!slot.lend().unwrap().is_empty());
+    assert!(f
+        .driver
+        .prepare_land(
+            &f.repo,
+            vec![],
+            &f.request,
+            "fixture",
+            "behind-slot",
+            &wal::OsFileSystem,
+            0
+        )
+        .err()
+        .unwrap()
+        .cause
+        .contains("lock-acquire"));
+    drop(slot);
+    let s = f
+        .driver
+        .prepare_land(
+            &f.repo,
+            vec![],
+            &f.request,
+            "fixture",
+            "after-slot",
+            &wal::OsFileSystem,
+            0,
+        )
+        .unwrap();
+    assert_eq!(
+        f.driver
+            .acquire_merge_slot(&f.repo, &dest, 0)
+            .err()
+            .unwrap()
+            .cause,
+        "merge-slot-busy"
+    );
+    drop(s);
+}
+#[test]
 fn held_custody_refuses_before_effect() {
     use fgos_holder_lock::{acquire, Acquire, BorrowedHandle, Mode, Resource, Wait};
     let f = Fixture::new();

@@ -15,6 +15,7 @@ use fgos_git::{
     ReadObject, RefMapping, RefName, RefValue, Remote, RemoteGrant, RepoHandle, ResolveRepo,
     ResultCode, Submodules, TrunkFact, Untracked,
 };
+use fgos_holder_lock::BorrowedHandle;
 use sha2::{Digest, Sha256};
 use std::io::Read;
 use std::path::Path;
@@ -226,6 +227,8 @@ fn lossy(path: &[u8]) -> String {
     String::from_utf8_lossy(path).into_owned()
 }
 
+type Held<'h> = Result<Vec<BorrowedHandle<'h>>, LandRefusal>;
+
 enum Attempt {
     Landed(LandOutcome),
     RemoteMoved,
@@ -278,8 +281,13 @@ impl Lander<'_> {
     }
 
     /// Fetch the target and fast-forward local main to the remote tip. Local main never holds an
-    /// unpushed commit: a local-only tip is `land-remote-diverged`.
-    fn sync_target(&self, branch: &str) -> Result<(), LandRefusal> {
+    /// unpushed commit: a local-only tip is `land-remote-diverged`. `held` lends a lock the caller
+    /// already holds (a paths land's merge slot) to every Git door called here.
+    fn sync_target<'h>(
+        &self,
+        branch: &str,
+        held: &dyn Fn() -> Held<'h>,
+    ) -> Result<(), LandRefusal> {
         let p = self.ports;
         let tracking = format!("refs/remotes/{}/{}", p.remote.name, branch);
         let dest = format!("refs/heads/{branch}");
@@ -289,7 +297,7 @@ impl Lander<'_> {
         };
         let receipt = p
             .git
-            .fetch_refs(p.repo, vec![], p.remote, &[mapping], p.writer, &self.id())
+            .fetch_refs(p.repo, held()?, p.remote, &[mapping], p.writer, &self.id())
             .map_err(at("fetch"))?;
         match receipt.remote {
             Remote::Acknowledged => {}
@@ -325,7 +333,7 @@ impl Lander<'_> {
             p.git
                 .catch_up_main_checkout(
                     p.repo,
-                    vec![],
+                    held()?,
                     &ref_name(&dest)?,
                     &local_tip,
                     &ref_name(&tracking)?,
@@ -587,7 +595,7 @@ impl Lander<'_> {
     ) -> Result<Attempt, LandRefusal> {
         let p = self.ports;
         let dest = format!("refs/heads/{target_branch}");
-        self.sync_target(target_branch)?;
+        self.sync_target(target_branch, &|| Ok(vec![]))?;
         let source = self
             .resolve(&format!(
                 "refs/heads/{}",
@@ -914,11 +922,18 @@ impl Lander<'_> {
                 ))
             }
         }
-        self.sync_target(&target)?;
+        // The target's merge slot, the one a branch Land holds, serialises this land with every
+        // Land of the same target from the sync through the push.
+        let slot = p
+            .git
+            .acquire_merge_slot(p.repo, &ref_name(&dest)?, p.wait_ms)
+            .map_err(at("merge slot"))?;
+        let held = || slot.lend().map_err(from_git);
+        self.sync_target(&target, &held)?;
         self.check_tests(p.repo.trusted_main_root(), &command.tests)?;
         let mut baseline = p
             .git
-            .preflight_commit(p.repo, vec![], None)
+            .preflight_commit(p.repo, held()?, None)
             .map_err(from_git)?;
         // The named paths are already modified: they are what this land commits, not pre-existing dirt.
         let mut others = Vec::new();
@@ -939,7 +954,7 @@ impl Lander<'_> {
             .git
             .scoped_commit(
                 p.repo,
-                vec![],
+                held()?,
                 &baseline,
                 &CommitRequest {
                     writes: paths.to_vec(),
@@ -967,73 +982,37 @@ impl Lander<'_> {
                 ),
             ));
         }
-        let mut retries = 0;
-        loop {
-            if self.push_local(&target)? {
-                break;
-            }
-            // The remote moved after the local commit: fast-forward push only.
-            let tracking = format!("refs/remotes/{}/{}", p.remote.name, target);
-            self.fetch_tracking(&target)?;
-            let remote_tip = self
-                .resolve(&tracking)?
-                .ok_or_else(|| refuse("land-remote-diverged", format!("{tracking} is absent")))?;
-            let local_tip = self
-                .resolve(&dest)?
-                .ok_or_else(|| refuse("land-target-unknown", format!("{dest} is absent")))?;
-            let can_ff = p
-                .git
-                .ancestry(p.repo, &remote_tip, &local_tip)
-                .map_err(from_git)?;
-            if !can_ff {
-                return Err(refuse(
-                    "land-remote-diverged",
-                    format!(
-                        "local commit {} is not pushed; the remote moved",
-                        commit.as_str()
-                    ),
-                ));
-            }
-            if retries >= MAX_RETRIES {
-                return Err(refuse(
-                    "land-remote-diverged",
-                    format!(
-                        "local commit {} is not pushed; the remote kept moving",
-                        commit.as_str()
-                    ),
-                ));
-            }
-            retries += 1;
+        // With the slot held no Land of this target can move the remote; a rejection is an
+        // outside push, and the local commit stays for a human to inspect.
+        if !self.push_local(&target, held()?)? {
+            return Err(refuse(
+                "land-paths-push-rejected",
+                format!(
+                    "local commit {} on {dest} was not pushed: the remote {target} moved outside fgos. \
+                     Inspect the commit, then reset local {target} to the remote tip \
+                     (`git fetch {remote} {target}` and `git reset --keep {remote}/{target}`) and land again",
+                    commit.as_str(),
+                    remote = p.remote.name,
+                ),
+            ));
         }
         Ok(LandOutcome {
             main_sha: commit.as_str().into(),
             landed_paths: result.files,
-            retries,
+            retries: 0,
             gates_run,
         })
     }
 
-    fn fetch_tracking(&self, branch: &str) -> Result<(), LandRefusal> {
-        let p = self.ports;
-        let mapping = RefMapping {
-            source: ref_name(&format!("refs/heads/{branch}"))?,
-            destination: ref_name(&format!("refs/remotes/{}/{}", p.remote.name, branch))?,
-        };
-        p.git
-            .fetch_refs(p.repo, vec![], p.remote, &[mapping], p.writer, &self.id())
-            .map_err(from_git)?;
-        Ok(())
-    }
-
     /// Push the local target branch itself; `false` when the remote rejected it as non-fast-forward.
-    fn push_local(&self, branch: &str) -> Result<bool, LandRefusal> {
+    fn push_local(&self, branch: &str, held: Vec<BorrowedHandle<'_>>) -> Result<bool, LandRefusal> {
         let p = self.ports;
         let name = ref_name(&format!("refs/heads/{branch}"))?;
         let receipt = p
             .git
             .push_refs(
                 p.repo,
-                vec![],
+                held,
                 p.remote,
                 &[RefMapping {
                     source: name.clone(),
