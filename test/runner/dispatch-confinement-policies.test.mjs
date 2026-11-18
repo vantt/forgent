@@ -738,7 +738,7 @@ test('workspace-paths: the shape takes project-relative paths and refuses empty,
   }), /unknown key "paths"/);
 });
 
-test('workspace-paths: the resolver binds a granted directory, binds the parent of a granted file read-write with its other entries bound back read-only, and refuses a missing path and any symbolic link on the way', () => {
+test('workspace-paths: the resolver binds a granted directory, binds the parent of a granted file read-write with its other entries bound back read-only, and refuses a missing path, a file in the project root and any symbolic link on the way', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-ws-paths-'));
   try {
     fs.mkdirSync(path.join(root, 'plans'));
@@ -774,6 +774,8 @@ test('workspace-paths: the resolver binds a granted directory, binds the parent 
     assert.throws(() => resolve(['nope']), (err) => err.code === 'workspace-path-missing');
     assert.throws(() => resolve(['link']), /symbolic link/);
     assert.throws(() => resolve(['../x']), (err) => err.code === 'confinement-grant-invalid');
+    // A file directly in the project root: its parent would make the whole root writable, so it is refused.
+    assert.throws(() => resolve(['top.md']), (err) => err.code === 'confinement-grant-invalid' && /below the project root/.test(err.message));
     // A redirected directory on the way (here one that names the project root) would bind its target's parent: refused.
     fs.symlinkSync('.', path.join(root, 'up'));
     assert.throws(() => resolve(['up/top.md']), (err) => err.code === 'confinement-grant-invalid' && /"up" .* symbolic link/.test(err.message));

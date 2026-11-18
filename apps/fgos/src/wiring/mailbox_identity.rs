@@ -120,8 +120,8 @@ fn identity_key<'a>(key: &'a WriterKey, cli: &Cli) -> Option<IdentityKey<'a>> {
 /// head's own supervisor is asked to bind it to the attempt it runs in
 /// (`head bind session`), which registers it on the attempt's gate and moves
 /// the attempt's role to it, so a role alias reaches this head's mailbox key.
-/// A bind that was busy or refused is asked again by the head's later hook
-/// calls until the read above finds the session (`mailbox_hook`); the
+/// A bind that was busy or refused is asked again by a later hook call at
+/// most once per period (`mailbox_hook::ensure_identity`); the
 /// variable is no trust boundary, the supervisor checks the caller's pid.
 ///
 /// Known limit, inside the same-user boundary of spec §8 item 3: the

@@ -434,10 +434,13 @@ export function isInsideRoot(target, root) {
  * entry changes. The granted file itself gets no bind of its own.
  *
  * Accepted trade-offs: a name created in that parent after launch, by the session or by Git on the host, is writable
- * in the session; and an entry bound back read-only is pinned by inode, so after a host rewrite the session reads it
- * stale until its next launch (reads only). A parent holding a symbolic link is refused: a link cannot be bound over
- * (a mount follows it), so it would stay removable. A file whose parent is a granted directory, or lies in one, needs
- * no parent bind. Shallow parents come first, so a deeper parent is bound over the read-only entry its parent bound back.
+ * in the session; and a sibling the host replaces (a Git pull unlinks it or renames a new file over it) becomes
+ * writable in the session until the session restarts, because Linux detaches the read-only bind whose mount point was
+ * unlinked on the host, and the name then resolves to the live host file in the read-write parent. A parent holding a
+ * symbolic link is refused: a link cannot be bound over (a mount follows it), so it would stay removable. A file
+ * directly in the project root is refused: its parent would make the whole root writable. A file whose parent is a
+ * granted directory, or lies in one, needs no parent bind. Shallow parents come first, so a deeper parent is bound
+ * over the read-only entry its parent bound back.
  */
 function fileGrantParents(entries, realRoot) {
   const dirs = entries.filter((e) => !e.isFile).map((e) => e.hostTarget);
@@ -447,6 +450,9 @@ function fileGrantParents(entries, realRoot) {
     .sort((a, b) => a.split(path.sep).length - b.split(path.sep).length || a.localeCompare(b));
   return parents.map((parent) => {
     const rel = path.relative(realRoot, parent) || '.';
+    if (rel === '.') {
+      throw new ConfinementResourceError('confinement-grant-invalid', `workspace-paths: a granted file must lie in a directory below the project root ${realRoot}; its parent would make the whole root writable.`);
+    }
     const kept = fs.readdirSync(parent, { withFileTypes: true })
       .map((dirent) => path.join(parent, dirent.name))
       .filter((entry) => !granted.has(entry))

@@ -91,10 +91,16 @@ fn reason(outcome: &ShellOutcome) -> Option<String> {
 
 /// The reason of the latest recorded outcome, when one is there.
 pub fn latest_reason(paths: &Paths) -> Option<String> {
+    latest(paths).map(|(reason, _)| reason)
+}
+
+/// The reason of the latest recorded outcome and when it was recorded
+/// (milliseconds since the epoch), when one is there.
+pub fn latest(paths: &Paths) -> Option<(String, u64)> {
     trusted_mailbox_dir(paths)?;
     let bytes = read_regular_capped(&paths.hook_outcome(), MAX_FILE_BYTES).ok()?;
     let line: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
-    line["reason"].as_str().map(String::from)
+    Some((line["reason"].as_str()?.to_string(), line["atMs"].as_u64()?))
 }
 
 /// Removes the latest outcome once what it recorded was repaired, so the

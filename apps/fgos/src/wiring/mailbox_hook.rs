@@ -156,9 +156,9 @@ fn run(args: &[OsString]) {
         return;
     };
     let confined = std::env::var_os(HEAD_REQUEST_SOCKET_ENV).is_some_and(|path| !path.is_empty());
-    let latest = || outcome_log::latest_reason(&paths);
+    let latest = || outcome_log::latest(&paths);
     if gate_idle.state() != GateState::Idle
-        || !ensure_identity(head.registered.is_some(), confined, latest)
+        || !ensure_identity(head.registered.is_some(), confined, latest(), now())
     {
         return;
     }
@@ -167,7 +167,7 @@ fn run(args: &[OsString]) {
     };
     match ensure_registered(root, fgos_dir.parent(), &cli, head) {
         // A retry that now holds clears the outcome it left.
-        None if latest().is_some_and(|reason| reason.starts_with(IDENT_PREFIX)) => {
+        None if latest().is_some_and(|(reason, _)| reason.starts_with(IDENT_PREFIX)) => {
             outcome_log::clear(&paths)
         }
         None => {}
@@ -177,21 +177,40 @@ fn run(args: &[OsString]) {
     }
 }
 
-/// Whether this call makes sure Identity knows its head: on the call that
-/// bound it to a new generation (quiet by construction); inside a confined
-/// head on every later call until its bind holds, because a busy or failed
-/// `head bind session` leaves the head unbound and its role on the attempt
-/// (`ensure_registered` first reads Identity's directory, so a bound head
-/// costs one read-only scan and no request); and otherwise again on a later
-/// quiet call while the latest outcome says Identity had no machine id yet,
-/// so a machine id minted after the head started still registers it.
-/// Steady calls of an unconfined head never touch Identity.
+/// How long a confined head waits after a failed Identity bind before a hook
+/// call asks again.
+const CONFINED_BIND_RETRY: Duration = Duration::from_secs(5 * 60);
+
+/// Whether this call makes sure Identity knows its head, given the latest
+/// hook outcome (`latest`: reason and time) and the time `now`:
+/// - on the call that bound it to a new generation (quiet by construction);
+/// - inside a confined head, while the latest outcome is a failed Identity
+///   step (`ident:*`, a busy or refused `head bind session`) at least
+///   [`CONFINED_BIND_RETRY`] old: a stuck head asks at most once per period,
+///   and the retry's own outcome (recorded, or cleared once it holds) is
+///   what dates the next one, so no hook call writes in between;
+/// - otherwise again on a later quiet call while the latest outcome says
+///   Identity had no machine id yet, so a machine id minted after the head
+///   started still registers it.
+///
+/// Steady calls of a head whose bind held never touch Identity.
 fn ensure_identity(
     newly_bound: bool,
     confined_head: bool,
-    latest_reason: impl FnOnce() -> Option<String>,
+    latest: Option<(String, u64)>,
+    now: Timestamp,
 ) -> bool {
-    newly_bound || confined_head || latest_reason().as_deref() == Some(IDENT_NO_MACHINE_ID)
+    if newly_bound {
+        return true;
+    }
+    let Some((reason, at_ms)) = latest else {
+        return false;
+    };
+    if confined_head {
+        let due = u64::try_from(CONFINED_BIND_RETRY.as_millis()).unwrap_or(u64::MAX);
+        return reason.starts_with(IDENT_PREFIX) && now.as_millis().saturating_sub(at_ms) >= due;
+    }
+    reason == IDENT_NO_MACHINE_ID
 }
 
 /// The prefix of every outcome `ensure_registered` leaves.
@@ -247,22 +266,38 @@ const IDENT_NO_MACHINE_ID: &str = "ident:machine-id-missing";
 
 #[cfg(test)]
 mod tests {
-    use super::{ensure_identity, IDENT_NO_MACHINE_ID};
+    use super::{ensure_identity, CONFINED_BIND_RETRY, IDENT_NO_MACHINE_ID};
+    use fgos_mailbox_core::Timestamp;
 
     #[test]
-    fn a_confined_head_retries_its_identity_bind_on_every_later_call_and_an_unconfined_head_only_after_a_missing_machine_id(
+    fn a_confined_head_retries_a_failed_identity_bind_at_most_once_per_period_and_an_unconfined_head_only_after_a_missing_machine_id(
     ) {
-        let none = || None;
-        let busy = || Some("ident:busy".to_string());
-        let no_machine = || Some(IDENT_NO_MACHINE_ID.to_string());
+        let period = u64::try_from(CONFINED_BIND_RETRY.as_millis()).unwrap();
+        let at = 1_000_000;
+        let busy = || Some(("ident:busy".to_string(), at));
+        let soon = Timestamp::from_millis(at + period - 1);
+        let later = Timestamp::from_millis(at + period);
         // A new generation always makes sure.
-        assert!(ensure_identity(true, false, none));
-        // A confined head whose bind was busy, refused, or whose outcome another head overwrote, tries again.
-        assert!(ensure_identity(false, true, busy));
-        assert!(ensure_identity(false, true, none));
+        assert!(ensure_identity(true, false, None, soon));
+        // A stuck confined head: nothing until the period has passed, then one retry.
+        assert!(!ensure_identity(false, true, busy(), soon));
+        assert!(ensure_identity(false, true, busy(), later));
+        // A confined head whose bind held (no failed Identity outcome) leaves Identity alone.
+        assert!(!ensure_identity(false, true, None, later));
+        assert!(!ensure_identity(
+            false,
+            true,
+            Some(("record:lock-busy".into(), at)),
+            later
+        ));
         // An unconfined steady call leaves Identity alone unless the machine id was missing.
-        assert!(!ensure_identity(false, false, none));
-        assert!(!ensure_identity(false, false, busy));
-        assert!(ensure_identity(false, false, no_machine));
+        assert!(!ensure_identity(false, false, None, soon));
+        assert!(!ensure_identity(false, false, busy(), later));
+        assert!(ensure_identity(
+            false,
+            false,
+            Some((IDENT_NO_MACHINE_ID.into(), at)),
+            soon
+        ));
     }
 }
