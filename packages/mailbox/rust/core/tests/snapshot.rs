@@ -18,9 +18,13 @@ fn populated_state() -> MailboxState {
         &limits,
         &mut ids,
     );
-    let mut with_handle = request("k2", "codex", None, "head-2");
-    with_handle.handle = Some("thread-2".to_string());
-    let codex = register_new(&mut state, with_handle, t(200), &limits, &mut ids);
+    let codex = register_new(
+        &mut state,
+        request("k2", "codex", None, "head-2"),
+        t(200),
+        &limits,
+        &mut ids,
+    );
 
     // Two messages that the record TTL refuses, one from each head, so the
     // notices lane, the notice marks and both counter tiers hold values.
@@ -217,6 +221,28 @@ fn a_version_1_snapshot_reads_as_the_current_version_with_no_remote_state() {
     assert!(state.remote_cursor().is_empty());
     let written = serde_json::to_value(&state).unwrap();
     assert_eq!(written["schema_version"], SNAPSHOT_SCHEMA_VERSION);
+}
+
+/// A binding no longer keeps the head's native handle (a Codex thread id; the
+/// session's identifiers live in its Identity record): a snapshot written
+/// while it did still reads, and is written back without the field.
+#[test]
+fn a_snapshot_whose_bindings_still_carry_a_handle_reads_and_is_written_back_without_it() {
+    let state = populated_state();
+    let mut old = serde_json::to_value(&state).unwrap();
+    let bindings = match &mut old["bindings"] {
+        serde_json::Value::Object(map) => map.values_mut().collect::<Vec<_>>(),
+        serde_json::Value::Array(list) => list.iter_mut().collect(),
+        other => panic!("bindings are a map or a list: {other}"),
+    };
+    assert!(!bindings.is_empty());
+    for binding in bindings {
+        binding["handle"] = serde_json::json!("thread-2");
+    }
+    let restored: MailboxState = serde_json::from_value(old).unwrap();
+    assert_eq!(restored, state);
+    let written = serde_json::to_string(&restored).unwrap();
+    assert!(!written.contains("thread-2"), "{written}");
 }
 
 /// Unflagged use must write records an older binary can still load: the ack

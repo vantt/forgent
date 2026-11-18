@@ -13,8 +13,8 @@
 //! duplicate window of spec §5.2), instead of being marked offered and lost.
 use super::breaker::Breaker;
 use super::{
-    begin, finish, render_reply, Adapter, Begun, Claimed, HandleOf, HeadFacts, HookCall, HookEvent,
-    HookLimits, QuietReason,
+    begin, finish, render_reply, Adapter, Begun, Claimed, HeadFacts, HookCall, HookEvent,
+    HookLimits, QuietReason, SenderOf,
 };
 use crate::adapters::TestedClis;
 use crate::head::{caller_is_head, Ancestry, NoHead};
@@ -59,8 +59,8 @@ pub struct ShellInput<'a> {
     /// again just before hold 1, for the caller check.
     pub ancestry: &'a dyn Fn() -> Option<Ancestry>,
     pub resolve: &'a Resolver<'a>,
-    /// Derives a sender's handle for a frame header (see [`HandleOf`]).
-    pub handle_of: &'a HandleOf<'a>,
+    /// Reads a sender's handle and role for a frame header (see [`SenderOf`]).
+    pub sender_of: &'a SenderOf<'a>,
     /// Shared with the budget watchdog: the shell writes stdout only after
     /// it moved the gate from idle to writing, and the watchdog ends the
     /// process only after it moved it from idle to done.
@@ -150,6 +150,8 @@ pub enum Quiet {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BoundHead {
     pub writer: WriterKey,
+    /// The head's short name in this record, as its binding holds it after the call.
+    pub name: Option<fgos_mailbox_core::ShortName>,
     pub head: HeadFacts,
     /// The generation this call created or replaced the binding with;
     /// `None` when the head was already bound.
@@ -275,8 +277,9 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
             Begun::Quiet { .. } | Begun::Pointer(_) => BTreeMap::new(),
         };
         let changed = begun.state_changed();
+        let name = state.binding(&call.writer).map(|b| b.name.clone());
         Reported {
-            value: (begun, sizes),
+            value: (begun, sizes, name),
             changed,
         }
     });
@@ -294,9 +297,10 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
             .collect(),
         ..ShellOutcome::default()
     };
-    let (begun, sizes) = held.value.value;
+    let (begun, sizes, name) = held.value.value;
     outcome.bound = begun.bound().then(|| BoundHead {
         writer: resolved.writer,
+        name,
         head: resolved.head,
         registered: begun.registered(),
     });
@@ -320,7 +324,7 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
             limits: input.limits,
             clock: input.clock,
             gate: &input.gate,
-            handle_of: input.handle_of,
+            sender_of: input.sender_of,
         },
         &claimed,
         &sizes,
@@ -339,7 +343,7 @@ pub(crate) struct Emit<'a> {
     pub limits: &'a Limits,
     pub clock: &'a dyn Fn() -> Timestamp,
     pub gate: &'a WriteGate,
-    pub handle_of: &'a HandleOf<'a>,
+    pub sender_of: &'a SenderOf<'a>,
 }
 
 /// What the write and the finish did.
@@ -375,7 +379,7 @@ pub(crate) fn emit_and_finish(
     let reply = render_reply(
         claimed,
         &|id| bodies.get(id).cloned(),
-        emit.handle_of,
+        emit.sender_of,
         emit.limits,
     );
     if !write_reply(emit.gate, stdout, &reply.stdout) {

@@ -477,9 +477,14 @@ fn the_frozen_version_1_snapshot_still_reads() {
     std::fs::write(fgos.paths().snapshot(), &fixture).unwrap();
     let state = rec::read_state(&record);
     // Read as the current version: the one section a version 1 snapshot lacks
-    // is empty and the version is the current one; nothing else changes.
+    // is empty, the version is the current one and the retired binding field
+    // is gone; nothing else changes.
     let mut upgraded = expected.clone();
     upgraded["schema_version"] = fgos_mailbox_core::SNAPSHOT_SCHEMA_VERSION.into();
+    // A binding's retired `handle` is read and dropped: the session's identifiers live in Identity.
+    for binding in upgraded["bindings"].as_object_mut().unwrap().values_mut() {
+        binding.as_object_mut().unwrap().remove("handle");
+    }
     upgraded["remote"] =
         serde_json::json!({ "baselined": false, "cursor": {}, "seen": {}, "refusals": [] });
     assert_eq!(serde_json::to_value(&state).unwrap(), upgraded);

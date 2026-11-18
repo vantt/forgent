@@ -13,8 +13,8 @@ pub mod resolve;
 pub mod shell;
 
 pub use drain::{
-    begin, finish, render_reply, Begun, Claimed, FinishTicket, HandleOf, HeadFacts, HookCall,
-    HookReply, PointerOnly, QuietReason,
+    begin, finish, render_reply, Begun, Claimed, FinishTicket, HeadFacts, HookCall, HookReply,
+    PointerOnly, QuietReason, Sender, SenderOf,
 };
 #[cfg(unix)]
 pub(crate) use drain::{claim_inbox, InboxClaim};
@@ -64,12 +64,6 @@ impl Adapter {
             Self::Pi => "pi",
             Self::Omp => "omp",
         }
-    }
-
-    /// Whether this CLI's session id is also its native thread handle
-    /// (Codex: the id `codex queue --thread` takes).
-    pub const fn session_is_handle(self) -> bool {
-        matches!(self, Self::Codex)
     }
 
     /// The core's CLI value of [`Adapter::word`].

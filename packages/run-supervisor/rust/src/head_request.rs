@@ -19,7 +19,11 @@ use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
+use fgos_identity::cli_dirs::{claude_config_dir, read_claude_session};
+use fgos_identity::directory::{CliSessionIds, Ids, MailboxIds};
+use fgos_identity::proc_tree::os_process_tree;
 use fgos_identity::resolve::{HeadRef, WriterKey, ENV_ORDER};
+use fgos_identity::session::cli_of;
 use fgos_process::facts::judge_here;
 use fgos_process::spawn::{run_bounded_command, Outcome as BoundedOutcome};
 use serde_json::{json, Value};
@@ -429,9 +433,11 @@ pub fn identity_take(
     .map_err(hold_error)
 }
 
-/// [`BIND_VERB`]: Identity binds the agent session `args` names (`{"source": <CLI session variable>, "value": <id>}`)
-/// to this attempt on its gate `head`, for the connecting process `peer` (which must run under the gate). Returns the
-/// bound session's `{id, handle}`.
+/// [`BIND_VERB`]: Identity binds the agent session `args` names (`{"source": <CLI session variable>, "value": <id>}`,
+/// plus an optional `"mailbox": {"fgosDir", "name"}`, the mailbox name the agent's hooks bound) to this attempt on
+/// its gate `head`, for the connecting process `peer` (which must run under the gate). The bound entry also gets the
+/// agent's CLI session as its CLI keeps it outside the sandbox ([`cli_session_of`]) and that mailbox name. Returns
+/// the bound session's `{id, handle}`.
 pub fn identity_bind(
     state_root: &Path,
     cwd: &Path,
@@ -440,19 +446,44 @@ pub fn identity_bind(
     args: &Value,
     peer: Option<u32>,
 ) -> Result<Value, HoldError> {
-    let text = |name: &str| {
-        args[name]
-            .as_str()
-            .filter(|_| args.as_object().is_some_and(|o| o.len() == 2))
+    let bad = || HoldError {
+        code: "bad-args".into(),
+        detail:
+            "args must be {source, value} with an optional mailbox {fgosDir, name}, all strings"
+                .into(),
     };
-    let (Some(source), Some(value)) = (text("source"), text("value")) else {
-        return Err(HoldError {
-            code: "bad-args".into(),
-            detail: "args must be exactly {source, value}, both strings".into(),
-        });
+    let fields = args.as_object().ok_or_else(bad)?;
+    if fields
+        .keys()
+        .any(|key| !matches!(key.as_str(), "source" | "value" | "mailbox"))
+    {
+        return Err(bad());
+    }
+    let text = |value: &Value| value.as_str().map(String::from);
+    let (Some(source), Some(value)) = (args["source"].as_str(), args["value"].as_str()) else {
+        return Err(bad());
+    };
+    let mailbox = match fields.get("mailbox") {
+        None => None,
+        Some(Value::Object(mailbox))
+            if mailbox.len() == 2
+                && mailbox.contains_key("fgosDir")
+                && mailbox.contains_key("name") =>
+        {
+            match (text(&mailbox["fgosDir"]), text(&mailbox["name"])) {
+                (Some(fgos_dir), Some(name)) => Some(MailboxIds { fgos_dir, name }),
+                _ => return Err(bad()),
+            }
+        }
+        Some(_) => return Err(bad()),
     };
     let peer = peer.ok_or_else(peer_unknown)?;
     let agent = WriterKey { source, value };
+    let ids = Ids {
+        cli_session: Some(cli_session_of(source, value, head, peer)),
+        mailbox,
+        ..Ids::default()
+    };
     fgos_identity::directory::bind_agent_session(
         state_root,
         Some(cwd),
@@ -460,10 +491,63 @@ pub fn identity_bind(
         &agent,
         head,
         peer,
-        None,
+        Some(&ids),
     )
     .map(|listed| json!({"id": listed.id, "handle": listed.handle}))
     .map_err(hold_error)
+}
+
+/// The CLI session of the agent the gate `head` runs, as the bind records it: its session variable and id, and for
+/// a Claude Code variable what the CLI keeps in `<config dir>/sessions/<agent pid>.json` outside the sandbox (name, messaging
+/// socket, process). The agent is the gate's direct child above `peer`; the file counts only when it names that pid,
+/// the bound session id and the agent's start time, so a stale or foreign file adds nothing.
+fn cli_session_of(source: &str, value: &str, head: &HeadRef, peer: u32) -> CliSessionIds {
+    let bare = CliSessionIds {
+        source: source.to_string(),
+        id: value.to_string(),
+        name: None,
+        name_source: None,
+        socket: None,
+        pid: None,
+        start_time: None,
+    };
+    // Only Claude Code keeps a session file; Identity names the CLI of the variable.
+    if cli_of(source, value) != "claude" {
+        return bare;
+    }
+    let Some(agent) = gate_child_above(head.pid, peer) else {
+        return bare;
+    };
+    let Some(sessions) = claude_config_dir(
+        std::env::var_os("HOME").as_deref(),
+        std::env::var_os("CLAUDE_CONFIG_DIR").as_deref(),
+    )
+    .map(|dir| dir.join("sessions")) else {
+        return bare;
+    };
+    let started =
+        fgos_process::facts::identity_of(fgos_process::ProcId(agent)).map(|tuple| tuple.start_time);
+    read_claude_session(&sessions, agent)
+        .filter(|session| session.session_id.as_deref() == Some(value))
+        .filter(|session| started.is_some() && session.proc_start == started)
+        .and_then(|session| CliSessionIds::of_claude(source, &session))
+        .unwrap_or(bare)
+}
+
+/// The process directly under `gate` that `pid` is or descends from, walking parents up the process table.
+fn gate_child_above(gate: u32, mut pid: u32) -> Option<u32> {
+    let tree = os_process_tree();
+    for _ in 0..64 {
+        let parent = tree.stat(pid)?.ppid;
+        if parent == gate {
+            return Some(pid);
+        }
+        if parent == 0 || parent == pid {
+            return None;
+        }
+        pid = parent;
+    }
+    None
 }
 
 /// Why [`write_granted`] wrote nothing, or did not finish: a refusal code of the contract and an optional detail.

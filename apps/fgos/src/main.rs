@@ -326,7 +326,8 @@ fn main() {
     ] {
         service.register_provider(Arc::new(
             fgos_identity::IdentityProvider::for_descriptor(descriptor)
-                .with_log_door(Arc::new(wiring::identity_log::StoreLogDoor)),
+                .with_log_door(Arc::new(wiring::identity_log::StoreLogDoor))
+                .with_terminal(Arc::new(wiring::terminal_tabs::HerdrTabs)),
         ));
     }
     for descriptor in [

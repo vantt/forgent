@@ -93,7 +93,7 @@ fn gated_call(
     let head_facts = HeadFacts {
         record: head.record(),
         own_suffix: None,
-        handle: None,
+        cli_session: None,
     };
     let resolve = move |_: &[u8], _: &Ancestry| {
         Ok(Resolved {
@@ -114,7 +114,7 @@ fn gated_call(
         clock: &clock,
         ancestry: &ancestry,
         resolve: &resolve,
-        handle_of: &|_, _, _| None,
+        sender_of: &|_, _, _| None,
         gate,
     };
     run(input, &mut &stdin[..], stdout)
@@ -521,7 +521,7 @@ fn call_as(
     let head_facts = HeadFacts {
         record: head.record(),
         own_suffix: None,
-        handle: None,
+        cli_session: None,
     };
     let resolve = move |_: &[u8], _: &Ancestry| {
         Ok(Resolved {
@@ -543,7 +543,7 @@ fn call_as(
         clock: &clock,
         ancestry: &ancestry,
         resolve: &resolve,
-        handle_of: &|_, _, _| None,
+        sender_of: &|_, _, _| None,
         gate: WriteGate::new(),
     };
     run(input, &mut &stdin[..], stdout)
@@ -628,7 +628,7 @@ fn the_breaker_opens_after_the_configured_counted_failures_and_answers_quiet_bef
         clock: &clock,
         ancestry: &ancestry,
         resolve: &resolve,
-        handle_of: &|_, _, _| None,
+        sender_of: &|_, _, _| None,
         gate: WriteGate::new(),
     };
     let outcome = run(input, &mut watched, &mut Vec::new());
@@ -956,7 +956,7 @@ fn a_confined_head_with_no_session_file_is_bound_by_its_hook_and_its_mail_carrie
         clock: &clock,
         ancestry: &ancestry,
         resolve: &resolve,
-        handle_of: &|_, _, _| None,
+        sender_of: &|_, _, _| None,
         gate: WriteGate::new(),
     };
     let outcome = run(input, &mut &stdin[..], &mut Vec::new());
@@ -1020,7 +1020,7 @@ fn a_codex_entry_whose_environment_names_another_session_than_its_payload_is_qui
         clock: &clock,
         ancestry: &ancestry,
         resolve: &resolve,
-        handle_of: &|_, _, _| None,
+        sender_of: &|_, _, _| None,
         gate: WriteGate::new(),
     };
     let mut out = Vec::new();
@@ -1057,7 +1057,7 @@ fn a_malformed_payload_never_opens_or_creates_the_record() {
             clock: &clock,
             ancestry: &ancestry,
             resolve: &resolve,
-            handle_of: &|_, _, _| None,
+            sender_of: &|_, _, _| None,
             gate: WriteGate::new(),
         };
         let outcome = run(input, &mut &stdin[..], &mut Vec::new());

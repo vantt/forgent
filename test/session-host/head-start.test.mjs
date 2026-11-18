@@ -11,6 +11,7 @@ import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { bindHeadSeat, headKeyOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, openingText, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
 import { grantOf } from '../../src/session-host/head-grants.mjs';
+import { headOf } from '../../src/runner/dispatch/session-attempt.mjs';
 
 seedFileLocalBwrapRegistry();
 seedStubAgentClis('alpha-bin');
@@ -18,14 +19,14 @@ seedStubAgentClis('alpha-bin');
 const PERSONA_TEXT = 'name: planner\ndescription: Plans the work in small verified steps.\npersona:\n  voice: calm\n';
 const scratch = () => fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-head-start-'));
 
-function fakes({ live = false, fronted = 'fronted', launchFails = null } = {}) {
+function fakes({ live = false, record = null, fronted = 'fronted', launchFails = null } = {}) {
   const calls = { launch: [], front: [] };
   const host = {
     front: (placement) => { calls.front.push(placement); return fronted === 'fronted' ? { result: 'fronted' } : { result: 'unsupported', code: 'host-unsupported-here' }; },
   };
   const ports = {
     host,
-    identity: () => ({ live }),
+    identity: () => (live ? { live, record } : { live }),
     pin: ({ persona }) => ({ name: persona, text: PERSONA_TEXT }),
     handoff: () => null,
     opening: ({ persona, name, pinned, handoff }) => openingText({ persona, name, personaLines: ['# Persona', `Description: ${pinned.text.split('\n')[1].slice('description: '.length)}`], handoff }),
@@ -101,6 +102,9 @@ test('a secretary launches with the paths and the verb its grant names; the line
   assert.deepEqual(request.grant.verbs, ['session start', 'session write', 'session bind session', 'session rotate', 'session answered', 'session restore role']);
   assert.equal(request.grant.mailbox, true, 'the secretary sends and receives mail');
   assert.deepEqual(request.env, { FGOS_HEAD_ROLE: headRoleOf('secretary', 'miu'), FGOS_HEAD_PERSONA: 'secretary', FGOS_HEAD_NAME: 'miu', FGOS_HEAD_GEN: '2' });
+  // The supervisor records this head in the session's Identity entry from the envelope's session fields.
+  assert.deepEqual(headOf(request.env), { persona: 'secretary', name: 'miu', gen: 2 });
+  assert.deepEqual(headOf({ FGOS_HEAD_PERSONA: 'secretary', FGOS_HEAD_NAME: 'miu' }), {}, 'no generation, no head fields');
   const kept = JSON.parse(fs.readFileSync(path.join(lineageDirOf(projectRoot, 'secretary', 'miu'), 'placement.json'), 'utf8'));
   assert.equal(kept.placement.key, out.key);
   assert.equal(out.key, 'cmd_head-secretary-miu-2');
@@ -138,23 +142,28 @@ test('a rotation successor opens beside the old session in its tab', async () =>
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 
-test('a role a live session holds is fronted and no second head is started', async () => {
+test('a role a live session holds is fronted by the slot its Identity record names and no second head is started', async () => {
   const projectRoot = scratch();
   const first = fakes();
   await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, first.ports);
-  const { calls, ports } = fakes({ live: true });
+  // The record is the authority: a slot other than the one placement.json kept is the one fronted.
+  const record = { id: 'fg-abc234/uuid-1', roles: ['head:planner-probe'], ids: { terminal: { driver: 'herdr', key: 'cmd_live-slot', paneId: 'w1:p1' } } };
+  const { calls, ports } = fakes({ live: true, record });
   const out = await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports);
-  assert.deepEqual(out, { already: true, role: 'head:planner-probe', key: 'cmd_head-planner-probe-1', fronted: true });
+  assert.deepEqual(out, { already: true, role: 'head:planner-probe', key: 'cmd_live-slot', fronted: true });
   assert.equal(calls.launch.length, 0);
-  assert.equal(calls.front[0].key, 'cmd_head-planner-probe-1');
+  assert.deepEqual(calls.front[0], { host: 'terminal', key: 'cmd_live-slot' });
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 
-test('a live role whose placement is not recorded is refused by name, never started a second time', async () => {
+test('a live role whose Identity record names no slot is refused by name, never started a second time', async () => {
   const projectRoot = scratch();
-  const { calls, ports } = fakes({ live: true });
+  const first = fakes();
+  await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, first.ports);
+  const { calls, ports } = fakes({ live: true, record: { id: 'fg-abc234/uuid-1', roles: ['head:planner-probe'] } });
   await assert.rejects(startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports), { code: 'placement-unknown' });
   assert.equal(calls.launch.length, 0);
+  assert.equal(calls.front.length, 0);
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 

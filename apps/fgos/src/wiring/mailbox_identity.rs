@@ -4,9 +4,11 @@
 //! as `send` addresses.
 //!
 //! Addresses (spec §5.1.1): an Identity handle
-//! (`claude-5v7u@fg-server`), a full id (`<machine-id>/<local id>`) or a role
-//! alias (`lead:<LANE>`), resolved through Identity's own doors and delivered
-//! only to a head this project's record holds. The mailbox crates never see
+//! (`claude-5v7u@fg-server`), a full id (`<machine-id>/<local id>`), a role
+//! alias (`lead:<LANE>`, `head:<persona>-<name>`) or any other identifier of a
+//! session's Identity record (pane, tab or tab label, CLI session id, name or
+//! socket, pid), resolved through Identity's one lookup and delivered only to
+//! a head this project's record holds. The mailbox crates never see
 //! Identity: this wiring hands the core either a head's key or a typed
 //! refusal (`Recipient::Key` or `Recipient::Refused`).
 //!
@@ -15,12 +17,17 @@
 //! resolved session is used only when it is one of this record's heads, a
 //! role delivery names the holder in the report, and candidates are cut to
 //! this record's heads, never the machine's sessions.
-use fgos_identity::directory::{is_role_alias, register_writer, resolve, NoTerminal};
+use super::terminal_tabs::HerdrTabs;
+use fgos_identity::directory::{
+    by_handle, is_role_alias, refresh_ids, register_writer, resolve, terminal_from_env,
+    CliSessionIds, Ids, Listed, MailboxIds, NoTerminal,
+};
 use fgos_identity::resolve::{HeadRef, WriterKey as IdentityKey, ENV_ORDER};
 use fgos_identity::session::cli_of;
 use fgos_identity::{session_for, Candidate, Liveness as IdentityLiveness, SessionInfo};
 use fgos_mailbox::hook::resolve::HEAD_REQUEST_SOCKET_ENV;
 use fgos_mailbox::hook::shell::BoundHead;
+use fgos_mailbox::hook::Sender;
 use fgos_mailbox::verbs::HeadView;
 use fgos_mailbox_core::{AliasCandidate, AliasRefusal, Cli, Liveness, WriterKey};
 use fgos_process::facts::{judge_here, Record};
@@ -75,6 +82,33 @@ pub fn session_of(
         .map(|session| session.info)
 }
 
+/// Who sent a message, for its frame header: the handle Identity derives for
+/// the sender ([`session_of`]) and the role its Identity record holds (a
+/// `head:` role first, else its first role), read from the one entry file of
+/// that handle. `None` when no handle can be derived.
+pub fn sender_of(
+    state_root: Option<&Path>,
+    key: &WriterKey,
+    cli: &Cli,
+    head: Option<&Record>,
+) -> Option<Sender> {
+    let root = state_root?;
+    let info = session_of(root, key, cli, head)?;
+    let roles = by_handle(root, &info.handle, &judge_here)
+        .filter(|listed| listed.id == info.id)
+        .map(|listed| listed.roles)
+        .unwrap_or_default();
+    let role = roles
+        .iter()
+        .find(|role| role.starts_with("head:"))
+        .or(roles.first())
+        .cloned();
+    Some(Sender {
+        handle: Some(info.handle),
+        role,
+    })
+}
+
 /// Identity's reference to a head process: its pid and start time, when the
 /// record has both.
 fn head_ref(record: &Record) -> Option<HeadRef> {
@@ -108,18 +142,21 @@ fn identity_key<'a>(key: &'a WriterKey, cli: &Cli) -> Option<IdentityKey<'a>> {
 /// found with another id, a handle collision, nothing registered; not
 /// found, Identity's `register_writer` door with the key from the payload
 /// and the head process the hook verified, named by its pid and start time
-/// (Identity refuses `head-not-live` when the pid now runs another process).
-/// `clone_dir` is the main checkout the head works in: the entry carries its
-/// project id (when the clone is a registered project), which is what lets
-/// the shared directory carry the head to other machines.
+/// (Identity refuses `head-not-live` when the pid now runs another process),
+/// carrying the identifier groups the hook owns ([`own_ids`]: CLI session,
+/// herdr pane, mailbox name). The main checkout the head works in is the
+/// parent of `fgos_dir`: the entry carries its project id (when the clone is
+/// a registered project), which is what lets the shared directory carry the
+/// head to other machines.
 /// Returns the hook-outcome reason when it did not hold; nothing is retried
 /// in this process.
 ///
 /// Inside a confined head (its env names the head request socket) Identity's
 /// directory is read-only, so the head's session is not registered here: the
 /// head's own supervisor is asked to bind it to the attempt it runs in
-/// (`session bind session`), which registers it on the attempt's gate and moves
-/// the attempt's role to it, so a role alias reaches this head's mailbox key.
+/// (`session bind session`, with the head's mailbox name), which registers it
+/// on the attempt's gate and moves the attempt's role to it, so a role alias
+/// reaches this head's mailbox key.
 /// A bind that was busy or refused is asked again by later hook calls until
 /// it holds, backing off only after the head's own recent failure
 /// (`mailbox_hook::ensure_identity`); the
@@ -132,14 +169,14 @@ fn identity_key<'a>(key: &'a WriterKey, cli: &Cli) -> Option<IdentityKey<'a>> {
 /// disk space until removed.
 pub fn ensure_registered(
     state_root: &Path,
-    clone_dir: Option<&Path>,
+    fgos_dir: &Path,
     cli: &Cli,
     head: &BoundHead,
 ) -> Option<String> {
     let socket = std::env::var_os(HEAD_REQUEST_SOCKET_ENV)
         .filter(|path| !path.is_empty())
         .map(PathBuf::from);
-    ensure_registered_via(state_root, clone_dir, cli, head, socket.as_deref())
+    ensure_registered_via(state_root, fgos_dir, cli, head, socket.as_deref())
 }
 
 /// The request-socket verb that binds a head's agent session to its attempt.
@@ -147,7 +184,7 @@ const BIND_SESSION_VERB: &str = "session bind session";
 
 fn ensure_registered_via(
     state_root: &Path,
-    clone_dir: Option<&Path>,
+    fgos_dir: &Path,
     cli: &Cli,
     head: &BoundHead,
     head_socket: Option<&Path>,
@@ -167,18 +204,135 @@ fn ensure_registered_via(
         Ok(listed) if listed.id == own.id => None,
         Ok(_) => Some("ident-handle-in-use".to_string()),
         Err(refusal) if refusal.reason == "not-found" => match head_socket {
-            Some(socket) => {
-                let args = serde_json::json!({ "source": key.source, "value": key.value });
-                let id = format!("mbx-{}", std::process::id());
-                request_head(socket, BIND_SESSION_VERB, &args, &id, REPLY_TIMEOUT)
-                    .err()
-                    .and_then(|error| refused(&error.code))
-            }
-            None => register_writer(state_root, clone_dir, &key, &head_ref, &[], false, None)
+            Some(socket) => bind_through(socket, &key, mailbox_of(fgos_dir, head).as_ref()),
+            None => {
+                let ids = own_ids(fgos_dir, &key, head);
+                register_writer(
+                    state_root,
+                    fgos_dir.parent(),
+                    &key,
+                    &head_ref,
+                    &[],
+                    false,
+                    Some(&ids),
+                )
                 .err()
-                .and_then(|refusal| refused(refusal.reason)),
+                .and_then(|refusal| refused(refusal.reason))
+            }
         },
         Err(refusal) => refused(refusal.reason),
+    }
+}
+
+/// Asks the head's own supervisor to bind its agent session (`session bind
+/// session`), with the mailbox name its hooks bound; the hook outcome reason
+/// when it did not hold.
+fn bind_through(socket: &Path, key: &IdentityKey, mailbox: Option<&MailboxIds>) -> Option<String> {
+    let mut args = serde_json::json!({ "source": key.source, "value": key.value });
+    if let Some(mailbox) = mailbox {
+        args["mailbox"] = serde_json::json!({ "fgosDir": mailbox.fgos_dir, "name": mailbox.name });
+    }
+    let id = format!("mbx-{}", std::process::id());
+    request_head(socket, BIND_SESSION_VERB, &args, &id, REPLY_TIMEOUT)
+        .err()
+        .map(|error| format!("ident:{}", error.code))
+}
+
+/// The mailbox name `head` is bound under in the record of `fgos_dir`.
+fn mailbox_of(fgos_dir: &Path, head: &BoundHead) -> Option<MailboxIds> {
+    Some(MailboxIds {
+        fgos_dir: fgos_dir.to_str()?.to_string(),
+        name: head.name.as_ref()?.as_str().to_string(),
+    })
+}
+
+/// The identifier groups an unconfined head's hook owns in its Identity
+/// entry: its CLI session (what the CLI's session file says, else the
+/// session variable and id alone), its herdr pane (the hook runs in the
+/// head's environment) and its mailbox name.
+fn own_ids(fgos_dir: &Path, key: &IdentityKey, head: &BoundHead) -> Ids {
+    let cli_session = head
+        .head
+        .cli_session
+        .as_ref()
+        .and_then(|session| CliSessionIds::of_claude(key.source, session))
+        .unwrap_or_else(|| CliSessionIds {
+            source: key.source.to_string(),
+            id: key.value.to_string(),
+            name: None,
+            name_source: None,
+            socket: None,
+            pid: None,
+            start_time: None,
+        });
+    Ids {
+        cli_session: Some(cli_session),
+        terminal: terminal_from_env(),
+        mailbox: mailbox_of(fgos_dir, head),
+        ..Ids::default()
+    }
+}
+
+/// Whether `held` already holds every group `fresh` carries, as `fresh` has it.
+fn holds_all(held: Option<&Ids>, fresh: &Ids) -> bool {
+    let held = held.cloned().unwrap_or_default();
+    (fresh.cli_session.is_none() || fresh.cli_session == held.cli_session)
+        && (fresh.terminal.is_none() || fresh.terminal == held.terminal)
+        && (fresh.mailbox.is_none() || fresh.mailbox == held.mailbox)
+}
+
+/// After a hook call that bound a new generation or ended a turn (`Stop`),
+/// with the mailbox lock released: brings the head's identifiers in its
+/// Identity entry up to date (a renamed CLI session, a new messaging socket,
+/// a moved pane, a new mailbox name). Reads the one entry of the head's
+/// handle and writes only on a difference: an unconfined head through
+/// Identity's `refresh_ids`, a confined one by asking its supervisor to bind
+/// it again (its sandbox reads the directory only). A head Identity does not
+/// know yet is left to [`ensure_registered`]; a busy directory is skipped
+/// (the next trigger retries). Returns the hook-outcome reason of a refusal.
+pub fn refresh_registered(
+    state_root: &Path,
+    fgos_dir: &Path,
+    cli: &Cli,
+    head: &BoundHead,
+) -> Option<String> {
+    let socket = std::env::var_os(HEAD_REQUEST_SOCKET_ENV)
+        .filter(|path| !path.is_empty())
+        .map(PathBuf::from);
+    refresh_registered_via(state_root, fgos_dir, cli, head, socket.as_deref())
+}
+
+fn refresh_registered_via(
+    state_root: &Path,
+    fgos_dir: &Path,
+    cli: &Cli,
+    head: &BoundHead,
+    head_socket: Option<&Path>,
+) -> Option<String> {
+    let key = identity_key(&head.writer, cli)?;
+    let head_ref = head_ref(&head.head.record)?;
+    let own = session_for(state_root, &key, Some(&head_ref)).ok()?.info;
+    let held: Listed =
+        by_handle(state_root, &own.handle, &judge_here).filter(|l| l.id == own.id)?;
+    if let Some(socket) = head_socket {
+        // The supervisor reads the CLI session outside the sandbox; the hook knows only its mailbox name.
+        let mailbox = mailbox_of(fgos_dir, head)?;
+        let fresh = Ids {
+            mailbox: Some(mailbox.clone()),
+            ..Ids::default()
+        };
+        return (!holds_all(held.ids.as_ref(), &fresh))
+            .then(|| bind_through(socket, &key, Some(&mailbox)))
+            .flatten();
+    }
+    let fresh = own_ids(fgos_dir, &key, head);
+    if holds_all(held.ids.as_ref(), &fresh) {
+        return None;
+    }
+    match refresh_ids(state_root, &own.id, &own.handle, &fresh) {
+        Ok(_) => None,
+        Err(refusal) if refusal.reason == "directory-busy" => None,
+        Err(refusal) => Some(format!("ident:{}", refusal.reason)),
     }
 }
 
@@ -224,10 +378,10 @@ pub fn address(state_root: Option<&Path>, to: &str, heads: &[HeadView]) -> Addre
         key: view.key.clone(),
         role_holder: is_role.then(|| (to.to_string(), info.handle.clone())),
     };
-    match resolve(root, to, &judge_here, None, &NoTerminal) {
+    match resolve(root, to, &judge_here, None, &HerdrTabs) {
         Ok(listed) => ours
             .iter()
-            .find(|(_, info)| info.id == listed.id && (!by_handle || info.handle == to))
+            .find(|(view, info)| is_head(&listed, view, info) && (!by_handle || info.handle == to))
             .map_or_else(|| unknown(Vec::new()), head),
         Err(refusal) if refusal.reason == "ambiguous" => {
             Addressed::Refused(AliasRefusal::Ambiguous {
@@ -252,6 +406,64 @@ pub fn address(state_root: Option<&Path>, to: &str, heads: &[HeadView]) -> Addre
                 None => unknown(ours_only(&refusal.candidates, &ours)),
             }
         }
+    }
+}
+
+/// Whether Identity's record `listed` is the session of this record's head
+/// `view`, whose derived session is `info`: the same full id, the CLI session
+/// the head's key names (a confined head is bound under its CLI session), or
+/// the mailbox name the head is bound under here.
+fn is_head(listed: &Listed, view: &HeadView, info: &SessionInfo) -> bool {
+    let ids = listed.ids.as_ref();
+    info.id == listed.id
+        || ids
+            .and_then(|ids| ids.cli_session.as_ref())
+            .is_some_and(|cli| cli.id == view.key.as_str())
+        || ids
+            .and_then(|ids| ids.mailbox.as_ref())
+            .is_some_and(|mailbox| mailbox.name == view.name.as_str())
+}
+
+/// A typed `--to` that is no alias and no exact short name or key of this
+/// record's `heads`: the head of this record that the Identity record `to`
+/// names by any identifier it holds (a pane, a tab or tab label, a CLI
+/// session id or name, a pid), so exact answers always come before the
+/// core's prefix rules. `None` when Identity names no head of this record
+/// (nothing, a stale CLI session, or sessions elsewhere): the core then
+/// resolves `to` as a name. Several heads of this record are refused
+/// `ambiguous-name`.
+pub fn identified(state_root: Option<&Path>, to: &str, heads: &[HeadView]) -> Option<Addressed> {
+    let root = state_root?;
+    if to.is_empty() || fgos_mailbox_core::is_group(to) {
+        return None;
+    }
+    let ours: Vec<(&HeadView, SessionInfo)> = heads
+        .iter()
+        .filter_map(|head| {
+            Some((
+                head,
+                session_of(root, &head.key, &head.cli, Some(&head.head))?,
+            ))
+        })
+        .collect();
+    let to_head = |(view, _): &(&HeadView, SessionInfo)| Addressed::Head {
+        key: view.key.clone(),
+        role_holder: None,
+    };
+    match resolve(root, to, &judge_here, None, &HerdrTabs) {
+        Ok(listed) => ours
+            .iter()
+            .find(|(view, info)| is_head(&listed, view, info))
+            .map(to_head),
+        Err(refusal) if refusal.reason == "ambiguous" => {
+            let candidates = ours_only(&refusal.candidates, &ours);
+            match candidates.as_slice() {
+                [] => None,
+                [one] => ours.iter().find(|(_, info)| info.id == one.id).map(to_head),
+                _ => Some(Addressed::Refused(AliasRefusal::Ambiguous { candidates })),
+            }
+        }
+        Err(_) => None,
     }
 }
 
@@ -359,13 +571,19 @@ mod tests {
         }
         BoundHead {
             writer: WriterKey::new(writer).unwrap(),
+            name: None,
             head: HeadFacts {
                 record,
                 own_suffix: None,
-                handle: None,
+                cli_session: None,
             },
             registered: None,
         }
+    }
+
+    /// The record directory of a project under `root` (not a repository, so no project id).
+    fn fgos_dir(root: &std::path::Path) -> PathBuf {
+        root.join("project").join(".fgos")
     }
 
     fn entries(root: &std::path::Path) -> usize {
@@ -455,7 +673,7 @@ mod tests {
         // The omp head sorts last among this record's two heads.
         let mut head = bound("zz-omp-session", None);
         head.head.record = omp.record();
-        assert_eq!(ensure_registered(&root, None, &pi, &head), None);
+        assert_eq!(ensure_registered(&root, &fgos_dir(&root), &pi, &head), None);
         let registered = std::fs::read_dir(fgos_identity::directory::directory(&root))
             .unwrap()
             .map(|e| std::fs::read_to_string(e.unwrap().path()).unwrap())
@@ -503,7 +721,7 @@ mod tests {
         assert_eq!(
             ensure_registered(
                 &stale,
-                None,
+                &fgos_dir(&stale),
                 &claude,
                 &bound("wiring-stale-head", Some("1"))
             )
@@ -514,7 +732,12 @@ mod tests {
         // The falsifier: the same head with its verified start time registers.
         let live = state_root("live");
         assert_eq!(
-            ensure_registered(&live, None, &claude, &bound("wiring-live-head", None)),
+            ensure_registered(
+                &live,
+                &fgos_dir(&live),
+                &claude,
+                &bound("wiring-live-head", None)
+            ),
             None
         );
         assert_eq!(entries(&live), 1);
@@ -556,7 +779,7 @@ mod tests {
         );
         let head = bound("wiring-bound-head", None);
         assert_eq!(
-            super::ensure_registered_via(&root, None, &claude, &head, Some(&socket)),
+            super::ensure_registered_via(&root, &fgos_dir(&root), &claude, &head, Some(&socket)),
             None
         );
         let request = server.join().unwrap();
@@ -576,10 +799,91 @@ mod tests {
             serde_json::json!({ "type": "REPLY", "result": "refused", "code": "session-bind-failed", "detail": "x" }),
         );
         assert_eq!(
-            super::ensure_registered_via(&root, None, &claude, &head, Some(&socket)).as_deref(),
+            super::ensure_registered_via(&root, &fgos_dir(&root), &claude, &head, Some(&socket))
+                .as_deref(),
             Some("ident:session-bind-failed")
         );
         server.join().unwrap();
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    /// The Identity entry file of the session `writer` registered under `root`.
+    fn entry_text(root: &std::path::Path, writer: &str) -> String {
+        let info = super::session_for(
+            root,
+            &super::IdentityKey {
+                source: "CLAUDE_CODE_SESSION_ID",
+                value: writer,
+            },
+            None,
+        )
+        .unwrap()
+        .info;
+        let listed = fgos_identity::directory::by_handle(
+            root,
+            &info.handle,
+            &fgos_process::facts::judge_here,
+        )
+        .unwrap();
+        serde_json::to_string(&listed.ids).unwrap()
+    }
+
+    #[test]
+    fn a_head_registers_its_cli_session_and_mailbox_name_and_a_refresh_writes_only_what_changed() {
+        let claude = Cli::new("claude").unwrap();
+        let root = state_root("refresh");
+        let fgos = fgos_dir(&root);
+        let mut head = bound("wiring-refresh-head", None);
+        head.name = Some(serde_json::from_value(serde_json::json!("project-claude-ab")).unwrap());
+        head.head.cli_session = Some(fgos_identity::cli_dirs::ClaudeSession {
+            session_id: Some("wiring-refresh-head".into()),
+            name: Some("first-name".into()),
+            socket: Some("/tmp/one.sock".into()),
+            ..Default::default()
+        });
+        assert_eq!(ensure_registered(&root, &fgos, &claude, &head), None);
+        let registered = entry_text(&root, "wiring-refresh-head");
+        assert!(registered.contains("\"first-name\""), "{registered}");
+        assert!(registered.contains("\"project-claude-ab\""), "{registered}");
+        // Nothing changed: no write, the entry (and its updatedAt) stays as it was.
+        assert_eq!(
+            super::refresh_registered_via(&root, &fgos, &claude, &head, None),
+            None
+        );
+        assert_eq!(entry_text(&root, "wiring-refresh-head"), registered);
+        // A renamed CLI session with a new socket replaces the group, never adds to it.
+        head.head.cli_session = Some(fgos_identity::cli_dirs::ClaudeSession {
+            session_id: Some("wiring-refresh-head".into()),
+            name: Some("second-name".into()),
+            socket: Some("/tmp/two.sock".into()),
+            ..Default::default()
+        });
+        assert_eq!(
+            super::refresh_registered_via(&root, &fgos, &claude, &head, None),
+            None
+        );
+        let refreshed = entry_text(&root, "wiring-refresh-head");
+        assert!(
+            refreshed.contains("\"second-name\"") && !refreshed.contains("first-name"),
+            "{refreshed}"
+        );
+        assert!(!refreshed.contains("/tmp/one.sock"), "{refreshed}");
+        // Inside a confined head the same change of mailbox name is asked of the supervisor instead.
+        head.name = Some(serde_json::from_value(serde_json::json!("project-claude-cd")).unwrap());
+        let (socket, server) = one_reply(
+            "refresh",
+            serde_json::json!({ "type": "REPLY", "result": "done", "data": {} }),
+        );
+        assert_eq!(
+            super::refresh_registered_via(&root, &fgos, &claude, &head, Some(&socket)),
+            None
+        );
+        let request = server.join().unwrap();
+        assert_eq!(
+            request["args"]["mailbox"],
+            serde_json::json!({ "fgosDir": fgos.to_str().unwrap(), "name": "project-claude-cd" })
+        );
+        assert_eq!(entry_text(&root, "wiring-refresh-head"), refreshed);
         let _ = std::fs::remove_dir_all(root);
     }
 

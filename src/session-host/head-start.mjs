@@ -61,6 +61,8 @@ export function writeHeadPlacement(dir, record) {
 /**
  * Whether a live session of this machine holds the role: `fgos identity resolve <role>` names exactly one live
  * session or refuses [not-found]. Identity stays the only authority for who is alive; nothing is cached here.
+ * Returns `{ live: true, session, record }` (`record` is Identity's whole answer, with the session's identifiers in
+ * `record.ids`) or `{ live: false }`.
  */
 export function identityHolder(role, projectRoot) {
   const { bin } = resolveActiveHostBin();
@@ -71,10 +73,17 @@ export function identityHolder(role, projectRoot) {
   if (res.status === 0) {
     let answer = null;
     try { answer = JSON.parse(res.stdout); } catch { /* the exit code is the answer */ }
-    return { live: true, session: answer?.data?.id ?? answer?.id ?? null };
+    const record = answer?.data ?? answer ?? null;
+    return { live: true, session: record?.id ?? null, record };
   }
   if (/not-found/.test(text)) return { live: false };
   throw new HeadStartError('identity-unavailable', `Identity refused the lookup of ${role}: ${text.trim().slice(0, 300)}`);
+}
+
+/** The terminal slot key of a session's Identity record (`ids.terminal.key`), or null when it names none. */
+export function slotKeyOf(record) {
+  const key = record?.ids?.terminal?.key;
+  return typeof key === 'string' && key !== '' ? key : null;
 }
 
 /** The opening a head session is typed: its persona section, the skills line the persona carries, and the start ritual. */
@@ -194,7 +203,7 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
  * Starts the head session of `persona` and `name`, or fronts the live one.
  *
  * `ports` (all optional, for the rotation executor and for tests): `host` (Session Host client, for fronting),
- * `identity({ role, projectRoot }) -> { live }`, `rotationHolds({ persona, name }) -> boolean`, and those of `placeHead`.
+ * `identity({ role, projectRoot }) -> { live, record }` (`record.ids.terminal.key` is the slot a live head is fronted by), `rotationHolds({ persona, name }) -> boolean`, and those of `placeHead`.
  *
  * Returns `{ already: true, role, key, fronted }` for a role a live session holds, else
  * `{ already: false, role, key, placement, runDir, cli }`. A refusal throws `HeadStartError` with a code.
@@ -208,15 +217,15 @@ export async function startHeadSession({ persona, name, projectRoot, beside = nu
 
   const lineageDir = lineageDirOf(projectRoot, persona, name);
   const host = ports.host ?? createSessionHost();
-  const holder = (ports.identity ?? ((ask) => identityHolder(ask.role, ask.projectRoot)))({ role, projectRoot });
-  if ((await holder).live) {
-    // One live head per persona-name: bring it to the front. Terminal Control offers no lookup by key prefix, so the
-    // live key was kept in the lineage folder when it was placed.
-    const known = readHeadPlacement(lineageDir);
-    if (!known) throw new HeadStartError('placement-unknown', `${role} is live but its placement is not recorded under ${lineageDir}; front it by hand`);
-    const answer = host.front(known.placement);
+  const holder = await (ports.identity ?? ((ask) => identityHolder(ask.role, ask.projectRoot)))({ role, projectRoot });
+  if (holder.live) {
+    // One live head per persona-name: bring it to the front. Its slot key is in its Identity record (the
+    // `terminal` group its supervisor wrote), so the head that holds the role is the one fronted.
+    const key = slotKeyOf(holder.record);
+    if (!key) throw new HeadStartError('placement-unknown', `${role} is live but its Identity record names no terminal slot (a head started before its supervisor recorded one); front it by hand`);
+    const answer = host.front({ host: 'terminal', key });
     if (answer.result !== 'fronted') throw new HeadStartError('front-refused', `${role} is live but could not be fronted: ${answer.code ?? answer.result}${answer.detail ? ` (${answer.detail})` : ''}`);
-    return { already: true, role, key: known.placement.key, fronted: true };
+    return { already: true, role, key, fronted: true };
   }
 
   const placed = await placeHead({ persona, name, projectRoot, beside, gen }, ports);

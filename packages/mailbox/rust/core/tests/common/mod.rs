@@ -40,7 +40,6 @@ pub fn request(
         project: "forgent".to_string(),
         own_suffix: own_suffix.map(str::to_string),
         head: head.to_string(),
-        handle: None,
     }
 }
 

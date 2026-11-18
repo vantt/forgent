@@ -20,6 +20,9 @@ const NO_AGENT: &str = "unregistered";
 /// The handle a frame shows for a head whose handle the store could not
 /// derive (no machine id yet).
 const NO_HANDLE: &str = "unknown";
+/// The role a frame shows for a sender whose Identity record holds none (or
+/// that has none to read).
+const NO_ROLE: &str = "none";
 
 /// The contract's sections, `(name, text)`, in file order; parsed once.
 pub fn frame_sections() -> &'static [(&'static str, &'static str)] {
@@ -223,6 +226,10 @@ fn render_message(
         (_, true) => NO_HANDLE.to_string(),
         (_, false) => NO_AGENT.to_string(),
     };
+    let role = sender
+        .role
+        .as_ref()
+        .map_or_else(|| NO_ROLE.to_string(), |role| escape_handle(role, limits));
     let attempt = item.attempt.to_string();
     let reply = if sender.has_head {
         let target = sender
@@ -253,6 +260,7 @@ fn render_message(
             ("from", &from),
             ("agent", &agent),
             ("handle", &handle),
+            ("role", &role),
             ("id", &id),
             ("attempt", &attempt),
             ("body", &body),
@@ -327,8 +335,8 @@ pub fn worst_case_len(item: &ClaimedItem, body_bytes: u64, limits: &Limits) -> u
 /// The largest size the frame of `item` can render to when its body takes
 /// `rendered_body` bytes once escaped ([`rendered_body_len`]), or when the
 /// body cannot be read: the frame around an empty body, plus the body, or
-/// the body-missing line when that is longer. The handle is derived after
-/// the claim, so the frame is measured with the longest handle a header
+/// the body-missing line when that is longer. The handle and the role are
+/// read after the claim, so the frame is measured with the longest a header
 /// holds. A notice has no body; its size is its rendered size.
 pub fn bounded_len(item: &ClaimedItem, rendered_body: u64, limits: &Limits) -> usize {
     match &item.what {
@@ -337,6 +345,7 @@ pub fn bounded_len(item: &ClaimedItem, rendered_body: u64, limits: &Limits) -> u
             let longest = MailFrom {
                 head: None,
                 handle: Some("x".repeat(limits.frame.max_header_chars as usize)),
+                role: Some("x".repeat(limits.frame.max_header_chars as usize)),
                 reply_to: from
                     .reply_to
                     .as_ref()

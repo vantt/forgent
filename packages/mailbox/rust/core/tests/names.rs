@@ -152,7 +152,7 @@ fn an_ambiguous_prefix_is_refused_and_lists_both_candidates() {
 }
 
 #[test]
-fn a_unique_key_prefix_resolves_when_no_short_name_matches_and_an_exact_key_wins_over_a_longer_key_it_prefixes(
+fn a_unique_key_prefix_resolves_when_no_short_name_matches_and_an_exact_key_wins_over_a_longer_key_or_a_short_name_it_prefixes(
 ) {
     let limits = spec_limits();
     let mut ids = SeqIds::default();
@@ -193,6 +193,26 @@ fn a_unique_key_prefix_resolves_when_no_short_name_matches_and_an_exact_key_wins
         state.resolve("123"),
         Err(ResolveRefusal::Ambiguous { .. })
     ));
+    // An exact key beats a short name it prefixes: exact answers always come before prefixes.
+    let named = register_new(
+        &mut state,
+        request("k-named", "codex", None, "h5"),
+        t(1),
+        &limits,
+        &mut ids,
+    );
+    let key_like_name = &named[..named.len() - 1];
+    register_new(
+        &mut state,
+        request(key_like_name, "codex", None, "h6"),
+        t(1),
+        &limits,
+        &mut ids,
+    );
+    assert_eq!(
+        state.resolve(key_like_name).unwrap().key.as_str(),
+        key_like_name
+    );
 }
 
 #[test]

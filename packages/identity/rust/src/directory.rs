@@ -171,6 +171,22 @@ pub struct HeadIds {
     pub gen: u64,
 }
 
+impl CliSessionIds {
+    /// The CLI session a Claude Code session file describes, under the session
+    /// variable `source`; `None` when the file names no session id.
+    pub fn of_claude(source: &str, session: &crate::cli_dirs::ClaudeSession) -> Option<Self> {
+        Some(Self {
+            source: source.to_string(),
+            id: session.session_id.clone()?,
+            name: session.name.clone(),
+            name_source: session.name_source.clone(),
+            socket: session.socket.clone(),
+            pid: session.pid,
+            start_time: session.proc_start.clone(),
+        })
+    }
+}
+
 impl Ids {
     /// Why these identifiers cannot be recorded; `None` when they can.
     fn problem(&self) -> Option<String> {
@@ -287,11 +303,12 @@ pub fn terminal_from_env() -> Option<TerminalIds> {
 /// Maps a terminal tab label to the ids of the tabs that carry it now, read
 /// live from the terminal driver (labels are renamed freely, so they are
 /// never stored). The driver lives above Identity and is injected.
-pub trait TerminalPort {
+pub trait TerminalPort: std::fmt::Debug + Send + Sync {
     fn tab_ids(&self, label: &str) -> Vec<String>;
 }
 
 /// The [`TerminalPort`] of a caller that has no terminal driver: it knows no label.
+#[derive(Debug, Clone, Copy, Default)]
 pub struct NoTerminal;
 
 impl TerminalPort for NoTerminal {
@@ -586,6 +603,17 @@ fn holds_cap(root: &Path) -> Result<bool, Refusal> {
         }
     }
     Ok(false)
+}
+
+/// The live session registered under `handle`, read from its one file with no
+/// directory scan: the cheap read of a caller that already knows the handle (a
+/// mailbox frame naming its sender's role, a hook comparing its own
+/// identifiers with what the entry holds). `None` when no entry of that
+/// handle is readable or its head is proven dead.
+pub fn by_handle(root: &Path, handle: &str, judge: Judge) -> Option<Listed> {
+    read_named(root, handle, judge)
+        .filter(|row| row.verdict != Verdict::Dead)
+        .map(|row| Listed::of(&row.entry, row.verdict, judge))
 }
 
 /// The one entry file named after `handle`, judged; `None` when it is missing

@@ -1,6 +1,6 @@
 //! Registration of heads under the four-row table of spec §5.1.
 //!
-//! The core never interprets a process identity: `head` and `handle` are
+//! The core never interprets a process identity: `head` is
 //! opaque text the store writes, and the store's judgement of the stored head
 //! arrives as plain input.
 use crate::ids::{Cli, Generation, IdSource, ShortName, WriterKey};
@@ -28,6 +28,16 @@ pub struct StoredHead {
     pub liveness: Liveness,
 }
 
+/// A retired snapshot field: any value reads as nothing and nothing is written.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub(crate) struct Retired;
+
+impl<'de> Deserialize<'de> for Retired {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        serde::de::IgnoredAny::deserialize(deserializer).map(|_| Retired)
+    }
+}
+
 /// One address: a head of a CLI process and its current generation.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -38,8 +48,11 @@ pub struct Binding {
     pub generation: Generation,
     /// The head's process identity, opaque text written by the store.
     pub head: String,
-    /// The head's native channel (socket, thread id), opaque text.
-    pub handle: Option<String>,
+    /// A field snapshots written before the session's identifiers moved to
+    /// its Identity record still carry (`handle`, a Codex thread id). It is
+    /// read and dropped, never written, so such a snapshot still parses.
+    #[serde(default, rename = "handle", skip_serializing)]
+    pub(crate) retired_handle: Retired,
     pub registered_at: Timestamp,
     /// When this head was registered or took the key over; a registration
     /// by the same head writes nothing.
@@ -61,7 +74,6 @@ pub struct RegisterRequest {
     /// The head's own two characters, when its CLI names it (Claude Code).
     pub own_suffix: Option<String>,
     pub head: String,
-    pub handle: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -93,8 +105,6 @@ pub enum RegisterRefusal {
     NameDoesNotFit,
     /// The writer key is longer than `frame.maxHeaderChars`.
     KeyTooLong,
-    /// The handle is longer than `frame.maxHeaderChars`.
-    HandleTooLong,
     /// The stored generation is the last one; only a corrupt or hand-edited
     /// snapshot gets here, and a takeover must never keep the old number.
     GenerationExhausted,
@@ -108,7 +118,6 @@ impl RegisterRefusal {
             Self::Deferred => "deferred",
             Self::NameDoesNotFit => "name-does-not-fit",
             Self::KeyTooLong => "key-too-long",
-            Self::HandleTooLong => "handle-too-long",
             Self::GenerationExhausted => "generation-exhausted",
         }
     }
@@ -140,13 +149,6 @@ impl MailboxState {
         let bound = limits.frame.max_header_chars as usize;
         if req.key.as_str().chars().count() > bound {
             return Err(RegisterRefusal::KeyTooLong);
-        }
-        if req
-            .handle
-            .as_ref()
-            .is_some_and(|h| h.chars().count() > bound)
-        {
-            return Err(RegisterRefusal::HandleTooLong);
         }
         let takeover = match (self.bindings.get(&req.key), judged) {
             // A new key whose head already holds another key's binding: the
@@ -224,7 +226,6 @@ impl MailboxState {
                 binding.last_drain_at = None;
                 binding.stop_blocks = 0;
                 binding.head = req.head;
-                binding.handle = req.handle;
                 binding.registered_at = now;
                 binding.last_seen = now;
                 let replaced = Registered::Replaced {
@@ -251,7 +252,7 @@ impl MailboxState {
             cli: req.cli,
             generation,
             head: req.head,
-            handle: req.handle,
+            retired_handle: Retired,
             registered_at: now,
             last_seen: now,
             last_drain_at: None,

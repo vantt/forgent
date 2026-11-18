@@ -167,7 +167,6 @@ fn with_cli_head(fgos: &TempFgos, writer: &str, cli: &str, head: &str) -> String
                 project: "forgent".to_string(),
                 own_suffix: None,
                 head: head.to_string(),
-                handle: None,
             };
             Reported::changing(state.register(req, None, T0, &limits(), ids).unwrap())
         })
@@ -737,7 +736,6 @@ fn with_codex_head(fgos: &TempFgos, writer: &str) -> String {
                 project: "forgent".to_string(),
                 own_suffix: None,
                 head: format!("head-of-{writer}"),
-                handle: None,
             };
             Reported::changing(state.register(req, None, T0, &limits(), ids).unwrap())
         })

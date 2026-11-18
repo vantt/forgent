@@ -26,7 +26,7 @@ import { readConfig } from '../config/facade.mjs';
 import { acquireSync, createLockScope, probe } from '../holder-lock/index.mjs';
 import { requestCancel } from '../run-supervisor/cancel-registry.mjs';
 import {
-  assertHeadArgs, headKeyOf, headRoleOf, identityHolder, lineageDirOf, nextHeadGeneration, placeHead, readHeadPlacement, writeHeadPlacement,
+  assertHeadArgs, headKeyOf, headRoleOf, identityHolder, lineageDirOf, nextHeadGeneration, placeHead, readHeadPlacement, slotKeyOf, writeHeadPlacement,
 } from '../session-host/head-start.mjs';
 import { requestHeadRestoreRole } from '../session-host/head-request-client.mjs';
 import { readLastAssistantMessage } from '../session-host/client.mjs';
@@ -218,7 +218,7 @@ const existingIn = (projectRoot, portfolio) => portfolio.filter((p) => !path.isA
  * `pendingQuestion`) and go into the handoff, which also carries the rotation id the successor must echo.
  *
  * `ports` (all optional, for tests): `end(runDir) -> boolean` (asks that session attempt's supervisor to stop it),
- * `identity({ role, projectRoot }) -> { live, session }`, `lock(lineage) -> { release } | null`, `place` (`placeHead`),
+ * `identity({ role, projectRoot }) -> { live, session, record }`, `lock(lineage) -> { release } | null`, `place` (`placeHead`),
  * `placePorts` (its ports), `config(projectRoot)`, `clock { now, sleep }`, `pollMs`, and for a manual rotation
  * `sessionDir(runDir, launchCommandId)` (`seatSessionDir`), `lastMessage({ projectsDir })` (the session-host route's
  * `last-message`) and `finalTurnWaitMs`. The handoff and `latest.json` record `reason` as the rotation kind, and a
@@ -327,7 +327,8 @@ export async function rotateHeadSession(request, ports = {}) {
       pendingQuestion: stopFacts.pendingQuestion ?? null, startedAt: new Date(clock.now()).toISOString(),
     });
     try {
-      successor = await (ports.place ?? placeHead)({ persona, name, projectRoot, beside: old.placement.key, gen }, ports.placePorts ?? {});
+      // The successor's tab opens beside the slot the role holder's Identity record names.
+      successor = await (ports.place ?? placeHead)({ persona, name, projectRoot, beside: slotKeyOf(holder.record), gen }, ports.placePorts ?? {});
     } catch (err) {
       return await abandon(err.code ?? 'start-refused', String(err.message ?? err));
     }

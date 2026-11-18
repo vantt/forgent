@@ -302,6 +302,10 @@ pub struct MailFrom {
     /// Identity handle, or its full session id), which the store cannot
     /// derive from a head it does not have; `None` for mail of this machine.
     pub reply_to: Option<String>,
+    /// The sender's Identity role (`head:secretary-miu`, `lead:MAIL`), read
+    /// by the store at render from the sender's Identity record and never
+    /// stored (the core leaves it `None`): a role moves between sessions.
+    pub role: Option<String>,
 }
 
 impl ClaimedItem {
@@ -781,6 +785,7 @@ impl MailboxState {
                     head: None,
                     handle: origin.handle.clone(),
                     reply_to: Some(reply_to),
+                    role: None,
                 }
             }
             None => MailFrom {
@@ -791,6 +796,7 @@ impl MailboxState {
                 head: sender.map(|b| b.head.clone()),
                 handle: None,
                 reply_to: None,
+                role: None,
             },
         };
         ClaimedItem {

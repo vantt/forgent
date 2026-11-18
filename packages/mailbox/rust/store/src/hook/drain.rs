@@ -46,8 +46,10 @@ pub struct HeadFacts {
     pub record: Record,
     /// The head's own two characters, when its CLI names it (Claude Code).
     pub own_suffix: Option<String>,
-    /// The head's native channel, when the shell knows it.
-    pub handle: Option<String>,
+    /// The head's CLI session as its CLI keeps it (Claude Code's session
+    /// file: name, messaging socket, process), when the shell read it; the
+    /// wiring records it in the head's Identity entry, the mailbox keeps none.
+    pub cli_session: Option<fgos_identity::cli_dirs::ClaudeSession>,
 }
 
 /// One hook call, with everything the shell resolved.
@@ -200,13 +202,22 @@ impl Begun {
     }
 }
 
-/// Derives a sender's Identity handle from its writer key, its CLI and its
-/// head process (the binding's stored head, so the handle is the one
-/// Identity registered: a shared session variable labels its CLI from that
-/// process's ancestry) when a frame is rendered; `None` when it cannot be
-/// derived. The wiring builds it from Identity's doors; the store never
-/// derives a handle itself.
-pub type HandleOf<'a> = dyn Fn(&WriterKey, &Cli, Option<&Record>) -> Option<String> + 'a;
+/// Who sent a message, as a frame header names it: the sender's Identity
+/// handle and the role its Identity record holds, read when the frame is
+/// rendered and never stored.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct Sender {
+    pub handle: Option<String>,
+    pub role: Option<String>,
+}
+
+/// Reads a sender's [`Sender`] from its writer key, its CLI and its head
+/// process (the binding's stored head, so the handle is the one Identity
+/// registered: a shared session variable labels its CLI from that process's
+/// ancestry) when a frame is rendered; `None` when nothing can be read. The
+/// wiring builds it from Identity's doors; the store never derives a handle
+/// or reads a role itself.
+pub type SenderOf<'a> = dyn Fn(&WriterKey, &Cli, Option<&Record>) -> Option<Sender> + 'a;
 
 /// What the shell writes to stdout; empty when quiet.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -268,19 +279,12 @@ pub fn begin(
     let judged = state
         .binding(&call.writer)
         .map(|binding| judge_stored(binding, &call.head.record));
-    // The payload's session is the writer itself here, so for a CLI whose
-    // session id is its native thread handle (Codex) it is the handle.
-    let session_handle = payload
-        .session
-        .clone()
-        .filter(|_| call.adapter.session_is_handle());
     let request = RegisterRequest {
         key: call.writer.clone(),
         cli,
         project: call.project.to_string(),
         own_suffix: call.head.own_suffix.clone(),
         head: head_text(&call.head.record),
-        handle: call.head.handle.clone().or(session_handle),
     };
     let (generation, registered) = match state.register(request, judged, now, limits, ids) {
         Ok(Registered::Refreshed { generation, .. }) => (generation, None),
@@ -358,12 +362,12 @@ pub fn begin(
 /// Outside the mutex: every claimed item's frame, joined by one blank line,
 /// then the pointer line when items were left as too large, in the output
 /// shape the CLI was recorded injecting. A body the store could not read
-/// gets the contract's body-missing line. A sender's handle is derived
-/// here, through `handle_of`, for the frame header only.
+/// gets the contract's body-missing line. A sender's handle and role are
+/// read here, through `sender_of`, for the frame header only.
 pub fn render_reply(
     claimed: &Claimed,
     bodies: &dyn Fn(&MessageId) -> Option<String>,
-    handle_of: &HandleOf<'_>,
+    sender_of: &SenderOf<'_>,
     limits: &Limits,
 ) -> HookReply {
     let mut parts: Vec<String> = claimed
@@ -373,11 +377,13 @@ pub fn render_reply(
             let mut item = item.clone();
             if let ClaimedWhat::Mail(from) = &mut item.what {
                 let head = from.head.as_deref().map(record_of_head_text);
-                from.handle = from
+                let sender = from
                     .cli
                     .as_ref()
-                    .and_then(|cli| handle_of(&from.key, cli, head.as_ref()))
-                    .or(from.handle.take());
+                    .and_then(|cli| sender_of(&from.key, cli, head.as_ref()))
+                    .unwrap_or_default();
+                from.handle = sender.handle.or(from.handle.take());
+                from.role = sender.role;
             }
             render(&item, bodies(&item.id).as_deref(), limits)
         })

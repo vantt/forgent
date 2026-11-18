@@ -232,3 +232,14 @@ fn integration_status_reads_each_hook_state_and_ignores_the_paths_after_it() {
         "a state is a whole word"
     );
 }
+
+#[test]
+fn tab_list_gives_the_ids_of_the_tabs_with_exactly_that_label() {
+    let listed = result("tab-list");
+    assert_eq!(
+        parse_tab_ids_labelled(&listed, "miu · secretary"),
+        Some(vec!["w6:tVF".to_string(), "w7:tA1".to_string()])
+    );
+    assert_eq!(parse_tab_ids_labelled(&listed, "miu"), Some(Vec::new()));
+    assert_eq!(parse_tab_ids_labelled(&Value::Null, "miu"), None);
+}

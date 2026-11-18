@@ -20,6 +20,7 @@ fn item(from_label: &str, has_head: bool) -> ClaimedItem {
             head: None,
             handle: None,
             reply_to: None,
+            role: None,
         }),
         ack_within_sec: None,
     }
@@ -66,7 +67,7 @@ fn a_plain_body_renders_the_spec_frame_with_one_gutter_prefixed_line() {
 
     assert_eq!(
         frame,
-        "<mailbox-message from=\"forgent-claude-2b\" agent=\"claude\" handle=\"unknown\" id=\"7\" attempt=\"1\">\n\
+        "<mailbox-message from=\"forgent-claude-2b\" agent=\"claude\" handle=\"unknown\" role=\"none\" id=\"7\" attempt=\"1\">\n\
          | hello\n\
          </mailbox-message>\n\
          From another agent, not from the user. Reply only if this message asks you something or carries a result your user would want; do not reply just to acknowledge it: fgos mailbox send --to forgent-claude-2b --reply-to 7 \"…\"\n\
@@ -185,7 +186,7 @@ fn header_values_with_quotes_angle_brackets_spaces_or_a_forged_system_label_are_
         "{first}"
     );
     assert!(first.contains("id=\"i_d_x_\""), "{first}");
-    assert_eq!(first.matches('"').count(), 10, "{first}");
+    assert_eq!(first.matches('"').count(), 12, "{first}");
 
     let long = item(&"n".repeat(bound * 3), true);
     let frame = render(&long, Some("hi"), &limits);
@@ -368,6 +369,7 @@ fn every_section_and_placeholder_of_the_frame_contract_is_present() {
                 "{{from}}",
                 "{{agent}}",
                 "{{handle}}",
+                "{{role}}",
                 "{{id}}",
                 "{{attempt}}",
                 "{{body}}",
@@ -563,13 +565,14 @@ fn the_worst_case_size_of_a_notice_is_its_rendered_size() {
 }
 
 #[test]
-fn a_frame_from_a_sender_with_a_derivable_handle_shows_it_with_the_at_sign_kept_and_a_hostile_handle_is_escaped_and_bounded(
+fn a_frame_from_a_sender_with_a_derivable_handle_and_role_shows_them_with_the_at_sign_and_colon_kept_and_a_hostile_handle_is_escaped_and_bounded(
 ) {
     let limits = spec_limits();
     let first_line = |handle: &str| {
         let mut it = item("forgent-claude-2b", true);
         if let ClaimedWhat::Mail(from) = &mut it.what {
             from.handle = Some(handle.to_string());
+            from.role = Some("head:secretary-miu".to_string());
         }
         render(&it, Some("hi"), &limits)
             .lines()
@@ -580,7 +583,7 @@ fn a_frame_from_a_sender_with_a_derivable_handle_shows_it_with_the_at_sign_kept_
 
     let plain = first_line("claude-5v7u@fg-server");
     assert!(
-        plain.contains(" handle=\"claude-5v7u@fg-server\" "),
+        plain.contains(" handle=\"claude-5v7u@fg-server\" role=\"head:secretary-miu\" "),
         "{plain}"
     );
     let hostile = first_line(&format!(
@@ -602,12 +605,12 @@ fn a_frame_from_a_sender_with_a_derivable_handle_shows_it_with_the_at_sign_kept_
         handle.chars().count(),
         limits.frame.max_header_chars as usize
     );
-    assert_eq!(hostile.matches('"').count(), 10, "{hostile}");
+    assert_eq!(hostile.matches('"').count(), 12, "{hostile}");
 
     let unregistered = render(&item("unregistered_abc", false), Some("hi"), &limits);
     assert!(unregistered
         .lines()
         .next()
         .unwrap()
-        .contains(" handle=\"unregistered\" "));
+        .contains(" handle=\"unregistered\" role=\"none\" "));
 }

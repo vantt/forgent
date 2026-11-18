@@ -1497,6 +1497,7 @@ fn each_identifier_group_is_replaced_whole_by_its_writer_and_every_other_group_i
 }
 
 /// A terminal driver that knows one tab label.
+#[derive(Debug)]
 struct OneLabel(&'static str, &'static str);
 
 impl TerminalPort for OneLabel {

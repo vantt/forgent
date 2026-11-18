@@ -16,7 +16,7 @@
 //! only after the caller check, and takes the mailbox lock with nothing
 //! else held: this process holds no other `LockScope` at any point.
 use super::mailbox_config::{is_config_reason, project_mailbox, CrossMachine};
-use super::mailbox_identity::{ensure_registered, session_of, state_root};
+use super::mailbox_identity::{ensure_registered, refresh_registered, sender_of, state_root};
 use fgos_event_store::layout::Layout;
 use fgos_mailbox::adapters::TestedClis;
 use fgos_mailbox::ancestry::ancestry_of;
@@ -129,8 +129,8 @@ fn run(args: &[OsString]) {
     let resolve = resolver_for(adapter, facts, &env, &loaded.hook.hook);
     let project = super::mailbox_root::project_name(&fgos_dir);
     let ancestry = || ancestry_of(std::process::id());
-    let handle_of = |key: &WriterKey, cli: &Cli, head: Option<&fgos_process::facts::Record>| {
-        session_of(identity_root.as_deref()?, key, cli, head).map(|info| info.handle)
+    let sender_of = |key: &WriterKey, cli: &Cli, head: Option<&fgos_process::facts::Record>| {
+        sender_of(identity_root.as_deref(), key, cli, head)
     };
     let input = ShellInput {
         adapter,
@@ -143,7 +143,7 @@ fn run(args: &[OsString]) {
         clock: &now,
         ancestry: &ancestry,
         resolve: &resolve,
-        handle_of: &handle_of,
+        sender_of: &sender_of,
         gate: gate.clone(),
     };
     let gate_idle = gate;
@@ -158,35 +158,49 @@ fn run(args: &[OsString]) {
     if gate_idle.state() == GateState::Idle {
         start_sync(&fgos_dir, &paths, &cross);
     }
-    // Make sure Identity knows the head (see `ensure_identity`). The write
-    // gate must be idle, so the watchdog still covers the step.
+    // Make sure Identity knows the head (see `ensure_identity`), then that its
+    // entry holds the head's current identifiers (see `refresh_due`). The
+    // write gate must be idle, so the watchdog still covers both steps.
     let Some((head, cli)) = outcome.bound.as_ref().zip(adapter.cli()) else {
+        return;
+    };
+    let Some(root) = identity_root.as_deref() else {
         return;
     };
     let confined = std::env::var_os(HEAD_REQUEST_SOCKET_ENV).is_some_and(|path| !path.is_empty());
     let own = head.writer.as_str();
     let latest = || outcome_log::latest(&paths);
-    if gate_idle.state() != GateState::Idle
-        || !ensure_identity(head.registered.is_some(), confined, own, latest(), now())
+    if gate_idle.state() == GateState::Idle
+        && ensure_identity(head.registered.is_some(), confined, own, latest(), now())
     {
-        return;
-    }
-    let Some(root) = identity_root.as_deref() else {
-        return;
-    };
-    match ensure_registered(root, fgos_dir.parent(), &cli, head) {
-        // A retry that now holds clears the outcome it left, never another head's.
-        None if latest().is_some_and(|l| {
-            l.reason.starts_with(IDENT_PREFIX) && l.writer.as_deref().is_none_or(|w| w == own)
-        }) =>
-        {
-            outcome_log::clear(&paths)
+        match ensure_registered(root, &fgos_dir, &cli, head) {
+            // A retry that now holds clears the outcome it left, never another head's.
+            None if latest().is_some_and(|l| {
+                l.reason.starts_with(IDENT_PREFIX) && l.writer.as_deref().is_none_or(|w| w == own)
+            }) =>
+            {
+                outcome_log::clear(&paths)
+            }
+            None => {}
+            Some(reason) => {
+                outcome_log::record_reason_for(&paths, adapter, event, &reason, own, now());
+                return;
+            }
         }
-        None => {}
-        Some(reason) => {
+    }
+    if gate_idle.state() == GateState::Idle && refresh_due(head.registered.is_some(), event) {
+        if let Some(reason) = refresh_registered(root, &fgos_dir, &cli, head) {
             outcome_log::record_reason_for(&paths, adapter, event, &reason, own, now());
         }
     }
+}
+
+/// Whether this call compares the head's identifiers with its Identity entry
+/// and refreshes what changed (a renamed CLI session, a new messaging socket,
+/// a moved pane): on the call that bound a new generation and when a turn
+/// ends. Steady tool calls never read Identity for it.
+fn refresh_due(newly_bound: bool, event: HookEvent) -> bool {
+    newly_bound || event == HookEvent::Stop
 }
 
 /// How long a confined head waits after its own failed Identity bind before

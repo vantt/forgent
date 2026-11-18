@@ -53,6 +53,17 @@ export function requirementOf(grant) {
 }
 
 /**
+ * The head the session is, as its launch environment names it (`FGOS_HEAD_PERSONA`, `FGOS_HEAD_NAME`,
+ * `FGOS_HEAD_GEN`): `{ persona, name, gen }` for the envelope's `session`, whose supervisor records it in the
+ * session's Identity entry, or nothing when the environment does not name all three.
+ */
+export function headOf(env) {
+  const gen = Number(env.FGOS_HEAD_GEN);
+  if (!env.FGOS_HEAD_PERSONA || !env.FGOS_HEAD_NAME || !Number.isInteger(gen) || gen < 1) return {};
+  return { persona: env.FGOS_HEAD_PERSONA, name: env.FGOS_HEAD_NAME, gen };
+}
+
+/**
  * Starts the session attempt of `key` and returns once the supervisor has bound it; it never waits for the session to
  * end. `binding` is `bind()`'s answer for the seat (executor, invocation, model, tier, account); `grant` is
  * `grantOf(role)`; `opening` is typed verbatim; `ceilingMs` bounds the session; `env` is added to the agent's launch
@@ -123,7 +134,7 @@ export async function launchSessionAttempt({ binding, runnerConfig, key, role, g
       dispatchBatchKey: beside ?? attemptId,
       mutating: false,
       settings: readLaunchSettings(projectRoot),
-      session: { role, verbs: [...grant.verbs], writes: [...grant.writes], ...(requestSocketPath ? { requestSocketPath } : {}) },
+      session: { role, verbs: [...grant.verbs], writes: [...grant.writes], ...(requestSocketPath ? { requestSocketPath } : {}), ...headOf(env) },
       requestSocket: requestSocketPath ?? undefined,
       ceilingMs,
       opening,

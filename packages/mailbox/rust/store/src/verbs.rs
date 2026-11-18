@@ -8,7 +8,7 @@ use crate::adapters::version::{recipient_version, VersionSources};
 use crate::adapters::TestedClis;
 use crate::head::stored_liveness;
 use crate::hook::shell::{claimed_sizes, emit_and_finish, Emit, WriteGate};
-use crate::hook::{claim_inbox, HandleOf, InboxClaim};
+use crate::hook::{claim_inbox, InboxClaim, SenderOf};
 use crate::nudge::Nudge;
 use crate::record::{Record, Reported, Wait};
 use fgos_mailbox_core::{
@@ -257,7 +257,7 @@ pub fn inbox_claim(
     wait: Wait,
     clock: &dyn Fn() -> Timestamp,
     limits: &Limits,
-    handle_of: &HandleOf<'_>,
+    sender_of: &SenderOf<'_>,
     stdout: &mut dyn Write,
 ) -> Result<InboxClaimed, String> {
     let line = |stdout: &mut dyn Write, text: String| InboxClaimed {
@@ -297,7 +297,7 @@ pub fn inbox_claim(
             limits,
             clock,
             gate: &gate,
-            handle_of,
+            sender_of,
         },
         &claimed,
         &sizes,

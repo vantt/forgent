@@ -19,7 +19,7 @@
 use super::mailbox_body;
 use super::mailbox_config::project_mailbox;
 use super::mailbox_identity::{
-    address, handle_conflicts, is_alias, session_of, state_root, Addressed,
+    address, handle_conflicts, identified, is_alias, sender_of, session_of, state_root, Addressed,
 };
 use super::mailbox_remote;
 use crate::exit_codes;
@@ -733,7 +733,20 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                     }
                 }
             } else {
-                (Recipient::Name(to.clone()), None)
+                // Exact short name, exact key, then any identifier of an Identity record, then the core's
+                // prefixes: an exact answer always beats a prefix.
+                let heads = verbs::heads(&fgos_dir, &loaded.limits).unwrap_or_default();
+                let exact = heads
+                    .iter()
+                    .any(|head| head.name.as_str() == to || head.key.as_str() == to);
+                match (!exact)
+                    .then(|| identified(state_root().as_deref(), to, &heads))
+                    .flatten()
+                {
+                    Some(Addressed::Head { key, .. }) => (Recipient::Key(key), None),
+                    Some(Addressed::Refused(refusal)) => (Recipient::Refused(refusal), None),
+                    None => (Recipient::Name(to.clone()), None),
+                }
             };
             let candidates = match &recipient {
                 Recipient::Refused(refusal) => Some(typed_candidates(refusal)),
@@ -815,11 +828,11 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 return failed(record_error_text("caller-unknown"), *json, warning);
             };
             let root = state_root();
-            let handle_of =
+            let sender_of =
                 |key: &WriterKey,
                  cli: &fgos_mailbox_core::Cli,
                  head: Option<&fgos_process::facts::Record>| {
-                    session_of(root.as_deref()?, key, cli, head).map(|info| info.handle)
+                    sender_of(root.as_deref(), key, cli, head)
                 };
             let mut stdout = std::io::stdout().lock();
             match verbs::inbox_claim(
@@ -828,7 +841,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                 Wait::Ms(loaded.hook.verbs.lock_wait_ms),
                 &now,
                 &loaded.limits,
-                &handle_of,
+                &sender_of,
                 &mut stdout,
             ) {
                 Ok(done) => MailboxAnswer {

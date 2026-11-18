@@ -100,7 +100,6 @@ pub fn register(
         project: "forgent".to_string(),
         own_suffix: None,
         head: format!("head-of-{writer}"),
-        handle: None,
     };
     state.register(req, None, now, limits, ids).unwrap()
 }
@@ -297,6 +296,5 @@ pub fn register_request(writer: &str, head: &fgos_process::facts::Record) -> Reg
         project: "forgent".to_string(),
         own_suffix: None,
         head: fgos_mailbox::head::head_text(head),
-        handle: None,
     }
 }
