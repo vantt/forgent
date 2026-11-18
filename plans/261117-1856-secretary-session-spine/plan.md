@@ -207,6 +207,13 @@ answered `unavailable / tool.missing`, so the blast radius below is from `rg`, a
   Rotation runs inside the confined head, so phase 14 adds a second verb `head rotate` to the same request contract
   and route (one door into the rotation executor), not a second socket. Until the grant follow-up, the head ceiling
   is the constant `HEAD_HARD_CEILING_MS` (7 days); rotation keeps real sessions far shorter.
+- **New code goes to Rust when it can (owner, 2026-11-18).** The project is moving to Rust; any new module this plan
+  still adds is written in Rust whenever its dependencies allow it now, and its Node twin is deleted in the same change.
+  Phase 17's hook therefore becomes a native `fgos hook session-rotation` subcommand in Rust (next to the native
+  `hook mailbox`), its socket client reuses the Rust head-request frame codec, and `measure`/`decide` (used only by the
+  hook) move to Rust with their Node files and tests retired. Code already landed in Node because it calls the Node seat
+  door (`head-start`, `head-request`, `head-request-client`, `head-grants`, `rotate`, `session-attempt`,
+  `handoff-store`) is tracked for porting as `p-kkkgpg6dzc`.
 
 ## Acceptance criteria
 
