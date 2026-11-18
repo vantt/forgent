@@ -159,6 +159,12 @@ pub fn project_cli_invocation(
                 args,
             )),
         ),
+        crate::wiring::worktree::CREATE_OPERATION_ID
+        | crate::wiring::worktree::REMOVE_OPERATION_ID
+        | crate::wiring::worktree::RESYNC_OPERATION_ID => (
+            ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
+            Box::new(crate::wiring::worktree::project_worktree_request(args)?),
+        ),
         crate::wiring::doctor::OPERATION_ID => (
             ContractRef::from_static("doctor.run.request", "1.0.0"),
             Box::new(crate::wiring::doctor::project_doctor_request(args, root)?),
@@ -229,6 +235,11 @@ pub fn native_operation_id(
     }
     if route_operation == crate::wiring::git_incidents::STATUS_OPERATION_ID {
         return Ok(crate::wiring::git_incidents::project_git_request(args)
+            .operation_id()
+            .to_string());
+    }
+    if route_operation == crate::wiring::worktree::CREATE_OPERATION_ID {
+        return Ok(crate::wiring::worktree::project_worktree_request(args)?
             .operation_id()
             .to_string());
     }

@@ -92,6 +92,7 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("lock", wiring::lock_fence::AVAILABLE_SUBCOMMANDS),
     ("dispatch", wiring::dispatch_decide::AVAILABLE_SUBCOMMANDS),
     ("agents", wiring::agents::AVAILABLE_SUBCOMMANDS),
+    ("worktree", wiring::worktree::AVAILABLE_SUBCOMMANDS),
 ];
 
 /// The operation a `legacy-cli` selector runs for the first positionals it serves natively. The route table gives
@@ -385,7 +386,7 @@ pub fn check_call(
 /// The verbs whose Node arm worded a missing or unknown sub-command with `requireSubVerb` (`<verb> requires a
 /// sub-verb: fgos <verb> <a|b>`), which the host keeps word for word; every other native verb says what the host's
 /// own parser says.
-const NODE_SUB_VERB_WORDING: &[&str] = &["agents"];
+const NODE_SUB_VERB_WORDING: &[&str] = &["agents", "worktree"];
 
 /// The refusal text for a missing (`None`) or unknown sub-command of `verb`.
 fn sub_verb_refusal(verb: &str, available: &[&str], sub: Option<&str>) -> String {

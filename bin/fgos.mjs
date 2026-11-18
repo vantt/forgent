@@ -89,7 +89,7 @@ import { invokeDispatchInspectOperation } from '../src/verbs/dispatch/inspect.mj
 import { invokeDispatchReconcileOperation } from '../src/verbs/dispatch/reconcile.mjs';
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
-import { branchNameFor, branchExists, resyncWorktree, detectTrunk, isMainWorktree, admitStoreAccess, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
+import { branchNameFor, branchExists, detectTrunk, isMainWorktree, admitStoreAccess, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { commitAt, pathExistsAt, readRepoFacts } from '../src/git/inspect.mjs';
@@ -3412,29 +3412,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return paginateVerbResult(rankImpact(listWork(dir), { includeDone: Boolean(flags.all) }), flags, 'triage-v1', 'triage');
     }
 
-    case 'worktree': {
-      const sub = requireField(positional[0], 'worktree requires a sub-verb: create <path> | remove <path> --delivered-to <ref> [--discard-ignored]');
-      if (sub === 'create') {
-        if (positional.length !== 2) throw new StoreError('validation', 'usage: fgos worktree create <path> [--branch <name> | --detach] [--base <ref>] [--json]');
-        const { worktreeContext } = await import('../src/verbs/worktree/context.mjs');
-        const { createWorktreeUseCase } = await import('../src/verbs/worktree/create.mjs');
-        return createWorktreeUseCase(worktreeContext(process.cwd(), mainCheckoutRootAt(process.cwd())), {
-          path: positional[1], branch: optionalField(flags.branch, 'worktree create --branch requires a name'),
-          detach: Boolean(flags.detach), base: optionalField(flags.base, 'worktree create --base requires a ref'),
-        });
-      }
-      if (sub === 'remove') {
-        if (positional.length !== 2) throw new StoreError('validation', 'usage: fgos worktree remove <path> --delivered-to <ref> [--discard-ignored] [--json]');
-        const { worktreeContext } = await import('../src/verbs/worktree/context.mjs');
-        const { removeWorktreeUseCase } = await import('../src/verbs/worktree/remove.mjs');
-        return removeWorktreeUseCase(worktreeContext(process.cwd(), mainCheckoutRootAt(process.cwd())), {
-          path: positional[1], deliveredTo: requireField(flags['delivered-to'], 'worktree remove requires --delivered-to <ref>'),
-          discardIgnored: flags['discard-ignored'],
-        });
-      }
-      throw new StoreError('validation', `unknown worktree sub-verb: ${sub}`);
-    }
-
     // Persisted-focus CLI surface (str67-goal-directed-planning D3/D4/D6/D7):
     // reads/writes go through the setFocus/goalFocusShow facades only, never
     // graph-metrics.mjs directly. Only `set`/`show` exist here — `clear`/
@@ -3529,16 +3506,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return { released: true, reason: 'stale-liveness', ...(rel.admin ? { admin: rel.admin } : {}) };
     }
 
-
-    // The repair verb `.githooks/pre-commit`'s stale-index guard prints. Run FROM INSIDE the stale
-    // worktree; `--path` points it at another one. `resyncWorktree` needs the MAIN checkout (branch
-    // refs and `--git-common-dir` resolve against the shared repo), which `mainCheckoutRootOf` reads
-    // from the worktree itself, or from `--dir` when that names the main root.
-    case 'resync-worktree': {
-      const worktreePath = flags.path ? path.resolve(flags.path) : process.cwd();
-      const repoRoot = mainCheckoutRootOf(flags, worktreePath);
-      return resyncWorktree(repoRoot, worktreePath, flags.branch);
-    }
 
     // tsk-3au: the safe path for a destructive `git reset --hard` on the main checkout -- refuses when the
     // whole-repo tree is dirty (the whole-repo check `approve` uses) unless `--confirm` follows the full

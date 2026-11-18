@@ -161,6 +161,9 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::dispatch_decide::DECIDE_DESCRIPTOR,
     wiring::dispatch_decide::EXPLAIN_DESCRIPTOR,
     wiring::agents::DESCRIPTOR,
+    wiring::worktree::CREATE_DESCRIPTOR,
+    wiring::worktree::REMOVE_DESCRIPTOR,
+    wiring::worktree::RESYNC_DESCRIPTOR,
 ];
 
 /// The legacy payload root of the running release, for the verbs that read what it ships (its skills, its scripts).
@@ -385,6 +388,15 @@ fn main() {
     ] {
         service.register_provider(Arc::new(
             wiring::git_incidents::GitIncidentsProvider::for_descriptor(descriptor),
+        ));
+    }
+    for descriptor in [
+        wiring::worktree::CREATE_DESCRIPTOR,
+        wiring::worktree::REMOVE_DESCRIPTOR,
+        wiring::worktree::RESYNC_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(
+            wiring::worktree::WorktreeProvider::for_descriptor(descriptor),
         ));
     }
     service.register_provider(Arc::new(wiring::lock_status::LockStatusProvider::new()));

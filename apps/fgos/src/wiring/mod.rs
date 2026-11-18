@@ -53,6 +53,7 @@ pub mod session_rotation_hook;
 pub mod session_rotation_hook;
 pub mod uninstall;
 pub mod wire_agents;
+pub mod worktree;
 
 /// The process environment as the list the packaging readers take. A variable whose name or value is not UTF-8 is
 /// left out.

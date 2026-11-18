@@ -4925,3 +4925,318 @@ fn dispatch_decide_work_asks_the_work_layer_through_the_node_bridge_for_an_item_
         "fgos: no work item \"tsk-unknown\" found -- cannot resolve its dispatch executor.\n"
     );
 }
+
+// ---- `fgos worktree` and `fgos resync-worktree`: argv shapes, exit codes and envelopes ----
+//
+// The checkout engine is `fgos-checkout`, which owns every outcome (what is created, provisioned, set aside,
+// removed, repaired). These cases own only what the host adds: how a call is read, which exit status and
+// envelope field answer it, and that no Node process takes part.
+
+/// A repository with one commit and the activation fence the Git driver requires, a state root and a home, and a
+/// `node` on PATH that fails if it is ever started.
+#[cfg(unix)]
+struct WorktreeWorld {
+    sandbox: PathBuf,
+    repo: PathBuf,
+    state: PathBuf,
+    path: String,
+    node_log: PathBuf,
+}
+
+#[cfg(unix)]
+impl WorktreeWorld {
+    fn new(label: &str) -> Self {
+        use std::os::unix::fs::PermissionsExt;
+        let sandbox =
+            std::env::temp_dir().join(format!("fgos_test_{label}_{}", std::process::id()));
+        let _ = fs::remove_dir_all(&sandbox);
+        let repo = sandbox.join("repo");
+        let state = sandbox.join("state");
+        let bin = sandbox.join("bin");
+        for dir in [&repo, &state, &bin, &sandbox.join("home")] {
+            fs::create_dir_all(dir).unwrap();
+        }
+        fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+        let node_log = sandbox.join("node-started.txt");
+        let failing_node = bin.join("node");
+        fs::write(
+            &failing_node,
+            format!(
+                "#!/bin/sh\necho started >> \"{}\"\nexit 99\n",
+                node_log.display()
+            ),
+        )
+        .unwrap();
+        fs::set_permissions(&failing_node, fs::Permissions::from_mode(0o755)).unwrap();
+        let world = Self {
+            path: format!(
+                "{}:{}",
+                bin.display(),
+                std::env::var("PATH").unwrap_or_default()
+            ),
+            sandbox,
+            repo,
+            state,
+            node_log,
+        };
+        world.git(&world.repo, &["init", "-q", "--initial-branch=main"]);
+        world.git(&world.repo, &["config", "user.name", "Fixture"]);
+        world.git(
+            &world.repo,
+            &["config", "user.email", "fixture@example.invalid"],
+        );
+        fs::write(world.repo.join(".gitignore"), ".fgos/\n").unwrap();
+        fs::write(world.repo.join("seed.txt"), "seed\n").unwrap();
+        world.git(&world.repo, &["add", "-A"]);
+        world.git(&world.repo, &["commit", "-qm", "seed"]);
+        let fence = world.repo.join(".fgos/locks/activation.lock");
+        fs::create_dir_all(&fence).unwrap();
+        fs::write(
+            fence.join("TOMBSTONE"),
+            r#"{"lock":"activation","by":"fgos git","at":"fixture"}"#,
+        )
+        .unwrap();
+        world
+    }
+
+    fn git(&self, cwd: &Path, args: &[&str]) -> String {
+        let out = Command::new("git")
+            .arg("-C")
+            .arg(cwd)
+            .args(args)
+            .output()
+            .unwrap();
+        assert!(
+            out.status.success(),
+            "git {args:?}: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        String::from_utf8_lossy(&out.stdout).trim().to_owned()
+    }
+
+    fn run(&self, cwd: &Path, args: &[&str]) -> std::process::Output {
+        Command::new(fgos_bin())
+            .args(args)
+            .current_dir(cwd)
+            .env("PATH", &self.path)
+            .env("FGOS_STATE_ROOT", &self.state)
+            .env("HOME", self.sandbox.join("home"))
+            .env("TMPDIR", &self.sandbox)
+            .env_remove("FGOS_ACTIVE_RELEASE_PATH")
+            .env_remove("FGOS_ACTIVE_MANIFEST_PATH")
+            .output()
+            .expect("failed to execute fgos")
+    }
+
+    fn data(&self, cwd: &Path, args: &[&str]) -> serde_json::Value {
+        let out = self.run(cwd, args);
+        assert_eq!(
+            out.status.code(),
+            Some(0),
+            "{args:?}: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        serde_json::from_slice::<serde_json::Value>(&out.stdout).unwrap()["data"].clone()
+    }
+
+    fn node_started(&self) -> bool {
+        self.node_log.exists()
+    }
+}
+
+#[cfg(unix)]
+impl Drop for WorktreeWorld {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.sandbox);
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn a_detached_checkout_without_provisioning_is_created_and_removed_through_the_worktree_verb() {
+    let world = WorktreeWorld::new("worktree_bare");
+    let checkout = world.sandbox.join("session-checkout");
+    let target = checkout.to_str().unwrap();
+    let created = world.data(
+        &world.repo,
+        &["worktree", "create", target, "--bare", "--json"],
+    );
+    assert_eq!(
+        fs::canonicalize(created["path"].as_str().unwrap()).unwrap(),
+        fs::canonicalize(&checkout).unwrap()
+    );
+    assert!(
+        created["branch"].is_null(),
+        "a checkout with no --branch is detached: {created}"
+    );
+    assert!(checkout.join("seed.txt").is_file());
+    // The delivery target is the commit the checkout stands on, named by its object id: `HEAD` is not a ref
+    // name `--delivered-to` accepts, as before.
+    let tip = world.git(&world.repo, &["rev-parse", "HEAD"]);
+    let removed = world.data(
+        &world.repo,
+        &[
+            "worktree",
+            "remove",
+            target,
+            "--delivered-to",
+            &tip,
+            "--json",
+        ],
+    );
+    assert_eq!(removed["removed"], true);
+    assert_eq!(
+        removed["discardedIgnored"],
+        serde_json::json!({"files": 0, "bytes": 0})
+    );
+    assert!(!checkout.exists(), "the checkout is gone");
+    assert!(!world.node_started(), "the worktree verb started node");
+}
+
+#[cfg(unix)]
+#[test]
+fn worktree_calls_answer_the_exit_codes_of_their_argv_shape() {
+    let world = WorktreeWorld::new("worktree_exit_codes");
+    let repo = world.repo.clone();
+    let code = |args: &[&str]| world.run(&repo, args).status.code();
+    // 4: arity, a missing or unknown sub-command, a flag that takes a value and is given none, no --delivered-to.
+    for args in [
+        &["worktree"][..],
+        &["worktree", "bogus"],
+        &["worktree", "create"],
+        &["worktree", "create", "../a", "../b"],
+        &["worktree", "create", "../w", "--branch"],
+        &["worktree", "create", "../w", "--base"],
+        &["worktree", "remove"],
+        &["worktree", "remove", "../w"],
+        &["worktree", "remove", "../w", "--delivered-to"],
+        // `--discard-ignored ../w` reads `../w` as the flag's value, as the Node verb did: no path is left.
+        &[
+            "worktree",
+            "remove",
+            "--discard-ignored",
+            "../w",
+            "--delivered-to",
+            "HEAD",
+        ],
+    ] {
+        assert_eq!(code(args), Some(4), "{args:?}");
+    }
+    // 1: a refusal of the engine or of the call that carries no category.
+    for args in [
+        &["worktree", "create", "../w", "--branch", "x", "--detach"][..],
+        &[
+            "worktree",
+            "remove",
+            "../not-a-worktree",
+            "--delivered-to",
+            "main",
+        ],
+    ] {
+        assert_eq!(code(args), Some(1), "{args:?}");
+    }
+    assert!(
+        !world.sandbox.join("w").exists(),
+        "a refused call made a checkout"
+    );
+    assert!(!world.node_started(), "the worktree verb started node");
+}
+
+#[cfg(unix)]
+#[test]
+fn a_removal_of_an_undeliverable_ref_is_refused_and_leaves_the_checkout() {
+    let world = WorktreeWorld::new("worktree_undeliverable");
+    let checkout = world.sandbox.join("w");
+    let target = checkout.to_str().unwrap();
+    world.data(&world.repo, &["worktree", "create", target, "--bare"]);
+    let out = world.run(
+        &world.repo,
+        &[
+            "worktree",
+            "remove",
+            target,
+            "--delivered-to",
+            "no-such-branch",
+        ],
+    );
+    assert_eq!(out.status.code(), Some(1));
+    assert!(
+        String::from_utf8_lossy(&out.stderr).contains("does not name an existing"),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    assert!(checkout.join("seed.txt").is_file());
+}
+
+#[cfg(unix)]
+#[test]
+fn a_bare_resync_worktree_inside_a_linked_worktree_resolves_the_main_checkout_and_repairs_it() {
+    let world = WorktreeWorld::new("worktree_resync");
+    let linked = world.sandbox.join("linked");
+    world.git(
+        &world.repo,
+        &[
+            "worktree",
+            "add",
+            "-q",
+            "-b",
+            "fgw/resync",
+            linked.to_str().unwrap(),
+        ],
+    );
+    // A checkout whose branch is moved from outside while it holds history of its own reflog.
+    fs::write(linked.join("change.txt"), "change\n").unwrap();
+    world.git(&linked, &["add", "change.txt"]);
+    world.git(&linked, &["commit", "-qm", "change"]);
+    let outside = world.sandbox.join("outside");
+    world.git(
+        &world.repo,
+        &[
+            "worktree",
+            "add",
+            "-q",
+            "--detach",
+            outside.to_str().unwrap(),
+            "fgw/resync",
+        ],
+    );
+    fs::write(outside.join("external.txt"), "external\n").unwrap();
+    world.git(&outside, &["add", "external.txt"]);
+    world.git(&outside, &["commit", "-qm", "external"]);
+    let tip = world.git(&outside, &["rev-parse", "HEAD"]);
+    world.git(&world.repo, &["update-ref", "refs/heads/fgw/resync", &tip]);
+    world.git(
+        &world.repo,
+        &["worktree", "remove", "--force", outside.to_str().unwrap()],
+    );
+
+    let answer = world.data(&linked, &["resync-worktree"]);
+    assert_eq!(answer["resynced"], true, "{answer}");
+    assert_eq!(answer["to"], tip.as_str());
+    assert!(
+        linked.join("external.txt").is_file(),
+        "the checkout follows the branch tip"
+    );
+    let again = world.data(
+        &linked,
+        &["resync-worktree", "--dir", world.repo.to_str().unwrap()],
+    );
+    assert_eq!(
+        again,
+        serde_json::json!({"resynced": false, "reason": "already-in-sync"})
+    );
+    assert!(!world.node_started(), "resync-worktree started node");
+}
+
+#[cfg(unix)]
+#[test]
+fn resync_worktree_refuses_a_flag_without_its_value() {
+    let world = WorktreeWorld::new("worktree_resync_flags");
+    assert_eq!(
+        world
+            .run(&world.repo, &["resync-worktree", "--branch"])
+            .status
+            .code(),
+        Some(4)
+    );
+}

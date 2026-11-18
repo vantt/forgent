@@ -346,6 +346,39 @@ pub const CATALOG: &[OperationDescriptor] = &[
         streaming_mode: StreamingMode::None,
     },
     OperationDescriptor {
+        operation_id: OperationId::from_static("worktree.create"),
+        owning_component_id: Cow::Borrowed("worktree"),
+        request_contract: ContractRef::from_static("worktree.create.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("worktree.create.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("worktree.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("worktree.remove"),
+        owning_component_id: Cow::Borrowed("worktree"),
+        request_contract: ContractRef::from_static("worktree.remove.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("worktree.remove.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("worktree.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("worktree.resync"),
+        owning_component_id: Cow::Borrowed("worktree"),
+        request_contract: ContractRef::from_static("worktree.resync.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("worktree.resync.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("worktree.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
         operation_id: OperationId::from_static("doctor.run"),
         owning_component_id: Cow::Borrowed("packaging"),
         request_contract: ContractRef::from_static("doctor.run.request", "1.0.0"),
@@ -443,7 +476,7 @@ mod tests {
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
         // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run and the init run, the dispatch decide and explain, and the agents list.
-        assert_eq!(CATALOG.len(), 38);
+        assert_eq!(CATALOG.len(), 41);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -473,6 +506,9 @@ mod tests {
         assert!(ids.contains(&"session.gc"));
         assert!(ids.contains(&"git.status"));
         assert!(ids.contains(&"git.recover"));
+        assert!(ids.contains(&"worktree.create"));
+        assert!(ids.contains(&"worktree.remove"));
+        assert!(ids.contains(&"worktree.resync"));
         assert!(ids.contains(&"holder-lock.status"));
         assert!(ids.contains(&"holder-lock.fence"));
         assert!(ids.contains(&"doctor.run"));

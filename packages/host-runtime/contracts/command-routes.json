@@ -1150,11 +1150,18 @@
   },
   "resync-worktree": {
     "selector": "resync-worktree",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
+    "route_kind": "native",
+    "operation_id": "worktree.resync",
+    "owner_path": "packages/execution/checkout",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "accepted_flags": [
+      "dir",
+      "json",
+      "help",
+      "path",
+      "branch"
     ],
     "store": "none"
   },
@@ -1415,12 +1422,33 @@
   },
   "worktree": {
     "selector": "worktree",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
+    "route_kind": "native",
+    "operation_id": "worktree.create",
+    "owner_path": "packages/execution/checkout",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
+    "subcommands": true,
+    "subcommand_flags": {
+      "create": [
+        "dir",
+        "json",
+        "help",
+        "path",
+        "branch",
+        "detach",
+        "base",
+        "bare"
+      ],
+      "remove": [
+        "dir",
+        "json",
+        "help",
+        "path",
+        "delivered-to",
+        "discard-ignored"
+      ]
+    },
     "store": "none"
   }
 }
