@@ -8,13 +8,11 @@ footprint:
   - plans/261118-0936-ops-metrics/**
   - packages/observe/**
   - packages/run-result/**
-  - packages/git/node-addon/src/run_result.rs
   - packages/host-runtime/contracts/command-routes.json
   - packages/config/contracts/fixtures/**
   - apps/fgos/src/wiring/**
   - apps/fgos/observe-kinds.json
   - apps/fgos/tests/**
-  - src/native/door.mjs
   - src/runner/execution/run-request.mjs
   - src/runner/execution/unit.mjs
   - src/runner/execution/unit-summary.mjs
@@ -50,7 +48,6 @@ footprint:
   - docs/platform/observe/**
   - docs/backlog.md
   - CHANGELOG.md
-  - packages/git/contracts/mutation-census.v1.json
   - packages/distribution/contracts/doctor-registry.v1.json
 base: ebff368da7c1d1d705c2ec386dd53d5b20544cd4
 source:
@@ -182,7 +179,7 @@ their consumers. A detection the supervisor plan adds later (pace, OM-D10), or o
 | 3 | [Run record facts and plan key](phase-03-run-record-facts.md) | - | src/runner/execution/run-request.mjs, src/runner/execution/unit.mjs, src/runner/execution/unit-summary.mjs, src/runner/execution/run.mjs, src/runner/dispatch/settlement.mjs, src/run-supervisor/steps/settle-attempt.mjs, src/workflow/case-verbs.mjs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-routes.json, packages/run-result/contracts/unit-summary.read.v3.json, test/runner/execution/unit-summary.test.mjs, test/runner/execution/run-request.test.mjs | 1 | done |
 | 4 | [Write door and health counters](phase-04-write-door.md) | 1 | packages/observe/rust/src/record/store/**, packages/observe/rust/src/record/mod.rs, packages/observe/rust/tests/store_*.rs | 2 | done |
 | 5 | [Query engine](phase-05-query-engine.md) | 1 | packages/observe/rust/src/query/**, packages/observe/rust/src/lib.rs, packages/observe/rust/tests/query_*.rs, test/fixtures/observe/query/** | 2 | done |
-| 6 | [Token parsers in Rust](phase-06-usage-parsers-rust.md) | 2, 3 | packages/run-result/rust/src/usage/**, packages/run-result/rust/src/lib.rs, packages/run-result/rust/tests/usage_*.rs, packages/git/node-addon/src/run_result.rs, src/native/door.mjs, src/runner/dispatch/settlement.mjs, src/runner/dispatch/usage-parsers.mjs, test/runner/usage-parsers.test.mjs, test/runner/run-result-source-scan.test.mjs, test/suite-baseline.json, docs/architecture-manifest.json | 2 | done |
+| 6 | [Token parsers in Rust](phase-06-usage-parsers-rust.md) | 2, 3 | packages/run-result/rust/src/usage/**, packages/run-result/rust/src/lib.rs, packages/run-result/rust/tests/usage_*.rs, src/runner/dispatch/settlement.mjs, src/runner/dispatch/usage-parsers.mjs, test/runner/usage-parsers.test.mjs, test/runner/run-result-source-scan.test.mjs, test/suite-baseline.json, docs/architecture-manifest.json | 2 | done |
 | 7 | [Query verbs and named definitions](phase-07-query-verbs-and-definitions.md) | 1, 4, 5 | packages/observe/rust/src/metrics_cli/mod.rs, packages/observe/rust/src/metrics_cli/record.rs, packages/observe/rust/src/metrics_cli/query.rs, packages/observe/rust/src/definition/**, packages/observe/rust/tests/definition_*.rs, apps/fgos/src/wiring/observe_query.rs, apps/fgos/src/wiring/mod.rs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-routes.json | 3 | done |
 | 8 | [Run, unit and verify projections](phase-08-run-projection.md) | 1, 3, 5, 6 | packages/run-result/rust/src/lib.rs, packages/run-result/rust/src/unit_summary.rs, packages/run-result/rust/src/projection/**, packages/run-result/rust/observe-kinds.json, packages/run-result/rust/tests/projection_*.rs, apps/fgos/src/wiring/metrics_sources.rs, apps/fgos/src/wiring/observe_declarations.rs | 3 | done |
 | 9 | [Friction on the contract: kinds, flags, rank](phase-09-friction-attrs-and-rank.md) | 4, 5, 7 | packages/observe/rust/src/friction.rs, packages/observe/rust/src/friction_cli.rs, packages/observe/rust/friction-kinds.json, packages/observe/contracts/observe.friction.v1.json, src/observe/friction-client.mjs, test/observe/friction-client.test.mjs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-routes.json | 4 | done |
@@ -193,7 +190,7 @@ their consumers. A detection the supervisor plan adds later (pace, OM-D10), or o
 | 14 | [Attention detections as definitions](phase-14-attention-detections.md) | 7, 8, 11 | src/runner/dispatch/attention-view.mjs, src/verbs/dispatch/inspect.mjs, core/attention/**, core/config-standard/dispatch.yaml, core/config-schema/dispatch.schema.yaml, packages/config/contracts/fixtures/**, test/runner/dispatch-runtime-inspect.test.mjs | 5 | ready |
 | 15 | [Driving measures as definitions](phase-15-driving-measures.md) | 7, 8, 11 | domains/coding/observe/**, apps/fgos/tests/driving_definitions.rs, test/fixtures/observe/driving/** | 5 | ready |
 | 17 | [Query grammar for the supervisor's definitions](phase-17-grammar-for-supervisor-definitions.md) | 5, 7 | packages/observe/rust/src/query/**, packages/observe/rust/src/definition/**, packages/observe/rust/src/metrics_cli/query.rs, packages/observe/rust/tests/query_*.rs, packages/observe/rust/tests/definition_*.rs, test/fixtures/observe/query/** | 5 | running |
-| 16 | [Docs, backlog, doctor and integration gate](phase-16-docs-and-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17 | docs/platform/observe/**, docs/backlog.md, CHANGELOG.md, packages/git/contracts/mutation-census.v1.json, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/observe.rs | 6 | ready |
+| 16 | [Docs, backlog, doctor and integration gate](phase-16-docs-and-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17 | docs/platform/observe/**, docs/backlog.md, CHANGELOG.md, packages/distribution/contracts/doctor-registry.v1.json, apps/fgos/src/wiring/doctor/observe.rs | 6 | ready |
 
 Contract reading check (planner), after the independent validation of 2026-11-18
 (`reports/validation-261118-plan-review.md`):
