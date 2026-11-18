@@ -30,6 +30,7 @@ members = [
     "packages/yaml-doc/rust",
     "packages/config/rust",
     "packages/execution/rust",
+    "packages/execution/checkout",
     "packages/supervision/rust",
     "packages/questions/rust",
 ]

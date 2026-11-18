@@ -264,6 +264,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-checkout"
+version = "0.2.0"
+dependencies = [
+ "fgos-config",
+ "fgos-durable-file",
+ "fgos-git",
+ "fgos-holder-lock",
+ "fgos-process",
+ "serde",
+ "serde_json",
+ "sha2",
+ "windows-sys",
+]
+
+[[package]]
 name = "fgos-config"
 version = "0.2.0"
 dependencies = [

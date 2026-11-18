@@ -1,0 +1,33 @@
+{
+  "contract": "worktree-provisioning.v1",
+  "worktree": "/tmp/fx-0mM5vV/wt",
+  "identity": {
+    "dev": 147,
+    "ino": 496
+  },
+  "regenerable": [],
+  "placed": [
+    {
+      "path": ".omp",
+      "kind": "dir"
+    },
+    {
+      "path": ".omp/skills",
+      "kind": "dir"
+    },
+    {
+      "path": ".omp/skills/mine",
+      "kind": "dir"
+    },
+    {
+      "path": ".omp/skills/mine/a.txt",
+      "kind": "file",
+      "sha256": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060"
+    },
+    {
+      "path": ".omp/skills/mine/link",
+      "kind": "symlink",
+      "target": "a.txt"
+    }
+  ]
+}
