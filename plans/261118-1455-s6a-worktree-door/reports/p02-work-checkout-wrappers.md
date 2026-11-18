@@ -153,7 +153,8 @@ Changed, not retired: two cases (`worktree.test.mjs` broken-dependency cases) as
 ## Backlog rows found (RUL104: ported as is)
 - `createClaimWorktree` now asserts the worktree-admin lock order up front, also on the reattach path that never takes it (Node asserted only on the create path). A scope already holding a higher-rank lock now fails earlier. No caller in `src` or `bin` passes such a scope.
 - `test/runner/worktree-admin-multiprocess.test.mjs` still carries a single-process held-worktree-admin case that the new wiring test also owns; retire one when that file is in a scope.
-- `repo-locks.mjs` still owns `addWorktreeSync` for the Land path (debt row), and the name `WORKTREE_ADMIN` is duplicated locally in `worktree.mjs`; both go when Land moves.
+- Census correction: `addWorktreeSync`/`addWorktree` in `repo-locks.mjs` have no production caller (Land no longer uses them). The only production user of `repo-locks.mjs` creation is `createWorktreeCheckoutSync` at `src/workflow/unit-handoff.mjs:343`, now a debt entry of the checkout door row. The name `WORKTREE_ADMIN` is still duplicated locally in `worktree.mjs`; it goes when unit-handoff moves.
+- Delete the dead `repo-locks.mjs` `addWorktreeSync`/`addWorktree` helpers and their multiprocess tests once unit-handoff moves to the checkout door (L10).
 
 ## Step 5: createWorktree wall time, before and after
 Debug-profile addon, ext4 tmp, machine load average about 7, a fresh temp repo, 12 create+remove cycles per run, 3 runs interleaved, same fixture and script, base = the unchanged file copied before editing.
@@ -170,3 +171,13 @@ Debug-profile addon, ext4 tmp, machine load average about 7, a fresh temp repo, 
 Status: DONE_WITH_CONCERNS
 Summary: the addon namespace, the wrappers, the doors row and the wiring test are in; the Node cases the crate owns are retired with the table above.
 Concerns: steady-state createWorktree is about 28% slower (debug build); the census needs regeneration; loop.test.mjs could not be run here (EROFS).
+
+
+## Fix round
+- Error-class drift fixed: the skill-copy failure in `provision.rs` is now `ErrorKind::Worktree` with details `{worktreePath, skillDirectory}`; `checkoutError` already maps `worktree` to `WorktreeError(message, details)`, so loop.mjs's `worktree-fail` checks see it again. Crate case: `a_skill_directory_that_cannot_be_copied_fails_as_a_worktree_refusal_naming_it` (skips when run as superuser).
+- Audit of every kind to class mapping against `origin/main:src/runner/worktree.mjs`: no other drift. Setup command failure (Provision + command to WorktreeError {worktreePath, command}), npm failure, npm missing, malformed package.json and config read failure (Provision without command to plain Error; Node threw raw errors), unknown ref (Invalid to StoreError validation), add/detach/list/remove failures (Worktree with branch/worktreePath/retained details, remove wraps every inner refusal including a held custody as Node did), held worktree-admin (LockHeld to HolderLockError), mkdir failure (Io keeps the errno code).
+- Doors row: pattern `createWorktreeCheckoutSync(` (not the definition) added; debt entry for `unit-handoff.mjs`; `repo-locks.mjs` debt reason corrected; seeded caught and passed cases added to `test/architecture.test.mjs`.
+- Addon `checkout.rs`: every entry runs in `catch_unwind`; a panic throws `{"kind":"panic","message":"checkout-worker-failed"}`, which the wrapper maps to a plain `Error`.
+- `worktree.test.mjs`: the wiring test is split into a shape and error-class test that runs everywhere, and a held-lock test that alone keeps `HOOK_TEST_SKIP`; the `finishWorktreeSetup` title now says provisioning.
+- Gates: `cargo test -p fgos-checkout`, `cargo clippy -p fgos-checkout -p fgos-node-addon --all-targets -- -D warnings`, `cargo fmt --all --check`, `node --check src/runner/worktree.mjs`. Node tests not run (seat).
+- Note: `test/runner/merge-target-slot-multiprocess.test.mjs` shows an uncommitted added test I did not write and is outside my scope.

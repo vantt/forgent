@@ -1574,7 +1574,7 @@
     {
       "job": "make, provision and remove a checkout",
       "kind": "door",
-      "patterns": ["\\bfgos_checkout\\b", "\\.create_worktree\\(", "\\.remove_worktree\\(", "\\.prune_worktree\\(", "(?<!function )\\bcreateGitWorktree\\(", "\\bworktreeSetup\\b"],
+      "patterns": ["\\bfgos_checkout\\b", "\\.create_worktree\\(", "\\.remove_worktree\\(", "\\.prune_worktree\\(", "(?<!function )\\bcreateGitWorktree\\(", "(?<!function )\\bcreateWorktreeCheckoutSync\\(", "\\bworktreeSetup\\b"],
       "allowed": [
         "packages/execution/checkout/**",
         "apps/fgos/src/wiring/worktree.rs",
@@ -1586,7 +1586,8 @@
         {"path": "src/setup/model-pool-checks.mjs", "reason": "names `worktreeSetup` in a check message; it provisions nothing"},
         {"path": "src/cli/command-registry.mjs", "reason": "names `worktreeSetup` in the description text of the `worktree` verb"},
         {"path": "apps/fgos/src/wiring/session.rs", "reason": "the session end removes its own session checkout through the Git port directly, not through the checkout door"},
-        {"path": "src/runner/repo-locks.mjs", "reason": "the Land path's creation helpers register a checkout through the Git port; they move with Land"},
+        {"path": "src/runner/repo-locks.mjs", "reason": "its creation helpers register a checkout through the Git port; their one production caller is unit-handoff, and they are deleted when it moves to the checkout door"},
+        {"path": "src/workflow/unit-handoff.mjs", "reason": "unit handoff creates its checkout through repo-locks; moves to the checkout door when its Node caller is retired"},
         {"path": "src/runner/merge.mjs", "reason": "Land removes its own candidate checkout through the Git port; it moves with Land"},
         {"path": "scripts/lib/git-ports.mjs", "reason": "the test launcher prunes registrations of checkouts a test run left behind"}
       ],

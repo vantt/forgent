@@ -243,13 +243,12 @@ pub fn provision_skill_roots(driver: &GitDriver, worktree: &Path, repo_root: &Pa
                     .map_err(|e| Error::io(format!("creating {}", parent.display()), &e))?;
             }
             copy_tree(&entry.path(), &target).map_err(|e| {
-                Error::new(
-                    ErrorKind::Provision,
-                    format!(
-                        "could not copy skill directory \"{rel}\" into \"{}\": {e}",
-                        worktree.display()
-                    ),
-                )
+                Error::worktree(format!(
+                    "could not copy skill directory \"{rel}\" into \"{}\": {e}",
+                    worktree.display()
+                ))
+                .detail("worktreePath", worktree.display().to_string())
+                .detail("skillDirectory", rel.clone())
                 .at(worktree)
             })?;
         }

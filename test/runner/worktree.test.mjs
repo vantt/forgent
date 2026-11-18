@@ -725,7 +725,7 @@ test('createWorktree provisions dependencies after git worktree add and leaves i
   assert.deepEqual(scope.holding(), [], 'worktree-admin is released before dependencies are provisioned');
 });
 
-test('tsk-4yv: createWorktree removes the worktree it just registered when finishWorktreeSetup fails (malformed package.json throws inside provisionDependencies) — never leaks a registered checkout', () => {
+test('tsk-4yv: createWorktree removes the worktree it just registered when provisioning fails (malformed package.json throws inside provisionDependencies) — never leaks a registered checkout', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
   // Malformed JSON forces a real, deterministic, fully offline throw inside
@@ -949,7 +949,7 @@ test('checkedOutBranch names the branch of an attached checkout and nothing for 
   assert.equal(checkedOutBranch(detached), null);
 });
 
-test('the Work creators and removers reach the Rust checkout door, keep their error class, and refuse a held worktree-admin as a lock-held HolderLockError', { skip: HOOK_TEST_SKIP }, async () => {
+test('the Work creators and removers reach the Rust checkout door, answer in the shapes their callers read, and keep their error class on a refusal', () => {
   const repoRoot = initTempRepo();
   const worktreeDir = mkWorktreeDir();
 
@@ -993,8 +993,11 @@ test('the Work creators and removers reach the Rust checkout door, keep their er
   const notAWorktree = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-not-a-worktree-'));
   assert.throws(() => removeWorktree(repoRoot, notAWorktree), (err) => err instanceof WorktreeError && err.errorClass === 'worktree-fail' && err.category === 'worktree-fail' && err.worktreePath === notAWorktree);
   assert.throws(() => createVerifyCheckout(repoRoot, 'no-such-ref'), (err) => err instanceof WorktreeError && err.errorClass === 'worktree-fail' && /git worktree add --detach failed at no-such-ref/.test(err.message));
+});
 
-  // A worktree-admin another process holds is a lock-held HolderLockError, never a generic worktree failure.
+test('a worktree-admin another process holds refuses every Work creator as a lock-held HolderLockError, never a generic worktree failure', { skip: HOOK_TEST_SKIP }, async () => {
+  const repoRoot = initTempRepo();
+  const worktreeDir = mkWorktreeDir();
   const holder = await holdLockInChild('worktree-admin', { fgosDir: path.join(repoRoot, '.fgos') });
   try {
     const refused = (fn) => assert.throws(fn, (err) => err instanceof HolderLockError && err.code === 'lock-held' && err.category === 'precondition' && err.lock === 'worktree-admin' && err.holders.includes(holder.child.pid) && err.timedOut === true && !(err instanceof WorktreeError));

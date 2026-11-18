@@ -149,6 +149,16 @@ fn parse<T: for<'de> Deserialize<'de>>(request: Value) -> Result<T> {
     serde_json::from_value(request).map_err(bad_request)
 }
 
+/// A crate panic must reach Node as a thrown error, never as an abort of the process.
+fn guarded(job: impl FnOnce() -> Result<Value>) -> Result<Value> {
+    std::panic::catch_unwind(std::panic::AssertUnwindSafe(job)).unwrap_or_else(|_| {
+        Err(Error::from_reason(
+            json!({"kind": "panic", "message": "checkout-worker-failed", "details": {}})
+                .to_string(),
+        ))
+    })
+}
+
 fn shown(path: &std::path::Path) -> String {
     path.display().to_string()
 }
@@ -182,109 +192,129 @@ fn created_json(c: WorkCreated) -> Value {
 
 #[napi(namespace = "checkout", js_name = "createWorktree")]
 pub fn create_worktree_entry(request: Value) -> Result<Value> {
-    let request: CreateRequest = parse(request)?;
-    create_worktree(&request.into())
-        .map(created_json)
-        .map_err(refusal)
+    guarded(|| {
+        let request: CreateRequest = parse(request)?;
+        create_worktree(&request.into())
+            .map(created_json)
+            .map_err(refusal)
+    })
 }
 
 #[napi(namespace = "checkout", js_name = "createDispatchWorktree")]
 pub fn create_dispatch_worktree_entry(request: Value) -> Result<Value> {
-    let request: CreateRequest = parse(request)?;
-    create_dispatch_worktree(&request.into())
-        .map(created_json)
-        .map_err(refusal)
+    guarded(|| {
+        let request: CreateRequest = parse(request)?;
+        create_dispatch_worktree(&request.into())
+            .map(created_json)
+            .map_err(refusal)
+    })
 }
 
 #[napi(namespace = "checkout", js_name = "createClaimWorktree")]
 pub fn create_claim_worktree_entry(request: Value) -> Result<Value> {
-    let request: CreateRequest = parse(request)?;
-    create_claim_worktree(&request.into())
-        .map(created_json)
-        .map_err(refusal)
+    guarded(|| {
+        let request: CreateRequest = parse(request)?;
+        create_claim_worktree(&request.into())
+            .map(created_json)
+            .map_err(refusal)
+    })
 }
 
 #[napi(namespace = "checkout", js_name = "createVerifyCheckout")]
 pub fn create_verify_checkout_entry(request: Value) -> Result<Value> {
-    let request: VerifyRequest = parse(request)?;
-    create_verify_checkout(&request.ctx.into(), &request.commit)
-        .map(|path| json!(shown(&path)))
-        .map_err(refusal)
+    guarded(|| {
+        let request: VerifyRequest = parse(request)?;
+        create_verify_checkout(&request.ctx.into(), &request.commit)
+            .map(|path| json!(shown(&path)))
+            .map_err(refusal)
+    })
 }
 
 #[napi(namespace = "checkout", js_name = "removeWorktree")]
 pub fn remove_worktree_entry(request: Value) -> Result<Value> {
-    let request: RemoveRequest = parse(request)?;
-    remove_worktree(&WorkRemove {
-        ctx: request.ctx.into(),
-        path: request.path,
-        delivered_to: request.delivered_to,
-        retain_to: request.retain_to,
+    guarded(|| {
+        let request: RemoveRequest = parse(request)?;
+        remove_worktree(&WorkRemove {
+            ctx: request.ctx.into(),
+            path: request.path,
+            delivered_to: request.delivered_to,
+            retain_to: request.retain_to,
+        })
+        .map(|retained| match retained {
+            Some(r) => json!({"retainedRef": r.retained_ref, "snapshot": r.snapshot}),
+            None => Value::Null,
+        })
+        .map_err(refusal)
     })
-    .map(|retained| match retained {
-        Some(r) => json!({"retainedRef": r.retained_ref, "snapshot": r.snapshot}),
-        None => Value::Null,
-    })
-    .map_err(refusal)
 }
 
 /// Never refuses: the cleanup failures come back as the log lines the caller prints.
 #[napi(namespace = "checkout", js_name = "removeDispatchWorktree")]
 pub fn remove_dispatch_worktree_entry(request: Value) -> Result<Value> {
-    let request: PathRequest = parse(request)?;
-    let mut lines: Vec<String> = Vec::new();
-    remove_dispatch_worktree(&request.ctx.into(), &request.path, &mut |line| {
-        lines.push(line.to_owned())
-    });
-    Ok(json!(lines))
+    guarded(|| {
+        let request: PathRequest = parse(request)?;
+        let mut lines: Vec<String> = Vec::new();
+        remove_dispatch_worktree(&request.ctx.into(), &request.path, &mut |line| {
+            lines.push(line.to_owned())
+        });
+        Ok(json!(lines))
+    })
 }
 
 #[napi(namespace = "checkout", js_name = "listLeftovers")]
 pub fn list_leftovers_entry(request: Value) -> Result<Value> {
-    let request: LeftoversRequest = parse(request)?;
-    list_leftovers(
-        &request.ctx.into(),
-        request.base.as_deref(),
-        request.include_tip,
-    )
-    .map(|rows| {
-        Value::Array(
-            rows.into_iter()
-                .map(|row| {
-                    let mut out = json!({"branch": row.branch, "aheadCount": row.ahead_count});
-                    if let Some(tip) = row.tip {
-                        out["tip"] = json!(tip);
-                    }
-                    out
-                })
-                .collect(),
+    guarded(|| {
+        let request: LeftoversRequest = parse(request)?;
+        list_leftovers(
+            &request.ctx.into(),
+            request.base.as_deref(),
+            request.include_tip,
         )
+        .map(|rows| {
+            Value::Array(
+                rows.into_iter()
+                    .map(|row| {
+                        let mut out = json!({"branch": row.branch, "aheadCount": row.ahead_count});
+                        if let Some(tip) = row.tip {
+                            out["tip"] = json!(tip);
+                        }
+                        out
+                    })
+                    .collect(),
+            )
+        })
+        .map_err(refusal)
     })
-    .map_err(refusal)
 }
 
 #[napi(namespace = "checkout", js_name = "reclaimOrphanedCheckout")]
 pub fn reclaim_orphaned_checkout_entry(request: Value) -> Result<Value> {
-    let request: ReclaimRequest = parse(request)?;
-    reclaim_orphaned_checkout(&request.ctx.into(), &request.branch, &request.caller_cwd)
-        .map(|r| json!({"reclaimed": r.reclaimed, "path": r.path.map(|p| shown(&p))}))
-        .map_err(refusal)
+    guarded(|| {
+        let request: ReclaimRequest = parse(request)?;
+        reclaim_orphaned_checkout(&request.ctx.into(), &request.branch, &request.caller_cwd)
+            .map(|r| json!({"reclaimed": r.reclaimed, "path": r.path.map(|p| shown(&p))}))
+            .map_err(refusal)
+    })
 }
 
 #[napi(namespace = "checkout", js_name = "provisionDependencies")]
 pub fn provision_dependencies_entry(request: Value) -> Result<Value> {
-    let request: DependenciesRequest = parse(request)?;
-    provision_dependencies(&request.worktree)
-        .map(|installed| json!(installed))
-        .map_err(refusal)
+    guarded(|| {
+        let request: DependenciesRequest = parse(request)?;
+        provision_dependencies(&request.worktree)
+            .map(|installed| json!(installed))
+            .map_err(refusal)
+    })
 }
 
 #[napi(namespace = "checkout", js_name = "runSetupCommands")]
 pub fn run_setup_commands_entry(request: Value) -> Result<Value> {
-    let request: SetupRequest = parse(request)?;
-    run_setup_commands(&request.worktree, &request.repo_root)
-        .map(|()| Value::Null)
-        .map_err(refusal)
+    guarded(|| {
+        let request: SetupRequest = parse(request)?;
+        run_setup_commands(&request.worktree, &request.repo_root)
+            .map(|()| Value::Null)
+            .map_err(refusal)
+    })
 }
 
 /// The version of this entry set; `versions().checkout` reports it.

@@ -118,6 +118,37 @@ fn a_failing_setup_command_fails_the_create_and_leaves_the_checkout_and_its_reco
 }
 
 #[test]
+fn a_skill_directory_that_cannot_be_copied_fails_as_a_worktree_refusal_naming_it() {
+    use std::os::unix::fs::PermissionsExt;
+    let f = Fixture::new();
+    fs::create_dir_all(f.repo.join(".omp/skills/mine")).unwrap();
+    let secret = f.repo.join(".omp/skills/mine/a.txt");
+    fs::write(&secret, "alpha\n").unwrap();
+    fs::set_permissions(&secret, fs::Permissions::from_mode(0o000)).unwrap();
+    if fs::read(&secret).is_ok() {
+        return; // a superuser reads any file, so the copy cannot be made to fail
+    }
+    let error = create(&f.request("skills", Provision::Full)).unwrap_err();
+    assert_eq!(error.kind, ErrorKind::Worktree);
+    assert!(
+        error
+            .message
+            .contains("could not copy skill directory \".omp/skills/mine\""),
+        "{error}"
+    );
+    let path = error.worktree_path.expect("the error names the checkout");
+    assert_eq!(
+        error.details.get("worktreePath").and_then(|v| v.as_str()),
+        Some(path.to_string_lossy().as_ref())
+    );
+    assert_eq!(
+        error.details.get("skillDirectory").and_then(|v| v.as_str()),
+        Some(".omp/skills/mine")
+    );
+    fs::set_permissions(&secret, fs::Permissions::from_mode(0o644)).unwrap();
+}
+
+#[test]
 fn no_git_lock_is_held_while_a_setup_command_runs() {
     let f = Fixture::new();
     let (started, gate) = (f.root.join("started"), f.root.join("gate"));

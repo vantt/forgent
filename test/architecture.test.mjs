@@ -2410,12 +2410,14 @@ test('door row for making, provisioning and removing a checkout catches each cal
     ['packages/p/rust/src/x.rs', 'let _ = driver.prune_worktree(&main, vec![], &id);\n'],
     ['apps/fgos/src/wiring/x.rs', 'let made = fgos_checkout::create(&request)?;\n'],
     ['src/x.mjs', "const commands = config.worktreeSetup.commands;\n"],
+    ['src/workflow/x.mjs', "createWorktreeCheckoutSync(scope, repoRoot, { path, branch, base }, { inspect });\n"],
   ];
   for (const [file, text] of caught) assert.equal(outsideDoor(job, file, text).length, 1, text);
   const passed = [
     ['src/x.mjs', 'export function createGitWorktree(options, loaderOptions) {}\n'],
     ['src/x.mjs', "import { createGitWorktree } from '../git/worktree.mjs';\n"],
     ['src/x.mjs', '// createGitWorktree(options).create(request)\n'],
+    ['src/x.mjs', 'export function createWorktreeCheckoutSync(scope, repoRoot, request) {}\n'],
     ['packages/p/rust/src/x.rs', 'pub fn create_worktree(&self) {}\n'],
     ['packages/p/rust/src/x.rs', '// driver.remove_worktree(&main, vec![], &request)\n'],
   ];
