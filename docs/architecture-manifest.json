@@ -1371,7 +1371,6 @@
     "src/runner/dispatch/write-scope.mjs": "kernel",
     "src/runner/dispatch/run-timeout.mjs": "kernel",
     "src/runner/dispatch/run-result.mjs": "infra",
-    "src/runner/dispatch/usage-parsers.mjs": "infra",
     "src/runner/dispatch/runtime-inspection.mjs": "infra",
     "src/runner/dispatch/attention-view.mjs": "infra",
     "src/runner/dispatch/reconciliation-planner.mjs": "infra",

@@ -13,8 +13,10 @@ import {
   snapshotDirtyBeforeFiles,
 } from '../../src/runner/dispatch/assignment-runner.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
-import { findMutatedDirtyBeforeFiles, safeGitStatusFiles, safeGitCommittedDiffFiles } from '../../src/runner/dispatch/settlement.mjs';
+import { findMutatedDirtyBeforeFiles, safeGitStatusFiles, safeGitCommittedDiffFiles, settleRunOutcome } from '../../src/runner/dispatch/settlement.mjs';
+import { acquireRunControl } from '../../src/run-supervisor/run-lock.mjs';
 import { sha256FileSync } from '../../src/native/proof-helpers.mjs';
+import { nativeDoor } from '../../src/native/door.mjs';
 import { validateRunResultV2, validateRunResultV3, runOutcome } from '../../src/runner/dispatch/run-result.mjs';
 import { interpretAssignmentRunResult } from '../../src/runner/operation-choice.mjs';
 
@@ -206,6 +208,38 @@ test('executeAssignment produces status: done and confidence: reported when work
   assert.equal(storedResult.runId, 'run_' + assignment.assignmentId + '_01');
   assert.equal(runOutcome(storedResult).category, 'ok');
   assert.equal(runOutcome(storedResult).evidence, 'reported');
+});
+
+test('settlement reads usage through the door for the CLI the launch ran, and a failing parser records parser-unavailable without changing the outcome', async () => {
+  // Settlement runs in the supervisor process during a real run, so the door is replaced here, around a direct settle.
+  const settle = async () => {
+    const runDir = path.join(mkTempDir(), 'run');
+    const outbox = path.join(runDir, 'worker-output', 'outbox');
+    fs.mkdirSync(outbox, { recursive: true });
+    fs.writeFileSync(path.join(outbox, 'report-1.md'), '# Findings\n\nThe module reads the config once.\n');
+    fs.writeFileSync(path.join(outbox, 'result-1.json'), JSON.stringify({ contract: { id: 'agent-result-claim', version: 2 }, status: 'done', summary: 'read the config' }));
+    // The launch's prepared record names the CLI that ran: the parser is picked by it, not by the executor id.
+    fs.mkdirSync(path.join(runDir, 'protected', 'prepared-invocation'), { recursive: true });
+    fs.writeFileSync(path.join(runDir, 'protected', 'prepared-invocation', 'cmd_usage.json'), JSON.stringify({ workerInvocation: { command: 'claude', args: [], cwd: runDir, env: {} } }));
+    const { controlToken } = acquireRunControl(runDir, { controllerId: 'test-ctrl' });
+    const { runResult } = await settleRunOutcome({
+      runDir, runMeta: { runId: 'run_usage_01', assignmentId: 'asgn_usage' }, controlEpoch: 1, controlToken, exitCode: 0,
+      settledAt: new Date().toISOString(), effectiveCwd: runDir, gitBefore: null, dirtyBefore: [], resolvedExecutorId: 'openai', launchCommandId: 'cmd_usage',
+      stdoutText: '{"usage":{"input_tokens":5,"output_tokens":7}}\n', opts: { cwd: runDir, repoRoot: runDir, adapter: 'cli-spawn' },
+    });
+    return { outcome: runOutcome(runResult), usage: runResult.usage };
+  };
+  const healthy = await settle();
+  const door = nativeDoor().runResult;
+  const parseUsage = door.parseUsage;
+  door.parseUsage = () => { throw new Error('parser crashed'); };
+  let broken;
+  try { broken = await settle(); } finally { door.parseUsage = parseUsage; }
+  assert.equal(healthy.usage.source, 'claude-json', 'picked by the prepared command, not the executor id');
+  assert.equal(healthy.usage.totalTokens, 12);
+  assert.equal(broken.usage.reason, 'parser-unavailable');
+  assert.equal(broken.usage.totalTokens, null);
+  assert.deepEqual(broken.outcome, healthy.outcome, 'usage never decides the outcome');
 });
 
 test('executeAssignment backfills mutation for its own effectiveAssignment re-read when a legacy assignment.json already exists on disk (ADR-006 R7, P02.4 Red-Team HIGH fix)', async () => {

@@ -130,8 +130,6 @@ test('structural source scan: no production file in src/** reads .status/.confid
   const allowedOwnerFiles = new Set([
     // run-result.mjs is the owner of RunResult and defines legacy projections and validators
     'src/runner/dispatch/run-result.mjs',
-    // usage-parsers.mjs parses adapter output, not RunResult
-    'src/runner/dispatch/usage-parsers.mjs',
   ]);
 
   const allViolations = [];

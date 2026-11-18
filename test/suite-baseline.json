@@ -374,7 +374,6 @@
     "test/runner/stop-processes-inside.test.mjs": 0.3,
     "test/runner/tier-cell.test.mjs": 0.8,
     "test/runner/tier-fallback-config.test.mjs": 2.4,
-    "test/runner/usage-parsers.test.mjs": 0,
     "test/runner/work-path-case-admission.test.mjs": 2.6,
     "test/runner/work-unit-for.test.mjs": 0.5,
     "test/runner/worker-log.test.mjs": 0.1,

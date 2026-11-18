@@ -29,7 +29,8 @@ import { validateAgentResultClaim, isReadOnlyAssignment } from './assignment.mjs
 import { resolveWorkerArtifactPath } from '../../run-supervisor/worker-artifacts.mjs';
 import { attributeWorkspaceChanges, evaluateAttributionPolicy } from './evidence-attribution.mjs';
 import { matchesWriteScope } from './write-scope.mjs';
-import { parseUsageForAdapter } from './usage-parsers.mjs';
+import { nativeDoor } from '../../native/door.mjs';
+import { seatSessionDir } from './confinement/authority.mjs';
 
 export function resolveRunWorkerArtifactPath(runDir, roundPattern, legacyName) {
   return resolveWorkerArtifactPath(runDir, roundPattern, legacyName);
@@ -188,6 +189,45 @@ export function safeGitCommittedDiffFiles(dir, gitBefore, gitAfter) {
   }
 }
 
+/** The invocation the Confinement Authority prepared for one launch, or null when there is no readable record. */
+function preparedInvocationOf(runDir, launchCommandId) {
+  if (!runDir || !launchCommandId) return null;
+  try {
+    return JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'prepared-invocation', `${launchCommandId}.json`), 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * What `runResult.parseUsage` reads one run's usage from: the command the launch really ran (never the executor
+ * id, which names a provider), whether it ran in a pane, its output, and where a claude seat's transcript may be:
+ * the session folder the launch kept or declared, else the config dir its environment named (claude's default
+ * under HOME without one), the cwd it ran in, a session id on its command line and the run's window.
+ */
+function usageRequestOf({ runDir, launchCommandId, adapter, stdout, stderr, settledAt, durationMs }) {
+  const worker = preparedInvocationOf(runDir, launchCommandId)?.workerInvocation;
+  const env = worker?.env ?? {};
+  const configDir = typeof env.CLAUDE_CONFIG_DIR === 'string' ? env.CLAUDE_CONFIG_DIR
+    : typeof env.HOME === 'string' ? path.join(env.HOME, '.claude') : null;
+  const projectsDir = seatSessionDir(runDir, launchCommandId) ?? (configDir ? path.join(configDir, 'projects') : null);
+  const args = Array.isArray(worker?.args) ? worker.args : [];
+  const idAt = args.findIndex((arg) => arg === '--session-id' || arg === '--resume');
+  const ended = Date.parse(settledAt);
+  const window = Number.isFinite(ended) && typeof durationMs === 'number'
+    ? { startedAt: new Date(ended - durationMs).toISOString(), endedAt: new Date(ended).toISOString() }
+    : { startedAt: null, endedAt: null };
+  return {
+    command: typeof worker?.command === 'string' ? worker.command : null,
+    pane: adapter === 'herdr-spawn',
+    stdout: stdout ?? '',
+    stderr: stderr ?? '',
+    claudeSession: projectsDir && typeof worker?.cwd === 'string'
+      ? { projectsDir, cwd: worker.cwd, sessionId: idAt >= 0 && typeof args[idAt + 1] === 'string' ? args[idAt + 1] : null, ...window }
+      : null,
+  };
+}
+
 /**
  * The sandbox backend the worker really ran under, or null when it ran without one.
  *
@@ -198,15 +238,9 @@ export function safeGitCommittedDiffFiles(dir, gitBefore, gitAfter) {
  * unconfined launch, and a requested mode named nothing that ran.
  */
 export function ranConfinementBackend(runDir, launchCommandId, attestation = null) {
-  if (runDir && launchCommandId) {
-    try {
-      const record = JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'prepared-invocation', `${launchCommandId}.json`), 'utf8'));
-      const type = record?.backend?.type;
-      if (typeof type === 'string' && type) return type === 'none' ? null : type;
-    } catch {
-      // No record for this launch: fall through to the attestation.
-    }
-  }
+  // No record for this launch: fall through to the attestation.
+  const type = preparedInvocationOf(runDir, launchCommandId)?.backend?.type;
+  if (typeof type === 'string' && type) return type === 'none' ? null : type;
   if (attestation?.outcome === 'enforced') {
     const type = attestation.backend?.type;
     if (typeof type === 'string' && type && type !== 'none') return type;
@@ -803,7 +837,16 @@ export async function settleRunOutcome({
   const readLog = (name) => {
     try { return fs.readFileSync(path.join(runDir, name), 'utf8'); } catch { return null; }
   };
-  const usage = parseUsageForAdapter(resolvedExecutorId || opts.adapter, { stdout: readLog('stdout.log'), stderr: readLog('stderr.log') });
+  // Usage never decides a run's outcome: an addon that cannot parse records why instead.
+  const usage = (() => {
+    try {
+      return nativeDoor().runResult.parseUsage(usageRequestOf({
+        runDir, launchCommandId, adapter: opts.adapter, stdout: readLog('stdout.log'), stderr: readLog('stderr.log'), settledAt, durationMs: durationOrNull,
+      }));
+    } catch {
+      return { inputTokens: null, outputTokens: null, totalTokens: null, cacheReadTokens: null, cacheCreationTokens: null, reasoningTokens: null, source: 'unsupported', reason: 'parser-unavailable' };
+    }
+  })();
   // A before/after snapshot of the run's checkout cannot tell the run's writes from
   // another session's (a commit landing on a shared checkout mid-run moves HEAD), so
   // every change it shows is correlated: no attestation is passed, nothing is proven.

@@ -936,6 +936,21 @@ function transcriptPathOf(runDir) {
   try { return fs.readdirSync(path.join(runDir, TRANSCRIPT_DIR)).length > 0 ? TRANSCRIPT_DIR : null; } catch { return null; }
 }
 
+/**
+ * The folder a seat's session is in while its run settles: the copy finalize-home kept in the run directory, else
+ * the session folder of the launch's private home (settle runs before finalize-home removes it). Null when the
+ * launch declared no session folder.
+ */
+export function seatSessionDir(runDir, launchCommandId) {
+  const kept = transcriptPathOf(runDir);
+  if (kept) return path.join(runDir, kept);
+  if (!launchCommandId) return null;
+  let descriptor;
+  try { descriptor = JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'confinement-finalization', `${launchCommandId}.json`), 'utf8')); } catch { return null; }
+  const home = (descriptor?.resources || []).find((res) => res.resourceId === 'private-home' && typeof res.sessionDir === 'string' && typeof (res.pathRef || res.path) === 'string');
+  return home ? path.join(home.pathRef || home.path, home.sessionDir) : null;
+}
+
 // Copy the session of one home into the run directory and note what the home held, by name only. Nothing
 // here can stop the removal: a refused or failed copy becomes a structured warning.
 function keepSessionBeforeRemoval({ target, sessionDir, runDir, launchCommandId }, keeping) {

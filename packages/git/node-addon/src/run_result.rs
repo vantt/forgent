@@ -21,3 +21,13 @@ pub fn recorded_category_agrees(recorded: String, derived: String) -> Result<boo
         &recorded, &derived,
     ))
 }
+
+/// The token usage of one run: counts read from what its CLI left (stdout, stderr or its transcript), or the named
+/// reason they are absent. `request` is `{command, pane, stdout, stderr, claudeSession}`.
+#[napi(namespace = "runResult", js_name = "parseUsage")]
+pub fn parse_usage(request: Value) -> Result<Value> {
+    check()?;
+    let request: fgos_run_result::usage::UsageRequest = serde_json::from_value(request)
+        .map_err(|e| Error::new(Status::InvalidArg, format!("usage-request-invalid: {e}")))?;
+    serde_json::to_value(fgos_run_result::usage::parse(&request)).map_err(error)
+}

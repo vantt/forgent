@@ -1,6 +1,7 @@
 //! Run Result Evaluator observation source (Lane A2 - Phase F2).
 
 pub mod unit_summary;
+pub mod usage;
 pub use unit_summary::scan_unit_summaries;
 
 use fgos_host_runtime::civil_time::parse_rfc3339_millis;
