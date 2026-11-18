@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c2129027616636008ee15db26562dca88869638fc58a48d66f38e002be6b7bd3",
+  "payloadDigest": "e19a6621677eaa4dc7a64adc22e3b1e2ea52c36b9d0d6ba219ea4fa6b8b7b0c0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1035,7 +1035,7 @@
     "scripts/ci-setup-bwrap.sh": "04e07490fff85c7e2116f4fe8b9b78f300a4ee488c6475e37aadbaf1c15de9ce",
     "scripts/convention-conformance.mjs": "14ceed9e37eb8b914f50a6237b61a2bd9b2c591e2d3f611a8321544930e419ea",
     "scripts/decision-question-hook.mjs": "af83a0333f802f38696c818186887ba439cd47f1b4616dec7bd727c792346d14",
-    "scripts/doc-health.mjs": "691ad601453ea13a4cccafb4221994c031ad8e41b074dc89e2a9102b40af2d66",
+    "scripts/doc-health.mjs": "1bd1bda92e7ece63176115cc789593e06b550fc8d08abaeaf0a5472b96b4da8d",
     "scripts/event-store/forge-probe.sh": "58f6e0a88b89acac30022a5c414f395af696c9073b2c004e6c1545fa628145a1",
     "scripts/event-store/power-loss-driver.mjs": "f7f88a6d9e80fe17027d7d6981c04f544d4b49e6629e46b0cfbdcbdeac75a7a3",
     "scripts/event-store/power-loss.sh": "f0023c1352dc57b85aba68c844d5abc28e8967a9a892c557d80b77434b9b2136",
@@ -1126,7 +1126,7 @@
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
     "src/cli/verb-exit.mjs": "f1838eeb76cf06a40276beaa26ee830400676ab81580b5bf240dba78c3b7db7e",
     "src/config/facade.mjs": "f20278ab7b8d1f7f7747f835c6ac319940ec939628ab8e0c31a3823ef3a1aff0",
-    "src/convention/convention-client.mjs": "abcfbfba6d06fd2669f3b5d3330f8f07301530b8fb448767b51eedcf7bbd7ace",
+    "src/convention/convention-client.mjs": "9a7d16e5da1d8077541ce665e710ffef7dbd0a423598b2319fe066abae8d1a69",
     "src/convention/definition-names.mjs": "f845b39591111b910bea842945a32c37287cafdd53fb08fc3cd2b64767294678",
     "src/convention/identifier-rules.mjs": "f3b0fed979b522c53be7c6b756b49425723121a587fe056b1bf616deef81b615",
     "src/convention/seat-id.mjs": "034caeb689c869e09acc0a3cd748757742c3f36b2eb331ddd0302515c25b0f83",
@@ -1170,7 +1170,7 @@
     "src/native/process-identity.mjs": "2a9324b9f416af7dadfde723ea10526f97cbd3639d3b0a4abec2c970bd98d9b6",
     "src/native/proof-helpers.mjs": "9077e45fa8f2d5a9441d2640f1c6dcfc015f78d060a61a144a011344078621d8",
     "src/observe/approve-fault-log.mjs": "43005f90192376164aa68c1877da5f20020b03de47b85bca7b3f381baa003077",
-    "src/observe/friction-client.mjs": "b509d80a15119a6a028926d6bdac84e5293d02fd883bc3b6bfce962da636e3f0",
+    "src/observe/friction-client.mjs": "043bc9fb3ac9a226a5fa9ff3c1d25e0e4f9782e33eb4bb9581d50fc8d689bac4",
     "src/observe/invocation-fault-log.mjs": "e4bf1672dd5f2ba07c27ef554b459996e187c2868f8350a5d0f4b2fdd916da04",
     "src/portfolio/open-questions.mjs": "be5c3ae3c91c4ef63a33fd2f16e6af5f47cdd61294db438ed9fd4a8e14d31eb2",
     "src/portfolio/plan-sections.mjs": "71767079e1cb3a3831737d031048c64f97f473fc830503b0feb70a3e33da9829",
@@ -1407,7 +1407,7 @@
     "src/util/format-lock-duration.mjs": "87e069a71d25348768de8fe5116d2ac3759a2c1e775433a6511750491f874b3e",
     "src/util/git-paths.mjs": "fbb0b5af5b149853b9d5279062d417cee88a24ce161f782b5ae6dec3d10f1941",
     "src/util/host-bin-path.mjs": "63a13f14a088bd9be44bd6c02cf95fdb01be10eff56dab69d12dc0889ff9b8e7",
-    "src/util/host-bin.mjs": "fcef820f5e33e6d1961d5aa13e4a14d68f50dee02106c5b7ad71ddf6a0fa46fd",
+    "src/util/host-bin.mjs": "33c004986a72c2bf292763bbf5d3a6fc2fc628c36b8b8b27f1ec5190e1858b8f",
     "src/util/identity-mint.mjs": "3d34b5b798486a8c747a33fe8bc7e7c1899d5eb6f5ae4d744e03580bfa0ae197",
     "src/util/normalize-path.mjs": "e1519327a67834d6309a0e92e69d5fb46bb671a7ddfbe9ef5c36acc22fc3062a",
     "src/util/refuse-symlink.mjs": "d159c2a509be27fe199675e37d5cb255eb44c1622e806de8a52916366f1cbffa",
@@ -4534,14 +4534,14 @@
     },
     {
       "path": "src/util/host-bin.mjs",
-      "line": 34,
+      "line": 32,
       "spawn": "spawnSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/util/host-bin.mjs",
-      "line": 70,
+      "line": 67,
       "spawn": "execFileSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
