@@ -2,7 +2,7 @@
 
 use fgos_host_runtime::civil_time::parse_rfc3339_millis;
 use fgos_observe::time::ParsedWindow;
-use fgos_observe::{Observation, SourceError, Subject, SubjectKind, UnitSummaryScan, Window};
+use fgos_observe::{SettledUnitSummary, SourceError, UnitSummaryScan, Window};
 use serde_json::Value;
 use std::fs::{self, File};
 use std::io::Read;
@@ -249,25 +249,20 @@ pub fn scan_unit_summaries(root: &Path, window: &Window) -> Result<UnitSummarySc
             scan.summaries_outside_window += 1;
             continue;
         }
-        scan.observations.push(Observation {
-            ts: value["settledAt"]
+        let Value::Object(body) = value else {
+            unreachable!("a valid summary is an object")
+        };
+        scan.summaries.push(SettledUnitSummary {
+            unit: name.to_owned(),
+            settled_at: body["settledAt"]
                 .as_str()
                 .expect("validated timestamp")
                 .to_owned(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: format!("unit-run:{name}"),
-            },
-            kind: "unit.settled".to_owned(),
-            attrs: match value {
-                Value::Object(attrs) => attrs,
-                _ => unreachable!(),
-            },
-            source: "unit-summary",
+            body,
         });
     }
-    scan.observations.sort_by_cached_key(|observation| {
-        parse_rfc3339_millis(&observation.ts).expect("validated timestamp")
+    scan.summaries.sort_by_cached_key(|summary| {
+        parse_rfc3339_millis(&summary.settled_at).expect("validated timestamp")
     });
     Ok(scan)
 }

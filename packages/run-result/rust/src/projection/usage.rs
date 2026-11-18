@@ -17,7 +17,7 @@ const COUNTS: &[(&str, &str)] = &[
     ("reasoningTokens", "fgos.usage.reasoning_tokens"),
 ];
 
-pub(super) fn project(
+pub(crate) fn project(
     usage: &Value,
     attrs: &mut BTreeMap<String, AttrValue>,
     measures: &mut BTreeMap<String, Number>,

@@ -1,6 +1,6 @@
-//! Discussion measurement consumes only owner-written `unit.settled` observations.
+//! Discussion measurement consumes only the unit summaries their owner wrote.
 
-use crate::contract::{Observation, ObserveRequest, UnitSummaryScanner, Window};
+use crate::contract::{ObserveRequest, SettledUnitSummary, UnitSummaryScanner, Window};
 use crate::metrics_cli::parse_flags;
 use crate::time::ParsedWindow;
 use fgos_host_runtime::civil_time::parse_rfc3339_millis;
@@ -37,7 +37,7 @@ pub fn dispatch_discussions(
     };
     let parsed_window = ParsedWindow::parse(&window)?;
     let scan = scanner(&req.root, &window).map_err(|err| err.to_string())?;
-    let mut output = compute_discussions(&scan.observations, &by, &window, &parsed_window);
+    let mut output = compute_discussions(&scan.summaries, &by, &window, &parsed_window);
     output["summaryDiagnosticsScope"] = json!("root-wide");
     output["summaryDirsSeen"] = json!(scan.summary_dirs_seen);
     output["summariesMissing"] = json!(scan.summaries_missing);
@@ -193,35 +193,30 @@ fn agreement(unit: &Map<String, Value>) -> Value {
 /// Group unit reliability separately from all dispatched attempts and final seats.
 /// A group counts each participating unit once; executor/persona groups can overlap.
 fn compute_discussions(
-    observations: &[Observation],
+    summaries: &[SettledUnitSummary],
     by: &str,
     window: &Window,
     parsed_window: &ParsedWindow,
 ) -> Value {
-    let mut units = observations
+    let mut units = summaries
         .iter()
-        .filter_map(|observation| {
-            if observation.source != "unit-summary" || observation.kind != "unit.settled" {
-                return None;
-            }
-            let timestamp = parse_rfc3339_millis(&observation.ts)?;
+        .filter_map(|summary| {
+            let timestamp = parse_rfc3339_millis(&summary.settled_at)?;
             parsed_window
                 .contains(timestamp)
-                .then_some((timestamp, observation))
+                .then_some((timestamp, summary))
         })
         .collect::<Vec<_>>();
-    units.sort_by(|(a_ts, a), (b_ts, b)| {
-        a_ts.cmp(b_ts).then_with(|| a.subject.id.cmp(&b.subject.id))
-    });
+    units.sort_by(|(a_ts, a), (b_ts, b)| a_ts.cmp(b_ts).then_with(|| a.unit.cmp(&b.unit)));
     let mut seen = BTreeSet::new();
     let mut overall = Totals::default();
     let mut groups = BTreeMap::<String, Totals>::new();
     let mut individual = Vec::new();
-    for (_, observation) in units {
-        if !seen.insert(&observation.subject.id) {
+    for (_, summary) in units {
+        if !seen.insert(&summary.unit) {
             continue;
         }
-        let unit = &observation.attrs;
+        let unit = &summary.body;
         let workflow_key = unit["workflow"]["runId"]
             .as_str()
             .unwrap_or("unlinked")
@@ -304,25 +299,19 @@ fn duration_seconds(unit: &Map<String, Value>) -> Option<f64> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::contract::{Subject, SubjectKind};
 
-    fn observation(id: &str, ts: &str) -> Observation {
-        let Value::Object(attrs) = json!({
+    fn summary(id: &str, ts: &str) -> SettledUnitSummary {
+        let Value::Object(body) = json!({
             "unitRunId": id, "workflow": null, "pattern": "panel", "capability": null,
             "outcome": "pass", "startedAt": null, "settledAt": ts,
             "stanceOptions": [], "seats": []
         }) else {
             unreachable!()
         };
-        Observation {
-            ts: ts.to_owned(),
-            subject: Subject {
-                kind: SubjectKind::Run,
-                id: format!("unit-run:{id}"),
-            },
-            kind: "unit.settled".into(),
-            attrs,
-            source: "unit-summary",
+        SettledUnitSummary {
+            unit: id.to_owned(),
+            settled_at: ts.to_owned(),
+            body,
         }
     }
 
@@ -432,20 +421,20 @@ mod tests {
 
     #[test]
     fn aggregation_independently_applies_temporal_offset_boundaries() {
-        // Already-read observations can include units outside the requested
+        // Already-read summaries can include units outside the requested
         // window; the pure aggregation boundary must remain correct by itself.
-        let observations = vec![
-            observation("before", "2026-10-05T01:00:00+02:00"),
-            observation("equal-positive", "2026-10-05T02:00:00+02:00"),
-            observation("equal-negative", "2026-10-04T19:00:00-05:00"),
-            observation("after", "2026-10-04T23:30:00-02:00"),
+        let summaries = vec![
+            summary("before", "2026-10-05T01:00:00+02:00"),
+            summary("equal-positive", "2026-10-05T02:00:00+02:00"),
+            summary("equal-negative", "2026-10-04T19:00:00-05:00"),
+            summary("after", "2026-10-04T23:30:00-02:00"),
         ];
         let window = Window {
             since: Some("2026-10-05T00:00:00Z".into()),
             until: Some("2026-10-05T00:00:00.000Z".into()),
         };
         let parsed = ParsedWindow::parse(&window).unwrap();
-        let report = compute_discussions(&observations, "workflow", &window, &parsed);
+        let report = compute_discussions(&summaries, "workflow", &window, &parsed);
         assert_eq!(report["totals"]["unitRuns"], 2);
         assert!(report["units"]
             .as_array()
@@ -457,7 +446,7 @@ mod tests {
             until: None,
         };
         let report = compute_discussions(
-            &observations,
+            &summaries,
             "workflow",
             &window,
             &ParsedWindow::parse(&window).unwrap(),

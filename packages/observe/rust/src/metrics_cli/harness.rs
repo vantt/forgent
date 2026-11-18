@@ -3,8 +3,9 @@
 //! Subcommand: `fgos metrics harness [--case <name> | --since <iso> [--until <iso>]] [--dir <root>]`
 
 use crate::case_journal;
-use crate::contract::{Observation, ObservationSource, ObserveRequest, Window};
+use crate::contract::{Observation, ObservationSource, ObserveRequest, RecordSource, Window};
 use crate::metrics_cli::parse_flags;
+use crate::metrics_cli::runs::settled_runs;
 use crate::scorecard::{
     compute_case, compute_faults, compute_runs, compute_tokens, compute_work, CommitsSection,
     Scorecard,
@@ -16,6 +17,7 @@ use serde_json::json;
 pub fn dispatch_harness(
     req: &ObserveRequest,
     sources: &[Box<dyn ObservationSource>],
+    record_sources: &[Box<dyn RecordSource>],
 ) -> Result<serde_json::Value, String> {
     let flags = parse_flags(
         "harness",
@@ -44,7 +46,15 @@ pub fn dispatch_harness(
         (None, w)
     };
 
-    // 2. Collect observations from sources + invocation_faults
+    // 2. Collect the settled runs, then observations from sources + invocation_faults
+    let runs = match settled_runs(record_sources, &req.root, &window) {
+        Ok(runs) => runs,
+        Err((source_id, e)) => {
+            warnings.push(format!("source '{source_id}' error: {e}"));
+            Vec::new()
+        }
+    };
+
     let mut observations: Vec<Observation> = Vec::new();
     for src in sources {
         match src.observations(&req.root, &window) {
@@ -77,10 +87,10 @@ pub fn dispatch_harness(
     let runs_sec = if is_plain_or_cook {
         Some(json!("n/a (harness plain/cook-plan)"))
     } else {
-        Some(serde_json::to_value(compute_runs(&observations)).map_err(|e| e.to_string())?)
+        Some(serde_json::to_value(compute_runs(&runs)).map_err(|e| e.to_string())?)
     };
 
-    let tokens_sec = compute_tokens(&observations);
+    let tokens_sec = compute_tokens(&observations, &runs);
 
     // Commits section
     let commits_sec = if let Some(cw) = &case_window {

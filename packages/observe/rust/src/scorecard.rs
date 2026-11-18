@@ -1,17 +1,26 @@
 //! Scorecard computation for Observe (Phase F4).
 //!
-//! Pure computation functions: `compute_*(&[Observation], ...) -> Section`.
+//! Pure computation functions: `compute_*(&[Observation] | &[Record], ...) -> Section`.
 //! Test guarantees NO `std::fs` is used in this module.
 
 use crate::case_journal::CaseWindow;
 use crate::contract::Observation;
+use crate::record::types::{AttrValue, Record};
 use fgos_host_runtime::civil_time::parse_iso_prefix_secs;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeMap, HashMap};
 
-/// The observation source whose `run.settled` records the runs section counts.
+/// The record source whose runs the runs section counts, and the kind it projects them as.
 pub const RUN_RESULT_SOURCE: &str = "run-result";
+pub const RUN_SETTLED_KIND: &str = "fgos.run.settled";
+
+fn run_attr<'a>(run: &'a Record, name: &str) -> Option<&'a str> {
+    match run.attrs.get(name) {
+        Some(AttrValue::Str(value)) => Some(value),
+        _ => None,
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct CaseSection {
@@ -172,42 +181,21 @@ pub fn compute_case(cw: &CaseWindow) -> (CaseSection, Vec<String>) {
     )
 }
 
-/// Compute runs section (#4)
-pub fn compute_runs(observations: &[Observation]) -> RunsSection {
+/// Compute runs section (#4) from the run owner's `fgos.run.settled` records.
+pub fn compute_runs(runs: &[Record]) -> RunsSection {
     let mut overall = RunStatusBuckets::default();
     let mut by_executor: BTreeMap<String, RunStatusBuckets> = BTreeMap::new();
     let mut by_adapter: BTreeMap<String, RunStatusBuckets> = BTreeMap::new();
     let mut by_role: BTreeMap<String, RunStatusBuckets> = BTreeMap::new();
 
-    for obs in observations {
-        if obs.source != RUN_RESULT_SOURCE || obs.kind != "run.settled" {
-            continue;
-        }
-        let executor = obs
-            .attrs
-            .get("executor")
-            .and_then(|v| v.as_str())
+    for run in runs.iter().filter(|run| run.kind == RUN_SETTLED_KIND) {
+        let executor = run_attr(run, "fgos.executor.id")
             .unwrap_or("unknown")
             .to_string();
-        let adapter = obs
-            .attrs
-            .get("adapter")
-            .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
-        let role = obs
-            .attrs
-            .get("role")
-            .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
-
-        let classification = obs.attrs.get("classification").and_then(|v| v.as_object());
-
-        let category = obs.attrs.get("category").and_then(|v| v.as_str());
-        let verdict = classification
-            .and_then(|c| c.get("assessment"))
-            .and_then(|a| a.get("verdict"))
-            .and_then(|v| v.as_str())
-            .unwrap_or("");
+        let adapter = run_attr(run, "fgos.run.adapter").map(str::to_string);
+        let role = run_attr(run, "fgos.run.role").map(str::to_string);
+        let category = run_attr(run, "fgos.run.category");
+        let verdict = run_attr(run, "fgos.run.verdict").unwrap_or("");
 
         let classify = |b: &mut RunStatusBuckets| {
             b.total += 1;
@@ -262,8 +250,8 @@ fn percentile(mut vals: Vec<f64>, p: f64) -> f64 {
     }
 }
 
-/// Compute tokens section
-pub fn compute_tokens(observations: &[Observation]) -> TokensSection {
+/// Compute tokens section: transcript usage, plus the usage of runs whose tokens no transcript already counts.
+pub fn compute_tokens(observations: &[Observation], runs: &[Record]) -> TokensSection {
     let mut sec = TokensSection::default();
     let mut sessions = std::collections::HashSet::new();
 
@@ -306,46 +294,30 @@ pub fn compute_tokens(observations: &[Observation]) -> TokensSection {
             {
                 sec.cache_read_input_tokens += c_read;
             }
-        } else if obs.source == RUN_RESULT_SOURCE && obs.kind == "run.settled" {
-            // Token usage from RunResult for non-Claude executors
-            if let Some(usage) = obs.attrs.get("usage").and_then(|v| v.as_object()) {
-                let usage_source = usage.get("source").and_then(|v| v.as_str());
-                if usage_source != Some("transcript") {
-                    let inp = usage
-                        .get("inputTokens")
-                        .and_then(|v| v.as_u64())
-                        .unwrap_or(0);
-                    let out = usage
-                        .get("outputTokens")
-                        .and_then(|v| v.as_u64())
-                        .unwrap_or(0);
-                    let c_create = usage
-                        .get("cacheCreationTokens")
-                        .and_then(|v| v.as_u64())
-                        .unwrap_or(0);
-                    let c_read = usage
-                        .get("cacheReadTokens")
-                        .and_then(|v| v.as_u64())
-                        .unwrap_or(0);
-                    let tot = usage
-                        .get("totalTokens")
-                        .and_then(|v| v.as_u64())
-                        .unwrap_or(0);
+        }
+    }
+    for run in runs.iter().filter(|run| run.kind == RUN_SETTLED_KIND) {
+        if run_attr(run, "fgos.usage.source") == Some("transcript") {
+            continue;
+        }
+        let count = |name: &str| run.measures.get(name).and_then(|n| n.as_u64()).unwrap_or(0);
+        let inp = count("gen_ai.usage.input_tokens");
+        let out = count("gen_ai.usage.output_tokens");
+        let c_create = count("gen_ai.usage.cache_creation.input_tokens");
+        let c_read = count("gen_ai.usage.cache_read.input_tokens");
+        let tot = count("fgos.usage.total_tokens");
 
-                    sec.input_tokens += inp;
-                    sec.output_tokens += out;
-                    sec.cache_creation_input_tokens += c_create;
-                    sec.cache_read_input_tokens += c_read;
+        sec.input_tokens += inp;
+        sec.output_tokens += out;
+        sec.cache_creation_input_tokens += c_create;
+        sec.cache_read_input_tokens += c_read;
 
-                    let part_sum = inp + out + c_create + c_read;
-                    if tot > part_sum {
-                        sec.input_tokens += tot - part_sum;
-                    }
-                    if inp > 0 || out > 0 || tot > 0 {
-                        sec.message_count += 1;
-                    }
-                }
-            }
+        let part_sum = inp + out + c_create + c_read;
+        if tot > part_sum {
+            sec.input_tokens += tot - part_sum;
+        }
+        if inp > 0 || out > 0 || tot > 0 {
+            sec.message_count += 1;
         }
     }
     sec.session_count = sessions.len() as u64;
@@ -634,46 +606,94 @@ mod tests {
         assert!(warnings[0].contains("more than 24 hours"));
     }
 
-    #[test]
-    fn test_compute_runs() {
-        let run = |id: &str, attrs: serde_json::Value| Observation {
+    /// A `fgos.run.settled` record carrying the given string attrs and token measures.
+    fn run_record(id: &str, attrs: &[(&str, &str)], measures: &[(&str, u64)]) -> Record {
+        use crate::record::types::{Basis, Origin, SubjectRef, RECORD_VERSION};
+        Record {
+            v: RECORD_VERSION,
+            id: format!("run-settled:{id}"),
+            kind: RUN_SETTLED_KIND.to_string(),
             ts: "2026-09-01T00:00:00Z".to_string(),
-            subject: Subject {
-                kind: SubjectKind::Run,
+            end_ts: None,
+            subject: SubjectRef {
+                kind: "run".to_string(),
                 id: id.to_string(),
             },
-            kind: "run.settled".to_string(),
-            attrs: serde_json::from_value(attrs).unwrap(),
-            source: "run-result",
-        };
-        let verdict = |verdict: &str| json!({ "assessment": { "verdict": verdict } });
+            refs: Vec::new(),
+            attrs: attrs
+                .iter()
+                .map(|(k, v)| (k.to_string(), AttrValue::Str(v.to_string())))
+                .collect(),
+            measures: measures
+                .iter()
+                .map(|(k, v)| (k.to_string(), serde_json::Number::from(*v)))
+                .collect(),
+            basis: Basis::Derived,
+            origin: Origin::default(),
+            detail: None,
+            redaction: None,
+        }
+    }
+
+    #[test]
+    fn test_compute_runs() {
+        let run = |id: &str, attrs: &[(&str, &str)]| run_record(id, attrs, &[]);
         let obs = vec![
             run(
                 "r1",
-                json!({ "executor": "claude", "adapter": "herdr-spawn", "role": "implementer", "category": "ok" }),
+                &[
+                    ("fgos.executor.id", "claude"),
+                    ("fgos.run.adapter", "herdr-spawn"),
+                    ("fgos.run.role", "implementer"),
+                    ("fgos.run.category", "ok"),
+                ],
             ),
             run(
                 "r2",
-                json!({ "executor": "claude", "adapter": "herdr-spawn", "category": "infra" }),
+                &[
+                    ("fgos.executor.id", "claude"),
+                    ("fgos.run.adapter", "herdr-spawn"),
+                    ("fgos.run.category", "infra"),
+                ],
             ),
             run(
                 "r3",
-                json!({ "executor": "agy", "category": "verdict", "classification": verdict("findings") }),
+                &[
+                    ("fgos.executor.id", "agy"),
+                    ("fgos.run.category", "verdict"),
+                    ("fgos.run.verdict", "findings"),
+                ],
             ),
-            run("r4", json!({ "executor": "agy", "category": "policy" })),
+            run(
+                "r4",
+                &[("fgos.executor.id", "agy"), ("fgos.run.category", "policy")],
+            ),
             run(
                 "r5",
-                json!({ "executor": "claude", "category": "verdict", "classification": verdict("inconclusive") }),
+                &[
+                    ("fgos.executor.id", "claude"),
+                    ("fgos.run.category", "verdict"),
+                    ("fgos.run.verdict", "inconclusive"),
+                ],
             ),
-            run("r6", json!({ "executor": "claude", "category": "blocked" })),
+            run(
+                "r6",
+                &[
+                    ("fgos.executor.id", "claude"),
+                    ("fgos.run.category", "blocked"),
+                ],
+            ),
             run(
                 "r8",
-                json!({ "executor": "claude", "category": "provider" }),
+                &[
+                    ("fgos.executor.id", "claude"),
+                    ("fgos.run.category", "provider"),
+                ],
             ),
-            // The producer always writes `category`; a record without one is unclassified.
+            // The producer always writes a category; a record without one is unclassified.
             run(
                 "r7",
-                json!({ "executor": "claude", "classification": verdict("pass") }),
+                &[("fgos.executor.id", "claude"), ("fgos.run.verdict", "pass")],
             ),
         ];
 
@@ -751,7 +771,7 @@ mod tests {
             },
         ];
 
-        let tokens = compute_tokens(&obs);
+        let tokens = compute_tokens(&obs, &[]);
         assert_eq!(tokens.message_count, 3);
         assert_eq!(tokens.session_count, 2);
         assert_eq!(tokens.input_tokens, 350);
@@ -759,6 +779,28 @@ mod tests {
         assert_eq!(tokens.cache_creation_input_tokens, 10);
         assert_eq!(tokens.cache_read_input_tokens, 5);
         assert_eq!(tokens.total_tokens, 435);
+
+        // A run adds its own usage, the uncounted rest of its total as input, unless a transcript already counted it.
+        let runs = vec![
+            run_record(
+                "adapter",
+                &[("fgos.usage.source", "adapter")],
+                &[
+                    ("gen_ai.usage.input_tokens", 7),
+                    ("gen_ai.usage.output_tokens", 3),
+                    ("fgos.usage.total_tokens", 15),
+                ],
+            ),
+            run_record(
+                "seen",
+                &[("fgos.usage.source", "transcript")],
+                &[("gen_ai.usage.input_tokens", 1000)],
+            ),
+        ];
+        let tokens = compute_tokens(&obs, &runs);
+        assert_eq!(tokens.message_count, 4);
+        assert_eq!(tokens.input_tokens, 350 + 7 + 5);
+        assert_eq!(tokens.output_tokens, 73);
     }
 
     #[test]

@@ -4,7 +4,7 @@
 //! and usage, and the unit's outcome, plan key and verify record. A fact the summary does not carry produces no
 //! attr, so the query engine counts the gap in `coverage` instead of reading a made-up value.
 
-mod usage;
+pub(crate) mod usage;
 
 use crate::unit_summary::scan_unit_summaries;
 use fgos_host_runtime::civil_time::{format_unix_millis_rfc3339, parse_rfc3339_millis};
@@ -55,9 +55,9 @@ impl RecordSource for RunProjectionSource {
         let scan = scan_unit_summaries(root, &widened)?;
         let host = machine_name();
         Ok(scan
-            .observations
-            .iter()
-            .flat_map(|o| project_summary(&Value::Object(o.attrs.clone()), host.as_deref()))
+            .summaries
+            .into_iter()
+            .flat_map(|s| project_summary(&Value::Object(s.body), host.as_deref()))
             .collect())
     }
 }

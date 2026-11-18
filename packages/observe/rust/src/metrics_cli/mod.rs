@@ -96,9 +96,9 @@ pub fn dispatch(
             }))
         }
         "case" => case::dispatch_case(req),
-        "harness" => harness::dispatch_harness(req, sources),
+        "harness" => harness::dispatch_harness(req, sources, &record_environment.record_sources()),
         "faults" => faults::dispatch_faults(req),
-        "runs" => runs::dispatch_runs(req, sources),
+        "runs" => runs::dispatch_runs(req, &record_environment.record_sources()),
         "coverage" => coverage::dispatch_coverage(req, coverage_scanner),
         "discussions" => discussions::dispatch_discussions(req, unit_summary_scanner),
         "eval" => eval::dispatch_eval(req),
@@ -120,7 +120,8 @@ pub fn dispatch(
     }
 }
 
-/// A record environment for verb tests that never reach records: any call is a test failure.
+/// A record environment for verb tests that never reach the record store: it has no record sources, and any other
+/// call is a test failure.
 #[cfg(test)]
 pub(crate) struct NoRecords;
 
@@ -133,7 +134,7 @@ impl RecordEnvironment for NoRecords {
         unreachable!("the verbs under test never read records")
     }
     fn record_sources(&self) -> Vec<Box<dyn crate::RecordSource>> {
-        unreachable!("the verbs under test never read records")
+        Vec::new()
     }
     fn config_number(&self, _: &Path, _: &str) -> Result<Option<f64>, String> {
         unreachable!("the verbs under test never read records")

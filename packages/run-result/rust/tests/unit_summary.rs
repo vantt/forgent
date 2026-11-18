@@ -1,7 +1,7 @@
 use fgos_observe::metrics_cli::discussions::dispatch_discussions;
 use fgos_observe::{
-    Observation, ObservationSource, ObserveRequest, SourceError, Window, WorkEntropySignalsRecord,
-    WorkObservationSource, WorkOutcomesRecord,
+    Observation, ObservationSource, ObserveRequest, RecordSource, SourceError, Window,
+    WorkEntropySignalsRecord, WorkObservationSource, WorkOutcomesRecord,
 };
 use fgos_run_result::{scan_coverage, scan_unit_summaries, RunResultSource};
 use serde_json::{json, Value};
@@ -101,10 +101,7 @@ impl Fixture {
             root: self.0.clone(),
             stdin: None,
         };
-        let sources: Vec<Box<dyn ObservationSource>> = vec![
-            Box::new(RunResultSource::new()),
-            Box::new(UnavailableTranscripts),
-        ];
+        let sources: Vec<Box<dyn ObservationSource>> = vec![Box::new(UnavailableTranscripts)];
         fgos_observe::metrics_cli::dispatch(
             &request,
             &sources,
@@ -328,22 +325,15 @@ fn summary_source_never_rebuilds_results_and_does_not_double_count_runs() {
         .unwrap(),
     )
     .unwrap();
-    let mut observations = scan_unit_summaries(&root.0, &Window::default())
+    let summaries = scan_unit_summaries(&root.0, &Window::default())
         .unwrap()
-        .observations;
-    assert_eq!(observations.len(), 1); // result-only unit does not become a discussion
-    assert_eq!(observations[0].source, "unit-summary");
-    assert_eq!(observations[0].kind, "unit.settled");
-    assert_eq!(observations[0].subject.id, "unit-run:unit-run-summary-only");
-    observations.extend(
-        RunResultSource::new()
-            .observations(&root.0, &Window::default())
-            .unwrap(),
-    );
-    assert_eq!(
-        fgos_observe::scorecard::compute_runs(&observations).total,
-        1
-    );
+        .summaries;
+    assert_eq!(summaries.len(), 1); // result-only unit does not become a discussion
+    assert_eq!(summaries[0].unit, "unit-run-summary-only");
+    let runs = RunResultSource::new()
+        .records(&root.0, &Window::default())
+        .unwrap();
+    assert_eq!(fgos_observe::scorecard::compute_runs(&runs).total, 1);
     assert_eq!(root.metrics(&[])["totals"]["unitRuns"], 1);
 }
 
@@ -497,20 +487,16 @@ fn optional_verify_record_reads_in_both_shapes_and_a_malformed_one_is_invalid_co
     v2["contract"]["version"] = json!(2);
     root.summary(&v2);
     let scan = scan_unit_summaries(&root.0, &Window::default()).unwrap();
-    let mut ids: Vec<_> = scan
-        .observations
-        .iter()
-        .map(|o| o.subject.id.clone())
-        .collect();
+    let mut ids: Vec<_> = scan.summaries.iter().map(|s| s.unit.clone()).collect();
     ids.sort();
     assert_eq!(
         ids,
         [
-            "unit-run:unit-run-v2-plain",
-            "unit-run:unit-run-verify-absent",
-            "unit-run:unit-run-verify-ran",
-            "unit-run:unit-run-verify-skipped",
-            "unit-run:unit-run-verify-timeout",
+            "unit-run-v2-plain",
+            "unit-run-verify-absent",
+            "unit-run-verify-ran",
+            "unit-run-verify-skipped",
+            "unit-run-verify-timeout",
         ]
     );
     assert_eq!(
@@ -595,14 +581,14 @@ fn fallback_provenance_objects_are_consumed_and_preserved_without_reselection() 
     root.summary(&summary);
     let source = scan_unit_summaries(&root.0, &Window::default())
         .unwrap()
-        .observations;
+        .summaries;
     assert_eq!(source.len(), 1);
     assert_eq!(
-        source[0].attrs["seats"][0]["final"]["fallbackFrom"],
+        source[0].body["seats"][0]["final"]["fallbackFrom"],
         provenance
     );
     assert_eq!(
-        source[0].attrs["seats"][0]["attempts"][0]["fallbackFrom"],
+        source[0].body["seats"][0]["attempts"][0]["fallbackFrom"],
         provenance
     );
     let report = root.metrics(&[]);
@@ -651,14 +637,12 @@ fn summary_and_cli_windows_compare_offset_timestamps_temporally_and_include_equa
         since: Some("2026-10-05T00:00:00Z".into()),
         until: Some("2026-10-05T00:00:00.000Z".into()),
     };
-    let observations = scan_unit_summaries(&root.0, &bounds).unwrap().observations;
-    assert_eq!(observations.len(), 2);
-    assert!(observations
-        .iter()
-        .all(|observation| observation.attrs["unitRunId"]
-            .as_str()
-            .unwrap()
-            .starts_with("unit-run-equal")));
+    let summaries = scan_unit_summaries(&root.0, &bounds).unwrap().summaries;
+    assert_eq!(summaries.len(), 2);
+    assert!(summaries.iter().all(|summary| summary.body["unitRunId"]
+        .as_str()
+        .unwrap()
+        .starts_with("unit-run-equal")));
     let exact = root.metrics(&[
         "--since",
         "2026-10-05T00:00:00Z",

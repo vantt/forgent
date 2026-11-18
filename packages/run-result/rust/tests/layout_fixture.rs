@@ -1,4 +1,5 @@
-use fgos_observe::{ObservationSource, Window};
+use fgos_observe::record::types::{AttrValue, Record};
+use fgos_observe::{ObservationSource, RecordSource, Window};
 use fgos_run_result::{scan_coverage, scan_runs, RunResultSource, MAX_ASSIGNMENT_DEPTH};
 use serde_json::{json, Value};
 use std::fs;
@@ -31,21 +32,37 @@ impl WorkObservationSource for NoWork {
     }
 }
 
+/// The run owner's record source and nothing else: the record store is never read.
 #[cfg(unix)]
-struct NoRecords;
+struct RunRecords;
 
-impl fgos_observe::metrics_cli::RecordEnvironment for NoRecords {
+#[cfg(unix)]
+impl fgos_observe::metrics_cli::RecordEnvironment for RunRecords {
     fn embedded_declarations(&self) -> Vec<fgos_observe::record::registry::EmbeddedDeclaration> {
         panic!("this verb must not read records")
     }
     fn payload_root(&self) -> Option<PathBuf> {
         panic!("this verb must not read records")
     }
-    fn record_sources(&self) -> Vec<Box<dyn fgos_observe::RecordSource>> {
-        panic!("this verb must not read records")
+    fn record_sources(&self) -> Vec<Box<dyn RecordSource>> {
+        vec![Box::new(RunResultSource::new())]
     }
     fn config_number(&self, _: &Path, _: &str) -> Result<Option<f64>, String> {
         panic!("this verb must not read records")
+    }
+}
+
+/// A record attr as JSON: its string, or null when the record does not carry it.
+trait Attr {
+    fn attr(&self, name: &str) -> Value;
+}
+
+impl Attr for Record {
+    fn attr(&self, name: &str) -> Value {
+        match self.attrs.get(name) {
+            Some(AttrValue::Str(value)) => Value::String(value.clone()),
+            _ => Value::Null,
+        }
     }
 }
 
@@ -198,13 +215,16 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         .iter()
         .find(|o| o.subject.id == "no-assignment")
         .unwrap();
-    assert_eq!(no_assignment.attrs["role"], Value::Null);
+    assert_eq!(no_assignment.attr("fgos.run.role"), Value::Null);
     let nested = scan.runs.iter().find(|o| o.subject.id == "nested").unwrap();
-    assert_eq!(nested.attrs["assignmentId"], "unit-run-example/member-1/1");
+    assert_eq!(
+        nested.attr("fgos.run.assignment"),
+        "unit-run-example/member-1/1"
+    );
     let flat = scan.runs.iter().find(|o| o.subject.id == "flat").unwrap();
-    assert_eq!(flat.attrs["assignmentId"], "legacy");
+    assert_eq!(flat.attr("fgos.run.assignment"), "legacy");
 
-    let sources: Vec<Box<dyn ObservationSource>> = vec![Box::new(RunResultSource::new())];
+    let sources: Vec<Box<dyn ObservationSource>> = Vec::new();
     let mut req = ObserveRequest {
         operation: "observe.metrics".to_string(),
         sub: "coverage".to_string(),
@@ -218,7 +238,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
-        &NoRecords,
+        &RunRecords,
     )
     .unwrap();
     assert_eq!(coverage["layoutRule"], expected["layoutRule"]);
@@ -231,7 +251,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
-        &NoRecords,
+        &RunRecords,
     )
     .unwrap();
     assert_eq!(runs["total"], coverage["observed"]);
@@ -242,7 +262,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
-        &NoRecords,
+        &RunRecords,
     )
     .unwrap();
     assert_eq!(harness["runs"]["total"], coverage["observed"]);
@@ -253,10 +273,9 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     ] {
         let observation = scan.runs.iter().find(|o| o.subject.id == id).unwrap();
         assert_eq!(observation.ts, timestamp);
-        assert_eq!(observation.source, "run-result");
-        assert_eq!(observation.kind, "run.settled");
-        assert_eq!(observation.attrs["assignmentId"], id);
-        assert_eq!(observation.attrs["status"], "done");
+        assert_eq!(observation.origin.source, "run-result");
+        assert_eq!(observation.kind, "fgos.run.settled");
+        assert_eq!(observation.attr("fgos.run.assignment"), id);
     }
     req.args = vec![
         "--since".to_string(),
@@ -271,7 +290,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
-        &NoRecords,
+        &RunRecords,
     )
     .unwrap();
     assert_eq!(windowed_runs["total"], 2);
@@ -282,7 +301,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
-        &NoRecords,
+        &RunRecords,
     )
     .unwrap();
     assert_eq!(windowed_harness["runs"]["total"], 2);
@@ -293,7 +312,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
-        &NoRecords,
+        &RunRecords,
     )
     .unwrap_err()
     .contains("metrics coverage: unknown option --since"));
@@ -304,7 +323,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
-        &NoRecords,
+        &RunRecords,
     )
     .unwrap();
     assert_eq!(
@@ -320,8 +339,8 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
             since: Some(since.to_string()),
             until: None,
         };
-        assert!(sources[0]
-            .observations(&root.0, &window)
+        assert!(RunResultSource::new()
+            .records(&root.0, &window)
             .unwrap()
             .is_empty());
     }
@@ -394,7 +413,7 @@ fn result_and_assignment_symlinks_are_never_read() {
             .iter()
             .find(|o| o.subject.id == "assignment-link")
             .unwrap()
-            .attrs["role"],
+            .attr("fgos.run.role"),
         Value::Null
     );
     assert_accounting(&root.0);
@@ -489,7 +508,7 @@ fn an_invalid_duplicate_does_not_hide_the_first_valid_record() {
     );
     let scan = scan_runs(&root.0).unwrap();
     assert_eq!(scan.runs.len(), 1);
-    assert_eq!(scan.runs[0].attrs["assignmentId"], "b-valid");
+    assert_eq!(scan.runs[0].attr("fgos.run.assignment"), "b-valid");
     assert_eq!(scan.skipped["no-timestamp"], 1);
     assert_eq!(scan.skipped["duplicate-run-id"], 1);
     let later = Window {
@@ -497,7 +516,7 @@ fn an_invalid_duplicate_does_not_hide_the_first_valid_record() {
         until: None,
     };
     assert!(RunResultSource::new()
-        .observations(&root.0, &later)
+        .records(&root.0, &later)
         .unwrap()
         .is_empty());
     assert_accounting(&root.0);
@@ -568,14 +587,16 @@ fn owner_settlement_requires_regular_parseable_metadata_without_changing_results
     assert_eq!(scan.skipped["no-timestamp"], 5);
     assert_eq!(scan.recent_runs, 12);
     for observation in &scan.runs {
-        assert_eq!(observation.source, "run-result");
-        assert_eq!(observation.kind, "run.settled");
-        assert_eq!(observation.attrs["assignmentId"], observation.subject.id);
+        assert_eq!(observation.origin.source, "run-result");
+        assert_eq!(observation.kind, "fgos.run.settled");
+        assert_eq!(
+            observation.attr("fgos.run.assignment"),
+            observation.subject.id.as_str()
+        );
         if observation.subject.id.ends_with("-true") {
             assert_eq!(observation.ts, "2026-10-05T12:00:00Z");
-            assert_eq!(observation.attrs["executor"], "executor");
-            assert_eq!(observation.attrs["role"], "producer");
-            assert_eq!(observation.attrs["status"], "done");
+            assert_eq!(observation.attr("fgos.executor.id"), "executor");
+            assert_eq!(observation.attr("fgos.run.role"), "producer");
         } else {
             assert_eq!(observation.subject.id, "valid-false");
             assert_eq!(observation.ts, owner_time);
@@ -656,13 +677,16 @@ fn run_scan_keeps_explicit_nulls_and_does_not_reclassify_non_object_results() {
     assert_eq!(scan.skipped["no-run-id"], 1);
     let by_id = |id: &str| scan.runs.iter().find(|o| o.subject.id == id).unwrap();
     assert_eq!(
-        by_id("null-contract").attrs["outcome"]["reason"],
+        by_id("null-contract").attr("fgos.run.reason"),
         "unsupported-contract"
     );
     let classification = by_id("null-classification");
-    assert_eq!(classification.attrs["classification"], Value::Null);
-    assert_eq!(classification.attrs["category"], "ok");
-    assert_eq!(by_id("null-executor-id").attrs["executor"], Value::Null);
+    assert_eq!(classification.attr("fgos.run.verdict"), Value::Null);
+    assert_eq!(classification.attr("fgos.run.category"), "ok");
+    assert_eq!(
+        by_id("null-executor-id").attr("fgos.executor.id"),
+        Value::Null
+    );
     assert_accounting(&root.0);
 }
 
@@ -724,7 +748,7 @@ fn owner_settlement_duplicates_keep_component_lexical_order_before_windowing() {
     );
     let scan = scan_runs(&root.0).unwrap();
     assert_eq!(scan.runs.len(), 1);
-    assert_eq!(scan.runs[0].attrs["assignmentId"], "a");
+    assert_eq!(scan.runs[0].attr("fgos.run.assignment"), "a");
     assert_eq!(scan.runs[0].ts, "2026-10-05T11:00:00Z");
     assert_eq!(scan.skipped["duplicate-run-id"], 1);
     let window = Window {
@@ -732,7 +756,7 @@ fn owner_settlement_duplicates_keep_component_lexical_order_before_windowing() {
         until: None,
     };
     assert!(RunResultSource::new()
-        .observations(&root.0, &window)
+        .records(&root.0, &window)
         .unwrap()
         .is_empty());
     assert_eq!(scan_coverage(&root.0).unwrap()["observed"], 1);
@@ -754,7 +778,7 @@ fn unicode_duplicate_winner_uses_utf8_component_order() {
     }
     let scan = scan_runs(&root.0).unwrap();
     assert_eq!(scan.runs.len(), 1);
-    assert_eq!(scan.runs[0].attrs["assignmentId"], "\u{e000}");
+    assert_eq!(scan.runs[0].attr("fgos.run.assignment"), "\u{e000}");
     assert_eq!(scan.runs[0].ts, "2026-10-05T10:00:00Z");
     assert_eq!(scan.skipped.get("duplicate-run-id"), Some(&1));
 }

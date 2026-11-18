@@ -8,7 +8,7 @@ use fgos_observe::metrics_cli::RecordEnvironment;
 use fgos_observe::record::registry::EmbeddedDeclaration;
 use fgos_observe::sources::claude_transcripts::ClaudeTranscriptsSource;
 use fgos_observe::RecordSource;
-use fgos_run_result::RunProjectionSource;
+use fgos_run_result::{RunProjectionSource, RunResultSource};
 use serde_json::Value;
 use std::path::{Path, PathBuf};
 
@@ -33,6 +33,7 @@ impl RecordEnvironment for HostRecordEnvironment {
         vec![
             Box::new(ClaudeTranscriptsSource::new()),
             Box::new(RunProjectionSource::new()),
+            Box::new(RunResultSource::new()),
         ]
     }
 

@@ -3,14 +3,39 @@
 //! Subcommand: `fgos metrics runs [--by executor|adapter|role] [--since <iso> [--until <iso>]] [--case <name>] [--dir <root>]`
 
 use crate::case_journal;
-use crate::contract::{Observation, ObservationSource, ObserveRequest, Window};
+use crate::contract::{ObserveRequest, RecordSource, SourceError, Window};
 use crate::metrics_cli::parse_flags;
-use crate::scorecard::{compute_runs, RUN_RESULT_SOURCE};
+use crate::record::types::Record;
+use crate::scorecard::{compute_runs, RUN_RESULT_SOURCE, RUN_SETTLED_KIND};
 use serde_json::Value;
+use std::path::Path;
+
+/// The settled runs of the run owner's record source; any other source is never read.
+pub(crate) fn settled_runs(
+    sources: &[Box<dyn RecordSource>],
+    root: &Path,
+    window: &Window,
+) -> Result<Vec<Record>, (&'static str, SourceError)> {
+    let mut runs = Vec::new();
+    for src in sources
+        .iter()
+        .filter(|src| src.source_id() == RUN_RESULT_SOURCE)
+    {
+        let records = src
+            .records(root, window)
+            .map_err(|e| (src.source_id(), e))?;
+        runs.extend(
+            records
+                .into_iter()
+                .filter(|record| record.kind == RUN_SETTLED_KIND),
+        );
+    }
+    Ok(runs)
+}
 
 pub fn dispatch_runs(
     req: &ObserveRequest,
-    sources: &[Box<dyn ObservationSource>],
+    sources: &[Box<dyn RecordSource>],
 ) -> Result<Value, String> {
     let flags = parse_flags(
         "runs",
@@ -44,20 +69,10 @@ pub fn dispatch_runs(
         }
     };
 
-    // 2. Collect observations from the run-result source, the only one the runs section reads
-    let mut observations: Vec<Observation> = Vec::new();
-    for src in sources
-        .iter()
-        .filter(|src| src.source_id() == RUN_RESULT_SOURCE)
-    {
-        observations.extend(
-            src.observations(&req.root, &window)
-                .map_err(|e| format!("source error: {}", e))?,
-        );
-    }
-
-    // 3. Compute runs section
-    let runs_sec = compute_runs(&observations);
+    // 2. Collect the settled runs and compute the runs section
+    let runs = settled_runs(sources, &req.root, &window)
+        .map_err(|(_, e)| format!("source error: {}", e))?;
+    let runs_sec = compute_runs(&runs);
 
     if let Some(by) = by_filter {
         match by {

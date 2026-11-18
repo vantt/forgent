@@ -9,6 +9,12 @@
     "fgos.outcome": { "type": "string" },
     "fgos.failure.code": { "type": "string" },
     "fgos.fallback": { "type": "bool" },
+    "fgos.run.adapter": { "type": "string" },
+    "fgos.run.role": { "type": "string" },
+    "fgos.run.verdict": { "type": "string" },
+    "fgos.run.category": { "type": "string" },
+    "fgos.run.reason": { "type": "string" },
+    "fgos.run.assignment": { "type": "string" },
     "fgos.usage.source": { "type": "string" },
     "fgos.usage.reason": { "type": "string" },
     "fgos.workflow": { "type": "string" },
@@ -26,6 +32,28 @@
     "fgos.usage.reasoning_tokens": { "unit": "token", "aggs": ["sum", "max", "p50", "p90"] }
   },
   "kinds": {
+    "fgos.run.settled": {
+      "subjects": ["run"],
+      "attrs": [
+        "fgos.executor.id",
+        "fgos.run.adapter",
+        "fgos.run.role",
+        "fgos.run.verdict",
+        "fgos.run.category",
+        "fgos.run.reason",
+        "fgos.run.assignment",
+        "fgos.usage.source",
+        "fgos.usage.reason"
+      ],
+      "measures": [
+        "gen_ai.usage.input_tokens",
+        "gen_ai.usage.output_tokens",
+        "gen_ai.usage.cache_read.input_tokens",
+        "gen_ai.usage.cache_creation.input_tokens",
+        "fgos.usage.total_tokens",
+        "fgos.usage.reasoning_tokens"
+      ]
+    },
     "fgos.run.attempt": {
       "subjects": ["run"],
       "attrs": [

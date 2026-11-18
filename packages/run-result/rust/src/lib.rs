@@ -1,4 +1,4 @@
-//! Run Result Evaluator observation source (Lane A2 - Phase F2).
+//! Run Result Evaluator: the settled-run record source, and the run, unit and verify projections.
 
 pub mod projection;
 pub mod unit_summary;
@@ -7,7 +7,9 @@ pub use projection::{RunProjectionSource, RUN_DECLARATION};
 pub use unit_summary::scan_unit_summaries;
 
 use fgos_host_runtime::civil_time::parse_rfc3339_millis;
-use fgos_observe::{Observation, ObservationSource, SourceError, Subject, SubjectKind, Window};
+use fgos_observe::record::types::{AttrValue, Basis, Origin, Record, SubjectRef, RECORD_VERSION};
+use fgos_observe::scorecard::{RUN_RESULT_SOURCE, RUN_SETTLED_KIND};
+use fgos_observe::{RecordSource, SourceError, Window};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeMap, HashSet};
@@ -315,12 +317,16 @@ impl Default for RunResultSource {
     }
 }
 
-impl ObservationSource for RunResultSource {
+impl RecordSource for RunResultSource {
     fn source_id(&self) -> &'static str {
-        "run-result"
+        RUN_RESULT_SOURCE
     }
 
-    fn observations(&self, root: &Path, w: &Window) -> Result<Vec<Observation>, SourceError> {
+    fn kinds(&self) -> &[&str] {
+        &[RUN_SETTLED_KIND]
+    }
+
+    fn records(&self, root: &Path, w: &Window) -> Result<Vec<Record>, SourceError> {
         let mut runs = scan_runs(root)?.runs;
         runs.retain(|o| {
             w.since
@@ -339,7 +345,7 @@ pub const MAX_ASSIGNMENT_DEPTH: usize = 16;
 
 #[derive(Debug, Default)]
 pub struct RunScan {
-    pub runs: Vec<Observation>,
+    pub runs: Vec<Record>,
     pub skipped: BTreeMap<&'static str, usize>,
     pub run_dirs_seen: usize,
     pub recent_runs: usize,
@@ -582,7 +588,7 @@ fn scan_assignment_runs(
             continue;
         }
         seen_ids.insert(run_id.to_string());
-        scan.runs.push(run_observation(
+        scan.runs.push(run_record(
             &record,
             &assignment,
             &assignment_id,
@@ -603,7 +609,6 @@ const RECORD_KEYS: &[&str] = &[
     "executorId",
     "executor",
     "status",
-    "confinement",
     "usage",
     "classification",
     "adapter",
@@ -695,63 +700,67 @@ fn read_run_record(path: &Path) -> Option<Value> {
     Some(value)
 }
 
-fn run_observation(
+/// One settled run as a `fgos.run.settled` record: the facts the runs and tokens sections read, copied verbatim.
+/// A fact the result does not carry as a string stays absent.
+fn run_record(
     record: &Value,
     assignment: &Value,
     assignment_id: &str,
     run_id: &str,
     timestamp: &str,
-) -> Observation {
-    let mut attrs = serde_json::Map::new();
-    attrs.insert(
-        "executor".to_string(),
-        record
-            .get("executorId")
-            .or_else(|| record.get("executor"))
-            .cloned()
-            .unwrap_or(Value::Null),
+) -> Record {
+    let mut attrs = BTreeMap::new();
+    let mut put = |name: &str, value: Option<&Value>| {
+        if let Some(s) = value.and_then(Value::as_str) {
+            attrs.insert(name.to_owned(), AttrValue::Str(s.to_owned()));
+        }
+    };
+    put(
+        "fgos.executor.id",
+        record.get("executorId").or_else(|| record.get("executor")),
     );
-    for key in ["status", "confinement", "usage"] {
-        attrs.insert(
-            key.to_string(),
-            record.get(key).cloned().unwrap_or(Value::Null),
-        );
+    for (key, name) in [("adapter", "fgos.run.adapter"), ("role", "fgos.run.role")] {
+        put(name, record.get(key).or_else(|| assignment.get(key)));
     }
-    if let Some(classification) = record.get("classification") {
-        attrs.insert("classification".to_string(), classification.clone());
-    }
+    put(
+        "fgos.run.verdict",
+        record.pointer("/classification/assessment/verdict"),
+    );
     let outcome = derive_legacy_outcome(record);
     attrs.insert(
-        "category".to_string(),
-        Value::String(outcome.category.clone()),
+        "fgos.run.category".to_owned(),
+        AttrValue::Str(outcome.category),
     );
+    attrs.insert("fgos.run.reason".to_owned(), AttrValue::Str(outcome.reason));
     attrs.insert(
-        "outcome".to_string(),
-        serde_json::to_value(outcome).unwrap_or(Value::Null),
+        "fgos.run.assignment".to_owned(),
+        AttrValue::Str(assignment_id.to_owned()),
     );
-    for key in ["adapter", "role"] {
-        attrs.insert(
-            key.to_string(),
-            record
-                .get(key)
-                .or_else(|| assignment.get(key))
-                .cloned()
-                .unwrap_or(Value::Null),
-        );
+    let mut measures = BTreeMap::new();
+    if let Some(usage) = record.get("usage") {
+        projection::usage::project(usage, &mut attrs, &mut measures);
     }
-    attrs.insert(
-        "assignmentId".to_string(),
-        Value::String(assignment_id.to_string()),
-    );
-    Observation {
-        ts: timestamp.to_string(),
-        subject: Subject {
-            kind: SubjectKind::Run,
-            id: run_id.to_string(),
+    Record {
+        v: RECORD_VERSION,
+        id: format!("run-settled:{run_id}"),
+        kind: RUN_SETTLED_KIND.to_owned(),
+        ts: timestamp.to_owned(),
+        end_ts: None,
+        subject: SubjectRef {
+            kind: "run".to_owned(),
+            id: run_id.to_owned(),
         },
-        kind: "run.settled".to_string(),
+        refs: Vec::new(),
         attrs,
-        source: "run-result",
+        measures,
+        basis: Basis::Derived,
+        origin: Origin {
+            source: RUN_RESULT_SOURCE.to_owned(),
+            component: Some("run-result".to_owned()),
+            ..Origin::default()
+        },
+        detail: None,
+        redaction: None,
     }
 }
 
@@ -759,6 +768,13 @@ fn run_observation(
 mod tests {
     use super::*;
     use std::fs;
+
+    fn attr<'a>(record: &'a Record, name: &str) -> Option<&'a str> {
+        match record.attrs.get(name) {
+            Some(AttrValue::Str(value)) => Some(value),
+            _ => None,
+        }
+    }
 
     #[test]
     fn test_run_result_source() {
@@ -788,18 +804,19 @@ mod tests {
         .unwrap();
 
         let source = RunResultSource::new();
-        let obs = source.observations(&temp_dir, &Window::default()).unwrap();
+        let obs = source.records(&temp_dir, &Window::default()).unwrap();
 
         assert_eq!(obs.len(), 1);
         let o = &obs[0];
-        assert_eq!(o.kind, "run.settled");
-        assert_eq!(o.subject.kind, SubjectKind::Run);
+        assert_eq!(o.kind, RUN_SETTLED_KIND);
+        assert_eq!(o.subject.kind, "run");
         assert_eq!(o.subject.id, "run_001_01");
-        assert_eq!(o.attrs.get("executor").unwrap(), "gemini");
-        assert_eq!(o.attrs.get("status").unwrap(), "done");
-        assert_eq!(o.attrs.get("role").unwrap(), "doer");
-        assert_eq!(o.attrs.get("adapter").unwrap(), &Value::Null);
-        assert!(o.attrs.contains_key("classification"));
+        assert_eq!(o.basis, Basis::Derived);
+        assert_eq!(attr(o, "fgos.executor.id"), Some("gemini"));
+        assert_eq!(attr(o, "fgos.run.role"), Some("doer"));
+        assert_eq!(attr(o, "fgos.run.adapter"), None);
+        assert_eq!(attr(o, "fgos.run.assignment"), Some("asgn_001"));
+        assert!(attr(o, "fgos.run.category").is_some());
 
         let _ = fs::remove_dir_all(&temp_dir);
     }
@@ -837,13 +854,13 @@ mod tests {
         fs::write(run_corrupt.join("result.json"), "NOT JSON").unwrap();
 
         let source = RunResultSource::new();
-        let obs = source.observations(&temp_dir, &Window::default()).unwrap();
+        let obs = source.records(&temp_dir, &Window::default()).unwrap();
 
         assert_eq!(obs.len(), 1);
         let o = &obs[0];
         assert_eq!(o.subject.id, "run_002_01");
-        assert!(!o.attrs.contains_key("classification"));
-        assert_eq!(o.attrs.get("role").unwrap(), "reviewer");
+        assert_eq!(attr(o, "fgos.run.verdict"), None);
+        assert_eq!(attr(o, "fgos.run.role"), Some("reviewer"));
 
         let _ = fs::remove_dir_all(&temp_dir);
     }

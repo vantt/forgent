@@ -101,10 +101,20 @@ pub trait RecordSource: Send + Sync {
     ) -> Result<Vec<crate::record::types::Record>, SourceError>;
 }
 
-/// One reader-owned scan: observations are windowed; structural counts are root-wide.
+/// One settled unit summary, as its owner wrote it. Observe reads the body without interpreting where it is stored.
+#[derive(Debug, Clone)]
+pub struct SettledUnitSummary {
+    /// The unit directory name, unique per unit.
+    pub unit: String,
+    /// The validated settlement instant (RFC 3339).
+    pub settled_at: String,
+    pub body: serde_json::Map<String, serde_json::Value>,
+}
+
+/// One reader-owned scan: summaries are windowed and ordered by settlement; structural counts are root-wide.
 #[derive(Debug, Default)]
 pub struct UnitSummaryScan {
-    pub observations: Vec<Observation>,
+    pub summaries: Vec<SettledUnitSummary>,
     pub summary_dirs_seen: usize,
     pub summaries_missing: usize,
     pub summaries_unusable: usize,
