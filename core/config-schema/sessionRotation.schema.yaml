@@ -42,7 +42,9 @@ properties:
           type: number
           minimum: 0
         reload:
-          description: Repo-relative portfolio paths the successor rereads before acting.
+          description: Repo-relative files or folders the successor rereads before acting, listed as written in its handoff; at most 50 are listed, each at most 300 characters.
           type: array
           items:
             type: string
+            minLength: 1
+            maxLength: 300

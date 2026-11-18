@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { createSessionHost, SessionHostError } from '../../src/session-host/client.mjs';
+import { createSessionHost, readLastAssistantMessage, SessionHostError } from '../../src/session-host/client.mjs';
 
 const HOST_BIN = process.env.FGOS_HOST_BIN;
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-sh-client-'));
@@ -40,4 +40,16 @@ test('a bad request, the removed screenless host included, throws a named error'
     () => host.open({ host: 'direct', key: 'client-open', cwd: scratch }),
     () => host.launch({ host: 'terminal', key: 'client-open' }, { cwd: scratch }),
   ]) assert.throws(call, (err) => err instanceof SessionHostError && err.code === 'session-host-route-usage');
+});
+
+test('the last assistant message of a session folder comes back through the route, and a missing folder is an answer', async () => {
+  const projects = path.join(scratch, 'projects');
+  fs.mkdirSync(path.join(projects, '-p'), { recursive: true });
+  const entry = { type: 'assistant', message: { id: 'm', stop_reason: 'end_turn', content: [{ type: 'text', text: 'Open questions: A?' }] } };
+  fs.writeFileSync(path.join(projects, '-p', 'e6540401-251d-4181-8930-661e69a42e3b.jsonl'), `${JSON.stringify(entry)}\n`);
+  const found = await readLastAssistantMessage({ projectsDir: projects }, { hostBin: HOST_BIN });
+  assert.deepEqual([found.result, found.message, found.turnEnded], ['found', 'Open questions: A?', true]);
+  const missing = await readLastAssistantMessage({ projectsDir: path.join(scratch, 'gone') }, { hostBin: HOST_BIN });
+  assert.equal(missing.result, 'not-found');
+  assert.match(missing.detail, /gone/);
 });

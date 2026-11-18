@@ -4,12 +4,12 @@
   "files": {
     "latest.json": {
       "writer": "handoff store, replaced atomically after the handoff file exists",
-      "shape": { "file": "string, <yymmdd>-<hhmm>-<sid8>.md, the newest handoff file of the folder", "session": "string, the rotating session", "rotate": "soft | hard", "writtenAt": "ISO-8601 UTC" },
+      "shape": { "file": "string, <yymmdd>-<hhmm>-<sid8>.md, the newest handoff file of the folder", "session": "string, the rotating session", "rotate": "soft | hard | manual", "writtenAt": "ISO-8601 UTC" },
       "readerRule": "a pointer that is missing, not one JSON object, or names a file that is not a handoff file name or is gone means no handoff"
     },
     "handoff file": {
       "writer": "handoff store, immutable",
-      "carries": "a line `Rotation id: <16 lowercase hex characters>` when a rotation executor wrote it; a `## Pending question (verbatim)` section on a hard rotation",
+      "carries": "a line `- rotation: soft | hard | manual`; a line `Rotation id: <16 lowercase hex characters>` when a rotation executor wrote it; the portfolio files to reread (the stop facts' portfolio, else `sessionRotation.personas.<persona>.reload`; an entry the project does not have is left out); a `## Last assistant message (verbatim)` and a `## Pending question (verbatim)` section on a hard or manual rotation. A manual rotation's last message is read by the executor from the old session's transcript (the `last-message` op below, after the old session ended its turn, at most 60 s); when it cannot be read, the section says `(not found: <why>)`",
       "sessionStart": "the reader inlines the text when it is under 10000 characters, else a pointer to the file plus the pending question verbatim"
     },
     "rotation.json": { "writer": "rotation executor", "readFields": { "gen": "integer, the successor's generation", "id": "the rotation id" } },
@@ -35,6 +35,12 @@
     "command": "fgos hook session-rotation --event stop|session-start",
     "never": "blocks, prints to the conversation (only session-start prints, one hookSpecificOutput.additionalContext object), or exits other than 0",
     "stop": "a successor whose generation the pending rotation waits for answers with `head answered` (the rotation id from its handoff); every other stop measures, decides and on soft or hard asks `head rotate`; a stop that answered does not also measure",
-    "pendingQuestion": "no lineage state defines a pending owner question yet, so the hook never reports one: soft is never held by a question, and a hard rotation carries the last assistant message verbatim"
+    "pendingQuestion": "no lineage state defines a pending owner question yet, so the hook never reports one: soft is never held by a question, and a hard or manual rotation carries the last assistant message verbatim, where a head batches its open questions"
+  },
+  "lastMessageRoute": {
+    "command": "fgos internal session-host last-message --protocol 1 --json, stdin {\"v\":1,\"request\":{\"projectsDir\":\"<session folder>\"}}",
+    "caller": "the rotation executor, for a manual rotation; the session folder is the one the old launch kept or declared (seatSessionDir in src/runner/dispatch/confinement/authority.mjs)",
+    "reader": "packages/session-host/rust/src/rotation/last_message.rs: the newest <session-id>.jsonl one level under the folder (regular files only, so a subagent transcript deeper down is never taken); its last non-sidechain assistant message with text, every text block of that message id joined by a blank line",
+    "answers": { "found": { "transcript": "string", "message": "string or null when no assistant message has text", "turnEnded": "boolean, the last assistant entry has stop_reason end_turn" }, "not-found": { "detail": "string, why" } }
   }
 }

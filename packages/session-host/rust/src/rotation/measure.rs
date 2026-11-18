@@ -27,7 +27,7 @@ pub struct Measure {
     pub stale: bool,
 }
 
-fn lines_of(file: &Path) -> Vec<Value> {
+pub(crate) fn lines_of(file: &Path) -> Vec<Value> {
     std::fs::read_to_string(file)
         .map(|text| {
             text.lines()
@@ -36,6 +36,12 @@ fn lines_of(file: &Path) -> Vec<Value> {
                 .collect()
         })
         .unwrap_or_default()
+}
+
+/// Whether a transcript entry is an assistant entry of the session itself, not of a subagent (a sidechain).
+pub(crate) fn main_assistant(entry: &Value) -> bool {
+    entry.get("type").and_then(Value::as_str) == Some("assistant")
+        && entry.get("isSidechain").and_then(Value::as_bool) != Some(true)
 }
 
 fn tokens_of(usage: &Value) -> u64 {
@@ -116,9 +122,7 @@ pub fn from_transcript(transcript: &Path, window_size: u64) -> Option<Measure> {
     let mut order: Vec<String> = Vec::new();
     let mut usage: std::collections::HashMap<String, Value> = std::collections::HashMap::new();
     for entry in lines_of(transcript) {
-        if entry.get("type").and_then(Value::as_str) != Some("assistant")
-            || entry.get("isSidechain").and_then(Value::as_bool) == Some(true)
-        {
+        if !main_assistant(&entry) {
             continue;
         }
         let Some(u) = entry.pointer("/message/usage").filter(|u| u.is_object()) else {

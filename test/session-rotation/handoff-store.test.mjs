@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { readLatestHandoff, redactText, writeHandoff, VERIFY_LINE } from '../../src/session-rotation/handoff-store.mjs';
+import { ROTATION_REASONS } from '../../src/session-rotation/rotate.mjs';
 
 const fgosDir = () => fs.mkdtempSync(path.join(os.tmpdir(), 'rot-store-'));
 const base = { persona: 'miu', name: 'main', sessionId: 'abcdef1234567', rotate: 'soft', portfolio: ['docs/backlog.md'], delta: 'did x' };
@@ -19,12 +20,16 @@ test('a handoff starts with the verify line, names its file by minute and sessio
   assert.doesNotMatch(latest.text, /Pending question/);
 });
 
-test('a hard handoff carries the last assistant message and the pending question verbatim', () => {
-  const d = fgosDir();
-  writeHandoff({ fgosDir: d, ...base, rotate: 'hard', lastAssistantMessage: 'Shall I proceed?\n  yes/no', pendingQuestion: 'Pick A or B', now: new Date() });
-  const { text } = readLatestHandoff({ fgosDir: d, persona: 'miu', name: 'main' });
-  assert.match(text, /Shall I proceed\?\n {2}yes\/no/);
-  assert.match(text, /Pick A or B/);
+test('a hard or manual handoff carries the last assistant message and the pending question verbatim, and names its kind', () => {
+  for (const rotate of ['hard', 'manual']) {
+    const d = fgosDir();
+    writeHandoff({ fgosDir: d, ...base, rotate, lastAssistantMessage: 'Shall I proceed?\n  yes/no', pendingQuestion: 'Pick A or B', now: new Date() });
+    const latest = readLatestHandoff({ fgosDir: d, persona: 'miu', name: 'main' });
+    assert.match(latest.text, /Shall I proceed\?\n {2}yes\/no/, rotate);
+    assert.match(latest.text, /Pick A or B/, rotate);
+    assert.match(latest.text, new RegExp(`^- rotation: ${rotate}$`, 'm'), rotate);
+    assert.equal(latest.rotate, rotate, 'latest.json records the real kind');
+  }
 });
 
 test('an existing handoff file is never overwritten', () => {
@@ -73,5 +78,6 @@ test('latest.json and the hard handoff carry exactly what the Rust hook reader c
   writeHandoff({ fgosDir: d, ...base, rotate: 'hard', pendingQuestion: 'Which database?', now: new Date('2026-11-17T15:04:00Z') });
   const pointer = JSON.parse(fs.readFileSync(path.join(dirOf(d), 'latest.json'), 'utf8'));
   assert.deepEqual(Object.keys(pointer).sort(), Object.keys(contract.files['latest.json'].shape).sort());
+  assert.deepEqual(contract.files['latest.json'].shape.rotate.split(' | '), [...ROTATION_REASONS], 'every rotation kind the executor writes is one the reader contract names');
   assert.match(readLatestHandoff({ fgosDir: d, persona: 'miu', name: 'main' }).text, /\n## Pending question \(verbatim\)\n\nWhich database\?\n/);
 });

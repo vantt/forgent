@@ -67,6 +67,7 @@ pub struct Latest {
     pub file: String,
     pub path: PathBuf,
     pub text: String,
+    /// How the handoff came about: `soft`, `hard` or `manual` (contract `rotation-files.v1.json`), as written.
     pub rotate: Option<String>,
 }
 
@@ -187,7 +188,8 @@ mod tests {
     }
 
     #[test]
-    fn the_latest_handoff_is_read_as_the_pointer_names_it_and_a_gone_or_foreign_file_is_none() {
+    fn the_latest_handoff_is_read_as_the_pointer_names_it_with_its_rotation_kind_and_a_gone_or_foreign_file_is_none(
+    ) {
         let d = dir("a");
         assert_eq!(read_latest(&d).unwrap(), None);
         store(&d, "261118-1000-abc12345.md", "body\n");
@@ -195,6 +197,16 @@ mod tests {
         assert_eq!(
             (got.file.as_str(), got.text.as_str(), got.rotate.as_deref()),
             ("261118-1000-abc12345.md", "body\n", Some("hard"))
+        );
+        std::fs::write(
+            d.join("latest.json"),
+            r#"{"file":"261118-1000-abc12345.md","rotate":"manual"}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            read_latest(&d).unwrap().unwrap().rotate.as_deref(),
+            Some("manual"),
+            "a manual rotation's pointer is read as it was written"
         );
         std::fs::write(d.join("latest.json"), r#"{"file":"../../etc/passwd"}"#).unwrap();
         assert_eq!(read_latest(&d).unwrap(), None);

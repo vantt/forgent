@@ -84,6 +84,43 @@ test('the old session is ended only after the successor answered and Identity na
   assert.equal(calls.released, 1, 'the lineage lock is given back');
 });
 
+test('a manual rotation is recorded as manual and hands off the old session\'s final message and the persona\'s existing portfolio', async (t) => {
+  const { root, dir } = project(t);
+  const { ports, request } = fakes(root);
+  ports.config = () => ({ keep: 10, answerWaitMs: 5000, personas: { planner: { reload: ['docs/backlog.md', 'plans/board/plan.md', 'docs/discussions'] } } });
+  fs.mkdirSync(path.join(root, 'docs', 'discussions'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'docs', 'backlog.md'), '# Backlog\n');
+  ports.sessionDir = (runDir, key) => { assert.deepEqual([runDir, key], ['/run/old', 'cmd_old']); return '/sessions/projects'; };
+  // The turn that asked for the rotation is still going on the first read; its final message is the one handed over.
+  const reads = [{ result: 'found', message: 'Rotating now.', turnEnded: false }, { result: 'found', message: 'Open questions:\n1. Which db?', turnEnded: true }];
+  ports.lastMessage = ({ projectsDir }) => { assert.equal(projectsDir, '/sessions/projects'); return reads.shift(); };
+  await rotateHeadSession({ ...request, reason: 'manual', stopFacts: {} }, ports);
+  const latest = JSON.parse(fs.readFileSync(path.join(dir, 'latest.json'), 'utf8'));
+  assert.equal(latest.rotate, 'manual');
+  const text = fs.readFileSync(path.join(dir, latest.file), 'utf8');
+  assert.match(text, /^- rotation: manual$/m);
+  assert.match(text, /## Last assistant message \(verbatim\)\n\nOpen questions:\n1\. Which db\?\n/);
+  assert.match(text, /^- docs\/backlog\.md\n- docs\/discussions$/m, 'the persona\'s reload paths are the portfolio, and one the project does not have is left out');
+  assert.doesNotMatch(text, /plans\/board/);
+  assert.deepEqual(reads, [], 'the reader is asked again until the old turn ended');
+});
+
+test('a manual rotation whose old transcript cannot be found says so in the handoff and still rotates', async (t) => {
+  for (const [sessionDir, lastMessage, says] of [
+    [() => null, () => assert.fail('nothing to read'), /\(not found: the old session's launch recorded no session folder\)/],
+    [() => '/s', () => ({ result: 'not-found', detail: 'no session transcript under /s' }), /\(not found: no session transcript under \/s\)/],
+    [() => '/s', () => { throw Object.assign(new Error('no host'), { code: 'session-host-no-host-binary' }); }, /\(not found: .*session-host-no-host-binary\)/],
+  ]) {
+    const { root, dir } = project(t);
+    const { calls, ports, request } = fakes(root);
+    Object.assign(ports, { sessionDir, lastMessage });
+    await rotateHeadSession({ ...request, reason: 'manual', stopFacts: {} }, ports);
+    assert.equal(calls.place.length, 1, 'the successor is still started');
+    const latest = JSON.parse(fs.readFileSync(path.join(dir, 'latest.json'), 'utf8'));
+    assert.match(fs.readFileSync(path.join(dir, latest.file), 'utf8'), says);
+  }
+});
+
 test('a successor that never answers is ended, the old session stays, and one incident line says why', async (t) => {
   const { root, dir } = project(t);
   const { calls, ports, request } = fakes(root);

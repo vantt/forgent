@@ -13,4 +13,10 @@ sessionRotation:
   # @fgos:doc Milliseconds the rotation executor waits for the successor to answer before it retires the successor and keeps the old session. Minimum: 1000. Default: 120000.
   answerWaitMs: 120000
   # @fgos:doc Per-persona overrides of soft and hard, and the portfolio paths its successor rereads, by bare persona name.
-  personas: {}
+  personas:
+    # The secretary's successor rereads its portfolio after any rotation: the backlog and the open discussions.
+    # An entry that does not exist in the project is left out of the handoff.
+    secretary:
+      reload:
+        - docs/backlog.md
+        - docs/discussions

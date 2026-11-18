@@ -1,6 +1,7 @@
 //! `fgos internal session-host <op> --protocol 1 --json`: one operation of the port per process, one
 //! JSON request on stdin, one JSON line out. A port answer, a refusal included, exits 0: the route
-//! decides nothing, it only carries the host's answer.
+//! decides nothing, it only carries the host's answer. `last-message` is the rotation executor's reader of a head's
+//! transcript (`rotation::last_message`): it needs no terminal, so it is answered before the driver is built.
 
 use crate::host::SessionHost;
 use crate::types::*;
@@ -14,6 +15,27 @@ use std::time::Instant;
 
 pub const PROTOCOL: u64 = 1;
 pub const OPS: [&str; 5] = ["open", "launch", "alive", "front", "retire"];
+/// The ops answered from files alone (contract: `packages/session-host/contracts/rotation-files.v1.json`).
+pub const FILE_OPS: [&str; 1] = ["last-message"];
+
+/// `last-message`: `request.projectsDir`, the head's session folder, to `found` (`transcript`, `message` or null,
+/// `turnEnded`) or `not-found` (`detail`).
+fn last_message(envelope: &Value) -> Result<(String, Value), String> {
+    let dir = envelope
+        .pointer("/request/projectsDir")
+        .and_then(Value::as_str)
+        .filter(|d| !d.is_empty())
+        .ok_or("request.projectsDir must be a non-empty string")?;
+    Ok(
+        match crate::rotation::last_message::last_message(std::path::Path::new(dir)) {
+            Ok(found) => (
+                "found".into(),
+                json!({ "transcript": found.transcript.display().to_string(), "message": found.text, "turnEnded": found.turn_ended }),
+            ),
+            Err(e) => ("not-found".into(), json!({ "detail": e.to_string() })),
+        },
+    )
+}
 
 fn refusal_fields(refusal: &Refusal) -> (String, Value) {
     let mut fields = json!({ "code": refusal.code });
@@ -141,8 +163,12 @@ pub fn main(args: &[String]) -> i32 {
     if !json_flag {
         return usage("--json is required");
     }
-    if !OPS.contains(&op) {
-        return usage(&format!("unknown op {op}; one of {}", OPS.join(", ")));
+    if !OPS.contains(&op) && !FILE_OPS.contains(&op) {
+        return usage(&format!(
+            "unknown op {op}; one of {}, {}",
+            OPS.join(", "),
+            FILE_OPS.join(", ")
+        ));
     }
     let envelope = match read_stdin() {
         Ok(v) => v,
@@ -150,6 +176,16 @@ pub fn main(args: &[String]) -> i32 {
     };
     if envelope.get("v").and_then(Value::as_u64) != Some(1) {
         return usage("stdin.v must be 1");
+    }
+    if FILE_OPS.contains(&op) {
+        return match last_message(&envelope) {
+            Ok((result, mut fields)) => {
+                fields["op"] = json!(op);
+                emit(&line(&result, fields));
+                EXIT_OK
+            }
+            Err(message) => usage(&message),
+        };
     }
     match envelope.get("driver").and_then(Value::as_str) {
         None | Some("herdr") => {}
@@ -196,5 +232,32 @@ mod tests {
             EXIT_USAGE
         );
         assert_eq!(main(&args(&["alive", "--protocol", "1"])), EXIT_USAGE);
+    }
+
+    #[test]
+    fn last_message_answers_from_the_session_folder_and_names_a_missing_one() {
+        let dir = std::env::temp_dir().join(format!("sh-route-last-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let slug = dir.join("-p");
+        std::fs::create_dir_all(&slug).unwrap();
+        std::fs::write(
+            slug.join("e6540401-251d-4181-8930-661e69a42e3b.jsonl"),
+            "{\"type\":\"assistant\",\"message\":{\"id\":\"m\",\"stop_reason\":\"end_turn\",\"content\":[{\"type\":\"text\",\"text\":\"bye\"}]}}\n",
+        )
+        .unwrap();
+        let (result, fields) =
+            last_message(&json!({ "request": { "projectsDir": dir.display().to_string() } }))
+                .unwrap();
+        assert_eq!(
+            (result.as_str(), &fields["message"], &fields["turnEnded"]),
+            ("found", &json!("bye"), &json!(true))
+        );
+        let (result, fields) = last_message(
+            &json!({ "request": { "projectsDir": dir.join("gone").display().to_string() } }),
+        )
+        .unwrap();
+        assert_eq!(result, "not-found");
+        assert!(fields["detail"].as_str().unwrap().contains("gone"));
+        assert!(last_message(&json!({ "request": {} })).is_err());
     }
 }

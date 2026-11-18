@@ -205,3 +205,20 @@ export function createSessionHost({ hostBin, herdrBin, env, config, timeoutMs = 
     },
   };
 }
+
+const FILE_OP_TIMEOUT_MS = 30_000;
+
+/**
+ * readLastAssistantMessage({ projectsDir }, { hostBin }) ->
+ *   { result: 'found', transcript, message: string | null, turnEnded } | { result: 'not-found', detail }
+ *
+ * The last assistant message of the head session whose session folder is `projectsDir` (Claude Code's `projects`
+ * folder of its home), read by the route's `last-message` op from the newest transcript in it. Answered from files
+ * alone: no terminal driver is involved.
+ */
+export async function readLastAssistantMessage({ projectsDir }, { hostBin } = {}) {
+  if (typeof projectsDir !== 'string' || projectsDir === '') throw new SessionHostError('session-host-route-usage', 'projectsDir must be a non-empty string');
+  const bin = hostBin ?? activeHostBin();
+  const argv = ['internal', 'session-host', 'last-message', '--protocol', String(PROTOCOL), '--json'];
+  return interpret(await spawnAsync(bin, argv, JSON.stringify({ v: PROTOCOL, request: { projectsDir } }), FILE_OP_TIMEOUT_MS), bin, 'last-message');
+}

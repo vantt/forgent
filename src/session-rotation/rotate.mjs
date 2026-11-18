@@ -29,6 +29,8 @@ import {
   assertHeadArgs, headKeyOf, headRoleOf, identityHolder, lineageDirOf, nextHeadGeneration, placeHead, readHeadPlacement, writeHeadPlacement,
 } from '../session-host/head-start.mjs';
 import { requestHeadRestoreRole } from '../session-host/head-request-client.mjs';
+import { readLastAssistantMessage } from '../session-host/client.mjs';
+import { seatSessionDir } from '../runner/dispatch/confinement/authority.mjs';
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
 import { redactText, writeHandoff } from './handoff-store.mjs';
 
@@ -41,6 +43,9 @@ const MAX_TEXT = 8000;
 const MAX_LIST = 50;
 const DEFAULT_ANSWER_WAIT_MS = 120_000;
 const CLOSE_WAIT_MS = 60_000;
+// How long a manual rotation waits for the old session to end the turn it asked for the rotation in, so the message
+// it writes after the request (where the secretary batches its open questions) is the one handed over.
+const FINAL_TURN_WAIT_MS = 60_000;
 const STOP_FACT_KEYS = ['sessionId', 'portfolio', 'delta', 'lastAssistantMessage', 'pendingQuestion'];
 
 export class RotationError extends Error {
@@ -162,6 +167,43 @@ async function askRestoreRole({ runDir, persona, name }) {
 
 const realClock = { now: () => Date.now(), sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)) };
 
+/** `text` cut to `MAX_TEXT` UTF-16 units, never inside a surrogate pair. */
+const bounded = (text) => {
+  const cut = text.slice(0, MAX_TEXT);
+  return /[\uD800-\uDBFF]$/.test(cut) ? cut.slice(0, -1) : cut;
+};
+
+/**
+ * The old head's last assistant message, for a rotation no Stop hook carried it for (a manual one): read by the
+ * session-host route from the newest transcript in the session folder the old launch kept or declared, after the
+ * old session ended its turn (at most `FINAL_TURN_WAIT_MS`). When it cannot be read, the text says why, so the
+ * handoff shows the gap instead of an empty section.
+ */
+async function lastMessageOfOld(old, ports, clock) {
+  const projectsDir = (ports.sessionDir ?? seatSessionDir)(old.runDir, old.placement?.key);
+  if (!projectsDir) return '(not found: the old session\'s launch recorded no session folder)';
+  const read = ports.lastMessage ?? readLastAssistantMessage;
+  const until = clock.now() + (ports.finalTurnWaitMs ?? FINAL_TURN_WAIT_MS);
+  for (;;) {
+    let answer;
+    try { answer = await read({ projectsDir }); } catch (err) {
+      return `(not found: the old session's transcript could not be read: ${err.code ?? err.message})`;
+    }
+    if (answer.result !== 'found') return `(not found: ${answer.detail ?? answer.result})`;
+    if (answer.turnEnded || clock.now() >= until) {
+      return typeof answer.message === 'string' && answer.message !== '' ? bounded(answer.message) : '(the old session wrote no assistant message)';
+    }
+    await clock.sleep(ports.pollMs ?? POLL_MS);
+  }
+}
+
+/** The portfolio a successor of `persona` rereads: `sessionRotation.personas.<persona>.reload`, bounded as stop facts are. */
+const reloadOf = (config, persona) => (config.personas?.[persona]?.reload ?? [])
+  .filter((p) => typeof p === 'string' && p !== '' && p.length <= 300).slice(0, MAX_LIST);
+
+/** The portfolio entries that exist in the project; a path the project does not have is left out quietly. */
+const existingIn = (projectRoot, portfolio) => portfolio.filter((p) => !path.isAbsolute(p) && fs.existsSync(path.join(projectRoot, p)));
+
 // ---- the executor ----------------------------------------------------------------------------------
 
 /**
@@ -172,7 +214,11 @@ const realClock = { now: () => Date.now(), sleep: (ms) => new Promise((resolve) 
  *
  * `ports` (all optional, for tests): `end(runDir) -> boolean` (asks that session attempt's supervisor to stop it),
  * `identity({ role, projectRoot }) -> { live, session }`, `lock(lineage) -> { release } | null`, `place` (`placeHead`),
- * `placePorts` (its ports), `config(projectRoot)`, `clock { now, sleep }`, `pollMs`. A rotation already running for the lineage is a no-op (`rotation-in-progress`).
+ * `placePorts` (its ports), `config(projectRoot)`, `clock { now, sleep }`, `pollMs`, and for a manual rotation
+ * `sessionDir(runDir, launchCommandId)` (`seatSessionDir`), `lastMessage({ projectsDir })` (the session-host route's
+ * `last-message`) and `finalTurnWaitMs`. The handoff and `latest.json` record `reason` as the rotation kind, and a
+ * handoff without a stop-fact portfolio lists the persona's `sessionRotation.personas.<persona>.reload`; an entry
+ * the project does not have is left out. A rotation already running for the lineage is a no-op (`rotation-in-progress`).
  */
 export async function rotateHeadSession(request, ports = {}) {
   const { persona, name, reason, projectRoot, stopFacts } = checkRequest(request);
@@ -259,11 +305,13 @@ export async function rotateHeadSession(request, ports = {}) {
     const bound = config.answerWaitMs ?? DEFAULT_ANSWER_WAIT_MS;
 
     const id = crypto.randomBytes(8).toString('hex');
+    const lastAssistantMessage = stopFacts.lastAssistantMessage
+      ?? (reason === 'manual' ? await lastMessageOfOld(old, ports, clock) : null);
     const handoff = writeHandoff({
       fgosDir: path.join(projectRoot, '.fgos'), persona, name, sessionId: stopFacts.sessionId ?? old.placement.key,
-      rotate: reason === 'soft' ? 'soft' : 'hard', keep: config.keep, portfolio: stopFacts.portfolio ?? [],
+      rotate: reason, keep: config.keep, portfolio: existingIn(projectRoot, stopFacts.portfolio ?? reloadOf(config, persona)),
       delta: `${rotationIdLine(id)}\n${stopFacts.delta ?? ''}`,
-      lastAssistantMessage: stopFacts.lastAssistantMessage ?? null, pendingQuestion: stopFacts.pendingQuestion ?? null,
+      lastAssistantMessage, pendingQuestion: stopFacts.pendingQuestion ?? null,
     });
 
     gen = nextHeadGeneration(projectRoot, persona, name);

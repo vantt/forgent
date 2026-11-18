@@ -45,11 +45,14 @@ function dirOf(fgosDir, persona, name) {
   return path.join(fgosDir, 'runtime', 'session-rotation', `${persona}-${name}`);
 }
 
-/** The Markdown body: pointers, delta, and on `hard` the last assistant message and pending question verbatim. */
+/** Rotations whose handoff carries the last assistant message and pending question: one no soft threshold chose. */
+const CARRIES_LAST_MESSAGE = new Set(['hard', 'manual']);
+
+/** The Markdown body: pointers, delta, and on `hard` or `manual` the last assistant message and pending question verbatim. */
 export function buildHandoff({ persona, name, sessionId, rotate, portfolio = [], delta = '', lastAssistantMessage = null, pendingQuestion = null }) {
   const lines = [VERIFY_LINE, '', `# Handoff: ${persona}-${name}`, '', `- session: ${sessionId}`, `- rotation: ${rotate}`, '', '## Portfolio files to reread', ''];
   lines.push(...(portfolio.length > 0 ? portfolio.map((p) => `- ${p}`) : ['- (none listed)']), '', '## Delta since the last handoff', '', delta.trim() || '(none recorded)', '');
-  if (rotate === 'hard') {
+  if (CARRIES_LAST_MESSAGE.has(rotate)) {
     lines.push('## Last assistant message (verbatim)', '', lastAssistantMessage ?? '(none)', '', '## Pending question (verbatim)', '', pendingQuestion ?? '(none)', '');
   }
   return lines.join('\n');
