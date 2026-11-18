@@ -20,3 +20,9 @@
 5. **Phạm vi câu trả lời.** "A" cho phép: đổi hai mount peer-sessions của head có `peers` sang rw, ghi rủi ro vào spec
    confinement, cập nhật backlog `p-oqs75qwyco`; không đổi quyền nào khác. "C" cho phép: không đổi gì thêm. "B": mở một
    phase mới trong plan này với test spike 30 phút trước.
+
+## Trả lời của owner (2026-11-19, qua supervisor)
+
+**C ngay, rồi A.** C (mailbox hai chiều) đã chạy thật. A thành phase 7d (sau phase 4): hai mount peer-sessions
+(`<configDir>/sessions` và `/run/user/<uid>/cc-socks`) chuyển sang đọc-ghi chỉ cho head có `peers`; ghi rủi ro vào spec
+confinement (Miu xoá/sửa được đăng ký và socket của session khác); cập nhật backlog `p-oqs75qwyco`. Không đổi quyền nào khác.
