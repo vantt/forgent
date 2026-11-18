@@ -268,7 +268,7 @@ impl Lander<'_> {
             _ => {
                 return Err(refuse(
                     "land-target-unknown",
-                    "the project trunk is not known; pass a target",
+                    "the project trunk is not known (no remote HEAD); pass a target, or record the remote's default branch once with `git remote set-head origin -a`",
                 ))
             }
         };

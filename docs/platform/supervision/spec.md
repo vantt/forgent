@@ -120,6 +120,7 @@ Personas and grants: shaper gains writes `docs/discussions` and verb `land`; sec
 | No supervisor startable from a timer, or a head killed together with the tick's unit | Spike first (plan phase 2); the start is detached from the tick's unit. Until proven, wake reports `wake-failed` and the tick notifies. |
 | Land onto a dirty main checkout | Refused (`main-checkout-dirty-mid-merge`); the lead's sandbox writes only its plan dir so it never dirties main itself. |
 | A land killed mid-way | `fgos git recover`; the session is journalled by the Land port. |
+| A clone with no remote HEAD (`git remote set-head origin -a` never run) | The trunk is only the checkout's attached branch, which is not trusted: the discussion source emits nothing and `fgos land` without `--target` refuses `land-target-unknown`, naming the fix. Run `git remote set-head origin -a` once. |
 | Lane leak | Lanes are kernel locks: a killed run supervisor frees its lane. `fgos slots` reads the OS state. |
 | Two supervisors | The Identity role is unique per project; a second start for the same role refuses. |
 | Stuck supervisor | A live supervisor leaving events unhandled for `watcher.stuckWakeLimit` ticks raises `supervisor-stuck` (notify). |
