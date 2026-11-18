@@ -16,13 +16,13 @@ macro_rules! sections {
 /// `(section, YAML text)` in schema-set order.
 pub const SCHEMAS: &[(&str, &str)] = sections!("config-schema", ".schema.yaml";
     checkpoint, cleanup, dispatch, docRegistry, eventStore, gateBypass, gateway, herdrOrchestrator,
-    herdrWebDashboard, invariantChecks, ironLaw, mailbox, runner, secrets, sessionRotation, terminal, workerSlots,
-    worktreeSetup);
+    herdrWebDashboard, invariantChecks, ironLaw, land, mailbox, runner, secrets, sessionRotation, supervisor, terminal,
+    watcher, workerSlots, worktreeSetup);
 /// `(section, YAML text)` in schema-set order.
 pub const STANDARD: &[(&str, &str)] = sections!("config-standard", ".yaml";
     checkpoint, cleanup, dispatch, docRegistry, eventStore, gateBypass, gateway, herdrOrchestrator,
-    herdrWebDashboard, invariantChecks, ironLaw, mailbox, runner, secrets, sessionRotation, terminal, workerSlots,
-    worktreeSetup);
+    herdrWebDashboard, invariantChecks, ironLaw, land, mailbox, runner, secrets, sessionRotation, supervisor, terminal,
+    watcher, workerSlots, worktreeSetup);
 
 /// sha256 over the sorted `(kind, name, bytes)` triples of both sets, as lowercase hex; the key of
 /// the snapshot cache. It does not depend on the order the files are listed.

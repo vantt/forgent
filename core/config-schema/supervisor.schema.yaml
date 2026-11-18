@@ -1,0 +1,11 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:supervisor:v1
+$comment: "owner: supervision"
+description: "The project supervisor head and its lead pool."
+type: object
+properties:
+  maxLeads:
+    description: Most leads the supervisor runs at once; it equals the default lane count and is not derived at read time. In leads.
+    type: integer
+    minimum: 1
+    x-fgos-scope: both

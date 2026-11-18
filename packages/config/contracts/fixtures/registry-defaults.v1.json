@@ -116,6 +116,16 @@
     "value": 5
    },
    "reason": "the bundled eventStore standard, which the reader takes for an unset key; the registration seeds only remote"
+  },
+  {
+   "path": "workerSlots.laneWaitSec",
+   "registry": {
+    "absent": true
+   },
+   "standard": {
+    "value": 900
+   },
+   "reason": "the bundled workerSlots standard, which the reader takes for an unset key; the registration seeds only the ceiling"
   }
  ],
  "schema-only": [

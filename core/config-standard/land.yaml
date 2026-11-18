@@ -1,0 +1,8 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc How a finished plan branch lands on the trunk: the gates it must pass and the files it regenerates.
+land:
+  # @fgos:doc Gates a landing runs, each a command and optional path globs; a gate with when runs only if a landed path matches one, and without when it always runs. Default: [].
+  gates: []
+  # @fgos:doc The command that regenerates derived files after a landing, with the files it rewrites; null runs none.
+  regenerate: null

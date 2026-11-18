@@ -464,6 +464,19 @@
   ],
   [
    "sessionRotation"
+  ],
+  [
+   "land"
+  ],
+  [
+   "supervisor"
+  ],
+  [
+   "watcher"
+  ],
+  [
+   "workerSlots",
+   "laneWaitSec"
   ]
  ]
 }

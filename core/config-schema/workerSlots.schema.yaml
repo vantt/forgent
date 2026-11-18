@@ -7,3 +7,8 @@ properties:
   ceiling:
     description: Most work items that may run at once; a claim past it is refused, and null leaves the ceiling unarmed so no claim is refused.
     type: [integer, "null"]
+  laneWaitSec:
+    description: How long a top-level worker seat waits for a free lane before it fails with lane-pool-full. In seconds.
+    type: integer
+    minimum: 0
+    x-fgos-scope: global-only

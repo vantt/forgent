@@ -1,0 +1,48 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:land:v1
+$comment: "owner: supervision"
+description: "How a finished plan branch lands on the trunk: the gates it must pass and the files it regenerates."
+type: object
+properties:
+  gates:
+    description: Gates a landing runs, each a command and optional path globs; a gate with when runs only if a landed path matches one, and without when it always runs.
+    type: array
+    x-fgos-scope: both
+    items:
+      type: object
+      additionalProperties: false
+      required: [run]
+      properties:
+        run:
+          $comment: "justification: read from the trusted main checkout, the landing trust boundary; the entry decides what runs on this machine"
+          description: Shell command of the gate.
+          type: string
+          pattern: "\\S"
+          x-fgos-scope: both
+          x-fgos-sensitivity: command
+        when:
+          description: Path globs; the gate runs only if a landed path matches one.
+          type: array
+          items:
+            type: string
+            minLength: 1
+  regenerate:
+    description: The command that regenerates derived files after a landing, with the files it rewrites; null runs none.
+    type: [object, "null"]
+    additionalProperties: false
+    required: [run, files]
+    x-fgos-scope: both
+    properties:
+      run:
+        $comment: "justification: read from the trusted main checkout, the landing trust boundary; the entry decides what runs on this machine"
+        description: Shell command that regenerates the files.
+        type: string
+        pattern: "\\S"
+        x-fgos-scope: both
+        x-fgos-sensitivity: command
+      files:
+        description: Repo-relative files the command rewrites.
+        type: array
+        items:
+          type: string
+          minLength: 1
