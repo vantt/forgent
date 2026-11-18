@@ -2,9 +2,6 @@
 
 pub mod case;
 pub mod coverage;
-// The definition module sits beside `metrics_cli` on disk; `lib.rs` is outside this change's footprint.
-#[path = "../definition/mod.rs"]
-pub mod definition;
 pub mod discussions;
 pub mod entropy;
 pub mod eval;
@@ -24,7 +21,6 @@ use crate::record::registry::EmbeddedDeclaration;
 use crate::RecordSource;
 use serde_json::json;
 use std::path::{Path, PathBuf};
-use std::sync::OnceLock;
 
 /// What the composition root adds to the record and query verbs: the declarations its crates embed, the payload
 /// tree to discover declarations in, extra record sources, and the config door. Observe depends on none of them.
@@ -35,42 +31,6 @@ pub trait RecordEnvironment: Send + Sync {
     fn record_sources(&self) -> Vec<Box<dyn RecordSource>>;
     /// The numeric config value at `key` for the project at `root`; `Ok(None)` when no layer sets it.
     fn config_number(&self, root: &Path, key: &str) -> Result<Option<f64>, String>;
-}
-
-/// Used until the composition root installs its own: Observe's own declarations, the project's declaration files,
-/// the record store, and no config door.
-struct StandaloneEnvironment;
-
-impl RecordEnvironment for StandaloneEnvironment {
-    fn embedded_declarations(&self) -> Vec<EmbeddedDeclaration> {
-        vec![
-            crate::record::store::HEALTH_DECLARATION,
-            crate::sources::transcript_records::TRANSCRIPT_DECLARATION,
-        ]
-    }
-    fn payload_root(&self) -> Option<PathBuf> {
-        None
-    }
-    fn record_sources(&self) -> Vec<Box<dyn RecordSource>> {
-        vec![Box::new(
-            crate::sources::claude_transcripts::ClaudeTranscriptsSource::new(),
-        )]
-    }
-    fn config_number(&self, _: &Path, key: &str) -> Result<Option<f64>, String> {
-        Err(format!("no config door is wired for {key}"))
-    }
-}
-
-static ENVIRONMENT: OnceLock<Box<dyn RecordEnvironment>> = OnceLock::new();
-
-/// Installs the composition root's environment once; `false` when one was already installed.
-pub fn install_environment(environment: Box<dyn RecordEnvironment>) -> bool {
-    ENVIRONMENT.set(environment).is_ok()
-}
-
-pub(crate) fn environment() -> &'static dyn RecordEnvironment {
-    static STANDALONE: StandaloneEnvironment = StandaloneEnvironment;
-    ENVIRONMENT.get().map_or(&STANDALONE, |e| e.as_ref())
 }
 
 pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
@@ -119,6 +79,7 @@ pub fn dispatch(
     work_source: &dyn WorkObservationSource,
     coverage_scanner: coverage::CoverageScanner,
     unit_summary_scanner: UnitSummaryScanner,
+    record_environment: &dyn RecordEnvironment,
 ) -> Result<serde_json::Value, String> {
     match req.sub.as_str() {
         "ping" => {
@@ -144,8 +105,8 @@ pub fn dispatch(
         "outcomes" => outcomes::dispatch_outcomes(req, work_source),
         "entropy" => entropy::dispatch_entropy(req, work_source),
         "snapshot" => snapshot::dispatch_snapshot(req, work_source),
-        "record" => record::dispatch_record(req),
-        "query" => query::dispatch_query(req),
+        "record" => record::dispatch_record(req, record_environment),
+        "query" => query::dispatch_query(req, record_environment),
         "--help" | "-h" | "help" => Ok(json!({
             "ok": true,
             "command": "metrics",
@@ -156,6 +117,26 @@ pub fn dispatch(
             other,
             AVAILABLE_SUBCOMMANDS.join(", ")
         )),
+    }
+}
+
+/// A record environment for verb tests that never reach records: any call is a test failure.
+#[cfg(test)]
+pub(crate) struct NoRecords;
+
+#[cfg(test)]
+impl RecordEnvironment for NoRecords {
+    fn embedded_declarations(&self) -> Vec<EmbeddedDeclaration> {
+        unreachable!("the verbs under test never read records")
+    }
+    fn payload_root(&self) -> Option<PathBuf> {
+        unreachable!("the verbs under test never read records")
+    }
+    fn record_sources(&self) -> Vec<Box<dyn crate::RecordSource>> {
+        unreachable!("the verbs under test never read records")
+    }
+    fn config_number(&self, _: &Path, _: &str) -> Result<Option<f64>, String> {
+        unreachable!("the verbs under test never read records")
     }
 }
 
@@ -200,7 +181,14 @@ mod tests {
         ) -> Result<crate::UnitSummaryScan, crate::SourceError> {
             unreachable!()
         }
-        dispatch(&request(sub, args), &[], &Unused, no_coverage, no_summaries)
+        dispatch(
+            &request(sub, args),
+            &[],
+            &Unused,
+            no_coverage,
+            no_summaries,
+            &NoRecords,
+        )
     }
 
     #[test]

@@ -7,6 +7,6 @@ mod door;
 mod health;
 mod source;
 
-pub use door::{RecordDoor, WriteOutcome, DEFAULT_LOCK_WAIT};
+pub use door::{new_record_id, RecordDoor, WriteOutcome, DEFAULT_LOCK_WAIT};
 pub use health::{Health, HealthSource, HEALTH_DECLARATION, HEALTH_KIND};
 pub use source::{RecordStoreSource, RECORDS_STORE};

@@ -6,8 +6,25 @@ use fgos_observe::{
 use fgos_run_result::{scan_coverage, scan_unit_summaries, RunResultSource};
 use serde_json::{json, Value};
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
+
+struct NoRecords;
+
+impl fgos_observe::metrics_cli::RecordEnvironment for NoRecords {
+    fn embedded_declarations(&self) -> Vec<fgos_observe::record::registry::EmbeddedDeclaration> {
+        panic!("this verb must not read records")
+    }
+    fn payload_root(&self) -> Option<PathBuf> {
+        panic!("this verb must not read records")
+    }
+    fn record_sources(&self) -> Vec<Box<dyn fgos_observe::RecordSource>> {
+        panic!("this verb must not read records")
+    }
+    fn config_number(&self, _: &Path, _: &str) -> Result<Option<f64>, String> {
+        panic!("this verb must not read records")
+    }
+}
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
@@ -94,6 +111,7 @@ impl Fixture {
             &UnavailableWork,
             scan_coverage,
             scan_unit_summaries,
+            &NoRecords,
         )
         .unwrap()
     }

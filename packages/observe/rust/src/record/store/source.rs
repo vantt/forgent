@@ -21,7 +21,7 @@ impl RecordSource for RecordStoreSource {
     }
 
     /// Any registered kind may be stored; the registry checks it on write.
-    fn kinds(&self) -> &'static [&'static str] {
+    fn kinds(&self) -> &[&str] {
         &[]
     }
 

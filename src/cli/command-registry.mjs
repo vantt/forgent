@@ -275,7 +275,7 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos metrics snapshot'],
       },
       record: {
-        description: 'Write records through the fail-open record door. "--json <file|->" holds one record object or an array; v, ts, basis and origin may be left out. A record the registry refuses is counted and reported, never an error.',
+        description: 'Write records through the fail-open record door. "--json <file|->" holds one record object or an array; v, ts, basis and origin may be left out. A record the registry refuses is counted and reported, never an error. The one refusal of the whole call: a root whose Git topology cannot be trusted exits non-zero with observe-root-unresolved and writes nothing.',
         parameters: {
           type: 'object',
           properties: {
@@ -284,7 +284,7 @@ export const COMMAND_REGISTRY = [
           positional: ['file'],
           required: [],
         },
-        examples: ['fgos metrics record --json record.json', 'echo \'{"kind":"fgos.example","subject":{"kind":"run","id":"r1"}}\' | fgos metrics record --json -'],
+        examples: ['fgos metrics record --json record.json', 'fgos metrics record --json - < records.json'],
       },
       query: {
         description: 'Query records with one grammar: --kind, --where, --ref, --since/--until, --by, --bucket, --latest-per, --agg, --having, --join, --without, --min-sample. Or run named definitions (*.query.json) with --def <file|dir>, repeatable; one call returns every definition\'s rows. A kind nobody declares or serves answers "unmeasured" with the reason.',

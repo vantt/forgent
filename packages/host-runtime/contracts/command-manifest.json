@@ -428,7 +428,7 @@
           ]
         },
         "record": {
-          "description": "Write records through the fail-open record door. \"--json <file|->\" holds one record object or an array; v, ts, basis and origin may be left out. A record the registry refuses is counted and reported, never an error.",
+          "description": "Write records through the fail-open record door. \"--json <file|->\" holds one record object or an array; v, ts, basis and origin may be left out. A record the registry refuses is counted and reported, never an error. The one refusal of the whole call: a root whose Git topology cannot be trusted exits non-zero with observe-root-unresolved and writes nothing.",
           "parameters": {
             "type": "object",
             "properties": {
@@ -444,7 +444,7 @@
           },
           "examples": [
             "fgos metrics record --json record.json",
-            "echo '{\"kind\":\"fgos.example\",\"subject\":{\"kind\":\"run\",\"id\":\"r1\"}}' | fgos metrics record --json -"
+            "fgos metrics record --json - < records.json"
           ]
         },
         "query": {

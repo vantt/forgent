@@ -1,8 +1,8 @@
 //! Named definitions through `fgos metrics query --def`: the seven detections and measures that consumers write,
 //! over the test-local declarations of the query fixtures; no Observe source names any of their kinds.
 
-use fgos_observe::metrics_cli::definition::DEFINITION_SUFFIX;
-use fgos_observe::metrics_cli::query::dispatch_query_with;
+use fgos_observe::definition::DEFINITION_SUFFIX;
+use fgos_observe::metrics_cli::query::dispatch_query;
 use fgos_observe::metrics_cli::RecordEnvironment;
 use fgos_observe::record::registry::EmbeddedDeclaration;
 use fgos_observe::record::store::RecordDoor;
@@ -109,7 +109,7 @@ fn query(root: &Path, args: &[&str], env: &TestEnvironment) -> Value {
         root: root.to_path_buf(),
         stdin: None,
     };
-    dispatch_query_with(&request, env).unwrap()
+    dispatch_query(&request, env).unwrap()
 }
 
 fn answer<'a>(all: &'a Value, name: &str) -> &'a Value {
@@ -242,7 +242,7 @@ fn a_required_kind_that_is_undeclared_or_has_no_source_is_unmeasured_with_the_re
         "kind-undeclared: fgos.nothing.*"
     );
 
-    // A declared kind written by nothing in this host has a store source, so a prefix over declared kinds measures.
+    // The store serves the declared kinds it holds, so a prefix over stored kinds measures.
     write_definition(&defs, "owner-wait", |d| {
         d["requires"] = json!(["fgos.question.*"]);
     });
@@ -252,6 +252,20 @@ fn a_required_kind_that_is_undeclared_or_has_no_source_is_unmeasured_with_the_re
         &TestEnvironment { config: vec![] },
     );
     assert!(answer(&all, "owner-wait")["unmeasured"].is_null());
+
+    // A declared kind nothing has written and no source serves has no source.
+    write_definition(&defs, "owner-wait", |d| {
+        d["requires"] = json!(["fgos.stale.kind"]);
+    });
+    let all = query(
+        &root,
+        &["--def", defs.to_str().unwrap(), "--now", NOW],
+        &TestEnvironment { config: vec![] },
+    );
+    assert_eq!(
+        answer(&all, "owner-wait")["unmeasured"],
+        "no-source: fgos.stale.kind"
+    );
 }
 
 #[test]
@@ -326,7 +340,7 @@ fn the_grammar_flags_run_one_query_and_a_definition_takes_no_other_flag() {
         root: root.clone(),
         stdin: None,
     };
-    assert!(dispatch_query_with(&request, &env)
+    assert!(dispatch_query(&request, &env)
         .unwrap_err()
         .contains("--kind cannot be used with --def"));
 }
@@ -342,13 +356,28 @@ fn two_definitions_with_one_name_are_refused() {
         defs.join("copy.query.json"),
     )
     .unwrap();
-    let request = ObserveRequest {
-        operation: "observe.metrics".to_owned(),
-        sub: "query".to_owned(),
-        args: vec!["--def".to_owned(), defs.to_str().unwrap().to_owned()],
-        root,
-        stdin: None,
+    let refused = |paths: &[&Path]| {
+        let request = ObserveRequest {
+            operation: "observe.metrics".to_owned(),
+            sub: "query".to_owned(),
+            args: paths
+                .iter()
+                .flat_map(|p| ["--def".to_owned(), p.to_str().unwrap().to_owned()])
+                .collect(),
+            root: root.clone(),
+            stdin: None,
+        };
+        dispatch_query(&request, &TestEnvironment { config: vec![] }).unwrap_err()
     };
-    let error = dispatch_query_with(&request, &TestEnvironment { config: vec![] }).unwrap_err();
-    assert!(error.contains("defined twice"), "{error}");
+    // Inside one directory, and across two --def paths, with both files named.
+    let within = refused(&[&defs]);
+    assert!(within.contains("defined twice"), "{within}");
+    let across = refused(&[
+        &defs.join("copy.query.json"),
+        &defs.join("head-gone.query.json"),
+    ]);
+    assert!(
+        across.contains("defined twice") && across.contains("copy.query.json"),
+        "{across}"
+    );
 }

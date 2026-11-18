@@ -157,7 +157,7 @@ impl RecordDoor {
     pub fn write(&self, mut record: Record) -> WriteOutcome {
         let deterministic = !record.id.is_empty();
         if !deterministic {
-            record.id = random_id();
+            record.id = new_record_id();
         }
         let checked = self.check(&record);
         let mut state = self.state.lock().unwrap_or_else(PoisonError::into_inner);
@@ -239,8 +239,9 @@ impl RecordDoor {
     }
 }
 
-/// A unique id for a record written without one: process-random state, the clock, the pid and a counter.
-fn random_id() -> String {
+/// A unique id for a record written without one: process-random state, the clock, the pid and a counter. A caller
+/// that must name the id it wrote assigns it before the write.
+pub fn new_record_id() -> String {
     static COUNTER: AtomicU64 = AtomicU64::new(0);
     let mut hasher = RandomState::new().build_hasher();
     hasher.write_u64(COUNTER.fetch_add(1, Ordering::Relaxed));

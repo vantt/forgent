@@ -1,9 +1,10 @@
 //! The Observe verbs' flags, read from the shared CLI parser (`fgos_host_runtime::cli_args`): `--key value`,
-//! boolean switches and at most one positional. `--dir` (the target root, which the host resolves before the
+//! boolean switches and at most one positional. A value flag may be given more than once: `values` reads every use
+//! in order, `value` the last one. `--dir` (the target root, which the host resolves before the
 //! verb runs) is skipped and `--json` is accepted as a no-op. An unknown flag, a missing value, a value given to
 //! a switch or a bad number is an error, never a silent drop.
 
-use fgos_host_runtime::cli_args::{parse_args, FlagScalar, FlagValue};
+use fgos_host_runtime::cli_args::{parse_args_repeating, FlagScalar, FlagValue};
 use std::ffi::OsString;
 use std::str::FromStr;
 
@@ -24,7 +25,12 @@ impl Flags {
         takes_positional: bool,
     ) -> Result<Self, String> {
         let tokens: Vec<OsString> = args.iter().map(OsString::from).collect();
-        let parsed = parse_args(&tokens).map_err(|error| error.to_string())?;
+        let repeatable: Vec<&str> = value_flags
+            .iter()
+            .filter_map(|flag| flag.strip_prefix("--"))
+            .collect();
+        let parsed =
+            parse_args_repeating(&tokens, &repeatable).map_err(|error| error.to_string())?;
         let mut flags = Self::default();
         let mut words = parsed.positional.clone();
         for (key, value) in &parsed.flags {
@@ -39,15 +45,23 @@ impl Flags {
             if name == "--dir" {
                 continue;
             }
+            if value_flags.contains(&name.as_str()) {
+                let uses = match value {
+                    FlagValue::One(scalar) => std::slice::from_ref(scalar),
+                    FlagValue::Many(all) => all.as_slice(),
+                };
+                for scalar in uses {
+                    match scalar {
+                        FlagScalar::Str(text) => flags.values.push((name.clone(), text.clone())),
+                        FlagScalar::Bool => return Err(format!("missing value for {name}")),
+                    }
+                }
+                continue;
+            }
             let FlagValue::One(scalar) = value else {
                 return Err(format!("unknown option {name}"));
             };
-            if value_flags.contains(&name.as_str()) {
-                match scalar {
-                    FlagScalar::Str(text) => flags.values.push((name, text.clone())),
-                    FlagScalar::Bool => return Err(format!("missing value for {name}")),
-                }
-            } else if switch_flags.contains(&name.as_str()) {
+            if switch_flags.contains(&name.as_str()) {
                 match scalar {
                     FlagScalar::Bool => flags.switches.push(name),
                     FlagScalar::Str(_) => return Err(format!("{name} takes no value")),
@@ -64,11 +78,18 @@ impl Flags {
         Ok(flags)
     }
 
+    /// The last use of the flag.
     pub fn value(&self, flag: &str) -> Option<&str> {
+        self.values(flag).pop()
+    }
+
+    /// Every use of the flag, in the order given.
+    pub fn values(&self, flag: &str) -> Vec<&str> {
         self.values
             .iter()
-            .find(|(name, _)| name == flag)
+            .filter(|(name, _)| name == flag)
             .map(|(_, value)| value.as_str())
+            .collect()
     }
 
     pub fn switch(&self, flag: &str) -> bool {
@@ -122,6 +143,30 @@ mod tests {
         assert!(flags.switch("--detail-stdin"));
         assert_eq!(flags.positional(), Some("work:a"));
         assert_eq!(flags.value("--dir"), None);
+    }
+
+    #[test]
+    fn a_repeated_value_flag_keeps_every_use_and_value_reads_the_last() {
+        let flags = Flags::parse(
+            &args(&["--where", "a=1", "--since", "-1h", "--where", "b<0.5"]),
+            &["--where", "--since"],
+            &[],
+            false,
+        )
+        .unwrap();
+        assert_eq!(flags.values("--where"), ["a=1", "b<0.5"]);
+        assert_eq!(flags.value("--where"), Some("b<0.5"));
+        assert_eq!(flags.value("--since"), Some("-1h"));
+        assert_eq!(
+            Flags::parse(
+                &args(&["--where", "a=1", "--where"]),
+                &["--where"],
+                &[],
+                false
+            )
+            .unwrap_err(),
+            "missing value for --where"
+        );
     }
 
     #[test]

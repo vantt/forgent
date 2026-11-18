@@ -150,7 +150,7 @@ impl RecordSource for HealthSource {
         SOURCE_ID
     }
 
-    fn kinds(&self) -> &'static [&'static str] {
+    fn kinds(&self) -> &[&str] {
         &[HEALTH_KIND]
     }
 

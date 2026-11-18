@@ -217,7 +217,7 @@ impl RecordSource for ClaudeTranscriptsSource {
         SOURCE_ID
     }
 
-    fn kinds(&self) -> &'static [&'static str] {
+    fn kinds(&self) -> &[&str] {
         &[USAGE_KIND, ACTIVITY_KIND]
     }
 

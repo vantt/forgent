@@ -89,61 +89,71 @@ impl Definition {
     }
 }
 
-/// The definitions in `path`: one file, or every `*.query.json` directly inside a directory, in name order.
-/// A symlink is never followed. Two definitions with one name are refused.
-pub fn load(path: &Path) -> Result<Vec<Definition>, DefinitionError> {
-    let read_error = |p: &Path, e: &std::io::Error| DefinitionError::Read {
-        path: p.display().to_string(),
-        message: e.to_string(),
-    };
-    let meta = fs::symlink_metadata(path).map_err(|e| read_error(path, &e))?;
-    let mut files = Vec::new();
-    if meta.is_dir() {
-        for entry in fs::read_dir(path).map_err(|e| read_error(path, &e))? {
-            let entry = entry.map_err(|e| read_error(path, &e))?;
-            let file = entry.path();
-            let is_definition = file
-                .file_name()
-                .and_then(|n| n.to_str())
-                .is_some_and(|n| n.ends_with(DEFINITION_SUFFIX));
-            let regular = entry.file_type().is_ok_and(|t| t.is_file());
-            if is_definition && regular {
-                files.push(file);
+/// The definitions in `paths`, in the order given: each path is one file, or every `*.query.json` directly inside a
+/// directory, in name order. A symlink is never followed. Two definitions with one name, in one path or across
+/// paths, are refused.
+pub fn load(paths: &[&Path]) -> Result<Vec<Definition>, DefinitionError> {
+    let mut loaded: Vec<(String, Definition)> = Vec::new();
+    for path in paths {
+        for file in definition_files(path)? {
+            let origin = file.display().to_string();
+            let len = fs::metadata(&file)
+                .map_err(|e| read_error(&file, &e))?
+                .len();
+            if len > MAX_DEFINITION_BYTES {
+                return Err(DefinitionError::Invalid {
+                    path: origin,
+                    message: format!("larger than {MAX_DEFINITION_BYTES} bytes"),
+                });
             }
+            let text = fs::read_to_string(&file).map_err(|e| read_error(&file, &e))?;
+            let definition = Definition::parse(&origin, &text)?;
+            if let Some((first, _)) = loaded.iter().find(|(_, d)| d.name == definition.name) {
+                return Err(DefinitionError::Duplicate {
+                    name: definition.name,
+                    first: first.clone(),
+                    second: origin,
+                });
+            }
+            loaded.push((origin, definition));
         }
-        files.sort();
-    } else if meta.is_file() {
-        files.push(path.to_path_buf());
-    } else {
+    }
+    Ok(loaded.into_iter().map(|(_, d)| d).collect())
+}
+
+fn read_error(path: &Path, e: &std::io::Error) -> DefinitionError {
+    DefinitionError::Read {
+        path: path.display().to_string(),
+        message: e.to_string(),
+    }
+}
+
+/// The one file `path` names, or the regular `*.query.json` files directly inside the directory, in name order.
+fn definition_files(path: &Path) -> Result<Vec<std::path::PathBuf>, DefinitionError> {
+    let meta = fs::symlink_metadata(path).map_err(|e| read_error(path, &e))?;
+    if meta.is_file() {
+        return Ok(vec![path.to_path_buf()]);
+    }
+    if !meta.is_dir() {
         return Err(DefinitionError::Read {
             path: path.display().to_string(),
             message: "not a regular file or directory".to_owned(),
         });
     }
-    let mut loaded: Vec<(String, Definition)> = Vec::new();
-    for file in files {
-        let origin = file.display().to_string();
-        let len = fs::metadata(&file)
-            .map_err(|e| read_error(&file, &e))?
-            .len();
-        if len > MAX_DEFINITION_BYTES {
-            return Err(DefinitionError::Invalid {
-                path: origin,
-                message: format!("larger than {MAX_DEFINITION_BYTES} bytes"),
-            });
+    let mut files = Vec::new();
+    for entry in fs::read_dir(path).map_err(|e| read_error(path, &e))? {
+        let entry = entry.map_err(|e| read_error(path, &e))?;
+        let file = entry.path();
+        let is_definition = file
+            .file_name()
+            .and_then(|n| n.to_str())
+            .is_some_and(|n| n.ends_with(DEFINITION_SUFFIX));
+        if is_definition && entry.file_type().is_ok_and(|t| t.is_file()) {
+            files.push(file);
         }
-        let text = fs::read_to_string(&file).map_err(|e| read_error(&file, &e))?;
-        let definition = Definition::parse(&origin, &text)?;
-        if let Some((first, _)) = loaded.iter().find(|(_, d)| d.name == definition.name) {
-            return Err(DefinitionError::Duplicate {
-                name: definition.name,
-                first: first.clone(),
-                second: origin,
-            });
-        }
-        loaded.push((origin, definition));
     }
-    Ok(loaded.into_iter().map(|(_, d)| d).collect())
+    files.sort();
+    Ok(files)
 }
 
 /// Resolves the `configKey` of a parameter. Observe never reads config: the composition root supplies this.

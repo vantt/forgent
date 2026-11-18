@@ -2478,6 +2478,65 @@ fn test_native_verb_with_stdin_payload_still_reads_it() {
     );
 }
 
+/// Runs `fgos metrics <args> --dir <root> --json` with `stdin` piped and returns the answer's `data`.
+fn metrics_with_stdin(root: &Path, args: &[&str], stdin: &str) -> serde_json::Value {
+    use std::io::Write;
+    use std::process::Stdio;
+    let mut child = Command::new(fgos_bin())
+        .arg("metrics")
+        .args(args)
+        .arg("--dir")
+        .arg(root)
+        .arg("--json")
+        .current_dir(root)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("failed to spawn fgos");
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(stdin.as_bytes())
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(
+        output.status.success(),
+        "metrics {args:?} failed: stdout={stdout} stderr={}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    serde_json::from_str::<serde_json::Value>(&stdout).unwrap()["data"].clone()
+}
+
+#[test]
+fn a_record_piped_into_metrics_record_is_read_back_by_a_query_piped_into_metrics_query() {
+    let root = std::env::temp_dir().join(format!("fgos_test_metrics_pipe_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    let kinds = root.join(".fgos/observe/kinds");
+    fs::create_dir_all(&kinds).unwrap();
+    fs::write(
+        kinds.join("probe.json"),
+        r#"{"contract":"observe-kinds.v1","subjectKinds":["probe"],"measures":{"probe.size":{"unit":"count","aggs":["sum"]}},"kinds":{"probe.sample":{"subjects":["probe"],"measures":["probe.size"]}}}"#,
+    )
+    .unwrap();
+
+    let written = metrics_with_stdin(
+        &root,
+        &["record", "--json", "-"],
+        r#"{"id":"probe-1","kind":"probe.sample","ts":"2026-11-18T10:00:00Z","subject":{"kind":"probe","id":"p"},"measures":{"probe.size":4}}"#,
+    );
+    assert_eq!(written["written"], 1, "{written}");
+    let read = metrics_with_stdin(
+        &root,
+        &["query", "--query", "-", "--now", "2026-11-18T12:00:00Z"],
+        r#"{"kind":["probe.sample"],"agg":["sum:probe.size"]}"#,
+    );
+    let _ = fs::remove_dir_all(&root);
+    assert_eq!(read["rows"][0]["aggs"]["sum:probe.size"], 4, "{read}");
+}
+
 /// The host resolves the state root once and pins it into the Node
 /// payload's environment as `FGOS_STATE_ROOT`; a root the caller already
 /// pinned is passed through untouched.

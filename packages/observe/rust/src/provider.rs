@@ -73,12 +73,14 @@ pub const OBSERVE_FRICTION_DESCRIPTOR: ProviderDescriptor = observe_descriptor(
 );
 
 /// What the composition root gives Observe: the observation sources and
-/// scanners the metrics verbs read and the work store they need.
+/// scanners the metrics verbs read, the work store they need, and the record
+/// environment of the record and query verbs.
 pub struct ObserveWiring {
     pub sources: Vec<Box<dyn crate::ObservationSource>>,
     pub work_source: Box<dyn crate::WorkObservationSource>,
     pub coverage_scanner: metrics_cli::coverage::CoverageScanner,
     pub unit_summary_scanner: crate::UnitSummaryScanner,
+    pub record_environment: Box<dyn metrics_cli::RecordEnvironment>,
 }
 
 /// The provider of one of Observe's two operations; the request's operation id
@@ -126,6 +128,7 @@ impl OperationProvider for ObserveProvider {
                         wiring.work_source.as_ref(),
                         wiring.coverage_scanner,
                         wiring.unit_summary_scanner,
+                        wiring.record_environment.as_ref(),
                     )
                 }
                 "observe.friction" => {

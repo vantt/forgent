@@ -30,11 +30,34 @@ use std::sync::Arc;
 fn native_invocation_reads_stdin(op_id: &str, cli_args: &[std::ffi::OsString]) -> bool {
     let arg = |i: usize| cli_args.get(i).and_then(|a| a.to_str());
     match op_id {
-        "observe.metrics" => {
-            arg(1) == Some("ping") || (arg(1) == Some("eval") && arg(2) == Some("record"))
-        }
+        "observe.metrics" => match arg(1) {
+            Some("ping") => true,
+            Some("eval") => arg(2) == Some("record"),
+            Some("record") | Some("query") => metrics_reads_stdin(arg(1), &cli_args[2..]),
+            _ => false,
+        },
         "observe.friction" => cli_args.iter().any(|a| a == "--detail-stdin"),
         _ => false,
+    }
+}
+
+/// `metrics record` reads stdin when its file (`--json <file>` or a bare word) is `-` or absent; `metrics query`
+/// only for `--query -`. Read with the one CLI parser the verbs use.
+fn metrics_reads_stdin(sub: Option<&str>, rest: &[std::ffi::OsString]) -> bool {
+    use fgos_host_runtime::cli_args::{parse_args, FlagScalar, FlagValue};
+    let Ok(parsed) = parse_args(rest) else {
+        return false;
+    };
+    let text = |flag: &str| match parsed.flag(flag) {
+        Some(FlagValue::One(FlagScalar::Str(value))) => Some(value.as_str()),
+        _ => None,
+    };
+    match sub {
+        Some("record") => {
+            let file = text("json").or(parsed.positional.first().map(String::as_str));
+            file.is_none_or(|file| file == "-")
+        }
+        _ => text("query") == Some("-"),
     }
 }
 
@@ -283,6 +306,9 @@ fn main() {
         work_source: wiring::metrics_sources::build_work_observation_source(),
         coverage_scanner: fgos_run_result::scan_coverage,
         unit_summary_scanner: wiring::metrics_sources::build_unit_summary_scanner(),
+        record_environment: Box::new(wiring::observe_query::HostRecordEnvironment {
+            payload_root: active_payload_root,
+        }),
     });
     for descriptor in [
         fgos_observe::OBSERVE_METRICS_DESCRIPTOR,

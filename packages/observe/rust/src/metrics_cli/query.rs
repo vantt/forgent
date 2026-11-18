@@ -10,17 +10,21 @@
 //! `--def <file|dir>` runs the named definitions in it and returns every definition's rows in one answer; a
 //! definition takes no other query flag. `--now <rfc3339>` fixes the clock.
 
-use super::definition::{self, Environment, ParamResolver};
-use super::{environment, RecordEnvironment};
+use super::{parse_flags, RecordEnvironment};
 use crate::contract::{ObserveRequest, RecordSource, SourceError, Window};
+use crate::definition::{self, Environment, ParamResolver};
+use crate::flags::Flags;
 use crate::query::{run, Cond, Op, Query, QueryContext};
 use crate::record::registry::{load_registry, Registry};
+use crate::record::store::{HealthSource, RecordStoreSource};
 use crate::record::types::Record;
+use crate::time::ParsedWindow;
 use fgos_host_runtime::civil_time::parse_rfc3339_millis;
 use serde_json::{json, Value};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 use std::io::Read;
 use std::path::Path;
+use std::sync::OnceLock;
 
 const VALUE_FLAGS: &[&str] = &[
     "--kind",
@@ -44,70 +48,28 @@ const VALUE_FLAGS: &[&str] = &[
     "--now",
 ];
 
-/// Every use of every flag, in order. `--json` and `--dir` belong to the host and are skipped.
-struct Scanned(Vec<(String, String)>);
-
-impl Scanned {
-    fn parse(args: &[String]) -> Result<Self, String> {
-        let mut found = Vec::new();
-        let mut i = 0;
-        while i < args.len() {
-            let token = &args[i];
-            i += 1;
-            if token == "--json" {
-                continue;
-            }
-            if !token.starts_with("--") {
-                return Err(format!("metrics query: unexpected argument {token}"));
-            }
-            let is_dir = token == "--dir";
-            if !is_dir && !VALUE_FLAGS.contains(&token.as_str()) {
-                return Err(format!("metrics query: unknown option {token}"));
-            }
-            match args.get(i) {
-                Some(value) if !value.starts_with("--") => {
-                    i += 1;
-                    if !is_dir {
-                        found.push((token.clone(), value.clone()));
-                    }
-                }
-                _ => return Err(format!("metrics query: missing value for {token}")),
-            }
-        }
-        Ok(Self(found))
-    }
-
-    fn all(&self, flag: &str) -> Vec<&str> {
-        self.0
-            .iter()
-            .filter(|(name, _)| name == flag)
-            .map(|(_, value)| value.as_str())
-            .collect()
-    }
-
-    fn one(&self, flag: &str) -> Option<&str> {
-        self.all(flag).last().copied()
-    }
-
-    /// Comma-separated entries of every use.
-    fn list(&self, flag: &str) -> Vec<String> {
-        self.all(flag)
-            .into_iter()
-            .flat_map(|v| v.split(','))
-            .map(str::trim)
-            .filter(|v| !v.is_empty())
-            .map(str::to_owned)
-            .collect()
-    }
+/// Comma-separated entries of every use of a list flag.
+fn list(flags: &Flags, flag: &str) -> Vec<String> {
+    flags
+        .values(flag)
+        .into_iter()
+        .flat_map(|v| v.split(','))
+        .map(str::trim)
+        .filter(|v| !v.is_empty())
+        .map(str::to_owned)
+        .collect()
 }
 
+/// A condition value: a boolean, a whole number, a decimal, or else the text itself.
 fn scalar(text: &str) -> Value {
     match text {
         "true" => json!(true),
         "false" => json!(false),
-        _ => text
-            .parse::<i64>()
-            .map_or_else(|_| json!(text), |n| json!(n)),
+        _ => match (text.parse::<i64>(), text.parse::<f64>()) {
+            (Ok(n), _) => json!(n),
+            (_, Ok(x)) if x.is_finite() => json!(x),
+            _ => json!(text),
+        },
     }
 }
 
@@ -179,53 +141,53 @@ fn read_query_file(req: &ObserveRequest, path: &str) -> Result<Query, String> {
     serde_json::from_slice(&bytes).map_err(|e| format!("metrics query: invalid query {path}: {e}"))
 }
 
-fn build_query(req: &ObserveRequest, flags: &Scanned) -> Result<Query, String> {
-    let mut query = match flags.one("--query") {
+fn build_query(req: &ObserveRequest, flags: &Flags) -> Result<Query, String> {
+    let mut query = match flags.value("--query") {
         Some(path) => read_query_file(req, path)?,
         None => Query::default(),
     };
-    query.kind.extend(flags.list("--kind"));
-    for text in flags.all("--where") {
+    query.kind.extend(list(flags, "--kind"));
+    for text in flags.values("--where") {
         query.where_.push(parse_cond(text)?);
     }
-    for text in flags.all("--where-latest") {
+    for text in flags.values("--where-latest") {
         query.where_latest.push(parse_cond(text)?);
     }
-    query.refs.extend(parse_each(flags.list("--ref"))?);
-    if let Some(since) = flags.one("--since") {
+    query.refs.extend(parse_each(list(flags, "--ref"))?);
+    if let Some(since) = flags.value("--since") {
         query.since = Some(since.to_owned());
     }
-    if let Some(until) = flags.one("--until") {
+    if let Some(until) = flags.value("--until") {
         query.until = Some(until.to_owned());
     }
-    if let Some(on) = flags.one("--window-on") {
+    if let Some(on) = flags.value("--window-on") {
         query.window_on = serde_json::from_value(json!(on))
             .map_err(|_| format!("metrics query: invalid --window-on {on}: expected ts or end"))?;
     }
-    query.by.extend(flags.list("--by"));
-    if let Some(bucket) = flags.one("--bucket") {
+    query.by.extend(list(flags, "--by"));
+    if let Some(bucket) = flags.value("--bucket") {
         query.bucket = Some(serde_json::from_value(json!(bucket)).map_err(|_| {
             format!("metrics query: invalid --bucket {bucket}: expected hour, day or week")
         })?);
     }
-    if let Some(latest) = flags.one("--latest-per") {
+    if let Some(latest) = flags.value("--latest-per") {
         query.latest_per = Some(
             latest
                 .parse()
                 .map_err(|e: crate::query::QueryError| e.to_string())?,
         );
     }
-    query.agg.extend(parse_each(flags.list("--agg"))?);
+    query.agg.extend(parse_each(list(flags, "--agg"))?);
     query
         .having
-        .extend(json_each("--having", &flags.all("--having"))?);
+        .extend(json_each("--having", &flags.values("--having"))?);
     query
         .join
-        .extend(json_each("--join", &flags.all("--join"))?);
+        .extend(json_each("--join", &flags.values("--join"))?);
     query
         .without
-        .extend(json_each("--without", &flags.all("--without"))?);
-    if let Some(n) = flags.one("--min-sample") {
+        .extend(json_each("--without", &flags.values("--without"))?);
+    if let Some(n) = flags.value("--min-sample") {
         query.min_sample = n
             .parse()
             .map_err(|_| format!("metrics query: --min-sample requires a whole number, got {n}"))?;
@@ -233,20 +195,69 @@ fn build_query(req: &ObserveRequest, flags: &Scanned) -> Result<Query, String> {
     Ok(query)
 }
 
-/// The record store, offered for every declared kind: the store holds any registered kind, so it names them all.
-struct StoreSource {
-    kinds: &'static [&'static str],
+/// The record store, offered for the declared kinds it holds, so a declared kind nobody has written answers
+/// `no-source`. The store is read once per call; a read that fails offers every declared kind, so the failure
+/// answers `source-failed` instead of a missing source.
+struct StoreSource<'a> {
+    root: &'a Path,
+    declared: Vec<&'a str>,
+    read: OnceLock<StoreRead<'a>>,
 }
 
-impl RecordSource for StoreSource {
+struct StoreRead<'a> {
+    kinds: Vec<&'a str>,
+    records: Result<Vec<Record>, String>,
+}
+
+const STORE_SOURCE_ID: &str = "fgos.observe.records";
+
+impl<'a> StoreSource<'a> {
+    fn read(&self) -> &StoreRead<'a> {
+        self.read.get_or_init(
+            || match RecordStoreSource.records(self.root, &Window::default()) {
+                Ok(records) => {
+                    let held: HashSet<&str> = records.iter().map(|r| r.kind.as_str()).collect();
+                    StoreRead {
+                        kinds: self
+                            .declared
+                            .iter()
+                            .copied()
+                            .filter(|k| held.contains(k))
+                            .collect(),
+                        records: Ok(records),
+                    }
+                }
+                Err(e) => StoreRead {
+                    kinds: self.declared.clone(),
+                    records: Err(e.to_string()),
+                },
+            },
+        )
+    }
+}
+
+impl RecordSource for StoreSource<'_> {
     fn source_id(&self) -> &'static str {
-        "fgos.observe.records"
+        STORE_SOURCE_ID
     }
-    fn kinds(&self) -> &'static [&'static str] {
-        self.kinds
+    fn kinds(&self) -> &[&str] {
+        &self.read().kinds
     }
-    fn records(&self, root: &Path, w: &Window) -> Result<Vec<Record>, SourceError> {
-        crate::record::store::RecordStoreSource.records(root, w)
+    /// The records of the one read, inside the window; the root is the one this source was built for.
+    fn records(&self, _: &Path, w: &Window) -> Result<Vec<Record>, SourceError> {
+        let failed = |message: String| SourceError::ReadFailed {
+            source_id: STORE_SOURCE_ID,
+            message,
+        };
+        let window = ParsedWindow::parse(w).map_err(failed)?;
+        match &self.read().records {
+            Err(message) => Err(failed(message.clone())),
+            Ok(records) => Ok(records
+                .iter()
+                .filter(|r| parse_rfc3339_millis(&r.ts).is_some_and(|ms| window.contains(ms)))
+                .cloned()
+                .collect()),
+        }
     }
 }
 
@@ -261,8 +272,8 @@ impl ParamResolver for Resolver<'_> {
     }
 }
 
-fn now_millis(flags: &Scanned) -> Result<i64, String> {
-    match flags.one("--now") {
+fn now_millis(flags: &Flags) -> Result<i64, String> {
+    match flags.value("--now") {
         Some(text) => parse_rfc3339_millis(text)
             .ok_or_else(|| format!("metrics query: invalid --now {text}: expected RFC 3339")),
         None => parse_rfc3339_millis(&crate::time::now_iso())
@@ -270,25 +281,16 @@ fn now_millis(flags: &Scanned) -> Result<i64, String> {
     }
 }
 
-pub fn dispatch_query(req: &ObserveRequest) -> Result<Value, String> {
-    dispatch_query_with(req, environment())
-}
-
-/// `dispatch_query` over an explicit environment, so a test or a composition root decides what it can reach.
-pub fn dispatch_query_with(
-    req: &ObserveRequest,
-    env: &dyn RecordEnvironment,
-) -> Result<Value, String> {
-    let flags = Scanned::parse(&req.args)?;
-    let definitions = flags.all("--def");
+/// Runs the query over what the environment reaches: the composition root's in the binary, a test's own in tests.
+pub fn dispatch_query(req: &ObserveRequest, env: &dyn RecordEnvironment) -> Result<Value, String> {
+    let flags = parse_flags("query", &req.args, VALUE_FLAGS, &[], false)?;
+    let definitions = flags.values("--def");
     if !definitions.is_empty() {
-        let others: Vec<&str> = flags
-            .0
+        let other = VALUE_FLAGS
             .iter()
-            .map(|(name, _)| name.as_str())
-            .filter(|n| !matches!(*n, "--def" | "--now"))
-            .collect();
-        if let Some(other) = others.first() {
+            .filter(|f| !matches!(**f, "--def" | "--now"))
+            .find(|f| flags.value(f).is_some());
+        if let Some(other) = other {
             return Err(format!(
                 "metrics query: {other} cannot be used with --def; a definition holds its own query"
             ));
@@ -300,36 +302,19 @@ pub fn dispatch_query_with(
         Some(&req.root),
     )
     .map_err(|e| format!("metrics query: registry load failed: {e}"))?;
-    // The sources live for this one call, so naming the kinds once for the store is bounded.
-    let kinds: &'static [&'static str] = Box::leak(
-        registry
-            .kind_names()
-            .map(|k| &*Box::leak(k.to_owned().into_boxed_str()))
-            .collect::<Vec<&'static str>>()
-            .into_boxed_slice(),
-    );
-    let store = StoreSource { kinds };
+    let store = StoreSource {
+        root: &req.root,
+        declared: registry.kind_names().collect(),
+        read: OnceLock::new(),
+    };
     let extra = env.record_sources();
-    let mut sources: Vec<&dyn RecordSource> = vec![&store];
+    let mut sources: Vec<&dyn RecordSource> = vec![&store, &HealthSource];
     sources.extend(extra.iter().map(|s| s.as_ref()));
     let now = now_millis(&flags)?;
 
     if !definitions.is_empty() {
-        let mut loaded = Vec::new();
-        for path in definitions {
-            loaded.extend(
-                definition::load(Path::new(path)).map_err(|e| format!("metrics query: {e}"))?,
-            );
-        }
-        let mut names = BTreeMap::new();
-        for d in &loaded {
-            if names.insert(d.name.as_str(), ()).is_some() {
-                return Err(format!(
-                    "metrics query: definition name '{}' is defined twice",
-                    d.name
-                ));
-            }
-        }
+        let paths: Vec<&Path> = definitions.iter().map(Path::new).collect();
+        let loaded = definition::load(&paths).map_err(|e| format!("metrics query: {e}"))?;
         let resolver = Resolver {
             env,
             root: &req.root,
@@ -349,7 +334,7 @@ pub fn dispatch_query_with(
 
     let query = build_query(req, &flags)?;
     let mut params = BTreeMap::new();
-    for pair in flags.all("--param") {
+    for pair in flags.values("--param") {
         let (name, value) = pair
             .split_once('=')
             .ok_or_else(|| format!("metrics query: --param {pair}: expected name=value"))?;
@@ -374,4 +359,116 @@ pub fn dispatch_query_with(
         map.insert("ok".to_owned(), json!(true));
     }
     Ok(answer)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::query::LatestPer;
+
+    fn built(args: &[&str]) -> Result<Query, String> {
+        let req = ObserveRequest {
+            operation: "observe.metrics".to_owned(),
+            sub: "query".to_owned(),
+            args: args.iter().map(|a| (*a).to_owned()).collect(),
+            root: std::path::PathBuf::from("/no-such-query-root"),
+            stdin: None,
+        };
+        let flags = parse_flags("query", &req.args, VALUE_FLAGS, &[], false)?;
+        build_query(&req, &flags)
+    }
+
+    #[test]
+    fn every_grammar_flag_reaches_the_query_and_repeated_flags_add_up() {
+        let having = r#"{"lhs":{"agg":{"agg":"count"}},"op":"gt","rhs":{"const":2}}"#;
+        let join = r#"{"kind":["fgos.run.attempt"],"on":"plan"}"#;
+        let without = r#"{"kind":["fgos.plan.status"],"within":"1h"}"#;
+        let query = built(&[
+            "--kind",
+            "a.kind,b.kind",
+            "--where",
+            "x=1",
+            "--where",
+            "y?",
+            "--where-latest",
+            "z!=off",
+            "--ref",
+            "plan:p1",
+            "--ref",
+            "lane:l1",
+            "--since",
+            "-1h",
+            "--latest-per",
+            "ref:plan",
+            "--having",
+            having,
+            "--join",
+            join,
+            "--without",
+            without,
+            "--min-sample",
+            "3",
+        ])
+        .unwrap();
+        assert_eq!(query.kind, ["a.kind", "b.kind"]);
+        assert_eq!(
+            query.where_,
+            [
+                Cond {
+                    field: "x".into(),
+                    op: Op::Eq,
+                    value: Some(json!(1))
+                },
+                Cond {
+                    field: "y".into(),
+                    op: Op::Exists,
+                    value: None
+                },
+            ]
+        );
+        assert_eq!(query.where_latest[0].op, Op::Ne);
+        let refs: Vec<(&str, &str)> = query
+            .refs
+            .iter()
+            .map(|r| (r.kind.as_str(), r.id.as_str()))
+            .collect();
+        assert_eq!(refs, [("plan", "p1"), ("lane", "l1")]);
+        assert_eq!(query.since.as_deref(), Some("-1h"));
+        assert_eq!(query.latest_per, Some(LatestPer::Ref("plan".into())));
+        assert_eq!(query.having, [serde_json::from_str(having).unwrap()]);
+        assert_eq!(query.join, [serde_json::from_str(join).unwrap()]);
+        assert_eq!(query.without, [serde_json::from_str(without).unwrap()]);
+        assert_eq!(query.min_sample, 3);
+    }
+
+    #[test]
+    fn bad_grammar_values_are_named_errors() {
+        let error = |args: &[&str]| built(args).unwrap_err();
+        assert!(error(&["--latest-per", "lane"]).contains("expected subject or ref:<kind>"));
+        assert!(error(&["--min-sample", "-1"]).contains("--min-sample requires a whole number"));
+        assert!(error(&["--having", "{"]).starts_with("invalid --having {"));
+        assert!(error(&["--join", "[]"]).starts_with("invalid --join []"));
+        assert!(error(&["--without", "{}"]).starts_with("invalid --without {}"));
+        assert!(error(&["--where", "nothing"]).starts_with("invalid condition nothing"));
+        assert_eq!(
+            error(&["--nope", "1"]),
+            "metrics query: unknown option --nope"
+        );
+        assert_eq!(
+            error(&["--kind"]),
+            "metrics query: missing value for --kind"
+        );
+    }
+
+    #[test]
+    fn a_condition_value_reads_as_a_whole_number_a_decimal_a_boolean_or_text() {
+        let value = |text: &str| parse_cond(text).unwrap().value.unwrap();
+        assert_eq!(value("x<0.5"), json!(0.5));
+        assert_eq!(value("x>-2.25"), json!(-2.25));
+        assert_eq!(value("x=7"), json!(7));
+        assert_eq!(value("x=true"), json!(true));
+        assert_eq!(value("x=1.2.3"), json!("1.2.3"));
+        assert_eq!(value("x=NaN"), json!("NaN"));
+        assert_eq!(value("x=0.5|2"), json!([0.5, 2]));
+    }
 }

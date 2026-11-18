@@ -34,7 +34,7 @@ impl RecordSource for MemorySource {
     fn source_id(&self) -> &'static str {
         self.id
     }
-    fn kinds(&self) -> &'static [&'static str] {
+    fn kinds(&self) -> &[&str] {
         self.kinds
     }
     fn records(&self, _: &Path, _: &Window) -> Result<Vec<Record>, SourceError> {
@@ -48,7 +48,7 @@ impl RecordSource for FailingSource {
     fn source_id(&self) -> &'static str {
         "failing"
     }
-    fn kinds(&self) -> &'static [&'static str] {
+    fn kinds(&self) -> &[&str] {
         &["fgos.stale.kind"]
     }
     fn records(&self, _: &Path, _: &Window) -> Result<Vec<Record>, SourceError> {

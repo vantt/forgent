@@ -93,7 +93,7 @@ pub trait ObservationSource: Send + Sync {
 pub trait RecordSource: Send + Sync {
     fn source_id(&self) -> &'static str;
     /// Every kind this source can return; each must be declared in the registry.
-    fn kinds(&self) -> &'static [&'static str];
+    fn kinds(&self) -> &[&str];
     fn records(
         &self,
         root: &Path,

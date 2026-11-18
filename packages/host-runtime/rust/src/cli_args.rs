@@ -77,6 +77,15 @@ pub enum ParseArgsError {
 /// Reads `args` (the tokens after the verb, Node's `rest`) with Node's rules. A token that is not UTF-8 is refused by
 /// position, never lossily converted.
 pub fn parse_args(args: &[OsString]) -> Result<ParsedArgs, ParseArgsError> {
+    parse_args_repeating(args, &[])
+}
+
+/// [`parse_args`] where the flags in `repeatable` (names without `--`) also collect every use, beside the shared
+/// `REPEATABLE_FLAGS`: a verb whose grammar repeats its own flags keeps each use instead of the last.
+pub fn parse_args_repeating(
+    args: &[OsString],
+    repeatable: &[&str],
+) -> Result<ParsedArgs, ParseArgsError> {
     let tokens = args
         .iter()
         .enumerate()
@@ -104,18 +113,23 @@ pub fn parse_args(args: &[OsString]) -> Result<ParsedArgs, ParseArgsError> {
             _ => FlagScalar::Bool,
         };
         i += 1;
-        record(&mut parsed.flags, key, scalar);
+        record(&mut parsed.flags, key, scalar, repeatable);
     }
     Ok(parsed)
 }
 
-fn record(flags: &mut Vec<(String, FlagValue)>, key: &str, scalar: FlagScalar) {
+fn record(
+    flags: &mut Vec<(String, FlagValue)>,
+    key: &str,
+    scalar: FlagScalar,
+    repeatable: &[&str],
+) {
     // Assigning a non-object to `__proto__` is a no-op in JavaScript, so Node never records that flag.
     if key == "__proto__" {
         return;
     }
     let slot = flags.iter().position(|(name, _)| name == key);
-    if REPEATABLE_FLAGS.contains(&key) {
+    if REPEATABLE_FLAGS.contains(&key) || repeatable.contains(&key) {
         match slot.map(|at| &mut flags[at].1) {
             Some(FlagValue::Many(all)) => all.push(scalar),
             _ => flags.push((key.to_owned(), FlagValue::Many(vec![scalar]))),

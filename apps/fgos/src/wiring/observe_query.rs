@@ -2,6 +2,7 @@
 //! sources it can reach, and the config door that resolves a definition's `configKey` parameters. Observe never
 //! reads config; it asks this environment.
 
+use super::agents::PayloadRoot;
 use super::observe_declarations::embedded_declarations;
 use fgos_observe::metrics_cli::RecordEnvironment;
 use fgos_observe::record::registry::EmbeddedDeclaration;
@@ -10,15 +11,21 @@ use fgos_observe::RecordSource;
 use serde_json::Value;
 use std::path::{Path, PathBuf};
 
-pub struct HostRecordEnvironment;
+/// The active release's payload tree (`core/**/observe/kinds`, `domains/**/observe/kinds`) is found through the
+/// one payload resolver the composition root hands in, never PATH or cwd.
+pub struct HostRecordEnvironment {
+    pub payload_root: PayloadRoot,
+}
 
 impl RecordEnvironment for HostRecordEnvironment {
     fn embedded_declarations(&self) -> Vec<EmbeddedDeclaration> {
         embedded_declarations()
     }
 
+    /// No payload (a host run outside any release, such as a test binary) reads only the embedded and project
+    /// declarations; a kind declared only in the payload then answers `kind-undeclared`, which names it.
     fn payload_root(&self) -> Option<PathBuf> {
-        None
+        (self.payload_root)().ok()
     }
 
     fn record_sources(&self) -> Vec<Box<dyn RecordSource>> {
@@ -38,16 +45,30 @@ fn number(value: &Value) -> Result<f64, String> {
         .ok_or_else(|| format!("expected a number, found {value}"))
 }
 
-/// Hands the environment to the verbs. The first install wins; a second is ignored.
-#[allow(dead_code)] // `main` calls it where it builds the Observe wiring.
-pub fn install() -> bool {
-    fgos_observe::metrics_cli::install_environment(Box::new(HostRecordEnvironment))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use serde_json::json;
+
+    fn no_payload() -> Result<PathBuf, String> {
+        Err("no release".to_owned())
+    }
+
+    fn a_payload() -> Result<PathBuf, String> {
+        Ok(PathBuf::from("/payload"))
+    }
+
+    #[test]
+    fn the_payload_tree_is_the_resolved_release_root_and_absent_when_none_resolves() {
+        let found = HostRecordEnvironment {
+            payload_root: a_payload,
+        };
+        assert_eq!(found.payload_root(), Some(PathBuf::from("/payload")));
+        let missing = HostRecordEnvironment {
+            payload_root: no_payload,
+        };
+        assert_eq!(missing.payload_root(), None);
+    }
 
     #[test]
     fn a_config_value_is_read_as_a_number_and_anything_else_is_named() {
@@ -60,11 +81,13 @@ mod tests {
 
     #[test]
     fn the_host_environment_embeds_the_same_declarations_the_registry_merges() {
-        let names: Vec<&str> = HostRecordEnvironment
-            .embedded_declarations()
-            .iter()
-            .map(|d| d.label)
-            .collect();
+        let names: Vec<&str> = HostRecordEnvironment {
+            payload_root: no_payload,
+        }
+        .embedded_declarations()
+        .iter()
+        .map(|d| d.label)
+        .collect();
         assert_eq!(names, ["fgos-observe-health", "fgos-observe-transcripts"]);
     }
 }

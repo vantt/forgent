@@ -85,6 +85,7 @@ mod tests {
             &ForbiddenWork,
             scanner,
             forbidden_summary_scanner,
+            &crate::metrics_cli::NoRecords,
         )
         .unwrap();
         assert!(dispatch_coverage(&request(&["--since=2026-10-05"]), scanner).is_err());

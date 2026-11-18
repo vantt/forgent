@@ -1,14 +1,15 @@
 //! `fgos metrics record --json <file|->`: the CLI over the record write door.
 //!
 //! The input is one record object or an array of them, read from the file, or from stdin when the file is `-` or
-//! absent. A record may leave out `v` (2), `ts` (now), `basis` (`reported`) and `origin` (this verb); everything
-//! else is the v2 envelope. Input that is not a record at all is a usage error and nothing is written. Once a
-//! record reaches the door the door's rule holds: it never fails the caller. Each outcome is reported, a refused or
-//! dropped record is counted in the writer's health, and the verb still succeeds.
+//! absent. A record may leave out `v` (2), `id` (a fresh one, which the answer reports), `ts` (now), `basis`
+//! (`reported`) and `origin` (this verb); everything else is the v2 envelope. Input that is not a record at all is a
+//! usage error and nothing is written. Once a record reaches the door the door's rule holds: it never fails the
+//! caller. Each outcome is reported, a refused or dropped record is counted in the writer's health, and the verb
+//! still succeeds.
 
-use super::{environment, parse_flags};
+use super::{parse_flags, RecordEnvironment};
 use crate::contract::ObserveRequest;
-use crate::record::store::{RecordDoor, WriteOutcome};
+use crate::record::store::{new_record_id, RecordDoor, WriteOutcome};
 use crate::record::types::{Record, RECORD_VERSION};
 use crate::time::now_iso;
 use serde_json::{json, Map, Value};
@@ -42,7 +43,10 @@ fn to_record(index: usize, value: Value) -> Result<Record, String> {
         ));
     };
     object.entry("v").or_insert_with(|| json!(RECORD_VERSION));
-    object.entry("id").or_insert_with(|| json!(""));
+    // The verb reports the id it wrote, so it names a missing one here instead of leaving it to the door.
+    if object.get("id").is_none_or(|id| id.as_str() == Some("")) {
+        object.insert("id".to_owned(), json!(new_record_id()));
+    }
     object.entry("ts").or_insert_with(|| json!(now_iso()));
     object.entry("basis").or_insert_with(|| json!("reported"));
     object.entry("origin").or_insert_with(|| {
@@ -69,7 +73,7 @@ fn outcome_json(id: &str, outcome: &WriteOutcome) -> Value {
     entry
 }
 
-pub fn dispatch_record(req: &ObserveRequest) -> Result<Value, String> {
+pub fn dispatch_record(req: &ObserveRequest, env: &dyn RecordEnvironment) -> Result<Value, String> {
     let flags = parse_flags("record", &req.args, &[], &[], true)?;
     let bytes = read_input(req, flags.positional())?;
     if bytes.len() as u64 > MAX_INPUT_BYTES {
@@ -92,7 +96,6 @@ pub fn dispatch_record(req: &ObserveRequest) -> Result<Value, String> {
         .map(|(i, v)| to_record(i, v))
         .collect::<Result<Vec<_>, _>>()?;
 
-    let env = environment();
     let door = RecordDoor::new(
         req.root.clone(),
         env.embedded_declarations(),

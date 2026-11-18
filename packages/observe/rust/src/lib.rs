@@ -5,6 +5,7 @@
 
 pub mod case_journal;
 pub mod contract;
+pub mod definition;
 pub mod eval_journal;
 pub mod flags;
 pub mod friction;

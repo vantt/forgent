@@ -31,6 +31,24 @@ impl WorkObservationSource for NoWork {
     }
 }
 
+#[cfg(unix)]
+struct NoRecords;
+
+impl fgos_observe::metrics_cli::RecordEnvironment for NoRecords {
+    fn embedded_declarations(&self) -> Vec<fgos_observe::record::registry::EmbeddedDeclaration> {
+        panic!("this verb must not read records")
+    }
+    fn payload_root(&self) -> Option<PathBuf> {
+        panic!("this verb must not read records")
+    }
+    fn record_sources(&self) -> Vec<Box<dyn fgos_observe::RecordSource>> {
+        panic!("this verb must not read records")
+    }
+    fn config_number(&self, _: &Path, _: &str) -> Result<Option<f64>, String> {
+        panic!("this verb must not read records")
+    }
+}
+
 static NEXT_TEMP: AtomicU64 = AtomicU64::new(0);
 
 struct FixtureRoot(PathBuf);
@@ -200,6 +218,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
+        &NoRecords,
     )
     .unwrap();
     assert_eq!(coverage["layoutRule"], expected["layoutRule"]);
@@ -212,6 +231,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
+        &NoRecords,
     )
     .unwrap();
     assert_eq!(runs["total"], coverage["observed"]);
@@ -222,6 +242,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
+        &NoRecords,
     )
     .unwrap();
     assert_eq!(harness["runs"]["total"], coverage["observed"]);
@@ -250,6 +271,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
+        &NoRecords,
     )
     .unwrap();
     assert_eq!(windowed_runs["total"], 2);
@@ -260,6 +282,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
+        &NoRecords,
     )
     .unwrap();
     assert_eq!(windowed_harness["runs"]["total"], 2);
@@ -270,6 +293,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
+        &NoRecords,
     )
     .unwrap_err()
     .contains("metrics coverage: unknown option --since"));
@@ -280,6 +304,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         &NoWork,
         scan_coverage,
         scan_unit_summaries,
+        &NoRecords,
     )
     .unwrap();
     assert_eq!(
