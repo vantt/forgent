@@ -340,6 +340,11 @@ async function main(argv) {
   return result.rotated || result.reason === 'rotation-in-progress' ? 0 : 1;
 }
 
+// No top-level await: head-request.mjs imports this module, and the role-restore path imports head-request.mjs while
+// the executor runs. An entry still evaluating (awaiting `main`) would wait on that import, which waits on the entry.
 if (process.argv[1] && fs.realpathSync(process.argv[1]) === fs.realpathSync(ENTRY)) {
-  process.exitCode = await main(process.argv.slice(2));
+  main(process.argv.slice(2)).then((code) => { process.exitCode = code; }, (err) => {
+    process.stderr.write(`${err?.stack ?? err}\n`);
+    process.exitCode = 1;
+  });
 }

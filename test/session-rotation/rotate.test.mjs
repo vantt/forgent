@@ -265,3 +265,50 @@ test('a late take that landed on the ended successor gives the role back to the 
   assert.deepEqual(third.calls.restore, []);
   assert.deepEqual(incidents(), ['rotation-failed']);
 });
+
+test('the detached entry still settles and records no-live-head when both heads end while it waits for the successor', (t) => {
+  const { root, dir } = project(t);
+  const entry = fileURLToPath(new URL('../../src/session-rotation/rotate.mjs', import.meta.url));
+  const oldRun = path.join(root, 'run-old');
+  fs.mkdirSync(oldRun, { recursive: true });
+  // The old head's supervisor is gone: its request socket path leads nowhere.
+  fs.writeFileSync(path.join(oldRun, 'envelope.json'), JSON.stringify({ session: { requestSocketPath: path.join(root, 'gone.sock') } }));
+  writeHeadPlacement(dir, { role: 'head:planner-x', gen: 1, placement: OLD, runDir: oldRun, persona: 'planner', startedAt: '2026-11-18T00:00:00Z' });
+  const file = path.join(dir, 'request-gone.json');
+  fs.writeFileSync(file, JSON.stringify({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { sessionId: 'oldsess1' } }));
+
+  // The real entry file runs as the main module with its own default role-restore path; only the outside world
+  // (Identity, the seat launch, the stop request) is replaced, through the port argument of the one call it makes.
+  const hooks = path.join(root, 'hooks.mjs');
+  fs.writeFileSync(hooks, `export async function load(url, context, next) {
+  const out = await next(url, context);
+  if (!url.endsWith('/session-rotation/rotate.mjs')) return out;
+  const needle = 'await rotateHeadSession(request)';
+  const source = String(out.source);
+  if (!source.includes(needle)) throw new Error('the entry no longer calls rotateHeadSession(request)');
+  return { ...out, source: source.replace(needle, 'await rotateHeadSession(request, globalThis.__rotatePorts)') };
+}\n`);
+  const child = path.join(root, 'child.mjs');
+  fs.writeFileSync(child, `import { register } from 'node:module';
+register(${JSON.stringify(new URL(`file://${hooks}`).href)});
+let ended = false;
+globalThis.__rotatePorts = {
+  lock: () => ({ release() {} }),
+  config: () => ({ keep: 10, answerWaitMs: 50 }),
+  clock: { now: () => Date.now(), sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)) },
+  pollMs: 5,
+  identity: () => (ended ? { live: false } : { live: true, session: 'old-session' }),
+  place: (request) => ({ role: 'head:planner-x', gen: request.gen, key: 'cmd_new', placement: { host: 'terminal', key: 'cmd_new' }, runDir: ${JSON.stringify(path.join(root, 'run-new'))}, cli: null, persona: 'planner' }),
+  end: (runDir) => { if (runDir.endsWith('run-new')) ended = true; return true; },
+  closed: () => true,
+};
+process.argv = [process.execPath, ${JSON.stringify(entry)}, '--request', ${JSON.stringify(file)}];
+await import(${JSON.stringify(new URL(`file://${entry}`).href)});
+`);
+  const run = spawnSync(process.execPath, [child], { encoding: 'utf8', timeout: 30_000 });
+  assert.doesNotMatch(run.stderr, /unsettled top-level await/);
+  assert.equal(run.status, 1, run.stderr);
+  assert.equal(JSON.parse(run.stdout.trim()).reason, 'no-answer');
+  const events = fs.readFileSync(path.join(dir, 'incidents.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l).event);
+  assert.deepEqual(events, ['no-live-head', 'rotation-failed']);
+});
