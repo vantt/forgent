@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a7163bc3d697b573f50f90bb55366270e74cacc01de34feb639a640612f1ca41",
+  "payloadDigest": "0d31b0abd3a58326c2eb2fc384ef9105258859b263788a134bf72956a3ac98ec",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -144,7 +144,7 @@
     "apps/fgos/src/wiring/session.rs": "f2569bef9f072e959f14673c2d2929e2b0b001540a4e147fd5e59082b2e64b43",
     "apps/fgos/src/wiring/session_rotation_hook.rs": "02c2b3fdf7c5776c9f0696dc3f63ad2c45985a1563e9022c420b1a0c90372e9f",
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
-    "apps/fgos/src/wiring/uninstall.rs": "623369d9ab6f90976db413384b804d9674bb1dbb9dfe7bca35120138866413e4",
+    "apps/fgos/src/wiring/uninstall.rs": "1fd8cdeef4360bb32ae0dd1452bdc6cb09c57427d95645c030105a24533dceff",
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
     "apps/fgos/tests/cli_tests.rs": "cd52257d09af4526d3f38c36e2ba94723128474fbc11b44368fd4919770f391e",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
@@ -343,7 +343,7 @@
     "packages/distribution/rust/src/store.rs": "1cdaf72bbdf7c4bc0ae3eafd1f37fecd6a358de60c8ce5851ccf9212149174de",
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
     "packages/distribution/rust/src/test_scratch.rs": "7f54aae398aca8c0b0241f22a0155cc0ba9782a91430fba0ceddda0dc19297e3",
-    "packages/distribution/rust/src/timer.rs": "9a0db76b38705ef325b7d31598b6170bbab381a5637c8af24fd9f3a5f7b16624",
+    "packages/distribution/rust/src/timer.rs": "13fda41d8983a05d40ac86e12c50759ee746a75cb873efe4004f5baf558c45d9",
     "packages/distribution/rust/src/uninstall.rs": "c33250178e8d5c098b1c23b6fafe8a7a6bdb9eaad3828bd1a5f7f091924701b8",
     "packages/distribution/rust/src/verify.rs": "5364a7d340d4ac1401473100ce2c2135016e4a694f9878aeafe7b126a49fd596",
     "packages/distribution/rust/src/workspace.rs": "fb9de636e764be6e6b8dee390e8e7cd05dd4f3578f79f2d4b64c75ad16f1e2ec",
@@ -2033,14 +2033,14 @@
     },
     {
       "path": "apps/fgos/src/wiring/uninstall.rs",
-      "line": 1193,
+      "line": 1190,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/src/wiring/uninstall.rs",
-      "line": 1865,
+      "line": 1858,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2799,7 +2799,7 @@
     },
     {
       "path": "packages/distribution/rust/src/timer.rs",
-      "line": 666,
+      "line": 671,
       "spawn": "Command::new <- packages/process/rust/src/spawn.rs:141",
       "binary": "(uncalled run_scheduler_call)",
       "class": "uncalled-wrapper"

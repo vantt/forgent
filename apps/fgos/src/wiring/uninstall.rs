@@ -792,10 +792,7 @@ pub fn uninstall_project(root: &Path, apply: bool, machine: &Machine) -> Reversa
                         timer_messages.push(fix.message);
                     }
                 }
-                None => failed.push(failed_step(
-                    &format!("{}-timer", schedule.name()),
-                    "no home directory is known",
-                )),
+                None => failed.push(failed_step(schedule.id(), "no home directory is known")),
             }
         }
     }
@@ -1671,11 +1668,7 @@ mod tests {
             .collect();
         assert_eq!(
             ids,
-            vec![
-                "mailbox-sync-timer",
-                "account-probe-timer",
-                "watcher-tick-timer"
-            ]
+            vec!["mailbox-sync-timer", "account-probe-timer", "watcher-timer"]
         );
     }
 
