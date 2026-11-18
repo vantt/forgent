@@ -6,6 +6,8 @@ import { readAttemptView } from './show-run.mjs';
 import { createTerminalControl, scanTerminalAllocations } from '../../terminal-control/client.mjs';
 import { resolveHerdrBin } from '../../runner/dispatch/terminal-slot.mjs';
 import { fgosDirFromRoot, resolveMainCheckoutRoot } from '../../runner/paths.mjs';
+import { invokeHost } from '../../util/host-bin.mjs';
+import { OWN_PAYLOAD_ROOT } from '../../run-supervisor/payload-root.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -27,6 +29,24 @@ function withAttemptView(repoRoot, inspected) {
     if (run?.runId === runId) return { ...inspected, ...readAttemptView(location.path, { fgosDir: fgosDirFromRoot(repoRoot) }) };
   }
   return inspected;
+}
+
+const ATTENTION_DEFINITIONS = path.join('core', 'attention', 'definitions');
+
+/**
+ * The one host call that runs every attention definition over the view's window, against the project's store. The
+ * definitions ship with fgOS, so they are read from the running payload (`payloadRoot`), never from the project. A
+ * payload without the directory, or a host that cannot answer, degrades to one `unmeasured` entry rather than hiding
+ * the run-derived rows or reading as "nothing needs a person".
+ */
+function attentionDefinitions(storeRoot, { invoke = invokeHost, payloadRoot = OWN_PAYLOAD_ROOT } = {}) {
+  const dir = path.join(payloadRoot, ATTENTION_DEFINITIONS);
+  if (!fs.existsSync(dir)) return () => ({ definitions: [{ name: ATTENTION_DEFINITIONS, unmeasured: `definitions-missing: ${dir}` }] });
+  return ({ since, now }) => {
+    try { return invoke(['metrics', 'query', '--def', dir, '--since', since, '--now', now, '--json'], { dir: storeRoot }); } catch (error) {
+      return { definitions: [{ name: ATTENTION_DEFINITIONS, unmeasured: `host-query-failed: ${error.message}` }] };
+    }
+  };
 }
 
 export function inspectDispatchUseCase(ctx, options = {}) {
@@ -56,6 +76,7 @@ export function inspectDispatchUseCase(ctx, options = {}) {
         const storeRoot = resolveMainCheckoutRoot(repoRoot) ?? repoRoot;
         const view = attentionView(storeRoot, { since: options.since }, {
           view: (runDir) => readAttemptView(runDir, { fgosDir: fgosDirFromRoot(storeRoot) }),
+          definitions: attentionDefinitions(storeRoot, { invoke: options.invokeHost, payloadRoot: options.payloadRoot }),
         });
         const terminal = scanTerminalAllocations(storeRoot, {
           globalConfigPath: options.globalConfigPath,

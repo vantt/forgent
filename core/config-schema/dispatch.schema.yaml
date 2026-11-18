@@ -1,7 +1,7 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: urn:fgos:config-schema:dispatch:v1
 $comment: "owner: run-supervisor"
-description: "Waits of the run supervisor when an agent or a controller is asked to stop, and the schedule of the account probe sweep."
+description: "Waits of the run supervisor when an agent or a controller is asked to stop, the schedule of the account probe sweep, and the thresholds of the attention view."
 type: object
 properties:
   gateKillGraceMs:
@@ -24,5 +24,15 @@ properties:
         description: "Seconds between sweeps of the scheduled account probe; 0 turns the timer off."
         type: integer
         minimum: 0
+        x-fgos-scope: both
+        x-fgos-file: config
+  attention:
+    description: "Thresholds of the attention view's detection definitions (core/attention/definitions)."
+    type: object
+    properties:
+      planNoProgressMinutes:
+        description: "Minutes a running plan may show no commit, board entry or run attempt before the attention view raises plan-no-progress."
+        type: integer
+        minimum: 1
         x-fgos-scope: both
         x-fgos-file: config

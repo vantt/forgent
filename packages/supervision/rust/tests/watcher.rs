@@ -295,6 +295,33 @@ fn a_missing_state_raises_rows_in_the_window_once_and_the_next_tick_nothing_new(
 }
 
 #[test]
+fn three_new_wake_events_in_one_tick_make_one_wake_with_the_oldest() {
+    let w = World::default();
+    at(&w, 1000);
+    for (k, s, t) in [("b", "2", "t2"), ("a", "1", "t1"), ("c", "3", "t3")] {
+        w.rows.borrow_mut().push(row(k, s, t));
+    }
+    let report = run(&w, None, &settings(Action::WakeSupervisor));
+    assert_eq!(*w.wakes.borrow(), vec!["a 1".to_owned()]);
+    assert_eq!((report.raised, report.wakes), (3, 1));
+}
+
+#[test]
+fn new_wake_events_with_older_unhandled_ones_still_make_one_wake() {
+    let w = World::default();
+    at(&w, 1000);
+    w.rows.borrow_mut().push(row("old", "p0", "t0"));
+    run(&w, None, &settings(Action::None));
+    let before = w.wakes.borrow().len();
+    w.rows.borrow_mut().push(row("n1", "p1", "t1"));
+    w.rows.borrow_mut().push(row("n2", "p2", "t2"));
+    at(&w, 1700);
+    let report = run(&w, None, &settings(Action::WakeSupervisor));
+    assert_eq!(w.wakes.borrow().len() - before, 1);
+    assert_eq!((report.raised, report.wakes), (2, 1));
+}
+
+#[test]
 fn the_action_table_routes_by_kind_and_a_null_notify_to_counts_an_error() {
     let w = World::default();
     at(&w, 1000);

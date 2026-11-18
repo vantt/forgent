@@ -21,7 +21,7 @@ pub use error::QueryError;
 pub use exec::{run, QueryContext};
 pub use model::{
     Agg, Anchor, Bucket, Cmp, Cond, Factor, Filter, Having, Join, LatestPer, Op, Operand, Query,
-    RefSel, WindowOn, Without,
+    RefSel, WindowOn, Within, Without,
 };
 pub use result::{AggValue, Coverage, QueryResult, ResultRow};
 pub use time::bucket_start;

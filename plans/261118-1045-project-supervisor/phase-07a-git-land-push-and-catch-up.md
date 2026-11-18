@@ -62,3 +62,14 @@ phase would open stops the phase with `NEEDS_CONTEXT`.
 
 ## Rollback
 Revert the phase commit. Nothing outside the Git crate calls the new doors until phase 7 lands.
+
+## Landed (5f6992daa, lead:OPC MERGE 2026-11-18) and follow-ups
+
+The two doors are on main; catch-up is told apart by its binding, not a new WAL kind (OPC accepted). The acceptance
+"phase 7's 11 land tests pass" is NOT met yet: phase 7 still calls `push_refs` and `fast_forward_checked_out`; the
+phase 7 re-run switches to `push_land_candidate` and `catch_up_main_checkout` (and fixes its `--paths` test that
+refuses `land-paths-empty`). Follow-ups from the review, fixed on branch `sv/p07a2` inside this footprint:
+1. The catch-up read-back no longer requires `remote_tracking` unchanged (a fetch in that window gave a spurious
+   `checkout-read-back-recovery-required`).
+2. A crash between push and delete leaves `refs/heads/fgos-land-push-<id>`; recovery of that Land deletes it.
+

@@ -92,6 +92,11 @@ test('public inspect use-case import graph cannot reach mutation/recovery/proces
   // calls). The file's other operations (allocate, attach, release, read) are not reachable from `inspect.mjs`.
   // Same identical-file, different-export carve-out as the entries above.
   //
+  // util/host-bin.mjs: `inspect.mjs` reaches it only through `invokeHost`, for the one `fgos metrics query --def` call
+  // that runs the attention definitions. That verb only reads the record store and answers; it writes nothing. The
+  // file's other export (`runHostInherited`, help) is not reachable from `inspect.mjs`. Same identical-file,
+  // different-export carve-out as the entries above.
+  //
   // The attempt view also reaches three files for one read each, verified by
   // direct reading: runner/paths.mjs `fgosDirFromRoot` (a path join);
   // dispatch/visibility-session.mjs `readVisibility` (one JSON read);
@@ -100,7 +105,7 @@ test('public inspect use-case import graph cannot reach mutation/recovery/proces
   // release, the visibility session) are not reachable from `inspect.mjs`.
   const isProvenLeaf = (file) => {
     const f = file.replaceAll('\\', '/');
-    return f.endsWith('/run-result.mjs') || f.endsWith('/config/facade.mjs') || f.endsWith('/provider-capacity.mjs') || f.endsWith('/run-supervisor/client.mjs') || f.endsWith('/terminal-control/client.mjs')
+    return f.endsWith('/run-result.mjs') || f.endsWith('/config/facade.mjs') || f.endsWith('/provider-capacity.mjs') || f.endsWith('/run-supervisor/client.mjs') || f.endsWith('/terminal-control/client.mjs') || f.endsWith('/util/host-bin.mjs')
       || f.endsWith('/runner/paths.mjs') || f.endsWith('/run-supervisor/run-lock.mjs') || f.endsWith('/dispatch/visibility-session.mjs');
   };
   function walk(file) {
@@ -373,11 +378,82 @@ test('attention through the use case reads the shared store from a linked worktr
   const terminalControl = { capabilities: () => ({ defaults: { allocationGraceMs: 60000 } }), reconcileScan: () => ({ result: 'scan', findings: [] }) };
   const listing = () => { const out = []; const walk = (d) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const f = path.join(d, e.name); if (e.isDirectory()) walk(f); else out.push(`${f}:${fs.statSync(f).mtimeMs}:${fs.statSync(f).size}`); } }; walk(path.join(main, '.fgos')); return out.sort(); };
   const before = listing();
-  const got = inspectDispatchUseCase({ repoRoot: linked }, { attention: true, since: '2026-11-17', terminalControl, globalConfigPath: path.join(root, 'no-global-config.json') });
+  const invokeHost = (args, { dir }) => { assert.equal(dir, main); return { definitions: [] }; };
+  const got = inspectDispatchUseCase({ repoRoot: linked }, { attention: true, since: '2026-11-17', terminalControl, invokeHost, globalConfigPath: path.join(root, 'no-global-config.json') });
   assert.deepEqual(Object.keys(kinds(got)).sort(), ['r-block', 'r-fail', 'r-human', 'r-live', 'r-refuse']);
   assert.match(got.terminal.state, /^(scanned|not-scanned)$/); // the scan itself is owned by the terminal-control client test
   assert.deepEqual(listing(), before);
   assert.throws(() => inspectDispatchUseCase({ repoRoot: linked }, { attention: true, terminalControl }), /--since/);
   assert.throws(() => inspectDispatchUseCase({ repoRoot: linked }, { attention: true, since: '2026-11-17', terminal: true, terminalControl }), /--attention cannot be combined with --terminal/);
   assert.throws(() => inspectDispatchUseCase({ repoRoot: linked }, { attention: true, since: '2026-11-17', providerCapacity: true }), /--attention cannot be combined with --provider-capacity/);
+});
+
+// The attention detections are definition files the host runs in one call; the engine's answers are proven in Rust
+// (packages/observe/rust/tests/definition_test.rs). Here only the wiring is proven: rows of any definition in the
+// directory join the run rows at the observation instant, sorted by instant then subject, with no code naming a
+// definition.
+const ATTENTION_DEFINITIONS = new URL('../../core/attention/definitions', import.meta.url).pathname;
+const answerRow = (subject, ts) => ({ group: { 'subject.id': subject }, count: 1, insufficient: false, aggs: { count: 1, 'max:ts': ts } });
+function hostOver(dir, byName, calls = []) {
+  return ({ since, now }) => {
+    calls.push({ since, now });
+    const defs = fs.readdirSync(dir).filter((f) => f.endsWith('.query.json')).map((f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')));
+    return { definitions: defs.map((d) => ({ name: d.name, row: d.row, ...(byName[d.name] ?? { rows: [] }) })) };
+  };
+}
+test('attention adds a head-gone row and a plan-no-progress row from the shipped definitions at the observation instant, even when the state they grouped changed before since', () => {
+  const { root } = attentionFixture();
+  const calls = [];
+  const got = attentionView(root, { since: '2026-11-17' }, { now: NOW, definitions: hostOver(ATTENTION_DEFINITIONS, {
+    'head-gone': { rows: [answerRow('h1', '2026-11-17T09:00:00.000Z')] },
+    'plan-no-progress': { rows: [answerRow('plans/p1', '2026-11-15T08:30:00.000Z')] },
+  }, calls) });
+  assert.deepEqual(calls, [{ since: '2026-11-17T00:00:00.000Z', now: '2026-11-17T10:00:00.000Z' }]);
+  const detected = got.rows.filter((r) => r.runId === undefined);
+  assert.deepEqual(detected.map((r) => [r.kind, r.subject]), [['head-gone', 'h1'], ['plan-no-progress', 'plans/p1']]);
+  for (const r of detected) { assert.ok(r.reason.length > 0 && r.nextCommand.length > 0); assert.equal(r.line, `${r.kind} ${r.subject} ${r.reason} -> ${r.nextCommand}`); }
+  assert.equal(got.contract.version, 2);
+  assert.ok(got.rows.every((r) => typeof r.subject === 'string'));
+  assert.equal(got.rows.find((r) => r.runId === 'r-fail').subject, 'r-fail');
+  assert.deepEqual(got.lines, got.rows.map((r) => r.line));
+});
+test('attention picks up a definition added to the directory with no code change, and reports one the host could not measure', () => {
+  const { root } = attentionFixture();
+  const dir = path.join(root, 'definitions');
+  fs.cpSync(ATTENTION_DEFINITIONS, dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'pace-slow.query.json'), JSON.stringify({ name: 'pace-slow', requires: ['fgos.run.attempt'], query: { kind: ['fgos.run.attempt'], by: ['subject.id'], agg: ['max:ts'] }, row: { kind: 'pace-slow', reason: 'runs are slower than their baseline', nextCommand: 'fgos metrics runs' } }));
+  const got = attentionView(root, { since: '2026-11-17' }, { now: NOW, definitions: hostOver(dir, {
+    'pace-slow': { rows: [answerRow('r-slow', '2026-11-17T09:30:00.000Z')] },
+    'head-gone': { unmeasured: 'kind-undeclared: fgos.head.state' },
+  }) });
+  assert.deepEqual(got.rows.filter((r) => r.runId === undefined).map((r) => r.kind), ['pace-slow']);
+  assert.deepEqual(got.unmeasured, [{ name: 'head-gone', reason: 'kind-undeclared: fgos.head.state' }]);
+  // Without a definitions source the view is the run-derived rows alone, as before.
+  assert.deepEqual(attentionView(root, { since: '2026-11-17' }, { now: NOW }).unmeasured, []);
+});
+test('attention keeps its run rows when the host cannot answer the definitions call or the payload ships none', () => {
+  const { root } = attentionFixture();
+  const main = path.join(root, 'main');
+  fs.mkdirSync(main, { recursive: true });
+  execFileSync('git', ['init', '-q'], { cwd: main });
+  fs.renameSync(path.join(root, '.fgos'), path.join(main, '.fgos'));
+  const terminalControl = { capabilities: () => ({ defaults: { allocationGraceMs: 60000 } }), reconcileScan: () => ({ result: 'scan', findings: [] }) };
+  const invokeHost = () => { throw new Error('host unavailable'); };
+  const got = inspectDispatchUseCase({ repoRoot: main }, { attention: true, since: '2026-11-17', terminalControl, invokeHost, globalConfigPath: path.join(root, 'no-global-config.json') });
+  assert.deepEqual(Object.keys(kinds(got)).sort(), ['r-block', 'r-fail', 'r-human', 'r-live', 'r-refuse']);
+  assert.match(got.unmeasured[0].reason, /host-query-failed: host unavailable/);
+  // The definitions are read from the running payload, not the project; a payload without them is a stated gap.
+  const bare = inspectDispatchUseCase({ repoRoot: main }, { attention: true, since: '2026-11-17', terminalControl, invokeHost, payloadRoot: path.join(root, 'bare-payload'), globalConfigPath: path.join(root, 'no-global-config.json') });
+  assert.deepEqual(Object.keys(kinds(bare)).sort(), ['r-block', 'r-fail', 'r-human', 'r-live', 'r-refuse']);
+  assert.match(bare.unmeasured[0].reason, /^definitions-missing: /);
+});
+test('the shipped attention definitions are named by their file and carry the row they raise', () => {
+  const files = fs.readdirSync(ATTENTION_DEFINITIONS).filter((f) => f.endsWith('.query.json')).sort();
+  assert.deepEqual(files, ['head-gone.query.json', 'plan-no-progress.query.json']);
+  for (const f of files) {
+    const def = JSON.parse(fs.readFileSync(path.join(ATTENTION_DEFINITIONS, f), 'utf8'));
+    assert.equal(`${def.name}.query.json`, f);
+    assert.equal(def.row.kind, def.name);
+    assert.ok(def.query.by.includes('subject.id'), 'the row subject comes from the group');
+  }
 });

@@ -272,6 +272,8 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
         }
     };
 
+    // A tick wakes at most once, with the oldest event that routed to a wake.
+    let mut wake_with: Option<RaisedEvent> = None;
     for row in rows {
         if row.unmeasured {
             r.unmeasured += 1;
@@ -292,14 +294,20 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
         match ports.queue.raise(event.clone()) {
             Ok(Raised::New) => {
                 r.raised += 1;
-                run_action(ports, settings, &event, &mut r);
+                if run_action(ports, settings, &event, &mut r)
+                    && wake_with.as_ref().is_none_or(|w| event.ts < w.ts)
+                {
+                    wake_with = Some(event);
+                }
             }
             Ok(Raised::Duplicate) => r.duplicate += 1,
             Err(_) => r.errors += 1,
         }
     }
 
-    if r.wakes == 0 {
+    if let Some(event) = &wake_with {
+        wake(ports, &event.kind, &event.subject, &mut r);
+    } else {
         match ports.queue.unhandled() {
             Ok(open) => {
                 if let Some(oldest) = open.first() {
@@ -331,20 +339,22 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
     r
 }
 
-fn run_action(ports: &Ports, settings: &Settings, event: &RaisedEvent, r: &mut TickReport) {
+/// Runs the non-wake actions; returns true when the event routes to a wake.
+fn run_action(ports: &Ports, settings: &Settings, event: &RaisedEvent, r: &mut TickReport) -> bool {
     let action = settings
         .actions
         .get(&event.kind)
         .copied()
         .unwrap_or(settings.default_action);
     match action {
-        Action::WakeSupervisor => wake(ports, &event.kind, &event.subject, r),
+        Action::WakeSupervisor => return true,
         Action::Notify => match ports.notifier.notify(event) {
             NotifyOutcome::Sent => r.notifies += 1,
             NotifyOutcome::Refused(_) | NotifyOutcome::Unavailable => r.errors += 1,
         },
         Action::None => {}
     }
+    false
 }
 
 fn wake(ports: &Ports, kind: &str, subject: &str, r: &mut TickReport) {

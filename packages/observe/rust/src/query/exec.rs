@@ -5,11 +5,12 @@ use super::aggregate::{
 };
 use super::error::{invalid, QueryError};
 use super::model::{
-    Agg, Anchor, Cond, Factor, Filter, Having, LatestPer, Op, Operand, Query, WindowOn,
+    Agg, Anchor, Cond, Factor, Filter, Having, LatestPer, Op, Operand, Query, WindowOn, Within,
 };
 use super::result::{AggValue, Coverage, QueryResult, ResultRow};
 use super::time::{
     bucket_start, format_instant, parse_absolute, parse_duration_millis, parse_instant,
+    scaled_duration_millis,
 };
 use crate::contract::{RecordSource, Window};
 use crate::record::registry::Registry;
@@ -175,6 +176,16 @@ fn factor(ctx: &QueryContext, k: &Factor) -> Result<f64, QueryError> {
     }
 }
 
+/// The span of an anti-join in milliseconds; a parameter span reads the caller's value.
+fn within_millis(ctx: &QueryContext, within: &Within) -> Result<i64, QueryError> {
+    match within {
+        Within::Literal(text) => parse_duration_millis(text),
+        Within::Param { param: name, unit } => {
+            scaled_duration_millis(param(ctx, name)?, unit, &within.label())
+        }
+    }
+}
+
 fn check_operand(names: &Names, ctx: &QueryContext, operand: &Operand) -> Result<(), QueryError> {
     match operand {
         Operand::Const(_) => Ok(()),
@@ -245,7 +256,7 @@ pub fn run(query: &Query, ctx: &QueryContext) -> Result<QueryResult, QueryError>
     let where_latest = names.conds("where_latest", &query.where_latest)?;
     let mut withouts = Vec::new();
     for w in &query.without {
-        let within = parse_duration_millis(&w.within)?;
+        let within = within_millis(ctx, &w.within)?;
         if let Some(on) = &w.on {
             names.subject_kind("without on", on)?;
         }
@@ -256,10 +267,13 @@ pub fn run(query: &Query, ctx: &QueryContext) -> Result<QueryResult, QueryError>
                 "latest reads the newest record at or before the record's ts; it takes anchor record",
             ));
         }
-        let back_from_now = ctx
-            .now_millis
-            .checked_sub(within)
-            .ok_or_else(|| invalid("within", &w.within, "reaches before the earliest instant"))?;
+        let back_from_now = ctx.now_millis.checked_sub(within).ok_or_else(|| {
+            invalid(
+                "within",
+                &w.within.label(),
+                "reaches before the earliest instant",
+            )
+        })?;
         withouts.push((
             w,
             names.conds("without where", &w.where_)?,
@@ -489,7 +503,11 @@ pub fn run(query: &Query, ctx: &QueryContext) -> Result<QueryResult, QueryError>
         for p in primary {
             let back_from_record = || {
                 p.ts.checked_sub(*within).ok_or_else(|| {
-                    invalid("within", &w.within, "reaches before the earliest instant")
+                    invalid(
+                        "within",
+                        &w.within.label(),
+                        "reaches before the earliest instant",
+                    )
                 })
             };
             let (lo, hi) = match w.anchor {

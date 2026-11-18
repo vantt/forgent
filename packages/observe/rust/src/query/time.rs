@@ -70,6 +70,35 @@ fn duration_millis(text: &str, whole: &str) -> Result<i64, QueryError> {
         .ok_or_else(too_large)
 }
 
+/// `amount` of `unit` (`s`, `m`, `h`, `d`, `w`) in milliseconds, for a span whose amount is a caller's number.
+/// `label` names the span in an error.
+pub(super) fn scaled_duration_millis(
+    amount: f64,
+    unit: &str,
+    label: &str,
+) -> Result<i64, QueryError> {
+    let factor: f64 = match unit {
+        "s" => 1.0,
+        "m" => 60.0,
+        "h" => 3600.0,
+        "d" => 86_400.0,
+        "w" => 604_800.0,
+        _ => return Err(invalid("duration", label, "unit must be s, m, h, d or w")),
+    };
+    if !amount.is_finite() || amount < 0.0 {
+        return Err(invalid(
+            "duration",
+            label,
+            format!("amount {amount} is not a number at or above zero"),
+        ));
+    }
+    let millis = (amount * factor * 1000.0).round();
+    if millis >= i64::MAX as f64 {
+        return Err(invalid("duration", label, "too large"));
+    }
+    Ok(millis as i64)
+}
+
 /// The start of the bucket holding `millis`. Weeks start on Monday 00:00 UTC.
 pub fn bucket_start(millis: i64, bucket: Bucket) -> i64 {
     match bucket {

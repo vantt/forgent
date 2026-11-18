@@ -26,6 +26,27 @@ function settledAttention(l, terminal) {
   return { kind: 'failed', reason: `the run failed${named}` };
 }
 
+// Rows of the named detections (`core/attention/definitions`), as the host's one `metrics query --def` call answers
+// them. The definition file owns the kind, the reason and the next command (its `row` template); the group names the
+// subject. A row is a detection made now, so its instant is the observation, never the record time it grouped: a plan
+// that went running before the window and has stalled since is late now (a `window: own` definition reaches back past
+// `since` on purpose). A definition the host could not measure, or that errored, yields no row and is listed in
+// `unmeasured` so a silent gap never reads as "nothing needs a person".
+function definitionRows(answer, nowMs) {
+  const rows = [], unmeasured = [];
+  for (const def of answer?.definitions ?? []) {
+    if (def.unmeasured || def.error) { unmeasured.push({ name: def.name, reason: def.unmeasured ?? def.error }); continue; }
+    if (!def.row) continue;
+    for (const r of def.rows ?? []) {
+      if (r.insufficient) continue;
+      const subject = r.group?.['subject.id'] ?? def.name;
+      const { kind, reason, nextCommand } = def.row;
+      rows.push({ subject, assignmentId: null, worktree: null, kind, reason, nextCommand, line: `${kind} ${subject} ${reason} -> ${nextCommand}`, atMs: nowMs });
+    }
+  }
+  return { rows, unmeasured };
+}
+
 /**
  * The runs of the whole project (every worktree) that need a person, started or settled at or after `since`.
  * Computed from the run records on each call; nothing is stored. Idle is not reported: the supervisor keeps
@@ -36,12 +57,16 @@ function settledAttention(l, terminal) {
  * the observation, since it is late now however long ago it started. Not held: `controller-dead`, unless a resume
  * already replaced the attempt or its unit settled.
  *
+ * Beyond the runs, the detections written as definition files (`definitions`) add rows about heads and plans, which
+ * have no run. `definitions` is the caller's one host call (`() => the metrics query answer`), injected so this module
+ * stays below the verbs; with none given only run-derived rows exist.
+ *
  * `view(runDir)` is the caller's read of the attempt's unit state (`{ attemptState, unitState, resumeCommand }`),
  * injected so this module stays below the verbs.
  *
  * @returns {{contract:{id:string,version:number}, since:string, observedAt:string, rows:object[], idle:{state:string,reason:string}, lines:string[]}}
  */
-export function attentionView(root, { since }, { now = () => new Date().toISOString(), view = () => ({}), runsCache = null } = {}) {
+export function attentionView(root, { since }, { now = () => new Date().toISOString(), view = () => ({}), runsCache = null, definitions = null } = {}) {
   const sinceMs = parseAttentionSince(since), observedAt = now(), nowMs = Date.parse(observedAt);
   const valid = allRuns(root, { runsCache }).filter((l) => !l.malformed && l.run.runId);
   const settled = valid.map((l) => ({ l, terminal: result(l) }));
@@ -74,9 +99,11 @@ export function attentionView(root, { since }, { now = () => new Date().toISOStr
     const live = found.kind === 'past-deadline';
     const nextCommand = attempt.resumeCommand ?? (live ? `fgos dispatch watch ${l.run.runId}` : `fgos dispatch inspect --run ${l.run.runId}`);
     const worktree = l.run.cwd ? workspace(l.run.cwd).root : null;
-    rows.push({ runId: l.run.runId, assignmentId: l.assignmentId ?? null, worktree, kind: found.kind, reason: found.reason, nextCommand, line: `${found.kind} ${l.run.runId} ${worktree ?? '-'} ${found.reason} -> ${nextCommand}`, atMs });
+    rows.push({ runId: l.run.runId, subject: l.run.runId, assignmentId: l.assignmentId ?? null, worktree, kind: found.kind, reason: found.reason, nextCommand, line: `${found.kind} ${l.run.runId} ${worktree ?? '-'} ${found.reason} -> ${nextCommand}`, atMs });
   }
-  rows.sort((a, b) => a.atMs - b.atMs || a.runId.localeCompare(b.runId));
+  const detected = definitions ? definitionRows(definitions({ since: new Date(sinceMs).toISOString(), now: observedAt }), nowMs) : { rows: [], unmeasured: [] };
+  rows.push(...detected.rows);
+  rows.sort((a, b) => a.atMs - b.atMs || a.subject.localeCompare(b.subject));
   const out = rows.map(({ atMs, ...row }) => row);
-  return { contract: { id: 'attention-view', version: 1 }, since, observedAt, rows: out, idle: { state: 'not-readable', reason: 'the supervisor keeps its idle clock in memory; no readable record, so no idle rows' }, lines: out.map((r) => r.line) };
+  return { contract: { id: 'attention-view', version: 2 }, since, observedAt, rows: out, unmeasured: detected.unmeasured, idle: { state: 'not-readable', reason: 'the supervisor keeps its idle clock in memory; no readable record, so no idle rows' }, lines: out.map((r) => r.line) };
 }
