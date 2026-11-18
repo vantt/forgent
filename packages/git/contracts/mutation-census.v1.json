@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "712817e41a04fea492325f9eae6c6b19df7bb60ce3dc79988e5a6b2b3d32c8b7",
+  "payloadDigest": "56ee9e9b4e7f8f05de9c06a91a27bee9188ad0fbce0d007d591babfd4f919a7e",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1223,7 +1223,7 @@
     "src/runner/dispatch/confinement/backend-registry.mjs": "143f1a161187876901c7782ac2e737fb315d42e4e8947454cb3e60b1433eaa28",
     "src/runner/dispatch/confinement/bypass-pairing.mjs": "93fc1f7a32b1513cf08bf6812a0d52d4b3744884c139d8e9277cf87c19e2fe01",
     "src/runner/dispatch/confinement/cleanup.mjs": "cc2eb8a96e4c605b1b93fb119fa7cb9d0d6e47cd64d2c5ac596f1105515c0204",
-    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "5822b664fe62dc1af22b5630a3569845f1c300ec092545448931d4002d56c93c",
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": "31237d179a66745d8cad6dfe99f197636bf0774970ebe607c6d4c7111b8f2df8",
     "src/runner/dispatch/confinement/policies.mjs": "d4b3ff203ee1b3c79d4f2ee4526f79d54acbef67c4c411e60d23ed86c51bc52d",
     "src/runner/dispatch/confinement/probes/harness.mjs": "7ea51a10a96a29a288c838b09b5c53c15c092e98e72719908a9107c4d27f1243",
     "src/runner/dispatch/confinement/request.mjs": "929df9da1034d0d5955face98776faaa2305cc675ac1a68a4bd61a8083a4810b",
