@@ -1,0 +1,2 @@
+{"v":2,"id":"b1","kind":"fgos.plan.status","ts":"2026-11-18T11:05:00Z","subject":{"kind":"plan","id":"p2"},"attrs":{"fgos.plan.status":"running","fgos.plan.change":"status"},"basis":"observed","origin":{"source":"fixture"}}
+{"v":2,"id":"b2","kind":"fgos.plan.status","ts":"2026-11-18T11:06:00Z","subject":{"kind":"plan","id":"p3"},"attrs":{"fgos.plan.status":"done","fgos.plan.change":"status"},"basis":"observed","origin":{"source":"fixture"}}

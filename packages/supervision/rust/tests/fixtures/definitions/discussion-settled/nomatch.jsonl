@@ -1,0 +1,1 @@
+{"v":2,"id":"b1","kind":"fgos.discussion.status","ts":"2026-11-18T11:10:00Z","subject":{"kind":"discussion","id":"d2"},"attrs":{"fgos.discussion.from":"draft","fgos.discussion.to":"open","fgos.discussion.path":"docs/discussions/d2/DISCUSSION.md"},"basis":"observed","origin":{"source":"fixture"}}

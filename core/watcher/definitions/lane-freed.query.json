@@ -1,0 +1,11 @@
+{
+  "name": "lane-freed",
+  "requires": ["fgos.run.attempt"],
+  "query": {
+    "kind": ["fgos.run.attempt"],
+    "window_on": "end",
+    "by": ["origin.host"],
+    "agg": ["count", "max:ts"]
+  },
+  "row": { "kind": "lane-freed", "reason": "a worker attempt ended and freed a lane on this machine", "nextCommand": "fgos supervisor plans" }
+}

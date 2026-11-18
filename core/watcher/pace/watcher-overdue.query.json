@@ -1,0 +1,12 @@
+{
+  "name": "watcher-overdue",
+  "requires": ["fgos.watcher.tick"],
+  "query": {
+    "kind": ["fgos.watcher.tick"],
+    "agg": ["age:ts"],
+    "having": [
+      { "lhs": { "agg": { "agg": "age:ts" } }, "op": "gt", "rhs": { "latest": { "measure": "fgos.watcher.interval", "k": 3 } } },
+      { "lhs": { "latest": { "measure": "fgos.plans.running" } }, "op": "gt", "rhs": { "const": 0 } }
+    ]
+  }
+}
