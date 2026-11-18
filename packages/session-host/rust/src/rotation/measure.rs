@@ -220,8 +220,17 @@ pub struct Sources<'a> {
     pub window_size: u64,
 }
 
-/// The context fraction of a session. Waits up to `wait` for a sidecar record newer than `after_ms` (the file may appear
-/// during the wait), else falls back to the transcript and marks the answer stale. `None` when
+/// Whether a status-line writer is running for this session: the sidecar holds at least one record of it (of
+/// any session when `session_id` is `None`), whatever its age. The one signal read from real state; no writer
+/// ships with fgOS, so a project without one is never waited for.
+fn writer_seen(sidecar: &Path, session_id: Option<&str>) -> bool {
+    lines_of(sidecar).iter().any(|record| {
+        session_id.is_none_or(|id| record.get("session_id").and_then(Value::as_str) == Some(id))
+    })
+}
+
+/// The context fraction of a session. Waits up to `wait` for a sidecar record newer than `after_ms` (only when the sidecar already
+/// holds a record of this session, see `writer_seen`), else falls back to the transcript and marks the answer stale. `None` when
 /// neither has data.
 pub fn measure(sources: &Sources, wait: Duration) -> Option<Measure> {
     let deadline = Instant::now() + wait;
@@ -234,7 +243,9 @@ pub fn measure(sources: &Sources, wait: Duration) -> Option<Measure> {
             {
                 return Some(fresh);
             }
-            if Instant::now() >= deadline {
+            // Only a writer that has already written for this session can still deliver this turn's record;
+            // with none, waiting would stall every stop for nothing.
+            if !writer_seen(sidecar, sources.session_id) || Instant::now() >= deadline {
                 break;
             }
             std::thread::sleep(POLL);
@@ -329,10 +340,9 @@ mod tests {
     }
 
     #[test]
-    fn a_sidecar_file_created_while_waiting_is_taken() {
+    fn a_newer_record_that_replaces_the_file_while_waiting_is_taken() {
         let d = dir("c");
-        let sidecar = d.join("c.jsonl");
-        let _ = std::fs::remove_file(&sidecar);
+        let sidecar = write(&d, "c.jsonl", &[rec(0, "s", 1, 1_000_000)]);
         let late = sidecar.clone();
         let writer = std::thread::spawn(move || {
             std::thread::sleep(Duration::from_millis(50));
@@ -354,7 +364,7 @@ mod tests {
     #[test]
     fn a_record_that_lands_in_an_existing_sidecar_while_waiting_is_taken() {
         let d = dir("c2");
-        let sidecar = write(&d, "c2.jsonl", &[]);
+        let sidecar = write(&d, "c2.jsonl", &[rec(0, "s", 1, 1_000_000)]);
         let late = sidecar.clone();
         let writer = std::thread::spawn(move || {
             std::thread::sleep(Duration::from_millis(50));
@@ -413,6 +423,33 @@ mod tests {
             Duration::ZERO
         )
         .is_none());
+    }
+
+    #[test]
+    fn no_writer_for_this_session_means_no_wait_and_the_transcript_is_used_at_once() {
+        let d = dir("nowriter");
+        let transcript = write(
+            &d,
+            "t.jsonl",
+            &[
+                json!({ "type": "assistant", "message": { "id": "m", "usage": usage(250_000, 0, 0) } }),
+            ],
+        );
+        let other = write(
+            &d,
+            "other.jsonl",
+            &[rec(0, "another-session", 1, 1_000_000)],
+        );
+        for sidecar in [d.join("absent.jsonl"), other] {
+            let started = Instant::now();
+            let m = measure(
+                &sources(Some(&sidecar), Some(&transcript), 1),
+                Duration::from_secs(5),
+            )
+            .unwrap();
+            assert_eq!((m.source, m.fraction), (Source::Transcript, 0.25));
+            assert!(started.elapsed() < Duration::from_secs(1));
+        }
     }
 
     #[test]
