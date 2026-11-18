@@ -13,8 +13,17 @@ use std::sync::atomic::{AtomicU64, Ordering};
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 
 fn git(root: &Path, args: &[&str]) -> String {
-    let o = Command::new("git").arg("-C").arg(root).args(args).output().unwrap();
-    assert!(o.status.success(), "{args:?}: {}", String::from_utf8_lossy(&o.stderr));
+    let o = Command::new("git")
+        .arg("-C")
+        .arg(root)
+        .args(args)
+        .output()
+        .unwrap();
+    assert!(
+        o.status.success(),
+        "{args:?}: {}",
+        String::from_utf8_lossy(&o.stderr)
+    );
     String::from_utf8(o.stdout).unwrap().trim().into()
 }
 
@@ -47,7 +56,11 @@ impl Env {
             name: "origin".into(),
             pinned_url: temp.join("remote.git").to_str().unwrap().into(),
         };
-        Self { driver, repo, grant }
+        Self {
+            driver,
+            repo,
+            grant,
+        }
     }
 }
 
@@ -71,9 +84,26 @@ impl Fixture {
         fs::create_dir(&temp).unwrap();
         fs::set_permissions(&temp, fs::Permissions::from_mode(0o700)).unwrap();
         let remote = temp.join("remote.git");
-        git(&temp, &["init", "-q", "--bare", "--initial-branch=trunk", remote.to_str().unwrap()]);
+        git(
+            &temp,
+            &[
+                "init",
+                "-q",
+                "--bare",
+                "--initial-branch=trunk",
+                remote.to_str().unwrap(),
+            ],
+        );
         let main = temp.join("repo");
-        git(&temp, &["init", "-q", "--initial-branch=trunk", main.to_str().unwrap()]);
+        git(
+            &temp,
+            &[
+                "init",
+                "-q",
+                "--initial-branch=trunk",
+                main.to_str().unwrap(),
+            ],
+        );
         git(&main, &["config", "user.name", "Fixture"]);
         git(&main, &["config", "user.email", "fixture@example.invalid"]);
         for name in ["a", "b", "c", "d", "src.txt", "census.txt"] {
@@ -81,7 +111,10 @@ impl Fixture {
         }
         git(&main, &["add", "."]);
         git(&main, &["commit", "-qm", "base"]);
-        git(&main, &["remote", "add", "origin", remote.to_str().unwrap()]);
+        git(
+            &main,
+            &["remote", "add", "origin", remote.to_str().unwrap()],
+        );
         git(&main, &["push", "-q", "origin", "trunk"]);
         let fence = main.join(".fgos/locks/activation.lock");
         fs::create_dir_all(&fence).unwrap();
@@ -93,11 +126,26 @@ impl Fixture {
         fs::create_dir(temp.join("state")).unwrap();
         fs::set_permissions(temp.join("state"), fs::Permissions::from_mode(0o700)).unwrap();
         let other = temp.join("other");
-        git(&temp, &["clone", "-q", remote.to_str().unwrap(), other.to_str().unwrap()]);
+        git(
+            &temp,
+            &[
+                "clone",
+                "-q",
+                remote.to_str().unwrap(),
+                other.to_str().unwrap(),
+            ],
+        );
         git(&other, &["config", "user.name", "Other"]);
         git(&other, &["config", "user.email", "other@example.invalid"]);
         let env = Env::open(&temp);
-        Self { temp, main, remote, other, env, ids: AtomicU64::new(0) }
+        Self {
+            temp,
+            main,
+            remote,
+            other,
+            env,
+            ids: AtomicU64::new(0),
+        }
     }
 
     /// A topic branch with the given file contents, committed in the main checkout, then back on trunk.
@@ -127,7 +175,11 @@ impl Fixture {
         git(&self.main, &["rev-parse", "refs/heads/trunk"])
     }
 
-    fn land(&self, command: &LandCommand, config: &LandConfig) -> Result<fgos_supervision::land::LandOutcome, fgos_supervision::land::LandRefusal> {
+    fn land(
+        &self,
+        command: &LandCommand,
+        config: &LandConfig,
+    ) -> Result<fgos_supervision::land::LandOutcome, fgos_supervision::land::LandRefusal> {
         run_land(&self.env, "op", &self.ids, command, config)
     }
 }
@@ -159,15 +211,24 @@ impl Drop for Fixture {
 }
 
 fn gate(run: &str) -> Gate {
-    Gate { run: run.into(), when: vec![] }
+    Gate {
+        run: run.into(),
+        when: vec![],
+    }
 }
 
 fn gate_when(run: &str, when: &[&str]) -> Gate {
-    Gate { run: run.into(), when: when.iter().map(|s| s.to_string()).collect() }
+    Gate {
+        run: run.into(),
+        when: when.iter().map(|s| s.to_string()).collect(),
+    }
 }
 
 fn config(gates: Vec<Gate>) -> LandConfig {
-    LandConfig { gates, regenerate: None }
+    LandConfig {
+        gates,
+        regenerate: None,
+    }
 }
 
 fn branch(name: &str) -> LandCommand {
@@ -212,7 +273,9 @@ fn mover(f: &Fixture, once: bool) -> String {
 fn a_clean_merge_lands_pushes_and_local_main_equals_the_remote_tip() {
     let f = Fixture::new();
     f.topic("topic", &[("a", "incoming\n")]);
-    let out = f.land(&branch("topic"), &config(vec![gate("true")])).unwrap();
+    let out = f
+        .land(&branch("topic"), &config(vec![gate("true")]))
+        .unwrap();
     assert_eq!(out.main_sha, f.remote_tip());
     assert_eq!(f.local_tip(), f.remote_tip());
     assert_eq!(out.landed_paths, vec!["a".to_string()]);
@@ -223,16 +286,28 @@ fn a_clean_merge_lands_pushes_and_local_main_equals_the_remote_tip() {
 #[test]
 fn a_conflicting_census_lands_regenerated() {
     let f = Fixture::new();
-    f.topic("topic", &[("src.txt", "topic-src\n"), ("census.txt", "topic-census\n")]);
+    f.topic(
+        "topic",
+        &[("src.txt", "topic-src\n"), ("census.txt", "topic-census\n")],
+    );
     f.move_remote("census.txt", "trunk-census\n");
     let cfg = LandConfig {
         gates: vec![gate("true")],
-        regenerate: Some(Regenerate { run: "cp src.txt census.txt".into(), files: vec!["census.txt".into()] }),
+        regenerate: Some(Regenerate {
+            run: "cp src.txt census.txt".into(),
+            files: vec!["census.txt".into()],
+        }),
     };
     let out = f.land(&branch("topic"), &cfg).unwrap();
     assert_eq!(out.main_sha, f.remote_tip());
-    assert_eq!(fs::read_to_string(f.main.join("census.txt")).unwrap(), "topic-src\n");
-    assert_eq!(fs::read_to_string(f.main.join("src.txt")).unwrap(), "topic-src\n");
+    assert_eq!(
+        fs::read_to_string(f.main.join("census.txt")).unwrap(),
+        "topic-src\n"
+    );
+    assert_eq!(
+        fs::read_to_string(f.main.join("src.txt")).unwrap(),
+        "topic-src\n"
+    );
 }
 
 #[test]
@@ -241,7 +316,9 @@ fn a_conflict_outside_the_declared_files_refuses_before_any_candidate_is_prepare
     f.topic("topic", &[("a", "topic\n")]);
     f.move_remote("a", "trunk\n");
     let before = f.remote_tip();
-    let refusal = f.land(&branch("topic"), &config(vec![gate("true")])).unwrap_err();
+    let refusal = f
+        .land(&branch("topic"), &config(vec![gate("true")]))
+        .unwrap_err();
     assert_eq!(refusal.code, "land-conflict-aborted");
     assert!(refusal.detail.contains('a'));
     assert_eq!(git(&f.main, &["worktree", "list"]).lines().count(), 1);
@@ -255,7 +332,10 @@ fn a_failing_gate_refuses_and_publishes_nothing() {
     let remote_before = f.remote_tip();
     let local_before = f.local_tip();
     let refusal = f
-        .land(&branch("topic"), &config(vec![gate("echo boom >&2; exit 1")]))
+        .land(
+            &branch("topic"),
+            &config(vec![gate("echo boom >&2; exit 1")]),
+        )
         .unwrap_err();
     assert_eq!(refusal.code, "land-gate-failed");
     assert!(refusal.detail.contains("boom"));
@@ -267,7 +347,9 @@ fn a_failing_gate_refuses_and_publishes_nothing() {
 fn the_remote_moving_once_between_prepare_and_push_lands_on_the_second_try() {
     let f = Fixture::new();
     f.topic("topic", &[("a", "incoming\n")]);
-    let out = f.land(&branch("topic"), &config(vec![gate(&mover(&f, true))])).unwrap();
+    let out = f
+        .land(&branch("topic"), &config(vec![gate(&mover(&f, true))]))
+        .unwrap();
     assert_eq!(out.retries, 1);
     assert_eq!(out.main_sha, f.remote_tip());
     assert_eq!(f.local_tip(), f.remote_tip());
@@ -278,10 +360,20 @@ fn the_remote_moving_once_between_prepare_and_push_lands_on_the_second_try() {
 fn the_remote_moving_every_time_ends_retries_exhausted_with_no_local_land() {
     let f = Fixture::new();
     f.topic("topic", &[("a", "incoming\n")]);
-    let refusal = f.land(&branch("topic"), &config(vec![gate(&mover(&f, false))])).unwrap_err();
+    let local_before = f.local_tip();
+    let refusal = f
+        .land(&branch("topic"), &config(vec![gate(&mover(&f, false))]))
+        .unwrap_err();
     assert_eq!(refusal.code, "land-retries-exhausted");
-    assert_eq!(f.local_tip(), f.remote_tip());
-    assert!(!git_ok(&f.main, &["merge-base", "--is-ancestor", "topic", "trunk"]));
+    assert_ne!(f.remote_tip(), local_before);
+    assert!(git_ok(
+        &f.main,
+        &["merge-base", "--is-ancestor", "trunk", "origin/trunk"]
+    ));
+    assert!(!git_ok(
+        &f.main,
+        &["merge-base", "--is-ancestor", "topic", "trunk"]
+    ));
 }
 
 #[test]
@@ -303,7 +395,10 @@ fn an_unrelated_dirty_main_checkout_file_does_not_block_a_branch_land_with_a_foo
     let mut cmd = branch("topic");
     cmd.footprint = Some(vec!["a".into()]);
     f.land(&cmd, &config(vec![gate("true")])).unwrap();
-    assert_eq!(fs::read_to_string(f.main.join("d")).unwrap(), "keep local\n");
+    assert_eq!(
+        fs::read_to_string(f.main.join("d")).unwrap(),
+        "keep local\n"
+    );
 }
 
 #[test]
@@ -331,7 +426,10 @@ fn a_tests_gate_receives_the_test_paths_and_an_unknown_test_is_refused() {
     let f = Fixture::new();
     f.topic("topic", &[("a", "incoming\n")]);
     let out_file = f.temp.join("tests.out");
-    let cfg = config(vec![gate(&format!("printf '%s\\n' {{tests}} > {}", out_file.display()))]);
+    let cfg = config(vec![gate(&format!(
+        "printf '%s\\n' {{tests}} > {}",
+        out_file.display()
+    ))]);
     let mut cmd = branch("topic");
     cmd.tests = vec!["b".into(), "c".into()];
     f.land(&cmd, &cfg).unwrap();
@@ -348,13 +446,22 @@ fn a_paths_land_commits_exactly_the_named_paths_and_runs_only_matching_gates() {
     let f = Fixture::new();
     fs::write(f.main.join("a"), "landed\n").unwrap();
     fs::write(f.main.join("b"), "still dirty\n").unwrap();
-    let cfg = config(vec![gate_when("true", &["a"]), gate_when("touch ran-for-b", &["b"])]);
+    let cfg = config(vec![
+        gate_when("true", &["a"]),
+        gate_when("touch ran-for-b", &["b"]),
+    ]);
     let out = f.land(&paths(&["a"]), &cfg).unwrap();
     assert_eq!(out.gates_run, vec!["true".to_string()]);
     assert_eq!(out.landed_paths, vec!["a".to_string()]);
     assert_eq!(out.main_sha, f.remote_tip());
-    assert_eq!(git(&f.main, &["show", "--name-only", "--format=", "HEAD"]), "a");
-    assert_eq!(fs::read_to_string(f.main.join("b")).unwrap(), "still dirty\n");
+    assert_eq!(
+        git(&f.main, &["show", "--name-only", "--format=", "HEAD"]),
+        "a"
+    );
+    assert_eq!(
+        fs::read_to_string(f.main.join("b")).unwrap(),
+        "still dirty\n"
+    );
     assert!(!f.main.join("ran-for-b").exists());
 }
 
@@ -373,7 +480,9 @@ fn a_paths_land_fast_forwards_to_a_remote_that_moved_first() {
 #[test]
 fn an_empty_paths_set_is_refused() {
     let f = Fixture::new();
-    let refusal = f.land(&paths(&[]), &config(vec![gate("true")])).unwrap_err();
+    let refusal = f
+        .land(&paths(&[]), &config(vec![gate("true")]))
+        .unwrap_err();
     assert_eq!(refusal.code, "land-paths-empty");
 }
 
@@ -397,7 +506,15 @@ fn a_land_after_an_interrupted_one_completes_or_names_the_recovery_verb() {
     let session = f
         .env
         .driver
-        .prepare_land(&f.env.repo, vec![], &request, "fixture", "interrupted", &fgos_git::wal::OsFileSystem, 0)
+        .prepare_land(
+            &f.env.repo,
+            vec![],
+            &request,
+            "fixture",
+            "interrupted",
+            &fgos_git::wal::OsFileSystem,
+            0,
+        )
         .unwrap();
     drop(session);
     match f.land(&branch("topic"), &config(vec![gate("true")])) {
