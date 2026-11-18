@@ -12,8 +12,8 @@ discussion settles the worktree split. Shaper: claude-kqih@fg-server2, branch `s
 and the `head` -> `session` rename; S6a builds the one Rust `fgos worktree` door, folding in what
 `session start/end/list/gc` did and the runner's own `createWorktree`; 0947 runs after S6a lands its
 worktree phase, not after all of S6a. D2: `worktree create` provisions by default, `--bare` opts out.
-D3: `fgos-runner` moves to S7.
-Open: Q3-Q4 in `QUESTIONS.md` (order against plan 1045 P6, whether `src/runner/worktree.mjs` is in scope).
+D3: `fgos-runner` moves to S7. D4: plan 1045 P6 lands first; S6a ports its `lanes` field.
+Open: Q4 in `QUESTIONS.md` (whether `src/runner/worktree.mjs` is in scope).
 
 ## 2. Mục tiêu & đề bài
 
@@ -36,7 +36,7 @@ lands; its phases 11 (doctor rows) and 12 (doors, close) are still pending.
 | Split with plan 0947 | settled (D1) | owner 2026-11-18 13:2x |
 | Session checkout: keep bare (no `worktreeSetup`/deps/skill roots) or provision like `worktree create` | settled (D2) | `apps/fgos/src/wiring/session.rs` start never provisions; `src/verbs/worktree/create.mjs:14` calls `provisionWorktree` |
 | `fgos-runner` entry belongs to S6a or S7 | settled (D3) | `bin/fgos-runner.mjs` drives the Work frontier via `src/runner/loop.mjs`; S7 owns tier-7 `src/runner/*.mjs` |
-| Order against plan 1045 P6 (lane pool edits `direct-launch.mjs`, `assignment-runner.mjs`, `envelope.v3.json`) | open, Q3 | both edit S6a's Node launchers |
+| Order against plan 1045 P6 (lane pool edits `direct-launch.mjs`, `assignment-runner.mjs`, `envelope.v3.json`) | settled (D4) | both edit S6a's Node launchers |
 | `src/runner/worktree.mjs` (1437 lines, real worktree engine, used by S6b/S7 callers) in S6a scope | open, Q4 | not in the program row's file list |
 | `src/run-supervisor/payload-root.mjs` imported by lower layers (seat-binding, session-host, native door, event-store) | clear: must move down before the directory is deleted | design principle 2 |
 | S5 gate | clear: S6a waits for S5 phases 11, 12 | `plans/261115-2328-execution-read-door/plan.md` |
@@ -51,6 +51,7 @@ lands; its phases 11 (doctor rows) and 12 (doors, close) are still pending.
 | D1 | Plan 0947 keeps: delete the `session` worktree lifecycle (`session.rs`, `sessions.json` writer, `sessions` lock, `is_session_worktree`), gateway `/v1/sessions` routes answer 501, Identity stops reading `sessions.json` (its phase 4 footprint gains `packages/mailbox/rust/store/src/hook/resolve.rs`), rename `head` to `session`. S6a builds `fgos worktree` in Rust as the single checkout door, carrying the jobs `session start/end/list/gc` did and replacing the runner's own `createWorktree`. 0947 starts after S6a lands its worktree phase (planned in S6a's first wave), not after all of S6a. | Avoids writing the session jobs into the Node `worktree` verb and then rewriting them in Rust; one door instead of three (RUL11, L10). | 2026-11-18 |
 | D2 | `fgos worktree create` provisions by default (`worktreeSetup` commands, dependencies, skill roots) as today; a `--bare` flag makes a checkout with no provisioning, the case `session start` served. | Keeps today's `worktree create` behaviour unchanged and still serves the throwaway session checkout through the one door. | 2026-11-18 |
 | D3 | The `fgos-runner` binary (`bin/fgos-runner.mjs`, the Work-frontier loop over `src/runner/loop.mjs`) moves from S6a to S7; S6a leaves it on Node calling Execution through the Rust doors. The program plan's S6a row drops it and S7's row gains it. | It is a Work-tier queue driver above Execution, not the `fgos run` verb; porting it in S6a would pull Work forward against "Work last". | 2026-11-18 |
+| D4 | Plan 1045 phase 6 (lane pool) lands first, on the Node launchers `src/runner/dispatch/assignment-runner.mjs` and `src/run-supervisor/direct-launch.mjs`; S6a ports those launchers with the optional envelope field `lanes: {ceiling, waitMs}` and the `workerSlots.ceiling`/`laneWaitSec` reads they carry. | 1045 is running now and P6 is ready after its P4, while S6a still waits for S5; the Node part of P6 is a few lines, so nobody waits on the other. | 2026-11-18 |
 
 ## 5. Q&A log
 
@@ -59,6 +60,7 @@ lands; its phases 11 (doctor rows) and 12 (doors, close) are still pending.
 - 2026-11-18 13:24 owner: "ok, chia vậy đi, ghi vào discussion" -> D1.
 - 2026-11-18 13:30 Q1 (session checkout provisioning): owner (b) -> D2.
 - 2026-11-18 13:34 owner asked whether `fgos-runner` is `fgos run`; shaper: no, `fgos run` runs one Unit (Execution), `fgos-runner` is the Work-frontier loop. Q2: owner (a) -> D3.
+- 2026-11-18 13:38 Q3 (order against 1045 P6): owner (a) -> D4.
 
 ## 6. Thiết kế đã chốt {#design}
 
