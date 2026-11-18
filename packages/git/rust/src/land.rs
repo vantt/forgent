@@ -987,6 +987,11 @@ impl GitDriver {
                     Some(&land),
                 )
             });
+        let interrupted = filesystem.checkpoint("land-push-after-transfer");
+        if let Err(e) = interrupted {
+            // A crash here leaves the temporary branch; the Land's recovery deletes it.
+            return Err(failure(e));
+        }
         // Best effort: a leftover branch is only a name for the same commit.
         let _ = self.delete_ref(
             repo,
@@ -1216,10 +1221,7 @@ impl GitDriver {
                 &["rev-parse", &format!("{}^{{tree}}", next.as_str())],
                 &[],
             )?;
-            if head_tree != next_tree
-                || crate::refs::direct(self, repo, target)? != new
-                || crate::refs::direct(self, repo, remote_tracking)? != new
-            {
+            if head_tree != next_tree || crate::refs::direct(self, repo, target)? != new {
                 return Err(recovery("checkout-read-back-recovery-required"));
             }
             let index = self.land_text(repo, &scope, &["write-tree"], &[])?;
@@ -1686,6 +1688,7 @@ impl GitDriver {
         scope
             .acquire("recovery", &recovery_params, Wait::Ms(0))
             .map_err(failure)?;
+        self.drop_land_push_branch(repo, &scope, id)?;
         if let Some(c) = compact {
             return land_outcome_receipt(id, &intent, &c.outcome()?, repo);
         }
@@ -1945,6 +1948,28 @@ impl GitDriver {
 }
 
 impl GitDriver {
+    /// Delete the temporary push branch a crashed `push_land_candidate` of this Land left behind:
+    /// only that exact name, by exact-old compare-and-swap on the OID it holds now.
+    fn drop_land_push_branch(&self, repo: &RepoHandle, scope: &LockScope, id: &str) -> Result<()> {
+        let name = RefName::parse(&format!("refs/heads/fgos-land-push-{id}")).map_err(failure)?;
+        if let ExpectedTip::Oid(oid) = crate::refs::direct(self, repo, &name)? {
+            self.land_text(
+                repo,
+                scope,
+                &durable_args(&[
+                    "update-ref",
+                    "--no-deref",
+                    "-d",
+                    name.as_str(),
+                    oid.as_str(),
+                ]),
+                &[],
+            )?;
+            crate::refs::sync_refs(repo, &name)?;
+        }
+        Ok(())
+    }
+
     /// Cleanup is part of explicit recovery, after the consumer has durably
     /// settled its unique (repoIdentity, operationId, settlementKind) identity.
     /// The opaque acknowledgement is a consumer assertion, never Git settlement.
