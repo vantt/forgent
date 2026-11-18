@@ -87,6 +87,8 @@ pub struct Verdict {
     pub adoptable: Option<bool>,
     /// What the envelope binds the steps to that no longer exists (empty when adoptable).
     pub gone: Vec<String>,
+    /// `lane-pool-over` when a live worker adopt re-owned found the lane pool full.
+    pub lane: Option<&'static str>,
 }
 
 impl Verdict {
@@ -98,6 +100,7 @@ impl Verdict {
             reason: None,
             adoptable: None,
             gone: Vec::new(),
+            lane: None,
         }
     }
 
@@ -128,6 +131,9 @@ impl Verdict {
             if let Some(value) = value {
                 line[key] = Value::String(value.clone());
             }
+        }
+        if let Some(lane) = self.lane {
+            line["lane"] = json!(lane);
         }
         if let Some(adoptable) = self.adoptable {
             line["adoptable"] = json!(adoptable);
@@ -250,7 +256,14 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
     if matches!(args.target, Target::Scan) && domain_state != DomainState::Empty {
         return Verdict::because("running", "domain-not-empty");
     }
-    adopt_locked(dir, &resource, binding.is_some(), agent, args)
+    adopt_locked(
+        dir,
+        &resource,
+        binding.is_some(),
+        agent,
+        envelope_json.as_ref(),
+        args,
+    )
 }
 
 /// What the envelope binds an attempt's steps to that no longer exists: the host binary, and the Node
@@ -322,6 +335,7 @@ fn adopt_locked(
     resource: &Resource,
     bound: bool,
     agent: Option<Record>,
+    envelope: Option<&Value>,
     args: &AdoptArgs,
 ) -> Verdict {
     let handle = match fgos_holder_lock::acquire(resource, Mode::Ex, Wait::Try, args.kill_wait_ms) {
@@ -336,11 +350,25 @@ fn adopt_locked(
             return Verdict::because("open", format!("{}: {detail}", reason.as_str()))
         }
     };
+    // A live worker this adopter re-owns holds a lane while it does, so the pool's live count never undercounts;
+    // a full pool keeps the worker and says so.
+    let live_agent = agent
+        .as_ref()
+        .is_some_and(|a| facts::judge_here(a) != Judged::Dead);
+    let (_lane, lane_note) = if live_agent {
+        crate::lanes::adopt(&fgos_holder_lock::lock_root(), envelope)
+    } else {
+        (crate::lanes::Lane::None, None)
+    };
     // The steps never run over a live agent.
     if agent.is_some_and(|a| !agent_ended(&a, args.kill_wait_ms)) {
-        return Verdict::because("held", "agent-alive");
+        return Verdict {
+            lane: lane_note,
+            ..Verdict::because("held", "agent-alive")
+        };
     }
-    let verdict = drive(dir, bound);
+    let mut verdict = drive(dir, bound);
+    verdict.lane = lane_note;
     // The marker only describes the current holder; it goes before the lock does.
     let _ = std::fs::remove_file(dir.join("adopting.json"));
     drop(handle);

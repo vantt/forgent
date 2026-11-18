@@ -52,6 +52,17 @@ test('the envelope vector is a complete v3 direct envelope', () => {
   for (const field of Object.keys(contract.fields.steps.item)) assert.ok(field in envelope.steps[0], `steps[].${field}`);
 });
 
+test('the envelope contract names the optional lanes field and its start-refusal code', () => {
+  const contract = readJson('packages/run-supervisor/contracts/envelope.v3.json');
+  assert.match(contract.optionalFields.lanes, /ceiling/);
+  assert.match(contract.optionalFields.lanes, /waitMs/);
+  assert.match(contract.optionalFields.lanes, /lane-pool-full/);
+  const lane = readJson('packages/holder-lock/contracts/lock-registry.v1.json').locks.find((l) => l.name === 'lane');
+  assert.deepEqual({ kind: lane.kind, scope: lane.scope, rank: lane.rank, v3Path: lane.v3Path }, { kind: 'mutex', scope: 'machine', rank: 80, v3Path: '<lockRoot>/lane/<k>.lock' });
+  // The same body canonicalizes byte for byte in Rust (envelope_digest_vectors.rs).
+  assert.equal(canonicalJson({ v: 3, lanes: { waitMs: 900000, ceiling: null } }), '{"lanes":{"ceiling":null,"waitMs":900000},"v":3}');
+});
+
 test('containment kinds agree across the port, the binding and the predecessor record', () => {
   const port = readJson('packages/process/contracts/containment.port.v1.json');
   const binding = readJson('packages/run-supervisor/contracts/supervisor-binding.v1.json');

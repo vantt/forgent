@@ -586,6 +586,22 @@ fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
         code: "envelope-invalid",
         why,
     })?;
+    // A top-level worker seat holds one lane of the machine pool from here to the end of `supervise`; the
+    // agent has exited by then. A head session and a nested dispatch carry no `lanes` and take none.
+    let _lane = match crate::lanes::take_for(&fgos_holder_lock::lock_root(), &envelope) {
+        Ok(lane) => lane,
+        Err(crate::lanes::TakeError::PoolFull(full)) => {
+            return not_started(
+                &envelope,
+                &run_dir,
+                &watch,
+                locks,
+                "lane-pool-full",
+                &format!("{} seats are held on this machine", full.ceiling),
+            );
+        }
+        Err(crate::lanes::TakeError::Unavailable(why)) => return Err(Refusal::internal(why)),
+    };
     if terminal {
         return supervise_terminal(&envelope, &run_dir, locks, &watch);
     }

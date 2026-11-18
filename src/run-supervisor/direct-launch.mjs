@@ -19,6 +19,7 @@ import { selfRecord } from '../native/process-identity.mjs';
 import { launcherEnv } from '../util/session-identity.mjs';
 import { adoptRun, resolveRouteHostBin, RunSupervisorError } from './client.mjs';
 import { readGateKillGraceMs } from './gate-kill-grace.mjs';
+import { readConfig } from '../config/facade.mjs';
 import { ensureRuntimeSocketDir } from './runtime-dir.mjs';
 import { OWN_PAYLOAD_ROOT, realpathOrNull, releasePayloadRoot } from './payload-root.mjs';
 import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL, ATTEMPT_STEP_TIMEOUT_MS, MAX_ATTEMPT_STEPS } from './protocol.mjs';
@@ -205,8 +206,9 @@ export function removeAttemptIntent(runDir) {
  * attempt directory (`runs/<NN>`); `attempt` is `prepareConfinementForLaunch(...).attempt`.
  * `session` (`{role, verbs, requestSocketPath?}`, terminal only) makes it a session attempt: no soft deadline, no idle
  * limit, no `settle-attempt` step, and `ceilingMs` (required, instead of the round-timeout ceiling) bounds it.
+ * `lanes` (`{ceiling, waitMs}`, from `laneTransport`) is the lane pool of a top-level worker seat; absent for any other attempt.
  */
-export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile, cwdLeaseOwner, identity, terminal = null, extraSteps = [], session = null, ceilingMs = null }) {
+export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutating, attempt, timeoutMs, idleTimeoutMs, maxOutputBytes, cli, stepEnv, gateKillGraceMs, killWaitMs, cwdLeaseFile, cwdLeaseOwner, identity, terminal = null, extraSteps = [], session = null, ceilingMs = null, lanes = null }) {
   if (session && !terminal) throw new DispatchError('session-needs-terminal', 'a session attempt runs in a pane', { runDir });
   if (session && !(Number.isInteger(ceilingMs) && ceilingMs > 0)) throw new DispatchError('session-needs-ceiling', 'a session attempt names its hard ceiling in milliseconds', { runDir });
   if ((session ? 1 : 2) + extraSteps.length > MAX_ATTEMPT_STEPS) throw new DispatchError('too-many-steps', `an attempt runs at most ${MAX_ATTEMPT_STEPS} steps`, { runDir });
@@ -256,6 +258,8 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
       terminal: { socketPath: terminal.socketPath, exitCommand: terminal.exitCommand ?? null, orphanSettleMs: terminal.orphanSettleMs, ...(terminal.retainFailedPaneMs !== undefined ? { retainFailedPaneMs: terminal.retainFailedPaneMs } : {}) },
     } : {}),
     ...(session ? { session } : {}),
+    // A head session is never a seat of the lane pool; the supervisor reads the pool size from here, not from config.
+    ...(lanes && !session ? { lanes } : {}),
     ...(cwdLeaseFile ? { cwdLeaseFile, ...(cwdLeaseOwner ? { cwdLeaseOwner } : {}) } : {}),
   };
 }
@@ -277,9 +281,24 @@ export function writeSettleContext(runDir, context) {
   publishMutableProjection(path.join(runDir, 'controller', 'settle-context.json'), { v: 1, ...context });
 }
 
-/** The kill grace and the predecessor kill wait the envelope carries. */
+/** The kill grace and the predecessor kill wait the envelope carries, and the lane pool settings (`workerSlots`). */
 export function readLaunchSettings(projectRoot) {
-  return { gateKillGraceMs: readGateKillGraceMs({ projectRoot }), killWaitMs: doorKillWaitMs() };
+  const { workerSlots } = readConfig({ projectRoot, sections: ['workerSlots'] }).value;
+  return {
+    gateKillGraceMs: readGateKillGraceMs({ projectRoot }),
+    killWaitMs: doorKillWaitMs(),
+    lanes: { ceiling: workerSlots.ceiling ?? null, laneWaitSec: workerSlots.laneWaitSec },
+  };
+}
+
+/**
+ * The envelope's `lanes` field for a launch at dispatch depth `depth`: only a top-level seat (depth 0) takes a
+ * lane, so a seat that dispatches a child never waits on its own pool. `null` means the envelope carries none.
+ * The supervisor reads no config; an absent field or `ceiling: null` leaves the pool unarmed.
+ */
+export function laneTransport(lanes, depth) {
+  if (depth !== 0 || !lanes) return null;
+  return { ceiling: lanes.ceiling ?? null, waitMs: lanes.laneWaitSec * 1000 };
 }
 
 /**
