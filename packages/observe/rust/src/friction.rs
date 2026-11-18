@@ -1,20 +1,55 @@
-//! Friction management for Observe: record, resolve, list, show, rank.
+//! Friction management for Observe: record, resolve, list, show, rank, classes.
+//!
+//! New friction is written as v2 records (`fgos.friction.recorded`, `fgos.friction.resolved`) through the record
+//! write door. Reads cover those records and the old `friction` shards until the shards are migrated, so a store
+//! that is not migrated still shows every record. A friction is settled by a later resolve of its subject (or, for a
+//! resolve by signature, of its class); the settle rule is the same for both stores.
 
-use crate::contract::{Subject, Window};
-use crate::shard::{self, is_session_shard, StoredRecord, TornTail, UnsafeShard};
-use crate::store_lock::acquire_store_lock;
+use crate::contract::{RecordSource, SourceError, Subject, Window};
+use crate::query::{run, Agg, AggValue, Bucket, Query, QueryContext};
+use crate::record::registry::{EmbeddedDeclaration, Registry};
+use crate::record::store::{new_record_id, RecordDoor, WriteOutcome, RECORDS_STORE};
+use crate::record::types::{
+    AttrValue, Basis, Origin, Record, Redaction, SubjectRef, DETAIL_MAX_BYTES, RECORD_VERSION,
+};
+use crate::shard::{self, is_session_shard, StoredRecord, UnsafeShard};
 use crate::time::{now_iso, ParsedWindow};
-use fgos_host_runtime::civil_time::parse_rfc3339_millis;
+use fgos_host_runtime::civil_time::{format_unix_millis_rfc3339, parse_rfc3339_millis};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::collections::HashMap;
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::path::Path;
 
+/// The declaration of both friction kinds, for the composition root's embedded list.
+pub const FRICTION_DECLARATION: EmbeddedDeclaration = EmbeddedDeclaration {
+    label: "fgos-observe-friction",
+    json: include_str!("../friction-kinds.json"),
+};
+
+pub const RECORDED_KIND: &str = "fgos.friction.recorded";
+pub const RESOLVED_KIND: &str = "fgos.friction.resolved";
+const KIND_ATTR: &str = "fgos.friction.kind";
+const LAYER_ATTR: &str = "fgos.friction.layer";
+const CLASS_ATTR: &str = "fgos.friction.class";
+const DISPOSITION_ATTR: &str = "fgos.friction.disposition";
+const PRODUCER_ATTR: &str = "fgos.friction.producer";
+const DOC_TYPE_ATTR: &str = "fgos.friction.doc_type";
+const REASON_ATTR: &str = "fgos.friction.reason";
+const ATTEMPTS_MEASURE: &str = "fgos.friction.attempts";
+
+/// The component layers a friction names: the layers of the platform's parts, then the layers older records carry.
 pub const PUBLISHED_LAYERS: &[&str] = &[
-    "verification",
-    "state",
-    "environment",
+    "skill",
+    "tool",
+    "runner",
+    "workflow",
+    "git",
+    "provider",
+    "config",
     "docs",
+    "state",
+    "verification",
+    "environment",
     "spec",
     "context",
     "task",
@@ -23,13 +58,26 @@ pub const PUBLISHED_LAYERS: &[&str] = &[
     "attestation",
 ];
 
+pub const PUBLISHED_KINDS: &[&str] = &["bug", "instability", "missing", "awkward", "doc"];
+
 pub const PUBLISHED_DISPOSITIONS: &[&str] = &["advisory", "blocked", "parked", "halted"];
 
 pub const VALID_REASONS: &[&str] = &["answer", "done", "wontfix", "clarify-pass", "migrated"];
 
+/// A resolve reason may also be `filed:<backlog-id>`: the friction became that backlog row.
+const FILED_PREFIX: &str = "filed:";
+
 pub const VALID_DOC_TYPES: &[&str] = &["tutorial", "how-to", "reference", "explanation"];
 
+/// What a friction may point at besides its subject.
+pub const REF_KINDS: &[&str] = &[
+    "run", "session", "plan", "backlog", "executor", "case", "work",
+];
+
 const STORE: &str = "friction";
+const DETAIL_REDACTION_REV: &str = "friction-detail-cap.v1";
+const RECORD_ORIGIN: &str = "fgos friction record";
+const LEGACY_ORIGIN: &str = "legacy-friction-shard";
 
 /// Prefix of every refusal caused by the caller's input (never by the store), so
 /// a client can tell the two apart from the first line of the host's error.
@@ -61,6 +109,10 @@ pub fn current_caller() -> CallerInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FrictionInput {
     pub subject: Subject,
+    /// The friction kind (bug, instability, missing, awkward, doc); older callers leave it out.
+    pub kind: Option<String>,
+    /// Further subjects the friction points at.
+    pub refs: Vec<SubjectRef>,
     pub layer: String,
     #[serde(rename = "errorClass")]
     pub error_class: String,
@@ -72,18 +124,40 @@ pub struct FrictionInput {
     pub doc_type: Option<String>,
 }
 
+fn one_of(value: &str, allowed: &[&str]) -> bool {
+    allowed.contains(&value)
+}
+
 pub fn validate_record_input(input: &FrictionInput) -> Result<(), String> {
     if input.subject.id.trim().is_empty() {
         return Err(invalid_input("subject id must not be empty"));
     }
-    if !PUBLISHED_LAYERS.contains(&input.layer.as_str()) {
+    if !one_of(&input.layer, PUBLISHED_LAYERS) {
         return Err(invalid_input(format!(
             "invalid layer \"{}\". Published layers: {}",
             input.layer,
             PUBLISHED_LAYERS.join(", ")
         )));
     }
-    if !PUBLISHED_DISPOSITIONS.contains(&input.disposition.as_str()) {
+    if let Some(kind) = &input.kind {
+        if !one_of(kind, PUBLISHED_KINDS) {
+            return Err(invalid_input(format!(
+                "invalid kind \"{kind}\". Allowed kinds: {}",
+                PUBLISHED_KINDS.join(", ")
+            )));
+        }
+    }
+    for reference in &input.refs {
+        if !one_of(&reference.kind, REF_KINDS) || reference.id.trim().is_empty() {
+            return Err(invalid_input(format!(
+                "invalid ref \"{}:{}\". Expected <kind>:<id>, kind one of {}",
+                reference.kind,
+                reference.id,
+                REF_KINDS.join(", ")
+            )));
+        }
+    }
+    if !one_of(&input.disposition, PUBLISHED_DISPOSITIONS) {
         return Err(invalid_input(format!(
             "invalid disposition \"{}\". Allowed dispositions: {}",
             input.disposition,
@@ -97,7 +171,7 @@ pub fn validate_record_input(input: &FrictionInput) -> Result<(), String> {
         return Err(invalid_input("producer must not be empty"));
     }
     if let Some(dt) = &input.doc_type {
-        if !VALID_DOC_TYPES.contains(&dt.as_str()) {
+        if !one_of(dt, VALID_DOC_TYPES) {
             return Err(invalid_input(format!(
                 "invalid docType \"{}\". Allowed docTypes: {}",
                 dt,
@@ -108,10 +182,17 @@ pub fn validate_record_input(input: &FrictionInput) -> Result<(), String> {
     Ok(())
 }
 
+/// The backlog row a `filed:<id>` reason names.
+fn filed_backlog(reason: &str) -> Option<&str> {
+    reason
+        .strip_prefix(FILED_PREFIX)
+        .filter(|id| !id.is_empty())
+}
+
 pub fn validate_resolve_input(reason: &str, by: &str) -> Result<(), String> {
-    if !VALID_REASONS.contains(&reason) {
+    if !one_of(reason, VALID_REASONS) && filed_backlog(reason).is_none() {
         return Err(invalid_input(format!(
-            "invalid resolve reason \"{}\". Allowed reasons: {}",
+            "invalid resolve reason \"{}\". Allowed reasons: {}, or {FILED_PREFIX}<backlog-id>",
             reason,
             VALID_REASONS.join(", ")
         )));
@@ -122,18 +203,34 @@ pub fn validate_resolve_input(reason: &str, by: &str) -> Result<(), String> {
     Ok(())
 }
 
-/// A friction event with its stamp parsed once and the shard line it came from.
+/// What a resolve settles: every unsettled friction of one subject, or of one signature.
+#[derive(Debug, Clone)]
+pub enum ResolveTarget {
+    Subject(Subject),
+    Class(String),
+}
+
+/// A friction event with its stamp parsed once and the line it came from. Events of both stores are held in one
+/// shape: `value` is the old shard form, so every reader and the settle rule see one thing.
 struct Event {
     value: Value,
     /// `None` only for a resolve whose stamp is free text (written by a past migration).
     millis: Option<i64>,
+    /// The store the line came from; shard names are only unique inside one store.
+    store: &'static str,
     shard: String,
     line: usize,
+    /// The v2 record, for an event read from the record store.
+    record: Option<Record>,
 }
 
 impl Event {
     fn kind(&self) -> &str {
         self.value.get("type").and_then(Value::as_str).unwrap_or("")
+    }
+
+    fn text(&self, name: &str) -> Option<&str> {
+        self.value.get(name).and_then(Value::as_str)
     }
 
     fn subject(&self) -> (String, String) {
@@ -147,6 +244,59 @@ impl Event {
         };
         (field("kind"), field("id"))
     }
+
+    /// The signature of a recorded friction; for a resolve, the signature it is limited to.
+    fn class(&self) -> Option<&str> {
+        if self.kind() == "friction-resolved" {
+            self.text("class")
+        } else {
+            self.text("errorClass")
+        }
+    }
+
+    /// The v2 form of a recorded friction: the stored record, or an old shard line projected onto it.
+    fn projected(&self) -> Option<Record> {
+        if let Some(record) = &self.record {
+            return Some(record.clone());
+        }
+        if self.kind() != "friction-recorded" {
+            return None;
+        }
+        let (kind, id) = self.subject();
+        let mut attrs = BTreeMap::new();
+        for (attr, field) in [
+            (LAYER_ATTR, "layer"),
+            (CLASS_ATTR, "errorClass"),
+            (DISPOSITION_ATTR, "disposition"),
+            (PRODUCER_ATTR, "producer"),
+        ] {
+            if let Some(value) = self.text(field) {
+                attrs.insert(attr.to_owned(), AttrValue::Str(value.to_owned()));
+            }
+        }
+        let mut measures = BTreeMap::new();
+        if let Some(attempts) = self.value.get("attempts").and_then(Value::as_u64) {
+            measures.insert(ATTEMPTS_MEASURE.to_owned(), attempts.into());
+        }
+        Some(Record {
+            v: RECORD_VERSION,
+            id: format!("legacy:{}:{}", self.shard, self.line),
+            kind: RECORDED_KIND.to_owned(),
+            ts: self.text("ts").unwrap_or_default().to_owned(),
+            end_ts: None,
+            subject: SubjectRef { kind, id },
+            refs: Vec::new(),
+            attrs,
+            measures,
+            basis: Basis::Reported,
+            origin: Origin {
+                source: LEGACY_ORIGIN.to_owned(),
+                ..Origin::default()
+            },
+            detail: None,
+            redaction: None,
+        })
+    }
 }
 
 /// The instant of a stamp. A trailing `~` (written by a past migration for a
@@ -158,12 +308,20 @@ fn stamp_millis(ts: &str) -> Option<i64> {
     }
 }
 
-/// Whether `resolve` settles `record` (same subject). A later instant settles; an
-/// equal instant settles only by file order inside one session-named shard
-/// (`pid-<N>` shard names are not unique across machines); a resolve with no
-/// instant settles the records before it in its own shard.
+/// Whether `resolve` settles `record` (same subject; a resolve by signature only the records of that signature).
+/// A later instant settles; an equal instant settles only by file order inside one session-named shard
+/// (`pid-<N>` shard names are not unique across machines); a resolve with no instant settles the records before
+/// it in its own shard.
 fn settles(resolve: &Event, record: &Event) -> bool {
-    let earlier_line_of_same_shard = resolve.shard == record.shard && resolve.line > record.line;
+    if resolve
+        .text("class")
+        .is_some_and(|c| record.class() != Some(c))
+    {
+        return false;
+    }
+    let earlier_line_of_same_shard = resolve.store == record.store
+        && resolve.shard == record.shard
+        && resolve.line > record.line;
     match (resolve.millis, record.millis) {
         (Some(resolved), Some(recorded)) if resolved != recorded => resolved > recorded,
         (Some(_), Some(_)) => earlier_line_of_same_shard && is_session_shard(&resolve.shard),
@@ -175,110 +333,397 @@ fn is_settled(record: &Event, resolves: &[&Event]) -> bool {
     resolves.iter().any(|resolve| settles(resolve, record))
 }
 
-/// Every usable friction event ordered by instant. A bad line, or a record whose
-/// stamp does not parse, is named on stderr and skipped; an unreadable store is
-/// an error.
-fn read_events(root: &Path) -> Result<Vec<Event>, String> {
-    let store = shard::read_store(root, STORE, UnsafeShard::Fail).map_err(|e| e.to_string())?;
-    let mut invalid = store.invalid;
-    let mut events = Vec::new();
-    for StoredRecord { value, shard, line } in store.records {
-        let millis = value
-            .get("ts")
-            .and_then(Value::as_str)
-            .and_then(stamp_millis);
-        let is_resolve = value.get("type").and_then(Value::as_str) == Some("friction-resolved");
-        if millis.is_none() && !is_resolve {
-            invalid.push(shard::InvalidLine {
-                file: format!(".fgos/observe/{STORE}/{shard}.jsonl"),
-                line,
-                reason: "ts is not an RFC 3339 instant".to_string(),
-            });
-            continue;
-        }
-        events.push(Event {
-            value,
-            millis,
-            shard,
-            line,
-        });
+/// The recorded frictions no resolve settles, across subjects.
+fn unsettled(events: &[Event]) -> Vec<&Event> {
+    let mut resolves: HashMap<(String, String), Vec<&Event>> = HashMap::new();
+    for event in events.iter().filter(|e| e.kind() == "friction-resolved") {
+        resolves.entry(event.subject()).or_default().push(event);
     }
-    shard::warn_skipped(STORE, &invalid);
+    events
+        .iter()
+        .filter(|event| event.kind() == "friction-recorded")
+        .filter(|event| !event.subject().1.is_empty())
+        .filter(|event| {
+            let own = resolves.get(&event.subject());
+            !is_settled(event, own.map(Vec::as_slice).unwrap_or(&[]))
+        })
+        .collect()
+}
+
+fn attr<'a>(record: &'a Record, name: &str) -> Option<&'a str> {
+    match record.attrs.get(name) {
+        Some(AttrValue::Str(value)) => Some(value),
+        _ => None,
+    }
+}
+
+fn subject_json(subject: &SubjectRef) -> Value {
+    json!({ "kind": subject.kind, "id": subject.id })
+}
+
+/// A friction record in the old shard form.
+fn old_form(record: &Record) -> Option<Value> {
+    let text = |name: &str| attr(record, name).map_or(Value::Null, |v| json!(v));
+    let refs: Vec<Value> = record.refs.iter().map(subject_json).collect();
+    match record.kind.as_str() {
+        RECORDED_KIND => Some(json!({
+            "v": RECORD_VERSION,
+            "type": "friction-recorded",
+            "id": record.id,
+            "ts": record.ts,
+            "subject": subject_json(&record.subject),
+            "refs": refs,
+            "frictionKind": text(KIND_ATTR),
+            "layer": text(LAYER_ATTR),
+            "errorClass": text(CLASS_ATTR),
+            "disposition": text(DISPOSITION_ATTR),
+            "detail": record.detail.clone().unwrap_or_default(),
+            "attempts": record.measures.get(ATTEMPTS_MEASURE),
+            "docType": text(DOC_TYPE_ATTR),
+            "producer": text(PRODUCER_ATTR),
+        })),
+        RESOLVED_KIND => Some(json!({
+            "v": RECORD_VERSION,
+            "type": "friction-resolved",
+            "id": record.id,
+            "ts": record.ts,
+            "subject": subject_json(&record.subject),
+            "refs": refs,
+            "class": text(CLASS_ATTR),
+            "reason": text(REASON_ATTR),
+            "by": text(PRODUCER_ATTR),
+        })),
+        _ => None,
+    }
+}
+
+/// Every usable friction event of both stores ordered by instant. A bad line, or a record whose stamp does not
+/// parse, is named on stderr and skipped; an unreadable store is an error.
+fn read_events(root: &Path) -> Result<Vec<Event>, String> {
+    let mut events = Vec::new();
+    for store in [STORE, RECORDS_STORE] {
+        let read = shard::read_store(root, store, UnsafeShard::Fail).map_err(|e| e.to_string())?;
+        let mut invalid = read.invalid;
+        for StoredRecord { value, shard, line } in read.records {
+            let (value, record) = if store == STORE {
+                (value, None)
+            } else {
+                let is_friction = value
+                    .get("kind")
+                    .and_then(Value::as_str)
+                    .is_some_and(|k| k == RECORDED_KIND || k == RESOLVED_KIND);
+                if !is_friction {
+                    continue;
+                }
+                match serde_json::from_value::<Record>(value)
+                    .ok()
+                    .and_then(|r| old_form(&r).map(|form| (form, r)))
+                {
+                    Some((form, record)) => (form, Some(record)),
+                    None => {
+                        invalid.push(shard::InvalidLine {
+                            file: format!(".fgos/observe/{store}/{shard}.jsonl"),
+                            line,
+                            reason: "not a friction record".to_string(),
+                        });
+                        continue;
+                    }
+                }
+            };
+            let millis = value
+                .get("ts")
+                .and_then(Value::as_str)
+                .and_then(stamp_millis);
+            let is_resolve = value.get("type").and_then(Value::as_str) == Some("friction-resolved");
+            if millis.is_none() && !is_resolve {
+                invalid.push(shard::InvalidLine {
+                    file: format!(".fgos/observe/{store}/{shard}.jsonl"),
+                    line,
+                    reason: "ts is not an RFC 3339 instant".to_string(),
+                });
+                continue;
+            }
+            events.push(Event {
+                value,
+                millis,
+                store: if store == STORE { STORE } else { RECORDS_STORE },
+                shard,
+                line,
+                record,
+            });
+        }
+        shard::warn_skipped(store, &invalid);
+    }
     events.sort_by_key(|event| event.millis);
     Ok(events)
 }
 
-fn append_values(root: &Path, values: &[Value]) -> Result<(), String> {
-    let lines = values
-        .iter()
-        .map(shard::encode_line)
-        .collect::<Result<Vec<_>, _>>()?;
-    shard::append_lines(root, STORE, TornTail::Heal, &lines)
-        .map(drop)
-        .map_err(|e| e.to_string())
+fn friction_door(root: &Path) -> RecordDoor {
+    RecordDoor::new(root.to_path_buf(), vec![FRICTION_DECLARATION], None)
 }
 
-/// Records a new friction event.
+fn origin() -> Origin {
+    Origin {
+        source: RECORD_ORIGIN.to_owned(),
+        component: Some("observe".to_owned()),
+        writer: current_caller().session_id,
+        ..Origin::default()
+    }
+}
+
+/// The detail as stored: trimmed and cut at the record's byte cap on a character boundary, stamped with the rule
+/// that did it. An empty detail is no detail.
+fn stamped_detail(detail: &str) -> (Option<String>, Option<Redaction>) {
+    let mut text = detail.trim();
+    if text.is_empty() {
+        return (None, None);
+    }
+    if text.len() > DETAIL_MAX_BYTES {
+        let mut end = DETAIL_MAX_BYTES;
+        while !text.is_char_boundary(end) {
+            end -= 1;
+        }
+        text = &text[..end];
+    }
+    (
+        Some(text.to_owned()),
+        Some(Redaction {
+            rev: DETAIL_REDACTION_REV.to_owned(),
+        }),
+    )
+}
+
+fn text_attr(value: &str) -> AttrValue {
+    AttrValue::Str(value.to_owned())
+}
+
+fn outcome_fields(outcome: &WriteOutcome) -> (&'static str, Option<&str>) {
+    match outcome {
+        WriteOutcome::Written => ("written", None),
+        WriteOutcome::Duplicate => ("duplicate", None),
+        WriteOutcome::Rejected(message) => ("rejected", Some(message)),
+        WriteOutcome::Failed(message) => ("failed", Some(message)),
+    }
+}
+
+fn landed(outcome: &WriteOutcome) -> bool {
+    matches!(outcome, WriteOutcome::Written | WriteOutcome::Duplicate)
+}
+
+/// Lower-case letters and digits only, so `Verify_Miss` and `verify-miss` are one signature.
+fn normalized(class: &str) -> String {
+    class
+        .chars()
+        .filter(|c| c.is_alphanumeric())
+        .flat_map(char::to_lowercase)
+        .collect()
+}
+
+fn edit_distance(a: &str, b: &str) -> usize {
+    let b: Vec<char> = b.chars().collect();
+    let mut row: Vec<usize> = (0..=b.len()).collect();
+    for (i, ca) in a.chars().enumerate() {
+        let mut diagonal = row[0];
+        row[0] = i + 1;
+        for (j, cb) in b.iter().enumerate() {
+            let above = row[j + 1];
+            row[j + 1] = (diagonal + usize::from(ca != *cb))
+                .min(above + 1)
+                .min(row[j] + 1);
+            diagonal = above;
+        }
+    }
+    row[b.len()]
+}
+
+/// Whether two different signatures read as one thing: the same once spelling is ignored, or a couple of letters
+/// apart in a name long enough for that to mean a slip.
+fn close_signatures(a: &str, b: &str) -> bool {
+    let (a, b) = (normalized(a), normalized(b));
+    a == b || (a.len().min(b.len()) >= 5 && edit_distance(&a, &b) <= 2)
+}
+
+/// A warning for each existing signature close to `class` but not the same. A store that cannot be read gives
+/// none: the warning is advice, never a reason to refuse the record.
+fn close_signature_warnings(root: &Path, class: &str) -> Vec<String> {
+    let Ok(events) = read_events(root) else {
+        return Vec::new();
+    };
+    let mut counts: BTreeMap<&str, usize> = BTreeMap::new();
+    for event in events.iter().filter(|e| e.kind() == "friction-recorded") {
+        if let Some(existing) = event.class() {
+            *counts.entry(existing).or_default() += 1;
+        }
+    }
+    counts
+        .into_iter()
+        .filter(|(existing, _)| *existing != class && close_signatures(existing, class))
+        .map(|(existing, count)| {
+            format!(
+                "signature \"{class}\" is close to the existing signature \"{existing}\" ({count} recorded); \
+                 reuse it unless they are different things"
+            )
+        })
+        .collect()
+}
+
+/// Records a new friction event through the record write door. The door never fails the caller: a record it
+/// refuses or cannot store is reported in the answer (`ok: false`), not as an error. A recorded signature close
+/// to an existing one is named in `warnings` and on stderr.
 pub fn record(root: &Path, input: FrictionInput) -> Result<Value, String> {
     validate_record_input(&input)?;
+    let warnings = close_signature_warnings(root, &input.error_class);
+    for warning in &warnings {
+        eprintln!("fgos: warning: friction {warning}");
+    }
 
-    let _guard = acquire_store_lock(root).map_err(|e| format!("store lock error: {}", e))?;
-
+    let (detail, redaction) = stamped_detail(&input.detail);
+    let mut attrs = BTreeMap::from([
+        (LAYER_ATTR.to_owned(), text_attr(&input.layer)),
+        (CLASS_ATTR.to_owned(), text_attr(&input.error_class)),
+        (DISPOSITION_ATTR.to_owned(), text_attr(&input.disposition)),
+        (PRODUCER_ATTR.to_owned(), text_attr(&input.producer)),
+    ]);
+    if let Some(kind) = &input.kind {
+        attrs.insert(KIND_ATTR.to_owned(), text_attr(kind));
+    }
+    if let Some(doc_type) = &input.doc_type {
+        attrs.insert(DOC_TYPE_ATTR.to_owned(), text_attr(doc_type));
+    }
+    let mut measures = BTreeMap::new();
+    if let Some(attempts) = input.attempts {
+        measures.insert(ATTEMPTS_MEASURE.to_owned(), attempts.into());
+    }
     let ts = now_iso();
-    let record_val = json!({
-        "v": 1,
-        "type": "friction-recorded",
-        "ts": ts,
-        "subject": {
-            "kind": input.subject.kind.as_str(),
-            "id": input.subject.id
+    let id = new_record_id();
+    let outcome = friction_door(root).write(Record {
+        v: RECORD_VERSION,
+        id: id.clone(),
+        kind: RECORDED_KIND.to_owned(),
+        ts: ts.clone(),
+        end_ts: None,
+        subject: SubjectRef {
+            kind: input.subject.kind.as_str().to_owned(),
+            id: input.subject.id.clone(),
         },
-        "layer": input.layer,
-        "errorClass": input.error_class,
-        "disposition": input.disposition,
-        "detail": input.detail,
-        "attempts": input.attempts,
-        "docType": input.doc_type,
-        "producer": input.producer,
-        "caller": current_caller()
+        refs: input.refs,
+        attrs,
+        measures,
+        basis: Basis::Reported,
+        origin: origin(),
+        detail,
+        redaction,
     });
-    append_values(root, &[record_val])?;
 
-    Ok(json!({
-        "ok": true,
+    let (name, message) = outcome_fields(&outcome);
+    let mut answer = json!({
+        "ok": landed(&outcome),
+        "id": id,
         "ts": ts,
-        "subject": input.subject.to_string_repr()
-    }))
+        "subject": input.subject.to_string_repr(),
+        "outcome": name,
+        "warnings": warnings,
+    });
+    if let Some(message) = message {
+        answer["message"] = json!(message);
+    }
+    Ok(answer)
 }
 
-/// Resolves an existing friction event for a subject.
-pub fn resolve(root: &Path, subject: Subject, reason: &str, by: &str) -> Result<Value, String> {
+/// Resolves friction: every unsettled friction of a subject, or of a signature. Each settled subject gets one
+/// resolve record, so a resolve by signature never settles another signature on the same subject.
+pub fn resolve(
+    root: &Path,
+    target: ResolveTarget,
+    reason: &str,
+    by: &str,
+) -> Result<Value, String> {
     validate_resolve_input(reason, by)?;
 
-    let _guard = acquire_store_lock(root).map_err(|e| format!("store lock error: {}", e))?;
+    let (class, subjects) = match &target {
+        ResolveTarget::Subject(subject) => (
+            None,
+            vec![SubjectRef {
+                kind: subject.kind.as_str().to_owned(),
+                id: subject.id.clone(),
+            }],
+        ),
+        ResolveTarget::Class(class) => {
+            if class.trim().is_empty() {
+                return Err(invalid_input("class must not be empty"));
+            }
+            let events = read_events(root)?;
+            let mut seen = BTreeSet::new();
+            let subjects = unsettled(&events)
+                .into_iter()
+                .filter(|event| event.class() == Some(class.as_str()))
+                .map(|event| event.subject())
+                .filter(|key| seen.insert(key.clone()))
+                .map(|(kind, id)| SubjectRef { kind, id })
+                .collect();
+            (Some(class.as_str()), subjects)
+        }
+    };
 
-    let ts = now_iso();
-    let resolved_val = json!({
-        "v": 1,
-        "type": "friction-resolved",
-        "ts": ts,
-        "subject": {
-            "kind": subject.kind.as_str(),
-            "id": subject.id
-        },
+    let door = friction_door(root);
+    let mut outcomes = Vec::new();
+    let mut last_ts = None;
+    for subject in subjects {
+        let mut attrs = BTreeMap::from([
+            (PRODUCER_ATTR.to_owned(), text_attr(by)),
+            (REASON_ATTR.to_owned(), text_attr(reason)),
+        ]);
+        if let Some(class) = class {
+            attrs.insert(CLASS_ATTR.to_owned(), text_attr(class));
+        }
+        let ts = now_iso();
+        let id = new_record_id();
+        let outcome = door.write(Record {
+            v: RECORD_VERSION,
+            id: id.clone(),
+            kind: RESOLVED_KIND.to_owned(),
+            ts: ts.clone(),
+            end_ts: None,
+            refs: filed_backlog(reason)
+                .map(|backlog| {
+                    vec![SubjectRef {
+                        kind: "backlog".to_owned(),
+                        id: backlog.to_owned(),
+                    }]
+                })
+                .unwrap_or_default(),
+            subject: subject.clone(),
+            attrs,
+            measures: BTreeMap::new(),
+            basis: Basis::Reported,
+            origin: origin(),
+            detail: None,
+            redaction: None,
+        });
+        let (name, message) = outcome_fields(&outcome);
+        let mut entry = json!({ "id": id, "subject": format!("{}:{}", subject.kind, subject.id), "outcome": name });
+        if let Some(message) = message {
+            entry["message"] = json!(message);
+        }
+        last_ts = Some(ts);
+        outcomes.push((landed(&outcome), entry));
+    }
+
+    let mut answer = json!({
+        "ok": outcomes.iter().all(|(landed, _)| *landed),
         "reason": reason,
         "by": by,
-        "caller": current_caller()
+        "resolved": outcomes.iter().filter(|(landed, _)| *landed).count(),
+        "outcomes": outcomes.into_iter().map(|(_, entry)| entry).collect::<Vec<_>>(),
     });
-    append_values(root, &[resolved_val])?;
-
-    Ok(json!({
-        "ok": true,
-        "ts": ts,
-        "subject": subject.to_string_repr(),
-        "reason": reason,
-        "by": by
-    }))
+    match &target {
+        ResolveTarget::Subject(subject) => answer["subject"] = json!(subject.to_string_repr()),
+        ResolveTarget::Class(class) => answer["class"] = json!(class),
+    }
+    if let Some(ts) = last_ts {
+        answer["ts"] = json!(ts);
+    }
+    Ok(answer)
 }
 
 /// Lists friction events with optional filters.
@@ -301,9 +746,7 @@ pub fn list(
         .into_iter()
         .filter(|event| event.kind() == "friction-recorded")
         .filter(|event| kind_filter.is_none_or(|k| event.subject().0 == k))
-        .filter(|event| {
-            layer_filter.is_none_or(|l| event.value.get("layer").and_then(Value::as_str) == Some(l))
-        })
+        .filter(|event| layer_filter.is_none_or(|l| event.text("layer") == Some(l)))
         .filter(|event| since.is_none_or(|w| w.contains(event.millis.unwrap_or(i64::MIN))))
         .map(|event| event.value)
         .collect();
@@ -346,67 +789,176 @@ pub fn show(root: &Path, subject_str: &str) -> Result<Value, String> {
     }))
 }
 
-/// Ranks open friction candidates by unsettled score (highest first).
-pub fn rank(root: &Path, limit: Option<usize>) -> Result<Value, String> {
+/// The signatures of recorded friction: how many records each has, how many are unsettled, and the last one.
+pub fn classes(root: &Path) -> Result<Value, String> {
     let events = read_events(root)?;
-
-    let mut recorded_by_subject: HashMap<(String, String), Vec<&Event>> = HashMap::new();
-    let mut resolves_by_subject: HashMap<(String, String), Vec<&Event>> = HashMap::new();
-    for event in &events {
-        let key = event.subject();
-        if key.1.is_empty() {
-            continue;
-        }
-        match event.kind() {
-            "friction-recorded" => recorded_by_subject.entry(key).or_default().push(event),
-            "friction-resolved" => resolves_by_subject.entry(key).or_default().push(event),
-            _ => {}
+    let open: BTreeMap<&str, usize> =
+        unsettled(&events)
+            .into_iter()
+            .fold(BTreeMap::new(), |mut counts, event| {
+                if let Some(class) = event.class() {
+                    *counts.entry(class).or_default() += 1;
+                }
+                counts
+            });
+    // (count, last instant) per class.
+    let mut seen: BTreeMap<&str, (usize, Option<i64>)> = BTreeMap::new();
+    for event in events.iter().filter(|e| e.kind() == "friction-recorded") {
+        if let Some(class) = event.class() {
+            let entry = seen.entry(class).or_default();
+            entry.0 += 1;
+            entry.1 = entry.1.max(event.millis);
         }
     }
+    let mut rows: Vec<(&str, usize, Option<i64>)> = seen
+        .into_iter()
+        .map(|(class, (count, last))| (class, count, last))
+        .collect();
+    rows.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(b.0)));
+    Ok(json!(rows
+        .into_iter()
+        .map(|(class, count, last)| json!({
+            "class": class,
+            "count": count,
+            "unsettled": open.get(class).copied().unwrap_or(0),
+            "lastSeen": last.and_then(|ms| format_unix_millis_rfc3339(ms, 0)),
+        }))
+        .collect::<Vec<_>>()))
+}
 
-    let mut candidates = Vec::new();
-    for (key, records) in recorded_by_subject {
-        let resolves = resolves_by_subject
-            .get(&key)
-            .map(Vec::as_slice)
-            .unwrap_or(&[]);
-        let unsettled: Vec<&&Event> = records
-            .iter()
-            .filter(|rec| !is_settled(rec, resolves))
-            .collect();
-        // Events are in instant order, so the last of the maxima is the latest.
-        let Some(latest) = unsettled.iter().max_by_key(|event| event.millis) else {
+/// The unsettled records, handed to the query engine as the one source it reads.
+struct UnsettledSource(Vec<Record>);
+
+impl RecordSource for UnsettledSource {
+    fn source_id(&self) -> &'static str {
+        "fgos.friction.unsettled"
+    }
+
+    fn kinds(&self) -> &[&str] {
+        &[RECORDED_KIND]
+    }
+
+    fn records(&self, _: &Path, _: &Window) -> Result<Vec<Record>, SourceError> {
+        Ok(self.0.clone())
+    }
+}
+
+/// A bucket word of `friction rank --bucket`.
+pub fn parse_bucket(word: &str) -> Result<Bucket, String> {
+    serde_json::from_value(json!(word)).map_err(|_| {
+        invalid_input(format!(
+            "invalid bucket \"{word}\". Allowed: hour, day, week"
+        ))
+    })
+}
+
+/// The start of the bucket holding `millis`, as the query engine reports it (weeks start on Monday, UTC).
+fn bucket_floor(millis: i64, bucket: Bucket) -> i64 {
+    const DAY: i64 = 86_400_000;
+    match bucket {
+        Bucket::Hour => millis.div_euclid(3_600_000) * 3_600_000,
+        Bucket::Day => millis.div_euclid(DAY) * DAY,
+        Bucket::Week => {
+            let day = millis.div_euclid(DAY);
+            (day - (day + 3).rem_euclid(7)) * DAY
+        }
+    }
+}
+
+/// Ranks open friction by signature, most recorded first: each group has its count, the distinct subjects and refs
+/// it touches, and when it was first and last seen. With a bucket there is one group per signature and bucket,
+/// newest bucket first.
+pub fn rank(root: &Path, limit: Option<usize>) -> Result<Value, String> {
+    rank_by_bucket(root, limit, None)
+}
+
+pub fn rank_by_bucket(
+    root: &Path,
+    limit: Option<usize>,
+    bucket: Option<Bucket>,
+) -> Result<Value, String> {
+    let events = read_events(root)?;
+    let records: Vec<Record> = unsettled(&events)
+        .into_iter()
+        .filter_map(Event::projected)
+        .collect();
+    let registry = Registry::from_embedded(&[FRICTION_DECLARATION]).map_err(|e| e.to_string())?;
+    let source = UnsettledSource(records.clone());
+    let sources: [&dyn RecordSource; 1] = [&source];
+    let now_millis = parse_rfc3339_millis(&now_iso()).unwrap_or_default();
+    let query = Query {
+        kind: vec![RECORDED_KIND.to_owned()],
+        by: vec![CLASS_ATTR.to_owned()],
+        bucket,
+        agg: vec![Agg::Count, Agg::MaxTs],
+        ..Query::default()
+    };
+    let result = run(
+        &query,
+        &QueryContext {
+            registry: &registry,
+            sources: &sources,
+            root,
+            now_millis,
+            params: BTreeMap::new(),
+        },
+    )
+    .map_err(|e| e.to_string())?;
+
+    let mut groups = Vec::new();
+    for row in result.rows {
+        let Some(class) = row.group.get(CLASS_ATTR) else {
             continue;
         };
-        let (kind, id) = key;
-        candidates.push(json!({
-            "id": id,
-            "kind": kind,
-            "score": unsettled.len() * 2,
-            "disposition": latest.value.get("disposition").cloned().unwrap_or(Value::Null),
-            "errorClass": latest.value.get("errorClass").cloned().unwrap_or(Value::Null),
-            "layer": latest.value.get("layer").cloned().unwrap_or(Value::Null),
-            "detail": latest.value.get("detail").cloned().unwrap_or(Value::Null),
-            "attempts": latest.value.get("attempts").cloned().unwrap_or(Value::Null),
-        }));
+        let in_bucket = |record: &Record| -> bool {
+            let Some(bucket) = bucket else { return true };
+            let start = parse_rfc3339_millis(&record.ts)
+                .and_then(|ms| format_unix_millis_rfc3339(bucket_floor(ms, bucket), 0));
+            start == row.bucket
+        };
+        let members: Vec<&Record> = records
+            .iter()
+            .filter(|record| attr(record, CLASS_ATTR) == Some(class.as_str()) && in_bucket(record))
+            .collect();
+        let mut refs = BTreeSet::new();
+        for record in &members {
+            refs.insert((record.subject.kind.as_str(), record.subject.id.as_str()));
+            refs.extend(record.refs.iter().map(|r| (r.kind.as_str(), r.id.as_str())));
+        }
+        let first = members
+            .iter()
+            .filter_map(|record| parse_rfc3339_millis(&record.ts))
+            .min();
+        let last = match row.aggs.get("max:ts") {
+            Some(Some(AggValue::Instant(ms))) => Some(*ms),
+            _ => None,
+        };
+        let stamp = |ms: Option<i64>| ms.and_then(|ms| format_unix_millis_rfc3339(ms, 0));
+        let mut group = json!({
+            "class": class,
+            "count": row.count,
+            "distinctRefs": refs.len(),
+            "firstSeen": stamp(first),
+            "lastSeen": stamp(last),
+        });
+        if let Some(start) = &row.bucket {
+            group["bucket"] = json!(start);
+        }
+        groups.push(group);
     }
 
-    // Sort: score descending, then id ascending
-    candidates.sort_by(|a, b| {
-        let score_a = a.get("score").and_then(|s| s.as_i64()).unwrap_or(0);
-        let score_b = b.get("score").and_then(|s| s.as_i64()).unwrap_or(0);
-        score_b.cmp(&score_a).then_with(|| {
-            let id_a = a.get("id").and_then(|s| s.as_str()).unwrap_or("");
-            let id_b = b.get("id").and_then(|s| s.as_str()).unwrap_or("");
-            id_a.cmp(id_b)
-        })
+    let text = |group: &Value, field: &str| group[field].as_str().unwrap_or("").to_owned();
+    groups.sort_by(|a, b| {
+        text(b, "bucket")
+            .cmp(&text(a, "bucket"))
+            .then_with(|| b["count"].as_u64().cmp(&a["count"].as_u64()))
+            .then_with(|| text(b, "lastSeen").cmp(&text(a, "lastSeen")))
+            .then_with(|| text(a, "class").cmp(&text(b, "class")))
     });
-
-    if let Some(lim) = limit {
-        candidates.truncate(lim);
+    if let Some(limit) = limit {
+        groups.truncate(limit);
     }
-
-    Ok(json!(candidates))
+    Ok(json!(groups))
 }
 
 #[cfg(test)]
@@ -430,6 +982,8 @@ mod tests {
             producer: "runner.loop".to_string(),
             attempts: Some(1),
             doc_type: None,
+            kind: None,
+            refs: Vec::new(),
         };
 
         let rec_res = record(&tmp, input).unwrap();
@@ -445,15 +999,15 @@ mod tests {
         let rank_res = rank(&tmp, None).unwrap();
         let rarr = rank_res.as_array().unwrap();
         assert_eq!(rarr.len(), 1);
-        assert_eq!(rarr[0]["id"], "tsk-abc");
-        assert_eq!(rarr[0]["score"], 2);
+        assert_eq!(rarr[0]["class"], "verify-miss");
+        assert_eq!(rarr[0]["count"], 1);
 
         // Show before resolve
         let show_res = show(&tmp, "work:tsk-abc").unwrap();
         assert_eq!(show_res["unsettled"], 1);
 
         // Resolve
-        let res_res = resolve(&tmp, subj.clone(), "done", "work").unwrap();
+        let res_res = resolve(&tmp, ResolveTarget::Subject(subj.clone()), "done", "work").unwrap();
         assert_eq!(res_res["ok"], true);
 
         // Rank after resolve
@@ -483,6 +1037,8 @@ mod tests {
             producer: "test".to_string(),
             attempts: None,
             doc_type: None,
+            kind: None,
+            refs: Vec::new(),
         };
         let refusal = record(&tmp, input).unwrap_err();
         assert!(
@@ -500,13 +1056,15 @@ mod tests {
             producer: "test".to_string(),
             attempts: None,
             doc_type: Some("nonexistent".to_string()),
+            kind: None,
+            refs: Vec::new(),
         };
         assert!(record(&tmp, input_doctype).is_err());
 
         // Invalid resolve reason
         assert!(resolve(
             &tmp,
-            Subject::parse("work:tsk-bad").unwrap(),
+            ResolveTarget::Subject(Subject::parse("work:tsk-bad").unwrap()),
             "bad-reason",
             "user"
         )
@@ -519,6 +1077,7 @@ mod tests {
         let tmp = std::env::temp_dir().join(format!("fgos-fric-{tag}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&tmp);
         fs::create_dir_all(tmp.join(".fgos/observe/friction")).unwrap();
+        fs::create_dir_all(tmp.join(".fgos/observe/records")).unwrap();
         tmp
     }
 
@@ -556,6 +1115,8 @@ mod tests {
             producer: "test".to_string(),
             attempts: None,
             doc_type: None,
+            kind: None,
+            refs: Vec::new(),
         }
     }
 
@@ -674,11 +1235,15 @@ mod tests {
             recorded_line("tsk-outside", "2026-10-01T10:00:00.000Z")
         );
         fs::write(&target, &original).unwrap();
-        std::os::unix::fs::symlink(&target, crate::shard::shard_path(&tmp, "friction").unwrap())
-            .unwrap();
+        std::os::unix::fs::symlink(
+            &target,
+            crate::shard::shard_path(&tmp, RECORDS_STORE).unwrap(),
+        )
+        .unwrap();
 
-        assert!(
-            record(&tmp, fresh_input("tsk-new")).is_err(),
+        assert_ne!(
+            record(&tmp, fresh_input("tsk-new")).unwrap()["ok"],
+            true,
             "record wrote through a symlinked shard"
         );
         assert_eq!(fs::read_to_string(&target).unwrap(), original);
@@ -690,5 +1255,239 @@ mod tests {
         }
         let _ = fs::remove_dir_all(&tmp);
         let _ = fs::remove_dir_all(&external);
+    }
+
+    fn input_of(id: &str, class: &str) -> FrictionInput {
+        FrictionInput {
+            error_class: class.to_string(),
+            ..fresh_input(id)
+        }
+    }
+
+    fn legacy_recorded(id: &str, class: &str, ts: &str) -> String {
+        recorded_line(id, ts).replace("verify-miss", class)
+    }
+
+    fn stored_records(root: &Path) -> Vec<Value> {
+        shard::read_store(root, RECORDS_STORE, UnsafeShard::Fail)
+            .unwrap()
+            .records
+            .into_iter()
+            .map(|stored| stored.value)
+            .collect()
+    }
+
+    #[test]
+    fn a_new_friction_is_a_v2_record_with_kind_layer_class_and_refs() {
+        let tmp = temp_root("v2-attrs");
+        let mut input = input_of("tsk-v2", "skill-misread");
+        input.layer = "skill".to_string();
+        input.kind = Some("awkward".to_string());
+        input.attempts = Some(3);
+        input.refs = vec![
+            SubjectRef {
+                kind: "plan".into(),
+                id: "plans/x".into(),
+            },
+            SubjectRef {
+                kind: "backlog".into(),
+                id: "p-1".into(),
+            },
+        ];
+        let answer = record(&tmp, input).unwrap();
+        assert_eq!(answer["ok"], true, "{answer}");
+
+        let stored = stored_records(&tmp);
+        assert_eq!(stored.len(), 1);
+        let line = &stored[0];
+        assert_eq!(line["kind"], RECORDED_KIND);
+        assert_eq!(line["subject"], json!({ "kind": "work", "id": "tsk-v2" }));
+        assert_eq!(line["attrs"][KIND_ATTR], "awkward");
+        assert_eq!(line["attrs"][LAYER_ATTR], "skill");
+        assert_eq!(line["attrs"][CLASS_ATTR], "skill-misread");
+        assert_eq!(line["attrs"][DISPOSITION_ATTR], "advisory");
+        assert_eq!(line["attrs"][PRODUCER_ATTR], "test");
+        assert_eq!(line["measures"][ATTEMPTS_MEASURE], 3);
+        assert_eq!(
+            line["refs"],
+            json!([{ "kind": "plan", "id": "plans/x" }, { "kind": "backlog", "id": "p-1" }])
+        );
+        assert_eq!(line["redaction"]["rev"], DETAIL_REDACTION_REV);
+        assert!(
+            fs::read_dir(friction_dir(&tmp)).unwrap().next().is_none(),
+            "a new friction must not touch the old shards"
+        );
+
+        let mut bad_kind = input_of("tsk-v2", "x");
+        bad_kind.kind = Some("meh".to_string());
+        assert!(record(&tmp, bad_kind).unwrap_err().contains("invalid kind"));
+        let mut bad_ref = input_of("tsk-v2", "x");
+        bad_ref.refs = vec![SubjectRef {
+            kind: "nope".into(),
+            id: "1".into(),
+        }];
+        assert!(record(&tmp, bad_ref).unwrap_err().contains("invalid ref"));
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn a_resolve_by_class_settles_that_signature_only_and_names_the_backlog_row_it_became() {
+        let tmp = temp_root("resolve-class");
+        record(&tmp, input_of("tsk-a", "alpha-fault")).unwrap();
+        record(&tmp, input_of("tsk-a", "beta-fault")).unwrap();
+        record(&tmp, input_of("tsk-b", "alpha-fault")).unwrap();
+
+        let answer = resolve(
+            &tmp,
+            ResolveTarget::Class("alpha-fault".to_string()),
+            "filed:p-9",
+            "test",
+        )
+        .unwrap();
+        assert_eq!(answer["resolved"], 2, "{answer}");
+
+        assert_eq!(show(&tmp, "work:tsk-a").unwrap()["unsettled"], 1);
+        assert_eq!(show(&tmp, "work:tsk-b").unwrap()["unsettled"], 0);
+        let open = rank(&tmp, None).unwrap();
+        assert_eq!(open.as_array().unwrap().len(), 1);
+        assert_eq!(open[0]["class"], "beta-fault");
+
+        let resolved: Vec<Value> = stored_records(&tmp)
+            .into_iter()
+            .filter(|line| line["kind"] == RESOLVED_KIND)
+            .collect();
+        assert_eq!(resolved.len(), 2);
+        assert!(resolved.iter().all(|line| line["refs"]
+            == json!([{ "kind": "backlog", "id": "p-9" }])
+            && line["attrs"][CLASS_ATTR] == "alpha-fault"));
+        assert!(resolve(
+            &tmp,
+            ResolveTarget::Class("alpha-fault".to_string()),
+            "filed:",
+            "test"
+        )
+        .is_err());
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn rank_groups_by_signature_with_count_distinct_refs_and_first_and_last_seen_per_week() {
+        let tmp = temp_root("rank-signature");
+        // 2026-10-05 and 2026-10-06 are in one ISO week; 2026-10-13 is in the next.
+        let lines = [
+            legacy_recorded("tsk-a", "flaky-gate", "2026-10-05T10:00:00.000Z"),
+            legacy_recorded("tsk-b", "flaky-gate", "2026-10-06T10:00:00.000Z"),
+            legacy_recorded("tsk-a", "flaky-gate", "2026-10-13T10:00:00.000Z"),
+            legacy_recorded("tsk-c", "other-fault", "2026-10-13T11:00:00.000Z"),
+        ];
+        fs::write(
+            friction_dir(&tmp).join("one-writer.jsonl"),
+            format!("{}\n", lines.join("\n")),
+        )
+        .unwrap();
+
+        let all = rank(&tmp, None).unwrap();
+        assert_eq!(all[0]["class"], "flaky-gate");
+        assert_eq!(all[0]["count"], 3);
+        assert_eq!(all[0]["distinctRefs"], 2);
+        assert_eq!(all[0]["firstSeen"], "2026-10-05T10:00:00.000Z");
+        assert_eq!(all[0]["lastSeen"], "2026-10-13T10:00:00.000Z");
+        assert_eq!(all[1]["class"], "other-fault");
+
+        let weekly = rank_by_bucket(&tmp, None, Some(Bucket::Week)).unwrap();
+        let rows: Vec<(String, String, u64, u64)> = weekly
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|g| {
+                (
+                    g["bucket"].as_str().unwrap().to_string(),
+                    g["class"].as_str().unwrap().to_string(),
+                    g["count"].as_u64().unwrap(),
+                    g["distinctRefs"].as_u64().unwrap(),
+                )
+            })
+            .collect();
+        assert_eq!(
+            rows,
+            vec![
+                (
+                    "2026-10-12T00:00:00.000Z".into(),
+                    "other-fault".into(),
+                    1,
+                    1
+                ),
+                ("2026-10-12T00:00:00.000Z".into(), "flaky-gate".into(), 1, 1),
+                ("2026-10-05T00:00:00.000Z".into(), "flaky-gate".into(), 2, 2),
+            ]
+        );
+        assert_eq!(
+            rank_by_bucket(&tmp, Some(1), None)
+                .unwrap()
+                .as_array()
+                .unwrap()
+                .len(),
+            1
+        );
+        assert!(parse_bucket("month").is_err());
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn a_store_with_old_shards_and_new_records_lists_ranks_and_settles_both() {
+        let tmp = temp_root("mixed");
+        fs::write(
+            friction_dir(&tmp).join("one-writer.jsonl"),
+            format!(
+                "{}\n",
+                legacy_recorded("tsk-old", "shared-fault", "2026-10-01T10:00:00.000Z")
+            ),
+        )
+        .unwrap();
+        record(&tmp, input_of("tsk-new", "shared-fault")).unwrap();
+
+        assert_eq!(
+            listed_ids(&tmp),
+            vec!["tsk-old".to_string(), "tsk-new".to_string()]
+        );
+        let ranked = rank(&tmp, None).unwrap();
+        assert_eq!(ranked[0]["class"], "shared-fault");
+        assert_eq!(ranked[0]["count"], 2);
+        assert_eq!(ranked[0]["distinctRefs"], 2);
+        assert_eq!(classes(&tmp).unwrap()[0]["unsettled"], 2);
+        assert_eq!(show(&tmp, "work:tsk-old").unwrap()["unsettled"], 1);
+
+        resolve(
+            &tmp,
+            ResolveTarget::Class("shared-fault".to_string()),
+            "done",
+            "test",
+        )
+        .unwrap();
+        assert_eq!(rank(&tmp, None).unwrap(), json!([]));
+        assert_eq!(show(&tmp, "work:tsk-old").unwrap()["unsettled"], 0);
+        assert_eq!(classes(&tmp).unwrap()[0]["unsettled"], 0);
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn recording_a_signature_close_to_an_existing_one_names_the_existing_one() {
+        let tmp = temp_root("close-signature");
+        assert_eq!(
+            record(&tmp, input_of("tsk-1", "verify-miss")).unwrap()["warnings"],
+            json!([])
+        );
+        let answer = record(&tmp, input_of("tsk-2", "Verify_Miss")).unwrap();
+        let warnings = answer["warnings"].as_array().unwrap();
+        assert_eq!(warnings.len(), 1, "{answer}");
+        assert!(warnings[0].as_str().unwrap().contains("\"verify-miss\""));
+        for id in ["tsk-3", "tsk-4"] {
+            assert_eq!(
+                record(&tmp, input_of(id, "state-corrupt")).unwrap()["warnings"],
+                json!([]),
+                "the same signature, or one far from every other, is not a close one"
+            );
+        }
+        let _ = fs::remove_dir_all(&tmp);
     }
 }

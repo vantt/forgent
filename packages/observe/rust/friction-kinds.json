@@ -1,0 +1,41 @@
+{
+  "contract": "observe-kinds.v1",
+  "subjectKinds": ["case", "work", "executor"],
+  "attrs": {
+    "fgos.friction.kind": { "type": "string", "values": ["bug", "instability", "missing", "awkward", "doc"] },
+    "fgos.friction.layer": {
+      "type": "string",
+      "values": [
+        "skill", "tool", "runner", "workflow", "git", "provider", "config", "docs", "state", "verification",
+        "environment", "spec", "context", "task", "task-spec", "executor", "attestation"
+      ]
+    },
+    "fgos.friction.class": { "type": "string" },
+    "fgos.friction.disposition": { "type": "string", "values": ["advisory", "blocked", "parked", "halted"] },
+    "fgos.friction.producer": { "type": "string" },
+    "fgos.friction.doc_type": { "type": "string", "values": ["tutorial", "how-to", "reference", "explanation"] },
+    "fgos.friction.reason": { "type": "string" }
+  },
+  "measures": {
+    "fgos.friction.attempts": { "unit": "attempt", "aggs": ["sum", "max", "p50", "p90"] }
+  },
+  "kinds": {
+    "fgos.friction.recorded": {
+      "subjects": ["run", "session", "executor", "case", "work"],
+      "attrs": [
+        "fgos.friction.kind",
+        "fgos.friction.layer",
+        "fgos.friction.class",
+        "fgos.friction.disposition",
+        "fgos.friction.producer",
+        "fgos.friction.doc_type"
+      ],
+      "measures": ["fgos.friction.attempts"]
+    },
+    "fgos.friction.resolved": {
+      "subjects": ["run", "session", "executor", "case", "work"],
+      "attrs": ["fgos.friction.class", "fgos.friction.producer", "fgos.friction.reason"],
+      "measures": []
+    }
+  }
+}

@@ -450,6 +450,11 @@
     ],
     "subcommands": true,
     "subcommand_flags": {
+      "classes": [
+        "dir",
+        "json",
+        "help"
+      ],
       "list": [
         "dir",
         "json",
@@ -467,13 +472,16 @@
         "dir",
         "json",
         "help",
-        "limit"
+        "limit",
+        "bucket"
       ],
       "record": [
         "dir",
         "json",
         "help",
         "subject",
+        "kind",
+        "ref",
         "layer",
         "error-class",
         "disposition",
@@ -488,6 +496,7 @@
         "json",
         "help",
         "subject",
+        "class",
         "reason",
         "by"
       ],

@@ -80,3 +80,25 @@ test('any other host failure warns and returns null instead of throwing into the
   assert.equal(recordFriction(host.root, { id: 'tsk-1', layer: 'state', errorClass: 'e', disposition: 'advisory' }), null);
   assert.match(warnings.join('\n'), /friction write failed \[host-exec-error\].*observe-lock-timeout/);
 });
+
+test('kind and every ref are passed through, each ref as its own --ref', (t) => {
+  const host = standInHost(t);
+  recordFriction(host.root, {
+    id: 'tsk-1', layer: 'skill', errorClass: 'usage', disposition: 'advisory', producer: 'agent',
+    kind: 'awkward', refs: ['plan:plans/x', { kind: 'backlog', id: 'p-1' }],
+  });
+  assert.deepEqual(host.argv().slice(0, -2), [
+    'friction', 'record', '--subject', 'work:tsk-1', '--kind', 'awkward', '--layer', 'skill', '--error-class', 'usage',
+    '--disposition', 'advisory', '--producer', 'agent', '--ref', 'plan:plans/x', '--ref', 'backlog:p-1', '--detail-stdin',
+  ]);
+});
+
+test('a resolve by class passes --class instead of --subject, and takes the filed reason as given', (t) => {
+  const host = standInHost(t);
+  resolveFriction(host.root, { class: 'verify-miss', reason: 'filed:p-abc', by: 'agent' });
+  assert.deepEqual(host.argv().slice(0, 7), ['friction', 'resolve', '--class', 'verify-miss', '--reason', 'filed:p-abc', '--by']);
+  assert.throws(
+    () => resolveFriction(host.root, { id: 'tsk-1', class: 'verify-miss', reason: 'done', by: 'agent' }),
+    (err) => err.category === 'validation',
+  );
+});

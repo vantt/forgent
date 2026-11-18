@@ -55,26 +55,38 @@ function callHost(what, args, { dir, input }) {
   }
 }
 
-/** Record a friction event: `{ id, layer, errorClass, disposition, detail?, attempts?, docType?, producer? }`. */
+// `--ref kind:id` once per ref; a ref is `'kind:id'` or `{ kind, id }`.
+const refFlags = (refs) => (refs ?? []).flatMap((ref) => ['--ref', typeof ref === 'string' ? ref : `${ref.kind}:${ref.id}`]);
+
+/**
+ * Record a friction event: `{ id, layer, errorClass, disposition, detail?, attempts?, docType?, producer?, kind?, refs? }`.
+ * `kind` is the friction kind (bug, instability, missing, awkward, doc); `refs` point at a run, session, plan, backlog
+ * row, executor, case or work item besides the subject.
+ */
 export function recordFriction(dirOrOptions, maybePayload) {
   const [dir, p] = target('recordFriction', dirOrOptions, maybePayload);
   const subject = requireId(p.id, 'friction');
   const args = ['friction', 'record', ...flags([
     ['--subject', subject],
+    ['--kind', p.kind],
     ['--layer', p.layer],
     ['--error-class', p.errorClass],
     ['--disposition', p.disposition],
     ['--producer', p.producer ?? 'work'],
     ['--attempts', typeof p.attempts === 'number' ? p.attempts : null],
     ['--doc-type', p.docType || null],
-  ]), '--detail-stdin'];
+  ]), ...refFlags(p.refs), '--detail-stdin'];
   return callHost('write', args, { dir, input: p.detail != null ? String(p.detail) : '' });
 }
 
-/** Resolve a work item's friction: `{ id, reason, by }`. */
+/**
+ * Resolve friction: `{ id, reason, by }` for one work item, or `{ class, reason, by }` for every unsettled friction
+ * with that signature. `reason` may be `filed:<backlog-id>`.
+ */
 export function resolveFriction(dirOrOptions, maybeOptions) {
   const [dir, o] = target('resolveFriction', dirOrOptions, maybeOptions);
-  const subject = requireId(o.id, 'resolveFriction');
-  const args = ['friction', 'resolve', ...flags([['--subject', subject], ['--reason', o.reason], ['--by', o.by]])];
+  if (o.class != null && o.id != null) throw validationError('resolveFriction takes an "id" or a "class", not both.');
+  const scope = o.class != null ? ['--class', o.class] : ['--subject', requireId(o.id, 'resolveFriction')];
+  const args = ['friction', 'resolve', ...flags([scope, ['--reason', o.reason], ['--by', o.by]])];
   return callHost('resolve', args, { dir });
 }

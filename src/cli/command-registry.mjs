@@ -330,13 +330,15 @@ export const COMMAND_REGISTRY = [
     description: 'Observation friction recording, resolution, inspection, and ranking. Native Rust host command.',
     subcommands: {
       record: {
-        description: 'Record one friction against a subject. --detail-stdin reads the detail text from stdin.',
+        description: 'Record one friction against a subject, as a v2 record through the record write door (the answer reports the outcome and any close-signature warnings). --detail-stdin reads the detail text from stdin.',
         parameters: {
           type: 'object',
           properties: {
             subject: { type: 'string', description: 'kind:id, kind one of run, session, executor, case, work (e.g. work:tsk-abc).' },
-            layer: { type: 'string', description: 'Where it hit: verification, state, environment, docs, spec, context, task, task-spec, executor or attestation.' },
-            'error-class': { type: 'string', description: 'Error class.' },
+            kind: { type: 'string', description: 'What kind of friction: bug, instability, missing, awkward or doc.' },
+            ref: { type: 'string', description: '<kind>:<id> of something else it points at; kind one of run, session, plan, backlog, executor, case, work. Repeatable.' },
+            layer: { type: 'string', description: 'The component layer it hit: skill, tool, runner, workflow, git, provider, config, docs, state, verification or environment; older records also carry spec, context, task, task-spec, executor or attestation.' },
+            'error-class': { type: 'string', description: 'The signature: a short slug that names the problem, reused for the same problem. A slug close to an existing one is recorded with a warning that names it.' },
             disposition: { type: 'string', description: 'advisory, blocked, parked or halted.' },
             producer: { type: 'string', description: 'Who records it.' },
             attempts: { type: 'string', description: 'Attempts before it resolved (integer).' },
@@ -349,17 +351,18 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos friction record --subject work:tsk-abc --layer verification --error-class usage --disposition advisory --producer agent --detail "flag missing"'],
       },
       resolve: {
-        description: 'Mark a subject\'s friction resolved.',
+        description: 'Mark friction resolved: every unsettled friction of one subject (--subject), or of one signature (--class). Give exactly one of the two.',
         parameters: {
           type: 'object',
           properties: {
             subject: { type: 'string', description: 'kind:id, kind one of run, session, executor, case, work.' },
-            reason: { type: 'string', description: 'answer, done, wontfix, clarify-pass or migrated.' },
+            class: { type: 'string', description: 'A signature: settles every unsettled friction with it, on any subject.' },
+            reason: { type: 'string', description: 'answer, done, wontfix, clarify-pass, migrated or filed:<backlog-id> (it became that backlog row).' },
             by: { type: 'string', description: 'Who resolved it.' },
           },
-          required: ['subject', 'reason', 'by'],
+          required: ['reason', 'by'],
         },
-        examples: ['fgos friction resolve --subject work:tsk-abc --reason done --by agent'],
+        examples: ['fgos friction resolve --subject work:tsk-abc --reason done --by agent', 'fgos friction resolve --class verify-miss --reason filed:p-abc123 --by agent'],
       },
       list: {
         description: 'List recorded frictions.',
@@ -385,13 +388,21 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos friction show work:tsk-abc'],
       },
       rank: {
-        description: 'Subjects ranked by friction.',
+        description: 'Unsettled friction ranked by signature: count, distinct refs, first seen and last seen. With --bucket there is one row per signature and bucket, newest bucket first.',
         parameters: {
           type: 'object',
-          properties: { limit: { type: 'string', description: 'At most this many (integer).' } },
+          properties: {
+            limit: { type: 'string', description: 'At most this many (integer).' },
+            bucket: { type: 'string', description: 'Group by UTC time bucket as well.', enum: ['hour', 'day', 'week'] },
+          },
           required: [],
         },
-        examples: ['fgos friction rank --limit 10'],
+        examples: ['fgos friction rank --limit 10', 'fgos friction rank --bucket week'],
+      },
+      classes: {
+        description: 'The signatures recorded so far: how many records each has, how many are unsettled, and when the last was recorded.',
+        parameters: { type: 'object', properties: {}, required: [] },
+        examples: ['fgos friction classes'],
       },
       ping: {
         description: 'Health check: echoes the resolved root.',

@@ -2,10 +2,13 @@
 
 use crate::contract::{ObserveRequest, Subject};
 use crate::flags::Flags;
-use crate::friction::{self, invalid_input, FrictionInput};
+use crate::friction::{self, invalid_input, FrictionInput, ResolveTarget};
+use crate::record::types::SubjectRef;
 use serde_json::json;
 
-pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["record", "resolve", "list", "show", "rank", "ping"];
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
+    "record", "resolve", "list", "show", "rank", "classes", "ping",
+];
 
 /// Whether the verb appends to the friction store.
 pub fn writes(req: &ObserveRequest) -> bool {
@@ -27,6 +30,19 @@ fn subject_of(flags: &Flags) -> Result<Subject, String> {
     })
 }
 
+/// `--ref <kind>:<id>`.
+fn ref_of(text: &str) -> Result<SubjectRef, String> {
+    match text.split_once(':') {
+        Some((kind, id)) if !kind.is_empty() && !id.is_empty() => Ok(SubjectRef {
+            kind: kind.to_string(),
+            id: id.to_string(),
+        }),
+        _ => Err(invalid_input(format!(
+            "invalid ref \"{text}\". Expected format kind:id"
+        ))),
+    }
+}
+
 pub fn dispatch(req: &ObserveRequest) -> Result<serde_json::Value, String> {
     let parse = |values: &[&str], switches: &[&str], positional: bool| {
         Flags::parse(&req.args, values, switches, positional).map_err(invalid_input)
@@ -40,6 +56,8 @@ pub fn dispatch(req: &ObserveRequest) -> Result<serde_json::Value, String> {
             let flags = parse(
                 &[
                     "--subject",
+                    "--kind",
+                    "--ref",
                     "--layer",
                     "--error-class",
                     "--disposition",
@@ -60,8 +78,15 @@ pub fn dispatch(req: &ObserveRequest) -> Result<serde_json::Value, String> {
             } else {
                 flags.value("--detail").unwrap_or_default().to_string()
             };
+            let refs = flags
+                .values("--ref")
+                .into_iter()
+                .map(ref_of)
+                .collect::<Result<Vec<_>, _>>()?;
             let input = FrictionInput {
                 subject,
+                kind: flags.value("--kind").map(str::to_string),
+                refs,
                 layer: required(&flags, "--layer")?.to_string(),
                 error_class: required(&flags, "--error-class")?.to_string(),
                 disposition: required(&flags, "--disposition")?.to_string(),
@@ -73,11 +98,19 @@ pub fn dispatch(req: &ObserveRequest) -> Result<serde_json::Value, String> {
             friction::record(&req.root, input)
         }
         "resolve" => {
-            let flags = parse(&["--subject", "--reason", "--by"], &[], false)?;
-            let subject = subject_of(&flags)?;
+            let flags = parse(&["--subject", "--class", "--reason", "--by"], &[], false)?;
+            let target = match (flags.value("--subject"), flags.value("--class")) {
+                (Some(_), None) => ResolveTarget::Subject(subject_of(&flags)?),
+                (None, Some(class)) => ResolveTarget::Class(class.to_string()),
+                _ => {
+                    return Err(invalid_input(
+                        "resolve takes exactly one of --subject and --class",
+                    ))
+                }
+            };
             friction::resolve(
                 &req.root,
-                subject,
+                target,
                 required(&flags, "--reason")?,
                 required(&flags, "--by")?,
             )
@@ -100,9 +133,17 @@ pub fn dispatch(req: &ObserveRequest) -> Result<serde_json::Value, String> {
             friction::show(&req.root, subject)
         }
         "rank" => {
-            let flags = parse(&["--limit"], &[], false)?;
+            let flags = parse(&["--limit", "--bucket"], &[], false)?;
             let limit = flags.number::<usize>("--limit").map_err(invalid_input)?;
-            friction::rank(&req.root, limit)
+            let bucket = flags
+                .value("--bucket")
+                .map(friction::parse_bucket)
+                .transpose()?;
+            friction::rank_by_bucket(&req.root, limit, bucket)
+        }
+        "classes" => {
+            parse(&[], &[], false)?;
+            friction::classes(&req.root)
         }
         "--help" | "-h" | "help" => Ok(json!({
             "ok": true,

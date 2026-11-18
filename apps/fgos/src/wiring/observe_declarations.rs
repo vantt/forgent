@@ -8,6 +8,7 @@ use std::path::Path;
 pub fn embedded_declarations() -> Vec<EmbeddedDeclaration> {
     vec![
         fgos_observe::record::store::HEALTH_DECLARATION,
+        fgos_observe::friction::FRICTION_DECLARATION,
         fgos_observe::sources::transcript_records::TRANSCRIPT_DECLARATION,
     ]
 }
@@ -32,5 +33,9 @@ mod tests {
         assert!(registry
             .kind(fgos_observe::record::store::HEALTH_KIND)
             .is_some());
+        assert!(registry
+            .kind(fgos_observe::friction::RECORDED_KIND)
+            .is_some());
+        assert!(registry.has_subject_kind("work"));
     }
 }
