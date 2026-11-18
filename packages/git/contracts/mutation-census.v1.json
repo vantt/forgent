@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9d26fbd9c794ea146a84d82ba2f045aafadd4f92715159896276da431ae31b7a",
+  "payloadDigest": "e16d68e1916d530294153997487b67404be37d4b398386a8202e91ac64941129",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1218,12 +1218,13 @@
     "src/seat-binding/client.mjs": "206a9ecbbc301f2c3c9688535dbeb60fabbe67052b870a62e23e7481ae82fdd8",
     "src/session-host/client.mjs": "39c4a0a4b6f07b7c85eee7fe83327f2c85c89e666c0e604e0114b86a87e5336b",
     "src/session-host/head-grants.mjs": "030b092e60719c02a0fed76f10d2063575934a04d91afbb005c9f109a08f827b",
-    "src/session-host/head-request.mjs": "e39a16e69bca45b5b1fe31a6a00dd31b93b41b1551f7024ee7b1c617c1791709",
+    "src/session-host/head-request-client.mjs": "229fabc75379e17594d78ff931f44ab53e965768a2e4f0cdaaf84023c8737cd6",
+    "src/session-host/head-request.mjs": "15e0d3a0577f99b69763a0437936e4180dd3ae25f6bdfa909378934fa8957c9e",
     "src/session-host/head-start.mjs": "b0fbec52278255ac12caea8fded41fff6c21f6c2b51982bc1e298fd2b81bb106",
     "src/session-rotation/decide.mjs": "c4252cfaf861cc8cdf65829d6b63f8e70ddcc990bde6d6b23343a5a9fe80e80f",
     "src/session-rotation/handoff-store.mjs": "0fdd8f18a406b5c2e1797c331e6bdf5ce72c3ed67a9daef28df5bb3b884aa133",
     "src/session-rotation/measure.mjs": "9707b594c14184c402229fe1cac9c1c67dbd84cd9b0db8ff235a8d51caab50be",
-    "src/session-rotation/rotate.mjs": "6c5b9df85246c870a688a10f2f8bfc1f257ec377dfe26c1aa3fbace9beb750d8",
+    "src/session-rotation/rotate.mjs": "5e88871207e3df22c7177912bc96cc83761b095fcc9de01ff9f341d516fc87b0",
     "src/setup/agent-cli-trust.mjs": "c42fb3fcb298d53609dcf76893366e45cd2007ab3c0b52a9446f8740b9a8600b",
     "src/setup/agent-hooks.mjs": "b8cc0592f2b625213629bed03754d128691792e9c41077d0e22a3df12e714647",
     "src/setup/agy-permissions.mjs": "f2370eb0e40de31783ab33ebdfd6d452369b014f78786c9d2338653f0d1e7ed4",

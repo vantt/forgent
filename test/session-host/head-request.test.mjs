@@ -10,7 +10,8 @@ import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
-import { HeadRequestError, requestHead, requestHeadStart, rotateHead, runHeadRequest, startHead } from '../../src/session-host/head-request.mjs';
+import { HeadRequestError, requestHead, requestHeadStart } from '../../src/session-host/head-request-client.mjs';
+import { rotateHead, runHeadRequest, startHead } from '../../src/session-host/head-request.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
 
 const scratch = (t) => {

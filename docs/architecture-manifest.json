@@ -1482,6 +1482,7 @@
     "src/session-host/head-start.mjs": "use-case",
     "src/session-host/head-grants.mjs": "kernel",
     "src/session-host/head-request.mjs": "use-case",
+    "src/session-host/head-request-client.mjs": "infra",
     "src/portfolio/plan-sections.mjs": "kernel",
     "src/portfolio/open-questions.mjs": "use-case",
     "src/terminal-control/config.mjs": "infra",

@@ -28,6 +28,7 @@ import { requestCancel } from '../run-supervisor/cancel-registry.mjs';
 import {
   assertHeadArgs, headKeyOf, headRoleOf, identityHolder, lineageDirOf, nextHeadGeneration, placeHead, readHeadPlacement, writeHeadPlacement,
 } from '../session-host/head-start.mjs';
+import { requestHeadRestoreRole } from '../session-host/head-request-client.mjs';
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
 import { redactText, writeHandoff } from './handoff-store.mjs';
 
@@ -155,7 +156,6 @@ function readRotationConfig(projectRoot) {
 
 /** Asks the old head's own supervisor, over its request socket, to register its role again; throws when it cannot. */
 async function askRestoreRole({ runDir, persona, name }) {
-  const { requestHeadRestoreRole } = await import('../session-host/head-request.mjs');
   const socketPath = readJson(path.join(runDir, 'envelope.json'))?.session?.requestSocketPath;
   return requestHeadRestoreRole({ persona, name }, { socketPath });
 }
