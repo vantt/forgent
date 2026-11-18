@@ -150,7 +150,7 @@ Refusals and exit codes (the table `exit-codes.v1.json`):
 | 3 | `rotation-in-progress` |
 | 4 | validation: missing persona or `--name`, `bad-persona`, `bad-name`, unknown sub-verb |
 
-`--json` prints the use case's result (`start`: the placement or the fronted holder; `rotate`: `{ started: true, pid }`). Proof: `test/cli/head-verb.test.mjs`.
+`--json` prints the use case's result (`start`: the placement or the fronted holder; `rotate`: `{ started: true, pid }`). Proof: `test/cli/session-verb.test.mjs`.
 
 ### 8.8 The rotation hook
 
