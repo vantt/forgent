@@ -1,8 +1,8 @@
 {
-  "sha": "8ab107a2c683210c0f84525da13b24923660986c",
-  "files": 622,
-  "tests": 7991,
-  "rustTests": 3104,
+  "sha": "fc5c8b494f3e63057635756d5a5ce0d5d6753fee",
+  "files": 624,
+  "tests": 7994,
+  "rustTests": 3107,
   "wallSeconds": 625,
   "cpuSeconds": 6199,
   "fileCpu": {
@@ -405,6 +405,7 @@
     "test/rust-host/observe-store-lock.test.mjs": 0.4,
     "test/rust-host/release-targets.test.mjs": 17.4,
     "test/rust-host/release-tree.test.mjs": 42.9,
+    "test/rust-host/verb-parity.test.mjs": 0.1,
     "test/scripts/build-domain-registry.test.mjs": 0.6,
     "test/scripts/check-decision-citation-drift.test.mjs": 4,
     "test/scripts/check-decision-codes.test.mjs": 0.4,

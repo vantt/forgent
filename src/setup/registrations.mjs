@@ -85,7 +85,7 @@ import { readCodexTrust, readAgyStore, defaultAgySettingsPath, operatorClaudeSto
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { discoverProjectPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
-import { createSeatBindingClient, resolveSeatBindingHost } from '../seat-binding/client.mjs';
+import { createSeatBindingClient, PROTOCOL as SEAT_BINDING_PROTOCOL, resolveSeatBindingHost } from '../seat-binding/client.mjs';
 import { checkSeatBindingDryBind } from './seat-binding-checks.mjs';
 import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, checkRunSupervisorConfig } from './run-supervisor-checks.mjs';
 import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
@@ -2463,7 +2463,7 @@ registerCheck({
 /**
  * The host Seat Binding would run (the same resolution the client uses:
  * the activation host inside an activated release, FGOS_HOST_BIN outside one)
- * answers `ladder` with protocol 1. Asked directly, never through the client's
+ * answers `ladder` at this payload's protocol. Asked directly, never through the client's
  * cached host, so an old activated release shows up as a version mismatch.
  */
 export function checkSeatBindingRoute(cwd, { hostBin } = {}) {
@@ -2479,7 +2479,7 @@ export function checkSeatBindingRoute(cwd, { hostBin } = {}) {
     const ladder = createSeatBindingClient({ hostBin: bin }).tierLadder();
     return {
       passed: true,
-      message: `${bin} (${activated ? 'activation host' : 'host in reach'}) answers ladder at protocol 1, hostVersion ${ladder.hostVersion}, ${ladder.vocabulary.length} tiers`,
+      message: `${bin} (${activated ? 'activation host' : 'host in reach'}) answers ladder at protocol ${SEAT_BINDING_PROTOCOL}, hostVersion ${ladder.hostVersion}, ${ladder.vocabulary.length} tiers`,
     };
   } catch (err) {
     return { passed: false, message: `${bin} -> ${err.code ?? 'error'}: ${err.message}` };

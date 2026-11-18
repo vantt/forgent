@@ -17,6 +17,7 @@
 //!
 //! - `bind`, `explain`: `ask`, `walk`, `session`, `accountState`, `now`;
 //! - `plan`: `for`, `needsSoul`, `hasLiveTaskAccess`, `repoRoot`, `session`, `now` (the binding selectors only);
+//!   the answer carries the purpose's `binding` when a seat was bound for it;
 //! - `preflight`: `session`, `pin: { pool, id }`, `accountState`, `now`;
 //! - `digest`, `ladder`: the runner alone (`ladder` needs none).
 //!
@@ -25,6 +26,7 @@
 //! under a byte cap.
 
 use std::cell::OnceCell;
+use std::ffi::OsString;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 
@@ -36,6 +38,7 @@ use fgos_execution::executor_model::ModelError;
 use fgos_execution::explain::explain_seat;
 use fgos_execution::ports::{Backend, Machine};
 use fgos_execution::tools::{Head, ToolProbe};
+use fgos_host_runtime::cli_args::{parse_args, FlagScalar, FlagValue};
 use fgos_seat_binding::ladder;
 use serde_json::{json, Value};
 
@@ -71,43 +74,41 @@ pub fn main(args: &[String]) -> i32 {
 
 /// The route without a process around it: the exit code and the one answer line.
 pub fn run(args: &[String], stdin: &str) -> (i32, Value) {
-    let mut protocol: Option<&str> = None;
-    let mut op: Option<&str> = None;
-    let mut iter = args.iter();
-    while let Some(arg) = iter.next() {
-        match arg.as_str() {
-            "--protocol" => match iter.next() {
-                Some(value) => protocol = Some(value),
-                None => {
-                    return error(
-                        op.unwrap_or(""),
-                        "usage",
-                        "--protocol needs a value",
-                        EXIT_USAGE,
-                    )
-                }
-            },
-            flag if flag.starts_with("--") => {
-                return error(
-                    op.unwrap_or(""),
-                    "usage",
-                    &format!("unknown argument {flag}"),
-                    EXIT_USAGE,
-                )
-            }
-            word if op.is_none() => op = Some(word),
-            word => {
-                return error(
-                    op.unwrap_or(""),
-                    "usage",
-                    &format!("unknown argument {word}"),
-                    EXIT_USAGE,
-                )
-            }
-        }
+    let parsed = match parse_args(&args.iter().map(OsString::from).collect::<Vec<_>>()) {
+        Ok(parsed) => parsed,
+        Err(err) => return error("", "usage", &err.to_string(), EXIT_USAGE),
+    };
+    let op = parsed.positional.first().map(String::as_str);
+    if let Some(extra) = parsed.positional.get(1) {
+        return error(
+            op.unwrap_or(""),
+            "usage",
+            &format!("unknown argument {extra}"),
+            EXIT_USAGE,
+        );
     }
+    if let Some((name, _)) = parsed.flags.iter().find(|(name, _)| name != "protocol") {
+        return error(
+            op.unwrap_or(""),
+            "usage",
+            &format!("unknown argument --{name}"),
+            EXIT_USAGE,
+        );
+    }
+    let protocol = match parsed.flag("protocol") {
+        None => None,
+        Some(FlagValue::One(FlagScalar::Str(value))) => Some(value.as_str()),
+        Some(_) => {
+            return error(
+                op.unwrap_or(""),
+                "usage",
+                "--protocol needs a value",
+                EXIT_USAGE,
+            )
+        }
+    };
     let op_name = op.unwrap_or("");
-    if protocol != Some("2") {
+    if protocol != Some(PROTOCOL.to_string().as_str()) {
         return error(
             op_name,
             "host-version-mismatch",
@@ -162,7 +163,7 @@ fn serve(op: &str, request: &Value) -> (i32, Value) {
         );
     }
     let session = session_of(request);
-    let machine = HostMachine::new(session.path_env.as_deref());
+    let machine = HostMachine::new(session.path_env.as_deref(), session.herdr_present);
     let now = now_of(request);
     let account_state = request.get("accountState").filter(|state| !state.is_null());
     match op {
@@ -229,7 +230,14 @@ fn serve(op: &str, request: &Value) -> (i32, Value) {
                 now,
             };
             match decide_over(runner, &decide, &probe, &binder) {
-                Ok(plan) => (0, answer(op, "ok", json!({ "plan": plan.to_json() }))),
+                Ok(plan) => {
+                    // The seat bound for a purpose rides along, so a caller reading its policy binds no second time.
+                    let mut body = plan.to_json();
+                    if let (Some(body), Some(binding)) = (body.as_object_mut(), &plan.binding) {
+                        body.insert("binding".into(), binding.clone());
+                    }
+                    (0, answer(op, "ok", json!({ "plan": body })))
+                }
                 Err(failure) => match failure {
                     DecideFailure::Refused(model) => failed(op, &model),
                     DecideFailure::SeatRefused { code, message } => (
@@ -280,6 +288,8 @@ fn serve(op: &str, request: &Value) -> (i32, Value) {
 struct Session {
     bind: BindSession,
     path_env: Option<String>,
+    /// What the caller states about herdr; the host's own detection answers when it states nothing.
+    herdr_present: Option<bool>,
 }
 
 fn session_of(request: &Value) -> Session {
@@ -295,6 +305,7 @@ fn session_of(request: &Value) -> Session {
             .get("pathEnv")
             .and_then(Value::as_str)
             .map(str::to_string),
+        herdr_present: session.get("herdrPresent").and_then(Value::as_bool),
     }
 }
 
@@ -398,12 +409,14 @@ fn split_root(path: &Path) -> Option<(PathBuf, PathBuf)> {
 /// The real machine, as the executor model and the tool probe read it.
 struct HostMachine {
     path_env: String,
+    herdr_present: Option<bool>,
     registry: OnceCell<Option<Value>>,
 }
 
 impl HostMachine {
-    fn new(path_env: Option<&str>) -> Self {
+    fn new(path_env: Option<&str>, herdr_present: Option<bool>) -> Self {
         HostMachine {
+            herdr_present,
             path_env: path_env.map(str::to_string).unwrap_or_else(|| {
                 std::env::var_os("PATH")
                     .map(|path| path.to_string_lossy().into_owned())
@@ -434,6 +447,14 @@ impl HostMachine {
             })
             .as_ref()
     }
+}
+
+/// Herdr as the process environment shows it: `HERDR_ENV=1` and an existing `HERDR_SOCKET_PATH`.
+fn herdr_in_environment() -> bool {
+    std::env::var("HERDR_ENV").is_ok_and(|env| env == "1")
+        && std::env::var_os("HERDR_SOCKET_PATH")
+            .filter(|socket| !socket.is_empty())
+            .is_some_and(|socket| Path::new(&socket).exists())
 }
 
 /// A path with a separator is judged by its executable bit, as Node does; a bare name is looked up on `path_env`
@@ -485,10 +506,7 @@ impl Machine for HostMachine {
     }
 
     fn herdr_present(&self) -> bool {
-        std::env::var("HERDR_ENV").is_ok_and(|env| env == "1")
-            && std::env::var_os("HERDR_SOCKET_PATH")
-                .filter(|socket| !socket.is_empty())
-                .is_some_and(|socket| Path::new(&socket).exists())
+        self.herdr_present.unwrap_or_else(herdr_in_environment)
     }
 
     fn home_dir(&self) -> Option<String> {
@@ -523,7 +541,12 @@ impl<'a> HostProbe<'a> {
                 relative,
             )
         } else {
-            (self.repo_root.clone(), target.to_path_buf())
+            // `.` and `./x` name the root and what lies beneath it: the current-directory steps carry nothing.
+            let relative: PathBuf = target
+                .components()
+                .filter(|part| !matches!(part, std::path::Component::CurDir))
+                .collect();
+            (self.repo_root.clone(), relative)
         };
         (
             root,
@@ -539,6 +562,12 @@ impl ToolProbe for HostProbe<'_> {
 
     fn scan_target_exists(&self, scan_target: &str) -> bool {
         let (root, relative) = self.scan_path(scan_target, None);
+        if relative.as_os_str().is_empty() {
+            // The target is the root itself: a directory is judged from its parent.
+            return split_root(&root)
+                .is_some_and(|(parent, name)| dir_exists_beneath(&parent, &name))
+                || root.parent().is_none() && root.is_dir();
+        }
         dir_exists_beneath(&root, &relative)
     }
 
@@ -695,5 +724,56 @@ mod tests {
         }
         assert!(!program_present("agent-tool", "/nonexistent-directory"));
         std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn herdr_presence_is_what_the_request_states_else_what_the_environment_shows() {
+        assert!(HostMachine::new(None, Some(true)).herdr_present());
+        assert!(!HostMachine::new(None, Some(false)).herdr_present());
+        assert_eq!(
+            HostMachine::new(None, None).herdr_present(),
+            herdr_in_environment()
+        );
+    }
+
+    #[test]
+    fn a_scan_target_of_dot_is_the_root_and_a_dot_prefixed_path_is_beneath_it() {
+        let root = std::env::temp_dir().join(format!("fgos-scan-target-{}", std::process::id()));
+        std::fs::create_dir_all(root.join(".index")).unwrap();
+        std::fs::write(root.join("meta.json"), r#"{"lastCommit":"abc"}"#).unwrap();
+        std::fs::write(root.join(".index/meta.json"), r#"{"lastCommit":"def"}"#).unwrap();
+        let machine = HostMachine::new(Some(""), None);
+        let probe = HostProbe::new(&machine, Some(root.clone()));
+        assert!(probe.scan_target_exists("."));
+        assert!(probe.scan_target_exists("./.index"));
+        assert!(!probe.scan_target_exists(".missing"));
+        assert_eq!(probe.index_commit(".").as_deref(), Some("abc"));
+        assert_eq!(probe.index_commit("./.index").as_deref(), Some("def"));
+        std::fs::remove_dir_all(&root).unwrap();
+    }
+
+    #[test]
+    fn the_plan_answer_carries_the_binding_of_a_purpose_with_a_prefer_pool() {
+        let request = json!({
+            "v": 2,
+            "runner": {
+                "executors": { "vec-agent": { "kind": "agent", "providerModel": "claude", "agentType": "vec-agent-type" } },
+                "modelPolicies": { "claude": { "standard": "sonnet" } },
+                "capabilities": { "vec-row": { "prefer": "vec-agent", "tier": "standard" }, "vec-plain": {} }
+            },
+            "for": "vec-row",
+            "hasLiveTaskAccess": true,
+            "now": 1_800_000_000_000_u64,
+        });
+        let (code, line) = run(&args(&["plan", "--protocol", "2"]), &request.to_string());
+        assert_eq!(code, 0, "{line}");
+        assert_eq!(line["plan"]["executorId"], "vec-agent");
+        assert_eq!(line["plan"]["binding"]["executor"], "vec-agent");
+        // A purpose no seat was bound for carries none.
+        let mut plain = request.clone();
+        plain["for"] = json!("vec-plain");
+        let (code, line) = run(&args(&["plan", "--protocol", "2"]), &plain.to_string());
+        assert_eq!(code, 0, "{line}");
+        assert!(line["plan"].get("binding").is_none());
     }
 }

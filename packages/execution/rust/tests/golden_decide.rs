@@ -114,6 +114,7 @@ fn decided_of(value: &Value) -> DecideAnswer {
             .get("blockedReason")
             .map(|r| r.as_str().map(str::to_string)),
         executor_id: text(value, "executorId"),
+        binding: None,
     }
 }
 

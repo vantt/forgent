@@ -591,6 +591,8 @@ export function compileDispatchPlan(
     const named = lookupExecutor(cfg, purpose);
     executorId = answer.executorId;
     resolved = named.configured ? named : { ...lookupExecutor(cfg, executorId), bindingSource: 'seat-binding' };
+    // The answer carries the binding the host made for the purpose; its policy is read from it, not bound again.
+    seatBinding = answer.binding;
   }
 
   if (!executorId) {

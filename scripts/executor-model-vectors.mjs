@@ -1,19 +1,16 @@
 #!/usr/bin/env node
 // executor-model-vectors.mjs -- the one regenerate path of the Execution contracts' golden vectors:
-// packages/execution/contracts/executor-model.v1.json (the executor facts) and bind.v1.json (the bind, the explain
-// answer, the pre-admission facts, the seat config slice and its digest, effective rigor).
+// packages/execution/contracts/executor-model.v1.json (the executor facts). The bind vectors (bind.v1.json) are
+// owned by the Rust crate alone and are not recorded from Node.
 //
 // A vector's inputs (name, fact, entry, runner, machine, args) are written by hand; its `expect` is whatever the
 // Node functions answer today, and its `leaseRead` (only for a fact that reads lease state) is what Dispatch's adapter
 // reads from the vector's lease state, the input a binder that takes account state as data is handed. This script
 // rewrites only those recorded values, through the same evaluator the replay tests use
 // (test/helpers/executor-model-vectors.helper.mjs), and keeps the file's one layout: a vector is a line per key. A
-// new vector is added with `"expect": null` and recorded by running this script. A vector marked `decided` states the
-// explicit invocation rule decided after the Node functions were written: its `expect` is written by hand, never
-// recorded here, and recording or checking refuses it unless the mark is that rule, the expect is written and Node
-// still answers differently.
+// new vector is added with `"expect": null` and recorded by running this script.
 //
-//   node scripts/executor-model-vectors.mjs           rewrite the recorded values of both contracts
+//   node scripts/executor-model-vectors.mjs           rewrite the recorded values of the contract
 //   node scripts/executor-model-vectors.mjs --check   exit 1 when any recorded value has drifted, naming the vectors
 //   --contract <file>                                 read and write that file only
 //
@@ -31,7 +28,6 @@ import { isDeepStrictEqual } from 'node:util';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 export const CONTRACT_URL = new URL('../packages/execution/contracts/executor-model.v1.json', import.meta.url);
-export const BIND_CONTRACT_URL = new URL('../packages/execution/contracts/bind.v1.json', import.meta.url);
 
 /** Replace this process's environment by the replay test's, the one `buildTestEnv` gives every test run. */
 export async function adoptTestEnvironment() {
@@ -52,15 +48,10 @@ export function serialize({ vectors, ...head }) {
 }
 
 /** One vector with its recorded values recomputed: `leaseRead` (when the fact reads lease state), then `expect`. */
-function recordVector(vector, { evaluateVector, leaseReadOf, decidedProblem }) {
-  const { expect, leaseRead: _leaseRead, ...inputs } = vector;
+function recordVector(vector, { evaluateVector, leaseReadOf }) {
+  const { expect: _expect, leaseRead: _leaseRead, ...inputs } = vector;
   const leaseRead = leaseReadOf(vector);
-  const got = evaluateVector(vector);
-  if (vector.decided !== undefined) {
-    const problem = decidedProblem(vector, got);
-    if (problem) throw new Error(problem);
-  }
-  return { ...inputs, ...(leaseRead === undefined ? {} : { leaseRead }), expect: vector.decided !== undefined ? expect : got };
+  return { ...inputs, ...(leaseRead === undefined ? {} : { leaseRead }), expect: evaluateVector(vector) };
 }
 
 /** The contract with every recorded value and the fact list recomputed from today's Node functions. */
@@ -78,7 +69,7 @@ const driftedNames = (next, current) => next.vectors
 async function main(argv) {
   await adoptTestEnvironment();
   const at = argv.indexOf('--contract');
-  const contractUrls = at >= 0 ? [pathToFileURL(path.resolve(argv[at + 1]))] : [CONTRACT_URL, BIND_CONTRACT_URL];
+  const contractUrls = at >= 0 ? [pathToFileURL(path.resolve(argv[at + 1]))] : [CONTRACT_URL];
   let failed = false;
   for (const contractUrl of contractUrls) {
     const current = JSON.parse(fs.readFileSync(contractUrl, 'utf8'));

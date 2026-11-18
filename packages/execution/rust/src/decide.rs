@@ -130,6 +130,9 @@ pub struct DecideAnswer {
     pub blocked_reason: Option<Option<String>>,
     /// The executor resolved, named only when the caller did not name it.
     pub executor_id: Option<String>,
+    /// The binding of the seat bound for the purpose, when one was; not part of the printed answer
+    /// ([`DecideAnswer::to_json`]), carried for the route's `plan` op.
+    pub binding: Option<Value>,
 }
 
 impl DecideAnswer {
@@ -202,6 +205,8 @@ impl DecideFailure {
 pub struct BoundSeat {
     pub executor: String,
     pub invocation: Option<String>,
+    /// The whole binding the bind answered, for a caller that reads its policy (the route's `plan` op carries it).
+    pub binding: Value,
 }
 
 /// Why Seat Binding bound no seat.
@@ -291,6 +296,7 @@ impl SeatBinder for CrateBinder<'_> {
                 .get("invocation")
                 .and_then(Value::as_str)
                 .map(str::to_string),
+            binding: bound,
         })
     }
 }
@@ -1107,6 +1113,7 @@ fn answer(mechanism: &'static str, configured: bool, reason_codes: Vec<&str>) ->
         reason_codes: reason_codes.into_iter().map(str::to_string).collect(),
         blocked_reason: None,
         executor_id: None,
+        binding: None,
     }
 }
 
@@ -1328,6 +1335,7 @@ pub fn decide_over(
         .and_then(Value::as_str)
         .filter(|t| !t.is_empty())
         .map(str::to_string);
+    out.binding = bound.map(|seat| seat.binding);
     Ok(named_out(out))
 }
 
