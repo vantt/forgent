@@ -200,6 +200,10 @@ lanes. Two steps wait on outside events; a short lead finishes them:
      git-tracked `.fgos/observe/friction/pid-2016389.jsonl` is still in git: the pre-commit hook refuses a `.fgos/`
      deletion from a linked worktree, so its removal waits for the supervisor's choice of door.
    - Step 2 waits for plan 261118-0947 (session verb), which holds `CHANGELOG.md`.
+   Tracked shard: `.fgos/observe/friction/pid-2016389.jsonl` stays tracked. Its content is migrated (rerun 0/1372) and
+   backed up under `.fgos/runtime/tmp/friction-shards-backup-20261118/`, but the pre-commit guard refuses any staged
+   deletion under `.fgos/` (also in the main checkout); removing it needs an owner decision on that guard (supervisor,
+   2026-11-18 22:0x).
 2. **CHANGELOG.** Gate: plan 261118-1455 (S6a worktree door) is done, so `CHANGELOG.md` can rejoin this footprint. Add
    `[Unreleased]` lines for phases 14-17: `fgos dispatch inspect --attention` head-gone / plan-no-progress rows and
    `dispatch.attention.planNoProgressMinutes`; driving-measure definitions under `domains/coding/observe/definitions`;
