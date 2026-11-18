@@ -154,6 +154,10 @@ pub(super) fn cond_matches(item: &Item, cond: &Cond, field_name: &str) -> bool {
             (Some(v), Some(list)) => list.iter().any(|w| equals(v, w)),
             _ => false,
         },
+        Op::Prefix => matches!(
+            (&val, wanted.and_then(Value::as_str)),
+            (Some(Val::Str(v)), Some(p)) if v.starts_with(p)
+        ),
         Op::Lt | Op::Gt => match (val, wanted.and_then(Value::as_f64)) {
             (Some(Val::Num(a)), Some(b)) => {
                 if cond.op == Op::Lt {
@@ -201,6 +205,8 @@ pub(super) fn compute(
     match agg {
         Agg::Count => Some(AggValue::Number(items.len() as f64)),
         Agg::MaxTs => newest(items).map(|i| AggValue::Instant(i.ts)),
+        Agg::MinTs => items.iter().map(|i| i.ts).min().map(AggValue::Instant),
+        Agg::MaxEnd => items.iter().map(|i| i.end).max().map(AggValue::Instant),
         Agg::AgeTs => newest(items).map(|i| AggValue::Number((now - i.ts) as f64 / 1000.0)),
         Agg::Span => {
             let start = items.iter().map(|i| i.ts).min()?;

@@ -1,6 +1,6 @@
 //! Named query definitions: a `*.query.json` file kept where its owner uses it.
 //!
-//! A definition is `{name, requires?, query, params?, minSample?, row?}`. Observe knows none of the names it will
+//! A definition is `{name, requires?, window?, query, params?, minSample?, row?}`. Observe knows none of the names it will
 //! meet: the owner writes the query, the kinds it needs and the thresholds it takes, and `run_definition` answers it
 //! through the one query engine. A required kind that is undeclared, or that no source serves, makes the answer
 //! `unmeasured` with the reason; nothing has to be declared as a placeholder.
@@ -52,6 +52,24 @@ pub struct RowTemplate {
     pub next_command: String,
 }
 
+/// Whether the caller's run window (`--since`/`--until`) bounds the definition's query.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum DefinitionWindow {
+    /// The caller's window replaces the query's own bounds.
+    #[default]
+    Caller,
+    /// The query bounds itself (for instance by an `after` anti-join); the caller's window is not applied. Rows are
+    /// still answered at the caller's `now`.
+    Own,
+}
+
+impl DefinitionWindow {
+    fn is_caller(&self) -> bool {
+        *self == DefinitionWindow::Caller
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Definition {
@@ -59,6 +77,8 @@ pub struct Definition {
     /// Kinds that must be declared and served. A trailing `*` stands for every declared kind with that prefix.
     #[serde(default)]
     pub requires: Vec<String>,
+    #[serde(default, skip_serializing_if = "DefinitionWindow::is_caller")]
+    pub window: DefinitionWindow,
     pub query: Query,
     #[serde(default)]
     pub params: BTreeMap<String, ParamSource>,
@@ -273,9 +293,10 @@ pub fn run_definition(def: &Definition, env: &Environment<'_>) -> DefinitionResu
     }
 }
 
-/// Sets the run's window on every definition: a given bound replaces the definition's own, an absent one leaves it.
+/// Sets the run's window on every definition whose `window` is `caller`: a given bound replaces the definition's own,
+/// an absent one leaves it. A `window: own` definition keeps its query's bounds.
 pub fn window(defs: &mut [Definition], since: Option<&str>, until: Option<&str>) {
-    for def in defs {
+    for def in defs.iter_mut().filter(|d| d.window.is_caller()) {
         if let Some(since) = since {
             def.query.since = Some(since.to_owned());
         }

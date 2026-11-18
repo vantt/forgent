@@ -107,8 +107,10 @@ impl TryFrom<String> for LatestPer {
     }
 }
 
-/// An aggregate: `count`, `sum|avg|min|max|p50|p90:<measure>`, `max:ts`, `age:ts` (seconds since the newest record)
-/// or `span` (seconds from the earliest start to the latest end).
+/// An aggregate: `count`, `sum|avg|min|max|p50|p90:<measure>`, `max:ts` (the newest start), `min:ts` (the earliest
+/// start), `max:end` (the latest end, `endTs` falling back to `ts`), `age:ts` (seconds since the newest record) or
+/// `span` (seconds from the earliest start to the latest end). `max:ts`, `min:ts` and `max:end` are instants and
+/// render as RFC 3339.
 ///
 /// `p50` and `p90` are nearest-rank percentiles: the value at rank `ceil(p × n)` of the group's sorted values, so the
 /// result is always one of the inputs. A record without the measure is left out; a group with no value gives `null`.
@@ -120,6 +122,8 @@ pub enum Agg {
     Count,
     Measure { func: String, measure: String },
     MaxTs,
+    MinTs,
+    MaxEnd,
     AgeTs,
     Span,
 }
@@ -131,6 +135,8 @@ impl FromStr for Agg {
             "count" => return Ok(Self::Count),
             "span" => return Ok(Self::Span),
             "max:ts" => return Ok(Self::MaxTs),
+            "min:ts" => return Ok(Self::MinTs),
+            "max:end" => return Ok(Self::MaxEnd),
             "age:ts" => return Ok(Self::AgeTs),
             _ => {}
         }
@@ -146,7 +152,7 @@ impl FromStr for Agg {
             _ => Err(invalid(
                 "agg",
                 s,
-                "expected count, span, max:ts, age:ts or sum|avg|min|max|p50|p90:<measure>",
+                "expected count, span, max:ts, min:ts, max:end, age:ts or sum|avg|min|max|p50|p90:<measure>",
             )),
         }
     }
@@ -171,6 +177,8 @@ impl fmt::Display for Agg {
             Agg::Count => f.write_str("count"),
             Agg::Span => f.write_str("span"),
             Agg::MaxTs => f.write_str("max:ts"),
+            Agg::MinTs => f.write_str("min:ts"),
+            Agg::MaxEnd => f.write_str("max:end"),
             Agg::AgeTs => f.write_str("age:ts"),
             Agg::Measure { func, measure } => write!(f, "{func}:{measure}"),
         }
@@ -186,13 +194,15 @@ pub enum Op {
     Exists,
     Lt,
     Gt,
+    Prefix,
 }
 
 /// A record filter. `field` is an attr, a measure, a joined measure, or a record field: `subject.kind`, `subject.id`,
 /// `basis`, `origin.source|component|writer|host|release|project`.
 ///
-/// `ne` also matches a record that lacks the field; `eq`, `in`, `lt` and `gt` do not. `in` takes an array;
-/// `exists` takes `true` (default) or `false`.
+/// `ne` also matches a record that lacks the field; `eq`, `in`, `lt`, `gt` and `prefix` do not. `in` takes an array;
+/// `exists` takes `true` (default) or `false`; `prefix` takes a string and matches a string field that starts with it
+/// (a non-string field never matches).
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Cond {
@@ -200,6 +210,44 @@ pub struct Cond {
     pub op: Op,
     #[serde(default)]
     pub value: Option<serde_json::Value>,
+}
+
+/// One entry of a condition list (`where`, `where_latest`, `without.where`): a condition, or `{"any": [[...], ...]}`,
+/// which holds when every entry of at least one branch holds. A branch is itself a condition list, so `any` nests.
+/// An `any` with no branch, or a branch with no entry, is refused when the query runs.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(untagged)]
+pub enum Filter {
+    Cond(Cond),
+    Any { any: Vec<Vec<Filter>> },
+}
+
+impl From<Cond> for Filter {
+    fn from(c: Cond) -> Self {
+        Filter::Cond(c)
+    }
+}
+
+impl<'de> Deserialize<'de> for Filter {
+    /// An object whose only key is `any` is a group; any other object is read as a condition, so a malformed
+    /// condition reports its own field error instead of an untagged mismatch.
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        use serde::de::Error;
+        let value = serde_json::Value::deserialize(d)?;
+        match value.as_object() {
+            Some(map) if map.contains_key("any") => {
+                if map.len() != 1 {
+                    return Err(D::Error::custom("an any group takes no key but any"));
+                }
+                serde_json::from_value(map["any"].clone())
+                    .map(|any| Filter::Any { any })
+                    .map_err(D::Error::custom)
+            }
+            _ => serde_json::from_value(value)
+                .map(Filter::Cond)
+                .map_err(D::Error::custom),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
@@ -213,8 +261,36 @@ pub enum Cmp {
     Ne,
 }
 
-fn one() -> f64 {
-    1.0
+/// The factor `k` of an operand: a number, or `{"param": "<name>"}` filled by the caller like `Operand::Param`.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(untagged)]
+pub enum Factor {
+    Number(f64),
+    Param { param: String },
+}
+
+impl<'de> Deserialize<'de> for Factor {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        use serde::de::Error;
+        #[derive(Deserialize)]
+        #[serde(deny_unknown_fields)]
+        struct ParamRef {
+            param: String,
+        }
+        let value = serde_json::Value::deserialize(d)?;
+        if let Some(n) = value.as_f64() {
+            return Ok(Factor::Number(n));
+        }
+        serde_json::from_value::<ParamRef>(value)
+            .map(|p| Factor::Param { param: p.param })
+            .map_err(|e| {
+                D::Error::custom(format!("k is a number or {{\"param\": \"<name>\"}}: {e}"))
+            })
+    }
+}
+
+fn one() -> Factor {
+    Factor::Number(1.0)
 }
 
 /// One side of a group filter. `Agg` and `Latest` take a factor `k`, so `k × another aggregate or measure` is one
@@ -228,12 +304,12 @@ pub enum Operand {
     Agg {
         agg: Agg,
         #[serde(default = "one")]
-        k: f64,
+        k: Factor,
     },
     Latest {
         measure: String,
         #[serde(default = "one")]
-        k: f64,
+        k: Factor,
     },
 }
 
@@ -277,21 +353,32 @@ pub enum Anchor {
     Now,
     /// The window runs from `within` before the record's `ts` to its end.
     Record,
+    /// The window runs from just after the record's `ts` to `now`, capped at `within` after `ts`: a matching record
+    /// that follows drops it.
+    After,
 }
 
 /// An anti-join: drop a record when a record of `kind` matches `where`, shares `ref <on>:<id>` (when `on` is set),
 /// and falls inside the `within` window.
+///
+/// With `latest`, only the newest record of `kind` (sharing the ref, when `on` is set) from `within` before the
+/// record's `ts` up to that `ts` is looked at, and the record is dropped when that one matches `where`. It reads the
+/// state in force at the record, so it takes `anchor: record` only; `now` and `after` are refused. The latest window is
+/// `[ts - within, ts]`, both ends included, so it holds the record itself when the record is of a `kind` here.
+/// Records at the same instant are ordered by id: the one with the largest id is the newest.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Without {
     pub kind: Vec<String>,
     #[serde(default, rename = "where")]
-    pub where_: Vec<Cond>,
+    pub where_: Vec<Filter>,
     #[serde(default)]
     pub on: Option<String>,
     pub within: String,
     #[serde(default)]
     pub anchor: Anchor,
+    #[serde(default)]
+    pub latest: bool,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Deserialize, Serialize)]
@@ -299,8 +386,8 @@ pub struct Without {
 pub struct Query {
     pub kind: Vec<String>,
     #[serde(rename = "where")]
-    pub where_: Vec<Cond>,
-    pub where_latest: Vec<Cond>,
+    pub where_: Vec<Filter>,
+    pub where_latest: Vec<Filter>,
     #[serde(rename = "ref")]
     pub refs: Vec<RefSel>,
     pub since: Option<String>,

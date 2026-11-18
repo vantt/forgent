@@ -5,17 +5,18 @@
 //! `--by`, `--bucket hour|day|week`, `--latest-per subject|ref:<kind>`, `--agg`, `--having`, `--join`,
 //! `--without`, `--min-sample`, `--param name=value`, `--query <file|->` (a whole query as JSON; flags add to it).
 //!
-//! A condition is `field=value`, `field!=value`, `field=a|b` (in), `field<n`, `field>n` or `field?` (exists), or
-//! the JSON object a definition file holds. `--having`, `--join` and `--without` take that JSON object.
+//! A condition is `field=value`, `field!=value`, `field^=text` (prefix), `field=a|b` (in), `field<n`, `field>n` or
+//! `field?` (exists), or the JSON object a definition file holds (a condition or an `{"any": [[...], ...]}` group). `--having`, `--join` and `--without` take that JSON object.
 //! `--def <file|dir>` runs the named definitions in it and returns every definition's rows in one answer; a
-//! definition takes no other query flag but `--since`/`--until`, which window every definition it runs.
+//! definition takes no other query flag but `--since`/`--until`, which window every definition it runs except one
+//! that declares `"window": "own"`.
 //! `--now <rfc3339>` fixes the clock.
 
 use super::{parse_flags, RecordEnvironment};
 use crate::contract::{ObserveRequest, RecordSource, SourceError, Window};
 use crate::definition::{self, Environment, ParamResolver};
 use crate::flags::Flags;
-use crate::query::{run, Cond, Op, Query, QueryContext};
+use crate::query::{run, Cond, Filter, Op, Query, QueryContext};
 use crate::record::registry::{load_registry, Registry};
 use crate::record::store::{HealthSource, RecordStoreSource};
 use crate::record::types::Record;
@@ -75,39 +76,51 @@ fn scalar(text: &str) -> Value {
 }
 
 /// One condition in its short text form, or as the JSON object a definition holds.
-fn parse_cond(text: &str) -> Result<Cond, String> {
+fn parse_cond(text: &str) -> Result<Filter, String> {
     if text.trim_start().starts_with('{') {
         return serde_json::from_str(text).map_err(|e| format!("invalid condition {text}: {e}"));
     }
-    let cond = |field: &str, op: Op, value: Option<Value>| Cond {
-        field: field.to_owned(),
-        op,
-        value,
+    let cond = |field: &str, op: Op, value: Option<Value>| {
+        Filter::Cond(Cond {
+            field: field.to_owned(),
+            op,
+            value,
+        })
     };
     if let Some(field) = text.strip_suffix('?') {
         return Ok(cond(field, Op::Exists, None));
     }
-    if let Some((field, value)) = text.split_once("!=") {
-        return Ok(cond(field, Op::Ne, Some(scalar(value))));
-    }
-    if let Some((field, value)) = text.split_once('=') {
-        return Ok(if value.contains('|') {
-            cond(
+    // Split at the earliest operator, so a value may itself hold one: `x=a^=b` is an eq on `x`.
+    let split = text.char_indices().find_map(|(at, c)| {
+        let rest = &text[at..];
+        let op = if rest.starts_with("^=") {
+            ("^=", Op::Prefix)
+        } else if rest.starts_with("!=") {
+            ("!=", Op::Ne)
+        } else {
+            match c {
+                '=' => ("=", Op::Eq),
+                '<' => ("<", Op::Lt),
+                '>' => (">", Op::Gt),
+                _ => return None,
+            }
+        };
+        Some((&text[..at], op.1, &rest[op.0.len()..]))
+    });
+    if let Some((field, op, value)) = split {
+        return Ok(match op {
+            // The prefix is text as written, never read as a number.
+            Op::Prefix => cond(field, op, Some(json!(value))),
+            Op::Eq if value.contains('|') => cond(
                 field,
                 Op::In,
                 Some(Value::Array(value.split('|').map(scalar).collect())),
-            )
-        } else {
-            cond(field, Op::Eq, Some(scalar(value)))
+            ),
+            _ => cond(field, op, Some(scalar(value))),
         });
     }
-    for (symbol, op) in [('<', Op::Lt), ('>', Op::Gt)] {
-        if let Some((field, value)) = text.split_once(symbol) {
-            return Ok(cond(field, op, Some(scalar(value))));
-        }
-    }
     Err(format!(
-        "invalid condition {text}: expected field=value, field!=value, field=a|b, field<n, field>n, field? or a JSON object"
+        "invalid condition {text}: expected field=value, field!=value, field^=text, field=a|b, field<n, field>n, field? or a JSON object"
     ))
 }
 
@@ -416,19 +429,19 @@ mod tests {
         assert_eq!(
             query.where_,
             [
-                Cond {
+                Filter::Cond(Cond {
                     field: "x".into(),
                     op: Op::Eq,
                     value: Some(json!(1))
-                },
-                Cond {
+                }),
+                Filter::Cond(Cond {
                     field: "y".into(),
                     op: Op::Exists,
                     value: None
-                },
+                }),
             ]
         );
-        assert_eq!(query.where_latest[0].op, Op::Ne);
+        assert!(matches!(&query.where_latest[0], Filter::Cond(c) if c.op == Op::Ne));
         let refs: Vec<(&str, &str)> = query
             .refs
             .iter()
@@ -463,8 +476,37 @@ mod tests {
     }
 
     #[test]
+    fn a_caret_equals_condition_is_a_prefix_whose_value_stays_text() {
+        let prefix = |text: &str| match parse_cond(text).unwrap() {
+            Filter::Cond(c) => (c.field, c.op, c.value.unwrap()),
+            other => panic!("not a condition: {other:?}"),
+        };
+        assert_eq!(
+            prefix("fgos.head.role^=head:lead-"),
+            ("fgos.head.role".into(), Op::Prefix, json!("head:lead-"))
+        );
+        assert_eq!(prefix("x^=12").2, json!("12"));
+    }
+
+    #[test]
+    fn a_condition_splits_at_its_earliest_operator_so_the_value_may_hold_another() {
+        let parts = |text: &str| match parse_cond(text).unwrap() {
+            Filter::Cond(c) => (c.field, c.op, c.value.unwrap()),
+            other => panic!("not a condition: {other:?}"),
+        };
+        assert_eq!(parts("x=a^=b"), ("x".into(), Op::Eq, json!("a^=b")));
+        assert_eq!(parts("x=a!=b"), ("x".into(), Op::Eq, json!("a!=b")));
+        assert_eq!(parts("x^=a=b"), ("x".into(), Op::Prefix, json!("a=b")));
+        assert_eq!(parts("x!=a<b"), ("x".into(), Op::Ne, json!("a<b")));
+        assert_eq!(parts("x<a=b"), ("x".into(), Op::Lt, json!("a=b")));
+    }
+
+    #[test]
     fn a_condition_value_reads_as_a_whole_number_a_decimal_a_boolean_or_text() {
-        let value = |text: &str| parse_cond(text).unwrap().value.unwrap();
+        let value = |text: &str| match parse_cond(text).unwrap() {
+            Filter::Cond(c) => c.value.unwrap(),
+            other => panic!("not a condition: {other:?}"),
+        };
         assert_eq!(value("x<0.5"), json!(0.5));
         assert_eq!(value("x>-2.25"), json!(-2.25));
         assert_eq!(value("x=7"), json!(7));

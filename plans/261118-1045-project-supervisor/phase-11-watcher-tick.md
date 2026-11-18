@@ -76,3 +76,11 @@ and stops nothing.
 
 ## Rollback
 Revert the phase commit. Nothing runs the tick until phases 15 and 16, so reverting leaves no timer behind.
+
+## Follow-up after landing (68133cd5b, lead:OPC review 2026-11-18)
+
+With action `wake-supervisor`, every new event in one tick called `wake`, so N events gave N wakes; every wake after
+the first answers `already-live`, and `supervisor-stuck` counts those against `watcher.stuckWakeLimit`, so one busy
+tick could trip it falsely (PS-9 reads the limit as ticks). Decision (lead, inside the frame): a tick calls `wake` at
+most once, with the oldest new or unhandled event; the supervisor reads the whole queue. Fixed on branch `sv/p11b`
+before phase 16 wires the tick.

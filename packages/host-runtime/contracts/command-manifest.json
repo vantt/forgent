@@ -458,7 +458,7 @@
               },
               "where": {
                 "type": "string",
-                "description": "Filter before latest-per: field=value, field!=value, field=a|b (in), field<n, field>n, field? (exists) or a JSON condition. Repeatable."
+                "description": "Filter before latest-per: field=value, field!=value, field^=text (prefix), field=a|b (in), field<n, field>n, field? (exists), a JSON condition or a JSON {\"any\": [[cond, ...], ...]} group. Repeatable."
               },
               "where-latest": {
                 "type": "string",
@@ -503,7 +503,7 @@
               },
               "agg": {
                 "type": "string",
-                "description": "count, span, max:ts, age:ts or sum|avg|min|max|p50|p90:<measure>. Comma-separated."
+                "description": "count, span, max:ts, min:ts, max:end, age:ts or sum|avg|min|max|p50|p90:<measure>. Comma-separated."
               },
               "having": {
                 "type": "string",
@@ -515,7 +515,7 @@
               },
               "without": {
                 "type": "string",
-                "description": "Anti-join as JSON {kind, where?, on?, within, anchor?}. Repeatable."
+                "description": "Anti-join as JSON {kind, where?, on?, within, anchor? (now|record|after), latest?}. Repeatable."
               },
               "min-sample": {
                 "type": "string",
@@ -531,7 +531,7 @@
               },
               "def": {
                 "type": "string",
-                "description": "A definition file, or a directory of *.query.json files. Repeatable; takes no other query flag but --now and --since/--until, which window every definition it runs."
+                "description": "A definition file, or a directory of *.query.json files. Repeatable; takes no other query flag but --now and --since/--until, which window every definition it runs except one declaring \"window\": \"own\"."
               },
               "now": {
                 "type": "string",
