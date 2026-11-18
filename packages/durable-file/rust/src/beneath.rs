@@ -73,7 +73,7 @@ fn identity_of(fd: BorrowedFd<'_>) -> Result<DirIdentity, BeneathError> {
 
 /// A directory opened no-follow; keep it to re-check the identity before a replace.
 #[derive(Debug)]
-pub struct Dir(OwnedFd);
+pub struct Dir(pub(crate) OwnedFd);
 impl Dir {
     pub fn identity(&self) -> Result<DirIdentity, BeneathError> {
         identity_of(self.0.as_fd())
@@ -85,6 +85,37 @@ impl Dir {
     /// Change the permission bits through the descriptor, never through a path.
     pub fn set_mode(&self, mode: u32) -> Result<(), BeneathError> {
         Ok(fchmod(&self.0, Mode::from_raw_mode(mode as _))?)
+    }
+
+    /// Open the directory `path` itself no-follow (a symlink at its last component is refused); `None` when missing.
+    pub fn open(path: &Path) -> Result<Option<Dir>, BeneathError> {
+        Ok(open_root(path)?.map(Dir))
+    }
+
+    /// The permission bits (`0o777` mask) of the regular file `name` in this directory, `None` when it does not exist.
+    /// A symlink is refused `Symlink`, anything but a regular file `NotRegular`; `name` must be one plain filename.
+    pub fn file_mode(&self, name: &OsStr) -> Result<Option<u32>, BeneathError> {
+        plain_name(name)?;
+        match statat(&self.0, name, AtFlags::SYMLINK_NOFOLLOW) {
+            Ok(stat) => match FileType::from_raw_mode(stat.st_mode) {
+                // The field width differs between platforms (u16 on macOS).
+                #[allow(clippy::unnecessary_cast)]
+                FileType::RegularFile => Ok(Some(stat.st_mode as u32 & 0o777)),
+                FileType::Symlink => Err(refused(BeneathRefusal::Symlink)),
+                _ => Err(refused(BeneathRefusal::NotRegular)),
+            },
+            Err(Errno::NOENT) => Ok(None),
+            Err(errno) => Err(errno.into()),
+        }
+    }
+}
+
+/// `name` is one plain filename: not empty, not `.` or `..`, no separator.
+pub(crate) fn plain_name(name: &OsStr) -> Result<(), BeneathError> {
+    let mut parts = Path::new(name).components();
+    match (parts.next(), parts.next()) {
+        (Some(Component::Normal(only)), None) if only == name => Ok(()),
+        _ => Err(refused(BeneathRefusal::Escape)),
     }
 }
 

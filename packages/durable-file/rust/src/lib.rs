@@ -11,6 +11,12 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 static NEXT_TEMP: AtomicU64 = AtomicU64::new(0);
 
+/// The next temporary name of this process, the one shape [`sweep_stale_temps`] recognises.
+pub(crate) fn next_temp_name() -> String {
+    let seq = NEXT_TEMP.fetch_add(1, Ordering::Relaxed);
+    format!(".durable-file-{}-{seq}.tmp", std::process::id())
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Installed {
     Created,
@@ -265,8 +271,7 @@ fn write_durably(
     #[cfg(not(unix))]
     let _ = mode;
     let (temporary, mut file) = loop {
-        let seq = NEXT_TEMP.fetch_add(1, Ordering::Relaxed);
-        let path = dir.join(format!(".durable-file-{}-{seq}.tmp", std::process::id()));
+        let path = dir.join(next_temp_name());
         if path == dir.join(name) {
             continue;
         }
@@ -484,3 +489,64 @@ pub use beneath::{
     ensure_dir_beneath, open_beneath, open_beneath_with, open_dir_beneath, BeneathError,
     BeneathRefusal, Dir, DirIdentity, OpenedFile, Read, Strategy,
 };
+
+#[cfg(unix)]
+use rustix::{
+    fs::{fchmod, fsync, openat, renameat, unlinkat, AtFlags, Mode, OFlags},
+    io::Errno,
+};
+#[cfg(unix)]
+use std::ffi::OsStr;
+
+/// The write half of [`Dir`]: lives beside the other durable writes of this door.
+#[cfg(unix)]
+impl Dir {
+    /// Replace `name` in this directory atomically, every step relative to this descriptor so no path is resolved
+    /// again: a new temporary (exclusive, no-follow) given exactly `mode` through its descriptor (not filtered by the
+    /// umask), the bytes written and synced, renamed over `name`, then the directory synced. A failure before the
+    /// rename removes the temporary. The error's `step` is that of [`InstallError`]; `installed` is set when
+    /// the rename happened.
+    pub fn replace(&self, name: &OsStr, bytes: &[u8], mode: u32) -> Result<(), InstallError> {
+        let fail = |source: io::Error, step: &'static str, installed| InstallError {
+            source,
+            step,
+            installed,
+            temporary: None,
+        };
+        beneath::plain_name(name).map_err(|e| {
+            fail(
+                io::Error::new(io::ErrorKind::InvalidInput, e.to_string()),
+                "name-check",
+                None,
+            )
+        })?;
+        let flags =
+            OFlags::WRONLY | OFlags::CREATE | OFlags::EXCL | OFlags::NOFOLLOW | OFlags::CLOEXEC;
+        let (temporary, fd) = loop {
+            let temporary = next_temp_name();
+            match openat(
+                &self.0,
+                temporary.as_str(),
+                flags,
+                Mode::from_raw_mode(0o600),
+            ) {
+                Ok(fd) => break (temporary, fd),
+                Err(Errno::EXIST) => continue,
+                Err(errno) => return Err(fail(errno.into(), "temp-created", None)),
+            }
+        };
+        let written = (|| -> Result<(), (io::Error, &'static str)> {
+            fchmod(&fd, Mode::from_raw_mode(mode as _)).map_err(|e| (e.into(), "temp-created"))?;
+            let mut file = fs::File::from(fd);
+            file.write_all(bytes).map_err(|e| (e, "bytes-written"))?;
+            file.sync_all().map_err(|e| (e, "file-fsync"))?;
+            renameat(&self.0, temporary.as_str(), &self.0, name)
+                .map_err(|e| (e.into(), "name-installed"))
+        })();
+        if let Err((source, step)) = written {
+            let _ = unlinkat(&self.0, temporary.as_str(), AtFlags::empty());
+            return Err(fail(source, step, None));
+        }
+        fsync(&self.0).map_err(|e| fail(e.into(), "parent-fsync", Some(Installed::Created)))
+    }
+}

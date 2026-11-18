@@ -535,6 +535,7 @@ dependencies = [
  "fgos-session-host",
  "fgos-terminal-control",
  "libc",
+ "serde",
  "serde_json",
  "sha2",
  "windows-sys",

@@ -585,6 +585,32 @@ fn descends(tree: &dyn ProcessTree, mut pid: u32, ancestor: u32) -> bool {
     false
 }
 
+/// Whether the process `caller_pid` (as the kernel names it) runs under the live `head`: the head itself or one of its
+/// descendants. Refused `head-not-live` when the head is not running with its start time, `caller-not-under-head`
+/// otherwise. The check [`bind_agent_session`] makes; a supervisor makes it for any request that must come from the
+/// agent it launched.
+pub fn caller_under_head(head: &HeadRef, caller_pid: u32) -> Result<(), Refusal> {
+    under_head_in(head, caller_pid, os_process_tree().as_ref()).map(|_| ())
+}
+
+fn under_head_in(
+    head: &HeadRef,
+    caller_pid: u32,
+    tree: &dyn ProcessTree,
+) -> Result<fgos_process::facts::Record, Refusal> {
+    let record = read_head(head).map_err(|detail| refused("head-not-live", detail))?;
+    if !descends(tree, caller_pid, head.pid) {
+        return Err(refused(
+            "caller-not-under-head",
+            format!(
+                "process {caller_pid} does not run under the head {}",
+                head.pid
+            ),
+        ));
+    }
+    Ok(record)
+}
+
 /// Upper bound on parent hops when a caller is checked against a head, so a cyclic table stops.
 const MAX_ANCESTRY_WALK: usize = 4096;
 
@@ -647,16 +673,7 @@ fn bind_agent_session_in(
             ),
         ));
     }
-    let record = read_head(head).map_err(|detail| refused("head-not-live", detail))?;
-    if !descends(tree, caller_pid, head.pid) {
-        return Err(refused(
-            "caller-not-under-head",
-            format!(
-                "process {caller_pid} does not run under the head {}, so it cannot bind a session to it",
-                head.pid
-            ),
-        ));
-    }
+    let record = under_head_in(head, caller_pid, tree)?;
     let own = session_for(state_root, attempt, None)?;
     let rows = scan(state_root, &judge_here)?.rows;
     let live_on_head = |row: &&Row| row.verdict != Verdict::Dead && on_head(&row.entry, head);

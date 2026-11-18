@@ -5,7 +5,10 @@
     "frame": "as gate-go.v1.json: 4-byte unsigned big-endian length N, then N bytes of UTF-8 JSON (one object)",
     "maxRequestBytes": 4194304,
     "maxReplyBytes": 65536,
-    "sizes": "a request frame may be up to maxRequestBytes because `head write` carries a whole file; a reply stays within the GO channel's 65536",
+    "sizes": "a request frame may be up to maxRequestBytes because `head write` carries a whole file; a reply stays within the GO channel's 65536. The length is read first: over maxRequestBytes is bad-frame; over maxReplyBytes is a large request, and while another large request is being read or run it is answered busy before its body is read. A large frame whose verb is not `head write` is bad-frame",
+    "maxRequestValues": 256,
+    "maxRequestDepth": 8,
+    "bounded": "the frame is parsed with a visitor that counts every JSON value it builds (objects, arrays, strings, numbers, booleans, null) and refuses more than maxRequestValues or nesting deeper than maxRequestDepth while it reads (bad-frame), so many tiny elements are never materialised; only one string, a head write's content, may be large",
     "oversizeOrInvalid": "the supervisor answers REPLY refused bad-frame and closes the connection",
     "readDeadlineMs": "5000 for the whole request frame (not per read)"
   },
@@ -49,7 +52,8 @@
     },
     "head write": {
       "args": { "path": "string, required: project-relative, exactly an entry of envelope.session.writes", "content": "string, required: the whole new content (UTF-8); exactly these two keys" },
-      "does": "answered by the supervisor itself, no route child: the only way a head changes a granted file, because its sandbox keeps every granted file read-only (granted directories stay bound writable). The path must be plain and relative (no empty, `.` or `..` segment, not absolute: path-invalid), named exactly by an entry of envelope.session.writes (path-not-granted), and an existing regular file reached from envelope.cwd without a symlink at it or at any directory on the way (path-symlink, not-a-file). Right before the replace its parent is resolved again and must be the directory the check opened (path-changed). The content is installed by the durable-file door (temp file beside it, fsync, rename over the name, parent fsync) with the old file's mode, so a reader sees the old or the new file, never a mix; a failure there is write-failed with the step in detail",
+      "does": "answered by the supervisor itself, no route child: the only way a head changes a granted file, because its sandbox keeps every granted file read-only (granted directories stay bound writable). The path must be plain and relative (no empty, `.` or `..` segment, not absolute: path-invalid), named exactly by an entry of envelope.session.writes (path-not-granted), and an existing regular file reached from envelope.cwd without a symlink at it or at any directory on the way (path-symlink, not-a-file). Its directory is opened once, no-follow at every component, and the content is installed through that descriptor by the durable-file door (Dir::replace: temp file beside it given exactly the old file's mode, fsync, renameat over the name, directory fsync), so nothing is resolved by path after the check and a directory swapped meanwhile is never followed; a reader sees the old or the new file, never a mix; a failure there is write-failed with the step in detail",
+      "peer": "the connecting process (SO_PEERCRED pid) must be the attempt's gate or run under it, the check of head bind session (Identity's caller_under_head): a same-uid process outside the head is refused caller-not-under-gate. The other verbs check the role only: head start, head rotate, head answered and head restore role act on the caller's own lineage or ask the use case to check it, so they are not given this check here",
       "data": "{path, bytes}",
       "identity": "held",
       "client": "`fgos head write <path>` with the new content on stdin (src/session-host/head-request-client.mjs requestHeadWrite)"
@@ -67,6 +71,7 @@
     "one request frame",
     "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed). For `head answered`, `head restore role` and `head bind session` the step is instead: this attempt's own session is registered and live (session-not-registered, failing closed the same way)",
     "verb: must be one of envelope.session.verbs (verb-not-granted)",
+    "peer (head write only): the connecting process runs under the gate (caller-not-under-gate)",
     "busy: at most one request runs at a time (busy)",
     "run: `<hostBin> internal head-request --protocol 1 --run-dir <attemptDir>`, request on stdin; `head bind session` and `head write` are answered by the supervisor itself instead"
   ],
@@ -82,7 +87,7 @@
     "bad-frame": "oversize, not one JSON object, no REQUEST type, an id outside the rule, a verb that is not a string or args that is not an object",
     "role-not-held": "Identity does not give this attempt's session the envelope's role; when Identity could not answer the detail is its refusal code only (its text goes to supervisor.log, never to the client)",
     "verb-not-granted": "the verb is not in envelope.session.verbs",
-    "busy": "another request is running",
+    "busy": "another request is running, or another large request (over maxReplyBytes) is being read or run",
     "session-not-registered": "head answered only: Identity does not list this attempt's own session as live; when Identity could not answer the detail is its refusal code only",
     "session-bind-failed": "head bind session only: Identity refused to bind the session; detail is its code",
     "bad-args": "head write only: args are not exactly {path, content}, both strings",
@@ -90,7 +95,7 @@
     "path-not-granted": "head write only: no entry of envelope.session.writes names the path exactly",
     "path-symlink": "head write only: the file or a directory on the way to it is a symbolic link",
     "not-a-file": "head write only: the granted path does not exist or is not a regular file (a granted directory is written in the sandbox, not here)",
-    "path-changed": "head write only: the file's directory changed between the check and the replace; nothing was written",
+    "caller-not-under-gate": "head write only: the connecting process is not the attempt's gate nor one of its descendants; detail is Identity's code (caller-not-under-head, head-not-live) or gate-unknown, peer-unknown",
     "write-failed": "head write only: the durable write failed; detail names the error and the step (a failure after the rename means the new content may already be in place)",
     "role-take-failed": "head answered only: the route recorded the answer but Identity refused to move the role to this session (detail is its code, for example gate-unknown or head-not-live); the executor then finds no holder change and retires the successor",
     "verb-failed": "the route child failed; detail is the entry's own code (for example head-key-used, bad-persona, start-refused) or the exit",

@@ -24,21 +24,25 @@ use fgos_process::facts::judge_here;
 use fgos_process::spawn::{run_bounded_command, Outcome as BoundedOutcome};
 use serde_json::{json, Value};
 
-use fgos_durable_file::{
-    open_beneath, open_dir_beneath, replace_durably_with_mode, BeneathError, BeneathRefusal,
-};
+use fgos_durable_file::{open_dir_beneath, BeneathError, BeneathRefusal, Dir};
 
 use crate::attempt_step::exec_payload;
-use crate::go_channel::{peer_pid, peer_uid, read_frame_within, write_frame, FrameError};
+use crate::go_channel::{peer_pid, peer_uid, write_frame, MAX_FRAME_BYTES};
 use crate::route::{refuse, Flags};
 
 /// The Node payload entry the route child runs.
 pub(crate) const ENTRY: &str = "src/session-host/head-request.mjs";
 /// How long one request may run before its child is killed (the head's own launch waits up to 45 s).
 pub const VERB_TIMEOUT: Duration = Duration::from_millis(60_000);
-/// Largest request frame: a `head write` carries the whole new content of a granted file in one. Replies stay within
-/// the GO channel's limit.
+/// Largest request frame: a `head write` carries the whole new content of a granted file in one. Only a `head write`
+/// may exceed the GO channel's limit ([`MAX_FRAME_BYTES`]), and only one such large request is read or run at a time;
+/// replies stay within the GO limit.
 pub const MAX_REQUEST_BYTES: usize = 4 * 1024 * 1024;
+/// Most JSON values (objects, arrays, strings, numbers, ...) one request frame may hold, counted while it is parsed:
+/// a frame of many tiny elements is refused before it is built. A `head rotate` with its full stop facts holds about 60.
+pub const MAX_REQUEST_VALUES: usize = 256;
+/// Deepest nesting of one request frame (frame, args, stop facts, portfolio, path is 5).
+const MAX_REQUEST_DEPTH: usize = 8;
 /// How long a connection has to deliver its one frame.
 const READ_DEADLINE: Duration = Duration::from_secs(5);
 /// Connections handled at once, the one running request included; a further one is dropped unanswered.
@@ -102,6 +106,7 @@ fn invalid(why: impl Into<String>) -> EnvelopeError {
 type HoldsRole = Box<dyn Fn() -> Result<bool, HoldError> + Send + Sync>;
 type TakesRole = Box<dyn Fn(bool) -> Result<(), HoldError> + Send + Sync>;
 type BindsSession = Box<dyn Fn(&Value, Option<u32>) -> Result<Value, HoldError> + Send + Sync>;
+type ChecksPeer = Box<dyn Fn(Option<u32>) -> Result<(), HoldError> + Send + Sync>;
 type LogLine = Box<dyn Fn(&str) + Send + Sync>;
 
 /// What serving the socket needs, all of it from the envelope except the two ports.
@@ -129,6 +134,10 @@ pub struct Config {
     /// [`BIND_VERB`]: binds the agent session the request's args name (`{source, value}`, a writer key) for the
     /// connecting process (its pid as the kernel names it, `None` when unknown); the reply's data on success.
     pub bind_session: BindsSession,
+    /// [`WRITE_VERB`]: does the connecting process (its pid as the kernel names it, `None` when unknown) run under the
+    /// attempt's gate, so the request comes from the agent the supervisor launched and not from another process of the
+    /// same user. An error is refused `caller-not-under-gate` with its code as the detail.
+    pub caller_under_gate: ChecksPeer,
     /// One line per request, for `supervisor.log`.
     pub log: LogLine,
 }
@@ -138,6 +147,8 @@ pub struct Config {
 pub struct HeadRequests {
     cfg: Arc<Config>,
     busy: Arc<AtomicBool>,
+    /// A request over the GO frame limit is being read or run.
+    large: Arc<AtomicBool>,
     connections: Arc<AtomicUsize>,
     gate: Arc<Mutex<Option<HeadRef>>>,
 }
@@ -151,6 +162,7 @@ impl HeadRequests {
         HeadRequests {
             cfg: Arc::new(cfg),
             busy: Arc::new(AtomicBool::new(false)),
+            large: Arc::new(AtomicBool::new(false)),
             connections: Arc::new(AtomicUsize::new(0)),
             gate,
         }
@@ -264,6 +276,14 @@ impl HeadRequests {
                     identity_bind(&state_root, &cwd, &writer_id, &head, args, peer)
                 }
             }),
+            caller_under_gate: Box::new({
+                let gate = gate.clone();
+                move |peer| {
+                    let head = known(&gate).ok_or_else(gate_unknown)?;
+                    let peer = peer.ok_or_else(peer_unknown)?;
+                    fgos_identity::directory::caller_under_head(&head, peer).map_err(hold_error)
+                }
+            }),
             take_role: Box::new({
                 let gate = gate.clone();
                 move |take| {
@@ -286,13 +306,14 @@ impl HeadRequests {
                 self.connections.fetch_sub(1, Ordering::SeqCst);
                 continue;
             }
-            let (cfg, busy, connections) = (
+            let (cfg, busy, large, connections) = (
                 self.cfg.clone(),
                 self.busy.clone(),
+                self.large.clone(),
                 self.connections.clone(),
             );
             std::thread::spawn(move || {
-                serve(&cfg, &busy, stream);
+                serve(&cfg, &busy, &large, stream);
                 connections.fetch_sub(1, Ordering::SeqCst);
             });
         }
@@ -308,6 +329,13 @@ fn gate_unknown() -> HoldError {
     HoldError {
         code: "gate-unknown".into(),
         detail: "the attempt's gate is not known yet".into(),
+    }
+}
+
+fn peer_unknown() -> HoldError {
+    HoldError {
+        code: "peer-unknown".into(),
+        detail: "the kernel did not name the connecting process".into(),
     }
 }
 
@@ -416,10 +444,7 @@ pub fn identity_bind(
             detail: "args must be exactly {source, value}, both strings".into(),
         });
     };
-    let peer = peer.ok_or_else(|| HoldError {
-        code: "peer-unknown".into(),
-        detail: "the kernel did not name the connecting process".into(),
-    })?;
+    let peer = peer.ok_or_else(peer_unknown)?;
     let agent = WriterKey { source, value };
     fgos_identity::directory::bind_agent_session(
         state_root,
@@ -463,10 +488,10 @@ fn plain_relative(path: &str) -> bool {
 /// [`WRITE_VERB`]: replace the granted file `args.path` beneath `root` with `args.content` (args exactly
 /// `{path, content}`, both strings). The path must be plain and relative (`path-invalid`), named exactly by an entry
 /// of `writes` (`path-not-granted`), and an existing regular file reached from `root` without a symlink at it or any
-/// directory on the way (`path-symlink`, `not-a-file`). The parent is resolved again right before the replace and must
-/// be the directory the check opened (`path-changed`). The content is installed by the durable-file door (temp file,
-/// fsync, rename over the name, parent fsync) with the old file's mode; a failure there is `write-failed`. Returns
-/// `{path, bytes}`.
+/// directory on the way (`path-symlink`, `not-a-file`). Its directory is opened once and the content is installed
+/// through that descriptor by the durable-file door (`Dir::replace`: temp file, the old file's exact mode, fsync,
+/// rename over the name, directory fsync), so nothing is resolved by path after the check; a failure there is
+/// `write-failed`. Returns `{path, bytes}`.
 pub fn write_granted(root: &Path, writes: &[String], args: &Value) -> Result<Value, WriteRefusal> {
     let text = |name: &str| {
         args[name]
@@ -491,31 +516,23 @@ pub fn write_granted(root: &Path, writes: &[String], args: &Value) -> Result<Val
         BeneathError::Refused(_) => write_refused("not-a-file", None),
         BeneathError::Io(error) => write_refused("write-failed", error.to_string()),
     };
+    let missing = || write_refused("not-a-file", "the granted file does not exist".to_string());
     let relative = Path::new(rel);
-    let opened = open_beneath(root, relative)
-        .map_err(beneath)?
-        .ok_or_else(|| {
-            write_refused("not-a-file", "the granted file does not exist".to_string())
-        })?;
-    let (held, mode) = (opened.parent_identity(), opened.mode().map_err(beneath)?);
-    drop(opened);
     let parent = relative.parent().unwrap_or(Path::new(""));
-    // A file directly in the root: its parent is the root the caller trusts, there is nothing on the way to re-check.
-    if !parent.as_os_str().is_empty() {
-        let now = open_dir_beneath(root, parent)
-            .map_err(beneath)?
-            .map(|dir| dir.identity())
-            .transpose()
-            .map_err(beneath)?;
-        if now != Some(held) {
-            return Err(write_refused("path-changed", None));
-        }
-    }
     let name = relative
         .file_name()
-        .and_then(|n| n.to_str())
         .ok_or_else(|| write_refused("path-invalid", None))?;
-    replace_durably_with_mode(&root.join(parent), name, content.as_bytes(), mode)
+    // The directory is opened once, no-follow at every component, and every later step works on that descriptor: a
+    // directory swapped on the way after this point is never followed.
+    let dir = if parent.as_os_str().is_empty() {
+        Dir::open(root)
+    } else {
+        open_dir_beneath(root, parent)
+    }
+    .map_err(beneath)?
+    .ok_or_else(missing)?;
+    let mode = dir.file_mode(name).map_err(beneath)?.ok_or_else(missing)?;
+    dir.replace(name, content.as_bytes(), mode)
         .map_err(|e| write_refused("write-failed", format!("{} at {}", e.source, e.step)))?;
     Ok(json!({"path": rel, "bytes": content.len()}))
 }
@@ -584,7 +601,7 @@ impl Drop for Busy<'_> {
     }
 }
 
-fn serve(cfg: &Config, busy: &AtomicBool, mut stream: UnixStream) {
+fn serve(cfg: &Config, busy: &AtomicBool, large: &AtomicBool, mut stream: UnixStream) {
     let _ = stream.set_nonblocking(false);
     let _ = stream.set_write_timeout(Some(READ_DEADLINE));
     // SAFETY: getuid has no failure mode.
@@ -597,12 +614,14 @@ fn serve(cfg: &Config, busy: &AtomicBool, mut stream: UnixStream) {
             stream: &stream,
             until: Instant::now() + READ_DEADLINE,
         };
-        match read_request(&mut reader) {
-            Ok(request) => {
+        match read_request(&mut reader, large) {
+            // The large slot, when this request holds it, is kept until the verb is done.
+            Ok((request, _large)) => {
                 let outcome = decide(cfg, busy, &request, peer_pid);
                 (Some(request.id), Some(request.verb), outcome)
             }
-            Err(id) => (id, None, refused("bad-frame")),
+            Err(Unread::Busy) => (None, None, refused("busy")),
+            Err(Unread::Bad(id)) => (id, None, refused("bad-frame")),
         }
     };
     let reply = match &outcome {
@@ -635,28 +654,147 @@ struct Request {
     args: Value,
 }
 
-/// One REQUEST frame; the error is the request's id when the frame carried a valid one.
-fn read_request(reader: &mut impl Read) -> Result<Request, Option<String>> {
-    let frame = match read_frame_within(reader, MAX_REQUEST_BYTES) {
-        Ok(frame) => frame,
-        Err(FrameError::Closed | FrameError::Protocol) => return Err(None),
+/// Why no request was read: another large request holds the slot (`busy`, answered before the body is read), or the
+/// frame broke the contract (`bad-frame`, with the request's id when it carried a valid one).
+enum Unread {
+    Busy,
+    Bad(Option<String>),
+}
+
+/// One REQUEST frame and, for a frame over [`MAX_FRAME_BYTES`], the large slot it holds. The length is checked before
+/// the body is read; the body is parsed with at most [`MAX_REQUEST_VALUES`] values and [`MAX_REQUEST_DEPTH`] levels;
+/// a large frame must be a [`WRITE_VERB`].
+fn read_request<'a>(
+    reader: &mut impl Read,
+    large: &'a AtomicBool,
+) -> Result<(Request, Option<Busy<'a>>), Unread> {
+    let mut head = [0u8; 4];
+    reader
+        .read_exact(&mut head)
+        .map_err(|_| Unread::Bad(None))?;
+    let len = u32::from_be_bytes(head) as usize;
+    if len > MAX_REQUEST_BYTES {
+        return Err(Unread::Bad(None));
+    }
+    let slot = if len > MAX_FRAME_BYTES {
+        large
+            .compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
+            .map_err(|_| Unread::Busy)?;
+        Some(Busy(large))
+    } else {
+        None
     };
-    let id = frame["id"]
-        .as_str()
+    let mut body = vec![0u8; len];
+    reader
+        .read_exact(&mut body)
+        .map_err(|_| Unread::Bad(None))?;
+    let left = std::cell::Cell::new(MAX_REQUEST_VALUES);
+    let mut de = serde_json::Deserializer::from_slice(&body);
+    let frame = serde::de::DeserializeSeed::deserialize(
+        Bounded {
+            left: &left,
+            depth: 0,
+        },
+        &mut de,
+    )
+    .and_then(|frame| de.end().map(|()| frame))
+    .map_err(|_| Unread::Bad(None))?;
+    drop(body);
+    let Value::Object(mut frame) = frame else {
+        return Err(Unread::Bad(None));
+    };
+    let id = frame
+        .get("id")
+        .and_then(Value::as_str)
         .filter(|id| valid_id(id))
         .map(String::from);
-    match (
-        frame["type"].as_str(),
-        &id,
-        frame["verb"].as_str(),
-        frame["args"].is_object(),
-    ) {
-        (Some("REQUEST"), Some(id), Some(verb), true) => Ok(Request {
-            id: id.clone(),
-            verb: verb.to_string(),
-            args: frame["args"].clone(),
-        }),
-        _ => Err(id),
+    let verb = frame.get("verb").and_then(Value::as_str).map(String::from);
+    let typed = frame.get("type").and_then(Value::as_str) == Some("REQUEST");
+    match (typed, id, verb, frame.remove("args")) {
+        (true, Some(id), Some(verb), Some(args @ Value::Object(_)))
+            if slot.is_none() || verb == WRITE_VERB =>
+        {
+            Ok((Request { id, verb, args }, slot))
+        }
+        (_, id, _, _) => Err(Unread::Bad(id)),
+    }
+}
+
+/// Parses one JSON value while counting every value it builds against `left` and refusing nesting deeper than
+/// [`MAX_REQUEST_DEPTH`], so a frame of many tiny elements fails while it is read instead of after it was built.
+struct Bounded<'a> {
+    left: &'a std::cell::Cell<usize>,
+    depth: usize,
+}
+
+impl Bounded<'_> {
+    fn take<E: serde::de::Error>(&self) -> Result<(), E> {
+        if self.depth >= MAX_REQUEST_DEPTH || self.left.get() == 0 {
+            return Err(E::custom(
+                "the request holds too many or too deeply nested values",
+            ));
+        }
+        self.left.set(self.left.get() - 1);
+        Ok(())
+    }
+
+    fn child(&self) -> Self {
+        Bounded {
+            left: self.left,
+            depth: self.depth + 1,
+        }
+    }
+}
+
+impl<'de> serde::de::DeserializeSeed<'de> for Bounded<'_> {
+    type Value = Value;
+    fn deserialize<D: serde::Deserializer<'de>>(self, de: D) -> Result<Value, D::Error> {
+        de.deserialize_any(self)
+    }
+}
+
+impl<'de> serde::de::Visitor<'de> for Bounded<'_> {
+    type Value = Value;
+    fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        f.write_str("a JSON value")
+    }
+    fn visit_bool<E: serde::de::Error>(self, v: bool) -> Result<Value, E> {
+        self.take().map(|()| Value::Bool(v))
+    }
+    fn visit_i64<E: serde::de::Error>(self, v: i64) -> Result<Value, E> {
+        self.take().map(|()| json!(v))
+    }
+    fn visit_u64<E: serde::de::Error>(self, v: u64) -> Result<Value, E> {
+        self.take().map(|()| json!(v))
+    }
+    fn visit_f64<E: serde::de::Error>(self, v: f64) -> Result<Value, E> {
+        self.take().map(|()| json!(v))
+    }
+    fn visit_str<E: serde::de::Error>(self, v: &str) -> Result<Value, E> {
+        self.take().map(|()| Value::String(v.to_string()))
+    }
+    fn visit_string<E: serde::de::Error>(self, v: String) -> Result<Value, E> {
+        self.take().map(|()| Value::String(v))
+    }
+    fn visit_unit<E: serde::de::Error>(self) -> Result<Value, E> {
+        self.take().map(|()| Value::Null)
+    }
+    fn visit_seq<A: serde::de::SeqAccess<'de>>(self, mut seq: A) -> Result<Value, A::Error> {
+        self.take()?;
+        let mut items = Vec::new();
+        while let Some(item) = seq.next_element_seed(self.child())? {
+            items.push(item);
+        }
+        Ok(Value::Array(items))
+    }
+    fn visit_map<A: serde::de::MapAccess<'de>>(self, mut map: A) -> Result<Value, A::Error> {
+        self.take()?;
+        let mut object = serde_json::Map::new();
+        while let Some(key) = map.next_key::<String>()? {
+            let value = map.next_value_seed(self.child())?;
+            object.insert(key, value);
+        }
+        Ok(Value::Object(object))
     }
 }
 
@@ -685,6 +823,18 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>)
     }
     if !cfg.verbs.contains(&request.verb) {
         return refused("verb-not-granted");
+    }
+    if request.verb == WRITE_VERB {
+        if let Err(why) = (cfg.caller_under_gate)(peer) {
+            (cfg.log)(&format!(
+                "head-request {} peer {}: {}",
+                request.id, why.code, why.detail
+            ));
+            return Outcome::Refused {
+                code: "caller-not-under-gate",
+                detail: Some(why.code),
+            };
+        }
     }
     if busy
         .compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)

@@ -22,7 +22,7 @@ use fgos_process::{facts, ProcId};
 use fgos_run_supervisor::go_channel::{read_frame, write_frame, MAX_FRAME_BYTES};
 use fgos_run_supervisor::head_request::{
     identity_bind, identity_holds, identity_registered, identity_take, Config, HeadRequests,
-    HoldError, BIND_VERB, MAX_REQUEST_BYTES, WRITE_VERB,
+    HoldError, BIND_VERB, MAX_REQUEST_BYTES, MAX_REQUEST_VALUES, WRITE_VERB,
 };
 use serde_json::{json, Value};
 
@@ -64,11 +64,20 @@ fn serve(
     )
 }
 
-/// What the answered verb asks Identity: is the attempt registered, and the move of the role (counted).
+/// What the answered verb asks Identity: is the attempt registered, and the move of the role (counted); and the gate
+/// a head write's caller must run under, checked for real (by default this test process, the one that connects).
 struct Identity {
     registered: Result<bool, String>,
     take: Result<(), String>,
     took: Arc<Mutex<u32>>,
+    gate: HeadRef,
+}
+
+fn head_of(pid: u32) -> HeadRef {
+    HeadRef {
+        pid,
+        start_time: facts::identity_of(ProcId(pid)).unwrap().start_time,
+    }
 }
 
 impl Default for Identity {
@@ -77,6 +86,7 @@ impl Default for Identity {
             registered: Ok(true),
             take: Ok(()),
             took: Arc::new(Mutex::new(0)),
+            gate: head_of(std::process::id()),
         }
     }
 }
@@ -148,6 +158,17 @@ fn serve_with(
                 code: "not-in-this-test".into(),
                 detail: String::new(),
             })
+        }),
+        caller_under_gate: Box::new({
+            let gate = identity.gate.clone();
+            move |peer| {
+                fgos_identity::directory::caller_under_head(&gate, peer.unwrap()).map_err(|r| {
+                    HoldError {
+                        code: r.reason.to_string(),
+                        detail: r.detail,
+                    }
+                })
+            }
         }),
         log: Box::new(move |line| sink.lock().unwrap().push(line.to_string())),
     });
@@ -391,8 +412,8 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "bad-args",
             "bad-frame",
             "busy",
+            "caller-not-under-gate",
             "not-a-file",
-            "path-changed",
             "path-invalid",
             "path-not-granted",
             "path-symlink",
@@ -431,6 +452,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
     );
     assert_eq!(contract["framing"]["maxRequestBytes"], MAX_REQUEST_BYTES);
     assert_eq!(contract["framing"]["maxReplyBytes"], MAX_FRAME_BYTES);
+    assert_eq!(contract["framing"]["maxRequestValues"], MAX_REQUEST_VALUES);
     assert_eq!(
         contract["run"]["verbTimeoutMs"],
         fgos_run_supervisor::head_request::VERB_TIMEOUT.as_millis() as u64
@@ -841,6 +863,7 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_a
         bind_session: Box::new(move |args, peer| {
             identity_bind(&r4, &r4, "att-bind", &g4, args, peer)
         }),
+        caller_under_gate: Box::new(|_| unreachable!("no head write in this test")),
         log: Box::new(|_| {}),
     });
     let stop = Arc::new(AtomicBool::new(false));
@@ -1037,4 +1060,98 @@ fn head_write_needs_the_role_and_the_verb_in_the_grant_before_any_file_is_touche
             "old\n"
         );
     }
+}
+
+#[test]
+fn head_write_from_a_process_outside_the_gate_tree_is_refused_and_writes_nothing() {
+    let mut outside = std::process::Command::new("sleep")
+        .arg("30")
+        .spawn()
+        .unwrap();
+    let identity = Identity {
+        gate: head_of(outside.id()),
+        ..Identity::default()
+    };
+    let served = serve_with(
+        "write-outside",
+        DONE_LINE,
+        Ok(true),
+        identity,
+        &[WRITE_VERB],
+        Duration::from_secs(5),
+    );
+    write_project(&served.dir);
+    // The test process holds the role (stubbed) but is not the gate nor one of its descendants.
+    let reply = write_request(
+        &served.socket,
+        json!({"path": "docs/backlog.md", "content": "x"}),
+    );
+    let _ = outside.kill();
+    let _ = outside.wait();
+    assert_eq!(reply["code"], "caller-not-under-gate", "{reply}");
+    assert_eq!(reply["detail"], "caller-not-under-head");
+    assert_eq!(
+        fs::read_to_string(served.dir.join("docs/backlog.md")).unwrap(),
+        "old\n"
+    );
+}
+
+#[test]
+fn a_frame_of_too_many_or_too_deep_values_or_a_large_frame_that_is_not_head_write_is_bad_frame() {
+    let served = granted("bounded", DONE_LINE);
+    let many = json!({"type": "REQUEST", "id": "r1", "verb": "head start",
+        "args": {"persona": "planner", "name": "x", "pad": vec![0; MAX_REQUEST_VALUES]}});
+    assert!(serde_json::to_vec(&many).unwrap().len() < MAX_FRAME_BYTES);
+    assert_eq!(request(&served.socket, &many)["code"], "bad-frame");
+    let mut deep = json!("leaf");
+    for _ in 0..8 {
+        deep = json!([deep]);
+    }
+    let deep =
+        json!({"type": "REQUEST", "id": "r1", "verb": "head start", "args": {"persona": deep}});
+    assert_eq!(request(&served.socket, &deep)["code"], "bad-frame");
+    // Just under the limits is read.
+    let fits = json!({"type": "REQUEST", "id": "r1", "verb": "head start",
+        "args": {"persona": "planner", "name": "x", "pad": vec![0; MAX_REQUEST_VALUES - 10]}});
+    assert_eq!(request(&served.socket, &fits)["result"], "done");
+    // Only a head write may be larger than a GO frame.
+    let big = json!({"type": "REQUEST", "id": "r1", "verb": "head start",
+        "args": {"persona": "p".repeat(MAX_FRAME_BYTES), "name": "x"}});
+    let body = serde_json::to_vec(&big).unwrap();
+    let mut stream = UnixStream::connect(&served.socket).unwrap();
+    stream
+        .set_read_timeout(Some(Duration::from_secs(15)))
+        .unwrap();
+    stream
+        .write_all(&(body.len() as u32).to_be_bytes())
+        .unwrap();
+    stream.write_all(&body).unwrap();
+    assert_eq!(read_frame(&mut stream).unwrap()["code"], "bad-frame");
+}
+
+#[test]
+fn a_second_large_request_is_busy_before_its_body_is_read() {
+    let served = granted("large-busy", DONE_LINE);
+    // The first large request announces its length and stalls with its body unread.
+    let mut first = UnixStream::connect(&served.socket).unwrap();
+    first
+        .write_all(&((MAX_FRAME_BYTES * 2) as u32).to_be_bytes())
+        .unwrap();
+    first.write_all(b"{").unwrap();
+    std::thread::sleep(Duration::from_millis(300));
+    let mut second = UnixStream::connect(&served.socket).unwrap();
+    second
+        .set_read_timeout(Some(Duration::from_secs(3)))
+        .unwrap();
+    second
+        .write_all(&((MAX_FRAME_BYTES * 2) as u32).to_be_bytes())
+        .unwrap();
+    let reply = read_frame(&mut second).expect("an answer before any body byte was sent");
+    assert_eq!(
+        (reply["result"].as_str(), reply["code"].as_str()),
+        (Some("refused"), Some("busy"))
+    );
+    // A small request is not held by the large slot.
+    assert_eq!(ask(&served.socket, "head start")["result"], "done");
+    drop(first);
 }
