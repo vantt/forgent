@@ -2,12 +2,17 @@
 
 pub mod case;
 pub mod coverage;
+// The definition module sits beside `metrics_cli` on disk; `lib.rs` is outside this change's footprint.
+#[path = "../definition/mod.rs"]
+pub mod definition;
 pub mod discussions;
 pub mod entropy;
 pub mod eval;
 pub mod faults;
 pub mod harness;
 pub mod outcomes;
+pub mod query;
+pub mod record;
 pub mod runs;
 pub mod snapshot;
 
@@ -15,7 +20,58 @@ use crate::contract::{
     ObservationSource, ObserveRequest, UnitSummaryScanner, WorkObservationSource,
 };
 use crate::flags::Flags;
+use crate::record::registry::EmbeddedDeclaration;
+use crate::RecordSource;
 use serde_json::json;
+use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
+
+/// What the composition root adds to the record and query verbs: the declarations its crates embed, the payload
+/// tree to discover declarations in, extra record sources, and the config door. Observe depends on none of them.
+pub trait RecordEnvironment: Send + Sync {
+    fn embedded_declarations(&self) -> Vec<EmbeddedDeclaration>;
+    fn payload_root(&self) -> Option<PathBuf>;
+    /// Sources besides the record store.
+    fn record_sources(&self) -> Vec<Box<dyn RecordSource>>;
+    /// The numeric config value at `key` for the project at `root`; `Ok(None)` when no layer sets it.
+    fn config_number(&self, root: &Path, key: &str) -> Result<Option<f64>, String>;
+}
+
+/// Used until the composition root installs its own: Observe's own declarations, the project's declaration files,
+/// the record store, and no config door.
+struct StandaloneEnvironment;
+
+impl RecordEnvironment for StandaloneEnvironment {
+    fn embedded_declarations(&self) -> Vec<EmbeddedDeclaration> {
+        vec![
+            crate::record::store::HEALTH_DECLARATION,
+            crate::sources::transcript_records::TRANSCRIPT_DECLARATION,
+        ]
+    }
+    fn payload_root(&self) -> Option<PathBuf> {
+        None
+    }
+    fn record_sources(&self) -> Vec<Box<dyn RecordSource>> {
+        vec![Box::new(
+            crate::sources::claude_transcripts::ClaudeTranscriptsSource::new(),
+        )]
+    }
+    fn config_number(&self, _: &Path, key: &str) -> Result<Option<f64>, String> {
+        Err(format!("no config door is wired for {key}"))
+    }
+}
+
+static ENVIRONMENT: OnceLock<Box<dyn RecordEnvironment>> = OnceLock::new();
+
+/// Installs the composition root's environment once; `false` when one was already installed.
+pub fn install_environment(environment: Box<dyn RecordEnvironment>) -> bool {
+    ENVIRONMENT.set(environment).is_ok()
+}
+
+pub(crate) fn environment() -> &'static dyn RecordEnvironment {
+    static STANDALONE: StandaloneEnvironment = StandaloneEnvironment;
+    ENVIRONMENT.get().map_or(&STANDALONE, |e| e.as_ref())
+}
 
 pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
     "ping",
@@ -29,6 +85,8 @@ pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
     "outcomes",
     "entropy",
     "snapshot",
+    "record",
+    "query",
 ];
 
 /// Parses a verb's arguments with the one Observe grammar; the verb passes its
@@ -48,7 +106,7 @@ pub(crate) fn parse_flags(
 pub fn writes(req: &ObserveRequest) -> bool {
     let action = req.args.first().map(String::as_str);
     match req.sub.as_str() {
-        "snapshot" => true,
+        "snapshot" | "record" => true,
         "case" => matches!(action, Some("open" | "close")),
         "eval" => action == Some("record"),
         _ => false,
@@ -86,6 +144,8 @@ pub fn dispatch(
         "outcomes" => outcomes::dispatch_outcomes(req, work_source),
         "entropy" => entropy::dispatch_entropy(req, work_source),
         "snapshot" => snapshot::dispatch_snapshot(req, work_source),
+        "record" => record::dispatch_record(req),
+        "query" => query::dispatch_query(req),
         "--help" | "-h" | "help" => Ok(json!({
             "ok": true,
             "command": "metrics",

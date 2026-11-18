@@ -958,6 +958,36 @@
         "json",
         "help"
       ],
+      "query": [
+        "dir",
+        "json",
+        "help",
+        "kind",
+        "where",
+        "where-latest",
+        "ref",
+        "since",
+        "until",
+        "window-on",
+        "by",
+        "bucket",
+        "latest-per",
+        "agg",
+        "having",
+        "join",
+        "without",
+        "min-sample",
+        "param",
+        "query",
+        "def",
+        "now"
+      ],
+      "record": [
+        "dir",
+        "json",
+        "help",
+        "file"
+      ],
       "runs": [
         "dir",
         "json",

@@ -138,7 +138,9 @@
               "eval",
               "outcomes",
               "entropy",
-              "snapshot"
+              "snapshot",
+              "record",
+              "query"
             ]
           }
         },
@@ -423,6 +425,124 @@
           },
           "examples": [
             "fgos metrics snapshot"
+          ]
+        },
+        "record": {
+          "description": "Write records through the fail-open record door. \"--json <file|->\" holds one record object or an array; v, ts, basis and origin may be left out. A record the registry refuses is counted and reported, never an error.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string",
+                "description": "Positional (given as --json <file>): the JSON file, or \"-\" for stdin."
+              }
+            },
+            "positional": [
+              "file"
+            ],
+            "required": []
+          },
+          "examples": [
+            "fgos metrics record --json record.json",
+            "echo '{\"kind\":\"fgos.example\",\"subject\":{\"kind\":\"run\",\"id\":\"r1\"}}' | fgos metrics record --json -"
+          ]
+        },
+        "query": {
+          "description": "Query records with one grammar: --kind, --where, --ref, --since/--until, --by, --bucket, --latest-per, --agg, --having, --join, --without, --min-sample. Or run named definitions (*.query.json) with --def <file|dir>, repeatable; one call returns every definition's rows. A kind nobody declares or serves answers \"unmeasured\" with the reason.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "description": "Record kinds to read, comma-separated."
+              },
+              "where": {
+                "type": "string",
+                "description": "Filter before latest-per: field=value, field!=value, field=a|b (in), field<n, field>n, field? (exists) or a JSON condition. Repeatable."
+              },
+              "where-latest": {
+                "type": "string",
+                "description": "Filter after latest-per; same forms as --where. Repeatable."
+              },
+              "ref": {
+                "type": "string",
+                "description": "<kind>:<id>: records that carry this subject or ref. Comma-separated or repeated."
+              },
+              "since": {
+                "type": "string",
+                "description": "Lower bound: RFC 3339, a date, or a relative offset such as -1h."
+              },
+              "until": {
+                "type": "string",
+                "description": "Upper bound; same forms as --since."
+              },
+              "window-on": {
+                "type": "string",
+                "description": "ts (start instant, default) or end (endTs).",
+                "enum": [
+                  "ts",
+                  "end"
+                ]
+              },
+              "by": {
+                "type": "string",
+                "description": "Attrs or record fields to group by, or ref:<kind>. Comma-separated."
+              },
+              "bucket": {
+                "type": "string",
+                "description": "Time bucket in UTC.",
+                "enum": [
+                  "hour",
+                  "day",
+                  "week"
+                ]
+              },
+              "latest-per": {
+                "type": "string",
+                "description": "Keep the newest record per subject, or per ref:<kind>."
+              },
+              "agg": {
+                "type": "string",
+                "description": "count, span, max:ts, age:ts or sum|avg|min|max|p50|p90:<measure>. Comma-separated."
+              },
+              "having": {
+                "type": "string",
+                "description": "Group filter as JSON {lhs, op, rhs}. Repeatable."
+              },
+              "join": {
+                "type": "string",
+                "description": "Join as JSON {kind, on, as?, within_span?}. Repeatable."
+              },
+              "without": {
+                "type": "string",
+                "description": "Anti-join as JSON {kind, where?, on?, within, anchor?}. Repeatable."
+              },
+              "min-sample": {
+                "type": "string",
+                "description": "A group with fewer records is reported insufficient."
+              },
+              "param": {
+                "type": "string",
+                "description": "name=value for a having parameter. Repeatable."
+              },
+              "query": {
+                "type": "string",
+                "description": "A whole query as JSON from this file, or \"-\" for stdin; flags add to it."
+              },
+              "def": {
+                "type": "string",
+                "description": "A definition file, or a directory of *.query.json files. Repeatable; takes no other query flag but --now."
+              },
+              "now": {
+                "type": "string",
+                "description": "RFC 3339 instant used as the clock."
+              }
+            },
+            "required": []
+          },
+          "examples": [
+            "fgos metrics query --kind fgos.run.attempt --ref plan:plans/x --by gen_ai.provider.name --agg count,sum:fgos.duration",
+            "fgos metrics query --def core/attention/definitions"
           ]
         }
       },
