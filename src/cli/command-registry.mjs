@@ -336,7 +336,7 @@ export const COMMAND_REGISTRY = [
           properties: {
             subject: { type: 'string', description: 'kind:id, kind one of run, session, executor, case, work (e.g. work:tsk-abc).' },
             kind: { type: 'string', description: 'What kind of friction: bug, instability, missing, awkward or doc.' },
-            ref: { type: 'string', description: '<kind>:<id> of something else it points at; kind one of run, session, plan, backlog, executor, case, work. Repeatable.' },
+            ref: { type: 'string', description: '<kind>:<id> of something else it points at; kind one of run, session, plan, phase, backlog, executor, case, work. Repeatable.' },
             layer: { type: 'string', description: 'The component layer it hit: skill, tool, runner, workflow, git, provider, config, docs, state, verification or environment; older records also carry spec, context, task, task-spec, executor or attestation.' },
             'error-class': { type: 'string', description: 'The signature: a short slug that names the problem, reused for the same problem. A slug close to an existing one is recorded with a warning that names it.' },
             disposition: { type: 'string', description: 'advisory, blocked, parked or halted.' },

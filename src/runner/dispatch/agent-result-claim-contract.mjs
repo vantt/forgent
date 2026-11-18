@@ -8,6 +8,10 @@ export const AGENT_RESULT_CLAIM_CONTRACT = Object.freeze({ id: 'agent-result-cla
 export const ALLOWED_AGENT_CLAIM_STATUSES = Object.freeze(['done', 'blocked', 'failed', 'no-evidence']);
 export const ASSESSMENT_VERDICTS = Object.freeze(['pass', 'findings', 'blocked', 'inconclusive', 'not-applicable']);
 
+// Bounds on the worker's friction list: the entries recorded per claim, and the length of kind, layer and errorClass.
+export const CLAIM_FRICTIONS_MAX = 5;
+export const CLAIM_FRICTION_FIELD_MAX = 80;
+
 export const CLAIM_FIELD_RULES = Object.freeze([
   Object.freeze({ path: 'status', description: `exactly one of: ${ALLOWED_AGENT_CLAIM_STATUSES.join(' | ')}`, required: true }),
   Object.freeze({ path: 'summary', description: 'a required non-empty string', required: true }),
@@ -17,9 +21,9 @@ export const CLAIM_FIELD_RULES = Object.freeze([
   // A request, not a write: files outside the declared write scope the worker needed and left alone.
   // Never checked, so a claim that carries it is exactly as valid as one that does not.
   Object.freeze({ path: 'needsWrites', description: 'an array of repo-relative paths if provided: files outside your write scope you needed to write and did not' }),
-  // A side channel: obstacles the worker met. Settlement records each one after the outcome is settled; a malformed
-  // entry is skipped there and never makes the claim invalid.
-  Object.freeze({ path: 'frictions', description: 'an array if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {"kind": bug|instability|missing|awkward|doc, "layer": <the layer it sits in>, "errorClass": <a signature from `fgos friction classes`, reused when one fits>, "detail": <one or two sentences>}; recording never changes your result' }),
+  // A side channel: obstacles the worker met. They are recorded after the outcome is settled; a malformed entry, or
+  // one past the limit, is skipped there and never makes the claim invalid.
+  Object.freeze({ path: 'frictions', description: `an array of at most ${CLAIM_FRICTIONS_MAX} entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {"kind": bug|instability|missing|awkward|doc, "layer": <the layer it sits in>, "errorClass": <a lowercase-hyphenated signature from \`fgos friction classes\`, reused when one fits>, "detail": <one or two sentences>}; kind, layer and errorClass are single lines of at most ${CLAIM_FRICTION_FIELD_MAX} characters that do not start with "-"; entries past the limit are dropped and recording never changes your result` }),
 ]);
 
 /** The report that goes with a claim: `result-<N>.json` pairs with `report-<N>.md` beside it (the agent protocol's names). */

@@ -291,7 +291,7 @@ Violating the letter of the rules is violating the spirit of the rules.
 
 ## Plan key and friction
 
-When the item being driven belongs to a plan, pass the plan key on every unit it starts: `fgos run ... --plan <plans/dir> --phase <phase-id>` and `fgos workflow start <preset> --plan <plans/dir> --phase <phase-id>`, so friction and run facts group by plan and phase. Friction met while driving is recorded per `../../../../core/skills/_shared/friction-capture.md`; recording never stops the loop.
+When the item being driven belongs to a plan, pass the plan key on every unit it starts: `fgos run ... --plan <plans/dir> --phase <phase-id>` and `fgos workflow start <preset> --plan <plans/dir> --phase <phase-id>`, so friction and run facts group by plan and phase. Friction met while driving is recorded per `../_shared/friction-capture.md`; recording never stops the loop.
 
 ## References
 

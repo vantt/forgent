@@ -3,7 +3,7 @@
   "$id": "observe.friction.v1",
   "title": "Observe Friction Shard Event Contract v1",
   "description": "Schema for the old append-only friction shards in .fgos/observe/friction/<writerId>.jsonl. New friction is not written here: it is written as v2 records of kind fgos.friction.recorded and fgos.friction.resolved (envelope: observe.record.v2; names: packages/observe/rust/friction-kinds.json). Readers cover both until the shards are migrated.",
-  "$comment": "v2 attrs: fgos.friction.kind (bug|instability|missing|awkward|doc), fgos.friction.layer, fgos.friction.class (the signature), fgos.friction.disposition, fgos.friction.producer, fgos.friction.doc_type, fgos.friction.reason; measure fgos.friction.attempts. Refs: run, session, plan, backlog, executor, case, work. A resolve record with fgos.friction.class settles only that signature on its subject; reason is a published reason or filed:<backlog-id>, which also carries a backlog ref.",
+  "$comment": "v2 attrs: fgos.friction.kind (bug|instability|missing|awkward|doc), fgos.friction.layer, fgos.friction.class (the signature), fgos.friction.disposition, fgos.friction.producer, fgos.friction.doc_type, fgos.friction.reason; measure fgos.friction.attempts. Refs: run, session, plan, phase, backlog, executor, case, work. A resolve record with fgos.friction.class settles only that signature on its subject; reason is a published reason or filed:<backlog-id>, which also carries a backlog ref.",
   "oneOf": [
     {
       "title": "FrictionRecorded",

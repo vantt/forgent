@@ -13,6 +13,9 @@ import { collectModelWarnings } from '../../runner/dispatch/provider-adapter.mjs
 import { strayWriteWarning, watchWritesOutsideWorkspace } from '../stray-writes.mjs';
 import { createTerminalControl } from '../../terminal-control/client.mjs';
 import { readSideFile, StepError } from '../step-support.mjs';
+import { CLAIM_FRICTION_FIELD_MAX } from '../../runner/dispatch/agent-result-claim-contract.mjs';
+import { assignmentDir } from '../../runner/dispatch/assignment-layout.mjs';
+import { recordFriction } from '../../observe/friction-client.mjs';
 
 const CAPTURE_TAIL_BYTES = 64 * 1024 * 1024;
 
@@ -172,6 +175,75 @@ function rawResultOf(receipt, outboxClaimPresent, screenText = '') {
   }
 }
 
+// One budget for recording every friction of a claim: checked before each record, so a slow host delays the step by
+// at most this plus one host call.
+const CLAIM_FRICTIONS_DEADLINE_MS = 10_000;
+// A worker value that becomes a host flag value: one line, never read as a flag.
+const FRICTION_TEXT = /^[^\s-][^\n]*$/;
+const FRICTION_CLASS = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+const frictionText = (value, pattern = FRICTION_TEXT) => {
+  if (typeof value !== 'string') return undefined;
+  const text = value.trim();
+  return text.length <= CLAIM_FRICTION_FIELD_MAX && pattern.test(text) ? text : undefined;
+};
+
+// The plan and phase the Unit run serves, read from its stored record beside the attempt's own assignment
+// (`<fgos>/assignments/<assignmentId>/runs/<NN>`); null when there is none.
+function unitPlanOf(runDir, assignmentId, unitRunId) {
+  if (typeof assignmentId !== 'string' || assignmentId === '' || typeof unitRunId !== 'string' || unitRunId === '') return null;
+  const assignmentsDir = path.resolve(runDir, '..', '..', ...assignmentId.split('/').map(() => '..'));
+  if (path.basename(assignmentsDir) !== 'assignments') return null;
+  const dir = assignmentDir(path.dirname(assignmentsDir), unitRunId);
+  const plan = dir ? readJson(path.join(dir, 'unit.json'))?.unit?.plan : null;
+  if (typeof plan?.dir !== 'string' || plan.dir === '') return null;
+  return { dir: plan.dir, phase: typeof plan.phase === 'string' && plan.phase !== '' ? plan.phase : null };
+}
+
+/**
+ * Record the frictions a settled worker claim lists through the friction door, with refs to the run and to the Unit's
+ * plan and phase. It runs after the outcome is settled and never changes it: a record the host cannot store is logged
+ * as a fault and warned by the friction client, a refused or malformed entry is warned and skipped, entries past
+ * the deadline are dropped with a warning; settlement has already cut the list to the claim limit.
+ */
+function recordClaimFrictions({ agentClaim, root, runDir, assignmentId, runId, unitRunId, workId }) {
+  const entries = Array.isArray(agentClaim?.frictions) ? agentClaim.frictions : [];
+  if (entries.length === 0) return;
+  const warn = (message) => console.error(`fgos: warning: worker friction ${message}`);
+  // Settlement already kept the claim's first entries and counted the rest.
+  if (agentClaim.frictionsDropped > 0) warn(`list was cut at settlement: ${agentClaim.frictionsDropped} entries dropped`);
+  const subject = workId ? null : (unitRunId ? `run:${unitRunId}` : `run:${runId}`);
+  const plan = unitPlanOf(runDir, assignmentId, unitRunId);
+  const refs = [
+    { kind: 'run', id: runId },
+    ...(plan ? [{ kind: 'plan', id: plan.dir }, ...(plan.phase ? [{ kind: 'phase', id: plan.phase }] : [])] : []),
+  ];
+  const deadline = Date.now() + CLAIM_FRICTIONS_DEADLINE_MS;
+  for (const [index, entry] of entries.entries()) {
+    if (Date.now() > deadline) {
+      warn(`recording passed its ${CLAIM_FRICTIONS_DEADLINE_MS} ms deadline; ${entries.length - index} entries not recorded`);
+      return;
+    }
+    const valid = entry !== null && typeof entry === 'object' && !Array.isArray(entry);
+    const kind = valid ? frictionText(entry.kind) : undefined;
+    const layer = valid ? frictionText(entry.layer) : undefined;
+    const errorClass = valid ? frictionText(entry.errorClass, FRICTION_CLASS) : undefined;
+    if (!layer || !errorClass || (valid && entry.kind != null && !kind)) {
+      warn(`entry ${index + 1} skipped: layer and errorClass must be single lines of at most ${CLAIM_FRICTION_FIELD_MAX} characters, errorClass a lowercase-hyphenated signature`);
+      continue;
+    }
+    try {
+      recordFriction(root, {
+        ...(subject ? { subject } : { id: workId }), kind, layer, errorClass, disposition: 'advisory', producer: 'worker-claim', refs,
+        detail: typeof entry.detail === 'string' ? entry.detail : '',
+      });
+    } catch (err) {
+      // The host refused this entry's values; the rest still record.
+      warn(`entry ${index + 1} refused: ${err.message}`);
+    }
+  }
+}
+
 export async function settleAttempt({ runDir, envelope }) {
   const runMeta = readJson(path.join(runDir, 'run.json'));
   if (!runMeta?.runId) throw new StepError('io', 'run.json is missing or has no runId');
@@ -205,8 +277,9 @@ export async function settleAttempt({ runDir, envelope }) {
   const stderrText = readTail(capture.stderr);
   const providerStop = providerStopOf(receipt, claimPath !== null);
 
+  let settled;
   try {
-    const settled = await settleRunOutcome({
+    settled = await settleRunOutcome({
       runDir,
       runMeta,
       assignment,
@@ -247,7 +320,6 @@ export async function settleAttempt({ runDir, envelope }) {
         adapter: (envelope.host ?? envelope.mode) === 'terminal' ? 'herdr-spawn' : 'cli-spawn',
       },
     });
-    return { result: 'done', detail: { settled: 'now', runId: runMeta.runId, status: settled.status } };
   } catch (err) {
     if (err?.code === 'run-control-superseded') {
       // Another writer settled this run first; its result.json is the answer.
@@ -256,4 +328,15 @@ export async function settleAttempt({ runDir, envelope }) {
     }
     throw err;
   }
+  // After the outcome is committed, so recording can only add a friction, never move the result.
+  try {
+    recordClaimFrictions({
+      agentClaim: settled.runResult?.agentClaim, root: context.repoRoot ?? envelope.cwd, runDir,
+      assignmentId: runMeta.assignmentId ?? assignment?.assignmentId, runId: runMeta.runId,
+      unitRunId: envelope.unitRunId ?? assignment?.unitRunId, workId: runMeta.workId ?? assignment?.workId,
+    });
+  } catch (err) {
+    console.error(`fgos: warning: worker frictions not recorded: ${err.message}`);
+  }
+  return { result: 'done', detail: { settled: 'now', runId: runMeta.runId, status: settled.status } };
 }

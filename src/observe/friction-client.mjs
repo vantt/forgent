@@ -32,6 +32,13 @@ const requireId = (id, name) => {
   return `work:${id}`;
 };
 
+// The subject a record names: `subject` as `kind:id` when given (the host owns the kind list), else the work item `id`.
+const subjectOf = (p) => {
+  if (p.subject == null) return requireId(p.id, 'friction');
+  if (typeof p.subject !== 'string' || !/^[a-z]+:\S/.test(p.subject)) throw validationError('friction "subject" must be "<kind>:<id>".');
+  return p.subject;
+};
+
 // `--flag value` for every pair whose value the caller supplied.
 const flags = (pairs) => pairs.filter(([, value]) => value != null).flatMap(([flag, value]) => [flag, String(value)]);
 
@@ -71,13 +78,14 @@ function callHost(what, args, { dir, input }) {
 const refFlags = (refs) => (refs ?? []).flatMap((ref) => ['--ref', typeof ref === 'string' ? ref : `${ref.kind}:${ref.id}`]);
 
 /**
- * Record a friction event: `{ id, layer, errorClass, disposition, detail?, attempts?, docType?, producer?, kind?, refs? }`.
- * `kind` is the friction kind (bug, instability, missing, awkward, doc); `refs` point at a run, session, plan, backlog
- * row, executor, case or work item besides the subject.
+ * Record a friction event: `{ id | subject, layer, errorClass, disposition, detail?, attempts?, docType?, producer?, kind?,
+ * refs? }`. `id` names a work item; `subject` (`kind:id`) names any other subject. `kind` is the friction kind (bug,
+ * instability, missing, awkward, doc); `refs` point at a run, session, plan, phase, backlog row, executor, case or work
+ * item besides the subject.
  */
 export function recordFriction(dirOrOptions, maybePayload) {
   const [dir, p] = target('recordFriction', dirOrOptions, maybePayload);
-  const subject = requireId(p.id, 'friction');
+  const subject = subjectOf(p);
   const args = ['friction', 'record', ...flags([
     ['--subject', subject],
     ['--kind', p.kind],

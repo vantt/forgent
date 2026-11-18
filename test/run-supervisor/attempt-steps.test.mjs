@@ -43,7 +43,7 @@ function workspace() {
 }
 
 /** A real attempt directory at runs/01 of an assignment, as the controller leaves it. */
-function attempt(w, { receipt, claim, side = true, baseline = true, outcomeFiles = {}, terminal = false, outboxSub = 'outbox' } = {}) {
+function attempt(w, { receipt, claim, side = true, baseline = true, outcomeFiles = {}, terminal = false, outboxSub = 'outbox', frictions } = {}) {
   const assignmentDir = path.join(w.root, 'assignments', 'asg-1');
   const runDir = path.join(assignmentDir, 'runs', '01');
   fs.mkdirSync(path.join(runDir, 'controller'), { recursive: true });
@@ -61,7 +61,7 @@ function attempt(w, { receipt, claim, side = true, baseline = true, outcomeFiles
   }
   if (claim) {
     fs.mkdirSync(path.join(runDir, outboxSub), { recursive: true });
-    fs.writeFileSync(path.join(runDir, outboxSub, 'result-1.json'), JSON.stringify({ contract: AGENT_RESULT_CLAIM_CONTRACT, status: 'done', summary: 'finished' }));
+    fs.writeFileSync(path.join(runDir, outboxSub, 'result-1.json'), JSON.stringify({ contract: AGENT_RESULT_CLAIM_CONTRACT, status: 'done', summary: 'finished', ...(frictions ? { frictions } : {}) }));
   }
   const control = acquireRunControl(runDir, { holder: buildRunControlHolder('controller'), purpose: 'attempt' });
   const sideFile = path.join(runDir, 'protected', 'attempt-secrets.json');
@@ -189,6 +189,106 @@ test('a timeout receipt with an outbox result is still judged from the outbox', 
     assert.equal((await run('settle-attempt', w, runDir)).exit, 0);
     assert.equal(resultOf(runDir).classification.execution.status, 'completed');
   } finally { w.cleanup(); }
+});
+
+// A stand-in friction host on FGOS_HOST_BIN: it logs each call's arguments, and stores or fails every call.
+function frictionHost(t, w, { fail = false } = {}) {
+  const log = path.join(w.root, 'friction-calls.log');
+  const bin = path.join(w.root, 'friction-host');
+  const answer = fail ? 'echo "boom" >&2; exit 1' : 'echo \'{"contract":"fgos.v1","data":{"ok":true}}\'';
+  fs.writeFileSync(bin, ['#!/bin/sh', 'cat > /dev/null', `printf '%s\\n' "$*" >> "${log}"`, answer, ''].join('\n'), { mode: 0o755 });
+  const saved = process.env.FGOS_HOST_BIN;
+  process.env.FGOS_HOST_BIN = bin;
+  t.after(() => { if (saved === undefined) delete process.env.FGOS_HOST_BIN; else process.env.FGOS_HOST_BIN = saved; });
+  t.mock.method(console, 'error', () => {});
+  return () => (fs.existsSync(log) ? fs.readFileSync(log, 'utf8').split('\n').filter((line) => line.startsWith('friction record')) : []);
+}
+
+/** Settle an exited attempt whose claim lists `frictions`, for a Unit run that serves plan `plans/p-one` phase 12. */
+async function settleWithFrictions(w, frictions, { workId = 'work-1' } = {}) {
+  const { runDir } = attempt(w, { receipt: { outcome: 'exited', gateExit: gateExit() }, claim: true, frictions });
+  const unitDir = path.join(w.root, 'assignments', 'unit-1');
+  fs.mkdirSync(unitDir, { recursive: true });
+  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify({ unit: { id: 'u1', plan: { dir: 'plans/p-one', phase: '12' } } }));
+  if (!workId) {
+    const runJson = path.join(runDir, 'run.json');
+    const { workId: _run, ...meta } = JSON.parse(fs.readFileSync(runJson, 'utf8'));
+    fs.writeFileSync(runJson, JSON.stringify(meta));
+    const assignmentJson = path.join(w.root, 'assignments', 'asg-1', 'assignment.json');
+    const { workId: _asg, ...assignment } = JSON.parse(fs.readFileSync(assignmentJson, 'utf8'));
+    fs.writeFileSync(assignmentJson, JSON.stringify(assignment));
+  }
+  const step = await run('settle-attempt', w, runDir);
+  assert.equal(step.exit, 0, JSON.stringify(step.out));
+  return resultOf(runDir);
+}
+
+const TWO_FRICTIONS = [
+  { kind: 'doc', layer: 'skill', errorClass: 'stale-doc', detail: 'the guide names a removed flag' },
+  { kind: 'missing', layer: 'tool', errorClass: 'no-linter', detail: 'no linter was installed' },
+];
+
+test('a settled claim that lists frictions records each with refs to the run, plan and phase, under the work item or else the unit run', async (t) => {
+  // Only the worker claim carries frictions, so no other test proves settling hands them to the friction door.
+  const w = workspace();
+  t.after(w.cleanup);
+  const calls = frictionHost(t, w);
+  await settleWithFrictions(w, TWO_FRICTIONS);
+  const recorded = calls();
+  assert.equal(recorded.length, 2);
+  for (const line of recorded) {
+    assert.match(line, /--subject work:work-1 /);
+    assert.match(line, /--ref run:run-1 --ref plan:plans\/p-one --ref phase:12 /);
+  }
+  assert.match(recorded[0], /--error-class stale-doc/);
+  assert.match(recorded[1], /--error-class no-linter/);
+
+  const bare = workspace();
+  t.after(bare.cleanup);
+  const bareCalls = frictionHost(t, bare);
+  await settleWithFrictions(bare, TWO_FRICTIONS.slice(0, 1), { workId: null });
+  assert.match(bareCalls()[0], /--subject run:unit-1 /);
+});
+
+test('worker frictions past the limit, with a flag-like, multi-line, overlong or non-slug value are not recorded', async (t) => {
+  // The worker writes these values; this proves they are bounded before they become host flag values.
+  const w = workspace();
+  t.after(w.cleanup);
+  const calls = frictionHost(t, w);
+  const good = (n) => ({ kind: 'doc', layer: 'skill', errorClass: `class-${n}`, detail: 'd' });
+  await settleWithFrictions(w, [
+    { ...good(0), layer: '--dir' },
+    { ...good(0), errorClass: 'Not A Slug' },
+    { ...good(0), layer: 'two\nlines' },
+    { ...good(0), layer: 'x'.repeat(81) },
+    'not an object',
+    ...[1, 2, 3, 4, 5, 6].map(good),
+  ]);
+  // Five entries are read; the first five are refused, so none of the six good ones past them is recorded.
+  assert.deepEqual(calls(), []);
+
+  const bounded = workspace();
+  t.after(bounded.cleanup);
+  const boundedCalls = frictionHost(t, bounded);
+  await settleWithFrictions(bounded, [1, 2, 3, 4, 5, 6].map(good));
+  assert.deepEqual(boundedCalls().map((line) => /--error-class (\S+)/.exec(line)[1]), ['class-1', 'class-2', 'class-3', 'class-4', 'class-5']);
+});
+
+test('a friction the host fails to store leaves the settled outcome unchanged', async (t) => {
+  // Recording runs after the outcome is committed; this is the one proof that a failure cannot move it.
+  const healthy = workspace();
+  t.after(healthy.cleanup);
+  const stored = frictionHost(t, healthy);
+  const healthyResult = await settleWithFrictions(healthy, TWO_FRICTIONS);
+  assert.equal(stored().length, 2);
+
+  const broken = workspace();
+  t.after(broken.cleanup);
+  const failed = frictionHost(t, broken, { fail: true });
+  const brokenResult = await settleWithFrictions(broken, TWO_FRICTIONS);
+  assert.equal(failed().length, 2, 'both entries were attempted');
+  assert.deepEqual(brokenResult.classification, healthyResult.classification);
+  assert.equal(brokenResult.agentClaim.status, healthyResult.agentClaim.status);
 });
 
 test('run control settled but result.json missing: the same token completes the publish with no new epoch', async () => {

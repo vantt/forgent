@@ -47,14 +47,26 @@
         },
         "agentClaim": {
           "type": "object",
-          "description": "The worker's validated result claim as stored in result.json. Observe does not read it for run facts; frictions the worker listed are recorded by settlement through the friction door, not by this reader.",
+          "description": "The worker's validated result claim as stored in result.json. Observe does not read it for run facts; frictions the worker listed are recorded by the settle-attempt step through the friction door, not by this reader.",
           "properties": {
             "frictions": {
               "type": "array",
-              "description": "Optional obstacles the worker met, each {kind, layer, errorClass, detail}; settlement records each with refs to the run and the Unit's plan and phase. Never read by the run-result source scan.",
+              "description": "Optional obstacles the worker met, each {kind, layer, errorClass, detail}; settlement keeps the first five and the settle-attempt step records them with refs to the run and the Unit's plan and phase, and skips an entry whose kind, layer or errorClass is not one line of at most 80 characters that does not start with '-' (errorClass a lowercase-hyphenated signature). Never read by the run-result source scan.",
+              "maxItems": 5,
               "items": {
-                "type": "object"
+                "type": "object",
+                "properties": {
+                  "kind": { "type": "string", "maxLength": 80, "pattern": "^[^\\s-][^\\n]*$" },
+                  "layer": { "type": "string", "maxLength": 80, "pattern": "^[^\\s-][^\\n]*$" },
+                  "errorClass": { "type": "string", "maxLength": 80, "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+                  "detail": { "type": "string" }
+                }
               }
+            },
+            "frictionsDropped": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "How many frictions past the first five the worker listed; settlement keeps the first five and stores only this count for the rest."
             }
           }
         }

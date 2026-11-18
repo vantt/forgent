@@ -600,7 +600,7 @@
               },
               "ref": {
                 "type": "string",
-                "description": "<kind>:<id> of something else it points at; kind one of run, session, plan, backlog, executor, case, work. Repeatable."
+                "description": "<kind>:<id> of something else it points at; kind one of run, session, plan, phase, backlog, executor, case, work. Repeatable."
               },
               "layer": {
                 "type": "string",

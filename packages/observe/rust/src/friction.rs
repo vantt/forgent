@@ -72,7 +72,7 @@ pub const VALID_DOC_TYPES: &[&str] = &["tutorial", "how-to", "reference", "expla
 
 /// What a friction may point at besides its subject.
 pub const REF_KINDS: &[&str] = &[
-    "run", "session", "plan", "backlog", "executor", "case", "work",
+    "run", "session", "plan", "phase", "backlog", "executor", "case", "work",
 ];
 
 const STORE: &str = "friction";
@@ -1558,6 +1558,10 @@ mod tests {
                 id: "plans/x".into(),
             },
             SubjectRef {
+                kind: "phase".into(),
+                id: "12".into(),
+            },
+            SubjectRef {
                 kind: "backlog".into(),
                 id: "p-1".into(),
             },
@@ -1578,7 +1582,11 @@ mod tests {
         assert_eq!(line["measures"][ATTEMPTS_MEASURE], 3);
         assert_eq!(
             line["refs"],
-            json!([{ "kind": "plan", "id": "plans/x" }, { "kind": "backlog", "id": "p-1" }])
+            json!([
+                { "kind": "plan", "id": "plans/x" },
+                { "kind": "phase", "id": "12" },
+                { "kind": "backlog", "id": "p-1" }
+            ])
         );
         assert_eq!(line["redaction"]["rev"], DETAIL_REDACTION_REV);
         assert!(

@@ -98,7 +98,7 @@ test('a host that cannot run at all warns and returns null instead of throwing i
   assert.match(warnings.join('\n'), /friction write failed \[host-exec-error\].*host crashed/);
 });
 
-test('kind and every ref are passed through, each ref as its own --ref', (t) => {
+test('kind, every ref and a non-work subject are passed through, each ref as its own --ref', (t) => {
   const host = standInHost(t);
   recordFriction(host.root, {
     id: 'tsk-1', layer: 'skill', errorClass: 'usage', disposition: 'advisory', producer: 'agent',
@@ -108,6 +108,9 @@ test('kind and every ref are passed through, each ref as its own --ref', (t) => 
     'friction', 'record', '--subject', 'work:tsk-1', '--kind', 'awkward', '--layer', 'skill', '--error-class', 'usage',
     '--disposition', 'advisory', '--producer', 'agent', '--ref', 'plan:plans/x', '--ref', 'backlog:p-1', '--detail-stdin',
   ]);
+  recordFriction(host.root, { subject: 'run:unit-1', layer: 'skill', errorClass: 'usage', disposition: 'advisory' });
+  assert.deepEqual(host.argv().slice(0, 4), ['friction', 'record', '--subject', 'run:unit-1']);
+  assert.throws(() => recordFriction(host.root, { subject: 'unit-1', layer: 'skill', errorClass: 'usage', disposition: 'advisory' }), { name: 'StoreError' });
 });
 
 test('a resolve by class passes --class instead of --subject, and takes the filed reason as given', (t) => {
