@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1d57e2f2e0015e838cdaa8af60de6d0df44be7cce6681943c5125a13c2199f00",
+  "payloadDigest": "dd7d9b3d135cf32d0d20a0b19571d51cc0f5fcb154bd2c8a154dd6721aad803c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -138,7 +138,7 @@
     "apps/fgos/src/wiring/observe_sources/mod.rs": "d5fb81609b375af587eed807d6c81ff70565fbc7ca8cdea1f6a22f3f3149afc1",
     "apps/fgos/src/wiring/observe_sources/plan_history.rs": "ab07623d1fc9c6c095f8f8e19c2b1407f23f663c9b6cb4a305c87f8513ca4a3a",
     "apps/fgos/src/wiring/observe_sources/plan_text.rs": "a71317e73180193a53d3e7f9b4b19ad18aef8c989a6e8981ba41108e1b1438c3",
-    "apps/fgos/src/wiring/observe_sources/tests.rs": "f80c8aeac717f0f41ecbf887fefa40d5a5a2529fd5faba4b3dcfc48ceedb57b2",
+    "apps/fgos/src/wiring/observe_sources/tests/mod.rs": "f80c8aeac717f0f41ecbf887fefa40d5a5a2529fd5faba4b3dcfc48ceedb57b2",
     "apps/fgos/src/wiring/run_dirs.rs": "8248bf1a45d37e2ca03315dea11489b6b90362a47479244a10a7c71648e90f60",
     "apps/fgos/src/wiring/seat_binding.rs": "9eb8ef8e81b7314cab1d579a3e7312aa413c268405271db2d3dc64f0cfe7b1b3",
     "apps/fgos/src/wiring/session.rs": "f2569bef9f072e959f14673c2d2929e2b0b001540a4e147fd5e59082b2e64b43",
@@ -1445,16 +1445,7 @@
     "src/workflow/units-source.mjs": "e4376a8f38d0a55f2e132aa6a094b552e8117eb46b6a4d8b03b00da32d6bb2b4",
     "scripts/lib/git-one-door-declarations.v1.json": "3ff089b6fdbb59c6e58f912603ba8a3e2bae612a1ecebe94e6bc95db590e30d7"
   },
-  "sites": [
-    {
-      "path": "apps/fgos/src/wiring/observe_sources/tests.rs",
-      "line": 31,
-      "spawn": "Command::new",
-      "binary": "git",
-      "siteId": "git_env:af1a11c7fdf0a26bbca5f63c60953e00384f77500b0d4ccdbdde31322741a46c",
-      "family": "rust"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
@@ -2015,6 +2006,13 @@
     {
       "path": "apps/fgos/src/wiring/mailbox_body.rs",
       "line": 712,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/src/wiring/observe_sources/tests/mod.rs",
+      "line": 31,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
