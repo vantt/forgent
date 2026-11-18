@@ -25,6 +25,7 @@ fgos-yaml-doc = { path = "../../yaml-doc/rust" }
 fgos-config = { path = "../../config/rust" }
 fgos-run-result = { path = "../../run-result/rust" }
 fgos-agent-protocol = { path = "../../agent-protocol/rust" }
+fgos-checkout = { path = "../../execution/checkout" }
 
 [build-dependencies]
 napi-build = "=2.2.4"

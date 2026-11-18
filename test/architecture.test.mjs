@@ -2399,3 +2399,30 @@ test('door row for a YAML frontmatter fence catches each literal way to open a b
   assert.deepEqual(outsideDoor(job, 'packages/p/rust/src/x.rs', rustReader), [], 'a reader that strips the fence');
   assert.equal(outsideDoor(job, 'packages/p/rust/src/x.rs', 'let t = format!("---\\n{body}---\\n");\n').length, 1, 'a Rust writer still fails');
 });
+
+test('door row for making, provisioning and removing a checkout catches each call beside the checkout crate and passes the crate, the wiring and comments', () => {
+  const job = 'make, provision and remove a checkout';
+  const caught = [
+    ['src/x.mjs', "createGitWorktree(options).create({ path, branch }, [handle]);\n"],
+    ['src/x.mjs', "const port = createGitWorktree(context);\n"],
+    ['packages/p/rust/src/x.rs', 'driver.create_worktree(&main, held, &request, &writer, id)?;\n'],
+    ['packages/p/rust/src/x.rs', 'driver.remove_worktree(&main, vec![lease], &request)?;\n'],
+    ['packages/p/rust/src/x.rs', 'let _ = driver.prune_worktree(&main, vec![], &id);\n'],
+    ['apps/fgos/src/wiring/x.rs', 'let made = fgos_checkout::create(&request)?;\n'],
+    ['src/x.mjs', "const commands = config.worktreeSetup.commands;\n"],
+  ];
+  for (const [file, text] of caught) assert.equal(outsideDoor(job, file, text).length, 1, text);
+  const passed = [
+    ['src/x.mjs', 'export function createGitWorktree(options, loaderOptions) {}\n'],
+    ['src/x.mjs', "import { createGitWorktree } from '../git/worktree.mjs';\n"],
+    ['src/x.mjs', '// createGitWorktree(options).create(request)\n'],
+    ['packages/p/rust/src/x.rs', 'pub fn create_worktree(&self) {}\n'],
+    ['packages/p/rust/src/x.rs', '// driver.remove_worktree(&main, vec![], &request)\n'],
+  ];
+  for (const [file, text] of passed) assert.deepEqual(outsideDoor(job, file, text), [], text);
+  const row = doorRow(job);
+  const owners = ['packages/execution/checkout/src/work_create.rs', 'apps/fgos/src/wiring/worktree.rs', 'packages/git/node-addon/src/checkout.rs'];
+  for (const owner of owners) {
+    assert.deepEqual(doorHits(row, owner, 'let made = fgos_checkout::create(&request)?;\ndriver.create_worktree(&main, held, &request, &writer, id)?;\n'), [], owner);
+  }
+});
