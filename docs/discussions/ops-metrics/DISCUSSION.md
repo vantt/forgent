@@ -167,6 +167,12 @@ Kết quả: envelope `fgos.v1`, mỗi dòng = một nhóm (giá trị chiều +
 dưới cỡ mẫu, và `coverage` (bao nhiêu bản ghi thiếu attr được nhóm theo). Định nghĩa có tên của tầng trên (OM-D5)
 là chính các đối số này lưu thành file.
 
+Ngữ pháp phải đủ để định nghĩa phát hiện sau này chỉ là dữ liệu (OM-D10, OM-D11), gồm: `--agg max:ts` (tuổi của sự
+kiện cuối, cho `supervisor-overdue`), lọc theo cửa sổ thời gian tương đối (`--since -30m`), và nối qua `refs` (token
+của các session mà tick LLM tham chiếu, cho `supervisor-idle-burn`; token theo plan qua run). Thiếu một trong các phép
+này thì thêm pacer sẽ phải sửa code — fixture của task `observe-contract` chạy thử chính các định nghĩa pace và
+câu hỏi để chứng minh không cần.
+
 Năm store hiện có sau này đi qua contract này (friction, case, eval, snapshot, invocation-faults → các `kind`
 `fgos.friction.*`, `fgos.case.*`...); thứ tự chuyển và việc gộp store là chuyện tầng 3, planner chia phase.
 
