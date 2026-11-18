@@ -80,7 +80,7 @@ Evidence for every claim below: [scan report](reports/scan-261118-0947-session-w
 | SV-7 | Gateway routes stay and refuse (HTTP 501, the gateway's own error body, naming the retirement) | owner 2026-11-18; the gateway will come back and owns its routes; no web screen calls them |
 | SV-8 | Old spellings vanish: no alias, no refusal pointer for `fgos head`, `session end|list|gc` | L10; only the owner runs fgOS and all machines upgrade together (owner 2026-11-09); the host's unknown-verb/sub-verb answer already lists what exists |
 | SV-9 | The head-request socket verbs `head start`/`head rotate` become `session start`/`session rotate`; the contract file, "head session", Identity's `head:` role and `FGOS_HEAD_ROLE` keep their names | the socket verbs mirror the CLI verbs by design (`head-request.v1.json`: "`fgos head rotate` calls the same one"); "head" stays the Session Host's word for the session kind (secretary phase 15) |
-| SV-10 | The renamed verb stays a Node verb in this plan | moving it to Rust is S6+ migration scope, not this rename |
+| SV-10 | The renamed verb stays a Node verb in this plan; any new code a phase must write is Rust, Node only a thin caller | owner 2026-11-18: new code in Rust when it does not disturb what exists, landed code is not rewritten; the head verb landed in Node (`f36f5620d`) and a rename is not new code |
 
 Prior art reused: `fgos worktree` (Git Worktree port) as the only checkout door; the host's unknown-verb answer as
 the refusal; secretary phase 15's provisional naming note. Missing and not added: any worktree list/gc (git's own list
@@ -114,6 +114,7 @@ suffices).
 - Deleting a mechanism retires its tests in the same phase; a retired test names the test that now owns the behaviour
   or says the behaviour was removed (design principle 8).
 - Generated files (command manifest, routes, annotations, skill render surfaces) are regenerated, never hand-merged.
+- New code goes in Rust (owner 2026-11-18): if a step needs code that does not exist yet (a helper, a refusal, a check), write it in the owning Rust crate and keep any Node side a thin caller. Edits and deletions of landed Node code stay in Node; do not port landed code as part of this plan.
 
 ## Phases
 
@@ -147,8 +148,9 @@ wanted instead.
 
 ## Risks and rollback
 
-- **Secretary waves land differently than phase 15-17 files say** (verb flags, skill paths). Step 0 of phase 5 reads the
-  landed tree; the rename follows what landed.
+- **Secretary phases 15-16 already landed** (`f36f5620d` head verb, `e72263ebd` secretary and /handoff skills; board
+  `9979a0de0`): `fgos head` is live. Phases 17-18 may add more `head` uses. Step 0 of phase 5 reads the landed tree, not
+  the secretary phase files; the rename follows what landed.
 - **A hidden reader of `sessions.json`** (outside the greps of §1). Phase 3's acceptance grep over the whole repo
   catches it; a reader found there joins phase 3 or stops it.
 - **Identity callers in hot paths** (`withStateTx` resolves the writer each call): the cache key becomes env-only;
@@ -158,5 +160,5 @@ wanted instead.
 
 ## Validation Log
 
-- 2026-11-18 planner: scan report written; owner answered SV-1, SV-7; plan status `draft` until the owner approves and
+- 2026-11-18 planner: scan report written; owner answered SV-1, SV-7; owner rule "new code in Rust" folded into SV-10 and leader rules; plan status `draft` until the owner approves and
   the two blocking plans land.
