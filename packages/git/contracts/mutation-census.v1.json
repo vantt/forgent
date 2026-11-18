@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "dd7d9b3d135cf32d0d20a0b19571d51cc0f5fcb154bd2c8a154dd6721aad803c",
+  "payloadDigest": "a7163bc3d697b573f50f90bb55366270e74cacc01de34feb639a640612f1ca41",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -105,8 +105,8 @@
     "apps/fgos/src/wiring/doctor/git.rs": "6005888e2f001b67929d65669376e062819ef687f2b70697b607df12f10a5eba",
     "apps/fgos/src/wiring/doctor/holder_lock.rs": "1c1c2e7ee193dd50f01b161e8198de7ec93193ca48f20533694e44a83818dc58",
     "apps/fgos/src/wiring/doctor/identity.rs": "40499cf62343b256decce7c1905cee1bc2f2a5f07e9d7b389f824d8c44de273f",
-    "apps/fgos/src/wiring/doctor/mailbox.rs": "8de4fb5222d9cba45cf7a269e5bb18cb2cd804333c13316821d2ebde5c16219b",
-    "apps/fgos/src/wiring/doctor/mod.rs": "b57d0ea8d98ee0ec8f385de639bc02820212febdca1e81fc592e07793c994dba",
+    "apps/fgos/src/wiring/doctor/mailbox.rs": "b7dba3ccf792e1365219d1450ceca8136a47a09692c1dde37253c6caffce03b1",
+    "apps/fgos/src/wiring/doctor/mod.rs": "90ff4d808a46dc23eaad2c2fe7ad626ba37f7f9de5fbde3670fa087b061beff5",
     "apps/fgos/src/wiring/doctor/observe.rs": "277742f65ac2d3ac816d11c212b27ba0fffebd5e121dce4f8370154cd864e03e",
     "apps/fgos/src/wiring/doctor/packaging.rs": "2e9c24031035b2d9431b8f6e6a44b31246b385f222d2b78a34b273e6118f3898",
     "apps/fgos/src/wiring/event_store_clone.rs": "923d718f7a6bd5705cbe6e4d4c8393672c1ef4a2142facc9ada314307a4d7574",
@@ -144,7 +144,7 @@
     "apps/fgos/src/wiring/session.rs": "f2569bef9f072e959f14673c2d2929e2b0b001540a4e147fd5e59082b2e64b43",
     "apps/fgos/src/wiring/session_rotation_hook.rs": "02c2b3fdf7c5776c9f0696dc3f63ad2c45985a1563e9022c420b1a0c90372e9f",
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
-    "apps/fgos/src/wiring/uninstall.rs": "1c5e55502b62d428ef0f9c560d2762d44ee499ac434741eb68b8208dbd6bce2e",
+    "apps/fgos/src/wiring/uninstall.rs": "623369d9ab6f90976db413384b804d9674bb1dbb9dfe7bca35120138866413e4",
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
     "apps/fgos/tests/cli_tests.rs": "cd52257d09af4526d3f38c36e2ba94723128474fbc11b44368fd4919770f391e",
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
@@ -343,7 +343,7 @@
     "packages/distribution/rust/src/store.rs": "1cdaf72bbdf7c4bc0ae3eafd1f37fecd6a358de60c8ce5851ccf9212149174de",
     "packages/distribution/rust/src/suggest.rs": "302d698667662b3544b0761cd53dd87c68594d6f1b1ce52d8b85032627d52182",
     "packages/distribution/rust/src/test_scratch.rs": "7f54aae398aca8c0b0241f22a0155cc0ba9782a91430fba0ceddda0dc19297e3",
-    "packages/distribution/rust/src/timer.rs": "c196566898872d769578cbaa35d73845e9ecc09723a5f1dbceeeaba1b3c3aa72",
+    "packages/distribution/rust/src/timer.rs": "9a0db76b38705ef325b7d31598b6170bbab381a5637c8af24fd9f3a5f7b16624",
     "packages/distribution/rust/src/uninstall.rs": "c33250178e8d5c098b1c23b6fafe8a7a6bdb9eaad3828bd1a5f7f091924701b8",
     "packages/distribution/rust/src/verify.rs": "5364a7d340d4ac1401473100ce2c2135016e4a694f9878aeafe7b126a49fd596",
     "packages/distribution/rust/src/workspace.rs": "fb9de636e764be6e6b8dee390e8e7cd05dd4f3578f79f2d4b64c75ad16f1e2ec",
@@ -2033,14 +2033,14 @@
     },
     {
       "path": "apps/fgos/src/wiring/uninstall.rs",
-      "line": 1191,
+      "line": 1193,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "apps/fgos/src/wiring/uninstall.rs",
-      "line": 1856,
+      "line": 1865,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2799,7 +2799,7 @@
     },
     {
       "path": "packages/distribution/rust/src/timer.rs",
-      "line": 547,
+      "line": 666,
       "spawn": "Command::new <- packages/process/rust/src/spawn.rs:141",
       "binary": "(uncalled run_scheduler_call)",
       "class": "uncalled-wrapper"
