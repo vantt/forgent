@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b6b53c98f7bec461a7d71bb79ae8a9bc61df0fbf412931efd311f7439461cd16",
+  "payloadDigest": "ea36ec0fcd4a041117f2914e34a26837565389c47c41abb0e784b4c963aff791",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -859,12 +859,13 @@
     "packages/supervision/rust/src/land.rs": "a9195f49413a62e7402b228f38ac9758d1d033a36b6948538125758490f091b4",
     "packages/supervision/rust/src/lib.rs": "8070f2ae2159030a71567ae0ce2da103178415a0703b3de3b9b0f8d76b4cdf15",
     "packages/supervision/rust/src/notify.rs": "779797ae745bcdf1c1b1babd2b7dad65d8aa13787ad080dbad9fabe97b3d7252",
-    "packages/supervision/rust/src/portfolio.rs": "3b69da82497336e9ecddc40d62657dc1d9b058778568137602ae6830e23ff8cc",
-    "packages/supervision/rust/src/queue.rs": "9d6a4d494f5dbfa4def27ba59f6cf6f27f82af692bf9dc136581eaa4d6c72cf7",
+    "packages/supervision/rust/src/portfolio.rs": "ef5b142f6734e6b8fecd82052ce3239f451416c411cb090b40c1d6665796e65f",
+    "packages/supervision/rust/src/queue.rs": "23d7cf84d1bd3dd53e29d76741970b57910b28ef27951e6969a7d2ce91cabacb",
     "packages/supervision/rust/src/supervisor.rs": "108d951d7694d9372ca6ed62b3cae3dad46a6729b6ca495f4d92f870ce6a88ac",
     "packages/supervision/rust/src/wake.rs": "5b66c7f805a75cc193da6484f1d84a2e916018015250f95c4b9027c33b55b4c9",
     "packages/supervision/rust/src/watcher.rs": "fe233a725dc44a7cd66ccdcbb45035f102c84fdf66c930937ce15fb42f7c72a9",
-    "packages/supervision/rust/tests/portfolio.rs": "8ae4a3f0a0855134276cb46a5daf00cc0a9b0f27af2a43dd825713c02bc9b7bd",
+    "packages/supervision/rust/tests/portfolio.rs": "84b83ffc4a69b2d79d48be467d2523fb63f447f4819586d6443651638cd3f449",
+    "packages/supervision/rust/tests/queue.rs": "64318ef31e520f9123cf018d0d66ab43ab67e75f8850f99a7d4112333a5bd60e",
     "packages/terminal-control/rust/src/core.rs": "0fa67399b5c1e59ac6accc448f58675cae90255659685254b48f428631ab66eb",
     "packages/terminal-control/rust/src/driver/herdr.rs": "8e43d642128ef3072b5009f835cdbeb9d03b89711b4be210f370a5953dd749a6",
     "packages/terminal-control/rust/src/driver/mod.rs": "72f4bbc3f4d1c55704fbe1e0cedd1d6ed1e526d5f06838c97ac32bbeab8c175c",
@@ -3686,6 +3687,27 @@
       "line": 314,
       "spawn": "Command::new",
       "binary": "? internal_harness()",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/supervision/rust/tests/queue.rs",
+      "line": 17,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/supervision/rust/tests/queue.rs",
+      "line": 254,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/supervision/rust/tests/queue.rs",
+      "line": 260,
+      "spawn": "Command::new",
+      "binary": "git",
       "class": "rust-test"
     },
     {

@@ -243,3 +243,83 @@ fn an_unreadable_store_is_store_unavailable_not_an_empty_list() {
     assert_eq!(q.unhandled().unwrap_err().code, "store-unavailable");
     assert_eq!(q.unhandled_count().unwrap_err().code, "store-unavailable");
 }
+
+#[test]
+fn a_skipped_foreign_mirror_refuses_store_unavailable_not_a_quiet_queue() {
+    let w = World::new();
+    let c = w.clone("a", "machine-aa");
+    let q = c.queue();
+    q.raise(event(A, "2026-11-18T01:00:00.000Z")).unwrap();
+    let dir = c.layout.common_dir.clone();
+    let out = Command::new("git")
+        .current_dir(&dir)
+        .args(["hash-object", "-t", "tree", "-w", "/dev/null"])
+        .output()
+        .unwrap();
+    let tree = String::from_utf8(out.stdout).unwrap().trim().to_owned();
+    let out = Command::new("git")
+        .current_dir(&dir)
+        .args([
+            "-c",
+            "user.name=t",
+            "-c",
+            "user.email=t@example.invalid",
+            "commit-tree",
+            &tree,
+            "-m",
+            "not an event commit",
+        ])
+        .output()
+        .unwrap();
+    let commit = String::from_utf8(out.stdout).unwrap().trim().to_owned();
+    git(
+        &dir,
+        &[
+            "update-ref",
+            "refs/fgos/remotes/origin/events/machine-bb",
+            &commit,
+        ],
+    );
+    assert_eq!(q.unhandled().unwrap_err().code, "store-unavailable");
+    assert_eq!(
+        q.raise(event(B, "2026-11-18T02:00:00.000Z"))
+            .unwrap_err()
+            .code,
+        "store-unavailable"
+    );
+}
+
+#[test]
+fn two_overlapping_raises_of_one_id_append_one_new_and_one_duplicate() {
+    let w = World::new();
+    let c = w.clone("a", "machine-aa");
+    c.queue()
+        .raise(event(B, "2026-11-18T00:00:00.000Z"))
+        .unwrap();
+    for round in 0..4 {
+        let id = format!("{:016x}", 0xa000 + round);
+        let barrier = std::sync::Barrier::new(2);
+        let results: Vec<Raised> = std::thread::scope(|s| {
+            let handles: Vec<_> = (0..2)
+                .map(|_| {
+                    s.spawn(|| {
+                        let q = c.queue();
+                        barrier.wait();
+                        q.raise(event(&id, "2026-11-18T01:00:00.000Z")).unwrap()
+                    })
+                })
+                .collect();
+            handles.into_iter().map(|h| h.join().unwrap()).collect()
+        });
+        assert_eq!(
+            results.iter().filter(|r| **r == Raised::New).count(),
+            1,
+            "{results:?}"
+        );
+        assert_eq!(
+            results.iter().filter(|r| **r == Raised::Duplicate).count(),
+            1,
+            "{results:?}"
+        );
+    }
+}
