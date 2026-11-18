@@ -343,6 +343,28 @@ flowchart LR
   FR --> F
 ```
 
+### 6 F. Câu hỏi cho chủ dự án: thông tin, nơi trả lời, đánh thức (Q11, đang bàn)
+
+Hiện trạng (`plans/reports/scout-261118-1125-owner-question-routing.md`): bốn nơi lưu câu hỏi (`fgos ask`,
+`QUESTIONS.md`, mục câu hỏi của plan, gate Workflow), bốn kiểu khoá, chỉ `fgos ask` ghi người viết (id Identity),
+không nơi nào có `askedAt`, chỉ gate có `answeredAt`; dashboard gateway chỉ thấy `fgos ask`; không đường nào đưa câu
+trả lời về người hỏi. Mảnh có sẵn: Identity tự biết session (in-process 0,1 ms), role nếu đã đăng ký; terminal-control
+`send` gõ được vào pane của agent đang chạy (cần khoá pane); hook `Stop`/`PostToolUse` chạm session ở điểm dừng.
+
+Đề xuất nháp (verb Rust theo OM-D13):
+- **Một bản ghi câu hỏi**, id mint qua cửa identity, trả về cho người hỏi lúc hỏi: `asker` tự điền (session id +
+  handle từ Identity, role nếu có, ref plan/phase/run/discussion, khoá pane nếu Session Host/terminal-control có
+  placement), `stage`, nội dung năm phần, `askedAt`; `answer {text, by, answeredAt}`.
+- **Một nơi xem và trả lời**: `fgos questions list|answer` và dashboard gateway (mở rộng màn S04) đọc/ghi cùng một
+  cửa; mỗi câu hỏi có lệnh trả lời của chính nó.
+- **Người hỏi tự nhận câu trả lời** bằng id đã nhận lúc hỏi: `fgos questions wait <id>` (session còn chạy, chặn có
+  hạn) hoặc hook `Stop`/`UserPromptSubmit` báo "câu hỏi Qx đã có trả lời" khi session tới điểm dừng.
+- **Đánh thức** là hành động của watcher (plan supervisor), không phải của verb câu hỏi: `fgos.question.answered` là
+  sự kiện Observe → định nghĩa `question-answered` → watcher chọn hành động: session còn sống và có khoá pane →
+  terminal-control `send`; session đã chết → đánh thức supervisor để nối tiếp việc. Mailbox vẫn hoãn.
+- Điểm mở cho chủ dự án: nguồn sự thật — (a) một kho câu hỏi duy nhất, `QUESTIONS.md`/mục plan/gate thành view hoặc
+  tham chiếu id; (b) giữ bốn nơi lưu, verb Rust là parser chung và thêm cột người hỏi/thời điểm vào từng nơi.
+
 ## 7. Danh mục hạng mục / task {#tasks}
 
 Nháp — planner sẽ chia phase theo plan contract.
