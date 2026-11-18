@@ -224,10 +224,6 @@ runner:
   personas:
     # @fgos:doc The tier, executors and account pool one persona prefers. Only a persona may name a pool; a role entry refuses the key by name.
     secretary:
-      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider.
-      # @fgos:why [48a564e9-e77d-4749-9957-17015907b265] secretary head binds claude sonnet (p-sozeraj6zq)
-      prefer:
-        - claude
       # @fgos:doc One tier of the model ladder. Values: nano | mini | standard | advanced | flagship | frontier.
       # @fgos:why [48a564e9-e77d-4749-9957-17015907b265] secretary head binds claude sonnet (p-sozeraj6zq)
       tier: standard
