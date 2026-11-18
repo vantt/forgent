@@ -15,7 +15,7 @@ open owner questions: QUESTIONS.md (Q1, Q2 chặn một phần việc; Q3, Q4 c�
 - **Constraints.** Config trước, code mới chỉ bằng Rust và chỉ khi không phá cửa hiện có (một cửa, một đường). Không in credential. Không đổi luật khoá trong `docs/platform/platform-foundations.md`. Tôn trọng quyết định 86 Q2 (2026-11-12): ghế claude không bao giờ dùng `~/.claude` làm kho login của một account, trừ khi chủ dự án đảo lại ở Q1.
 - **Non-goals.** Không viết lại thuật toán lease, xếp hạng hay quarantine. Không thêm cơ chế "chờ" cho pane. Không đổi cách xếp tier hay `tierFallback`. Không chạm pool của codex, pi, omp, agy.
 - **Acceptance criteria.**
-  1. Không pool nào trong `runner.llmAccounts` trỏ tới `~/.claude` hay tới login của Miu; một cổng máy móc (doctor hoặc config door) từ chối khi có.
+  1. Trên máy của chủ dự án không pool nào trong `runner.llmAccounts` trỏ tới `~/.claude` hay tới tài khoản của Miu; một hàng doctor cảnh báo (không từ chối) khi có, để người chỉ có một tài khoản vẫn dùng được fgOS.
   2. `fgos dispatch explain` cho một ghế pane bất kỳ không bao giờ liệt kê tài khoản của Miu trong walk.
   3. Một lần khởi động thật của một pane claude lease đúng một tài khoản của pool pane; một lần khởi động thật của Miu (đường đã chọn ở Q1) chạy đúng tài khoản của Miu và không tiêu quota pane.
   4. Hết quota pool pane: bằng chứng thật (hoặc ca vàng của crate) rằng ghế đổi tài khoản, rồi đổi family, rồi từ chối theo tên; Miu vẫn chạy.
@@ -24,7 +24,7 @@ open owner questions: QUESTIONS.md (Q1, Q2 chặn một phần việc; Q3, Q4 c�
 
 ## 1. Trạng thái hiện tại
 
-Việc khảo sát xong, thiết kế chốt, còn hai câu hỏi cho chủ dự án (Q1, Q2) chỉ chặn từng phần. Phát hiện quan trọng nhất: **pane hiện đang dùng chung quota với Miu**, vì pool `claude` duy nhất trên máy này có một tài khoản `vantt` mà login của nó là cùng một tài khoản Anthropic với login mặc định trong `~/.claude` (hai login khác thư mục, cùng một tài khoản). Cần thêm tài khoản khác và tắt tài khoản này khỏi pool pane. Đường "config thuần" làm được ngay; đường để Miu khởi động tin cậy qua `fgos head start` cần một chút code Rust nhỏ (Q1).
+Việc khảo sát xong, thiết kế chốt, còn hai câu hỏi cho chủ dự án (Q1, Q2) chỉ chặn từng phần. Phát hiện quan trọng nhất: **pane hiện đang dùng chung quota với Miu**, vì pool `claude` duy nhất trên máy này có một tài khoản `vantt` mà login của nó là cùng một tài khoản Anthropic với login mặc định trong `~/.claude` (hai login khác thư mục, cùng một tài khoản). Cần thêm tài khoản khác và tắt tài khoản này khỏi pool pane. Người chỉ có một tài khoản Claude thì không có gì để tách: pane và phiên chính chung quota, và fgOS vẫn phải chạy được cho họ. Đường "config thuần" làm được ngay; đường để Miu khởi động tin cậy qua `fgos head start` cần một chút code Rust nhỏ (Q1).
 
 ## 2. Mục tiêu và đề bài
 
@@ -61,7 +61,7 @@ Id cục bộ của phiên shaping; planner mint D-ADR qua `fgos identity mint d
 | OD3 | Tài khoản của Miu không bao giờ bị pane làm cạn | chủ dự án 2026-11-18 |
 | SD1 | Dùng nhà của cơ chế có sẵn: `llmAccounts` + cờ `disabled` + lease/quarantine/walk hiện tại. Không thêm cơ chế lease mới | F1, F10 (L10, tenet một cửa) |
 | SD2 | Tài khoản `claude/vantt` hiện có là tài khoản của Miu về mặt quota (F3): ra khỏi pool pane ngay khi pool có ít nhất một tài khoản khác. Cho tới lúc đó pane vẫn chung quota với Miu | F3 |
-| SD3 | Thêm một cổng máy móc từ chối một store của `llmAccounts` mà đường thật (realpath) trùng thư mục login mặc định của chính CLI đó; một cửa, dùng bảng `CLI_LOGIN_HOMES` có sẵn | F11, tenet "một cửa cần guard máy móc" |
+| SD3 | Thêm một hàng doctor **cảnh báo, không bao giờ từ chối hay fail**, khi một store của `llmAccounts` có đường thật (realpath) trùng thư mục login mặc định của chính CLI đó, nêu rủi ro gia hạn (F15); dùng bảng `CLI_LOGIN_HOMES` có sẵn. Không từ chối cứng, vì người chỉ có một tài khoản Claude (login ở `~/.claude`) vẫn phải dùng được fgOS (chủ dự án 2026-11-18 18:22) | F11, F15, tenet "một cửa cần guard máy móc", ranh giới sứ mệnh (fgOS phục vụ project khác) |
 | SD4 | Giữ hành vi hết quota hiện tại cho pane (đổi tài khoản → đổi family → từ chối); không thêm chờ | F10 |
 
 ## 5. Q&A log
@@ -90,7 +90,7 @@ flowchart LR
 **Ba tầng, từ rẻ đến đủ.**
 
 1. **Config thuần (làm được ngay).** Thêm các tài khoản Claude khác vào pool `claude` (mỗi cái đăng nhập bằng `CLAUDE_CONFIG_DIR=<thư mục riêng> claude /login`, đúng quy trình trong guide declare-claude-seat-store); đặt `disabled: true` (hoặc xoá) cho `claude/vantt` khi pool đã có ít nhất một tài khoản khác. Miu giữ khởi động tay trên `~/.claude`. Không code. Hiệu quả: pane không còn tiêu quota Miu, Miu nằm ngoài lease.
-2. **Cổng máy móc (SD3).** Một lỗi cấu hình (config door, hàng `llm-accounts-shape`) hoặc một hàng doctor từ chối store nào có realpath trùng thư mục login mặc định của CLI đó (bảng `CLI_LOGIN_HOMES`). Mục đích: biến OD1 từ lời nói thành thứ không thể vô tình phá. Một chỗ, một bảng.
+2. **Cảnh báo máy móc (SD3).** Một hàng doctor chỉ-đọc, mức warn, báo store nào có realpath trùng thư mục login mặc định của CLI đó (bảng `CLI_LOGIN_HOMES`) kèm lý do và cách tách (một login thứ hai bằng `CLAUDE_CONFIG_DIR=<thư mục riêng> claude /login`). Không từ chối: người chỉ có một tài khoản Claude (login ở `~/.claude`) khai nó vào pool vẫn chạy được, chỉ chịu rủi ro gia hạn đã nêu; người có nhiều tài khoản được nhắc đúng lúc. Một chỗ, một bảng. Hệ quả cho OD1: việc giữ login mặc định cho Miu là quy ước của máy chủ dự án, không bị ép cho mọi người dùng fgOS.
 3. **Miu khởi động tin cậy qua `fgos head start secretary --name miu` (chỉ khi Q1 chọn).** Head là ghế confined có lease (F6). Để lease của Miu không chạm pool pane cần một khoá persona mới `runner.personas.<p>.pool` (Rust, crate seat-binding: policy.rs, schema, ca vàng) và một pool `claude-miu` mà không cell nào nêu tên (pool không cell nào nêu thì pane không bao giờ tới, an toàn theo cấu trúc, không cần cờ). Thư mục login của Miu trong đường này là kho riêng do fgOS sở hữu (một login thứ hai của cùng tài khoản Anthropic, có thể là kho `claude-vantt` hiện có), không phải `~/.claude`, vì F15. Bắt buộc có một lần khởi động thật chứng minh F14 (hook, skill, settings) trước khi dựa vào nó.
 
 **Hết quota.** Giữ nguyên (SD4): trong pool pane ghế xoay tài khoản theo thứ tự khai báo; hết tài khoản thì sang family tiếp theo của `tierFallback.<tier>`; không còn thì từ chối theo tên. Miu được bảo vệ bằng cấu trúc: tài khoản Anthropic của Miu không nằm trong pool pane (SD2, SD3), nên không đường nào của walk chạm tới. Rủi ro còn lại ngoài cấu hình: F12 (tier nặng ưu tiên claude) tăng áp lực lên pool pane; nó chỉ làm pane hết sớm hơn, không ảnh hưởng Miu.
@@ -105,9 +105,9 @@ flowchart LR
 - **Verify.** `fgos dispatch explain --for execute --json` rồi đọc `data.accounts`: pool `claude` không còn `vantt` usable; một khởi động pane thật lease một tài khoản mới.
 
 ### task-default-home-guard {#task-default-home-guard}
-- **Goal.** Từ chối máy móc một store của `llmAccounts` trùng login mặc định của CLI (SD3); xem Q3 về phạm vi.
+- **Goal.** Hàng doctor warn (không fail, không từ chối) khi một store của `llmAccounts` trùng login mặc định của CLI (SD3); xem Q3 về phạm vi.
 - **§6 excerpt.** Tầng 2. **D-IDs.** SD3, OD1. **Phụ thuộc.** không.
-- **Verify.** Test chủ của `llm-accounts` (hoặc hàng doctor) với một store giả trỏ vào thư mục login mặc định của một home tạm: bị từ chối, nêu tên khoá; store hợp lệ qua. Một proof sở hữu, đúng tầng thấp nhất.
+- **Verify.** Test chủ của `llm-accounts` (hoặc hàng doctor) với một store giả trỏ vào thư mục login mặc định của một home tạm: hàng doctor ra `warn` nêu tên khoá và cách tách, pool vẫn lease được; store riêng thì không cảnh báo. Một proof sở hữu, đúng tầng thấp nhất.
 
 ### task-miu-start {#task-miu-start}
 - **Goal.** `fgos head start secretary --name miu` chạy Miu trên tài khoản của Miu, ngoài pool pane, và proof bằng khởi động thật.
