@@ -21,6 +21,8 @@ footprint:
   - test/runner/dispatch-runtime-inspect.test.mjs
   - domains/coding/observe/**
   - apps/fgos/tests/driving_definitions.rs
+  - apps/fgos/tests/attention_definitions.rs
+  - apps/fgos/src/wiring/observe_sources/**
   - test/fixtures/observe/driving/**
   - docs/platform/observe/**
   - docs/backlog.md
