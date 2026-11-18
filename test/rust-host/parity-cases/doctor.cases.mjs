@@ -23,12 +23,16 @@ import { strict as assert } from 'node:assert';
 
 import { runCaseOnEntry } from '../harness.mjs';
 import { initFixtureRepo } from '../../helpers/git-fixture.mjs';
-import { writeProjectConfig, writeRawGlobalConfig, writeRawLegacyGlobalConfig, writeRawLegacyProjectConfig, writeRawProjectConfig } from '../../helpers/config-fixture.mjs';
+import { writeAccountsFile, writeProjectConfig, writeRawGlobalConfig, writeRawLegacyGlobalConfig, writeRawLegacyProjectConfig, writeRawProjectConfig } from '../../helpers/config-fixture.mjs';
 
 export const cases = [];
+// `FGOS_TEST_PARITY_ONLY` narrows a run to the cases whose id starts with one of its comma-separated prefixes.
+const only = (process.env.FGOS_TEST_PARITY_ONLY ?? '').split(',').filter(Boolean);
 
 const call = (args, extra = {}) => ({ args: ['doctor', ...args], ...extra });
-const add = (id, steps, extra = {}) => cases.push({ id: `doctor-${id}`, steps, ...extra });
+const add = (id, steps, extra = {}) => {
+  if (only.length === 0 || only.some((prefix) => `doctor-${id}`.startsWith(prefix))) cases.push({ id: `doctor-${id}`, steps, ...extra });
+};
 
 // Reading.
 add('plain', [call([])]);
@@ -204,7 +208,7 @@ const GIT_DIR = '.git';
 /** The rows whose description names the dispatch door: the base release names `dispatch.mjs decide`, this one `fgos dispatch decide`
  * (and the seat binding row names protocol 2). The host's words are pinned in the registry; here the rows are compared on all else. */
 const DESCRIBED_ANEW = new Set(['dispatch-decide-hook-wired', 'codex-hook-wired', 'agy-hook-wired', 'omp-hook-wired', 'pi-hook-wired', 'seat-binding-route']);
-/** The seven rows this change moved into Rust, for the per-row report (`FGOS_PARITY_ROWS` names a file the rows are appended to). */
+/** The seven rows this change moved into Rust, for the per-row report (`FGOS_TEST_PARITY_ROWS` names a file the rows are appended to). */
 const MOVED_ROWS = new Set(['runner-generated-paths', 'executor-confinement', 'invocation-git-write-grants', 'capability-serves-valid', 'omp-natives-present', 'agy-sub-homes-configured', 'tool-registry-configured']);
 
 function makeWorld() {
@@ -415,7 +419,7 @@ function act(world, step) {
       if (step.variant === 'agy-present') fs.mkdirSync(path.join(world.home, 'agy-homes', 'present'), { recursive: true });
       const runner = step.variant === 'agy-account' ? {} : { executors: executors[step.variant] ?? assert.fail(`unknown variant ${step.variant}`) };
       if (step.variant === 'agy-account') {
-        runner.llmAccounts = { gemini: { one: { credentialStore: { agy: `${world.home}/agy-homes/account-absent` } } } };
+        writeAccountsFile(path.join(world.home, '.fgos'), { llmAccounts: { gemini: { one: { credentialStore: { agy: `${world.home}/agy-homes/account-absent` } } } } });
       }
       if (step.variant.startsWith('tool-')) {
         runner.capabilities = Object.fromEntries(['tc-one', 'tc-two'].map((name) => [name, {}]));
@@ -428,8 +432,8 @@ function act(world, step) {
         'serves-identical': { capabilities: { review: { serves: { outputKind: 'finding', mutates: false } }, 'docs:review': { serves: { mutates: false, outputKind: 'finding' } } } },
         'serves-distinct': { capabilities: { review: { serves: { outputKind: 'finding', mutates: false } }, 'docs:review': { serves: { outputKind: 'finding', mutates: true } } } },
         'paths-good': { generatedPaths: [{ from: 'core/skills', also: ['.agents/skills'] }] },
-        'paths-glob': { generatedPaths: [{ from: '**/skills', also: [] }] },
-        'paths-parent': { generatedPaths: [{ from: 'core/../skills', also: [] }] },
+        'paths-glob': { generatedPaths: [{ from: '**/skills', also: ['.agents/skills'] }] },
+        'paths-parent': { generatedPaths: [{ from: 'core/../skills', also: ['.agents/skills'] }] },
         'paths-absolute': { generatedPaths: [{ from: 'core/skills', also: ['/abs/out'] }] },
       };
       writeRawProjectConfig(world.repo, `# @fgos:v1\n\n${JSON.stringify({ runner: sections[step.variant] ?? assert.fail(`unknown variant ${step.variant}`) })}\n`);
@@ -503,6 +507,10 @@ function normaliser(world, entry) {
       // The floor row no longer names the Node version (Node is the bridged rows' runtime, reported by them).
       .replace(/"message": "node v\d+\.\d+\.\d+, git available"/g, '"message": "git available"')
       .replace(/\(node v\d+\.\d+\.\d+, git available\)/g, '(git available)')
+      // The pretty text carries the rows' descriptions: the five hook rows name the dispatch door by its verb now, and the seat
+      // binding row names the protocol it speaks (the JSON answers are compared on every other field).
+      .replace(/\bdispatch\.mjs decide\b/g, 'fgos dispatch decide')
+      .replace('answers the internal seat-binding route at protocol 1', 'answers ladder on the internal seat-binding route at protocol 2, the protocol the Node client speaks (its message names the protocol it sent)')
       .replace(UUID, '<UUID>')
       // The machine id a fix mints is random after the host's name.
       .replace(new RegExp(`${MACHINE_ID_SLUG}-[a-z2-7]{6}\\b`, 'g'), '<MACHINE-ID>')
@@ -574,7 +582,7 @@ function describe(text, ignoreRows = [], accepted = null, side = 'host', runOf =
     // it lists the Git component's (accepted change); the floor in `detail` is compared.
     rows: data.checks.filter(({ id }) => !RETIRED_ROWS.has(id)).map(({ id, status, passed, fix, message, detail: rawDetail, description }) => {
       if (ignoreRows.includes(id)) return { id, description };
-      if (process.env.FGOS_PARITY_ROWS && MOVED_ROWS.has(id)) fs.appendFileSync(process.env.FGOS_PARITY_ROWS, `${JSON.stringify({ run: runOf, id, status, passed, fix, message })}\n`);
+      if (process.env.FGOS_TEST_PARITY_ROWS && MOVED_ROWS.has(id)) fs.appendFileSync(process.env.FGOS_TEST_PARITY_ROWS, `${JSON.stringify({ run: runOf, id, status, passed, fix, message })}\n`);
       if (DESCRIBED_ANEW.has(id)) return { id, status, passed, fix, message, detail: rawDetail, description: '<DESCRIBED ANEW>' };
       const detail = id === 'git-component-compatible' && rawDetail ? { ...rawDetail, versions: undefined }
         // How much finished-operation history the journal holds, and since when, depends on when the run was.
