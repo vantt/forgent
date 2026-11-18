@@ -15,7 +15,7 @@ Depends on phase 7. OPC reviews every run-supervisor gate change.
 ## Steps
 0. Find the owning proof of "empty pid namespace means the tree is dead" and every place that relies on it (gate wait,
    cancel, reap, orphan checks).
-1. Run-supervisor gate (Rust): track and kill a head's process tree without a pid namespace, by pidfd or cgroup
+1. Run-supervisor gate (Rust): track and kill a head's process tree without a pid namespace in the gate's existing non-pid-1 subreaper mode plus PDEATHSIG (decided 2026-11-18 from the step-0 scout: gates run in a root-owned scope, so no unprivileged cgroup; supervisor ack)
    (pick by what the gate already uses and what works unprivileged on Linux; macOS/Windows keep compiling). The old
    invariant is replaced by the new one ("the gate's tracked tree is empty => the tree is gone") with an owning proof
    that a forked grandchild is reaped on cancel and on gate exit.
