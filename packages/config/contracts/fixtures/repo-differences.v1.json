@@ -477,6 +477,10 @@
   [
    "workerSlots",
    "laneWaitSec"
+  ],
+  [
+   "runner",
+   "personas"
   ]
  ]
 }

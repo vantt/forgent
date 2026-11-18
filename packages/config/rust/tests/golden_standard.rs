@@ -116,6 +116,23 @@ fn every_standard_agent_pool_names_both_claude_and_openai() {
         if !list.is_array() {
             continue;
         }
+        // A head pinned to a bypass pane (the secretary) is not a failover pool: only claude has such a
+        // pane, and falling over to another family would change the head's permission mode.
+        let pins_bypass = list.as_array().unwrap().iter().any(|entry| {
+            let (Some(executor), Some(id)) =
+                (entry["executor"].as_str(), entry["invocation"].as_str())
+            else {
+                return false;
+            };
+            runner["executors"][executor]["invocations"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .any(|inv| inv["id"] == id && inv["permissionMode"] == "bypass")
+        });
+        if pins_bypass {
+            continue;
+        }
         let listed = names(list);
         if listed
             .iter()
