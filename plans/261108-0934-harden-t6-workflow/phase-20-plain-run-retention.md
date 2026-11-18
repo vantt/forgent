@@ -1,7 +1,8 @@
 ---
 phase: 20
 title: "Plain fgos run retention: a read-only measurement of the share and bytes of plain Unit runs for the owner machine (guide), then the retention options and their costs as an owner question; no rule is decided here"
-status: step 1 landed; step 2 waits for the owner numbers
+status: done
+decision: "step 1 landed 2026-11-08; step 2 owner option A 2026-11-18 13:10: do nothing now, no retention rule"
 depends_on: ["01-15 on main (T6 as closed 2026-11-08)"]
 parallel: "final wave: step 1 with 16, 17, 18, 19 (touches only the guide); step 2 waits for the owner's numbers and answer"
 effort: ~0.5d (step 1 ~0.25d, step 2 ~0.25d; the owner's measurement and answer are outside the estimate)

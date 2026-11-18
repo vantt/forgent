@@ -1,8 +1,8 @@
 ---
 title: "HARDEN T6 sub-plan: Workflow (guide and case)"
 description: "Step 4 of the HARDEN per-layer loop for T6: the accepted findings of the T6 arbitration and owner decision 71 (1a 2a 3a 4a 5b 6a 7a) split into fifteen sub-phases with one writer per hot file, plus a final wave of five (16-20, owner decision 73), six parallel leads in the widest wave, net size below zero, self-landing on fg-server2 and a Vietnamese owner-machine guide."
-status: running
-closedNote: "Open only on phase 20 step 2 (plain-run retention), waiting for the owner; phase 17 landed 6b45c34c5; size miss accepted by decision 73 (plans/reports/decision-261118-1308-harden-owner-questions.md)."
+status: done
+closedNote: "Closed 2026-11-18: phase 17 landed 6b45c34c5; size miss accepted by decision 73; phase 20 step 2 (plain-run retention) owner option A 2026-11-18 13:10: no retention rule now (plans/reports/decision-261118-1308-harden-owner-questions.md)."
 priority: P1
 effort: ~8d lead time (wave 0 ≈ 1d; P03 1d; wave 2 ≈ 2d; wave 3 ≈ 1.5d; P13 1.5d; P14 0.5d; P15 1d) + final wave ~1d wide (phases 16-20, five leads in parallel; 20 step 2 waits for the owner)
 branch: main (plan only; each phase runs on its own track branch `harden/t6-pNN-<slug>` in its own linked worktree from origin/main)
@@ -111,7 +111,7 @@ Settled without a phase: D5 (`fgos-cook` retry) closed by `b75259cbd`; W-6, W-7 
 | 17 | [Settle wins](phase-17-settle-wins.md) (decision 73 (b)) (**landed** 2026-11-08 `6b45c34c5`) | T6 as closed | final wave | `case-runtime.mjs`, `test/workflow/case-runtime.test.mjs`, `test/workflow/case-projection.test.mjs` (append) | +5 / 0 / +35 |
 | 18 | [Prune the whole case, keep reasons as one table](phase-18-prune-whole-case.md) (decision 73 (c) and (a)'s table) (**landed** 2026-11-08 `c9aecc8e5`) | T6 as closed | final wave | `case-close.mjs`, `test/workflow/case-close.test.mjs` | 0 / 0 / +25 |
 | 19 | [Status accounts for every run](phase-19-status-accounts.md) (decision 73 (d)) (**landed** 2026-11-08 `66567ab26`) | T6 as closed | final wave | `case-verbs.mjs`, `command-registry.mjs` (text), `test/workflow/units-runner.test.mjs` | 0 / 0 / +12 |
-| 20 | [Plain run retention: measure, then the owner question](phase-20-plain-run-retention.md) (decision 73 (e); **step 1 landed** 2026-11-08, the owner question waits for the numbers) | step 1 none; step 2 the owner's numbers and answer | final wave | guide only | 0 / 0 / 0 |
+| 20 | [Plain run retention: measure, then the owner question](phase-20-plain-run-retention.md) (decision 73 (e); **step 1 landed** 2026-11-08; step 2: owner option A 2026-11-18, no retention rule now) | step 1 none; step 2 the owner's numbers and answer | final wave | guide only | 0 / 0 / 0 |
 
 ```
 wave 0:  P01 ∥ P02                    P01 edits case-verbs/-runtime/-projection only after the answer-gate branch lands
