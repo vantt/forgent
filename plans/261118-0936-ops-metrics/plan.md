@@ -151,7 +151,7 @@ their consumers. A detection the supervisor plan adds later (pace, OM-D10), or o
 - Money and price tables (OM-D2).
 - Alerts or mailbox delivery (OM-D1).
 - The watcher process, its row-kind → action table, the supervisor, the pace and wake-trigger definitions, and the `fgos.watcher.tick` / `fgos.supervisor.wake` producers, which belong to the supervisor plan (OM-D10).
-- The question reader and the `fgos.question.*` producer, which belong to the secretary's grant follow-up plan (OM-D11).
+- The question reader and the `fgos.question.*` producer, which belong to the question owner, lead:HARDEN (OM-D11).
 - Sources for driving measures 4, 5 and 6, filed as backlog rows (OM-D6).
 - The council stability fix (p-24dxhwq7zr: only its measurement comes for free).
 - Retention of run directories (p-tslryr3buq).
@@ -198,12 +198,12 @@ Contract reading check (planner):
 
 External dependents:
 - The supervisor plan (session `shape-supervisor`): its watcher and wake producers wait for phases 1 and 4; its trigger definitions (`plan-became-ready`, `plan-done`, `plan-priority-changed`, `lane-freed`) read `fgos.plan.status` and `fgos.head.state` from phase 8; its watcher runs the phase-10 definitions.
-- The secretary's grant follow-up plan: its `fgos.question.*` producer waits for phase 1.
+- The `fgos.question.*` producer (owner of Q7: lead:HARDEN) waits for phase 1.
 
 ## Owner questions
 
 None open. Every question was answered in the discussion (OM-D1..D12). Q7 went to the secretary, which confirmed the
-event shape on 2026-11-18.
+event shape on 2026-11-18 and, by the owner's choice, forwarded it to lead:HARDEN.
 
 ## Risks and rollback
 
