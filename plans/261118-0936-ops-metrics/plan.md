@@ -26,7 +26,6 @@ footprint:
   - test/fixtures/observe/driving/**
   - docs/platform/observe/**
   - docs/backlog.md
-  - packages/distribution/contracts/doctor-registry.v1.json
   - apps/fgos/src/wiring/doctor/observe.rs
   - apps/fgos/src/wiring/doctor/mod.rs
   - test/setup/registrations.test.mjs

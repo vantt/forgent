@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Account lease for the secretary: Miu on her own pool, every other Claude account in the pane pool, a doctor warn for a store on a CLI's default login home"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 footprint:
@@ -19,7 +19,6 @@ footprint:
   - test/runner/runner-schema-vocabulary.test.mjs
   - docs/platform/seat-binding/spec.md
   - .fgos/config.yaml
-  - CHANGELOG.md
 base: 4c6f25972953e10bc86e5659d98f94400002b56a
 source:
   - docs/discussions/account-lease-secretary/DISCUSSION.md
@@ -117,6 +116,7 @@ owner/OPC; 3 and 4 `code:implement`; 5 `code:test` (live proof) plus the release
 
 | Plan (status) | Shared files | Handling |
 |---|---|---|
+| 261118-1455 S6a worktree door (ready) | `CHANGELOG.md` | out of this frontmatter footprint while 1455 holds it (plan-contract-check refuses two active plans on one path); phase 5 re-adds it to the footprint once 1455 is done (supervisor, 2026-11-18) |
 | 261118-0936 ops-metrics (running) | `packages/distribution/contracts/doctor-registry.v1.json` | phase 3 appends one row; rebase, not a wait |
 | 261118-1341 S6a execution tier (draft) | `src/runner/dispatch/llm-accounts.mjs`, `doctor-registry.v1.json`, `docs/platform/agent-confinement/spec.md` | phase 3 is a small additive edit; S6a's port carries the row (A5). Whichever lands second rebases |
 | 261118-1045 supervisor (draft) | `core/config-schema/**`, `.fgos/config.yaml`, `src/setup/**`, `test/**`, `doctor-registry.v1.json` (catch-all footprint) | one `$defs/taste.pool` property, one persona line, one registration; rebase, not a wait |
