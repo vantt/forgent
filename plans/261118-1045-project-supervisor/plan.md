@@ -226,6 +226,16 @@ accepted only from the asker or its successor: the supervisor passes the questio
 16, 18). The owner question verb is bare `fgos questions` (the `--open` flag is gone); the supervisor asks through
 `fgos questions ask`.
 
+**Handoff update 2 (2026-11-18, owner-question plan after its red team, 3300fcc1b).** A successor that the supervisor
+starts for a gone asker also holds the Identity role `answers:<question id>`, set at its start (phases 12 and 18 use
+whatever the question plan lands for setting that role; step 0 checks it). Only these may ack or cancel: the asker,
+a holder of the same `head:` role, the holder of `answers:<id>`, or any head for a migrated question. The supervisor
+never acks. The question store is an Event Store consumer `questions` (synced across machines), and
+`question-answered` anti-joins `fgos.question.acked`, so an answer that was already taken never wakes the supervisor.
+Heads ask, ack and cancel through the head-request verbs `questions ask|ack|cancel` that the question plan adds to
+`head_request.rs`, `head-request.v1.json` and `head-grants.mjs`. Phases 9 and 10 edit those files after that plan
+lands and keep its verbs.
+
 ## Leader rules (every phase)
 
 - Step 0 re-greps every input: this plan was written on `base` before its blocking plans finished; a finding
