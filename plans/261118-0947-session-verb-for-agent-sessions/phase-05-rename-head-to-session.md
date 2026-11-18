@@ -15,7 +15,7 @@ See the phase table footprint in plan.md.
 0. Re-grep on the landed tree; list every `fgos head` use with its file. Stop with `NEEDS_CONTEXT` if the verb landed in Rust or under another name.
 1. Registry entry `head` becomes `session` (same sub-verbs, flags, exit codes); drop the "provisional" note; regenerate manifest and routes.
 2. `bin/fgos.mjs` arm and every message/help text that prints `fgos head ...`.
-3. Socket verbs `head start|rotate` become `session start|rotate` in the contract, the Rust supervisor and the Node client; tests follow.
+3. Every socket verb `head <x>` (at base: `head start`, `head rotate`, `head answered`, `head restore role`) becomes `session <x>` in the contract, the Rust supervisor and the Node client; tests follow.
 4. Skills and hook text: `fgos head` becomes `fgos session`; `npm run build:skills` regenerates `.agents/skills`, `plugins/fgOS/skills`, `.claude/skills`.
 5. Rename `test/cli/head-verb.test.mjs` to `test/cli/session-verb.test.mjs` (same cases, plus `session end` answering unknown sub-verb as one case of the existing refusal proof).
 6. Session-host spec: the verb section speaks of `fgos session`; one decision-history line records the rename and that `fgos head` left no alias.
