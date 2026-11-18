@@ -17,7 +17,7 @@
 // guaranteed to exist by that point, so no main-checkout fallback is
 // needed here.
 
-import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../util/fgos-file-registry.mjs';
 import { appendFaultRecord } from '../util/capped-jsonl-log.mjs';
 
 /**

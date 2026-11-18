@@ -19,6 +19,7 @@ import { foldRunSetting } from '../runner/execution/run-request.mjs';
 import { anonymousInputName, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER, reportDigest, resolveUnitInputs } from '../runner/execution/handoff-refs.mjs';
 import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
 import { stepSubjectDigest, unitRunsOf } from './ref-digests.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 const GATE_ANSWER_NOTE_CHARS = 200;
 
@@ -412,7 +413,7 @@ export function settleUnitWorktrees({ mainRoot, state }) {
 export function canResumeUnitRun(mainRoot, uState) {
   if (!uState.unitRunId) return false;
   if (uState.worktreePath && !fs.existsSync(uState.worktreePath)) return false;
-  return unitRunFacts(path.join(mainRoot, '.fgos'), uState.unitRunId).resumable;
+  return unitRunFacts(fgosDirFromRoot(mainRoot), uState.unitRunId).resumable;
 }
 
 /**

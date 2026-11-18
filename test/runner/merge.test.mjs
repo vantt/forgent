@@ -24,7 +24,7 @@ import {
 // this file, next to the merge behavior that resolves a target through it.
 import { branchNameFor, detectTrunk } from '../../src/runner/worktree.mjs';
 import { activateGitFixture } from './worktree-native-fixture.helper.mjs';
-import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/util/fgos-file-registry.mjs';
 import { createLockScope, probe } from '../../src/holder-lock/index.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { withMainCheckout, withWorktreeAdmin } from '../../src/runner/repo-locks.mjs';

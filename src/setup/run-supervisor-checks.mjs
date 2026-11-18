@@ -20,7 +20,7 @@ import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL } from '../run-supervisor/protocol.
 import { resolveRuntimeSocketDir, ensureRuntimeSocketDir, RuntimeDirError, SOCKET_PATH_MAX_BYTES, SOCKET_NAME_BYTES } from '../run-supervisor/runtime-dir.mjs';
 import { adoptScan } from '../run-supervisor/client.mjs';
 import { GATE_KILL_GRACE_KEY, readDispatchConfig, resolveGateKillGrace, CANCEL_WAIT_KEY, resolveCancelWait } from '../run-supervisor/gate-kill-grace.mjs';
-import { fgosDirFromRoot } from '../runner/paths.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 const ROUTES = ['supervise', 'gate', 'adopt', 'attempt-step'];
 const PROBE_TIMEOUT_MS = 15_000;

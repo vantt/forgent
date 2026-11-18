@@ -15,6 +15,7 @@ import { tryAcquireAdvanceLock } from './case-lock.mjs';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { isCaseId, runDirOf, runsRoot } from '../runner/execution/case-run-paths.mjs';
 import { judgeUnitRun, removeUnitRun } from '../runner/execution/unit-run-record.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 /**
  * @param {object} params
@@ -176,7 +177,7 @@ function treeBytes(dir) {
  * that would have gone is listed as `case-kept`, so a dry run and an apply say the same.
  */
 function judgeCase({ mainRoot, caseId, ledger, namedElsewhere, kept }) {
-  const fgosDir = path.join(mainRoot, '.fgos');
+  const fgosDir = fgosDirFromRoot(mainRoot);
   const doomed = [];
   let blocked = false;
   for (const unitRunId of ledger.refs.unitRuns) {
@@ -265,7 +266,7 @@ export function pruneFinishedCases({ mainRoot, olderThanMs, apply = false, now =
         const size = treeBytes(unit.dir);
         if (apply) {
           let gone;
-          try { gone = removeUnitRun(path.join(mainRoot, '.fgos'), unit.id, { caseId, unless: namedElsewhere }); } catch { gone = { keep: 'delete-failed' }; }
+          try { gone = removeUnitRun(fgosDirFromRoot(mainRoot), unit.id, { caseId, unless: namedElsewhere }); } catch { gone = { keep: 'delete-failed' }; }
           if (gone.keep) { kept.push({ id: unit.id, reason: gone.keep }); failed = true; break; }
         }
         bytes += size;

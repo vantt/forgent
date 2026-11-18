@@ -18,9 +18,10 @@ const dirs = (dir) => { try { return fs.readdirSync(dir, { withFileTypes: true }
 const uniq = (xs) => [...new Set(xs.filter(Boolean))];
 const real = (p) => { try { return fs.realpathSync(p); } catch { return path.resolve(p); } };
 // Local on purpose: the reconcile import graph is an exact list, and `runner/paths.mjs` would pull the git and worktree closure into it.
-const fgosDir = (root) => path.join(root, '.fgos');
+const fgosDir = (root) => fgosDirFromRoot(root);
 
 import { AsyncLocalStorage } from 'node:async_hooks';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 const verbRunsCacheStorage = new AsyncLocalStorage();
 

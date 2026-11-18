@@ -20,6 +20,7 @@ import { evaluationsOf } from '../runner/execution/outcome.mjs';
 import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-port.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
 import { GATE_RUN_PREFIX } from './case-runtime.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 /** The default activity a gate settles: the one that produces the integrated tree's receipt. */
 const GATE_ACTIVITY = 'integrate';
@@ -80,7 +81,7 @@ export async function runCaseGate({
   // with it and a reservation whose custody is free is provably dead. Custody is released before the settle, so
   // the worktree is quiet when the port gives its binding back.
   let admitted;
-  const verified = await runUnderCustody(path.join(mainRoot, '.fgos'), realWorktree, async (custody) => {
+  const verified = await runUnderCustody(fgosDirFromRoot(mainRoot), realWorktree, async (custody) => {
     admitted = port.admit({
       unitRunId,
       caseRef: { caseId, activity, ...(reason ? { reason } : {}) },

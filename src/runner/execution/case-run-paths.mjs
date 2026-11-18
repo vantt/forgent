@@ -7,6 +7,7 @@
 
 import path from 'node:path';
 import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 const CASE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
 
@@ -14,7 +15,7 @@ const CASE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
 export const isCaseId = (id) => typeof id === 'string' && CASE_ID.test(id);
 
 /** The directory that holds every case, and the bindings directory beside them. */
-export const runsRoot = (mainRoot) => path.join(mainRoot, '.fgos', 'workflow-runs');
+export const runsRoot = (mainRoot) => path.join(fgosDirFromRoot(mainRoot), 'workflow-runs');
 
 /** The directory of one case; refuses an id that is not a case id. */
 export function runDirOf(mainRoot, caseId) {

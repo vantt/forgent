@@ -92,7 +92,7 @@ import { resolveRoot, hasOpenDescendant, indexChildrenByParent } from '../state/
 import { cleanupMergedBranch } from './merge.mjs';
 import { claimWork, ClaimError, readWorkerSlotCeiling } from './claim-port.mjs';
 import { hasWorkerSlotRoom, countWorkerSlots } from '../state/worker-slots.mjs';
-import { resolveRepoRoot, fgosDirFromRoot, resolveInvocationRoot } from './paths.mjs';
+import { resolveRepoRoot, resolveInvocationRoot } from './paths.mjs';
 import { FALLBACK_VERIFY, resolveDiscovery, classificationPatchFromVerdict } from '../intake/discovery.mjs';
 import { resolvePlan, resolveContentRoot } from '../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../intake/plan-verdict-from-plan-md.mjs';
@@ -104,6 +104,7 @@ import { runOutcome } from './dispatch/run-result.mjs';
 import { sweepAttempts } from '../run-supervisor/client.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 import { acquireSync, createLockScope, lockHolders, resolveLock } from '../holder-lock/index.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 // errorClass -> failure layer: 5-layer self-attribution (task-spec / context /
 // environment / verification / state) the runner stamps on every friction

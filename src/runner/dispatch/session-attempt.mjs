@@ -14,7 +14,6 @@ import {
 } from '../../run-supervisor/direct-launch.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from '../../session-host/head-grants.mjs';
-import { fgosDirFromRoot } from '../paths.mjs';
 import { withDefaultExecutor } from './config.mjs';
 import { createCredentialRenewal } from './provider-credential-renewal.mjs';
 import { BUILTIN_POLICIES } from './confinement/policies.mjs';
@@ -23,6 +22,7 @@ import {
   closeAttempt, leaseAccountForAttempt, openAttempt, prepareAttemptSeat, publishAttemptIntent,
   releaseSelectedProviderLease, renewLeasedLogin, startAndBind,
 } from './assignment-runner.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 export class SessionLaunchError extends Error {
   constructor(code, message, extra = {}) {

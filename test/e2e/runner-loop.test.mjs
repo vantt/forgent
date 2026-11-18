@@ -1,7 +1,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
-import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/util/fgos-file-registry.mjs';
 import { readRawEvents } from '../../src/state/store.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

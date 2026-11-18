@@ -60,8 +60,8 @@ import { enableCancelOnSignal } from '../src/run-supervisor/cancel-opt-in.mjs';
 // names from, derived from the executing copy's own on-disk location like `integrationScriptPath()` in
 // src/setup/registrations.mjs.
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-import { resolveInvocationRoot, fgosDirFromRoot } from '../src/runner/paths.mjs';
-import { resolveFgosFile, FGOS_FILE } from '../src/state/fgos-file-registry.mjs';
+import { resolveInvocationRoot } from '../src/runner/paths.mjs';
+import { resolveFgosFile, FGOS_FILE, fgosDirFromRoot } from '../src/util/fgos-file-registry.mjs';
 import { hasRealVerify } from '../src/intake/discovery.mjs';
 import { replaceLockedDecisionsSection, resolveContentRoot } from '../src/intake/plan.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';

@@ -48,7 +48,7 @@ import { bindSeatOf } from '../execution/seat-resolver.mjs';
 import { legacyStateKey } from './llm-accounts.mjs';
 import { loadRunnerConfigForDir, withDefaultExecutor } from './config.mjs';
 import { RunnerConfigError } from './runner-config-error.mjs';
-import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
+import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt } from './operation-prompt-templates.mjs';
 import { addDirsOf, withRunDirAccess } from './cli.mjs';
@@ -124,6 +124,7 @@ import {
   redactProviderCapacitySelection,
   releaseProviderAccountLease,
 } from './provider-capacity.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 export {
   buildEffectiveExecutionContract,
@@ -242,7 +243,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
       );
     }
     const root = opts.repoRoot ?? resolveRepoRoot(cwd);
-    const unitJsonPath = path.join(root, '.fgos', 'assignments', unitRunId, 'unit.json');
+    const unitJsonPath = path.join(fgosDirFromRoot(root), 'assignments', unitRunId, 'unit.json');
     if (!fs.existsSync(unitJsonPath)) {
       throw new RunnerConfigError(
         `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" refers to missing unit.json at "${unitJsonPath}" -- refused`,

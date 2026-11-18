@@ -1,11 +1,11 @@
 // fgos-file-registry.mjs — single source of truth for well-known FILE paths
 // under `.fgos/` (plans/260825-0842-fgos-logs-dir-bucketing, phase-03).
-// Kernel layer: pure `path.join`/`path.basename` only, no fs, no git, no
-// cwd knowledge -- every domain/kernel module that needs a `.fgos/` file
-// path can import this without violating the one-directional-layer rule
-// (test/architecture.test.mjs), unlike `src/runner/paths.mjs` (infra:
-// resolveMainCheckoutRoot etc. shell out to git), which only entry/
-// use-case/infra-layer callers may import.
+// Lowest layer (src/util, tier 0): pure `path.join`/`path.basename` only, no
+// fs, no git, no cwd knowledge -- every module of any tier that needs a
+// `.fgos/` path imports this without violating the one-directional-layer rule
+// (test/architecture.test.mjs). It also owns the one join of a project root
+// onto its `.fgos` (`fgosDirFromRoot`), unlike `src/runner/paths.mjs` (infra:
+// resolveMainCheckoutRoot etc. shell out to git).
 //
 // Before this module, well-known files (state.json, 5 diagnostic
 // logs) each had their path built
@@ -18,6 +18,13 @@
 // place of a raw string literal.
 
 import path from 'node:path';
+
+/** Join an already-resolved repo root onto `.fgos` — the single place that
+ * join happens, so every caller that already has a root (however it got
+ * resolved) produces the identical path. */
+export function fgosDirFromRoot(root) {
+  return path.join(path.resolve(root), '.fgos');
+}
 
 export const FGOS_FILE = {
   STATE: 'state',

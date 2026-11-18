@@ -45,6 +45,7 @@ import { readCancelWaitMs } from '../../run-supervisor/gate-kill-grace.mjs';
 import { listGenerations } from '../../run-supervisor/run-lock.mjs';
 import { currentAttemptOf } from './unit-state.mjs';
 import { admitFreshUnit, branchPathsOutsideScope, leftByDeadController, loadResumedUnit, writesWorktree } from './unit-run-start.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 /** A problem the caller should know of, told on the result as a structured warning and on stderr for a person. */
 function warnUnit(scope, code, message) {
@@ -299,7 +300,7 @@ async function runUnitBody(options, scope) {
   let rootsFailure = null;
   try { roots = resolveGitRoots(cwd, { allowNoRepository: true }); } catch (err) { rootsFailure = err; }
   const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots?.mainCheckoutRoot;
-  try { sweepAttempts({ assignmentsRoot: mainRoot ? path.join(mainRoot, '.fgos', 'assignments') : undefined }); } catch { /* best effort */ }
+  try { sweepAttempts({ assignmentsRoot: mainRoot ? path.join(fgosDirFromRoot(mainRoot), 'assignments') : undefined }); } catch { /* best effort */ }
   if (rootsFailure) throw rootsFailure;
 
   // The config this run reads live, at first use: the account inventory always comes from it, never from unit.json.
@@ -310,7 +311,7 @@ async function runUnitBody(options, scope) {
     worktreePath: options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot,
     caseRef: normalizeCaseRef(options.caseRef),
     port: options.caseAdmission === undefined ? null : assertCaseAdmissionPort(options.caseAdmission),
-    assignmentsDir: path.join(mainRoot, '.fgos', 'assignments'),
+    assignmentsDir: path.join(fgosDirFromRoot(mainRoot), 'assignments'),
     withAccounts: (runner) => ({ ...runner, ...readAccountInventory(mainRoot, options.runnerConfig) }),
     snapshot: () => snapshotRunnerConfig(mainRoot, liveConfig()),
     assertRepository: (writes) => assertRepositoryForWrites(roots, cwd, { writes }),

@@ -75,7 +75,6 @@
     "src/session-rotation/rotate.mjs": 5,
     "src/setup/": 9,
     "src/state/": 7,
-    "src/state/fgos-file-registry.mjs": 0,
     "src/terminal-control/": 2,
     "src/util/": 0,
     "src/verbs/": 9,
@@ -656,6 +655,26 @@
       "reason": "which project and which .fgos a call acts on is decided once, in fgos-git, for Node (through the addon) and the host. Patterns name the definitions of a root decision, not their callers (narrowed from the call names, to cover the same job exactly)"
     },
     {
+      "job": "join .fgos onto a project root",
+      "kind": "door",
+      "patterns": ["path\\.join\\((?!\\s*(?:home|homeDir|os\\.homedir\\(\\))\\b)(?:[^()]|\\([^()]*\\))*'\\.fgos'", "`[^`]*\\$\\{[^}]+\\}/\\.fgos\\b"],
+      "allowed": [
+        "src/util/fgos-file-registry.mjs",
+        { "path": "src/util/host-bin-path.mjs", "reason": "bootstrap: finds the activation before any door can load; the Git one-door scan needs the literal shim path" },
+        { "path": "scripts/**", "reason": "repo tooling and harnesses build their own fixture projects; not payload" }
+      ],
+      "debt": [
+        { "path": "src/runner/merge.mjs", "reason": "Work tier; Work is deferred until after the packaging release" },
+        { "path": "src/runner/operation-choice.mjs", "reason": "Work tier; Work is deferred until after the packaging release" },
+        { "path": "src/runner/work-dispatch.mjs", "reason": "Work tier; Work is deferred until after the packaging release" },
+        { "path": "src/state/porting-store.mjs", "reason": "Work tier; Work is deferred until after the packaging release" },
+        { "path": "src/state/store.mjs", "reason": "Work tier; Work is deferred until after the packaging release" },
+        { "path": "src/setup/registrations.mjs", "reason": "phase 6 swaps it" }
+      ],
+      "retiredBy": "the Work batch (T7) swaps the five Work-tier joins",
+      "reason": "which root is decided by the invocation-root door; the .fgos of that root is joined in one T0 function, so every tier uses the same answer"
+    },
+    {
       "job": "global fgOS directory",
       "kind": "door",
       "patterns": ["homedir\\(\\)\\s*,\\s*['\\\"]\\.fgos['\\\"]", "\\b(?:homeDir|home)\\s*,\\s*['\\\"]\\.fgos['\\\"]", "\\bhome\\.join\\(\\\"\\.fgos\\\"\\)", "pub fn home_dir\\(", "fn global_dir\\(", "export function globalFgosDir", "get\\(\\\"HOME\\\"\\)"],
@@ -691,8 +710,8 @@
       "allowed": [
         "packages/observe/rust/src/invocation_fault.rs",
         "src/observe/invocation-fault-log.mjs",
-        "src/state/fgos-file-registry.mjs",
-        "src/util/capped-jsonl-log.mjs"
+        "src/util/capped-jsonl-log.mjs",
+        "src/util/fgos-file-registry.mjs"
       ],
       "debt": [],
       "retiredBy": "S7: the Node twin retires with the last Node verb",
@@ -1805,7 +1824,7 @@
     "src/run-supervisor/steps/cleanup-trust.mjs": "infra",
     "src/run-supervisor/steps/finalize-home.mjs": "infra",
     "src/run-supervisor/steps/settle-attempt.mjs": "infra",
-    "src/state/fgos-file-registry.mjs": "kernel",
+    "src/util/fgos-file-registry.mjs": "kernel",
     "src/state/runtime-coordination.mjs": "infra",
     "src/runner/dispatch/brief.mjs": "infra",
     "src/run-supervisor/cwd-lock.mjs": "infra",

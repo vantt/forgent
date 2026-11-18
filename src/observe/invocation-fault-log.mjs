@@ -38,8 +38,8 @@
 import fs from 'node:fs';
 
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
-import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
-import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
+import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { resolveFgosFile, FGOS_FILE, fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { appendFaultRecord } from '../util/capped-jsonl-log.mjs';
 
 const FLAG_NAME = /^-{1,2}[A-Za-z][A-Za-z0-9-]{0,39}$/;

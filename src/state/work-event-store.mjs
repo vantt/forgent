@@ -5,7 +5,7 @@ import { prepareStore, readEventStoreConfig } from '../event-store/index.mjs';
 import { hotLockDepth, HotLockError } from './hot-lock.mjs';
 import { withConsumerState } from './consumer-event-gate.mjs';
 import { foldEvents, serializeView, VIEW_SCHEMA_VERSION } from './replay.mjs';
-import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../util/fgos-file-registry.mjs';
 import fs from 'node:fs';
 import { isDeepStrictEqual } from 'node:util';
 

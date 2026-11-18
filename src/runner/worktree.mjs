@@ -52,7 +52,7 @@ export function deleteBranchRef(repo, branch, expected = resolveRefSha(repo, bra
 function withCheckoutCustody(worktree, fn, { custody, scope = createLockScope('worktree-custody') } = {}) {
   const options = gitPortOptions(worktree, { mutation: true });
   if (custody) return fn(options, custody);
-  const acquired = acquireSync(scope, 'dispatch-cwd', { fgosDir: path.join(options.trustedMain, '.fgos'), cwd: worktree });
+  const acquired = acquireSync(scope, 'dispatch-cwd', { fgosDir: fgosDirFromRoot(options.trustedMain), cwd: worktree });
   if (acquired.result !== 'acquired') throw new HolderLockError('lock-held', 'worktree custody is held', { lock: 'dispatch-cwd' });
   try { return fn(options, acquired.handle); }
   finally { acquired.handle.release(); }
@@ -63,6 +63,7 @@ function restoreCheckout(repo, worktree, target, { baseline, reapplyLocalDelta =
 export function resetDispatchWorktree(repo, worktree, target) { return restoreCheckout(repo, worktree, target, { discardLocalDelta: true }); }
 
 import { statusPaths } from '../util/git-paths.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 /** Raised for any git worktree/branch operation failure. `errorClass`
  * reuses the vocabulary declared in `recovery.mjs`'s `ERROR_CLASSES` (per

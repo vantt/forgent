@@ -14,12 +14,12 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fgosDirFromRoot } from '../../runner/paths.mjs';
 import { readVisibility } from '../../runner/dispatch/visibility-session.mjs';
 import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
 import { findRunDir, listAssignmentRuns, RunLookupError } from '../../runner/dispatch/assignment-layout.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
 import { deriveUnitState, unitDirOfAssignment } from '../../runner/execution/unit-state.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 export class DispatchObserveError extends Error {
   constructor(code, message, details = {}) {

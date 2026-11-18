@@ -35,6 +35,7 @@ import { seedSync } from './unit-sync.mjs';
 import { resolveUnitInputs } from './handoff-refs.mjs';
 import { acquireUnitControl } from './unit-control.mjs';
 import { currentAttemptOf, lastAttempts } from './unit-state.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 /**
  * The text of a unit's persona, read once so every attempt and resume renders the same definition. A name
@@ -346,7 +347,7 @@ export function loadResumedUnit({ options, scope, mainRoot, worktreePath, port, 
   }
 
   // A live dispatch-cwd holder means a worker still runs in this worktree.
-  const cwdHolder = dispatchCwdHolder(path.join(mainRoot, '.fgos'), worktreePath);
+  const cwdHolder = dispatchCwdHolder(fgosDirFromRoot(mainRoot), worktreePath);
   if (cwdHolder) throw dispatchInFlightError(worktreePath, cwdHolder);
   assertNoStrayCommit(unitRunId, unitRecord, mainRoot);
   assertPinnedAccountsUsable(lastAttempts(unitRecord).filter((a) => a.outcome !== 'pass').map((a) => a.binding ?? {}), {
@@ -357,7 +358,7 @@ export function loadResumedUnit({ options, scope, mainRoot, worktreePath, port, 
   const declaredOp = unitRecord.declared ? declaredOperationOf(unitRecord.declared, unit, unitRecord.collaboration?.effective?.loop ?? unitRecord.pattern) : null;
   if (writing) {
     if (options.forceSharedCwd === true) throw sharedCwdRefusal(unitRecord.worktree, unit);
-    scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), unitRecord.worktree);
+    scope.custody = admitSuccessor(createLockScope('unit-custody'), fgosDirFromRoot(mainRoot), unitRecord.worktree);
   }
   return { unit, unitRunId, unitRecord, declaredOp, runnerConfigForLoop };
 }
@@ -428,7 +429,7 @@ export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, c
   if ((writing || caseRef) && !port) throw portMissing();
   const unitRunId = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
   if (writing && !caseRef) requireFreeWorktree(port, worktreePath);
-  if (writing) scope.custody = admitSuccessor(createLockScope('unit-custody'), path.join(mainRoot, '.fgos'), worktreePath);
+  if (writing) scope.custody = admitSuccessor(createLockScope('unit-custody'), fgosDirFromRoot(mainRoot), worktreePath);
   let admittedCeiling = null;
   if (caseRef) {
     const reason = caseRef.reason ?? options.reason ?? options.request?.reason ?? null;

@@ -11,6 +11,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { NO_GIT_DOOR_CODES, createGitInspect, gitPortOptions, readRepoFacts, worktreeDoor } from '../git/inspect.mjs';
 import { branchNameFor, checkoutPathForBranch, realpathOrSelf } from './worktree.mjs';
 
@@ -86,7 +87,8 @@ const isDirectory = (target) => {
 function rootWithoutGitDoor({ cwd, dir, policy }, cause) {
   if (policy === 'main-checkout-only') throw validationError(`cannot establish the main checkout of "${cwd}": ${cause}`);
   const root = path.resolve(typeof dir === 'string' && dir.trim() ? dir : cwd);
-  return { root, fgosDir: fgosDirFromRoot(root), found: isDirectory(path.join(root, '.fgos')) };
+  const fgosDir = fgosDirFromRoot(root);
+  return { root, fgosDir, found: isDirectory(fgosDir) };
 }
 
 /**
@@ -108,13 +110,6 @@ export function resolveInvocationRoot({ cwd = process.cwd(), dir, policy = 'call
   }
   if (answer.refused) throw validationError(answer.refused.message);
   return answer;
-}
-
-/** Join an already-resolved repo root onto `.fgos` — the single place that
- * join happens, so every caller that already has a root (however it got
- * resolved) produces the identical path. */
-export function fgosDirFromRoot(root) {
-  return path.join(path.resolve(root), '.fgos');
 }
 
 /** The logs directory under an already-resolved `.fgos` root. */
@@ -272,7 +267,7 @@ export function resolveContentRoot(stateRoot, id, docsRef) {
 
 // Well-known FILE paths under `.fgos/` (state.json, diagnostic
 // logs...) moved to
-// src/state/fgos-file-registry.mjs (kernel layer, tsk phase-03): this
+// src/util/fgos-file-registry.mjs (kernel layer, tsk phase-03): this
 // module (infra) reads git, so a domain/kernel-layer caller
 // importing FGOS_FILE/resolveFgosFile from here would violate the
 // one-directional-layer rule (test/architecture.test.mjs). Import from

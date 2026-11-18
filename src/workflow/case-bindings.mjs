@@ -20,6 +20,7 @@ import { installOnce, replaceDurably } from '../native/door.mjs';
 import { appendWorkflowEvent, fsyncDirectory, readWorkflowEvents } from './store.mjs';
 import { projectCase } from './case-projection.mjs';
 import { runsRoot } from '../runner/execution/case-run-paths.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 export const SENTINEL_NAME = '.root';
 
@@ -145,7 +146,7 @@ export function unbindWorktree({ mainRoot, hold, caseId, generation, key, worktr
   if (!fs.existsSync(file)) return { unbound: true, reason: 'no-record' };
   const record = parseRecord(file);
   if (!record || record.caseId !== caseId || record.generation !== generation) return { unbound: false, reason: 'generation-mismatch' };
-  if (custodyHeld(path.join(mainRoot, '.fgos'), worktree ?? record.worktreeRoot)) return { unbound: false, reason: 'attempt-not-quiet' };
+  if (custodyHeld(fgosDirFromRoot(mainRoot), worktree ?? record.worktreeRoot)) return { unbound: false, reason: 'attempt-not-quiet' };
   appendWorkflowEvent({
     repoRoot: mainRoot,
     workflowRunId: caseId,

@@ -27,6 +27,7 @@ import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { holdLockInChild } from '../helpers/hold-lock-in-child.mjs';
 import { dispatchCwdHolder } from '../../src/run-supervisor/cwd-lock.mjs';
 import { moveMachineKeysTo, writeGlobalConfig, writeProjectConfig, writeRawProjectConfig } from '../helpers/config-fixture.mjs';
+import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time. No real agent CLI is
@@ -53,7 +54,7 @@ function mkTempGitRepo() {
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd: repoRoot });
   const headCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
   activateGitFixture(repoRoot);
-  const fgosDir = path.join(repoRoot, '.fgos');
+  const fgosDir = fgosDirFromRoot(repoRoot);
   fs.mkdirSync(fgosDir, { recursive: true });
   return { repoRoot, fgosDir, headCommit };
 }
@@ -549,7 +550,7 @@ test('loadRunnerConfigForDir on a project with no config file reads the standard
   const cfg = withHome(mkTempDir(), () => withOnlyOnPath(['claude'], () => loadRunnerConfigForDir(dir)));
   assert.equal(cfg.executor.command, 'claude');
   assert.equal(cfg.timeoutMs, 900000);
-  assert.equal(fs.existsSync(path.join(dir, '.fgos')), false);
+  assert.equal(fs.existsSync(fgosDirFromRoot(dir)), false);
 });
 
 test('with no executor set and no assistant CLI on PATH the config loads, a named executor resolves, and the default refuses where it is used, naming the command that sets one', () => {
@@ -1406,7 +1407,7 @@ test('resolveExecutorCommand throws for a non-Claude "cli" executor even when fg
 });
 
 function writeRunnerConfigFixture(root, cfg) {
-  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
+  fs.mkdirSync(fgosDirFromRoot(root), { recursive: true });
   // `execute <agent>` names the capability it runs under; every fixture
   // carries the writing one the CLI tests dispatch with.
   const capabilities = { execute: { serves: { outputKind: 'change', mutates: true } }, ...cfg.capabilities };
@@ -2103,7 +2104,7 @@ test('registered executors.glm entry resolves command "claude" and env block fro
       defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } },
       timeoutMs: 1000,
     };
-    const fgosDir = path.join(repoRoot, '.fgos');
+    const fgosDir = fgosDirFromRoot(repoRoot);
     writeProjectConfig(repoRoot, { runner: glmConfig });
   
     const cfg = loadRunnerConfigForDir(repoRoot);

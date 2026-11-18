@@ -24,6 +24,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 /** The prefix of a result line; anything else on stdout is not a result. */
 export const RESULT_PREFIX = '\u001eFGOS-DOCTOR-BRIDGE ';
@@ -64,13 +65,13 @@ export async function serve(text, { write, runBridged, initStore, workHint, work
   let request;
   try { request = parseRequest(text); } catch (error) { write(resultLine('refusal', { message: error.message })); return 2; }
   if (request.phase === 'work-store-init') {
-    try { await initStore(path.join(request.dir, '.fgos')); } catch (error) { write(refusalLine(error)); return 2; }
+    try { await initStore(fgosDirFromRoot(request.dir)); } catch (error) { write(refusalLine(error)); return 2; }
     write(resultLine('end', { count: 0, nodeVersion }));
     return 0;
   }
   if (request.phase === 'work-dispatch-hint') {
     let hint;
-    try { hint = await workHint({ workId: request.workId, stage: request.stage, fgosDir: path.join(request.dir, '.fgos') }); } catch (error) { write(refusalLine(error)); return 2; }
+    try { hint = await workHint({ workId: request.workId, stage: request.stage, fgosDir: fgosDirFromRoot(request.dir) }); } catch (error) { write(refusalLine(error)); return 2; }
     write(resultLine('hint', { hint: hint ?? null }));
     write(resultLine('end', { count: 1, nodeVersion }));
     return 0;
@@ -122,7 +123,7 @@ export function readWorkQuestions({ dir }, { runsRoot, isCaseId, readCaseProject
       answerDoor: `fgos workflow answer ${runId} --step ${g.stepId} --answer "<answer>"`,
     }));
   });
-  const view = listWork(path.join(dir, '.fgos'));
+  const view = listWork(fgosDirFromRoot(dir));
   const asks = Object.values(view.work ?? {})
     .filter((item) => item.status === 'awaiting-human')
     .map((item) => ({

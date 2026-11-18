@@ -20,13 +20,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { readRunSnapshot } from './show-run.mjs';
 import { findRunDir, RunLookupError } from '../../runner/dispatch/assignment-layout.mjs';
-import { fgosDirFromRoot } from '../../runner/paths.mjs';
 import { plan, checkApply, collectEvidence, RecoveryPlannerError } from '../../runner/dispatch/recovery-planner.mjs';
 import { currentGeneration, controlDirs } from '../../run-supervisor/run-lock.mjs';
 import { findCoordinationSessionOwningAssignment } from '../../runner/dispatch/runtime-inspection.mjs';
 import { classifyRunOutcome } from '../../runner/dispatch/visibility-session.mjs';
 import { acquireSync, createLockScope, resolveLock } from '../../holder-lock/index.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 export class RecoveryError extends Error {
   constructor(code, message, details = {}) {

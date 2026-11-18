@@ -21,6 +21,7 @@ import { repairCaseBindings, unbindWorktree } from './case-bindings.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
 import { writeFrontmatter } from '../util/yaml.mjs';
 import { readAgentFileSync } from '../native/proof-helpers.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 /** The id prefix of the Unit run a case gate makes; a gate has no unit record to resume. */
 export const GATE_RUN_PREFIX = 'gate-run-';
@@ -71,7 +72,7 @@ const listJson = (dir) => {
  * a missing worktree, a lock that cannot be listed and a record that cannot be read are all "not proven".
  */
 function reservationDead(mainRoot, { worktree, unitRunId }) {
-  const fgosDir = path.join(mainRoot, '.fgos');
+  const fgosDir = fgosDirFromRoot(mainRoot);
   if (!worktree || !fs.existsSync(worktree) || custodyHeld(fgosDir, worktree)) return false;
   if (typeof unitRunId === 'string' && unitRunId.startsWith(GATE_RUN_PREFIX)) return true;
   const run = unitRunFacts(fgosDir, unitRunId);

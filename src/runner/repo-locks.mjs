@@ -10,6 +10,7 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { gitPortOptions } from '../git/inspect.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { createGitWorktree } from '../git/worktree.mjs';
 import { acquire, acquireSync, lockHolders, HolderLockError } from '../holder-lock/index.mjs';
 
@@ -80,7 +81,7 @@ function lockHeldError(res, label, fgosDir) {
 export function createWorktreeCheckoutSync(scope, repoRoot, request, { waitMs = DEFAULT_WORKTREE_ADMIN_WAIT_MS, inspect } = {}) {
   scope.assertCanAcquire(WORKTREE_ADMIN, 40);
   const options = gitPortOptions(repoRoot, { mutation: true, inspect });
-  const fgosDir = `${options.trustedMain}/.fgos`;
+  const fgosDir = fgosDirFromRoot(options.trustedMain);
   const res = acquireSync(scope, WORKTREE_ADMIN, { fgosDir }, { waitMs });
   if (res.result !== 'acquired') throw lockHeldError(res, 'worktree admin', fgosDir);
   try {
@@ -113,7 +114,7 @@ export async function addWorktree(scope, repoRoot, args, options = {}) {
   scope.assertCanAcquire(WORKTREE_ADMIN, 40);
   const context = gitPortOptions(repoRoot, { mutation: true });
   const request = creationRequest(args);
-  return withWorktreeAdmin(scope, `${context.trustedMain}/.fgos`, handle => {
+  return withWorktreeAdmin(scope, fgosDirFromRoot(context.trustedMain), handle => {
     try {
       if (fs.existsSync(request.path) && fs.readdirSync(request.path).length === 0) fs.rmdirSync(request.path);
       createGitWorktree(context)[request.branch ? 'create' : 'createDetached']({ ...request, operationId: crypto.randomUUID() }, [handle]);

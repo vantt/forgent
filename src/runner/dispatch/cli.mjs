@@ -8,7 +8,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 
 import { StoreError } from '../../util/store-error.mjs';
-import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
+import { resolveRepoRoot, resolveMainCheckoutRoot } from '../paths.mjs';
 import { loadRunnerConfigForDir } from './config.mjs';
 import { commandCli } from './provider-capacity.mjs';
 import { registeredCapabilityOf } from '../execution/capability-config.mjs';
@@ -23,6 +23,7 @@ import { envForSession } from './worker-session.mjs';
 import { resolveHerdrBin } from './transport.mjs';
 import { buildAssignment, claimAssignmentId } from './assignment.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 export { watchWritesOutsideWorkspace, strayWriteWarning } from '../../run-supervisor/stray-writes.mjs';
 

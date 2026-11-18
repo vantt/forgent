@@ -10,7 +10,7 @@ import { fork } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { initStore, addPorting, movePorting, listPorting, rebuild } from '../../src/state/porting-store.mjs';
 import { PortingError } from '../../src/state/porting.mjs';
-import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/util/fgos-file-registry.mjs';
 import { execFileSync } from 'node:child_process';
 
 const PORTING_STORE_MJS = pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/porting-store.mjs')).href;

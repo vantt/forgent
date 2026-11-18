@@ -5,7 +5,7 @@
 // that cache, so the next identity read folds the stream again and checks every
 // signature again.
 import fs from 'node:fs';
-import { FGOS_FILE, resolveFgosFile } from '../state/fgos-file-registry.mjs';
+import { FGOS_FILE, resolveFgosFile } from '../util/fgos-file-registry.mjs';
 
 /** The consumer registry's rebuild port: the view is empty until an identity read refolds it. */
 export function rebuildFromStore({ fgosDir }) {

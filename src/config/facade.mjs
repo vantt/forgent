@@ -6,6 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fromDoorJson, nativeDoor } from '../native/door.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 /** The variable a confined launch sets to `1` in every worker; the crate's `CONFINED_MARKER` and the launch driver name the same one. */
 export const CONFINED_MARKER_ENV = 'FGOS_CONFINED';
@@ -94,7 +95,7 @@ export const projectConfigPresent = (projectRoot, options = {}) => readConfig({ 
  * validating door, for the conversion of keys the door refuses on purpose; everything else asks the door.
  */
 export function readProjectConfigSource(dir) {
-  const fgosDir = path.join(dir, '.fgos');
+  const fgosDir = fgosDirFromRoot(dir);
   try {
     const entries = fs.readdirSync(fgosDir);
     const file = ['config.yaml', 'config.json'].find((name) => entries.includes(name));

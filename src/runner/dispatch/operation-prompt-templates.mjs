@@ -29,6 +29,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { RunnerConfigError } from './runner-config-error.mjs';
 import { domainCatalog } from '../../util/domain-dirs.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 import { PROTOCOL_OPERATION_STAMP_PREFIX } from './execution-contract.mjs';
 
 const THIS_DIR = path.dirname(fileURLToPath(import.meta.url));
@@ -36,7 +37,6 @@ export const PACKAGE_ROOT = path.resolve(THIS_DIR, '../../../');
 
 export const CORE_PROMPT_TEMPLATES_DIR = path.join('core', 'prompt-templates');
 export const DOMAIN_PROMPT_TEMPLATES_SEGMENT = 'prompt-templates';
-export const PROJECT_PROMPT_TEMPLATES_DIR = path.join('.fgos', 'prompt-templates');
 
 export const TEMPLATE_FILE_RE = /\.(md|txt)$/i;
 export const TEMPLATE_ID_RE = /^[A-Za-z0-9._-]+$/;
@@ -196,7 +196,7 @@ function scanTier(tier, dir, source, packageRoot = PACKAGE_ROOT) {
  * @returns {ReadonlyArray<object>}
  */
 export function discoverProjectPromptTemplates({ cwd = process.cwd(), packageRoot = PACKAGE_ROOT } = {}) {
-  return scanTier('project', path.join(cwd, PROJECT_PROMPT_TEMPLATES_DIR), 'project', packageRoot);
+  return scanTier('project', path.join(fgosDirFromRoot(cwd), DOMAIN_PROMPT_TEMPLATES_SEGMENT), 'project', packageRoot);
 }
 
 /**
@@ -269,7 +269,7 @@ export function loadOperationPromptTemplate(templateId, options = {}) {
   const targetDomain = options.domain;
 
   // 1. Check project tier
-  const projectDir = path.join(cwd, PROJECT_PROMPT_TEMPLATES_DIR);
+  const projectDir = path.join(fgosDirFromRoot(cwd), DOMAIN_PROMPT_TEMPLATES_SEGMENT);
   if (fs.existsSync(projectDir)) {
     const projectEntries = scanTier('project', projectDir, 'project', packageRoot);
     const found = projectEntries.find((e) => e.id === templateId);

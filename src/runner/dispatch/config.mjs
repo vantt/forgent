@@ -32,6 +32,7 @@ import {
   normalizeLegacyConfinement,
 } from './confinement/policies.mjs';
 import { rejectProjectBackendOverride } from './confinement/backend-registry.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 
 
@@ -157,7 +158,7 @@ export function resolveOriginLocations(origins, paths, projectDir) {
         displayFile = `~/.fgos/${rel}`;
       } else if (entry.layer === 'project' || entry.file?.startsWith('project:')) {
         const rel = entry.file ? entry.file.replace(/^project:/, '') : 'config.yaml';
-        displayFile = projectDir ? path.join(projectDir, '.fgos', rel) : `.fgos/${rel}`;
+        displayFile = projectDir ? path.join(fgosDirFromRoot(projectDir), rel) : `.fgos/${rel}`;
       } else if (entry.layer === 'shipped' || entry.layer === 'standard') {
         displayFile = '<standard>';
       } else {
@@ -333,7 +334,7 @@ export function loadRunnerConfigForDir(dir) {
   const cfg = JSON.parse(JSON.stringify(runner));
   refuseGlobalRigorToTier(origins);
   try {
-    validateRunnerConfigShape(cfg, `${path.join(dir, '.fgos')} runner`);
+    validateRunnerConfigShape(cfg, `${fgosDirFromRoot(dir)} runner`);
   } catch (err) {
     const attributed = attributeRunnerConfigError(err, origins, dir);
     if (attributed) throw attributed;

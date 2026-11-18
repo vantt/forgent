@@ -26,6 +26,7 @@ import { BWRAP_DRIVER_VERSION, CONFINED_MARKER_ENV, prepareBwrapSync } from '../
 import { MACHINE_PRIVATE_ROOTS, SESSION_SOCKET_DIR, resolveConfinementResources } from '../resources.mjs';
 import { SOCKET_PATH_MAX_BYTES } from '../../../../run-supervisor/runtime-dir.mjs';
 import { BUILTIN_POLICIES, BUILTIN_POLICY_IDS } from '../policies.mjs';
+import { fgosDirFromRoot } from '../../../../util/fgos-file-registry.mjs';
 
 export const PROOF_PROFILE = 'local-bwrap-v1';
 
@@ -475,7 +476,7 @@ export function probeHostReadAndNetworkNotOverclaimed({ bwrapBin = '/usr/bin/bwr
 export function probePeerRunHidden({ bwrapBin = '/usr/bin/bwrap', scratchDir, brokenConfig = false } = {}) {
   const root = fs.realpathSync(scratchDir);
   const project = path.join(root, 'project');
-  const fgosDir = path.join(project, '.fgos');
+  const fgosDir = fgosDirFromRoot(project);
   const peerReport = path.join(fgosDir, 'assignments', 'probe-unit', 'peer', '1', 'outbox', 'report-1.md');
   const ownDir = path.join(fgosDir, 'assignments', 'probe-unit', 'self', '1');
   const ownBrief = path.join(ownDir, 'brief.md');
@@ -684,7 +685,7 @@ function probeMachinePrivateHiddenIn({ bwrapBin, root, stand, blind, brokenConfi
     const slug = label.replace(/[+/]/g, '-');
     const dir = path.join(root, slug);
     const project = path.join(dir, 'project');
-    const fgosDir = path.join(project, '.fgos');
+    const fgosDir = fgosDirFromRoot(project);
     const ownDir = path.join(fgosDir, 'assignments', 'probe-unit', 'self', '1');
     const runDir = path.join(ownDir, 'runs', '01');
     const outboxFile = path.join(runDir, 'worker-output', 'outbox', 'probe-out.txt');

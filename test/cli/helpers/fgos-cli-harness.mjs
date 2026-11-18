@@ -25,7 +25,7 @@ import { appendEvent } from '../../helpers/legacy-event-fixture.mjs';
 import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
 import { moveUseCase } from '../../../src/verbs/state/move.mjs';
 import { claimWork } from '../../../src/runner/claim-port.mjs';
-import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../../src/util/fgos-file-registry.mjs';
 import { invokeHost } from '../../../src/util/host-bin.mjs';
 import { cliEntryFor, spawnFgos } from '../../helpers/cli-entry.mjs';
 import { initFixtureRepo, activateGitFixture } from '../../helpers/git-fixture.mjs';

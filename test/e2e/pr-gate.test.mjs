@@ -1,6 +1,6 @@
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
-import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/util/fgos-file-registry.mjs';
 import { invokeHost } from '../../src/util/host-bin.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

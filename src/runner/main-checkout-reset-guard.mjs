@@ -12,10 +12,10 @@ import { createLockScope } from '../holder-lock/index.mjs';
 import { gitPortOptions } from '../git/inspect.mjs';
 import { nativeError } from '../git/native.mjs';
 import { createGitSafeRestore } from '../git/restore.mjs';
-import { fgosDirFromRoot } from './paths.mjs';
 import { isWorkingTreeClean } from './merge.mjs';
 import { withMainCheckout } from './repo-locks.mjs';
 import { inspectGit, isMainWorktree } from './worktree.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 export class UnsafeMainCheckoutResetError extends Error {
   constructor(message) {

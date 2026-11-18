@@ -21,6 +21,7 @@ import { canonicalJson } from '../../native/door.mjs';
 // reports on are kernel locks (the import-graph test pins the door's files).
 import { acquireSync, createLockScope } from '../../holder-lock/index.mjs';
 import { dispatchCwdHolder } from '../../run-supervisor/cwd-lock.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 const digest = (v) => `sha256:${createHash('sha256').update(canonicalJson(v)).digest('hex')}`;
 const json = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return undefined; } };
@@ -61,7 +62,7 @@ const SETTLED_STATUS = 'settled';
 if (!RUN_STATUSES.includes(SETTLED_STATUS)) throw new Error('reconciliation-planner: repair-projection target status must be a member of visibility-session.mjs RUN_STATUSES');
 const actionKey = (snapshot, action, expiresAt) => `reconcile_${createHash('sha256').update(canonicalJson({ snapshot, action, expiresAt })).digest('hex')}`;
 
-function actionLog(root) { return path.join(root, '.fgos', 'dispatch', 'reconciliation-actions.jsonl'); }
+function actionLog(root) { return path.join(fgosDirFromRoot(root), 'dispatch', 'reconciliation-actions.jsonl'); }
 function resultFile(runDir) { return path.join(runDir, 'result.json'); }
 // Plans arrive over a public CLI boundary.  A path in one is descriptive only;
 // apply derives its actual target from the trusted root and action kind.
@@ -83,7 +84,7 @@ export function planReconciliation(root, { action = 'clear-cwd-lock', runId, cwd
     // The per-cwd dispatch lock is a kernel lock: a holder that dies has
     // already released it, so there is never a dead holder's lock to clear.
     // The plan only reports whether a live dispatch holds it.
-    if (dispatchCwdHolder(path.join(root, '.fgos'), cwd)) return { outcome: 'refused', reason: 'cwd lock is held by a live dispatch' };
+    if (dispatchCwdHolder(fgosDirFromRoot(root), cwd)) return { outcome: 'refused', reason: 'cwd lock is held by a live dispatch' };
     return { outcome: 'blocked', reason: 'no cwd lock is held' };
   });
 }
@@ -213,7 +214,7 @@ function planRepairProjection(root, { runId, now, ttlMs }) {
 // `<fgosDir>/locks/reconcile.lock`, one try. A crashed apply released it when
 // it died, so nothing here ever judges a holder alive or dead.
 function withLocalLock(root, fn) {
-  const res = acquireSync(createLockScope('reconcile'), 'reconcile', { fgosDir: path.join(root, '.fgos') });
+  const res = acquireSync(createLockScope('reconcile'), 'reconcile', { fgosDir: fgosDirFromRoot(root) });
   if (res.result !== 'acquired') return { outcome: 'blocked', reason: 'another reconcile apply is in progress' };
   try {
     fs.mkdirSync(path.dirname(actionLog(root)), { recursive: true });

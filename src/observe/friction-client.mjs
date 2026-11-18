@@ -9,7 +9,8 @@
 
 import { invokeHost } from '../util/host-bin.mjs';
 import { recordInvocationFault } from './invocation-fault-log.mjs';
-import { fgosDirFromRoot, resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 const INPUT_REFUSAL = /^fgos: error: invocation failed: provider failed: friction-invalid-input:\s*/;
 

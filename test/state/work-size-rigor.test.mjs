@@ -1,7 +1,7 @@
 import '../helpers/process-tmp-root.mjs';
 import { initializeWorkRepository } from '../helpers/work-store-release.mjs';
 import { prepareWorkStore } from '../../src/state/work-event-store.mjs';
-import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/util/fgos-file-registry.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';

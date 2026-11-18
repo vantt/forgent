@@ -2,8 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { consumers, loadRebuildModule } from '../../event-store/index.mjs';
 import { viewRevision } from '../../state/replay.mjs';
-import { fgosDirFromRoot } from '../../runner/paths.mjs';
 import { eventsContext } from './context.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 const sizeOf = value => Array.isArray(value) ? value.length : value && typeof value === 'object' ? Object.keys(value).length : undefined;
 

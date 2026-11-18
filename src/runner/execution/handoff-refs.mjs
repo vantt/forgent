@@ -16,6 +16,7 @@ import { resolveBlindHiddenRoots, isInsideRoot } from '../dispatch/confinement/r
 import { readSeatHistory } from './unit-run-history.mjs';
 import { seatKeyOf } from './legacy-seat-read.mjs';
 import { seatIdProblem } from '../../convention/seat-id.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 const UNIT_RUN_PREFIX = 'unit-run:';
 const GATE_ANSWER_PREFIX = 'gate-answer:';
@@ -97,7 +98,7 @@ function resolveUnitRunRef(input, mainRoot, seat, accept) {
   // A seat id becomes a path segment of the run's directory, so only Convention's seat ids reach it.
   const fail = (reason) => new HandoffRefError(input, seat && reason === 'no-such-role' ? 'no-such-seat' : reason);
   if (seatIdProblem(wanted) === 'invalid-identifier') throw fail('no-such-role');
-  const assignmentsDir = path.join(mainRoot, '.fgos', 'assignments');
+  const assignmentsDir = path.join(fgosDirFromRoot(mainRoot), 'assignments');
   const unitDir = path.resolve(assignmentsDir, unitRunId);
   if (path.dirname(unitDir) !== assignmentsDir || !fs.existsSync(unitDir)) throw fail('no-such-run');
   // The latest round counts (the history keeps only the latest fallback attempt of each round).
@@ -168,7 +169,7 @@ function liesInsideAny(ref, base, roots) {
 
 /** Whether `ref` lies inside a root `hostRead: blind` hides, so it reaches a blind worker only as a copy. */
 export function refIsHiddenFromBlind(ref, mainRoot) {
-  return liesInsideAny(ref, mainRoot, resolveBlindHiddenRoots({ fgosDir: path.join(mainRoot, '.fgos') }));
+  return liesInsideAny(ref, mainRoot, resolveBlindHiddenRoots({ fgosDir: fgosDirFromRoot(mainRoot) }));
 }
 
 /**
@@ -205,7 +206,7 @@ export function resolveUnitInputs(inputs, mainRoot, { anonymizeInto, blind = fal
   const refs = [];
   const sources = [];
   const copies = [];
-  const hiddenRoots = blind ? resolveBlindHiddenRoots({ fgosDir: path.join(mainRoot, '.fgos') }) : [];
+  const hiddenRoots = blind ? resolveBlindHiddenRoots({ fgosDir: fgosDirFromRoot(mainRoot) }) : [];
   for (const input of inputs) {
     let ref = input;
     const isUnitRun = input.startsWith(UNIT_RUN_PREFIX);
@@ -251,7 +252,7 @@ export function resolveUnitInputs(inputs, mainRoot, { anonymizeInto, blind = fal
  * an assignment's report, `gate-<step>` for a gate answer, else the file's own name.
  */
 export function plainInputName(index, source, mainRoot) {
-  const rel = path.relative(path.join(mainRoot, '.fgos'), source).split(path.sep);
+  const rel = path.relative(fgosDirFromRoot(mainRoot), source).split(path.sep);
   let what = path.basename(source, path.extname(source));
   if (rel[0] === 'assignments' && rel.length > 4) what = `${rel[2]}-r${rel[3]}`;
   else if (rel[0] === 'workflow-runs' && rel[2] === 'gate-answers') what = `gate-${what}`;

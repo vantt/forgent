@@ -16,6 +16,7 @@ import { replaceDurably } from '../native/door.mjs';
 import { createSessionHost } from './client.mjs';
 import { grantOf } from './head-grants.mjs';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 const PERSONA_PATTERN = /^[a-z][a-z0-9-]{0,63}$/;
 const NAME_PATTERN = /^[a-z0-9-]{1,32}$/;
@@ -38,7 +39,7 @@ export const headRoleOf = (persona, name) => `head:${persona}-${name}`;
 export const headKeyOf = (persona, name, gen) => `head-${persona}-${name}-${gen}`;
 
 /** The folder the lineage of one persona-name keeps its runtime files in (handoffs, the live placement). */
-export const lineageDirOf = (projectRoot, persona, name) => path.join(projectRoot, '.fgos', 'runtime', 'session-rotation', `${persona}-${name}`);
+export const lineageDirOf = (projectRoot, persona, name) => path.join(fgosDirFromRoot(projectRoot), 'runtime', 'session-rotation', `${persona}-${name}`);
 
 /** The record of where the live head of a lineage was placed (`{ role, gen, placement, runDir, persona, startedAt }`; `runDir` is the session attempt's directory), or null. */
 export function readHeadPlacement(dir) {
@@ -140,7 +141,7 @@ async function defaultRunnerConfig(projectRoot) {
 /** The generation a start without one takes: the first whose attempt directory does not exist yet. */
 export function nextHeadGeneration(projectRoot, persona, name) {
   let gen = 1;
-  while (fs.existsSync(path.join(projectRoot, '.fgos', 'assignments', headKeyOf(persona, name, gen)))) gen += 1;
+  while (fs.existsSync(path.join(fgosDirFromRoot(projectRoot), 'assignments', headKeyOf(persona, name, gen)))) gen += 1;
   return gen;
 }
 
@@ -151,7 +152,7 @@ async function defaultPin({ persona, projectRoot }) {
 
 async function defaultHandoff({ persona, name, projectRoot }) {
   const { readLatestHandoff } = await import('../session-rotation/handoff-store.mjs');
-  return readLatestHandoff({ fgosDir: path.join(projectRoot, '.fgos'), persona, name });
+  return readLatestHandoff({ fgosDir: fgosDirFromRoot(projectRoot), persona, name });
 }
 
 // ---- the use case -------------------------------------------------------------------------------

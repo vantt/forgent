@@ -53,6 +53,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lexSource } from '../../scripts/lib/js-source-lexer.mjs';
+import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 
 const root = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const LAYOUT_OWNER = 'src/runner/dispatch/assignment-layout.mjs';
@@ -513,7 +514,7 @@ test('detector recognizes direct, derived, wrapped and roots-loop listings and i
     ['probe.mjs: <module>: readdirSync(r)'],
   );
   assert.deepEqual(
-    detect(`const dirs = (dir) => fs.readdirSync(dir, { withFileTypes: true });\nconst base = path.join(root, '.fgos', 'assignments');\nfor (const id of dirs(base)) {}`),
+    detect(`const dirs = (dir) => fs.readdirSync(dir, { withFileTypes: true });\nconst base = path.join(fgosDirFromRoot(root), 'assignments');\nfor (const id of dirs(base)) {}`),
     ['probe.mjs: <module>: dirs(base)'],
   );
   assert.deepEqual(
@@ -559,13 +560,13 @@ test('detector follows multi-line bindings, callback and method parameters, glob
   // Globs carry the directory in their options or their pattern.
   assert.deepEqual(detect(`function f(fgosDir) {\n  return fs.globSync('**/result.json', { cwd: path.join(fgosDir, 'assignments') });\n}`), ["probe.mjs: f: globSync('**/result.json')"]);
   assert.deepEqual(detect(`async function f() {\n  for await (const p of fsp.glob('.fgos/assignments/**/run.json')) {}\n}`), ["probe.mjs: f: glob('.fgos/assignments/**/run.json')"]);
-  assert.deepEqual(detect(`function f(root) {\n  return fs.globSync('**/*.json', { cwd: path.join(root, '.fgos') });\n}`), ["probe.mjs: f: globSync('**/*.json')"]);
+  assert.deepEqual(detect(`function f(root) {\n  return fs.globSync('**/*.json', { cwd: fgosDirFromRoot(root) });\n}`), ["probe.mjs: f: globSync('**/*.json')"]);
   // An import alias of a primitive is still a primitive.
   assert.deepEqual(detect(`import { readdirSync as ls } from 'node:fs';\nfunction f(fgosDir) {\n  return ls(path.join(fgosDir, 'assignments'));\n}`), ["probe.mjs: f: ls(path.join(fgosDir, 'assignments'))"]);
   // Walking the whole state root descends into assignments.
   assert.deepEqual(
-    detect(`function f(root) {\n  return fs.readdirSync(path.join(root, '.fgos'), { recursive: true }).filter((p) => p.startsWith('assignments/'));\n}`),
-    ["probe.mjs: f: readdirSync(path.join(root, '.fgos'))"],
+    detect(`function f(root) {\n  return fs.readdirSync(fgosDirFromRoot(root), { recursive: true }).filter((p) => p.startsWith('assignments/'));\n}`),
+    ["probe.mjs: f: readdirSync(fgosDirFromRoot(root))"],
   );
   assert.deepEqual(detect(`function walk(dir) {\n  for (const e of fs.readdirSync(dir)) walk(path.join(dir, e));\n}\nwalk(fgosDir);`), ['probe.mjs: walk: readdirSync(dir)']);
   assert.deepEqual(
@@ -576,7 +577,7 @@ test('detector follows multi-line bindings, callback and method parameters, glob
   assert.deepEqual(detect(`function f(fgosDir) {\n  return fs.readdirSync(path.join(fgosDir, 'events'));\n}`), []);
   assert.deepEqual(detect(`function f(fgosDir) {\n  return fs.readdirSync(fgosDir);\n}`), []);
   assert.deepEqual(
-    detect(`function f(cwd) {\n  const dirs = [path.join(cwd, '.fgos', 'coordination-protocols')];\n  function scan(dir) {\n    for (const e of fs.readdirSync(dir)) scan(path.join(dir, e));\n  }\n  for (const d of dirs) scan(d);\n}`),
+    detect(`function f(cwd) {\n  const dirs = [path.join(fgosDirFromRoot(cwd), 'coordination-protocols')];\n  function scan(dir) {\n    for (const e of fs.readdirSync(dir)) scan(path.join(dir, e));\n  }\n  for (const d of dirs) scan(d);\n}`),
     [],
   );
   // Two nested helpers sharing a name each take only their own call sites' values.

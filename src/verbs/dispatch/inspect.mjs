@@ -5,11 +5,12 @@ import { inspectProviderCapacity } from '../../runner/dispatch/provider-capacity
 import { readAttemptView } from './show-run.mjs';
 import { createTerminalControl, scanTerminalAllocations } from '../../terminal-control/client.mjs';
 import { resolveHerdrBin } from '../../runner/dispatch/terminal-slot.mjs';
-import { fgosDirFromRoot, resolveMainCheckoutRoot } from '../../runner/paths.mjs';
+import { resolveMainCheckoutRoot } from '../../runner/paths.mjs';
 import { invokeHost } from '../../util/host-bin.mjs';
 import { OWN_PAYLOAD_ROOT } from '../../run-supervisor/payload-root.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 export class DispatchInspectError extends Error {
   constructor(message) { super(message); this.name = 'DispatchInspectError'; this.code = 'validation'; this.category = 'validation'; }

@@ -33,6 +33,7 @@ import { readLastAssistantMessage } from '../session-host/client.mjs';
 import { seatSessionDir } from '../runner/dispatch/confinement/authority.mjs';
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
 import { redactText, writeHandoff } from './handoff-store.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 export const ROTATION_REASONS = Object.freeze(['soft', 'hard', 'manual']);
 export const ROTATION_LOCK = 'session-rotation';
@@ -142,7 +143,7 @@ export function markSuccessorAnswered({ projectRoot, persona, name, key, session
 
 // ---- default ports ---------------------------------------------------------------------------------
 
-const lockParams = (projectRoot, persona, name) => ({ fgosDir: path.join(projectRoot, '.fgos'), id: `${persona}-${name}` });
+const lockParams = (projectRoot, persona, name) => ({ fgosDir: fgosDirFromRoot(projectRoot), id: `${persona}-${name}` });
 
 /** Whether a rotation of this lineage holds its lock right now (a shared try on the lock file; nothing is taken). */
 export function rotationHolds({ projectRoot, persona, name }) {
@@ -313,7 +314,7 @@ export async function rotateHeadSession(request, ports = {}) {
     const lastAssistantMessage = stopFacts.lastAssistantMessage
       ?? (reason === 'manual' ? await lastMessageOfOld(old, ports, clock) : null);
     const handoff = writeHandoff({
-      fgosDir: path.join(projectRoot, '.fgos'), persona, name, sessionId: stopFacts.sessionId ?? old.placement.key,
+      fgosDir: fgosDirFromRoot(projectRoot), persona, name, sessionId: stopFacts.sessionId ?? old.placement.key,
       rotate: reason, keep: config.keep, portfolio: existingIn(projectRoot, stopFacts.portfolio ?? reloadOf(config, persona)),
       delta: `${rotationIdLine(id)}\n${stopFacts.delta ?? ''}`,
       lastAssistantMessage, pendingQuestion: stopFacts.pendingQuestion ?? null,

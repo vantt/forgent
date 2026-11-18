@@ -14,7 +14,7 @@ import { readEventStoreConfig } from '../event-store/index.mjs';
 import { prepareWorkStore } from './work-event-store.mjs';
 import { withConsumerState } from './consumer-event-gate.mjs';
 import { getMainFgosDir } from './runtime-coordination.mjs';
-import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../util/fgos-file-registry.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { hotLockDepth, HotLockError } from './hot-lock.mjs';
 import path from 'node:path';

@@ -23,7 +23,7 @@ import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { KnowledgeValidationError, applyKnowledgeEvent } from './knowledge-registry.mjs';
 import { resolveFriction, recordFriction } from '../observe/friction-client.mjs';
 export { recordFriction, resolveFriction };
-import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../util/fgos-file-registry.mjs';
 import { readClaim, readClaims, releaseClaimTx, withMainState, getMainFgosDir, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
 
 import { StoreError, categoryOf } from '../util/store-error.mjs';

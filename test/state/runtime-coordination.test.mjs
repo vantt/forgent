@@ -10,7 +10,7 @@ import { fork } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { initStore, addWork, settleClaim, listWork, readyWork, moveWork, editWork, graphWhatIf, footprintConflicts, computedSchedule, staleDoingAdvisory, readRawEvents, addDecision, recordGateApprove, StoreError } from '../../src/state/store.mjs';
 import { acquireClaim, releaseClaim, readClaim, readClaims, buildEffectiveView, getItemDurableRevision, ClaimError } from '../../src/state/runtime-coordination.mjs';
-import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/util/fgos-file-registry.mjs';
 import { loadNativeAddon } from '../../src/git/native.mjs';
 
 const STORE_MJS = pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs')).href;

@@ -9,6 +9,7 @@ import { runDirOf } from '../runner/execution/case-run-paths.mjs';
 import { acquireSync, createLockScope, lockHolders, probe, resolveLock } from '../holder-lock/index.mjs';
 import { createAdvanceHold, recoverWorkflowLedgerTail } from './store.mjs';
 import { drainCaseInbox } from './case-runtime.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 export const PROGRESS_LINE_LIMIT = 300;
 // Set by the detached child that advances a case, so only it prints progress to its log.
@@ -18,7 +19,7 @@ export const ADVANCE_DETACHED_ENV = 'FGOS_WORKFLOW_ADVANCE_DETACHED';
 // lets one process advance a run at a time and releases it the moment that process dies, so a holder
 // killed mid-advance never leaves the run stuck.
 function advanceLockParams(mainRoot, workflowRunId) {
-  return { fgosDir: path.join(mainRoot, '.fgos'), workflowRunDir: runDirOf(mainRoot, workflowRunId) };
+  return { fgosDir: fgosDirFromRoot(mainRoot), workflowRunDir: runDirOf(mainRoot, workflowRunId) };
 }
 
 /** `{ pid }` of the process currently advancing the run (pid null when unlistable), null when nothing holds it. */

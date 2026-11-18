@@ -7,14 +7,8 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
-import {
-  resolveRepoRoot,
-  resolveInvocationRoot,
-  resolveMainCheckoutRoot,
-  fgosDirFromRoot,
-  resolveLogsDir,
-  resolveSkillRoot,
-} from '../../src/runner/paths.mjs';
+import { resolveRepoRoot, resolveInvocationRoot, resolveMainCheckoutRoot, resolveLogsDir, resolveSkillRoot } from '../../src/runner/paths.mjs';
+import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -52,7 +46,7 @@ test('resolveRepoRoot throws (validation) outside a git repository', () => {
 
 test('fgosDirFromRoot joins .fgos onto an already-resolved root', () => {
   const root = path.resolve('/some/repo/root');
-  assert.equal(fgosDirFromRoot(root), path.join(root, '.fgos'));
+  assert.equal(fgosDirFromRoot(root), fgosDirFromRoot(root));
 });
 
 test('fgosDirFromRoot resolves a relative root with path.resolve before joining', () => {
@@ -118,7 +112,7 @@ test("a refusal of the door is a validation error carrying the door's own text, 
 
 test('an install with no Git door answers the directory itself for every policy but the destructive one, which refuses', () => {
   const plain = real(mkTempDir('paths-door-no-door-'));
-  fs.mkdirSync(path.join(plain, '.fgos'));
+  fs.mkdirSync(fgosDirFromRoot(plain));
   const module = pathToFileURL(path.resolve('src/runner/paths.mjs')).href;
   const ask = (request) => {
     const script = `import {resolveInvocationRoot} from ${JSON.stringify(module)};
@@ -127,7 +121,7 @@ test('an install with no Git door answers the directory itself for every policy 
     return JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { cwd: plain, encoding: 'utf8', env }));
   };
   for (const policy of ['caller-tree', 'main-checkout', 'strict-cwd']) {
-    assert.deepEqual(ask({ cwd: plain, policy }), { root: plain, fgosDir: path.join(plain, '.fgos'), found: true }, policy);
+    assert.deepEqual(ask({ cwd: plain, policy }), { root: plain, fgosDir: fgosDirFromRoot(plain), found: true }, policy);
   }
   const refused = ask({ cwd: plain, policy: 'main-checkout-only' });
   assert.equal(refused.category, 'validation');

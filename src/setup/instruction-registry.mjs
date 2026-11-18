@@ -18,6 +18,7 @@ import { cutFrontmatter, parseYaml } from '../util/yaml.mjs';
 import { domainCatalog } from '../util/domain-dirs.mjs';
 import { buildDecisionIndexMarkdown, narrativeHolderResolver } from '../report/decision-index.mjs';
 import { listWork } from '../state/store.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 /**
  * Valid instruction rule forces (Section 6)
@@ -92,7 +93,7 @@ const DECISION_ID_PATTERN = /^D-ADR\d{4}$/;
 const DECISION_ID_PREFIX_PATTERN = /^\s*(D-ADR\d{4})\b/;
 const VERIFIED_SUPERSESSION_UNITS = new WeakSet();
 
-function readDecisionIds(projectRoot, fgosDir = path.join(projectRoot, '.fgos')) {
+function readDecisionIds(projectRoot, fgosDir = fgosDirFromRoot(projectRoot)) {
   const indexPath = path.join(projectRoot, 'docs', 'decisions', 'index.md');
   if (!fs.existsSync(indexPath)) return new Set();
   const content = fs.readFileSync(indexPath, 'utf8');

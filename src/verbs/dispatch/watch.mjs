@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { readRunSnapshot, DispatchObserveError } from './show-run.mjs';
 import { findRunDir, RunLookupError } from '../../runner/dispatch/assignment-layout.mjs';
-import { fgosDirFromRoot } from '../../runner/paths.mjs';
+import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
 
 /** How often to look, when the caller does not say. */
 export const DEFAULT_WATCH_INTERVAL_MS = 1000;

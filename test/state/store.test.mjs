@@ -23,7 +23,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { initStore, addWork, editWork, moveWork, moveStep, addOutcome, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, rebuild, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
 import { appendEvent } from '../helpers/legacy-event-fixture.mjs';
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
-import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { resolveFgosFile, FGOS_FILE } from '../../src/util/fgos-file-registry.mjs';
 
 const WRITER_SOURCES = new Set(['registry', 'env', 'pid', 'unresolved']);
 

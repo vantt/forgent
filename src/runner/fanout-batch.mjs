@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from './paths.mjs';
+import { resolveMainCheckoutRoot, resolveRepoRoot } from './paths.mjs';
 import { loadRunnerConfigForDir } from './dispatch/config.mjs';
 import { readConfig } from '../config/facade.mjs';
 import { listWork } from '../state/store.mjs';
@@ -11,6 +11,7 @@ import { workDispatchHint, workUnitFor } from './work-dispatch.mjs';
 import fs from 'node:fs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 import { isMainModule } from '../../scripts/lib/is-main-module.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 /** The host that serves `fgos` for the project at `root`; none is a refusal, never another checkout's binary. */
 export function resolveBinFgos(root) {

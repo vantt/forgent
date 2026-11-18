@@ -40,6 +40,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 const RUNTIME_DIRS = new Set(['.fgos', '.claude', 'target', 'node_modules']);
 const UNKNOWN = null;
@@ -228,7 +229,7 @@ function canonical(p) {
   }
 }
 
-const isMainCheckoutRoot = (dir) => Boolean(statOrNull(path.join(dir, '.git'))?.isDirectory() && statOrNull(path.join(dir, '.fgos'))?.isDirectory());
+const isMainCheckoutRoot = (dir) => Boolean(statOrNull(path.join(dir, '.git'))?.isDirectory() && statOrNull(fgosDirFromRoot(dir))?.isDirectory());
 
 /** The checkout `dir` lies in: `{ root, main }` for the nearest directory holding a `.git` entry,
  * with `mainRoot` the main checkout a linked worktree belongs to; null outside any checkout. */

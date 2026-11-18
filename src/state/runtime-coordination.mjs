@@ -7,8 +7,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
-import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
+import { resolveFgosFile, FGOS_FILE, fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
+import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { withWorkState } from './work-event-store.mjs';
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
