@@ -11,6 +11,20 @@ Decisions: SV-1, SV-5. Depends on phases 1 and 2 (no caller left). Evidence: sca
 - `packages/git/rust/src/store_admission.rs` (`is_session_worktree` ~161, the admission branch ~122-133, tests ~296), `packages/git/contracts/mutation-census.v1.json`, `docs/platform/git/spec.md` G-191 (~850, ~1308).
 - `test/rust-host/help-routes.test.mjs`, `test/util/host-bin.test.mjs`, `test/rust-host/fixtures/store-declaration-vectors.json`.
 
+## Facts re-checked on origin/main 0d3179d92 (lead, 2026-11-18)
+- `main.rs` descriptors :149-152, :375-380; `routing.rs:90`; catalog `session.*` :292-331 (test assert :490-493); no
+  separate `session.*` contract files. `cli_tests.rs` session cases: `test_session_verbs_start_no_node` (:3005),
+  `test_session_verbs_outside_a_project_are_refused_and_create_nothing` (:3084).
+- `apps/fgos/src/cli_projector.rs:111-116,231` imports `wiring::session::*_OPERATION_ID` and `project_session_args`:
+  remove those (the `identity session` projection ~:474 stays for phase 4).
+- Registry `session` entry `command-registry.mjs:2280`; generator `scripts/export-command-selectors.mjs`.
+- The `sessions` lock (rank 80) is taken only by `session.rs` (`lock_sessions`): retire it.
+- `store_admission.rs`: `is_session_worktree` :166, call :128, tests :297, :339, :427, :522, :594. Census `session.rs`
+  rows :144, :2027, :2034 (regenerate). G-191 `docs/platform/git/spec.md:853,1312`.
+- Fixtures: `store-declaration-vectors.json:34-39` (six `session` vectors, also read by `test/cli/fgos-manifest.test.mjs`),
+  `help-routes.test.mjs:187,195`, `host-bin.test.mjs:185-186` (`session list`: replace with another read-only verb).
+- Head code (`src/session-host`, `src/session-rotation`, `packages/run-supervisor`) calls no `session` host verb.
+
 ## Files this phase may write
 See the phase table footprint in plan.md.
 
