@@ -83,11 +83,6 @@
   },
   "tierExceptions": [
     {
-      "from": "src/identity/directory-store.mjs",
-      "to": "src/state/runtime-coordination.mjs",
-      "reason": "the identity directory rebuild finds the main .fgos directory through the Work state helper getMainFgosDir; it goes to the invocation-root door with the Work batch"
-    },
-    {
       "from": "src/util/host-bin.mjs",
       "to": "src/runner/paths.mjs",
       "reason": "the host binary lookup needs the main checkout root and the .fgos directory that paths.mjs resolves through the Git port; the root resolver moves down when the project locator becomes one leaf"
