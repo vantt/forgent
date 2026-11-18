@@ -475,8 +475,9 @@ test('a workspace, cwd or repo root inside a machine-private root is refused bef
   assert.deepEqual(ok, []);
 });
 
-// A head granted its peers reads the session sockets under the user runtime directory and the session registry under
-// the Claude login home: both lie inside machine-private roots, and both are bound back read-only after the masks.
+// A head granted its peers reaches the session sockets under the user runtime directory and the session registry under
+// the Claude login home: both lie inside machine-private roots, and both are bound back read-write after the masks
+// (its own Claude Code registers and listens there), which the real preflight accepts.
 test('a head granted its peers starts with the session sockets and registry inside machine-private roots, and a non-session launch carrying that grant is still refused', async () => {
   const host = makeHost({ withPrivate: false, socketBase: 'with-sockets' });
   const registry = path.join(host.home, '.claude', 'sessions');
@@ -511,9 +512,10 @@ test('a head granted its peers starts with the session sockets and registry insi
     const args = out.invocation.args;
     const head = args.slice(0, args.indexOf('--'));
     await out.cleanup();
-    const sockets = indexOfFlag(head, '--ro-bind', host.sessionSockets);
-    assert.ok(sockets > indexOfFlag(head, '--tmpfs', host.claudeSocketBase) && indexOfFlag(head, '--tmpfs', host.claudeSocketBase) > 0, 'the sockets are bound back read-only after the runtime directory mask');
-    assert.ok(indexOfFlag(head, '--ro-bind', registry) > 0, 'the registry is bound read-only');
+    const sockets = indexOfFlag(head, '--bind', host.sessionSockets);
+    assert.ok(sockets > indexOfFlag(head, '--tmpfs', host.claudeSocketBase) && indexOfFlag(head, '--tmpfs', host.claudeSocketBase) > 0, 'the sockets are bound back read-write after the runtime directory mask');
+    assert.ok(indexOfFlag(head, '--bind', registry) > 0, 'the registry is bound read-write');
+    assert.equal(indexOfFlag(head, '--ro-bind', host.sessionSockets) + indexOfFlag(head, '--ro-bind', registry), -2, 'neither peer directory is bound read-only as well');
 
     const refused = assessBwrap(launch(null), backendFor(host));
     assert.equal(refused.coverage['grant:peer-sessions'], 'unsatisfied');

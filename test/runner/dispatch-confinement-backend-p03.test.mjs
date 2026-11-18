@@ -1364,7 +1364,7 @@ test('a launched secretary shape cannot write docs/backlog.md or any docs file, 
   }
 });
 
-test('a launched secretary shape keeps the host pid space and reaches the session sockets and registry read-only; a worker shape keeps its own pid namespace', async (t) => {
+test('a launched secretary shape keeps the host pid space, reaches the session sockets and registry and registers and listens beside its peers; a worker shape keeps its own pid namespace', async (t) => {
   if (!HAS_WORKING_BWRAP) return t.skip('no working bwrap on this machine');
   // Outside /tmp: the sandbox mounts a private tmpfs there.
   const base = fs.mkdtempSync(path.join(fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir(), 'fgos-peers-shape-'));
@@ -1394,8 +1394,8 @@ test('a launched secretary shape keeps the host pid space and reaches the sessio
         `[ -d /proc/${process.pid} ]`,
         `node -e 'require("net").connect(process.env.XDG_RUNTIME_DIR + "/cc-socks/4242.sock").on("data", (d) => process.exit(String(d) === "peer\\n" ? 0 : 1)).on("error", () => process.exit(1))'`,
         `[ "$(cat ${privateHome}/sessions/4242.k.key)" = key ]`,
-        `! (echo x > ${privateHome}/sessions/1.json) 2>/dev/null`,
-        `! (echo x > "$XDG_RUNTIME_DIR/cc-socks/1.sock") 2>/dev/null`,
+        `echo '{"pid":1}' > ${privateHome}/sessions/1.json`,
+        `node -e 's = require("net").createServer().listen(process.env.XDG_RUNTIME_DIR + "/cc-socks/1.sock", () => process.exit(0))'`,
         `[ ! -e "$XDG_RUNTIME_DIR/bus" ]`,
       ].join(' && ');
       const prepared = await prepareBwrap(plan, {
@@ -1415,13 +1415,17 @@ test('a launched secretary shape keeps the host pid space and reaches the sessio
     };
 
     const head = await launch('head:secretary-miu');
+    for (const dir of [path.join(runtime, 'cc-socks'), path.join(home, '.claude', 'sessions')]) assert.ok(head.args.some((arg, i) => arg === '--bind' && head.args[i + 1] === dir), `${dir} is bound read-write`);
     assert.equal(head.args.includes('--unshare-pid') || head.args.includes('--as-pid-1'), false, 'no pid namespace');
     assert.equal(head.env.XDG_RUNTIME_DIR, runtime);
     assert.equal(head.code, 0, head.output);
-    assert.deepEqual(fs.readdirSync(path.join(home, '.claude', 'sessions')).sort(), ['4242.json', '4242.k.key']);
+    assert.deepEqual(fs.readdirSync(path.join(home, '.claude', 'sessions')).sort(), ['1.json', '4242.json', '4242.k.key'], 'the head registers in the host registry');
+    assert.ok(fs.statSync(path.join(runtime, 'cc-socks', '1.sock')).isSocket(), 'the head listens in the host socket directory');
+    for (const own of [path.join(home, '.claude', 'sessions', '1.json'), path.join(runtime, 'cc-socks', '1.sock')]) fs.rmSync(own);
 
     const worker = await launch('head:shaper-x');
     assert.ok(worker.args.includes('--unshare-pid') && worker.args.includes('--as-pid-1'), 'a launch without the grant keeps its own pid namespace');
+    assert.equal(worker.args.some((arg) => arg === path.join(runtime, 'cc-socks') || arg.startsWith(path.join(home, '.claude', 'sessions'))), false, 'a launch without the grant binds no peer directory');
     assert.notEqual(worker.code, 0, 'without the grant the host pid space, the sockets and the registry stay out of reach');
   } finally {
     peer.close();
@@ -1491,7 +1495,7 @@ test('assessBwrap: a workspace-paths grant is supported under host-write-denied 
       requirement: {
         mode: 'required', policyId: 'host-write-denied', policy: {
           controls: { hostWrite: 'deny', hostRead: 'allow', networkEgress: 'allow', process: 'host', home: 'host', session: 'shared', workspace: 'shared' },
-          grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }, { resource: 'peer-sessions', access: 'read', scope: 'dispatch', optional: false }],
+          grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }, { resource: 'peer-sessions', access: 'read-write', scope: 'dispatch', optional: false }],
         },
       },
     }, { id: 'bwrap', config: { type: 'bwrap' } });
