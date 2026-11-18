@@ -12,7 +12,7 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 import { acquireSync, createLockScope, spawnWithLocks } from '../../src/holder-lock/index.mjs';
 import { computeSha256Digest } from '../../src/native/proof-helpers.mjs';
 import { readSettledResult } from '../../src/runner/dispatch/run-result.mjs';
-import { attemptGateCommand, attemptPaths, writeAttemptIntent, attemptStepEnv, awaitSettledResult, buildEnvelope, captureTail, laneTransport, prepareAttemptFiles, waitForBinding, withIdentityEnv, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
+import { attemptGateCommand, attemptPaths, writeAttemptIntent, attemptStepEnv, awaitSettledResult, buildEnvelope, captureTail, bindingWaitMs, laneTransport, prepareAttemptFiles, waitForBinding, withIdentityEnv, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
 import { BIN_FGOS, bwrapUsable, createProject, killToken, readJson, startRun, waitUntil } from './support/direct-harness.mjs';
 import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -163,6 +163,30 @@ test('a launcher at dispatch depth 0 writes the lane pool into the envelope and 
   const terminal = { socketPath: '/run/s.sock', exitCommand: null, orphanSettleMs: 1, briefPath: '/b.md', outboxDir: '/o', groupKey: 'g' };
   const head = buildEnvelope({ ...base, terminal, extraSteps: ['cleanup-trust'], session: { role: 'head:planner-probe', verbs: [] }, ceilingMs: 1000, lanes: laneTransport(settings, 0) });
   assert.equal('lanes' in head, false);
+});
+
+test('a seat that may wait for a lane gets the wait added to its binding budget and to both deadlines, so a late seat still runs its whole round', (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-envelope-lane-wait-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const runDir = path.join(dir, 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const base = {
+    attemptId: 'att-1', unitRunId: 'unit-1', runDir, host: { hostBin: '/h/fgos', payloadRoot: '/h/payload' }, cwd: dir, mutating: false,
+    attempt: { command: '/bin/agent', args: [], env: { PATH: '/bin' }, bwrapPrefix: ['--unshare-pid', '--'], bwrapExecutable: '/usr/bin/bwrap' },
+    timeoutMs: 60_000, idleTimeoutMs: null, cli: 'claude', stepEnv: { PATH: '/bin', FGOS_STATE_ROOT: '/state' }, gateKillGraceMs: 1000, killWaitMs: 1000,
+  };
+  const plain = buildEnvelope(base);
+  const waiting = buildEnvelope({ ...base, lanes: { ceiling: 2, waitMs: 900_000 } });
+  const unarmed = buildEnvelope({ ...base, lanes: { ceiling: null, waitMs: 900_000 } });
+  const wait = 900_000 * 1e6;
+  const slack = 1e9; // two envelopes are stamped a few milliseconds apart
+  for (const field of ['softAt', 'hardCeiling']) {
+    const extra = waiting.deadlines[field].boottimeNs - plain.deadlines[field].boottimeNs;
+    assert.ok(extra >= wait - slack && extra <= wait + slack, `${field} starts after the lane wait budget`);
+    assert.ok(Math.abs(unarmed.deadlines[field].boottimeNs - plain.deadlines[field].boottimeNs) < slack, `${field} of an unarmed pool is unchanged`);
+  }
+  assert.equal(bindingWaitMs(waiting), bindingWaitMs(plain) + 900_000);
+  assert.equal(bindingWaitMs(unarmed), bindingWaitMs(plain));
 });
 
 test('the attempt writer id replaces whatever the controller carried, in the launch env and in the side-file env', (t) => {

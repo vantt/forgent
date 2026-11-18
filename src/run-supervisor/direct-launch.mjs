@@ -215,6 +215,8 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
   const paths = attemptPaths(runDir, attemptId);
   const confined = Array.isArray(attempt.bwrapPrefix);
   const placement = terminal ? 'terminal' : 'direct';
+  // The supervisor binds only after it holds a lane, so a seat that waited for one still gets its whole execution budget.
+  const laneWaitMs = laneWaitBudgetMs({ lanes: session ? null : lanes });
   return {
     v: 3,
     attemptId,
@@ -239,9 +241,9 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
     },
     containment: { preferred: confined ? 'linux-gate' : (process.platform === 'win32' ? 'windows-job' : process.platform === 'darwin' ? 'macos-tree' : 'linux-pgroup'), ...(confined ? { bwrapPrefix: [attempt.bwrapExecutable, ...attempt.bwrapPrefix] } : {}) },
     deadlines: {
-      softAt: !session && timeoutMs ? boottimeAfter(timeoutMs) : null,
+      softAt: !session && timeoutMs ? boottimeAfter(timeoutMs + laneWaitMs) : null,
       idleMs: session ? null : idleTimeoutMs || null,
-      hardCeiling: boottimeAfter((session ? ceilingMs : (timeoutMs || ATTEMPT_STEP_TIMEOUT_MS)) + gateKillGraceMs + HARD_CEILING_SLACK_MS),
+      hardCeiling: boottimeAfter((session ? ceilingMs : (timeoutMs || ATTEMPT_STEP_TIMEOUT_MS)) + laneWaitMs + gateKillGraceMs + HARD_CEILING_SLACK_MS),
       gateKillGraceMs,
       killWaitMs,
     },
@@ -357,6 +359,17 @@ export function captureTail(paths, onChunk) {
       }
     }
   };
+}
+
+/** How long an envelope's supervisor may wait for a lane before it binds: the pool's wait, or none when it names no ceiling. */
+export function laneWaitBudgetMs(envelope) {
+  const lanes = envelope?.lanes;
+  return lanes && lanes.ceiling != null ? lanes.waitMs ?? 0 : 0;
+}
+
+/** The binding wait of one launch: the normal start budget plus the lane wait the envelope allows. */
+export function bindingWaitMs(envelope) {
+  return BINDING_WAIT_MS + laneWaitBudgetMs(envelope);
 }
 
 /** Wait for the supervisor's binding: `{state}` is `'bound'`, `'exited'` (ended without one; `exit` has its code) or `'unknown'` (alive, none in time). */

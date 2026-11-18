@@ -235,3 +235,57 @@ fn an_adopted_worker_holds_a_lane_and_a_full_pool_reports_lane_pool_over() {
     let (none, note) = lanes::adopt(&lock_root, Some(&json!({})));
     assert!(matches!(none, Lane::None) && note.is_none());
 }
+
+/// Rewrites the fixture's envelope with a lane pool of `ceiling` seats, digest kept valid.
+fn name_lane_pool(a: &support::adopt_fixture::Fixture, ceiling: u64) {
+    let mut envelope = a.json("envelope.json").expect("envelope.json");
+    envelope["lanes"] = json!({"ceiling": ceiling, "waitMs": 0});
+    envelope["digest"] = Value::Null;
+    envelope["digest"] = json!(fgos_run_supervisor::envelope::digest(&envelope).unwrap());
+    std::fs::write(a.path("envelope.json"), envelope.to_string()).unwrap();
+}
+
+fn adopt_with_state_root(root: &Path, dir: &Path) -> Value {
+    let child = std::process::Command::new(internal_harness())
+        .args(["internal", "adopt", "--protocol", "1", "--run-dir"])
+        .arg(dir)
+        .env_clear()
+        .env("FGOS_STATE_ROOT", root)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+    let (code, mut lines) = support::adopt_fixture::adopt_finish(child);
+    assert_eq!(code, 0, "{lines:?}");
+    lines.remove(0)
+}
+
+#[test]
+fn the_adopt_door_takes_a_lane_for_a_live_worker_and_a_full_pool_reports_lane_pool_over() {
+    use support::adopt_fixture::{attempt, dead_tuple, live_process};
+    let root = state_root("adopt-door");
+    let seat = hold(&root, 0);
+    let a = attempt("lane-adopt-door", &["settle-attempt"]);
+    let (mut agent, tuple) = live_process();
+    a.bind(&dead_tuple());
+    a.best_effort_agent(&tuple);
+    a.gate_exit("agent");
+    name_lane_pool(&a, 1);
+    let line = adopt_with_state_root(&root, &a.dir);
+    assert_eq!(line["lane"], "lane-pool-over", "{line}");
+    let _ = agent.wait();
+    drop(seat);
+
+    // With a free seat the adopter takes it and reports nothing.
+    let free_root = state_root("adopt-door-free");
+    let b = attempt("lane-adopt-door-free", &["settle-attempt"]);
+    let (mut agent, tuple) = live_process();
+    b.bind(&dead_tuple());
+    b.best_effort_agent(&tuple);
+    b.gate_exit("agent");
+    name_lane_pool(&b, 1);
+    let line = adopt_with_state_root(&free_root, &b.dir);
+    assert!(line.get("lane").is_none(), "{line}");
+    let _ = agent.wait();
+    assert_eq!(lanes::snapshot(&lock_root(&free_root), 1).live, 0);
+}
