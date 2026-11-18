@@ -137,6 +137,12 @@ fn params(repo: &RepoHandle) -> BTreeMap<String, String> {
             .into(),
     )])
 }
+/// The one builder of a destination's merge-slot params: the fgos dir plus the slot key.
+fn merge_slot_params(repo: &RepoHandle, destination: &str) -> BTreeMap<String, String> {
+    let mut p = params(repo);
+    p.insert("ref".into(), slot_key(destination));
+    p
+}
 fn slot_key(reference: &str) -> String {
     // Same encodeURIComponent key as the existing repo-locks door.
     reference
@@ -355,8 +361,7 @@ impl GitDriver {
         }
         validate_declared_files(&req.files, "land")?;
         let slot = LockScope::seeded(vec![]).map_err(failure)?;
-        let mut p = params(repo);
-        p.insert("ref".into(), slot_key(&req.destination));
+        let p = merge_slot_params(repo, &req.destination);
         let operation_repo = self.checkout_repository(repo)?;
         let repo = &operation_repo;
         let wal = Wal::open_with(repo, filesystem)?;
@@ -686,7 +691,7 @@ impl GitDriver {
         })
     }
     /// Hold `destination`'s merge slot, waiting at most `wait_ms`; a slot still held then (a live
-    /// Land session or another holder) refuses `merge-slot-busy`.
+    /// Land session or another holder) refuses `merge-slot-busy` (Busy, retryable).
     pub fn acquire_merge_slot(
         &self,
         repo: &RepoHandle,
@@ -698,8 +703,7 @@ impl GitDriver {
             return Err(failure("invalid-refs-request"));
         }
         let mut slot = LockScope::seeded(vec![]).map_err(failure)?;
-        let mut p = params(repo);
-        p.insert("ref".into(), slot_key(destination.as_str()));
+        let p = merge_slot_params(repo, destination.as_str());
         match slot.acquire("merge-slot", &p, Wait::Ms(wait_ms)) {
             Ok(_) => Ok(MergeSlot { slot }),
             Err(fgos_holder_lock::ScopeError::Acquire(acquire))
@@ -709,7 +713,7 @@ impl GitDriver {
                         | fgos_holder_lock::Acquire::Timeout { .. }
                 ) =>
             {
-                Err(failure("merge-slot-busy"))
+                Err(busy("merge-slot-busy"))
             }
             Err(other) => Err(failure(other)),
         }
@@ -1719,8 +1723,7 @@ impl GitDriver {
             return Err(failure("land-authority-mismatch"));
         }
         let mut slot = LockScope::seeded(vec![]).map_err(failure)?;
-        let mut p = params(repo);
-        p.insert("ref".into(), slot_key(&req.destination));
+        let p = merge_slot_params(repo, &req.destination);
         slot.acquire("merge-slot", &p, Wait::Ms(0))
             .map_err(failure)?;
         // A crashed `push_land_candidate` leaves its temporary branch. The Refs door drops it
@@ -2042,8 +2045,7 @@ impl GitDriver {
         if let Some(c) = wal.compacted(id)? {
             let intent = compact_land_intent(&wal, &c, repo, writer)?;
             let mut slot = LockScope::seeded(vec![]).map_err(failure)?;
-            let mut p = params(repo);
-            p.insert("ref".into(), slot_key(intent.resource_set.first().unwrap()));
+            let p = merge_slot_params(repo, intent.resource_set.first().unwrap());
             slot.acquire("merge-slot", &p, Wait::Ms(0))
                 .map_err(failure)?;
             let scope = crate::refs::acquire_worktree_admin(
@@ -2083,8 +2085,7 @@ impl GitDriver {
             }
         }
         let mut slot = LockScope::seeded(vec![]).map_err(failure)?;
-        let mut p = params(repo);
-        p.insert("ref".into(), slot_key(&payload.request.destination));
+        let p = merge_slot_params(repo, &payload.request.destination);
         slot.acquire("merge-slot", &p, Wait::Ms(0))
             .map_err(failure)?;
         // The removal Intent retains this authorization digest and caller writer

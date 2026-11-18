@@ -252,13 +252,15 @@ fn a_held_merge_slot_excludes_a_land_of_its_target_and_a_live_land_excludes_the_
             0,
         )
         .unwrap();
-    assert_eq!(
-        f.driver
-            .acquire_merge_slot(&f.repo, &dest, 0)
-            .err()
-            .unwrap()
-            .cause,
-        "merge-slot-busy"
+    let busy = f
+        .driver
+        .acquire_merge_slot(&f.repo, &dest, 0)
+        .err()
+        .unwrap();
+    assert_eq!(busy.cause, "merge-slot-busy");
+    assert!(
+        busy.retryable,
+        "a busy merge slot is retryable like worktree-admin-held"
     );
     drop(s);
 }
