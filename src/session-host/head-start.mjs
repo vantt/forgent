@@ -178,7 +178,7 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
 
   const request = {
     binding, runnerConfig, key, role, grant, opening: text, ceilingMs: HEAD_HARD_CEILING_MS,
-    env: { FGOS_HEAD_ROLE: role, FGOS_HEAD_GEN: String(generation) },
+    env: { FGOS_HEAD_ROLE: role, FGOS_HEAD_PERSONA: persona, FGOS_HEAD_NAME: name, FGOS_HEAD_GEN: String(generation) },
     projectRoot, beside, display: { id: name, title: persona },
   };
   let launched;

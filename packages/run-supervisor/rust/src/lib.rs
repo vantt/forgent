@@ -36,6 +36,10 @@ pub mod route;
 /// The `fgos internal attempt-step` route: hands a step to the Node payload.
 pub mod attempt_step;
 
+/// The client end of the head request socket, for a process inside a head's sandbox.
+#[cfg(unix)]
+pub mod head_client;
+
 /// The head request socket of a session attempt: transport and enforcement for one granted verb.
 #[cfg(unix)]
 pub mod head_request;

@@ -1,0 +1,40 @@
+{
+  "contract": { "id": "session-host-rotation-files", "version": 1 },
+  "description": "The files of a head session's lineage that its rotation hook reads, and the environment and hook payload it takes. The Node handoff store (src/session-rotation/handoff-store.mjs) writes latest.json and the handoff files, the rotation executor (src/session-rotation/rotate.mjs) writes rotation.json and answered.json, and the Rust reader is packages/session-host/rust/src/rotation/handoff.rs. Folder: <main checkout>/.fgos/runtime/session-rotation/<persona>-<name>/ (persona and name are lowercase slugs).",
+  "files": {
+    "latest.json": {
+      "writer": "handoff store, replaced atomically after the handoff file exists",
+      "shape": { "file": "string, <yymmdd>-<hhmm>-<sid8>.md, the newest handoff file of the folder", "session": "string, the rotating session", "rotate": "soft | hard", "writtenAt": "ISO-8601 UTC" },
+      "readerRule": "a pointer that is missing, not one JSON object, or names a file that is not a handoff file name or is gone means no handoff"
+    },
+    "handoff file": {
+      "writer": "handoff store, immutable",
+      "carries": "a line `Rotation id: <16 lowercase hex characters>` when a rotation executor wrote it; a `## Pending question (verbatim)` section on a hard rotation",
+      "sessionStart": "the reader inlines the text when it is under 10000 characters, else a pointer to the file plus the pending question verbatim"
+    },
+    "rotation.json": { "writer": "rotation executor", "readFields": { "gen": "integer, the successor's generation", "id": "the rotation id" } },
+    "answered.json": { "writer": "markSuccessorAnswered", "readFields": { "gen": "integer" } },
+    "context-sidecar.jsonl": {
+      "writer": "a status-line wrapper, optional; none ships with fgOS",
+      "shape": { "ts": "integer, epoch milliseconds", "session_id": "string", "context_window": { "context_window_size": "integer", "current_usage": "object of input_tokens, cache_creation_input_tokens, cache_read_input_tokens" } },
+      "readerRule": "only a record newer than the Stop hook's own timestamp is fresh; an absent file is never waited for and the transcript (one turn stale) is used"
+    }
+  },
+  "environment": {
+    "FGOS_HEAD_ROLE": "set by the head start door; its presence is the only gate, the hook never parses it",
+    "FGOS_HEAD_PERSONA": "the persona slug, declared in the session envelope's env by the head start door",
+    "FGOS_HEAD_NAME": "the head's name slug, declared the same way",
+    "FGOS_HEAD_GEN": "the generation of this head's lineage",
+    "FGOS_HEAD_REQUEST_SOCKET": "the head request socket (head-request.v1.json); without it the hook asks nothing"
+  },
+  "hookPayload": {
+    "stop": ["session_id", "transcript_path", "last_assistant_message", "background_tasks", "session_crons"],
+    "session-start": []
+  },
+  "hook": {
+    "command": "fgos hook session-rotation --event stop|session-start",
+    "never": "blocks, prints to the conversation (only session-start prints, one hookSpecificOutput.additionalContext object), or exits other than 0",
+    "stop": "a successor whose generation the pending rotation waits for answers with `head answered` (the rotation id from its handoff); every other stop measures, decides and on soft or hard asks `head rotate`; a stop that answered does not also measure",
+    "pendingQuestion": "no lineage state defines a pending owner question yet, so the hook never reports one: soft is never held by a question, and a hard rotation carries the last assistant message verbatim"
+  }
+}

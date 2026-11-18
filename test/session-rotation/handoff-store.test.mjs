@@ -66,3 +66,12 @@ test('no handoff reads as null and an unsafe persona name is refused', () => {
   assert.equal(readLatestHandoff({ fgosDir: fgosDir(), persona: 'miu', name: 'main' }), null);
   assert.throws(() => writeHandoff({ fgosDir: fgosDir(), ...base, persona: '../x' }), TypeError);
 });
+
+test('latest.json and the hard handoff carry exactly what the Rust hook reader contract names', () => {
+  const contract = JSON.parse(fs.readFileSync(new URL('../../packages/session-host/contracts/rotation-files.v1.json', import.meta.url), 'utf8'));
+  const d = fgosDir();
+  writeHandoff({ fgosDir: d, ...base, rotate: 'hard', pendingQuestion: 'Which database?', now: new Date('2026-11-17T15:04:00Z') });
+  const pointer = JSON.parse(fs.readFileSync(path.join(dirOf(d), 'latest.json'), 'utf8'));
+  assert.deepEqual(Object.keys(pointer).sort(), Object.keys(contract.files['latest.json'].shape).sort());
+  assert.match(readLatestHandoff({ fgosDir: d, persona: 'miu', name: 'main' }).text, /\n## Pending question \(verbatim\)\n\nWhich database\?\n/);
+});

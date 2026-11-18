@@ -47,10 +47,28 @@
       },
       {
         "cli": "claude",
+        "kind": "session-rotation",
+        "args": "--event stop",
+        "event": "Stop",
+        "matcher": null,
+        "command": "S=\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\"; [ -x \"$S\" ] || exit 0; \"$S\" hook session-rotation --event stop || true",
+        "timeout": 80
+      },
+      {
+        "cli": "claude",
         "kind": "session-register",
         "event": "SessionStart",
         "matcher": null,
         "command": "S=\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\"; [ -x \"$S\" ] || exit 0; \"$S\" identity session --register >/dev/null || true",
+        "timeout": 10
+      },
+      {
+        "cli": "claude",
+        "kind": "session-rotation",
+        "args": "--event session-start",
+        "event": "SessionStart",
+        "matcher": null,
+        "command": "S=\"${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos\"; [ -x \"$S\" ] || exit 0; \"$S\" hook session-rotation --event session-start || true",
         "timeout": 10
       }
     ],

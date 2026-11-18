@@ -650,7 +650,11 @@ test('setup writes a SessionStart registration row for Claude Code, Codex and ag
   installAllAgentHooks(repoRoot);
   const shim = path.join(fs.realpathSync(repoRoot), '.fgos', 'installation', 'bin', 'fgos');
   const claude = readFile(repoRoot, 'claude').hooks.SessionStart;
-  assert.deepEqual(claude, [{ hooks: [{ type: 'command', command: `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" identity session --register >/dev/null || true`, timeout: 10 }] }]);
+  assert.deepEqual(claude, [
+    { hooks: [{ type: 'command', command: `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" identity session --register >/dev/null || true`, timeout: 10 }] },
+    // A head session's rotation hook prints the latest handoff at its start; it sits beside the registration, Claude Code only.
+    { hooks: [{ type: 'command', command: `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" hook session-rotation --event session-start || true`, timeout: 10 }] },
+  ]);
   const command = `'${shim}' identity session --register >/dev/null || true`;
   assert.deepEqual(readFile(repoRoot, 'codex').hooks.SessionStart, [{ hooks: [{ type: 'command', command, timeout: 10 }] }]);
   assert.deepEqual(readFile(repoRoot, 'agy')['fgos-session-register'], { enabled: true, SessionStart: [{ type: 'command', command, timeout: 10 }] });
@@ -680,7 +684,11 @@ test('mailbox rows install Stop and PostToolUse for Claude Code and Codex and no
   const mailbox = agentHookRows(repoRoot).filter((row) => row.kind === 'mailbox');
   assert.deepEqual(mailbox.map((row) => `${row.cli} ${row.event}`).sort(), ['claude PostToolUse', 'claude Stop', 'codex PostToolUse', 'codex Stop']);
   const claude = readFile(repoRoot, 'claude');
-  assert.deepEqual(claude.hooks.Stop, [{ hooks: [{ type: 'command', command: mailbox.find((r) => r.cli === 'claude' && r.event === 'Stop').command, timeout: 10 }] }]);
+  // The mailbox checkpoint, then a head session's rotation hook, whose stop may wait for its supervisor's reply.
+  assert.deepEqual(claude.hooks.Stop, [
+    { hooks: [{ type: 'command', command: mailbox.find((r) => r.cli === 'claude' && r.event === 'Stop').command, timeout: 10 }] },
+    { hooks: [{ type: 'command', command: `S="\${CLAUDE_PROJECT_DIR}/.fgos/installation/bin/fgos"; [ -x "$S" ] || exit 0; "$S" hook session-rotation --event stop || true`, timeout: 80 }] },
+  ]);
   assert.equal(claude.hooks.PostToolUse[0].matcher, '*');
   const shim = path.join(fs.realpathSync(repoRoot), '.fgos', 'installation', 'bin', 'fgos');
   const codex = readFile(repoRoot, 'codex');
@@ -766,7 +774,8 @@ test('mailbox rows install only when the project opts in, and opting out removes
   installCodexHook(repoRoot);
   assert.equal(mailboxIn('claude') + mailboxIn('codex'), 0);
   const after = readFile(repoRoot, 'claude');
-  assert.deepEqual(after.hooks.Stop, [{ hooks: [{ type: 'command', command: userOwn }] }]);
+  // The rotation hook does not follow the mailbox opt-in, so it stays beside the user's own hook.
+  assert.deepEqual(after.hooks.Stop.map((entry) => entry.hooks[0].command), [agentHookRows(repoRoot).find((r) => r.cli === 'claude' && r.kind === 'session-rotation' && r.event === 'Stop').command, userOwn]);
   assert.equal(after.hooks.PostToolUse, undefined, 'an event left empty by our removal is dropped');
   assert.equal(after.hooks.PreToolUse.length, 3, 'the guards stay');
   assert.equal(readFile(repoRoot, 'codex').hooks.Stop, undefined);
@@ -951,7 +960,7 @@ test('install preserves user hooks on the same events and is idempotent', () => 
   const rows = agentHookRows(repoRoot);
   const post = rows.find((r) => r.cli === 'claude' && r.event === 'PostToolUse');
   assert.deepEqual(settings.hooks.Stop[0], userStop);
-  assert.equal(settings.hooks.Stop.length, 2);
+  assert.equal(settings.hooks.Stop.length, 3, 'the user hook, the mailbox checkpoint and the rotation hook');
   assert.equal(settings.hooks.PostToolUse.length, 1, 'our hook replaced inside the shared entry');
   assert.deepEqual(settings.hooks.PostToolUse[0].hooks, [{ type: 'command', command: 'audit.sh' }, { type: 'command', command: post.command, timeout: 10 }]);
   fs.rmSync(repoRoot, { recursive: true, force: true });

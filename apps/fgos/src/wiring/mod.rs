@@ -41,6 +41,11 @@ pub mod metrics_sources;
 pub mod run_dirs;
 pub mod seat_binding;
 pub mod session;
+#[cfg(unix)]
+pub mod session_rotation_hook;
+#[cfg(not(unix))]
+#[path = "session_rotation_hook_unsupported.rs"]
+pub mod session_rotation_hook;
 pub mod uninstall;
 pub mod wire_agents;
 

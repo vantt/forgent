@@ -26,6 +26,7 @@ export const HOOK_KINDS = {
   DECISION: 'decision-question',
   MAILBOX: 'mailbox',
   SESSION: 'session-register',
+  ROTATION: 'session-rotation',
   DELETE_GUARD: 'main-checkout-delete-guard',
 };
 
@@ -199,6 +200,13 @@ const CLAUDE_DELETE_GUARD_COMMAND = deleteGuardScript(CLAUDE_SHIM, HOOK_KINDS.DE
  * itself skips a seat the runner started. */
 const SESSION_REGISTER_ARGS = 'identity session --register';
 const SESSION_REGISTER_TIMEOUT_SEC = 10;
+/** A head session's rotation hook (served natively by the host, docs/platform/session-host/spec.md 8.8); its stop waits for the supervisor's `head answered` reply, up to its 60 s verb bound. */
+const ROTATION_STOP_TIMEOUT_SEC = 80;
+const ROTATION_START_TIMEOUT_SEC = 10;
+const claudeRotationRow = (args, event, timeout) => ({
+  cli: 'claude', kind: HOOK_KINDS.ROTATION, args, event, matcher: null,
+  command: `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" hook ${HOOK_KINDS.ROTATION} ${args} || true`, timeout,
+});
 
 /**
  * Every fgOS hook a JSON hook file carries, one row per (cli, kind, event): the file, where the row
@@ -216,10 +224,12 @@ const hookRows = (repoRoot) => [
   // matcher, PostToolUse for every tool.
   { cli: 'claude', kind: HOOK_KINDS.MAILBOX, args: '--cli claude --event stop', event: 'Stop', matcher: null, command: claudeMailboxCommand('stop'), timeout: mailboxHookTimeoutSec() },
   { cli: 'claude', kind: HOOK_KINDS.MAILBOX, args: '--cli claude --event post-tool-use', event: 'PostToolUse', matcher: '*', command: claudeMailboxCommand('post-tool-use'), timeout: mailboxHookTimeoutSec() },
+  claudeRotationRow('--event stop', 'Stop', ROTATION_STOP_TIMEOUT_SEC),
   // The CLIs whose recorded hook events name a session start: Claude Code (`SessionStart`, no matcher:
   // every source), Codex (`SessionStart`, measured on 0.162.1) and agy (`SessionStart`, a flat entry,
   // measured on 1.4.2). omp and pi have none in their facts and register at their first fgOS verb.
   { cli: 'claude', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: `S=${CLAUDE_SHIM}; [ -x "$S" ] || exit 0; "$S" ${SESSION_REGISTER_ARGS} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
+  claudeRotationRow('--event session-start', 'SessionStart', ROTATION_START_TIMEOUT_SEC),
   { cli: 'codex', kind: HOOK_KINDS.SESSION, event: 'SessionStart', matcher: null, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
   { cli: 'agy', kind: HOOK_KINDS.SESSION, event: 'SessionStart', group: 'fgos-session-register', flat: true, command: `${shimCommand(repoRoot, SESSION_REGISTER_ARGS)} >/dev/null || true`, timeout: SESSION_REGISTER_TIMEOUT_SEC },
   { cli: 'codex', kind: HOOK_KINDS.DISPATCH, event: 'PreToolUse', matcher: '.*', command: shimCommand(repoRoot, 'hook dispatch-decide') },

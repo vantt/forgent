@@ -265,6 +265,7 @@ fn main() {
         match kind {
             HookKind::MailboxSync => wiring::mailbox_sync::main(&cli_args[2..]),
             HookKind::Mailbox => wiring::mailbox_hook::main(&cli_args[2..]),
+            HookKind::SessionRotation => wiring::session_rotation_hook::main(&cli_args[2..]),
         }
     }
 

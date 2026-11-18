@@ -533,6 +533,7 @@ dependencies = [
  "fgos-terminal-control",
  "serde",
  "serde_json",
+ "thiserror",
 ]
 
 [[package]]

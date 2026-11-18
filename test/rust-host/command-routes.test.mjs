@@ -94,7 +94,7 @@ test('a verb whose registry native list names first positionals routes to the le
   const routes = JSON.parse(fs.readFileSync(DEFAULT_ROUTES_PATH, 'utf8'));
   const listed = COMMAND_REGISTRY.filter((e) => Array.isArray(e.native));
   assert.deepEqual(listed.map((e) => e.name), ['hook']);
-  assert.deepEqual(routes.hook.native_subcommands, ['mailbox', 'mailbox-sync']);
+  assert.deepEqual(routes.hook.native_subcommands, ['mailbox', 'mailbox-sync', 'session-rotation']);
   assert.equal(routes.hook.route_kind, 'legacy-cli', 'every other hook kind still reaches the legacy payload');
   const withNativeSubs = Object.values(routes).filter((r) => r.native_subcommands !== undefined).map((r) => r.selector);
   assert.deepEqual(withNativeSubs, ['hook']);

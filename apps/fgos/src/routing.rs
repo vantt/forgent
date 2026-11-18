@@ -97,13 +97,15 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
 pub enum HookKind {
     Mailbox,
     MailboxSync,
+    SessionRotation,
 }
 
 impl HookKind {
     /// Every kind with a handler in the host: the entries of `native_subcommands` of `hook` must all be here.
-    pub const ALL: [(&'static str, HookKind); 2] = [
+    pub const ALL: [(&'static str, HookKind); 3] = [
         ("mailbox", HookKind::Mailbox),
         ("mailbox-sync", HookKind::MailboxSync),
+        ("session-rotation", HookKind::SessionRotation),
     ];
 
     fn named(name: &str) -> Option<Self> {
@@ -566,6 +568,13 @@ mod tests {
         assert_eq!(
             decide(route("hook"), &call("hook", &["mailbox-sync"])),
             Lane::HookProtocol(HookKind::MailboxSync)
+        );
+        assert_eq!(
+            decide(
+                route("hook"),
+                &call("hook", &["session-rotation", "--event", "stop"])
+            ),
+            Lane::HookProtocol(HookKind::SessionRotation)
         );
         for other in [
             call("hook", &["dispatch-decide"]),

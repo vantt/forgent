@@ -135,6 +135,12 @@ pub fn project_mailbox(fgos_dir: &Path) -> Result<(Loaded, CrossMachine), Config
     Ok((loaded, cross))
 }
 
+/// The effective config of the project whose main checkout's `.fgos` is `fgos_dir`, for a reader of another
+/// section (the rotation hook reads `sessionRotation` through the same one snapshot).
+pub fn effective_config(fgos_dir: &Path) -> Result<Value, ConfigFailure> {
+    effective_snapshot(fgos_dir).map(|(value, _)| value)
+}
+
 /// The `eventStore` section of `snapshot` as the config crate reads it; a value of the section that breaks
 /// its rule is a refusal under the section's own code.
 fn event_store_of(snapshot: &Value, ctx: &Context) -> Result<EventStoreConfig, ConfigFailure> {

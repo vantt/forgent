@@ -41,6 +41,7 @@ const KIND_DISPATCH: &str = "dispatch-decide";
 const KIND_DECISION: &str = "decision-question";
 const KIND_MAILBOX: &str = "mailbox";
 const KIND_SESSION: &str = "session-register";
+const KIND_ROTATION: &str = "session-rotation";
 const KIND_DELETE_GUARD: &str = "main-checkout-delete-guard";
 
 /// The shim relative to the project root, with forward slashes.
@@ -52,6 +53,9 @@ pub use crate::shim::project_shim_path;
 
 const SESSION_REGISTER_ARGS: &str = "identity session --register";
 const SESSION_REGISTER_TIMEOUT_SEC: u64 = 10;
+/// A rotation hook's stop waits for the supervisor's `head answered` reply, which may take its 60 s verb bound.
+const ROTATION_STOP_TIMEOUT_SEC: u64 = 80;
+const ROTATION_START_TIMEOUT_SEC: u64 = 10;
 const AGY_ALLOW: &str = r#"{"decision":"allow"}"#;
 
 // ---------------------------------------------------------------------------------------------------------
@@ -602,6 +606,21 @@ pub fn hook_rows(root: &Path, mailbox_timeout: u64) -> Vec<HookRow> {
         }
     };
     let session = shim_command(root, SESSION_REGISTER_ARGS);
+    // The rotation hook of a head session: guarded like Claude's mailbox command, and its stdout passes through
+    // (the session start's one `additionalContext` object). It does nothing outside a head session.
+    let claude_rotation = |args: &'static str, hook_event: &'static str, timeout: u64| {
+        HookRow::new(
+            "claude",
+            KIND_ROTATION,
+            hook_event,
+            format!(
+                "S={}; [ -x \"$S\" ] || exit 0; \"$S\" hook {KIND_ROTATION} {args} || true",
+                claude_shim()
+            ),
+        )
+        .args(args)
+        .timeout(timeout)
+    };
     vec![
         HookRow::new(
             "claude",
@@ -634,6 +653,7 @@ pub fn hook_rows(root: &Path, mailbox_timeout: u64) -> Vec<HookRow> {
             "PostToolUse",
             Some("*"),
         ),
+        claude_rotation("--event stop", "Stop", ROTATION_STOP_TIMEOUT_SEC),
         HookRow::new(
             "claude",
             KIND_SESSION,
@@ -644,6 +664,11 @@ pub fn hook_rows(root: &Path, mailbox_timeout: u64) -> Vec<HookRow> {
             ),
         )
         .timeout(SESSION_REGISTER_TIMEOUT_SEC),
+        claude_rotation(
+            "--event session-start",
+            "SessionStart",
+            ROTATION_START_TIMEOUT_SEC,
+        ),
         HookRow::new(
             "codex",
             KIND_SESSION,

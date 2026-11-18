@@ -619,7 +619,8 @@
     ],
     "native_subcommands": [
       "mailbox",
-      "mailbox-sync"
+      "mailbox-sync",
+      "session-rotation"
     ],
     "store": "none"
   },

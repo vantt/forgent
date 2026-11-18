@@ -99,7 +99,7 @@ test('a secretary launches with the paths and the verb its grant names; the line
   assert.deepEqual(request.grant, grantOf('head:secretary-miu'));
   assert.deepEqual(request.grant.writes, ['plans', 'docs/backlog.md', 'docs/discussions']);
   assert.deepEqual(request.grant.verbs, ['head start', 'head rotate', 'head answered', 'head restore role']);
-  assert.deepEqual(request.env, { FGOS_HEAD_ROLE: headRoleOf('secretary', 'miu'), FGOS_HEAD_GEN: '2' });
+  assert.deepEqual(request.env, { FGOS_HEAD_ROLE: headRoleOf('secretary', 'miu'), FGOS_HEAD_PERSONA: 'secretary', FGOS_HEAD_NAME: 'miu', FGOS_HEAD_GEN: '2' });
   const kept = JSON.parse(fs.readFileSync(path.join(lineageDirOf(projectRoot, 'secretary', 'miu'), 'placement.json'), 'utf8'));
   assert.equal(kept.placement.key, out.key);
   assert.equal(out.key, 'cmd_head-secretary-miu-2');

@@ -10,6 +10,7 @@
 pub mod host;
 pub mod pane_io;
 pub mod panes;
+pub mod rotation;
 pub mod route;
 pub mod types;
 

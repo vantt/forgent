@@ -9,3 +9,4 @@ fgos-agent-protocol = { path = "../../agent-protocol/rust" }
 fgos-terminal-control = { path = "../../terminal-control/rust" }
 serde = { workspace = true }
 serde_json = { workspace = true }
+thiserror = { workspace = true }
