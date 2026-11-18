@@ -175,7 +175,7 @@ their consumers. A detection the supervisor plan adds later (pace, OM-D10), or o
 | 9 | [Capture channels: skills and worker claims](phase-09-capture-channels.md) | 5, 7 | core/skills/_shared/friction-capture.md, core/skills/**, domains/coding/skills/**, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/**, src/runner/dispatch/settlement.mjs, packages/run-result/contracts/run-result.read.v1.json, test/runner/dispatch/settlement*.test.mjs | 4 | draft |
 | 10 | [Attention detections as definitions](phase-10-attention-detections.md) | 4, 6, 8 | src/runner/dispatch/attention-view.mjs, src/verbs/dispatch/inspect.mjs, core/attention/**, core/config-standard/attention.yaml, core/config-schema/attention.schema.yaml, test/runner/dispatch/attention-view*.test.mjs | 5 | draft |
 | 11 | [Driving measures as definitions](phase-11-driving-measures.md) | 4, 6, 8 | domains/coding/observe/**, test/fixtures/observe/driving/**, packages/observe/rust/tests/driving_definitions.rs | 5 | draft |
-| 12 | [Docs, backlog and integration gate](phase-12-docs-and-integration.md) | 1-11 | docs/platform/observe/**, docs/backlog.md, CHANGELOG.md, packages/git/contracts/mutation-census.v1.json, packages/distribution/contracts/doctor-registry.v1.json | 6 | draft |
+| 12 | [Docs, backlog and integration gate](phase-12-docs-and-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 | docs/platform/observe/**, docs/backlog.md, CHANGELOG.md, packages/git/contracts/mutation-census.v1.json, packages/distribution/contracts/doctor-registry.v1.json | 6 | draft |
 
 Contract reading check (planner):
 - Every phase sits in a later wave than its dependencies.
