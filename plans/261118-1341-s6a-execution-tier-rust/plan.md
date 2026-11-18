@@ -380,3 +380,4 @@ doctor; after that, revert 15/17 first (V17).
   `previousArtifactDigest`. F13: corpus (phase 00) replayed by readers, CHANGELOG upgrade line. F14: P19
   (`src/native/stop-processes-inside.mjs`; no host needed by `npm test`). Red-team question 2 answered by the lead
   (phase 04 lands with phase 1).
+- 2026-11-18 lead:S6A-LAND: S5 is `done` on main (586765804); this plan now waits only on `261118-1455-s6a-worktree-door` and stays `draft` until it lands.

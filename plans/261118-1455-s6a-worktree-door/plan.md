@@ -167,3 +167,4 @@ Rust wrote because phase 01 keeps Node's record path, key and shape.
 - 2026-11-18 planner: plan split from `261118-1341-s6a-execution-tier-rust` (old phases 01 and 04, `git mv`), applying
   validation V8, V9, V12, V13, V15, V20 ([report](../reports/validator-261118-1442-s6a-plan-validate.md)) and red-team
   F1, F2, F9, F11 ([report](../reports/red-team-261118-1442-s6a-plan-red-team.md)).
+- 2026-11-18 lead:S6A-LAND: S5 (`261115-2328`) is `done` on main (586765804). Status stays `draft`: plan-contract-check refuses `ready` while the footprint overlaps the active plan `261118-0936-ops-metrics`; turn `ready` when ops-metrics closes or the overlap is cleared.
