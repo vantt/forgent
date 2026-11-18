@@ -499,6 +499,7 @@ version = "0.2.0"
 dependencies = [
  "fgos-host-runtime",
  "fgos-observe",
+ "fgos-process",
  "serde",
  "serde_json",
  "thiserror",

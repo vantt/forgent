@@ -65,6 +65,7 @@ test('normalizeRunResultV3: clean pass produces done status and native-v3 proven
   assert.equal(res.classification.failure, null);
   assert.equal(res.classification.policy.disposition, 'allow');
   assert.equal(res.classification.provenance, 'native-v3');
+  assert.equal(Object.hasOwn(res, 'durationMs'), false, 'a run result never stores a duration; the run binding is its one source');
 
   const validation = validateRunResultV3(res);
   assert.ok(validation.valid, `Validation failed: ${validation.reasons?.join(', ')}`);

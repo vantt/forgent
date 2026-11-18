@@ -375,7 +375,6 @@ export function normalizeRunResultV3({
   executorRedirected,
   policy: dispatchPolicy,
   settledAt,
-  durationMs = null,
   planContentHash,
   inputDigests,
   claimSha256,
@@ -600,7 +599,6 @@ export function normalizeRunResultV3({
         }
       : {}),
     settledAt: settledAt || new Date().toISOString(),
-    durationMs: typeof durationMs === 'number' ? durationMs : null,
     ...(planContentHash ? { planContentHash } : {}),
     ...(Array.isArray(inputDigests) && inputDigests.length ? { inputDigests } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),

@@ -7,7 +7,6 @@
     "fgos.seat.id": { "type": "string" },
     "fgos.seat.role": { "type": "string" },
     "fgos.outcome": { "type": "string" },
-    "fgos.failure.code": { "type": "string" },
     "fgos.fallback": { "type": "bool" },
     "fgos.run.adapter": { "type": "string" },
     "fgos.run.role": { "type": "string" },
@@ -21,8 +20,7 @@
     "fgos.pattern": { "type": "string" },
     "fgos.infrastructure": { "type": "bool" },
     "fgos.verify.outcome": { "type": "string", "values": ["pass", "findings", "timeout", "not-run"] },
-    "fgos.verify.how": { "type": "string" },
-    "fgos.verify.round": { "type": "int" }
+    "fgos.verify.how": { "type": "string" }
   },
   "measures": {
     "fgos.duration": { "unit": "ms", "aggs": ["sum", "min", "max", "avg", "p50", "p90"] },
@@ -65,7 +63,6 @@
         "fgos.seat.id",
         "fgos.seat.role",
         "fgos.outcome",
-        "fgos.failure.code",
         "fgos.fallback",
         "fgos.usage.source",
         "fgos.usage.reason"
@@ -87,7 +84,7 @@
     },
     "fgos.unit.verify": {
       "subjects": ["unit"],
-      "attrs": ["fgos.verify.outcome", "fgos.verify.how", "fgos.verify.round"],
+      "attrs": ["fgos.verify.outcome", "fgos.verify.how"],
       "measures": ["fgos.duration"]
     }
   }

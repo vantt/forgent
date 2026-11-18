@@ -701,7 +701,8 @@ fn read_run_record(path: &Path) -> Option<Value> {
 }
 
 /// One settled run as a `fgos.run.settled` record: the facts the runs and tokens sections read, copied verbatim.
-/// A fact the result does not carry as a string stays absent.
+/// A fact the result does not carry as a string stays absent. Its usage is the same fact `fgos.run.attempt` carries
+/// for a unit's attempts (see `projection`): query one kind for tokens, never the sum of both.
 fn run_record(
     record: &Value,
     assignment: &Value,

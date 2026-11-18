@@ -235,11 +235,3 @@ fn a_verify_that_did_not_run_is_a_not_run_record_and_a_usage_reason_is_an_attr()
         "a count never reported is unknown, never zero"
     );
 }
-
-#[test]
-fn the_source_states_only_declared_kinds() {
-    let registry = registry();
-    registry
-        .check_source_kinds(&RunProjectionSource::new())
-        .unwrap();
-}

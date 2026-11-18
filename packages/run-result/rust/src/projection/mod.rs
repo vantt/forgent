@@ -3,6 +3,13 @@
 //! Facts are copied, never recomputed: the summary already holds each attempt's provider, model, account, duration
 //! and usage, and the unit's outcome, plan key and verify record. A fact the summary does not carry produces no
 //! attr, so the query engine counts the gap in `coverage` instead of reading a made-up value.
+//!
+//! Spans: the summary stores no per-attempt start or end, so every `fgos.run.attempt` spans its unit, from the
+//! unit's start to its settlement. `fgos.seats` on `fgos.unit.settled` counts seat entries, one per seat and round.
+//!
+//! One usage fact, two views: `fgos.run.attempt` (units only, one record per dispatched seat attempt) and
+//! `fgos.run.settled` (every settled run, units or not, from its `result.json`) both carry the usage the run
+//! result reported. Query one of the two kinds for tokens, never the sum of both.
 
 pub(crate) mod usage;
 
@@ -53,23 +60,14 @@ impl RecordSource for RunProjectionSource {
             until: None,
         };
         let scan = scan_unit_summaries(root, &widened)?;
-        let host = machine_name();
+        // The machine a record was projected on: the supervisor reads it to know whose lane was freed.
+        let host = Some(fgos_process::facts::host());
         Ok(scan
             .summaries
             .into_iter()
             .flat_map(|s| project_summary(&Value::Object(s.body), host.as_deref()))
             .collect())
     }
-}
-
-/// The machine a record was projected on: the supervisor reads it to know whose lane was freed.
-fn machine_name() -> Option<String> {
-    ["HOSTNAME", "COMPUTERNAME", "HOST"]
-        .iter()
-        .find_map(|key| std::env::var(key).ok())
-        .or_else(|| std::fs::read_to_string("/etc/hostname").ok())
-        .map(|name| name.trim().to_owned())
-        .filter(|name| !name.is_empty())
 }
 
 fn text(value: &Value) -> Option<&str> {
