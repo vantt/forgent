@@ -220,6 +220,20 @@ runner:
         - openai
         - claude
         - gemini
+  # @fgos:doc Per-persona tier and executor taste, for every capability, by bare persona name.
+  personas:
+    # @fgos:doc The tier, executors and account pool one persona prefers. Only a persona may name a pool; a role entry refuses the key by name.
+    secretary:
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider.
+      # @fgos:why [48a564e9-e77d-4749-9957-17015907b265] secretary head binds claude sonnet (p-sozeraj6zq)
+      prefer:
+        - claude
+      # @fgos:doc One tier of the model ladder. Values: nano | mini | standard | advanced | flagship | frontier.
+      # @fgos:why [48a564e9-e77d-4749-9957-17015907b265] secretary head binds claude sonnet (p-sozeraj6zq)
+      tier: standard
+      # @fgos:doc Account pool every seat of this persona leases from, for every family it walks; a pool no tier cell names is reachable only through it.
+      # @fgos:why [c6590ad1-341a-47a9-8b84-0725bf2950e8] secretary head leases only from its own pool claude-miu (p-mnymjukvqd)
+      pool: claude-miu
 # @fgos:doc How far agent work may skip human approval gates.
 gateBypass:
   # @fgos:doc Gate bypass level for agent work; off approves nothing automatically and each higher level approves work up to that size. Values: off | light | standard | heavy. Default: off.
