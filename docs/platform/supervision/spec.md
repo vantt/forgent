@@ -138,7 +138,7 @@ Dated 2026-11-18, from [the plan](../../../plans/261118-1045-project-supervisor/
 
 - PS-1: new area Supervision and one crate `fgos-supervision`; a new area gets a spec before code (L5 q2) and one crate keeps one door per job.
 - PS-2: `fgos land` composes the existing Git ports and adds no `land` lock, because the Land port's rank-20 merge slot already serialises.
-- PS-3: land merges and does not rebase, because Git has no rebase port and adding one is a new mechanism (RUL104).
+- PS-3: land merges and does not rebase, because Git has no rebase port and adding one is a new mechanism (RUL104 ("better, not bigger")).
 - PS-4: generated-file conflicts are found by a read-only merge-tree, regenerated in the candidate, then prepared again with a fresh operation id at the same pinned target.
 - PS-5: gates and regeneration are project config (`land.gates`, `land.regenerate`), never fgOS repo constants (mission #1).
 - PS-6: `fgos land --paths` commits exact main-checkout edits of a confined head, the one way a portfolio edit reaches `main`.
