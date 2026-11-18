@@ -83,11 +83,6 @@
   },
   "tierExceptions": [
     {
-      "from": "src/runner/worktree.mjs",
-      "to": "src/state/store.mjs",
-      "reason": "worktree.mjs throws the StoreError class its callers catch and uses nothing else of the Work store; the class moves down with the Work batch"
-    },
-    {
       "from": "src/identity/directory-store.mjs",
       "to": "src/state/runtime-coordination.mjs",
       "reason": "the identity directory rebuild finds the main .fgos directory through the Work state helper getMainFgosDir; it goes to the invocation-root door with the Work batch"
@@ -1667,7 +1662,7 @@
     "src/runner/main-checkout-reset-guard.mjs": "infra",
     "src/runner/github-adapter.mjs": "infra",
     "src/state/drift-status.mjs": "infra",
-    "src/state/store-error.mjs": "kernel",
+    "src/util/store-error.mjs": "kernel",
     "src/state/store.mjs": "infra",
     "src/state/gate-bypass.mjs": "infra",
     "src/state/cursor.mjs": "use-case",

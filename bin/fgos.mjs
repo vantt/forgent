@@ -30,7 +30,7 @@ import path from 'node:path';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn,      parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
-import { StoreError, categoryOf, withFaultClass } from '../src/state/store-error.mjs';
+import { StoreError, categoryOf, withFaultClass } from '../src/util/store-error.mjs';
 import { EXIT_CODES } from '../src/cli/exit-codes.mjs';
 import { exitCodeOf } from '../src/cli/verb-exit.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';

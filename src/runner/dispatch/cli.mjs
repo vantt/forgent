@@ -7,14 +7,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 
-class StoreError extends Error {
-  constructor(category, message) {
-    super(message);
-    this.name = 'StoreError';
-    this.category = category;
-  }
-}
-
+import { StoreError } from '../../util/store-error.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { loadRunnerConfigForDir } from './config.mjs';
 import { commandCli } from './provider-capacity.mjs';
