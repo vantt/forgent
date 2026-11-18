@@ -3,7 +3,7 @@
 //! decides nothing, it only carries the host's answer.
 
 use crate::direct::OsDirect;
-use crate::host::{SessionHost, DEFAULT_GRACE_MS, DEFAULT_READY_MS};
+use crate::host::{SessionHost, DEFAULT_GRACE_MS};
 use crate::types::*;
 use fgos_terminal_control::port::LaunchSpec;
 use fgos_terminal_control::route::{
@@ -14,7 +14,7 @@ use serde_json::{json, Value};
 use std::time::Instant;
 
 pub const PROTOCOL: u64 = 1;
-pub const OPS: [&str; 6] = ["start", "open", "launch", "alive", "front", "retire"];
+pub const OPS: [&str; 5] = ["open", "launch", "alive", "front", "retire"];
 
 fn refusal_fields(refusal: &Refusal) -> (String, Value) {
     let mut fields = json!({ "code": refusal.code });
@@ -53,20 +53,6 @@ fn run(op: &str, host: &SessionHost, envelope: &Value) -> Result<(String, Value)
         .cloned()
         .unwrap_or_else(|| json!({}));
     Ok(match op {
-        "start" => {
-            let cli = match envelope.get("cli").filter(|v| !v.is_null()) {
-                None => None,
-                Some(v) => Some(v.as_str().ok_or("cli needs a string")?.to_string()),
-            };
-            let start: StartRequest =
-                serde_json::from_value(request).map_err(|e| format!("request: {e}"))?;
-            match host.start(&start, cli.as_deref()) {
-                StartAnswer::Placed(placement) => {
-                    ("placed".into(), json!({ "placement": placement }))
-                }
-                StartAnswer::Refused(refusal) => refusal_fields(&refusal),
-            }
-        }
         "open" => {
             let open: OpenRequest =
                 serde_json::from_value(request).map_err(|e| format!("request: {e}"))?;
@@ -179,14 +165,8 @@ pub fn main(args: &[String]) -> i32 {
         None | Some("herdr") => {}
         Some(other) => return usage(&format!("unknown driver {other}")),
     }
-    let timing = (|| {
-        Ok::<_, String>((
-            milliseconds(&envelope, "readyMs", DEFAULT_READY_MS)?,
-            milliseconds(&envelope, "graceMs", DEFAULT_GRACE_MS)?,
-        ))
-    })();
-    let (ready_ms, grace_ms) = match timing {
-        Ok(t) => t,
+    let grace_ms = match milliseconds(&envelope, "graceMs", DEFAULT_GRACE_MS) {
+        Ok(ms) => ms,
         Err(message) => return usage(&message),
     };
     let parts = match CoreParts::from_envelope(&envelope, started) {
@@ -198,7 +178,6 @@ pub fn main(args: &[String]) -> i32 {
     let host = SessionHost {
         panes: &core,
         direct: &direct,
-        ready_ms,
         grace_ms,
     };
     match run(op, &host, &envelope) {

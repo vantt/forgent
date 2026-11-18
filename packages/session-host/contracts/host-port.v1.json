@@ -2,21 +2,12 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "session-host/host-port.v1.json",
   "title": "Session Host port, version 1",
-  "description": "The one port that places an agent session: start, alive, front, retire; and, for a controller that builds its command only after the slot exists, open then launch. Adapters: terminal (Terminal Control), direct (screenless prepared command). Spec: docs/platform/session-host/spec.md.",
+  "description": "The one port that places an agent session: open then launch (the controller builds its command only after the slot exists), alive, front, retire. A session is started by its controller (the run supervisor) through open and launch; there is no single start operation. Adapters: terminal (Terminal Control), direct (screenless prepared command). Spec: docs/platform/session-host/spec.md.",
   "contract": { "id": "session-host-port", "version": 1 },
   "$defs": {
     "key": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$", "description": "Same key shape as terminal-control; for a run the attempt id, for a head session <persona>-<name>." },
     "host": { "enum": ["terminal", "direct"] },
     "display": { "type": "object", "description": "Terminal Control display fields; written to the screen only, never read back.", "additionalProperties": true },
-    "opening": {
-      "type": "object",
-      "required": ["text", "delivery"],
-      "additionalProperties": false,
-      "properties": {
-        "text": { "type": "string", "minLength": 1, "description": "The full opening text, never a pointer to a file." },
-        "delivery": { "enum": ["typed", "argument", "file"], "description": "typed: through the shared delivery step into the composer, visibly (terminal only). argument or file: a screenless host passes it itself." }
-      }
-    },
     "placement": {
       "type": "object",
       "required": ["host", "key"],
@@ -33,7 +24,7 @@
       "additionalProperties": false,
       "properties": {
         "result": { "enum": ["unsupported", "unknown"] },
-        "code": { "enum": ["head-needs-interactive-host", "host-unsupported-here", "opening-delivery-unsupported", "pane-not-ready", "placement-unknown", "key-in-use"] },
+        "code": { "enum": ["host-unsupported-here", "placement-unknown"] },
         "detail": { "type": "string" },
         "capability": { "type": "string", "description": "The Terminal Control capability the driver lacks; present on an unsupported answer that came from the driver." }
       }
@@ -70,37 +61,9 @@
       "required": ["pid", "startTime", "bootId", "pgid"],
       "additionalProperties": false,
       "properties": { "pid": { "type": "integer" }, "startTime": { "type": "string" }, "bootId": { "type": "string" }, "pgid": { "type": "integer" } }
-    },
-    "startRequest": {
-      "type": "object",
-      "required": ["host", "key", "cwd", "command"],
-      "additionalProperties": false,
-      "properties": {
-        "host": { "$ref": "#/$defs/host" },
-        "key": { "$ref": "#/$defs/key" },
-        "groupKey": { "$ref": "#/$defs/key", "description": "Panes of one group share a tab (terminal only)." },
-        "beside": { "$ref": "#/$defs/key", "description": "Open next to this existing placement (terminal only)." },
-        "cwd": { "type": "string", "minLength": 1 },
-        "env": { "type": "object", "additionalProperties": { "type": "string" } },
-        "command": { "type": "string", "minLength": 1, "description": "The prepared command. For direct it is already contained: the adapter never builds containment." },
-        "args": { "type": "array", "items": { "type": "string" } },
-        "opening": { "$ref": "#/$defs/opening" },
-        "display": { "$ref": "#/$defs/display" },
-        "role": { "enum": ["worker", "head"], "default": "worker", "description": "head on host direct is refused." }
-      }
     }
   },
   "operations": {
-    "start": {
-      "request": { "$ref": "#/$defs/startRequest" },
-      "answer": { "oneOf": [ { "$ref": "#/$defs/placement" }, { "$ref": "#/$defs/refusal" } ] },
-      "rules": [
-        "terminal: Terminal Control allocate, then launch (quoted line), then, only when opening is given, await_ready and deliver_brief through fgos-agent-protocol over the port's own PaneIo.",
-        "direct: starts the prepared command without a screen; opening.delivery must be argument or file, typed is refused with opening-delivery-unsupported.",
-        "role head with host direct answers unsupported / head-needs-interactive-host.",
-        "a key that already has a live placement answers that placement; it never starts a second one."
-      ]
-    },
     "open": {
       "request": { "$ref": "#/$defs/openRequest" },
       "answer": { "oneOf": [
@@ -109,8 +72,7 @@
       ] },
       "rules": [
         "terminal only: Terminal Control allocate and nothing else; nothing is started in the slot. host direct answers unsupported / host-unsupported-here.",
-        "a key that already has a live placement answers that placement and allocates nothing.",
-        "start is open followed by launch (and the opening); a controller that learns its command only after the slot exists calls the two itself."
+        "a key that already has a live placement answers that placement and allocates nothing."
       ]
     },
     "launch": {
@@ -123,7 +85,7 @@
       "rules": [
         "terminal only: Terminal Control launch into the slot open allocated for the placement's key; the launched marker is durable before the answer, so the caller may let the process run on once it has the identity.",
         "not-started: nothing was proven to run; the slot is kept and never launched into again.",
-        "host direct answers unsupported / host-unsupported-here: a screenless host runs its process in start."
+        "host direct answers unsupported / host-unsupported-here: a screenless host has no slot to launch into."
       ]
     },
     "alive": {

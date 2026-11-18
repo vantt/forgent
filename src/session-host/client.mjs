@@ -1,7 +1,7 @@
 // client.mjs -- thin Node client of `fgos internal session-host`.
 //
 // One process per operation: the request goes to the host binary on stdin, one JSON line comes
-// back. Every decision (which adapter, which refusal, how an opening text is typed, SIGTERM before
+// back. Every decision (which adapter, which refusal, SIGTERM before
 // the grace and SIGKILL after it) lives in the Rust crate; this module only carries the call. A
 // port refusal (`unsupported`, `unknown`) is returned as the route gave it, never thrown.
 
@@ -9,7 +9,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 
 const PROTOCOL = 1;
-// A start with an opening waits for the agent's prompt (60 s) and then types and confirms the text.
+// A launch waits for the pane's shell to be ready and the launched process to be identified.
 const DEFAULT_TIMEOUT_MS = 180_000;
 const MAX_OUTPUT_BYTES = 8 * 1024 * 1024;
 
@@ -116,15 +116,13 @@ function spawnAsync(bin, argv, input, timeoutMs) {
 }
 
 /**
- * createSessionHost({ hostBin, herdrBin, env, config, timeoutMs, readyMs, graceMs }) ->
- *   { start, open, launch, alive, front, retire, openAsync, retireAsync }
+ * createSessionHost({ hostBin, herdrBin, env, config, timeoutMs, graceMs }) ->
+ *   { open, launch, alive, front, retire, openAsync, retireAsync }
  *
  * `hostBin` defaults to the active release's host (resolved on first call). `herdrBin`, `env` and `config`
  * are the terminal driver's, as for Terminal Control (`config` the core settings the route accepts:
- * minCols, minRows, maxPanesPerTab, policy, ...). `readyMs` is how long an agent gets to put its prompt up
- * before an opening text is typed; `graceMs` how long a screenless process gets to leave after SIGTERM.
+ * minCols, minRows, maxPanesPerTab, policy, ...). `graceMs` is how long a screenless process gets to leave after SIGTERM.
  *
- *   start(request, { cli })  -> { result: 'placed', placement } | refusal
  *   open(request)            -> { result: 'placed', placement } | refusal   (a slot, nothing started in it)
  *   launch(placement, spec)  -> { result: 'launched', identity } | { result: 'not-started', reason } | refusal
  *   alive(placement)         -> { result: 'live' | 'gone' | 'unknown' } | ...
@@ -136,16 +134,13 @@ function spawnAsync(bin, argv, input, timeoutMs) {
  * close waits behind the earlier opens of its group. The group of a close is the one the key was opened
  * under by this client, or `{ groupKey }`; a close of a key whose group is unknown is refused (rejected)
  * instead of running outside the queue. Another group, and `retain`, do not wait.
- *
- * `cli` selects the agent-protocol adapter that types an opening; it defaults to the command's name.
  */
-export function createSessionHost({ hostBin, herdrBin, env, config, timeoutMs = DEFAULT_TIMEOUT_MS, readyMs, graceMs } = {}) {
+export function createSessionHost({ hostBin, herdrBin, env, config, timeoutMs = DEFAULT_TIMEOUT_MS, graceMs } = {}) {
   const prepare = (op, request, extra) => {
     const body = { v: PROTOCOL, driver: 'herdr', timeoutMs, request, ...extra };
     if (herdrBin) body.herdrBin = herdrBin;
     if (env) body.env = env;
     if (config) body.config = config;
-    if (readyMs !== undefined) body.readyMs = readyMs;
     if (graceMs !== undefined) body.graceMs = graceMs;
     const bin = hostBin ?? activeHostBin();
     return {
@@ -191,7 +186,6 @@ export function createSessionHost({ hostBin, herdrBin, env, config, timeoutMs = 
   };
 
   return {
-    start: (request, { cli } = {}) => call('start', request, cli ? { cli } : {}),
     open: (request) => call('open', request),
     launch: (placement, spec) => call('launch', { placement, spec }),
     alive: (placement) => call('alive', { placement }),

@@ -26,20 +26,15 @@ test('each operation answers with the contract shape through the route on the di
   const host = createSessionHost({ hostBin: HOST_BIN, graceMs: 1_000 });
   const placement = { host: 'direct', key: 'client-worker' };
 
-  const started = host.start({ host: 'direct', key: 'client-worker', cwd: scratch, command: 'true' });
-  assert.deepEqual([started.result, started.placement], ['placed', placement]);
-  assert.ok(['live', 'gone', 'unknown'].includes(host.alive(placement).result));
+  assert.equal(host.alive(placement).result, 'gone', 'a key nobody started is gone');
   const fronted = host.front(placement);
   assert.deepEqual([fronted.result, fronted.code], ['unsupported', 'host-unsupported-here']);
   assert.equal(host.retire(placement, 'close').result, 'retired');
 });
 
-test('a refusal comes back as an answer and a bad request throws a named error', () => {
+test('a bad request throws a named error', () => {
   const host = createSessionHost({ hostBin: HOST_BIN });
-  const head = host.start({ host: 'direct', key: 'client-head', cwd: scratch, command: 'claude', role: 'head' });
-  assert.deepEqual([head.result, head.code], ['unsupported', 'head-needs-interactive-host']);
-
-  assert.throws(() => host.start({ host: 'direct', key: 'client-head', command: 'claude' }), (err) => err instanceof SessionHostError && err.code === 'session-host-route-usage');
+  assert.throws(() => host.alive({ host: 'direct' }), (err) => err instanceof SessionHostError && err.code === 'session-host-route-usage');
 });
 
 test('open and launch reach the route and a screenless placement is refused for both', () => {

@@ -15,7 +15,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use fgos_session_host::direct::OsDirect;
 use fgos_session_host::{
     HostKind, Panes, Placement, RefusalKind, RetireAnswer, Retirement, SessionHost,
-    DEFAULT_GRACE_MS, DEFAULT_READY_MS,
+    DEFAULT_GRACE_MS,
 };
 use fgos_terminal_control::core::{Core, CoreConfig, Want};
 use fgos_terminal_control::driver::herdr::{HerdrConfig, HerdrDriver};
@@ -258,7 +258,6 @@ pub fn release(
     let host = SessionHost {
         panes: &panes,
         direct: &direct,
-        ready_ms: DEFAULT_READY_MS,
         grace_ms: DEFAULT_GRACE_MS,
     };
     let placement = Placement {

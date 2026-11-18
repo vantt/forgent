@@ -761,7 +761,6 @@ pub(super) fn run(
     let session_host = SessionHost {
         panes: &core,
         direct: &direct,
-        ready_ms: READY_MS,
         grace_ms: DEFAULT_GRACE_MS,
     };
     let placement = Placement {

@@ -1,0 +1,44 @@
+# Phase 12: head sessions start confined, through the worker's seat door
+
+Status: DONE_WITH_CONCERNS (live check done; two plan assumptions did not hold, listed below; the screenless Direct host is left without a creator).
+
+## What changed
+- Envelope `session {role, verbs, requestSocketPath?}` (contract `envelope.v3.json`, spec `run-supervisor/spec.md` 5.3): no soft deadline, no idle limit, no `settle-attempt`, a caller-given hard ceiling (`HEAD_HARD_CEILING_MS`, 7 days, constant in `head-start.mjs`). Supervisor session mode (`terminal.rs`): after `BRIEF_DELIVERED` it waits only for the domain, the carrier, cancel and the ceiling; right after the AGENT frame it registers the attempt writer id in Identity with the role through `register_writer` (head = the gate tuple); a `role-held` refusal registers without the role, any other refusal is one `supervisor.log` line. Run-supervisor crate takes the `directory` feature of `fgos-identity`.
+- Grant resource `workspace-paths` (`policies.mjs` shape, `resources.mjs` resolver, `bwrap.mjs` allow-list, `agent-confinement/spec.md` 9.1): one writable bind per project-relative path; empty, absolute, `..` and glob entries are refused by name; a missing path is `workspace-path-missing`, a symlink is refused.
+- Launch context discriminator `kind: 'assignment' | 'session'` (`confinement/request.mjs`, `agent-confinement/spec.md` 9.1): absent kind is `assignment` and stays strict; `session` carries run ids, command id and `session.role`, and refuses `controlEpoch`, `controlTokenDigest`, `dispatchPlanDigest`, `evaluatorBaselineDigest`. Why no run control: nothing settles a session, and the one live head is fenced by Identity's role.
+- `src/session-host/head-grants.mjs`: frozen table (secretary: writes `plans`, `docs/backlog.md`, `docs/discussions`, verb `head start`; other personas nothing) and the one reader `grantOf(role)`.
+- Seat door: `prepareAttemptSeat` extracted from `buildLaunch` (pure move, plus hooks `afterConfinement` and `beforeEnvelope` for the worker's own steps); `startAndBind` is the first half of `awaitBinding`; `openAttempt`, `publishAttemptIntent`, `closeAttempt`, `leaseAccountForAttempt`, `renewLeasedLogin`, `releaseSelectedProviderLease` exported. New `session-attempt.mjs` (`launchSessionAttempt`); `prepareTerminalAttempt` takes `opening: 'verbatim'`, `display`, `beside`.
+- `head-start.mjs`: `startHeadSession` binds, launches through the launch port, keeps refusals, fronting, `placement.json`; a start without `gen` takes the first unused generation (the attempt directory of a used key is never reused).
+- Session Host `start` deleted (route op, `host.start`, types `StartRequest`, `Opening`, `Delivery`, `Role`, refusal codes `head-needs-interactive-host`, `opening-delivery-unsupported`, `pane-not-ready`, `key-in-use`, `readyMs`/`ready_ms`, `Screenless::spawn`, `opening_file`, the Node client `start`, its tests, the contract entries).
+
+## Callers of the edited functions (rg, GitNexus not installed here)
+`buildLaunch`: one caller, `executeAssignment` (`assignment-runner.mjs`). `awaitBinding`: the same one. Nothing else in `src/`, `test/`, `scripts/`.
+
+## Proof
+- `cargo test -p fgos-run-supervisor -p fgos-session-host`: all green (supervisor terminal fake-herdr: 13 pass including the new session case: a Blocked screen after delivery does not end it, the role resolves in Identity, closing the pane ends it `carrier-lost`, no settle step). `cargo clippy --all-targets -D warnings` and `cargo fmt --check` clean, `cargo check --target aarch64-apple-darwin` clean for both crates.
+- Node (`node scripts/run-tests.mjs`): head-start 11, direct-cutover 12, confinement policies 33, backend-p03 40, authority 13, terminal-cutover + assignment + client 41, group-queue/client/head-start 18, architecture 71; no ERROR lines, 0 fail.
+- Live (working tree, host and addon staged by `stageLauncherDoor`, the door `npm run fgos:dev` uses; this machine, real herdr, gemini via account tetnu):
+  - `planner` / `probe`: a herdr tab opened, the full persona text and start ritual typed visibly, `fgos identity resolve head:planner-probe` live (id `fg-server2-jdp2bv/att-cmd_...`, role held), `.fgos/assignments/head-planner-probe-1/runs/01/` has `supervisor-binding.json`, envelope `session {role, verbs: []}`, `softAt` and `idleMs` null, steps `finalize-home, cleanup-trust, release-slot`. Seen from the agent process: `FGOS_HEAD_ROLE` and `FGOS_HEAD_GEN` set; `/run/user/1000` holds only the bound-back `fgos` socket (no herdr socket); `~/.config/herdr` is an empty tmpfs. Account gemini/tetnu, CLI gemini (agy), `credentialProvisioned` true.
+  - `secretary-probe` (secretary grant, planner persona and binding because no secretary persona exists yet): through the agent's mount namespace, `touch plans/x-probe.md` works, `touch src/x-probe` fails read-only, appending to `docs/backlog.md` works. Probe file removed, backlog restored with `git checkout`.
+  - Both panes closed with `herdr pane close`: `receipt.json` outcome `gate-lost` (the gate saw its pty hang up before the carrier check; `carrier-lost` in the fake-herdr case), `steps/finalize-home.json` done (write-back ran), `release-slot` and `cleanup-trust` receipts, `closed.json`, role resolves `not-found`. `fgos dispatch inspect --assignment head-secretary-probe-1` answers cleanly; every attempt directory of this worktree has `closed.json`; doctor's one `run-attempts-stuck` warning is not from this worktree.
+  - No processes or panes left running.
+
+## Deviations from the phase file
+1. `echo $FGOS_CONFINED` is not `1` inside the agent: bwrap sets it on the gate (verified on the gate's environ) and the gate starts the agent with a cleared environment, as for every worker. Confinement was shown by the masked runtime and herdr directories and the read-only `src`, not by that variable.
+2. The seat door needed a launch context with run control (`prepareConfinementForLaunch` refused a context without `controlEpoch` and digests). Resolved with the coordinator: the `kind` discriminator above; side file `controlEpoch` and `controlToken` are null for a session (envelope contract updated).
+3. Files outside the footprint, each approved by the coordinator: `src/runner/dispatch/confinement/drivers/bwrap.mjs` (allow-list refused `workspace-paths`) and `test/runner/dispatch-confinement-backend-p03.test.mjs` (its one case); `docs/platform/run-supervisor/spec.md` (session attempt section); `src/runner/dispatch/confinement/request.mjs` and `test/runner/dispatch-confinement-authority.test.mjs` (session launch context). `docs/platform/agent-confinement/spec.md` is in the footprint.
+4. The head's `cli` is not returned by `startHeadSession` (the binding names none); the supervisor reads the CLI from the executor.
+5. `FGOS_HEAD_ROLE` and `FGOS_HEAD_GEN` needed no change to `worker-env-allowlist.v1.json`: they travel in the executor invocation environment and reach the agent.
+
+## Exposure (risk 1, owner question 1 option a)
+The head holds a leased account for hours; a renewed claude or xai login inside its private home is only staged, never applied, and a rotating refresh token used inside the home can invalidate the source for other seats of that account. This live run bound gemini (account tetnu), whose login was provisioned and written back by `finalize-home`. No code mitigation in this phase; `fgos doctor credential-copies-retained` names staged copies.
+
+## Port-contract delta for the Session Host spec (phase 14 folds it into `docs/platform/session-host/spec.md`)
+- Operations are now `open`, `launch`, `alive`, `front`, `retire`; `start` and the `readyMs` request field are gone. Refusal codes are `host-unsupported-here` and `placement-unknown`.
+- Nothing starts a screenless (`direct`) process through the port any more, so no direct placement can exist: `alive`, `retire` and `front` for `host: direct`, `OsDirect`'s handle reads and the `Screenless` trait are unreachable in production. Its removal is a separate decision (no backlog row minted here: `fgos identity mint backlog` needs an installed project). Unresolved item for the lead.
+- A head session is started by its supervisor through `open` then `launch` (the supervisor's own path), with its opening typed by the supervisor's agent protocol, not by the port.
+
+## Unresolved
+- Open the backlog item for removing the Direct host (above).
+- A head key (`head-<persona>-<name>-<gen>`) is used once; the chain of `beside` group keys is the predecessor's key, as in the earlier design (third generation reuses the predecessor key as group; rotation's phase owns it).
+- Open question 2 (`HEAD_HARD_CEILING_MS` constant) unchanged.

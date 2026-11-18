@@ -1,12 +1,10 @@
-//! The real process door: a prepared command is started without a screen, judged by identity,
-//! asked to leave with SIGTERM, and forgotten.
+//! The real process door: a process whose handle is on disk is judged by identity, asked to leave with SIGTERM, and
+//! forgotten. The test writes the handle itself: nothing starts a screenless process through the port any more.
 #![cfg(unix)]
 
 use fgos_session_host::direct::{OsDirect, Screenless};
 use fgos_session_host::panes::Panes;
-use fgos_session_host::{
-    HostKind, Liveness, Placement, RetireAnswer, Retirement, Role, SessionHost, StartRequest,
-};
+use fgos_session_host::{HostKind, Liveness, Placement, RetireAnswer, Retirement, SessionHost};
 
 struct NoPanes;
 impl Panes for NoPanes {
@@ -62,36 +60,28 @@ impl Panes for NoPanes {
 }
 
 #[test]
-fn a_started_process_is_live_then_retired_by_sigterm() {
+fn a_process_with_a_handle_is_live_then_retired_by_sigterm() {
     let dir = std::env::temp_dir().join(format!("fgos-session-host-direct-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).unwrap();
     let door = OsDirect::new(&dir);
-    let request = StartRequest {
-        host: HostKind::Direct,
-        key: "w-1".into(),
-        group_key: None,
-        beside: None,
-        cwd: std::env::temp_dir().to_string_lossy().into_owned(),
-        env: Default::default(),
-        command: "sleep".into(),
-        args: vec!["60".into()],
-        opening: None,
-        display: None,
-        role: Role::Worker,
-    };
     assert_eq!(
         door.liveness("w-1"),
         Liveness::Gone,
-        "a key never started is gone"
+        "a key with no handle is gone"
     );
+    let mut child = std::process::Command::new("sleep")
+        .arg("60")
+        .spawn()
+        .unwrap();
+    let tuple = fgos_process::facts::identity_of_child(fgos_process::ProcId(child.id())).unwrap();
+    let handle = serde_json::json!({ "key": "w-1", "process": tuple.to_record().to_json() });
+    std::fs::write(dir.join("w-1.json"), handle.to_string()).unwrap();
     let host = SessionHost {
         panes: &NoPanes,
         direct: &door,
-        ready_ms: 1_000,
         grace_ms: 5_000,
     };
-    host.start(&request, None);
-    assert_eq!(door.liveness("w-1"), Liveness::Live);
     let p = Placement {
         host: HostKind::Direct,
         key: "w-1".into(),
@@ -100,5 +90,6 @@ fn a_started_process_is_live_then_retired_by_sigterm() {
     assert_eq!(host.alive(&p).result, Liveness::Live);
     assert_eq!(host.retire(&p, Retirement::Close), RetireAnswer::Retired);
     assert_eq!(door.liveness("w-1"), Liveness::Gone);
+    let _ = child.wait();
     let _ = std::fs::remove_dir_all(&dir);
 }

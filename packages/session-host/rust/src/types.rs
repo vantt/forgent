@@ -12,29 +12,6 @@ pub enum HostKind {
     Direct,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum Role {
-    #[default]
-    Worker,
-    Head,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum Delivery {
-    Typed,
-    Argument,
-    File,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct Opening {
-    pub text: String,
-    pub delivery: Delivery,
-}
-
 /// Where a session runs. `display` is written to the screen only, never read back.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -43,29 +20,6 @@ pub struct Placement {
     pub key: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub display: Option<Value>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct StartRequest {
-    pub host: HostKind,
-    pub key: String,
-    #[serde(default)]
-    pub group_key: Option<String>,
-    #[serde(default)]
-    pub beside: Option<String>,
-    pub cwd: String,
-    #[serde(default)]
-    pub env: BTreeMap<String, String>,
-    pub command: String,
-    #[serde(default)]
-    pub args: Vec<String>,
-    #[serde(default)]
-    pub opening: Option<Opening>,
-    #[serde(default)]
-    pub display: Option<Value>,
-    #[serde(default)]
-    pub role: Role,
 }
 
 /// Allocate the slot of a terminal placement without starting anything in it: what a controller that
@@ -99,12 +53,8 @@ pub enum RefusalKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum RefusalCode {
-    HeadNeedsInteractiveHost,
     HostUnsupportedHere,
-    OpeningDeliveryUnsupported,
-    PaneNotReady,
     PlacementUnknown,
-    KeyInUse,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -136,12 +86,6 @@ impl Refusal {
             capability: None,
         }
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum StartAnswer {
-    Placed(Placement),
-    Refused(Refusal),
 }
 
 /// What `open` answers: the placement, and its slot: the one this call allocated, or the one a live key's

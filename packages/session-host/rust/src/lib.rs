@@ -1,5 +1,5 @@
-//! Session Host: the one port that places an agent session (`start`, `alive`, `front`,
-//! `retire`, and for a controller that builds its command late, `open` then `launch`), for a worker under the run supervisor and for a long-lived head session.
+//! Session Host: the one port that places an agent session (`open` then `launch`, `alive`, `front`,
+//! `retire`), for a worker or a head session under the run supervisor, which builds its command late.
 //!
 //! The wire types are in `types` (contract: `packages/session-host/contracts/host-port.v1.json`),
 //! the Terminal Control surface the terminal adapter needs is `panes::Panes`, the screenless
@@ -14,7 +14,7 @@ pub mod panes;
 pub mod route;
 pub mod types;
 
-pub use host::{SessionHost, DEFAULT_GRACE_MS, DEFAULT_READY_MS};
+pub use host::{SessionHost, DEFAULT_GRACE_MS};
 pub use pane_io::{PaneIo, SendFailure};
 pub use panes::Panes;
 pub use types::*;
