@@ -1,7 +1,7 @@
 ---
 phase: 07
 title: "Closing report and handoff of T6–T9"
-status: pending
+status: done
 depends_on: [06 closed]
 effort: ~0.5d
 ---

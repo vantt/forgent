@@ -1,7 +1,8 @@
 ---
 title: "HARDEN: soát và làm cứng các tầng thấp, từ T0 lên T5"
 description: "Skeleton plan for the HARDEN lane: per-layer closed loop (measure, council, arbitrate, sub-plan, verify, land, re-measure, close) from Process Facts & Control (T0) to Execution Core (T5), moving lower-layer decisions into Rust and shrinking Node to thin clients, without growing the system."
-status: pending
+status: done
+closedNote: "Closed 2026-11-18: layers T0-T6, T8, T9 and Packaging closed; T7 Work not hardened (decision 78). Closing report and handoff table plans/reports/closing-261118-1344-harden-root-closing.md. Whole-suite wall-time re-measure not run, owner asked."
 priority: P1
 effort: ~30d of HARDEN work (rough; each layer's sub-plan re-estimates) plus wait time on SEAT landing (gates phase 02 close) and ES store layer (gates phase 04b)
 branch: main (plan only; each layer opens its own track branch)
