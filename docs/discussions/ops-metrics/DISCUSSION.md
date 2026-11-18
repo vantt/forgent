@@ -16,7 +16,7 @@ discussion: settled
 >   độ ổn định council (p-24dxhwq7zr); retention run dir (p-tslryr3buq); p-ixrbglli5o.
 > - **Acceptance:** golden fixture ghi→truy vấn cho contract; định nghĩa pace và câu hỏi chạy được trên fixture mà
 >   không sửa code Observe; mỗi CLI có parser token hoặc lý do có tên; `cargo test --workspace` và `npm test` xanh.
-> - **Open, chặn một phần:** không. Phụ thuộc ngoài: plan supervisor chờ phase đăng ký `fgos.supervisor.tick`.
+> - **Open, chặn một phần:** không. Phụ thuộc ngoài: plan supervisor (watcher, supervisor wake) chờ phase 1 và 4.
 > - **Sources:** backlog p-s5mliyp335, p-mvc3d54cda, p-7nqygnztum, p-24dxhwq7zr (phần đo); inventory
 >   `plans/reports/scout-261118-0936-ops-metrics-inventory.md`; research
 >   `plans/reports/research-261118-1017-skillstation-observability-lessons.md`.
@@ -108,6 +108,10 @@ phạm vi.
 - 2026-11-18 ~12:30 — Shaper supervisor trả lời Q6: pace = lịch tick; hai row overdue / idle-burn; cần event tick
   mới (họ sinh), token theo head session, sự kiện trạng thái plan, placement/gone của head. Đổi tên event theo OM-D8
   → `fgos.supervisor.tick` (§6 E).
+- 2026-11-18 ~13:40 — Shaper supervisor: chủ dự án đổi cách chia — watcher (không-LLM, giữ timer, chạy định nghĩa,
+  làm hành động theo kind row) và supervisor (LLM, thức theo sự kiện). Event thành `fgos.watcher.tick` +
+  `fgos.supervisor.wake`; pace thành `watcher-overdue` + `supervisor-idle-burn`; hỏi trigger nào ops-metrics định
+  nghĩa → §6 E.
 - 2026-11-18 ~12:45 — Chủ dự án: Q7 trả về secretary để bàn riêng, đo lại ở đây sau như pace → OM-D11.
 - 2026-11-18 ~12:55 — Chủ dự án: đăng ký một số đo mới / vấn đề mới để quan sát làm tại nơi dùng được không, hay
   phải vào Observe code lại? → đề xuất khai báo tại nơi dùng, Q10.
@@ -197,8 +201,8 @@ dưới cỡ mẫu, và `coverage` (bao nhiêu bản ghi thiếu attr được n
 là chính các đối số này lưu thành file.
 
 Ngữ pháp phải đủ để định nghĩa phát hiện sau này chỉ là dữ liệu (OM-D10, OM-D11), gồm: `--agg max:ts` (tuổi của sự
-kiện cuối, cho `supervisor-overdue`), lọc theo cửa sổ thời gian tương đối (`--since -30m`), và nối qua `refs` (token
-của các session mà tick LLM tham chiếu, cho `supervisor-idle-burn`; token theo plan qua run). Thiếu một trong các phép
+kiện cuối, cho `watcher-overdue`), lọc theo cửa sổ thời gian tương đối (`--since -30m`), và nối qua `refs` (token
+của các session mà wake của supervisor tham chiếu, cho `supervisor-idle-burn`; token theo plan qua run). Thiếu một trong các phép
 này thì thêm pacer sẽ phải sửa code — fixture của task `observe-contract` chạy thử chính các định nghĩa pace và
 câu hỏi để chứng minh không cần.
 
@@ -282,16 +286,28 @@ ngưỡng trong config), attention view chạy chúng; Observe không biết cá
 Cơ chế chung (OM-D10): attention view đọc một danh sách định nghĩa phát hiện, mỗi định nghĩa = truy vấn có tên +
 ngưỡng (config) + kind row + lệnh gợi ý; `head-gone`, `plan-no-progress` là hai định nghĩa đầu; pacer của supervisor
 sau này là định nghĩa thứ ba.
-Phản hồi của shaper supervisor (2026-11-18): pace = lịch tick của supervisor (nhanh khi có plan `running` hoặc lead
-được đặt, chậm khi rảnh; tick là tiến trình không-LLM, chỉ gọi LLM khi có phát hiện). Định nghĩa thứ ba có hai kind
-row: `supervisor-overdue` (có việc chạy mà tick cuối cũ hơn k × khoảng active, k config mặc định 3) và
-`supervisor-idle-burn` (không plan chạy/ready mà tick LLM vẫn tiêu token trong cửa sổ). Producer phía supervisor ghi
-qua cửa ghi một kind mới, đặt tên theo OM-D8:
-`fgos.supervisor.tick` — `ts`/`endTs` (span); attrs `fgos.supervisor.mode` (active|idle), `fgos.supervisor.llm`
-(bool), `fgos.supervisor.outcome` (noop|lead-started|lead-reclaimed|plan-closed|question-raised|error); measures
-`fgos.supervisor.interval` (s, khoảng đang áp dụng, chép trong event để không phụ thuộc config bên kia),
-`fgos.plans.ready`, `fgos.plans.running` (count); `refs` session khi `llm` (nối token theo session); project nằm ở
-`origin`. Contract tầng 1 phải nhận kind này ngay từ registry đầu tiên. Để pacer diễn đạt được, contract phải có sẵn nguồn hoạt động của head session: sự kiện
+Phản hồi của shaper supervisor (2026-11-18, cập nhật cùng ngày khi chủ dự án đổi cách chia): **watcher** là tiến
+trình không-LLM, tầng dưới, giữ timer; mỗi tick chạy các định nghĩa phát hiện của plan này, rồi với mỗi kind row chạy
+các hành động cấu hình cho kind đó (mặc định: đánh thức supervisor; hoặc báo người). **Supervisor** là session LLM được
+đánh thức theo sự kiện, xử lý hàng đợi rồi thoát; nó phân xử plan nào chạy tiếp, chia lane, xử lý lead chết/kẹt.
+Chia sở hữu: ops-metrics giữ contract Observe, các định nghĩa phát hiện và attention view; plan supervisor xây
+watcher (lịch timer thứ ba trong `timer.rs`, Rust), bảng kind row → hành động (config) và supervisor. Hành động thuộc
+watcher, nên OM-D1 (tầng ops-metrics chỉ phát hiện) vẫn đúng.
+Hai kind do bên supervisor sinh qua cửa ghi, tên theo OM-D8:
+- `fgos.watcher.tick` (span, producer watcher): attrs `fgos.watcher.mode` (active|idle), `fgos.watcher.outcome`
+  (noop|woke-supervisor|notified|error); measures `fgos.watcher.interval` (s, khoảng đang áp dụng),
+  `fgos.plans.ready`, `fgos.plans.running`; project ở `origin`.
+- `fgos.supervisor.wake` (span từ lúc thức tới lúc thoát, producer session supervisor): attrs
+  `fgos.supervisor.trigger` (kind row), `fgos.supervisor.outcome` (noop|lead-started|lead-reclaimed|plan-closed|
+  question-raised|error); `refs` session (nối token).
+Định nghĩa pace (bên supervisor thêm sau): `watcher-overdue` (có plan chạy mà tick watcher cuối cũ hơn k × khoảng
+active, k config mặc định 3) và `supervisor-idle-burn` (wake tiêu token khi không plan ready/running, hoặc tỉ lệ wake
+`noop` vượt ngưỡng).
+Trigger đánh thức: `head-gone` và `plan-no-progress` là định nghĩa của plan này (phase 10). `plan-became-ready`,
+`plan-done`, `plan-priority-changed`, `lane-freed` là định nghĩa của bên supervisor (nơi dùng, OM-D5/OM-D12), viết
+trên sự kiện plan này cung cấp: `fgos.plan.status` (gồm cả đổi `priority`) và `fgos.head.state` (gồm `retired`).
+Watcher đọc "mới từ tick trước" bằng `--since <ts tick trước>`.
+Registry đầu tiên phải nhận được hai kind này (khai báo của bên supervisor, OM-D12). Để pacer diễn đạt được, contract phải có sẵn nguồn hoạt động của head session: sự kiện
 hoạt động theo session (statusline sidecar / transcript) và token theo session — nằm trong §6 C.
 Ngưỡng là config key mới qua standard + schema. Logic phát hiện viết bằng Rust (chủ dự án 11-18: code mới viết
 được bằng Rust thì viết Rust); view Node chỉ nối dây.
@@ -329,7 +345,7 @@ Nháp — planner sẽ chia phase theo plan contract.
 ### observe-contract {#task-observe-contract}
 §6.0 tầng 1: contract v2 (bản ghi, registry kind/subject/attr/measure, truy vấn) + một cửa ghi + verb truy vấn, đi
 trước mọi task khác; nguồn chiếu hiện có (run, unit summary) và store friction chuyển qua nó. Verify: golden fixture
-ghi→truy vấn ở `cargo test -p fgos-observe`. Registry đầu tiên phải có `fgos.supervisor.tick` (§6 E): phase producer
+ghi→truy vấn ở `cargo test -p fgos-observe`. Registry đầu tiên phải nhận `fgos.watcher.tick` và `fgos.supervisor.wake` (§6 E): phase producer
 của plan supervisor (session shape-supervisor) chờ phase này — phụ thuộc ngoài, ghi vào plan khi viết.
 
 ### usage-survey {#task-usage-survey}

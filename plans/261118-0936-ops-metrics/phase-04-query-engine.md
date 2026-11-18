@@ -35,9 +35,11 @@ Layer 1, second half. Rust.
 5. Tests own the grammar.
    - Cover each operator once, including the relative window under a fixed clock and a join.
    - Using test-local declarations (no Observe source change), run:
-     - `supervisor-overdue`: the newest tick is older than k × `fgos.supervisor.interval` while
+     - `watcher-overdue`: the newest `fgos.watcher.tick` is older than k × `fgos.watcher.interval` while
        `fgos.plans.running > 0`;
-     - `supervisor-idle-burn`: no plan running or ready, and tick sessions spent tokens in the window;
+     - `supervisor-idle-burn`: no plan running or ready, and the sessions of `fgos.supervisor.wake` spans spent
+       tokens in the window (join through the session ref);
+     - a wake trigger, `plan-became-ready`: `fgos.plan.status` records with status `ready` since a given instant;
      - an owner-wait definition: `question.answered.ts - question.asked.ts` joined by ref.
 
 ## Verify

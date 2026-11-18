@@ -28,6 +28,8 @@ The detection logic is the generic query engine (Rust). The Node view only wires
    - The view loads every definition in `core/attention/definitions/`, runs each through the phase-4 door in one host
      call, and appends the rows.
    - A definition the supervisor plan adds later (pace) is picked up without a code change.
+   - The supervisor plan's watcher runs the same definition files on its own timer through `fgos metrics query
+     --def`; the actions it takes per row kind are its own (config), never this view's.
    - Run-derived rows stay as they are.
 4. Tests extend the owning attention-view test file:
    - Fixture records give one `head-gone` row and one `plan-no-progress` row.

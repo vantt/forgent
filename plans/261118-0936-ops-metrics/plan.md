@@ -121,9 +121,9 @@ their consumers. A detection the supervisor plan adds later (pace, OM-D10), or o
      covering `--where`, `--ref`, `--by`, `--bucket` and `--agg count|sum|p50|p90|max`, `max:ts`, relative `--since`,
      a join through `refs`, `insufficient` and `coverage`;
    - a test that refuses two declarations of the same name.
-2. The same fixture runs a test-local declaration of `fgos.supervisor.tick` and `fgos.question.*`, with the two pace
+2. The same fixture runs a test-local declaration of `fgos.watcher.tick`, `fgos.supervisor.wake` and `fgos.question.*`, with the two pace
    definitions and an owner-wait definition, through `fgos metrics query --def`. No Observe source file names those
-   kinds (`rg -n 'supervisor\.tick|question\.asked' packages/observe/rust/src` returns nothing).
+   kinds (`rg -n 'watcher\.tick|supervisor\.wake|question\.asked' packages/observe/rust/src` returns nothing).
 3. Every settled attempt in `unit-summary.json` carries `accountId`, `durationMs` and `usage`. `usage` holds either
    token counts or a named `reason`, one per CLI, and is proven by the parser tests in `packages/execution/rust`.
    `src/runner/dispatch/usage-parsers.mjs` is gone.
@@ -150,7 +150,7 @@ their consumers. A detection the supervisor plan adds later (pace, OM-D10), or o
 
 - Money and price tables (OM-D2).
 - Alerts or mailbox delivery (OM-D1).
-- The meaning of supervisor pace and the `fgos.supervisor.tick` producer, which belong to the supervisor plan (OM-D10).
+- The watcher process, its row-kind → action table, the supervisor, the pace and wake-trigger definitions, and the `fgos.watcher.tick` / `fgos.supervisor.wake` producers, which belong to the supervisor plan (OM-D10).
 - The question reader and the `fgos.question.*` producer, which belong to the secretary's grant follow-up plan (OM-D11).
 - Sources for driving measures 4, 5 and 6, filed as backlog rows (OM-D6).
 - The council stability fix (p-24dxhwq7zr: only its measurement comes for free).
@@ -197,7 +197,7 @@ Contract reading check (planner):
   recorded in the plan's log line on the board.
 
 External dependents:
-- The supervisor plan (session `shape-supervisor`): its tick producer phase waits for phases 1 and 4.
+- The supervisor plan (session `shape-supervisor`): its watcher and wake producers wait for phases 1 and 4; its trigger definitions (`plan-became-ready`, `plan-done`, `plan-priority-changed`, `lane-freed`) read `fgos.plan.status` and `fgos.head.state` from phase 8; its watcher runs the phase-10 definitions.
 - The secretary's grant follow-up plan: its `fgos.question.*` producer waits for phase 1.
 
 ## Owner questions

@@ -56,8 +56,8 @@ Layer 1 of OM-D4: the part that must be right first. Rust (OM-D3).
    - a duplicate id ignored;
    - the bounded time while another process holds the lock, with the counter incremented and no error to the caller;
    - a fixed clock in the fixtures.
-7. Review before phase 4 starts: express, as test-local declarations, the deferred kinds `fgos.supervisor.tick`
-   (DISCUSSION §6 E) and `fgos.question.asked|answered` (OM-D11). Show they validate without touching Observe source.
+7. Review before phase 4 starts: express, as test-local declarations, the deferred kinds `fgos.watcher.tick` and
+   `fgos.supervisor.wake` (DISCUSSION §6 E) and `fgos.question.asked|answered` (OM-D11). Show they validate without touching Observe source.
 
 ## Verify
 `cargo test -p fgos-observe` green. `rg -n 'supervisor|question' packages/observe/rust/src/record` returns nothing.

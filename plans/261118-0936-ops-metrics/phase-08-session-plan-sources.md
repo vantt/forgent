@@ -27,9 +27,10 @@ These are new sources, written in Rust, and they are projections of truth owned 
    are declared in `packages/observe/contracts/` next to it.
 2. **Composition root sources** (`apps/fgos/src/wiring/observe_sources/`, declared in `apps/fgos/observe-kinds.json`):
    - `fgos.head.state`: a live projection of each placed head or lead. It joins the placement, Identity role and
-     liveness with Session Host `alive`. `gone` and `unknown` stay distinct, because unknown is never turned into
-     gone.
-   - `fgos.plan.status`: the transitions of `status` in each `plans/*/plan.md`, read from git history through the Git
+     liveness with Session Host `alive`. States are `live`, `gone`, `unknown` and `retired`; `gone` and `unknown`
+     stay distinct, because unknown is never turned into gone. `retired` lets the supervisor plan define `lane-freed`.
+   - `fgos.plan.status`: the transitions of `status` and of `priority` in each `plans/*/plan.md` (attr
+     `fgos.plan.change` = status|priority), read from git history through the Git
      door, with deterministic ids.
    - `fgos.plan.activity`: commits touching `plans/<dir>/` on any branch, and board log lines naming the dir.
 3. Register them in `metrics_sources.rs`.
