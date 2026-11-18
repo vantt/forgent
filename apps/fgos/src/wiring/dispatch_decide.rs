@@ -41,8 +41,6 @@ pub const EXPLAIN_OPERATION_ID: &str = "dispatch.explain";
 /// The sub-commands of `fgos dispatch` the host serves; every other one reaches the legacy payload.
 pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["decide", "explain"];
 
-/// The most bytes of an assignment record `decide --assignment` reads.
-const ASSIGNMENT_CAP: usize = 1024 * 1024;
 /// The most bytes of a hook payload read from stdin; a payload cut at the cap does not parse and so allows.
 const HOOK_STDIN_CAP: u64 = 8 * 1024 * 1024;
 
@@ -487,18 +485,17 @@ fn work_hint(root: &Path, work_id: &str, stage: Option<&str>) -> Result<Option<V
 /// The assignment record of `id` under the project's `.fgos`; absent or unreadable is no record.
 fn assignment_record(fgos_dir: &Path, id: &str) -> Option<Value> {
     let relative = Path::new("assignments").join(id).join("assignment.json");
-    let bytes = read_beneath_capped(fgos_dir, &relative)?;
+    let bytes = read_beneath(fgos_dir, &relative)?;
     serde_json::from_slice(&bytes).ok()
 }
 
-fn read_beneath_capped(root: &Path, relative: &Path) -> Option<Vec<u8>> {
-    let bytes = read_beneath(root, relative)?;
-    (bytes.len() <= ASSIGNMENT_CAP).then_some(bytes)
-}
-
-/// An id that is one plain path segment: no separator, no `.` or `..`, no NUL.
+/// An id that is one plain path segment: no separator, no drive prefix, no `.` or `..`, no NUL.
 fn plain_segment(id: &str) -> bool {
-    !id.is_empty() && id != "." && id != ".." && !id.contains(['/', '\\', '\0'])
+    !id.contains(['/', '\\', ':', '\0'])
+        && matches!(
+            Path::new(id).components().collect::<Vec<_>>().as_slice(),
+            [std::path::Component::Normal(_)]
+        )
 }
 
 /// What a decision is asked, whichever door asks it.
@@ -850,7 +847,7 @@ mod tests {
         for good in ["asgn-1", "unit-run-1794977600551-f5a8957a"] {
             assert!(plain_segment(good), "{good}");
         }
-        for bad in ["", ".", "..", "a/b", "../x", "a\\b", "a\0b"] {
+        for bad in ["", ".", "..", "a/b", "../x", "a\\b", "a\0b", "C:x", "C:"] {
             assert!(!plain_segment(bad), "{bad:?}");
         }
     }

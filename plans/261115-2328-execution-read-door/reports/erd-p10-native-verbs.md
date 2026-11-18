@@ -72,3 +72,11 @@ Kept and changed: the retired-door test now also pins that `decide` is an unknow
 The four parity tables and `execution-world.mjs` ran green against base `7655f4f3e` (counts above) and were removed
 before landing: with tables present, `test/rust-host/verb-parity.test.mjs` needs a staged base release
 (`FGOS_TEST_PARITY_BASE`) and would fail `npm test` on main. Restore them from commit `0d3ee1395` to re-run parity.
+
+## Review notes kept as facts
+
+- A hook payload over 8 MiB is cut at the cap, does not parse and so allows the call (the fail-open rule for a payload
+  that does not parse); a guard over a huge prompt is therefore not enforced.
+- `routing.rs` `PARTIAL_VERB_OPERATIONS` hand-maps the operation ids of a partly native verb because the route exporter
+  emits none for a `legacy-cli` verb with native sub-commands. Out of this phase's scope; proposed as its own backlog
+  item at plan close.

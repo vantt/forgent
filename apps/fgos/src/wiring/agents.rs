@@ -49,9 +49,6 @@ pub const DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
     health: None,
 };
 
-/// The most bytes of a definition file the listing reads.
-const DEFINITION_CAP: usize = 1024 * 1024;
-
 /// One `fgos agents list` invocation, as the projector read it.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AgentsRequest {
@@ -95,7 +92,7 @@ fn read_tier_dir(dir: &Path, rel_dir: &str, files: &mut Vec<AgentFile>, ignored:
         let rel = format!("{rel_dir}/{file_name}");
         if let Some(name) = file_name.strip_suffix(".yaml") {
             let content = match read_beneath(dir, Path::new(&file_name)) {
-                Some(bytes) if bytes.len() <= DEFINITION_CAP => Content::Bytes(bytes),
+                Some(bytes) => Content::Bytes(bytes),
                 _ => Content::Unreadable,
             };
             files.push(AgentFile {

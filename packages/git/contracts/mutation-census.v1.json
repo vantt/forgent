@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "70df757d0c0f3d2bf192fa13d61e33132063c1eed19548db05ea4b04c2aa33d9",
+  "payloadDigest": "62aa3154b4837a4d5dc24e204c8b3521d2afddecf8e6a879807cc8106080173b",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -95,8 +95,8 @@
     "apps/fgos/src/legacy_exec.rs": "3516964122e7f002fed147e2f78de3f12df1a0274dd51349bdebff9bac8427d8",
     "apps/fgos/src/main.rs": "d80c5765124cec7e9e079b84a89309d10a47b23ccd7395def3dcc42063f85028",
     "apps/fgos/src/routing.rs": "37f34d634b9713a020c75357210ad87d766223047da45b831d2100f0877d53b7",
-    "apps/fgos/src/wiring/agents.rs": "677d8a923a7d42c2d7fe16f2b2372ad7c177de6f95fcabb48a57923041213e78",
-    "apps/fgos/src/wiring/dispatch_decide.rs": "83ffe20c039a7c6a61017349cba87050e4a611851c6ea8cae3b902d48bd34c2d",
+    "apps/fgos/src/wiring/agents.rs": "7b64d432f3568f7ee6bc495049d6303507ec9065758ebd09b5eaca2da9832519",
+    "apps/fgos/src/wiring/dispatch_decide.rs": "2e5e7b6f9ac4987923c8e915d12ea8e4d57f34a81f91ddacaa2c5504a6dadaad",
     "apps/fgos/src/wiring/doctor/bridge.rs": "f88bdc7742bcef98e0012f8209150b63eb198d1caea6729937e7a4d5275e689a",
     "apps/fgos/src/wiring/doctor/config.rs": "a956ab079d6c7a634df6fd1f9246317135f7cf96a6da2eb1e6f873a1eba1fcec",
     "apps/fgos/src/wiring/doctor/event_store.rs": "61c66e050710eb6ea4aa2f8cb4643bdf91f8cd63bb482f1674de4614edf46e34",
@@ -1035,7 +1035,7 @@
     "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
-    "src/cli/command-registry.mjs": "167ae407e7f946d3e0b96da354ee365cdf4c905b3e1e8cf4372baf6b8e955b36",
+    "src/cli/command-registry.mjs": "19330ea531d3d8e8b9d20e163de58ddff837921dd3c05b8f333e478227bb1122",
     "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
