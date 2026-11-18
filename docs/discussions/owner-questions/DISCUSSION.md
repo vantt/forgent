@@ -30,6 +30,7 @@ Code mới viết bằng Rust khi làm được mà không gây xáo trộn.
 | 3 | Một chỗ chung để xem và trả lời | chờ Q1 | `fgos questions --open` gộp discussion, plan, gate nhưng thiếu `fgos ask`; dashboard S04 chỉ thấy `fgos ask`. |
 | 4 | Session hỏi nhận ra câu trả lời của mình | chờ Q1 | Chưa có khoá chung. Ý nháp: id trả về lúc hỏi; `fgos questions wait <id>` hoặc hook `Stop`/`UserPromptSubmit` báo khi có trả lời. |
 | 5 | Đánh thức session khi có trả lời | chờ Q1; phối hợp shaper supervisor | Ý nháp: watcher coi `fgos.question.answered` là một loại row; asker còn sống thì terminal-control `send`, đã chết thì đánh thức supervisor. Ranh giới watcher/supervisor thuộc shaper supervisor. |
+| 7 | Kho câu hỏi là gì | nghiêng: kho vận hành | Hàng đợi + nhật ký cho câu đang mở; câu hỏi và câu trả lời lâu dài ghi ở nơi phát sinh. Mở: ai ghi lại khi người hỏi đã chết; bản ghi đã trả lời giữ bao lâu (ops-metrics cần thời gian chờ). |
 | 6 | Socket `head answered` có dùng được cho câu trả lời không | rõ: không | Đó là bước bắt tay của session kế nhiệm khi xoay (`src/session-rotation/rotate.mjs:115-133`), không mang câu trả lời của chủ dự án. |
 
 ## 4. Quyết định đã chốt
@@ -43,6 +44,10 @@ Code mới viết bằng Rust khi làm được mà không gây xáo trộn.
 - 2026-11-18 11:41 — Mở discussion. Kiểm tra scout trên main `9b462207d`: bốn nơi lưu và các khoảng trống còn
   nguyên; plan secretary ghi việc gộp câu hỏi về một chỗ là nợ SM-D9 (`plans/261117-1856-secretary-session-spine/plan.md:246`).
   Hỏi Q1.
+- 2026-11-18 — Chủ dự án hỏi: kho câu hỏi chỉ là bản tạm cho vận hành/UX? Trả lời xong có ghi lại đúng chỗ phát
+  sinh, hay không còn chỗ nào liệt kê câu hỏi? Shaper: đúng là kho vận hành (L1: log, không phải state); nơi phát
+  sinh vẫn giữ bản lâu dài và nhận câu trả lời ghi lại. Sửa lựa chọn (a) trong Q1 theo hướng đó (bản trước nói
+  "markdown chỉ còn id", bỏ).
 
 ## 6. Thiết kế đã chốt {#design}
 
