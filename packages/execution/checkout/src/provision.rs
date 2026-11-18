@@ -89,18 +89,22 @@ pub fn provision_dependencies(worktree: &Path) -> Result<bool> {
     } else {
         "install"
     };
-    let path_env = std::env::var("PATH").unwrap_or_default();
-    let pathext = std::env::var("PATHEXT").unwrap_or_default();
-    let npm = resolve_program("npm", &path_env, &pathext, cfg!(windows)).ok_or_else(|| {
-        Error::new(
+    // npm as the caller's environment finds it: PATH, and on Windows PATHEXT for its `npm.cmd` shim.
+    let Some(npm) = resolve_program(
+        "npm",
+        &std::env::var("PATH").unwrap_or_default(),
+        &std::env::var("PATHEXT").unwrap_or_default(),
+        cfg!(windows),
+    ) else {
+        return Err(Error::new(
             ErrorKind::Provision,
             format!(
                 "npm {subcommand} failed in \"{}\": npm is not on PATH",
                 worktree.display()
             ),
         )
-        .at(worktree)
-    })?;
+        .at(worktree));
+    };
     let mut command = Command::new(npm);
     command.arg(subcommand).current_dir(worktree);
     run(command, &format!("npm {subcommand}")).map_err(|m| {

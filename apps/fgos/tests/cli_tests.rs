@@ -4952,13 +4952,13 @@ impl WorktreeWorld {
         let _ = fs::remove_dir_all(&sandbox);
         let repo = sandbox.join("repo");
         let state = sandbox.join("state");
-        let bin = sandbox.join("bin");
-        for dir in [&repo, &state, &bin, &sandbox.join("home")] {
+        let bin_dir = sandbox.join("bin");
+        for dir in [&repo, &state, &bin_dir, &sandbox.join("home")] {
             fs::create_dir_all(dir).unwrap();
         }
         fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
         let node_log = sandbox.join("node-started.txt");
-        let failing_node = bin.join("node");
+        let failing_node = bin_dir.join("node");
         fs::write(
             &failing_node,
             format!(
@@ -4971,7 +4971,7 @@ impl WorktreeWorld {
         let world = Self {
             path: format!(
                 "{}:{}",
-                bin.display(),
+                bin_dir.display(),
                 std::env::var("PATH").unwrap_or_default()
             ),
             sandbox,

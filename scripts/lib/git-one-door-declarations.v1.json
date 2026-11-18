@@ -7,6 +7,20 @@
       "class": "configured-binary",
       "reason": "the host binary named by the project's activation record, read by fgos_distribution::activated_host_bin",
       "retireWhen": "p-7aqs6rhb2k"
+    },
+    {
+      "path": "packages/execution/checkout/src/provision.rs",
+      "siteId": "run_setup_commands:6c234bc09629f4d029db15602027886cb3cdbce26438dcbaa2680862178283c1",
+      "class": "configured-binary",
+      "reason": "a worktreeSetup.commands line from the main checkout's project config, run through the platform shell's script operand (cmd /d /s /c, Windows); the scanner's Rust path classifies a shell only by a literal script, so a configured script cannot be classified from code",
+      "retireWhen": "the scanner's Rust path classifies a shell whose script operand is configuration data as configured-binary, or worktree setup commands stop running through a shell"
+    },
+    {
+      "path": "packages/execution/checkout/src/provision.rs",
+      "siteId": "run_setup_commands:9c66f36223a4c57e5d65d0af8d0c78816504d8731acfdfa84a65fb5a1158f04c",
+      "class": "configured-binary",
+      "reason": "a worktreeSetup.commands line from the main checkout's project config, run through the platform shell's script operand (sh -c, Unix); the scanner's Rust path classifies a shell only by a literal script, so a configured script cannot be classified from code",
+      "retireWhen": "the scanner's Rust path classifies a shell whose script operand is configuration data as configured-binary, or worktree setup commands stop running through a shell"
     }
   ]
 }
