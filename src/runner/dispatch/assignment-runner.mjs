@@ -79,6 +79,7 @@ import {
   awaitSettledResult,
   buildEnvelope,
   readLaunchSettings,
+  laneTransport,
   resolveAttemptHost,
   startSupervisor,
   waitForBinding,
@@ -1100,6 +1101,7 @@ export async function prepareAttemptSeat(attempt, seat, hooks = {}) {
     killWaitMs: settings.killWaitMs,
     identity: attemptIdentity,
     ...(session ? { session, ceilingMs: seat.ceilingMs } : {}),
+    lanes: laneTransport(settings.lanes, currentDispatchDepth()),
     ...(attempt.terminal
       ? {
         terminal: {

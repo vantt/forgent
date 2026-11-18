@@ -35,6 +35,19 @@ fn every_vector_matches_canonical_json_and_digest() {
 }
 
 #[test]
+fn the_optional_lanes_field_has_one_canonical_form_with_a_null_ceiling() {
+    let body: Value =
+        serde_json::from_str(r#"{"v":3,"lanes":{"waitMs":900000,"ceiling":null}}"#).unwrap();
+    assert_eq!(
+        canonical_json(&body).unwrap(),
+        r#"{"lanes":{"ceiling":null,"waitMs":900000},"v":3}"#
+    );
+    // Part of the digested body: dropping the field changes the digest.
+    let bare: Value = serde_json::from_str(r#"{"v":3}"#).unwrap();
+    assert_ne!(digest(&body).unwrap(), digest(&bare).unwrap());
+}
+
+#[test]
 fn floats_have_no_canonical_form() {
     let value: Value = serde_json::from_str(r#"{"a":1.5}"#).unwrap();
     assert!(matches!(

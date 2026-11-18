@@ -106,6 +106,24 @@
       "note": "serialises bringing one herdr worker session up (src/runner/dispatch/worker-session-boot.mjs); <id> is the session name"
     },
     {
+      "name": "lane",
+      "kind": "mutex",
+      "scope": "machine",
+      "rank": 80,
+      "v3Path": "<lockRoot>/lane/<k>.lock",
+      "owner": "run-supervisor",
+      "note": "new lock, no v1 predecessor; one seat of the machine's worker pool, k in 0..workerSlots.ceiling. The run supervisor of a top-level worker seat holds one from before it launches the agent until the agent exits (packages/run-supervisor/rust/src/lanes.rs); a head session and a nested dispatch take none"
+    },
+    {
+      "name": "watcher",
+      "kind": "mutex",
+      "scope": "repo",
+      "rank": 80,
+      "v3Path": "<fgosDir>/locks/watcher.lock",
+      "owner": "supervision",
+      "note": "new lock, no v1 predecessor; held by one watcher tick at a time"
+    },
+    {
       "name": "agent-trust-store",
       "kind": "mutex",
       "scope": "machine",

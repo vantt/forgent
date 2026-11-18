@@ -161,7 +161,7 @@ Ranks (a scope may only take a lock of a higher rank than every lock it holds):
 | 58 | `event-seal` | mutex |
 | 60 | `state`, `porting-events` | hot-mutex |
 | 70 | `event-append` | mutex |
-| 80 | leaves: `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `worker-session`, `agent-trust-store`, `identity-pins`, `observe`, `activation`, `install`, `project-config`, `global-config`, `mailbox`, `session-rotation` | mutex, lease |
+| 80 | leaves: `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `worker-session`, `agent-trust-store`, `identity-pins`, `observe`, `activation`, `install`, `project-config`, `global-config`, `mailbox`, `session-rotation`, `lane`, `watcher` | mutex, lease |
 
 The ranks 58 (`event-seal`) and 70 (`event-append`) above are declared by the signed [Event Store spec §4](../event-store/spec.md#4-layering-and-locks), D-ADR0055 (event log as sealed changesets on per-machine refs); implementation has not started. They are planned additions to the shipped registry, which currently declares neither rank nor lock. They do not claim a registered kind, path or cutover. The design permits `state` (60) → `event-append` (70) and forbids seal/sync under `state`; registry and implementation must land together under the Event Store proof gates.
 
@@ -178,6 +178,10 @@ Locks cut over by the Rust-callers track (registry owner `4.4`), all leaves of r
 Git adds `repo-config`, a repo mutex at rank 80, `<fgosDir>/locks/repo-config.lock`, with no legacy path. It serializes the local fetch-mapping writer; Git's native `config.lock` also excludes ordinary Git config writers.
 
 Mailbox adds `mailbox`, a repo mutex at rank 80, `<fgosDir>/locks/mailbox.lock`, with no legacy path. It serializes every mutation of the agent mailbox's snapshot (docs/platform/agent-mailbox/spec.md §6.4); held briefly, never across an emit. Only the mailbox's Rust store (`packages/mailbox/rust/store/src/record`) takes it. The row's `<fgosDir>` template is one Node's `resolveLock` can fill, as for `repo-config`, so this is a rule of use rather than a refusal: no Node code takes `mailbox`, and refusing it in Node would need a second owner list in the facade.
+
+Run Supervisor adds `lane`, a machine mutex at rank 80, `<lockRoot>/lane/<k>.lock` with `k` in `0..workerSlots.ceiling`, with no legacy path. It is one seat of the machine's worker pool: the run supervisor of a top-level worker seat takes the first free `k` (one `Wait::Try` per seat, retried until `workerSlots.laneWaitSec`) before it launches the agent and holds it until the agent exits; the kernel frees it when the supervisor dies. A head session and a nested dispatch take none. Read-only `holders()` over the seat files gives the live count (docs/platform/run-supervisor/spec.md section 5.4).
+
+Supervision adds `watcher`, a repo mutex at rank 80, `<fgosDir>/locks/watcher.lock`, with no legacy path. One watcher tick holds it at a time.
 
 Session Host adds `session-rotation`, a repo mutex at rank 80, `<fgosDir>/locks/session-rotation--<id>.lock` (`<id>` is `<persona>-<name>`), with no legacy path. It admits one rotation at a time per head lineage (docs/platform/session-host/spec.md); the rotation executor holds it for the whole rotation, and `head start` probes it so no head is started while a rotation runs. A holder that dies leaves it free at once.
 

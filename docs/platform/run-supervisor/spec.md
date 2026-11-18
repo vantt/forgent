@@ -176,6 +176,14 @@ One attempt in a terminal pane. The supervisor still knows no pane: it asks term
 
 **Job control of the shell.** Measured on herdr 0.9.1 (P01 report, measurements): the pane's shell is the session leader and the parent of bwrap; `tcsetpgrp(0, group)` works from pid 1 of the PID namespace without `setsid` (`setsid` plus `TIOCSCTTY` fails with `EPERM` in a pane). The gate hands the foreground back to its own group when the domain is empty; inside a PID namespace `getpgrp` reads 0, so the shell reclaims the tty when the sandbox exits. Before that it drops the tty's unread input (`tcflush(TCIFLUSH)`): text typed for an agent that never read it stays queued on the tty, and the shell would read it next and run it, backtick spans included (seen 2026-10-21, debug report). A gate killed outright (the supervisor's domain sweep after the grace) cannot drop it. Closing the pane, or killing the herdr server, ends bwrap, gate and agent within the first 500 ms check.
 
+### 5.4 Lane pool (top-level worker seats)
+
+A lane is a held machine-scope lock `<lockRoot>/lane/<k>.lock` (`lane`, rank 80, mutex; [holder-lock spec](../holder-lock/spec.md)). The supervisor of a **top-level** worker seat takes one after `locks.complete` and before it launches the agent, waiting at most `lanes.waitMs`, and keeps it to the end of `supervise` (the agent has exited by then). It takes the first free `k` in `0..lanes.ceiling`, one try per seat, retrying on a short fixed step until the wait ends. The kernel frees the lock with the process, so a supervisor killed with SIGKILL frees its lane. Pool full at the end of the wait: nothing starts, `start-refused.json` carries code `lane-pool-full` (`<ceiling> seats are held on this machine`) and the receipt ends `abandoned-not-started`; the steps still run.
+
+The supervisor reads no config. The Node launchers write the envelope field `lanes {ceiling, waitMs}` (`workerSlots.ceiling`, `workerSlots.laneWaitSec` x 1000) only when `FGOS_DISPATCH_DEPTH` is 0 and the attempt is not a session; a nested dispatch and a head session carry no `lanes` and take no lane, so a seat that dispatches a child never waits on its own pool. An absent `lanes` or `ceiling: null` is unarmed: no lock file is touched. `ceiling` stays null until the old worker-slot gate is removed.
+
+Adopt re-owns a live worker domain whose envelope has `lanes` by taking a lane with one try, so the live count never undercounts. A full pool keeps the domain (the worker is never killed for a lane) and records `lane-pool-over` in the adopt result. `lanes::snapshot` reads every held seat file read-only, including `k >= ceiling` after the ceiling was lowered.
+
 ## 6. Receipt
 
 [Contract](../../../packages/run-supervisor/contracts/receipt.v1.json). The receipt is the physical result, published once. It is not the work result.

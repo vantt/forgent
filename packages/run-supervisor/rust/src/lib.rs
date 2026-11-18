@@ -17,6 +17,9 @@ pub mod supervise;
 /// Post-receipt steps and their receipts, shared by supervise and adopt.
 pub mod steps;
 
+/// The machine's worker lane pool: one held lock per running top-level worker seat.
+pub mod lanes;
+
 /// The `fgos internal adopt` route and its recovery matrix.
 pub mod adopt;
 
