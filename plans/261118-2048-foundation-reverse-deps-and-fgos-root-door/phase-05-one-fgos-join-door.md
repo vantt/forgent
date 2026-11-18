@@ -63,6 +63,9 @@ written by hand in 35 files because its one function, `fgosDirFromRoot`, sits in
      - `retiredBy`: "the Work batch (T7) swaps the five Work-tier joins";
      - `reason`: "which root is decided by the invocation-root door; the .fgos of that root is joined in one T0
        function, so every tier uses the same answer".
+   - As built: the first pattern is `path\.join\((?!...)(?:[^()]|\([^()]*\))*'\.fgos'`, wider than `[^)]*` so a
+     nested call such as `path.join(foo(x), '.fgos')` is caught too. The reconcile import-graph pin
+     (`test/runner/dispatch-reconciliation-import-graph.test.mjs`) lists the new leaf, which the planner now loads.
    - Run `checkDoors` and fix any other hit the pattern finds (a hit in `apps/` or `packages/` would mean the pattern
      is too wide: narrow it, do not allow the file).
 

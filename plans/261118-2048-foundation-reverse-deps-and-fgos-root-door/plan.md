@@ -72,6 +72,7 @@ footprint:
   - test/report/authoritative-match.test.mjs
   - test/runner/assignment-enumerator-guard.test.mjs
   - test/runner/dispatch-runtime-inspect.test.mjs
+  - test/runner/dispatch-reconciliation-import-graph.test.mjs
   - test/runner/dispatch.test.mjs
   - test/runner/merge.test.mjs
   - test/runner/paths.test.mjs
