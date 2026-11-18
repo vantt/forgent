@@ -6,7 +6,7 @@ lookup" for every tier except Work (phase 01 F3).
 ## Context
 
 Which project root a call acts on is already decided once (invocation-root door). The join `root + '.fgos'` is
-written by hand in 36 files because its one function, `fgosDirFromRoot`, sits in T2 `src/runner/paths.mjs` and the
+written by hand in 35 files because its one function, `fgosDirFromRoot`, sits in T2 `src/runner/paths.mjs` and the
 `.fgos` file registry sits in `src/state/`, which the A4 guard forbids to T5/T6 files (phase 01 F4). Design principle
 2 puts a shared path primitive in the lowest layer that needs it: T0.
 
@@ -30,13 +30,16 @@ written by hand in 36 files because its one function, `fgosDirFromRoot`, sits in
    this plan's base is moved too.
 3. **Swap every hand join** outside Work to the leaf: `path.join(X, '.fgos')` becomes `fgosDirFromRoot(X)`,
    `path.join(X, '.fgos', a, b)` becomes `path.join(fgosDirFromRoot(X), a, b)`, the template joins of
-   `src/runner/repo-locks.mjs` likewise. Files (phase 01 F3): `src/config/facade.mjs`, `src/git/inspect.mjs`,
+   `src/runner/repo-locks.mjs` likewise. Files (phase 01 F3): `src/config/facade.mjs`,
    `src/git/main-checkout-delete-guard.mjs`, `src/runner/paths.mjs`, `src/runner/worktree.mjs`,
    `src/runner/repo-locks.mjs`, `src/runner/dispatch/{assignment-runner,config,confinement/probes/harness,operation-prompt-templates,reconciliation-planner,runtime-inspection}.mjs`,
-   `src/runner/execution/{case-run-paths,commit-unit-work,handoff-refs,run,unit-run-start}.mjs`,
-   `src/session-host/head-start.mjs`, `src/session-rotation/rotate.mjs`,
+   `src/runner/execution/{case-run-paths,handoff-refs,run,unit-run-start}.mjs`,
+   `src/session-host/head-start.mjs` (joins at :41, :143, :154; not renamed), `src/session-rotation/rotate.mjs`,
    `src/workflow/{case-bindings,case-close,case-gate,case-lock,case-runtime,unit-handoff}.mjs`,
-   `src/setup/{doctor-bridge,instruction-registry}.mjs`. A relative constant with no root
+   `src/setup/{doctor-bridge,instruction-registry}.mjs`. `src/git/inspect.mjs` and `execution/commit-unit-work.mjs` no longer
+   join `.fgos` (the latter only compares the string `'.fgos'`), so they are not touched. `src/setup/agent-hooks.mjs:8`
+   is a comment only; `doorText` (`test/architecture.test.mjs:1791`) blanks comments, so the door does not see it and it
+   needs no edit. A relative constant with no root
    (`operation-prompt-templates.mjs:39` `path.join('.fgos', 'prompt-templates')`) becomes a join on the root at its
    use site, or, if it is only ever shown as text, stays text without `path.join` (validating decides per site).
    Home joins (`harness.mjs:632`, `llm-accounts.mjs:258`) are not touched: they belong to the global directory door.
@@ -56,7 +59,7 @@ written by hand in 36 files because its one function, `fgosDirFromRoot`, sits in
        reason "repo tooling and harnesses build their own fixture projects; not payload";
      - `debt`: `src/runner/merge.mjs`, `src/runner/operation-choice.mjs`, `src/runner/work-dispatch.mjs`,
        `src/state/porting-store.mjs`, `src/state/store.mjs`, each "Work tier; Work is deferred until after the
-       packaging release", and `src/setup/registrations.mjs` "held by plan 261118-1847; phase 6 swaps it";
+       packaging release", and `src/setup/registrations.mjs` "phase 6 swaps it" (plan 261118-1847 is done; the entry exists only until phase 6 lands);
      - `retiredBy`: "the Work batch (T7) swaps the five Work-tier joins";
      - `reason`: "which root is decided by the invocation-root door; the .fgos of that root is joined in one T0
        function, so every tier uses the same answer".

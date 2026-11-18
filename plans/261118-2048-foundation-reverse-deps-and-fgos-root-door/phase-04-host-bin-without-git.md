@@ -23,9 +23,13 @@ variable. A T0 leaf cannot ask Git, and the layer below cannot be made to know t
 - Fact check (lead, on `ba9d302ec`): `invokeHost` (`src/util/host-bin.mjs:62`) also calls `resolveMainCheckoutRoot`, to
   compute the `--dir` of a default `dirScope: 'main-checkout'` call, so dropping the `paths.mjs` import needs it too.
   Decided form (no new mechanism): `invokeHost` passes `path.resolve(dir)` as `--dir` and loses the `dirScope`
-  option; the two default-scope callers, `src/observe/friction-client.mjs:64` (T3) and `src/runner/session.mjs:14`
-  (T7, forced edit), resolve the main checkout themselves with `resolveMainCheckoutRoot(dir) || dir` (T2, below
-  them); the `dirScope: 'caller'` callers (`src/convention/convention-client.mjs:21,35`, `scripts/doc-health.mjs:193`)
+  option; the default-scope caller `src/observe/friction-client.mjs:64` (T3) resolves the main checkout itself with
+  `resolveMainCheckoutRoot(dir) || dir` (T2, below it). `src/verbs/dispatch/inspect.mjs:42,79` also uses the default
+  `invokeHost` but already passes `storeRoot` (`resolveMainCheckoutRoot(repoRoot) ?? repoRoot`, :76), so its answer is
+  unchanged and it needs no edit (`src/runner/session.mjs` was deleted on main). Test callers with the default scope
+  (`test/cli/helpers/fgos-cli-harness.mjs:190`, `test/e2e/pr-gate.test.mjs:99`, `test/runner/loop.test.mjs:34`,
+  `test/state/retrospective-doors.test.mjs:253`): confirm each passes a main checkout and not a linked worktree, or
+  wrap with `resolveMainCheckoutRoot`; the `dirScope: 'caller'` callers (`src/convention/convention-client.mjs:21,35`, `scripts/doc-health.mjs:193`)
   drop the option. Answers stay byte-identical.
 - Manifest: delete the `tierExceptions` row `host-bin.mjs -> paths.mjs`. The list is now `[]`; keep the key with an
   empty array (the test reads it), unless the test is changed to treat a missing key as empty in the same commit.
@@ -48,4 +52,4 @@ The removed main-checkout behaviour had no test (checked: no linked-worktree cas
 
 ## Risk and rollback
 
-Low after validation (behaviour change on unsupported channels only). Rollback: revert the commit; the exception row returns with it.
+Low after validation (behaviour change on unsupported channels only). Other `resolveHostBin` callers lose the main-checkout step when run from a linked worktree without `FGOS_HOST_BIN`: `src/event-store/maintenance.mjs:6,43,88` (childHost default), `src/run-supervisor/client.mjs:7,28`, `scripts/event-store/forge-probe.sh:26,34`, `test/e2e/self-improve-loop.test.mjs:18`; the implementer shows each has `FGOS_HOST_BIN` or runs in the main checkout. Rollback: revert the commit; the exception row returns with it.
