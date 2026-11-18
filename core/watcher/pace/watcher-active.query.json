@@ -1,0 +1,16 @@
+{
+  "name": "watcher-active",
+  "requires": ["fgos.plan.status"],
+  "query": {
+    "kind": ["fgos.plan.status"],
+    "where": [
+      { "field": "fgos.plan.change", "op": "ne", "value": "priority" }
+    ],
+    "latest_per": "subject",
+    "where_latest": [
+      { "field": "fgos.plan.status", "op": "eq", "value": "running" }
+    ],
+    "by": ["subject.id"],
+    "agg": ["count"]
+  }
+}

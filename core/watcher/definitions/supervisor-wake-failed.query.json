@@ -1,0 +1,17 @@
+{
+  "name": "supervisor-wake-failed",
+  "requires": ["fgos.supervisor.wake"],
+  "params": { "limit": { "configKey": "watcher.wakeFailureLimit" } },
+  "query": {
+    "kind": ["fgos.supervisor.wake"],
+    "where": [
+      { "field": "fgos.supervisor.outcome", "op": "in", "value": ["start-failed", "identity-unknown"] }
+    ],
+    "by": ["subject.id"],
+    "agg": ["count", "span", "max:ts"],
+    "having": [
+      { "lhs": { "agg": { "agg": "count" } }, "op": "gt", "rhs": { "param": "limit" } }
+    ]
+  },
+  "row": { "kind": "supervisor-wake-failed", "reason": "the supervisor could not be started", "nextCommand": "fgos doctor" }
+}

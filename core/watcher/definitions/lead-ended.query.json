@@ -1,0 +1,13 @@
+{
+  "name": "lead-ended",
+  "requires": ["fgos.head.state"],
+  "query": {
+    "kind": ["fgos.head.state"],
+    "where": [
+      { "field": "fgos.head.state", "op": "eq", "value": "retired" }
+    ],
+    "by": ["subject.id"],
+    "agg": ["max:ts"]
+  },
+  "row": { "kind": "lead-ended", "reason": "a head retired", "nextCommand": "fgos supervisor plans" }
+}

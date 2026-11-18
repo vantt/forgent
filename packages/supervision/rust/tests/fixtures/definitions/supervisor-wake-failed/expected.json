@@ -1,0 +1,15 @@
+{
+  "now": "2026-11-18T12:00:00Z",
+  "group": {
+    "subject.id": "sup-1"
+  },
+  "since": "2026-11-18T09:30:00Z",
+  "ts": "2026-11-18T10:00:00Z",
+  "config": {
+    "watcher.wakeFailureLimit": 3
+  },
+  "later": {
+    "now": "2026-11-18T12:30:00Z",
+    "since": "2026-11-18T09:45:00Z"
+  }
+}

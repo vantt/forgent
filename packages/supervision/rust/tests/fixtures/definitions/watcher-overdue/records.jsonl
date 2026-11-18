@@ -1,0 +1,1 @@
+{"v":2,"id":"a1","kind":"fgos.watcher.tick","ts":"2026-11-18T11:00:00Z","subject":{"kind":"session","id":"w1"},"measures":{"fgos.watcher.interval":60,"fgos.plans.running":1,"fgos.plans.ready":0},"basis":"observed","origin":{"source":"fixture"}}

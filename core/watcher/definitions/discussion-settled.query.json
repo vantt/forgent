@@ -1,0 +1,13 @@
+{
+  "name": "discussion-settled",
+  "requires": ["fgos.discussion.status"],
+  "query": {
+    "kind": ["fgos.discussion.status"],
+    "where": [
+      { "field": "fgos.discussion.to", "op": "eq", "value": "settled" }
+    ],
+    "by": ["subject.id"],
+    "agg": ["max:ts"]
+  },
+  "row": { "kind": "discussion-settled", "reason": "a discussion status changed to settled", "nextCommand": "fgos supervisor plans" }
+}

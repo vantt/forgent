@@ -1,0 +1,14 @@
+{
+  "name": "plan-became-ready",
+  "requires": ["fgos.plan.status"],
+  "query": {
+    "kind": ["fgos.plan.status"],
+    "where": [
+      { "field": "fgos.plan.change", "op": "ne", "value": "priority" },
+      { "field": "fgos.plan.status", "op": "eq", "value": "ready" }
+    ],
+    "by": ["subject.id"],
+    "agg": ["max:ts"]
+  },
+  "row": { "kind": "plan-became-ready", "reason": "a plan's status changed to ready", "nextCommand": "fgos supervisor plans" }
+}

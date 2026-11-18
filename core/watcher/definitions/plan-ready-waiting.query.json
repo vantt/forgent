@@ -1,0 +1,17 @@
+{
+  "name": "plan-ready-waiting",
+  "requires": ["fgos.plan.status"],
+  "query": {
+    "kind": ["fgos.plan.status"],
+    "where": [
+      { "field": "fgos.plan.change", "op": "ne", "value": "priority" }
+    ],
+    "latest_per": "subject",
+    "where_latest": [
+      { "field": "fgos.plan.status", "op": "eq", "value": "ready" }
+    ],
+    "by": ["subject.id"],
+    "agg": ["max:ts"]
+  },
+  "row": { "kind": "plan-ready-waiting", "reason": "a plan is ready and no lead has taken it", "nextCommand": "fgos supervisor plans" }
+}
