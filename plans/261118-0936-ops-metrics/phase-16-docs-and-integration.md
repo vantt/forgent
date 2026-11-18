@@ -55,3 +55,11 @@ This is the final serial phase. It merges every branch and gates the combined tr
 
 ## Rollback
 Revert the merge commit. Old friction shards stay until this phase is green.
+
+## Carried from the phase 9 review
+- `docs/platform/observe/spec.md` § Friction still lists the old verbs: add `classes`, v2 writes, `resolve --class`,
+  `--reason filed:<id>`, the per-signature rank row, and that a failed friction write is fail-open (fault + warning,
+  outcome unchanged). Add the user-visible friction changes and `fgos metrics record|query` to CHANGELOG
+  `[Unreleased]`.
+- The doctor row `observe-host-resolvable` runs `friction rank --limit 1`, which now runs the query engine; confirm
+  its cost is still fine.

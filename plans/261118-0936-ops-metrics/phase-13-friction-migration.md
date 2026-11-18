@@ -30,3 +30,10 @@ In wave 5 this phase is the only writer of `command-registry.mjs`.
 
 ## Rollback
 Revert the phase commit. Old shards are untouched until phase 16.
+
+## Carried from the phase 9 review
+- Old shard lines read as v2 friction get the fixed id `legacy:<shard>:<line>`. The write door dedupes an id only in
+  the writer's own shard, and `read_events` does not dedupe by id. So: the migration checks existing ids across the
+  whole records store before writing, and while old shards stay readable (until phase 16) readers skip an old line
+  whose id already exists as a v2 record. Test both: two migrate runs from two writers, and a mixed store, each count
+  every record once.
