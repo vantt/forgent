@@ -10,9 +10,9 @@
 //! control: a lead lands only a phase its reviewer passed, and the commands come from the trusted
 //! main checkout's config. Confined gates are not built here.
 use fgos_git::{
-    wal, CommitRequest, DiffScope, DiffSides, GitDriver, InspectCursor, LandEvidence,
-    LandFile, LandRequest, ObjectType, Oid, OperationError, ReadObject, RefMapping, RefName,
-    RefValue, Remote, RemoteGrant, RepoHandle, TrunkFact,
+    wal, CommitRequest, DiffScope, DiffSides, GitDriver, InspectCursor, LandEvidence, LandFile,
+    LandRequest, ObjectType, Oid, OperationError, ReadObject, RefMapping, RefName, RefValue,
+    Remote, RemoteGrant, RepoHandle, TrunkFact,
 };
 use sha2::{Digest, Sha256};
 use std::io::Read;
@@ -205,7 +205,8 @@ struct Lander<'a> {
 }
 
 fn oid_of(repo: &RepoHandle, text: &str) -> Result<Oid, LandRefusal> {
-    Oid::parse(text, repo.object_format()).map_err(|e| refuse("land-request-invalid", e.to_string()))
+    Oid::parse(text, repo.object_format())
+        .map_err(|e| refuse("land-request-invalid", e.to_string()))
 }
 
 fn ref_name(text: &str) -> Result<RefName, LandRefusal> {
@@ -257,14 +258,22 @@ impl Lander<'_> {
             .resolve_trunk(self.ports.repo, None)
             .map_err(from_git)?;
         let TrunkFact::Known(name) = trunk else {
-            return Err(refuse("land-target-unknown", "the project trunk is not known; pass a target"));
+            return Err(refuse(
+                "land-target-unknown",
+                "the project trunk is not known; pass a target",
+            ));
         };
         let remote_prefix = format!("refs/remotes/{}/", self.ports.remote.name);
         name.as_str()
             .strip_prefix("refs/heads/")
             .or_else(|| name.as_str().strip_prefix(&remote_prefix))
             .map(str::to_string)
-            .ok_or_else(|| refuse("land-target-unknown", format!("trunk {} is not a branch", name.as_str())))
+            .ok_or_else(|| {
+                refuse(
+                    "land-target-unknown",
+                    format!("trunk {} is not a branch", name.as_str()),
+                )
+            })
     }
 
     /// Fetch the target and fast-forward local main to the remote tip. Local main never holds an
@@ -284,7 +293,10 @@ impl Lander<'_> {
         match receipt.remote {
             Remote::Acknowledged => {}
             Remote::Unknown => {
-                return Err(refuse("land-remote-outcome-unknown", "the fetch outcome is unknown"))
+                return Err(refuse(
+                    "land-remote-outcome-unknown",
+                    "the fetch outcome is unknown",
+                ))
             }
             _ => {
                 return Err(refuse(
@@ -293,25 +305,32 @@ impl Lander<'_> {
                 ))
             }
         }
-        let remote_tip = self
-            .resolve(&tracking)?
-            .ok_or_else(|| refuse("land-remote-diverged", format!("{tracking} is absent after fetch")))?;
+        let remote_tip = self.resolve(&tracking)?.ok_or_else(|| {
+            refuse(
+                "land-remote-diverged",
+                format!("{tracking} is absent after fetch"),
+            )
+        })?;
         let local_tip = self
             .resolve(&dest)?
             .ok_or_else(|| refuse("land-target-unknown", format!("local {dest} is absent")))?;
         if remote_tip == local_tip {
             return Ok(());
         }
-        if p.git.ancestry(p.repo, &local_tip, &remote_tip).map_err(from_git)? {
+        if p.git
+            .ancestry(p.repo, &local_tip, &remote_tip)
+            .map_err(from_git)?
+        {
             p.git
-                .fast_forward_checked_out(
+                .catch_up_main_checkout(
                     p.repo,
                     vec![],
                     &ref_name(&dest)?,
                     &local_tip,
-                    &remote_tip,
+                    &ref_name(&tracking)?,
                     p.writer,
                     &self.id(),
+                    &wal::OsFileSystem,
                 )
                 .map_err(at("fast-forward main"))?;
             return Ok(());
@@ -368,7 +387,12 @@ impl Lander<'_> {
             fgos_git::ObjectFormat::Sha1 => 20,
             fgos_git::ObjectFormat::Sha256 => 32,
         };
-        let bad = |what: &str| refuse("land-object-unreadable", format!("{path} at {commit}: {what}"));
+        let bad = |what: &str| {
+            refuse(
+                "land-object-unreadable",
+                format!("{path} at {commit}: {what}"),
+            )
+        };
         let Some((_, commit_bytes)) = self.object(&oid_of(repo, commit)?)? else {
             return Err(bad("commit missing"));
         };
@@ -388,8 +412,14 @@ impl Lander<'_> {
             let mut rest = tree.as_slice();
             let mut found: Option<(Vec<u8>, Oid)> = None;
             while !rest.is_empty() {
-                let space = rest.iter().position(|b| *b == b' ').ok_or_else(|| bad("bad tree"))?;
-                let nul = rest.iter().position(|b| *b == 0).ok_or_else(|| bad("bad tree"))?;
+                let space = rest
+                    .iter()
+                    .position(|b| *b == b' ')
+                    .ok_or_else(|| bad("bad tree"))?;
+                let nul = rest
+                    .iter()
+                    .position(|b| *b == 0)
+                    .ok_or_else(|| bad("bad tree"))?;
                 if nul < space || rest.len() < nul + 1 + hash_len {
                     return Err(bad("bad tree"));
                 }
@@ -426,9 +456,13 @@ impl Lander<'_> {
         for t in tests {
             let p = Path::new(t);
             let plain = !p.is_absolute()
-                && p.components().all(|c| matches!(c, std::path::Component::Normal(_)));
+                && p.components()
+                    .all(|c| matches!(c, std::path::Component::Normal(_)));
             if !plain || !root.join(p).exists() {
-                return Err(refuse("land-test-unknown", format!("{t} is not in {}", root.display())));
+                return Err(refuse(
+                    "land-test-unknown",
+                    format!("{t} is not in {}", root.display()),
+                ));
             }
         }
         Ok(())
@@ -442,7 +476,11 @@ impl Lander<'_> {
         tests: &[String],
         gates_run: &mut Vec<String>,
     ) -> Result<(), LandRefusal> {
-        let quoted = tests.iter().map(|t| shell_quote(t)).collect::<Vec<_>>().join(" ");
+        let quoted = tests
+            .iter()
+            .map(|t| shell_quote(t))
+            .collect::<Vec<_>>()
+            .join(" ");
         for gate in &self.config.gates {
             let applies = if gate.when.is_empty() {
                 true
@@ -500,7 +538,8 @@ impl Lander<'_> {
         target: &Oid,
         dest: &str,
         files: Vec<LandFile>,
-    ) -> Result<fgos_git::LandSession, LandRefusal> {
+    ) -> Result<(fgos_git::LandSession, String), LandRefusal> {
+        let id = self.id();
         let request = LandRequest {
             source: source.as_str().into(),
             target: target.as_str().into(),
@@ -511,18 +550,31 @@ impl Lander<'_> {
             subtree: None,
             files,
         };
-        self.ports
+        let session = self
+            .ports
             .git
             .prepare_land(
                 self.ports.repo,
                 vec![],
                 &request,
                 self.ports.writer,
-                &self.id(),
+                &id,
                 &wal::OsFileSystem,
                 self.ports.wait_ms,
             )
-            .map_err(at("prepare"))
+            .map_err(at("prepare"))?;
+        Ok((session, id))
+    }
+
+    /// Drop a session that published nothing and settle its chain, so an abandoned attempt does
+    /// not keep the target ref busy for the main-checkout catch-up.
+    fn abandon(&self, session: fgos_git::LandSession, id: &str) -> Result<(), LandRefusal> {
+        drop(session);
+        self.ports
+            .git
+            .recover_land(self.ports.repo, vec![], self.ports.writer, id)
+            .map(|_| ())
+            .map_err(at("settle abandoned attempt"))
     }
 
     fn branch_attempt(
@@ -536,8 +588,16 @@ impl Lander<'_> {
         let dest = format!("refs/heads/{target_branch}");
         self.sync_target(target_branch)?;
         let source = self
-            .resolve(&format!("refs/heads/{}", branch.strip_prefix("refs/heads/").unwrap_or(branch)))?
-            .ok_or_else(|| refuse("land-branch-unknown", format!("{branch} is not a local branch")))?;
+            .resolve(&format!(
+                "refs/heads/{}",
+                branch.strip_prefix("refs/heads/").unwrap_or(branch)
+            ))?
+            .ok_or_else(|| {
+                refuse(
+                    "land-branch-unknown",
+                    format!("{branch} is not a local branch"),
+                )
+            })?;
         let target = self
             .resolve(&dest)?
             .ok_or_else(|| refuse("land-target-unknown", format!("{dest} is absent")))?;
@@ -548,7 +608,10 @@ impl Lander<'_> {
             .map(|r| r.files.clone())
             .unwrap_or_default();
 
-        let merged = p.git.merge_tree(p.repo, &target, &source).map_err(from_git)?;
+        let merged = p
+            .git
+            .merge_tree(p.repo, &target, &source)
+            .map_err(from_git)?;
         if let Some(footprint) = &command.footprint {
             let outside: Vec<String> = self
                 .changed_paths(&target, &merged.tree)?
@@ -565,11 +628,18 @@ impl Lander<'_> {
             }
         }
         let conflicted: Vec<String> = merged.conflicted_paths.iter().map(|b| lossy(b)).collect();
-        let undeclared: Vec<&String> = conflicted.iter().filter(|c| !regen_files.contains(c)).collect();
+        let undeclared: Vec<&String> = conflicted
+            .iter()
+            .filter(|c| !regen_files.contains(c))
+            .collect();
         if !undeclared.is_empty() {
             return Err(refuse(
                 "land-conflict-aborted",
-                undeclared.iter().map(|s| s.as_str()).collect::<Vec<_>>().join(", "),
+                undeclared
+                    .iter()
+                    .map(|s| s.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", "),
             ));
         }
         let mut files = Vec::new();
@@ -580,15 +650,26 @@ impl Lander<'_> {
             });
         }
 
-        let mut session = self.prepare(command, &source, &target, &dest, files)?;
+        let prepared = match self.prepare(command, &source, &target, &dest, files) {
+            Ok(prepared) => prepared,
+            // Another land took the slot first and moved the target: start over from a fresh fetch.
+            Err(refusal) if refusal.code == "land-target-changed" => {
+                return Ok(Attempt::RemoteMoved)
+            }
+            Err(refusal) => return Err(refusal),
+        };
+        let (mut session, mut session_id) = prepared;
         if session.candidate().is_none() {
-            return Err(refuse("land-recovery-required", "no candidate; run `fgos git recover`"));
+            return Err(refuse(
+                "land-recovery-required",
+                "no candidate; run `fgos git recover`",
+            ));
         }
         if let Some(regen) = &self.config.regenerate {
             let first = self.regenerate(&session, regen)?;
             if let Some(files) = first {
-                drop(session);
-                session = self.prepare(command, &source, &target, &dest, files)?;
+                self.abandon(session, &session_id)?;
+                (session, session_id) = self.prepare(command, &source, &target, &dest, files)?;
                 if self.regenerate(&session, regen)?.is_some() {
                     return Err(refuse(
                         "land-regenerate-failed",
@@ -599,16 +680,26 @@ impl Lander<'_> {
         }
         let candidate = session
             .candidate()
-            .ok_or_else(|| refuse("land-recovery-required", "no candidate; run `fgos git recover`"))?
+            .ok_or_else(|| {
+                refuse(
+                    "land-recovery-required",
+                    "no candidate; run `fgos git recover`",
+                )
+            })?
             .clone();
         let candidate_oid = oid_of(p.repo, &candidate.candidate)?;
         let changed = self.changed_paths(&target, &candidate_oid)?;
         self.check_tests(&candidate.worktree, &command.tests)?;
         let mut gates_run = Vec::new();
-        self.run_gates(&candidate.worktree, &changed, &command.tests, &mut gates_run)?;
+        self.run_gates(
+            &candidate.worktree,
+            &changed,
+            &command.tests,
+            &mut gates_run,
+        )?;
 
-        if !self.push_candidate(&candidate_oid, target_branch)? {
-            drop(session);
+        if !self.push_candidate(&session, target_branch)? {
+            self.abandon(session, &session_id)?;
             return Ok(Attempt::RemoteMoved);
         }
         let digest = Sha256::digest(format!("{}\n{}", candidate.candidate, gates_run.join("\n")));
@@ -620,12 +711,21 @@ impl Lander<'_> {
             evidence_digest: hex(&digest),
         };
         p.git
-            .publish_land(p.repo, &mut session, &evidence, &wal::OsFileSystem, p.wait_ms)
+            .publish_land(
+                p.repo,
+                &mut session,
+                &evidence,
+                &wal::OsFileSystem,
+                p.wait_ms,
+            )
             .map_err(at("publish"))?;
         drop(session);
-        let main = self
-            .resolve(&dest)?
-            .ok_or_else(|| refuse("land-target-unknown", format!("{dest} is absent after publish")))?;
+        let main = self.resolve(&dest)?.ok_or_else(|| {
+            refuse(
+                "land-target-unknown",
+                format!("{dest} is absent after publish"),
+            )
+        })?;
         Ok(Attempt::Landed(LandOutcome {
             main_sha: main.as_str().into(),
             landed_paths: changed,
@@ -688,36 +788,40 @@ impl Lander<'_> {
         Ok(differs.then_some(regenerated))
     }
 
-    /// Push the candidate to the remote target branch; `false` when the remote moved. The port
-    /// refuses a `refs/fgos/` source, so the candidate rides a short-lived branch.
-    fn push_candidate(&self, candidate: &Oid, target_branch: &str) -> Result<bool, LandRefusal> {
+    /// Push the session's candidate to the remote target branch from inside the live session;
+    /// `false` when the remote moved.
+    fn push_candidate(
+        &self,
+        session: &fgos_git::LandSession,
+        target_branch: &str,
+    ) -> Result<bool, LandRefusal> {
         let p = self.ports;
-        let temp = ref_name(&format!("refs/heads/fgos-land-{}", self.id()))?;
-        p.git
-            .ensure_branch(p.repo, vec![], &temp, candidate, p.writer, &self.id())
-            .map_err(at("push branch"))?;
-        let pushed = p.git.push_refs(
-            p.repo,
-            vec![],
-            p.remote,
-            &[RefMapping {
-                source: temp.clone(),
-                destination: ref_name(&format!("refs/heads/{target_branch}"))?,
-            }],
-            p.writer,
-            &self.id(),
-        );
-        let _ = p
+        let receipt = p
             .git
-            .delete_ref(p.repo, vec![], &temp, candidate, p.writer, &self.id());
-        match pushed.map_err(at("push"))?.remote {
+            .push_land_candidate(
+                p.repo,
+                session,
+                p.remote,
+                &ref_name(&format!("refs/heads/{target_branch}"))?,
+                p.writer,
+                &wal::OsFileSystem,
+            )
+            .map_err(at("push"))?;
+        match receipt.remote {
             Remote::Acknowledged => Ok(true),
             Remote::Rejected => Ok(false),
-            _ => Err(refuse("land-remote-outcome-unknown", "the push outcome is unknown")),
+            _ => Err(refuse(
+                "land-remote-outcome-unknown",
+                "the push outcome is unknown",
+            )),
         }
     }
 
-    fn land_paths(&self, command: &LandCommand, paths: &[String]) -> Result<LandOutcome, LandRefusal> {
+    fn land_paths(
+        &self,
+        command: &LandCommand,
+        paths: &[String],
+    ) -> Result<LandOutcome, LandRefusal> {
         let p = self.ports;
         if paths.is_empty() {
             return Err(refuse("land-paths-empty", "no paths named"));
@@ -726,9 +830,25 @@ impl Lander<'_> {
         let dest = format!("refs/heads/{target}");
         self.sync_target(&target)?;
         self.check_tests(p.repo.trusted_main_root(), &command.tests)?;
-        let baseline = p.git.preflight_commit(p.repo, vec![], None).map_err(from_git)?;
+        let mut baseline = p
+            .git
+            .preflight_commit(p.repo, vec![], None)
+            .map_err(from_git)?;
+        // The named paths are already modified: they are what this land commits, not pre-existing dirt.
+        let mut others = Vec::new();
+        for entry in std::mem::take(&mut baseline.dirty) {
+            if !self.matches_any(&entry.0, paths)? {
+                others.push(entry);
+            }
+        }
+        baseline.dirty = others;
         let mut gates_run = Vec::new();
-        self.run_gates(p.repo.trusted_main_root(), paths, &command.tests, &mut gates_run)?;
+        self.run_gates(
+            p.repo.trusted_main_root(),
+            paths,
+            &command.tests,
+            &mut gates_run,
+        )?;
         let result = p
             .git
             .scoped_commit(
@@ -745,7 +865,10 @@ impl Lander<'_> {
             )
             .map_err(from_git)?;
         let Some(commit) = result.oid else {
-            return Err(refuse("land-paths-empty", "the named paths have no changes to land"));
+            return Err(refuse(
+                "land-paths-empty",
+                "the named paths have no changes to land",
+            ));
         };
         let mut retries = 0;
         loop {
@@ -761,17 +884,26 @@ impl Lander<'_> {
             let local_tip = self
                 .resolve(&dest)?
                 .ok_or_else(|| refuse("land-target-unknown", format!("{dest} is absent")))?;
-            let can_ff = p.git.ancestry(p.repo, &remote_tip, &local_tip).map_err(from_git)?;
+            let can_ff = p
+                .git
+                .ancestry(p.repo, &remote_tip, &local_tip)
+                .map_err(from_git)?;
             if !can_ff {
                 return Err(refuse(
                     "land-remote-diverged",
-                    format!("local commit {} is not pushed; the remote moved", commit.as_str()),
+                    format!(
+                        "local commit {} is not pushed; the remote moved",
+                        commit.as_str()
+                    ),
                 ));
             }
             if retries >= MAX_RETRIES {
                 return Err(refuse(
                     "land-remote-diverged",
-                    format!("local commit {} is not pushed; the remote kept moving", commit.as_str()),
+                    format!(
+                        "local commit {} is not pushed; the remote kept moving",
+                        commit.as_str()
+                    ),
                 ));
             }
             retries += 1;
@@ -817,7 +949,10 @@ impl Lander<'_> {
         match receipt.remote {
             Remote::Acknowledged => Ok(true),
             Remote::Rejected => Ok(false),
-            _ => Err(refuse("land-remote-outcome-unknown", "the push outcome is unknown")),
+            _ => Err(refuse(
+                "land-remote-outcome-unknown",
+                "the push outcome is unknown",
+            )),
         }
     }
 }
