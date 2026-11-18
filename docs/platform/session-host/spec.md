@@ -110,7 +110,7 @@ Authority: Identity alone says who holds the role. The executor owns the replace
 
 ### 8.3 Requesting a rotation
 
-`requestRotation` is the one entry that asks for a rotation: the request socket's `head rotate`, `fgos head rotate` and an unconfined hook all call it. It checks `{ persona, name, reason: soft|hard|manual, stopFacts }`, writes `request-<id>.json` under the lineage folder, starts the executor as a detached process through the one detach door and returns at once. `soft` and `hard` rotate when the measured fraction of the context window reaches `sessionRotation.soft` or `.hard` (`decide.mjs`; `hard` carries the pending question verbatim into the handoff); `manual` is the owner's `/handoff` and carries it too. One rotation at a time per lineage: the executor holds the `session-rotation` lock (holder-lock registry, `<fgosDir>/locks/session-rotation--<persona>-<name>.lock`), a second request finds it held and is a no-op, and `head start` refuses `rotation-in-progress` while it is held.
+`requestRotation` is the one entry that asks for a rotation: the request socket's `head rotate` and the unconfined branch of `rotateHead` (which `fgos head rotate` and a hook call) end in it. It checks `{ persona, name, reason: soft|hard|manual, stopFacts }`, writes `request-<id>.json` under the lineage folder, starts the executor as a detached process through the one detach door and returns at once. `soft` and `hard` rotate when the measured fraction of the context window reaches `sessionRotation.soft` or `.hard` (`decide.mjs`; `hard` carries the pending question verbatim into the handoff); `manual` is the owner's `/handoff` and carries it too. One rotation at a time per lineage: the executor holds the `session-rotation` lock (holder-lock registry, `<fgosDir>/locks/session-rotation--<persona>-<name>.lock`), a second request finds it held and is a no-op, and `head start` refuses `rotation-in-progress` while it is held.
 
 ### 8.4 Files
 
@@ -135,9 +135,27 @@ Under `.fgos/runtime/session-rotation/<persona>-<name>/`:
 
 `/clear` through Terminal Control `send` works (the spike measured 3 of 3, with a SessionStart hook re-injecting a short context) but cannot meet the two-step rule: the old context is gone before the successor answers. It is recorded only as a fallback for a host that cannot open a second session and is never used on the terminal host.
 
+### 8.7 The `fgos head` verb
+
+`fgos head start <persona> --name <name>` and `fgos head rotate <persona> --name <name>` are the owner's door to 8.1 and 8.3. The noun `head` is provisional: backlog `p-g2iprtzptz` renames it to `session` with no alias, and Identity's `head:` role and `FGOS_HEAD_ROLE` keep their names. The existing `fgos session` (worktree lifecycle) is untouched. The verb is declared once in the command registry (`src/cli/command-registry.mjs`, generated manifest and routes beside it); the host serves its help.
+
+The CLI arm holds no behaviour: `start` calls `startHead` and `rotate` calls `rotateHead` (both in `src/session-host/head-request.mjs`: a confined caller asks through its request socket, anyone else calls `startHeadSession` or `requestRotation`). The project is the worktree root found from the current directory. A CLI rotation is always reason `manual`; `soft` and `hard` come only from the rotation hook, so the verb has no flag for a reason.
+
+Refusals and exit codes (the table `exit-codes.v1.json`):
+
+| Exit | Meaning |
+|---|---|
+| 0 | started, fronted the live holder, or rotation requested (`rotate` returns at once; the executor runs detached) |
+| 2 | precondition: a refusal of the use case or the socket (grant, role, `no-request-socket`, bind or start refused), or a rotation that did not start |
+| 3 | `rotation-in-progress` |
+| 4 | validation: missing persona or `--name`, `bad-persona`, `bad-name`, unknown sub-verb |
+
+`--json` prints the use case's result (`start`: the placement or the fronted holder; `rotate`: `{ started: true, pid }`). Proof: `test/cli/head-verb.test.mjs`.
+
 ## 9. Lịch sử quyết định
 
 - 2026-11-17 — Home decision, settled by evidence not asked: the port is a new foundation component Session Host, a Rust crate, layered between Terminal Control and the run supervisor. The run supervisor, which must place through it, is Rust (`supervise.rs`), so the port must be Rust to be reachable without a second path; `component-boundary.md` §4 forbids the run supervisor knowing a pane and says Terminal Control stands alone and must not know runs, so the port belongs to neither; design principle 4 (foundations in Rust). Evidence: [facts report](../../../plans/261117-1856-secretary-session-spine/reports/facts-host-port.md) sections 1 and 4. Prior art: none existed or was removed (`git log -S'placement' -- src/run-supervisor` is empty).
 - 2026-11-17 — Opening delivery reuses the one shared delivery step; nothing moves out of the run supervisor, whose `TermIo` wraps the port's `PaneIo`.
 - 2026-11-18 — Worker attempts are placed through the port (`open` + `launch` replace `start`; the envelope carries `host`). The direct adapter and the port's own `start` and opening delivery were deleted: a head is started by its run supervisor as a session attempt (confined like a worker), so the port never types into a pane and a screenless launch stays the supervisor's. Evidence: phase 11 and 12 reports of the secretary plan.
 - 2026-11-18 — Head rotation is two steps (start the successor beside the old session, move the role only after the successor answered, then end the old one). Because a confined successor can write neither `.fgos` nor Identity, its first answer travels as the verb `head answered` through the request socket and its own supervisor moves the role with Identity's `take`; the executor never moves a role. The lineage lock is a holder-lock registry row (`session-rotation`). No earlier rotation mechanism existed (`git log -S` on rotation symbols found none).
+- 2026-11-18 — The verb `fgos head start|rotate` (owner answer 2026-11-17, noun provisional) is a thin arm over `startHead` and `rotateHead`, so a confined head running it goes through its socket exactly as the use cases do. CLI rotation is always `manual`: the use case requires a reason, and an extra `--now` flag would have named the same thing. See 8.7.

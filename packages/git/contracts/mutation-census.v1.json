@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "e16d68e1916d530294153997487b67404be37d4b398386a8202e91ac64941129",
+  "payloadDigest": "9e0e7a7ceb3bab7cc51e67575482e223ee60661687deaaa6f2c198befa3af201",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "68bd36c02991c59a52f206cb092605f9aa16d218d0f52eb2cb34d1db8d4d9ace",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -141,7 +141,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "7b53b51bdbf0986c0771534eae6d1040b36f605cb209c0d9649fe56edecbfb07",
+    "bin/fgos.mjs": "ac931eff813a4df469d63cc6789838f5cfdcd11a99c47438b43d28d4a2e63500",
     "core/skills/_shared/capability-catalog.md": "5b53b25182fc2834519869b19d3076dd2635f4eec889966eaa3425d82537b49a",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -999,7 +999,7 @@
     "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
-    "src/cli/command-registry.mjs": "6cc1b3d22534820f572b33ae1370e89c4703af17abd1b6dfbded5fc499a503d5",
+    "src/cli/command-registry.mjs": "b568aa3205e3a0f53ac6ee810cace3a006c987fcfa30478a2ab5915f0ded3db0",
     "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
@@ -2445,14 +2445,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3089,
+      "line": 3092,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3233,
+      "line": 3236,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"

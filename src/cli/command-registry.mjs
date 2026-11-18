@@ -2258,6 +2258,56 @@ export const COMMAND_REGISTRY = [
     native: true,
   }),
   withSubcommands({
+    name: 'head',
+    invoke: 'fgos head <start|rotate>',
+    description: 'Agent head sessions (provisional noun, distinct from the worktree verb "session"): "start" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; "rotate" asks for its replacement by a successor that reads a redacted handoff. From inside a confined head both go through its request socket.',
+    subcommands: {
+      start: {
+        description: 'Start head:<persona>-<name> as a confined supervised session, or front the live holder of that role.',
+        parameters: {
+          type: 'object',
+          properties: {
+            persona: { type: 'string', description: 'Positional: the agent persona (a-z, 0-9, hyphen; starts with a letter).' },
+            name: { type: 'string', description: 'The head\'s name, 1 to 32 characters of a-z, 0-9 and hyphen.' },
+          },
+          positional: ['persona'],
+          required: ['persona', 'name'],
+        },
+        examples: ['fgos head start secretary --name miu', 'fgos head start shaper --name <slug>'],
+      },
+      rotate: {
+        description: 'Ask for the rotation of a live head (reason manual); returns at once while a detached executor starts the successor and moves the role after it answered.',
+        parameters: {
+          type: 'object',
+          properties: {
+            persona: { type: 'string', description: 'Positional: the agent persona of the head.' },
+            name: { type: 'string', description: 'The name of the head.' },
+          },
+          positional: ['persona'],
+          required: ['persona', 'name'],
+        },
+        examples: ['fgos head rotate secretary --name miu'],
+      },
+    },
+    examples: ['fgos head start secretary --name miu', 'fgos head rotate secretary --name miu'],
+    touchesState: true,
+    store: 'none',
+    externalEffect: true,
+    paginated: false,
+    deprecated: null,
+    guide: {
+      changes: 'start opens a herdr tab running the persona\'s CLI and records the placement under .fgos/runtime/session-rotation/<persona>-<name>/. rotate writes a rotation request there and starts a detached executor that opens the successor beside the old session.',
+      prerequisites: 'A project, a terminal host (herdr) and a persona definition. A confined head needs the verb in its grant (request socket); a confined caller without a socket is refused.',
+      exitCodes: [
+        '0 started, fronted, or rotation requested',
+        '2 refused: grant, role or host precondition not met, or the start or request failed',
+        '3 a rotation of this head is already in progress',
+        '4 refused: missing --name or persona, or a name that does not match the pattern',
+      ],
+      next: 'fgos identity resolve head:<persona>-<name> to see the holder.',
+    },
+  }),
+  withSubcommands({
     name: 'gateway',
     invoke: 'fgos gateway <start|stop|status>',
     description: 'One-door lifecycle for the fgos gateway (REST API + web dashboard, apps/fgos-gateway/src/gateway.rs) as a detached background process (tsk-31v). Use this instead of a hand-rolled nohup/tmux/systemd invocation — AGENTS.md names it the mandatory entry point.',

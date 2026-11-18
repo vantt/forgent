@@ -197,7 +197,7 @@ const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nati
 const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.native === true);
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
-  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'goal', 'merge', 'workflow', 'worktree']);
+  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'goal', 'head', 'merge', 'workflow', 'worktree']);
   assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'session']);
 });
 

@@ -267,6 +267,9 @@ function requireField(value, message) {
   return value;
 }
 
+// Codes of a malformed head or rotation argument: refused as validation, never as a failed start.
+const HEAD_ARGUMENT_CODES = new Set(['bad-persona', 'bad-name', 'bad-project-root', 'bad-generation', 'bad-args', 'bad-reason', 'bad-stop-facts']);
+
 // The sub-verb of `verb`, checked against the registry's `subcommands`: the one list of what the verb accepts.
 function requireSubVerb(verb, positional) {
   const subs = Object.keys(COMMAND_REGISTRY.find((e) => e.name === verb).subcommands);
@@ -1813,7 +1816,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // docs/enduser-docs-index.json). `--check` never writes: it reports
     // whether the on-disk file matches what a fresh regenerate would
     // produce, refusing (validation) when it does not -- the drift-mode
-    // half of the verify draft this task's own DISCUSSION.md names.
+    // half of the verify draft docs/discussions/canonical-decision-projection/DISCUSSION.md names.
     case 'decision-index': {
       const repoRoot = path.dirname(dir);
       if (flags.check) {
@@ -3460,6 +3463,35 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // reads/writes go through the setFocus/goalFocusShow facades only, never
     // graph-metrics.mjs directly. Only `set`/`show` exist here — `clear`/
     // `list` are explicitly deferred (CONTEXT.md Deferred Ideas).
+    // Head sessions: a thin arm over the two use cases that own the behaviour. Exit codes: a malformed argument is
+    // validation (4), a refusal or a request that did not start anything is precondition (2), a rotation already
+    // running is conflict (3).
+    case 'head': {
+      const sub = requireSubVerb('head', positional);
+      const persona = requireField(positional[1], `head ${sub} requires a persona: fgos head ${sub} <persona> --name <name>`);
+      const name = requireField(flags.name, `head ${sub} requires --name <name>`);
+      const { startHead, rotateHead } = await import('../src/session-host/head-request.mjs');
+      const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
+      const projectRoot = resolveGitRoots(process.cwd()).worktreeRoot;
+      const refused = (err) => {
+        const category = HEAD_ARGUMENT_CODES.has(err.code) ? 'validation' : err.code === 'rotation-in-progress' ? 'conflict' : 'precondition';
+        return new StoreError(category, `${err.code ?? 'head-refused'}: ${err.message}`);
+      };
+      let result;
+      try {
+        if (sub === 'start') {
+          result = await startHead({ persona, name, projectRoot });
+        }
+        if (sub === 'rotate') {
+          result = await rotateHead({ persona, name, reason: 'manual', projectRoot });
+        }
+      } catch (err) {
+        throw refused(err);
+      }
+      if (result?.started === false) throw refused({ code: result.reason, message: `rotation of head:${persona}-${name} was not started` });
+      return result;
+    }
+
     case 'goal': {
       const sub = requireField(positional[0], 'goal requires a sub-verb: fgos goal <set|show> ...');
       if (sub === 'set') {
