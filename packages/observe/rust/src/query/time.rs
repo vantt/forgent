@@ -71,7 +71,7 @@ fn duration_millis(text: &str, whole: &str) -> Result<i64, QueryError> {
 }
 
 /// The start of the bucket holding `millis`. Weeks start on Monday 00:00 UTC.
-pub(super) fn bucket_start(millis: i64, bucket: Bucket) -> i64 {
+pub fn bucket_start(millis: i64, bucket: Bucket) -> i64 {
     match bucket {
         Bucket::Hour => millis.div_euclid(3_600_000) * 3_600_000,
         Bucket::Day => millis.div_euclid(DAY_MS) * DAY_MS,

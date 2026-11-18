@@ -6,7 +6,7 @@
 //! resolve by signature, of its class); the settle rule is the same for both stores.
 
 use crate::contract::{RecordSource, SourceError, Subject, Window};
-use crate::query::{run, Agg, AggValue, Bucket, Query, QueryContext};
+use crate::query::{bucket_start, run, Agg, AggValue, Bucket, Query, QueryContext};
 use crate::record::registry::{EmbeddedDeclaration, Registry};
 use crate::record::store::{new_record_id, RecordDoor, WriteOutcome, RECORDS_STORE};
 use crate::record::types::{
@@ -536,28 +536,52 @@ fn edit_distance(a: &str, b: &str) -> usize {
     row[b.len()]
 }
 
-/// Whether two different signatures read as one thing: the same once spelling is ignored, or a couple of letters
-/// apart in a name long enough for that to mean a slip.
+/// Whether two different signatures read as one thing: the same once spelling is ignored, or one letter apart in a
+/// name of eight letters or more. Shorter names a letter apart are usually different words (`usage`, `image`).
 fn close_signatures(a: &str, b: &str) -> bool {
     let (a, b) = (normalized(a), normalized(b));
-    a == b || (a.len().min(b.len()) >= 5 && edit_distance(&a, &b) <= 2)
+    a == b || (a.chars().count().min(b.chars().count()) >= 8 && edit_distance(&a, &b) == 1)
 }
 
-/// A warning for each existing signature close to `class` but not the same. A store that cannot be read gives
-/// none: the warning is advice, never a reason to refuse the record.
-fn close_signature_warnings(root: &Path, class: &str) -> Vec<String> {
-    let Ok(events) = read_events(root) else {
-        return Vec::new();
-    };
-    let mut counts: BTreeMap<&str, usize> = BTreeMap::new();
-    for event in events.iter().filter(|e| e.kind() == "friction-recorded") {
-        if let Some(existing) = event.class() {
-            *counts.entry(existing).or_default() += 1;
+/// The signature of every recorded friction, counted: the `fgos.friction.recorded` records of the records store and
+/// the recorded lines of the old shards. Other kinds are skipped unread, and an unreadable store gives nothing.
+fn recorded_signatures(root: &Path) -> BTreeMap<String, usize> {
+    let mut counts: BTreeMap<String, usize> = BTreeMap::new();
+    for store in [STORE, RECORDS_STORE] {
+        let Ok(read) = shard::read_store(root, store, UnsafeShard::Report) else {
+            continue;
+        };
+        for StoredRecord { value, .. } in read.records {
+            let class = if store == STORE {
+                (value.get("type").and_then(Value::as_str) == Some("friction-recorded"))
+                    .then(|| {
+                        value
+                            .get("errorClass")
+                            .and_then(Value::as_str)
+                            .map(str::to_owned)
+                    })
+                    .flatten()
+            } else if value.get("kind").and_then(Value::as_str) == Some(RECORDED_KIND) {
+                serde_json::from_value::<Record>(value)
+                    .ok()
+                    .and_then(|record| attr(&record, CLASS_ATTR).map(str::to_owned))
+            } else {
+                None
+            };
+            if let Some(class) = class {
+                *counts.entry(class).or_default() += 1;
+            }
         }
     }
     counts
+}
+
+/// A warning for each existing signature close to `class` but not the same. The warning is advice, never a reason
+/// to refuse the record.
+fn close_signature_warnings(root: &Path, class: &str) -> Vec<String> {
+    recorded_signatures(root)
         .into_iter()
-        .filter(|(existing, _)| *existing != class && close_signatures(existing, class))
+        .filter(|(existing, _)| existing != class && close_signatures(existing, class))
         .map(|(existing, count)| {
             format!(
                 "signature \"{class}\" is close to the existing signature \"{existing}\" ({count} recorded); \
@@ -852,19 +876,6 @@ pub fn parse_bucket(word: &str) -> Result<Bucket, String> {
     })
 }
 
-/// The start of the bucket holding `millis`, as the query engine reports it (weeks start on Monday, UTC).
-fn bucket_floor(millis: i64, bucket: Bucket) -> i64 {
-    const DAY: i64 = 86_400_000;
-    match bucket {
-        Bucket::Hour => millis.div_euclid(3_600_000) * 3_600_000,
-        Bucket::Day => millis.div_euclid(DAY) * DAY,
-        Bucket::Week => {
-            let day = millis.div_euclid(DAY);
-            (day - (day + 3).rem_euclid(7)) * DAY
-        }
-    }
-}
-
 /// Ranks open friction by signature, most recorded first: each group has its count, the distinct subjects and refs
 /// it touches, and when it was first and last seen. With a bucket there is one group per signature and bucket,
 /// newest bucket first.
@@ -905,6 +916,8 @@ pub fn rank_by_bucket(
     )
     .map_err(|e| e.to_string())?;
 
+    // The engine gives each group its count and newest instant. It has no aggregate for the oldest instant or for
+    // distinct subjects and refs, so one pass over each group's members supplies firstSeen and distinctRefs.
     let mut groups = Vec::new();
     for row in result.rows {
         let Some(class) = row.group.get(CLASS_ATTR) else {
@@ -913,7 +926,7 @@ pub fn rank_by_bucket(
         let in_bucket = |record: &Record| -> bool {
             let Some(bucket) = bucket else { return true };
             let start = parse_rfc3339_millis(&record.ts)
-                .and_then(|ms| format_unix_millis_rfc3339(bucket_floor(ms, bucket), 0));
+                .and_then(|ms| format_unix_millis_rfc3339(bucket_start(ms, bucket), 0));
             start == row.bucket
         };
         let members: Vec<&Record> = records
@@ -1486,6 +1499,20 @@ mod tests {
                 record(&tmp, input_of(id, "state-corrupt")).unwrap()["warnings"],
                 json!([]),
                 "the same signature, or one far from every other, is not a close one"
+            );
+        }
+        let answer = record(&tmp, input_of("tsk-5", "state-corupt")).unwrap();
+        assert_eq!(
+            answer["warnings"].as_array().unwrap().len(),
+            1,
+            "a long signature one letter off is a close one: {answer}"
+        );
+        for (first, second) in [("git-push", "git-pull"), ("usage", "image")] {
+            record(&tmp, input_of("tsk-6", first)).unwrap();
+            assert_eq!(
+                record(&tmp, input_of("tsk-7", second)).unwrap()["warnings"],
+                json!([]),
+                "short signatures a few letters apart are different words: {first} / {second}"
             );
         }
         let _ = fs::remove_dir_all(&tmp);

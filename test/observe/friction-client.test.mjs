@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { recordFriction, resolveFriction } from '../../src/observe/friction-client.mjs';
+import { resolveFaultLogPath } from '../../src/observe/invocation-fault-log.mjs';
 
 function standInHost(t) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-friction-client-'));
@@ -19,6 +20,7 @@ function standInHost(t) {
       'printf "%s\\n" "$@" > "$STAND_IN_ARGV"',
       'cat > "$STAND_IN_STDIN"',
       'if [ -n "$STAND_IN_STDERR" ]; then echo "$STAND_IN_STDERR" >&2; exit 1; fi',
+      'if [ -n "$STAND_IN_ANSWER" ]; then echo "$STAND_IN_ANSWER"; exit 0; fi',
       'echo \'{"contract":"fgos.v1","data":{"ok":true}}\'',
       '',
     ].join('\n'),
@@ -31,8 +33,9 @@ function standInHost(t) {
     STAND_IN_STDIN: path.join(dir, 'stdin'),
   });
   delete process.env.STAND_IN_STDERR;
+  delete process.env.STAND_IN_ANSWER;
   t.after(() => {
-    for (const key of ['FGOS_HOST_BIN', 'STAND_IN_ARGV', 'STAND_IN_STDIN', 'STAND_IN_STDERR']) {
+    for (const key of ['FGOS_HOST_BIN', 'STAND_IN_ARGV', 'STAND_IN_STDIN', 'STAND_IN_STDERR', 'STAND_IN_ANSWER']) {
       if (saved[key] === undefined) delete process.env[key]; else process.env[key] = saved[key];
     }
     fs.rmSync(dir, { recursive: true, force: true });
@@ -72,13 +75,27 @@ test('a refusal of the caller\'s input is rethrown as a validation StoreError', 
   assert.throws(() => resolveFriction(host.root, {}), (err) => err.category === 'validation');
 });
 
-test('any other host failure warns and returns null instead of throwing into the workflow', (t) => {
+test('a write the door could not store is returned as answered, logged as a fault and warned', (t) => {
   const host = standInHost(t);
-  process.env.STAND_IN_STDERR = 'fgos: error: invocation failed: provider failed: observe-lock-timeout: timed out';
+  const answer = { ok: false, outcome: 'failed', message: 'observe-lock-timeout: timed out' };
+  process.env.STAND_IN_ANSWER = JSON.stringify({ contract: 'fgos.v1', data: answer });
+  const warnings = [];
+  t.mock.method(console, 'error', (line) => warnings.push(line));
+  assert.deepEqual(recordFriction(host.root, { id: 'tsk-1', layer: 'state', errorClass: 'e', disposition: 'advisory' }), answer);
+  assert.match(warnings.join('\n'), /friction write failed \[failed\]: observe-lock-timeout/);
+  const faults = fs.readFileSync(resolveFaultLogPath(path.join(host.root, '.fgos')), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  assert.equal(faults.length, 1);
+  assert.equal(faults[0].faultClass, 'friction-write-failed');
+  assert.match(faults[0].message, /^failed: observe-lock-timeout/);
+});
+
+test('a host that cannot run at all warns and returns null instead of throwing into the workflow', (t) => {
+  const host = standInHost(t);
+  process.env.STAND_IN_STDERR = 'fgos: error: invocation failed: host crashed';
   const warnings = [];
   t.mock.method(console, 'error', (line) => warnings.push(line));
   assert.equal(recordFriction(host.root, { id: 'tsk-1', layer: 'state', errorClass: 'e', disposition: 'advisory' }), null);
-  assert.match(warnings.join('\n'), /friction write failed \[host-exec-error\].*observe-lock-timeout/);
+  assert.match(warnings.join('\n'), /friction write failed \[host-exec-error\].*host crashed/);
 });
 
 test('kind and every ref are passed through, each ref as its own --ref', (t) => {

@@ -3,8 +3,9 @@
 // host owns every value list, default and validation.
 // A refusal of the caller's input (the host names it `friction-invalid-input:`)
 // is rethrown as a StoreError so programming mistakes surface in tests. Any other
-// failure is best-effort: it is logged to invocation-faults.jsonl and warned on
-// stderr, never thrown into the workflow that recorded the friction.
+// failure, including an answer of `ok: false` from the write door, is best-effort:
+// it is logged to invocation-faults.jsonl and warned on stderr, never thrown into
+// the workflow that recorded the friction.
 
 import { invokeHost } from '../util/host-bin.mjs';
 import { recordInvocationFault } from './invocation-fault-log.mjs';
@@ -34,25 +35,36 @@ const requireId = (id, name) => {
 // `--flag value` for every pair whose value the caller supplied.
 const flags = (pairs) => pairs.filter(([, value]) => value != null).flatMap(([flag, value]) => [flag, String(value)]);
 
+// A friction the host could not store: logged as an invocation fault and warned on stderr.
+function reportLoss(what, args, dir, code, message) {
+  recordInvocationFault({
+    fgosDir: dir ? (dir.endsWith('.fgos') ? dir : fgosDirFromRoot(dir)) : null,
+    cwd: dir,
+    verb: 'friction',
+    sub: args[1],
+    faultClass: 'friction-write-failed',
+    message: `${code}: ${message}`,
+    argv: args,
+  });
+  console.error(`fgos: warning: friction ${what} failed [${code}]: ${message}`);
+}
+
+// The write door never fails its caller: a record it could not store (lock timeout, I/O) comes back as
+// `{ ok: false, outcome, message }` with exit 0. The answer is returned unchanged, and the loss is reported.
 function callHost(what, args, { dir, input }) {
+  let answer;
   try {
-    return invokeHost(args, { input, dir });
+    answer = invokeHost(args, { input, dir });
   } catch (err) {
     const firstLine = String(err.stderr ?? '').split('\n', 1)[0];
     if (INPUT_REFUSAL.test(firstLine)) throw validationError(firstLine.replace(INPUT_REFUSAL, ''));
-    const code = err.code || 'host-exec-error';
-    recordInvocationFault({
-      fgosDir: dir ? (dir.endsWith('.fgos') ? dir : fgosDirFromRoot(dir)) : null,
-      cwd: dir,
-      verb: 'friction',
-      sub: args[1],
-      faultClass: 'friction-write-failed',
-      message: `${code}: ${err.message}`,
-      argv: args,
-    });
-    console.error(`fgos: warning: friction ${what} failed [${code}]: ${err.message}`);
+    reportLoss(what, args, dir, err.code || 'host-exec-error', err.message);
     return null;
   }
+  if (answer && answer.ok === false) {
+    reportLoss(what, args, dir, answer.outcome || 'not-stored', answer.message || 'the host did not store the record');
+  }
+  return answer;
 }
 
 // `--ref kind:id` once per ref; a ref is `'kind:id'` or `{ kind, id }`.

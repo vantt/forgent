@@ -155,8 +155,7 @@ test(
     // HEAVY_KEYWORDS entry ("schema migration") — the deterministic route to
     // a real Iron-Law-tripping candidate (per this cell's action), never a
     // fabricated module-path-touching commit.
-    // (2) `fgos friction rank` — candidate appears with every field a human
-    // needs to judge it.
+    // (2) `fgos friction rank` — the candidate's signature group appears.
     // Record friction via Observe CLI
     const rec = fgos(repoRoot, [
       'friction', 'record',
@@ -172,25 +171,28 @@ test(
 
     const list = fgos(repoRoot, ['friction', 'rank']);
     assert.equal(list.status, 0, `friction rank failed: ${list.stderr}`);
-    const listData = envelopeData(list.stdout);
-    const candidate = listData.find((c) => c.id === 'self-fix-source');
-    assert.ok(candidate, 'self-fix-source appears in the ranked list');
-    assert.equal(candidate.score, 2);
+    const group = envelopeData(list.stdout).find((g) => g.class === 'verify-miss');
+    assert.ok(group, 'the verify-miss signature appears in the ranked list');
+    assert.equal(group.count, 1);
+    assert.equal(group.distinctRefs, 1);
+    assert.ok(group.firstSeen && group.firstSeen === group.lastSeen, 'one record is first and last seen at once');
+
+    // (3) `fgos friction show <subject>` is read-only and carries the detail
+    // a human needs to judge the candidate.
+    const show = fgos(repoRoot, ['friction', 'show', 'work:self-fix-source']);
+    assert.equal(show.status, 0, `friction show failed: ${show.stderr}`);
+    const showData = envelopeData(show.stdout);
+    assert.equal(showData.unsettled, 1);
+    const candidate = showData.records[0];
+    assert.equal(candidate.subject.id, 'self-fix-source');
     assert.equal(candidate.disposition, 'blocked');
     assert.equal(candidate.errorClass, 'verify-miss');
     assert.equal(candidate.layer, 'verification');
     assert.equal(candidate.attempts, 2);
     assert.match(candidate.detail, /schema migration/);
 
-    // (3) `fgos friction show <subject>` is read-only
-    const show = fgos(repoRoot, ['friction', 'show', 'work:self-fix-source']);
-    assert.equal(show.status, 0, `friction show failed: ${show.stderr}`);
-    const showData = envelopeData(show.stdout);
-    assert.equal(showData.unsettled, 1);
-    assert.equal(showData.records[0].subject.id, 'self-fix-source');
-
     // (4) `fgos submit` — creates exactly one new work item
-    const desc = `Self-improve candidate ${candidate.id}: ${candidate.disposition} (${candidate.errorClass}, layer ${candidate.layer}). ${candidate.detail}`;
+    const desc = `Self-improve candidate ${candidate.subject.id}: ${candidate.disposition} (${candidate.errorClass}, layer ${candidate.layer}). ${candidate.detail}`;
     const submit = fgos(repoRoot, ['submit', desc]);
     assert.equal(submit.status, 0, `submit failed: ${submit.stderr}`);
     const submitted = envelopeData(submit.stdout);

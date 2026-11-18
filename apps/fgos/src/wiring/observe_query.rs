@@ -88,6 +88,13 @@ mod tests {
         .iter()
         .map(|d| d.label)
         .collect();
-        assert_eq!(names, ["fgos-observe-health", "fgos-observe-transcripts"]);
+        assert_eq!(
+            names,
+            [
+                "fgos-observe-health",
+                "fgos-observe-friction",
+                "fgos-observe-transcripts"
+            ]
+        );
     }
 }

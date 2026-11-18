@@ -23,3 +23,4 @@ pub use model::{
     Without,
 };
 pub use result::{AggValue, Coverage, QueryResult, ResultRow};
+pub use time::bucket_start;
