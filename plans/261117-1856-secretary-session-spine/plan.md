@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Secretary Miu, one start door and host port for head sessions, automatic session rotation"
-status: ready
+status: done
 priority: P1
 blockedBy: []
 footprint:
@@ -287,7 +287,7 @@ answered `unavailable / tool.missing`, so the blast radius below is from `rg`, a
 | 15 | [Head verb binding: start and rotate](phase-15-head-verb.md) | 12, 12b, 13, 14 | src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, bin/fgos.mjs, test/cli/head-verb.test.mjs, docs/platform/session-host/spec.md | 8 | done |
 | 16 | [Secretary persona, secretary skill and /handoff skill](phase-16-secretary-and-handoff-skills.md) | 3, 7, 13, 15 | core/agents/secretary.yaml, core/skills/fgos-secretary/**, core/skills/handoff/**, .claude/agents/**, plugins/fgOS/skills/**, .agents/skills/**, .claude/skills/** | 9 | done |
 | 17 | [Rotation hooks, doctor row and install wiring](phase-17-rotation-hooks.md) | 14, 15 | src/session-rotation/hook.mjs, bin/fgos.mjs, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/distribution/rust/src/agent_hooks.rs, packages/distribution/rust/tests/goldens/agent-hooks-vectors.json, src/setup/agent-hooks.mjs, packages/distribution/contracts/agent-hooks.v1.json, packages/distribution/contracts/doctor-registry.v1.json, test/setup/agent-hooks.test.mjs, .claude/settings.json | 9 | done |
-| 18 | [Integration, live checks and full gate](phase-18-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 | CHANGELOG.md, docs/reading-map.md, docs/platform/run-supervisor/spec.md, packages/git/contracts/mutation-census.v1.json, plans/261117-1856-secretary-session-spine/reports/integration.md | 10 | ready |
+| 18 | [Integration, live checks and full gate](phase-18-integration.md) | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 | CHANGELOG.md, docs/reading-map.md, docs/platform/run-supervisor/spec.md, packages/git/contracts/mutation-census.v1.json, plans/261117-1856-secretary-session-spine/reports/integration.md | 10 | done |
 
 **Waves.** 1: phases 1-4. 2: 5-8. 3: 9-10. 4: 11, 13. 5: 12. 6: 12b. 7: 14 (adds `head rotate` to the 12b contract). 8: 15. 9: 16-17. 10: 18. Layers stay serial: the port
 contract (1) lands before the crate (9), the crate before its two consumers (11, then 12, which also needs 11's seat
