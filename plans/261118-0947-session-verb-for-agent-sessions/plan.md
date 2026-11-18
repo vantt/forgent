@@ -53,7 +53,7 @@ source:
 created: 2026-11-18
 ---
 
-> **Hold (owner 2026-11-18 13:10, option A):** no phase starts until the S6a shaping (fgos worktree to Rust) settles; the rename needs phase 3, which is the session-worktree retirement, so the worktree work is done once with S6a.
+> Hold lifted (owner 2026-11-18 20:4x, option A after the S6a worktree door 1455 landed): this plan runs next; status stays draft until plan 261118-1847 (account lease) is done, because their footprints share src/**, test/**, doctor-registry and CHANGELOG.
 
 # Give `fgos session` back to agent sessions
 

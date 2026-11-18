@@ -6,31 +6,8 @@ priority: P1
 blockedBy: []
 footprint:
   - plans/261118-0936-ops-metrics/**
-  - packages/observe/rust/src/query/**
-  - packages/observe/rust/src/definition/**
-  - packages/observe/rust/src/metrics_cli/query.rs
-  - packages/observe/rust/tests/query_*.rs
-  - packages/observe/rust/tests/definition_*.rs
-  - test/fixtures/observe/query/**
-  - src/runner/dispatch/attention-view.mjs
-  - src/verbs/dispatch/inspect.mjs
-  - core/attention/**
-  - core/config-standard/dispatch.yaml
-  - core/config-schema/dispatch.schema.yaml
-  - packages/config/contracts/fixtures/**
-  - test/runner/dispatch-runtime-inspect.test.mjs
-  - domains/coding/observe/**
-  - apps/fgos/tests/driving_definitions.rs
-  - apps/fgos/tests/attention_definitions.rs
-  - apps/fgos/src/wiring/observe_sources/**
-  - test/fixtures/observe/driving/**
-  - docs/platform/observe/**
-  - docs/backlog.md
-  - apps/fgos/src/wiring/doctor/observe.rs
-  - apps/fgos/src/wiring/doctor/mod.rs
-  - test/setup/registrations.test.mjs
-  - docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
   - packages/observe/rust/src/friction.rs
+  - docs/platform/observe/**
 base: ebff368da7c1d1d705c2ec386dd53d5b20544cd4
 source:
   - docs/discussions/ops-metrics/DISCUSSION.md
