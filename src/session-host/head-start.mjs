@@ -184,7 +184,7 @@ export async function startHeadSession({ persona, name, projectRoot, beside = nu
   const generation = gen ?? nextGeneration(projectRoot, persona, name);
   const key = headKeyOf(persona, name, generation);
   let grant;
-  try { grant = grantOf(role); } catch (err) { throw new HeadStartError('grant-invalid', err.message); }
+  try { grant = grantOf(role, persona); } catch (err) { throw new HeadStartError('grant-invalid', err.message); }
   const pinned = await (ports.pin ?? defaultPin)({ persona, projectRoot });
   const handoff = await (ports.handoff ?? defaultHandoff)({ persona, name, projectRoot });
   const text = await (ports.opening ?? defaultOpening)({ persona, name, projectRoot, pinned, handoff });

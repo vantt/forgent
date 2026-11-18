@@ -33,12 +33,15 @@ export class SessionLaunchError extends Error {
 
 const ATTEMPT_STR = '01';
 
-/** The requirement of a head: the read-only posture plus the writable project paths its grant names. */
+/**
+ * The requirement of a head: the read-only posture plus the writable project paths its grant names. The paths grant is
+ * required (`optional: false`): a bind that cannot be made refuses the launch by name, it never starts the head read-only.
+ */
 function requirementOf(grant) {
   const base = BUILTIN_POLICIES['host-write-denied'];
   const policy = grant.writes.length === 0
     ? base
-    : { ...base, grants: [...base.grants, { resource: WORKSPACE_PATHS_RESOURCE, access: 'read-write', scope: 'dispatch', paths: [...grant.writes] }] };
+    : { ...base, grants: [...base.grants, { resource: WORKSPACE_PATHS_RESOURCE, access: 'read-write', scope: 'dispatch', optional: false, paths: [...grant.writes] }] };
   return { mode: 'required', policyId: 'host-write-denied', policy };
 }
 
@@ -57,9 +60,14 @@ export async function launchSessionAttempt({ binding, runnerConfig, key, role, g
   const assignmentDir = path.join(assignmentsDir, key);
   const runDir = path.join(assignmentDir, 'runs', ATTEMPT_STR);
   const runId = `run_${key}_${ATTEMPT_STR}`;
-  if (fs.existsSync(path.join(runDir, 'envelope.json')) || fs.existsSync(path.join(runDir, 'attempt-intent.json'))) {
-    throw new SessionLaunchError('head-key-used', `${runDir} already holds an attempt; a head key is used once, start the next generation`);
-  }
+  // A head key is used once. Checked before anything is made and again under the attempt lock, where a second
+  // start of the same key can no longer slip in between the check and the intent.
+  const refuseUsedKey = () => {
+    if (fs.existsSync(path.join(runDir, 'envelope.json')) || fs.existsSync(path.join(runDir, 'attempt-intent.json'))) {
+      throw new SessionLaunchError('head-key-used', `${runDir} already holds an attempt; a head key is used once, start the next generation`);
+    }
+  };
+  refuseUsedKey();
   fs.mkdirSync(runDir, { recursive: true });
 
   const attemptId = `cmd_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
@@ -74,6 +82,7 @@ export async function launchSessionAttempt({ binding, runnerConfig, key, role, g
   try {
     // Read-only, so no dispatch-cwd lease: a head writes only the paths its grant binds.
     attempt.locks = acquireAttemptLocks({ executorId, capability: 'execute', fgosDir, assignmentDir, attemptStr: ATTEMPT_STR, cwd: projectRoot, mutating: false, custody: null });
+    refuseUsedKey();
     publishAttemptIntent(attempt);
 
     const lease = await leaseAccountForAttempt({

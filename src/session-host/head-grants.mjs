@@ -4,8 +4,6 @@
 // `writes` (project-relative paths the sandbox binds writable) and the request socket reads `verbs`. A later
 // change moves the data into the standard config by changing only the body of `grantOf`.
 
-import path from 'node:path';
-
 /** `head:<persona>-<name>`; the persona and the name may both hold hyphens, so the table decides where they split. */
 const ROLE_PATTERN = /^head:([a-z][a-z0-9-]*)$/;
 
@@ -26,29 +24,23 @@ export class HeadGrantError extends Error {
   }
 }
 
-/** A write path is relative to the project root and names one exact path: refused by name, never normalized into range. */
-function checkWritePath(entry, persona) {
-  const where = `grant of persona "${persona}"`;
-  if (typeof entry !== 'string' || entry.trim() === '') throw new HeadGrantError('grant-path-invalid', `${where}: a write path must be a non-empty string`);
-  if (path.isAbsolute(entry) || /^[A-Za-z]:/.test(entry)) throw new HeadGrantError('grant-path-absolute', `${where}: write path ${JSON.stringify(entry)} is absolute`);
-  if (entry.split(/[\\/]/).includes('..')) throw new HeadGrantError('grant-path-climbs', `${where}: write path ${JSON.stringify(entry)} climbs out of the project root`);
-  if (/[*?[\]{}]/.test(entry)) throw new HeadGrantError('grant-path-glob', `${where}: write path ${JSON.stringify(entry)} is a glob; name the exact path`);
-}
-
 /**
  * The grant of a head role: `{ writes, verbs }`, both frozen arrays. A persona the table does not name holds
  * nothing. A role that is not `head:<persona>-<name>` is refused.
+ *
+ * The persona matches a table key exactly. A caller that knows the persona passes it, which is the only exact
+ * reading: `head:secretary-x-y` could be persona `secretary` with name `x-y` or persona `secretary-x` with name `y`.
+ * Without it the persona is the text before the first hyphen, so a persona with a hyphen holds nothing. What a
+ * `writes` path may be is the confinement shape's rule (`validateWorkspacePaths`), checked where the sandbox is built.
  */
-export function grantOf(role) {
+export function grantOf(role, persona = null) {
   const match = ROLE_PATTERN.exec(typeof role === 'string' ? role : '');
   if (!match || !/-[a-z0-9-]+$/.test(match[1])) {
     throw new HeadGrantError('role-invalid', `${JSON.stringify(role)} is not a head role (head:<persona>-<name>)`);
   }
-  const persona = Object.keys(GRANTS)
-    .filter((candidate) => match[1].startsWith(`${candidate}-`))
-    .sort((a, b) => b.length - a.length)[0];
-  if (!persona) return NONE;
-  const grant = GRANTS[persona];
-  for (const entry of grant.writes) checkWritePath(entry, persona);
-  return grant;
+  const named = persona ?? match[1].slice(0, match[1].indexOf('-'));
+  if (persona !== null && !match[1].startsWith(`${persona}-`)) {
+    throw new HeadGrantError('role-invalid', `${JSON.stringify(role)} does not belong to persona ${JSON.stringify(persona)}`);
+  }
+  return Object.hasOwn(GRANTS, named) ? GRANTS[named] : NONE;
 }

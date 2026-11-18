@@ -15,6 +15,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { globalFgosDir } from '../../../config/facade.mjs';
 import { resolveConfinementTempRoot } from './cleanup.mjs';
+import { validateWorkspacePaths } from './policies.mjs';
 import { createGitInspect, gitPortOptions } from '../../../git/inspect.mjs';
 import { userRuntimeDir } from '../../../run-supervisor/runtime-dir.mjs';
 import { machineLoginStores } from '../llm-accounts.mjs';
@@ -581,13 +582,12 @@ export function resolveConfinementResources({
     if (!root) {
       throw new ConfinementResourceError('confinement-grant-invalid', 'workspace-paths requires context.repoRoot or context.cwd.');
     }
-    if (!Array.isArray(grant.paths) || grant.paths.length === 0) {
-      throw new ConfinementResourceError('confinement-grant-invalid', 'workspace-paths requires a non-empty "paths" array.');
+    try {
+      validateWorkspacePaths(grant.paths, 'workspace-paths grant');
+    } catch (err) {
+      throw new ConfinementResourceError('confinement-grant-invalid', err.message);
     }
     for (const rel of grant.paths) {
-      if (typeof rel !== 'string' || !rel.trim() || path.isAbsolute(rel) || rel.split(/[\\/]/).includes('..')) {
-        throw new ConfinementResourceError('confinement-grant-invalid', `workspace-paths entry ${JSON.stringify(rel)} must be a path relative to the project root, without "..".`);
-      }
       const target = path.join(root, rel);
       const seen = fs.lstatSync(target, { throwIfNoEntry: false });
       if (!seen) {

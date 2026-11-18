@@ -106,8 +106,13 @@ test('a secretary launches with the paths and the verb its grant names; the line
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 
-test('the grant table: a persona it does not name holds nothing, and a role that is no head role is refused', () => {
+test('the grant table: the persona matches a table key exactly, an unnamed persona holds nothing, a non-head role is refused', () => {
   assert.deepEqual(grantOf('head:planner-probe'), { writes: [], verbs: [] });
+  assert.deepEqual(grantOf('head:secretary-miu').verbs, ['head start']);
+  assert.deepEqual(grantOf('head:secretary-miu', 'secretary'), grantOf('head:secretary-miu'));
+  // `secretary-x` is another persona: asked by persona it is not the secretary, even though the role starts alike.
+  assert.deepEqual(grantOf('head:secretary-x-y', 'secretary-x'), { writes: [], verbs: [] });
+  assert.throws(() => grantOf('head:secretary-miu', 'planner'), { code: 'role-invalid' });
   assert.throws(() => grantOf('lead:MAIL'), { code: 'role-invalid' });
   assert.throws(() => grantOf('head:secretary'), { code: 'role-invalid' });
   assert.throws(() => grantOf(undefined), { code: 'role-invalid' });

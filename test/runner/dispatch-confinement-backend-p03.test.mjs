@@ -1286,6 +1286,20 @@ test('assessBwrap: a workspace-paths grant is supported under host-write-denied 
     }, { id: 'bwrap', config: { type: 'bwrap' } });
     assert.ok(!assessed.mismatches.some((m) => /workspace-paths/.test(m.detail)), JSON.stringify(assessed.mismatches));
     assert.equal(assessed.coverage['grant:workspace-paths'], 'satisfied');
+
+    // A required paths grant (a session's) whose path is gone refuses the launch by name, never starts read-only.
+    const refused = assessBwrap({
+      dispatchId: 'disp_ws_paths_missing',
+      invocation: { command: 'agent', args: [], env: {} },
+      context: { cwd: tmp, repoRoot: tmp, runDir: path.join(tmp, 'run'), fgosDir: tmp },
+      requirement: {
+        mode: 'required', policyId: 'host-write-denied', policy: {
+          controls: { hostWrite: 'deny', hostRead: 'allow', networkEgress: 'allow', process: 'host', home: 'host', session: 'shared', workspace: 'shared' },
+          grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }, { resource: 'workspace-paths', access: 'read-write', scope: 'dispatch', optional: false, paths: ['plans', 'gone'] }],
+        },
+      },
+    }, { id: 'bwrap', config: { type: 'bwrap' } });
+    assert.ok(refused.mismatches.some((m) => m.code === 'workspace-path-missing' && /gone/.test(m.detail)), JSON.stringify(refused.mismatches));
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

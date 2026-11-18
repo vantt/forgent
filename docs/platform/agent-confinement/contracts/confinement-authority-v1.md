@@ -89,9 +89,20 @@ interface ResourceGrantV1 {
   access: 'read' | 'write' | 'read-write';
   scope: 'dispatch';
   // Defaults to true: an unavailable optional resource is unverified, not a refusal.
+  // For `workspace-paths` the grant is required (a bind that cannot be made refuses the launch by name).
   optional?: boolean;
+  // `workspace-paths` only, and required there: non-empty project-relative paths, each bound writable on its own.
+  paths?: string[];
 }
 ```
+
+`paths` nhận mọi shape trên đúng một resource, `workspace-paths` (access `read-write`); resource khác có `paths`
+là shape không hợp lệ. Mỗi phần tử là đường dẫn tương đối so với `context.repoRoot`, đúng một path cụ thể:
+rỗng, tuyệt đối (kể cả `C:`), chứa đoạn `..` hoặc ký tự glob (`* ? [ ] { }`) bị từ chối theo tên ở shape
+(`ConfinementPolicyError`). Resolver từ chối thêm path không tồn tại (`workspace-path-missing`), symlink và path
+thoát root (`confinement-grant-invalid`). Mỗi path thành một resolved resource riêng, `delivery: mount`,
+`collect: none`. Một check duy nhất: `validateWorkspacePaths` (`src/runner/dispatch/confinement/policies.mjs`),
+cả shape và resolver gọi nó.
 
 Thứ tự mức bảo vệ cố định theo từng control: `hostWrite deny > allow`,
 `hostRead deny > blind > allow`, `networkEgress deny > filtered > allow`,
@@ -409,6 +420,35 @@ interface ConfinementRequestV1 {
   backendId: string | null;
 }
 ```
+
+`assignmentLaunchContext` (field của request cho launch của một attempt có giám sát) mang đúng một discriminator,
+`kind`; vắng nghĩa là `assignment`:
+
+```ts
+interface AssignmentLaunchContextV1 {
+  contract: 'assignment-cli-spawn-launch-context.v1' | 'assignment-herdr-spawn-launch-context.v1'
+          | 'assignment-launch-context.v1';
+  kind?: 'assignment';
+  run: { runId: string; assignmentId: string; attempt: number /* >= 1 */;
+         dispatchPlanDigest: `sha256:${string}`; evaluatorBaselineDigest: `sha256:${string}` };
+  command: { launchCommandId: string; controlEpoch: number /* >= 1 */; controlTokenDigest: `sha256:${string}` };
+}
+
+interface SessionLaunchContextV1 {
+  contract: 'assignment-launch-context.v1';
+  kind: 'session';                       // a head session, not a unit of work
+  run: { runId: string; assignmentId: string /* the head key */; attempt: number /* >= 1 */ };
+  command: { launchCommandId: string };
+  session: { role: string };             // the Identity role (head:<persona>-<name>)
+}
+```
+
+`assignment` giữ nguyên mọi field bắt buộc và từ chối `session`. `session` từ chối `controlEpoch`,
+`controlTokenDigest`, `dispatchPlanDigest` và `evaluatorBaselineDigest` nếu có mặt, không đọc lỏng. Một session
+không có run control vì không có gì để settle, và một head sống duy nhất của persona và tên được rào bằng việc
+Identity đăng ký role, không phải bằng control epoch. `kind` khác hai giá trị trên bị từ chối
+(`confinement-launch-context-invalid`). Code: `validateAssignmentLaunchContext`
+(`src/runner/dispatch/confinement/request.mjs`).
 
 Mọi path phải absolute sau normalize. `runDir` bắt buộc với dispatch agent;
 không backend nào được tự suy nó từ `.fgos/assignments` hay current working
