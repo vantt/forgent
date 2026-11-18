@@ -49,10 +49,23 @@ function decodeFrame(buffer) {
   return frame;
 }
 
+const USE_CASE_CODE = /^[a-z][a-z0-9-]*$/;
+
+/**
+ * The error of a refused reply. `verb-failed` only wraps the entry's own failure, whose code is `detail` (contract
+ * `head-request.v1.json`): the error carries that code, so a confined caller sees the same codes as an unconfined one.
+ * A `detail` that is not a code (the exit of a crashed entry) leaves `verb-failed` as the code.
+ */
+function refusalOf(verb, reply) {
+  const wrapped = reply.code === 'verb-failed' && typeof reply.detail === 'string' && USE_CASE_CODE.test(reply.detail);
+  const code = wrapped ? reply.detail : String(reply.code ?? 'refused');
+  return new HeadRequestError(code, `${verb} was refused: ${reply.code ?? 'no code'}${reply.detail ? ` (${reply.detail})` : ''}`, { detail: reply.detail ?? null, supervisorCode: reply.code ?? null });
+}
+
 /**
  * Asks for `verb` over the request socket and returns its `data`. A refusal throws `HeadRequestError` with the
- * supervisor's code (`verb-not-granted`, `role-not-held`, `busy`, `verb-failed` with the entry's own code in `detail`,
- * ...); a socket that is gone is `request-socket-unavailable`. The socket file must belong to this user.
+ * supervisor's code (`verb-not-granted`, `role-not-held`, `busy`, ...), or for `verb-failed` the entry's own code
+ * (`bad-persona`, `rotation-in-progress`, ...); a socket that is gone is `request-socket-unavailable`. The socket file must belong to this user.
  */
 export function requestHead(verb, args, { socketPath = process.env[HEAD_REQUEST_SOCKET_ENV], timeoutMs = DEFAULT_REPLY_TIMEOUT_MS } = {}) {
   if (typeof socketPath !== 'string' || socketPath === '') {
@@ -90,7 +103,7 @@ export function requestHead(verb, args, { socketPath = process.env[HEAD_REQUEST_
       } else if (reply.result === 'done') {
         finish(resolve, reply.data ?? {});
       } else {
-        finish(reject, new HeadRequestError(String(reply.code ?? 'refused'), `${verb} was refused: ${reply.code ?? 'no code'}${reply.detail ? ` (${reply.detail})` : ''}`, { detail: reply.detail ?? null }));
+        finish(reject, refusalOf(verb, reply));
       }
     });
     socket.on('error', (err) => finish(reject, new HeadRequestError('request-socket-unavailable', `the request socket ${socketPath} did not answer (${err.code ?? err.message})`)));

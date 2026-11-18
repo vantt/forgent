@@ -56,11 +56,15 @@ test('the client sends one REQUEST frame, returns the data of a done reply and n
   assert.deepEqual(seen[0].args, { persona: 'planner', name: 'x' });
 });
 
-test('a refused reply is a HeadRequestError carrying the supervisor\'s code and detail', async (t) => {
+test('a refused reply is a HeadRequestError carrying the supervisor\'s code, or the use case\'s own code when verb-failed wraps it', async (t) => {
   const socketPath = path.join(scratch(t), 'req.sock');
   serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'refused', code: 'verb-failed', detail: 'bad-persona' }));
   await listening();
-  await assert.rejects(requestHeadStart({ persona: 'Bad', name: 'x' }, { socketPath }), (err) => err instanceof HeadRequestError && err.code === 'verb-failed' && err.detail === 'bad-persona');
+  await assert.rejects(requestHeadStart({ persona: 'Bad', name: 'x' }, { socketPath }), (err) => err instanceof HeadRequestError && err.code === 'bad-persona' && err.supervisorCode === 'verb-failed' && err.detail === 'bad-persona');
+  const crashed = path.join(scratch(t), 'c.sock');
+  serveOnce(t, crashed, (request) => ({ type: 'REPLY', id: request.id, result: 'refused', code: 'verb-failed', detail: 'exit 1' }));
+  await listening();
+  await assert.rejects(requestHeadStart({ persona: 'x', name: 'x' }, { socketPath: crashed }), (err) => err.code === 'verb-failed');
 });
 
 test('a socket that is gone is request-socket-unavailable, and an unset variable is no-request-socket', async (t) => {

@@ -7,6 +7,7 @@ import { initGitCwd, run, tmpCwd } from './helpers/fgos-cli-harness.mjs';
 
 const EXIT_VALIDATION = 4;
 const EXIT_PRECONDITION = 2;
+const unconfined = { FGOS_CONFINED: '', FGOS_HEAD_REQUEST_SOCKET: '' };
 
 function project() {
   const cwd = tmpCwd();
@@ -24,7 +25,7 @@ test('a head call without a persona or --name, or with a malformed one, is refus
     [['head', 'bogus', 'secretary', '--name', 'miu'], /sub-verb/],
   ];
   for (const [args, message] of cases) {
-    const result = run(cwd, args);
+    const result = run(cwd, args, unconfined);
     assert.equal(result.status, EXIT_VALIDATION, `${args.join(' ')}: ${result.stderr}`);
     assert.match(result.stderr, message);
   }
