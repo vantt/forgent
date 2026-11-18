@@ -2,22 +2,23 @@
 
 ## Inputs
 
-- `docs/platform/write-scope/spec.md` (the soundness contract and the chosen meaning) from phase 1.
+- `docs/platform/write-scope/spec.md` (the soundness contract, the chosen meaning, the error policy) and `reports/facts.md` from phase 1.
 - `packages/write-scope/src/lib.rs` (`canonicalize`, `prefix`, `overlaps`, `matches`, `expand`).
 - `packages/git/node-addon/src/git/write_scope.rs` (what Node can call today: `canonicalize`, `canonicalizeAll`, `matches`, `expand`).
 - `src/runner/dispatch/write-scope.mjs` (`writeScopesOverlap`, `canonicalizeWrites`, `matchesWriteScope`).
-- `test/git/write-scope-parity.test.mjs` (runs the JS golden suite `test/runner/write-scope.test.mjs` against the native leaf) and the Node access decision in `reports/facts.md`.
+- `test/git/write-scope-parity.test.mjs` (runs the JS golden suite `test/runner/write-scope.test.mjs` against the native leaf).
 
 ## Files it may write
 
-`packages/write-scope/**`, `packages/git/node-addon/src/**`, `test/git/write-scope-parity.test.mjs` and `test/runner/write-scope.test.mjs`.
+`docs/platform/write-scope/`, `packages/write-scope/**`, `packages/git/node-addon/src/**`, `test/git/write-scope-parity.test.mjs` and `test/runner/write-scope.test.mjs`.
 
 ## Steps
 
-1. Add the set-level function: given items `{id, scopes[]}`, return every colliding pair with the shared entries in the first item's own spelling, in a deterministic order. Build it on a path-segment trie so the cost follows the number of paths and hits, not the square of the item count.
-2. Keep the pairwise `overlaps` as the one definition of the relation; the trie is an optimisation that must agree with it. A property-style test compares the trie against the naive pairwise result on generated inputs from a small seeded generator in the test file (no new crate); one owning test per behaviour.
-3. Expose the new function to Node the way phase 1 decided (if the native addon: next to the existing four operations in `write_scope.rs`; if the host verb: nothing here).
-4. Extend the existing parity test, which already pins `canonicalize`, `matches` and `expand` between JS and Rust, with overlap and colliding-pair cases, so the JS port cannot drift until dispatch migrates. Do not add a second parity file (design principle 8).
+1. Add the set-level function: given items `{id, scopes[]}`, canonicalize every scope, compare pairs with the pairwise `overlaps` and return every colliding pair with the shared entries in the first item's own spelling, in a deterministic order. An entry that does not canonicalize is reported by item and entry, never dropped (decision 17). Cap the number of emitted pairs by the contract limit and return `truncated`.
+2. Measure the largest real input (the folded Work view and the largest plan table) and record the time in `reports/facts.md`. Add a path trie only if that measurement shows pairwise is too slow (decision 19); otherwise do not.
+3. Expose the function to Node through the native addon, next to the existing four operations in `write_scope.rs`.
+4. Extend the existing parity test, which already pins `canonicalize`, `matches` and `expand` between JS and Rust, with overlap and colliding-pair cases and a differential corpus over Unicode whitespace (the Rust `space()` set includes U+FEFF and U+3000), repeated `**`, empty segments and the malformed entries of decision 17, comparing JS and Rust on `overlaps` as well as `canonicalize`. Do not add a second parity file (design principle 8).
+5. Record the settled decision in the `write-scope` spec's decision history.
 
 ## Verify
 

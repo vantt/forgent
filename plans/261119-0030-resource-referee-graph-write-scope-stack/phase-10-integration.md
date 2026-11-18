@@ -13,18 +13,18 @@ A branch that passes alone does not prove the merge; this phase merges the branc
 
 ## Steps
 
-1. Merge `origin/main` into the integration branch first, then the phase branches in wave order.
-2. Regenerate the mutation census once with `git-one-door-scan --write-census` and commit it; this is the first point where `test/git/one-door.test.mjs` is expected to pass.
-3. Run the gates one after the other, never together: `cargo test --workspace` with `-j4` after checking `free -g`, then `npm test`.
-4. Confirm acceptance criteria 1 to 9 one by one and write the result in `reports/close.md`, including the measured time of the door on the largest plan in `plans/`.
+1. Merge `origin/main` into the integration branch first (rebuild `Cargo.lock` and re-run `npm run build:skills` after it, decision 21), then the phase branches in wave order.
+2. Regenerate the mutation census once with `git-one-door-scan --write-census`. Before committing it, list the entries removed and added by name (the moved `write-scope` files, the new crates and addon modules) and record the list in `reports/close.md`; any entry that is not explained by a phase is a stop.
+3. Run the gates one after the other, never together: `cargo test --workspace` with `-j4` after checking `free -g`, then `npm test`, then `node scripts/plan-contract-check.mjs --all`.
+4. Confirm acceptance criteria 1 to 10 one by one and write the result in `reports/close.md`, including the measured time of the door on the largest plan in `plans/`.
 5. Update the board: the lane row and one line at the top of its `log.md`, naming the commit, what other lanes must know, and the lanes affected (those holding `Cargo.toml`, `main.rs`, `CHANGELOG.md`, `packages/git`).
-6. Record the settled decisions in the three specs' decision history.
-7. Check that the release is activated before calling the lane done; landing is not done.
+6. Check that each of the three specs carries the decision history its phase wrote.
+7. Record whether the release is activated. `fgos doctor` through the installed shim is the only gate; if the release is not activated, say so in `reports/close.md`: landing is not done.
 
 ## Verify
 
-Both suites green in sequence, `fgos doctor` clean through the installed shim after activation, and the planner door passing on this plan.
+Both suites green in sequence, the plan-contract check clean on every plan, and `fgos doctor` through the installed shim clean after activation.
 
 ## Rollback
 
-Revert the merge commit; each earlier phase is its own commit and can be reverted in reverse order.
+Revert the merge commit; each earlier phase is its own commit and can be reverted in the reverse order 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, regenerating the census at the end.
