@@ -7,9 +7,11 @@
 //! stdout; the contract is `packages/distribution/contracts/doctor-bridge.v1.json`. Stray output of a body is
 //! never read as a result because only prefixed lines count, and a crash keeps the results already produced.
 //!
-//! The same door carries one more request, `work-store-init`, for the Work store `fgos init` creates until the
-//! Work layer moves (`work_store_init`): no rows, an `end` line when the store was made, a refusal line with the
-//! error's text and exit category when it was not.
+//! The same door carries two more requests until the Work layer moves. `work-store-init` is the Work store `fgos
+//! init` creates (`work_store_init`): no rows, an `end` line when the store was made, a refusal line with the
+//! error's text and exit category when it was not. `work-dispatch-hint` is the Work lookup of `fgos dispatch decide
+//! --work` (`work_dispatch_hint`): one `hint` line (the hint object, or null for an item the store does not hold), a
+//! refusal line when the lookup failed.
 //!
 //! The child is a bounded helper of one doctor run (or of one init), not a legacy route: it gets a fresh recursion guard
 //! (a guard the host inherited does not stop it), leads its own process group so a deadline or a signal reaches
@@ -50,6 +52,9 @@ enum Line {
         result: RowResult,
     },
     Fix(FixResult),
+    Hint {
+        hint: Option<serde_json::Value>,
+    },
     End {
         count: usize,
         #[serde(default, rename = "nodeVersion")]
@@ -233,6 +238,31 @@ impl NodeBridge {
         }
     }
 
+    /// The dispatch hint of the Work item `work_id` at `stage` in the Work store of the main checkout `root`
+    /// (`resolveWorkForDispatch`): `Ok(None)` when the store holds no such item, the fault otherwise (a refusal
+    /// carries the error's text and category).
+    pub fn work_dispatch_hint(
+        &self,
+        root: &Path,
+        work_id: &str,
+        stage: Option<&str>,
+    ) -> Result<Option<serde_json::Value>, Fault> {
+        let extra = serde_json::json!({ "workId": work_id, "stage": stage });
+        match self.call_with(
+            root,
+            "work-dispatch-hint",
+            &[],
+            &extra,
+            self.work_store_deadline,
+        ) {
+            (_, Some(fault)) => Err(fault),
+            (lines, None) => Ok(lines.into_iter().find_map(|line| match line {
+                Line::Hint { hint } => hint,
+                _ => None,
+            })),
+        }
+    }
+
     /// One call: the lines the child produced, and why it did not finish when it did not. The child runs under the
     /// process door's bounded run (its own group, ended whole at the deadline and when it exits); a signal sent to
     /// the host is forwarded to that group for as long as it lives, and ends the doctor once the call returns.
@@ -243,12 +273,27 @@ impl NodeBridge {
         ids: &[&str],
         deadline: Duration,
     ) -> (Vec<Line>, Option<Fault>) {
+        self.call_with(root, phase, ids, &serde_json::Value::Null, deadline)
+    }
+
+    /// [`Self::call`] with the fields of `extra` (an object) added to the request.
+    fn call_with(
+        &self,
+        root: &Path,
+        phase: &str,
+        ids: &[&str],
+        extra: &serde_json::Value,
+        deadline: Duration,
+    ) -> (Vec<Line>, Option<Fault>) {
         let command = match (self.launch)() {
             Ok(command) => command,
             Err(fault) => return (Vec::new(), Some(fault)),
         };
-        let request =
+        let mut request =
             serde_json::json!({ "phase": phase, "ids": ids, "dir": root.to_string_lossy() });
+        if let (Some(request), Some(extra)) = (request.as_object_mut(), extra.as_object()) {
+            request.extend(extra.clone());
+        }
         let outcome = fgos_process::spawn::run_bounded_command(
             command,
             Some(request.to_string().as_bytes()),
@@ -554,6 +599,66 @@ mod tests {
     }
 
     #[test]
+    fn the_work_dispatch_hint_request_names_the_item_and_the_stage_and_reads_one_hint_line() {
+        let dir = std::env::temp_dir().join(format!("fgos-bridge-hint-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let seen = dir.join("request.json");
+        let bridge = scripted(
+            &format!(
+                "cat > '{}'; {}; {}",
+                seen.display(),
+                line(r#"{"kind":"hint","hint":{"workExecutorId":null,"agentType":"x"}}"#),
+                end(1)
+            ),
+            Duration::from_secs(20),
+        );
+        assert_eq!(
+            bridge.work_dispatch_hint(Path::new("/main"), "tsk-1", Some("plan")),
+            Ok(Some(
+                serde_json::json!({ "workExecutorId": null, "agentType": "x" })
+            ))
+        );
+        let request: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(&seen).unwrap()).unwrap();
+        std::fs::remove_dir_all(&dir).unwrap();
+        assert_eq!(request["phase"], "work-dispatch-hint");
+        assert_eq!(request["ids"], serde_json::json!([]));
+        assert_eq!(request["dir"], "/main");
+        assert_eq!(request["workId"], "tsk-1");
+        assert_eq!(request["stage"], "plan");
+    }
+
+    #[test]
+    fn an_item_the_work_store_does_not_hold_is_no_hint_and_a_refused_lookup_is_the_fault() {
+        let unknown = scripted(
+            &format!(
+                "cat >/dev/null; {}; {}",
+                line(r#"{"kind":"hint","hint":null}"#),
+                end(1)
+            ),
+            Duration::from_secs(20),
+        );
+        assert_eq!(
+            unknown.work_dispatch_hint(Path::new("/main"), "none", None),
+            Ok(None)
+        );
+        let refused = scripted(
+            &format!(
+                "cat >/dev/null; {}",
+                line(r#"{"kind":"refusal","message":"unreadable","category":"validation"}"#)
+            ),
+            Duration::from_secs(20),
+        );
+        assert_eq!(
+            refused.work_dispatch_hint(Path::new("/main"), "w", None),
+            Err(Fault::Refused {
+                message: "unreadable".into(),
+                category: Some("validation".into())
+            })
+        );
+    }
+
+    #[test]
     fn a_refused_work_store_step_carries_the_error_text_and_its_category() {
         let bridge = scripted(
             &format!(
@@ -789,6 +894,13 @@ mod contract_tests {
                     assert_eq!(
                         body.get("nodeVersion").and_then(|v| v.as_str()),
                         node_version.as_deref(),
+                        "{name}"
+                    );
+                }
+                Line::Hint { hint } => {
+                    assert_eq!(
+                        body.get("hint").filter(|h| !h.is_null()),
+                        hint.as_ref(),
                         "{name}"
                     );
                 }

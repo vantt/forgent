@@ -1,4 +1,9 @@
 {
+  "agents": {
+    "operation_id": "agents.list",
+    "owner_path": "packages/execution/rust",
+    "subcommands": true
+  },
   "config": {
     "operation_id": "config.read",
     "owner_path": "packages/config/rust",
@@ -7,6 +12,9 @@
   "convention": {
     "operation_id": "convention.query",
     "owner_path": "packages/convention/rust",
+    "subcommands": true
+  },
+  "dispatch": {
     "subcommands": true
   },
   "doctor": {

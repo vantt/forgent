@@ -365,7 +365,7 @@ fn failed(op: &str, failure: &ModelError) -> (i32, Value) {
 /// A file's bytes, opened no-follow beneath `root` and read under [`READ_CAP`]. A missing file, a link, a
 /// non-regular file or a file over the cap is `None`: nothing this route reads is worth following out of its root.
 #[cfg(unix)]
-fn read_beneath(root: &Path, relative: &Path) -> Option<Vec<u8>> {
+pub(crate) fn read_beneath(root: &Path, relative: &Path) -> Option<Vec<u8>> {
     fgos_durable_file::open_beneath(root, relative)
         .ok()
         .flatten()?
@@ -375,7 +375,7 @@ fn read_beneath(root: &Path, relative: &Path) -> Option<Vec<u8>> {
 }
 
 #[cfg(not(unix))]
-fn read_beneath(root: &Path, relative: &Path) -> Option<Vec<u8>> {
+pub(crate) fn read_beneath(root: &Path, relative: &Path) -> Option<Vec<u8>> {
     let path = root.join(relative);
     let meta = std::fs::symlink_metadata(&path).ok()?;
     if !meta.is_file() || meta.len() > READ_CAP as u64 {
@@ -407,14 +407,14 @@ fn split_root(path: &Path) -> Option<(PathBuf, PathBuf)> {
 }
 
 /// The real machine, as the executor model and the tool probe read it.
-struct HostMachine {
+pub(crate) struct HostMachine {
     path_env: String,
     herdr_present: Option<bool>,
     registry: OnceCell<Option<Value>>,
 }
 
 impl HostMachine {
-    fn new(path_env: Option<&str>, herdr_present: Option<bool>) -> Self {
+    pub(crate) fn new(path_env: Option<&str>, herdr_present: Option<bool>) -> Self {
         HostMachine {
             herdr_present,
             path_env: path_env.map(str::to_string).unwrap_or_else(|| {
@@ -516,13 +516,13 @@ impl Machine for HostMachine {
 }
 
 /// The tool probe: the machine's PATH, and the repository root a tool's `scanTarget` and `HEAD` resolve against.
-struct HostProbe<'a> {
+pub(crate) struct HostProbe<'a> {
     machine: &'a HostMachine,
     repo_root: PathBuf,
 }
 
 impl<'a> HostProbe<'a> {
-    fn new(machine: &'a HostMachine, repo_root: Option<PathBuf>) -> Self {
+    pub(crate) fn new(machine: &'a HostMachine, repo_root: Option<PathBuf>) -> Self {
         HostProbe {
             machine,
             repo_root: repo_root

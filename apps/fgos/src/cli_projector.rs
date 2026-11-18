@@ -179,6 +179,17 @@ pub fn project_cli_invocation(
             ContractRef::from_static("init.run.request", "1.0.0"),
             Box::new(crate::wiring::init::project_init_request(args, root)?),
         ),
+        crate::wiring::dispatch_decide::DECIDE_OPERATION_ID
+        | crate::wiring::dispatch_decide::EXPLAIN_OPERATION_ID => (
+            ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
+            Box::new(crate::wiring::dispatch_decide::project_dispatch_request(
+                args,
+            )),
+        ),
+        crate::wiring::agents::OPERATION_ID => (
+            ContractRef::from_static("agents.list.request", "1.0.0"),
+            Box::new(crate::wiring::agents::project_agents_request(args)),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
@@ -198,7 +209,7 @@ pub fn project_cli_invocation(
 /// `identity.read`, `identity.write`) and `mailbox` over five
 /// (`mailbox.send`, `mailbox.inbox`, `mailbox.inbox.claim` with `--claim`,
 /// `mailbox.list`, `mailbox.status`) and `git` over two (`git.status`, `git.recover`),
-/// and the arguments decide which.
+/// and `dispatch` over two (`dispatch.decide`, `dispatch.explain`), and the arguments decide which.
 pub fn native_operation_id(
     route_operation: &str,
     args: &[OsString],
@@ -220,6 +231,16 @@ pub fn native_operation_id(
         return Ok(crate::wiring::git_incidents::project_git_request(args)
             .operation_id()
             .to_string());
+    }
+    if route_operation == crate::wiring::dispatch_decide::DECIDE_OPERATION_ID {
+        return Ok(
+            if crate::wiring::dispatch_decide::project_dispatch_request(args).explain {
+                crate::wiring::dispatch_decide::EXPLAIN_OPERATION_ID
+            } else {
+                crate::wiring::dispatch_decide::DECIDE_OPERATION_ID
+            }
+            .to_string(),
+        );
     }
     if route_operation == fgos_config::provider::CONFIG_READ_OPERATION_ID {
         let request = project_config_request(args, std::path::PathBuf::new())?;

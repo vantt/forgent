@@ -12,12 +12,21 @@
   },
   "agents": {
     "selector": "agents",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
+    "route_kind": "native",
+    "operation_id": "agents.list",
+    "owner_path": "packages/execution/rust",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
+    "subcommands": true,
+    "subcommand_flags": {
+      "list": [
+        "dir",
+        "json",
+        "help",
+        "worktree"
+      ]
+    },
     "store": "none"
   },
   "answer": {
@@ -279,6 +288,34 @@
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
+    "subcommands": true,
+    "native_subcommands": [
+      "decide",
+      "explain"
+    ],
+    "subcommand_flags": {
+      "decide": [
+        "dir",
+        "json",
+        "help",
+        "executor-id",
+        "for",
+        "work",
+        "stage",
+        "assignment",
+        "has-live-task-access",
+        "needs-soul",
+        "cwd",
+        "repo-root"
+      ],
+      "explain": [
+        "dir",
+        "json",
+        "help",
+        "for",
+        "rigor"
+      ]
+    },
     "store": "none",
     "mutates_store": [
       "recover --action"
@@ -618,6 +655,7 @@
       "test/rust-host/command-routes.test.mjs"
     ],
     "native_subcommands": [
+      "dispatch-decide",
       "mailbox",
       "mailbox-sync",
       "session-rotation"

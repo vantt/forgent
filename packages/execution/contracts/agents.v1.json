@@ -91,6 +91,12 @@
    "project": {},
    "install": null,
    "expect": {"agents":[],"masked":[],"duplicates":[],"ignored":[]}
+  },
+  {
+   "name": "definitions are listed in bytewise order of their file names whatever the locale: capitals, dash, dot, underscore and lower case",
+   "project": {"fgos/agents/Zed.yaml":"name: Zed\ndescription: Zed persona\n","fgos/agents/a-b.yaml":"name: a-b\ndescription: a-b persona\n","fgos/agents/a.b.yaml":"name: a.b\ndescription: a.b persona\n","fgos/agents/aB.yaml":"name: aB\ndescription: aB persona\n","fgos/agents/a_b.yaml":"name: a_b\ndescription: a_b persona\n","fgos/agents/ab.yaml":"name: ab\ndescription: ab persona\n","fgos/agents/b.yaml":"name: b\ndescription: b persona\n","fgos/agents/Zed.yml":"name: Zed\ndescription: typo\n"},
+   "install": null,
+   "expect": {"agents":[{"name":"Zed","tier":"workspace","source":"fgos/agents/Zed.yaml","shadows":[],"description":"Zed persona","problems":[],"warnings":[]},{"name":"a-b","tier":"workspace","source":"fgos/agents/a-b.yaml","shadows":[],"description":"a-b persona","problems":[],"warnings":[]},{"name":"a.b","tier":"workspace","source":"fgos/agents/a.b.yaml","shadows":[],"description":"a.b persona","problems":[],"warnings":[]},{"name":"aB","tier":"workspace","source":"fgos/agents/aB.yaml","shadows":[],"description":"aB persona","problems":[],"warnings":[]},{"name":"a_b","tier":"workspace","source":"fgos/agents/a_b.yaml","shadows":[],"description":"a_b persona","problems":[],"warnings":[]},{"name":"ab","tier":"workspace","source":"fgos/agents/ab.yaml","shadows":[],"description":"ab persona","problems":[],"warnings":[]},{"name":"b","tier":"workspace","source":"fgos/agents/b.yaml","shadows":[],"description":"b persona","problems":[],"warnings":[]}],"masked":[],"duplicates":[],"ignored":["fgos/agents/Zed.yml"]}
   }
  ]
 }

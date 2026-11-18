@@ -864,7 +864,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'hook',
     invoke: 'fgos hook <kind>',
-    description: 'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi). Bypasses CLI envelope and store admission to preserve hook exit codes and stdio protocols. `mailbox` is the agent mailbox\'s checkpoint (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host: it registers the calling head, prints pending mail in the shape the CLI injects, and always exits 0, printing nothing on any failure. `session-rotation --event stop|session-start` is a head session\'s rotation hook (docs/platform/session-host/spec.md section 8.8), also native: it does nothing outside a head session, asks its own supervisor for `head answered` or `head rotate`, prints only the session start\'s handoff context, and always exits 0. `main-checkout-delete-guard` refuses a shell command that would mass-delete inside the main checkout of a fgOS project (git clean -x/-X, xargs rm, rm -r of the checkout or a top-level runtime directory, find -delete).',
+    description: 'Execute managed hook guards for supported coding agents (Claude, Codex, AGY, OMP, Pi). Bypasses CLI envelope and store admission to preserve hook exit codes and stdio protocols. `dispatch-decide` is the PreToolUse guard of Agent/Task calls, also served natively by the Rust host: it asks `fgos dispatch decide` for the call\'s subagent type and blocks (exit 2, or a deny answer with `--format=agy`) unless the answer is `in-process`; a payload that does not parse, a failed decision and any other error allow the call, a unusable config blocks it. `mailbox` is the agent mailbox\'s checkpoint (docs/platform/agent-mailbox/spec.md §6.1), served natively by the Rust host: it registers the calling head, prints pending mail in the shape the CLI injects, and always exits 0, printing nothing on any failure. `session-rotation --event stop|session-start` is a head session\'s rotation hook (docs/platform/session-host/spec.md section 8.8), also native: it does nothing outside a head session, asks its own supervisor for `head answered` or `head rotate`, prints only the session start\'s handoff context, and always exits 0. `main-checkout-delete-guard` refuses a shell command that would mass-delete inside the main checkout of a fgOS project (git clean -x/-X, xargs rm, rm -r of the checkout or a top-level runtime directory, find -delete).',
     parameters: {
       type: 'object',
       properties: {
@@ -898,7 +898,7 @@ export const COMMAND_REGISTRY = [
     externalEffect: false,
     paginated: false,
     deprecated: null,
-    native: ['mailbox', 'mailbox-sync', 'session-rotation'],
+    native: ['dispatch-decide', 'mailbox', 'mailbox-sync', 'session-rotation'],
   },
   {
     name: 'decision',
@@ -1394,7 +1394,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'plan-lint',
     invoke: 'fgos plan-lint <path>',
-    description: 'Read-only static check of a plan.md\'s own `- unit: ... / capability: <name>` and `## Product Gates` table annotations against the planning-capability-awareness doctrine (src/report/capability-plan-lint.mjs): a hedged parenthetical outside "unresolved (...)", a duplicate `capability:` line, a plan-time pin of executor/provider/model/tier/prefer/invocation/actors, an invalid or unregistered capability shape. `registered` is always the capability names declared in this repo\'s own live config. Exit 0 clean, 1 when a hard finding is present, 2 on a usage error (missing/nonexistent path). Default output is human-readable (each unit alongside its capability\'s catalog description); `--json` returns the raw findings/units. Never calls `decide`, never writes state.',
+    description: 'Read-only static check of a plan.md\'s own `- unit: ... / capability: <name>` and `## Product Gates` table annotations against the planning-capability-awareness doctrine (src/report/capability-plan-lint.mjs): a hedged parenthetical outside "unresolved (...)", a duplicate `capability:` line, a plan-time pin of executor/provider/model/tier/prefer/invocation/actors, an invalid capability shape, a tool ability whose tool is not present. `registered` is always the capability names declared in this repo\'s own live config. Exit 0 clean, 1 when a hard finding is present, 2 on a usage error (missing/nonexistent path). Default output is human-readable (each unit alongside its capability\'s catalog description); `--json` returns the raw findings/units. Never calls `decide`, never writes state.',
     parameters: {
       type: 'object',
       properties: {
@@ -1617,7 +1617,7 @@ export const COMMAND_REGISTRY = [
           },
           required: ['for'],
         },
-        examples: ['fgos dispatch explain --for code:implement', 'fgos dispatch explain --for architecture:synthesize --rigor critical'],
+        examples: ['fgos dispatch explain --for code:implement', 'fgos dispatch explain --for code:review --rigor critical'],
       },
       'probe-account': {
         description: 'Diagnostic: two legs per account. Leg 1 (direct) calls each login store of the account with its own login (no sandbox, no pane) under the account lock, on the model the harness leg asks the same CLI for. Leg 2 (harness) starts every CLI configured for the account at the same moment through the real dispatch door (confinement, leased login, herdr pane) with a read-only prompt, closes the panes it opened, and marks a round the account\'s quarantine refused as quarantined (out of the verdict). Reports per row an outcome class (direct: ok, auth, quota, other, no-probe; harness: ok, blocked-trust-prompt, auth, quota, sandbox, timeout, quarantined, other) with its evidence line, and one verdict: healthy, account-fault, harness-fault, mixed, or nothing-to-probe. --all probes every enabled account one after another; --record writes the direct leg to provider-capacity state (a login or quota stop quarantines, an answer lifts a quota or login lock) and its audit log. Selects and schedules nothing.',
@@ -1661,6 +1661,7 @@ export const COMMAND_REGISTRY = [
       'fgos dispatch inspect --run run_abc123',
       'fgos dispatch reconcile plan',
     ],
+    native: ['decide', 'explain'],
     touchesState: true,
     // "reconcile"/"recover" write guard and Run state (touchesState: true);
     // "probe-account" and "probe-session" spawn provider CLIs (externalEffect: true). A verb with
@@ -2382,6 +2383,7 @@ export const COMMAND_REGISTRY = [
       },
     },
     examples: ['fgos agents list'],
+    native: true,
     touchesState: false,
     store: 'none',
     externalEffect: false,

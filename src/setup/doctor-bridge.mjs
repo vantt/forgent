@@ -12,9 +12,12 @@
 // result is written as soon as it exists, so a crash keeps the results already produced. Deleted with the last
 // row Node owns.
 //
-// One more request shares the door: `work-store-init`, the Work store `fgos init` creates until the Work layer
-// moves (the Event Store rebuild of the project's `.fgos`). It answers with an `end` line of count 0, or with a
-// `refusal` line carrying the error's text and its category.
+// Two more requests share the door until the Work layer moves. `work-store-init` is the Work store `fgos init`
+// creates (the Event Store rebuild of the project's `.fgos`): it answers with an `end` line of count 0, or with a
+// `refusal` line carrying the error's text and its category. `work-dispatch-hint` is the Work lookup of
+// `fgos dispatch decide --work <id> [--stage <stage>]` (`resolveWorkForDispatch`): it answers with one `hint`
+// line (the hint object, or null when the Work store holds no such item) and an `end` line of count 1, or with a
+// `refusal` line.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -23,15 +26,19 @@ import { pathToFileURL } from 'node:url';
 /** The prefix of a result line; anything else on stdout is not a result. */
 export const RESULT_PREFIX = '\u001eFGOS-DOCTOR-BRIDGE ';
 
-/** Reads the request from `input`: `{ phase: 'fix' | 'check' | 'work-store-init', ids: [...], dir }`, or throws what is wrong with it. */
+/** Reads the request from `input`: `{ phase: 'fix' | 'check' | 'work-store-init' | 'work-dispatch-hint', ids: [...], dir }` (a `work-dispatch-hint` also carries `workId` and an optional `stage`), or throws what is wrong with it. */
 export function parseRequest(text) {
   let request;
   try { request = JSON.parse(text); } catch (error) { throw new Error(`the request is not JSON (${error.message})`); }
-  const { phase, ids, dir } = request ?? {};
-  if (phase !== 'fix' && phase !== 'check' && phase !== 'work-store-init') throw new Error('the request names no phase (fix, check or work-store-init)');
-  if (!Array.isArray(ids) || ids.some((id) => typeof id !== 'string' || id === '') || (phase === 'work-store-init' && ids.length > 0)) throw new Error('the request names no list of ids');
+  const { phase, ids, dir, workId, stage } = request ?? {};
+  const noIds = phase === 'work-store-init' || phase === 'work-dispatch-hint';
+  if (phase !== 'fix' && phase !== 'check' && !noIds) throw new Error('the request names no phase (fix, check, work-store-init or work-dispatch-hint)');
+  if (!Array.isArray(ids) || ids.some((id) => typeof id !== 'string' || id === '') || (noIds && ids.length > 0)) throw new Error('the request names no list of ids');
   if (typeof dir !== 'string' || dir === '') throw new Error('the request names no project directory');
-  return { phase, ids, dir };
+  if (phase !== 'work-dispatch-hint') return { phase, ids, dir };
+  if (typeof workId !== 'string' || workId === '') throw new Error('the request names no work item');
+  if (stage !== undefined && stage !== null && typeof stage !== 'string') throw new Error('the request names a stage that is not text');
+  return { phase, ids, dir, workId, ...(typeof stage === 'string' ? { stage } : {}) };
 }
 
 /** One result line: the prefix, the JSON, a newline, written in one call so nothing lands inside it. */
@@ -51,12 +58,19 @@ function refusalLine(error) {
  * `requires.node`, so it starts no Node of its own to ask), so the host can tell a finished call from one that stopped. A refusal (a malformed
  * request, an id with no body) is one `refusal` line.
  */
-export async function serve(text, { write, runBridged, initStore, nodeVersion = process.version }) {
+export async function serve(text, { write, runBridged, initStore, workHint, nodeVersion = process.version }) {
   let request;
   try { request = parseRequest(text); } catch (error) { write(resultLine('refusal', { message: error.message })); return 2; }
   if (request.phase === 'work-store-init') {
     try { await initStore(path.join(request.dir, '.fgos')); } catch (error) { write(refusalLine(error)); return 2; }
     write(resultLine('end', { count: 0, nodeVersion }));
+    return 0;
+  }
+  if (request.phase === 'work-dispatch-hint') {
+    let hint;
+    try { hint = await workHint({ workId: request.workId, stage: request.stage, fgosDir: path.join(request.dir, '.fgos') }); } catch (error) { write(refusalLine(error)); return 2; }
+    write(resultLine('hint', { hint: hint ?? null }));
+    write(resultLine('end', { count: 1, nodeVersion }));
     return 0;
   }
   let count = 0;
@@ -95,7 +109,7 @@ async function main() {
   // The rows' bodies load only for the requests that run rows.
   const text = Buffer.concat(chunks).toString('utf8');
   let runsRows = true;
-  try { runsRows = parseRequest(text).phase !== 'work-store-init'; } catch { /* serve answers a malformed request */ }
+  try { runsRows = ['fix', 'check'].includes(parseRequest(text).phase); } catch { /* serve answers a malformed request */ }
   let runBridged;
   if (runsRows) {
     const rows = await import('./registrations.mjs');
@@ -103,7 +117,9 @@ async function main() {
   }
   // Loaded only for the one request that needs the store.
   const initStore = async (dir) => (await import('../state/store.mjs')).initStore(dir);
-  process.exitCode = await serve(text, { write, runBridged, initStore });
+  // Loaded only for the one request that needs the Work layer.
+  const workHint = async (params) => (await import('../runner/work-dispatch.mjs')).resolveWorkForDispatch(params);
+  process.exitCode = await serve(text, { write, runBridged, initStore, workHint });
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {

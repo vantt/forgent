@@ -135,6 +135,9 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::wire_agents::DESCRIPTOR,
     wiring::uninstall::DESCRIPTOR,
     wiring::init::DESCRIPTOR,
+    wiring::dispatch_decide::DECIDE_DESCRIPTOR,
+    wiring::dispatch_decide::EXPLAIN_DESCRIPTOR,
+    wiring::agents::DESCRIPTOR,
 ];
 
 /// The legacy payload root of the running release, for the verbs that read what it ships (its skills, its scripts).
@@ -266,6 +269,7 @@ fn main() {
             HookKind::MailboxSync => wiring::mailbox_sync::main(&cli_args[2..]),
             HookKind::Mailbox => wiring::mailbox_hook::main(&cli_args[2..]),
             HookKind::SessionRotation => wiring::session_rotation_hook::main(&cli_args[2..]),
+            HookKind::DispatchDecide => wiring::dispatch_decide::hook_main(&cli_args[2..]),
         }
     }
 
@@ -365,6 +369,17 @@ fn main() {
         active_payload_root,
     )));
     service.register_provider(Arc::new(wiring::init::InitProvider::new()));
+    for descriptor in [
+        wiring::dispatch_decide::DECIDE_DESCRIPTOR,
+        wiring::dispatch_decide::EXPLAIN_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(
+            wiring::dispatch_decide::DispatchProvider::for_descriptor(descriptor),
+        ));
+    }
+    service.register_provider(Arc::new(wiring::agents::AgentsProvider::new(
+        active_payload_root,
+    )));
     let tracker = service.tracker();
 
     match lane {

@@ -90,7 +90,15 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("session", wiring::session::AVAILABLE_SUBCOMMANDS),
     ("git", wiring::git_incidents::AVAILABLE_SUBCOMMANDS),
     ("lock", wiring::lock_fence::AVAILABLE_SUBCOMMANDS),
+    ("dispatch", wiring::dispatch_decide::AVAILABLE_SUBCOMMANDS),
+    ("agents", wiring::agents::AVAILABLE_SUBCOMMANDS),
 ];
+
+/// The operation a `legacy-cli` selector runs for the first positionals it serves natively. The route table gives
+/// one only to a verb that is native whole, so a verb served in part names its operation here: `dispatch` serves
+/// `decide` and `explain`, one operation each, told apart by the projector.
+const PARTIAL_VERB_OPERATIONS: &[(&str, &str)] =
+    &[("dispatch", wiring::dispatch_decide::DECIDE_OPERATION_ID)];
 
 /// The `hook` kinds the host runs before the composition root.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -98,14 +106,16 @@ pub enum HookKind {
     Mailbox,
     MailboxSync,
     SessionRotation,
+    DispatchDecide,
 }
 
 impl HookKind {
     /// Every kind with a handler in the host: the entries of `native_subcommands` of `hook` must all be here.
-    pub const ALL: [(&'static str, HookKind); 3] = [
+    pub const ALL: [(&'static str, HookKind); 4] = [
         ("mailbox", HookKind::Mailbox),
         ("mailbox-sync", HookKind::MailboxSync),
         ("session-rotation", HookKind::SessionRotation),
+        ("dispatch-decide", HookKind::DispatchDecide),
     ];
 
     fn named(name: &str) -> Option<Self> {
@@ -299,10 +309,12 @@ pub fn decide(route: &CommandRouteDescriptor, call: &Call) -> Lane {
     if route.selector == RAW_KIND_VERB {
         return HookKind::named(sub).map_or(Lane::Legacy, Lane::HookProtocol);
     }
-    match &route.operation_id {
-        Some(operation_id) => Lane::Native {
-            operation_id: operation_id.clone(),
-        },
+    let partial = PARTIAL_VERB_OPERATIONS
+        .iter()
+        .find(|(selector, _)| *selector == route.selector)
+        .map(|(_, operation_id)| (*operation_id).to_owned());
+    match route.operation_id.clone().or(partial) {
+        Some(operation_id) => Lane::Native { operation_id },
         None => Lane::Legacy,
     }
 }
@@ -341,20 +353,14 @@ pub fn check_call(
             Some(sub) => {
                 return Err(CallFault {
                     class: ARG_PARSE,
-                    message: format!(
-                        "unknown {name} subcommand \"{sub}\". Available: {}",
-                        available.join(", ")
-                    ),
+                    message: sub_verb_refusal(name, available, Some(sub)),
                     sub: None,
                 })
             }
             None => {
                 return Err(CallFault {
                     class: ARG_PARSE,
-                    message: format!(
-                        "{name} requires a subcommand. Available: {}",
-                        available.join(", ")
-                    ),
+                    message: sub_verb_refusal(name, available, None),
                     sub: None,
                 })
             }
@@ -367,6 +373,32 @@ pub fn check_call(
             sub: served_sub,
         }),
         None => Ok(served_sub),
+    }
+}
+
+/// The verbs whose Node arm worded a missing or unknown sub-command with `requireSubVerb` (`<verb> requires a
+/// sub-verb: fgos <verb> <a|b>`), which the host keeps word for word; every other native verb says what the host's
+/// own parser says.
+const NODE_SUB_VERB_WORDING: &[&str] = &["agents"];
+
+/// The refusal text for a missing (`None`) or unknown sub-command of `verb`.
+fn sub_verb_refusal(verb: &str, available: &[&str], sub: Option<&str>) -> String {
+    if NODE_SUB_VERB_WORDING.contains(&verb) {
+        let usage = format!("fgos {verb} <{}>", available.join("|"));
+        return match sub {
+            Some(sub) => format!("unknown {verb} sub-verb \"{sub}\". Usage: {usage}"),
+            None => format!("{verb} requires a sub-verb: {usage}"),
+        };
+    }
+    match sub {
+        Some(sub) => format!(
+            "unknown {verb} subcommand \"{sub}\". Available: {}",
+            available.join(", ")
+        ),
+        None => format!(
+            "{verb} requires a subcommand. Available: {}",
+            available.join(", ")
+        ),
     }
 }
 
@@ -495,7 +527,10 @@ mod tests {
                     );
                 } else {
                     assert!(
-                        route.operation_id.is_some(),
+                        route.operation_id.is_some()
+                            || PARTIAL_VERB_OPERATIONS
+                                .iter()
+                                .any(|(selector, _)| *selector == route.selector),
                         "{} {sub} names no operation",
                         route.selector
                     );
@@ -576,12 +611,35 @@ mod tests {
             ),
             Lane::HookProtocol(HookKind::SessionRotation)
         );
+        assert_eq!(
+            decide(
+                route("hook"),
+                &call("hook", &["dispatch-decide", "--format=agy"])
+            ),
+            Lane::HookProtocol(HookKind::DispatchDecide)
+        );
         for other in [
-            call("hook", &["dispatch-decide"]),
+            call("hook", &["decision-question"]),
             call("hook", &["--cli", "claude", "mailbox"]),
             call("hook", &[]),
         ] {
             assert_eq!(decide(route("hook"), &other), Lane::Legacy);
+        }
+        for sub in ["decide", "explain"] {
+            assert_eq!(
+                decide(route("dispatch"), &call("dispatch", &[sub, "--for", "x"])),
+                Lane::Native {
+                    operation_id: "dispatch.decide".into()
+                },
+                "dispatch {sub}"
+            );
+        }
+        for sub in ["inspect", "reconcile", "probe-account", "recover"] {
+            assert_eq!(
+                decide(route("dispatch"), &call("dispatch", &[sub])),
+                Lane::Legacy,
+                "dispatch {sub}"
+            );
         }
         assert_eq!(
             decide(route("config"), &call("config", &["show"])),
@@ -628,6 +686,20 @@ mod tests {
         assert_eq!(
             check_call(route("config"), &call("config", &["show", "--json"])),
             Ok(Some("show".into()))
+        );
+    }
+
+    #[test]
+    fn agents_words_a_missing_or_unknown_sub_verb_as_the_node_arm_did() {
+        let missing = check_call(route("agents"), &call("agents", &[])).unwrap_err();
+        assert_eq!(
+            (missing.class, missing.message.as_str()),
+            (ARG_PARSE, "agents requires a sub-verb: fgos agents <list>")
+        );
+        let unknown = check_call(route("agents"), &call("agents", &["show"])).unwrap_err();
+        assert_eq!(
+            unknown.message,
+            "unknown agents sub-verb \"show\". Usage: fgos agents <list>"
         );
     }
 

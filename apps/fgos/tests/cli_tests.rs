@@ -4339,3 +4339,386 @@ fn the_seat_binding_route_answers_protocol_two_through_the_host_wiring() {
     assert_eq!(code, Some(0));
     assert_eq!(line["ladder"]["vocabulary"].as_array().unwrap().len(), 6);
 }
+
+// ---- fgos dispatch decide, dispatch explain, hook dispatch-decide and agents list ----------------------------------
+//
+// Execution's read door is served by the host: each verb answers with a failing `node` first on PATH that records
+// being started, so a Node child is a failure of the test. Only `decide --work` reaches Node (the Work layer's hint
+// is read through the Node rows bridge), and it says so when Node fails.
+
+/// A git project with one commit, its own HOME (private `.fgos` directory) and state root, and the dev release of
+/// this checkout as the payload.
+#[cfg(unix)]
+struct ExecutionWorld {
+    project: PathBuf,
+    home: PathBuf,
+    state: PathBuf,
+    manifest: PathBuf,
+    /// A `node` that records being started and fails, and the PATH that finds it first.
+    node_log: PathBuf,
+    path: String,
+}
+
+#[cfg(unix)]
+impl ExecutionWorld {
+    fn new(prefix: &str) -> Self {
+        use std::os::unix::fs::PermissionsExt;
+        let project = fresh_dir(&format!("{prefix}_project"));
+        let home = fresh_dir(&format!("{prefix}_home"));
+        let state = fresh_dir(&format!("{prefix}_state"));
+        fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+        fs::create_dir_all(home.join(".fgos")).unwrap();
+        fs::set_permissions(home.join(".fgos"), fs::Permissions::from_mode(0o700)).unwrap();
+        for args in [
+            &["init", "-q", "-b", "main"][..],
+            &["config", "user.email", "a@b.c"],
+            &["config", "user.name", "n"],
+            &["config", "fgos.machineId", "testbox"],
+            &["commit", "-q", "--allow-empty", "-m", "init"],
+        ] {
+            assert!(Command::new("git")
+                .args(args)
+                .current_dir(&project)
+                .status()
+                .unwrap()
+                .success());
+        }
+        let node_log = state.join("node-started.log");
+        let (_, path) = scripted_node(
+            &format!("{prefix}_node"),
+            &format!("echo started >> '{}'\nexit 1", node_log.display()),
+        );
+        ExecutionWorld {
+            project,
+            home,
+            state,
+            manifest: ensure_dev_manifest(),
+            node_log,
+            path,
+        }
+    }
+
+    /// The machine's global config: an executor whose only invocation is a CLI, which `decide` answers as
+    /// out-of-process.
+    fn with_out_of_process_executor(self) -> Self {
+        fs::write(
+            self.home.join(".fgos/config.yaml"),
+            "runner:\n  executors:\n    outproc:\n      kind: agent\n      providerModel: claude\n      invocations:\n        - id: outproc-cli\n          via: cli\n          adapter: cli-spawn\n          command: claude\n          args: [\"-p\"]\n",
+        )
+        .unwrap();
+        self
+    }
+
+    fn command(&self, args: &[&str]) -> Command {
+        let mut command = Command::new(fgos_bin());
+        command
+            .args(args)
+            .current_dir(&self.project)
+            .env("PATH", &self.path)
+            .env("HOME", &self.home)
+            .env("FGOS_STATE_ROOT", &self.state)
+            .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
+            .env("FGOS_ACTIVE_MANIFEST_PATH", &self.manifest)
+            .env_remove("CLAUDE_PROJECT_DIR");
+        command
+    }
+
+    fn run(&self, args: &[&str]) -> std::process::Output {
+        self.command(args).output().expect("failed to execute fgos")
+    }
+
+    fn hook(&self, args: &[&str], payload: &str) -> std::process::Output {
+        use std::io::Write;
+        use std::process::Stdio;
+        let mut child = self
+            .command(&[&["hook", "dispatch-decide"], args].concat())
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .expect("failed to execute fgos");
+        child
+            .stdin
+            .take()
+            .unwrap()
+            .write_all(payload.as_bytes())
+            .unwrap();
+        child.wait_with_output().unwrap()
+    }
+
+    fn node_started(&self) -> bool {
+        self.node_log.exists()
+    }
+
+    fn data(output: &std::process::Output) -> serde_json::Value {
+        assert_eq!(
+            output.status.code(),
+            Some(0),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        envelope["data"].clone()
+    }
+
+    fn project_config(&self, text: &str) {
+        fs::create_dir_all(self.project.join(".fgos")).unwrap();
+        fs::write(self.project.join(".fgos/config.yaml"), text).unwrap();
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn dispatch_decide_answers_the_mechanism_of_each_selector_and_starts_no_node() {
+    let world = ExecutionWorld::new("fgos_decide").with_out_of_process_executor();
+    let soul = ExecutionWorld::data(&world.run(&[
+        "dispatch",
+        "decide",
+        "--for",
+        "general-purpose",
+        "--needs-soul",
+        "--has-live-task-access",
+    ]));
+    assert_eq!(soul["mechanism"], "in-process");
+    assert_eq!(soul["configured"], false);
+    let named = ExecutionWorld::data(&world.run(&["dispatch", "decide", "outproc"]));
+    assert_eq!(named["mechanism"], "out-of-process");
+    assert_eq!(named["configured"], true);
+    let bare = world.run(&["dispatch", "decide"]);
+    assert_eq!(bare.status.code(), Some(4));
+    assert!(String::from_utf8_lossy(&bare.stderr)
+        .starts_with("fgos: usage: fgos dispatch decide <executorId>"));
+    let guard = world.run(&[
+        "dispatch",
+        "decide",
+        "--for",
+        "x",
+        "--repo-root",
+        "/elsewhere",
+    ]);
+    assert_eq!(guard.status.code(), Some(4));
+    assert!(String::from_utf8_lossy(&guard.stderr)
+        .contains("--repo-root (\"/elsewhere\") passed without --cwd"));
+    let unknown = world.run(&["dispatch", "decide", "--bogus"]);
+    assert_eq!(unknown.status.code(), Some(4));
+    assert!(String::from_utf8_lossy(&unknown.stderr)
+        .contains("unknown flag \"--bogus\" for \"fgos dispatch decide\""));
+    assert!(!world.node_started(), "a decision started a Node child");
+}
+
+#[cfg(unix)]
+#[test]
+fn dispatch_decide_refuses_a_project_whose_config_breaks_a_semantic_rule_naming_it() {
+    let world = ExecutionWorld::new("fgos_decide_refuse");
+    world.project_config("runner:\n  capabilities:\n    foo:\n      prefer: ghost\n");
+    let refused = world.run(&["dispatch", "decide", "--for", "foo"]);
+    assert_eq!(refused.status.code(), Some(4));
+    let stderr = String::from_utf8_lossy(&refused.stderr);
+    assert!(
+        stderr.starts_with("fgos: runner config (")
+            && stderr.contains(" runner capabilities.foo) \"prefer\" names \"ghost\" but no such executor is registered."),
+        "{stderr}"
+    );
+    world.project_config("runner: [\n");
+    let unparsed = world.run(&["dispatch", "decide", "--for", "foo"]);
+    assert_eq!(unparsed.status.code(), Some(4));
+    assert!(String::from_utf8_lossy(&unparsed.stderr)
+        .starts_with("fgos: config-parse project:config.yaml:2:1 (syntax-error)"));
+    assert!(!world.node_started());
+}
+
+#[cfg(unix)]
+#[test]
+fn dispatch_decide_work_names_the_bridge_cause_when_node_fails_and_nothing_else_needs_node() {
+    let world = ExecutionWorld::new("fgos_decide_work");
+    let answered = ExecutionWorld::data(&world.run(&[
+        "dispatch",
+        "decide",
+        "--for",
+        "general-purpose",
+        "--needs-soul",
+        "--has-live-task-access",
+    ]));
+    assert_eq!(answered["mechanism"], "in-process");
+    assert!(!world.node_started());
+    let work = world.run(&["dispatch", "decide", "--work", "tsk-1", "--stage", "plan"]);
+    assert_eq!(
+        work.status.code(),
+        Some(2),
+        "{}",
+        String::from_utf8_lossy(&work.stderr)
+    );
+    let stderr = String::from_utf8_lossy(&work.stderr);
+    assert!(
+        stderr.contains("--work needs the Work layer, which is read through Node")
+            && stderr.contains("the Node rows bridge failed"),
+        "{stderr}"
+    );
+    assert!(
+        world.node_started(),
+        "the Work hint is the one read that reaches Node"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn dispatch_explain_lays_out_the_binding_of_a_capability_and_starts_no_node() {
+    let world = ExecutionWorld::new("fgos_explain");
+    let explained = ExecutionWorld::data(&world.run(&[
+        "dispatch",
+        "explain",
+        "--for",
+        "code:implement",
+        "--rigor",
+        "high",
+    ]));
+    assert_eq!(explained["ask"]["capability"], "code:implement");
+    assert_eq!(explained["ask"]["rigor"], "high");
+    assert!(explained["explanation"]
+        .as_array()
+        .is_some_and(|lines| !lines.is_empty()));
+    let missing = world.run(&["dispatch", "explain"]);
+    assert_eq!(missing.status.code(), Some(4));
+    assert_eq!(
+        String::from_utf8_lossy(&missing.stderr),
+        "fgos: dispatch explain requires --for <capability>\n"
+    );
+    assert!(!world.node_started());
+}
+
+#[cfg(unix)]
+#[test]
+fn the_dispatch_decide_hook_blocks_an_out_of_process_task_and_allows_an_in_process_one() {
+    let world = ExecutionWorld::new("fgos_hook").with_out_of_process_executor();
+    let out_of_process = r#"{"tool_name":"Task","tool_input":{"subagent_type":"outproc"}}"#;
+    let blocked = world.hook(&[], out_of_process);
+    assert_eq!(blocked.status.code(), Some(2));
+    let stderr = String::from_utf8_lossy(&blocked.stderr);
+    assert!(
+        stderr.starts_with("BLOCKED: this Task call resolves to out-of-process dispatch")
+            && stderr.contains("`fgos run \"<prompt>\" --provider outproc"),
+        "{stderr}"
+    );
+    assert!(blocked.stdout.is_empty());
+    let allowed = world.hook(
+        &[],
+        r#"{"tool_name":"Task","tool_input":{"subagent_type":"general-purpose"}}"#,
+    );
+    assert_eq!(allowed.status.code(), Some(0));
+    assert!(allowed.stdout.is_empty() && allowed.stderr.is_empty());
+    let other_tool = world.hook(&[], r#"{"tool_name":"Bash","tool_input":{"command":"ls"}}"#);
+    assert_eq!(other_tool.status.code(), Some(0));
+    let empty = world.hook(&[], "");
+    assert_eq!(empty.status.code(), Some(0));
+    assert!(!world.node_started(), "the hook started a Node child");
+}
+
+#[cfg(unix)]
+#[test]
+fn the_dispatch_decide_hook_answers_agy_on_stdout_with_exit_zero_and_blocks_an_unusable_config() {
+    let world = ExecutionWorld::new("fgos_hook_agy").with_out_of_process_executor();
+    let payload = format!(
+        r#"{{"toolCall":{{"name":"Task","args":{{"subagent_type":"outproc"}}}},"workspacePaths":["{}"]}}"#,
+        world.project.display()
+    );
+    let denied = world.hook(&["--format=agy"], &payload);
+    assert_eq!(denied.status.code(), Some(0));
+    let answer: serde_json::Value = serde_json::from_slice(&denied.stdout).unwrap();
+    assert_eq!(answer["decision"], "deny");
+    assert!(answer["reason"]
+        .as_str()
+        .unwrap()
+        .starts_with("BLOCKED: this Task call resolves to out-of-process dispatch"));
+    let allowed = world.hook(
+        &["--format=agy"],
+        &payload.replace("outproc", "general-purpose"),
+    );
+    assert_eq!(allowed.status.code(), Some(0));
+    assert_eq!(allowed.stdout, b"{\"decision\":\"allow\"}\n");
+    // A config the door refuses blocks the call (allowing it would bypass the rules the file declares).
+    world.project_config("runner: [\n");
+    let broken = world.hook(
+        &[],
+        r#"{"tool_name":"Task","tool_input":{"subagent_type":"x"}}"#,
+    );
+    assert_eq!(broken.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&broken.stderr).starts_with(
+        "BLOCKED: this Task call cannot be routed because the config is unusable: config-parse"
+    ));
+    assert!(!world.node_started());
+}
+
+#[cfg(unix)]
+#[test]
+fn agents_list_reads_the_project_and_the_payload_tiers_and_starts_no_node() {
+    let world = ExecutionWorld::new("fgos_agents");
+    let agents = world.project.join("fgos/agents");
+    fs::create_dir_all(&agents).unwrap();
+    fs::write(
+        agents.join("mine.yaml"),
+        "name: mine\ndescription: my own persona\n",
+    )
+    .unwrap();
+    fs::write(
+        agents.join("typo.yml"),
+        "name: typo\ndescription: wrong extension\n",
+    )
+    .unwrap();
+    let listed = ExecutionWorld::data(&world.run(&["agents", "list"]));
+    assert_eq!(listed["projectRoot"], world.project.display().to_string());
+    let names: Vec<(&str, &str)> = listed["agents"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|agent| {
+            (
+                agent["tier"].as_str().unwrap(),
+                agent["name"].as_str().unwrap(),
+            )
+        })
+        .collect();
+    assert_eq!(names.first(), Some(&("workspace", "mine")));
+    assert!(
+        names.iter().any(|(tier, _)| *tier == "core"),
+        "the payload's core personas are listed: {names:?}"
+    );
+    assert_eq!(
+        listed["ignored"],
+        serde_json::json!(["fgos/agents/typo.yml"])
+    );
+    let named = ExecutionWorld::data(&world.run(&[
+        "agents",
+        "list",
+        "--worktree",
+        &world.project.display().to_string(),
+    ]));
+    assert_eq!(named["projectRoot"], listed["projectRoot"]);
+    let missing_sub = world.run(&["agents"]);
+    assert_eq!(missing_sub.status.code(), Some(4));
+    assert!(!world.node_started());
+}
+
+#[cfg(unix)]
+#[test]
+fn dispatch_decide_work_asks_the_work_layer_through_the_node_bridge_for_an_item_the_store_lacks() {
+    let world = ExecutionWorld::new("fgos_decide_work_node");
+    let real_path = std::env::var("PATH").unwrap_or_default();
+    let output = world
+        .command(&[
+            "dispatch",
+            "decide",
+            "--work",
+            "tsk-unknown",
+            "--stage",
+            "plan",
+            "--has-live-task-access",
+        ])
+        .env("PATH", real_path)
+        .output()
+        .expect("failed to execute fgos");
+    assert_eq!(output.status.code(), Some(4));
+    assert_eq!(
+        String::from_utf8_lossy(&output.stderr),
+        "fgos: no work item \"tsk-unknown\" found -- cannot resolve its dispatch executor.\n"
+    );
+}

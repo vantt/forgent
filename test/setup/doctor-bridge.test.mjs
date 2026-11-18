@@ -83,3 +83,34 @@ test('as a script: a malformed request exits 2 with one refusal line', () => {
   assert.equal(run.status, 2);
   assert.match(run.stdout, /"kind":"refusal"/);
 });
+
+test('a work dispatch hint request names the item and answers one hint line then its end', async () => {
+  assert.throws(() => parseRequest('{"phase":"work-dispatch-hint","ids":[],"dir":"/p"}'), /no work item/);
+  assert.throws(() => parseRequest('{"phase":"work-dispatch-hint","ids":["a"],"dir":"/p","workId":"w"}'), /no list of ids/);
+  assert.throws(() => parseRequest('{"phase":"work-dispatch-hint","ids":[],"dir":"/p","workId":"w","stage":3}'), /stage/);
+  assert.deepEqual(parseRequest('{"phase":"work-dispatch-hint","ids":[],"dir":"/p","workId":"w","stage":"plan"}'), { phase: 'work-dispatch-hint', ids: [], dir: '/p', workId: 'w', stage: 'plan' });
+  lines.length = 0;
+  const asked = [];
+  const workHint = async (params) => { asked.push(params); return params.workId === 'known' ? { workExecutorId: null, agentType: null } : null; };
+  const request = (workId) => JSON.stringify({ phase: 'work-dispatch-hint', ids: [], dir: '/p', workId, stage: 'plan' });
+  assert.equal(await serve(request('known'), { ...collect(), workHint }), 0);
+  assert.equal(await serve(request('unknown'), { ...collect(), workHint }), 0);
+  assert.deepEqual(asked.map(({ workId, stage, fgosDir }) => ({ workId, stage, fgosDir })), [
+    { workId: 'known', stage: 'plan', fgosDir: path.join('/p', '.fgos') },
+    { workId: 'unknown', stage: 'plan', fgosDir: path.join('/p', '.fgos') },
+  ]);
+  const read = lines.map((line) => JSON.parse(line.slice(RESULT_PREFIX.length)));
+  assert.deepEqual(read.map((entry) => entry.kind), ['hint', 'end', 'hint', 'end']);
+  assert.deepEqual(read[0].hint, { workExecutorId: null, agentType: null });
+  assert.equal(read[2].hint, null);
+  assert.equal(read[1].count, 1);
+});
+
+test('a work lookup that throws is one refusal line carrying the error category', async () => {
+  lines.length = 0;
+  const workHint = async () => { throw Object.assign(new Error('the item is unreadable'), { category: 'validation' }); };
+  const code = await serve(JSON.stringify({ phase: 'work-dispatch-hint', ids: [], dir: '/p', workId: 'w' }), { ...collect(), workHint });
+  assert.equal(code, 2);
+  assert.equal(lines.length, 1);
+  assert.deepEqual(JSON.parse(lines[0].slice(RESULT_PREFIX.length)), { kind: 'refusal', message: 'the item is unreadable', category: 'validation' });
+});

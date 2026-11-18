@@ -1,12 +1,14 @@
 {
   "version": 1,
-  "about": "The contract of the Node rows bridge: the one door the Rust host uses to reach the doctor rows and fixes whose layers Node still owns (owner bridge:<step> in doctor-registry.v1.json). The host starts `module` of the legacy payload with the payload's Node, writes one request as JSON on its stdin and reads one line per result from its stdout. Only a line that starts with resultPrefix is a result, so output a body prints can never be read as one; each result is written as soon as it exists, so a crash keeps what was produced; the call ends with one `end` line carrying the number of results and, optionally, `nodeVersion` (the `process.version` of the Node that ran the call, which the host judges against the release's `requires.node` instead of starting a Node of its own), and a call without it did not finish. A malformed request or an id with no body is one `refusal` line. One more request shares the door until the Work layer moves: `work-store-init` creates the Work store of the project's `.fgos` (the Event Store rebuild `fgos init` needs); it has no ids, answers with an `end` line of count 0 when it worked, and with a `refusal` line whose optional `category` is the error's exit category when it did not. The level of a row (`status` when the row does not say it), the fix of a failing row, `ok` and `next` are the host's, never the bridge's. Each side reads `vectors`: the Node module writes exactly `line` for `kind` and `body`, the host reads `line` back as `body`. The bridge ends with the last Node-owned row.",
+  "about": "The contract of the Node rows bridge: the one door the Rust host uses to reach the doctor rows and fixes whose layers Node still owns (owner bridge:<step> in doctor-registry.v1.json). The host starts `module` of the legacy payload with the payload's Node, writes one request as JSON on its stdin and reads one line per result from its stdout. Only a line that starts with resultPrefix is a result, so output a body prints can never be read as one; each result is written as soon as it exists, so a crash keeps what was produced; the call ends with one `end` line carrying the number of results and, optionally, `nodeVersion` (the `process.version` of the Node that ran the call, which the host judges against the release's `requires.node` instead of starting a Node of its own), and a call without it did not finish. A malformed request or an id with no body is one `refusal` line. Two more requests share the door until the Work layer moves. `work-store-init` creates the Work store of the project's `.fgos` (the Event Store rebuild `fgos init` needs); it has no ids, answers with an `end` line of count 0 when it worked, and with a `refusal` line whose optional `category` is the error's exit category when it did not. `work-dispatch-hint` is the Work lookup of `fgos dispatch decide --work <id> [--stage <stage>]`: it has no ids and carries `workId` and an optional `stage`; it answers with one `hint` line (`hint` is the dispatch hint object of the Work item at that stage, or null when the Work store holds no such item) and an `end` line of count 1, and with a `refusal` line when the lookup failed. The level of a row (`status` when the row does not say it), the fix of a failing row, `ok` and `next` are the host's, never the bridge's. Each side reads `vectors`: the Node module writes exactly `line` for `kind` and `body`, the host reads `line` back as `body`. The bridge ends with the last Node-owned row.",
   "module": "src/setup/doctor-bridge.mjs",
   "resultPrefix": "\u001eFGOS-DOCTOR-BRIDGE ",
   "request": {
-    "phase": "`fix` (every id is a fix id), `check` (every id is a row id) or `work-store-init` (no ids)",
-    "ids": "a non-empty-string id each, in registry order; one call per run of consecutive fixes of the bridge, one call for every bridged row; an empty list for `work-store-init`",
-    "dir": "the project root the run acts on (for `work-store-init`, the project whose `.fgos` the store is created in)"
+    "phase": "`fix` (every id is a fix id), `check` (every id is a row id), `work-store-init` (no ids) or `work-dispatch-hint` (no ids)",
+    "ids": "a non-empty-string id each, in registry order; one call per run of consecutive fixes of the bridge, one call for every bridged row; an empty list for `work-store-init` and `work-dispatch-hint`",
+    "dir": "the project root the run acts on (for `work-store-init`, the project whose `.fgos` the store is created in; for `work-dispatch-hint`, the main checkout whose `.fgos` holds the Work store)",
+    "workId": "`work-dispatch-hint` only: the Work item id, a non-empty string",
+    "stage": "`work-dispatch-hint` only: the stage the item is dispatched at; absent when the caller named none"
   },
   "lines": {
     "row": {
@@ -44,6 +46,12 @@
       "optional": [
         "category"
       ]
+    },
+    "hint": {
+      "required": [
+        "hint"
+      ],
+      "optional": []
     }
   },
   "vectors": [
@@ -80,6 +88,27 @@
         "message": "2 repaired"
       },
       "line": "\u001eFGOS-DOCTOR-BRIDGE {\"kind\":\"fix\",\"id\":\"lock-dirs\",\"changed\":true,\"message\":\"2 repaired\"}\n"
+    },
+    {
+      "name": "the dispatch hint of a Work item",
+      "kind": "hint",
+      "body": {
+        "hint": {
+          "workExecutorId": "claude",
+          "agentType": "general-purpose",
+          "rigor": "high",
+          "domain": "coding"
+        }
+      },
+      "line": "\u001eFGOS-DOCTOR-BRIDGE {\"kind\":\"hint\",\"hint\":{\"workExecutorId\":\"claude\",\"agentType\":\"general-purpose\",\"rigor\":\"high\",\"domain\":\"coding\"}}\n"
+    },
+    {
+      "name": "the dispatch hint of a Work item the store does not hold",
+      "kind": "hint",
+      "body": {
+        "hint": null
+      },
+      "line": "\u001eFGOS-DOCTOR-BRIDGE {\"kind\":\"hint\",\"hint\":null}\n"
     },
     {
       "name": "the end of a finished call",
