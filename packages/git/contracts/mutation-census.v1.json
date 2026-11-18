@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "aa5917a6129c2b708cac030b526dc65e99e52384a4e549aa1ceb27057ab08063",
+  "payloadDigest": "a17491ea3de057af2ffe77f497eb1024fc7138b6d5ba16f76e9009d5b0d867e8",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -119,9 +119,9 @@
     "apps/fgos/src/wiring/lock_status.rs": "067bd9e25326f1142b82ce964a893a1db7c3f67af7f98632055c58b9e03831a1",
     "apps/fgos/src/wiring/mailbox_body.rs": "68910fba9f0e68ac08a823fb51e781f076395418656debaa61c316433cbaa977",
     "apps/fgos/src/wiring/mailbox_config.rs": "e2786b045220a2ca832bbe450d57f2811e1707eb943b1247f5343f1be2a827ac",
-    "apps/fgos/src/wiring/mailbox_hook.rs": "2a2fbd7ac27b9318efcf9e9c7e3a3b1d7164b2c7817360ea0cf64852ea13f27c",
+    "apps/fgos/src/wiring/mailbox_hook.rs": "7c359f0685416a7867c097cbca47407971a4bb4d64801bc612f3732c9bd76b0f",
     "apps/fgos/src/wiring/mailbox_hook_unsupported.rs": "42f2aa9df8c530b5a1534696b2dba99e8410552598691748a6518ede830d674e",
-    "apps/fgos/src/wiring/mailbox_identity.rs": "7c70629e28b90d1194db9a33061c3c662066b262b64f300a3e9f84b7b7fb062b",
+    "apps/fgos/src/wiring/mailbox_identity.rs": "683be945eddb0a628ac0433a75ada8ffc09a5a1c94382b3c2066dec1e0f22779",
     "apps/fgos/src/wiring/mailbox_ingest.rs": "1e79f3efdac0797ffb6897f98456c34d824fa99044493898c6335e41f0540054",
     "apps/fgos/src/wiring/mailbox_remote.rs": "3d1de1aed597404bae9f2e07776795bc67f6ad6f28ec750c04b5057e313dd372",
     "apps/fgos/src/wiring/mailbox_root.rs": "e04f92eaa95d71cd1273b529163f0f903b4f11f4a4de45daecdffb8748d9dbc6",
@@ -679,7 +679,7 @@
     "packages/mailbox/rust/store/src/hook/drain.rs": "ebd74a7df8c97ff2eb85d9f2930df0e71a4cfacfacb49b7b29a122ef59c36d65",
     "packages/mailbox/rust/store/src/hook/limits.rs": "c68b39d60c857406aebe81f0704ece49cf957d7803d65d3d53c12eb899613c8d",
     "packages/mailbox/rust/store/src/hook/mod.rs": "b2eefd59290d4e2aeaa9fb2556f32af3aa88fc8a3e06dd9ae4348421850cd5dd",
-    "packages/mailbox/rust/store/src/hook/outcome_log.rs": "f7a5c1411ad96cfe4a1ae8ac3913270288eefe5dc6eed5adcddde36e793e66c4",
+    "packages/mailbox/rust/store/src/hook/outcome_log.rs": "db7fa596c21a51dd641d0714e1d007e455e14b3b34920e784cb38696c5e8de5b",
     "packages/mailbox/rust/store/src/hook/resolve.rs": "f61fff66f33717da02f20d94449e4f4a110830460b2b04788700f1e039ca6cb4",
     "packages/mailbox/rust/store/src/hook/shell.rs": "c705bcbcef1b55989eba759cf007fdfc64c67e4396c6ad07de76de024570d415",
     "packages/mailbox/rust/store/src/lib.rs": "168a22d982494903bb11318dfc99d6a02d12e5cf2d09f732ca80fae6e43c2765",

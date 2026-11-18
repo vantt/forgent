@@ -30,6 +30,10 @@ struct Line<'a> {
     cli: &'static str,
     event: &'static str,
     reason: &'a str,
+    /// The head's writer key, on an outcome a head left for its own step
+    /// after the shell (`record_reason_for`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    writer: Option<&'a str>,
 }
 
 /// How many hook calls skipped their drain because the mailbox lock was
@@ -91,16 +95,29 @@ fn reason(outcome: &ShellOutcome) -> Option<String> {
 
 /// The reason of the latest recorded outcome, when one is there.
 pub fn latest_reason(paths: &Paths) -> Option<String> {
-    latest(paths).map(|(reason, _)| reason)
+    latest(paths).map(|latest| latest.reason)
 }
 
-/// The reason of the latest recorded outcome and when it was recorded
-/// (milliseconds since the epoch), when one is there.
-pub fn latest(paths: &Paths) -> Option<(String, u64)> {
+/// The latest recorded outcome as the entry reads it back.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Latest {
+    pub reason: String,
+    /// When it was recorded, in milliseconds since the epoch.
+    pub at_ms: u64,
+    /// The head it was recorded for, when it names one.
+    pub writer: Option<String>,
+}
+
+/// The latest recorded outcome, when one is there.
+pub fn latest(paths: &Paths) -> Option<Latest> {
     trusted_mailbox_dir(paths)?;
     let bytes = read_regular_capped(&paths.hook_outcome(), MAX_FILE_BYTES).ok()?;
     let line: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
-    Some((line["reason"].as_str()?.to_string(), line["atMs"].as_u64()?))
+    Some(Latest {
+        reason: line["reason"].as_str()?.to_string(),
+        at_ms: line["atMs"].as_u64()?,
+        writer: line["writer"].as_str().map(String::from),
+    })
 }
 
 /// Removes the latest outcome once what it recorded was repaired, so the
@@ -137,6 +154,30 @@ pub fn record_reason(
     reason: &str,
     now: Timestamp,
 ) {
+    write_line(paths, adapter, event, reason, None, now);
+}
+
+/// [`record_reason`] for a step of the head `writer`, which the line names,
+/// so the entry can tell its own outcome from another head's.
+pub fn record_reason_for(
+    paths: &Paths,
+    adapter: Adapter,
+    event: HookEvent,
+    reason: &str,
+    writer: &str,
+    now: Timestamp,
+) {
+    write_line(paths, adapter, event, reason, Some(writer), now);
+}
+
+fn write_line(
+    paths: &Paths,
+    adapter: Adapter,
+    event: HookEvent,
+    reason: &str,
+    writer: Option<&str>,
+    now: Timestamp,
+) {
     let Some(dir) = trusted_mailbox_dir(paths) else {
         return;
     };
@@ -149,6 +190,7 @@ pub fn record_reason(
             HookEvent::PostToolUse => "post-tool-use",
         },
         reason,
+        writer,
     };
     if let Ok(bytes) = serde_json::to_vec(&line) {
         let _ = fgos_durable_file::replace_durably(&dir, Paths::hook_outcome_name(), &bytes);
