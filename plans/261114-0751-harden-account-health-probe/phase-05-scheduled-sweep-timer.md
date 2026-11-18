@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Scheduled sweep: the mailbox timer becomes the one managed-timer door and gains the account-probe schedule"
-status: pending
+status: done
 depends_on: [3]
 parallel: "wave 3 with P04 (file-disjoint)"
 branch: harden/acct-a-p05

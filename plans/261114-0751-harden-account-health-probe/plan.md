@@ -1,15 +1,181 @@
 ---
+contract: plan-v1
 title: "HARDEN account health A: on-demand and scheduled account probe"
-description: "probe-account gains a direct leg (the account's own login, no bwrap, no herdr) beside the harness leg, four verdicts, --all, --record, a scheduled sweep, and one self-probe per account per run when a quota stop named no reset."
-status: pending
+status: done
 priority: P1
-effort: ~3.5d of lead work (5 phases); critical path P02 -> P03 -> P05 ~2.75d
-branch: mail/acct-a-plan (plan only; each phase on its own branch `harden/acct-a-pNN` in its own linked worktree, base origin/main)
-tags: [harden, account-health, provider-capacity, probe-account, doctor-timer]
+blockedBy: []
+footprint:
+  - plans/261114-0751-harden-account-health-probe/**
+  - plans/reports/phase-261114-0806-acct-a-p01.md
+  - plans/reports/phase-261114-0810-acct-a-p02.md
+  - plans/reports/phase-261114-0816-acct-a-p03.md
+  - plans/reports/phase-261114-0819-acct-a-p04.md
+  - plans/reports/phase-261114-0822-acct-a-p05.md
+  - src/runner/dispatch/provider-credential-probe.mjs
+  - src/runner/dispatch/provider-capacity.mjs
+  - src/runner/dispatch/provider-account-probe.mjs
+  - src/runner/dispatch/cli.mjs
+  - src/runner/dispatch/assignment-runner.mjs
+  - src/cli/command-registry.mjs
+  - src/setup/managed-timer.mjs
+  - src/setup/mailbox-sync-timer.mjs
+  - src/setup/registrations.mjs
+  - src/setup/uninstall-project.mjs
+  - core/config-standard/dispatch.yaml
+  - core/config-schema/dispatch.schema.yaml
+  - test/runner/provider-credential-probe.test.mjs
+  - test/runner/provider-capacity.test.mjs
+  - test/runner/provider-quarantine-probe.test.mjs
+  - test/runner/provider-account-probe.test.mjs
+  - test/runner/assignment-dispatch.test.mjs
+  - test/setup/managed-timer.test.mjs
+  - test/setup/mailbox-sync-timer.test.mjs
+  - test/setup/checks.test.mjs
+  - docs/platform/runner/subcomponents/h-6979005beaf7/spec.md
+  - docs/platform/runner/decisions/h-36d872fbb0e5.md
+  - docs/platform/packaging-distribution/spec.md
+  - docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
+  - docs/architecture-manifest.json
+  - docs/backlog.md
+  - packages/git/contracts/mutation-census.v1.json
+  - test/suite-baseline.json
+  - CHANGELOG.md
+base: 9c8f5289b7b1dc4220c23f97a2f64e024adf7f15
+source:
+  - plans/reports/research-261113-0009-account-health-check-quota-vs-infra.md
+  - plans/261113-1257-harden-account-health-run-diagnosis/plan.md
 created: 2026-11-14
 ---
 
 # HARDEN account health A: on-demand and scheduled account probe
+
+## Re-plan 2026-11-18: the plan is already delivered; it is closed, not rewritten
+
+The owner chose on 2026-11-18 (option A, via head:secretary-miu) not to run this plan as written but to rewrite it
+after S6a, so the probe would be Rust on the new runner and the timer would use the supervisor's shared timer door.
+The decision assumed the five phases were still to do. They are not: all five landed on `main` on 2026-11-14, and the
+timer was moved to Rust on 2026-11-15. The plan file was never updated (it still said `pending`). Rewriting it now
+would create a second plan for work S6a already owns, so this re-plan closes it as `done` and records where each part
+goes next.
+
+Evidence, every commit on `origin/main`:
+
+| Phase | Landed as | Report |
+|---|---|---|
+| P01 direct call returns its verdict, asks for the seat's model | `183956947` | `plans/reports/phase-261114-0806-acct-a-p01.md` |
+| P02 probe results recorded, `resetKnown`, self-probe door | `022bdf730` | `plans/reports/phase-261114-0810-acct-a-p02.md` |
+| P03 direct leg, four verdicts, `--all`, `--record`, `--leg` | `b7db97731`, fix `4ee3ab8d3`, spec `c5a068ad8` | `plans/reports/phase-261114-0816-acct-a-p03.md` |
+| P04 self-probe before launch, once per unit run (`runKey`) | `a11c6088e` | `plans/reports/phase-261114-0819-acct-a-p04.md` |
+| P05 one managed-timer door, account-probe schedule | `5628a798a` (Node), docs `9a1f0addf` | `plans/reports/phase-261114-0822-acct-a-p05.md` |
+| (after the plan) the managed timers in Rust, Node timer deleted | `f308dcf51`, `06800f2c0` | `packages/distribution/rust/src/timer.rs` |
+
+Why each owner concern is already answered, without a rewrite:
+
+- **"The probe edits Node in `src/runner/dispatch/**`, which S6a moves to Rust."** The Node code is shipped, not
+  pending. Its Rust port is already inside plan `261118-1341-s6a-execution-tier-rust`: phase 9 (engine module
+  `accounts`) ports `provider-capacity.mjs` (record, `resetKnown`, the self-probe candidate rule and `runKey`),
+  `provider-account-probe.mjs` and `provider-credential-probe.mjs` with golden vectors recorded from Node; phase 16
+  ports `assignment-runner.mjs` (the lease-time self-probe call); phase 21 makes `fgos dispatch probe-account` native
+  with argv and envelope unchanged (`--all`, `--record`, `--leg` included). A second Rust plan for the same files would
+  be two doors for one job (design principle 1, L10).
+- **"Phase 5 builds a Node timer that duplicates the supervisor's Rust timer."** The timers moved to Rust on
+  2026-11-15 (`f308dcf51`) and the Node module `src/setup/managed-timer.mjs` was deleted (`06800f2c0`); `packages/distribution/rust/src/timer.rs` has
+  `Schedule::AccountProbe` beside `Schedule::MailboxSync`. Plan `261118-1045-project-supervisor` phase 15 adds
+  `Schedule::WatcherTick` as the third variant of that same enum, so the account probe already uses the one shared
+  timer door. Nothing is left to move.
+- **"Phase 3 touches `command-registry.mjs` (OPS-METRICS), phase 5 touches `registrations.mjs` (S5 p11)."** Nothing
+  in this plan will write either file again; the footprint above is history.
+
+Contract the later plans must keep (each is already in their text; listed so a lead of those plans can check it):
+
+1. S6a phase 21 keeps `fgos dispatch probe-account --all --record --leg direct --dir <root>` accepted byte for byte:
+   that is the command the Rust timer writes into every installed account-probe unit (`timer.rs` `command`). Changing
+   it breaks installed timers until `fgos doctor --fix` rewrites them.
+2. S6a phase 9 vectors include the `resetKnown` and `probe.runKey` fields of `provider-capacity-state.v1` and the
+   `action: "probe"` audit line; `packages/execution/contracts/bind.v1.json` already reads `resetKnown`.
+3. Supervisor phase 15 adds its survival setting to the watcher unit only. Input from lead:SUPERVISION (2026-11-18,
+   `plans/261118-1045-project-supervisor/reports/spike-timer-head-start.md`, main `4eabf8a06`): a timer that starts a
+   long-running head needs PATH to the agent CLIs and herdr plus `KillMode=process` (or a `--scope` start), and launchd
+   needs `AbandonProcessGroup`. The account probe is a oneshot that exits with its call and starts nothing that must
+   outlive it, so its unit keeps the default kill mode and its PATH-only environment (`service_vars`, `probe_path`).
+
+Loose ends found after landing stay where they are: backlog row `p-d3vxsgz6to` (rc.10 live smoke: `--help` missing
+`--leg`, a doubled refresh-ahead stderr line, assignment directories left by a probe without `--record`, a codex row
+with no reason code). Under RUL104 the S6a port keeps behaviour, so these are not added to S6a; the row stays
+`proposed` for the owner to order. The first one (`--help`) is likely fixed for free once phase 21 serves help from
+route data; the phase 21 lead checks it and updates the row.
+
+## Outcome
+
+`fgos dispatch probe-account` calls each login directly beside the harness leg and returns one of `healthy`,
+`account-fault`, `harness-fault`, `mixed`, `nothing-to-probe`; `--all` sweeps every enabled account; `--record` writes
+the direct leg to capacity state and its audit log; a seat launch checks a named account whose quota stop named no
+reset with one real call per unit run; `dispatch.probeAccount.intervalSec` schedules the sweep through the managed
+timer door (now Rust). Delivered 2026-11-14; timer in Rust 2026-11-15.
+
+## Acceptance criteria
+
+Each is checkable on `main` today:
+
+1. Direct leg and verdicts: `rg -n "harness-fault" src/runner/dispatch/provider-account-probe.mjs` and the
+   `probe-account` description in `src/cli/command-registry.mjs`; tests `test/runner/provider-account-probe.test.mjs`.
+2. Record and self-probe: `rg -n "export function recordAccountProbe|runKey" src/runner/dispatch/provider-capacity.mjs`;
+   tests `test/runner/provider-capacity.test.mjs`, `test/runner/provider-quarantine-probe.test.mjs`.
+3. Lease-time self-probe: `rg -n "runKey: unitRunId" src/runner/dispatch/assignment-runner.mjs`; wiring case in
+   `test/runner/assignment-dispatch.test.mjs`.
+4. Scheduled sweep: `rg -n "AccountProbe" packages/distribution/rust/src/timer.rs`;
+   `cargo test -p fgos-distribution timer`; key in `core/config-standard/dispatch.yaml` (`probeAccount.intervalSec`, 0).
+5. Closure: `node scripts/plan-contract-check.mjs --plan plans/261114-0751-harden-account-health-probe` prints ok.
+
+## Non-goals
+
+A Rust port of the probe (owned by S6a phases 9, 16, 21); any timer change (owned by the Rust timer door and
+supervisor phase 15); the backlog loose ends in `p-d3vxsgz6to`.
+
+## Phases
+
+| id | title | depends-on | footprint | wave | status |
+|---|---|---|---|---|---|
+| 1 | [Direct call returns its verdict and asks for the seat's model](phase-01-direct-call-structured-result.md) | - | src/runner/dispatch/provider-credential-probe.mjs, test/runner/provider-credential-probe.test.mjs, plans/reports/phase-261114-0806-acct-a-p01.md | 1 | done |
+| 2 | [Capacity: probe results recorded, quota reset known/unknown, self-probe door](phase-02-capacity-probe-record-and-self-probe-door.md) | - | src/runner/dispatch/provider-capacity.mjs, test/runner/provider-capacity.test.mjs, test/runner/provider-quarantine-probe.test.mjs, plans/reports/phase-261114-0810-acct-a-p02.md | 1 | done |
+| 3 | [probe-account: direct leg, four verdicts, `--all`, `--record`](phase-03-probe-account-direct-leg-all-record.md) | 1, 2 | src/runner/dispatch/provider-account-probe.mjs, src/runner/dispatch/cli.mjs, src/cli/command-registry.mjs, test/runner/provider-account-probe.test.mjs, docs/platform/runner/subcomponents/h-6979005beaf7/spec.md, docs/platform/runner/decisions/h-36d872fbb0e5.md, plans/reports/phase-261114-0816-acct-a-p03.md | 2 | done |
+| 4 | [Self-probe before launch, once per account per run](phase-04-self-probe-before-launch.md) | 1, 2, 3 | src/runner/dispatch/assignment-runner.mjs, test/runner/assignment-dispatch.test.mjs, plans/reports/phase-261114-0819-acct-a-p04.md | 3 | done |
+| 5 | [Scheduled sweep: one managed timer door](phase-05-scheduled-sweep-timer.md) | 3 | src/setup/managed-timer.mjs, src/setup/mailbox-sync-timer.mjs, src/setup/registrations.mjs, src/setup/uninstall-project.mjs, core/config-standard/dispatch.yaml, core/config-schema/dispatch.schema.yaml, test/setup/managed-timer.test.mjs, test/setup/mailbox-sync-timer.test.mjs, test/setup/checks.test.mjs, docs/architecture-manifest.json, docs/platform/packaging-distribution/spec.md, docs/platform/packaging-distribution/contracts/setup-doctor-registry.md, plans/reports/phase-261114-0822-acct-a-p05.md | 3 | done |
+
+Generated and shared files written at landing, not by a phase: `packages/git/contracts/mutation-census.v1.json`,
+`test/suite-baseline.json`, `CHANGELOG.md`, `docs/backlog.md`. Contract check by reading: every phase sits in a later
+wave than its dependencies; wave 1 (P1 vs P2) and wave 3 (P4 vs P5) footprints are disjoint. Script result in the
+Validation log.
+
+## Owner questions
+
+None. The rewrite the owner asked for on 2026-11-18 rested on the plan being unexecuted; the evidence table above
+shows it was delivered, so the plan is closed instead (decided from evidence, reported to head:secretary-miu). If the
+owner still wants a separate plan, its only possible content is S6a phases 9, 16 and 21, which already exist.
+
+## Risks and rollback
+
+| Risk | L x I | Mitigation |
+|---|---|---|
+| S6a phase 21 changes the `probe-account` argv the installed timers call | L x M | contract item 1 above; phase 21 already requires argv unchanged |
+| S6a phase 9 drops `resetKnown`/`runKey` in the port | L x M | contract item 2; vectors recorded from Node include them |
+| Supervisor phase 15 applies `KillMode=process` to every schedule | L x L | contract item 3; phase 15 step 4 scopes it to the watcher unit |
+
+Rollback of this re-plan: revert its one commit; the plan returns to its 2026-11-14 text. The delivered code is not
+touched by this plan any more; reverting any of it follows the per-phase notes in the history below.
+
+## Validation log
+
+- 2026-11-18 lead:PROBE-REPLAN: re-plan on `origin/main` `2086b4b31`. Prior art: `git log -S` on
+  `recordAccountProbe`, `resetKnown`, `runKey`, `probeAccount`, `modelArgs`, `--leg` found the landed commits listed
+  above and `f308dcf51` (Rust timers); no Rust probe exists yet outside S6a's plan. Status migrated `pending` -> `done`
+  (contract legacy map), phase files `pending` -> `done`.
+- 2026-11-18 lead:PROBE-REPLAN: `scripts/plan-contract-check.mjs --plan` (main checkout's script, staged addon env, plan path absolute) prints `ok`.
+
+## History: the plan as written on 2026-11-14
+
+The text below is the original plan, kept unchanged as the record the phase files and reports cite.
+
 
 Input: [research section 5A and 7](../reports/research-261113-0009-account-health-check-quota-vs-infra.md), [B plan](../261113-1257-harden-account-health-run-diagnosis/plan.md) (fully landed on main: P01..P06, last range `161e82ac2..145578359`, board line `9c8f5289b`). Baseline `origin/main` `9c8f5289b` (2026-11-14); every `file:line` below was read there. Each lead re-reads by symbol before the first edit.
 
@@ -17,7 +183,7 @@ Scope: exactly the five HARDEN decisions (owner-approved): (1) a direct leg besi
 
 Citations: RUL104, RUL11, L1 (log vs state), L10 (through the door), design principles 1 (one door), 2 (bottom-up), 8 (one owning proof); runner spec RUL74 (lazy unlock after one real call, `3b6b152ee`), RUL79 (probe-account, `80cf7a8a6`). Impact analysis: `fgos tool query` cannot run inside the plan worktree (no `.fgos/installation`); the B plan found 0 providers, so **impact-analysis: inactive**; blast radius below is from `git grep` on `origin/main`.
 
-## Prior art (what existed, what is reused, what is missing)
+### Prior art (what existed, what is reused, what is missing)
 
 | Thing | Where | Reused as |
 |---|---|---|
@@ -31,7 +197,7 @@ Citations: RUL104, RUL11, L1 (log vs state), L10 (through the door), design prin
 
 `git log -S` for `probe-account`, `capacityEvent`, `capacity-event`, `provider-health`, `accountHealth`, `healthProbe`: only RUL79's introduction and its docs; no removed sweeper or timer to revive.
 
-## Phases
+### Phases
 
 | # | Phase | Depends on | Effort | Status |
 |---|---|---|---|---|
@@ -45,7 +211,7 @@ Citations: RUL104, RUL11, L1 (log vs state), L10 (through the door), design prin
 
 **Shared files written only at landing, never inside a phase:** `CHANGELOG.md`, `packages/git/contracts/mutation-census.v1.json` (regenerate with `node scripts/git-one-door-scan.mjs --root . --write-census`, never hand-merge), `test/suite-baseline.json` (regenerate with `scripts/test-proof-inventory.mjs --write-baseline` when a test file is added or removed). No phase touches Rust or `Cargo.lock` (the addon door `agentProtocol.classifyDirect` already exists, `packages/git/node-addon/src/agent_protocol.rs`).
 
-## Data flow (after)
+### Data flow (after)
 
 ```
 manual:    fgos dispatch probe-account --provider P --account A | --all [--record] [--leg direct]   (P03)
@@ -66,7 +232,7 @@ run (P04): leaseAccountForAttempt -> probeQuarantinedAccounts({..., accountId, r
      -> same direct call (createCredentialProbe) -> recordAccountProbe -> lease (refused -> existing rebind)
 ```
 
-## Contract changes
+### Contract changes
 
 | Contract | Change | Phase |
 |---|---|---|
@@ -76,7 +242,7 @@ run (P04): leaseAccountForAttempt -> probeQuarantinedAccounts({..., accountId, r
 | `fgos dispatch probe-account` JSON | `verdict` vocabulary: `cli-fault` and `no-confined-cli` retire, `harness-fault` added; each row gains `leg`; `--all` returns `{accounts: [...]}` | P03 |
 | config `dispatch.probeAccount.intervalSec` (D5) | new key, default 0 (off), in `core/config-standard/dispatch.yaml` + `core/config-schema/dispatch.schema.yaml` | P05 |
 
-## Decisions for HARDEN
+### Decisions for HARDEN
 
 Each follows `core/skills/_shared/decision-question.md`. All are inside the five approved decisions except D4 (one more flag), which is why it is asked.
 
@@ -129,7 +295,7 @@ Each follows `core/skills/_shared/decision-question.md`. All are inside the five
 - Recommendation: (a): the owner's rule literally; spend is bounded by the number of unit runs that reach that account.
 - Scope of answer: the quota self-probe guard only.
 
-## Decided by analysis (not questions)
+### Decided by analysis (not questions)
 
 1. **Legs run in order, direct first, per account.** The direct call runs in the account's real home and may rotate a refresh token (credential probe header `:5-7`); the harness leg copies the login into a private home. Direct first, under the account lock, means the harness copies the fresh token.
 2. **Accounts are swept one after another.** Parallel accounts would open up to ~20 rounds at once and two families can share one login home (`openrouter` under z-ai and deepseek); account locks are per provider/account, not per home.
@@ -139,14 +305,14 @@ Each follows `core/skills/_shared/decision-question.md`. All are inside the five
 6. **"Latest failure" is read from the state record, not from `audit.jsonl`.** `setQuarantine` (`:752`) overwrites the record on every quarantining fault, so the record is the latest one; scanning a log on the lease path is L1-wrong (log is history, state is the view). An expired quota record stays in `state.json` until overwritten or cleared (`isQuarantined` `:538` only compares `until`), which is exactly the marker D6(a) needs.
 7. **`--all` refuses `--provider`, `--account`, `--executor`, `--invocation`**, and skips accounts with `disabled: true` (listed as `skipped: disabled`). No narrowing flags added.
 
-## Backwards compatibility
+### Backwards compatibility
 
 - `probe-account --provider P --account A` without new flags keeps running the harness leg as today and now also the direct leg; JSON adds `leg` on rows and the verdict vocabulary changes (CHANGELOG line). No other program parses it (`git grep` above).
 - Quota records written before A have no `resetKnown`: read as known, never self-probed; the next quota stop writes the field.
 - Old `audit.jsonl` readers: none in `src` read records by action except `inspectProviderCapacity`, which reads `state.json` only; a new action is inert to them.
 - Timer: off by default (`intervalSec: 0`); a machine that never sets it sees one doctor row `info: not scheduled` (P05 decides the exact status per `docs/platform/packaging-distribution/contracts/setup-doctor-registry.md` section 3).
 
-## Test matrix (one owning proof per behaviour)
+### Test matrix (one owning proof per behaviour)
 
 | Behaviour | Owning proof (lowest layer) | Phase |
 |---|---|---|
@@ -158,7 +324,7 @@ Each follows `core/skills/_shared/decision-question.md`. All are inside the five
 
 No e2e: a real provider call is spend; the CLI wiring proof is the drift test plus one `runDispatchCli` case with injected doors.
 
-## Risk summary
+### Risk summary
 
 | Risk | L x I | Mitigation |
 |---|---|---|
@@ -169,16 +335,16 @@ No e2e: a real provider call is spend; the CLI wiring proof is the drift test pl
 | Timer generalisation breaks mailbox sync | L x H | mailbox tests stay unchanged and green; unit file names and marker string unchanged for mailbox |
 | Timer env lacks a herdr session | M x M | D4 (b): the timer never opens panes |
 
-## Rollback
+### Rollback
 
 Each phase is one merge commit, revertable alone in reverse landing order (P05, P04, P03, P02, P01). P02 data: `resetKnown`/`probe.runKey` fields are ignored by the old reader; `probe` lines stay in `audit.jsonl` unread. P05: before reverting, `fgos doctor --fix` with `intervalSec: 0` removes the probe timer units (marker-owned); a revert without that leaves a timer calling a flag that may not exist (it fails and logs, nothing else).
 
-## OPC conditions (process and Git call sites)
+### OPC conditions (process and Git call sites)
 
 - No phase adds a Git call; `node scripts/git-one-door-scan.mjs --root .` count must not rise.
 - No phase adds a spawn/exec site: the direct leg reuses `runCredentialProbe`'s `spawn` through the account lock's `spawnHolding`; the timer reuses `mailbox-sync-timer.mjs`'s `systemctl`/`launchctl` runner (`:90-91` of the module body). If a lead finds a new site is needed, stop and ask lead:OPC (claude-muyt@fg-server2) with the site, why the existing door does not serve, and the census diff, before writing it.
 
-## Landing
+### Landing
 
 - B is on main (`9c8f5289b`). Main is frozen until tag `v0.2.0-rc.8` is out; A phases develop, test and push on `harden/acct-a-pNN` (one linked worktree each, own `CARGO_TARGET_DIR` only if Rust is touched, which no phase plans), never land. After the tag, the landing lead rebases each on `origin/main` and lands one at a time in dependency order (P01, P02, P03, P04, P05).
 - CHANGELOG lines (added at landing, `[Unreleased]`):
@@ -186,7 +352,7 @@ Each phase is one merge commit, revertable alone in reverse landing order (P05, 
   - P02+P04: "An account whose last quota stop named no reset time is checked with one real call, at most once per run, before a seat uses it again: a still-exhausted account stays out, a recovered one is released early."
   - P05: "`dispatch.probeAccount.intervalSec` schedules `probe-account --all --record --leg direct`; `fgos doctor --fix` writes the timer (off by default)."
 
-## Budget
+### Budget
 
 | Phase | src | test | docs | days |
 |---|---|---|---|---|
@@ -199,7 +365,7 @@ Each phase is one merge commit, revertable alone in reverse landing order (P05, 
 
 Provider spend for proof: none in tests (injected spawn/dispatch); one manual `--all` smoke after P03 (~30 cheap calls with both legs) and one timer tick after P05 (~15 calls), each named in the lead report.
 
-## Success criteria (observable)
+### Success criteria (observable)
 
 - `fgos dispatch probe-account --provider gemini --account tetcu72` prints a `direct` row per login store with `reason`, `providerSignal`, `elapsedMs`, harness rows as today, and one of the four verdicts.
 - With an exhausted account, `--record` leaves `state.json` quarantine `quota-limit` dated from the provider signal and two audit lines (`fault` with `source: probe`, `probe`).
@@ -207,6 +373,6 @@ Provider spend for proof: none in tests (injected spawn/dispatch); one manual `-
 - A unit run whose bound account carries an expired `quota-limit` record with `resetKnown: false` makes exactly one direct call for it, however many seats lease it.
 - With `dispatch.probeAccount.intervalSec: 21600`, `fgos doctor --fix` writes and enables `fgos-account-probe-<hash>` units; with 0 it removes only marked units; mailbox timer tests unchanged.
 
-## Open questions
+### Open questions
 
 D1-D7 above; D4 is the only one that widens the approved scope (one flag). No phase waits on another plan.

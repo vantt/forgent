@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "probe-account: a direct leg beside the harness leg, four verdicts, --all, --record"
-status: pending
+status: done
 depends_on: [1, 2]
 parallel: "wave 2, alone (shares the runner spec with P02 and P04)"
 branch: harden/acct-a-p03

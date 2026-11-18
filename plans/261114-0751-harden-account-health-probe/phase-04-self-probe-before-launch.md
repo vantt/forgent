@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Self-probe before launch: once per account per unit run when the last quota stop named no reset"
-status: pending
+status: done
 depends_on: [1, 2, 3]
 parallel: "wave 3 with P05 (file-disjoint); after P03 only because both edit the runner spec"
 branch: harden/acct-a-p04

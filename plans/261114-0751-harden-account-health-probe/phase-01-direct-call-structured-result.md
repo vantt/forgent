@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "The direct call returns its verdict and asks for the seat's model"
-status: pending
+status: done
 depends_on: []
 parallel: "wave 1 with P02 (file-disjoint)"
 branch: harden/acct-a-p01

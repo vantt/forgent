@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Capacity: a probe result is recorded, a quota record says whether its reset was known, and the unlock door takes quota self-probes"
-status: pending
+status: done
 depends_on: []
 parallel: "wave 1 with P01 (file-disjoint)"
 branch: harden/acct-a-p02
