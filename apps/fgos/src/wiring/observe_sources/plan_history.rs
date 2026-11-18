@@ -1,9 +1,10 @@
 //! `fgos.plan.status` and `fgos.plan.activity`, projected from git history (through the Git component door) and from
 //! the program board log. Nothing is stored: every query walks the history again.
 //!
-//! Commits are read from every branch tip (HEAD, local and remote branches). A merge commit is skipped: the commits
-//! it brings in are walked on their own, so a transition is recorded once, at the commit that made it. A root commit
-//! has nothing to compare with and records nothing.
+//! Commits are read from every branch tip (HEAD, local and remote branches) through the Git door `walk_changes`,
+//! limited to `plans/`. A merge commit reports no change of its own: the commits it brings in are walked on their
+//! own, so a transition is recorded once, at the commit that made it. A root commit has nothing to compare with and
+//! records nothing.
 //!
 //! A record's subject is the plan, `plan:plans/<dir>`, the id a run attempt's plan ref carries.
 //!
@@ -13,15 +14,16 @@
 //! is absent. The id is `(plan dir, change, from, to, author time)`, so a rebased copy of the same transition on a
 //! stale branch is one record; of the copies, the one committed first (then the smaller sha) is kept.
 //!
-//! The walk is bounded (`WALK_LIMIT` commits). Every commit record carries `fgos.plan.history`: `complete` when the
-//! walk reached the window's start or the root, `truncated` when the bound stopped it first, so older transitions
-//! missing from the answer are a stated gap, not a silent one.
+//! The walk is bounded (`WALK_LIMIT` plan-touching commits, newest kept). Every commit record carries
+//! `fgos.plan.history`: `complete` when the walk reached the window's start or the root, `truncated` when the bound
+//! stopped it first, so older transitions missing from the
+//! answer are a stated gap, not a silent one.
 
 use super::plan_text::{log_line, plan_dir_names, plan_fields, PlanFields};
 use super::{PLAN_ACTIVITY_KIND, PLAN_STATUS_KIND};
 use fgos_git::{
-    DiffScope, DiffSides, GitDriver, HeadFact, Inspect, Oid, PathRead, PathValue, ReadObject,
-    RefPrefix, RefValue, RepoHandle, ResolveRepo, WalkBounds,
+    GitDriver, HeadFact, Inspect, Oid, PathRead, PathValue, RefPrefix, RefValue, RepoHandle,
+    ResolveRepo, Since, WalkChanges,
 };
 use fgos_host_runtime::civil_time::{
     days_from_civil, format_unix_millis_rfc3339, parse_rfc3339_millis,
@@ -35,14 +37,14 @@ use std::path::{Path, PathBuf};
 
 const SOURCE_ID: &str = "plan-history";
 const WALK_LIMIT: usize = 20_000;
+/// Plan files read per batch.
 const WALK_PAGE: usize = 250;
-const WALK_BYTES: usize = 8 * 1024 * 1024;
-/// The total of one batch of commit objects; a page holds `WALK_PAGE` commits of a few hundred bytes to a few KB.
-const COMMIT_OBJECT_BYTES: usize = 8 * 1024 * 1024;
+/// The bound on the history read's output.
+const WALK_BYTES: usize = 64 * 1024 * 1024;
 const PLAN_FILE_BYTES: usize = 256 * 1024;
 const BOARD_LOG: &str = "plans/261017-1313-fgos-platform-program-board/log.md";
-/// A page older than the window by more than this is the end of what can still hold a commit inside it: the walk
-/// follows parents, and a branch can carry commits whose time runs a little behind its parent's.
+/// Board log lines are read until one is older than the window by more than this: the log is newest first, but a
+/// line's stamp can run a little behind the one above it.
 const WINDOW_SLACK_MS: i64 = 3 * 24 * 3600 * 1000;
 
 /// Reads the plan history of the repository at the project root. `state_root` is the Git door's state directory;
@@ -302,7 +304,7 @@ fn blob_text(read: Option<&PathRead>) -> Option<String> {
     }
 }
 
-/// A commit of the current page whose `plan.md` of `dir` changed: its two sides are read in one batch per page.
+/// A commit whose `plan.md` of `dir` changed: its two sides are read in one batch.
 struct PlanFileChange {
     dir: String,
     parent: Oid,
@@ -318,199 +320,114 @@ fn commit_records(
     walk_limit: usize,
 ) -> Result<Vec<Record>, String> {
     let tips = tips(driver, repo)?;
-    if tips.is_empty() {
-        return Ok(Vec::new());
-    }
+    // The door takes whole seconds: the first second whose millisecond start is inside the window.
+    let since_seconds = since.map(|ms| (ms + 999).div_euclid(1000));
+    let found = driver
+        .walk_changes(
+            repo,
+            &WalkChanges {
+                tips: &tips,
+                first_parent: false,
+                since: since_seconds.map(Since::Instant),
+                paths: &["plans"],
+                renames: false,
+                max_commits: walk_limit.max(1),
+                max_bytes: WALK_BYTES,
+            },
+        )
+        .map_err(|e| e.cause)?;
     let mut out = Vec::new();
     // Transition id → (committer time, sha, record): a rebased copy keeps the copy committed first.
     let mut transitions: BTreeMap<String, (i64, String, Record)> = BTreeMap::new();
-    let mut walked = 0usize;
-    let mut truncated = false;
-    let mut cursor = None;
-    loop {
-        let page = driver
-            .walk_commits(
-                repo,
-                &tips,
-                &[],
-                cursor,
-                WalkBounds {
-                    max_commits: WALK_PAGE.min(walk_limit).max(1),
-                    max_bytes: WALK_BYTES,
-                },
-            )
-            .map_err(|e| e.cause)?;
-        let oids: Vec<Oid> = page.commits.iter().map(|c| c.oid.clone()).collect();
-        let times = commit_times(driver, repo, &oids)?;
-        // The walk interleaves every branch, so a page mixes old and new commits: only a page whose newest commit
-        // is already older than the window ends the walk.
-        let newest_in_page = times.iter().flatten().map(|t| t.committer).max();
-        let mut plan_files = Vec::new();
-        for (commit, time) in page.commits.iter().zip(&times) {
-            walked += 1;
-            let Some(time) = *time else { continue };
-            if since.is_some_and(|s| time.committer < s) {
-                continue; // Outside the window: no need to diff it.
-            }
-            let [parent] = commit.parents.as_slice() else {
-                continue; // A root has nothing to compare with; a merge is its parents' commits.
-            };
-            let changed = changed_plan_paths(driver, repo, parent, &commit.oid)?;
-            if changed.is_empty() {
-                continue;
-            }
-            let Some(ts) = utc(time.committer) else {
-                continue;
-            };
-            let sha = commit.oid.as_str();
-            let mut dirs: BTreeMap<String, bool> = BTreeMap::new();
-            for (dir, is_plan_file) in changed {
-                *dirs.entry(dir).or_default() |= is_plan_file;
-            }
-            for (dir, plan_file_changed) in dirs {
-                out.push(record(
-                    format!("plan-activity:commit:plans/{dir}:{sha}"),
-                    PLAN_ACTIVITY_KIND,
-                    ts.clone(),
-                    &dir,
-                    BTreeMap::from([
-                        ("fgos.plan.activity.source".to_owned(), text("commit")),
-                        ("fgos.git.commit".to_owned(), text(sha)),
-                    ]),
-                ));
-                if plan_file_changed {
-                    plan_files.push(PlanFileChange {
-                        dir,
-                        parent: parent.clone(),
-                        commit: commit.oid.clone(),
-                        ts: ts.clone(),
-                        times: time,
-                    });
-                }
+    let mut plan_files = Vec::new();
+    for commit in &found.commits {
+        let Some(parent) = &commit.parent else {
+            continue; // A root has nothing to compare with; a merge reports no change of its own.
+        };
+        let times = CommitTimes {
+            author: commit.author_time * 1000,
+            committer: commit.commit_time * 1000,
+        };
+        let Some(ts) = utc(times.committer) else {
+            continue;
+        };
+        let sha = commit.oid.as_str();
+        let mut dirs: BTreeMap<String, bool> = BTreeMap::new();
+        for (dir, is_plan_file) in commit.changes.iter().filter_map(|c| plan_path(&c.path)) {
+            *dirs.entry(dir).or_default() |= is_plan_file;
+        }
+        for (dir, plan_file_changed) in dirs {
+            out.push(record(
+                format!("plan-activity:commit:plans/{dir}:{sha}"),
+                PLAN_ACTIVITY_KIND,
+                ts.clone(),
+                &dir,
+                BTreeMap::from([
+                    ("fgos.plan.activity.source".to_owned(), text("commit")),
+                    ("fgos.git.commit".to_owned(), text(sha)),
+                ]),
+            ));
+            if plan_file_changed {
+                plan_files.push(PlanFileChange {
+                    dir,
+                    parent: parent.clone(),
+                    commit: commit.oid.clone(),
+                    ts: ts.clone(),
+                    times,
+                });
             }
         }
-        if !plan_files.is_empty() {
-            let reads: Vec<(Oid, Vec<Vec<u8>>)> = plan_files
-                .iter()
-                .flat_map(|c| {
-                    let path = format!("plans/{}/plan.md", c.dir).into_bytes();
-                    [
-                        (c.parent.clone(), vec![path.clone()]),
-                        (c.commit.clone(), vec![path]),
-                    ]
-                })
-                .collect();
-            let answers = driver
-                .read_paths_at_many(repo, &reads, PLAN_FILE_BYTES)
-                .map_err(|e| e.cause)?;
-            for (change, sides) in plan_files.iter().zip(answers.chunks(2)) {
-                let [before, after] = sides else { continue };
-                let before = blob_text(before.first()).map(|t| plan_fields(&t));
-                let Some(after) = blob_text(after.first()).map(|t| plan_fields(&t)) else {
-                    continue; // The plan file was deleted: no value to record.
-                };
-                let sha = change.commit.as_str();
-                for found in status_transitions(
-                    &change.dir,
-                    sha,
-                    &change.ts,
-                    change.times.author,
-                    before.as_ref(),
-                    &after,
-                ) {
-                    let key = (change.times.committer, sha.to_owned());
-                    match transitions.get(&found.id) {
-                        Some((ms, kept, _)) if (*ms, kept.as_str()) <= (key.0, key.1.as_str()) => {}
-                        _ => {
-                            transitions.insert(found.id.clone(), (key.0, key.1, found));
-                        }
+    }
+    for batch in plan_files.chunks(WALK_PAGE) {
+        let reads: Vec<(Oid, Vec<Vec<u8>>)> = batch
+            .iter()
+            .flat_map(|c| {
+                let path = format!("plans/{}/plan.md", c.dir).into_bytes();
+                [
+                    (c.parent.clone(), vec![path.clone()]),
+                    (c.commit.clone(), vec![path]),
+                ]
+            })
+            .collect();
+        let answers = driver
+            .read_paths_at_many(repo, &reads, PLAN_FILE_BYTES)
+            .map_err(|e| e.cause)?;
+        for (change, sides) in batch.iter().zip(answers.chunks(2)) {
+            let [before, after] = sides else { continue };
+            let before = blob_text(before.first()).map(|t| plan_fields(&t));
+            let Some(after) = blob_text(after.first()).map(|t| plan_fields(&t)) else {
+                continue; // The plan file was deleted: no value to record.
+            };
+            let sha = change.commit.as_str();
+            for found in status_transitions(
+                &change.dir,
+                sha,
+                &change.ts,
+                change.times.author,
+                before.as_ref(),
+                &after,
+            ) {
+                let key = (change.times.committer, sha.to_owned());
+                match transitions.get(&found.id) {
+                    Some((ms, kept, _)) if (*ms, kept.as_str()) <= (key.0, key.1.as_str()) => {}
+                    _ => {
+                        transitions.insert(found.id.clone(), (key.0, key.1, found));
                     }
                 }
             }
         }
-        let past_window =
-            since.is_some_and(|s| newest_in_page.is_some_and(|n| n < s - WINDOW_SLACK_MS));
-        match page.next_cursor {
-            Some(next) if !page.complete && !past_window => {
-                if walked >= walk_limit {
-                    truncated = true;
-                    break;
-                }
-                cursor = Some(next);
-            }
-            _ => break,
-        }
     }
     out.extend(transitions.into_values().map(|(_, _, r)| r));
-    let history = text(if truncated { "truncated" } else { "complete" });
+    let history = text(if found.truncated {
+        "truncated"
+    } else {
+        "complete"
+    });
     for r in &mut out {
         r.attrs
             .insert("fgos.plan.history".to_owned(), history.clone());
     }
     Ok(out)
-}
-
-/// The author and committer times of each commit, read from the commit objects in one batch. A commit the
-/// repository cannot show, or one without both readable lines, is `None`.
-fn commit_times(
-    driver: &GitDriver,
-    repo: &RepoHandle,
-    ids: &[Oid],
-) -> Result<Vec<Option<CommitTimes>>, String> {
-    let objects = driver
-        .read_objects(repo, ids, COMMIT_OBJECT_BYTES)
-        .map_err(|e| e.cause)?;
-    Ok(objects
-        .into_iter()
-        .map(|object| match object {
-            ReadObject::Present { bytes, .. } => Some(CommitTimes {
-                author: header_seconds(&bytes, b"author ")? * 1000,
-                committer: header_seconds(&bytes, b"committer ")? * 1000,
-            }),
-            ReadObject::Missing => None,
-        })
-        .collect())
-}
-
-/// `<field> Name <mail> 1700000000 +0700` in the header of a raw commit object.
-fn header_seconds(commit: &[u8], field: &[u8]) -> Option<i64> {
-    let mut header = commit.split(|b| *b == b'\n').take_while(|l| !l.is_empty());
-    let line = header.find(|l| l.starts_with(field))?;
-    let line = std::str::from_utf8(line).ok()?;
-    let mut tail = line.rsplit(' ');
-    let _zone = tail.next()?;
-    tail.next()?.parse().ok()
-}
-
-fn changed_plan_paths(
-    driver: &GitDriver,
-    repo: &RepoHandle,
-    parent: &Oid,
-    commit: &Oid,
-) -> Result<Vec<(String, bool)>, String> {
-    let scope = DiffScope {
-        prefix: Some("plans/"),
-        renames: false,
-    };
-    let mut changed = Vec::new();
-    let mut cursor = None;
-    loop {
-        let page = driver
-            .diff(
-                repo,
-                DiffSides::Objects(parent, commit),
-                &scope,
-                cursor,
-                4096,
-            )
-            .map_err(|e| e.cause)?;
-        changed.extend(page.entries.iter().filter_map(|e| plan_path(&e.path)));
-        match page.next_cursor {
-            Some(next) if !page.complete => cursor = Some(next),
-            _ => break,
-        }
-    }
-    Ok(changed)
 }
 
 /// The machine's offset from UTC at `unix_secs`, in seconds. The board log carries local wall-clock stamps and no

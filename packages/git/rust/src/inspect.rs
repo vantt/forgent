@@ -15,7 +15,7 @@ fn oid(repo: &RepoHandle, bytes: &[u8]) -> Result<Oid> {
     )
     .map_err(|_| failure("invalid-object-id"))
 }
-fn records(bytes: &[u8]) -> Result<Vec<&[u8]>> {
+pub(crate) fn records(bytes: &[u8]) -> Result<Vec<&[u8]>> {
     if bytes.is_empty() {
         return Ok(vec![]);
     }
@@ -100,7 +100,7 @@ pub struct AttributeFact {
 }
 /// A canonical repository-relative prefix (a trailing `/` is accepted), never
 /// pathspec magic, a glob or a traversal.
-fn literal_prefix(raw: &str) -> Result<&str> {
+pub(crate) fn literal_prefix(raw: &str) -> Result<&str> {
     let prefix = raw.strip_suffix('/').unwrap_or(raw);
     if prefix.is_empty()
         || prefix.chars().any(char::is_control)

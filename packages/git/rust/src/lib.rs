@@ -20,6 +20,8 @@ pub use worktree::{
 };
 mod remote;
 mod sequence;
+mod walk_changes;
+pub use walk_changes::{ChangedCommit, ChangedCommits, PathChange, Since, WalkChanges};
 pub mod store_admission;
 pub use inspect::*;
 pub use remote::{RefMapping, RemoteRef};
