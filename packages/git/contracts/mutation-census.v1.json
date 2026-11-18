@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "144a819a9b073ed7d60f52d571f0016ccb7662889ce120bee78db01ff6a8820d",
+  "payloadDigest": "ba5a4eee828f3df7b249a39ea9f1acc9d2ae14fcc6a99b876aeea69773d876a0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -864,7 +864,7 @@
     "packages/supervision/rust/src/supervisor.rs": "108d951d7694d9372ca6ed62b3cae3dad46a6729b6ca495f4d92f870ce6a88ac",
     "packages/supervision/rust/src/wake.rs": "5b66c7f805a75cc193da6484f1d84a2e916018015250f95c4b9027c33b55b4c9",
     "packages/supervision/rust/src/watcher.rs": "fe233a725dc44a7cd66ccdcbb45035f102c84fdf66c930937ce15fb42f7c72a9",
-    "packages/supervision/rust/tests/portfolio.rs": "936dba6f372d20c1e835ce633f01295be370ab1d69c789b6411667f98ca124da",
+    "packages/supervision/rust/tests/portfolio.rs": "8ae4a3f0a0855134276cb46a5daf00cc0a9b0f27af2a43dd825713c02bc9b7bd",
     "packages/terminal-control/rust/src/core.rs": "0fa67399b5c1e59ac6accc448f58675cae90255659685254b48f428631ab66eb",
     "packages/terminal-control/rust/src/driver/herdr.rs": "8e43d642128ef3072b5009f835cdbeb9d03b89711b4be210f370a5953dd749a6",
     "packages/terminal-control/rust/src/driver/mod.rs": "72f4bbc3f4d1c55704fbe1e0cedd1d6ed1e526d5f06838c97ac32bbeab8c175c",
