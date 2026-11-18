@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0-rc.12] - 2026-11-18
+
 - New secretary persona (`core/agents/secretary.yaml`, tier `standard`) and the `/handoff` skill: `fgos head start secretary --name miu` opens the owner's long-lived front session (a confined head session: the herdr socket and the user runtime directory stay masked, writes go only to its grant `plans`, `docs/backlog.md`, `docs/discussions`), and `/handoff` inside a head session asks for its replacement through `fgos head rotate`. A new core shaper (`fgos-shaping`) shapes any domain that has no shaper of its own, and `fgos-clarifying` answers "unsure" instead of defaulting to `coding`; the domain registry now names every domain under `domains/` (so `marketing` is classified).
 - Session rotation settings in the project config, registered in the standard and schema: `sessionRotation.soft` (0.4), `hard` (0.7), `keep` (10 handoff files per persona and name), `windowSize` (1000000), `answerWaitMs` (120000) and per-persona overrides under `sessionRotation.personas`. Handoff files are written, redacted and immutable, under `.fgos/runtime/session-rotation/<persona>-<name>/`.
 - Discussions moved from `docs/history/<slug>/DISCUSSION.md` to `docs/discussions/<slug>/` (Convention kind `discussion`; open questions in `QUESTIONS.md`), and `fgos questions --open` lists the open owner questions of the discussion, plan and execution stages in one batch.
