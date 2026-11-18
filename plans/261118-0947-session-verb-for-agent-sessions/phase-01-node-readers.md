@@ -17,6 +17,20 @@ Decisions: SV-2, SV-3, SV-4 (plan.md). Evidence: scan report §1, §8.
 - Docs: `docs/platform/runner/subcomponents/h-ce5b9771a26a/spec.md:38`, `docs/platform/runner/operations/h-51f5cd7279fd.md`
   (~281, 664-778), `docs/platform/runner/contracts/conserved-dispatch-doctrine.md:31-33`, `docs/architecture-manifest.json`.
 
+## Facts re-checked on origin/main 4cde6c9de (lead, 2026-11-18)
+- Lines moved: `bin/fgos.mjs` import :100, guard :3140-3158; `approve.mjs` import :57, loop :232-241, refusal :243-256;
+  `merge.mjs` import :47/:52, `detectPostLandDrift` :348, call :1036; `checkLeafNotifyDrift` :939, row :1077;
+  doctor-registry row :360 (no Rust mirror); manifest entry :1675; `test/architecture.test.mjs:1694` lists `session.mjs`.
+- `postLand` consumers: `approve.mjs:655,668,853,866`, `src/verbs/merge/sync-root.mjs:226`.
+- Extra tests to retire/adjust: `test/state/postland-drift.test.mjs`, `test/runner/merge.test.mjs` (`detectPostLandDrift`
+  cases ~1451-1594), `test/runner/merge-quoted-paths.test.mjs` (~102-117), `test/direct/merge-gate.test.mjs` (~428:
+  the "verify breaks the session registry" case), `test/test-ownership.mjs:68`, `test/suite-baseline.json:540`;
+  `startSession`/`endSession` have ~28 importers under `test/cli/**` (all of them move).
+- Comment-only mentions to fix: `src/runner/worktree.mjs:206-207,281`, `test/runner/paths.test.mjs:58`.
+- Not this phase (left for phase 4): `src/util/session-identity.mjs`, `src/cli/command-registry.mjs` identity text,
+  `test/util/session-identity.test.mjs`, `docs/platform/runner/spec.md:223`, `docs/platform/runner/subcomponents/h-f34e0d170d89/spec.md:74`.
+  Decision history (`docs/platform/runner/decisions/**`) stays as history.
+
 ## Files this phase may write
 See the phase table footprint in plan.md.
 
@@ -30,8 +44,8 @@ See the phase table footprint in plan.md.
 6. Runner docs: remove the `fgos session` entry point and its operations section; the doctrine line keeps the rule "a merge into main never runs from a linked worktree" without the session exemption.
 
 ## Verify
-- `node scripts/run-tests.mjs` focused on the touched test files (`test/cli/fgos-return.test.mjs`, `test/verbs/merge/**`, `test/setup/checks.test.mjs`, `test/cli/fgos-disconnected-worktree-guard.test.mjs`, `test/cli/fgos-claim*.test.mjs`, `test/architecture.test.mjs`): all pass.
-- `rg -n "listSessions|sessions\.json|session\.mjs|leaf-notify-drift" src bin test docs/platform/runner docs/architecture-manifest.json` finds nothing.
+- `node scripts/run-tests.mjs` focused on the touched test files (`test/runner/merge*.test.mjs`, `test/direct/merge-gate.test.mjs`, `test/cli/fgos-return.test.mjs`, `test/verbs/merge/**`, `test/setup/checks.test.mjs`, `test/cli/fgos-disconnected-worktree-guard.test.mjs`, `test/cli/fgos-claim*.test.mjs`, `test/architecture.test.mjs`): all pass.
+- `rg -n "listSessions|runner/session\.mjs|postland-drift|leaf-notify-drift|startSession|endSession" src bin test docs/platform/runner docs/architecture-manifest.json -g '!docs/platform/runner/decisions/**'` finds nothing (gateway client.ts is outside these roots); `rg -n "sessions\.json" src bin test docs/platform/runner` finds only the phase-4 identity files listed above.
 
 ## Rollback
 `git revert` the phase commit set.

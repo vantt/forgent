@@ -7,6 +7,13 @@ Decision: SV-7 (owner 2026-11-18). Evidence: scan report §1 (gateway), §8.
 - `apps/fgos-gateway/src/mcp.rs` (~34, which mentions `/sessions*`), `apps/fgos-gateway/web/src/api/client.ts` (~150-160).
 - Contract `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml` (`/sessions` ~507-570, intro ~21-24).
 
+## Facts re-checked on origin/main 4cde6c9de (lead, 2026-11-18)
+- Handlers `post_sessions` :1087, `delete_session` :1109, `get_session_slots` :1130; routes :1282-1284; test
+  `the_session_routes_drive_the_real_host_and_return_its_summary_unchanged` ~:2786-2875.
+- HTTP mapping is `ErrorCategory::http_status` (~:203-213): nothing maps to 501 today, so step 1 adds one category/variant.
+- `client.ts` :151/:154/:160; its comments cite yaml lines 431-521, now 507-570: drop the line numbers.
+- Contract: intro :23-24, `/sessions` :507, `/sessions/{sessionId}` :538, `/slots` :561.
+
 ## Files this phase may write
 See the phase table footprint in plan.md.
 
