@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "509813ee8a1ad5233a5a7b5d7cff1dfc0731e56511ab0b8cbabd5d45e99850e5",
+  "payloadDigest": "a6836403989024d8e89320a5c7faebe9f6cc04ddb82e8bf0c474fb2604a1a09f",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1185,7 +1185,7 @@
     "src/runner/claim-port.mjs": "4b3eafd94c29e504d624a44a60b9ba27ca51fac14d5d19e946938b92aaca658e",
     "src/runner/dispatch.mjs": "49864b737fd4c875f5360c61d442ff10dd0d05a0da56197a102b7e53f82c80af",
     "src/runner/dispatch/adapters.mjs": "af0278e126f6d871cade36adae321d1ede5a5295845de2cb9ce9a115465e5f35",
-    "src/runner/dispatch/agent-result-claim-contract.mjs": "ec7b00d1ad9e98a1dc5ffd12e98963e642da3100c6492ce337e798da2105a45b",
+    "src/runner/dispatch/agent-result-claim-contract.mjs": "9c406b39f7d84dcb84646522e1927fafd70d2168700d61698918f3cceb88fef7",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "1e1a922ad6d9ef2c9d8f0e7f6fec77d2c8b83b27ce9adfc8eaf3ec69e200ce6b",
     "src/runner/dispatch/assignment-runner.mjs": "ba984c58a12cf1052553f6ce45781c3a21219da5d65f0b29dfb361d724f46b13",
