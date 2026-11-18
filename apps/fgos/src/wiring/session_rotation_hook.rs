@@ -10,7 +10,6 @@
 //! show the model. Files read: `packages/session-host/contracts/rotation-files.v1.json`.
 use super::mailbox_config::effective_config;
 use super::mailbox_identity::state_root;
-use super::mailbox_root::mailbox_fgos_dir;
 use fgos_run_supervisor::head_client::{request_head, ClientError, REPLY_TIMEOUT};
 use fgos_session_host::rotation::decide::{decide, AtRest, RotationConfig};
 use fgos_session_host::rotation::handoff::{
@@ -189,6 +188,18 @@ fn session_start(head: &Head, fgos_dir: &Path) -> Result<Option<String>, String>
     Ok(Some(json!({ "hookSpecificOutput": { "hookEventName": "SessionStart", "additionalContext": context } }).to_string()))
 }
 
+/// `<project>/.fgos` of the directory the head was started in: Claude Code's project directory when it names a
+/// directory (its hook cwd follows the model's `cd`), else the cwd. That is the `projectRoot` the head start door
+/// recorded the lineage under, which is not always the main checkout (a head started in a linked worktree).
+fn fgos_dir_of(claude_project_dir: Option<&std::ffi::OsStr>, cwd: &Path) -> Option<PathBuf> {
+    let start = claude_project_dir
+        .filter(|d| !d.is_empty())
+        .map(Path::new)
+        .filter(|d| d.is_dir())
+        .unwrap_or(cwd);
+    Some(start.join(".fgos")).filter(|dir| dir.is_dir())
+}
+
 fn now_ms() -> u64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -204,10 +215,9 @@ fn run(args: &[OsString]) {
     let Ok(cwd) = std::env::current_dir() else {
         return;
     };
-    let project_dir = std::env::var_os("CLAUDE_PROJECT_DIR");
-    let fgos_dir = match mailbox_fgos_dir(project_dir.as_deref(), &cwd) {
-        Ok(dir) => dir,
-        Err(e) => return fail(e.code().to_string()),
+    let Some(fgos_dir) = fgos_dir_of(std::env::var_os("CLAUDE_PROJECT_DIR").as_deref(), &cwd)
+    else {
+        return fail("the project has no .fgos directory".into());
     };
     match event {
         Event::SessionStart => match session_start(&head, &fgos_dir) {
@@ -343,6 +353,23 @@ mod tests {
             })
         );
         assert_eq!(head_from_env(&env(&[("FGOS_HEAD_ROLE", "head:a-b")])), None);
+    }
+
+    #[test]
+    fn the_lineage_root_is_the_project_directory_the_head_started_in_not_the_main_checkout() {
+        let (fgos_dir, _) = fgos("root");
+        let project = fgos_dir.parent().unwrap();
+        let elsewhere = std::env::temp_dir();
+        assert_eq!(
+            fgos_dir_of(Some(project.as_os_str()), &elsewhere),
+            Some(fgos_dir.clone())
+        );
+        assert_eq!(fgos_dir_of(None, project), Some(fgos_dir.clone()));
+        assert_eq!(
+            fgos_dir_of(Some(std::ffi::OsStr::new("/no/such/dir")), project),
+            Some(fgos_dir)
+        );
+        assert_eq!(fgos_dir_of(None, &elsewhere.join("srh-no-fgos")), None);
     }
 
     #[test]

@@ -1,6 +1,6 @@
 {
   "contract": { "id": "session-host-rotation-files", "version": 1 },
-  "description": "The files of a head session's lineage that its rotation hook reads, and the environment and hook payload it takes. The Node handoff store (src/session-rotation/handoff-store.mjs) writes latest.json and the handoff files, the rotation executor (src/session-rotation/rotate.mjs) writes rotation.json and answered.json, and the Rust reader is packages/session-host/rust/src/rotation/handoff.rs. Folder: <main checkout>/.fgos/runtime/session-rotation/<persona>-<name>/ (persona and name are lowercase slugs).",
+  "description": "The files of a head session's lineage that its rotation hook reads, and the environment and hook payload it takes. The Node handoff store (src/session-rotation/handoff-store.mjs) writes latest.json and the handoff files, the rotation executor (src/session-rotation/rotate.mjs) writes rotation.json and answered.json, and the Rust reader is packages/session-host/rust/src/rotation/handoff.rs. Folder: <the project directory the head was started in (CLAUDE_PROJECT_DIR, else the cwd)>/.fgos/runtime/session-rotation/<persona>-<name>/ (persona and name are lowercase slugs).",
   "files": {
     "latest.json": {
       "writer": "handoff store, replaced atomically after the handoff file exists",
