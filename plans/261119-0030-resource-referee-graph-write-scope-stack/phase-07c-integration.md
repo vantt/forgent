@@ -1,12 +1,12 @@
 # Phase 7c: Integration and landing of the packages
 
 A branch that passes alone does not prove the merge; this phase lands the integrated tree of this plan.
-The lead already merged finished waves into one integration branch after waves 2 and 3 and ran the
+The lead already merged every finished wave into one integration branch and ran the
 combined crate-level and owning tests there (decision 14), so this phase is the last merge, not the first.
 
 ## Inputs
 
-- The integration branch with the branches of phases 2 to 7.
+- The integration branch with the branches of phases 1 to 7.
 - The board sections "Các luồng" and "File chung dễ va" of `plans/261017-1313-fgos-platform-program-board/plan.md` (open them now: this is the lane landing).
 
 ## Files it may write
@@ -27,7 +27,7 @@ combined crate-level and owning tests there (decision 14), so this phase is the 
 
 ## Verify
 
-Both suites green in sequence apart from the two named census tests before regeneration, the plan-contract check clean on every plan, the census matching the tree.
+Both suites green in sequence apart from the two named census tests before regeneration, the plan-contract check scoped as decision 30 says (no error naming this plan and no overlap pair involving it), the census matching the tree.
 
 ## Rollback
 

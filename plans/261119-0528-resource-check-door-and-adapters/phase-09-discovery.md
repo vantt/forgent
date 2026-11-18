@@ -9,17 +9,17 @@ not know the existing door.
 ## Inputs
 
 - `core/skills/_shared/plan-contract.md` sections 4 and 5.
-- `core/skills/fgos-coding-planning/SKILL.md` and its `references/approach-and-shape.md`, `references/split-and-child-specs.md`; `core/skills/fgos-cook/references/reading-ak-plans.md`.
+- `domains/coding/skills/fgos-coding-planning/SKILL.md` (the `fgos graph` lines at 97) and its `references/approach-and-shape.md` (line 10) and `references/split-and-child-specs.md` (line 7); `core/skills/fgos-cook/references/reading-ak-plans.md`, which has no `fgos graph` line.
 - The door's help text and final name from phase 7b; the divergence list from phase 8b and the differences recorded in phase 8; `CHANGELOG.md` `## [Unreleased]`.
 
 ## Files it may write
 
-`core/skills/**`, the generated surfaces `plugins/fgOS/skills/**`, `.agents/skills/**` and `.claude/skills/**` only through `npm run build:skills`, `CHANGELOG.md`, `docs/reading-map.md`. If the build also rewrites the managed block of `AGENTS.md`, list that file in the commit and in `reports/`; otherwise it must stay byte-identical.
+`core/skills/**`, `domains/coding/skills/**`, the generated surfaces `plugins/fgOS/skills/**`, `.agents/skills/**` and `.claude/skills/**` only through `npm run build:skills`, `CHANGELOG.md`, `docs/reading-map.md`. If the build also rewrites the managed block of `AGENTS.md`, list that file in the commit and in `reports/`; otherwise it must stay byte-identical.
 
 ## Steps
 
 1. In `plan-contract.md` section 4 add the step: before fixing the phase table, run the door on the draft (`--units` before the files exist, `--plan` after); in a project without fgOS the planner applies the same rule by hand as section 4 already states.
-2. In the planning skill's split guidance and in `reading-ak-plans.md` add one pointer line each, next to the existing `fgos graph` references, saying which tool each line means; no duplicated rule text.
+2. In the planning skill's split guidance (`domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md` and `approach-and-shape.md`) add one pointer line next to the existing `fgos graph` references, and one line in `reading-ak-plans.md` in the section that explains phase footprints; each line says which tool it means; no duplicated rule text.
 3. Run `npm run build:skills`; never edit generated files by hand.
 4. Add the three packages to `docs/reading-map.md`, one line each pointing to their specs, and say how the package `graph` differs from the Work verb; this is the index a developer reads before writing a new path or graph helper.
 5. Add the CHANGELOG lines: the new door; Work advisories now seeing containment and globs; the decompose gate staying advisory with its new findings; merge readiness no longer auto-merging items whose footprints contain one another; the fan-out verifier reporting new conflicts; the supervisor admission divergences listed in phase 8b, saying that admission is not wired to a running door; the plan-check script now keeping globs in phase tables.
