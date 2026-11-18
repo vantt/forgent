@@ -53,3 +53,7 @@ Revert the phase commit.
 - From the phase 3 review: `result.json.durationMs` is still always null (`settlement.mjs`); the binding's `durationMs`
   is the one source and reaches the unit summary. Drop the null field from the run-result record (Rust `RECORD_KEYS`
   and fixtures) when this phase touches the run-result contract.
+- From the phase 6 review: the run-result `usage` object uses camelCase keys (`inputTokens`, `cacheReadTokens`,
+  `cacheCreationTokens`, ...). The projection maps them to the `observe-names.json` OTel names
+  (`gen_ai.usage.input_tokens`, `gen_ai.usage.cache_read.input_tokens`, ...) when it writes the run records; `source`
+  and `reason` become attrs.
