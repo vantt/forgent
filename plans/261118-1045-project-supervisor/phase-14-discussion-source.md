@@ -6,6 +6,8 @@ Produces `fgos.discussion.status`: one record each time a discussion's `discussi
 phase 16.
 
 ## Inputs
+- Waits: phase 14a (`walk_changes`, the one history read door; owner option B, 2026-11-18). The parked reader on
+  branch `sv/p14` is reworked onto it: keep the source logic, drop its own walk.
 - Waits: ops-metrics phase 1 (`RecordSource`, kind registry) and phase 5 (query reads the source). Re-read their landed
   trait in Step 0; the signature below is a sketch.
 - Marker sites at the current tree: line 3 in `docs/discussions/ops-metrics/DISCUSSION.md:3` and
