@@ -53,6 +53,8 @@ add('config-does-not-parse-blocks', [project('runner: [\n'), call([], inProject(
 add('config-does-not-parse-blocks-in-agy', [project('runner: [\n'), call(['--format=agy'], { stdin: agy('general-purpose') })]);
 add('config-key-in-the-wrong-scope-blocks', [project('runner:\n  executors:\n    a:\n      kind: agent\n      invocations: []\n'), call([], inProject({ stdin: task('general-purpose') }))]);
 add('config-semantic-rule-broken-blocks', [project('runner:\n  capabilities:\n    foo:\n      prefer: ghost\n'), call([], inProject({ stdin: task('foo') }))]);
+add('config-retired-pattern-key-blocks-with-what-replaced-it', [project('runner:\n  patterns:\n    reviewed:\n      maxRounds: 3\n'), call([], inProject({ stdin: task('general-purpose') }))]);
+add('global-config-retired-pattern-key-blocks', [{ do: 'globalConfig', text: 'runner:\n  patterns:\n    defaultRule: x\n' }, call([], inProject({ stdin: task('general-purpose') }))]);
 add('global-config-does-not-parse-blocks', [{ do: 'globalConfig', text: 'runner: [\n' }, call([], inProject({ stdin: task('general-purpose') }))]);
 add('global-rigor-to-tier-blocks', [{ do: 'globalConfig', text: 'runner:\n  rigorToTier:\n    high: flagship\n' }, call([], inProject({ stdin: task('general-purpose') }))]);
 add('a-non-config-failure-allows-an-unusable-payload-tool-input', [call([], inProject({ stdin: JSON.stringify({ tool_name: 'Task', tool_input: 'oops' }) }))]);

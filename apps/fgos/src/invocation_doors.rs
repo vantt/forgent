@@ -280,8 +280,16 @@ impl<'a> Doors<'a> {
 
     /// The doors before the invocation, in Node's order. A refusal is already recorded.
     pub fn enter(&self) -> Result<Entered, Refused> {
-        let sub = check_call(self.route, self.call)
-            .map_err(|fault| self.refuse(None, fault.sub.as_deref(), fault.class, fault.message))?;
+        let sub = check_call(self.route, self.call).map_err(|fault| {
+            if fault.record {
+                self.refuse(None, fault.sub.as_deref(), fault.class, fault.message)
+            } else {
+                Refused {
+                    message: fault.message,
+                    recorded: None,
+                }
+            }
+        })?;
         let dir = self.call.named_dir();
         let verb = self.route.selector.as_str();
         let verb_root = verb_root(verb);

@@ -4529,6 +4529,25 @@ fn dispatch_decide_refuses_a_project_whose_config_breaks_a_semantic_rule_naming_
 
 #[cfg(unix)]
 #[test]
+fn dispatch_decide_names_a_retired_pattern_key_with_its_place_and_what_replaced_it() {
+    let world = ExecutionWorld::new("fgos_decide_retired");
+    world.project_config("runner:\n  patterns:\n    reviewed:\n      maxRounds: 3\n");
+    let refused = world.run(&["dispatch", "decide", "--for", "foo"]);
+    assert_eq!(refused.status.code(), Some(4));
+    assert_eq!(
+        String::from_utf8_lossy(&refused.stderr),
+        "fgos: project:config.yaml:4:7: runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.\n"
+    );
+    world.project_config("runner:\n  patterns:\n    defaultRule: x\n");
+    let rule = world.run(&["dispatch", "decide", "--for", "foo"]);
+    assert_eq!(
+        String::from_utf8_lossy(&rule.stderr),
+        "fgos: project:config.yaml:3:5: runner.patterns.defaultRule was retired; delete the key.\n"
+    );
+}
+
+#[cfg(unix)]
+#[test]
 fn dispatch_decide_work_names_the_bridge_cause_when_node_fails_and_nothing_else_needs_node() {
     let world = ExecutionWorld::new("fgos_decide_work");
     let answered = ExecutionWorld::data(&world.run(&[

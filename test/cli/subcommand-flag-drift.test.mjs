@@ -56,9 +56,6 @@ const DELEGATES = {
 // Verbs whose shared tail is itself one sub-verb's handler.
 const FALLTHROUGH = { workflow: 'operations', tool: 'query' };
 
-// Verbs with a single sub-verb guard (`if (sub !== 'x') throw`): the whole case is that sub-verb.
-const SINGLE = { agents: 'list' };
-
 /** Index just past the `}` matching the `{` at `open`, skipping strings, templates and comments. */
 function matchBrace(src, open) {
   assert.equal(src[open], '{');
@@ -175,7 +172,6 @@ function regionReads(text, where, seen = new Set()) {
 }
 
 function subRegions(verb, caseText, subs) {
-  if (SINGLE[verb]) return { regions: { [SINGLE[verb]]: caseText }, shared: '' };
   const regions = {};
   let shared = caseText;
   let tailStart = 0;
@@ -197,8 +193,8 @@ const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nati
 const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.native === true);
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
-  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['agents', 'dispatch', 'goal', 'head', 'merge', 'workflow', 'worktree']);
-  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['config', 'convention', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'session']);
+  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['dispatch', 'goal', 'head', 'merge', 'workflow', 'worktree']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'config', 'convention', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'session']);
 });
 
 for (const entry of MULTI) {
@@ -264,6 +260,14 @@ test('the scanner sees what it claims to: known reads in known regions', () => {
 // apps/fgos/src/wiring/session.rs), which names a flag as `flag("item")`.
 const RUST = (rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
 const NATIVE_SOURCES = {
+  agents: {
+    subs: RUST('apps/fgos/src/wiring/agents.rs'),
+    shared: () => {
+      const src = RUST('apps/fgos/src/wiring/agents.rs');
+      const start = src.indexOf('pub fn project_agents_request');
+      return src.slice(start, src.indexOf('fn names_in', start));
+    },
+  },
   metrics: {
     subs: RUST('packages/observe/rust/src/metrics_cli/mod.rs'),
     region: (sub) => {

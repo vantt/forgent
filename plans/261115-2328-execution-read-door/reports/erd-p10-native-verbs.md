@@ -9,3 +9,44 @@ Lead must also run, outside my scope and now failing or needing an edit: `test/r
 Concerns: the Node `checkDoorRefusalsForRetiredKeys` sentence (retired pattern keys, `config-key-retired`) is not ported to a config door refusal (host prints the door text); hook prints no advisory validation warnings (decide/explain print them to stderr as Node did); `agents list` needs the payload resolvable (precondition refusal otherwise).
 Retired test -> owner now: none yet (seat C). Proposed `## [Unreleased]` line: "`fgos dispatch decide`, `fgos dispatch explain`, `fgos agents list` and the `dispatch-decide` PreToolUse hook run in the host without Node (`decide --work` still reads the Work store through Node)."
 Files outside scope I needed: `scripts/export-command-selectors.mjs` (optional, see decision 2), the lead-owned tests and door row above.
+
+## Lead pass: parity against the base release
+
+Base: the Node arms of the commit this branch was cut from (`7655f4f3e`), staged in a linked worktree with its own cargo
+target (recipe in `test/rust-host/harness.mjs`; the staged host copy inside the release, not the target binary, is the
+description file's `hostBin`). Run: `FGOS_TEST_PARITY_BASE=<file> node scripts/run-tests.mjs test/rust-host/verb-parity.test.mjs`.
+
+| table | cases | first run (seat A tree) | after the lead's fixes |
+|---|---|---|---|
+| agents | 25 | 4 green | 25 green |
+| dispatch-decide | 46 (42 + 4 retired-key cases) | 40 green | 46 green |
+| dispatch-explain | 22 | 22 green | 22 green |
+| hook-dispatch-decide | 37 (35 + 2 retired-key cases) | 35 green | 37 green |
+
+Rust fixes the parity run demanded:
+- `agents list` JSON key order is the Node order (`shadows` right after `source`): field order of `Agent` in `fgos-execution`.
+- A missing or unknown `agents` sub-verb is the verb's own refusal in Node and filed no fault record; the host's door filed one
+  (`CallFault.record`, false for the verbs that keep the Node sub-verb wording).
+- Retired `runner.patterns` keys (concern 1): a config-door refusal that lies on a retired key now says
+  `<file>:<line>:<col>: <key> was retired; <instruction>.` with code `config-key-retired`, places taken from the config
+  check's findings first and the refusals second, as Node did. Matcher: `retired_pattern_key_at` in `runner_check.rs`;
+  owning proof `dispatch_decide_names_a_retired_pattern_key_with_its_place_and_what_replaced_it` in `cli_tests.rs`; the
+  parity tables carry four decide and two hook cases. On non-Unix targets the config check does not exist, so the
+  refusals alone name the places.
+- Hook advisory warnings (concern 2): the only advisory is the provider-family warning, which the config door can no
+  longer let through (a blank or missing `command` is refused by the schema), so no case can reach it; Node's hook prints
+  on stderr only when it blocks, as the host does. Nothing to port.
+
+One decided difference, normalised in the table runner: the no-selector usage of `dispatch decide` names `fgos dispatch
+decide` on the host and `node src/runner/dispatch.mjs decide` in Node (`decide.v1.json` records both as `expect` and
+`nativeExpect`).
+
+Node tests that spawn `node bin/fgos.mjs dispatch decide` or `hook dispatch-decide` directly now fail because the arm is
+native on the host (they are retired or moved by the step that deletes the arms): `test/cli/dispatch-operability.test.mjs`
+(2), `test/cli/dispatch-retired-doors.test.mjs` (3), `test/runner/dispatch.test.mjs` (1: decide --work). The same step
+owns `test/cli/fgos-manifest.test.mjs` "manifest verb-name set equals the set of verbs runVerb() dispatches" (fails only
+while the `agents` arm is still in `bin/fgos.mjs`). `test/rust-host/help-routes.test.mjs` needs the release addon.
+
+Lead-owned edits: `agent-definitions.mjs` bytewise `sortedNames` (the Node twin replays the new vector; `agent-listing`
+green), `command-routes.test.mjs`, `subcommand-flag-drift.test.mjs` (agents is native, its Rust source added, dead
+single-sub-verb table removed), architecture door row for `wiring/agents.rs`, census regenerated.

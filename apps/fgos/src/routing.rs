@@ -326,6 +326,9 @@ pub struct CallFault {
     pub class: &'static str,
     pub message: String,
     pub sub: Option<String>,
+    /// Whether the refusal is filed as a malformed call. A verb that keeps its Node wording for a missing or
+    /// unknown sub-command answered it as the verb's own refusal, which nothing filed.
+    pub record: bool,
 }
 
 /// The fault class of a missing or unknown sub-command.
@@ -355,6 +358,7 @@ pub fn check_call(
                     class: ARG_PARSE,
                     message: sub_verb_refusal(name, available, Some(sub)),
                     sub: None,
+                    record: !NODE_SUB_VERB_WORDING.contains(&name),
                 })
             }
             None => {
@@ -362,6 +366,7 @@ pub fn check_call(
                     class: ARG_PARSE,
                     message: sub_verb_refusal(name, available, None),
                     sub: None,
+                    record: !NODE_SUB_VERB_WORDING.contains(&name),
                 })
             }
         }
@@ -371,6 +376,7 @@ pub fn check_call(
             class: UNKNOWN_FLAG,
             message,
             sub: served_sub,
+            record: true,
         }),
         None => Ok(served_sub),
     }

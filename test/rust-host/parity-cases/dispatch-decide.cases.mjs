@@ -68,6 +68,10 @@ add('config-semantic-rule-broken-for-an-executor', [project('runner:\n  capabili
 add('config-does-not-parse', [project('runner: [\n'), call(['--for', 'x'])]);
 add('config-key-in-the-wrong-scope', [project('runner:\n  executors:\n    a:\n      kind: agent\n      invocations: []\n'), call(['--for', 'x'])]);
 add('config-value-breaks-its-schema', [project('runner:\n  maxTier: 7\n'), call(['--for', 'x'])]);
+add('config-retired-pattern-key-says-what-replaced-it', [project('runner:\n  patterns:\n    reviewed:\n      maxRounds: 3\n'), call(['--for', 'x'])]);
+add('config-retired-default-rule-says-to-delete-it', [project('runner:\n  patterns:\n    defaultRule: x\n'), call(['--for', 'x'])]);
+add('config-retired-gated-pattern-name', [project('runner:\n  patterns:\n    research-fan-out-gated:\n      rounds: 1\n'), call(['--for', 'x'])]);
+add('global-config-retired-pattern-key', [{ do: 'globalConfig', text: 'runner:\n  patterns:\n    reviewed:\n      checkersByRigor:\n        high: 2\n' }, call(['--for', 'x'])]);
 add('global-config-does-not-parse', [{ do: 'globalConfig', text: 'runner: [\n' }, call(['--for', 'x'])]);
 add('global-rigor-to-tier-is-refused', [{ do: 'globalConfig', text: 'runner:\n  rigorToTier:\n    high: flagship\n' }, call(['--for', 'x'])]);
 add('model-policies-broken', [project('runner:\n  modelPolicies:\n    claude:\n      standard: ""\n'), call(['--for', 'x'])]);

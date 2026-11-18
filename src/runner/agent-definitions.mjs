@@ -32,7 +32,7 @@ export class AgentNotFoundError extends RunnerConfigError {}
 const TIER_LABELS = { workspace: 'fgos/agents', domain: 'domains/*/agents', core: 'core/agents' };
 
 function sortedNames(dir) {
-  return fs.readdirSync(dir).sort((a, b) => a.localeCompare(b));
+  return fs.readdirSync(dir).sort();
 }
 
 /** The directories each tier is read from, in lookup order: [{ tier, label, dirs: [{ dir, relDir }] }]. */

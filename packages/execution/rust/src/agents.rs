@@ -55,10 +55,10 @@ pub struct Agent {
     pub name: String,
     pub tier: String,
     pub source: String,
+    pub shadows: Vec<String>,
     pub description: String,
     pub problems: Vec<String>,
     pub warnings: Vec<String>,
-    pub shadows: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]

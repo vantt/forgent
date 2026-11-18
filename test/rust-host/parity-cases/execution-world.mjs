@@ -115,6 +115,9 @@ function normaliser(world, entry) {
     for (const known of runtime) out = out.replaceAll(known, '<RUNTIME>');
     return out
       .replace(/<RUNTIME>(?:\/\.fgos\/runtime\/git-addon\/[0-9a-f]+)?/g, '<RUNTIME>')
+      // The one decided difference: the host's decide usage names the verb the caller types, the Node text a script path
+      // (the contract `decide.v1.json` records both as `expect` and `nativeExpect`).
+      .replace('usage: node src/runner/dispatch.mjs decide', 'usage: fgos dispatch decide')
       .replace(UUID, '<UUID>')
       .replace(ISO, '<TS>')
       .replace(/"data_hash": "[0-9a-f]{64}"/g, '"data_hash": "<H64>"');

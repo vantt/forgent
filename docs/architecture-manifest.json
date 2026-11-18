@@ -851,7 +851,8 @@
         "src/runner/agent-definitions.mjs",
         { "path": "src/util/domain-dirs.mjs", "reason": "defines the domain layout (a domain's agents/ folder) that the door reads" },
         { "path": "src/cli/command-registry.mjs", "reason": "help text naming the tiers a persona is looked up in; no directory is read" },
-        { "path": "packages/execution/rust/src/agents.rs", "reason": "the listing's judgement names the core tier folder in the masked answer; the host still reads the directories" }
+        { "path": "packages/execution/rust/src/agents.rs", "reason": "the listing's judgement names the core tier folder in the masked answer; the host still reads the directories" },
+        { "path": "apps/fgos/src/wiring/agents.rs", "reason": "the host adapter reads the tier directories beneath the project and the payload and hands the files to the listing in the execution crate" }
       ],
       "debt": [],
       "retiredBy": "S6a: the doctor row agent-type-names-unique moves to Rust and the Node listing is deleted",

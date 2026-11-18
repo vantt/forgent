@@ -1258,6 +1258,21 @@ fn check_declared_seats(raw: &Value) -> Result<(), SeatProblem> {
     Ok(())
 }
 
+/// The retired `runner.patterns` key a dotted config path is, or lies under, with what replaces it: the sentence a
+/// refusal of the config door gets for a key that an earlier release accepted.
+pub fn retired_pattern_key_at(path: &str) -> Option<(String, &'static str)> {
+    RETIRED_PATTERN_KEYS
+        .iter()
+        .find_map(|(dotted, instruction)| {
+            let key = format!("runner.patterns.{dotted}");
+            (path == key
+                || path
+                    .strip_prefix(&key)
+                    .is_some_and(|rest| rest.starts_with('.')))
+            .then_some((key, *instruction))
+        })
+}
+
 /// The rules of `runner.patterns` that read beyond its own fields: a retired key says what replaced it, a
 /// reserved name cannot name a pattern, and a declared seat list is Seat Resolver's to judge.
 fn validate_runner_patterns_shape(patterns: &Value, label: &str) -> Check {
