@@ -51,6 +51,8 @@
       "identity-shared-directory",
       "observe-dir-writable",
       "observe-host-resolvable",
+      "observe-write-health",
+      "observe-friction-migrated",
       "node-version-and-git",
       "main-checkout-hook-wired",
       "git-component-compatible",
@@ -727,6 +729,18 @@
       "id": "observe-host-resolvable",
       "description": "Rust host binary resolves and reads the friction store (friction rank)",
       "owner": "rust:observe"
+    },
+    {
+      "id": "observe-write-health",
+      "description": "read-only pointer: records the Observe write door refused or dropped in the last 7 days (per-writer health counters), read by fgos metrics query --kind fgos.observe.health; warns, never fails, no fix",
+      "owner": "rust:observe",
+      "pointer": true
+    },
+    {
+      "id": "observe-friction-migrated",
+      "description": "read-only pointer: old friction shard lines the v2 records store does not hold yet; warns until fgos friction migrate --to-records has copied them, never fails, no fix",
+      "owner": "rust:observe",
+      "pointer": true
     },
     {
       "id": "writer-identity-resolvable",
