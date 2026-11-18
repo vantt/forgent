@@ -1,17 +1,66 @@
 {
   "name": "supervisor-stuck",
-  "requires": ["fgos.supervisor.wake"],
-  "params": { "limit": { "configKey": "watcher.stuckWakeLimit" } },
+  "requires": [
+    "fgos.supervisor.wake"
+  ],
+  "window": "own",
+  "params": {
+    "limit": {
+      "configKey": "watcher.stuckWakeLimit"
+    }
+  },
   "query": {
-    "kind": ["fgos.supervisor.wake"],
-    "where": [
-      { "field": "fgos.supervisor.outcome", "op": "eq", "value": "already-live" }
+    "kind": [
+      "fgos.supervisor.wake"
     ],
-    "by": ["subject.id"],
-    "agg": ["count", "span", "max:ts"],
+    "where": [
+      {
+        "field": "fgos.supervisor.outcome",
+        "op": "eq",
+        "value": "already-live"
+      }
+    ],
+    "by": [
+      "subject.id"
+    ],
+    "agg": [
+      "count",
+      "min:ts"
+    ],
     "having": [
-      { "lhs": { "agg": { "agg": "count" } }, "op": "gt", "rhs": { "param": "limit" } }
+      {
+        "lhs": {
+          "agg": {
+            "agg": "count"
+          }
+        },
+        "op": "gt",
+        "rhs": {
+          "param": "limit"
+        }
+      }
+    ],
+    "since": "-30d",
+    "without": [
+      {
+        "kind": [
+          "fgos.supervisor.wake"
+        ],
+        "where": [
+          {
+            "field": "fgos.supervisor.outcome",
+            "op": "eq",
+            "value": "started"
+          }
+        ],
+        "within": "30d",
+        "anchor": "after"
+      }
     ]
   },
-  "row": { "kind": "supervisor-stuck", "reason": "the supervisor is live but its queue is not shrinking", "nextCommand": "fgos supervisor plans" }
+  "row": {
+    "kind": "supervisor-stuck",
+    "reason": "the supervisor is live but its queue is not shrinking",
+    "nextCommand": "fgos supervisor plans"
+  }
 }

@@ -1,12 +1,24 @@
 {
   "name": "lane-freed",
-  "requires": ["fgos.run.attempt"],
+  "requires": [
+    "fgos.run.attempt"
+  ],
   "query": {
-    "kind": ["fgos.run.attempt"],
+    "kind": [
+      "fgos.run.attempt"
+    ],
     "window_on": "end",
     "latest_per": "subject",
-    "by": ["origin.host", "subject.id"],
-    "agg": ["max:ts", "span"]
+    "by": [
+      "origin.host"
+    ],
+    "agg": [
+      "max:end"
+    ]
   },
-  "row": { "kind": "lane-freed", "reason": "a worker attempt ended and freed a lane on this machine", "nextCommand": "fgos supervisor plans" }
+  "row": {
+    "kind": "lane-freed",
+    "reason": "a worker attempt ended and freed a lane on this machine",
+    "nextCommand": "fgos supervisor plans"
+  }
 }
