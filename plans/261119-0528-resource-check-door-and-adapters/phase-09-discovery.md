@@ -1,6 +1,6 @@
 # Phase 9: Discovery in the contract and skills
 
-> This phase belongs to the door plan `plans/261119-0528-resource-check-door-and-adapters`. Phases 1 to 7 and 7c are in plan A (`plans/261119-0030-resource-referee-graph-write-scope-stack`), whose decisions 1 to 29 apply.
+> This phase belongs to the door plan `plans/261119-0528-resource-check-door-and-adapters`. Phases 1 to 7 and 7c are in plan A (`plans/261119-0030-resource-referee-graph-write-scope-stack`), whose decisions 1 to 31 apply.
 
 A planner only uses the door if the document it already reads tells it to. The same applies to a
 developer about to write a new path or graph helper: the previous copies were written by people who did
@@ -14,7 +14,7 @@ not know the existing door.
 
 ## Files it may write
 
-`core/skills/**`, the generated surfaces `plugins/fgOS/skills/**` and `.agents/skills/**` only through `npm run build:skills`, `CHANGELOG.md`, `docs/reading-map.md`.
+`core/skills/**`, the generated surfaces `plugins/fgOS/skills/**`, `.agents/skills/**` and `.claude/skills/**` only through `npm run build:skills`, `CHANGELOG.md`, `docs/reading-map.md`. If the build also rewrites the managed block of `AGENTS.md`, list that file in the commit and in `reports/`; otherwise it must stay byte-identical.
 
 ## Steps
 
@@ -22,11 +22,11 @@ not know the existing door.
 2. In the planning skill's split guidance and in `reading-ak-plans.md` add one pointer line each, next to the existing `fgos graph` references, saying which tool each line means; no duplicated rule text.
 3. Run `npm run build:skills`; never edit generated files by hand.
 4. Add the three packages to `docs/reading-map.md`, one line each pointing to their specs, and say how the package `graph` differs from the Work verb; this is the index a developer reads before writing a new path or graph helper.
-5. Add the CHANGELOG lines: the new door; Work advisories now seeing containment and globs; the decompose gate staying advisory with its new findings; the fan-out verifier reporting new conflicts; the supervisor admission divergences listed in phase 8b, saying that admission is not wired to a running door.
+5. Add the CHANGELOG lines: the new door; Work advisories now seeing containment and globs; the decompose gate staying advisory with its new findings; merge readiness no longer auto-merging items whose footprints contain one another; the fan-out verifier reporting new conflicts; the supervisor admission divergences listed in phase 8b, saying that admission is not wired to a running door; the plan-check script now keeping globs in phase tables.
 
 ## Verify
 
-`npm run build:skills` leaves a clean second run (`git diff --exit-code` after a second build). The plan-contract check on every plan runs in phase 10, after phases 8 and 8b have changed it.
+`npm run build:skills` leaves a clean second run (`git diff --exit-code` after a second build). The plan-contract check runs in phase 10, after phases 8 and 8b have changed it.
 
 ## Rollback
 

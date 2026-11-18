@@ -18,6 +18,7 @@ footprint:
   - packages/git/write-scope
   - packages/git/rust/Cargo.toml
   - packages/git/node-addon
+  - packages/git/contracts/ports.v1.json
   - packages/supervision/rust/Cargo.toml
   - Cargo.toml
   - domains/coding/slice-kinds.yaml
@@ -28,7 +29,7 @@ footprint:
   - test/runner/write-scope.test.mjs
   - test/workflow/propose-classify.test.mjs
   - test/config/config-door.test.mjs
-base: 49cc3885dc1515bce95f3d39a5ad3651846604f3
+base: a7564f1c7658a2d5921329cdf1aa590749bc0f79
 source:
   - plans/reports/research-261118-1704-pkm-graph-algorithms-for-shared-overlap-core.md
 created: 2026-11-19
@@ -48,8 +49,8 @@ groups, any dependency cycle with its path, and a verdict with reasons under its
 Every consumer is in the second plan, `plans/261119-0528-resource-check-door-and-adapters`: the planner door `fgos resource-check`, the supervisor
 adapter, the plan-check script, plan-lint and the Work adapters (all admission rules switch together),
 and discovery. That plan is blocked by this plan and by `owner-question-store`. Phases 7b, 8, 8b, 9 and
-10 named anywhere in this plan's files live there. The merge conductor and the dispatch gate can adopt
-the packages later and are in neither plan.
+10 named anywhere in this plan's files live there. The dispatch gate can adopt the packages later and is in neither plan; merge readiness is changed through
+the Work exports by the door plan (decision 8).
 
 Three independent packages, each with one authority, none knowing the layer above it:
 
@@ -93,7 +94,7 @@ calls the three packages, and prints the verdict. Policy content belongs to each
   in the main checkout or on the trunk (`.githooks/pre-commit:420-428`).
 
 - A seventh overlap meaning exists: `globsMeet`, a segment-wise glob intersection in
-  `src/runner/dispatch/write-scope.mjs:111-142`, used by `src/workflow/propose-validate.mjs:17,216`. It is
+  `src/runner/dispatch/write-scope.mjs:142` (built on `segmentsMeet` at 111), used by `src/workflow/propose-validate.mjs:17,83,172,216`. It is
   a recorded follow-up, not a target here.
 - The supervisor's `admissible`, `overlaps` and `read_plan` have no production caller: only the crate's
   own tests use them (`rg "admissible\(|portfolio::"` over `apps` and `packages`). The design of that
@@ -104,6 +105,22 @@ calls the three packages, and prints the verdict. Policy content belongs to each
 - No CI job and no hook runs `scripts/plan-contract-check.mjs` (`.github/workflows/ci.yml` ignores
   `plans/**`); only its own test does, on fixtures.
 - The addon's `versions()` object is pinned whole by `test/git/native-load.test.mjs:25`.
+
+- Both phase-table readers (the Rust one in `portfolio.rs:317` and the JS one in
+  `scripts/plan-contract-check.mjs:42`) delete every backtick and every `*` from a footprint cell before
+  paths are compared, so `apps/fgos/tests/questions_*.rs` reaches the overlap rule as
+  `apps/fgos/tests/questions_.rs`. The Rust reader also turns a non-integer wave into `None`, keeps a
+  duplicate id, and drops a non-string frontmatter entry, where the JS check refuses each.
+- `scripts/plan-contract-check.mjs` cannot load the native addon from a checkout or a linked worktree
+  (`src/native/door.mjs:22-29,38`): run plainly, every plan fails with `git-addon-unavailable`. Scripts such
+  as `scripts/build-skill-wrappers.mjs:15,20` call `ensureAddonForScript()` first; this one does not.
+- `mergeReadiness` (`src/state/graph-harness.mjs:21,144`, used by `src/verbs/merge/merge.mjs`) decides
+  what `fgos merge` merges from the result of `footprintOverlapAmong`, and `rankImpact` orders it with
+  `connectedComponents`. Swapping those exports changes merge readiness. Work footprints are optional
+  and today an item without one never conflicts (`src/state/graph-metrics.mjs:598,603`); the current open
+  Work items (13) have none.
+- `scripts/plan-contract-check.mjs --all` is red today for plans of other lanes; it is not a gate this work
+  can turn green.
 
 ## Prior art, reused and missing
 
@@ -135,47 +152,57 @@ fgOS output must hash the same on every rebuild.
 
 ## Decisions made while writing this plan (override at approval)
 
-7. Limits and truncation. Limits are per item first: an item beyond them (claims per node, entry length)
-   becomes an item-level finding and the rest of the set is still evaluated. The set-level caps are
-   generous and come from measured maxima (the largest plan frontmatter today has 95 entries; Work graphs
-   walk every item regardless of status): phase 1 measures them and fixes the values, starting at 20000
-   nodes, 200000 edges, 512 claims per node, entries of at most 1024 bytes, 200 rules, 100000 emitted
-   pairs and 50000000 pair comparisons. When a set-level cap is hit the packages return what they have
-   plus `truncated: {reason, limit}`. Every caller fails closed on `truncated`: the referee emits the
-   blocking `facts-truncated`; a consumer that does not use the referee refuses to treat the answer as
-   complete (the supervisor marks every candidate not admissible with that reason, the plan check errors,
-   a Work adapter throws). Cycle reporting is linear and needs no cap.
+7. Limits and truncation, one mechanism per package. `graph` and `resource-referee` refuse oversize
+   set-level input by name and never return a partial answer. Only the colliding-pairs function of
+   `write-scope` can truncate (its emitted-pairs cap and its comparison cap): it returns what it has plus
+   `truncated: {reason, limit}`, and its caller passes `truncated` to the referee as a fact, which
+   emits the blocking `facts-truncated`; a consumer that does not use the referee refuses to treat the
+   answer as complete (the plan check errors, a Work adapter throws a named error). Per-item limits
+   (claims per node, entry length) give an item-level finding and the rest of the set is still evaluated.
+   Cycle reporting is linear and needs no cap. The set-level values come from measured maxima (the
+   largest plan frontmatter today has 95 entries; Work graphs walk every item regardless of status):
+   phase 1 measures them and fixes the values, starting at 20000 nodes, 200000 edges, 512 claims per
+   node, entries of at most 1024 bytes, 200 rules, 100000 emitted pairs, 50000000 pair comparisons and
+   4 MiB of input bytes per file. A Work advisory whose `graph` call is refused fails with the named
+   error; it does not degrade silently.
 8. Work advisories (`fgos conflicts`, `fgos schedule`) become stricter because they adopt the
-   `write-scope` rule; this is a visible change made in the door plan, where its before and after
-   outcomes, the decompose gate (stays advisory) and the fan-out verifier's exit code are recorded.
+   `write-scope` rule; this is a visible change made in the door plan. Merge readiness changes with it:
+   `mergeReadiness` and `rankImpact` call the same exports, so `fgos merge` stops auto-merging pairs it
+   used to merge when their footprints contain one another. The door plan records before and after
+   outcomes for conflicts, schedule, the decompose gate (stays advisory), merge readiness and the fan-out
+   verifier's exit code, and the CHANGELOG names each. The merge conductor's own logic is not redesigned.
 9. In `graph`, "layer" is the neutral word; the planner adapter maps layer to the plan's "wave".
 10. The planner door is `fgos resource-check --plan <dir> | --units <file.json>`. The first working
     name, `fgos referee`, was dropped because `referee` is already a seat name in the execution
     catalog (decision 26); `fgos check` is a Work verb, and `resource-check` is not used anywhere.
-11. The door takes `--policy <file>`; without it, the shipped default policy applies: the floor (no
-    cycles, no dangling edges, claims declared, facts not truncated) plus declared layers valid. The
-    default is data inside the door, and this repository ships no policy file of its own. A `--policy`
-    file replaces the default but can never remove the floor, and the verdict echoes the policy identity
-    (path and sha256) so a reader sees which rules were applied. A policy file is operator input, named
-    explicitly, never discovered from the plan directory. No new config key. The hot-file rule needs no
-    policy: two phases that list the same file in one wave already collide on the footprint overlap rule,
-    and a project that wants more (a width cap, one risky phase per layer) opts in through the policy.
-12. Catalog v1: no cycles, no dangling edges, claims declared, facts not truncated (the floor); declared
-    layers valid (every node later than its dependencies, no exclusion pair in one layer); and two
-    optional checks with no default, maximum layer width and alone-in-layer (selected by a node
-    attribute, never by a path pattern). A numeric attribute check (phase size, risk) is left out until a
-    plan table carries such a column.
+11. The door takes `--policy <file>`; without it, the shipped default policy applies: the floor plus
+    declared layers valid. The floor, which no policy can remove, is: no cycles, no dangling edges, claims
+    declared, facts not truncated, and no exclusion pair (a footprint collision) in one declared layer.
+    The default is data inside the door, and this repository ships no policy file of its own. A
+    `--policy` file replaces the default; the verdict echoes the policy identity (path and sha256) in the
+    human output as well as in `--json`. A missing or unreadable policy file is a refusal, never a fall
+    back to the default. A policy file is operator input, named explicitly, never discovered from the plan
+    directory. No new config key. The hot-file rule needs no policy: two phases that list the same file in
+    one wave collide on the footprint overlap rule, and a project that wants more (a width cap) opts in
+    through the policy.
+12. Catalog v1: the floor; declared layers valid (every node later than its dependencies); and one
+    optional check with no default, maximum layer width. A numeric attribute check (phase size, risk) and
+    alone-in-layer are left out: no plan table carries an attribute for them to read.
 13. Every node declares `claims` or `readOnly: true`; a node with neither, and a phase whose footprint
     cell is empty, is a blocking finding (`claims-declared`). An empty list means "unknown", not
     "disjoint": `portfolio.rs:200` treats empty lists as never overlapping, which would break the
     soundness contract of `write-scope`. `readOnly` is caller-asserted and the verdict says so, as it does
     for the lexical caveat. A real `Unit` treats empty `writes` as read-only because dispatch enforces it
     (`src/runner/execution/unit.mjs:125`), which is why the door's `--units` shape is a neutral shape and
-    not the `Unit` file schema.
-14. The mutation census is regenerated by the lead as the last commit of each landing and re-run
-    immediately before the fast-forward (merge, regenerate, test, fast-forward; start over if the push is
-    rejected). It hashes about fourteen hundred files, so a phase that edits any covered file would
-    otherwise collide with every parallel phase on one generated file. This relies on
+    not the `Unit` file schema. The `claims` of decision 5 carry a `space` from a closed registry in the
+    referee contract (`path`, compared by `write-scope`; any other space compared by equality); an unknown
+    space is refused by name, so a misspelt space can never pass as "no collision".
+14. The mutation census is regenerated by the lead as the last commit of each landing. The landing is a
+    loop: merge `origin/main`, rebuild `Cargo.lock`, run `npm run build:skills`, run
+    `cargo build --workspace --locked` and the owning tests of every file the merge brought in,
+    regenerate the census, run the two census tests, fast-forward; if the push is rejected, start again.
+    The census hashes about fourteen hundred files, so a phase that edits any covered file would otherwise
+    collide with every parallel phase on one generated file. This relies on
     `.githooks/pre-commit:420-428`: the census refusal applies only to a commit made in the main checkout
     or on the trunk, so every phase commits in its own linked worktree on its own branch. A phase branch
     expects exactly two reds, `test/git/one-door.test.mjs` and `test/setup/git-mutation-census.test.mjs`.
@@ -183,54 +210,74 @@ fgOS output must hash the same on every rebuild.
     `git diff --name-only $(git merge-base HEAD origin/main)...HEAD`, intersected with the keys of the
     census `files` map; every one must lie inside that phase's footprint. The lead merges finished waves
     into one integration branch after waves 2 and 3.
-15. No new external crate. Phase 2 declares `serde` and `serde_json` (`workspace = true`) for the new
-    crates so `Cargo.lock` changes in phase 2 and, for the edges of `apps/fgos`, once more in the door
+15. No new external crate. `fgos-write-scope` stays dependency-free: its result types are plain and the
+    addon builds JSON with `json!`, as `write_scope.rs` does, so neither `Cargo.lock` nor the gateway's own
+    lock changes for it. Phase 2 declares `serde` and `serde_json` (`workspace = true`) for the two new
+    crates, so `Cargo.lock` changes in phase 2 and, for the edges of `apps/fgos`, once more in the door
     plan. Tests use plain cases and, where a naive oracle helps, a small seeded generator in the test
     file (`proptest` is not in the workspace).
-16. Node code reaches the packages through the native addon, in process; this is settled by evidence
-    (`src/util/yaml.mjs:3-5`: the addon is already a hard requirement of every script that reads YAML).
-    The host verb is the door for planners only. The addon gets bindings for `graph` and for the new
-    `write-scope` operations (colliding pairs, overlap) only; a `resource-referee` binding is added when a
-    Node caller exists. Phase 7 adds a `versions()` field for `graph` and for `writeScope`, the matching
-    clauses in `combinedAbiMatches`, an error that names the first missing or low field, the update of
-    the test that pins `versions()` whole, and panic containment (`catch_unwind`, as
-    `packages/git/node-addon/src/checkout.rs:154` does) for every new entry. A payload never falls back
-    silently.
+16. Node code reaches the packages through the native addon, in process (`src/util/yaml.mjs:3-5`: the
+    addon is already a hard requirement of every script that reads YAML). The host verb is the door for
+    planners only. The addon gets bindings for `graph` and for the new `write-scope` operations only; a
+    `resource-referee` binding is added when a Node caller exists. Phase 7 adds a `versions()` field for
+    `graph` and for `writeScope`, the matching clauses in `combinedAbiMatches` with an error that names
+    the first missing or low field, the update of the test that pins `versions()` whole
+    (`test/git/native-load.test.mjs:25`), the `graph` entry of `packages/git/contracts/ports.v1.json`, and
+    panic containment: the addon has no shared helper (`checkout.rs:153` and `git/land.rs:65` each have a
+    private `guarded`), so phase 7 lifts one helper into the addon's `lib.rs`, wraps every new entry
+    once (the `write_scope.rs` additions of phase 3 included) and proves it with a Rust unit test of the
+    helper, never with a test-only branch. The two older `guarded` functions stay, their error names
+    differ. A payload never falls back silently.
 17. Error policy for a footprint entry that does not canonicalize (`.`, `..`, absolute, backslash,
-    empty, `ab**`) and for an empty or missing footprint: the door refuses and names the node and the
-    entry; the plan check refuses it at `ready`; Work adapters treat that one item as conflicting with
-    everything (advisory); the supervisor marks that one plan not admissible with a named reason
-    (`footprint-entry-invalid`, `footprint-empty`) through a reporting function next to `admissible`,
-    whose signature does not change, and every other plan is unaffected. The reason is proven by a crate
-    test; no running door reads it yet, because nothing calls `admissible` today.
-18. The export names of `src/state/graph-metrics.mjs` are the Work adapter surface and survive;
-    `src/state/impact.mjs` and `scripts/verify-fanout-overlap.mjs` keep calling them unchanged. The new
-    adapter file is `src/state/graph-adapter.mjs` in the `domain` layer; it imports only the kernel door
-    `src/native/door.mjs` (as `src/state/hot-lock.mjs` does) and has a row in
-    `docs/architecture-manifest.json`.
+    empty, `ab**`) and for an empty or missing footprint. The door refuses and names the node and the
+    entry; the plan check refuses it at `ready`; the supervisor marks that one plan not admissible, through
+    a small `footprint_problem(plan)` function that `admissible` itself calls, so the reasons
+    (`footprint-entry-invalid`, `footprint-empty`) are reachable and tested; no output surface is added, and
+    every other plan is unaffected. Work adapters differ on purpose: an entry that fails to canonicalize
+    makes that one item conflict with everything (advisory), but a missing or empty footprint keeps meaning
+    "no claim" in Work, because Work footprints are optional and today an item without one never
+    conflicts. That is a named exception to the soundness contract, recorded in the door plan.
+18. The export names of `src/state/graph-metrics.mjs` are the Work adapter surface and survive, and so do
+    their importers: `src/state/graph-harness.mjs`, `src/state/store.mjs`, `src/state/impact.mjs`,
+    `scripts/verify-fanout-overlap.mjs`, `src/intake/plan.mjs` and `src/runner/claim-liveness.mjs`
+    (`STALE_DOING_DEFAULTS`). `goalScopedCriticalPath` goes through the adapter too and `longestChain` is
+    deleted, so one critical-path rule remains. The new adapter file is `src/state/graph-adapter.mjs` in the
+    `domain` layer; it imports only the kernel door `src/native/door.mjs` (as `src/state/hot-lock.mjs`
+    does) and has a row in `docs/architecture-manifest.json`.
 19. The set-level colliding-pairs function is a deterministic pairwise comparison of canonicalized
     scopes; no trie and no measurement gate. If the one timing recorded at the door plan's landing shows
-    it is too slow, a trie becomes a separate item.
+    it is too slow, a trie becomes a separate item. It is proven by Rust tests against a naive pairwise
+    oracle; the JS port has no set-level function and gets none.
 20. Parity evidence: the existing cases of `test/state/graph-metrics.test.mjs` are ported as Rust
-    cases; the verdicts of the old plan-check script over a snapshot of real phase tables are recorded in
-    phase 1, before any consumer is swapped, and the door plan compares against that recording. There is
-    no byte-for-byte regeneration test.
+    cases. The verdicts of the old plan-check script over a snapshot of real phase tables are recorded in
+    phase 1, before any consumer is swapped, with the exact runnable invocation (a small runner that calls
+    `ensureAddonForScript()` first); the door plan records a second baseline with the pre-swap script at
+    its own base, so differences caused by other plans are not reported as rule changes. There is no
+    byte-for-byte regeneration test.
 21. After every rebase or merge of `origin/main`, `Cargo.lock` is rebuilt, `npm run build:skills` is
     re-run and the census is regenerated; generated text is never hand-merged.
 22. The `write-scope` contract is lexical: case folding, Unicode normalisation and repository symlinks
     are outside it, and the spec says so; a verdict carries that caveat.
 23. Input hardening: the planner door reads its files with `fgos_durable_file::open_beneath` and its
     capped read (no symlink at any position, regular files only, a byte cap, the sha256 revision used as
-    the policy identity); it adds no reader of its own. Errors never quote file content. The threat is
-    narrow and stated: no CI job or hook reads a plan directory, so the door is the one new reader of
-    files an operator points it at.
-24. Step zero: when a blocker lands before this plan starts, refresh `base`, re-read the file and line
-    facts cited in the phases, re-run the plan check and the overlap measurement, then start.
+    the policy identity) and adds no reader of its own. Roots: for `--plan <dir>` the root is that
+    directory, opened without following symlinks, and the files are read beneath it; for `--units <file>`
+    and `--policy <file>` the root is the file's parent directory, so only the leaf is protected against a
+    symlink and the parents are the operator's responsibility. A missing file, a symlink, a non-regular file
+    and an oversize file are refused by name. Errors and human output never quote file content raw: an
+    entry is printed escaped (control characters escaped, length capped) through one function. The threat is
+    narrow: no CI job or hook reads a plan directory, so the door is the one new reader of files an operator
+    points it at.
+24. Step zero: when a blocker lands before a plan starts, refresh `base`, re-read the file and line facts
+    its phases cite, re-run the plan check (through the runner of decision 20) and the overlap measurement,
+    then start.
 25. The work is split in two plans along one line: this plan holds the foundation (the three packages
     and the addon bindings) and changes no consumer; `plans/261119-0528-resource-check-door-and-adapters` holds every consumer, so the
     admission rules that decide whether plans may run together (the supervisor, the plan-check script,
-    plan-lint, Work, the door) switch to the same rule in one landing. Landing this plan alone cannot
-    make two authorities disagree.
+    plan-lint, Work, the door) switch to the same rule in one landing. Landing this plan alone cannot make
+    two authorities disagree. The door plan stays `draft` until this plan is `done` and
+    `owner-question-store` is `done`; the same instruction goes to the `project-supervisor` lane. Promoting it
+    earlier makes `activeOverlaps`, which ignores `blockedBy`, report an overlap that no phase here can fix.
 26. Names (planner decision, reversible until phase 2 starts; the owner may object). The packages keep
     the names the owner chose: `write-scope`, `graph`, `resource-referee`. The compound names do not
     collide with the seat `referee` (role `judge`, `test/runner/execution/patterns/catalog.test.mjs:676`)
@@ -251,31 +298,42 @@ fgOS output must hash the same on every rebuild.
     the known copy names, the pinned JS port and `globsMeet` allow-listed as debt with a `retiredBy`.
     `domains/coding/slice-kinds.yaml` matches the crate by the glob `packages/*/write-scope/**`, which stops
     matching after the move; phase 2 fixes it and its generated `compiled.json`.
+30. The plan-check gate is scoped to what these plans control: `node scripts/plan-contract-check.mjs --all`,
+    run through the runner of decision 20 until the door plan makes the plain command load the addon,
+    reports no error that names this plan and no overlap pair that involves it. Errors of other lanes' plans
+    are recorded in `reports/close.md`, not fixed here.
+31. The phase-table reader is shared and honest: the footprint-cell reader keeps every `*` (it strips only
+    the backticks and the link syntax around a whole entry) and refuses, with a named code, a wave that is
+    not an integer from 1, a duplicate id, a missing column and a non-string frontmatter entry. It is
+    fixed in the supervisor's `read_phase_table` (door plan, phase 8b) and mirrored in the plan-check script
+    (phase 8) before the door reads a table (phase 7b depends on 8b).
 
 ## Acceptance criteria
 
 1. `packages/git/write-scope` no longer exists; `packages/write-scope`, `packages/graph` and
    `packages/resource-referee` build in the workspace. Proof: `cargo test --workspace` (phase 7c).
 2. The JS port `src/runner/dispatch/write-scope.mjs` stays pinned to the Rust rule: the extended parity
-   test compares JS and Rust on `overlaps` and on colliding pairs through the addon. Proof: phase 3.
+   test compares JS and Rust on whole-scope `overlaps` and on canonicalisation through the addon; the
+   colliding-pairs function is proven by Rust tests against a naive pairwise oracle. Proof: phase 3.
 3. `graph` passes the ported cases of `test/state/graph-metrics.test.mjs` and its intended differences
    are listed by name. Proof: phase 4.
 4. Each rule in the catalog has one owning test; every blocking finding code is produced by some test; a
-   truncated fact set never yields `accept`; a per-item limit breach is an item-level finding. Proof:
-   phase 5.
+   `truncated` fact never yields `accept`; an unknown claim space is refused by name; a per-item limit
+   breach is an item-level finding. Proof: phase 5.
 5. An addon lacking the `graph` or `writeScope` fields is refused by name; the test that pins
-   `versions()` whole is updated; a forced panic in a new entry surfaces as a thrown error. Proof: phase 7.
-6. `cargo test --workspace`, `npm test` and `node scripts/plan-contract-check.mjs --all` are green, run
-   one after the other, only the two named census tests may be red until the census is regenerated, and
-   the census matches the tree afterwards. Proof: phase 7c.
+   `versions()` whole and `ports.v1.json` are updated; the shared panic helper is proven by a Rust unit
+   test. Proof: phase 7.
+6. `cargo test --workspace`, `npm test` and the plan-contract check of decision 30 are green, run one
+   after the other, only the two named census tests may be red until the census is regenerated, and the
+   census matches the tree afterwards. Proof: phase 7c.
 
 ## Non-goals
 
-- Any consumer change (the supervisor, the plan-check script, plan-lint, Work, the door, the skills):
-  all in the door plan.
+- Any consumer change (the supervisor, the plan-check script, plan-lint, Work including merge readiness,
+  the door, the skills): all in the door plan.
 - Any change to Work's storage, status machine or `deps`/`parent` rules.
 - Dispatch's runtime enforcement, the event store, instruction composition, `globsMeet` and the
-  state-transition graphs; the packages are built so they can adopt later.
+  state-transition graphs; the packages are built so they can adopt later. Merge readiness is a consumer of the Work exports and is handled in the door plan (decision 8).
 - A web UI, an MCP tool, a new always-loaded instruction, a new config key or a doctor row.
 
 ## Phases
@@ -287,7 +345,7 @@ fgOS output must hash the same on every rebuild.
 | 3 | [write-scope: colliding pairs and the addon operations](phase-03-write-scope-pairs.md) | 1, 2 | docs/platform/write-scope, packages/write-scope, packages/git/node-addon/src/git/write_scope.rs, test/git/write-scope-parity.test.mjs, test/runner/write-scope.test.mjs | 2 | ready |
 | 4 | [graph crate](phase-04-graph-crate.md) | 1, 2 | docs/platform/graph, packages/graph/rust | 2 | ready |
 | 5 | [resource-referee crate](phase-05-resource-referee-crate.md) | 1, 3, 4 | docs/platform/resource-referee, packages/resource-referee/rust | 3 | ready |
-| 7 | [Addon bindings and ABI](phase-07-addon-bindings.md) | 3, 4 | packages/git/node-addon/src, src/native/door.mjs, test/config/config-door.test.mjs, test/git/native-load.test.mjs | 3 | ready |
+| 7 | [Addon bindings and ABI](phase-07-addon-bindings.md) | 3, 4 | packages/git/node-addon/src, packages/git/contracts/ports.v1.json, src/native/door.mjs, test/config/config-door.test.mjs, test/git/native-load.test.mjs | 3 | ready |
 | 7c | [Integration and landing of the packages](phase-07c-integration.md) | 5, 7 | packages/git/contracts/mutation-census.v1.json, plans/261119-0030-resource-referee-graph-write-scope-stack/reports | 4 | ready |
 
 Reading check (planner applied the contract by hand, then ran the script, which reads frontmatter and
@@ -320,6 +378,8 @@ frontmatters are disjoint and nothing more.
 (`activeOverlaps` in `scripts/plan-contract-check.mjs:149-157`); recorded below as a follow-up. Step zero
 (decision 24) applies whenever a blocker lands before start.
 
+The door plan stays `draft` until this plan is `done` and `owner-question-store` is `done` (decision 25).
+
 ## Recorded follow-ups (separate items, not in this plan)
 
 Found while reviewing; each is a duplicate or a candidate of the same kind and is left out on purpose.
@@ -349,17 +409,18 @@ plans"); the names were settled in decision 26.
 - Moving `write-scope` touches the workspace `Cargo.toml` and three consumers' manifests, hot files of
   other lanes. Announce before phase 2; the lane that lands second rebases (board rule).
 - The census is one generated file covering about fourteen hundred sources; two phases regenerating it
-  in parallel would conflict. Only the landing regenerates it, and it is re-run right before the
-  fast-forward. This is safe only while phases commit in linked worktrees (decision 14).
+  in parallel would conflict. Only the landing regenerates it, in the loop of decision 14. This is safe
+  only while phases commit in linked worktrees.
 - This plan changes no behaviour: nothing calls the packages until the door plan lands, so a landing here
   cannot make two authorities disagree. The cost is that the packages ship unused, and the reading-map
   rows (owned by the door plan because `owner-question-store` also claims that file) land with it.
 - An addon built before phase 7 is refused by name through the ABI clauses; no payload falls back.
 - Rollback: each phase is its own commit. Revert in the reverse order 7c, 7, 5, 4, 3, 2, 1, regenerate
   the census and rebuild `Cargo.lock` at the end. If the door plan has landed, revert it first
-  (10, 9, 8b, 8, 7b), because `apps/fgos/Cargo.toml` then depends on these crates. If a release was
-  activated, re-stage and re-activate the previous release with `fgctl repair` and run `fgos doctor`
-  through the shim; check that `apps/fgos-gateway` still builds from its own lock.
+  (10, 9, 7b, 8, 8b). `fgctl repair` steps back one activation only, so phase 7c records the digest of
+  the release that was active before this landing in `reports/close.md` and rollback re-activates that
+  digest explicitly (`fgctl upgrade --from <tree of that release>`); check that `apps/fgos-gateway` still
+  builds from its own lock.
 
 ## Validation Log
 
@@ -540,3 +601,42 @@ before adjudicating: no production caller of `admissible`, `open_beneath` and it
 Whole-Plan Consistency Sweep after session 4: both plans and all phase files were regenerated from the
 decisions above and re-read against each other; the owner of each hot file, the consumers, the Node
 access rule, the error policy, the limits and the footprints agree. Unresolved contradictions: none.
+
+### Session 5: independent reviewers, fifth round (2026-11-19)
+
+Four `code-reviewer` subagents ran again on the pair of plans after the consumers moved to the door plan.
+28 raw findings (scope 7, security 7, failure modes 7, assumptions 7). The planner verified the
+load-bearing claims in the tree before adjudicating: both phase-table readers strip `*`
+(`portfolio.rs:317`, `plan-contract-check.mjs:42`), `graph-harness.mjs:21,144` feeds `fgos merge`, the
+script cannot load the addon from a checkout, `ports.v1.json:115` lists the addon functions, the JS port
+has no set-level function, the addon has two private panic wrappers and no shared one, Work items carry
+no footprint today.
+
+| # | Cluster (reviewers) | Severity | Disposition | Applied to |
+|---|---|---|---|---|
+| 1 | Phase-table readers strip `*` and drop bad cells, so the door says accept on colliding phases (security, assumption) | Critical | Accept | Decision 31, door plan phases 8b, 8, 7b |
+| 2 | The plan-check gate and the verdict recording cannot run from a checkout; `--all` is red for other lanes (failure, assumption) | Critical | Accept | Decisions 20, 30; phases 1, 7c |
+| 3 | Phase 8 changes merge readiness and `rankImpact`; "merge conductor in neither plan" was false (assumption, security) | Critical | Accept | Decision 8; door plan phase 8 |
+| 4 | Work items without a footprint would conflict with everything (assumption) | High | Accept | Decision 17 |
+| 5 | A policy file can switch off the collision check (security) | High | Accept | Decision 11 |
+| 6 | Limits: refuse versus truncate was contradictory; only pairs truncate (scope, security) | High | Accept | Decision 7 |
+| 7 | Landing loop skipped lock, skills and tests after a merge (failure) | High | Accept | Decision 14 |
+| 8 | Door plan promoted early blocks the foundation's gate (failure) | High | Accept | Decision 25 |
+| 9 | Acceptance 2 needed a JS pairs function that does not exist (scope) | High | Accept | Criterion 2, decision 19 |
+| 10 | Panic helper does not exist; test-only branch forbidden; double ownership of `write_scope.rs` (scope, assumption) | Medium | Accept | Decision 16, phases 3, 7 |
+| 11 | Roots, byte cap and refusal mapping of `open_beneath` unspecified (security) | Medium | Accept | Decision 23, door plan 7b |
+| 12 | Claim spaces undefined; an unknown space never collides (security) | Medium | Accept | Decision 13 |
+| 13 | Control characters in printed entries (security) | Medium | Accept | Decision 23 |
+| 14 | `ports.v1.json` and the `--units` contract unowned (scope) | Medium | Accept | Phases 1, 7 |
+| 15 | Two critical-path rules remain (failure, assumption) | Medium | Accept | Decision 18 |
+| 16 | Importers of the swapped exports incomplete; verify grep false (scope, assumption) | Medium | Accept | Decision 18, door plan 8 |
+| 17 | Door plan had no step zero or second baseline after `owner-question-store` (failure) | Medium | Accept | Decisions 20, 24 |
+| 18 | `fgctl repair` rolls back one activation only (failure) | Medium | Accept | Risks and rollback |
+| 19 | A dependency on `fgos-write-scope` would drift two lock files (failure) | Medium | Accept | Decision 15 |
+| 20 | Door plan footprints missed tests and generated skill wrappers (assumption) | Medium | Accept | Door plan 8, 9 |
+| 21 | Supervisor reporting function and `facts-truncated` unreachable in a pairwise `admissible` (scope) | Medium | Accept | Decision 17, door plan 8b |
+| 22 | Optional alone-in-layer cannot fire from `--plan` (scope) | Medium | Accept | Decision 12 |
+| R1 | Drop `cycle_through` and `--policy` as unrequested (scope) | Medium | Reject | Owner asked for the cycle workaround and chose `--policy` (decisions 11, 27) |
+
+Whole-Plan Consistency Sweep after session 5: both plans and all phase files were regenerated from the
+decisions above and re-read against each other. Unresolved contradictions: none.
