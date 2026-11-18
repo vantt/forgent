@@ -25,6 +25,7 @@
       "mailbox-hook",
       "mailbox-sync-timer",
       "account-probe-timer",
+      "watcher-timer",
       "config-parse",
       "config-schema",
       "config-legacy-shadowed",
@@ -89,6 +90,7 @@
       "lock-dirs",
       "mailbox-sync-timer",
       "account-probe-timer",
+      "watcher-timer",
       "config-refresh-docs",
       "config-remove-redundant",
       "config-chmod",
@@ -448,6 +450,11 @@
     {
       "id": "account-probe-timer",
       "description": "account health: when dispatch.probeAccount.intervalSec is set, an OS timer runs fgos dispatch probe-account --all --record --leg direct every that many seconds, so an exhausted or logged-out account is found between runs; off (0) by default",
+      "owner": "rust:packaging"
+    },
+    {
+      "id": "watcher-timer",
+      "description": "project supervision: when watcher.enabled is true, an OS timer runs fgos watcher tick every watcher.activeIntervalSec and keeps a head it starts alive after the timer's run ends; off by default; a platform without a timer scheduler only warns",
       "owner": "rust:packaging"
     },
     {
@@ -857,6 +864,10 @@
     },
     {
       "id": "account-probe-timer",
+      "owner": "rust:packaging"
+    },
+    {
+      "id": "watcher-timer",
       "owner": "rust:packaging"
     },
     {
