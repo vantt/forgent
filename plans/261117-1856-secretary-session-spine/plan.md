@@ -325,6 +325,9 @@ Kept below as the record of what was asked.
 3. **(2026-11-18, answered (2))** Confine head sessions like workers and also give them one request socket with the verb
    `head start` in phase 12 (option 2), rather than confining now and leaving the secretary unable to start sessions
    until a later plan (option 1). Recorded under "Design settled by this plan".
+4. **(2026-11-18, answered (a))** A head may hold a leased account for hours (phase 12 open question 1): accepted;
+   rotation keeps sessions short and `fgos doctor credential-copies-retained` names staged copies. A dedicated account per
+   head persona (option c) goes to the role-grant follow-up plan.
 
 1. **Head-session verb name: `fgos session start` is already taken.**
    - *Chuyện gì đang xảy ra:* SM-D6 named the head-session door `fgos session start <persona> --name <name>`, but
