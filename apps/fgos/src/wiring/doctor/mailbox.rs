@@ -13,8 +13,13 @@ use fgos_distribution::timer::{
 use serde_json::Value;
 use std::path::Path;
 
-pub const ROWS: &[&str] = &["mailbox-hook", "mailbox-sync-timer", "account-probe-timer"];
-pub const FIXES: &[&str] = &["mailbox-sync-timer", "account-probe-timer"];
+pub const ROWS: &[&str] = &[
+    "mailbox-hook",
+    "mailbox-sync-timer",
+    "account-probe-timer",
+    "watcher-timer",
+];
+pub const FIXES: &[&str] = &["mailbox-sync-timer", "account-probe-timer", "watcher-timer"];
 
 pub const GROUP: Rows = Rows {
     rows: ROWS,
@@ -29,6 +34,7 @@ fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
             "mailbox-hook" => mailbox_hook(root),
             "mailbox-sync-timer" => timer_row(Schedule::MailboxSync, root),
             "account-probe-timer" => timer_row(Schedule::AccountProbe, root),
+            "watcher-timer" => timer_row(Schedule::WatcherTick, root),
             other => unreachable!("mailbox group asked for row {other}"),
         })
         .collect()
@@ -39,6 +45,7 @@ fn fix(root: &Path, ids: &[&str]) -> Vec<FixResult> {
         .map(|id| match *id {
             "mailbox-sync-timer" => timer_fix(id, Schedule::MailboxSync, root),
             "account-probe-timer" => timer_fix(id, Schedule::AccountProbe, root),
+            "watcher-timer" => timer_fix(id, Schedule::WatcherTick, root),
             other => unreachable!("mailbox group asked for fix {other}"),
         })
         .collect()
@@ -353,8 +360,15 @@ mod tests {
     fn the_group_names_exactly_the_rows_and_fixes_the_registry_gives_to_the_mailbox_and_its_timers()
     {
         let registry = crate::wiring::doctor::registry().unwrap();
-        let mine =
-            |id: &str| ["mailbox-hook", "mailbox-sync-timer", "account-probe-timer"].contains(&id);
+        let mine = |id: &str| {
+            [
+                "mailbox-hook",
+                "mailbox-sync-timer",
+                "account-probe-timer",
+                "watcher-timer",
+            ]
+            .contains(&id)
+        };
         let mut rows: Vec<&str> = registry
             .rows
             .iter()

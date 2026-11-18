@@ -1,8 +1,9 @@
 //! The OS timers fgOS writes per project: a systemd user timer on Linux, a launchd agent on macOS.
 //!
 //! A schedule is data (what it runs, how often, how doctor words it); render, scheduler lookup, the owned-unit
-//! check and the fix are shared by every schedule. Two exist: `mailbox-sync` takes mail on a machine nobody is
-//! typing on, `account-probe` sweeps every provider account between runs. Every unit carries its schedule's
+//! check and the fix are shared by every schedule. Three exist: `mailbox-sync` takes mail on a machine nobody is
+//! typing on, `account-probe` sweeps every provider account between runs, `watcher-tick` wakes the project
+//! supervisor's watcher. Every unit carries its schedule's
 //! marker line and only a unit with that marker is ever removed, so `fix` removes the timer of a project that
 //! turned its schedule off and never touches a unit it did not write.
 //!
@@ -33,6 +34,7 @@ const DOOR_FAILURE_IDS: [&str; 4] = [
 pub enum Schedule {
     MailboxSync,
     AccountProbe,
+    WatcherTick,
 }
 
 /// What a project's config asks of a schedule.
@@ -65,12 +67,17 @@ pub struct Fix {
 }
 
 impl Schedule {
-    pub const ALL: [Schedule; 2] = [Schedule::MailboxSync, Schedule::AccountProbe];
+    pub const ALL: [Schedule; 3] = [
+        Schedule::MailboxSync,
+        Schedule::AccountProbe,
+        Schedule::WatcherTick,
+    ];
 
     pub fn name(self) -> &'static str {
         match self {
             Self::MailboxSync => "mailbox-sync",
             Self::AccountProbe => "account-probe",
+            Self::WatcherTick => "watcher-tick",
         }
     }
 
@@ -78,6 +85,7 @@ impl Schedule {
         match self {
             Self::MailboxSync => "mailbox sync",
             Self::AccountProbe => "account probe",
+            Self::WatcherTick => "watcher tick",
         }
     }
 
@@ -86,6 +94,7 @@ impl Schedule {
         match self {
             Self::MailboxSync => "fgos-managed: mailbox-sync-timer",
             Self::AccountProbe => "fgos-managed: account-probe-timer",
+            Self::WatcherTick => "fgos-managed: watcher-timer",
         }
     }
 
@@ -93,6 +102,7 @@ impl Schedule {
         match self {
             Self::MailboxSync => "fgos-mailbox-sync",
             Self::AccountProbe => "fgos-account-probe",
+            Self::WatcherTick => "fgos-watcher",
         }
     }
 
@@ -102,6 +112,9 @@ impl Schedule {
             Self::AccountProbe => {
                 "fgOS account probe (calls each provider account directly and records what it found)"
             }
+            Self::WatcherTick => {
+                "fgOS watcher tick (wakes the project supervisor's watcher, which decides nothing itself)"
+            }
         }
     }
 
@@ -109,6 +122,7 @@ impl Schedule {
         match self {
             Self::MailboxSync => "fgOS mailbox sync timer",
             Self::AccountProbe => "fgOS account probe timer",
+            Self::WatcherTick => "fgOS watcher tick timer",
         }
     }
 
@@ -135,6 +149,16 @@ impl Schedule {
                 interval_sec: integer(config.pointer("/dispatch/probeAccount/intervalSec")?)?,
                 remote: None,
             }),
+            // The tick skips its own work while idle, so the unit only ever uses the active interval.
+            Self::WatcherTick => {
+                if config.pointer("/watcher/enabled") != Some(&Value::Bool(true)) {
+                    return None;
+                }
+                Some(Found {
+                    interval_sec: integer(config.pointer("/watcher/activeIntervalSec")?)?,
+                    remote: None,
+                })
+            }
         }
     }
 
@@ -166,14 +190,40 @@ impl Schedule {
                 Word::Plain("--dir"),
                 dir,
             ],
+            Self::WatcherTick => vec![
+                Word::Plain("watcher"),
+                Word::Plain("tick"),
+                Word::Plain("--dir"),
+                dir,
+            ],
         }
     }
 
-    /// The service's environment. The probe reads PATH to find the provider CLIs; nothing secret.
+    /// Whether processes the service starts must outlive its run. The watcher starts a supervisor head from
+    /// a oneshot unit; the scheduler's default would kill that head when the unit exits.
+    fn leaves_started_processes_running(self) -> bool {
+        matches!(self, Self::WatcherTick)
+    }
+
+    /// The service's environment. The probe reads PATH to find the provider CLIs; nothing secret. The watcher
+    /// also starts a head, which needs account homes (HOME) and the runtime socket directory.
     fn service_vars(self, host: &Host) -> Vec<(String, String)> {
         match self {
             Self::MailboxSync => Vec::new(),
             Self::AccountProbe => vec![("PATH".to_string(), host.probe_path())],
+            Self::WatcherTick => {
+                let mut vars = vec![
+                    ("PATH".to_string(), host.probe_path()),
+                    ("HOME".to_string(), host.home.to_string_lossy().into_owned()),
+                ];
+                if host.platform == "linux" {
+                    vars.push((
+                        "XDG_RUNTIME_DIR".to_string(),
+                        format!("/run/user/{}", host.uid),
+                    ));
+                }
+                vars
+            }
         }
     }
 
@@ -181,6 +231,7 @@ impl Schedule {
         match self {
             Self::MailboxSync => "cross-machine mail is not enabled here (or eventStore.sync.intervalSec is 0), so no timer is needed",
             Self::AccountProbe => "the account probe is not scheduled here (dispatch.probeAccount.intervalSec is 0), so no timer is needed",
+            Self::WatcherTick => "the watcher is not enabled here (watcher.enabled is false), so no timer is needed",
         }
     }
 
@@ -188,6 +239,7 @@ impl Schedule {
         match self {
             Self::MailboxSync => "mail is taken when a session runs a tool",
             Self::AccountProbe => "run fgos dispatch probe-account --all --record by hand",
+            Self::WatcherTick => "supervision does not run on this platform (no timer scheduler)",
         }
     }
 
@@ -199,6 +251,9 @@ impl Schedule {
             Self::AccountProbe => format!(
                 "{kind} timer {stem} is still installed but dispatch.probeAccount.intervalSec is 0 here"
             ),
+            Self::WatcherTick => {
+                format!("{kind} timer {stem} is still installed but watcher.enabled is false here")
+            }
         }
     }
 
@@ -212,6 +267,10 @@ impl Schedule {
                 "{kind} timer {stem} probes every account every {} s",
                 found.interval_sec
             ),
+            Self::WatcherTick => format!(
+                "{kind} timer {stem} wakes the watcher every {} s",
+                found.interval_sec
+            ),
         }
     }
 
@@ -220,6 +279,9 @@ impl Schedule {
             Self::MailboxSync => format!("no working {kind} timer ({state}) for {stem}: mail from another machine waits until a session there runs a tool"),
             Self::AccountProbe => format!(
                 "no working {kind} timer ({state}) for {stem}: no account is probed between runs"
+            ),
+            Self::WatcherTick => format!(
+                "no working {kind} timer ({state}) for {stem}: nothing wakes the watcher, so supervision waits until a session wakes it"
             ),
         }
     }
@@ -231,6 +293,9 @@ impl Schedule {
             }
             Self::AccountProbe => {
                 format!("removed {kind} timer {stem}: the account probe is off here")
+            }
+            Self::WatcherTick => {
+                format!("removed {kind} timer {stem}: the watcher is off here")
             }
         }
     }
@@ -355,6 +420,9 @@ pub fn render_systemd(spec: &UnitSpec) -> Result<Vec<(String, String)>, String> 
         "[Service]".to_string(),
         "Type=oneshot".to_string(),
     ];
+    if spec.schedule.leaves_started_processes_running() {
+        service.push("KillMode=process".to_string());
+    }
     service.extend(
         spec.vars
             .iter()
@@ -412,6 +480,9 @@ pub fn render_launchd(spec: &UnitSpec) -> Result<Vec<(String, String)>, String> 
                 .map(|(k, v)| format!("    <key>{}</key><string>{}</string>", xml(k), xml(v))),
         );
         lines.push("  </dict>".to_string());
+    }
+    if spec.schedule.leaves_started_processes_running() {
+        lines.push("  <key>AbandonProcessGroup</key><true/>".to_string());
     }
     lines.push(format!(
         "  <key>StartInterval</key><integer>{}</integer>",
@@ -1064,7 +1135,7 @@ mod tests {
                 interval_sec: 300,
                 remote: Some("origin".into()),
             },
-            Schedule::AccountProbe => Found {
+            Schedule::AccountProbe | Schedule::WatcherTick => Found {
                 interval_sec: 300,
                 remote: None,
             },
@@ -1210,6 +1281,84 @@ mod tests {
         assert!(render_systemd(&spec("/b/fgos", ok, vars))
             .unwrap_err()
             .contains("refuses PATH"));
+    }
+
+    // Systemd units and launchd plists are written for Unix hosts from host paths; a Windows host has no timer.
+    #[cfg(unix)]
+    #[test]
+    fn the_watcher_unit_runs_the_tick_with_the_head_start_environment_and_keeps_a_started_head_alive(
+    ) {
+        let schedule = Schedule::WatcherTick;
+        let config = json!({"watcher": {"enabled": true, "activeIntervalSec": 45}});
+        let found = schedule.schedule_of(Some(&config)).unwrap();
+        assert_eq!(found.interval_sec, 45);
+        for off in [
+            json!({"watcher": {"enabled": false, "activeIntervalSec": 45}}),
+            json!({"watcher": {"enabled": true, "activeIntervalSec": 0}}),
+            json!({"watcher": {"activeIntervalSec": 45}}),
+        ] {
+            assert_eq!(schedule.schedule_of(Some(&off)), None, "{off}");
+        }
+        let root = PathBuf::from("/p");
+        let words = schedule.command(&found, &root);
+        let stem = unit_stem(&root, schedule);
+        assert!(stem.starts_with("fgos-watcher-"));
+        for (platform, home) in [("linux", "/home/u"), ("darwin", "/Users/u")] {
+            let h = host(platform, Path::new(home));
+            let vars = schedule.service_vars(&h);
+            let names: Vec<&str> = vars.iter().map(|(k, _)| k.as_str()).collect();
+            let want: &[&str] = if platform == "linux" {
+                &["PATH", "HOME", "XDG_RUNTIME_DIR"]
+            } else {
+                &["PATH", "HOME"]
+            };
+            assert_eq!(names, want, "{platform}");
+            assert_eq!(vars[0].1, h.probe_path());
+            assert_eq!(vars[1].1, home);
+            let spec = UnitSpec {
+                stem: &stem,
+                bin: BIN,
+                words: &words,
+                vars: &vars,
+                interval_sec: found.interval_sec,
+                schedule,
+            };
+            let files = if platform == "linux" {
+                render_systemd(&spec).unwrap()
+            } else {
+                render_launchd(&spec).unwrap()
+            };
+            let text = files
+                .iter()
+                .map(|(_, t)| t.as_str())
+                .collect::<Vec<_>>()
+                .join("\n");
+            assert!(text.contains("fgos-managed: watcher-timer"), "{text}");
+            if platform == "linux" {
+                assert!(
+                    text.contains(&format!("ExecStart=\"{BIN}\" watcher tick --dir \"/p\"")),
+                    "{text}"
+                );
+                assert!(text.contains("KillMode=process"), "{text}");
+                assert!(
+                    text.contains("Environment=\"XDG_RUNTIME_DIR=/run/user/501\""),
+                    "{text}"
+                );
+                assert!(text.contains("OnUnitActiveSec=45"), "{text}");
+            } else {
+                assert!(text.contains("<string>watcher</string>"), "{text}");
+                assert!(text.contains("<string>tick</string>"), "{text}");
+                assert!(
+                    text.contains("<key>AbandonProcessGroup</key><true/>"),
+                    "{text}"
+                );
+                assert!(text.contains("<integer>45</integer>"), "{text}");
+            }
+        }
+        // The other two schedules keep the default scheduler behaviour.
+        for other in [Schedule::MailboxSync, Schedule::AccountProbe] {
+            assert!(!other.leaves_started_processes_running());
+        }
     }
 
     #[test]
