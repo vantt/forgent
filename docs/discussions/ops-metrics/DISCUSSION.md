@@ -9,10 +9,9 @@ supervisor detection thuộc plan này, chỉ hiện ở attention view (D1); đ
 Rust (D3); khung ba tầng, contract ghi/truy vấn làm tốt nhất trước (D4); bảy thước đo và quy tắc phát hiện là định
 nghĩa của tầng trên, chạy qua truy vấn chung, Observe không biết chúng (D5).
 
-Q2 → OM-D6, Q5 → OM-D7. Đang mở (QUESTIONS.md): Q6 (nghĩa "pace"),
-Q7 (reader câu hỏi Node → Rust), Q8 (bộ tên gốc theo OpenTelemetry). Friction (§6 D) chờ chủ dự án xem năm loại
-`kind`. Đã học skillstation (báo cáo research-261118-1017), đưa 8 bài học vào §6.0. Việc tiếp: chi tiết contract tầng 1 —
-hình bản ghi, registry, ngữ pháp truy vấn.
+Vòng 6: Q2 → OM-D6, Q5 → OM-D7, Q8 → OM-D8, Q9 → OM-D9; Q6 chuyển sang session shaper supervisor, ở đây chỉ làm cơ
+chế định nghĩa phát hiện chung (OM-D10). Đã học skillstation (`plans/reports/research-261118-1017-…`), 8 bài học vào
+§6.0; nháp contract tầng 1 ở §6.0.1. Còn mở: Q7 (reader câu hỏi Node → Rust).
 
 ## 2. Mục tiêu & đề bài
 
@@ -41,7 +40,7 @@ phạm vi.
 | V9 | Thước đo 3-6 không có nguồn trên main | chốt OM-D6 | prototype dùng file tsv ghi tay (`plan-board.mjs:431-525`) |
 | V10 | Friction: không kind `plan`/`backlog`, không xu hướng, gần như không ai ghi nữa | rõ | `observe.friction.v1.json`; 10 bản ghi tháng 11; không skill nào gọi `friction record` |
 | V11 | Supervisor/lead là gì trên main | rõ | head session `head:<persona>-<name>` (commit `771c44ce8`), lead `lead:<LANE>`; Identity `liveness`; Session Host `alive(placement)` (`docs/platform/session-host/spec.md:49`) |
-| V12 | "Pace" (R9) nghĩa là gì khi chỉ phát hiện | **mở → Q6** | audit R9: nhịp tick thích ứng — là hành vi, không phải tín hiệu |
+| V12 | "Pace" (R9) nghĩa là gì khi chỉ phát hiện | chuyển session shaper supervisor (OM-D10) | audit R9: nhịp tick thích ứng — là hành vi, không phải tín hiệu |
 | V13 | Ngưỡng no-progress | chốt OM-D7 | audit R7 "hai tick không tiến"; trên main supervisor là LLM head, không có tick đếm được |
 | V14 | Attention view chỉ có row gắn run | rõ | `attention-view.mjs:44-82`: row giả định `runId`, sort dòng 79; contract `attention-view` v1 |
 | V16 | Friction ghi gì, ai ghi, phân loại và gom thế nào | đang bàn | 762 record, 21 chữ ký, layer: docs 284, verification 249, state 221 — gần hết từ writer tự động thời Work; trial 11-17 ghi `--layer skill` bị từ chối (`friction.rs:13,79`) nên tự ghi friction `layer-not-published`; `rank` gom theo subject (`friction.rs:350-398`) |
@@ -58,6 +57,9 @@ phạm vi.
 | OM-D5 | Bảy thước đo bộ lái (và mọi khái niệm kiểu "lead time của plan", "plan đứng yên") là khái niệm của tầng trên — chỗ cần quan sát (bộ lái/portfolio/supervisor) — không cố định trong tầng Observe. Observe chỉ biết bản ghi, span, refs, phép lọc/nhóm/gộp | chủ dự án | 2026-11-18 |
 | OM-D6 | Plan này dựng nguồn cho thước đo 1 (hoàn tất), 2 (lead time tách bốn phần), 7 (qua cổng lần đầu) và 3 (can thiệp, từ thời điểm hỏi/trả lời câu hỏi). Thước đo 4 (bám phạm vi), 5 (lỗi plan do validate), 6 (độ trễ phát hiện) trả `unmeasured` kèm lý do, mỗi cái thành một dòng backlog | chủ dự án, Q2 | 2026-11-18 |
 | OM-D7 | "Plan đứng yên" = plan `running` không có tín hiệu tiến (commit trên nhánh, run settle mang khoá plan, dòng board) trong N phút; N là config, mặc định 60; về sau N theo phase từ median đã đo khi đủ mẫu | chủ dự án, Q5 | 2026-11-18 |
+| OM-D8 | Tên trong registry theo mô hình và tên OpenTelemetry chỗ đã có chuẩn (gồm GenAI `gen_ai.*`); tên riêng `fgos.*` cho phần chỉ fgOS có; không SDK/collector OTel trong lõi; OTel đổi tên thì registry ghi alias | chủ dự án, Q8 | 2026-11-18 |
+| OM-D9 | Friction có attr `fgos.friction.kind` với năm giá trị: bug, instability, missing, awkward, doc (thêm sau qua registry) | chủ dự án, Q9 | 2026-11-18 |
+| OM-D10 | "Pace" là gì do session shaper supervisor quyết (nơi đang định hình hành vi supervisor). Plan này không định nghĩa pace; nó làm cho quy tắc phát hiện của attention view là định nghĩa có tên (truy vấn + ngưỡng + kind row), chạy chung, để thêm pacer sau chỉ là thêm một định nghĩa, không đổi code hay contract | chủ dự án, Q6 | 2026-11-18 |
 
 ## 5. Q&A log
 
@@ -80,6 +82,8 @@ phạm vi.
 - 2026-11-18 ~11:45 — Chủ dự án: học repo vantt/skillstation (nhiều kỹ thuật quan sát) → báo cáo research, bài học
   vào §6.0.
 - 2026-11-18 ~12:00 — Chủ dự án: Q2, Q5 đồng ý đề xuất → OM-D6, OM-D7.
+- 2026-11-18 ~12:15 — Chủ dự án: Q8, Q9 đồng ý → OM-D8, OM-D9. Q6 đưa sang session `shaper: supervisor`; ở đây
+  thiết kế để thêm pacer sau không phải đổi gì → OM-D10.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -233,7 +237,11 @@ ngưỡng trong config), attention view chạy chúng; Observe không biết cá
   `gone` và chưa retire, hoặc Identity không còn liệt kê.
 - `plan-no-progress`: plan `running` không có tín hiệu tiến (commit trên nhánh, run settle mang khoá plan, dòng
   board) trong ngưỡng (Q4).
-- pace: theo Q6. Ngưỡng đứng yên: OM-D7 (config, mặc định 60 phút).
+- pace: không định nghĩa ở đây (OM-D10). Ngưỡng đứng yên: OM-D7 (config, mặc định 60 phút).
+Cơ chế chung (OM-D10): attention view đọc một danh sách định nghĩa phát hiện, mỗi định nghĩa = truy vấn có tên +
+ngưỡng (config) + kind row + lệnh gợi ý; `head-gone`, `plan-no-progress` là hai định nghĩa đầu; pacer của supervisor
+sau này là định nghĩa thứ ba. Để pacer diễn đạt được, contract phải có sẵn nguồn hoạt động của head session: sự kiện
+hoạt động theo session (statusline sidecar / transcript) và token theo session — nằm trong §6 C.
 Ngưỡng là config key mới qua standard + schema. Logic phát hiện viết bằng Rust (chủ dự án 11-18: code mới viết
 được bằng Rust thì viết Rust); view Node chỉ nối dây.
 
