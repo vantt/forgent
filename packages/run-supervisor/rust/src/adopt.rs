@@ -261,6 +261,7 @@ pub fn adopt_one(dir: &Path, args: &AdoptArgs) -> Verdict {
         &resource,
         binding.is_some(),
         agent,
+        domain_state != DomainState::Empty,
         envelope_json.as_ref(),
         args,
     )
@@ -335,6 +336,7 @@ fn adopt_locked(
     resource: &Resource,
     bound: bool,
     agent: Option<Record>,
+    domain_live: bool,
     envelope: Option<&Value>,
     args: &AdoptArgs,
 ) -> Verdict {
@@ -352,10 +354,11 @@ fn adopt_locked(
     };
     // A live worker this adopter re-owns holds a lane while it does, so the pool's live count never undercounts;
     // a full pool keeps the worker and says so.
-    let live_agent = agent
-        .as_ref()
-        .is_some_and(|a| facts::judge_here(a) != Judged::Dead);
-    let (_lane, lane_note) = if live_agent {
+    let live_worker = domain_live
+        || agent
+            .as_ref()
+            .is_some_and(|a| facts::judge_here(a) != Judged::Dead);
+    let (_lane, lane_note) = if live_worker {
         crate::lanes::adopt(&fgos_holder_lock::lock_root(), envelope)
     } else {
         (crate::lanes::Lane::None, None)

@@ -83,6 +83,7 @@ import {
   resolveAttemptHost,
   startSupervisor,
   waitForBinding,
+  bindingWaitMs,
   removeAttemptIntent,
   writeAttemptFiles,
   writeAttemptIntent,
@@ -1149,7 +1150,7 @@ export async function startAndBind(attempt, { envelope }) {
     supervisor = startSupervisor({ envelope, locks: attempt.locks, stepEnv: attempt.stepEnv, extraEnv: attempt.terminalPrep?.endpointEnv });
     attempt.handedOver = true;
     if (process.platform === 'win32') attempt.locks.releaseAttempt();
-    bound = await waitForBinding(attemptRunDir, supervisor.child);
+    bound = await waitForBinding(attemptRunDir, supervisor.child, { timeoutMs: bindingWaitMs(envelope) });
     if (bound.state === 'bound') registerDeliveredAttempt(attemptRunDir);
   } finally {
     attempt.locks.releaseAttempt();
