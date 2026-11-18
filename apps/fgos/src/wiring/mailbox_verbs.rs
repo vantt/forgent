@@ -697,7 +697,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                     Ok(heads) => heads,
                     Err(text) => return failed(text, *json, warning),
                 };
-                match address(state_root().as_deref(), to, &heads) {
+                match address(state_root().as_deref(), &fgos_dir, to, &heads) {
                     Addressed::Head { key, role_holder } => (Recipient::Key(key), role_holder),
                     Addressed::Refused(refusal) => {
                         // No head of this record answers: a session of another
@@ -740,7 +740,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
                     .iter()
                     .any(|head| head.name.as_str() == to || head.key.as_str() == to);
                 match (!exact)
-                    .then(|| identified(state_root().as_deref(), to, &heads))
+                    .then(|| identified(state_root().as_deref(), &fgos_dir, to, &heads))
                     .flatten()
                 {
                     Some(Addressed::Head { key, .. }) => (Recipient::Key(key), None),

@@ -1785,3 +1785,104 @@ fn a_refresh_racing_a_role_take_never_hands_the_role_back_or_loses_the_refresh()
     }
     let _ = fs::remove_dir_all(&*root);
 }
+
+#[test]
+fn a_dead_holder_is_judged_and_replaced_only_under_the_directory_lock_so_a_rewrite_that_revived_it_survives(
+) {
+    let root = state_root();
+    let session = |id: &str, pid: u32, roles: &[&str]| {
+        let mut entry = entry("x", Some(pid), roles);
+        entry.id = format!("fg-abc234/{id}");
+        entry
+    };
+    directory::register(&root, session("old", 30, &[]), false, &judge(&[30])).unwrap();
+    // This test holds the directory lock, as a concurrent rewrite of the entry would.
+    let mut scope = fgos_holder_lock::LockScope::seeded(Vec::new()).unwrap();
+    let params = std::collections::BTreeMap::from([(
+        "lockRoot".to_owned(),
+        root.join("locks").to_string_lossy().into_owned(),
+    )]);
+    scope
+        .acquire(
+            "identity-directory",
+            &params,
+            fgos_holder_lock::Wait::Ms(1_000),
+        )
+        .unwrap();
+    let newcomer = {
+        let root = root.clone();
+        std::thread::spawn(move || {
+            directory::register(&root, session("new", 40, &[]), false, &judge(&[30]))
+        })
+    };
+    std::thread::sleep(std::time::Duration::from_millis(300));
+    let dir = directory::directory(&root);
+    let file = fs::read_dir(&dir).unwrap().next().unwrap().unwrap().path();
+    assert!(
+        fs::read_to_string(&file).unwrap().contains("fg-abc234/old"),
+        "the dead holder was removed without the lock"
+    );
+    // Under the lock the old session comes back alive and takes a role.
+    let mut revived = serde_json::to_vec(&session("old", 31, &["lead:MAIL"])).unwrap();
+    revived.push(b'\n');
+    fs::write(&file, revived).unwrap();
+    drop(scope);
+    let refused = newcomer.join().unwrap().unwrap_err();
+    assert_eq!(refused.reason, "handle-in-use");
+    assert_eq!(
+        directory::resolve(
+            &root,
+            "lead:MAIL",
+            &judge(&[30]),
+            None,
+            &directory::NoTerminal
+        )
+        .unwrap()
+        .id,
+        "fg-abc234/old"
+    );
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
+fn a_new_cli_session_on_the_same_head_takes_the_roles_and_pane_of_the_one_before_which_is_removed()
+{
+    let root = machine_root();
+    let me = head_of(std::process::id());
+    let key = |value| fgos_identity::WriterKey {
+        source: "CLAUDE_CODE_SESSION_ID",
+        value,
+    };
+    let before = directory::register_writer(
+        &root,
+        None,
+        &key("uuid-before"),
+        &me,
+        &["lead:MAIL".to_string()],
+        false,
+        Some(&Ids {
+            terminal: Some(pane("w1:p1")),
+            ..Ids::default()
+        }),
+    )
+    .unwrap();
+    // The CLI started a new session in the same process (`/clear`).
+    let after =
+        directory::register_writer(&root, None, &key("uuid-after"), &me, &[], false, None).unwrap();
+    assert_eq!(after.roles, vec!["lead:MAIL".to_string()]);
+    assert_eq!(after.ids.and_then(|ids| ids.terminal), Some(pane("w1:p1")));
+    let alive = judge(&[]);
+    let by_pane = directory::resolve(&root, "w1:p1", &alive, None, &directory::NoTerminal).unwrap();
+    assert_eq!(
+        by_pane.id, "fg-abc234/uuid-after",
+        "the pane names one session"
+    );
+    assert_eq!(
+        directory::resolve(&root, &before.handle, &alive, None, &directory::NoTerminal)
+            .unwrap_err()
+            .reason,
+        "not-found",
+        "the session before is gone"
+    );
+    let _ = fs::remove_dir_all(root);
+}

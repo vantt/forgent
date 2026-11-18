@@ -673,8 +673,8 @@ impl<'r> DirLock<'r> {
 
 /// Registration of an entry that takes no role into a directory below its cap:
 /// the atomic create of the handle-named file, and only when the name is
-/// taken, a read of that one entry. A dead holder is replaced, the same
-/// session refreshes under the lock, any other is refused `handle-in-use`. No
+/// taken, a read of that one entry under the lock. A dead holder is replaced,
+/// the same session refreshes, any other is refused `handle-in-use`. No
 /// scan, no prune.
 fn register_by_handle(lock: &mut DirLock, entry: Entry, judge: Judge) -> Result<Listed, Refusal> {
     let root = lock.root;
@@ -682,16 +682,19 @@ fn register_by_handle(lock: &mut DirLock, entry: Entry, judge: Judge) -> Result<
     if store(root, &merged, false)? == Installed::Created {
         return Ok(Listed::of(&merged, merged.verdict(judge), judge));
     }
-    let holder = read_named(root, &merged.handle, judge);
+    // The holder is judged and a dead one removed under the lock, so a rewrite
+    // that brought it back (a re-registration taking a role) is never erased.
+    lock.hold()?;
+    let mut holder = read_named(root, &merged.handle, judge);
     if let Some(row) = holder.as_ref().filter(|row| row.verdict == Verdict::Dead) {
         remove(root, &row.file)?;
         if store(root, &merged, false)? == Installed::Created {
             return Ok(Listed::of(&merged, merged.verdict(judge), judge));
         }
-        // Another registration took the name in between: it decides below.
+        // A create-once registration took the name in between: it decides below.
+        holder = read_named(root, &merged.handle, judge);
     }
-    lock.hold()?;
-    if let Some(row) = read_named(root, &merged.handle, judge) {
+    if let Some(row) = holder {
         if row.entry.id != merged.id {
             return Err(handle_in_use(&row.entry.id, &merged.id, &merged.handle));
         }
@@ -906,7 +909,11 @@ pub fn register_current(
 /// env does not carry it (a Codex hook process has no `CODEX_THREAD_ID`).
 /// `head` is the agent head the caller already checked, by pid and start
 /// time; its process facts are read here and recorded as the entry's
-/// liveness. `ids` carries the identifier groups this writer owns. Refused
+/// liveness. `ids` carries the identifier groups this writer owns. A CLI
+/// session (not a runner attempt) is the one current session of its head:
+/// any other live non-attempt entry on the same head (the CLI's session before
+/// a `/clear`) hands it its roles, `terminal` and `head` groups and is
+/// removed, under the `identity-directory` lock. Refused
 /// `invalid-writer-key` (see [`session_for`]) and `head-not-live` when the
 /// head cannot be read, is not running, or has a different start time (the
 /// detail says which); every other rule is [`register`]'s.
@@ -945,15 +952,65 @@ fn register_writer_in(
         detail,
         candidates: Vec::new(),
     })?;
-    register_session(
+    if crate::attempt::is_attempt_writer_id(key.value) {
+        return register_session(
+            lock,
+            session,
+            Some(record),
+            clone_dir,
+            roles,
+            take,
+            ids.cloned(),
+        );
+    }
+    // One current session per head: a CLI session that registers on a head another live session of that head
+    // was registered on (the CLI started a new session in the same process, e.g. after `/clear`) takes that
+    // session's roles, `terminal` and `head` groups, and the session before is removed, all under the lock.
+    checked_ids(ids)?;
+    lock.hold()?;
+    let rows = scan(lock.root, &judge_here)?.rows;
+    let previous: Vec<&Row> = rows
+        .iter()
+        .filter(|row| {
+            row.verdict != Verdict::Dead
+                && on_head(&row.entry, head)
+                && !is_attempt_entry(&row.entry)
+                && row.entry.id != session.info.id
+        })
+        .collect();
+    let mut all_roles = roles.to_vec();
+    all_roles.extend(
+        previous
+            .iter()
+            .flat_map(|row| row.entry.roles.iter().cloned()),
+    );
+    all_roles.sort();
+    all_roles.dedup();
+    let moved_roles = all_roles.len() > roles.len();
+    let mut carried = ids.cloned().unwrap_or_default();
+    let held: Vec<&Ids> = previous
+        .iter()
+        .filter_map(|row| row.entry.ids.as_ref())
+        .collect();
+    if carried.terminal.is_none() {
+        carried.terminal = held.iter().find_map(|ids| ids.terminal.clone());
+    }
+    if carried.head.is_none() {
+        carried.head = held.iter().find_map(|ids| ids.head.clone());
+    }
+    let listed = register_session(
         lock,
         session,
         Some(record),
         clone_dir,
-        roles,
-        take,
-        ids.cloned(),
-    )
+        &all_roles,
+        take || moved_roles,
+        carried.carries_any().then_some(carried),
+    )?;
+    for row in previous {
+        remove(lock.root, &row.file)?;
+    }
+    Ok(listed)
 }
 
 /// Replaces the identifier groups `ids` carries in the entry of the session
