@@ -21,6 +21,13 @@
       "class": "configured-binary",
       "reason": "a worktreeSetup.commands line from the main checkout's project config, run through the platform shell's script operand (sh -c, Unix); the scanner's Rust path classifies a shell only by a literal script, so a configured script cannot be classified from code",
       "retireWhen": "the scanner's Rust path classifies a shell whose script operand is configuration data as configured-binary, or worktree setup commands stop running through a shell"
+    },
+    {
+      "path": "packages/supervision/rust/src/land.rs",
+      "siteId": "run:f956953ff77a52d61188c8ea0703843d119b8c4aa1b683e7ca42dfd9626eb2a5",
+      "class": "configured-binary",
+      "reason": "a land.gates command line from the trusted main checkout's project config (land.schema.yaml, x-fgos-sensitivity: command), run through the POSIX shell's -c operand in the candidate checkout, like worktreeSetup.commands; the scanner's Rust path classifies a shell only by a literal",
+      "retireWhen": "the scanner's Rust path classifies a shell whose script operand is configuration data as configured-binary, or land gates stop running through a shell"
     }
   ]
 }
