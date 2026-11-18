@@ -1,0 +1,18 @@
+{
+  "contract": "observe-kinds.v1",
+  "attrs": {
+    "fixture.outcome": { "type": "string", "values": ["pass", "fail", "partial"] },
+    "fixture.attempt": { "type": "int" },
+    "fixture.resumed": { "type": "bool" }
+  },
+  "measures": {
+    "fixture.duration": { "unit": "ms", "aggs": ["sum", "p50", "p90", "max"] }
+  },
+  "kinds": {
+    "fixture.run.attempt": {
+      "subjects": ["run"],
+      "attrs": ["gen_ai.provider.name", "gen_ai.request.model", "fixture.outcome", "fixture.attempt", "fixture.resumed"],
+      "measures": ["gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens", "fixture.duration"]
+    }
+  }
+}

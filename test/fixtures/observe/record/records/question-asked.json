@@ -1,0 +1,8 @@
+{
+  "v": 2, "id": "q-1-asked", "kind": "fgos.question.asked",
+  "ts": "2026-11-18T03:10:00Z",
+  "subject": { "kind": "session", "id": "head-7" },
+  "refs": [{ "kind": "plan", "id": "plans/x" }],
+  "attrs": { "fgos.question.channel": "mailbox" },
+  "basis": "observed", "origin": { "source": "fixture-questions" }
+}

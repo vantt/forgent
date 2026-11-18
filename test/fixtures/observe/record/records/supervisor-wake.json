@@ -1,0 +1,9 @@
+{
+  "v": 2, "id": "wake-1", "kind": "fgos.supervisor.wake",
+  "ts": "2026-11-18T03:00:02Z", "endTs": "2026-11-18T03:04:00Z",
+  "subject": { "kind": "session", "id": "supervisor-1" },
+  "refs": [{ "kind": "session", "id": "head-7" }],
+  "attrs": { "fgos.supervisor.trigger": "plan-no-progress", "fgos.supervisor.outcome": "lead-reclaimed" },
+  "measures": { "gen_ai.usage.input_tokens": 1000, "gen_ai.usage.output_tokens": 200 },
+  "basis": "reported", "origin": { "source": "fixture-supervisor" }
+}

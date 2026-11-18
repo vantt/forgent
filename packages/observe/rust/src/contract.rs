@@ -88,6 +88,19 @@ pub trait ObservationSource: Send + Sync {
     fn observations(&self, root: &Path, w: &Window) -> Result<Vec<Observation>, SourceError>;
 }
 
+/// A v2 source: it returns records, and states the kinds it projects so the registry can check them.
+/// The v1 `ObservationSource` stays until its sources move.
+pub trait RecordSource: Send + Sync {
+    fn source_id(&self) -> &'static str;
+    /// Every kind this source can return; each must be declared in the registry.
+    fn kinds(&self) -> &'static [&'static str];
+    fn records(
+        &self,
+        root: &Path,
+        w: &Window,
+    ) -> Result<Vec<crate::record::types::Record>, SourceError>;
+}
+
 /// One reader-owned scan: observations are windowed; structural counts are root-wide.
 #[derive(Debug, Default)]
 pub struct UnitSummaryScan {

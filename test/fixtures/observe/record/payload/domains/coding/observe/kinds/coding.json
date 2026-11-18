@@ -1,0 +1,7 @@
+{
+  "contract": "observe-kinds.v1",
+  "attrs": { "fixture.phase.status": { "type": "string", "values": ["ready", "doing", "done"] } },
+  "kinds": {
+    "fixture.phase.status": { "subjects": ["phase"], "attrs": ["fixture.phase.status"] }
+  }
+}

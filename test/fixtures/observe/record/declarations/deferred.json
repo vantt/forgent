@@ -1,0 +1,34 @@
+{
+  "contract": "observe-kinds.v1",
+  "attrs": {
+    "fgos.watcher.mode": { "type": "string", "values": ["active", "idle"] },
+    "fgos.watcher.outcome": { "type": "string", "values": ["noop", "woke-supervisor", "notified", "error"] },
+    "fgos.supervisor.trigger": { "type": "string" },
+    "fgos.supervisor.outcome": { "type": "string", "values": ["noop", "lead-started", "lead-reclaimed", "plan-closed", "question-raised", "error"] },
+    "fgos.question.channel": { "type": "string", "values": ["mailbox", "terminal"] }
+  },
+  "measures": {
+    "fgos.watcher.interval": { "unit": "s", "aggs": ["max", "p50"] },
+    "fgos.plans.ready": { "unit": "count", "aggs": ["max", "p50"] },
+    "fgos.plans.running": { "unit": "count", "aggs": ["max", "p50"] },
+    "fgos.question.wait": { "unit": "ms", "aggs": ["sum", "p50", "p90", "max"] }
+  },
+  "kinds": {
+    "fgos.watcher.tick": {
+      "subjects": ["session"],
+      "attrs": ["fgos.watcher.mode", "fgos.watcher.outcome"],
+      "measures": ["fgos.watcher.interval", "fgos.plans.ready", "fgos.plans.running"]
+    },
+    "fgos.supervisor.wake": {
+      "subjects": ["session"],
+      "attrs": ["fgos.supervisor.trigger", "fgos.supervisor.outcome"],
+      "measures": ["gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens"]
+    },
+    "fgos.question.asked": { "subjects": ["session"], "attrs": ["fgos.question.channel"] },
+    "fgos.question.answered": {
+      "subjects": ["session"],
+      "attrs": ["fgos.question.channel"],
+      "measures": ["fgos.question.wait"]
+    }
+  }
+}

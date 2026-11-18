@@ -1,0 +1,8 @@
+{
+  "contract": "observe-kinds.v1",
+  "subjectKinds": ["lane"],
+  "attrs": { "fixture.state": { "type": "string", "values": ["open", "closed"] } },
+  "kinds": {
+    "fixture.lane.state": { "subjects": ["lane"], "attrs": ["fixture.state"] }
+  }
+}

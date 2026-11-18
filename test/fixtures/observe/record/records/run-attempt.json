@@ -1,0 +1,21 @@
+{
+  "v": 2,
+  "id": "sha256:unit-run-1/producer/1/01",
+  "kind": "fixture.run.attempt",
+  "ts": "2026-11-18T02:32:33Z",
+  "endTs": "2026-11-18T02:35:21Z",
+  "subject": { "kind": "run", "id": "unit-run-1/producer/1/01" },
+  "refs": [{ "kind": "plan", "id": "plans/261117-1856-example" }, { "kind": "phase", "id": "16" }],
+  "attrs": {
+    "gen_ai.provider.name": "anthropic",
+    "gen_ai.request.model": "claude-opus-5-5",
+    "fixture.outcome": "pass",
+    "fixture.attempt": 1,
+    "fixture.resumed": false
+  },
+  "measures": { "gen_ai.usage.input_tokens": 41200, "gen_ai.usage.output_tokens": 3900, "fixture.duration": 168000 },
+  "basis": "derived",
+  "origin": { "source": "run-result", "release": "0.0.0", "configRev": "rev-1" },
+  "detail": "short note",
+  "redaction": { "rev": "r1" }
+}

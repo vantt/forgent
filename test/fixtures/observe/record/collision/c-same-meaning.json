@@ -1,0 +1,5 @@
+{
+  "contract": "observe-kinds.v1",
+  "measures": { "fixture.latency": { "unit": "ms", "aggs": ["p90", "p50"] } },
+  "kinds": {}
+}

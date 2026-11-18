@@ -1,0 +1,8 @@
+{
+  "v": 2, "id": "q-1-answered", "kind": "fgos.question.answered",
+  "ts": "2026-11-18T03:40:00Z",
+  "subject": { "kind": "session", "id": "head-7" },
+  "attrs": { "fgos.question.channel": "mailbox" },
+  "measures": { "fgos.question.wait": 1800000 },
+  "basis": "owner", "origin": { "source": "fixture-questions" }
+}

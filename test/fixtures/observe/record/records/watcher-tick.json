@@ -1,0 +1,8 @@
+{
+  "v": 2, "id": "tick-1", "kind": "fgos.watcher.tick",
+  "ts": "2026-11-18T03:00:00Z", "endTs": "2026-11-18T03:00:01Z",
+  "subject": { "kind": "session", "id": "watcher-1" },
+  "attrs": { "fgos.watcher.mode": "active", "fgos.watcher.outcome": "noop" },
+  "measures": { "fgos.watcher.interval": 60, "fgos.plans.ready": 2, "fgos.plans.running": 1 },
+  "basis": "observed", "origin": { "source": "fixture-watcher", "project": "demo" }
+}

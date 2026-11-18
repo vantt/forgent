@@ -1,0 +1,5 @@
+{
+  "contract": "observe-kinds.v1",
+  "measures": { "gen_ai.usage.input_tokens": { "unit": "ms", "aggs": ["sum"] } },
+  "kinds": {}
+}

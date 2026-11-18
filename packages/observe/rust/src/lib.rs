@@ -12,6 +12,7 @@ pub mod friction_cli;
 pub mod invocation_fault;
 pub mod metrics_cli;
 pub mod provider;
+pub mod record;
 pub mod scorecard;
 pub mod shard;
 pub mod sources;

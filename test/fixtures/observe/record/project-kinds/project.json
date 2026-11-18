@@ -1,0 +1,7 @@
+{
+  "contract": "observe-kinds.v1",
+  "measures": { "fixture.widgets": { "unit": "count", "aggs": ["sum", "max"] } },
+  "kinds": {
+    "fixture.project.widgets": { "subjects": ["session"], "measures": ["fixture.widgets"] }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "observe.record.v2",
+  "title": "Observe Record Contract v2",
+  "description": "One record shape for every measurement and event, for writing and for reading. The record only grows by addition: readers ignore fields they do not know, and `v` changes only on a breaking change. Kinds, subject and ref kinds, attrs and measures are open strings checked against the merged registry (observe-names.json plus every observe-kinds declaration), never against an enum here.",
+  "type": "object",
+  "required": ["v", "id", "kind", "ts", "subject", "basis", "origin"],
+  "properties": {
+    "v": { "const": 2, "description": "Envelope version; changes only on a breaking change." },
+    "id": { "type": "string", "minLength": 1, "description": "Deterministic for projected or re-imported records, so a re-run never counts twice." },
+    "kind": { "type": "string", "minLength": 1, "description": "Dot-separated name declared in the registry." },
+    "ts": { "type": "string", "description": "RFC 3339 instant. For a span, its start." },
+    "endTs": { "type": "string", "description": "RFC 3339 instant; present makes the record a span, never before ts." },
+    "subject": { "$ref": "#/definitions/subjectRef" },
+    "refs": { "type": "array", "items": { "$ref": "#/definitions/subjectRef" }, "description": "Links to other subjects (plan, phase, backlog, session...); kinds are checked against the registry." },
+    "attrs": {
+      "type": "object",
+      "description": "Dimensions to filter and group by. Names and types come from the registry.",
+      "additionalProperties": { "type": ["string", "boolean", "integer"] }
+    },
+    "measures": {
+      "type": "object",
+      "description": "Numbers to aggregate. Names, units and valid aggregations come from the registry.",
+      "additionalProperties": { "type": "number" }
+    },
+    "basis": { "enum": ["observed", "reported", "transcript", "owner", "derived"], "description": "How it is known." },
+    "origin": {
+      "type": "object",
+      "required": ["source"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "component": { "type": "string" },
+        "writer": { "type": "string" },
+        "host": { "type": "string" },
+        "release": { "type": "string" },
+        "configRev": { "type": "string" },
+        "project": { "type": "string" }
+      }
+    },
+    "detail": { "type": "string", "maxLength": 2048, "description": "Optional free text, capped in bytes by the writer. Empty by default." },
+    "redaction": {
+      "type": "object",
+      "required": ["rev"],
+      "properties": { "rev": { "type": "string", "minLength": 1, "description": "Version of the redaction rules applied to detail." } }
+    }
+  },
+  "definitions": {
+    "subjectRef": {
+      "type": "object",
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "id": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
