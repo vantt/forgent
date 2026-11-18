@@ -13,6 +13,9 @@ This phase rewrites the pending definitions on those features. Data files and th
   11) for `lead-ended` and `watcher-active`. Agreed with lead:OPS-METRICS on 2026-11-18: the attr is `fgos.head.role`
   (`head:<persona>-<name>` or `lead:<LANE>`); `fgos.plan.status` covers only `contract: plan-v1` plans, dedupes rebased
   copies across branches, and emits a creation transition (from absent) for a plan born at a status.
+  Landed in ops-metrics phase 11 (0e7c8fc07), with attr `fgos.plan.history` (`complete|truncated`) and kind
+  `fgos.plan.activity`. Known cost: a plan-history query takes 30-80 s until the Git lane adds a `walk_changes` door
+  call, so definitions over `fgos.plan.*` keep their windows short; step 0 measures one run and records the time.
 - The README's pending table and phase 13's spec (`phase-13-trigger-definitions.md`) for the behaviour each must have.
 
 ## Footprint

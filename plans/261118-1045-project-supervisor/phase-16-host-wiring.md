@@ -6,6 +6,12 @@ It adds the one confined routing rule (PS-20), injects the new Observe kinds, ad
 regenerates the command contracts. Sole writer of the command registry, `bin/fgos.mjs`, the generated contracts and
 `Cargo.lock` in its wave.
 
+
+**Known cost (ops-metrics, 2026-11-18).** Queries over `fgos.plan.*` take 30-80 s until the Git lane adds a
+`walk_changes` door call, longer than the 60 s active interval. The wired tick holds the `watcher` lock, so an
+overrunning tick makes the next one `skipped-busy`, not concurrent; the live check in phase 19 records the real tick
+duration.
+
 ## Inputs
 Step 0: re-grep every line below after the session-verb, ops-metrics, read-door and owner-question-store plans land
 (they write `main.rs`, `routing.rs`, `observe_declarations.rs`, the registry and the routes). Verb names follow the
