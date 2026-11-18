@@ -830,17 +830,17 @@ test('a mailbox-record grant refuses a symbolic link at its targets or on the wa
     fs.symlinkSync('..', path.join(fgosDir, 'runtime', 'mailbox'));
     assert.throws(grant, refused);
     fs.unlinkSync(path.join(fgosDir, 'runtime', 'mailbox'));
-    // locks/mailbox.lock -> ../config.yaml would grant the config.
-    fs.writeFileSync(path.join(fgosDir, 'config.yaml'), 'k: v\n');
+    // locks/mailbox.lock -> ../project.json would grant another .fgos file.
+    fs.writeFileSync(path.join(fgosDir, 'project.json'), 'k: v\n');
     fs.mkdirSync(path.join(fgosDir, 'locks'));
-    fs.symlinkSync('../config.yaml', path.join(fgosDir, 'locks', 'mailbox.lock'));
+    fs.symlinkSync('../project.json', path.join(fgosDir, 'locks', 'mailbox.lock'));
     assert.throws(grant, refused);
     // A redirected directory on the way: locks -> runtime.
     fs.rmSync(path.join(fgosDir, 'locks'), { recursive: true });
     fs.symlinkSync('runtime', path.join(fgosDir, 'locks'));
     assert.throws(grant, refused);
     assert.ok(!fs.existsSync(path.join(fgosDir, 'runtime', 'mailbox.lock')), 'nothing was created through the link');
-    assert.equal(fs.readFileSync(path.join(fgosDir, 'config.yaml'), 'utf8'), 'k: v\n');
+    assert.equal(fs.readFileSync(path.join(fgosDir, 'project.json'), 'utf8'), 'k: v\n');
     // The falsifier: real paths are granted.
     fs.unlinkSync(path.join(fgosDir, 'locks'));
     assert.equal(grant().filter((r) => r.resource === 'mailbox-record').length, 2);
