@@ -40,16 +40,22 @@ fn asker_attrs(attrs: &mut BTreeMap<String, AttrValue>, asked: &Asked) {
         text(&asker.session_id),
     );
     attrs.insert("fgos.question.asker.handle".into(), text(&asker.handle));
-    // The role attr is the head role when the asker held one, else the first role.
-    if let Some(role) = asker.head_roles().next().or(asker.roles.first()) {
-        attrs.insert("fgos.question.asker.role".into(), text(role));
-    }
-    if let Some(persona) = &asker.persona {
-        attrs.insert("fgos.question.asker.persona".into(), text(persona));
-    }
-    if let Some(pane) = &asker.pane {
-        attrs.insert("fgos.question.asker.pane".into(), text(pane));
-    }
+    // Role, persona and pane are always written, empty when the asker had none: a definition that
+    // groups by them would otherwise drop the record and never wake that asker. The role attr is the
+    // head role when the asker held one, else the first role.
+    let role = asker.head_roles().next().or(asker.roles.first());
+    attrs.insert(
+        "fgos.question.asker.role".into(),
+        text(role.map_or("", |r| r.as_str())),
+    );
+    attrs.insert(
+        "fgos.question.asker.persona".into(),
+        text(asker.persona.as_deref().unwrap_or("")),
+    );
+    attrs.insert(
+        "fgos.question.asker.pane".into(),
+        text(asker.pane.as_deref().unwrap_or("")),
+    );
     attrs.insert("fgos.question.asker.machine".into(), text(&asker.machine));
 }
 

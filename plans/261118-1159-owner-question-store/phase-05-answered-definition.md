@@ -36,3 +36,12 @@ Waits for ops-metrics phase 7 (the definition runner, `fgos metrics query --def`
 
 ## Rollback
 Revert the phase commit.
+
+## Done notes (lead, 2026-11-18)
+- The definition also excludes cancelled questions (a cancelled question never wakes its asker); the fixture covers
+  answered-then-cancelled.
+- The record source always writes `asker.role`, `asker.persona` and `asker.pane`, empty when the asker had none: the
+  runner drops a record missing a `by` attr, which would never wake that asker. The fixture has such an asker.
+- Open (review, non-blocking): the anti-joins use `within: 3650d` from `now`, so an ack or cancel stamped by a machine
+  whose clock runs ahead of the reader does not count yet and gives one false wake; `nextCommand` names
+  `fgos questions show`, which phase 4 lands.

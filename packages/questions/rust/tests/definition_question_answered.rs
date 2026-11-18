@@ -71,7 +71,11 @@ fn run() -> (Value, Value) {
             payload: e["payload"].clone(),
         })
         .collect();
-    let root = std::env::temp_dir().join(format!("fgos-question-def-{}", std::process::id()));
+    let root = std::env::temp_dir().join(format!(
+        "fgos-question-def-{}-{:?}",
+        std::process::id(),
+        std::thread::current().id()
+    ));
     std::fs::create_dir_all(&root).unwrap();
     let definition = repo_file("core/questions/definitions/question-answered.query.json");
     let request = ObserveRequest {
@@ -132,4 +136,12 @@ fn each_row_carries_the_attrs_the_watcher_needs() {
     );
     assert_eq!(group["fgos.question.asker.pane"], "p1");
     assert_eq!(group["fgos.question.asker.machine"], "m-1");
+
+    // An asker with no role, persona or pane still gets its row, with those attrs empty.
+    let bare = &all["definitions"][0]["rows"][1]["group"];
+    assert_eq!(bare["subject.id"], "q-pending-2");
+    assert_eq!(bare["fgos.question.asker.role"], "");
+    assert_eq!(bare["fgos.question.asker.persona"], "");
+    assert_eq!(bare["fgos.question.asker.pane"], "");
+    assert_eq!(bare["fgos.question.asker.session"], "m-1/s4");
 }

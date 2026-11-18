@@ -161,12 +161,7 @@
     "asker": {
      "sessionId": "m-1/s4",
      "handle": "h4",
-     "roles": [
-      "head:coder-x",
-      "work:tsk-1"
-     ],
-     "persona": "coder",
-     "pane": "p4",
+     "roles": [],
      "machine": "m-1"
     },
     "stage": "planning",
