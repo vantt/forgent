@@ -219,7 +219,11 @@ the verb's route. Phase 8 waits for the hook, so the skills can tell sessions to
 crate, `observe_declarations.rs`, the routes, the doctor registry and the skills; session-verb writes `src/**`, the
 gateway, Identity and the skills; S5 writes `main.rs`, `routing.rs` and the registry. This plan therefore starts
 after all three. Plan `261118-1045-project-supervisor` writes the same host files and reads `fgos questions` and
-`question-answered`, so it should list this plan in its `blockedBy`; its planner has been told.
+`question-answered`, so it lists this plan in its `blockedBy`. Its planner agreed on 2026-11-18 (session `plan-supervisor-b9`):
+- it uses the bare `fgos questions`;
+- the watcher reads `core/questions/definitions/`;
+- a successor's `session start` carries the question id for `--for`;
+- the supervisor itself never acks or cancels.
 
 **Contract check (by reading, script run below).**
 - Every phase sits in a later wave than each of its dependencies.
