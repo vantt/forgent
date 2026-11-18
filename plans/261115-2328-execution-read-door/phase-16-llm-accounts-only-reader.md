@@ -20,11 +20,16 @@ machine's config, before the gate line is on the board. Do not guess the gate: r
 2. Delete the schema entry (`core/config-schema/runner.schema.yaml` ~:313-316, "Older account inventory by provider").
 3. If 06 or 09 left a Rust twin of the old reader (`legacyStateKey` is the state key, not the reader; check), delete it
    in the same change.
+4. Move the agy sub-HOME doctor row (`src/setup/agy-permissions.mjs` ~:160, `checkAgySubHomesConfigured`) to read the
+   `gemini` pool of `runner.llmAccounts`, and drop its demand for `toolPermission: "always-proceed"` in each sub-HOME's
+   settings.json: both agy invocations already pass a session-only `--settings` with always-proceed and the deny list
+   (`core/config-standard/runner.yaml` ~:211, ~:234), so the file is never read on a run. Owner 2026-11-18: fix it
+   here, not by hand-editing the tetnu/mucdong homes. Retire the test cases that assert the file demand.
 
 ## Files
 
 - Modify: `src/runner/dispatch/provider-capacity.mjs`, `src/runner/dispatch/llm-accounts.mjs` (delete if emptied),
-  `core/config-schema/runner.schema.yaml`, `packages/execution/rust/src/accounts.rs` (only if a twin exists), tests,
+  `core/config-schema/runner.schema.yaml`, `src/setup/agy-permissions.mjs`, `packages/execution/rust/src/accounts.rs` (only if a twin exists), tests,
   `docs/platform/runner/**` mention if any, mutation census.
 
 ## Acceptance
