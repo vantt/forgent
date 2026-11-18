@@ -103,7 +103,8 @@ mod tests {
                 "fgos-observe-friction",
                 "fgos-observe-transcripts",
                 "fgos-run-result",
-                "fgos-host-sources"
+                "fgos-host-sources",
+                "fgos-questions"
             ]
         );
     }

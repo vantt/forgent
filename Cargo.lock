@@ -231,6 +231,7 @@ dependencies = [
  "fgos-mailbox-core",
  "fgos-observe",
  "fgos-process",
+ "fgos-questions",
  "fgos-run-result",
  "fgos-run-supervisor",
  "fgos-seat-binding",
