@@ -30,7 +30,9 @@ at 60 s, so a long verb must not run inside the request.
   `docs/platform/session-host/spec.md` section 3.
 - The `retired` signal: ops-metrics phase 11's landed `fgos.head.state` source
   (`rg -n "retired" apps/fgos/src/wiring/observe_sources`). Step 0 reads what it derives `retired` from.
-- Owner-question store: `fgos questions ack|cancel <id> --for <id>` accepts the asker or its successor (its QP-4, QP-15).
+- Owner-question store: `fgos questions ack|cancel <id>` accepts the asker, any session holding the same `head:` role
+  (the successor the supervisor starts with the asker's persona and name), or any head when the asker held no head
+  role (its QP-4). No `answers:` role, no `--for` flag.
 
 ## Footprint
 `packages/run-supervisor/contracts/head-request.v1.json`, `packages/run-supervisor/rust/src/head_request.rs`,
@@ -83,7 +85,8 @@ at 60 s, so a long verb must not run inside the request.
    or `planner-*` lineage of this project, an asker named by an answered question, or the caller's own.
 8. `session start` with `forQuestion`: passed through `startHead` to `startHeadSession`, which adds one opening line
    (`openingText` in `head-start.mjs`): "You continue question <id>: write its answer back to its origin, then
-   `fgos questions ack <id> --for <id>` (or `cancel`)". No other start changes.
+   `fgos questions ack <id>` (or `cancel`)". The successor holds the asker's own head role, so no flag is needed. No
+   other start changes.
 9. `supervisor handled|done`: the route child runs the host verb `fgos supervisor <sub> --json` and returns its JSON.
    On `done` answering `{done: true}`, the route spawns a detached `session stop` of the caller's own role (after the
    reply is written) and adds `stopping: true` (PS-9).

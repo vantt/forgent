@@ -38,8 +38,10 @@ here naming `fgos-supervisor` / `fgos-lead`; regenerate `.claude/agents/**` with
      `fgos session stop` once its plan is `ready`.
    - `question-answered` (Handoffs): a live busy asker needs nothing; an idle or gone asker: `fgos session stop` the
      idle holder, then start the successor from the event's `successor` field with
-     `fgos session start <persona> --name <name> --for-question <question id>`; the successor writes the answer back
-     and acks or cancels with `--for <question id>`; only the asker or its successor may ack or cancel.
+     `fgos session start <persona> --name <name> --for-question <question id>` (the asker's own persona and name, so
+     the successor holds the asker's `head:` role; Identity has no `answers:` role); the successor writes the answer
+     back and acks or cancels with `fgos questions ack|cancel <id>`. Only the asker, a session with the same head
+     role, or any head (asker without a head role) may ack or cancel; the supervisor never acks or cancels.
    - Portfolio edits reach `main` only through `fgos land --paths`. Owner questions only through
      `fgos questions ask` (five-part form), batched. Never implements, reviews, lands code or chats with the owner.
 2. `fgos-lead/SKILL.md`: one plan. On start, `fgos request result` (no id) lists this role's tickets, so a restarted

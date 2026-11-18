@@ -25,7 +25,7 @@ machine or a restart never loses or doubles an event. Rust, in `fgos-supervision
 0. Re-grep inputs; confirm `mod queue;` is in `packages/supervision/rust/src/lib.rs` and the two event types exist.
 1. Event types (from phase 3): `supervision.event-raised` `{id, kind, ref, ts, reason, nextCommand}` and
    `supervision.event-handled` `{id, by}`. Stream `project`. `id` is a deterministic 16-hex string the watcher builds
-   from `kind`, `subject` and the row's state-change instant `ts` (phase 11 step 2.5), so the same row raised twice has
+   from `kind`, `subject` and the row's state-change instant `ts` (phase 11 step 2.6), so the same row raised twice has
    the same id; `ref` carries the subject.
 2. `queue.rs` public surface (one door, no other module touches the stream):
    - `Queue::open(layout, machine, writer) -> Result<Queue, QueueError>`.

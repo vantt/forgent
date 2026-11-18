@@ -30,22 +30,26 @@ and stops nothing.
 1. Ports as traits in `watcher.rs` (the host wires real ones in phase 16): `Fetch` (fetch the trunk's remote-tracking
    ref), `Definitions` (`run(defs: &[path], since: Option<instant>) -> Result<Vec<Row>>`; the adapter runs the host's
    `metrics query` with one `--def` per entry), `Wake` (`wake(kind, ref) -> WakeOutcome`; the adapter runs
-   `fgos supervisor wake`), `Notifier`, `Portfolio` (plan rows, phase 3 reader), `Clock`, `TickState`, `Telemetry` (span emit), `TickLock`.
+   `fgos supervisor wake`), `Notifier`, `Portfolio` (plan rows, phase 3 reader), `QuestionsView` (`refresh()`; the adapter runs `fgos questions --json`
+   once), `Clock`, `TickState`, `Telemetry` (span emit), `TickLock`.
 2. `tick(ports, settings) -> TickReport`, in this order:
    1. take the `watcher` lock; busy -> outcome `skipped-busy`, no action (a second tick is not an error);
    2. read state `{lastTick, lastFullTick}` (`.fgos/runtime/watcher/state.json`); a missing or unreadable state is a
-      first tick, handled by step 4's window, never "raise nothing" (PS-21);
-   3. pace (PS-13, PS-22): run the pace file `watcher-active` (never raised); no row and
+      first tick, handled by step 5's window, never "raise nothing" (PS-21);
+   3. `QuestionsView.refresh()` once, on every tick that holds the lock (idle ones too): it refreshes the per-machine
+      view `.fgos/cache/questions.json` that the owner-question receipt hook reads (that plan's QP-11, QP-23); a
+      failure is counted in `errors` and never stops the tick;
+   4. pace (PS-13, PS-22): run the pace file `watcher-active` (never raised); no row and
       `now - lastFullTick < idleIntervalSec` -> finish early with outcome `noop`, mode `idle`;
-   4. full tick: `Fetch` (a failure is counted in `errors` and the tick goes on with local refs); run every
+   5. full tick: `Fetch` (a failure is counted in `errors` and the tick goes on with local refs); run every
       `watcher.definitions` entry with `since = (lastTick or now) - lookbackSec`. A runner failure leaves state
       unchanged (events are retried next tick) and reports `error`; a row `unmeasured` is counted, not raised; a
       listed path that does not exist is counted in `unmeasured` (the watcher still runs);
-   5. per row: a row missing `subject` or `ts` is counted in `errors` and not raised; id = first 16 hex of sha256 of
+   6. per row: a row missing `subject` or `ts` is counted in `errors` and not raised; id = first 16 hex of sha256 of
       `kind|subject|ts`; `queue.raise`; only `New` runs the action for its kind (`actions[kind]` else `defaultAction`:
       `wake-supervisor`, `notify`, `none`); a `Duplicate` does nothing;
-   6. if unhandled events remain and no wake ran this tick, call `wake` once with the oldest (PS-9);
-   7. only after steps 4 to 6, write state (`lastTick = now`; `lastFullTick = now` on a full tick); emit span
+   7. if unhandled events remain and no wake ran this tick, call `wake` once with the oldest (PS-9);
+   8. only after steps 5 to 7, write state (`lastTick = now`; `lastFullTick = now` on a full tick); emit span
       `fgos.watcher.tick` with exactly phase 3's names: attrs `fgos.watcher.mode`, `fgos.watcher.outcome`; measures
       `fgos.watcher.interval` (the interval in force), `fgos.plans.ready`, `fgos.plans.running` (counted by a `Portfolio`
       port over phase 3's reader), `fgos.watcher.raised`, `.duplicate`, `.wakes`, `.notifies`, `.errors`, `.unmeasured`.
@@ -59,6 +63,8 @@ and stops nothing.
    - a missing state raises the rows inside `lookbackSec` once, and a second tick raises nothing new;
    - the action table routes `wake-supervisor`, `notify` and `none` by kind; a null `notifyTo` counts an error;
    - an idle tick inside `idleIntervalSec` runs no definition; an active one fetches and runs them;
+   - every tick that takes the lock refreshes the questions view once, idle or full; a refresh failure is counted and
+     the tick goes on; a `skipped-busy` tick does not refresh;
    - a runner failure leaves `lastTick` unchanged, and the next tick raises the event;
    - a busy lock skips;
    - a notifier refusal is counted and the other rows still run;

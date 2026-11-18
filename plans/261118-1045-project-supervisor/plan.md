@@ -220,17 +220,20 @@ asker that is idle or gone, the supervisor stops the idle holder (`session stop`
 **Handoff update (2026-11-18, agreed with plan `261118-1159-owner-question-store`).** The definition file is
 `core/questions/definitions/question-answered.query.json`; `core/questions/definitions` is in the standard
 `watcher.definitions` list (phase 4). Its event attrs are asker role, session id, handle, persona, origin ref,
-`answeredAt` and an optional pane. That plan adds kind `fgos.question.cancelled` and ack/cancel `--for <question id>`,
-accepted only from the asker or its successor: the supervisor passes the question id into the successor's start
-(`session start ... --for-question <id>`, carried into its opening) so the successor can ack or cancel (phases 10, 12,
-16, 18). The owner question verb is bare `fgos questions` (the `--open` flag is gone); the supervisor asks through
+`answeredAt` and an optional pane. That plan adds kind `fgos.question.cancelled`; ack and cancel are authorized by
+role, with no `--for` flag (see handoff update 3). The supervisor passes the question id into the successor's start
+(`session start ... --for-question <id>`, carried into its opening) only so the successor knows which question it
+continues (phases 10, 12, 16, 18). The owner question verb is bare `fgos questions` (the `--open` flag is gone); the supervisor asks through
 `fgos questions ask`.
 
 **Handoff update 2 (2026-11-18, owner-question plan after its red team, 3300fcc1b).** A successor that the supervisor
-starts for a gone asker also holds the Identity role `answers:<question id>`, set at its start (phases 12 and 18 use
-whatever the question plan lands for setting that role; step 0 checks it). Only these may ack or cancel: the asker,
-a holder of the same `head:` role, the holder of `answers:<id>`, or any head for a migrated question. The supervisor
-never acks. The question store is an Event Store consumer `questions` (synced across machines), and
+starts for a gone asker is started under the asker's own `head:` role (`session start <persona> --name <name>` with
+the asker's persona and name, so `head:<persona>-<name>` is the same role). **Handoff update 3 (2026-11-18, the
+question plan's hand-off note, `plans/261118-1159-owner-question-store/reports/handoff-to-supervisor-plan.md`):**
+there is no `answers:<question id>` role, because Identity accepts only `lead:`, `work:` and `head:` roles. Only
+these may ack or cancel (the question spec's QP-4): the asker session, any session holding the same `head:` role, and
+any head for a question whose asker held no `head:` role or which is `migrated`. The supervisor itself never acks or
+cancels. The question store is an Event Store consumer `questions` (synced across machines), and
 `question-answered` anti-joins `fgos.question.acked`, so an answer that was already taken never wakes the supervisor.
 Heads ask, ack and cancel through the head-request verbs `questions ask|ack|cancel` that the question plan adds to
 `head_request.rs`, `head-request.v1.json` and `head-grants.mjs`. Phases 9 and 10 edit those files after that plan

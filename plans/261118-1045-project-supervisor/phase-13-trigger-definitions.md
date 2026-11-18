@@ -43,7 +43,7 @@ in `watcher.definitions` (phase 4), not written here.
      `ts` = the first such failure.
    - `supervisor-stuck` (notify-only): `fgos.supervisor.wake` with outcome `already-live` since the last `started`,
      count above `params.limit <- watcher.stuckWakeLimit` (the watcher calls wake every tick while events stay
-     unhandled, phase 11 step 2.6); `ts` = the first such wake.
+     unhandled, phase 11 step 2.7); `ts` = the first such wake.
    Each carries `row: {kind, reason, nextCommand}`; `nextCommand` is the verb the supervisor (or the notified person)
    runs next, e.g. `fgos supervisor plans`, written once here.
 2. Pace definitions, `core/watcher/pace/<name>.query.json`, never in `watcher.definitions` and never raised (PS-22):

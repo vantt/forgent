@@ -16,8 +16,9 @@ One door starts the supervisor (`supervisor wake`), and four small verbs let it 
   `project_id` (`:110`); the directory is per OS user (`docs/platform/identity/spec.md` §5), so roles of every project
   on the machine share it. Project id and handle: the crate's `project(repo)` read (same spec, "Verbs").
 - Owner-question store: `fgos.question.answered` attrs (asker role, session id, handle, persona, origin ref,
-  `answeredAt`, optional pane) and kind `fgos.question.cancelled`; ack/cancel `--for <question id>` accepted only from
-  the asker or its successor (its QP-4, QP-15).
+  `answeredAt`, optional pane) and kind `fgos.question.cancelled`; ack/cancel are accepted from the asker, any session
+  holding the same `head:` role, or any head when the asker held no head role (its QP-4); there is no `answers:` role
+  and no `--for` flag. The supervisor never acks or cancels.
 - Session verb name after the session-verb plan: `fgos session start <persona> --name <name>` (PS-16).
 - Config keys from phase 4: `supervisor.maxLeads`, `watcher.wakeFailureLimit`, `watcher.activeIntervalSec`,
   `watcher.idleIntervalSec`, `watcher.overdueFactor` (use the landed names).
@@ -51,7 +52,8 @@ One door starts the supervisor (`supervisor wake`), and four small verbs let it 
      `fgos slots` for it.
    - `successor(event) -> Option<{persona, name, forQuestion}>` for a `question-answered` event: persona and name from
      the asker role, `forQuestion` = the question id (the event ref). The supervisor passes all three to
-     `session start` so the successor can `ack`/`cancel` with `--for <id>`; `queue` attaches it as `successor` to each
+     `session start`, so the successor runs under the asker's own `head:<persona>-<name>` role (which lets it
+     `ack`/`cancel`) and its opening names the question; `queue` attaches it as `successor` to each
      `question-answered` event, so no new verb is needed.
    - `queue(queue) -> Vec<RaisedEvent>`; `handled(queue, ids, by)`; `done(queue)` refuses `events-unhandled` with the
      count when any remain, else answers `{done: true}` (the request route then stops the caller, phase 10).
