@@ -14,6 +14,9 @@ pub enum ErrorKind {
     Provision,
     /// A file operation of this crate failed.
     Io,
+    /// A checkout lifecycle step the caller must see as a worktree failure (Node: `WorktreeError`, class
+    /// `worktree-fail`); `Error::details` carries the fields the Node error carries.
+    Worktree,
 }
 
 #[derive(Debug)]
@@ -24,6 +27,10 @@ pub struct Error {
     pub worktree_path: Option<PathBuf>,
     /// The setup command that failed.
     pub command: Option<String>,
+    /// Extra fields the Node error carries, keyed as Node names them: `branch`, `worktreePath`, `orphanPath`,
+    /// `targetPath`, `retainedRef`, `snapshot`, `lastSynced`, `branchTip`, and for `LockHeld` `lock`, `label`,
+    /// `holders` (pids) and `timedOut`.
+    pub details: Box<serde_json::Map<String, serde_json::Value>>,
 }
 
 impl Error {
@@ -33,7 +40,16 @@ impl Error {
             message: message.into(),
             worktree_path: None,
             command: None,
+            details: Box::default(),
         }
+    }
+    pub(crate) fn worktree(message: impl Into<String>) -> Self {
+        Self::new(ErrorKind::Worktree, message)
+    }
+    /// Add one field the Node error carries.
+    pub(crate) fn detail(mut self, key: &str, value: impl Into<serde_json::Value>) -> Self {
+        self.details.insert(key.to_owned(), value.into());
+        self
     }
     pub(crate) fn invalid(message: impl Into<String>) -> Self {
         Self::new(ErrorKind::Invalid, message)

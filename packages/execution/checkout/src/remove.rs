@@ -109,10 +109,11 @@ fn still_as_placed(abs: &Path, entry: &Placed) -> bool {
 
 fn set_provisioned_aside(
     driver: &GitDriver,
-    request: &RemoveRequest,
+    repo_root: &Path,
+    state_root: &Path,
     worktree: &Path,
 ) -> Result<Option<(Aside, Record)>> {
-    let Some(record) = record::read(&request.state_root, worktree) else {
+    let Some(record) = record::read(state_root, worktree) else {
         return Ok(None);
     };
     let tag = git::operation_id("");
@@ -133,7 +134,7 @@ fn set_provisioned_aside(
     let result = (|| -> Result<()> {
         let io = |rel: &str, e: std::io::Error| Error::io(format!("setting aside {rel}"), &e);
         if record.disposable {
-            for entry in untracked_entries(driver, worktree, &request.repo_root)? {
+            for entry in untracked_entries(driver, worktree, repo_root)? {
                 let rel = entry.trim_end_matches('/').to_owned();
                 aside.mv(&rel).map_err(|e| io(&rel, e))?;
             }
@@ -178,6 +179,34 @@ fn set_provisioned_aside(
         });
     }
     Ok(Some((aside, record)))
+}
+
+/// Run `removal` with what provisioning placed in `target` set aside, so the Git port judges only the checkout's own
+/// bytes: a refusal puts it back, a success deletes it with the record.
+pub(crate) fn around_removal<T>(
+    driver: &GitDriver,
+    repo_root: &Path,
+    state_root: &Path,
+    target: &Path,
+    removal: impl FnOnce() -> Result<T>,
+) -> Result<T> {
+    let aside = set_provisioned_aside(driver, repo_root, state_root, target)?;
+    let removed = match removal() {
+        Ok(removed) => removed,
+        Err(error) => {
+            if let Some((mut aside, _)) = aside {
+                if let Err(kept) = aside.restore() {
+                    return Err(Error::new(ErrorKind::Io, format!("{error}; {kept}")));
+                }
+            }
+            return Err(error);
+        }
+    };
+    if let Some((aside, _)) = aside {
+        let _ = fs::remove_dir_all(&aside.aside);
+    }
+    record::delete(state_root, target);
+    Ok(removed)
 }
 
 /// Remove one delivered checkout. What provisioning placed is set aside first, so the Git port judges only the
@@ -241,41 +270,33 @@ pub fn remove(request: &RemoveRequest) -> Result<Removed> {
     .iter()
     .map(|b| format!("{b:02x}"))
     .collect();
-    let aside = set_provisioned_aside(&driver, request, &target)?;
-    let removal = driver
-        .remove_worktree(
-            &repo,
-            vec![],
-            &target,
-            &WorktreeDelivery {
-                expected_tip: expected_tip.clone(),
-                delivered_to: delivered.clone(),
-                evidence_digest: evidence_digest.clone(),
-            },
-            &request.writer,
-            &git::operation_id("worktree"),
-            if request.discard_ignored {
-                IgnoredBytes::Discard
-            } else {
-                IgnoredBytes::Preserve
-            },
-        )
-        .map_err(Error::git);
-    let discarded = match removal {
-        Ok(discarded) => discarded,
-        Err(error) => {
-            if let Some((mut aside, _)) = aside {
-                if let Err(kept) = aside.restore() {
-                    return Err(Error::new(ErrorKind::Io, format!("{error}; {kept}")));
-                }
-            }
-            return Err(error);
-        }
-    };
-    if let Some((aside, _)) = aside {
-        let _ = fs::remove_dir_all(&aside.aside);
-    }
-    record::delete(&request.state_root, &target);
+    let discarded = around_removal(
+        &driver,
+        &request.repo_root,
+        &request.state_root,
+        &target,
+        || {
+            driver
+                .remove_worktree(
+                    &repo,
+                    vec![],
+                    &target,
+                    &WorktreeDelivery {
+                        expected_tip: expected_tip.clone(),
+                        delivered_to: delivered.clone(),
+                        evidence_digest: evidence_digest.clone(),
+                    },
+                    &request.writer,
+                    &git::operation_id("worktree"),
+                    if request.discard_ignored {
+                        IgnoredBytes::Discard
+                    } else {
+                        IgnoredBytes::Preserve
+                    },
+                )
+                .map_err(Error::git)
+        },
+    )?;
     Ok(Removed {
         path: target,
         expected_tip: expected_tip.as_str().to_owned(),
