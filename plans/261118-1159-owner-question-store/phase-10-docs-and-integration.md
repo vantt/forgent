@@ -6,6 +6,7 @@
   204 reaches it only through the supervision entry).
 - `CHANGELOG.md` `## [Unreleased]`.
 - `docs/backlog.md`, row `p-wgbzcazoak` (line 38, present at the re-check), added with the plan.
+- `docs/backlog.md`, row `p-o5h4qfpt53` (`session write` publishes): set it done with the phase 8b commit.
 
 ## Footprint
 See the phase table in `plan.md`, row 10.
