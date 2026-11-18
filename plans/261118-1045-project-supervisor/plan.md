@@ -261,7 +261,8 @@ lands and keep its verbs.
 | 4 | [Config keys: watcher, supervisor, land, lane wait](phase-04-config-keys.md) | - | core/config-standard/watcher.yaml, core/config-standard/supervisor.yaml, core/config-standard/land.yaml, core/config-standard/workerSlots.yaml, core/config-schema/watcher.schema.yaml, core/config-schema/supervisor.schema.yaml, core/config-schema/land.schema.yaml, core/config-schema/workerSlots.schema.yaml, packages/config/** | 1 | done |
 | 5 | [Census refusal only in the main checkout or on the trunk](phase-05-census-hook-trunk-only.md) | - | .githooks/pre-commit, test/githooks/census-drift.test.mjs | 1 | done |
 | 6 | [Lane pool at top-level worker seat start](phase-06-lane-pool.md) | 4 | packages/run-supervisor/rust/src/lanes.rs, packages/run-supervisor/rust/src/supervise.rs, packages/run-supervisor/rust/src/lib.rs, packages/run-supervisor/rust/src/adopt.rs, packages/run-supervisor/rust/tests/lanes.rs, packages/run-supervisor/rust/tests/envelope_digest_vectors.rs, packages/run-supervisor/contracts/envelope.v3.json, src/runner/dispatch/assignment-runner.mjs, src/run-supervisor/direct-launch.mjs, test/run-supervisor/direct-cutover.test.mjs, test/run-supervisor/contracts.test.mjs, packages/holder-lock/contracts/lock-registry.v1.json, docs/platform/holder-lock/spec.md, docs/platform/run-supervisor/spec.md | 2 | done |
-| 7 | [Landing use case](phase-07-landing-use-case.md) | 3, 4 | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs | 2 | ready |
+| 7a | [Git: push inside a Land session, main-checkout catch-up](phase-07a-git-land-push-and-catch-up.md) | - | packages/git/rust/src/refs.rs, packages/git/rust/src/remote.rs, packages/git/rust/src/land.rs, packages/git/rust/tests/*land*, docs/platform/git/spec.md | 2 | ready |
+| 7 | [Landing use case](phase-07-landing-use-case.md) | 3, 4, 7a | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs | 3 | ready |
 | 8 | [Event queue in the Event Store](phase-08-event-queue.md) | 3 | packages/supervision/rust/src/queue.rs, packages/supervision/rust/tests/queue.rs | 2 | done |
 | 10 | [Request transport: confined door, ticket verbs, session stop](phase-10-request-transport.md) | 3 | packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request*.rs, src/session-host/head-request.mjs, src/session-host/head-request-client.mjs, src/session-host/head-stop.mjs, src/session-host/head-plan.mjs, src/session-host/head-start.mjs, test/session-host/head-request.test.mjs, test/session-host/head-stop.test.mjs, test/session-host/head-plan.test.mjs, docs/platform/session-host/spec.md | 2 | ready |
 | 13 | [Trigger and pace definitions](phase-13-trigger-definitions.md) | 3, 4 | core/watcher/**, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/** | 2 | ready |
@@ -301,6 +302,13 @@ once by 3 (declares every module) and never again. Checked by `node scripts/plan
 None open. Q1 (the lead's write grant) was answered by the owner on 2026-11-18: **(A)**. The lead's sandbox writes
 only its plan dir; the plan's footprint, read from the trunk tip, bounds `run --writes` and `land` (PS-24). This
 amends settled item 4 for the lead only.
+
+Q2 (phase 7: Git refuses a push while the session's own Land chain holds the target, and refuses to fast-forward the
+main checkout to the remote tip) was answered by the owner on 2026-11-18: **(A)**
+(`reports/decision-261118-1431-p07-land-push-order.md`). A new phase 7a adds two narrow Git doors: a push of the Land's
+own candidate from inside its session, and a main-checkout catch-up that is clean and fast-forward only. Phase 7 then
+re-runs unchanged. No other path is exempted from `main-checkout-fast-forward-refused`. Phase 7a lands only after a
+named Git reviewer has reviewed it; lead:OPC is closed, so the reviewer is still to be named.
 
 **Approval.** Owner-approved 2026-11-18. The status stays `draft` until every `blockedBy` plan is `done`; then it turns
 `ready` with no other change.
