@@ -1,6 +1,25 @@
 # Đo vận hành fgOS (ops-metrics) — Discussion
 
-discussion: open
+discussion: settled
+
+> **Hand-off cho planner** (plan contract `core/skills/_shared/plan-contract.md`; plan dir
+> `plans/261118-0936-ops-metrics`).
+> - **Outcome:** người vận hành trả lời bằng `fgos metrics query` (và các định nghĩa có tên ở nơi dùng) các câu: token
+>   theo plan/phase/run/provider/account/model; thời gian theo phase, lead time ready→done; tỉ lệ hỏng theo
+>   provider/account/model/executor; friction theo loại/chữ ký/tuần, gắn plan và dòng backlog; thước đo bộ lái 1, 2, 3,
+>   7; attention view thấy `head-gone`, `plan-no-progress`.
+> - **Constraints:** OM-D1..D12; RUL104 (mở rộng `metrics`/`friction`/bản ghi run/attention view, không store song
+>   song); L10 (thay cửa thì chuyển mọi caller, xoá đường cũ cùng đợt); nguyên tắc 8; config key mới qua
+>   `core/config-standard` + `core/config-schema`; code mới bằng Rust (OM-D3).
+> - **Non-goals:** tiền/bảng giá (OM-D2); cảnh báo/mailbox (OM-D1); định nghĩa pace và producer tick (plan supervisor,
+>   OM-D10); reader câu hỏi và producer `fgos.question.*` (secretary, OM-D11); thước đo 4, 5, 6 (backlog, OM-D6); sửa
+>   độ ổn định council (p-24dxhwq7zr); retention run dir (p-tslryr3buq); p-ixrbglli5o.
+> - **Acceptance:** golden fixture ghi→truy vấn cho contract; định nghĩa pace và câu hỏi chạy được trên fixture mà
+>   không sửa code Observe; mỗi CLI có parser token hoặc lý do có tên; `cargo test --workspace` và `npm test` xanh.
+> - **Open, chặn một phần:** không. Phụ thuộc ngoài: plan supervisor chờ phase đăng ký `fgos.supervisor.tick`.
+> - **Sources:** backlog p-s5mliyp335, p-mvc3d54cda, p-7nqygnztum, p-24dxhwq7zr (phần đo); inventory
+>   `plans/reports/scout-261118-0936-ops-metrics-inventory.md`; research
+>   `plans/reports/research-261118-1017-skillstation-observability-lessons.md`.
 
 ## 1. Trạng thái hiện tại
 
@@ -11,7 +30,7 @@ nghĩa của tầng trên, chạy qua truy vấn chung, Observe không biết ch
 
 Vòng 6: Q2 → OM-D6, Q5 → OM-D7, Q8 → OM-D8, Q9 → OM-D9; Q6 chuyển sang session shaper supervisor, ở đây chỉ làm cơ
 chế định nghĩa phát hiện chung (OM-D10). Đã học skillstation (`plans/reports/research-261118-1017-…`), 8 bài học vào
-§6.0; nháp contract tầng 1 ở §6.0.1. Q7 trả về secretary (OM-D11). Mở Q10 (khai báo kind tại nơi dùng).
+§6.0; nháp contract tầng 1 ở §6.0.1. Q7 trả về secretary (OM-D11). Q10 → OM-D12 (khai báo tại nơi dùng). Không còn câu hỏi mở; discussion settled, giao planner.
 
 ## 2. Mục tiêu & đề bài
 
@@ -61,6 +80,7 @@ phạm vi.
 | OM-D9 | Friction có attr `fgos.friction.kind` với năm giá trị: bug, instability, missing, awkward, doc (thêm sau qua registry) | chủ dự án, Q9 | 2026-11-18 |
 | OM-D10 | "Pace" là gì do session shaper supervisor quyết (nơi đang định hình hành vi supervisor). Plan này không định nghĩa pace; nó làm cho quy tắc phát hiện của attention view là định nghĩa có tên (truy vấn + ngưỡng + kind row), chạy chung, để thêm pacer sau chỉ là thêm một định nghĩa, không đổi code hay contract | chủ dự án, Q6 | 2026-11-18 |
 | OM-D11 | Reader câu hỏi (Node → Rust, cột thời điểm) trả về secretary để chủ dự án bàn riêng. Plan này chỉ đăng ký kind `fgos.question.asked` / `fgos.question.answered` (refs plan/phase/discussion, attr stage discussion|plan|execution); bên sở hữu câu hỏi sinh chúng sau qua cửa ghi. Tới lúc đó phần "chờ chủ dự án" của thước đo 2 và thước đo 3 trả `unmeasured` kèm lý do; không phải làm lại gì ở đây | chủ dự án, Q7 | 2026-11-18 |
+| OM-D12 | Kind/attr/measure khai báo tại nơi dùng (component, skill, project `.fgos/observe/kinds/`); Observe giữ envelope, tên chuẩn dùng chung và bộ máy ghi/truy vấn, gộp mọi khai báo lúc chạy, test chặn trùng tên. Thêm số đo / vấn đề mới không sửa code Observe | chủ dự án, Q10 | 2026-11-18 |
 
 ## 5. Q&A log
 
@@ -91,6 +111,7 @@ phạm vi.
 - 2026-11-18 ~12:45 — Chủ dự án: Q7 trả về secretary để bàn riêng, đo lại ở đây sau như pace → OM-D11.
 - 2026-11-18 ~12:55 — Chủ dự án: đăng ký một số đo mới / vấn đề mới để quan sát làm tại nơi dùng được không, hay
   phải vào Observe code lại? → đề xuất khai báo tại nơi dùng, Q10.
+- 2026-11-18 ~13:00 — Chủ dự án: đồng ý Q10 → OM-D12. Discussion settled.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -151,7 +172,7 @@ Một bản ghi (ví dụ: một attempt của run vừa settle, chiếu từ `u
 }
 ```
 
-Registry khai báo tại nơi dùng (đề xuất, Q10): Observe chỉ giữ envelope, các tên chuẩn dùng chung (`gen_ai.*`, và
+Registry khai báo tại nơi dùng (OM-D12): Observe chỉ giữ envelope, các tên chuẩn dùng chung (`gen_ai.*`, và
 `fgos.plan`, `fgos.phase`, `fgos.session`, `fgos.account`...) và bộ máy ghi/truy vấn. Mỗi bên sở hữu một kind khai báo
 nó trong file của chính mình (component: `packages/<x>/contracts/observe-kinds.json`; skill/công cụ: thư mục của nó;
 project dùng fgOS: `.fgos/observe/kinds/*.json` — cho mission #2, workflow của project tự đo cái của nó). Observe gộp
