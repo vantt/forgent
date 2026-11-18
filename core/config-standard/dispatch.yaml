@@ -1,6 +1,6 @@
 # @fgos:v1
 # see: fgos config standard
-# @fgos:doc Waits of the run supervisor when an agent or a controller is asked to stop, and the schedule of the account probe sweep.
+# @fgos:doc Waits of the run supervisor when an agent or a controller is asked to stop, the schedule of the account probe sweep, and the thresholds of the attention view.
 dispatch:
   # @fgos:doc Milliseconds between the SIGTERM and the SIGKILL of a launch gate that does not stop. In milliseconds. Minimum: 1000. Default: 10000.
   gateKillGraceMs: 10000
@@ -10,3 +10,7 @@ dispatch:
   probeAccount:
     # @fgos:doc Seconds between sweeps of the scheduled account probe; 0 turns the timer off. Minimum: 0. Default: 0.
     intervalSec: 0
+  # @fgos:doc Thresholds of the attention view's detection definitions (core/attention/definitions).
+  attention:
+    # @fgos:doc Minutes a running plan may show no commit, board entry or run attempt before the attention view raises plan-no-progress. Minimum: 1. Default: 60.
+    planNoProgressMinutes: 60

@@ -1,0 +1,14 @@
+{
+  "name": "head-gone",
+  "requires": ["fgos.head.state"],
+  "query": {
+    "kind": ["fgos.head.state"],
+    "latest_per": "subject",
+    "where_latest": [
+      { "field": "fgos.head.state", "op": "eq", "value": "gone" }
+    ],
+    "by": ["subject.id"],
+    "agg": ["count", "max:ts"]
+  },
+  "row": { "kind": "head-gone", "reason": "a head that was live has gone and nothing replaced it", "nextCommand": "fgos supervisor plans" }
+}
