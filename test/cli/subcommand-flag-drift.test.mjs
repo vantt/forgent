@@ -194,7 +194,7 @@ const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nat
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
   assert.deepEqual(MULTI.map((e) => e.name).sort(), ['dispatch', 'goal', 'merge', 'session', 'workflow']);
-  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'config', 'convention', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'worktree']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'config', 'convention', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'questions', 'worktree']);
 });
 
 // A verb that lists sub-verbs in `native` serves those in the Rust host: the Node handler holds no branch for them
@@ -273,7 +273,7 @@ test('the scanner sees what it claims to: known reads in known regions', () => {
 // sub-verb's own Rust region equal its schema's flags. Regions: metrics -> its
 // metrics_cli/<sub>.rs file; friction -> its match arm in friction_cli.rs;
 // lock -> the flags its wiring file reads from the shared parser (`parsed.flag("<name>")`);
-// config, convention, events and identity -> one parser shared by every sub-verb (cli_projector.rs),
+// config, convention, events, identity and questions -> one parser shared by every sub-verb (cli_projector.rs),
 // mailbox -> one parser in apps/fgos/src/wiring/mailbox_verbs.rs, so
 // its flags must equal the union of the sub-verbs' schemas; its sub-verb names
 // live in mailbox_surface.rs, shared by every platform build; worktree -> its sub-verb's match arm in
@@ -373,6 +373,14 @@ const NATIVE_SOURCES = {
       return src.slice(start, Math.min(...ends, src.indexOf('Some(other) =>', start)));
     },
   },
+  questions: {
+    subs: RUST('apps/fgos/src/wiring/questions.rs'),
+    shared: () => {
+      const src = RUST('apps/fgos/src/cli_projector.rs');
+      const start = src.indexOf('fn project_questions_request');
+      return src.slice(start, src.indexOf('fn project_events_request', start));
+    },
+  },
   convention: {
     subs: RUST('packages/convention/rust/src/lib.rs'),
     shared: () => {
@@ -403,7 +411,10 @@ for (const entry of NATIVE) {
     const problems = [];
     if (source.shared) {
       const declared = new Set(Object.values(entry.subcommands).flatMap(schemaFlags));
-      assert.deepEqual([...declared].sort(), [...rustFlags(source.shared())].sort(), `${entry.name}: schema flags != the shared Rust parser's flags`);
+      // a positional parameter may also be accepted as a flag (questions show --id), as in the per-region rule below
+      const positional = new Set(Object.values(entry.subcommands).flatMap((spec) => spec.parameters.positional ?? []));
+      const read = [...rustFlags(source.shared())].filter((name) => declared.has(name) || !positional.has(name));
+      assert.deepEqual([...declared].sort(), read.sort(), `${entry.name}: schema flags != the shared Rust parser's flags`);
       return;
     }
     for (const sub of subs) {
