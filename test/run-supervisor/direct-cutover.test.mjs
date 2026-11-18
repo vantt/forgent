@@ -12,7 +12,7 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 import { acquireSync, createLockScope, spawnWithLocks } from '../../src/holder-lock/index.mjs';
 import { computeSha256Digest } from '../../src/native/proof-helpers.mjs';
 import { readSettledResult } from '../../src/runner/dispatch/run-result.mjs';
-import { attemptGateCommand, attemptPaths, writeAttemptIntent, attemptStepEnv, awaitSettledResult, buildEnvelope, captureTail, bindingWaitMs, laneTransport, prepareAttemptFiles, waitForBinding, withIdentityEnv, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
+import { attemptGateCommand, attemptPaths, writeAttemptIntent, attemptStepEnv, awaitSettledResult, buildEnvelope, captureTail, bindingWaitMs, laneTransport, settlementCeilingMs, prepareAttemptFiles, waitForBinding, withIdentityEnv, writeAttemptFiles } from '../../src/run-supervisor/direct-launch.mjs';
 import { BIN_FGOS, bwrapUsable, createProject, killToken, readJson, startRun, waitUntil } from './support/direct-harness.mjs';
 import { writeProjectConfig, readProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -165,7 +165,7 @@ test('a launcher at dispatch depth 0 writes the lane pool into the envelope and 
   assert.equal('lanes' in head, false);
 });
 
-test('a seat that may wait for a lane gets the wait added to its binding budget and to both deadlines, so a late seat still runs its whole round', (t) => {
+test('a seat that may wait for a lane gets the wait added to its binding budget and to both deadlines, so a late seat still runs its whole round and the controller awaits it', (t) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-envelope-lane-wait-'));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   const runDir = path.join(dir, 'runs', '01');
@@ -187,6 +187,10 @@ test('a seat that may wait for a lane gets the wait added to its binding budget 
   }
   assert.equal(bindingWaitMs(waiting), bindingWaitMs(plain) + 900_000);
   assert.equal(bindingWaitMs(unarmed), bindingWaitMs(plain));
+  const round = { timeoutMs: 60_000, gateKillGraceMs: 1000 };
+  assert.equal(settlementCeilingMs(plain, round), 60_000 + 1000 + 120_000, 'an attempt without a pool is awaited as before');
+  assert.equal(settlementCeilingMs(waiting, round), settlementCeilingMs(plain, round) + 900_000, 'the controller awaits the settlement as long as the lane-extended deadline');
+  assert.equal(settlementCeilingMs(unarmed, round), settlementCeilingMs(plain, round));
 });
 
 test('the attempt writer id replaces whatever the controller carried, in the launch env and in the side-file env', (t) => {

@@ -34,6 +34,8 @@ const ADOPT_POLL_MS = 250;
 const ADOPT_WAIT_MS = 60_000;
 /** Slack past the soft deadline for SIGTERM, the kill grace and the supervisor's own domain sweep. */
 const HARD_CEILING_SLACK_MS = 15_000;
+// What the controller waits for the settle step past the round and the gate's kill grace.
+const SETTLEMENT_SLACK_MS = 120_000;
 const ENV_ALLOW = ['PATH', 'HOME', 'USERPROFILE', 'TMPDIR', 'TEMP', 'TMP', 'LANG', 'LC_ALL', 'SYSTEMROOT', 'XDG_RUNTIME_DIR'];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -370,6 +372,15 @@ export function laneWaitBudgetMs(envelope) {
 /** The binding wait of one launch: the normal start budget plus the lane wait the envelope allows. */
 export function bindingWaitMs(envelope) {
   return BINDING_WAIT_MS + laneWaitBudgetMs(envelope);
+}
+
+/**
+ * How long the controller waits for the settled result after the binding: the round, the gate's kill grace and a
+ * settle margin, plus the lane wait the envelope's deadlines include, so a seat that waited for a lane is still
+ * awaited for as long as the supervisor lets it run.
+ */
+export function settlementCeilingMs(envelope, { timeoutMs, gateKillGraceMs }) {
+  return timeoutMs + laneWaitBudgetMs(envelope) + gateKillGraceMs + SETTLEMENT_SLACK_MS;
 }
 
 /** Wait for the supervisor's binding: `{state}` is `'bound'`, `'exited'` (ended without one; `exit` has its code) or `'unknown'` (alive, none in time). */

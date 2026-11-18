@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "468f72fd2007f2b8a7125ed728e63c34ad7e45e8d59f7f39ae762360bd50f9cf",
+  "payloadDigest": "d9933e132d8f0d212ee93d93088f059f19898a463cd6a3b5905012fc23c2919d",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -811,7 +811,7 @@
     "packages/run-supervisor/rust/examples/gate_agent.rs": "91486ceb4f500a9b8b06975c3cf98ebcdc65cdb8629b863304520c14240e80fd",
     "packages/run-supervisor/rust/examples/gate_harness.rs": "7412bfe67e635bdc37b2c100b0498670209bd54faa2714830929ce346b603742",
     "packages/run-supervisor/rust/examples/internal_harness.rs": "8801bb6f1b52e89a113be1b1392b577d7db603c407e903038a4199a9fdf0e76e",
-    "packages/run-supervisor/rust/src/adopt.rs": "57a2383f0dfff30c4c7dddc5653714d81caa30313fa1641cc91ca842042b8340",
+    "packages/run-supervisor/rust/src/adopt.rs": "788e7fe59bb9828e4b2a8f1e6396ab4d9d35acb67a79599428c5c402737e108c",
     "packages/run-supervisor/rust/src/attempt_step.rs": "63eea4036a32b75260a4e39842804fa8a2256c3dfc7c8e284bd3c157e88b6b82",
     "packages/run-supervisor/rust/src/envelope.rs": "f068c9cbf016d098bce8bb4460bfc40a9ba0cd80e418e62939da883fcd8f7b61",
     "packages/run-supervisor/rust/src/gate.rs": "562a8e46577ab3d932689b0a5065676ec4db3b400a40b6c8ecf703e93bbfed14",
@@ -844,7 +844,7 @@
     "packages/run-supervisor/rust/tests/gate_portable.rs": "1a97989cd9fbebc519506651eb3a79c7c577e0ffb199abb71bd07a0e133cc0db",
     "packages/run-supervisor/rust/tests/gate_terminal_socket.rs": "cba60e64b6f41309553c78216e66937d164b70bc2f1b37e49d657882daf2ce00",
     "packages/run-supervisor/rust/tests/head_request.rs": "da306372018dc11d45403b30c639acf4244ab4e800296ca5c8a53667fffb54ae",
-    "packages/run-supervisor/rust/tests/lanes.rs": "08129e9cff6bcf9edd54035a72a3f15eeb7336f797e22d8e1db056c94684e38d",
+    "packages/run-supervisor/rust/tests/lanes.rs": "0b909f34780e01cf66e49dae91ac1ae25ee0ca4ef794f22c53fddf6b45fbdaff",
     "packages/run-supervisor/rust/tests/portable/mod.rs": "6153ea7719f18ef0cc293fde0d603101df1308a4b2980edcc8dff57ad6d37363",
     "packages/run-supervisor/rust/tests/portable/supervisor.rs": "7c927cf97a970c37493f26e5ffedf3aefd59e294254d3b73583ab3db4cada1b2",
     "packages/run-supervisor/rust/tests/release_slot_step.rs": "5940a173550ba16062d73954fbe19081561a24722a90162c7b7ab78625a75b1e",
@@ -901,6 +901,7 @@
     "packages/supervision/rust/src/supervisor.rs": "108d951d7694d9372ca6ed62b3cae3dad46a6729b6ca495f4d92f870ce6a88ac",
     "packages/supervision/rust/src/wake.rs": "5b66c7f805a75cc193da6484f1d84a2e916018015250f95c4b9027c33b55b4c9",
     "packages/supervision/rust/src/watcher.rs": "fe233a725dc44a7cd66ccdcbb45035f102c84fdf66c930937ce15fb42f7c72a9",
+    "packages/supervision/rust/tests/definitions.rs": "3016e706df2b48e130ce81aa763fd4b4a60917f71282e457553bebe1a0a32bf6",
     "packages/supervision/rust/tests/portfolio.rs": "84b83ffc4a69b2d79d48be467d2523fb63f447f4819586d6443651638cd3f449",
     "packages/supervision/rust/tests/queue.rs": "64318ef31e520f9123cf018d0d66ab43ab67e75f8850f99a7d4112333a5bd60e",
     "packages/terminal-control/rust/src/core.rs": "0fa67399b5c1e59ac6accc448f58675cae90255659685254b48f428631ab66eb",
@@ -1152,7 +1153,7 @@
     "src/run-supervisor/cancel-registry.mjs": "c2e4eda5761ecf342e5b1916bc5e7d3995d6fd1a9e65c7070d53e5ef43c30779",
     "src/run-supervisor/client.mjs": "16445d0a7d4a4a145fc75187da3da8420b92a4a8b38903b88c9fff88c3c54cbc",
     "src/run-supervisor/cwd-lock.mjs": "e397642c0d8f4dc0c7aadb557d5e74e6b2ef43a07f0ea86cc043d7efd4dcb5d5",
-    "src/run-supervisor/direct-launch.mjs": "1a420b35078650a0b90e38a3a0b4d9c7c2229a2848c65be20ed640fc61b05469",
+    "src/run-supervisor/direct-launch.mjs": "8f1fbb15546c4c777678f13f6e8ac262bf26402a9b6e72fcb7a192115e2d7d69",
     "src/run-supervisor/dispatch-error.mjs": "53d164ad2b08fc1caeb3089b12ed987cfac3df6ba6c28e43ac0c844b61b75d86",
     "src/run-supervisor/gate-kill-grace.mjs": "a4490fb22db5839f39e0c98aaf9cf6f4cc4870cba36f11e5219edb18cb1a0d32",
     "src/run-supervisor/payload-root.mjs": "1231aa5b558578ff592c5b071ee6dc151d738227534a76fcf355d7200183eb43",
@@ -1178,7 +1179,7 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "ec7b00d1ad9e98a1dc5ffd12e98963e642da3100c6492ce337e798da2105a45b",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "1e1a922ad6d9ef2c9d8f0e7f6fec77d2c8b83b27ce9adfc8eaf3ec69e200ce6b",
-    "src/runner/dispatch/assignment-runner.mjs": "b5049de9d8679c366a3700fe964f62886c6bb6986c5fe20fb47524bf1dae3082",
+    "src/runner/dispatch/assignment-runner.mjs": "ba984c58a12cf1052553f6ce45781c3a21219da5d65f0b29dfb361d724f46b13",
     "src/runner/dispatch/assignment.mjs": "e17a8b1dd75893d3b0607a6f333fbccc32678e9c69f9ba42caa9169ba9135d1c",
     "src/runner/dispatch/attention-view.mjs": "3595f6cc09a1b9e8b3e84ca8a87864ea4b2e3b6ffde0178f8d95fc556be7866e",
     "src/runner/dispatch/brief.mjs": "c51d5398653cd6f839c2902134e627e57af7911b473fe16904478919c2d95e14",
@@ -4184,15 +4185,15 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1048,
+      "line": 1049,
       "spawn": "prepareTerminalAttempt -> src/runner/dispatch/herdr-round.mjs:483",
       "binary": "(env FGOS_HERDR_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1545,
-      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1169",
+      "line": 1546,
+      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1170",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
@@ -4206,7 +4207,7 @@
     {
       "path": "src/runner/dispatch/session-attempt.mjs",
       "line": 130,
-      "spawn": "startAndBind -> src/runner/dispatch/assignment-runner.mjs:1150",
+      "spawn": "startAndBind -> src/runner/dispatch/assignment-runner.mjs:1151",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
