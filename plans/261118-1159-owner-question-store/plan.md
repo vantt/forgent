@@ -264,7 +264,6 @@ phases share files with them. The phases themselves wait for less:
 - Phase 1 is docs and contracts only, and its files are disjoint from every running or ready plan. It is `ready` and
   can start now.
 - Phase 2 waits for session-verb phase 4, which rewrites `packages/identity/**`.
-- Phases 3 and later also wait for the owner's answer to Q1.
 - Phase 3 waits for phase 2 and for Observe's landed record contract and query engine (ops-metrics phases 1 and 5).
 - Phases 4 and later wait for S5 phases 10-12 and session-verb phase 5, which own `main.rs`, `routing.rs`, the
   registry and the head-request contract.
@@ -324,7 +323,11 @@ Round 2 changes two points, and its planner has been told:
 
 ## Owner questions
 
-### Q1: the questions door runs on Linux only (it blocks phases 3 and later)
+**Approved by the owner on 2026-11-18. Q1 answer: A.** The plan stays `draft` only because its three blockers are
+not done. Phase 1 is `ready`. Once the blockers land, the next planner or supervisor sets `ready` after the real
+contract check.
+
+### Q1: the questions door runs on Linux only (answered A, 2026-11-18)
 
 1. **What is happening.** With the Event Store as the store, `fgos questions`, the hook, S04 and Miu's batches work
    only on Linux. On macOS and Windows they refuse by name. Today's markdown reader works everywhere, but it does not
