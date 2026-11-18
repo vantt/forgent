@@ -22,6 +22,10 @@
     {
       "id": "mailbox",
       "contractFile": "packages/mailbox/contracts/event-streams.v1.json"
+    },
+    {
+      "id": "supervision",
+      "contractFile": "packages/supervision/contracts/event-streams.v1.json"
     }
   ]
 }

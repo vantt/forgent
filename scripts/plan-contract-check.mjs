@@ -16,14 +16,16 @@ import { isMainModule } from './lib/is-main-module.mjs';
 import { PLAN_SECTIONS, hasSection } from '../src/portfolio/plan-sections.mjs';
 
 export const CONTRACT_MARKER = 'plan-v1';
-export const STATUSES = ['draft', 'ready', 'running', 'done', 'withdrawn'];
+// The plan vocabulary has one source, shared with the Rust portfolio reader and the head-name resolver.
+const VOCABULARY = JSON.parse(fs.readFileSync(new URL('../packages/supervision/contracts/plan-vocabulary.v1.json', import.meta.url), 'utf8'));
+export const STATUSES = VOCABULARY.statuses;
 // Legacy status values and the contract value each one is rewritten to when the plan is migrated.
 export const LEGACY_STATUS = {
   pending: 'draft', proposed: 'draft', todo: 'ready', 'in-progress': 'running',
   completed: 'done', complete: 'done', landed: 'done', done: 'done', approved: 'ready', cancelled: 'withdrawn', archived: 'withdrawn',
 };
-const PRIORITIES = ['P0', 'P1', 'P2', 'P3'];
-const TABLE_COLUMNS = ['id', 'title', 'dependson', 'footprint', 'wave', 'status'];
+const PRIORITIES = VOCABULARY.priorities;
+const TABLE_COLUMNS = VOCABULARY.tableColumns;
 
 const strings = (v) => Array.isArray(v) && v.every((s) => typeof s === 'string' && s.trim() !== '');
 const norm = (p) => p.replace(/\\/g, '/').replace(/\*.*$/, '').replace(/\/+$/, '');

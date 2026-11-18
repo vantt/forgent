@@ -1,0 +1,7 @@
+{
+  "v": 1,
+  "statuses": ["draft", "ready", "running", "done", "withdrawn"],
+  "priorities": ["P0", "P1", "P2", "P3"],
+  "tableColumns": ["id", "title", "dependson", "footprint", "wave", "status"],
+  "headName": { "max": 32, "projectPrefix": 8 }
+}

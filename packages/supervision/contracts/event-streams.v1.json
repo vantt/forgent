@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "types": [
+    {
+      "type": "supervision.event-raised",
+      "domain": "supervision",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    },
+    {
+      "type": "supervision.event-handled",
+      "domain": "supervision",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": false
+    }
+  ]
+}
