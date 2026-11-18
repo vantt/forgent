@@ -21,6 +21,7 @@ footprint:
   - packages/execution/rust/src/bind.rs
   - packages/execution/contracts/bind.v1.json
   - .fgos/config.yaml
+  - CHANGELOG.md
 base: 4c6f25972953e10bc86e5659d98f94400002b56a
 source:
   - docs/discussions/account-lease-secretary/DISCUSSION.md
