@@ -1,16 +1,38 @@
-discussion: open
+discussion: settled
 
 # Câu hỏi cho chủ dự án (owner questions)
 
+> **Hand-off cho planner** (plan contract `core/skills/_shared/plan-contract.md`; secretary lead:HARDEN mở planner).
+> - **Outcome:** mọi câu hỏi gửi chủ dự án (discussion, plan, execution) được hỏi qua `fgos questions ask`, có id,
+>   người hỏi tự điền, `askedAt`, năm phần; chủ dự án thấy và trả lời mọi câu ở một chỗ (`fgos questions`, màn S04
+>   dashboard, Miu gom bộ); session hỏi nhận câu trả lời ở điểm dừng kế tiếp và ghi nó về nơi phát sinh; asker rảnh
+>   hoặc đã chết được supervisor nối tiếp qua `fgos.question.answered`.
+> - **Constraints:** OQ-D1..OQ-D7, OM-D11, OM-D13; Rust cho code mới; L10 (cửa mới thay reader markdown thì xoá đường
+>   cũ cùng đợt); nguyên tắc 1, 2, 7, 8; RUL104; config key mới qua `core/config-standard` + `core/config-schema`;
+>   hook mới có row trong doctor registry; `CHANGELOG.md` `[Unreleased]`.
+> - **Non-goals:** thiết kế lại gate Workflow hay `fgos ask` (tầng Work tạm dừng; đọc cạnh nhau, gộp sau);
+>   watcher, bảng hành động, supervisor (plan `261118-1045-project-supervisor`); mailbox/nudge; gõ vào pane;
+>   thước đo thời gian chờ (ops-metrics); đồng bộ tức thời giữa máy.
+> - **Acceptance:** (1) `ask` trả id, bản ghi có asker (session id, handle, role nếu có), `askedAt`, stage, origin
+>   ref, năm phần được kiểm; người gọi không tự khai asker được. (2) `answer <id>` ghi `{text, by, answeredAt}` một
+>   lần; trả lời lần hai bị từ chối có tên. (3) `ask`/`answer` phát `fgos.question.asked|answered` với attrs OQ-D6.
+>   (4) `fgos questions` liệt kê câu mở của kho cùng gate Workflow mở, mỗi câu có lệnh trả lời; S04 hiện và trả lời
+>   cùng tập đó. (5) Hook của session hỏi báo đúng câu đã trả lời của chính nó, không báo câu của session khác.
+>   (6) Định nghĩa `question-answered` chạy trên fixture. (7) Câu mở cũ trong `QUESTIONS.md`/mục plan được hỏi lại
+>   qua verb lúc cutover và reader markdown bị xoá. (8) `cargo test --workspace`, `npm test` xanh.
+> - **Open, chặn một phần:** không. Phụ thuộc ngoài: kind `fgos.question.*` do ops-metrics đăng ký (OM-D11), cửa ghi
+>   Observe của ops-metrics; hành động đánh thức do plan supervisor (phase watcher).
+> - **Sources:** OM-D11, OM-D13, OM-D14 (`docs/discussions/ops-metrics/DISCUSSION.md`); nợ SM-D9
+>   (`plans/261117-1856-secretary-session-spine/plan.md:246`); scout `plans/reports/scout-261118-1125-owner-question-routing.md`
+>   (nhánh `origin/shape/ops-metrics`).
+
 Shaper: tab "shaper: owner-questions", nhánh `shape/owner-questions`. Phạm vi do chủ dự án đặt 2026-11-18 (OM-D14).
-Dừng ở `discussion: settled`; secretary (lead:HARDEN) mở planner.
 
 ## 1. Trạng thái hiện tại
 
-2026-11-18. Vòng 2. OQ-D1 đã chốt: kho câu hỏi vận hành, nơi phát sinh giữ bản lâu dài. Điểm 2, 3, 4 có đề xuất ở
-§6 (shaper quyết, chưa mint D-ID vì mới một vòng). Điểm 5 (đánh thức) chờ phối hợp với planner supervisor về ranh
-giới watcher. Còn mở: chỗ đặt kho (component riêng hay trong Observe), ai ghi câu trả lời về nơi phát sinh khi người
-hỏi đã chết. Không có câu hỏi nào đang chờ chủ dự án.
+2026-11-18. Settled. Năm điểm chốt: nguồn sự thật OQ-D1, chỗ đặt kho OQ-D2, người hỏi OQ-D3, chỗ xem chung OQ-D4,
+nhận câu trả lời OQ-D5, đánh thức OQ-D6, chuyển đổi OQ-D7. Ranh giới với plan supervisor đã thống nhất. Không câu
+hỏi nào chờ chủ dự án. Bước tiếp: secretary mở planner.
 
 ## 2. Mục tiêu & đề bài
 
@@ -25,20 +47,28 @@ Code mới viết bằng Rust khi làm được mà không gây xáo trộn.
 
 | # | Điểm | Trạng thái | Ghi chú |
 |---|------|-----------|---------|
-| 1 | Nguồn sự thật của câu hỏi | chốt OQ-D1 | Hiện bốn nơi lưu, bốn kiểu khoá: `fgos ask` (work id), `QUESTIONS.md#Qn`, mục câu hỏi của plan, `workflow:<run>#<step>`. |
-| 2 | Ghi gì về người hỏi | đề xuất ở §6 | Identity tự cho session id + handle (in-process ~0,1 ms), role nếu đã đăng ký. Khoá pane nằm ở terminal-control/Session Host, không ở Identity. Plan/phase chưa nơi nào có. |
-| 3 | Một chỗ chung để xem và trả lời | đề xuất ở §6 | `fgos questions --open` gộp discussion, plan, gate nhưng thiếu `fgos ask`; dashboard S04 chỉ thấy `fgos ask`. |
-| 4 | Session hỏi nhận ra câu trả lời của mình | đề xuất ở §6 | Chưa có khoá chung. Ý nháp: id trả về lúc hỏi; `fgos questions wait <id>` hoặc hook `Stop`/`UserPromptSubmit` báo khi có trả lời. |
-| 5 | Đánh thức session khi có trả lời | đề xuất ở §6; phối hợp planner supervisor (`plan-supervisor-b9`) | Ý nháp: watcher coi `fgos.question.answered` là một loại row; asker còn sống thì terminal-control `send`, đã chết thì đánh thức supervisor. Ranh giới watcher/supervisor thuộc shaper supervisor. |
-| 7 | Kho câu hỏi là gì | chốt OQ-D1 | Hàng đợi + nhật ký cho câu đang mở; câu hỏi và câu trả lời lâu dài ghi ở nơi phát sinh. Mở: ai ghi lại khi người hỏi đã chết; bản ghi đã trả lời giữ bao lâu (ops-metrics cần thời gian chờ). |
-| 6 | Socket `head answered` có dùng được cho câu trả lời không | rõ: không | Đó là bước bắt tay của session kế nhiệm khi xoay (`src/session-rotation/rotate.mjs:115-133`), không mang câu trả lời của chủ dự án. |
+| 1 | Nguồn sự thật của câu hỏi | chốt OQ-D1 | Kho vận hành; nơi phát sinh giữ bản lâu dài. |
+| 2 | Ghi gì về người hỏi | chốt OQ-D3 | Verb tự điền từ Identity; pane không dùng để đánh thức. |
+| 3 | Một chỗ chung để xem và trả lời | chốt OQ-D4 | `fgos questions` + S04; gate và `fgos ask` đọc cạnh nhau. |
+| 4 | Session hỏi nhận ra câu trả lời của mình | chốt OQ-D5 | Hook ở điểm dừng, khoá = id + session id. |
+| 5 | Đánh thức session khi có trả lời | chốt OQ-D6 | Supervisor nối tiếp; không gõ pane, không mailbox. |
+| 6 | Socket `head answered` có dùng được không | rõ: không | Bước bắt tay xoay session (`src/session-rotation/rotate.mjs:115-133`). |
+| 7 | Chỗ đặt kho | chốt OQ-D2 | Component riêng, mẫu shard của Observe. |
+| 8 | Đồng bộ giữa máy | rõ: theo git, không tức thời | Câu hỏi và asker thường cùng máy; supervisor chạy theo máy. Nếu cần tức thời, mở item riêng. |
+| 9 | `fgos ask` và gate Workflow | rõ: giữ nguyên | Tầng Work tạm dừng; gộp khi Work mở lại (secretary ghi dòng backlog). |
 
 ## 4. Quyết định đã chốt
 
 | D-ID | Quyết định | Nguồn |
 |------|-----------|-------|
 | OQ-D1 | Câu hỏi đang mở nằm trong một kho vận hành (hàng đợi + nhật ký): `fgos questions ask` mint id, tự ghi người hỏi, `askedAt` và năm phần; `answer` ghi câu trả lời; danh sách mở là phép gộp bản ghi. Nơi phát sinh (`QUESTIONS.md`, mục câu hỏi của plan, gate) giữ bản lâu dài, thêm id, và nhận lại câu trả lời + quyết định. Gate Workflow giữ nguyên, được đọc như nguồn thứ hai tới khi tầng Work mở lại. Loại bỏ: giữ bốn nơi lưu với cột điền tay (không kiểm được người hỏi, không đánh thức được). | Q1, 2026-11-18 (hai vòng; chủ dự án làm rõ, shaper quyết theo ưu tiên #2) |
-| OM-D13 (kế thừa) | Verb Rust `fgos questions ask|answer` ghi thời điểm hỏi/trả lời và phát `fgos.question.asked|answered` qua cửa ghi Observe; một parser; Node chỉ là lớp gọi mỏng. Supervisor không nói chuyện với chủ dự án; câu hỏi của nó vào `fgos questions --open` và Miu gom thành bộ. | `docs/discussions/ops-metrics/DISCUSSION.md` §4 (nhánh `shape/ops-metrics`) |
+| OQ-D2 | Kho là một component Rust riêng (không thuộc Observe: Observe sở hữu đo lường và friction, câu hỏi là trạng thái điều phối). Bản ghi append-only theo writer như shard Observe (`docs/platform/observe/spec.md` §3), ở store của main checkout; tái dùng cửa shard có sẵn thay vì viết lại (nguyên tắc 1, 2; planner quyết tách primitive xuống lớp thấp hay gọi qua). Ngoài ra phát sự kiện qua cửa ghi Observe (OM-D13). | Shaper, 2026-11-18 |
+| OQ-D3 | Người hỏi do verb tự điền, người gọi không khai được: session id + handle (Identity in-process), role nếu session đã đăng ký, persona nếu là head session. Người gọi đưa `--ref` nơi phát sinh (discussion `QUESTIONS.md#Qn`, plan + phase, run/gate), verb kiểm tra tồn tại. Khoá pane/tab ghi nếu Session Host có placement, chỉ để hiển thị. | Shaper, 2026-11-18 (vòng 2 đề xuất, vòng 3 giữ nguyên) |
+| OQ-D4 | Một chỗ xem và trả lời: `fgos questions` (list mở, `show <id>`, `answer <id>`) và màn S04 dashboard gateway mở rộng, cùng một cửa. Gate Workflow mở và `fgos ask` hiện cạnh đó, trả lời qua cửa riêng của chúng. Miu đọc danh sách này để gom bộ câu hỏi; chủ dự án trả lời qua Miu thì Miu gọi `answer`, `by` ghi chủ dự án qua Miu. | Shaper, 2026-11-18 (vòng 2-3) |
+| OQ-D5 | Session hỏi nhận câu trả lời bằng id nhận lúc hỏi: một hook Rust ở `UserPromptSubmit` và `Stop` (không `PostToolUse`, quá dày) tra câu đã trả lời có asker là session này mà chưa ghi nhận, báo một dòng; session ghi câu trả lời + quyết định về nơi phát sinh rồi gọi `fgos questions ack <id>`. | Shaper, 2026-11-18 (vòng 2-3) |
+| OQ-D6 | Đánh thức không thuộc verb câu hỏi. Question plan sinh `fgos.question.answered` (ref = id câu hỏi; attrs: asker role + session id, handle/persona, origin ref, answeredAt; pane tuỳ chọn) và định nghĩa phát hiện `question-answered`. Plan supervisor sở hữu watcher, bảng hành động (mặc định `wake-supervisor`) và supervisor: asker còn sống và đang chạy tự nhận qua OQ-D5; asker rảnh hoặc đã chết → supervisor mở session nối tiếp (`fgos session start`), session đó ghi câu trả lời về nơi phát sinh và `ack`. Không gõ pane (PS-9), không mailbox (hoãn). Khi nudge của mailbox lên main, supervisor có thể nudge asker rảnh thay vì thay nó. | Planner supervisor + shaper, 2026-11-18 |
+| OQ-D7 | Chuyển đổi: lúc cutover mọi câu mở trong `QUESTIONS.md` và mục câu hỏi plan nháp được hỏi lại qua verb một lần (asker `migrated`), cột/mục markdown thêm id; reader markdown của `src/portfolio/open-questions.mjs` bị xoá cùng đợt (L10). `fgos-shaping`, plan contract và skill planner đổi để hỏi qua verb. | Shaper, 2026-11-18 |
+| OM-D11, OM-D13 (kế thừa) | Verb Rust `fgos questions ask|answer` ghi thời điểm hỏi/trả lời và phát `fgos.question.asked|answered` qua cửa ghi Observe; một parser; Node chỉ là lớp gọi mỏng. OM-D11: ops-metrics đăng ký kind `fgos.question.*`, bên sở hữu câu hỏi sinh sự kiện. Supervisor không nói chuyện với chủ dự án; câu hỏi của nó vào `fgos questions --open` và Miu gom thành bộ. | `docs/discussions/ops-metrics/DISCUSSION.md` §4 (nhánh `shape/ops-metrics`) |
 
 ## 5. Q&A log
 
@@ -52,27 +82,66 @@ Code mới viết bằng Rust khi làm được mà không gây xáo trộn.
 - 2026-11-18 — Chủ dự án: "suy nghĩ kỹ xem tại sao vẫn còn hỏi a hay b". Đúng: phân tích đã chọn rõ (a), (b) không
   đáp được điểm 4 và 5; theo AGENTS.md ưu tiên #2 shaper phải quyết và báo cáo. Quyết (a) → OQ-D1. Từ đây shaper
   tự quyết điểm nào phân tích chọn rõ; chỉ hỏi khi phương án ngang nhau hoặc phụ thuộc ý định chủ dự án.
+- 2026-11-18 — Planner supervisor (`plan-supervisor-b9`, plan `261118-1045-project-supervisor`) trả lời: watcher
+  chạy được với cách chia như ops-metrics; question plan sở hữu kind và định nghĩa `question-answered`, plan supervisor
+  sở hữu watcher, bảng hành động (mặc định `wake-supervisor`) và supervisor. Xung đột: PS-9 cấm watcher gõ vào pane
+  (gõ giữa turn của LLM không an toàn). Shaper bỏ hẳn terminal-control `send`: asker còn sống và đang chạy nhận qua
+  hook của chính nó; asker rảnh hoặc đã chết → supervisor mở session nối tiếp. Mailbox nudge chỉ có trên nhánh
+  `mailbox/v1-v3`, chủ dự án giữ hoãn. Đã báo lại planner supervisor.
+- 2026-11-18 — Shaper quyết các điểm 2-5 và chỗ đặt kho (OQ-D2..OQ-D7): phân tích chọn rõ, không phương án nào ngang
+  nhau hay phụ thuộc ý định chủ dự án. Discussion settled.
+
 
 ## 6. Thiết kế đã chốt {#design}
 
-Bản nháp vòng 2; chỉ OQ-D1 đã chốt, phần còn lại là đề xuất của shaper.
+Mỗi câu hỏi gửi chủ dự án có hai chỗ ở: **nơi phát sinh** (hàng `QUESTIONS.md` của discussion, mục câu hỏi của plan
+nháp, gate Workflow) giữ văn bản lâu dài và nhận lại câu trả lời; **kho câu hỏi** (component Rust riêng, OQ-D2) là
+hàng đợi + nhật ký của câu đang mở, nguồn duy nhất cho danh sách và cho sự kiện.
 
-- **Kho (OQ-D1).** Mỗi câu hỏi là một bản ghi append-only: id (mint qua cửa identity), người hỏi, `askedAt`, stage
-  (discussion | plan | execution), ref nơi phát sinh, năm phần; câu trả lời `{text, by, answeredAt}` là bản ghi thứ
-  hai cùng id. Danh sách mở = gộp. `ask`/`answer` phát `fgos.question.asked|answered` (OM-D13).
-- **Người hỏi (đề xuất).** Verb tự điền, không nhận từ tay người gọi: session id + handle từ Identity (in-process),
-  role nếu session đã đăng ký; khoá pane/tab lấy từ placement của Session Host/terminal-control nếu có, bỏ trống nếu
-  không. Plan/phase hoặc discussion là `--ref` do người gọi đưa (chỉ người gọi biết), kiểm tra tồn tại.
-- **Một chỗ xem và trả lời (đề xuất).** `fgos questions` (list mở, `answer <id>`) và màn S04 dashboard gateway mở
-  rộng đọc/ghi qua cùng cửa. Gate Workflow hiện cạnh đó, trả lời qua cửa gate của nó. `fgos ask` (work item) gọi
-  qua cửa mới hoặc nghỉ: planner quyết theo L10.
-- **Người hỏi nhận câu trả lời (đề xuất).** Bằng id nhận lúc hỏi. Hook `UserPromptSubmit`/`Stop` của session tra
-  câu đã trả lời mà người hỏi là session này và báo một dòng; session đó ghi câu trả lời + quyết định về nơi phát
-  sinh rồi đánh dấu đã ghi nhận.
-- **Đánh thức (đề xuất, chờ phối hợp).** Không thuộc verb câu hỏi: watcher của supervisor coi
-  `fgos.question.answered` là một loại row; người hỏi còn sống và có khoá pane → terminal-control `send`; đã chết →
-  supervisor mở session nối tiếp, session đó ghi câu trả lời về nơi phát sinh. Mailbox vẫn hoãn.
+1. **Hỏi.** Session gọi `fgos questions ask --ref <nơi phát sinh> <năm phần>`. Verb kiểm năm phần, tự điền người
+   hỏi từ Identity (OQ-D3), mint id, ghi bản ghi append-only với `askedAt` và stage, phát `fgos.question.asked`, trả
+   id. Session ghi id vào nơi phát sinh rồi làm tiếp phần việc không phụ thuộc câu hỏi (AGENTS.md ưu tiên #2).
+2. **Xem và trả lời.** `fgos questions` và màn S04 liệt kê câu mở của kho, cạnh gate Workflow mở và `fgos ask`
+   (OQ-D4). Miu gom bộ cho chủ dự án. `answer <id>` ghi `{text, by, answeredAt}` một lần, phát
+   `fgos.question.answered` (OQ-D6).
+3. **Nhận.** Hook `UserPromptSubmit`/`Stop` của session hỏi thấy câu đã trả lời của chính nó, báo một dòng; session
+   ghi câu trả lời và quyết định về nơi phát sinh rồi `ack` (OQ-D5).
+4. **Nối tiếp.** Watcher (plan supervisor) thấy `question-answered` → mặc định đánh thức supervisor; asker rảnh hoặc
+   đã chết → supervisor mở session nối tiếp làm bước 3 (OQ-D6).
+
+```mermaid
+flowchart LR
+  S[Session hỏi] -- ask --> K[(Kho câu hỏi)]
+  S -- ghi id --> O[Nơi phát sinh]
+  K -- fgos.question.asked/answered --> OB[Observe]
+  K --> L[fgos questions / S04 / Miu]
+  G[Gate Workflow, fgos ask] --> L
+  L -- answer --> K
+  K -- hook ở điểm dừng --> S
+  OB -- question-answered --> W[Watcher → supervisor]
+  W -- asker rảnh/chết: session start --> S2[Session nối tiếp]
+  S -- ghi câu trả lời, ack --> O
+  S2 -- ghi câu trả lời, ack --> O
+```
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Chưa có; điền khi hình dạng đã rõ.
+### question-store {#task-question-store}
+Component Rust: bản ghi, id, asker tự điền, `ask|answer|show|ack|list`, cửa shard tái dùng, sự kiện qua cửa ghi
+Observe. §6 bước 1-2. OQ-D1, D2, D3, OM-D13. Verify nháp: `cargo test -p <crate câu hỏi>`.
+
+### question-views {#task-question-views}
+`fgos questions` (Rust) thay reader Node; màn S04 mở rộng đọc/ghi qua cùng cửa; gate và `fgos ask` hiện cạnh. §6
+bước 2. OQ-D4. Sau question-store. Verify nháp: test gateway S04 + test verb.
+
+### question-receipt-hook {#task-question-receipt-hook}
+Hook Rust `UserPromptSubmit`/`Stop`, row doctor registry, cài qua cửa hook có sẵn. §6 bước 3. OQ-D5. Sau
+question-store. Verify nháp: hook chỉ báo câu của chính session trên fixture hai session.
+
+### question-answered-definition {#task-question-answered-definition}
+Định nghĩa phát hiện `question-answered` với attrs OQ-D6, chạy trên fixture; hành động thuộc plan supervisor.
+Phụ thuộc cửa ghi Observe của ops-metrics. Verify nháp: query định nghĩa trên fixture.
+
+### question-cutover {#task-question-cutover}
+Hỏi lại câu mở cũ qua verb, thêm cột id, đổi `fgos-shaping`/plan contract/skill planner, xoá reader markdown
+(L10). OQ-D7. Sau question-store và question-views. Verify nháp: `npm test` + `fgos questions` trên repo thật.
