@@ -276,7 +276,7 @@ fn age(asked_at: &str, now_ms: i64) -> String {
     }
 }
 
-fn now_ms() -> i64 {
+pub(crate) fn now_ms() -> i64 {
     std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_or(0, |elapsed| elapsed.as_millis() as i64)
@@ -725,8 +725,112 @@ fn process_caller() -> IdentityCaller {
     }
 }
 
-/// Opens the stream and runs the call in the real process: the writer of an append is the caller's session.
+/// The variable that names a head's request socket inside its sandbox.
+pub const HEAD_SOCKET_ENV: &str = "FGOS_HEAD_REQUEST_SOCKET";
+/// How many times a write is retried when the head's supervisor answers `busy`, and how long it waits between tries.
+pub const BUSY_RETRIES: u32 = 3;
+pub const BUSY_PAUSE: std::time::Duration = std::time::Duration::from_secs(1);
+
+/// The head-request verb and arguments of a write sub-command: `ask` carries the parsed input and its flags, the
+/// others their own fields. The caller is never an argument; the supervisor's envelope names it.
+fn head_call(request: &QuestionsRequest) -> Result<(&'static str, Value), CategorisedRefusal> {
+    Ok(match &request.verb {
+        Verb::Ask {
+            reference,
+            input,
+            migrated,
+            supersedes,
+        } => {
+            let payload = ask_input(request, &None, input, false, &None)?;
+            let mut args = json!({ "input": payload, "migrated": migrated });
+            if let Some(reference) = reference {
+                args["ref"] = json!(reference);
+            }
+            if let Some(old) = supersedes {
+                args["supersedes"] = json!(old);
+            }
+            ("questions ask", args)
+        }
+        Verb::Ack { id } => ("questions ack", json!({ "id": id })),
+        Verb::Cancel { id, reason } => (
+            "questions cancel",
+            json!({ "id": id, "reason": reason.as_deref().unwrap_or("") }),
+        ),
+        Verb::Answer {
+            id, option, text, ..
+        } => {
+            let mut args = json!({ "id": id });
+            if let Some(option) = option {
+                args["option"] = json!(option);
+            }
+            if let Some(text) = text {
+                args["text"] = json!(text);
+            }
+            ("questions answer", args)
+        }
+        Verb::List { .. } | Verb::Show { .. } => {
+            return Err(validation("only a write goes through the request socket"))
+        }
+    })
+}
+
+/// The text a head write prints, the same words the local call prints.
+fn head_text(verb: &Verb, data: &Value) -> String {
+    let id = data["id"].as_str().unwrap_or("");
+    match verb {
+        Verb::Ask { .. } => id.to_owned(),
+        Verb::Answer { .. } => format!("answered {id}"),
+        Verb::Ack { .. } => format!("acked {id}"),
+        _ => format!("cancelled {id}"),
+    }
+}
+
+/// Runs `call` until it is not `busy`, at most `retries` more times, waiting `pause` between tries.
+#[cfg(unix)]
+pub fn retry_busy<T>(
+    retries: u32,
+    pause: std::time::Duration,
+    mut call: impl FnMut() -> Result<T, fgos_run_supervisor::head_client::ClientError>,
+) -> Result<T, fgos_run_supervisor::head_client::ClientError> {
+    let mut tried = 0;
+    loop {
+        match call() {
+            Err(error) if error.code == "busy" && tried < retries => {
+                tried += 1;
+                std::thread::sleep(pause);
+            }
+            other => return other,
+        }
+    }
+}
+
+/// A write of a confined head: asked of its supervisor over the request socket, answered with the data the head
+/// route (`head_questions`) returned.
+#[cfg(unix)]
+fn through_socket(
+    request: &QuestionsRequest,
+    socket: &Path,
+) -> Result<VerbAnswer, CategorisedRefusal> {
+    use fgos_run_supervisor::head_client::{request_head, REPLY_TIMEOUT};
+    let (verb, args) = head_call(request)?;
+    let id = format!("q-{}-{}", std::process::id(), now_ms());
+    let data = retry_busy(BUSY_RETRIES, BUSY_PAUSE, || {
+        request_head(socket, verb, &args, &id, REPLY_TIMEOUT)
+    })
+    .map_err(|e| refused(&Refusal::new(e.code, e.detail.unwrap_or_default())))?;
+    let text = head_text(&request.verb, &data);
+    Ok(present(request, data, text))
+}
+
+/// Opens the stream and runs the call in the real process: the writer of an append is the caller's session. Inside a
+/// confined head (its request socket variable is set) a write goes through that socket instead.
 fn run(request: &QuestionsRequest) -> Result<VerbAnswer, CategorisedRefusal> {
+    #[cfg(unix)]
+    if WRITE_SUBCOMMANDS.contains(&request.verb.sub()) {
+        if let Some(socket) = std::env::var_os(HEAD_SOCKET_ENV).filter(|s| !s.is_empty()) {
+            return through_socket(request, Path::new(&socket));
+        }
+    }
     let caller = process_caller();
     let writer = if WRITE_SUBCOMMANDS.contains(&request.verb.sub()) {
         caller.caller().map_err(|r| refused(&r))?.session_id
@@ -933,5 +1037,43 @@ mod tests {
         assert_eq!(plan_priority(&dir, "plan:../x"), None);
         assert_eq!(plan_priority(&dir, "case:r1"), None);
         std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_busy_reply_is_retried_three_times_and_any_other_refusal_is_not() {
+        use fgos_run_supervisor::head_client::ClientError;
+        let busy = || ClientError {
+            code: "busy".into(),
+            detail: None,
+        };
+        let mut calls = 0;
+        let out: Result<(), _> = retry_busy(BUSY_RETRIES, std::time::Duration::ZERO, || {
+            calls += 1;
+            Err(busy())
+        });
+        assert_eq!((calls, out.unwrap_err().code.as_str()), (4, "busy"));
+        let mut calls = 0;
+        let out = retry_busy(BUSY_RETRIES, std::time::Duration::ZERO, || {
+            calls += 1;
+            if calls < 3 {
+                Err(busy())
+            } else {
+                Ok(calls)
+            }
+        });
+        assert_eq!(out.unwrap(), 3);
+        let mut calls = 0;
+        let out: Result<(), _> = retry_busy(BUSY_RETRIES, std::time::Duration::ZERO, || {
+            calls += 1;
+            Err(ClientError {
+                code: "verb-not-granted".into(),
+                detail: None,
+            })
+        });
+        assert_eq!(
+            (calls, out.unwrap_err().code.as_str()),
+            (1, "verb-not-granted")
+        );
     }
 }

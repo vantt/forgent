@@ -12,7 +12,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { HeadRequestError, MAX_FRAME_BYTES, MAX_REQUEST_BYTES, requestHead, requestHeadStart, requestHeadWrite } from '../../src/session-host/head-request-client.mjs';
 import { rotateHead, runHeadRequest, startHead } from '../../src/session-host/head-request.mjs';
-import { HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
+import { grantOf, HEAD_REQUEST_SOCKET_ENV, QUESTION_VERBS } from '../../src/session-host/head-grants.mjs';
 
 const scratch = (t) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-head-req-'));
@@ -183,4 +183,55 @@ test('the payload entry runs session rotate and session answered for the envelop
   assert.equal(otherRestore.line.code, 'role-mismatch');
   const stray = await runHeadRequest({ runDir, request: { verb: 'session answered', args: { persona: 'planner', name: 'x', sessionId: 's1', rotationId: '0123456789abcdef', message: 'm', key: 'head-planner-x-9' } } }, ports);
   assert.equal(stray.line.code, 'bad-args');
+});
+
+test('every head may ask, ack and cancel its own questions and only the secretary may answer, all from the one shared list', () => {
+  assert.deepEqual(QUESTION_VERBS, ['questions ask', 'questions ack', 'questions cancel']);
+  for (const role of ['head:secretary-miu', 'head:shaper-x']) {
+    for (const verb of QUESTION_VERBS) assert.ok(grantOf(role).verbs.includes(verb), `${role} holds ${verb}`);
+  }
+  assert.ok(grantOf('head:secretary-miu').verbs.includes('questions answer'));
+  assert.ok(!grantOf('head:shaper-x').verbs.includes('questions answer'), 'the shaper never answers');
+  assert.deepEqual(grantOf('head:planner-x').verbs, [], 'a persona the table does not name still holds nothing');
+});
+
+test('the payload entry hands each questions verb to the host route with the envelope\'s own run directory and returns its answer or its refusal code', async (t) => {
+  const runDir = scratch(t);
+  const project = scratch(t);
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, hostBin: '/the/fgos', session: { role: 'head:secretary-miu', verbs: ['questions ask'], requestSocketPath: '/run/s.sock' } }));
+  const calls = [];
+  const ports = { questions: (call) => { calls.push(call); if (call.request.verb === 'questions cancel') throw Object.assign(new Error('not yours'), { code: 'not-asker' }); return { id: 'q-1' }; } };
+  for (const verb of ['questions ask', 'questions ack', 'questions answer']) {
+    const done = await runHeadRequest({ runDir, request: { verb, args: { id: 'q-1', role: 'head:shaper-x' } } }, ports);
+    assert.deepEqual(done, { exit: 0, line: { result: 'done', data: { id: 'q-1' } } });
+  }
+  assert.deepEqual(calls[0], { hostBin: '/the/fgos', runDir, cwd: project, request: { verb: 'questions ask', args: { id: 'q-1', role: 'head:shaper-x' } } });
+  const refused = await runHeadRequest({ runDir, request: { verb: 'questions cancel', args: { id: 'q-1', reason: 'r' } } }, ports);
+  assert.deepEqual(refused, { exit: 70, line: { result: 'error', code: 'not-asker', message: 'not yours' } });
+  const notAnObject = await runHeadRequest({ runDir, request: { verb: 'questions ask', args: [] } }, ports);
+  assert.equal(notAnObject.line.code, 'bad-args');
+});
+
+test('the default host call runs `internal head-questions --run-dir` with the request on stdin and reads its one line', async (t) => {
+  const runDir = scratch(t);
+  const project = scratch(t);
+  const bin = path.join(scratch(t), 'fake-fgos');
+  fs.writeFileSync(bin, '#!/bin/sh\ncat > "$0.stdin"\necho "$@" > "$0.argv"\nif [ -f "$0.fail" ]; then echo \'{"result":"error","code":"answer-not-owner","message":"no"}\'; exit 70; fi\necho \'{"result":"done","data":{"id":"q-9"}}\'\n', { mode: 0o755 });
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, hostBin: bin, session: { role: 'head:secretary-miu', verbs: [], requestSocketPath: '/run/s.sock' } }));
+  const done = await runHeadRequest({ runDir, request: { verb: 'questions ack', args: { id: 'q-9' } } });
+  assert.deepEqual(done, { exit: 0, line: { result: 'done', data: { id: 'q-9' } } });
+  assert.equal(fs.readFileSync(`${bin}.argv`, 'utf8').trim(), `internal head-questions --run-dir ${runDir}`);
+  assert.deepEqual(JSON.parse(fs.readFileSync(`${bin}.stdin`, 'utf8')), { v: 1, verb: 'questions ack', args: { id: 'q-9' } });
+  fs.writeFileSync(`${bin}.fail`, '');
+  const refused = await runHeadRequest({ runDir, request: { verb: 'questions answer', args: { id: 'q-9', option: 'A' } } });
+  assert.deepEqual(refused, { exit: 70, line: { result: 'error', code: 'answer-not-owner', message: 'no' } });
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, hostBin: path.join(project, 'missing'), session: { role: 'head:secretary-miu' } }));
+  assert.equal((await runHeadRequest({ runDir, request: { verb: 'questions ack', args: { id: 'q-9' } } })).line.code, 'internal');
+});
+
+test('a busy reply of the supervisor reaches the caller as the code busy, so the questions client can retry it', async (t) => {
+  const socketPath = path.join(scratch(t), 'req.sock');
+  serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'refused', code: 'busy' }));
+  await listening();
+  await assert.rejects(requestHead('questions ask', { input: {}, ref: 'plan:p' }, { socketPath }), (err) => err.code === 'busy');
 });

@@ -19,6 +19,10 @@ export const HEAD_ROTATE_VERB = 'session rotate';
 export const HEAD_ANSWERED_VERB = 'session answered';
 export const HEAD_RESTORE_VERB = 'session restore role';
 export const HEAD_WRITE_VERB = 'session write';
+export const HEAD_QUESTIONS_ASK_VERB = 'questions ask';
+export const HEAD_QUESTIONS_ACK_VERB = 'questions ack';
+export const HEAD_QUESTIONS_CANCEL_VERB = 'questions cancel';
+export const HEAD_QUESTIONS_ANSWER_VERB = 'questions answer';
 /** A reply may take as long as the supervisor lets the verb run (60 s) plus its own overhead. */
 const DEFAULT_REPLY_TIMEOUT_MS = 70_000;
 

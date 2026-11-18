@@ -29,6 +29,15 @@ export const HEAD_BIND_SESSION_VERB = 'session bind session';
 const HEAD_VERBS = Object.freeze([HEAD_BIND_SESSION_VERB, 'session rotate', 'session answered', 'session restore role']);
 
 /**
+ * Every head may ask, acknowledge and cancel its own owner questions through the socket (`head-request.v1.json`);
+ * answering is the owner's, and only the secretary, which carries the owner's reply, may do it. The shared list is the
+ * one place these three are named.
+ */
+export const QUESTION_VERBS = Object.freeze(['questions ask', 'questions ack', 'questions cancel']);
+/** The verb only the secretary head holds: it records the owner's answer with source `secretary`. */
+export const QUESTION_ANSWER_VERB = 'questions answer';
+
+/**
  * `mailbox`: the sandbox binds the project's mailbox lock and record writable, so the head can send and receive mail.
  * `peers`: the head keeps the host pid space and reads the machine's session sockets and registry, so it can list and
  * message the other agent sessions of its machine (Claude Code's SendMessage); owner decision 2026-11-18, secretary only.
@@ -36,11 +45,11 @@ const HEAD_VERBS = Object.freeze([HEAD_BIND_SESSION_VERB, 'session rotate', 'ses
 const GRANTS = Object.freeze({
   secretary: Object.freeze({
     writes: Object.freeze(['plans', 'docs/backlog.md', 'docs/discussions']),
-    verbs: Object.freeze(['session start', 'session write', ...HEAD_VERBS]),
+    verbs: Object.freeze(['session start', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, QUESTION_ANSWER_VERB]),
     mailbox: true,
     peers: true,
   }),
-  shaper: Object.freeze({ writes: Object.freeze([]), verbs: HEAD_VERBS, mailbox: false, peers: false }),
+  shaper: Object.freeze({ writes: Object.freeze([]), verbs: Object.freeze([...HEAD_VERBS, ...QUESTION_VERBS]), mailbox: false, peers: false }),
 });
 
 export class HeadGrantError extends Error {

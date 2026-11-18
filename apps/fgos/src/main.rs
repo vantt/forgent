@@ -218,6 +218,15 @@ fn main() {
                 .collect();
             std::process::exit(wiring::seat_binding::main(&rest));
         }
+        // `head-questions --run-dir <dir>`: a confined head's owner-question writes, asked over its request
+        // socket and served here with the caller taken from the head's envelope (see `wiring::head_questions`).
+        if args.get(2).is_some_and(|a| a == "head-questions") {
+            let rest: Vec<String> = args[3..]
+                .iter()
+                .map(|a| a.to_string_lossy().into_owned())
+                .collect();
+            std::process::exit(wiring::head_questions::main(&rest));
+        }
         // `source-payload <root>`: the one source-payload rule, for the release builder (see
         // `fgos_distribution::source_payload`).
         if args.get(2).is_some_and(|a| a == "source-payload") {

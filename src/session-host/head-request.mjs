@@ -11,10 +11,11 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { CONFINED_MARKER_ENV } from '../config/facade.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
-import { HEAD_ANSWERED_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_START_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
+import { HEAD_ANSWERED_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_START_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
 import { headRoleOf, startHeadSession } from './head-start.mjs';
 import { markSuccessorAnswered, requestRotation, rotationHolds } from '../session-rotation/rotate.mjs';
 
@@ -71,9 +72,30 @@ function ownLineage(args, envelope) {
   }
 }
 
+/** Slightly under the supervisor's 60 s verb bound, so this error, not a kill, is what the head reads. */
+const QUESTIONS_TIMEOUT_MS = 55_000;
+
+/**
+ * The `questions *` verbs are served by the host: `fgos internal head-questions --run-dir <dir>` reads the envelope
+ * itself, takes the asker from it and runs the question use case, so this payload carries the request and nothing
+ * else. Returns the route's `data`; a refusal throws with the route's own code.
+ */
+function callHeadQuestions({ hostBin, runDir, cwd, request }) {
+  const run = spawnSync(hostBin, ['internal', 'head-questions', '--run-dir', runDir], {
+    input: JSON.stringify({ v: 1, verb: request.verb, args: request.args }), cwd, encoding: 'utf8', timeout: QUESTIONS_TIMEOUT_MS, maxBuffer: MAX_REQUEST_BYTES,
+  });
+  const lastLine = (run.stdout ?? '').trim().split('\n').filter(Boolean).pop() ?? '';
+  let line;
+  try { line = JSON.parse(lastLine); } catch { line = null; }
+  if (line?.result === 'done') return line.data ?? {};
+  if (line?.result === 'error') throw Object.assign(new Error(String(line.message ?? 'refused')), { code: String(line.code ?? 'internal') });
+  throw Object.assign(new Error(run.error ? String(run.error.message) : `the questions route ended with exit ${run.status}`), { code: 'internal' });
+}
+
 /**
  * Runs the verb of one request for the attempt in `runDir`, in this attempt's project: `session start`, `session rotate`,
- * `session answered` or `session restore role` (which only checks its arguments: the supervisor registers the role). Returns `{ exit, line }`: the one JSON line to print, `{result: 'done', data}` or
+ * `session answered`, `session restore role` (which only checks its arguments: the supervisor registers the role) or a
+ * `questions *` verb (served by the host route, `ports.questions` replacing it in a test). Returns `{ exit, line }`: the one JSON line to print, `{result: 'done', data}` or
  * `{result: 'error', code, message}`, and the exit code (0 done, 70 error). Who may ask and for what was decided by
  * the supervisor before it ran this; the verb arguments are re-checked here because they come from the sandbox.
  * `session rotate` returns at once (the rotation runs detached); `session answered` is the one verb of a successor that does
@@ -110,6 +132,15 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
         ownLineage(args, envelope);
         data = {};
         break;
+      case HEAD_QUESTIONS_ASK_VERB:
+      case HEAD_QUESTIONS_ACK_VERB:
+      case HEAD_QUESTIONS_CANCEL_VERB:
+      case HEAD_QUESTIONS_ANSWER_VERB: {
+        const hostBin = envelope.hostBin ?? process.env.FGOS_HOST_BIN;
+        if (typeof hostBin !== 'string' || hostBin === '') throw Object.assign(new Error('the envelope names no host binary'), { code: 'envelope-invalid' });
+        data = await (ports.questions ?? callHeadQuestions)({ hostBin, runDir, cwd: projectRoot, request: { verb: request.verb, args } });
+        break;
+      }
       default:
         throw Object.assign(new Error(`unknown verb ${JSON.stringify(request?.verb)}`), { code: 'unknown-verb' });
     }

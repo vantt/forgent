@@ -7,6 +7,7 @@ pub mod event_store_clone;
 pub mod events;
 pub mod gateway_control;
 pub mod git_incidents;
+pub mod head_questions;
 pub mod identity_log;
 pub mod init;
 pub mod lock_fence;
