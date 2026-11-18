@@ -193,8 +193,8 @@ const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nati
 const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.native === true);
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
-  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['dispatch', 'goal', 'head', 'merge', 'workflow', 'worktree']);
-  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'config', 'convention', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'session']);
+  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['dispatch', 'goal', 'head', 'merge', 'workflow']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'config', 'convention', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'session', 'worktree']);
 });
 
 // A verb that lists sub-verbs in `native` serves those in the Rust host: the Node handler holds no branch for them
@@ -278,7 +278,9 @@ test('the scanner sees what it claims to: known reads in known regions', () => {
 // its flags must equal the union of the sub-verbs' schemas; its sub-verb names
 // live in mailbox_surface.rs, shared by every platform build; session -> one
 // reader of the shared parser's output (`project_session_request` in
-// apps/fgos/src/wiring/session.rs), which names a flag as `flag("item")`.
+// apps/fgos/src/wiring/session.rs), which names a flag as `flag("item")`; worktree -> its sub-verb's match arm in
+// `project_worktree_request` (apps/fgos/src/wiring/worktree.rs), which also names a flag through its two readers
+// `named_value(&call, "x", ..)` and `truthy(&call, "x")`.
 const RUST = (rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
 const NATIVE_SOURCES = {
   agents: {
@@ -367,6 +369,16 @@ const NATIVE_SOURCES = {
       return src.slice(start, src.indexOf('/// What a request answers', start));
     },
   },
+  worktree: {
+    subs: RUST('apps/fgos/src/wiring/worktree.rs'),
+    region: (sub, subs) => {
+      const src = RUST('apps/fgos/src/wiring/worktree.rs');
+      const start = src.indexOf(`Some("${sub}") =>`);
+      assert.ok(start >= 0, `worktree.rs has no "${sub}" arm`);
+      const ends = subs.map((other) => src.indexOf(`Some("${other}") =>`, start + 1)).filter((i) => i > start);
+      return src.slice(start, Math.min(...ends, src.indexOf('Some(other) =>', start)));
+    },
+  },
   convention: {
     subs: RUST('packages/convention/rust/src/lib.rs'),
     shared: () => {
@@ -384,8 +396,9 @@ function rustSubcommands(src) {
 }
 
 // A flag is named as a `"--x"` literal, or, where the shared parser's output is read, as `.flag("x")` or a read of it
-// by name (`value("x")`, `switch("x")`, `text("x")`, `has("x")`, `named("x", ...)`).
-const rustFlags = (text) => new Set([...text.matchAll(/"--([a-z][a-z-]*)"|\.flag\("([a-z][a-z-]*)"\)|\b(?:value|switch|text|named|has)\("([a-z][a-z-]*)"[,)]/g)].map((m) => m[1] ?? m[2] ?? m[3]).filter((n) => !GLOBAL.has(n)));
+// by name (`value("x")`, `switch("x")`, `text("x")`, `has("x")`, `named("x", ...)`, `named_value(&call, "x", ...)`,
+// `truthy(&call, "x")`).
+const rustFlags = (text) => new Set([...text.matchAll(/"--([a-z][a-z-]*)"|\.flag\("([a-z][a-z-]*)"\)|\b(?:value|switch|text|named|has)\("([a-z][a-z-]*)"[,)]|\b(?:named_value|truthy)\(\s*&call,\s*"([a-z][a-z-]*)"[,)]/g)].map((m) => m[1] ?? m[2] ?? m[3] ?? m[4]).filter((n) => !GLOBAL.has(n)));
 const schemaFlags = (spec) => Object.keys(spec.parameters.properties).filter((n) => !(spec.parameters.positional ?? []).includes(n));
 
 for (const entry of NATIVE) {

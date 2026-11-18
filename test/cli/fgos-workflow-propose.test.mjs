@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 import { unknownFlagMessage } from '../../src/cli/flag-check.mjs';
@@ -16,6 +16,7 @@ import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 import { readProjectConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 seedFileLocalBwrapRegistry();
@@ -49,7 +50,7 @@ function setup() {
 }
 
 // boundary: the generated lines are only proven usable by the CLI's own argument parser, start and admission, which no use-case test reaches.
-const fgos = (tmp, args) => spawnSync(process.execPath, [FGOS, ...args, '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
+const fgos = (tmp, args) => spawnFgos(FGOS, [...args, '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
 const entryOf = (verb) => COMMAND_REGISTRY.find((entry) => entry.name === verb);
 
 test('the proposal writes nothing, and the lines it generates are accepted by the real parser, the real start and the case', (t) => {
