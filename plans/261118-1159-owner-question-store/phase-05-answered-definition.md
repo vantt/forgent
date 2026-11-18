@@ -1,10 +1,12 @@
 # Phase 5: Detection `question-answered`
 
+Waits for ops-metrics phase 7 (the definition runner, `fgos metrics query --def`).
+
 ## Inputs
-- `plan.md`, decision QP-12, and OQ-D6 (the attrs).
-- The definition file format `*.query.json` and its runner (`fgos metrics query --def`), from ops-metrics phase 7.
-- The phase 7 definition tests in `packages/observe/rust/tests/definition_*.rs`, used as the pattern.
-- `packages/questions/rust/observe-kinds.json`, from phase 1.
+- `plan.md` QP-12 and OQ-D6 attrs (DISCUSSION §4).
+- The definition format `*.query.json` and its runner, ops-metrics phase 7 (landed).
+- The anti-join tests of ops-metrics phase 5 (`packages/observe/rust/tests/query_*.rs`).
+- `packages/questions/rust/observe-kinds.json`.
 
 ## Footprint
 - `core/questions/**`
@@ -13,17 +15,21 @@
 
 ## Steps
 0. Re-grep the landed definition format.
-1. Write `core/questions/definitions/question-answered.query.json`. It selects `fgos.question.answered` records
-   whose question has no later `acked` record (an anti-join on the store's ack events or on the subject id, as the
-   query grammar allows). Each row carries the asker role, session id, handle and persona, the origin ref,
-   answeredAt and the pane. If the grammar cannot express "no ack yet" because acks are not events, emit
-   every answered question and let the watcher dedupe by the event id. Note that choice in the file's `about` field.
-2. Write the fixture records under `test/fixtures/questions/observe/`.
-3. Write `packages/questions/rust/tests/definition_question_answered.rs` (acceptance 6). It runs the definition
-   through the observe definition runner over the fixture and checks the rows and attrs.
+1. Write `core/questions/definitions/question-answered.query.json`. It selects `fgos.question.answered` records that
+   have no `fgos.question.acked` record for the same subject (an anti-join), with these attrs:
+   - asker role
+   - session id
+   - handle
+   - persona
+   - origin ref
+   - answeredAt
+   - pane
+2. Write fixture records under `test/fixtures/questions/observe/`: three answered questions, one of them acked.
+3. Write `packages/questions/rust/tests/definition_question_answered.rs`. It runs the definition through the runner
+   and checks for two rows with their attrs.
 
 ## Verify
-`cargo test -p fgos-questions --test definition_question_answered` must be green.
+`cargo test -p fgos-questions --test definition_question_answered` is green and returns two rows.
 
 ## Rollback
 Revert the phase commit.

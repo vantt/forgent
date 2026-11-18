@@ -1,32 +1,34 @@
 # Phase 2: Mint kind `question`
 
+Waits for session-verb phase 4, which rewrites `packages/identity/**`.
+
 ## Inputs
-- `packages/identity/rust/src/mint.rs`: `RandomKind` (:18), the prefixes (:25-26), `Kind::parse` (:69),
-  `Kind::name` (:80) and `KIND_NAMES` (:65).
-- `docs/platform/identity/spec.md` §4a (around line 99).
-- The id-minting law in `core/instructions/id-minting.md`.
+- `packages/identity/rust/src/mint.rs`: `RandomKind` (:18), the prefixes (:25-26), `KIND_NAMES` (:65),
+  `Kind::parse` (:69) and `Kind::name` (:80).
+- Every other place that lists the kinds:
+  - `packages/identity/contracts/identity.write.v1.json:78`
+  - `core/instructions/id-minting.md:15`
+  - `docs/platform/identity/spec.md` §4a
+  - `src/cli/command-registry.mjs:1153-1157` (the enum). This file is phase 4's hot file. If the enum is not
+    generated from `KIND_NAMES`, note it in the commit, and phase 4 adds `question` there in the same wave as its
+    own registry edit.
 
 ## Footprint
 - `packages/identity/rust/src/mint.rs`
 - `packages/identity/rust/tests/**`
+- `packages/identity/contracts/identity.write.v1.json`
 - `docs/platform/identity/spec.md`
+- `core/instructions/id-minting.md`
 
 ## Steps
-0. Re-grep. The session-verb plan (a blocker) has changed this crate.
-1. Add `RandomKind::Question` with prefix `q`. Give it the same 10-character base32 body as the other random kinds,
-   and it needs no network.
-2. Add `question` to `Kind::parse`, `Kind::name` and `KIND_NAMES`.
-3. Extend the existing mint test that owns the random kinds (do not write a new file) so it covers `question`: the
-   format, and that no network is used.
-4. Add the kind to the table in §4a of the identity spec.
-5. If `fgos identity mint --help` text is generated from `KIND_NAMES`, nothing else changes. If it is written by
-   hand, leave it alone and note that in the commit; phase 9 regenerates it.
+0. Re-grep the inputs.
+1. Add `RandomKind::Question` with prefix `q`, using the same body as the other random kinds and no network.
+2. Add `question` to `Kind::parse`, `Kind::name`, `KIND_NAMES`, the write contract, `id-minting.md` and spec §4a.
+3. Extend the existing test that owns the random kinds so it covers `question`.
 
 ## Verify
-`cargo test -p fgos-identity` must be green.
-
-`npm run fgos:dev -- identity mint question --json` must return an id of the form `q-[a-z2-7]{10}`, or whatever form
-the random kinds already use.
+- `cargo test -p fgos-identity` is green.
+- `npm run fgos:dev -- identity mint question --json` returns an id in the random-kind format.
 
 ## Rollback
 Revert the phase commit.

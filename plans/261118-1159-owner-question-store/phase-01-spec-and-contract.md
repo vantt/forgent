@@ -1,58 +1,74 @@
-# Phase 1: Area spec, record contract, kinds
+# Phase 1: Area spec, contracts, kinds
 
-This phase writes docs and JSON contracts only. It writes no code.
+This phase writes docs and JSON contracts only. It writes no code. Its status is `ready`: its files are disjoint from
+every running or ready plan.
 
 ## Inputs
-- `docs/discussions/owner-questions/DISCUSSION.md`, sections 4 and 6, decisions OQ-D1..D7.
-- `plan.md`, decisions QP-1..QP-18.
-- `docs/platform/observe/spec.md`, section 3 (shards and lock), as a template for the spec's shape.
-- Ops-metrics phase 1, landed: the `observe-kinds` declaration format (`packages/observe/contracts/observe-names.json`
-  and the record v2 contract).
-- `core/skills/_shared/decision-question.md` (the five parts).
+- `docs/discussions/owner-questions/DISCUSSION.md`, sections 4 and 6 (OQ-D1..D7).
+- `plan.md`, decisions QP-1..QP-22.
+- The house spec shape, taken from `docs/platform/observe/spec.md` and `docs/platform/identity/spec.md`.
+- The Event Store stream contract format: `packages/identity/contracts/identity-event-streams.v1.json`,
+  `packages/event-store/contracts/consumers.v1.json` and `docs/platform/event-store/spec.md`.
+- The `observe-kinds` declaration format, landed in `d97ee32b8`: `packages/observe/contracts/observe-names.json` and
+  `packages/observe/contracts/observe.record.v2.json`.
+- `core/skills/_shared/decision-question.md`.
+- The area table in `docs/platform/component-boundary.md:82` and the holder table in `docs/platform/governance.md`
+  (around line 540).
 
 ## Footprint
 - `docs/platform/questions/**`
+- `docs/platform/component-boundary.md`
+- `docs/platform/governance.md`
 - `packages/questions/contracts/**`
 - `packages/questions/rust/observe-kinds.json`
 
 ## Steps
-0. Re-grep the inputs. Check that the ops-metrics declaration format has landed, and read its real field names.
-1. Write `docs/platform/questions/spec.md`. Use the house spec shape: purpose, owned decisions, shared entities,
-   store, verbs, refusals, events, hook, boundaries with Observe, Identity, Supervision and Workflow, and decision
-   history (OQ-D1..D7 and QP-1..QP-18, with a link to the discussion).
-2. Write `packages/questions/contracts/question.record.v1.json`, a JSON Schema for the four record kinds:
-   - `asked`: `{id, askedAt, asker{sessionId, handle, roles, persona?, pane?}, stage, ref, parts{what, cause,
-     options[{label, does, gain, harm, cost, recommended?}], recommendation, scope}, openDiscovery, migrated,
-     supersedes?}`;
-   - `answered`: `{id, option?, text?, by, via?, answeredAt}`;
-   - `acked`: `{id, by, at}`;
-   - `cancelled`: `{id, by, reason, at}`.
-3. Write `packages/questions/contracts/questions-input.v1.json`, the `ask --input` JSON shape (QP-5, QP-17 and
-   QP-19). It holds `headline` and `blocks` and every QP-19 limit as data (`maxLength`, `minItems`/`maxItems`), so
-   the code reads the limits from the contract and keeps no copy of its own. Add `headline` and `blocks` to the
-   `asked` record in step 2.
-4. Write `packages/questions/contracts/refusals.v1.json`. It names each refusal and its exit category:
+0. Re-grep every input.
+1. Write `docs/platform/questions/spec.md` with these sections:
+   - purpose and owned decisions;
+   - shared entities: question, answer, ack, cancel;
+   - store: Event Store consumer `questions`, the fold, and the cross-machine conflict rule;
+   - verbs and head-socket verbs;
+   - who may answer, ack and cancel, stating that the owner rule guards against mistakes only;
+   - refusals;
+   - events;
+   - hook;
+   - boundaries with Observe, Identity, Event Store, Session Host, Supervision and Workflow;
+   - decision history: OQ-D1..D7 and QP-1..QP-22, with links.
+2. Add the Questions row to `component-boundary.md`, and add the holder row for the `questions` scope to
+   `governance.md`.
+3. Write `packages/questions/contracts/question-event-streams.v1.json`. It declares four types, each `scope: project`,
+   `schemaVersion: 1`, `sealOnWrite: false`. Their payloads:
+   - `question.asked`: `{id, askedAt, asker{sessionId, handle, roles, persona?, pane?}, stage, ref{value, branch,
+     commit}, headline, blocks, parts{what, cause, options[{label, does, gain, harm, cost, recommended?}],
+     recommendation, scope{allows, forbids}}, migrated, supersedes?}`
+   - `question.answered`: `{id, option?, text?, by, via?, answeredAt}`
+   - `question.acked`: `{id, by, at}`
+   - `question.cancelled`: `{id, by, reason, at}`
+4. Write `packages/questions/contracts/questions-input.v1.json`, the `ask --input` shape. Every QP-19 limit is data
+   in this file (`maxLength` counts characters, and `minItems`/`maxItems` count options). The discovery exception is
+   tied to a `discussion:` ref with stage `shaping`.
+5. Write `packages/questions/contracts/refusals.v1.json`. Each refusal gets an exit category:
    - `asker-unresolved`
-   - `question-unclear` (names the field and the rule)
    - `ref-invalid`
    - `parts-incomplete`
+   - `question-unclear`, which names the field and the rule
    - `question-unknown`
    - `question-already-answered`
    - `question-not-open`
    - `answer-not-owner`
    - `not-asker`
-5. Write `packages/questions/rust/observe-kinds.json`. It declares `fgos.question.asked`, `fgos.question.answered`
-   and `fgos.question.cancelled`. The subject is the question id. The attrs are the asker role, session id, handle,
-   persona, origin ref, stage, pane (optional) and answeredAt or cancel reason. Use the declaration format of
-   ops-metrics phase 1.
+6. Write `packages/questions/rust/observe-kinds.json`. It declares `fgos.question.asked`, `answered`, `acked` and
+   `cancelled`, with the question id as subject and the OQ-D6 attrs.
 
 ## Verify
-- The declaration test of ops-metrics phase 1 accepts the file. Use its test-local loading path, or
-  `cargo test -p fgos-observe record_` with this file added to the test glob if the phase provides one. Otherwise
-  validate the file with the JSON Schema of the declaration format.
-- The record schema validates one example of each record kind.
+- The observe declaration test accepts the kinds file. Run `cargo test -p fgos-observe record_` with the file loaded
+  the way the phase 1 tests load a test-local declaration. If no such loader exists, validate the file against the
+  declaration schema.
+- One example of each event type and one valid and one invalid `--input` validate as expected against their schemas,
+  using a JSON Schema check run through `node`.
 
-Pass condition: the declaration file loads with no error, and the record schema accepts all four example records.
+Pass condition: both checks pass, and the spec has every section listed in step 1.
 
 ## Rollback
 Revert the phase commit.
