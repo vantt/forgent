@@ -187,6 +187,19 @@ lanes. Two steps wait on outside events; a short lead finishes them:
    longer written to the old shards. Then run `fgos friction migrate --to-records` in each project with
    `.fgos/observe/friction/` (main checkout first), record in/out counts here (dry run 2026-11-18: 1372 in, 1372 out),
    check `fgos doctor` row `observe-friction-migrated` is clear, then delete the old shards (phase 16 step 7).
+   - **Migration done 2026-11-18 21:59** (lead:OM-CLOSE, installed release sha256:084fe2ef from a4537ad92, which
+     holds d59b56b6c). Only the main checkout has real shards; the plugin-marketplace clone and
+     `.claude/worktrees/agent-abd822ce…` hold the git-tracked copy of `pid-2016389.jsonl` from this repo. Main
+     checkout: in 1373 lines (763 recorded, 609 resolved, 1 non-friction line skipped by design), written 1372,
+     unusable 0, records 1 -> 1373; a rerun wrote 0 (1372 already migrated). Doctor `observe-friction-migrated` ok.
+     Newest shard line 11:09, before the release switch, so nothing new lands there.
+   - Shards backed up to `.fgos/runtime/tmp/friction-shards-backup-20261118/` in the main checkout (sha256 list next
+     to it). The 1 skipped non-friction line stays in that backup.
+   - Shards deleted 2026-11-18 22:00 with supervisor approval (no fgos verb deletes them): backup and live files
+     re-checked by sha256 and mtime first; the 3 untracked shards removed by exact path in the main checkout. The
+     git-tracked `.fgos/observe/friction/pid-2016389.jsonl` is still in git: the pre-commit hook refuses a `.fgos/`
+     deletion from a linked worktree, so its removal waits for the supervisor's choice of door.
+   - Step 2 waits for plan 261118-0947 (session verb), which holds `CHANGELOG.md`.
 2. **CHANGELOG.** Gate: plan 261118-1455 (S6a worktree door) is done, so `CHANGELOG.md` can rejoin this footprint. Add
    `[Unreleased]` lines for phases 14-17: `fgos dispatch inspect --attention` head-gone / plan-no-progress rows and
    `dispatch.attention.planNoProgressMinutes`; driving-measure definitions under `domains/coding/observe/definitions`;
