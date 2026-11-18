@@ -4,20 +4,14 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
-Vòng 1 (2026-11-18). Inventory xong: `plans/reports/scout-261118-0936-ops-metrics-inventory.md`. Chủ dự án đã chốt
-hai việc: (a) đưa phát hiện liveness / no-progress / pace của supervisor vào plan này, chỉ phát hiện và hiện trong
-attention view, không cảnh báo; (b) bảy thước đo §13.3 của prototype bộ lái là bộ câu hỏi phải trả lời được, cùng
-bốn câu của brief (cost, time, failure rate, friction).
+Vòng 5 (2026-11-18). Inventory: `plans/reports/scout-261118-0936-ops-metrics-inventory.md`. Đã chốt OM-D1..D5:
+supervisor detection thuộc plan này, chỉ hiện ở attention view (D1); đo token trước, tiền hoãn (D2); phần mới viết
+Rust (D3); khung ba tầng, contract ghi/truy vấn làm tốt nhất trước (D4); bảy thước đo và quy tắc phát hiện là định
+nghĩa của tầng trên, chạy qua truy vấn chung, Observe không biết chúng (D5).
 
-Vòng 2: Q1 đã trả lời (OM-D2: đo token trước, tiền hoãn tới khi có hạ tầng giá). Q3/Q4 rút lại vì thiếu bối cảnh,
-hỏi lại thành Q5 (ngưỡng "plan đứng yên") và Q6 (nghĩa của "pace"). Q2 còn mở; chủ dự án xin danh sách bảy thước đo.
-OM-D3 (Rust cho phần mới) đổi chỗ đặt code ở §6 A, C, E; mở Q7 (reader câu hỏi đang là Node).
-Vòng 3: chủ dự án hỏi friction được ghi nhận, phân loại, gom nhóm thế nào — đề xuất ở §6 D.
-Vòng 4: chủ dự án đặt khung ba tầng (OM-D4): contract ghi/truy vấn trước hết, tích hợp sau, lưu trữ tự do. §6.0 mới;
-friction (§6 D) trở thành một loại sự kiện trong contract chung. Mở Q8 (chuẩn tên).
-Vòng 5: OM-D5 — bảy thước đo và các quy tắc phát hiện là định nghĩa của tầng trên, chạy qua truy vấn chung; bỏ verb
-`metrics plans`. Các phần không phụ thuộc chúng (nguồn token/duration/account, khoá plan/phase, chiều
-`--by`, friction) shape tiếp được.
+Đang mở (QUESTIONS.md): Q2 (thước đo nào có nguồn trong plan này), Q5 (ngưỡng "plan đứng yên"), Q6 (nghĩa "pace"),
+Q7 (reader câu hỏi Node → Rust), Q8 (bộ tên gốc theo OpenTelemetry). Friction (§6 D) chờ chủ dự án xem năm loại
+`kind`. Việc tiếp: chi tiết contract tầng 1 (§6.0) — hình bản ghi, registry, ngữ pháp truy vấn.
 
 ## 2. Mục tiêu & đề bài
 
