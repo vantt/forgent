@@ -230,6 +230,13 @@ fgOS output must hash the same on every rebuild.
     or, for `graph`, with the Work verb `fgos graph` (`src/cli/command-registry.mjs:1103`): the specs and
     the reading map say how each differs. Only the planner verb changes, to `fgos resource-check`
     (decision 10), because the bare word `referee` is the one that collides.
+27. A cycle report must help when the canonical cycle cannot be broken because the edge belongs to a
+    plan the planner does not control. For each non-trivial strongly connected component `graph` returns
+    its members and induced edges, one canonical shortest cycle (through the smallest id), and a bounded
+    query `cycle_through(id)` that returns the shortest cycle through a chosen member; each is linear.
+    The planner then sees every edge it may cut and can ask for a cycle through another node. All cycles
+    are still not enumerated, so decision 7 stands (owner question of the validation interview,
+    2026-11-19).
 
 ## Acceptance criteria
 
@@ -380,6 +387,16 @@ against other active plans"); the names were settled in decision 26.
 - Stale claims removed: census owned by phase 7; `test/runner/dispatch` as the conformance test
   location; waves 7 and 6 labels; phase 2 depending on phase 1; proptest in phases 3 and 4.
 - Unresolved contradictions: none.
+
+### Validation interview (2026-11-19)
+
+The owner was asked the three decisions the planner had taken after the red-team rounds.
+
+| Topic | Planner recommendation | Owner answer | Result |
+|---|---|---|---|
+| Cycle reporting: one canonical cycle per component or all cycles with a step cap | One canonical cycle per component | Asked: if the shortest cycle is stuck with another plan, is there a way around it | Kept, and extended with component members, induced edges and a bounded `cycle_through(id)` query (decision 27) |
+| Work advisories become stricter with no switch back | Accept, CHANGELOG, no switch | Asked what is correct and most beneficial | Kept: one rule means a green plan is not refused at runtime, and the before and after outcomes are recorded in phase 8; a switch would recreate the second rule this plan removes |
+| `--policy` with a floor and the policy hash | Keep | Keep (option A) | Kept (decision 11, phase 7b) |
 
 ## Red Team Review
 
