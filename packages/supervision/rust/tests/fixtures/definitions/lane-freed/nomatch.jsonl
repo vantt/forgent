@@ -1,1 +1,2 @@
 {"v":2,"id":"b1","kind":"fgos.run.attempt","ts":"2026-11-18T08:00:00Z","subject":{"kind":"run","id":"r3"},"endTs":"2026-11-18T09:00:00Z","basis":"observed","origin":{"source":"fixture","host":"beta"}}
+{"v":2,"id":"b2","kind":"fgos.run.attempt","ts":"2026-11-18T09:00:00Z","subject":{"kind":"run","id":"r4"},"endTs":"2026-11-18T10:20:00Z","basis":"observed","origin":{"source":"fixture","host":"alpha"}}
