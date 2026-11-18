@@ -44,12 +44,22 @@
   "refusalCodes": {
     "peer-uid": "the connection is not from the supervisor's own user",
     "bad-frame": "oversize, not one JSON object, no REQUEST type, an id outside the rule, a verb that is not a string or args that is not an object",
-    "role-not-held": "Identity does not give this attempt's session the envelope's role",
+    "role-not-held": "Identity does not give this attempt's session the envelope's role; when Identity could not answer the detail is its refusal code only (its text goes to supervisor.log, never to the client)",
     "verb-not-granted": "the verb is not in envelope.session.verbs",
     "busy": "another request is running",
     "verb-failed": "the route child failed; detail is the entry's own code (for example head-key-used, bad-persona, start-refused) or the exit",
     "verb-timeout": "the verb ran longer than verbTimeoutMs"
   },
+  "envelope": {
+    "refusal": "envelope-invalid (the supervisor refuses the attempt before the pane is launched)",
+    "rules": [
+      "session.verbs not empty and session.requestSocketPath absent, or the path present with no verbs",
+      "the socket path lies in the very directory of the attempt's GO socket (envelope.terminal.socketPath): the same rule the sandbox bind-back applies on its side",
+      "identity.writerId, session.role and hostBin are non-empty strings",
+      "at least one process step (not a builtin) exists: the route child starts with the environment of the first one and nothing else"
+    ]
+  },
+  "trust": "the route reads the attempt's own run directory and its envelope as trusted because the sandbox only ever sees it read-only. The guard is the paths grant: a workspace-paths entry under `.fgos` is refused by name (confinement shape, validateWorkspacePaths), so no grant can make that directory writable",
   "log": "one line per request in supervisor.log: `head-request <id> <verb> <done|refused> <code|->`; arguments are never logged and client text is cut to 32 plain characters",
   "client": "src/session-host/head-request.mjs: `requestHeadStart` connects to FGOS_HEAD_REQUEST_SOCKET after checking the socket file is owned by its own uid; `startHead` is the one branch (FGOS_CONFINED=1 asks through the socket, refused no-request-socket when the variable is unset, otherwise startHeadSession directly)"
 }

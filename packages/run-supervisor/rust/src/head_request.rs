@@ -43,7 +43,28 @@ pub(crate) fn uid_allowed(peer: Option<libc::uid_t>, own: libc::uid_t) -> bool {
     peer == Some(own)
 }
 
-type HoldsRole = Box<dyn Fn() -> Result<bool, String> + Send + Sync>;
+/// Why Identity could not answer: its refusal code (what a client is told) and its text (what the log gets).
+#[derive(Debug, PartialEq, Eq)]
+pub struct HoldError {
+    pub code: String,
+    pub detail: String,
+}
+
+/// An envelope that cannot serve a request socket. `code` is the one the contract names (`envelope-invalid`).
+#[derive(Debug, PartialEq, Eq)]
+pub struct EnvelopeError {
+    pub code: &'static str,
+    pub why: String,
+}
+
+fn invalid(why: impl Into<String>) -> EnvelopeError {
+    EnvelopeError {
+        code: "envelope-invalid",
+        why: why.into(),
+    }
+}
+
+type HoldsRole = Box<dyn Fn() -> Result<bool, HoldError> + Send + Sync>;
 type LogLine = Box<dyn Fn(&str) + Send + Sync>;
 
 /// What serving the socket needs, all of it from the envelope except the two ports.
@@ -56,7 +77,8 @@ pub struct Config {
     /// Verbs `envelope.session.verbs` allows.
     pub verbs: Vec<String>,
     pub verb_timeout: Duration,
-    /// Does Identity give this session the envelope's role right now. An error is refused like a "no".
+    /// Does Identity give this session the envelope's role right now. An error is refused like a "no", and the
+    /// client is told only its code.
     pub holds_role: HoldsRole,
     /// One line per request, for `supervisor.log`.
     pub log: LogLine,
@@ -80,16 +102,21 @@ impl HeadRequests {
     }
 
     /// The socket path and the server an envelope asks for. `None`: no session, or a role with no verbs (no socket
-    /// at all). Identity is asked through the attempt's writer id, the one `register_session` registered.
+    /// at all). Identity is asked, under `state_root`, through the attempt's writer id, the one `register_session`
+    /// registered. An envelope that names verbs without a socket path, a path without verbs, or no step to take the
+    /// environment from is `envelope-invalid`.
     pub fn from_envelope(
         envelope: &Value,
         run_dir: &Path,
-    ) -> Result<Option<(PathBuf, HeadRequests)>, String> {
+        state_root: &Path,
+    ) -> Result<Option<(PathBuf, HeadRequests)>, EnvelopeError> {
         let session = &envelope["session"];
         let has_verbs = session["verbs"].as_array().is_some_and(|v| !v.is_empty());
         let Some(path) = session["requestSocketPath"].as_str() else {
             return if has_verbs {
-                Err("session.verbs is not empty but session.requestSocketPath is missing".into())
+                Err(invalid(
+                    "session.verbs is not empty but session.requestSocketPath is missing",
+                ))
             } else {
                 Ok(None)
             };
@@ -98,7 +125,7 @@ impl HeadRequests {
             v.as_str()
                 .filter(|s| !s.is_empty())
                 .map(String::from)
-                .ok_or_else(|| format!("envelope field {what} missing"))
+                .ok_or_else(|| invalid(format!("envelope field {what} missing")))
         };
         let verbs: Vec<String> = session["verbs"]
             .as_array()
@@ -110,10 +137,13 @@ impl HeadRequests {
             })
             .unwrap_or_default();
         if verbs.is_empty() {
-            return Err("session.requestSocketPath is set but session.verbs is empty".into());
+            return Err(invalid(
+                "session.requestSocketPath is set but session.verbs is empty",
+            ));
         }
         let role = text(&session["role"], "session.role")?;
         let writer_id = text(&envelope["identity"]["writerId"], "identity.writerId")?;
+        let state_root = state_root.to_path_buf();
         let step_env = envelope["steps"]
             .as_array()
             .into_iter()
@@ -125,7 +155,9 @@ impl HeadRequests {
                     .filter_map(|(k, v)| v.as_str().map(|s| (k.clone(), s.to_string())))
                     .collect()
             })
-            .ok_or("the envelope has no step environment to run a verb with")?;
+            .ok_or_else(|| {
+                invalid("the envelope has no process step to take the verb environment from")
+            })?;
         let cfg = Config {
             run_dir: run_dir.to_path_buf(),
             host_bin: text(&envelope["hostBin"], "hostBin")?,
@@ -133,7 +165,7 @@ impl HeadRequests {
             env: step_env,
             verbs,
             verb_timeout: VERB_TIMEOUT,
-            holds_role: Box::new(move || identity_holds(&role, &writer_id)),
+            holds_role: Box::new(move || identity_holds(&state_root, &role, &writer_id)),
             log: Box::new(|line| eprintln!("fgos internal supervise: {line}")),
         };
         Ok(Some((PathBuf::from(path), HeadRequests::new(cfg))))
@@ -161,18 +193,20 @@ impl HeadRequests {
 
 /// Identity's answer to "does this attempt's session hold the role": the session the writer id names is the one
 /// `resolve` finds holding it. Nothing is cached; a role that rotation moved away stops answering yes at once.
-fn identity_holds(role: &str, writer_id: &str) -> Result<bool, String> {
-    let state_root = fgos_holder_lock::state_root::state_root().0;
+pub fn identity_holds(state_root: &Path, role: &str, writer_id: &str) -> Result<bool, HoldError> {
+    let hold_error = |r: fgos_identity::refusal::Refusal| HoldError {
+        code: r.reason.to_string(),
+        detail: r.detail,
+    };
     let key = WriterKey {
         source: ENV_ORDER[0],
         value: writer_id,
     };
-    let own = fgos_identity::current::session_for(&state_root, &key, None)
-        .map_err(|r| format!("{}: {}", r.reason, r.detail))?;
-    match fgos_identity::directory::resolve(&state_root, role, &judge_here, None) {
+    let own = fgos_identity::current::session_for(state_root, &key, None).map_err(hold_error)?;
+    match fgos_identity::directory::resolve(state_root, role, &judge_here, None) {
         Ok(holder) => Ok(holder.id == own.info.id),
         Err(r) if r.reason == "not-found" => Ok(false),
-        Err(r) => Err(format!("{}: {}", r.reason, r.detail)),
+        Err(r) => Err(hold_error(r)),
     }
 }
 
@@ -321,10 +355,14 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request) -> Outcome {
         Ok(true) => {}
         Ok(false) => return refused("role-not-held"),
         Err(why) => {
+            (cfg.log)(&format!(
+                "head-request {} identity {}: {}",
+                request.id, why.code, why.detail
+            ));
             return Outcome::Refused {
                 code: "role-not-held",
-                detail: Some(why),
-            }
+                detail: Some(why.code),
+            };
         }
     }
     if !cfg.verbs.contains(&request.verb) {

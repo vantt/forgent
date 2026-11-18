@@ -214,6 +214,19 @@ impl AttemptSocket {
         })
     }
 
+    /// [`Self::bind`] for a second socket of the same attempt: it must lie in the very directory of `sibling` (the
+    /// GO socket), the rule the sandbox's bind-back enforces on the other side.
+    fn bind_beside(path: &Path, sibling: &Path) -> Result<AttemptSocket, String> {
+        if path.parent() != sibling.parent() {
+            return Err(format!(
+                "socket {} is not in the directory of the attempt's GO socket {}",
+                path.display(),
+                sibling.display()
+            ));
+        }
+        Self::bind(path)
+    }
+
     /// The gate's connection: same uid, first frame HELLO for this attempt. Anything else is dropped
     /// and the wait goes on, so a stranger cannot take the gate's place or end the wait.
     fn accept_gate(&self, attempt_id: &str, limit: Duration) -> Option<UnixStream> {
@@ -763,17 +776,25 @@ pub(super) fn run(
     let plan = Plan::from(envelope)?;
     let mut socket = AttemptSocket::bind(&plan.socket_path).map_err(Refusal::internal)?;
     // A head session's request socket listens from before the pane is launched until the attempt closes.
-    let requests = match HeadRequests::from_envelope(envelope, run_dir).map_err(|why| Refusal {
-        exit: EXIT_ENVELOPE_INVALID,
-        code: "envelope-invalid",
-        why,
-    })? {
-        Some((path, server)) => Some((
-            AttemptSocket::bind(&path).map_err(Refusal::internal)?,
-            server,
-        )),
-        None => None,
-    };
+    let state_root = fgos_holder_lock::state_root::state_root().0;
+    let requests =
+        match HeadRequests::from_envelope(envelope, run_dir, &state_root).map_err(|err| {
+            Refusal {
+                exit: EXIT_ENVELOPE_INVALID,
+                code: err.code,
+                why: err.why,
+            }
+        })? {
+            Some((path, server)) => Some((
+                AttemptSocket::bind_beside(&path, &plan.socket_path).map_err(|why| Refusal {
+                    exit: EXIT_ENVELOPE_INVALID,
+                    code: "envelope-invalid",
+                    why,
+                })?,
+                server,
+            )),
+            None => None,
+        };
     crate::terminal_slot::record_endpoint(run_dir);
     let backend = Backend::from_env(run_dir)
         .with_shell_ready_timeout_ms(crate::terminal_slot::shell_ready_timeout_ms(envelope));

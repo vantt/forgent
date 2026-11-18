@@ -23,6 +23,12 @@ export function validateWorkspacePaths(paths, label) {
     if (entry.split(/[\\/]/).includes('..')) {
       throw new ConfinementPolicyError(`runner config (${label}) path ${JSON.stringify(entry)} climbs out of the project root with "..".`);
     }
+    // The attempt's own run directory, its envelope and the request route's trust all live under .fgos; a grant over
+    // any of it would let the sandbox rewrite what the supervisor trusts.
+    const first = entry.split(/[\\/]/).find((part) => part !== '' && part !== '.');
+    if (first !== undefined && first.toLowerCase() === '.fgos') {
+      throw new ConfinementPolicyError(`runner config (${label}) path ${JSON.stringify(entry)} lies under ".fgos", which holds the attempt's own run directory; a grant never binds it writable.`);
+    }
     if (/[*?[\]{}]/.test(entry)) {
       throw new ConfinementPolicyError(`runner config (${label}) path ${JSON.stringify(entry)} contains a glob character; name the exact path.`);
     }

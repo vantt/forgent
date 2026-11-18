@@ -13,10 +13,10 @@ import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CONFINED_MARKER_ENV } from '../config/facade.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
 import { startHeadSession } from './head-start.mjs';
 
-const CONFINED_ENV = 'FGOS_CONFINED';
 const PROTOCOL = 1;
 const MAX_FRAME_BYTES = 65_536;
 const HEAD_START_VERB = 'head start';
@@ -111,7 +111,7 @@ export function requestHeadStart(args, { socketPath = process.env[HEAD_REQUEST_S
  * outside the sandbox (the supervisor starts a confined caller's head in its own project).
  */
 export async function startHead({ persona, name, beside = null, projectRoot } = {}, { env = process.env, ports = {}, request = requestHeadStart } = {}) {
-  if (env[CONFINED_ENV] === '1') {
+  if (env[CONFINED_MARKER_ENV] === '1') {
     return request({ persona, name, ...(beside ? { beside } : {}) }, { socketPath: env[HEAD_REQUEST_SOCKET_ENV] });
   }
   return startHeadSession({ persona, name, beside, projectRoot }, ports);

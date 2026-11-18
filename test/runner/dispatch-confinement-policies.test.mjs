@@ -729,6 +729,8 @@ test('workspace-paths: the shape takes project-relative paths and refuses empty,
   assert.throws(() => validateConfinementPolicyShape(pathsPolicy(['/etc'])), /is absolute/);
   assert.throws(() => validateConfinementPolicyShape(pathsPolicy(['plans/../src'])), /climbs out/);
   assert.throws(() => validateConfinementPolicyShape(pathsPolicy(['plans/**'])), /glob character/);
+  for (const under of ['.fgos', '.fgos/assignments', './.fgos/x', '.FGOS/x']) assert.throws(() => validateConfinementPolicyShape(pathsPolicy([under])), /lies under "\.fgos"/, under);
+  assert.doesNotThrow(() => validateConfinementPolicyShape(pathsPolicy(['plans', 'docs/.fgos-notes'])));
   // `paths` belongs to no other resource.
   assert.throws(() => validateConfinementPolicyShape({
     ...BUILTIN_POLICIES['host-write-denied'],
