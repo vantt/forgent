@@ -90,3 +90,24 @@ fn every_contract_plan_of_this_repo_reads() {
     }
     assert!(read > 0, "at least one contract plan exists");
 }
+
+#[test]
+fn the_observe_kinds_declaration_parses_and_accepts_a_tick_record() {
+    use fgos_observe::record::registry::{EmbeddedDeclaration, Registry};
+    use fgos_observe::record::types::Record;
+    let registry = Registry::from_embedded(&[EmbeddedDeclaration {
+        label: "supervision",
+        json: include_str!("../observe-kinds.json"),
+    }])
+    .expect("declaration parses and merges with the shared names");
+    let tick: Record = serde_json::from_str(
+        r#"{"v": 2, "id": "tick-1", "kind": "fgos.watcher.tick",
+            "ts": "2026-11-18T03:00:00Z", "endTs": "2026-11-18T03:00:01Z",
+            "subject": {"kind": "session", "id": "watcher-1"},
+            "attrs": {"fgos.watcher.mode": "active", "fgos.watcher.outcome": "noop"},
+            "measures": {"fgos.watcher.interval": 60, "fgos.plans.ready": 2, "fgos.watcher.raised": 1},
+            "basis": "observed", "origin": {"source": "supervision-test"}}"#,
+    )
+    .expect("record shape");
+    registry.validate(&tick).expect("tick record is valid");
+}

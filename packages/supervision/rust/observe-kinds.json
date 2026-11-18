@@ -14,19 +14,19 @@
     "fgos.discussion.path": { "type": "string" }
   },
   "measures": {
-    "fgos.watcher.interval": { "unit": "s" },
-    "fgos.plans.ready": { "unit": "1" },
-    "fgos.plans.running": { "unit": "1" },
-    "fgos.watcher.raised": { "unit": "1" },
-    "fgos.watcher.duplicate": { "unit": "1" },
-    "fgos.watcher.wakes": { "unit": "1" },
-    "fgos.watcher.notifies": { "unit": "1" },
-    "fgos.watcher.errors": { "unit": "1" },
-    "fgos.watcher.unmeasured": { "unit": "1" }
+    "fgos.watcher.interval": { "unit": "s", "aggs": ["max", "p50"] },
+    "fgos.plans.ready": { "unit": "1", "aggs": ["max", "p50", "avg"] },
+    "fgos.plans.running": { "unit": "1", "aggs": ["max", "p50", "avg"] },
+    "fgos.watcher.raised": { "unit": "1", "aggs": ["sum", "max"] },
+    "fgos.watcher.duplicate": { "unit": "1", "aggs": ["sum", "max"] },
+    "fgos.watcher.wakes": { "unit": "1", "aggs": ["sum", "max"] },
+    "fgos.watcher.notifies": { "unit": "1", "aggs": ["sum", "max"] },
+    "fgos.watcher.errors": { "unit": "1", "aggs": ["sum", "max"] },
+    "fgos.watcher.unmeasured": { "unit": "1", "aggs": ["sum", "max"] }
   },
   "kinds": {
     "fgos.watcher.tick": {
-      "subjects": [],
+      "subjects": ["session"],
       "attrs": ["fgos.watcher.mode", "fgos.watcher.outcome"],
       "measures": [
         "fgos.watcher.interval", "fgos.plans.ready", "fgos.plans.running", "fgos.watcher.raised",
