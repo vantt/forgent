@@ -1348,12 +1348,19 @@ mod tests {
     #[cfg(unix)]
     #[test]
     fn the_watcher_unit_does_not_change_with_whoever_reads_or_rewrites_it() {
+        for platform in ["linux", "darwin"] {
+            watcher_unit_is_caller_independent(platform);
+        }
+    }
+
+    #[cfg(unix)]
+    fn watcher_unit_is_caller_independent(platform: &str) {
         let w = World::new();
         let root = PathBuf::from("/p");
         let run = |_: &str, _: &[String]| -> Result<(), String> { Ok(()) };
         let bin = move |_: &Path| Some(PathBuf::from(BIN));
         let caller = |tool_dirs: &[&str], herdr: &[(&str, &str)]| {
-            let mut h = host("linux", &w.home);
+            let mut h = host(platform, &w.home);
             h.tool_dirs = tool_dirs.iter().map(|d| d.to_string()).collect();
             h.herdr_env = herdr
                 .iter()
@@ -1377,8 +1384,16 @@ mod tests {
         let bare = env(caller(&[], &[]));
         let other = env(caller(&["/else/bin"], &[("HERDR_SESSION", "s2")]));
         let schedule = Schedule::WatcherTick;
-        let unit = |name: &str| std::fs::read_to_string(w.units().join(name)).unwrap();
-        let service = format!("{}.service", unit_stem(&root, schedule));
+        let stem = unit_stem(&root, schedule);
+        let (dir, service) = if platform == "linux" {
+            (w.units(), format!("{stem}.service"))
+        } else {
+            (
+                w.home.join("Library").join("LaunchAgents"),
+                format!("dev.fgos.{stem}.plist"),
+            )
+        };
+        let unit = |name: &str| std::fs::read_to_string(dir.join(name)).unwrap();
 
         assert!(fix_with(schedule, &root, on(schedule), &installer).fixed);
         let installed = unit(&service);
