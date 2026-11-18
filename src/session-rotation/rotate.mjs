@@ -3,8 +3,10 @@
 // The successor is started next to the old session (`placeHead`, the one launch path of a head) while the old one
 // still holds the role. The successor takes the role only by answering: its own hook reports its first turn through
 // the request socket (`head answered`), which lands in `markSuccessorAnswered` below, and its own supervisor then moves
-// the role in Identity. The executor retires the old session only after it sees the answer on disk, Identity naming the
-// successor as the holder, and the answer naming the question the old session had pending. Any failure retires the
+// the role in Identity. The executor ends the old session only after it sees the answer on disk, Identity naming the
+// successor as the holder, and the answer naming the question the old session had pending. A session is ended by asking
+// its own supervisor to stop it (`cancel-requested.json`): the supervisor stops the agent and its release step closes
+// the pane, which the Session Host's `retire` cannot do while an agent is the pane's foreground. Any failure ends the
 // successor and leaves the old session alone, with one incident line under the lineage folder.
 //
 // Authority: Identity alone says who holds the role; this module owns the two-step replacement and the lineage files;
@@ -22,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { replaceDurably } from '../native/door.mjs';
 import { readConfig } from '../config/facade.mjs';
 import { acquireSync, createLockScope, probe } from '../holder-lock/index.mjs';
-import { createSessionHost } from '../session-host/client.mjs';
+import { requestCancel } from '../run-supervisor/cancel-registry.mjs';
 import {
   assertHeadArgs, headKeyOf, headRoleOf, identityHolder, lineageDirOf, nextHeadGeneration, placeHead, readHeadPlacement, writeHeadPlacement,
 } from '../session-host/head-start.mjs';
@@ -164,9 +166,9 @@ const realClock = { now: () => Date.now(), sleep: (ms) => new Promise((resolve) 
  * are what the old session's last stop knew (`sessionId`, `portfolio`, `delta`, `lastAssistantMessage`,
  * `pendingQuestion`) and go into the handoff.
  *
- * `ports` (all optional, for tests): `host` (Session Host client: `retire`), `identity({ role, projectRoot }) -> { live,
- * session }`, `lock(lineage) -> { release } | null`, `place` (`placeHead`), `placePorts` (its ports), `config(projectRoot)`,
- * `clock { now, sleep }`, `pollMs`. A rotation already running for the lineage is a no-op (`rotation-in-progress`).
+ * `ports` (all optional, for tests): `end(runDir) -> boolean` (asks that session attempt's supervisor to stop it),
+ * `identity({ role, projectRoot }) -> { live, session }`, `lock(lineage) -> { release } | null`, `place` (`placeHead`),
+ * `placePorts` (its ports), `config(projectRoot)`, `clock { now, sleep }`, `pollMs`. A rotation already running for the lineage is a no-op (`rotation-in-progress`).
  */
 export async function rotateHeadSession(request, ports = {}) {
   const { persona, name, reason, projectRoot, stopFacts } = checkRequest(request);
@@ -174,21 +176,19 @@ export async function rotateHeadSession(request, ports = {}) {
   const dir = lineageDirOf(projectRoot, persona, name);
   const lock = (ports.lock ?? takeLock)({ projectRoot, persona, name });
   if (!lock) return { rotated: false, reason: 'rotation-in-progress' };
-  const host = ports.host ?? createSessionHost();
+  const end = ports.end ?? ((runDir) => requestCancel(runDir, 'session-rotation'));
   const clock = ports.clock ?? realClock;
   const whoHolds = ports.identity ?? ((ask) => identityHolder(ask.role, ask.projectRoot));
   let successor = null;
   const abandon = (code, detail) => {
-    if (successor) {
-      try { host.retire(successor.placement, 'close'); } catch (err) { incident(dir, { event: 'successor-retire-failed', code, detail: String(err.message ?? err) }); }
-    }
+    if (successor && !end(successor.runDir)) incident(dir, { event: 'successor-not-ended', code, detail: `no stop request could be written for ${successor.runDir}` });
     fs.rmSync(path.join(dir, 'rotation.json'), { force: true });
     incident(dir, { event: 'rotation-failed', role, code, detail });
     return { rotated: false, reason: code, detail };
   };
   try {
     const old = readHeadPlacement(dir);
-    if (!old) return abandon('placement-unknown', `${role} has no recorded placement under ${dir}`);
+    if (!old?.runDir) return abandon('placement-unknown', `${role} has no recorded placement with its run directory under ${dir}`);
     const holder = await whoHolds({ role, projectRoot });
     if (!holder.live) return abandon('old-not-live', `${role} is not held by a live session, there is nothing to rotate`);
     const config = (ports.config ?? readRotationConfig)(projectRoot);
@@ -226,11 +226,11 @@ export async function rotateHeadSession(request, ports = {}) {
     }
 
     // The role is the successor's: record where it lives first, then let the old session go.
-    writeHeadPlacement(dir, { role, gen, placement: successor.placement, persona: successor.persona, startedAt: new Date(clock.now()).toISOString() });
+    writeHeadPlacement(dir, { role, gen, placement: successor.placement, runDir: successor.runDir, persona: successor.persona, startedAt: new Date(clock.now()).toISOString() });
     fs.rmSync(path.join(dir, 'rotation.json'), { force: true });
-    const retired = host.retire(old.placement, 'close');
-    if (retired.result !== 'retired') incident(dir, { event: 'old-retire-failed', role, code: retired.code ?? retired.result, detail: retired.detail ?? null });
-    return { rotated: true, key: successor.key, gen, oldRetired: retired.result === 'retired' };
+    const oldEnded = end(old.runDir);
+    if (!oldEnded) incident(dir, { event: 'old-not-ended', role, code: 'cancel-unwritable', detail: `no stop request could be written for ${old.runDir}` });
+    return { rotated: true, key: successor.key, gen, oldEnded };
   } catch (err) {
     return abandon(err.code ?? 'internal', String(err.message ?? err).slice(0, 500));
   } finally {
@@ -266,7 +266,7 @@ export function requestRotation(request, ports = {}) {
 /** The detached process: reads its request file (and removes it), runs the executor and prints one result line. */
 async function main(argv) {
   const at = argv.indexOf('--request');
-  const file = at > 0 ? argv[at + 1] : undefined;
+  const file = at >= 0 ? argv[at + 1] : undefined;
   if (!file) { process.stderr.write('usage: rotate.mjs --request <file>\n'); return 2; }
   let request;
   try { request = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (err) {

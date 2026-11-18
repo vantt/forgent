@@ -1,4 +1,4 @@
-// The owning proof of the rotation executor: the two-step replacement (the old session is retired only after the
+// The owning proof of the rotation executor: the two-step replacement (the old session is ended only after the
 // successor answered and Identity names it holder), what a failure leaves behind, the one-rotation-per-lineage lock,
 // the answer record, and the one entry that starts the detached executor. The Session Host, Identity, the launch and
 // the clock are fakes; the lineage files are real files in a scratch project.
@@ -8,6 +8,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { answerNamesQuestion, markSuccessorAnswered, requestRotation, rotateHeadSession, rotationHolds } from '../../src/session-rotation/rotate.mjs';
 import { lineageDirOf, readHeadPlacement, writeHeadPlacement } from '../../src/session-host/head-start.mjs';
 import { acquireSync, createLockScope } from '../../src/holder-lock/index.mjs';
@@ -21,7 +23,7 @@ function project(t) {
   // The old head's attempt directory exists, so the successor is generation 2.
   fs.mkdirSync(path.join(root, '.fgos', 'assignments', 'head-planner-x-1'), { recursive: true });
   const dir = lineageDirOf(root, 'planner', 'x');
-  writeHeadPlacement(dir, { role: 'head:planner-x', gen: 1, placement: OLD, persona: 'planner', startedAt: '2026-11-18T00:00:00Z' });
+  writeHeadPlacement(dir, { role: 'head:planner-x', gen: 1, placement: OLD, runDir: '/run/old', persona: 'planner', startedAt: '2026-11-18T00:00:00Z' });
   return { root, dir };
 }
 
@@ -30,11 +32,11 @@ function project(t) {
  * lets the successor answer. `holder` is what Identity says holds the role at that moment.
  */
 function fakes(root, { onSleep = () => {}, holder = { live: true, session: 'old-session' }, placeFails = null, lock = undefined } = {}) {
-  const calls = { retire: [], place: [], released: 0, order: [] };
+  const calls = { end: [], place: [], released: 0, order: [] };
   let now = 0;
   let sleeps = 0;
   const ports = {
-    host: { retire: (placement, disposition) => { calls.retire.push([placement.key, disposition]); calls.order.push(`retire ${placement.key}`); return { result: 'retired' }; } },
+    end: (runDir) => { calls.end.push(runDir); calls.order.push(`end ${runDir}`); return true; },
     identity: () => (typeof holder === 'function' ? holder() : holder),
     lock: lock ?? (() => ({ release() { calls.released += 1; } })),
     place: (request) => {
@@ -54,7 +56,7 @@ const answer = (root, message = 'I resumed the question whether the backlog rows
   projectRoot: root, persona: 'planner', name: 'x', key: 'head-planner-x-2', sessionId: 'new-session', message,
 });
 
-test('the old session is retired only after the successor answered and Identity names it the holder', async (t) => {
+test('the old session is ended only after the successor answered and Identity names it the holder', async (t) => {
   const { root, dir } = project(t);
   let moved = false;
   const { calls, ports, request } = fakes(root, {
@@ -62,11 +64,11 @@ test('the old session is retired only after the successor answered and Identity 
     onSleep: (n) => { if (n === 2) { answer(root); moved = true; } },
   });
   const result = await rotateHeadSession({ ...request, reason: 'hard' }, ports);
-  assert.deepEqual(result, { rotated: true, key: 'cmd_new', gen: 2, oldRetired: true });
-  assert.deepEqual(calls.order, ['place', 'retire cmd_old'], 'the successor starts first, the old pane closes last');
+  assert.deepEqual(result, { rotated: true, key: 'cmd_new', gen: 2, oldEnded: true });
+  assert.deepEqual(calls.order, ['place', 'end /run/old'], 'the successor starts first, the old session is ended last');
   assert.equal(calls.place[0].beside, 'cmd_old', 'the successor opens in the old session\'s tab');
   assert.equal(calls.place[0].gen, 2);
-  assert.deepEqual(calls.retire, [['cmd_old', 'close']]);
+  assert.deepEqual(calls.end, ['/run/old']);
   assert.equal(readHeadPlacement(dir).placement.key, 'cmd_new', 'the placement record follows the role');
   assert.equal(readHeadPlacement(dir).gen, 2);
   assert.equal(fs.existsSync(path.join(dir, 'rotation.json')), false, 'no rotation is left pending');
@@ -75,13 +77,13 @@ test('the old session is retired only after the successor answered and Identity 
   assert.equal(calls.released, 1, 'the lineage lock is given back');
 });
 
-test('a successor that never answers is retired, the old session stays, and one incident line says why', async (t) => {
+test('a successor that never answers is ended, the old session stays, and one incident line says why', async (t) => {
   const { root, dir } = project(t);
   const { calls, ports, request } = fakes(root);
   const result = await rotateHeadSession(request, ports);
   assert.equal(result.rotated, false);
   assert.equal(result.reason, 'no-answer');
-  assert.deepEqual(calls.retire, [['cmd_new', 'close']], 'only the successor is retired, never the old session');
+  assert.deepEqual(calls.end, ['/run/new'], 'only the successor is ended, never the old session');
   assert.equal(readHeadPlacement(dir).placement.key, 'cmd_old');
   assert.equal(fs.existsSync(path.join(dir, 'rotation.json')), false);
   const lines = fs.readFileSync(path.join(dir, 'incidents.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
@@ -95,15 +97,15 @@ test('an answer is not enough while Identity still names another session the hol
   const { calls, ports, request } = fakes(root, { onSleep: (n) => { if (n === 1) answer(root); } });
   const result = await rotateHeadSession(request, ports);
   assert.equal(result.reason, 'no-answer');
-  assert.deepEqual(calls.retire, [['cmd_new', 'close']]);
+  assert.deepEqual(calls.end, ['/run/new']);
 });
 
-test('a successor refused at start leaves the old session alone and retires nothing', async (t) => {
+test('a successor refused at start leaves the old session alone and ends nothing', async (t) => {
   const { root, dir } = project(t);
   const { calls, ports, request } = fakes(root, { placeFails: 'bind-refused' });
   const result = await rotateHeadSession(request, ports);
   assert.equal(result.reason, 'bind-refused');
-  assert.deepEqual(calls.retire, []);
+  assert.deepEqual(calls.end, []);
   assert.equal(readHeadPlacement(dir).placement.key, 'cmd_old');
 });
 
@@ -112,7 +114,7 @@ test('a second rotation request while one runs is a no-op', async (t) => {
   const { calls, ports, request } = fakes(root, { lock: () => null });
   assert.deepEqual(await rotateHeadSession(request, ports), { rotated: false, reason: 'rotation-in-progress' });
   assert.deepEqual(calls.place, []);
-  assert.deepEqual(calls.retire, []);
+  assert.deepEqual(calls.end, []);
 });
 
 test('the lineage lock is the real kernel lock: a held lock is seen by the probe and refuses a second rotation', async (t) => {
@@ -172,4 +174,17 @@ test('a request is checked, written beside the lineage and handed to one detache
   assert.deepEqual(requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root }, { holds: () => false, spawn: () => ({ pid: null, error: 'ENOENT' }) }), { started: false, reason: 'spawn-failed' });
   assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'sometimes', projectRoot: root }, ports), { code: 'bad-reason' });
   assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, stopFacts: { extra: 1 } }, ports), { code: 'bad-stop-facts' });
+});
+
+test('the detached entry reads its request file, removes it and prints one result line', (t) => {
+  const { root, dir } = project(t);
+  const entry = fileURLToPath(new URL('../../src/session-rotation/rotate.mjs', import.meta.url));
+  const file = path.join(dir, 'request-x.json');
+  fs.writeFileSync(file, '{ not json');
+  const bad = spawnSync(process.execPath, [entry, '--request', file], { encoding: 'utf8' });
+  assert.equal(bad.status, 1);
+  assert.equal(JSON.parse(bad.stdout).reason, 'bad-request');
+  assert.equal(fs.existsSync(file), false, 'the request file is consumed even when it is unusable');
+  assert.equal(spawnSync(process.execPath, [entry], { encoding: 'utf8' }).status, 2, 'no request file is a usage error');
+  assert.ok(root);
 });

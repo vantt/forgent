@@ -40,7 +40,7 @@ export const headKeyOf = (persona, name, gen) => `head-${persona}-${name}-${gen}
 /** The folder the lineage of one persona-name keeps its runtime files in (handoffs, the live placement). */
 export const lineageDirOf = (projectRoot, persona, name) => path.join(projectRoot, '.fgos', 'runtime', 'session-rotation', `${persona}-${name}`);
 
-/** The record of where the live head of a lineage was placed (`{ role, gen, placement, persona, startedAt }`), or null. */
+/** The record of where the live head of a lineage was placed (`{ role, gen, placement, runDir, persona, startedAt }`; `runDir` is the session attempt's directory), or null. */
 export function readHeadPlacement(dir) {
   try {
     const record = JSON.parse(fs.readFileSync(path.join(dir, PLACEMENT_FILE), 'utf8'));
@@ -220,6 +220,6 @@ export async function startHeadSession({ persona, name, projectRoot, beside = nu
   }
 
   const placed = await placeHead({ persona, name, projectRoot, beside, gen }, ports);
-  writeHeadPlacement(lineageDir, { role, gen: placed.gen, placement: placed.placement, persona: placed.persona, startedAt: new Date().toISOString() });
+  writeHeadPlacement(lineageDir, { role, gen: placed.gen, placement: placed.placement, runDir: placed.runDir, persona: placed.persona, startedAt: new Date().toISOString() });
   return { already: false, role, key: placed.key, placement: placed.placement, runDir: placed.runDir, cli: placed.cli };
 }

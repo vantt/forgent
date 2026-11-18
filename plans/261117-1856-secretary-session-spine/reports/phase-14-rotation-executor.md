@@ -1,0 +1,33 @@
+# Phase 14: rotation executor, two-step replacement of a confined head
+
+Status: DONE (live check done, both paths).
+
+## What changed
+- `src/session-rotation/rotate.mjs`: `rotateHeadSession` (the executor), `requestRotation` (the one entry every caller uses: `head rotate` over the socket, phase 15's `fgos head rotate`, an unconfined hook; it writes `request-<id>.json` in the lineage folder and starts the executor through `spawnDetachedCli` with `executable = node`, args `rotate.mjs --request <file>`; no CLI verb added), `markSuccessorAnswered`, `rotationHolds` (probe), `answerNamesQuestion`, `checkStopFacts`.
+- Two-step rule as built: handoff written, `placeHead` starts the successor beside the old session (old still holds the role), the executor waits for `answered.json` (gen, successor key, Identity session id, message) and for Identity to list that session as holder, records the successor's placement, then ends the old session. Any failure ends the successor, leaves the old session and its placement, removes `rotation.json`, appends one line to `incidents.jsonl`.
+- `startHeadSession` split: checks, front shortcut and placement record stay; `placeHead` is the one bind/seat/launch path (exported, owning test in `head-start.test.mjs`); `readHeadPlacement`, `writeHeadPlacement`, `identityHolder`, `nextHeadGeneration`, `assertHeadArgs` exported. The placement record now carries `runDir`.
+- Request contract (`head-request.v1.json`): verbs `head rotate` (returns at once) and `head answered` (successor's first answer); `persona`+`name` must spell the envelope role (`role-mismatch`); the answer's key is the envelope `unitRunId`, never an argument. Client: `requestHead(verb, ...)`, `requestHeadStart/Rotate/Answered`, branch `rotateHead` beside `startHead`; `head start` now passes `rotationHolds`.
+- Supervisor (`head_request.rs`, `terminal.rs`): for `head answered` the role step asks Identity only that the attempt's session is registered and live (`session-not-registered`); after the route child says done it moves the envelope role with Identity's take (`register_writer`, take, against the gate set after launch via `set_gate`); a failed move is `role-take-failed`. New codes and the verb table are in the contract; the contract test pins codes and verbs.
+- Grants: secretary `head start`, `head rotate`, `head answered`; `shaper` entry (no writes, rotate and answered) so a shaper has a socket.
+- holder-lock row `session-rotation` (mutex, repo, rank 80, `<fgosDir>/locks/session-rotation--<id>.lock`, owner `session-host`; schema owner enum, spec, registry test). Config `sessionRotation.answerWaitMs` (default 120000, min 1000) in `core/config-standard` and `core/config-schema` only; read through `readConfig`. Architecture manifest rows for `rotate.mjs` (tier 5, use-case).
+- Session Host spec rewritten: stale lines 16, 28, 44, 66 folded (five operations `open launch alive front retire`, no `start`, no direct host, no opening delivery in the port, key is the attempt id), phase 9/11/12 deltas, new section 8 (head start, two-step rule, request, lineage files, config, `/clear` fallback), decision history. Run-supervisor spec: one sentence on `head answered`.
+
+## Deviations from the phase text
+1. The marker and `--take` cannot be done by the successor's own hook: its sandbox writes neither `.fgos` nor Identity. The hook sends `head answered`; the entry records the answer, its own supervisor takes the role. Phase 17's hook calls `requestHeadAnswered` (never `identity --take`).
+2. The old (and a failed successor) session is ended by `cancel-requested.json` (`requestCancel`), not by Session Host `retire(close)`: live check showed Terminal Control keeps a pane whose foreground is the agent ("foreground is not provably the launched process or shell; kept"). The supervisor stops the agent, release-slot closes the pane (receipt `cancelled`).
+3. The lock is a registry row (new), not an existing one; none existed (rg of registry and phase 8/12 code).
+4. `startHeadSession` no longer takes `gen`-driven mode switches; the executor calls `placeHead` (lead decision).
+
+## Proof
+- `node scripts/run-tests.mjs`: `test/session-rotation/rotate.test.mjs` 11 (owning), `head-start` (placeHead, grants), `head-request` (verbs, branch), `holder-lock/registry-contract`, `run-supervisor/contracts`, `architecture`, `config/*`: 0 fail, no ERROR lines. `test/install-packaging.test.mjs` and `test/rust-host/release-tree.test.mjs` need `target/release` (not built here): not run.
+- Rust: `cargo test -p fgos-run-supervisor` 176 pass, `-p fgos-holder-lock` 124, `-p fgos-config` 113; `clippy --all-targets -D warnings` and `fmt --check` clean; `cargo check --target aarch64-apple-darwin` clean (an unused import on non-Linux in `head_request.rs` fixed by a `cfg`).
+- Live (staged dev host built from this tree, real herdr, gemini via the leased account; a scratch `fgos/agents/secretary.yaml` copy of planner stood in because no secretary persona exists, deleted after):
+  - Success: `secretary-rot3` started, `head rotate` over its real request socket answered `{started:true}` and the detached executor started the successor beside it while the old one still held the role; `head answered` over the successor's socket (as its phase 17 hook will) answered `{accepted:true,gen:2}`; Identity then listed the successor as holder, `placement.json` gen 2, the old attempt `closed.json` with receipt `cancelled`, no incident, one pane left. `supervisor.log`: `head-request ... head rotate done -`, `head-request ... head answered done -`.
+  - Failure: `secretary-fail1`, successor pane closed before it answered: after the 120 s bound one incident `no-answer`, old session still alive and holding the role, placement still gen 1, `rotation.json` gone, successor attempt closed.
+  - First run found two bugs fixed here: the executor's argv parse (`--request` at index 0) and the pane-close refusal (deviation 2). Every pane and attempt of the runs is closed (`closed.json`), no process left.
+
+## Carried items
+- Phase 17: the hook needs persona and name inside the head (`FGOS_HEAD_ROLE` splits `head:<persona>-<name>` ambiguously; head-start could also export them); it calls `rotateHead` / `requestHeadAnswered` and passes the successor's Identity session id (`<machine-id>/<writerId>`).
+- Heads placed before this change have no `runDir` in `placement.json` and are refused rotation `placement-unknown`.
+- The answer check is word overlap (half of the pending question's words of 4+ letters); a stricter match is a later choice.
+- `HEAD_HARD_CEILING_MS` and the grant follow-up plan unchanged.
