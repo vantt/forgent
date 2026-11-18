@@ -17,7 +17,9 @@
 // `refusal` line carrying the error's text and its category. `work-dispatch-hint` is the Work lookup of
 // `fgos dispatch decide --work <id> [--stage <stage>]` (`resolveWorkForDispatch`): it answers with one `hint`
 // line (the hint object, or null when the Work store holds no such item) and an `end` line of count 1, or with a
-// `refusal` line.
+// `refusal` line. `work-questions` is the read of what waits for the owner outside the question store: the open
+// Workflow gates (`readCaseProjection`) and the `fgos ask` items of the Work view (the awaiting-human items). It
+// answers with one `data` line (`{gates, asks}`) and an `end` line of count 1, or with a `refusal` line.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -26,13 +28,13 @@ import { pathToFileURL } from 'node:url';
 /** The prefix of a result line; anything else on stdout is not a result. */
 export const RESULT_PREFIX = '\u001eFGOS-DOCTOR-BRIDGE ';
 
-/** Reads the request from `input`: `{ phase: 'fix' | 'check' | 'work-store-init' | 'work-dispatch-hint', ids: [...], dir }` (a `work-dispatch-hint` also carries `workId` and an optional `stage`), or throws what is wrong with it. */
+/** Reads the request from `input`: `{ phase: 'fix' | 'check' | 'work-store-init' | 'work-dispatch-hint' | 'work-questions', ids: [...], dir }` (a `work-dispatch-hint` also carries `workId` and an optional `stage`), or throws what is wrong with it. */
 export function parseRequest(text) {
   let request;
   try { request = JSON.parse(text); } catch (error) { throw new Error(`the request is not JSON (${error.message})`); }
   const { phase, ids, dir, workId, stage } = request ?? {};
-  const noIds = phase === 'work-store-init' || phase === 'work-dispatch-hint';
-  if (phase !== 'fix' && phase !== 'check' && !noIds) throw new Error('the request names no phase (fix, check, work-store-init or work-dispatch-hint)');
+  const noIds = phase === 'work-store-init' || phase === 'work-dispatch-hint' || phase === 'work-questions';
+  if (phase !== 'fix' && phase !== 'check' && !noIds) throw new Error('the request names no phase (fix, check, work-store-init, work-dispatch-hint or work-questions)');
   if (!Array.isArray(ids) || ids.some((id) => typeof id !== 'string' || id === '') || (noIds && ids.length > 0)) throw new Error('the request names no list of ids');
   if (typeof dir !== 'string' || dir === '') throw new Error('the request names no project directory');
   if (phase !== 'work-dispatch-hint') return { phase, ids, dir };
@@ -58,7 +60,7 @@ function refusalLine(error) {
  * `requires.node`, so it starts no Node of its own to ask), so the host can tell a finished call from one that stopped. A refusal (a malformed
  * request, an id with no body) is one `refusal` line.
  */
-export async function serve(text, { write, runBridged, initStore, workHint, nodeVersion = process.version }) {
+export async function serve(text, { write, runBridged, initStore, workHint, workQuestions, nodeVersion = process.version }) {
   let request;
   try { request = parseRequest(text); } catch (error) { write(resultLine('refusal', { message: error.message })); return 2; }
   if (request.phase === 'work-store-init') {
@@ -70,6 +72,13 @@ export async function serve(text, { write, runBridged, initStore, workHint, node
     let hint;
     try { hint = await workHint({ workId: request.workId, stage: request.stage, fgosDir: path.join(request.dir, '.fgos') }); } catch (error) { write(refusalLine(error)); return 2; }
     write(resultLine('hint', { hint: hint ?? null }));
+    write(resultLine('end', { count: 1, nodeVersion }));
+    return 0;
+  }
+  if (request.phase === 'work-questions') {
+    let data;
+    try { data = await workQuestions({ dir: request.dir }); } catch (error) { write(refusalLine(error)); return 2; }
+    write(resultLine('data', { data }));
     write(resultLine('end', { count: 1, nodeVersion }));
     return 0;
   }
@@ -85,6 +94,45 @@ export async function serve(text, { write, runBridged, initStore, workHint, node
   }
   write(resultLine('end', { count, nodeVersion }));
   return 0;
+}
+
+/**
+ * What waits for the owner outside the question store, read from the Work layer: `gates` are the open Workflow
+ * gates of the running and parked cases (a case whose ledger cannot be read is listed as one unreadable gate, never
+ * dropped) and `asks` are the awaiting-human items of the Work view (`fgos ask`). Reads only.
+ * @param {{ dir: string }} params the project root
+ * @param {{ runsRoot, isCaseId, readCaseProjection, listWork }} reads the Work layer's own readers
+ */
+export function readWorkQuestions({ dir }, { runsRoot, isCaseId, readCaseProjection, listWork }) {
+  const base = runsRoot(dir);
+  const runIds = fs.existsSync(base)
+    ? fs.readdirSync(base, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort().filter(isCaseId)
+    : [];
+  const gates = runIds.flatMap((runId) => {
+    let read;
+    try {
+      read = readCaseProjection(dir, runId, { retryTail: true });
+    } catch (err) {
+      return [{ ref: `workflow:${runId}`, question: `unreadable workflow case: ${err?.message ?? String(err)}`, answerDoor: `fgos workflow status ${runId}` }];
+    }
+    if (!['running', 'parked'].includes(read.state.status)) return [];
+    return (read.projection.openGates ?? []).map((g) => ({
+      ref: `workflow:${runId}#${g.stepId}`,
+      question: String(g.question ?? ''),
+      answerDoor: `fgos workflow answer ${runId} --step ${g.stepId} --answer "<answer>"`,
+    }));
+  });
+  const view = listWork(path.join(dir, '.fgos'));
+  const asks = Object.values(view.work ?? {})
+    .filter((item) => item.status === 'awaiting-human')
+    .map((item) => ({
+      ref: `work:${item.id}`,
+      title: String(item.title ?? ''),
+      question: String(view.gates?.[item.id]?.ask ?? ''),
+      answerDoor: `fgos answer ${item.id} --text "<answer>"`,
+    }))
+    .sort((a, b) => (a.ref < b.ref ? -1 : a.ref > b.ref ? 1 : 0));
+  return { gates, asks };
 }
 
 /** Writes every byte of `bytes` to `fd`, waiting out a full pipe instead of dropping the rest of a long line. */
@@ -119,7 +167,16 @@ async function main() {
   const initStore = async (dir) => (await import('../state/store.mjs')).initStore(dir);
   // Loaded only for the one request that needs the Work layer.
   const workHint = async (params) => (await import('../runner/work-dispatch.mjs')).resolveWorkForDispatch(params);
-  process.exitCode = await serve(text, { write, runBridged, initStore, workHint });
+  // Loaded only for the one request that reads what waits for the owner in the Work layer.
+  const workQuestions = async (params) => {
+    const [paths, projection, store] = await Promise.all([
+      import('../runner/execution/case-run-paths.mjs'),
+      import('../workflow/case-projection.mjs'),
+      import('../state/store.mjs'),
+    ]);
+    return readWorkQuestions(params, { runsRoot: paths.runsRoot, isCaseId: paths.isCaseId, readCaseProjection: projection.readCaseProjection, listWork: store.listWork });
+  };
+  process.exitCode = await serve(text, { write, runBridged, initStore, workHint, workQuestions });
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {

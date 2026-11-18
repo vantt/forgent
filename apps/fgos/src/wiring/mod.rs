@@ -43,6 +43,7 @@ pub mod metrics_sources;
 pub mod observe_declarations;
 pub mod observe_query;
 pub mod observe_sources;
+pub mod questions;
 pub mod run_dirs;
 pub mod seat_binding;
 #[cfg(unix)]

@@ -138,6 +138,11 @@ pub fn project_cli_invocation(
             ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
             Box::new(project_events_request(args, root?)?),
         ),
+        crate::wiring::questions::READ_OPERATION_ID
+        | crate::wiring::questions::WRITE_OPERATION_ID => (
+            ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
+            Box::new(project_questions_request(args, root?, stdin)?),
+        ),
         crate::wiring::git_incidents::STATUS_OPERATION_ID => (
             ContractRef::from_static("git.status.request", "1.0.0"),
             Box::new(crate::wiring::git_incidents::project_git_request(args)),
@@ -254,7 +259,118 @@ pub fn native_operation_id(
         let request = project_events_request(args, std::path::PathBuf::new())?;
         return Ok(request.operation_id().to_string());
     }
+    if route_operation == crate::wiring::questions::READ_OPERATION_ID {
+        let request = project_questions_request(args, std::path::PathBuf::new(), None)?;
+        return Ok(request.operation_id().to_string());
+    }
     Ok(route_operation.to_string())
+}
+
+/// `fgos questions [list] [--all] [--answered]`, `show <id>`, `ask [--ref <ref>] --input <file|-> [--migrated]
+/// [--supersedes <id>]`, `answer <id> [--option <label>] [--text <t>] [--source <s>]`, `ack <id>` and `cancel <id>
+/// --reason <t>`, read through the shared parser. A call without a sub-command lists. Whether a rule of the
+/// store holds (an option label, who may answer) is the crate's to say, never the projector's.
+fn project_questions_request(
+    args: &[OsString],
+    root: std::path::PathBuf,
+    stdin: Option<Vec<u8>>,
+) -> Result<crate::wiring::questions::QuestionsRequest, ProjectError> {
+    use crate::wiring::questions::{QuestionsRequest, Verb, WhichList};
+    use fgos_host_runtime::cli_args::{FlagScalar, FlagValue};
+    let call = crate::routing::Call::new(args);
+    let parsed = call.parsed();
+    let refuse =
+        |message: String| ProjectError::Refused(CategorisedRefusal::new("validation", message));
+    let available = crate::wiring::questions::AVAILABLE_SUBCOMMANDS;
+    let (sub, rest) = match parsed.positional.split_first() {
+        None => (crate::wiring::questions::DEFAULT_SUBCOMMAND, &[][..]),
+        Some((first, rest)) if available.contains(&first.as_str()) => (first.as_str(), rest),
+        Some((first, _)) => {
+            return Err(refuse(format!(
+                "unknown questions subcommand \"{first}\". Available: {}",
+                available.join(", ")
+            )))
+        }
+    };
+    let value = |name: &str| -> Result<Option<String>, ProjectError> {
+        match parsed.flag(name) {
+            None => Ok(None),
+            Some(FlagValue::One(FlagScalar::Str(text))) => Ok(Some(text.clone())),
+            Some(_) => Err(refuse(format!("questions {sub} --{name} needs a value"))),
+        }
+    };
+    let switch = |name: &str| -> Result<bool, ProjectError> {
+        match parsed.flag(name) {
+            None => Ok(false),
+            Some(FlagValue::One(FlagScalar::Bool)) => Ok(true),
+            Some(_) => Err(refuse(format!("questions {sub} --{name} takes no value"))),
+        }
+    };
+    // The id is the positional after the sub-command, or `--id`, as every verb that names an item reads it.
+    let id = || -> Result<String, ProjectError> {
+        match (rest, value("id")?) {
+            ([id], None) => Ok(id.clone()),
+            ([], Some(id)) => Ok(id),
+            ([], None) => Err(refuse(format!("questions {sub} needs a question id"))),
+            _ => Err(refuse(format!("questions {sub} takes one question id"))),
+        }
+    };
+    let no_id = || -> Result<(), ProjectError> {
+        if rest.is_empty() && parsed.flag("id").is_none() {
+            Ok(())
+        } else {
+            Err(refuse(format!("questions {sub} takes no question id")))
+        }
+    };
+    let verb = match sub {
+        "list" => {
+            no_id()?;
+            let (all, answered) = (switch("all")?, switch("answered")?);
+            Verb::List {
+                which: match (all, answered) {
+                    (true, true) => {
+                        return Err(refuse(
+                            "questions list: --all and --answered exclude each other".to_owned(),
+                        ))
+                    }
+                    (true, false) => WhichList::All,
+                    (false, true) => WhichList::Answered,
+                    (false, false) => WhichList::Open,
+                },
+            }
+        }
+        "show" => Verb::Show { id: id()? },
+        "ask" => {
+            no_id()?;
+            let input = value("input")?;
+            if input.is_none() && parsed.flag("input").is_none() {
+                return Err(refuse("questions ask needs --input <file|->".to_owned()));
+            }
+            Verb::Ask {
+                reference: value("ref")?,
+                input: input.filter(|path| path != "-"),
+                migrated: switch("migrated")?,
+                supersedes: value("supersedes")?,
+            }
+        }
+        "answer" => Verb::Answer {
+            id: id()?,
+            option: value("option")?,
+            text: value("text")?,
+            source: value("source")?,
+        },
+        "ack" => Verb::Ack { id: id()? },
+        _ => Verb::Cancel {
+            id: id()?,
+            reason: value("reason")?,
+        },
+    };
+    Ok(QuestionsRequest {
+        root,
+        verb,
+        json: call.flags().flag("json").is_some(),
+        stdin,
+    })
 }
 
 /// `fgos events sync [--remote <name>] [--no-push] [--opportunistic]`, `status [--remote <name>]`, `seal --stream

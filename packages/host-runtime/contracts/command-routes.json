@@ -1064,13 +1064,66 @@
   },
   "questions": {
     "selector": "questions",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
+    "route_kind": "native",
+    "operation_id": "questions.read",
+    "owner_path": "apps/fgos",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ],
-    "store": "none"
+    "subcommands": true,
+    "subcommand_flags": {
+      "ack": [
+        "dir",
+        "json",
+        "help",
+        "id"
+      ],
+      "answer": [
+        "dir",
+        "json",
+        "help",
+        "id",
+        "option",
+        "text",
+        "source"
+      ],
+      "ask": [
+        "dir",
+        "json",
+        "help",
+        "input",
+        "ref",
+        "migrated",
+        "supersedes"
+      ],
+      "cancel": [
+        "dir",
+        "json",
+        "help",
+        "id",
+        "reason"
+      ],
+      "list": [
+        "dir",
+        "json",
+        "help",
+        "all",
+        "answered"
+      ],
+      "show": [
+        "dir",
+        "json",
+        "help",
+        "id"
+      ]
+    },
+    "store": "open",
+    "mutates_store": [
+      "ask",
+      "answer",
+      "ack",
+      "cancel"
+    ]
   },
   "ready": {
     "selector": "ready",

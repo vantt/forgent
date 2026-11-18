@@ -72,6 +72,11 @@
     "owner_path": "packages/observe/rust",
     "subcommands": true
   },
+  "questions": {
+    "operation_id": "questions.read",
+    "owner_path": "apps/fgos",
+    "subcommands": true
+  },
   "resync-worktree": {
     "operation_id": "worktree.resync",
     "owner_path": "packages/execution/checkout"

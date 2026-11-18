@@ -40,6 +40,12 @@
     {"verb":"lock","argv":["status"],"mutates":false,"landsWork":false,"eventStoreChild":false},
     {"verb":"topic","argv":["register","some-topic","--purpose-slug","x"],"mutates":true,"landsWork":false,"eventStoreChild":false},
     {"verb":"doc","argv":["reserve","some-topic","explanation","docs/x.md"],"mutates":true,"landsWork":false,"eventStoreChild":false},
-    {"verb":"return","argv":["tsk-1"],"mutates":false,"landsWork":false,"eventStoreChild":false}
+    {"verb":"return","argv":["tsk-1"],"mutates":false,"landsWork":false,"eventStoreChild":false},
+    {"verb":"questions","argv":["list"],"mutates":false,"landsWork":false,"eventStoreChild":false},
+    {"verb":"questions","argv":[],"mutates":false,"landsWork":false,"eventStoreChild":false},
+    {"verb":"questions","argv":["ask","--input","-"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"questions","argv":["answer","q-1","--option","A"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"questions","argv":["ack","q-1"],"mutates":true,"landsWork":false,"eventStoreChild":false},
+    {"verb":"questions","argv":["cancel","q-1","--reason","x"],"mutates":true,"landsWork":false,"eventStoreChild":false}
   ]
 }

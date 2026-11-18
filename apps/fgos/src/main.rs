@@ -37,6 +37,14 @@ fn native_invocation_reads_stdin(op_id: &str, cli_args: &[std::ffi::OsString]) -
             _ => false,
         },
         "observe.friction" => cli_args.iter().any(|a| a == "--detail-stdin"),
+        // `questions ask --input -` carries the question on stdin.
+        "questions.write" => {
+            use fgos_host_runtime::cli_args::{FlagScalar, FlagValue};
+            let call = Call::new(cli_args);
+            call.sub_word() == Some("ask")
+                && call.parsed().flag("input")
+                    == Some(&FlagValue::One(FlagScalar::Str("-".to_owned())))
+        }
         _ => false,
     }
 }
@@ -146,6 +154,8 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::events::STATUS_DESCRIPTOR,
     wiring::events::SEAL_DESCRIPTOR,
     wiring::events::EXPORT_DESCRIPTOR,
+    wiring::questions::READ_DESCRIPTOR,
+    wiring::questions::WRITE_DESCRIPTOR,
     wiring::git_incidents::STATUS_DESCRIPTOR,
     wiring::git_incidents::RECOVER_DESCRIPTOR,
     wiring::lock_status::DESCRIPTOR,
@@ -161,6 +171,23 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::worktree::REMOVE_DESCRIPTOR,
     wiring::worktree::RESYNC_DESCRIPTOR,
 ];
+
+/// The host catalog with the operations the composition root's own wiring serves: the shared catalog
+/// (`fgos_host_runtime::CATALOG`) and the questions operations, which this wiring declares next to the provider
+/// that serves them.
+fn composition_catalog() -> fgos_host_runtime::OperationCatalog {
+    static CATALOG_WITH_WIRING: std::sync::OnceLock<Vec<fgos_host_runtime::OperationDescriptor>> =
+        std::sync::OnceLock::new();
+    CATALOG_WITH_WIRING
+        .get_or_init(|| {
+            CATALOG
+                .iter()
+                .cloned()
+                .chain(wiring::questions::CATALOG_ENTRIES)
+                .collect()
+        })
+        .as_slice()
+}
 
 /// The legacy payload root of the running release, for the verbs that read what it ships (its skills, its scripts).
 fn active_payload_root() -> Result<std::path::PathBuf, String> {
@@ -296,7 +323,11 @@ fn main() {
     }
 
     // Composition root: build snapshot and InvocationService.
-    let snapshot = build_snapshot(CATALOG, COMPOSITION_PROVIDERS, "fgos-composition-root-v1");
+    let snapshot = build_snapshot(
+        composition_catalog(),
+        COMPOSITION_PROVIDERS,
+        "fgos-composition-root-v1",
+    );
     let service = InvocationService::new(snapshot);
     service.register_provider(Arc::new(fgos_distribution::BuildShowProvider::new()));
     service.register_provider(Arc::new(fgos_work_state::GateBypassShowProvider::new()));
@@ -367,6 +398,14 @@ fn main() {
         service.register_provider(Arc::new(wiring::events::EventsProvider::for_descriptor(
             descriptor,
         )));
+    }
+    for descriptor in [
+        wiring::questions::READ_DESCRIPTOR,
+        wiring::questions::WRITE_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(
+            wiring::questions::QuestionsProvider::for_descriptor(descriptor),
+        ));
     }
     for descriptor in [
         wiring::git_incidents::STATUS_DESCRIPTOR,

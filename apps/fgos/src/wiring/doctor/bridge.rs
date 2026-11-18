@@ -11,7 +11,9 @@
 //! init` creates (`work_store_init`): no rows, an `end` line when the store was made, a refusal line with the
 //! error's text and exit category when it was not. `work-dispatch-hint` is the Work lookup of `fgos dispatch decide
 //! --work` (`work_dispatch_hint`): one `hint` line (the hint object, or null for an item the store does not hold), a
-//! refusal line when the lookup failed.
+//! refusal line when the lookup failed. `work-questions` is the read behind `fgos questions` of what waits for the owner in
+//! the Work layer (`work_questions`): one `data` line with the open Workflow gates and the `fgos ask` items, a refusal line
+//! when a read failed, and a bounded deadline of its own.
 //!
 //! The child is a bounded helper of one doctor run (or of one init), not a legacy route: it gets a fresh recursion guard
 //! (a guard the host inherited does not stop it), leads its own process group so a deadline or a signal reaches
@@ -39,6 +41,9 @@ pub const FIX_DEADLINE: Duration = Duration::from_secs(30);
 /// How long the Work store step of `fgos init` may run: it rebuilds the view from the whole log, which grows with
 /// the project, so the bound is generous; a stuck child still never outlives its caller.
 pub const WORK_STORE_DEADLINE: Duration = Duration::from_secs(600);
+/// How long the read of `fgos questions` may run: it lists case ledgers and folds the Work view, a few hundred
+/// milliseconds on a project; a list that waits longer prints `work-sources: unavailable` instead.
+pub const WORK_QUESTIONS_DEADLINE: Duration = Duration::from_secs(15);
 /// How much of the child's stderr a failure shows.
 const STDERR_EXCERPT: usize = 400;
 
@@ -54,6 +59,9 @@ enum Line {
     Fix(FixResult),
     Hint {
         hint: Option<serde_json::Value>,
+    },
+    Data {
+        data: serde_json::Value,
     },
     End {
         count: usize,
@@ -121,6 +129,7 @@ pub struct NodeBridge {
     check_deadline: Duration,
     fix_deadline: Duration,
     work_store_deadline: Duration,
+    work_questions_deadline: Duration,
     /// What the calls so far showed of the Node that runs the bridge.
     node: std::sync::Mutex<NodeFact>,
 }
@@ -201,8 +210,16 @@ impl NodeBridge {
             check_deadline,
             fix_deadline,
             work_store_deadline: WORK_STORE_DEADLINE,
+            work_questions_deadline: WORK_QUESTIONS_DEADLINE,
             node: std::sync::Mutex::new(NodeFact::Unknown),
         }
+    }
+
+    /// The same bridge with its own deadline for the `work-questions` read.
+    #[allow(dead_code)] // The deadline test of the questions verb sets it; production keeps the default.
+    pub fn with_work_questions_deadline(mut self, deadline: Duration) -> Self {
+        self.work_questions_deadline = deadline;
+        self
     }
 
     fn remember_node(&self, fact: NodeFact) {
@@ -260,6 +277,22 @@ impl NodeBridge {
                 Line::Hint { hint } => hint,
                 _ => None,
             })),
+        }
+    }
+
+    /// What waits for the owner in the Work layer of the project at `root`: `{gates, asks}` as the payload read
+    /// them (the open Workflow gates and the `fgos ask` items). The fault names why the read failed; a refusal
+    /// carries the payload's text.
+    pub fn work_questions(&self, root: &Path) -> Result<serde_json::Value, Fault> {
+        match self.call(root, "work-questions", &[], self.work_questions_deadline) {
+            (_, Some(fault)) => Err(fault),
+            (lines, None) => lines
+                .into_iter()
+                .find_map(|line| match line {
+                    Line::Data { data } => Some(data),
+                    _ => None,
+                })
+                .ok_or_else(|| Fault::Failed("it answered without the data line".to_owned())),
         }
     }
 
@@ -629,6 +662,51 @@ mod tests {
     }
 
     #[test]
+    fn the_work_questions_request_has_no_ids_and_reads_one_data_line_or_the_fault() {
+        let dir =
+            std::env::temp_dir().join(format!("fgos-bridge-questions-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let seen = dir.join("request.json");
+        let bridge = scripted(
+            &format!(
+                "cat > '{}'; {}; {}",
+                seen.display(),
+                line(r#"{"kind":"data","data":{"gates":[],"asks":[{"ref":"work:tsk-1"}]}}"#),
+                end(1)
+            ),
+            Duration::from_secs(20),
+        );
+        assert_eq!(
+            bridge.work_questions(Path::new("/main")),
+            Ok(serde_json::json!({ "gates": [], "asks": [{ "ref": "work:tsk-1" }] }))
+        );
+        let request: serde_json::Value =
+            serde_json::from_str(&std::fs::read_to_string(&seen).unwrap()).unwrap();
+        std::fs::remove_dir_all(&dir).unwrap();
+        assert_eq!(request["phase"], "work-questions");
+        assert_eq!(request["ids"], serde_json::json!([]));
+        assert_eq!(request["dir"], "/main");
+
+        let refused = scripted(
+            &format!(
+                "cat >/dev/null; {}",
+                line(r#"{"kind":"refusal","message":"corrupt-log"}"#)
+            ),
+            Duration::from_secs(20),
+        );
+        assert!(matches!(
+            refused.work_questions(Path::new("/main")),
+            Err(Fault::Refused { .. })
+        ));
+        let slow = scripted("cat >/dev/null; sleep 30", Duration::from_secs(20))
+            .with_work_questions_deadline(Duration::from_millis(300));
+        assert!(matches!(
+            slow.work_questions(Path::new("/main")),
+            Err(Fault::Failed(_))
+        ));
+    }
+
+    #[test]
     fn an_item_the_work_store_does_not_hold_is_no_hint_and_a_refused_lookup_is_the_fault() {
         let unknown = scripted(
             &format!(
@@ -908,6 +986,9 @@ mod contract_tests {
                         hint.as_ref(),
                         "{name}"
                     );
+                }
+                Line::Data { data } => {
+                    assert_eq!(&body["data"], &data, "{name}");
                 }
                 Line::Refusal { message, category } => {
                     assert_eq!(body["message"], message.as_str(), "{name}");

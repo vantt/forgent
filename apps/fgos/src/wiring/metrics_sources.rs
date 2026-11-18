@@ -19,10 +19,13 @@ pub fn build_unit_summary_scanner() -> fgos_observe::UnitSummaryScanner {
     fgos_run_result::scan_unit_summaries
 }
 
-/// The record sources the host adds to Observe's own: head state and plan history, projected from their owners.
+/// The record sources the host adds to Observe's own: head state, plan history and owner questions, projected from their owners.
 pub fn build_host_record_sources() -> Vec<Box<dyn fgos_observe::RecordSource>> {
     vec![
         Box::new(super::observe_sources::head_state::HeadStateSource::new()),
         Box::new(super::observe_sources::plan_history::PlanHistorySource::new()),
+        Box::new(fgos_questions::source::QuestionSource::new(Box::new(
+            super::questions::HostLogOpener::reader(),
+        ))),
     ]
 }
