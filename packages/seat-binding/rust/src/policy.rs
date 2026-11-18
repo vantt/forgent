@@ -56,8 +56,22 @@ fn validate(config: &Config) -> Result<(), Refusal> {
             ));
         }
     }
+    for (role, scope) in &config.roles.0 {
+        if scope.pool.is_some() {
+            return Err(invalid(
+                &format!("roles.{role}.pool"),
+                "pool is a persona key; a role cannot name an account pool",
+            ));
+        }
+    }
     for (group, scopes) in [("roles", &config.roles), ("personas", &config.personas)] {
         for (name, scope) in &scopes.0 {
+            if scope.pool.as_deref().is_some_and(|p| p.trim().is_empty()) {
+                return Err(invalid(
+                    &format!("{group}.{name}.pool"),
+                    "pool must not be blank",
+                ));
+            }
             if scope.prefer.as_ref().is_some_and(Vec::is_empty) {
                 return Err(invalid(
                     &format!("{group}.{name}.prefer"),
@@ -302,11 +316,29 @@ pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
         .cloned()
         .unwrap_or_default();
 
+    // The persona's pool replaces the pool of every cell entry: the seat leases from it for every
+    // family it walks, and a pool no cell names is reachable only this way.
+    let (pool, pool_source) = persona
+        .and_then(|name| {
+            config
+                .personas
+                .0
+                .get(name)
+                .and_then(|scope| scope.pool.clone())
+                .map(|pool| (pool, format!("personas.{name}.pool")))
+        })
+        .unzip();
+
     let mut cells = BTreeMap::new();
     for (family, by_tier) in &config.model_policies.0 {
         if let Some(cell) = by_tier.0.get(final_tier.name()) {
             let path = format!("modelPolicies.{family}.{}", final_tier.name());
-            let entries = cell.entries().map_err(|detail| invalid(&path, &detail))?;
+            let mut entries = cell.entries().map_err(|detail| invalid(&path, &detail))?;
+            if let Some(pool) = &pool {
+                for entry in &mut entries {
+                    entry.pool = Some(pool.clone());
+                }
+            }
             cells.insert(family.clone(), entries);
         }
     }
@@ -325,6 +357,8 @@ pub fn policy(ask: &Ask, config: &Config) -> Result<Policy, Refusal> {
         ),
         prefer,
         prefer_source,
+        pool,
+        pool_source,
         tier_fallback,
         cells,
         effective_rigor: ask.effective_rigor,

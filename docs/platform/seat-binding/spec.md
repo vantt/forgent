@@ -189,9 +189,10 @@ Workflow khai ghế tường minh; workflow không bao giờ khai `prefer`. Kh�
 | `modelPolicies.<family>.<tier>` | cell (mục 5.3) | thiếu khoá = unmet |
 | `capabilities.<cap-or-prefix>` | `{ tier?, maxTier?, rigor?, prefer?, ...khoá hiện có }` | `<prefix>:*` khớp mọi capability bắt đầu `<prefix>:` |
 | `roles.<role>` | `{ tier?, prefer? }` | một trong năm role; chỉ file project; áp cho mọi capability |
-| `personas.<persona-name>` | `{ tier?, prefer? }` | tên persona trần; chỉ file project; áp cho mọi capability |
+| `personas.<persona-name>` | `{ tier?, prefer?, pool? }` | tên persona trần; chỉ file project; áp cho mọi capability |
 
 - `prefer` là khoá duy nhất, giữ hình sẵn có: id executor, hoặc `{executor, invocation}` cho ghim. Không có khoá `families`: capability còn do tool executor phục vụ (`impact-analysis: prefer "gitnexus"`), nên "family" không phải khái niệm config chung. Với agent executor, id gọi tên family của nó (một executor mỗi family, `executor-family-unique`, `src/setup/registrations.mjs:1473`), nhờ đó `prefer` gặp được `tierFallback` và `modelPolicies` khoá theo family (ví dụ executor `glm` ↔ family `z-ai`). Spec viết ghim invocation là `family#invocation`; trong config là entry `{executor, invocation}`.
+- `personas.<name>.pool` (chuỗi không trống, không có mặc định; vắng = pool của cell như trước): ghế của persona chỉ thuê account từ pool này, cho mọi family nó đi qua; pool mà không cell tier nào gọi tên chỉ tới được qua khoá này. Mọi account, thứ tự, quarantine và lý do từ chối là của sẵn có: pool không có account bật giữ login store cho CLI là `pool-unusable`, pool hết account sẵn sàng là `no-account-available`, và ghế không bao giờ rơi sang pool của family. Role không có khoá này (`runner.roles.<role>.pool` bị schema từ chối đích danh, binding trả `invalid-config` với `roles.<role>.pool`). `explain` ghi nguồn: `pool: personas.<name>.pool = <pool>`. Bằng chứng: các case golden "a persona with a pool binds claude ..." đến "a blank persona pool ...".
 - Khoá capability hiện có (`description`, `aliases`, `confinement`, `serves`, `persona`, `minCheckers`, `verify`) giữ nguyên.
 - `red-team` là `minCheckers` mặc định của capability `code` và `code:*`. Một mục `minCheckers` tường minh **thay** mặc định đó (khoá khớp đúng được xét trước, rồi theo tiền tố; `[]` xoá nó). Hệ quả: một mục tường minh không có `red-team` thì capability `code:*` không còn nhận `red-team`.
 - `checkersByRigor` nằm ở `runner.loops.reviewed` (không còn dưới `runner.patterns.reviewed`). Một rigor dưới `standard` không có dòng riêng rơi về dòng `standard`; thiếu dòng `high` hoặc `critical` là lỗi cấu hình.
@@ -434,6 +435,13 @@ Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker 
 - Đổi luật "project thắng": chỉ owner; lý do gốc ở mục 15.
 
 ## 15. Lịch sử quyết định
+
+### Persona pool key (runner.personas.<name>.pool) — một khoá tuỳ chọn để persona thuê account từ pool riêng; số D-ADR do `fgos identity mint d-adr` cấp khi ghi (chưa cấp: mint cần mạng và ghi git)
+
+- **Quyết định:** `runner.personas.<name>.pool` (chỉ file project) khiến mọi ghế của persona thuê account chỉ từ pool đó, cho mọi family nó đi qua; vắng khoá = pool của cell, hành vi cũ không đổi. Backlog `p-mnymjukvqd`, quyết định OD4 của thảo luận account-lease-secretary.
+- **Vì sao không ghim account:** một ghim `pool/account` chỉ áp khi lựa chọn đầu của ghế đã thuộc pool đó và "never moves a seat to another pool" (mục 8), nên không đưa được ghế sang pool mà không cell nào gọi tên.
+- **Hệ quả thấy được:** pane không bao giờ chạm pool của persona (không cell nào gọi tên nó); persona có pool hết account thì bị từ chối đích danh, không rơi sang pool `claude`. Role không có khoá này.
+- **Điều kiện đảo:** owner muốn pool theo role hoặc theo capability (nơi của nó là một dòng backlog mới).
 
 ### D-ADR0080 (persona and role taste live in runner.personas and runner.roles) — khẩu vị persona và role có bảng riêng; hàng capability giữ việc và khả năng tool; sửa mục 6.3 của D-ADR0072 (Seat Binding: one authority for agent seat choice), luật file persona của nó giữ nguyên
 

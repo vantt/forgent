@@ -59,7 +59,7 @@ properties:
     type: object
     x-fgos-scope: project-only
     additionalProperties:
-      $ref: "#/$defs/taste"
+      $ref: "#/$defs/personaTaste"
   modelPolicies:
     description: "The model each family uses at each tier, by family then tier.\nTier ladder, weakest first:\nnano: mechanical, no reasoning; self-check: only recognizes or transforms by pattern?; e.g. classify, extract, format, route, vote\nmini: light reasoning over the given input, narrow scope; self-check: enough information, only understand and summarize?; e.g. summarize, answer from a given document, small exact fix, review a small diff\nstandard: follows an existing plan, many steps; self-check: is there a plan with detailed instructions?; e.g. code to a plan, write tests, refactor as described\nadvanced: finds its own way, no ready answer; self-check: must investigate and decide how?; e.g. hard debugging, complex code, many files with no plan\nflagship: judgment, design, critique; self-check: is the result an opinion or a design?; e.g. review, red-team, solution design, panel synthesis\nfrontier: the costliest decisions; self-check: hard to reverse, costly if wrong?; e.g. architecture lock-in, final synthesis of an important council"
     type: object
@@ -433,6 +433,19 @@ $defs:
         $ref: "#/$defs/tierName"
       prefer:
         $ref: "#/$defs/preferList"
+  personaTaste:
+    description: "The tier, executors and account pool one persona prefers. Only a persona may name a pool; a role entry refuses the key by name."
+    type: object
+    additionalProperties: false
+    properties:
+      tier:
+        $ref: "#/$defs/tierName"
+      prefer:
+        $ref: "#/$defs/preferList"
+      pool:
+        description: "Account pool every seat of this persona leases from, for every family it walks; a pool no tier cell names is reachable only through it."
+        type: string
+        pattern: "\\S"
   capabilityConfinement:
     $comment: "justification: read from the trusted main checkout, spec section 5 rule 6; the entry decides what runs on this machine"
     x-fgos-scope: both

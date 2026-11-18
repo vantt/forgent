@@ -42,6 +42,9 @@ pub fn explain(
             ));
         }
         lines.push(format!("    {}", tier_line(policy)));
+        if let Some(line) = pool_line(policy) {
+            lines.push(line);
+        }
         let list: Vec<&str> = policy.prefer.iter().map(|p| p.executor()).collect();
         let mut prefer = format!(
             "    prefer: {} = [{}]",
@@ -91,6 +94,9 @@ pub fn explain(
     } else if let Some(refusal) = refusal {
         if let Some(policy) = policy {
             lines.push(format!("    {}", tier_line(policy)));
+            if let Some(line) = pool_line(policy) {
+                lines.push(line);
+            }
         }
         lines.push(format!("  refused {}: {}", refusal.reason, refusal.detail));
         if let Some(config) = &refusal.config {
@@ -106,6 +112,14 @@ pub fn explain(
         }
     }
     Explain { lines }
+}
+
+/// The account pool a persona fixes for the seat and the config line that fixed it.
+fn pool_line(policy: &Policy) -> Option<String> {
+    match (&policy.pool_source, &policy.pool) {
+        (Some(source), Some(pool)) => Some(format!("    pool: {source} = {pool}")),
+        _ => None,
+    }
 }
 
 fn tier_line(policy: &Policy) -> String {
