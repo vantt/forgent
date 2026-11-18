@@ -1476,6 +1476,78 @@ fn a_registering_call_registers_the_head_with_identity_once_and_a_second_call_of
     assert!(!fgos_identity::directory::directory(&root).exists());
 }
 
+/// The context a delivering Claude Code hook call injected.
+fn injected(out: &Output) -> String {
+    let reply: serde_json::Value = serde_json::from_slice(&out.stdout)
+        .unwrap_or_else(|e| panic!("{e}: {}", String::from_utf8_lossy(&out.stdout)));
+    reply["hookSpecificOutput"]["additionalContext"]
+        .as_str()
+        .unwrap()
+        .to_string()
+}
+
+#[test]
+fn the_record_a_head_registers_from_its_hook_finds_it_by_its_pane_and_its_frames_name_the_senders_handle(
+) {
+    let scene = Scene::new("ident-ids");
+    let root = identity_root(&scene);
+    let pane = Path::new("w9:p42");
+    let first = scene.hook_as_head_env(
+        &["--cli", "claude", "--event", "post-tool-use"],
+        &post_tool_use(),
+        &[
+            ("HERDR_PANE_ID", pane),
+            ("HERDR_TAB_ID", Path::new("w9:t7")),
+        ],
+    );
+    assert_eq!(first.status.code(), Some(0), "{first:?}");
+    let name = scene.head_name();
+    let own = identity_of(&root, "CLAUDE_CODE_SESSION_ID", WRITER);
+    // One record holds the head's CLI session, pane and mailbox name.
+    let record = fgos_identity::directory::resolve(
+        &root,
+        "w9:p42",
+        &fgos_process::facts::judge_here,
+        None,
+        &fgos_identity::directory::NoTerminal,
+    )
+    .unwrap();
+    assert_eq!(record.id, own.id);
+    let ids = record.ids.expect("the hook records the head's identifiers");
+    assert_eq!(
+        ids.cli_session.map(|c| (c.id, c.name)),
+        Some((WRITER.to_string(), Some("routes-test-5c".to_string())))
+    );
+    assert_eq!(ids.mailbox.map(|m| m.name), Some(name.clone()));
+
+    // `--to <pane id>` reaches the head the record names.
+    let sent = send_to(&scene, "w9:p42", false);
+    assert_eq!(sent.status.code(), Some(0), "{sent:?}");
+    assert!(
+        String::from_utf8_lossy(&sent.stdout).contains(&format!(" for {name}")),
+        "{sent:?}"
+    );
+
+    // Another head holding a role sends: the frame names the sender by its handle.
+    const SENDER: &str = "00000000-0000-4000-8000-0000000000ab";
+    let _sender_head = CodexHead::start(&scene, SENDER);
+    let sender = register_identity(&root, "CODEX_THREAD_ID", SENDER, &["head:secretary-miu"]);
+    let sent = scene.run(
+        &scene.main(),
+        Some(SENDER),
+        &["mailbox", "send", "--to", &name, "from the secretary"],
+        b"",
+    );
+    assert_eq!(sent.status.code(), Some(0), "{sent:?}");
+    let out = scene.claude_hook("post-tool-use", &post_tool_use());
+    let context = injected(&out);
+    assert!(
+        context.contains(&format!(" handle=\"{sender}\" ")),
+        "{context}"
+    );
+    assert!(context.contains("| from the secretary"), "{context}");
+}
+
 #[test]
 fn a_registering_call_whose_handle_identity_already_holds_for_another_id_registers_nothing_and_records_ident_handle_in_use(
 ) {

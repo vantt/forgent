@@ -53,7 +53,6 @@ fn register(
         project: "forgent".to_string(),
         own_suffix: None,
         head,
-        handle: None,
     };
     match state.register(req, None, now, &limits(), ids).unwrap() {
         fgos_mailbox_core::Registered::Created { name, .. } => name.as_str().to_string(),

@@ -106,10 +106,10 @@ fn names_of<'a>(bindings: impl Iterator<Item = &'a Binding>) -> Vec<ShortName> {
 }
 
 impl MailboxState {
-    /// Resolves a typed name to exactly one head: exact short name, then a
-    /// unique short-name prefix, then the exact key, then a unique key
-    /// prefix. A name is never
-    /// taken from message text.
+    /// Resolves a typed name to exactly one head: exact short name, then the
+    /// exact key, then a unique short-name prefix, then a unique key prefix,
+    /// so an exact answer always beats a prefix. A name is never taken from
+    /// message text.
     pub fn resolve(&self, query: &str) -> Result<&Binding, ResolveRefusal> {
         self.resolve_skipping(query, &BTreeSet::new())
     }
@@ -151,8 +151,8 @@ impl MailboxState {
         }
         let steps: [Step<'_>; 4] = [
             (Match::Exact, &|b| b.name.as_str() == query),
-            (Match::Prefix, &|b| b.name.as_str().starts_with(query)),
             (Match::Exact, &|b| b.key.as_str() == query),
+            (Match::Prefix, &|b| b.name.as_str().starts_with(query)),
             (Match::Prefix, &|b| b.key.as_str().starts_with(query)),
         ];
         for (kind, matches) in steps {

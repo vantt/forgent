@@ -106,6 +106,22 @@ impl Backend {
         Core::new(&self.driver, self.policy.as_ref(), self.config.clone())
     }
 
+    /// The tab and pane the store of a server incarnation allocated to `key`, as Identity's `terminal`
+    /// group names them; `None` when no readable record holds the key.
+    pub fn placed(&self, key: &str) -> Option<fgos_identity::directory::TerminalIds> {
+        let (root, driver) = (&self.config.state_root, self.driver.name());
+        incarnation_ids(root, driver).iter().find_map(|id| {
+            let record = Store::existing(root, driver, id)?.read_record(key).ok()??;
+            Some(fgos_identity::directory::TerminalIds {
+                driver: record.driver,
+                key: Some(record.key),
+                pane_id: record.pane_id,
+                tab_id: Some(record.tab_id),
+                workspace_id: None,
+            })
+        })
+    }
+
     /// Whether the store of any server incarnation, current or earlier, holds an allocation record for
     /// `key`. A record that cannot be read counts as one: only a proven absence says no pane was allocated.
     fn ever_recorded(&self, key: &str) -> bool {

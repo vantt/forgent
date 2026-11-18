@@ -98,7 +98,8 @@ pub enum Verb {
     /// `session [--register [--role <role> [--take]] | --drop-role <role>]`: this session's
     /// full id and handle, and its entry in the local directory.
     Session(SessionAction),
-    /// `resolve <handle|role|full id>`: the one live session it names.
+    /// `resolve <any identifier>`: the one live session it names (a handle, role, full id, pid, socket, CLI
+    /// session id or name, pane, tab or mailbox name).
     Resolve { query: String },
     /// `list [--project] [--prune] [--machine <handle|id>]`: the sessions the machine knows.
     List {
@@ -224,6 +225,8 @@ pub struct IdentityProvider {
     descriptor: ProviderDescriptor,
     /// The door to the clone's shared log; without it the directory stays local.
     log_door: Option<Arc<dyn LogDoor>>,
+    /// Maps a terminal tab label to its tabs for `resolve`; without it a label resolves nothing.
+    terminal: Option<Arc<dyn directory::TerminalPort>>,
 }
 
 impl IdentityProvider {
@@ -237,12 +240,19 @@ impl IdentityProvider {
         Self {
             descriptor,
             log_door: None,
+            terminal: None,
         }
     }
 
     /// The same provider publishing to and reading from the shared directory through `door`.
     pub fn with_log_door(mut self, door: Arc<dyn LogDoor>) -> Self {
         self.log_door = Some(door);
+        self
+    }
+
+    /// The same provider resolving a terminal tab label through `terminal`.
+    pub fn with_terminal(mut self, terminal: Arc<dyn directory::TerminalPort>) -> Self {
+        self.terminal = Some(terminal);
         self
     }
 }
@@ -436,6 +446,7 @@ fn remote_view(
 fn answer(
     request: &IdentityRequest,
     door: Option<&dyn LogDoor>,
+    terminal: &dyn directory::TerminalPort,
 ) -> Result<serde_json::Value, Refusal> {
     let root = state_root();
     match &request.verb {
@@ -514,17 +525,24 @@ fn answer(
                     cwd.as_deref(),
                     &role.iter().cloned().collect::<Vec<_>>(),
                     *take,
+                    None,
                 )?;
                 publish(request, door, &root, Some(&listed));
                 Ok(serde_json::to_value(listed).expect("Listed always serializes"))
             }
         },
         Verb::Resolve { query } => {
-            let listed = match directory::resolve(&root, query, &judge_here, None) {
+            let listed = match directory::resolve(&root, query, &judge_here, None, terminal) {
                 // Local first: other machines are asked only when this one has no answer.
                 Err(missing) if missing.reason == "not-found" => {
                     match remote_view(request, door, &root) {
-                        Some(view) => directory::resolve(&root, query, &judge_here, Some(&view))?,
+                        Some(view) => directory::resolve(
+                            &root,
+                            query,
+                            &judge_here,
+                            Some(&view),
+                            &directory::NoTerminal,
+                        )?,
                         None => return Err(missing),
                     }
                 }
@@ -593,11 +611,14 @@ impl OperationProvider for IdentityProvider {
                 .ok_or_else(|| {
                     ProviderError::SemanticValidation("input is not IdentityRequest".into())
                 })?;
-            let output: Box<dyn std::any::Any + Send> =
-                match answer(request, self.log_door.as_deref()) {
-                    Ok(value) => Box::new(JsonOutcome(value)),
-                    Err(refusal) => Box::new(refusal),
-                };
+            let output: Box<dyn std::any::Any + Send> = match answer(
+                request,
+                self.log_door.as_deref(),
+                self.terminal.as_deref().unwrap_or(&directory::NoTerminal),
+            ) {
+                Ok(value) => Box::new(JsonOutcome(value)),
+                Err(refusal) => Box::new(refusal),
+            };
             Ok(ProviderOutcome::completed(
                 self.descriptor().outcome_contract.clone(),
                 output,

@@ -81,23 +81,7 @@
     "src/verbs/": 9,
     "src/workflow/": 6
   },
-  "tierExceptions": [
-    {
-      "from": "src/runner/worktree.mjs",
-      "to": "src/state/store.mjs",
-      "reason": "worktree.mjs throws the StoreError class its callers catch and uses nothing else of the Work store; the class moves down with the Work batch"
-    },
-    {
-      "from": "src/identity/directory-store.mjs",
-      "to": "src/state/runtime-coordination.mjs",
-      "reason": "the identity directory rebuild finds the main .fgos directory through the Work state helper getMainFgosDir; it goes to the invocation-root door with the Work batch"
-    },
-    {
-      "from": "src/util/host-bin.mjs",
-      "to": "src/runner/paths.mjs",
-      "reason": "the host binary lookup needs the main checkout root and the .fgos directory that paths.mjs resolves through the Git port; the root resolver moves down when the project locator becomes one leaf"
-    }
-  ],
+  "tierExceptions": [],
   "doors": [
     {
       "job": "agent hook table",
@@ -666,7 +650,7 @@
       ],
       "debt": [
         { "path": "apps/fgos/src/wiring/mailbox_root.rs", "reason": "the mailbox picks its record root (the main checkout from CLAUDE_PROJECT_DIR or the cwd) separately from the invocation root, so a hook call needs no Git process; one door once the mailbox verbs move" },
-        { "path": "src/util/host-bin-path.mjs", "reason": "walks up from cwd for .fgos/installation/activation.json with no Git ceiling and no home exclusion, a root decision of its own for finding the host binary" },
+        { "path": "src/util/host-bin-path.mjs", "reason": "walks up from cwd for .fgos/installation/activation.json with no Git ceiling and no home exclusion, a root decision of its own for finding the host binary; it is the bootstrap reader, running before any door can load, and retires with the Node payload (S7)" },
         { "path": "src/runner/worktree.mjs", "reason": "isMainWorktree asks 'is this the main checkout' in Node while fgos-git store_admission asks it in Rust; six other Node callers (resolveMainCheckoutRoot and friends) keep it until their verbs move" }
       ],
       "reason": "which project and which .fgos a call acts on is decided once, in fgos-git, for Node (through the addon) and the host. Patterns name the definitions of a root decision, not their callers (narrowed from the call names, to cover the same job exactly)"
@@ -1667,7 +1651,7 @@
     "src/runner/main-checkout-reset-guard.mjs": "infra",
     "src/runner/github-adapter.mjs": "infra",
     "src/state/drift-status.mjs": "infra",
-    "src/state/store-error.mjs": "kernel",
+    "src/util/store-error.mjs": "kernel",
     "src/state/store.mjs": "infra",
     "src/state/gate-bypass.mjs": "infra",
     "src/state/cursor.mjs": "use-case",

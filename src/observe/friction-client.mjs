@@ -9,7 +9,7 @@
 
 import { invokeHost } from '../util/host-bin.mjs';
 import { recordInvocationFault } from './invocation-fault-log.mjs';
-import { fgosDirFromRoot } from '../runner/paths.mjs';
+import { fgosDirFromRoot, resolveMainCheckoutRoot } from '../runner/paths.mjs';
 
 const INPUT_REFUSAL = /^fgos: error: invocation failed: provider failed: friction-invalid-input:\s*/;
 
@@ -61,7 +61,7 @@ function reportLoss(what, args, dir, code, message) {
 function callHost(what, args, { dir, input }) {
   let answer;
   try {
-    answer = invokeHost(args, { input, dir });
+    answer = invokeHost(args, { input, dir: resolveMainCheckoutRoot(dir) || dir });
   } catch (err) {
     const firstLine = String(err.stderr ?? '').split('\n', 1)[0];
     if (INPUT_REFUSAL.test(firstLine)) throw validationError(firstLine.replace(INPUT_REFUSAL, ''));

@@ -108,7 +108,7 @@ impl Drain {
             head: HeadFacts {
                 record: own_record(),
                 own_suffix: Some("2b".to_string()),
-                handle: None,
+                cli_session: None,
             },
             tested: TestedClis::embedded().clone(),
             hook_limits: hook_limits(),
@@ -180,7 +180,6 @@ impl Drain {
                     project: PROJECT.to_string(),
                     own_suffix: None,
                     head: format!("peer-process-{key}"),
-                    handle: None,
                 },
                 None,
                 now,
@@ -617,13 +616,6 @@ fn the_writer_key_the_hook_derives_equals_the_one_its_tool_sees() {
 }
 
 #[test]
-fn the_codex_thread_becomes_the_binding_handle() {
-    let drain = Drain::registered(Adapter::Codex);
-    let binding = drain.state.binding(&drain.writer).unwrap();
-    assert_eq!(binding.handle.as_deref(), Some(drain.writer.as_str()));
-}
-
-#[test]
 fn a_payload_naming_another_session_changes_nothing_and_the_head_keeps_its_name() {
     for adapter in tested() {
         let mut drain = Drain::registered(adapter);
@@ -896,7 +888,7 @@ fn a_codex_binding_that_already_holds_stop_blocks_answers_stop_channel_off_and_k
 }
 
 #[test]
-fn a_frame_shows_the_handle_derived_at_render_from_the_senders_key_cli_and_stored_head() {
+fn a_frame_shows_the_handle_read_at_render_from_the_senders_key_cli_and_stored_head() {
     let mut drain = Drain::registered(Adapter::Claude);
     // A peer whose binding stores a real head process of its own.
     let now = drain.tick();
@@ -911,7 +903,6 @@ fn a_frame_shows_the_handle_derived_at_render_from_the_senders_key_cli_and_store
                 project: PROJECT.to_string(),
                 own_suffix: None,
                 head: fgos_mailbox::head::head_text(&peer_head),
-                handle: None,
             },
             None,
             now,

@@ -908,15 +908,6 @@ function resolvedRelativeImports(file, source) {
   });
 }
 
-// Edges into the Work layer that shared runner modules take today, each with its reason and the
-// exact names it imports. Nothing else may reach the Work layer from the guarded files.
-const WORK_LAYER_EDGE_ALLOWLIST = {
-  'src/runner/worktree.mjs -> src/state/store.mjs': {
-    reason: 'worktree.mjs throws the StoreError class callers catch; it uses nothing else of the store',
-    imports: 'StoreError',
-  },
-};
-
 /**
  * Work-layer modules `file` reaches through relative imports, followed transitively
  * through any module that re-exports or imports one, so a re-export one hop away is
@@ -931,7 +922,6 @@ export function findWorkLayerReach(file, readSource) {
     const source = readSource(current);
     if (source === null) return;
     for (const dep of resolvedRelativeImports(current, source)) {
-      if (Object.hasOwn(WORK_LAYER_EDGE_ALLOWLIST, `${current} -> ${dep}`)) continue;
       if (WORK_LAYER_MODULES.some((re) => re.test(dep))) hits.push([...trail, dep].join(' -> '));
       else walk(dep, [...trail, dep]);
     }
@@ -975,16 +965,6 @@ test('A4 boundary guard: dispatch, execution, the dispatch barrel and src/workfl
     violations.push(...findWorkLayerReach(file, readRepoSource));
   }
   assert.deepEqual(violations, [], `Expected 0 Work-layer reach from the A4-guarded files, found:\n${violations.join('\n')}`);
-  // Each allowed edge still exists and imports exactly the pinned names, nothing more.
-  for (const [edge, { imports }] of Object.entries(WORK_LAYER_EDGE_ALLOWLIST)) {
-    const [from, to] = edge.split(' -> ');
-    const source = lexSource(fs.readFileSync(path.join(root, from), 'utf8')).code;
-    const named = [...source.matchAll(/\bimport\s*\{([^}]*)\}\s*from\s*(['"])([^'"]+)\2/g)]
-      .filter((m) => path.posix.normalize(path.posix.join(path.posix.dirname(from), m[3])) === to)
-      .map((m) => m[1].split(',').map((x) => x.trim()).filter(Boolean).join(', '));
-    assert.deepEqual(named, [imports], edge);
-    assert.equal(resolvedRelativeImports(from, source).filter((dep) => dep === to).length, 1, `${edge}: imported once, by name`);
-  }
 });
 
 test('A4 Work-layer guard catches a dynamic import(), a require() and a re-export one hop away', () => {
@@ -1655,7 +1635,7 @@ const ENTRY_LEAF_IMPORTS = [
   '../src/cli/parse-args.mjs',
   '../src/cli/verb-exit.mjs',
   '../src/state/envelope.mjs',
-  '../src/state/store-error.mjs',
+  '../src/util/store-error.mjs',
 ];
 const ARM_STATIC_IMPORTS = [
   '../src/cli/flag-check.mjs',

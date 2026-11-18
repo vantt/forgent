@@ -374,7 +374,8 @@ fn a_brief_the_pane_refuses_because_its_shell_holds_the_foreground_ends_the_atte
 }
 
 #[test]
-fn a_session_attempt_holds_its_role_through_a_blocked_screen_and_ends_only_when_its_pane_goes() {
+fn a_session_attempt_holds_its_role_and_records_its_pane_and_generation_through_a_blocked_screen_and_ends_only_when_its_pane_goes(
+) {
     let herdr = FakeHerdr::new("session");
     let mut run = terminal_run_shaped(
         "tsession",
@@ -384,7 +385,13 @@ fn a_session_attempt_holds_its_role_through_a_blocked_screen_and_ends_only_when_
         |_| {},
         |_| {},
         |envelope| {
-            envelope["session"] = json!({"role": "head:planner-probe", "verbs": []});
+            envelope["session"] = json!({
+                "role": "head:planner-probe",
+                "verbs": [],
+                "persona": "planner",
+                "name": "probe",
+                "gen": 3,
+            });
             // A session has no settle step: the answer of a head is not a result.
             envelope["steps"].as_array_mut().unwrap().remove(0);
         },
@@ -400,6 +407,7 @@ fn a_session_attempt_holds_its_role_through_a_blocked_screen_and_ends_only_when_
             "head:planner-probe",
             &fgos_process::facts::judge_here,
             None,
+            &fgos_identity::directory::NoTerminal,
         )
     };
     wait_until(STEP, "the session to hold its role in Identity", || {
@@ -422,6 +430,30 @@ fn a_session_attempt_holds_its_role_through_a_blocked_screen_and_ends_only_when_
             .ends_with(&format!("/att-{}", run.attempt_id)),
         "the role is held by the attempt's writer id"
     );
+    // The record carries the slot the head was placed in and which head of its lineage it is, and the pane alone
+    // finds it.
+    let held = resolve().unwrap();
+    let ids = held
+        .ids
+        .clone()
+        .expect("the supervisor records identifier groups");
+    let head = ids.head.expect("head group");
+    assert_eq!(
+        (head.persona.as_str(), head.name.as_str(), head.gen),
+        ("planner", "probe", 3)
+    );
+    let terminal = ids.terminal.expect("terminal group");
+    assert_eq!(terminal.key.as_deref(), Some(run.attempt_id.as_str()));
+    assert!(terminal.tab_id.is_some(), "{terminal:?}");
+    let by_pane = fgos_identity::directory::resolve(
+        &state_root,
+        &terminal.pane_id,
+        &fgos_process::facts::judge_here,
+        None,
+        &fgos_identity::directory::NoTerminal,
+    )
+    .expect("the pane resolves the session");
+    assert_eq!(by_pane.id, held.id);
 
     herdr.set_flag("gone", true);
     let (code, line) = finish(supervisor, LIMIT);

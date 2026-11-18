@@ -66,12 +66,6 @@ impl Adapter {
         }
     }
 
-    /// Whether this CLI's session id is also its native thread handle
-    /// (Codex: the id `codex queue --thread` takes).
-    pub const fn session_is_handle(self) -> bool {
-        matches!(self, Self::Codex)
-    }
-
     /// The core's CLI value of [`Adapter::word`].
     pub fn cli(self) -> Option<Cli> {
         Cli::new(self.word()).ok()

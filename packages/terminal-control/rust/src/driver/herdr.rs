@@ -187,6 +187,29 @@ pub fn parse_tab_created(result: &Value) -> Option<CreatedPane> {
     })
 }
 
+/// `tab list`: the ids of the tabs whose label is exactly `label`, in herdr's order.
+pub fn parse_tab_ids_labelled(result: &Value, label: &str) -> Option<Vec<String>> {
+    Some(
+        result
+            .get("tabs")?
+            .as_array()?
+            .iter()
+            .filter(|tab| text(tab, "label") == Some(label))
+            .filter_map(|tab| text(tab, "tab_id").map(String::from))
+            .collect(),
+    )
+}
+
+/// The ids of the tabs that carry `label` now, read live with `tab list` (a
+/// label is renamed freely, so nobody stores it). One command, no probe and no
+/// pane: the read Identity's resolve makes for a tab label.
+pub fn tab_ids_labelled(config: &HerdrConfig, label: &str) -> DriverResult<Vec<String>> {
+    let result =
+        call(config, &["tab", "list"], config.timeout()).map_err(CallError::into_refusal)?;
+    parse_tab_ids_labelled(&result, label)
+        .ok_or_else(|| unknown("herdr tab list answered an unexpected shape"))
+}
+
 /// `pane split`: the new pane and the tab it landed in.
 pub fn parse_split(result: &Value) -> Option<CreatedPane> {
     let pane = result.get("pane")?;

@@ -697,7 +697,7 @@ export function resolveConfinementResources({
       entries.push({ rel, hostTarget, isFile: !seen.isDirectory() });
     }
     // A granted file gets no bind at all: the sandbox reads it live through the read-only project, and only the head's
-    // supervisor writes it (`head write` on the request socket, head-request.v1.json), so its directory and every
+    // supervisor writes it (`session write` on the request socket, head-request.v1.json), so its directory and every
     // sibling stay read-only whatever the host replaces. A bind would pin the inode (a long-lived session would read a
     // file Git replaced); a writable parent would let the head change siblings the host replaced or created. A granted
     // directory is bound writable.

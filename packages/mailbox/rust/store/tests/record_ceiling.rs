@@ -161,12 +161,14 @@ fn a_full_record_refuses_sends_and_keeps_draining() {
         .value
         .value;
 
-    // Sends through the record until one is refused as full.
-    let sender = &heads[heads.len() - 1];
+    // Sends through the record until one is refused as full, each head at
+    // most its budget of a new window, so the room the fill left is reached
+    // whatever the exact size of a binding.
     let later = now.plus_secs(step);
     let mut accepted = 0;
     let refused = loop {
         let before = std::fs::read(fgos.paths().snapshot()).unwrap();
+        let sender = &heads[heads.len() - 1 - accepted / budget];
         match record.send(
             rec::send_req(sender, &names[accepted % 2], "m"),
             Wait::Try,
@@ -176,7 +178,10 @@ fn a_full_record_refuses_sends_and_keeps_draining() {
             Ok(held) => {
                 held.value.unwrap();
                 accepted += 1;
-                assert!(accepted < budget, "the write cap never refused a send");
+                assert!(
+                    accepted < budget * heads.len(),
+                    "the write cap never refused a send"
+                );
             }
             Err(err) => break (err, before),
         }

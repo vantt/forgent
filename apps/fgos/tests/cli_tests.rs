@@ -1946,6 +1946,9 @@ fn identity_register_publishes_and_resolve_answers_a_session_of_another_machine(
         roles: vec!["lead:MAIL".into()],
         liveness: fgos_identity::refusal::Liveness::Alive,
         remote: None,
+        ids: None,
+        matched: Vec::new(),
+        stale: Vec::new(),
     };
     let payload = published_payload(
         &bravo_state,

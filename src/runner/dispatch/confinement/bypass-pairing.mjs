@@ -17,3 +17,18 @@ export function evaluateBypassPairing({ isBypass, hasOwnWorktree, hasPrivateHome
   if (!hasOwnWorktree) missing.push("workspace: own (ownWorktree)");
   return { satisfied: missing.length === 0, missing };
 }
+
+/**
+ * Who delivers the controls a bypass invocation declares. The pairing above judges the declaration; this judges
+ * the delivery. Under a required backend the backend delivers the private home and the session, so the host-side
+ * measures that deliver them for a launch without one (a worker home, the worker session) are not taken. A head
+ * session also lives in the main checkout, which is allowed only while the policy denies host writes: the grant
+ * narrows what it may write, so the declared own workspace is met by that policy rather than by a worktree.
+ * That narrowing is not a prompt: under bypass the paths the grant opens (for the secretary, its plans, its
+ * discussion files and docs/backlog.md through the door) are written without asking.
+ */
+export function controlDelivery({ launchKind, requirement, backend }) {
+  const backendDelivers = requirement?.mode === 'required' && Boolean(backend);
+  const rootWorkspaceAllowed = backendDelivers && launchKind === 'session' && requirement.policy?.controls?.hostWrite === 'deny';
+  return { backendDelivers, rootWorkspaceAllowed };
+}

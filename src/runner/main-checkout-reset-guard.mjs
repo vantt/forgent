@@ -7,7 +7,7 @@
 // stash/reflog/blob could recover it).
 
 import { randomUUID } from 'node:crypto';
-import { StoreError } from '../state/store-error.mjs';
+import { StoreError } from '../util/store-error.mjs';
 import { createLockScope } from '../holder-lock/index.mjs';
 import { gitPortOptions } from '../git/inspect.mjs';
 import { nativeError } from '../git/native.mjs';

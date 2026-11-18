@@ -30,7 +30,7 @@ pub fn find_head(ancestry: &Ancestry, facts: &AdapterFacts) -> Result<HeadFacts,
     Ok(HeadFacts {
         record: record.clone(),
         own_suffix: None,
-        handle: None,
+        cli_session: None,
     })
 }
 

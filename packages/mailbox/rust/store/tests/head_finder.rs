@@ -57,6 +57,7 @@ fn session(pid: u32, start_time: &str) -> Value {
         "entrypoint": "sdk-cli",
         "name": "forgent-session-3a",
         "nameSource": "derived",
+        "messagingSocketPath": "/tmp/cc-messaging/3a.sock",
         "version": "2.1.308"
     })
 }
@@ -159,7 +160,11 @@ fn a_session_file_naming_the_head_and_the_writer_gives_that_process_as_the_head(
 
     assert_eq!(head.record, record);
     assert_eq!(head.own_suffix.as_deref(), Some("3a"));
-    assert_eq!(head.handle, None);
+    // The file's session goes on to the head's Identity record: its name and messaging socket.
+    let cli = head.cli_session.expect("the session file's session");
+    assert_eq!(cli.session_id.as_deref(), Some(WRITER));
+    assert_eq!(cli.name.as_deref(), Some("forgent-session-3a"));
+    assert_eq!(cli.socket.as_deref(), Some("/tmp/cc-messaging/3a.sock"));
 }
 
 #[test]

@@ -483,7 +483,7 @@ fn register(root: &Path, writer_id: &str, roles: &[&str]) {
         value: writer_id,
     };
     let roles: Vec<String> = roles.iter().map(|r| r.to_string()).collect();
-    fgos_identity::directory::register_writer(root, None, &key, &head, &roles, false)
+    fgos_identity::directory::register_writer(root, None, &key, &head, &roles, false, None)
         .unwrap_or_else(|r| panic!("register {writer_id}: {} {}", r.reason, r.detail));
 }
 
@@ -834,7 +834,7 @@ fn the_restore_verb_needs_only_a_registered_session_and_registers_after_done() {
 // ---- binding the agent session: answered by the supervisor, against a real state root --------------
 
 #[test]
-fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_and_later_checks_follow_it(
+fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_records_its_cli_session_and_mailbox_and_later_checks_follow_it(
 ) {
     let role = "head:secretary-x";
     let root = state_root("bind", true);
@@ -890,16 +890,56 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_a
         bind(json!({"source": "CLAUDE_CODE_SESSION_ID"}))["detail"],
         "bad-args"
     );
-    let done = bind(json!({"source": "CLAUDE_CODE_SESSION_ID", "value": "uuid-bind"}));
+    for bad in [
+        json!({"source": "CLAUDE_CODE_SESSION_ID", "value": "uuid-bind", "pane": "w1:p1"}),
+        json!({"source": "CLAUDE_CODE_SESSION_ID", "value": "uuid-bind", "mailbox": {"name": "x"}}),
+    ] {
+        assert_eq!(bind(bad.clone())["detail"], "bad-args", "{bad}");
+    }
+    let done = bind(json!({
+        "source": "CLAUDE_CODE_SESSION_ID",
+        "value": "uuid-bind",
+        "mailbox": {"fgosDir": "/p/.fgos", "name": "p-claude-2b"},
+    }));
     stop.store(true, Ordering::SeqCst);
     pump.join().unwrap();
     assert_eq!(done["result"], "done", "{done}");
     assert_eq!(done["data"]["id"], "fg-abc234/uuid-bind");
-    let holder = fgos_identity::directory::resolve(&root, role, &facts::judge_here, None).unwrap();
+    let holder = fgos_identity::directory::resolve(
+        &root,
+        role,
+        &facts::judge_here,
+        None,
+        &fgos_identity::directory::NoTerminal,
+    )
+    .unwrap();
     assert_eq!(
         (holder.id.as_str(), holder.cli.as_str()),
         ("fg-abc234/uuid-bind", "claude")
     );
+    // The bound entry records its CLI session and the mailbox name the hook sent, so either finds the head.
+    let ids = holder
+        .ids
+        .clone()
+        .expect("the bind records identifier groups");
+    let cli = ids.cli_session.expect("cliSession");
+    assert_eq!(
+        (cli.source.as_str(), cli.id.as_str()),
+        ("CLAUDE_CODE_SESSION_ID", "uuid-bind")
+    );
+    assert_eq!(
+        ids.mailbox.map(|m| (m.fgos_dir, m.name)),
+        Some(("/p/.fgos".to_string(), "p-claude-2b".to_string()))
+    );
+    let by_mailbox = fgos_identity::directory::resolve(
+        &root,
+        "p-claude-2b",
+        &facts::judge_here,
+        None,
+        &fgos_identity::directory::NoTerminal,
+    )
+    .unwrap();
+    assert_eq!(by_mailbox.id, "fg-abc234/uuid-bind");
     // The socket's role check now asks for the bound session; without the gate it is the attempt alone.
     assert_eq!(
         identity_holds(&root, role, "att-bind", Some(&gate)),

@@ -2,9 +2,10 @@
 
 ## Inputs
 - Every landed phase branch.
-- `docs/reading-map.md` (line 191 names `fgos questions --open`).
+- `docs/reading-map.md`: line 190 names `fgos questions --open`; the Questions area spec has no entry of its own (line
+  204 reaches it only through the supervision entry).
 - `CHANGELOG.md` `## [Unreleased]`.
-- `docs/backlog.md`, row `p-wgbzcazoak`, added with the plan.
+- `docs/backlog.md`, row `p-wgbzcazoak` (line 38, present at the re-check), added with the plan.
 
 ## Footprint
 See the phase table in `plan.md`, row 10.
@@ -12,11 +13,12 @@ See the phase table in `plan.md`, row 10.
 ## Steps
 1. Merge the phase branches on a fresh integration worktree. Regenerate the command manifest, the census and the
    skill renders; never hand-merge them.
-2. In the reading map, add the Questions area spec and the `fgos questions` line.
+2. In the reading map, add an entry for `docs/platform/questions/spec.md` (near the supervision entry, line 204) and
+   fix the `fgos questions` line (190), dropping `--open`.
 3. Write the CHANGELOG `[Unreleased]` entries:
    - the new verb `fgos questions ask|answer|show|ack|cancel`;
    - `--open` removed (the bare verb that `head-start` already printed now works);
-   - the head socket verbs;
+   - the head socket verbs `questions ask|ack|cancel` (every head) and `questions answer` (secretary only);
    - the receipt hook;
    - S04 lists every question and answers store questions.
 4. Run the full gate:

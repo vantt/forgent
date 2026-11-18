@@ -36,3 +36,28 @@ test('preparing a seat returns its binding and seeds the trust entry the agent w
   const bare = await prepareSeat({ binding: { command: 'claude' }, round, runDir: tmp('fgos-seat-run-'), cwd: project, repoRoot: project, fullEnv: {} });
   assert.deepEqual([bare.args, bare.env, bare.trust], [[], {}, { seeded: false, store: null }], 'no trust store declared: nothing is seeded');
 });
+
+test('a bypass seat with a backend-delivered home takes no worker home and no worker session and has its acceptance seeded in its private config directory', async () => {
+  const project = tmp('fgos-seat-bypass-project-');
+  const operatorDir = tmp('fgos-seat-bypass-operator-');
+  const privateDir = tmp('fgos-seat-bypass-private-');
+  const store = path.join(operatorDir, '.claude.json');
+  fs.writeFileSync(store, JSON.stringify({ hasCompletedOnboarding: true, projects: { [project]: { hasTrustDialogAccepted: true } } }));
+  fs.writeFileSync(path.join(privateDir, 'settings.json'), JSON.stringify({ theme: 'light' }));
+  const notes = [];
+  const round = { workId: 'w', trustWritten: false, note: (n) => notes.push(n) };
+  const binding = {
+    command: 'claude', args: ['--dangerously-skip-permissions'], env: {},
+    trustStore: { kind: 'claude-json', path: store }, permissionMode: 'bypass',
+    confinement: { privateHome: true, isolatedSession: true, ownWorktree: true },
+  };
+  const seat = await prepareSeat({
+    binding, round, runDir: tmp('fgos-seat-bypass-run-'), cwd: project, repoRoot: project,
+    fullEnv: { CLAUDE_CONFIG_DIR: operatorDir }, attemptEnv: { CLAUDE_CONFIG_DIR: privateDir },
+    delivery: { backendDelivers: true, rootWorkspaceAllowed: true },
+  });
+  assert.equal(seat.workerHomePath, null);
+  assert.equal(seat.confined, true);
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(privateDir, 'settings.json'), 'utf8')), { theme: 'light', skipDangerousModePermissionPrompt: true });
+  assert.equal(fs.existsSync(path.join(operatorDir, 'settings.json')), false, 'the operator config directory is never written');
+});

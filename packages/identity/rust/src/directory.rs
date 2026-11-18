@@ -11,6 +11,13 @@
 //!
 //! The process facts are reached through an injected judge, so every rule
 //! here is tested without real processes.
+//!
+//! An entry also holds the session's other identifiers (`ids`: its CLI
+//! session, terminal pane, mailbox name and head generation), each group
+//! owned by one writer and replaced whole. Creating an entry stays lock-free;
+//! every read-modify-write of an existing entry runs under the machine mutex
+//! `identity-directory`, so a role move and an identifier refresh never lose
+//! each other's change. [`resolve`] finds a session by any of its identifiers.
 
 use crate::current::{
     current_session, machine_info, os_record, read_head, session_for, CurrentSession,
@@ -22,9 +29,12 @@ use crate::resolve::{terminal_head, HeadRef, WriterKey};
 use crate::shared::SharedView;
 use crate::text::{base32_prefix, iso_utc_now};
 use fgos_durable_file::{install_once_with_mode, replace_durably_with_mode, Installed};
+use fgos_holder_lock::{LockScope, ScopeError, Wait};
 use fgos_process::facts::{judge_here, Record, Verdict};
+use fgos_process::ProcId;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -42,9 +52,19 @@ pub const ROLE_KINDS: [(&str, &str); 3] = [
 /// What a refused role is not, for the refusal detail.
 const ROLE_SHAPE: &str =
     "`lead:<LANE>` with a Convention lane-id, `work:<name>` with a Convention work-item-id or `head:<persona>-<name>` with a Convention head-name";
+/// Still 1: `ids` is additive, so an older build reads the entry and ignores it.
 const FORMAT_VERSION: u32 = 1;
 const FILE_SUFFIX: &str = ".json";
 const FILE_HASH_LENGTH: usize = 12;
+/// Version of the `ids` block of an entry.
+const IDS_VERSION: u32 = 1;
+/// Longest identifier value an entry keeps, so a caller cannot bloat the file every scan reads.
+const MAX_ID_VALUE: usize = 1024;
+/// Registry name of the machine mutex around every rewrite of an existing entry.
+const LOCK_NAME: &str = "identity-directory";
+/// How long a rewrite waits for that lock; a rewrite holds it for milliseconds, so a longer wait means something
+/// is stuck, and the caller is better told (`directory-busy`) than held.
+const LOCK_WAIT_MS: u64 = 2_000;
 
 /// Judges the recorded head process of an entry.
 pub type Judge<'a> = &'a dyn Fn(&Record) -> Verdict;
@@ -67,6 +87,234 @@ pub struct Entry {
     /// The agent head as `Record::to_json`; `None` when the session has no
     /// terminal ancestor, so its liveness is unknown.
     pub liveness: Option<serde_json::Value>,
+    /// The session's other identifiers; absent in an entry written before
+    /// they existed or by a writer that knows none.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ids: Option<Ids>,
+}
+
+/// The identifiers a session carries besides its id, handle and roles. Each
+/// group has one writer and a write replaces a group whole ([`merge_ids`]),
+/// so a stale value is replaced, never accumulated.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Ids {
+    /// [`IDS_VERSION`]; set by the merge, whatever the caller passed.
+    #[serde(default)]
+    pub v: u32,
+    /// When a group last changed; set by the merge.
+    #[serde(default)]
+    pub updated_at: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cli_session: Option<CliSessionIds>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub terminal: Option<TerminalIds>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mailbox: Option<MailboxIds>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub head: Option<HeadIds>,
+}
+
+/// The agent CLI's own session: its id, name and messaging socket, and the
+/// process that serves that socket (a new one on every CLI restart).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CliSessionIds {
+    /// Where the id was read (the CLI's session variable, or its sessions file).
+    pub source: String,
+    pub id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// Where the name came from (the CLI's own name, or one given by `/rename`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name_source: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub socket: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pid: Option<u32>,
+    /// Start time text of `pid` (`fgos_process::facts::Record::start_time`), so a reused pid is told apart.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub start_time: Option<String>,
+}
+
+/// The terminal pane the session runs in. The tab label is not kept: it is
+/// renamed freely, so [`resolve`] reads it live through a [`TerminalPort`].
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct TerminalIds {
+    /// The terminal driver (`herdr`).
+    pub driver: String,
+    /// The supervisor's slot key, for a supervised head.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub key: Option<String>,
+    pub pane_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tab_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub workspace_id: Option<String>,
+}
+
+/// The mailbox name the session receives under, in the project of `fgos_dir`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MailboxIds {
+    pub fgos_dir: String,
+    pub name: String,
+}
+
+/// The supervised head this session is: persona, name and generation (one
+/// more on every rotation; each generation is its own entry).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HeadIds {
+    pub persona: String,
+    pub name: String,
+    pub gen: u64,
+}
+
+impl CliSessionIds {
+    /// The CLI session a Claude Code session file describes, under the session
+    /// variable `source`; `None` when the file names no session id.
+    pub fn of_claude(source: &str, session: &crate::cli_dirs::ClaudeSession) -> Option<Self> {
+        Some(Self {
+            source: source.to_string(),
+            id: session.session_id.clone()?,
+            name: session.name.clone(),
+            name_source: session.name_source.clone(),
+            socket: session.socket.clone(),
+            pid: session.pid,
+            start_time: session.proc_start.clone(),
+        })
+    }
+}
+
+impl Ids {
+    /// Why these identifiers cannot be recorded; `None` when they can.
+    fn problem(&self) -> Option<String> {
+        let mut values: Vec<(&str, Option<&str>, bool)> = Vec::new();
+        if let Some(cli) = &self.cli_session {
+            values.extend([
+                ("cliSession.source", Some(cli.source.as_str()), true),
+                ("cliSession.id", Some(cli.id.as_str()), true),
+                ("cliSession.name", cli.name.as_deref(), false),
+                ("cliSession.nameSource", cli.name_source.as_deref(), false),
+                ("cliSession.socket", cli.socket.as_deref(), false),
+                ("cliSession.startTime", cli.start_time.as_deref(), false),
+            ]);
+        }
+        if let Some(terminal) = &self.terminal {
+            values.extend([
+                ("terminal.driver", Some(terminal.driver.as_str()), true),
+                ("terminal.key", terminal.key.as_deref(), false),
+                ("terminal.paneId", Some(terminal.pane_id.as_str()), true),
+                ("terminal.tabId", terminal.tab_id.as_deref(), false),
+                (
+                    "terminal.workspaceId",
+                    terminal.workspace_id.as_deref(),
+                    false,
+                ),
+            ]);
+        }
+        if let Some(mailbox) = &self.mailbox {
+            values.extend([
+                ("mailbox.fgosDir", Some(mailbox.fgos_dir.as_str()), true),
+                ("mailbox.name", Some(mailbox.name.as_str()), true),
+            ]);
+        }
+        if let Some(head) = &self.head {
+            values.extend([
+                ("head.persona", Some(head.persona.as_str()), true),
+                ("head.name", Some(head.name.as_str()), true),
+            ]);
+        }
+        values
+            .into_iter()
+            .find_map(|(field, value, required)| match value {
+                Some(text) if text.trim().is_empty() => Some(format!("{field} is empty")),
+                Some(text) if text.len() > MAX_ID_VALUE => {
+                    Some(format!("{field} is longer than {MAX_ID_VALUE} bytes"))
+                }
+                Some(text) if text.chars().any(char::is_control) => {
+                    Some(format!("{field} holds a control character"))
+                }
+                None if required => Some(format!("{field} is missing")),
+                _ => None,
+            })
+    }
+
+    fn carries_any(&self) -> bool {
+        self.cli_session.is_some()
+            || self.terminal.is_some()
+            || self.mailbox.is_some()
+            || self.head.is_some()
+    }
+}
+
+/// Refused `invalid-ids` when `ids` cannot be recorded.
+fn checked_ids(ids: Option<&Ids>) -> Result<(), Refusal> {
+    match ids.and_then(Ids::problem) {
+        Some(problem) => Err(refused("invalid-ids", problem)),
+        None => Ok(()),
+    }
+}
+
+/// The identifiers an entry holds after a write that carries `carried`: each
+/// group `carried` has replaces the held one whole, every other held group is
+/// kept. `updatedAt` moves only when a group changed, so an unchanged refresh
+/// is no change at all.
+fn merge_ids(held: Option<&Ids>, carried: Option<&Ids>) -> Option<Ids> {
+    let Some(carried) = carried.filter(|ids| ids.carries_any()) else {
+        return held.cloned();
+    };
+    let mut merged = held.cloned().unwrap_or_default();
+    let mut changed = held.is_none();
+    macro_rules! take_group {
+        ($group:ident) => {
+            if carried.$group.is_some() && carried.$group != merged.$group {
+                merged.$group = carried.$group.clone();
+                changed = true;
+            }
+        };
+    }
+    take_group!(cli_session);
+    take_group!(terminal);
+    take_group!(mailbox);
+    take_group!(head);
+    if changed {
+        merged.v = IDS_VERSION;
+        merged.updated_at = iso_utc_now();
+    }
+    Some(merged)
+}
+
+/// The terminal pane the calling process runs in, from the variables herdr
+/// sets in every pane (`HERDR_PANE_ID`, `HERDR_TAB_ID`, `HERDR_WORKSPACE_ID`);
+/// `None` outside a herdr pane.
+pub fn terminal_from_env() -> Option<TerminalIds> {
+    let var = |name: &str| std::env::var(name).ok().filter(|v| !v.trim().is_empty());
+    Some(TerminalIds {
+        driver: "herdr".into(),
+        key: None,
+        pane_id: var("HERDR_PANE_ID")?,
+        tab_id: var("HERDR_TAB_ID"),
+        workspace_id: var("HERDR_WORKSPACE_ID"),
+    })
+}
+
+/// Maps a terminal tab label to the ids of the tabs that carry it now, read
+/// live from the terminal driver (labels are renamed freely, so they are
+/// never stored). The driver lives above Identity and is injected.
+pub trait TerminalPort: std::fmt::Debug + Send + Sync {
+    fn tab_ids(&self, label: &str) -> Vec<String>;
+}
+
+/// The [`TerminalPort`] of a caller that has no terminal driver: it knows no label.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct NoTerminal;
+
+impl TerminalPort for NoTerminal {
+    fn tab_ids(&self, _label: &str) -> Vec<String> {
+        Vec::new()
+    }
 }
 
 impl Entry {
@@ -90,6 +338,7 @@ impl Entry {
             registered_at: iso_utc_now(),
             roles,
             liveness: liveness.map(|record| record.to_json()),
+            ids: None,
         }
     }
 
@@ -116,10 +365,41 @@ pub struct Listed {
     /// Set only for a session of another machine (flattened into the object).
     #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub remote: Option<Remote>,
+    /// The session's other identifiers ([`Ids`]); never on a remote session.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ids: Option<Ids>,
+    /// The fields the [`resolve`] query matched (`handle`, `role`, `terminal.paneId`, ...); empty elsewhere.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub matched: Vec<String>,
+    /// The `ids` groups known to be out of date: `cliSession` when its process is dead while the session lives.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub stale: Vec<String>,
+}
+
+/// The `ids` groups of `entry` known to be out of date: `cliSession` when the
+/// process recorded for it is dead (the CLI restarted, its socket is gone).
+fn stale_groups(entry: &Entry, judge: Judge) -> Vec<String> {
+    let cli_dead = entry
+        .ids
+        .as_ref()
+        .and_then(|ids| ids.cli_session.as_ref())
+        .and_then(|cli| {
+            Some(Record {
+                pid: Some(ProcId(cli.pid?)),
+                start_time: cli.start_time.clone(),
+                ..Record::default()
+            })
+        })
+        .is_some_and(|record| judge(&record) == Verdict::Dead);
+    if cli_dead {
+        vec!["cliSession".into()]
+    } else {
+        Vec::new()
+    }
 }
 
 impl Listed {
-    fn of(entry: &Entry, verdict: Verdict) -> Self {
+    fn of(entry: &Entry, verdict: Verdict, judge: Judge) -> Self {
         Self {
             id: entry.id.clone(),
             handle: entry.handle.clone(),
@@ -130,6 +410,9 @@ impl Listed {
             roles: entry.roles.clone(),
             liveness: liveness_of(verdict),
             remote: None,
+            ids: entry.ids.clone(),
+            matched: Vec::new(),
+            stale: stale_groups(entry, judge),
         }
     }
 }
@@ -148,6 +431,7 @@ fn candidate_of(row: &Row) -> Candidate {
         handle: row.entry.handle.clone(),
         liveness: liveness_of(row.verdict),
         remote: None,
+        matched: Vec::new(),
     }
 }
 
@@ -321,6 +605,17 @@ fn holds_cap(root: &Path) -> Result<bool, Refusal> {
     Ok(false)
 }
 
+/// The live session registered under `handle`, read from its one file with no
+/// directory scan: the cheap read of a caller that already knows the handle (a
+/// mailbox frame naming its sender's role, a hook comparing its own
+/// identifiers with what the entry holds). `None` when no entry of that
+/// handle is readable or its head is proven dead.
+pub fn by_handle(root: &Path, handle: &str, judge: Judge) -> Option<Listed> {
+    read_named(root, handle, judge)
+        .filter(|row| row.verdict != Verdict::Dead)
+        .map(|row| Listed::of(&row.entry, row.verdict, judge))
+}
+
 /// The one entry file named after `handle`, judged; `None` when it is missing
 /// or this build cannot read it (another format version, or not ours).
 fn read_named(root: &Path, handle: &str, judge: Judge) -> Option<Row> {
@@ -337,22 +632,66 @@ fn read_named(root: &Path, handle: &str, judge: Judge) -> Option<Row> {
     })
 }
 
+/// The `identity-directory` lock of one directory, taken on first need and
+/// held until dropped, so a door that rewrites several entries takes it once
+/// and the doors it calls never take it a second time.
+struct DirLock<'r> {
+    root: &'r Path,
+    scope: Option<LockScope<'static>>,
+}
+
+impl<'r> DirLock<'r> {
+    fn new(root: &'r Path) -> Self {
+        Self { root, scope: None }
+    }
+
+    /// Takes the lock unless this guard already holds it. Refused
+    /// `directory-busy` when it is not free within [`LOCK_WAIT_MS`] or cannot be
+    /// taken at all; the caller may skip the write and retry on its next trigger.
+    fn hold(&mut self) -> Result<(), Refusal> {
+        if self.scope.is_some() {
+            return Ok(());
+        }
+        let busy = |e: ScopeError| {
+            refused(
+                "directory-busy",
+                format!("cannot take the {LOCK_NAME} lock: {e}"),
+            )
+        };
+        let mut scope = LockScope::seeded(Vec::new()).map_err(busy)?;
+        let params = BTreeMap::from([(
+            "lockRoot".to_owned(),
+            self.root.join("locks").to_string_lossy().into_owned(),
+        )]);
+        scope
+            .acquire(LOCK_NAME, &params, Wait::Ms(LOCK_WAIT_MS))
+            .map_err(busy)?;
+        self.scope = Some(scope);
+        Ok(())
+    }
+}
+
 /// Registration of an entry that takes no role into a directory below its cap:
 /// the atomic create of the handle-named file, and only when the name is
-/// taken, a read of that one entry. A dead holder is replaced, the same
-/// session refreshes, any other is refused `handle-in-use`. No scan, no prune.
-fn register_by_handle(root: &Path, entry: Entry, judge: Judge) -> Result<Listed, Refusal> {
+/// taken, a read of that one entry under the lock. A dead holder is replaced,
+/// the same session refreshes, any other is refused `handle-in-use`. No
+/// scan, no prune.
+fn register_by_handle(lock: &mut DirLock, entry: Entry, judge: Judge) -> Result<Listed, Refusal> {
+    let root = lock.root;
     let mut merged = entry;
     if store(root, &merged, false)? == Installed::Created {
-        return Ok(Listed::of(&merged, merged.verdict(judge)));
+        return Ok(Listed::of(&merged, merged.verdict(judge), judge));
     }
+    // The holder is judged and a dead one removed under the lock, so a rewrite
+    // that brought it back (a re-registration taking a role) is never erased.
+    lock.hold()?;
     let mut holder = read_named(root, &merged.handle, judge);
     if let Some(row) = holder.as_ref().filter(|row| row.verdict == Verdict::Dead) {
         remove(root, &row.file)?;
         if store(root, &merged, false)? == Installed::Created {
-            return Ok(Listed::of(&merged, merged.verdict(judge)));
+            return Ok(Listed::of(&merged, merged.verdict(judge), judge));
         }
-        // Another registration took the name in between: it decides now.
+        // A create-once registration took the name in between: it decides below.
         holder = read_named(root, &merged.handle, judge);
     }
     if let Some(row) = holder {
@@ -362,15 +701,17 @@ fn register_by_handle(root: &Path, entry: Entry, judge: Judge) -> Result<Listed,
         refresh_from(&mut merged, &row.entry);
     }
     store(root, &merged, true)?;
-    Ok(Listed::of(&merged, merged.verdict(judge)))
+    Ok(Listed::of(&merged, merged.verdict(judge), judge))
 }
 
-/// `merged` keeps the first registration time and the roles `held` already has.
+/// `merged` keeps the first registration time, the roles `held` already has,
+/// and every `ids` group it does not carry itself.
 fn refresh_from(merged: &mut Entry, held: &Entry) {
     merged.registered_at = held.registered_at.clone();
     merged.roles.extend(held.roles.iter().cloned());
     merged.roles.sort();
     merged.roles.dedup();
+    merged.ids = merge_ids(held.ids.as_ref(), merged.ids.as_ref());
 }
 
 fn handle_in_use(registered: &str, wanted: &str, handle: &str) -> Refusal {
@@ -392,7 +733,21 @@ fn handle_in_use(registered: &str, wanted: &str, handle: &str) -> Refusal {
 /// directory and removes the entries whose head process is dead; a role held
 /// by another live session then refuses the call unless `take`, which removes
 /// the role from the holder, and at [`MAX_ENTRIES`] the call is refused.
+/// `entry.ids` carries the identifier groups this writer owns; each replaces
+/// the held group whole and the others are kept. Refused `invalid-ids` when
+/// they cannot be recorded, `directory-busy` when an existing entry must be
+/// rewritten and the `identity-directory` lock is not free.
 pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<Listed, Refusal> {
+    register_in(&mut DirLock::new(root), entry, take, judge)
+}
+
+fn register_in(
+    lock: &mut DirLock,
+    entry: Entry,
+    take: bool,
+    judge: Judge,
+) -> Result<Listed, Refusal> {
+    let root = lock.root;
     if let Some(role) = entry.roles.iter().find(|role| role_problem(role).is_some()) {
         return Err(Refusal {
             candidates: Vec::new(),
@@ -400,11 +755,18 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
             detail: format!("role {role:?} is not {ROLE_SHAPE}"),
         });
     }
+    checked_ids(entry.ids.as_ref())?;
+    let mut entry = entry;
+    // Stamped as a fresh record; a refresh below merges it into the held one.
+    entry.ids = merge_ids(None, entry.ids.as_ref());
     let dir = directory(root);
     fs::create_dir_all(&dir).map_err(|e| write_failed(&dir, e))?;
     if entry.roles.is_empty() && !holds_cap(root)? {
-        return register_by_handle(root, entry, judge);
+        return register_by_handle(lock, entry, judge);
     }
+    // Every entry this call reads may be rewritten (its own, a role holder's),
+    // so the scan already runs under the lock.
+    lock.hold()?;
     let Scan { rows, foreign } = scan(root, judge)?;
     let (rows, _) = sweep(root, rows, |row| row.verdict == Verdict::Dead)?;
 
@@ -443,22 +805,20 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
     }
     match store(root, &merged, own.is_some())? {
         Installed::Created => {}
-        // Another registration took this name between the scan and the
-        // create: the same session refreshes it, any other is refused.
-        Installed::AlreadyExists => {
-            let current = scan(root, judge)?
-                .rows
-                .into_iter()
-                .find(|row| row.entry.handle == merged.handle);
-            match current {
-                Some(row) if row.entry.id != merged.id => {
-                    return Err(handle_in_use(&row.entry.id, &merged.id, &merged.handle))
-                }
-                _ => {
-                    store(root, &merged, true)?;
-                }
+        // A lock-free registration created this name between the scan and
+        // the create: the same session refreshes it, any other is refused.
+        Installed::AlreadyExists => match read_named(root, &merged.handle, judge) {
+            Some(row) if row.entry.id != merged.id => {
+                return Err(handle_in_use(&row.entry.id, &merged.id, &merged.handle))
             }
-        }
+            Some(row) => {
+                refresh_from(&mut merged, &row.entry);
+                store(root, &merged, true)?;
+            }
+            None => {
+                store(root, &merged, true)?;
+            }
+        },
     }
     for row in rows.iter().filter(|row| {
         row.entry.id != merged.id
@@ -472,25 +832,27 @@ pub fn register(root: &Path, entry: Entry, take: bool, judge: Judge) -> Result<L
         holder.roles.retain(|role| !merged.roles.contains(role));
         store(root, &holder, true)?;
     }
-    Ok(Listed::of(&merged, merged.verdict(judge)))
+    Ok(Listed::of(&merged, merged.verdict(judge), judge))
 }
 
 /// Registers `session` on this machine with `head` as the liveness record:
 /// the project of `clone_dir` (none when it is not a registered project) and
-/// [`register`] with `roles` (and `take`). The one registration body behind
-/// [`register_current`] and [`register_writer`].
+/// [`register`] with `roles` (and `take`) and the identifier groups `ids`. The
+/// one registration body behind [`register_current`] and [`register_writer`].
 fn register_session(
-    state_root: &Path,
+    lock: &mut DirLock,
     session: CurrentSession,
     head: Option<Record>,
     clone_dir: Option<&Path>,
     roles: &[String],
     take: bool,
+    ids: Option<Ids>,
 ) -> Result<Listed, Refusal> {
+    let state_root = lock.root;
     let project_id = clone_dir
         .and_then(|dir| project::project_info(state_root, dir).ok())
         .map(|project| project.id);
-    let entry = Entry::new(
+    let mut entry = Entry::new(
         session.info.id,
         session.info.handle,
         session.local.cli.to_owned(),
@@ -499,40 +861,62 @@ fn register_session(
         roles.to_vec(),
         head,
     );
-    register(state_root, entry, take, &judge_here)
+    entry.ids = ids;
+    register_in(lock, entry, take, &judge_here)
 }
 
 /// Registers the session the process `caller_pid` is, from the real env and
 /// OS process tree: resolves its full id and handle, the project of
 /// `clone_dir` (none when it is not a registered project), the agent head's
-/// liveness record, and calls [`register`] with `roles` (and `take`).
+/// liveness record, and calls [`register`] with `roles` (and `take`). `ids`
+/// carries the identifier groups the caller knows; when it has no `terminal`
+/// group, the herdr pane of the process's own env is recorded
+/// ([`terminal_from_env`]).
 ///
 /// The cost is bounded for a hook on the first tool call of a head: no
-/// network, no lock (the entry is a create-once file named by the handle),
-/// one durable write, and no directory scan unless the call takes a role or
-/// the directory is at its cap (see [`register`]).
-/// The CLI's `identity session --register` is this function.
+/// network, no lock unless an existing entry is rewritten (the entry is a
+/// create-once file named by the handle), one durable write, and no directory
+/// scan unless the call takes a role or the directory is at its cap (see
+/// [`register`]). The CLI's `identity session --register` is this function.
 pub fn register_current(
     state_root: &Path,
     caller_pid: u32,
     clone_dir: Option<&Path>,
     roles: &[String],
     take: bool,
+    ids: Option<&Ids>,
 ) -> Result<Listed, Refusal> {
     let current = current_session(state_root, caller_pid)?;
     let tree = os_process_tree();
     let head = head_liveness(tree.as_ref(), caller_pid, &os_record);
-    register_session(state_root, current, head, clone_dir, roles, take)
+    let mut ids = ids.cloned().unwrap_or_default();
+    if ids.terminal.is_none() {
+        ids.terminal = terminal_from_env();
+    }
+    let ids = ids.carries_any().then_some(ids);
+    register_session(
+        &mut DirLock::new(state_root),
+        current,
+        head,
+        clone_dir,
+        roles,
+        take,
+        ids,
+    )
 }
 
 /// Registers the session a hook-carried `key` names, for a caller whose own
 /// env does not carry it (a Codex hook process has no `CODEX_THREAD_ID`).
 /// `head` is the agent head the caller already checked, by pid and start
 /// time; its process facts are read here and recorded as the entry's
-/// liveness. Refused `invalid-writer-key` (see [`session_for`]) and
-/// `head-not-live` when the head cannot be read, is not running, or has a
-/// different start time (the detail says which); every other rule is
-/// [`register`]'s.
+/// liveness. `ids` carries the identifier groups this writer owns. A CLI
+/// session (not a runner attempt) is the one current session of its head:
+/// any other live non-attempt entry on the same head (the CLI's session before
+/// a `/clear`) hands it its roles, `terminal` and `head` groups and is
+/// removed, under the `identity-directory` lock. Refused
+/// `invalid-writer-key` (see [`session_for`]) and `head-not-live` when the
+/// head cannot be read, is not running, or has a different start time (the
+/// detail says which); every other rule is [`register`]'s.
 pub fn register_writer(
     state_root: &Path,
     clone_dir: Option<&Path>,
@@ -540,14 +924,127 @@ pub fn register_writer(
     head: &HeadRef,
     roles: &[String],
     take: bool,
+    ids: Option<&Ids>,
 ) -> Result<Listed, Refusal> {
-    let session = session_for(state_root, key, Some(head))?;
+    register_writer_in(
+        &mut DirLock::new(state_root),
+        clone_dir,
+        key,
+        head,
+        roles,
+        take,
+        ids,
+    )
+}
+
+fn register_writer_in(
+    lock: &mut DirLock,
+    clone_dir: Option<&Path>,
+    key: &WriterKey,
+    head: &HeadRef,
+    roles: &[String],
+    take: bool,
+    ids: Option<&Ids>,
+) -> Result<Listed, Refusal> {
+    let session = session_for(lock.root, key, Some(head))?;
     let record = read_head(head).map_err(|detail| Refusal {
         reason: "head-not-live",
         detail,
         candidates: Vec::new(),
     })?;
-    register_session(state_root, session, Some(record), clone_dir, roles, take)
+    if crate::attempt::is_attempt_writer_id(key.value) {
+        return register_session(
+            lock,
+            session,
+            Some(record),
+            clone_dir,
+            roles,
+            take,
+            ids.cloned(),
+        );
+    }
+    // One current session per head: a CLI session that registers on a head another live session of that head
+    // was registered on (the CLI started a new session in the same process, e.g. after `/clear`) takes that
+    // session's roles, `terminal` and `head` groups, and the session before is removed, all under the lock.
+    checked_ids(ids)?;
+    lock.hold()?;
+    let rows = scan(lock.root, &judge_here)?.rows;
+    let previous: Vec<&Row> = rows
+        .iter()
+        .filter(|row| {
+            row.verdict != Verdict::Dead
+                && on_head(&row.entry, head)
+                && !is_attempt_entry(&row.entry)
+                && row.entry.id != session.info.id
+        })
+        .collect();
+    let mut all_roles = roles.to_vec();
+    all_roles.extend(
+        previous
+            .iter()
+            .flat_map(|row| row.entry.roles.iter().cloned()),
+    );
+    all_roles.sort();
+    all_roles.dedup();
+    let moved_roles = all_roles.len() > roles.len();
+    let mut carried = ids.cloned().unwrap_or_default();
+    let held: Vec<&Ids> = previous
+        .iter()
+        .filter_map(|row| row.entry.ids.as_ref())
+        .collect();
+    if carried.terminal.is_none() {
+        carried.terminal = held.iter().find_map(|ids| ids.terminal.clone());
+    }
+    if carried.head.is_none() {
+        carried.head = held.iter().find_map(|ids| ids.head.clone());
+    }
+    let listed = register_session(
+        lock,
+        session,
+        Some(record),
+        clone_dir,
+        &all_roles,
+        take || moved_roles,
+        carried.carries_any().then_some(carried),
+    )?;
+    for row in previous {
+        remove(lock.root, &row.file)?;
+    }
+    Ok(listed)
+}
+
+/// Replaces the identifier groups `ids` carries in the entry of the session
+/// `own_id` (whose handle is `handle`), keeping every other group, its roles
+/// and its liveness: the door for a value that changed after registration (a
+/// renamed CLI session, a new messaging socket, a moved pane). Reads the one
+/// entry and writes only when a group differs, under the `identity-directory`
+/// lock. Refused `invalid-ids`, `not-registered` when `handle` names no entry
+/// of `own_id`, and `directory-busy` when the lock is not free (the caller may
+/// skip; its next trigger retries).
+pub fn refresh_ids(
+    state_root: &Path,
+    own_id: &str,
+    handle: &str,
+    ids: &Ids,
+) -> Result<Listed, Refusal> {
+    checked_ids(Some(ids))?;
+    let mut lock = DirLock::new(state_root);
+    lock.hold()?;
+    let Some(row) =
+        read_named(state_root, handle, &judge_here).filter(|row| row.entry.id == own_id)
+    else {
+        return Err(refused(
+            "not-registered",
+            format!("{own_id} has no entry under the handle {handle}; register it first"),
+        ));
+    };
+    let mut entry = row.entry;
+    let merged = merge_ids(entry.ids.as_ref(), Some(ids));
+    if merged != entry.ids {
+        entry.ids = merged;
+        store(state_root, &entry, true)?;
+    }
+    Ok(Listed::of(&entry, row.verdict, &judge_here))
 }
 
 /// Whether the head process recorded as `entry`'s liveness is the one `head` names (same pid, same start time).
@@ -688,6 +1185,11 @@ fn refused(reason: &'static str, detail: String) -> Refusal {
 /// attempt's agent: binding it would move the head's roles to a short-lived session), `attempt-not-registered` when
 /// the attempt has no live entry on that head, and `session-in-use` when the agent's id is already a live session on
 /// another head. Every other rule is [`register`]'s.
+///
+/// The `terminal` and `head` identifier groups move with the roles: the bound session takes them from the session
+/// bound before (else from the attempt's own entry), and the attempt keeps neither, so a pane or a head generation
+/// names one session. `ids` carries the groups the caller owns (`cliSession`, `mailbox`). The whole bind runs under
+/// the `identity-directory` lock.
 pub fn bind_agent_session(
     state_root: &Path,
     clone_dir: Option<&Path>,
@@ -695,6 +1197,7 @@ pub fn bind_agent_session(
     agent: &WriterKey,
     head: &HeadRef,
     caller_pid: u32,
+    ids: Option<&Ids>,
 ) -> Result<Listed, Refusal> {
     bind_agent_session_in(
         state_root,
@@ -703,10 +1206,12 @@ pub fn bind_agent_session(
         agent,
         head,
         caller_pid,
+        ids,
         os_process_tree().as_ref(),
     )
 }
 
+#[allow(clippy::too_many_arguments)] // the public door's six inputs, plus the process tree port tests inject
 fn bind_agent_session_in(
     state_root: &Path,
     clone_dir: Option<&Path>,
@@ -714,6 +1219,7 @@ fn bind_agent_session_in(
     agent: &WriterKey,
     head: &HeadRef,
     caller_pid: u32,
+    ids: Option<&Ids>,
     tree: &dyn ProcessTree,
 ) -> Result<Listed, Refusal> {
     if agent.checked().is_none_or(|(source, value)| {
@@ -730,7 +1236,10 @@ fn bind_agent_session_in(
     }
     let record = under_head_in(head, caller_pid, tree)?;
     agent_is_gate_child(tree, caller_pid, head.pid)?;
+    checked_ids(ids)?;
     let own = session_for(state_root, attempt, None)?;
+    let mut lock = DirLock::new(state_root);
+    lock.hold()?;
     let rows = scan(state_root, &judge_here)?.rows;
     let live_on_head = |row: &&Row| row.verdict != Verdict::Dead && on_head(&row.entry, head);
     let Some(attempt_row) = rows
@@ -762,11 +1271,13 @@ fn bind_agent_session_in(
     }
     // A second bind on the same live head (the CLI started a new session, e.g. after `/clear`) moves the roles from
     // the session bound before and retires that entry, so the head has one current binding.
-    let previous: Vec<&Row> = rows
+    let mut previous: Vec<&Row> = rows
         .iter()
         .filter(live_on_head)
         .filter(|row| !is_attempt_entry(&row.entry) && row.entry.id != session.info.id)
         .collect();
+    // Latest binding first: what moved last is what moves on.
+    previous.sort_by(|a, b| b.entry.registered_at.cmp(&a.entry.registered_at));
     let mut roles = attempt_row.entry.roles.clone();
     roles.extend(
         previous
@@ -775,9 +1286,46 @@ fn bind_agent_session_in(
     );
     roles.sort();
     roles.dedup();
-    let listed = register_session(state_root, session, Some(record), clone_dir, &roles, true)?;
+    let mut carried = ids.cloned().unwrap_or_default();
+    let movers: Vec<&Ids> = previous
+        .iter()
+        .copied()
+        .chain(std::iter::once(attempt_row))
+        .filter_map(|row| row.entry.ids.as_ref())
+        .collect();
+    if carried.terminal.is_none() {
+        carried.terminal = movers.iter().find_map(|ids| ids.terminal.clone());
+    }
+    if carried.head.is_none() {
+        carried.head = movers.iter().find_map(|ids| ids.head.clone());
+    }
+    let carried = carried.carries_any().then_some(carried);
+    let attempt_handle = attempt_row.entry.handle.clone();
+    let listed = register_session(
+        &mut lock,
+        session,
+        Some(record),
+        clone_dir,
+        &roles,
+        true,
+        carried,
+    )?;
     for row in previous {
         remove(state_root, &row.file)?;
+    }
+    // The attempt's entry was rewritten when its roles moved: read it again and drop the groups that moved too.
+    if let Some(mut row) = read_named(state_root, &attempt_handle, &judge_here) {
+        if let Some(held) = row.entry.ids.as_mut() {
+            if held.terminal.is_some() || held.head.is_some() {
+                held.terminal = None;
+                held.head = None;
+                held.updated_at = iso_utc_now();
+                if !held.carries_any() {
+                    row.entry.ids = None;
+                }
+                store(state_root, &row.entry, true)?;
+            }
+        }
     }
     Ok(listed)
 }
@@ -815,11 +1363,12 @@ pub fn attempt_session(
             rows.iter()
                 .find(|row| row.verdict != Verdict::Dead && row.entry.id == own.info.id)
         })
-        .map(|row| Listed::of(&row.entry, row.verdict)))
+        .map(|row| Listed::of(&row.entry, row.verdict, judge)))
 }
 
-/// Registers `roles` (with `take`) for the session the attempt is ([`attempt_session`]): the agent session bound on
-/// `head` when there is one, else the attempt's own key through [`register_writer`].
+/// Registers `roles` (with `take`) and the identifier groups `ids` for the session the attempt is
+/// ([`attempt_session`]): the agent session bound on `head` when there is one, else the attempt's own key through
+/// [`register_writer`]. Runs under the `identity-directory` lock from the read of the binding to the last write.
 pub fn register_attempt_roles(
     state_root: &Path,
     clone_dir: Option<&Path>,
@@ -827,15 +1376,19 @@ pub fn register_attempt_roles(
     head: &HeadRef,
     roles: &[String],
     take: bool,
+    ids: Option<&Ids>,
 ) -> Result<Listed, Refusal> {
+    let mut lock = DirLock::new(state_root);
+    lock.hold()?;
     let rows = scan(state_root, &judge_here)?.rows;
     match current_binding(&rows, head) {
         Some(row) => {
             let mut entry = row.entry.clone();
             entry.roles = roles.to_vec();
-            register(state_root, entry, take, &judge_here)
+            entry.ids = ids.cloned();
+            register_in(&mut lock, entry, take, &judge_here)
         }
-        None => register_writer(state_root, clone_dir, attempt, head, roles, take),
+        None => register_writer_in(&mut lock, clone_dir, attempt, head, roles, take, ids),
     }
 }
 
@@ -882,6 +1435,8 @@ pub fn drop_role(root: &Path, own_id: &str, role: &str, judge: Judge) -> Result<
             detail: format!("role {role:?} is not {ROLE_SHAPE}"),
         });
     }
+    let mut lock = DirLock::new(root);
+    lock.hold()?;
     let Scan { rows, .. } = scan(root, judge)?;
     let Some(row) = rows.iter().find(|row| row.entry.id == own_id) else {
         return Err(Refusal {
@@ -913,7 +1468,7 @@ pub fn drop_role(root: &Path, own_id: &str, role: &str, judge: Judge) -> Result<
     let mut entry = row.entry.clone();
     entry.roles.retain(|held| held != role);
     store(root, &entry, true)?;
-    Ok(Listed::of(&entry, row.verdict))
+    Ok(Listed::of(&entry, row.verdict, judge))
 }
 
 /// [`drop_role`] for the session the process `caller_pid` is.
@@ -926,42 +1481,164 @@ pub fn drop_current_role(
     drop_role(state_root, &current.info.id, role, &judge_here)
 }
 
-/// The live session `query` names: a handle, a role alias (`lead:<LANE>`, `work:<name>`), or a
-/// full id `<machine-id>/<local id>`. Exactly one, else `ambiguous` or
-/// `not-found` with the candidates in the detail and in `Refusal::candidates`
-/// (Identity's own codes; the mailbox maps them to its names). Local first:
-/// only when this machine's directory has no answer does `shared` (the
-/// sessions other machines published) get asked; a full id of another machine
-/// resolves through it, and is `not-found` without it.
+/// The fields of `entry` that `query` names, by the query's shape ([`resolve`]'s rules 1, 3, 4 and 5).
+fn matched_fields(entry: &Entry, query: &str) -> Vec<String> {
+    let ids = entry.ids.as_ref();
+    let cli = ids.and_then(|ids| ids.cli_session.as_ref());
+    let terminal = ids.and_then(|ids| ids.terminal.as_ref());
+    let mailbox = ids.and_then(|ids| ids.mailbox.as_ref());
+    let candidates: Vec<(&str, Option<String>)> = if query.starts_with('/') {
+        vec![("cliSession.socket", cli.and_then(|c| c.socket.clone()))]
+    } else if is_role_alias(query) {
+        return if entry.roles.iter().any(|role| role == query) {
+            vec!["role".into()]
+        } else {
+            Vec::new()
+        };
+    } else if !query.is_empty() && query.bytes().all(|b| b.is_ascii_digit()) {
+        let head_pid = entry
+            .liveness
+            .as_ref()
+            .and_then(|value| Record::from_json(value).pid)
+            .map(|pid| pid.0.to_string());
+        vec![
+            ("liveness.pid", head_pid),
+            (
+                "cliSession.pid",
+                cli.and_then(|c| c.pid).map(|p| p.to_string()),
+            ),
+        ]
+    } else {
+        vec![
+            ("handle", Some(entry.handle.clone())),
+            ("cliSession.id", cli.map(|c| c.id.clone())),
+            ("cliSession.name", cli.and_then(|c| c.name.clone())),
+            ("terminal.paneId", terminal.map(|t| t.pane_id.clone())),
+            ("terminal.tabId", terminal.and_then(|t| t.tab_id.clone())),
+            ("terminal.key", terminal.and_then(|t| t.key.clone())),
+            ("mailbox.name", mailbox.map(|m| m.name.clone())),
+        ]
+    };
+    candidates
+        .into_iter()
+        .filter(|(_, value)| value.as_deref() == Some(query))
+        .map(|(field, _)| field.to_owned())
+        .collect()
+}
+
+/// A local entry a query matched, with the fields it matched by.
+struct Hit<'r> {
+    row: &'r Row,
+    matched: Vec<String>,
+}
+
+impl Hit<'_> {
+    /// Whether the entry is reached only through its CLI session and that session's process is dead while the entry
+    /// lives on: the identifier is out of date (the CLI restarted, its socket is gone).
+    fn stale(&self, judge: Judge) -> bool {
+        self.matched
+            .iter()
+            .all(|field| field.starts_with("cliSession."))
+            && stale_groups(&self.row.entry, judge).contains(&"cliSession".to_owned())
+    }
+
+    fn listed(&self, judge: Judge) -> Listed {
+        let mut listed = Listed::of(&self.row.entry, self.row.verdict, judge);
+        listed.matched = self.matched.clone();
+        listed
+    }
+
+    fn candidate(&self) -> Candidate {
+        let mut candidate = candidate_of(self.row);
+        candidate.matched = self.matched.clone();
+        candidate
+    }
+}
+
+/// The one live session `query` names, by any identifier it holds. Matching is
+/// exact and the query's shape picks the fields, in this order:
+///
+/// 1. starting with `/`: the CLI session's messaging socket;
+/// 2. `<machine-id>/<local id>`: the full id (of another machine through `shared`);
+/// 3. a role alias (`lead:`, `work:`, `head:`): the roles;
+/// 4. all digits: the head's pid or the CLI session's pid;
+/// 5. else the handle, the CLI session id or name, the terminal pane id, tab id
+///    or slot key, or the mailbox name;
+/// 6. no hit for 5: `terminal` maps the query as a tab label to the tabs that
+///    carry it now and the tab ids are tried;
+/// 7. still none: for 3 and 5, `shared` (the sessions other machines
+///    published) by handle or role only.
+///
+/// Exactly one, else `ambiguous` (each candidate names the fields it matched)
+/// or `not-found` with the close candidates in the detail and in
+/// `Refusal::candidates` (Identity's own codes; the mailbox maps them to its
+/// names). An entry reached only through its CLI session whose process is dead
+/// is not an answer; when only such entries match the call is refused `stale`.
+/// The answer carries `ids`, `matched` and `stale`.
 pub fn resolve(
     root: &Path,
     query: &str,
     judge: Judge,
     shared: Option<&SharedView>,
+    terminal: &dyn TerminalPort,
 ) -> Result<Listed, Refusal> {
     let query = query.trim();
-    if let Some((machine_id, _)) = query.split_once('/') {
-        return resolve_full_id(root, machine_id, query, judge, shared);
+    if !query.starts_with('/') {
+        if let Some((machine_id, _)) = query.split_once('/') {
+            return resolve_full_id(root, machine_id, query, judge, shared);
+        }
     }
     let live = scan(root, judge)?
         .rows
         .into_iter()
         .filter(|row| row.verdict != Verdict::Dead)
         .collect::<Vec<_>>();
+    let hits_of = |query: &str| -> Vec<Hit> {
+        live.iter()
+            .map(|row| Hit {
+                row,
+                matched: matched_fields(&row.entry, query),
+            })
+            .filter(|hit| !hit.matched.is_empty())
+            .collect()
+    };
     let is_role = is_role_alias(query);
-    let hits: Vec<&Row> = live
-        .iter()
-        .filter(|row| {
-            if is_role {
-                row.entry.roles.iter().any(|role| role == query)
-            } else {
-                row.entry.handle == query
+    let by_name = !is_role && !query.starts_with('/') && !query.bytes().all(|b| b.is_ascii_digit());
+    let mut hits = hits_of(query);
+    if hits.is_empty() && by_name && !query.is_empty() {
+        for tab in terminal.tab_ids(query) {
+            for mut hit in hits_of(&tab) {
+                if hit.matched.iter().any(|field| field == "terminal.tabId")
+                    && !hits
+                        .iter()
+                        .any(|seen: &Hit| seen.row.entry.id == hit.row.entry.id)
+                {
+                    hit.matched = vec!["terminal.tabLabel".into()];
+                    hits.push(hit);
+                }
             }
-        })
-        .collect();
+        }
+    }
+    let (stale, hits): (Vec<Hit>, Vec<Hit>) = hits.into_iter().partition(|hit| hit.stale(judge));
     match hits.as_slice() {
-        [row] => Ok(Listed::of(&row.entry, row.verdict)),
+        [hit] => Ok(hit.listed(judge)),
+        [] if !stale.is_empty() => Err(Refusal {
+            reason: "stale",
+            detail: format!(
+                "{query:?} names only the CLI session of {}, whose process has ended (the CLI restarted); resolve the session by its handle or role",
+                join(&stale.iter().map(|hit| hit.row.entry.handle.clone()).collect::<Vec<_>>())
+            ),
+            candidates: stale.iter().map(Hit::candidate).collect(),
+        }),
         [] => {
+            let close = |row: &Row| {
+                !query.is_empty()
+                    && if is_role {
+                        row.entry.roles.iter().any(|role| role.contains(query))
+                    } else {
+                        row.entry.handle.contains(query)
+                    }
+            };
             let names: Vec<String> = live
                 .iter()
                 .flat_map(|row| {
@@ -979,20 +1656,10 @@ pub fn resolve(
                     "no live session is named {query:?}; candidates: {}",
                     join(&names)
                 ),
-                candidates: live
-                    .iter()
-                    .filter(|row| {
-                        !query.is_empty()
-                            && if is_role {
-                                row.entry.roles.iter().any(|role| role.contains(query))
-                            } else {
-                                row.entry.handle.contains(query)
-                            }
-                    })
-                    .map(candidate_of)
-                    .collect(),
+                candidates: live.iter().filter(|row| close(row)).map(candidate_of).collect(),
             };
-            match shared.map(|view| view.resolve(query)) {
+            let remote = if is_role || by_name { shared } else { None };
+            match remote.map(|view| view.resolve(query)) {
                 Some(Ok(listed)) => Ok(listed),
                 Some(Err(refusal)) if refusal.reason == "ambiguous" => Err(refusal),
                 Some(Err(refusal)) => {
@@ -1005,9 +1672,15 @@ pub fn resolve(
         many => {
             let ids: Vec<String> = many
                 .iter()
-                .map(|row| format!("{} ({})", row.entry.handle, row.entry.id))
+                .map(|hit| {
+                    format!(
+                        "{} ({}, by {})",
+                        hit.row.entry.handle,
+                        hit.row.entry.id,
+                        hit.matched.join("+")
+                    )
+                })
                 .collect();
-            let candidates = many.iter().map(|row| candidate_of(row)).collect();
             Err(Refusal {
                 reason: "ambiguous",
                 detail: format!(
@@ -1015,7 +1688,7 @@ pub fn resolve(
                     many.len(),
                     join(&ids)
                 ),
-                candidates,
+                candidates: many.iter().map(Hit::candidate).collect(),
             })
         }
     }
@@ -1045,7 +1718,11 @@ fn resolve_full_id(
         .rows
         .iter()
         .find(|row| row.entry.id == id && row.verdict != Verdict::Dead)
-        .map(|row| Listed::of(&row.entry, row.verdict))
+        .map(|row| {
+            let mut listed = Listed::of(&row.entry, row.verdict, judge);
+            listed.matched = vec!["id".into()];
+            listed
+        })
         .ok_or_else(|| not_found(format!("no live session has the id {id:?}")))
 }
 
@@ -1082,7 +1759,7 @@ pub fn list(
         .iter()
         .filter(|row| row.verdict != Verdict::Dead)
         .filter(|row| project_id.is_none_or(|id| row.entry.project_id.as_deref() == Some(id)))
-        .map(|row| Listed::of(&row.entry, row.verdict))
+        .map(|row| Listed::of(&row.entry, row.verdict, judge))
         .collect();
     sessions.sort_by(|a, b| (&a.registered_at, &a.handle).cmp(&(&b.registered_at, &b.handle)));
     if let Some(view) = shared {

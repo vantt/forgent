@@ -26,7 +26,7 @@ export { recordFriction, resolveFriction };
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 import { readClaim, readClaims, releaseClaimTx, withMainState, getMainFgosDir, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
 
-import { StoreError, categoryOf } from './store-error.mjs';
+import { StoreError, categoryOf } from '../util/store-error.mjs';
 
 export { FsmError, WorkValidationError, EventLogError, KnowledgeValidationError };
 

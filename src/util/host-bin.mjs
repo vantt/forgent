@@ -1,7 +1,6 @@
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../runner/paths.mjs';
 import { resolveActiveHostBin } from './host-bin-path.mjs';
 
 const HOST_TIMEOUT_MS = 5_000;
@@ -10,14 +9,13 @@ const CONVENTION_UNKNOWN_VERB =
 
 /**
  * The host binary of the project `dir` sits in, through the one activation reader
- * (`resolveActiveHostBin`): FGOS_HOST_BIN, else the activation of the main checkout's
- * `.fgos/installation`, else the nearest activation above `dir`. Never another
+ * (`resolveActiveHostBin`): FGOS_HOST_BIN, else the activation at the nearest
+ * `.fgos/installation` at or above `dir` (a `.fgos` path names its project). Never another
  * checkout's host, never `target/` or `$PATH`. Returns an absolute path or null.
  */
 export function resolveHostBin(dir = process.cwd()) {
   const cleanDir = typeof dir === 'string' && dir.endsWith('.fgos') ? path.dirname(dir) : dir;
-  const mainRoot = resolveMainCheckoutRoot(cleanDir) || cleanDir;
-  return resolveActiveHostBin({ fgosDir: fgosDirFromRoot(mainRoot), cwd: cleanDir }).bin;
+  return resolveActiveHostBin({ cwd: cleanDir }).bin;
 }
 
 /**
@@ -39,18 +37,17 @@ export function runHostInherited(args, { dir = process.cwd() } = {}) {
 }
 
 /**
- * Invokes the Rust host binary with `args`. Store clients default to the main
- * checkout; tree-local readers explicitly select `dirScope: 'caller'`.
+ * Invokes the Rust host binary with `args`, measuring `dir` as given: a store client that wants the main
+ * checkout resolves it before calling.
  *
  * @param {string[]} args CLI arguments for fgos (e.g. ['metrics', 'ping'])
  * @param {object} [options]
  * @param {string|Buffer} [options.input] stdin payload
  * @param {string} [options.dir] starting directory (defaults to process.cwd())
  * @param {string} [options.cwd] working directory of the host child, for a verb that acts on the caller's own directory (defaults to this process's)
- * @param {'main-checkout'|'caller'} [options.dirScope] root to measure (default main-checkout)
  * @returns {object} data field from the returned fgos.v1 envelope
  */
-export function invokeHost(args, { input, dir = process.cwd(), dirScope = 'main-checkout', cwd } = {}) {
+export function invokeHost(args, { input, dir = process.cwd(), cwd } = {}) {
   const hostBin = resolveHostBin(dir);
   if (!hostBin) {
     const err = new Error('Rust host binary unavailable (FGOS_HOST_BIN unset and no active installation manifest)');
@@ -59,11 +56,11 @@ export function invokeHost(args, { input, dir = process.cwd(), dirScope = 'main-
   }
 
   const cleanDir = typeof dir === 'string' && dir.endsWith('.fgos') ? path.dirname(dir) : dir;
-  const mainRoot = dirScope === 'caller' ? path.resolve(cleanDir) : resolveMainCheckoutRoot(cleanDir) || cleanDir;
+  const rootDir = path.resolve(cleanDir);
   const separator = args.indexOf('--');
   const fullArgs = separator === -1
-    ? [...args, '--dir', mainRoot]
-    : [...args.slice(0, separator), '--dir', mainRoot, ...args.slice(separator)];
+    ? [...args, '--dir', rootDir]
+    : [...args.slice(0, separator), '--dir', rootDir, ...args.slice(separator)];
 
   let stdout;
   try {

@@ -103,6 +103,17 @@ test('config merges project over global and refuses a bad value by code; the Wor
   assert.equal('snapshot' in cache, false);
 });
 
+test('rebuild run from a linked worktree drops the identity cache of the main checkout, not of the cwd tree (the other cases run from the main checkout)', async t => {
+  const f = fixture(t);
+  f.git('commit', '--allow-empty', '-qm', 'initial');
+  const linked = path.join(f.temp, 'linked'); f.git('worktree', 'add', '-qb', 'linked', linked);
+  const cacheOf = root => path.join(root, '.fgos/cache/identity-directory.json');
+  for (const root of [f.repo, linked]) { fs.mkdirSync(path.dirname(cacheOf(root)), { recursive: true }); fs.writeFileSync(cacheOf(root), '{}'); }
+  await rebuildStoreUseCase({ ...f.ctx, cwd: linked });
+  assert.equal(fs.existsSync(cacheOf(f.repo)), false, 'the main checkout cache is dropped');
+  assert.equal(fs.existsSync(cacheOf(linked)), true, 'the cwd tree cache is left alone');
+});
+
 test('status identifies deferred predecessors explicitly and exports no deferred event', t => {
   const f = fixture(t);
   const origin = 'a'.repeat(32);

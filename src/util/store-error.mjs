@@ -1,4 +1,4 @@
-// store-error.mjs -- the error class Work and its callers throw, with no imports. store.mjs re-exports it, so every
+// src/util/store-error.mjs -- the error class Work and its callers throw, with no imports. store.mjs re-exports it, so every
 // existing importer keeps working. `categoryOf` reads it back. The category -> exit status map is src/cli/exit-codes.mjs.
 
 /** Error raised by this module. `category` is a key of the CLI exit-code table. `faultClass`, when given, names the

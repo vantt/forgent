@@ -31,7 +31,10 @@ function project(t) {
  * Fakes whose clock only moves when the executor sleeps. `onSleep(n)` runs at the n-th sleep (1-based): where a test
  * lets the successor answer. `holder` is what Identity says holds the role at that moment.
  */
-function fakes(root, { onSleep = () => {}, holder = { live: true, session: 'old-session' }, placeFails = null, lock = undefined } = {}) {
+/** Identity's record of the old head: its slot key (`ids.terminal.key`) is where the successor opens beside it. */
+const OLD_RECORD = { id: 'fg-abc234/old-session', roles: ['head:planner-x'], ids: { terminal: { driver: 'herdr', key: 'cmd_old-slot', paneId: 'w1:p1' }, head: { persona: 'planner', name: 'x', gen: 1 } } };
+
+function fakes(root, { onSleep = () => {}, holder = { live: true, session: 'old-session', record: OLD_RECORD }, placeFails = null, lock = undefined } = {}) {
   const calls = { end: [], place: [], restore: [], released: 0, order: [] };
   let now = 0;
   let sleeps = 0;
@@ -65,14 +68,14 @@ test('the old session is ended only after the successor answered and Identity na
   const { root, dir } = project(t);
   let moved = false;
   const { calls, ports, request } = fakes(root, {
-    holder: () => ({ live: true, session: moved ? 'new-session' : 'old-session' }),
+    holder: () => (moved ? { live: true, session: 'new-session' } : { live: true, session: 'old-session', record: OLD_RECORD }),
     onSleep: (n) => { if (n === 2) { answer(root); moved = true; } },
   });
   const result = await rotateHeadSession({ ...request, reason: 'hard' }, ports);
   assert.deepEqual(result, { rotated: true, key: 'cmd_new', gen: 2, oldEnded: true });
   assert.deepEqual(calls.order, ['place', 'end /run/old'], 'the successor starts first, the old session is ended last');
-  assert.equal(calls.place[0].beside, 'cmd_old', 'the successor opens in the old session\'s tab');
-  assert.equal(calls.place[0].gen, 2);
+  assert.equal(calls.place[0].beside, 'cmd_old-slot', 'the successor opens beside the slot the role holder\'s record names');
+  assert.equal(calls.place[0].gen, 2, 'the successor is the next generation of the lineage the record names (1)');
   assert.deepEqual(calls.end, ['/run/old']);
   assert.equal(readHeadPlacement(dir).placement.key, 'cmd_new', 'the placement record follows the role');
   assert.equal(readHeadPlacement(dir).gen, 2);

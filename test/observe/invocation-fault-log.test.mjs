@@ -15,7 +15,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { StoreError, withFaultClass } from '../../src/state/store-error.mjs';
+import { StoreError, withFaultClass } from '../../src/util/store-error.mjs';
 import { argvShape, recordInvocationFault, resolveFaultLogPath } from '../../src/observe/invocation-fault-log.mjs';
 import { appendFaultRecord, FAULT_LOG_MAX_BYTES } from '../../src/util/capped-jsonl-log.mjs';
 import { recordApprovePostSuccessFault } from '../../src/observe/approve-fault-log.mjs';

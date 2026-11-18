@@ -93,7 +93,7 @@ fn gated_call(
     let head_facts = HeadFacts {
         record: head.record(),
         own_suffix: None,
-        handle: None,
+        cli_session: None,
     };
     let resolve = move |_: &[u8], _: &Ancestry| {
         Ok(Resolved {
@@ -521,7 +521,7 @@ fn call_as(
     let head_facts = HeadFacts {
         record: head.record(),
         own_suffix: None,
-        handle: None,
+        cli_session: None,
     };
     let resolve = move |_: &[u8], _: &Ancestry| {
         Ok(Resolved {

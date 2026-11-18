@@ -575,6 +575,9 @@ impl SharedView {
             roles: entry.roles.clone(),
             liveness: Liveness::Remote,
             remote: Some(self.remote(remote)),
+            ids: None,
+            matched: Vec::new(),
+            stale: Vec::new(),
         }
     }
 
@@ -584,6 +587,7 @@ impl SharedView {
             handle: remote.entry.handle.clone(),
             liveness: Liveness::Remote,
             remote: Some(self.remote(remote)),
+            matched: Vec::new(),
         }
     }
 

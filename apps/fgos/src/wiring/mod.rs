@@ -50,6 +50,7 @@ pub mod session_rotation_hook;
 #[cfg(not(unix))]
 #[path = "session_rotation_hook_unsupported.rs"]
 pub mod session_rotation_hook;
+pub mod terminal_tabs;
 pub mod uninstall;
 pub mod wire_agents;
 pub mod worktree;

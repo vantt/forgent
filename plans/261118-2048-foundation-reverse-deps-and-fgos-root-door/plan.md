@@ -22,7 +22,6 @@ footprint:
   - src/verbs/events/rebuild.mjs
   - src/util/host-bin.mjs
   - src/util/host-bin-path.mjs
-  - src/runner/session.mjs
   - src/convention/convention-client.mjs
   - scripts/doc-health.mjs
   - docs/platform/component-boundary.md
@@ -51,6 +50,7 @@ footprint:
   - src/setup/doctor-bridge.mjs
   - src/setup/instruction-registry.mjs
   - src/setup/run-supervisor-checks.mjs
+  - src/setup/registrations.mjs
   - src/verbs/dispatch/**
   - bin/fgos.mjs
   - scripts/fgos-session-start-hook.mjs
@@ -111,10 +111,12 @@ art with file:line evidence: [phase 01](phase-01-facts-and-prior-art.md) (done w
 3. A new row in the manifest's existing `doors` table ("join .fgos onto a project root") makes the rule mechanical:
    `checkDoors` fails on any new hand-written join outside the leaf. The five Work-tier files are its only debt, each
    with reason and `retiredBy: the Work batch (T7)`.
-4. Of the 36 files the HARDEN criterion counts (`path.join(..., '.fgos')` in `src`/`bin`: 35, plus the template join
-   in `src/runner/repo-locks.mjs`; the review's 36 is confirmed), 29 lose their own join, 1 (`host-bin-path.mjs`)
-   is the named bootstrap exception, 1 (`llm-accounts.mjs`) is a home join that the existing "global fgOS directory"
-   door already lists as debt, and 5 are Work debt.
+4. The join grep (`path.join(..., '.fgos')` and `${...}/.fgos` in `src`/`bin`, recounted on `ee31debfa`) matches 35
+   files (the review counted 36 on the older base; `src/git/inspect.mjs` no longer joins). One of them,
+   `src/setup/agent-hooks.mjs:8`, is a comment (`doorText` blanks comments, so the door never sees it). Of the other
+   34, 27 lose their own join (25 swapped in phase 5, `directory-store.mjs` in phase 3, `registrations.mjs` in phase
+   6), 1 (`host-bin-path.mjs`) is the named bootstrap exception, 1 (`llm-accounts.mjs`) is a home join that the
+   existing "global fgOS directory" door already lists as debt, and 5 are Work debt.
 
 ## Constraints and non-goals
 
@@ -135,9 +137,9 @@ art with file:line evidence: [phase 01](phase-01-facts-and-prior-art.md) (done w
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Facts and prior art](phase-01-facts-and-prior-art.md) | - | plans/261118-2048-foundation-reverse-deps-and-fgos-root-door/phase-01-facts-and-prior-art.md | 1 | done |
-| 2 | [StoreError leaf moves to T0](phase-02-store-error-leaf.md) | 1 | src/state/store-error.mjs, src/util/store-error.mjs, src/runner/worktree.mjs, src/runner/dispatch/cli.mjs, src/state/store.mjs, src/runner/main-checkout-reset-guard.mjs, bin/fgos.mjs, test/architecture.test.mjs, test/cli/exit-code-table.test.mjs, test/observe/invocation-fault-log.test.mjs, docs/architecture-manifest.json | 2 | draft |
-| 3 | [Identity rebuild takes the main .fgos from the rebuild door](phase-03-identity-rebuild-root.md) | 2 | src/identity/directory-store.mjs, src/verbs/events/rebuild.mjs, test/event-store/verbs.test.mjs, docs/architecture-manifest.json | 3 | draft |
-| 4 | [Host binary lookup without a Git root](phase-04-host-bin-without-git.md) | 3 | src/util/host-bin.mjs, src/observe/friction-client.mjs, src/runner/session.mjs, src/convention/convention-client.mjs, scripts/doc-health.mjs, test/util/host-bin.test.mjs, docs/architecture-manifest.json | 4 | draft |
+| 2 | [StoreError leaf moves to T0](phase-02-store-error-leaf.md) | 1 | src/state/store-error.mjs, src/util/store-error.mjs, src/runner/worktree.mjs, src/runner/dispatch/cli.mjs, src/state/store.mjs, src/runner/main-checkout-reset-guard.mjs, bin/fgos.mjs, test/architecture.test.mjs, test/cli/exit-code-table.test.mjs, test/observe/invocation-fault-log.test.mjs, docs/architecture-manifest.json | 2 | done |
+| 3 | [Identity rebuild takes the main .fgos from the rebuild door](phase-03-identity-rebuild-root.md) | 2 | src/identity/directory-store.mjs, src/verbs/events/rebuild.mjs, test/event-store/verbs.test.mjs, docs/architecture-manifest.json | 3 | done |
+| 4 | [Host binary lookup without a Git root](phase-04-host-bin-without-git.md) | 3 | src/util/host-bin.mjs, src/observe/friction-client.mjs, src/convention/convention-client.mjs, scripts/doc-health.mjs, test/util/host-bin.test.mjs, docs/architecture-manifest.json | 4 | done |
 | 5 | [One join door for a project .fgos](phase-05-one-fgos-join-door.md) | 4 | every footprint path of this plan except src/setup/registrations.mjs (listed in the phase file) | 5 | draft |
 | 6 | [Setup registrations through the door](phase-06-setup-registrations.md) | 5 | src/setup/registrations.mjs, docs/architecture-manifest.json | 6 | draft |
 | 7 | [Integration, docs and full gate](phase-07-integration.md) | 6 | plans/261118-2048-foundation-reverse-deps-and-fgos-root-door/reports/integration.md, docs/platform/event-store/spec.md, docs/platform/component-boundary.md, packages/event-store/contracts/consumers.v1.json, docs/backlog.md | 7 | draft |
@@ -146,10 +148,9 @@ Phases 2-5 are serial because each rewrites `docs/architecture-manifest.json` an
 `test/architecture.test.mjs`; the architecture test fails on a stale exception (`test/architecture.test.mjs:261-264`),
 so each phase drops its own row in its own commit and stays green alone.
 
-`src/setup/registrations.mjs` is held by the running plan 261118-1847 (account lease), so it is not in this plan's
-frontmatter footprint; phase 6 starts only when 1847 is done (an external wait the phase table cannot express) and
-adds the path then, and until then phase 5 lists that file as debt of the new
-door row.
+Plan 261118-1847 (account lease) is done, so `src/setup/registrations.mjs` is in this plan's footprint and phase 6
+no longer waits; it stays a separate small phase, and until it lands phase 5 lists that file as debt of the new door
+row.
 
 Effort (lead-days): 1: 0.25 (done); 2: 0.25; 3: 0.25; 4: 0.5; 5: 1; 6: 0.1; 7: 0.25. Total 2.6; remaining 2.35,
 all on one serial path. One lead, one linked worktree, Sonnet-class implementer is enough (mechanical moves with a
@@ -159,9 +160,8 @@ Capability per phase: 1 `code:review`; 2-6 `code:implement`; 7 `code:test`.
 
 ## What can run now and what waits
 
-- **Runs now:** phases 2-5 and 7. None depends on the packaging release: the change is Node payload and manifest only
+- **Runs now:** phases 2-7 (plans 261118-1847 and 261118-0947 are both done). None depends on the packaging release: the change is Node payload and manifest only
   and ships with whatever release comes next. Work is not needed: its files only receive forced import-path edits.
-- **Waits on plan 261118-1847 (running):** phase 6 only (one file, three joins).
 - **Packaging release:** no real dependency; nothing here waits for it.
 - **Work batch:** not needed; the five Work-tier joins stay as named debt and retire with it.
 
@@ -169,9 +169,9 @@ Capability per phase: 1 `code:review`; 2-6 `code:implement`; 7 `code:test`.
 
 | Plan (status) | Shared files | Handling |
 |---|---|---|
-| 261118-1847 account lease (running) | `src/setup/registrations.mjs` (and `test/setup/**`, `llm-accounts.mjs`, which this plan does not touch) | registrations: phase 6 waits for 1847 done and adds the path to this footprint then. `llm-accounts.mjs` keeps its home join under the global door. The frontmatter names exact dispatch and test files, no prefix that covers a 1847 path |
+| 261118-1847 account lease (done) | `src/setup/registrations.mjs` (and `test/setup/**`, `llm-accounts.mjs`, which this plan does not touch) | none left: phase 6 swaps registrations. `llm-accounts.mjs` keeps its home join under the global door |
 | 261118-0936 ops-metrics (running, phase 16 only) | none (its footprint is its plan dir, `friction.rs`, `docs/platform/observe/**`) | - |
-| 261118-0947 session verb (lead started; plan draft until 1847 is done) | catch-all `src/**`, `test/**`, `docs/architecture-manifest.json`; concretely `src/runner/worktree.mjs` (comment lines), `src/git/inspect.mjs`, `test/util/host-bin.test.mjs`, `test/architecture.test.mjs` | supervisor ruling 2026-11-18 21:01 (board log): 0947 is not interrupted; phases 2-7 start when 0947 is done. Phases 2-5 re-grep their file lists on the base they start from |
+| 261118-0947 session verb (done) | was `src/runner/worktree.mjs`, `src/git/inspect.mjs`, `test/util/host-bin.test.mjs`, `test/architecture.test.mjs` | none left. Phases 2-5 still re-grep their file lists on the base they start from |
 | 261118-1341 S6a execution tier (draft) | `src/runner/dispatch/**`, `src/runner/execution/**`, `src/workflow/**`, `src/setup/**`, `head-start.mjs`, `rotate.mjs`, `bin/fgos.mjs` | phase 5 edits there are one-line join/import swaps; S6a rebases. S6a moving `payload-root.mjs` is unaffected (this plan does not import it) |
 | 261118-1045 supervisor (draft) | `src/runner/dispatch/assignment-runner.mjs` | one join swap; whichever lands second rebases |
 | 261118-1455 S6a worktree door | done | - |

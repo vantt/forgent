@@ -4,8 +4,8 @@
 - `plan.md` QP-14, QP-16, QP-17 and QP-20.
 - `apps/fgos-gateway/src/gateway.rs`:
   - `run_verb_blocking` (:427);
-  - `require_token` and `Caller` (:440);
-  - the routes (:1270-1273);
+  - `Caller` (:441) and `require_token` (:481);
+  - the routes (:1237-1268, `/work/{id}/answer` at :1242);
   - the work-ask handlers (:940).
 - `apps/fgos-gateway/src/mcp.rs`, read only. No binding is added.
 - `apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx` and its test, plus `web/src/api/{client,types}.ts`.
@@ -23,7 +23,9 @@ See the phase table in `plan.md`, row 7.
    - `fgos gateway start` spawns the gateway detached, so it is reparented away from any agent CLI. Its children
      therefore pass the ancestry owner rule (QP-16).
    - The verb accepts `--source gateway:<name>` only from a caller with no agent ancestor. Write a test for it.
-   - In step 0, confirm the detach (`fgos gateway start`). If the detach is not true, stop with `NEEDS_CONTEXT`.
+   - In step 0, confirm the detach: `fgos gateway start` spawns through `spawn_detached`
+     (`apps/fgos/src/wiring/gateway_control.rs:454`), confirmed at the re-check. If it no longer holds, stop with
+     `NEEDS_CONTEXT`.
 3. Do not add an MCP binding. Record that choice in the API yaml's description.
 4. Change `NeedsAnswer.tsx` so it renders `/v1/questions` only, and drop its own `listWork` call.
    - Rows come in three groups: store questions, `fgos ask` items and gates.

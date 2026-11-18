@@ -524,7 +524,7 @@ test('resolveOriginLocations falls back to the first line per file of the neares
   assert.deepEqual(resolveOriginLocations(origins, ['runner.patterns.other.promise'], '/project'), []);
 });
 
-// Invocation ids state how the agent runs: <cli>-<cli|herdr>[-bwrap], and -bwrap is present exactly when the
+// Invocation ids state how the agent runs: <cli>-<cli|herdr>[-bypass][-bwrap] (-bypass for a permissionMode bypass invocation), and -bwrap is present exactly when the
 // invocation is confined by bwrap. <cli> is the invocation's command.
 const invocationIdViolations = (executors) => {
   const violations = [];
@@ -534,8 +534,8 @@ const invocationIdViolations = (executors) => {
       if (inv.id === undefined) continue;
       checked += 1;
       const where = `${name}/${inv.id}`;
-      const shape = new RegExp(`^${inv.command}-(cli|herdr)(-bwrap)?$`);
-      if (!shape.test(inv.id)) violations.push(`${where}: id is not <command>-(cli|herdr)[-bwrap] for command ${inv.command}`);
+      const shape = new RegExp(`^${inv.command}-(cli|herdr)(-bypass)?(-bwrap)?$`);
+      if (!shape.test(inv.id)) violations.push(`${where}: id is not <command>-(cli|herdr)[-bypass][-bwrap] for command ${inv.command}`);
       const confined = inv.confinement?.backend === 'bwrap';
       if (inv.id.endsWith('-bwrap') !== confined) violations.push(`${where}: -bwrap suffix ${inv.id.endsWith('-bwrap') ? 'present' : 'absent'} but confinement.backend is ${inv.confinement?.backend ?? 'unset'}`);
     }

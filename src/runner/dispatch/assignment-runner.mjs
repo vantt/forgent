@@ -97,7 +97,7 @@ import { watchWritesOutsideWorkspace } from '../../run-supervisor/stray-writes.m
 import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, PANE_IDLE_TIMEOUT_MS, ORPHAN_SETTLE_MS } from './herdr-round.mjs';
 import { resolveHerdrBin, workLabelOf, herdrEndpointEnv } from './terminal-slot.mjs';
 import { retainFailedPaneMsOf } from '../../terminal-control/config.mjs';
-import { finalizeAttemptHome, prepareConfinementForLaunch } from './confinement/authority.mjs';
+import { controlDeliveryOf, finalizeAttemptHome, prepareConfinementForLaunch } from './confinement/authority.mjs';
 import { CREDENTIAL_HOME_KEPT } from './confinement/cleanup.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import { DEFAULT_SEAT_TIMEOUT_MS } from './confinement/resources.mjs';
@@ -977,7 +977,7 @@ export async function prepareAttemptSeat(attempt, seat, hooks = {}) {
     ? terminalAgentArgs({ resolvedCmd, prompt, model: effectivePolicy.model, runDir: attemptRunDir, writerId: attemptWriterId, caseContext: opts.caseContext ?? null })
     : withRunDirAccess({ adapter: 'cli-spawn', command: resolvedCmd.command, args: resolvedCmd.args, outboxDir: attemptPaths(attemptRunDir, attemptId).outboxDir });
 
-  const prepResult = await prepareConfinementForLaunch(buildConfinementRequest({
+  const confinementRequest = buildConfinementRequest({
     capability: seat.capability,
     stageSkill: executorId,
     executorId,
@@ -1027,7 +1027,8 @@ export async function prepareAttemptSeat(attempt, seat, hooks = {}) {
     gateCommand: attemptGateCommand(attempt.host.hostBin, runDir, { goSocket: terminalSocket }),
     attemptBinds: prepareAttemptFiles(runDir, attemptId),
     ...(seat.requestSocket ? { requestSocket: seat.requestSocket } : {}),
-  }), { adapterPort: opts.adapterPort });
+  });
+  const prepResult = await prepareConfinementForLaunch(confinementRequest, { adapterPort: opts.adapterPort });
 
   let providerCapacityEvidence = seat.providerCapacityEvidence;
   if (providerCapacityEvidence && prepResult?.providerCapacity?.credentialProvisioned === true) {
@@ -1080,6 +1081,8 @@ export async function prepareAttemptSeat(attempt, seat, hooks = {}) {
       beside: seat.beside,
       beforeAllocate: attempt.intentWritten ? (pane) => publishAttemptIntent(attempt, pane) : undefined,
       effectiveContract,
+      // The answer the Authority judged the request by, never one rebuilt from the prepared record.
+      controlsDelivered: controlDeliveryOf(confinementRequest),
     });
   }
 

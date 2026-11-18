@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { StoreError } from '../state/store.mjs';
+import { StoreError } from '../util/store-error.mjs';
 import { createLockScope, HolderLockError, acquireSync } from '../holder-lock/index.mjs';
 import crypto from 'node:crypto';
 import { nativeDoor } from '../native/door.mjs';

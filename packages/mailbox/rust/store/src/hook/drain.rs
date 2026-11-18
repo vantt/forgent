@@ -46,8 +46,10 @@ pub struct HeadFacts {
     pub record: Record,
     /// The head's own two characters, when its CLI names it (Claude Code).
     pub own_suffix: Option<String>,
-    /// The head's native channel, when the shell knows it.
-    pub handle: Option<String>,
+    /// The head's CLI session as its CLI keeps it (Claude Code's session
+    /// file: name, messaging socket, process), when the shell read it; the
+    /// wiring records it in the head's Identity entry, the mailbox keeps none.
+    pub cli_session: Option<fgos_identity::cli_dirs::ClaudeSession>,
 }
 
 /// One hook call, with everything the shell resolved.
@@ -268,19 +270,12 @@ pub fn begin(
     let judged = state
         .binding(&call.writer)
         .map(|binding| judge_stored(binding, &call.head.record));
-    // The payload's session is the writer itself here, so for a CLI whose
-    // session id is its native thread handle (Codex) it is the handle.
-    let session_handle = payload
-        .session
-        .clone()
-        .filter(|_| call.adapter.session_is_handle());
     let request = RegisterRequest {
         key: call.writer.clone(),
         cli,
         project: call.project.to_string(),
         own_suffix: call.head.own_suffix.clone(),
         head: head_text(&call.head.record),
-        handle: call.head.handle.clone().or(session_handle),
     };
     let (generation, registered) = match state.register(request, judged, now, limits, ids) {
         Ok(Registered::Refreshed { generation, .. }) => (generation, None),

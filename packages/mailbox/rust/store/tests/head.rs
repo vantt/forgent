@@ -25,7 +25,6 @@ fn binding_with_head(head: String) -> Binding {
         "cli": "claude",
         "generation": 1,
         "head": head,
-        "handle": null,
         "registered_at": 0,
         "last_seen": 0,
         "last_drain_at": null,

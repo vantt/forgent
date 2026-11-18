@@ -18,7 +18,7 @@ export function conventionCheck(selection, { dir = process.cwd() } = {}) {
   } else {
     throw new TypeError('conventionCheck expects an array of paths or {all:true}');
   }
-  return invokeHost(args, { dir, dirScope: 'caller' });
+  return invokeHost(args, { dir });
 }
 
 /**
@@ -32,7 +32,7 @@ export function conventionCheck(selection, { dir = process.cwd() } = {}) {
  */
 export function planDirNameProblem(name, { dir = process.cwd() } = {}) {
   try {
-    invokeHost(['convention', 'path', '--kind', 'report', '--type', 'check', '--plan', name, '--slug', 'plan-check', '--json'], { dir, dirScope: 'caller' });
+    invokeHost(['convention', 'path', '--kind', 'report', '--type', 'check', '--plan', name, '--slug', 'plan-check', '--json'], { dir });
     return null;
   } catch (err) {
     if (err.code === 'host-exec-error' && /invalid-plan-dir/.test(err.stderr ?? '')) return err.stderr.trim();

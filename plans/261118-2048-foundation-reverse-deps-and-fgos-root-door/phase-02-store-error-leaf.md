@@ -15,7 +15,7 @@ of the same class sits in `src/runner/dispatch/cli.mjs:10`.
 - Every importer moves to the new path in the same commit, no re-export left at the old path: `src/state/store.mjs`
   (import line; its public re-export of `StoreError`/`categoryOf` for Work callers stays as is), `bin/fgos.mjs`,
   `src/runner/main-checkout-reset-guard.mjs`, `test/cli/exit-code-table.test.mjs`,
-  `test/observe/invocation-fault-log.test.mjs`, `test/architecture.test.mjs` (if it names the path).
+  `test/observe/invocation-fault-log.test.mjs`, `test/architecture.test.mjs:1658` (`ENTRY_LEAF_IMPORTS` names the path `../src/state/store-error.mjs`; required edit).
 - `src/runner/worktree.mjs` imports `StoreError` from `../util/store-error.mjs`, not from `../state/store.mjs`.
 - `src/runner/dispatch/cli.mjs` deletes its local `class StoreError` and imports the leaf (A4 allows `src/util`).
 - Manifest: delete the `tierExceptions` row `worktree.mjs -> store.mjs`, and rename the `files` layer-map key

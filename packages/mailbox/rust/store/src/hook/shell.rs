@@ -59,7 +59,7 @@ pub struct ShellInput<'a> {
     /// again just before hold 1, for the caller check.
     pub ancestry: &'a dyn Fn() -> Option<Ancestry>,
     pub resolve: &'a Resolver<'a>,
-    /// Derives a sender's handle for a frame header (see [`HandleOf`]).
+    /// Reads a sender's handle for a frame header (see [`HandleOf`]).
     pub handle_of: &'a HandleOf<'a>,
     /// Shared with the budget watchdog: the shell writes stdout only after
     /// it moved the gate from idle to writing, and the watchdog ends the
@@ -150,6 +150,8 @@ pub enum Quiet {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BoundHead {
     pub writer: WriterKey,
+    /// The head's short name in this record, as its binding holds it after the call.
+    pub name: Option<fgos_mailbox_core::ShortName>,
     pub head: HeadFacts,
     /// The generation this call created or replaced the binding with;
     /// `None` when the head was already bound.
@@ -275,8 +277,9 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
             Begun::Quiet { .. } | Begun::Pointer(_) => BTreeMap::new(),
         };
         let changed = begun.state_changed();
+        let name = state.binding(&call.writer).map(|b| b.name.clone());
         Reported {
-            value: (begun, sizes),
+            value: (begun, sizes, name),
             changed,
         }
     });
@@ -294,9 +297,10 @@ fn drive(input: &ShellInput<'_>, stdin: &mut dyn Read, stdout: &mut dyn Write) -
             .collect(),
         ..ShellOutcome::default()
     };
-    let (begun, sizes) = held.value.value;
+    let (begun, sizes, name) = held.value.value;
     outcome.bound = begun.bound().then(|| BoundHead {
         writer: resolved.writer,
+        name,
         head: resolved.head,
         registered: begun.registered(),
     });

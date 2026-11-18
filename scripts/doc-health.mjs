@@ -190,7 +190,7 @@ export function runCli(argv, cwd = process.cwd(), { classify } = {}) {
     const files = platformDocs(repoRoot);
     const readFile = (file) => fs.statSync(path.resolve(repoRoot, file)).isDirectory() ? '' : fs.readFileSync(path.resolve(repoRoot, file), 'utf8');
     const links = checkPlatformLinks({ files, readFile, exists: (file) => fs.existsSync(path.resolve(repoRoot, file)) });
-    const classifyDoc = classify || ((file) => invokeHost(['convention', 'classify', '--json', '--', file], { dir: repoRoot, dirScope: 'caller' }));
+    const classifyDoc = classify || ((file) => invokeHost(['convention', 'classify', '--json', '--', file], { dir: repoRoot }));
     const metadata = checkPlatformMetadata({
       files, readFile, baseline: governanceBaselineFields(repoRoot),
       classify: classifyDoc,

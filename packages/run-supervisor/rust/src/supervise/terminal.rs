@@ -30,7 +30,7 @@ use fgos_agent_protocol::terminal::{
     REASON_NEEDS_SETUP, REASON_RESULT_UNREADABLE,
 };
 use fgos_agent_protocol::BlockedReason;
-use fgos_identity::directory::register_writer;
+use fgos_identity::directory::{register_writer, HeadIds, Ids, TerminalIds};
 use fgos_identity::resolve::{HeadRef, WriterKey, ENV_ORDER};
 use fgos_process::facts::{self, ProcTuple};
 use fgos_process::{domain_is_empty, domain_kill_all, Domain, DomainState, ProcId};
@@ -95,6 +95,9 @@ struct SessionPlan {
     role: String,
     writer_id: String,
     cwd: PathBuf,
+    /// The head this session is (`session.persona`, `session.name`, `session.gen`), recorded as Identity's `head`
+    /// group; `None` when the envelope names none.
+    head: Option<HeadIds>,
 }
 
 impl Plan {
@@ -170,10 +173,27 @@ fn session_plan(envelope: &Value) -> Result<Option<SessionPlan>, Refusal> {
             .map(String::from)
             .ok_or_else(|| invalid(&format!("envelope field {what} missing")))
     };
+    let session = &envelope["session"];
+    let named = ["persona", "name", "gen"]
+        .iter()
+        .any(|field| !session[*field].is_null());
+    let head = if named {
+        Some(HeadIds {
+            persona: text(&session["persona"], "session.persona")?,
+            name: text(&session["name"], "session.name")?,
+            gen: session["gen"]
+                .as_u64()
+                .filter(|gen| *gen >= 1)
+                .ok_or_else(|| invalid("envelope field session.gen must be an integer >= 1"))?,
+        })
+    } else {
+        None
+    };
     Ok(Some(SessionPlan {
-        role: text(&envelope["session"]["role"], "session.role")?,
+        role: text(&session["role"], "session.role")?,
         writer_id: text(&envelope["identity"]["writerId"], "identity.writerId")?,
         cwd: PathBuf::from(text(&envelope["cwd"], "cwd")?),
+        head,
     }))
 }
 
@@ -554,6 +574,8 @@ struct Sup<'a> {
     adapter: Terminal,
     /// A head session's request socket and its server; closed (path unlinked) when the attempt is ending.
     requests: Option<(AttemptSocket, HeadRequests)>,
+    /// The slot key, tab and pane the attempt was placed in, as the terminal store recorded them.
+    placed: Option<TerminalIds>,
 }
 
 impl Sup<'_> {
@@ -836,6 +858,12 @@ pub(super) fn run(
         }
     };
 
+    // Only a session attempt records where it was placed (Identity's `terminal` group).
+    let placed = plan
+        .session
+        .as_ref()
+        .and_then(|_| backend.placed(&plan.key));
+
     let Some(stream) = socket.accept_gate(&watch.attempt_id, HELLO_LIMIT) else {
         socket.close();
         return super::not_started(
@@ -893,6 +921,7 @@ pub(super) fn run(
         end: TerminalEnd::default(),
         adapter: plan.adapter,
         requests,
+        placed,
     };
     drive(&plan, &core, &mut sup);
 
@@ -921,10 +950,12 @@ pub(super) fn run(
 
 /// Registers a session attempt in Identity under its role, from outside the sandbox: Identity stays the only
 /// authority for who holds a role, and the supervisor only transports the fact that this attempt is that session.
-/// The head is the gate, which lives exactly as long as the attempt's domain. A role a live session still holds
-/// (a rotation successor starting before its predecessor ended) registers the session without it; any other
-/// refusal is one log line and the attempt goes on.
-fn register_session(session: &SessionPlan, gate: &ProcTuple) {
+/// The head is the gate, which lives exactly as long as the attempt's domain. The entry carries the identifiers
+/// the supervisor owns: `terminal` (the slot key, tab and pane it was placed in) and `head` (persona, name and
+/// generation from the envelope), which a later bind of the agent session moves with the roles. A role a live
+/// session still holds (a rotation successor starting before its predecessor ended) registers the session
+/// without it; any other refusal is one log line and the attempt goes on.
+fn register_session(session: &SessionPlan, gate: &ProcTuple, placed: Option<&TerminalIds>) {
     let state_root = fgos_holder_lock::state_root::state_root().0;
     let key = WriterKey {
         // The attempt's writer id is the first variable of Identity's rule, the one the gate exports.
@@ -935,8 +966,21 @@ fn register_session(session: &SessionPlan, gate: &ProcTuple) {
         pid: gate.pid.0,
         start_time: gate.start_time.clone(),
     };
+    let ids = Ids {
+        terminal: placed.cloned(),
+        head: session.head.clone(),
+        ..Ids::default()
+    };
     let register = |roles: &[String]| {
-        register_writer(&state_root, Some(&session.cwd), &key, &head, roles, false)
+        register_writer(
+            &state_root,
+            Some(&session.cwd),
+            &key,
+            &head,
+            roles,
+            false,
+            Some(&ids),
+        )
     };
     let refused = match register(std::slice::from_ref(&session.role)) {
         Ok(_) => return,
@@ -1003,7 +1047,7 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
         return;
     }
     if let Some(session) = &plan.session {
-        register_session(session, &io.sup.gate);
+        register_session(session, &io.sup.gate, io.sup.placed.as_ref());
         if let Some((_, server)) = &io.sup.requests {
             server.set_gate(HeadRef {
                 pid: io.sup.gate.pid.0,
