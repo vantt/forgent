@@ -167,10 +167,15 @@ async function askRestoreRole({ runDir, persona, name }) {
 
 const realClock = { now: () => Date.now(), sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)) };
 
-/** `text` cut to `MAX_TEXT` UTF-16 units, never inside a surrogate pair. */
+const CUT_MARKER = '…(earlier text cut)\n';
+/**
+ * `text` within `MAX_TEXT` UTF-16 units, keeping its END: a head batches its open questions at the end of its last
+ * message, so a longer text loses its beginning, marked by `CUT_MARKER`, never inside a surrogate pair.
+ */
 const bounded = (text) => {
-  const cut = text.slice(0, MAX_TEXT);
-  return /[\uD800-\uDBFF]$/.test(cut) ? cut.slice(0, -1) : cut;
+  if (text.length <= MAX_TEXT) return text;
+  const tail = text.slice(text.length - (MAX_TEXT - CUT_MARKER.length));
+  return `${CUT_MARKER}${/^[\uDC00-\uDFFF]/.test(tail) ? tail.slice(1) : tail}`;
 };
 
 /**

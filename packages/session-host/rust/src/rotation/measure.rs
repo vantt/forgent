@@ -27,7 +27,7 @@ pub struct Measure {
     pub stale: bool,
 }
 
-pub(crate) fn lines_of(file: &Path) -> Vec<Value> {
+fn lines_of(file: &Path) -> Vec<Value> {
     std::fs::read_to_string(file)
         .map(|text| {
             text.lines()
@@ -36,6 +36,57 @@ pub(crate) fn lines_of(file: &Path) -> Vec<Value> {
                 .collect()
         })
         .unwrap_or_default()
+}
+
+/// Most bytes read from the end of a transcript to find its last entries; an older part is never read.
+pub(crate) const TAIL_CAP: u64 = 8 * 1024 * 1024;
+const TAIL_CHUNK: u64 = 64 * 1024;
+
+/// The JSON entries of a JSON-lines file, newest first, read backwards from the end in bounded chunks: `visit`
+/// returns `true` to stop. At most `cap` bytes are read; a line that is not complete within them (or not JSON,
+/// such as a last line still being written) is skipped.
+pub(crate) fn scan_back(file: &Path, cap: u64, mut visit: impl FnMut(&Value) -> bool) {
+    use std::io::{Read, Seek, SeekFrom};
+    let Ok(mut f) = std::fs::File::open(file) else {
+        return;
+    };
+    let Ok(len) = f.metadata().map(|m| m.len()) else {
+        return;
+    };
+    let floor = len.saturating_sub(cap);
+    let mut pos = len;
+    // The start of a line whose beginning lies before `pos`, not yet complete.
+    let mut carry: Vec<u8> = Vec::new();
+    while pos > floor {
+        let start = pos.saturating_sub(TAIL_CHUNK).max(floor);
+        let mut buf = vec![0; (pos - start) as usize];
+        if f.seek(SeekFrom::Start(start)).is_err() || f.read_exact(&mut buf).is_err() {
+            return;
+        }
+        buf.extend_from_slice(&carry);
+        pos = start;
+        let complete_from = if pos == 0 {
+            0
+        } else {
+            match buf.iter().position(|b| *b == b'\n') {
+                Some(i) => i + 1,
+                None => {
+                    carry = buf;
+                    continue;
+                }
+            }
+        };
+        for line in buf[complete_from..].rsplit(|b| *b == b'\n') {
+            let Ok(value) = serde_json::from_slice::<Value>(line) else {
+                continue;
+            };
+            if visit(&value) {
+                return;
+            }
+        }
+        buf.truncate(complete_from.saturating_sub(1));
+        carry = buf;
+    }
 }
 
 /// Whether a transcript entry is an assistant entry of the session itself, not of a subagent (a sidechain).
@@ -112,31 +163,26 @@ pub fn latest_sidecar_record(
     found.map(|(_, record)| record)
 }
 
-/// Fraction from the transcript: the last non-sidechain assistant entry, deduplicated by `message.id`, over
-/// `window_size`.
+/// Fraction from the transcript: the last entry of the last non-sidechain assistant message with usage, read from
+/// the end of the file (at most [`TAIL_CAP`] bytes), over `window_size`.
 pub fn from_transcript(transcript: &Path, window_size: u64) -> Option<Measure> {
     if window_size == 0 {
         return None;
     }
-    // A repeated id keeps its last entry; the order is that of first insertion.
-    let mut order: Vec<String> = Vec::new();
-    let mut usage: std::collections::HashMap<String, Value> = std::collections::HashMap::new();
-    for entry in lines_of(transcript) {
-        if !main_assistant(&entry) {
-            continue;
-        }
-        let Some(u) = entry.pointer("/message/usage").filter(|u| u.is_object()) else {
-            continue;
-        };
-        let id = entry
-            .pointer("/message/id")
-            .and_then(Value::as_str)
-            .map_or_else(|| format!("line-{}", order.len()), str::to_string);
-        if usage.insert(id.clone(), u.clone()).is_none() {
-            order.push(id);
-        }
-    }
-    let tokens = tokens_of(usage.get(order.last()?)?);
+    // Newest first: the first assistant entry with usage is the last entry of the last message.
+    let mut last: Option<Value> = None;
+    scan_back(transcript, TAIL_CAP, |entry| {
+        last = main_assistant(entry)
+            .then(|| {
+                entry
+                    .pointer("/message/usage")
+                    .filter(|u| u.is_object())
+                    .cloned()
+            })
+            .flatten();
+        last.is_some()
+    });
+    let tokens = tokens_of(&last?);
     Some(Measure {
         fraction: tokens as f64 / window_size as f64,
         tokens,
@@ -413,5 +459,37 @@ mod tests {
         );
         let m = from_transcript(&t, 10_000).unwrap();
         assert_eq!((m.tokens, m.fraction), (10_000, 1.0));
+    }
+
+    #[test]
+    fn the_backward_scan_gives_every_complete_line_newest_first_across_chunks_and_stops_at_the_cap()
+    {
+        let d = dir("scan");
+        let lines: Vec<Value> = (0..300)
+            .map(|i| json!({ "i": i, "pad": "y".repeat(500) }))
+            .collect();
+        let mut text = lines.iter().map(|l| format!("{l}\n")).collect::<String>();
+        text.push_str("{\"partial\":");
+        let f = d.join("scan.jsonl");
+        std::fs::write(&f, &text).unwrap();
+        let mut seen = Vec::new();
+        scan_back(&f, TAIL_CAP, |v| {
+            seen.push(v["i"].as_u64().unwrap());
+            false
+        });
+        assert_eq!(seen, (0..300).rev().collect::<Vec<u64>>());
+        let mut capped = Vec::new();
+        scan_back(&f, 10_000, |v| {
+            capped.push(v["i"].as_u64().unwrap());
+            false
+        });
+        assert!(!capped.is_empty() && capped.len() < 20, "{capped:?}");
+        assert_eq!(capped[0], 299);
+        let mut first = None;
+        scan_back(&f, TAIL_CAP, |v| {
+            first = v["i"].as_u64();
+            true
+        });
+        assert_eq!(first, Some(299), "visit stops the scan");
     }
 }

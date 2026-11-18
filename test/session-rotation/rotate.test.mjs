@@ -99,10 +99,24 @@ test('a manual rotation is recorded as manual and hands off the old session\'s f
   assert.equal(latest.rotate, 'manual');
   const text = fs.readFileSync(path.join(dir, latest.file), 'utf8');
   assert.match(text, /^- rotation: manual$/m);
-  assert.match(text, /## Last assistant message \(verbatim\)\n\nOpen questions:\n1\. Which db\?\n/);
+  assert.match(text, /## Last assistant message \(verbatim\)\n\n```text\nOpen questions:\n1\. Which db\?\n```\n/);
   assert.match(text, /^- docs\/backlog\.md\n- docs\/discussions$/m, 'the persona\'s reload paths are the portfolio, and one the project does not have is left out');
   assert.doesNotMatch(text, /plans\/board/);
   assert.deepEqual(reads, [], 'the reader is asked again until the old turn ended');
+});
+
+test('a manual rotation keeps the end of a long last message, where the open questions are, and marks the cut', async (t) => {
+  const { root, dir } = project(t);
+  const { ports, request } = fakes(root);
+  const long = `START${'x'.repeat(9000)}\nOpen questions:\n1. Which db?`;
+  Object.assign(ports, { sessionDir: () => '/s', lastMessage: () => ({ result: 'found', message: long, turnEnded: true }) });
+  await rotateHeadSession({ ...request, reason: 'manual', stopFacts: {} }, ports);
+  const latest = JSON.parse(fs.readFileSync(path.join(dir, 'latest.json'), 'utf8'));
+  const text = fs.readFileSync(path.join(dir, latest.file), 'utf8');
+  const section = text.slice(text.indexOf('```text\n') + 8, text.indexOf('\n```\n'));
+  assert.ok(section.startsWith('…(earlier text cut)\n') && section.endsWith('Open questions:\n1. Which db?'), section.slice(0, 80));
+  assert.equal(section.length, 8000);
+  assert.doesNotMatch(section, /START/);
 });
 
 test('a manual rotation whose old transcript cannot be found says so in the handoff and still rotates', async (t) => {

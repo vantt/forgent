@@ -48,12 +48,22 @@ function dirOf(fgosDir, persona, name) {
 /** Rotations whose handoff carries the last assistant message and pending question: one no soft threshold chose. */
 const CARRIES_LAST_MESSAGE = new Set(['hard', 'manual']);
 
-/** The Markdown body: pointers, delta, and on `hard` or `manual` the last assistant message and pending question verbatim. */
+/**
+ * `text` in a code fence its content cannot close: backticks one longer than its longest backtick run (at least
+ * three), so a heading quoted in it (`## Pending question (verbatim)`) stays text and is never read as a section.
+ */
+export function fenced(text) {
+  const longest = Math.max(0, ...(String(text).match(/`+/g) ?? []).map((run) => run.length));
+  const fence = '`'.repeat(Math.max(3, longest + 1));
+  return `${fence}text\n${text}\n${fence}`;
+}
+
+/** The Markdown body: pointers, delta, and on `hard` or `manual` the last assistant message (fenced, see `fenced`) and pending question verbatim. */
 export function buildHandoff({ persona, name, sessionId, rotate, portfolio = [], delta = '', lastAssistantMessage = null, pendingQuestion = null }) {
   const lines = [VERIFY_LINE, '', `# Handoff: ${persona}-${name}`, '', `- session: ${sessionId}`, `- rotation: ${rotate}`, '', '## Portfolio files to reread', ''];
   lines.push(...(portfolio.length > 0 ? portfolio.map((p) => `- ${p}`) : ['- (none listed)']), '', '## Delta since the last handoff', '', delta.trim() || '(none recorded)', '');
   if (CARRIES_LAST_MESSAGE.has(rotate)) {
-    lines.push('## Last assistant message (verbatim)', '', lastAssistantMessage ?? '(none)', '', '## Pending question (verbatim)', '', pendingQuestion ?? '(none)', '');
+    lines.push('## Last assistant message (verbatim)', '', lastAssistantMessage === null ? '(none)' : fenced(lastAssistantMessage), '', '## Pending question (verbatim)', '', pendingQuestion ?? '(none)', '');
   }
   return lines.join('\n');
 }

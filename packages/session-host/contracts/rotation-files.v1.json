@@ -9,7 +9,7 @@
     },
     "handoff file": {
       "writer": "handoff store, immutable",
-      "carries": "a line `- rotation: soft | hard | manual`; a line `Rotation id: <16 lowercase hex characters>` when a rotation executor wrote it; the portfolio files to reread (the stop facts' portfolio, else `sessionRotation.personas.<persona>.reload`; an entry the project does not have is left out); a `## Last assistant message (verbatim)` and a `## Pending question (verbatim)` section on a hard or manual rotation. A manual rotation's last message is read by the executor from the old session's transcript (the `last-message` op below, after the old session ended its turn, at most 60 s); when it cannot be read, the section says `(not found: <why>)`",
+      "carries": "a line `- rotation: soft | hard | manual`; a line `Rotation id: <16 lowercase hex characters>` when a rotation executor wrote it; the portfolio files to reread (the stop facts' portfolio, else `sessionRotation.personas.<persona>.reload`; an entry the project does not have is left out); a `## Last assistant message (verbatim)` section (the message in a code fence one backtick longer than its longest backtick run, at least three, so nothing in it reads as a heading; kept to its last 8000 characters behind `…(earlier text cut)` when longer) and a `## Pending question (verbatim)` section on a hard or manual rotation; the reader takes the pending question only from that heading outside any fence. A manual rotation's last message is read by the executor from the old session's transcript (the `last-message` op below, after the old session ended its turn, at most 60 s); when it cannot be read, the section says `(not found: <why>)`",
       "sessionStart": "the reader inlines the text when it is under 10000 characters, else a pointer to the file plus the pending question verbatim"
     },
     "rotation.json": { "writer": "rotation executor", "readFields": { "gen": "integer, the successor's generation", "id": "the rotation id" } },
@@ -40,7 +40,7 @@
   "lastMessageRoute": {
     "command": "fgos internal session-host last-message --protocol 1 --json, stdin {\"v\":1,\"request\":{\"projectsDir\":\"<session folder>\"}}",
     "caller": "the rotation executor, for a manual rotation; the session folder is the one the old launch kept or declared (seatSessionDir in src/runner/dispatch/confinement/authority.mjs)",
-    "reader": "packages/session-host/rust/src/rotation/last_message.rs: the newest <session-id>.jsonl one level under the folder (regular files only, so a subagent transcript deeper down is never taken); its last non-sidechain assistant message with text, every text block of that message id joined by a blank line",
-    "answers": { "found": { "transcript": "string", "message": "string or null when no assistant message has text", "turnEnded": "boolean, the last assistant entry has stop_reason end_turn" }, "not-found": { "detail": "string, why" } }
+    "reader": "packages/session-host/rust/src/rotation/last_message.rs: the newest <session-id>.jsonl one level under the folder (regular files only, so a subagent transcript deeper down is never taken); its last non-sidechain assistant message with text, every text block of that message id joined by a blank line; read backwards from the end, at most 8 MiB. A session folder holding only Codex rollouts (YYYY/MM/DD/rollout-*.jsonl) is not-found with a reason naming it: no fixture proves the Codex assistant record",
+    "answers": { "found": { "transcript": "string", "message": "string or null when no assistant message has text", "turnEnded": "boolean, the last user or assistant entry (sidechains aside) is an assistant entry with stop_reason end_turn" }, "not-found": { "detail": "string, why" } }
   }
 }
