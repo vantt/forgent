@@ -147,16 +147,16 @@ export function createApiClient(config: ApiClientConfig) {
       return (await response.json()) as DigestEnvelope
     },
 
-    // POST /sessions (fgos-gateway-api-v1.yaml:431-460)
+    // POST /sessions answers 501 (the per-session worktree verb was retired; see fgos-gateway-api-v1.yaml)
     startSession: (item?: string) => request<Session>(config, '/sessions', jsonBody(item ? { item } : {})),
 
-    // DELETE /sessions/{sessionId} (fgos-gateway-api-v1.yaml:462-483)
+    // DELETE /sessions/{sessionId} answers 501 (see fgos-gateway-api-v1.yaml)
     endSession: (sessionId: string, force = false) =>
       request<unknown>(config, `/sessions/${encodeURIComponent(sessionId)}${query({ force: force || undefined })}`, {
         method: 'DELETE',
       }),
 
-    // GET /sessions/{sessionId}/slots (fgos-gateway-api-v1.yaml:485-521)
+    // GET /sessions/{sessionId}/slots answers 501 (see fgos-gateway-api-v1.yaml)
     sessionSlots: (sessionId: string) =>
       request<SessionSlotsData>(config, `/sessions/${encodeURIComponent(sessionId)}/slots`),
 

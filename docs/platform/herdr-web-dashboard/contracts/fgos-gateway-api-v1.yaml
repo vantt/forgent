@@ -20,7 +20,7 @@ info:
         no new write path into `.fgos/`.
       - The daemon becomes the one control-plane that can drive BOTH
         interactive session workflows (what herdr/TUI panes do today via
-        `fgos session start/end`) and the headless runner
+        `fgos worktree`) and the headless runner
         (`fgos-runner --once`) — see `/v1/sessions` and `/v1/runner/tick`.
       - The attention/push channel (STR48, contract CTR008, status
         `idea`) is explicitly OUT of scope for v1 — 0014 point 6 keeps it
@@ -508,30 +508,17 @@ paths:
     post:
       operationId: startSession
       tags: [orchestration]
-      summary: Open an interactive session worktree (wraps `fgos session start`)
+      summary: Open an interactive session worktree (retired, answers 501)
       description: |
-        Interactive-session half of 0014's orchestration scope — what a
-        herdr/TUI pane does today by shelling out directly. A future
-        web/desktop client drives the same lifecycle through this route
-        instead of spawning its own git worktree.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                item: { type: string, description: Optional work item id to open the session against. }
+        RETIRED. The per-session worktree verb this route wrapped no longer exists, so the route answers
+        501 `{category: precondition, message}` and runs nothing. It returns when the gateway is rebuilt on
+        `fgos session` (head sessions). Making or removing a checkout is `fgos worktree`.
       responses:
-        '200':
-          description: Session opened
+        '501':
+          description: Retired; the route runs no verb
           content:
             application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/Envelope'
-                  - type: object
-                    properties:
-                      data: { $ref: '#/components/schemas/Session' }
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
         default:
           $ref: '#/components/responses/Error'
 
@@ -544,17 +531,17 @@ paths:
     delete:
       operationId: endSession
       tags: [orchestration]
-      summary: Close an interactive session worktree (wraps `fgos session end`)
-      parameters:
-        - name: force
-          in: query
-          schema: { type: boolean, default: false }
+      summary: Close an interactive session worktree (retired, answers 501)
+      description: |
+        RETIRED. The per-session worktree verb this route wrapped no longer exists, so the route answers
+        501 `{category: precondition, message}` and runs nothing. It returns when the gateway is rebuilt on
+        `fgos session` (head sessions). Making or removing a checkout is `fgos worktree`.
       responses:
-        '200':
-          description: Session closed
+        '501':
+          description: Retired; the route runs no verb
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Envelope' }
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
         default:
           $ref: '#/components/responses/Error'
 
@@ -567,32 +554,17 @@ paths:
     get:
       operationId: sessionSlots
       tags: [orchestration]
-      summary: Worker-slot occupancy for one session (wraps `fgos slots`, session-scoped)
+      summary: Worker-slot occupancy for one session (retired, answers 501)
+      description: |
+        RETIRED. The per-session worktree verb this route wrapped no longer exists, so the route answers
+        501 `{category: precondition, message}` and runs nothing. It returns when the gateway is rebuilt on
+        `fgos session` (head sessions). Making or removing a checkout is `fgos worktree`.
       responses:
-        '200':
-          description: OK
+        '501':
+          description: Retired; the route runs no verb
           content:
             application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/Envelope'
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        properties:
-                          execution:
-                            type: object
-                            properties:
-                              occupied: { type: integer }
-                              items:
-                                type: array
-                                items:
-                                  type: object
-                                  properties:
-                                    id: { type: string }
-                                    sessionId: { type: string }
-                                    claimRole: { type: string }
+              schema: { $ref: '#/components/schemas/ErrorEnvelope' }
         default:
           $ref: '#/components/responses/Error'
 
