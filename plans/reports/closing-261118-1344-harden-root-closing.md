@@ -24,7 +24,23 @@ The "better, not bigger" test (net at most zero per language) was met by T0 plus
 
 ## 2. Whole-suite wall time against phase 00
 
-Not re-measured. The re-measure is a heavy full-suite run, and the owner has not been asked yet; it is listed in section 7. Until then the only suite timings are the ones each layer report quotes, at different loads.
+Re-measured on 2026-11-18 by the lead, on the owner's decision (option B). Command `npm test` in the main checkout at main `a7719c357` (the two docs commits of this plan on top of `794f75274`), fg-server2, 24 CPUs, started 14:13:27, ended 14:27:18.
+
+| Measure | Value |
+|---|---|
+| Wall time | 13 min 51 s (830.99 s); the runner's own test duration 769.6 s |
+| CPU | 862 percent of one core; user 4 783 s, system 2 387 s; peak resident 3.4 GB |
+| Tests | 8 480 run, 8 444 pass, 8 fail, 28 skipped, 0 cancelled |
+| Load average at start, end | 5.11 at start; 16.6 (5-minute figure) at end, because other lanes ran tests at the same time |
+| Phase 00 baseline | T0 baseline report quotes 8 724 tests and 145 doctor rows; it records no whole-suite wall time (`research-261021-1210-harden-t0-baseline.md`), so there is no like-for-like pair to compare |
+
+Read this figure by load class (HL-29): the machine was shared during the run, so 13 min 51 s is an upper bound for a quiet machine, not a quiet measurement. It is recorded as the first whole-suite wall time of record for the program.
+
+Failures: 8 at the full run. Re-run on their own after the suite finished, 6 pass (they failed only under the shared load: `facade-multiprocess` predecessor kill wait, `fanout-batch-runner-commit`, `loop-rununit` stray-write, `spawn-worker` dispatch depth, `release-tree` R3, `test-select` detached HEAD). Two reproduce alone:
+- `test/cli/fgos-workflow.test.mjs:90` expects `workflow start --plan` to be an unknown flag, but the OPS-METRICS lane landed `workflow start --plan <dir>` at 13:34 (board line 2026-11-18 13:34). The test is stale against main; the owner is the metrics lane.
+- `test/setup/instruction-projections.test.mjs:232` reports `.fgos/instructions/effective/repo.json` and the `AGENTS.md` managed block as stale. Not caused by this plan (it changed only plans files). Owner and cause not yet traced.
+
+Nothing here is a regression of a HARDEN layer as far as the evidence shows, but both reds sit on main today.
 
 ## 3. Layers T0 to T2
 
@@ -606,7 +622,7 @@ Closed with evidence in the ledger (not re-listed as open): H1, H2/H3 recorded, 
 
 ## 7. Open owner decisions and unresolved questions
 
-1. Re-measure whole-suite wall time against phase 00 (heavy run, needs the machine quiet; no focused runs in the same worktree meanwhile). Run it, or accept the per-layer timings?
+1. The whole-suite wall time was measured under shared load (section 2); a quiet-machine re-run is optional. Two reds on main need an owner: the stale `workflow start --plan` test (metrics lane) and the instruction projections.
 2. Accept or reject the T9 misses: 211 modules at entry, doctor 15 s against 12 s, Node +550 over estimate. No recorded answer.
 3. T9 inputs still open on main: doctor per-row timing (owner pick 2b), `test.fixture.echo` in the production catalog, the tautological admission gate, the empty `RouterPolicy`. Pick which become items; none is built until chosen (RUL104).
 4. T7: open the Work-layer council now that T8 and T9 are closed? Decision 87 deferred "the Work batch" to after the packaging release; its status is not verified.
