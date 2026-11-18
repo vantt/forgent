@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "615718b68ae961f21d22c24ebf6ae165897506b43c1f5101e612c231af197ed6",
+  "payloadDigest": "73c1bb3e7d67fba41136bbf9f5a09fa8fc9ffe0f38a7398c74715fb8a7632587",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -922,7 +922,7 @@
     "packages/session-host/rust/src/types.rs": "c11cdb42d69f78fa2b709f45d801a54bdc6b3447e7786e94c816bd5f12464cc4",
     "packages/session-host/rust/tests/host.rs": "cb88dacad840bde304e2dcf593b959a76cb1d65411b3adfa1002d8be70350a85",
     "packages/supervision/rust/src/discussion_source.rs": "636069f9dd1394767b1c4afa81b5c1afb32140b75bd9fe92b2e5da60014ccdac",
-    "packages/supervision/rust/src/land.rs": "a9195f49413a62e7402b228f38ac9758d1d033a36b6948538125758490f091b4",
+    "packages/supervision/rust/src/land.rs": "a5c67ddd10f92c26790e27fab8f952acf5381fb286dcf178c9e485feee2a31df",
     "packages/supervision/rust/src/lib.rs": "8070f2ae2159030a71567ae0ce2da103178415a0703b3de3b9b0f8d76b4cdf15",
     "packages/supervision/rust/src/notify.rs": "2a8ce19013396e3a31c915a903c4762889cc3f902137279e6378c3deb84e8edd",
     "packages/supervision/rust/src/portfolio.rs": "ef5b142f6734e6b8fecd82052ce3239f451416c411cb090b40c1d6665796e65f",
@@ -931,6 +931,7 @@
     "packages/supervision/rust/src/wake.rs": "5b66c7f805a75cc193da6484f1d84a2e916018015250f95c4b9027c33b55b4c9",
     "packages/supervision/rust/src/watcher.rs": "752537c015a05cdf8569954da55a30466f82d8a70719546c0e63569fe44190b2",
     "packages/supervision/rust/tests/definitions.rs": "8140a980c0f45a55dedf14efebcfc69f3fb7f87897f51a8bb4e3ce0bf58416cb",
+    "packages/supervision/rust/tests/land.rs": "907b6cf495ce71d4eab406ae9feaec59df923c2b4cb5d5fa985dead6c102dca5",
     "packages/supervision/rust/tests/portfolio.rs": "84b83ffc4a69b2d79d48be467d2523fb63f447f4819586d6443651638cd3f449",
     "packages/supervision/rust/tests/queue.rs": "64318ef31e520f9123cf018d0d66ab43ab67e75f8850f99a7d4112333a5bd60e",
     "packages/supervision/rust/tests/watcher.rs": "4487b09077652472c7b3e1771d7d4a6accd3a2a74e5bbd0369c758cc89c3eaae",
@@ -1465,7 +1466,16 @@
     "src/workflow/units-source.mjs": "e4376a8f38d0a55f2e132aa6a094b552e8117eb46b6a4d8b03b00da32d6bb2b4",
     "scripts/lib/git-one-door-declarations.v1.json": "aef53267edf8f1a66e7fa295d4029f1cf86b55a0bd52cf81779c41aa3cb86b51"
   },
-  "sites": [],
+  "sites": [
+    {
+      "path": "packages/supervision/rust/src/land.rs",
+      "line": 137,
+      "spawn": "Command::new",
+      "binary": "sh",
+      "siteId": "run:f956953ff77a52d61188c8ea0703843d119b8c4aa1b683e7ca42dfd9626eb2a5",
+      "family": "unresolved-binary"
+    }
+  ],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
@@ -3856,6 +3866,20 @@
       "spawn": "Command::new <- packages/supervision/rust/src/notify.rs:46",
       "binary": "(uncalled new)",
       "class": "uncalled-wrapper"
+    },
+    {
+      "path": "packages/supervision/rust/tests/land.rs",
+      "line": 16,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/supervision/rust/tests/land.rs",
+      "line": 31,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
     },
     {
       "path": "packages/supervision/rust/tests/queue.rs",

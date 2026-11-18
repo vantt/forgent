@@ -10,9 +10,10 @@
 //! control: a lead lands only a phase its reviewer passed, and the commands come from the trusted
 //! main checkout's config. Confined gates are not built here.
 use fgos_git::{
-    wal, CommitRequest, DiffScope, DiffSides, GitDriver, InspectCursor, LandEvidence, LandFile,
-    LandRequest, ObjectType, Oid, OperationError, ReadObject, RefMapping, RefName, RefValue,
-    Remote, RemoteGrant, RepoHandle, TrunkFact,
+    wal, CommitRequest, DiffScope, DiffSides, GitDriver, HeadFact, Ignored, Inspect, InspectCursor,
+    LandCandidate, LandEvidence, LandFile, LandRequest, ObjectType, Oid, OperationError,
+    ReadObject, RefMapping, RefName, RefValue, Remote, RemoteGrant, RepoHandle, ResolveRepo,
+    ResultCode, Submodules, TrunkFact, Untracked,
 };
 use sha2::{Digest, Sha256};
 use std::io::Read;
@@ -608,15 +609,13 @@ impl Lander<'_> {
             .map(|r| r.files.clone())
             .unwrap_or_default();
 
-        let merged = p
-            .git
-            .merge_tree(p.repo, &target, &source)
-            .map_err(from_git)?;
+        // The footprint judges what the branch itself carries (merge base to source). A regenerated
+        // file is exempt only through the regeneration this land performs, never as a branch edit.
         if let Some(footprint) = &command.footprint {
+            let base = self.merge_base(&target, &source)?;
             let outside: Vec<String> = self
-                .changed_paths(&target, &merged.tree)?
+                .changed_paths(&base, &source)?
                 .into_iter()
-                .filter(|path| !regen_files.contains(path))
                 .map(|path| self.matches_any(&path, footprint).map(|ok| (ok, path)))
                 .collect::<Result<Vec<_>, _>>()?
                 .into_iter()
@@ -627,6 +626,10 @@ impl Lander<'_> {
                 return Err(refuse("land-outside-footprint", outside.join(", ")));
             }
         }
+        let merged = p
+            .git
+            .merge_tree(p.repo, &target, &source)
+            .map_err(from_git)?;
         let conflicted: Vec<String> = merged.conflicted_paths.iter().map(|b| lossy(b)).collect();
         let undeclared: Vec<&String> = conflicted
             .iter()
@@ -697,6 +700,9 @@ impl Lander<'_> {
             &command.tests,
             &mut gates_run,
         )?;
+        // A gate that changed tracked or staged candidate bytes means the gated tree is not the
+        // candidate: refuse before anything reaches the remote.
+        self.require_clean_candidate(&candidate)?;
 
         if !self.push_candidate(&session, target_branch)? {
             self.abandon(session, &session_id)?;
@@ -732,6 +738,76 @@ impl Lander<'_> {
             retries,
             gates_run,
         }))
+    }
+
+    fn merge_base(&self, target: &Oid, source: &Oid) -> Result<Oid, LandRefusal> {
+        let facts = self
+            .ports
+            .git
+            .compare_commits(self.ports.repo, target, source)
+            .map_err(from_git)?;
+        let base = facts
+            .get("mergeBase")
+            .and_then(|b| b.as_str())
+            .ok_or_else(|| {
+                refuse(
+                    "land-branch-unknown",
+                    "the branch shares no history with the target",
+                )
+            })?;
+        oid_of(self.ports.repo, base)
+    }
+
+    /// The candidate checkout still holds exactly the candidate commit, with no tracked or staged
+    /// change: the same rule publication applies, read before the push.
+    fn require_clean_candidate(&self, candidate: &LandCandidate) -> Result<(), LandRefusal> {
+        let p = self.ports;
+        let dirty = |what: String| refuse("land-candidate-dirty", what);
+        let repo = match p
+            .git
+            .resolve_repo(&candidate.worktree, p.repo.trusted_main_root())
+            .map_err(from_git)?
+        {
+            ResolveRepo::Repository(repo) => repo,
+            ResolveRepo::NotARepository => {
+                return Err(dirty(format!(
+                    "{} is no longer a checkout",
+                    candidate.worktree.display()
+                )))
+            }
+        };
+        match p.git.resolve_head(&repo).map_err(from_git)? {
+            HeadFact::Attached { commit, .. } | HeadFact::Detached { commit }
+                if commit.as_str() == candidate.candidate => {}
+            other => {
+                return Err(dirty(format!(
+                    "a gate moved the candidate checkout's HEAD: {other:?}"
+                )))
+            }
+        }
+        let status = p
+            .git
+            .status(
+                &repo,
+                Untracked::None,
+                Submodules::Configured,
+                Ignored::Excluded,
+                None,
+                64,
+            )
+            .map_err(from_git)?;
+        if !status.entries.is_empty() {
+            return Err(dirty(format!(
+                "a gate changed tracked candidate files: {}",
+                status
+                    .entries
+                    .iter()
+                    .map(|e| lossy(&e.path))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )));
+        }
+        Ok(())
     }
 
     /// Run the regeneration command in the candidate worktree. `Some(files)` when a regenerated file
@@ -828,6 +904,16 @@ impl Lander<'_> {
         }
         let target = self.target_branch(command)?;
         let dest = format!("refs/heads/{target}");
+        // A paths land commits the main checkout's checked-out branch, so that branch is the target.
+        match p.git.resolve_head(p.repo).map_err(from_git)? {
+            HeadFact::Attached { target: head, .. } if head.as_str() == dest => {}
+            other => {
+                return Err(refuse(
+                    "land-target-not-checked-out",
+                    format!("the main checkout is on {other:?}, not {dest}"),
+                ))
+            }
+        }
         self.sync_target(&target)?;
         self.check_tests(p.repo.trusted_main_root(), &command.tests)?;
         let mut baseline = p
@@ -870,6 +956,17 @@ impl Lander<'_> {
                 "the named paths have no changes to land",
             ));
         };
+        // A hook changed the commit's tree, files or parents: it is not what was gated; push nothing.
+        if result.status != ResultCode::Committed {
+            return Err(refuse(
+                "land-commit-contract-violation",
+                format!(
+                    "local commit {} ended {:?}, not a clean commit of the named paths; nothing pushed",
+                    commit.as_str(),
+                    result.status
+                ),
+            ));
+        }
         let mut retries = 0;
         loop {
             if self.push_local(&target)? {
