@@ -81,6 +81,11 @@ impl Schedule {
         }
     }
 
+    /// The doctor row and fix id of this schedule's timer: the marker's name.
+    pub fn id(self) -> &'static str {
+        self.marker().trim_start_matches("fgos-managed: ")
+    }
+
     fn label(self) -> &'static str {
         match self {
             Self::MailboxSync => "mailbox sync",
@@ -904,7 +909,11 @@ fn plan(schedule: Schedule, project_root: &Path, found: Option<Found>, env: &Tim
     };
     let stem = unit_stem(project_root, schedule);
     let words = schedule.command(&found, project_root);
-    let vars = schedule.service_vars(&env.host);
+    let host = match schedule {
+        Schedule::WatcherTick => pin_installed_caller_env(&env.host, &chosen, &stem, schedule),
+        _ => env.host.clone(),
+    };
+    let vars = schedule.service_vars(&host);
     let spec = UnitSpec {
         stem: &stem,
         bin: &bin.to_string_lossy(),
@@ -922,6 +931,81 @@ fn plan(schedule: Schedule, project_root: &Path, found: Option<Found>, env: &Tim
         },
         Err(message) => Plan::Refused(message),
     }
+}
+
+/// The values the installing environment decided, as an installed unit carries them: the PATH folders beyond
+/// the fixed ones and the herdr variables. A unit's content must not depend on who reads or rewrites it, so
+/// once a unit with this schedule's marker is installed these lines are its own, never the caller's.
+fn pin_installed_caller_env(
+    host: &Host,
+    chosen: &Scheduler,
+    stem: &str,
+    schedule: Schedule,
+) -> Host {
+    let installed = match chosen.kind {
+        Kind::Systemd => {
+            std::fs::read_to_string(chosen.dir.join(format!("{stem}.service"))).map(|t| (t, true))
+        }
+        Kind::Launchd => std::fs::read_to_string(chosen.dir.join(format!("dev.fgos.{stem}.plist")))
+            .map(|t| (t, false)),
+    };
+    let Ok((text, systemd)) = installed else {
+        return host.clone();
+    };
+    if !text.contains(schedule.marker()) {
+        return host.clone();
+    }
+    let mut vars: Vec<(String, String)> = Vec::new();
+    for line in text.lines() {
+        let line = line.trim();
+        if systemd {
+            if let Some(body) = line
+                .strip_prefix("Environment=\"")
+                .and_then(|b| b.strip_suffix('"'))
+            {
+                let mut plain = String::new();
+                let mut chars = body.chars();
+                while let Some(c) = chars.next() {
+                    plain.push(if c == '\\' {
+                        chars.next().unwrap_or(c)
+                    } else {
+                        c
+                    });
+                }
+                if let Some((k, v)) = plain.split_once('=') {
+                    vars.push((k.to_string(), v.to_string()));
+                }
+            }
+        } else if let Some(rest) = line.strip_prefix("<key>") {
+            if let Some((k, v)) = rest.split_once("</key><string>") {
+                if let Some(v) = v.strip_suffix("</string>") {
+                    vars.push((
+                        k.to_string(),
+                        v.replace("&lt;", "<")
+                            .replace("&gt;", ">")
+                            .replace("&amp;", "&"),
+                    ));
+                }
+            }
+        }
+    }
+    let fixed: Vec<String> = host.probe_path().split(':').map(str::to_string).collect();
+    let mut pinned = host.clone();
+    pinned.tool_dirs = vars
+        .iter()
+        .find(|(k, _)| k == "PATH")
+        .map(|(_, v)| {
+            v.split(':')
+                .filter(|d| !d.is_empty() && !fixed.iter().any(|f| f == d))
+                .map(str::to_string)
+                .collect()
+        })
+        .unwrap_or_default();
+    pinned.herdr_env = vars
+        .into_iter()
+        .filter(|(k, _)| k == "HERDR_SOCKET_PATH" || k == "HERDR_SESSION")
+        .collect();
+    pinned
 }
 
 fn found_of(
@@ -1259,6 +1343,54 @@ mod tests {
             host("darwin", home).probe_path(),
             "/home/u/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
         );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn the_watcher_unit_does_not_change_with_whoever_reads_or_rewrites_it() {
+        let w = World::new();
+        let root = PathBuf::from("/p");
+        let run = |_: &str, _: &[String]| -> Result<(), String> { Ok(()) };
+        let bin = move |_: &Path| Some(PathBuf::from(BIN));
+        let caller = |tool_dirs: &[&str], herdr: &[(&str, &str)]| {
+            let mut h = host("linux", &w.home);
+            h.tool_dirs = tool_dirs.iter().map(|d| d.to_string()).collect();
+            h.herdr_env = herdr
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect();
+            h
+        };
+        let env = |host: Host| TimerEnv {
+            host,
+            config: &|_| Ok(None),
+            host_bin: &bin,
+            run: &run,
+        };
+        let installer = env(caller(
+            &["/nvm/bin"],
+            &[
+                ("HERDR_SOCKET_PATH", "/run/h.sock"),
+                ("HERDR_SESSION", "s1"),
+            ],
+        ));
+        let bare = env(caller(&[], &[]));
+        let other = env(caller(&["/else/bin"], &[("HERDR_SESSION", "s2")]));
+        let schedule = Schedule::WatcherTick;
+        let unit = |name: &str| std::fs::read_to_string(w.units().join(name)).unwrap();
+        let service = format!("{}.service", unit_stem(&root, schedule));
+
+        assert!(fix_with(schedule, &root, on(schedule), &installer).fixed);
+        let installed = unit(&service);
+        assert!(installed.contains("/nvm/bin") && installed.contains("HERDR_SOCKET_PATH"));
+        for caller_env in [&installer, &bare, &other] {
+            let check = check_with(schedule, &root, on(schedule), caller_env).unwrap();
+            assert!(check.passed, "{}", check.message);
+        }
+        assert!(fix_with(schedule, &root, on(schedule), &bare).fixed);
+        assert_eq!(unit(&service), installed);
+        assert!(fix_with(schedule, &root, on(schedule), &other).fixed);
+        assert_eq!(unit(&service), installed);
     }
 
     #[cfg(unix)]
