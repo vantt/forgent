@@ -42,6 +42,7 @@ pub mod mailbox_verbs;
 pub mod metrics_sources;
 pub mod observe_declarations;
 pub mod observe_query;
+pub mod observe_sources;
 pub mod run_dirs;
 pub mod seat_binding;
 pub mod session;

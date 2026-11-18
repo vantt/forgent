@@ -3,6 +3,7 @@
 //! reads config; it asks this environment.
 
 use super::agents::PayloadRoot;
+use super::metrics_sources::build_host_record_sources;
 use super::observe_declarations::embedded_declarations;
 use fgos_observe::metrics_cli::RecordEnvironment;
 use fgos_observe::record::registry::EmbeddedDeclaration;
@@ -30,11 +31,13 @@ impl RecordEnvironment for HostRecordEnvironment {
     }
 
     fn record_sources(&self) -> Vec<Box<dyn RecordSource>> {
-        vec![
+        let mut sources: Vec<Box<dyn RecordSource>> = vec![
             Box::new(ClaudeTranscriptsSource::new()),
             Box::new(RunProjectionSource::new()),
             Box::new(RunResultSource::new()),
-        ]
+        ];
+        sources.extend(build_host_record_sources());
+        sources
     }
 
     fn config_number(&self, root: &Path, key: &str) -> Result<Option<f64>, String> {
@@ -99,7 +102,8 @@ mod tests {
                 "fgos-observe-health",
                 "fgos-observe-friction",
                 "fgos-observe-transcripts",
-                "fgos-run-result"
+                "fgos-run-result",
+                "fgos-host-sources"
             ]
         );
     }

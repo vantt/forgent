@@ -36,6 +36,10 @@ sha2 = { workspace = true }
 # directory reads.
 fgos-process = { path = "../../packages/process/rust" }
 
+[target.'cfg(unix)'.dependencies]
+# The board log carries local wall-clock stamps; the local UTC offset comes from the C library.
+libc = { workspace = true }
+
 [dev-dependencies]
 
 [target.'cfg(unix)'.dev-dependencies]

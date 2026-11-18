@@ -1,0 +1,33 @@
+{
+  "contract": "observe-kinds.v1",
+  "attrs": {
+    "fgos.head.state": { "type": "string", "values": ["live", "gone", "unknown", "retired"] },
+    "fgos.head.identity": { "type": "string", "values": ["alive", "unknown", "remote", "absent"] },
+    "fgos.head.persona": { "type": "string" },
+    "fgos.head.gen": { "type": "int" },
+    "fgos.plan.change": { "type": "string", "values": ["status", "priority"] },
+    "fgos.plan.from": { "type": "string" },
+    "fgos.plan.to": { "type": "string" },
+    "fgos.plan.activity.source": { "type": "string", "values": ["commit", "board-log"] },
+    "fgos.git.commit": { "type": "string" },
+    "fgos.board.lane": { "type": "string" }
+  },
+  "measures": {},
+  "kinds": {
+    "fgos.head.state": {
+      "subjects": ["head"],
+      "attrs": ["fgos.head.state", "fgos.head.identity", "fgos.head.persona", "fgos.head.gen"],
+      "measures": []
+    },
+    "fgos.plan.status": {
+      "subjects": ["plan"],
+      "attrs": ["fgos.plan.change", "fgos.plan.from", "fgos.plan.to", "fgos.git.commit"],
+      "measures": []
+    },
+    "fgos.plan.activity": {
+      "subjects": ["plan"],
+      "attrs": ["fgos.plan.activity.source", "fgos.git.commit", "fgos.board.lane"],
+      "measures": []
+    }
+  }
+}

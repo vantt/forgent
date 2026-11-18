@@ -11,6 +11,7 @@ pub fn embedded_declarations() -> Vec<EmbeddedDeclaration> {
         fgos_observe::friction::FRICTION_DECLARATION,
         fgos_observe::sources::transcript_records::TRANSCRIPT_DECLARATION,
         fgos_run_result::RUN_DECLARATION,
+        super::observe_sources::SOURCES_DECLARATION,
     ]
 }
 
