@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "S6a worktree door: one checkout door in Rust (fgos worktree, resync-worktree, Work's create/remove as addon wrappers), landed on main as one series"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 footprint:
