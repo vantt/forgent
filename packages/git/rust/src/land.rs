@@ -1673,6 +1673,24 @@ impl GitDriver {
         p.insert("ref".into(), slot_key(&req.destination));
         slot.acquire("merge-slot", &p, Wait::Ms(0))
             .map_err(failure)?;
+        // A crashed `push_land_candidate` leaves its temporary branch. The Refs door drops it
+        // under the merge slot with the candidate as exact-old and under the same operation id
+        // as the normal path, so a half-done drop replays. A refusal (branch in use, moved, or
+        // pointing elsewhere) leaves the branch: it is only a name.
+        let push_branch =
+            RefName::parse(&format!("refs/heads/fgos-land-push-{id}")).map_err(failure)?;
+        let pushed_candidate =
+            Oid::parse(&payload.candidate.candidate, repo.object_format()).map_err(failure)?;
+        if crate::refs::direct(self, repo, &push_branch)? != ExpectedTip::Absent {
+            let _ = self.delete_ref(
+                repo,
+                held(&slot)?,
+                &push_branch,
+                &pushed_candidate,
+                writer,
+                &format!("{id}-pushsrc-drop"),
+            );
+        }
         let mut scope = crate::refs::acquire_worktree_admin(repo, held(&slot)?)?;
         scope
             .acquire("main-checkout", &params(repo), Wait::Ms(5000))
@@ -1688,7 +1706,6 @@ impl GitDriver {
         scope
             .acquire("recovery", &recovery_params, Wait::Ms(0))
             .map_err(failure)?;
-        self.drop_land_push_branch(repo, &scope, id)?;
         if let Some(c) = compact {
             return land_outcome_receipt(id, &intent, &c.outcome()?, repo);
         }
@@ -1948,28 +1965,6 @@ impl GitDriver {
 }
 
 impl GitDriver {
-    /// Delete the temporary push branch a crashed `push_land_candidate` of this Land left behind:
-    /// only that exact name, by exact-old compare-and-swap on the OID it holds now.
-    fn drop_land_push_branch(&self, repo: &RepoHandle, scope: &LockScope, id: &str) -> Result<()> {
-        let name = RefName::parse(&format!("refs/heads/fgos-land-push-{id}")).map_err(failure)?;
-        if let ExpectedTip::Oid(oid) = crate::refs::direct(self, repo, &name)? {
-            self.land_text(
-                repo,
-                scope,
-                &durable_args(&[
-                    "update-ref",
-                    "--no-deref",
-                    "-d",
-                    name.as_str(),
-                    oid.as_str(),
-                ]),
-                &[],
-            )?;
-            crate::refs::sync_refs(repo, &name)?;
-        }
-        Ok(())
-    }
-
     /// Cleanup is part of explicit recovery, after the consumer has durably
     /// settled its unique (repoIdentity, operationId, settlementKind) identity.
     /// The opaque acknowledgement is a consumer assertion, never Git settlement.
