@@ -25,6 +25,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import { domainCatalog } from '../util/domain-dirs.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { checkCompiledDomains } from '../util/domain-compile.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { defaultLoginHomeStores } from '../runner/dispatch/llm-accounts.mjs';
@@ -172,7 +173,7 @@ export function createDoctorRun() {
  */
 function doctorWorkView(root, run = createDoctorRun()) {
   return run.once(`work-view:${root}`, () => {
-    const fgosDir = path.join(root, '.fgos');
+    const fgosDir = fgosDirFromRoot(root);
     if (!fs.existsSync(fgosDir)) return null;
     try {
       return listWork(fgosDir);
@@ -326,7 +327,7 @@ export function checkRunnerPatternsConfig(cwd, run) {
   const globalDir = globalFgosDir();
   const display = (file) => {
     if (file?.startsWith('global:')) return path.join(globalDir, file.slice('global:'.length));
-    if (file?.startsWith('project:')) return path.join(cwd, '.fgos', file.slice('project:'.length));
+    if (file?.startsWith('project:')) return path.join(fgosDirFromRoot(cwd), file.slice('project:'.length));
     return file ?? '<file>';
   };
 
@@ -2261,7 +2262,7 @@ registerCheck({
  */
 export function checkSeatBindingRoute(cwd, { hostBin } = {}) {
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
-  const fgosDir = path.join(root, '.fgos');
+  const fgosDir = fgosDirFromRoot(root);
   const { bin, tried, activated } = hostBin
     ? { bin: hostBin, tried: [], activated: false }
     : resolveSeatBindingHost({ cwd, fgosDir });

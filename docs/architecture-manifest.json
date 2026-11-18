@@ -668,8 +668,7 @@
         { "path": "src/runner/operation-choice.mjs", "reason": "Work tier; Work is deferred until after the packaging release" },
         { "path": "src/runner/work-dispatch.mjs", "reason": "Work tier; Work is deferred until after the packaging release" },
         { "path": "src/state/porting-store.mjs", "reason": "Work tier; Work is deferred until after the packaging release" },
-        { "path": "src/state/store.mjs", "reason": "Work tier; Work is deferred until after the packaging release" },
-        { "path": "src/setup/registrations.mjs", "reason": "phase 6 swaps it" }
+        { "path": "src/state/store.mjs", "reason": "Work tier; Work is deferred until after the packaging release" }
       ],
       "retiredBy": "the Work batch (T7) swaps the five Work-tier joins",
       "reason": "which root is decided by the invocation-root door; the .fgos of that root is joined in one T0 function, so every tier uses the same answer"

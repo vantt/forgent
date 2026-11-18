@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "0a6eea972f565c51aad4a33bd7b8196945f665e4924a8681162af8fba2e516b5",
+  "payloadDigest": "ab716377393a8d89a4ae016e912a90c6b59af456e57aa2bb26ca4839c13491f3",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -81,7 +81,7 @@
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c1bfc1a2b6992cfe70c59acf9350a6da5fcce08033bb76fc1720d2c5df1091fa",
     "apps/fgos-gateway/build.rs": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",
     "apps/fgos-gateway/src/cf_access.rs": "91dd9c6789d96baaf89d7b740ec56280c671b30a9cac9776bafe79c3d9cfd2ee",
-    "apps/fgos-gateway/src/gateway.rs": "dd71beeeaeaf22eda04b77b6df808e55ec62ff2a2f5083371467be44006ba005",
+    "apps/fgos-gateway/src/gateway.rs": "bc57e90723bd6b322dc9e9772bfcfde091997d0e17cd923cb058b2b1c0138e6e",
     "apps/fgos-gateway/src/lib.rs": "32d594b18ae0c15f09c3b06c69d82bb142f1370e6fffb6b95d104378b0ffa3fd",
     "apps/fgos-gateway/src/main.rs": "8184c8e2edfb686747243fbb2916582781687195d602fd63e5837b4383edc47e",
     "apps/fgos-gateway/src/mcp.rs": "8fb0f82ca74811e1c73f11d35f8b09061299dac984380abd32dea85fab133fea",
@@ -1353,7 +1353,7 @@
     "src/setup/instruction-registry.mjs": "54422d21433247b6bbdf580a8480cd4ce912c8c7928c96ca03a72e8be25abdd7",
     "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
     "src/setup/model-pool-checks.mjs": "2e7570e565313df19a151d79aa6bd5ad7f1deed21ea273c61767014869e0eb28",
-    "src/setup/registrations.mjs": "16fad6661a98627587898f9da24e25ee3f5b35c69feffbd91d9bedb7e1cffdf6",
+    "src/setup/registrations.mjs": "1811dc369a13b551089cea92d76af7a629098ef81b1ead35049b8833fcd74075",
     "src/setup/run-supervisor-checks.mjs": "9dba2363cea63e472ffccd19f4f9349219079cedbc5cc0639e473a967d450d87",
     "src/setup/seat-binding-checks.mjs": "ab0ff541e60c8e5340e87063839f954d970d889159c2aa40ac41992accd2a894",
     "src/setup/session-keep-declared.mjs": "de88967dc8c6dd6a7c460ddf264a07aa13c4c7ee3a458a07ba6be3830e52864e",
@@ -4487,41 +4487,41 @@
     {
       "path": "src/setup/doctor-bridge.mjs",
       "line": 88,
-      "spawn": "runBridged -> src/setup/registrations.mjs:250",
+      "spawn": "runBridged -> src/setup/registrations.mjs:251",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2011,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:836",
+      "line": 2012,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:837",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2058,
+      "line": 2059,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:835",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2098,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:836",
+      "line": 2099,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:837",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2105,
+      "line": 2106,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:526",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2272,
+      "line": 2273,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:160",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
