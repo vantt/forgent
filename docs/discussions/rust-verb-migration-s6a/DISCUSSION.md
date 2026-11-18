@@ -11,8 +11,8 @@ discussion settles the worktree split. Shaper: claude-kqih@fg-server2, branch `s
 2026-11-18 13:25. Scan done (base 2080d7bb4). D1 settled: plan 0947 keeps the session-verb retirement
 and the `head` -> `session` rename; S6a builds the one Rust `fgos worktree` door, folding in what
 `session start/end/list/gc` did and the runner's own `createWorktree`; 0947 runs after S6a lands its
-worktree phase, not after all of S6a. Open: Q1-Q4 in `QUESTIONS.md` (session checkout provisioning,
-`fgos-runner` owner, order against plan 1045 P6, whether `src/runner/worktree.mjs` is in scope).
+worktree phase, not after all of S6a. D2: `worktree create` provisions by default, `--bare` opts out.
+Open: Q2-Q4 in `QUESTIONS.md` (`fgos-runner` owner, order against plan 1045 P6, whether `src/runner/worktree.mjs` is in scope).
 
 ## 2. Mục tiêu & đề bài
 
@@ -33,7 +33,7 @@ lands; its phases 11 (doctor rows) and 12 (doors, close) are still pending.
 | Point | State | Evidence / note |
 |---|---|---|
 | Split with plan 0947 | settled (D1) | owner 2026-11-18 13:2x |
-| Session checkout: keep bare (no `worktreeSetup`/deps/skill roots) or provision like `worktree create` | open, Q1 | `apps/fgos/src/wiring/session.rs` start never provisions; `src/verbs/worktree/create.mjs:14` calls `provisionWorktree` |
+| Session checkout: keep bare (no `worktreeSetup`/deps/skill roots) or provision like `worktree create` | settled (D2) | `apps/fgos/src/wiring/session.rs` start never provisions; `src/verbs/worktree/create.mjs:14` calls `provisionWorktree` |
 | `fgos-runner` entry belongs to S6a or S7 | open, Q2 | `bin/fgos-runner.mjs` drives the Work frontier via `src/runner/loop.mjs`; S7 owns tier-7 `src/runner/*.mjs` |
 | Order against plan 1045 P6 (lane pool edits `direct-launch.mjs`, `assignment-runner.mjs`, `envelope.v3.json`) | open, Q3 | both edit S6a's Node launchers |
 | `src/runner/worktree.mjs` (1437 lines, real worktree engine, used by S6b/S7 callers) in S6a scope | open, Q4 | not in the program row's file list |
@@ -48,12 +48,14 @@ lands; its phases 11 (doctor rows) and 12 (doors, close) are still pending.
 | D-ID | Decision | Rationale | Date |
 |---|---|---|---|
 | D1 | Plan 0947 keeps: delete the `session` worktree lifecycle (`session.rs`, `sessions.json` writer, `sessions` lock, `is_session_worktree`), gateway `/v1/sessions` routes answer 501, Identity stops reading `sessions.json` (its phase 4 footprint gains `packages/mailbox/rust/store/src/hook/resolve.rs`), rename `head` to `session`. S6a builds `fgos worktree` in Rust as the single checkout door, carrying the jobs `session start/end/list/gc` did and replacing the runner's own `createWorktree`. 0947 starts after S6a lands its worktree phase (planned in S6a's first wave), not after all of S6a. | Avoids writing the session jobs into the Node `worktree` verb and then rewriting them in Rust; one door instead of three (RUL11, L10). | 2026-11-18 |
+| D2 | `fgos worktree create` provisions by default (`worktreeSetup` commands, dependencies, skill roots) as today; a `--bare` flag makes a checkout with no provisioning, the case `session start` served. | Keeps today's `worktree create` behaviour unchanged and still serves the throwaway session checkout through the one door. | 2026-11-18 |
 
 ## 5. Q&A log
 
 - 2026-11-18 13:15 shaper -> owner: scan summary, 10 lines (scope ~34k Node lines; three worktree doors; S5 gate open; collisions with 1045/1159).
 - 2026-11-18 13:18 owner: "another plan moves worktree work out of the session verb into the worktree verb; is it related?" Shaper: that plan is 0947, on hold for this shaping; the `sv-p0*` worktrees belong to plan 1045 (supervision). Proposed the D1 split.
 - 2026-11-18 13:24 owner: "ok, chia vậy đi, ghi vào discussion" -> D1.
+- 2026-11-18 13:30 Q1 (session checkout provisioning): owner (b) -> D2.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -67,7 +69,7 @@ flowchart LR
     R[runner/worktree.mjs createWorktree<br/>Node, pick/take/run] --> G
   end
   subgraph after
-    WR[fgos worktree<br/>Rust, one door] --> G2[GitDriver worktree.rs]
+    WR[fgos worktree<br/>Rust, one door<br/>provision default, --bare] --> G2[GitDriver worktree.rs]
     H[fgos session = renamed head<br/>plan 0947]
   end
 ```
@@ -80,7 +82,8 @@ renames head) beside the rest of S6a.
 ### Rust worktree door {#task-worktree-door}
 
 Goal: `fgos worktree` native in Rust, the one checkout door; covers the `session` jobs per D1 and
-replaces `createWorktree` in `src/runner/worktree.mjs`. D1. Blocks plan 0947. Shape depends on Q1, Q4.
+replaces `createWorktree` in `src/runner/worktree.mjs`. Provisions by default, `--bare` for no provisioning. D1, D2.
+Blocks plan 0947. Shape depends on Q4.
 Draft verify: `cargo test -p fgos-git --test worktree` and the host CLI tests for `worktree`.
 
 (Other S6a tasks are filled once Q2-Q4 settle.)
