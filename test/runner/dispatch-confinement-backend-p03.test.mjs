@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import cp from 'node:child_process';
+import net from 'node:net';
 import { commitUnitWork, preflightUnitWorktree } from '../../src/runner/execution/commit-unit-work.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { admitSuccessor } from '../../src/run-supervisor/cwd-lock.mjs';
@@ -1354,6 +1355,71 @@ test('a launched secretary shape replaces docs/backlog.md through a temp file, f
   }
 });
 
+test('a launched secretary shape keeps the host pid space and reaches the session sockets and registry read-only; a worker shape keeps its own pid namespace', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('no working bwrap on this machine');
+  // Outside /tmp: the sandbox mounts a private tmpfs there.
+  const base = fs.mkdtempSync(path.join(fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir(), 'fgos-peers-shape-'));
+  const peer = net.createServer((socket) => socket.end('peer\n'));
+  try {
+    const home = path.join(base, 'home');
+    fs.mkdirSync(path.join(home, '.claude', 'sessions'), { recursive: true, mode: 0o700 });
+    fs.writeFileSync(path.join(home, '.claude', 'sessions', '4242.json'), '{"pid":4242}');
+    fs.writeFileSync(path.join(home, '.claude', 'sessions', '4242.k.key'), 'key', { mode: 0o600 });
+    const runtime = path.join(base, 'run');
+    fs.mkdirSync(path.join(runtime, 'cc-socks'), { recursive: true, mode: 0o700 });
+    fs.writeFileSync(path.join(runtime, 'bus'), 'private');
+    const peerSocket = path.join(runtime, 'cc-socks', '4242.sock');
+    await new Promise((resolve) => peer.listen(peerSocket, resolve));
+    const backendConfig = { tempRoot: path.join(base, 'confinement') };
+    fs.mkdirSync(backendConfig.tempRoot, { mode: 0o700 });
+
+    const launch = async (role) => {
+      const grants = [{ resource: 'private-home', access: 'read-write', scope: 'dispatch' }, ...requirementOf(grantOf(role)).policy.grants.filter((g) => g.resource === 'peer-sessions')];
+      const resources = resolveConfinementResources({
+        dispatchId: `disp_${role.slice(5)}`, context: { cwd: base, repoRoot: base }, grants, backendConfig,
+        homeDir: home, claudeSocketBase: runtime, xdgRuntimeDir: runtime, xdgConfigHome: null, herdrSocketPath: null, loginStores: [],
+      });
+      const privateHome = resources.find((r) => r.resource === 'private-home').executionTarget.path;
+      const plan = { contract: 'confinement-plan.v1', dispatchId: `disp_${role.slice(5)}`, decision: 'execute', coverage: {}, resources };
+      const script = [
+        `[ -d /proc/${process.pid} ]`,
+        `node -e 'require("net").connect(process.env.XDG_RUNTIME_DIR + "/cc-socks/4242.sock").on("data", (d) => process.exit(String(d) === "peer\\n" ? 0 : 1)).on("error", () => process.exit(1))'`,
+        `[ "$(cat ${privateHome}/sessions/4242.k.key)" = key ]`,
+        `! (echo x > ${privateHome}/sessions/1.json) 2>/dev/null`,
+        `! (echo x > "$XDG_RUNTIME_DIR/cc-socks/1.sock") 2>/dev/null`,
+        `[ ! -e "$XDG_RUNTIME_DIR/bus" ]`,
+      ].join(' && ');
+      const prepared = await prepareBwrap(plan, {
+        dispatchId: plan.dispatchId, executorId: 'x',
+        invocation: { command: 'sh', args: ['-c', script], env: { PATH: process.env.PATH } },
+        context: { cwd: base, runDir: base },
+      }, { id: 'bwrap', type: 'bwrap', config: backendConfig });
+      const run = await new Promise((resolve) => {
+        const child = cp.spawn(prepared.invocation.command, prepared.invocation.args, { cwd: base, env: prepared.invocation.env, stdio: ['ignore', 'pipe', 'pipe'] });
+        let output = '';
+        child.stdout.on('data', (chunk) => { output += chunk; });
+        child.stderr.on('data', (chunk) => { output += chunk; });
+        child.on('close', (code) => resolve({ code, output }));
+      });
+      await prepared.cleanup();
+      return { args: prepared.invocation.args, env: prepared.invocation.env, ...run };
+    };
+
+    const head = await launch('head:secretary-miu');
+    assert.equal(head.args.includes('--unshare-pid') || head.args.includes('--as-pid-1'), false, 'no pid namespace');
+    assert.equal(head.env.XDG_RUNTIME_DIR, runtime);
+    assert.equal(head.code, 0, head.output);
+    assert.deepEqual(fs.readdirSync(path.join(home, '.claude', 'sessions')).sort(), ['4242.json', '4242.k.key']);
+
+    const worker = await launch('head:shaper-x');
+    assert.ok(worker.args.includes('--unshare-pid') && worker.args.includes('--as-pid-1'), 'a launch without the grant keeps its own pid namespace');
+    assert.notEqual(worker.code, 0, 'without the grant the host pid space, the sockets and the registry stay out of reach');
+  } finally {
+    peer.close();
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});
+
 test('assessBwrap: a workspace-paths grant is supported under host-write-denied and covered', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-ws-paths-grant-'));
   try {
@@ -1405,6 +1471,26 @@ test('assessBwrap: a workspace-paths grant is supported under host-write-denied 
       const worker = withMailbox(other);
       assert.equal(worker.coverage['grant:mailbox-record'], 'unsatisfied');
       assert.ok(worker.mismatches.some((m) => m.code === 'confinement-grant-invalid' && /mailbox-record/.test(m.detail)), JSON.stringify(worker.mismatches));
+    }
+
+    // So are the peer sessions: a worker never drops its pid namespace.
+    const withPeers = (assignmentLaunchContext) => assessBwrap({
+      dispatchId: 'disp_peers_grant',
+      invocation: { command: 'agent', args: [], env: {} },
+      context: { cwd: tmp, repoRoot: tmp, runDir: path.join(tmp, 'run'), fgosDir: tmp },
+      ...(assignmentLaunchContext ? { assignmentLaunchContext } : {}),
+      requirement: {
+        mode: 'required', policyId: 'host-write-denied', policy: {
+          controls: { hostWrite: 'deny', hostRead: 'allow', networkEgress: 'allow', process: 'host', home: 'host', session: 'shared', workspace: 'shared' },
+          grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }, { resource: 'peer-sessions', access: 'read', scope: 'dispatch', optional: false }],
+        },
+      },
+    }, { id: 'bwrap', config: { type: 'bwrap' } });
+    assert.equal(withPeers({ kind: 'session' }).coverage['grant:peer-sessions'], 'satisfied');
+    for (const other of [null, { kind: 'assignment' }]) {
+      const worker = withPeers(other);
+      assert.equal(worker.coverage['grant:peer-sessions'], 'unsatisfied');
+      assert.ok(worker.mismatches.some((m) => m.code === 'confinement-grant-invalid' && /peer-sessions/.test(m.detail)), JSON.stringify(worker.mismatches));
     }
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });

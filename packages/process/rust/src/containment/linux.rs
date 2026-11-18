@@ -396,6 +396,13 @@ impl ContainmentDriver for LinuxPgroup {
         domain: &mut ContainmentDomain,
         spec: SpawnSpec,
     ) -> Result<Spawned, ContainmentError> {
+        // This driver starts the gate itself and runs no sandbox: a prefix would be dropped and the gate would run
+        // unconfined. A sandbox without a pid namespace (a head's) is started by terminal control in a pane, never here.
+        if spec.bwrap_prefix.is_some() {
+            return Err(ContainmentError::InvalidPrefix(
+                "prefix-needs-pid-namespace",
+            ));
+        }
         let (child, root) = pgroup::spawn_leader(&spec, facts::identity_of_child)?;
         domain.seen.push(root.clone());
         domain.set_domain(Domain::LinuxPgroup(root.clone()));

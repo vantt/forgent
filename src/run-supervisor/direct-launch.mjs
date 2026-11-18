@@ -216,6 +216,11 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
   if ((session ? 1 : 2) + extraSteps.length > MAX_ATTEMPT_STEPS) throw new DispatchError('too-many-steps', `an attempt runs at most ${MAX_ATTEMPT_STEPS} steps`, { runDir });
   const paths = attemptPaths(runDir, attemptId);
   const confined = Array.isArray(attempt.bwrapPrefix);
+  // A sandbox without its own pid namespace (a head granted its peer sessions, bwrap.mjs) has no pid 1 to hold the
+  // domain: its gate is held as a process group and ends its own subreaped tree. Only a pane may run one, where the
+  // launcher dies with the pane; a direct attempt in such a sandbox would have no domain the supervisor can end.
+  const pidNamespace = confined && attempt.bwrapPrefix.includes('--unshare-pid');
+  if (confined && !pidNamespace && !terminal) throw new DispatchError('pid-namespace-required', 'a direct attempt runs in a pid namespace of its own', { runDir });
   const placement = terminal ? 'terminal' : 'direct';
   // The supervisor binds only after it holds a lane, so a seat that waited for one still gets its whole execution budget.
   const laneWaitMs = laneWaitBudgetMs({ lanes: session ? null : lanes });
@@ -241,7 +246,7 @@ export function buildEnvelope({ attemptId, unitRunId, runDir, host, cwd, mutatin
       ...(maxOutputBytes ? { maxOutputBytes } : {}),
       capture: { stdout: paths.stdout, stderr: paths.stderr },
     },
-    containment: { preferred: confined ? 'linux-gate' : (process.platform === 'win32' ? 'windows-job' : process.platform === 'darwin' ? 'macos-tree' : 'linux-pgroup'), ...(confined ? { bwrapPrefix: [attempt.bwrapExecutable, ...attempt.bwrapPrefix] } : {}) },
+    containment: { preferred: pidNamespace ? 'linux-gate' : (process.platform === 'win32' ? 'windows-job' : process.platform === 'darwin' ? 'macos-tree' : 'linux-pgroup'), ...(confined ? { bwrapPrefix: [attempt.bwrapExecutable, ...attempt.bwrapPrefix] } : {}) },
     deadlines: {
       softAt: !session && timeoutMs ? boottimeAfter(timeoutMs + laneWaitMs) : null,
       idleMs: session ? null : idleTimeoutMs || null,

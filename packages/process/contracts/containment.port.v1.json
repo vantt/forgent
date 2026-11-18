@@ -16,7 +16,7 @@
         "domain": "domain",
         "spec": {
           "argv": "string[], the gate command",
-          "bwrapPrefix": "string[] | null (linux-gate only): the confinement's bwrap argv, absolute program first, up to but not including --info-fd; must carry --unshare-pid, --as-pid-1 and --proc /proc; --die-with-parent is required when mode is terminal and refused when it is direct; null builds the default prefix. The driver appends --info-fd N -- and argv, and never edits a given prefix (its digest is attested)",
+          "bwrapPrefix": "string[] | null (linux-gate only): the confinement's bwrap argv, absolute program first, up to but not including --info-fd; must carry --unshare-pid, --as-pid-1 and --proc /proc; --die-with-parent is required when mode is terminal and refused when it is direct; null builds the default prefix. The driver appends --info-fd N -- and argv, and never edits a given prefix (its digest is attested). linux-pgroup refuses any prefix (invalid-bwrap-prefix: prefix-needs-pid-namespace): it runs no sandbox and would start the gate unconfined. A sandbox without a pid namespace (a session head granted peer-sessions) is a terminal launch that terminal control starts in a pane, never this port; its domain is linux-pgroup on the gate, and the gate, not pid 1, is a subreaper that exits only once its own tree is empty: the gate's subreaped tree being empty means the tree is gone",
           "mode": "direct | terminal",
           "fdMap": "map child fd -> parent fd; every other fd >= 3 is closed in the child (spawn_with_fds of fgos-process)",
           "env": "object string -> string, exact environment (no inheritance)",

@@ -93,3 +93,23 @@ fn spawn_in_never_makes_the_caller_a_subreaper() {
         String::from_utf8_lossy(&output.stderr)
     );
 }
+
+/// This driver runs no sandbox, so a bwrap prefix handed to it is refused by name rather than dropped, which would
+/// start the gate unconfined.
+#[test]
+fn a_bwrap_prefix_is_refused_never_dropped() {
+    let driver = LinuxPgroup::default();
+    let mut domain = driver.create("attempt-prefix").unwrap();
+    let mut given = spec(["true"]);
+    given.bwrap_prefix = Some(vec![
+        "/usr/bin/bwrap".into(),
+        "--ro-bind".into(),
+        "/".into(),
+        "/".into(),
+    ]);
+    let err = driver.spawn_in(&mut domain, given).err().expect("refused");
+    assert_eq!(
+        err.to_string(),
+        "invalid-bwrap-prefix: prefix-needs-pid-namespace"
+    );
+}

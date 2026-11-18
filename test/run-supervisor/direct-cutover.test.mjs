@@ -146,6 +146,25 @@ test('a session envelope has no soft deadline, no idle limit and no settle step,
   assert.throws(() => buildEnvelope({ ...base, session }), (err) => err.code === 'session-needs-ceiling');
 });
 
+test('a sandbox that keeps the host pid space is held as a process group in a pane and refused for a direct attempt', { skip: process.platform !== 'linux' }, (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-envelope-pidspace-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const runDir = path.join(dir, 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const prefix = (pidNamespace) => [...(pidNamespace ? ['--unshare-pid', '--as-pid-1'] : []), '--proc', '/proc', '--die-with-parent', '--'];
+  const base = {
+    attemptId: 'att-1', unitRunId: 'unit-1', runDir, host: { hostBin: '/h/fgos', payloadRoot: '/h/payload' }, cwd: dir, mutating: false,
+    timeoutMs: 60_000, cli: 'claude', stepEnv: { PATH: '/bin' }, gateKillGraceMs: 1000, killWaitMs: 1000,
+    terminal: { socketPath: '/run/s.sock', exitCommand: null, orphanSettleMs: 1, briefPath: '/b.md', outboxDir: '/o', groupKey: 'g' },
+    session: { role: 'head:secretary-miu', verbs: [] }, ceilingMs: 1000,
+  };
+  const attempt = (pidNamespace) => ({ command: '/bin/agent', args: [], env: {}, bwrapPrefix: prefix(pidNamespace), bwrapExecutable: '/usr/bin/bwrap' });
+  const head = buildEnvelope({ ...base, attempt: attempt(false) });
+  assert.deepEqual(head.containment, { preferred: 'linux-pgroup', bwrapPrefix: ['/usr/bin/bwrap', ...prefix(false)] });
+  assert.equal(buildEnvelope({ ...base, attempt: attempt(true) }).containment.preferred, 'linux-gate');
+  assert.throws(() => buildEnvelope({ ...base, terminal: null, session: null, attempt: attempt(false) }), (err) => err.code === 'pid-namespace-required');
+});
+
 test('a launcher at dispatch depth 0 writes the lane pool into the envelope and a nested one or a session writes none', (t) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-envelope-lanes-'));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));

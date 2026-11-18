@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- The secretary head runs in the host pid space and can read peer sessions' sockets and registrations (read-only, including their `.key` files), so its SendMessage and ListAgents reach live peers; workers keep their own pid namespace, and peers still reach the head through the mailbox.
 - The secretary head can edit its backlog and discussion files (an edit lands on the host file even after Git replaced it; other files beside them stay read-only), send and receive mailbox mail, and resolves as its head role under its own CLI session, also after `/clear`.
 - `fgos doctor` row `llm-accounts-default-login-home` warns (never fails, no fix) when a `runner.llmAccounts` login store is its CLI's own default login home (such as `~/.claude` or `~/.codex`): a pane renewing a copy of that login can make the provider revoke the real token. Log the account into its own directory (`CLAUDE_CONFIG_DIR=<dir> claude /login`).
 - New project key `runner.personas.<name>.pool`: every seat of that persona leases only from the named account pool, for every family it walks, and is refused by name (`pool-unusable`, or no available account) instead of falling back to a cell's pool. Roles refuse the key.

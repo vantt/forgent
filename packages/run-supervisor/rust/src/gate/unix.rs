@@ -475,7 +475,7 @@ fn supervise_agent(
             cause: "hard-ceiling".into(),
         });
     } else {
-        let child = match spawn_agent(config, &arrived.frame, secrets) {
+        let child = match spawn_agent(config, &arrived.frame, secrets, pid1) {
             Ok(child) => child,
             Err(err) => {
                 crate::gate::note_in_capture(config, &err.why());
@@ -635,8 +635,15 @@ fn spawn_agent(
     config: &Config,
     go_frame: &Value,
     secrets: BTreeMap<String, String>,
+    pid1: bool,
 ) -> Result<std::process::Child, StartError> {
     let mut cmd = Command::new(&config.command);
+    #[cfg(target_os = "linux")]
+    if !pid1 {
+        arm_agent_death_with_gate(&mut cmd);
+    }
+    #[cfg(not(target_os = "linux"))]
+    let _ = pid1;
     // A sandbox hides some directories (a worktree under /tmp behind its private tmpfs): the agent then
     // starts at the root, as a process started by bwrap itself would.
     if config.cwd.is_dir() {
@@ -733,6 +740,28 @@ fn spawn_agent(
         program: config.command.clone(),
         source,
     })
+}
+
+/// Without a namespace a SIGKILL of the gate cannot end its domain: nothing runs the sweep. The agent at least dies
+/// with the gate (PR_SET_PDEATHSIG, held across exec); an orphan the agent had already left goes to the gate's own
+/// subreaper, the named limit of a gate that is not pid 1. A gate that died before the agent armed it is caught by
+/// the parent check, so the agent never starts unarmed.
+#[cfg(target_os = "linux")]
+fn arm_agent_death_with_gate(cmd: &mut Command) {
+    // SAFETY: getpid has no preconditions.
+    let gate = unsafe { libc::getpid() };
+    // SAFETY: prctl and getppid are async-signal-safe and allocate nothing; the error is a raw OS code.
+    unsafe {
+        cmd.pre_exec(move || {
+            if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL, 0, 0, 0) < 0 {
+                return Err(io::Error::last_os_error());
+            }
+            if libc::getppid() != gate {
+                return Err(io::Error::from_raw_os_error(libc::ESRCH));
+            }
+            Ok(())
+        });
+    }
 }
 
 fn signal_agent_group(agent: Option<libc::pid_t>, sig: libc::c_int) {

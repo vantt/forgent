@@ -12,6 +12,13 @@ export const WORKSPACE_PATHS_RESOURCE = 'workspace-paths';
 /** The grant that binds the project's mailbox record writable: its lock file and its runtime directory, nothing else of `.fgos`. */
 export const MAILBOX_RECORD_RESOURCE = 'mailbox-record';
 
+/**
+ * The grant that lets a head reach the agent sessions of its own machine: the launch keeps the host pid space (no pid
+ * namespace, so a peer's pid means what the peer wrote), and Claude Code's session socket directory and session
+ * registry are bound back read-only. Read-only: the head dials its peers, it never registers or listens beside them.
+ */
+export const PEER_SESSIONS_RESOURCE = 'peer-sessions';
+
 /** `paths` of a workspace-paths grant: relative, inside the root, no glob; refused by name, never normalized into range. */
 export function validateWorkspacePaths(paths, label) {
   if (!Array.isArray(paths) || paths.length === 0) {

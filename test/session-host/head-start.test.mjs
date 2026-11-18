@@ -83,7 +83,7 @@ test('the session launches with its role, its grant and the opening verbatim as 
   assert.match(request.opening, /# Start ritual/);
   assert.match(request.opening, /which pending question you resumed/);
   assert.equal(request.role, 'head:planner-probe');
-  assert.deepEqual(request.grant, { writes: [], verbs: [], mailbox: false });
+  assert.deepEqual(request.grant, { writes: [], verbs: [], mailbox: false, peers: false });
   assert.equal(request.ceilingMs, HEAD_HARD_CEILING_MS);
   assert.deepEqual(request.display, { id: 'probe', title: 'planner' });
   assert.deepEqual(request.binding, { executor: 'alpha', key: 'head-planner-probe-1' });
@@ -108,12 +108,13 @@ test('a secretary launches with the paths and the verb its grant names; the line
 });
 
 test('the grant table: the persona matches a table key exactly, an unnamed persona holds nothing, a non-head role is refused', () => {
-  assert.deepEqual(grantOf('head:planner-probe'), { writes: [], verbs: [], mailbox: false });
+  assert.deepEqual(grantOf('head:planner-probe'), { writes: [], verbs: [], mailbox: false, peers: false });
   assert.deepEqual(grantOf('head:secretary-miu').verbs, ['head start', 'head bind session', 'head rotate', 'head answered', 'head restore role']);
-  assert.deepEqual(grantOf('head:shaper-x'), { writes: [], verbs: ['head bind session', 'head rotate', 'head answered', 'head restore role'], mailbox: false }, 'a shaper binds its session and rotates but starts nothing, writes nothing and has no mailbox');
+  assert.equal(grantOf('head:secretary-miu').peers, true, 'only the secretary reaches the peer sessions of its machine');
+  assert.deepEqual(grantOf('head:shaper-x'), { writes: [], verbs: ['head bind session', 'head rotate', 'head answered', 'head restore role'], mailbox: false, peers: false }, 'a shaper binds its session and rotates but starts nothing, writes nothing, has no mailbox and reaches no peer session');
   assert.deepEqual(grantOf('head:secretary-miu', 'secretary'), grantOf('head:secretary-miu'));
   // `secretary-x` is another persona: asked by persona it is not the secretary, even though the role starts alike.
-  assert.deepEqual(grantOf('head:secretary-x-y', 'secretary-x'), { writes: [], verbs: [], mailbox: false });
+  assert.deepEqual(grantOf('head:secretary-x-y', 'secretary-x'), { writes: [], verbs: [], mailbox: false, peers: false });
   assert.throws(() => grantOf('head:secretary-miu', 'planner'), { code: 'role-invalid' });
   assert.throws(() => grantOf('lead:MAIL'), { code: 'role-invalid' });
   assert.throws(() => grantOf('head:secretary'), { code: 'role-invalid' });

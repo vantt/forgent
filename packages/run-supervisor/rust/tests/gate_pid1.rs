@@ -364,11 +364,9 @@ fn no_process_of_the_attempt_but_the_gate_holds_the_lock() {
     wait_exit(&mut gate.spawned, Duration::from_secs(10));
 }
 
-/// Without a namespace (`linux-pgroup`) the gate is an ordinary process: it
-/// adopts orphans as a subreaper and must still end every one of them, and it
-/// must never signal anything outside its own tree.
-#[test]
-fn a_gate_that_is_not_pid_1_ends_the_orphans_it_adopted() {
+/// A gate run without a namespace (`linux-pgroup`), as a head's sandbox runs it, with `script` as its agent: started,
+/// given GO, and handed back with its attempt.
+fn start_pgroup_gate(name: &str, script: &str) -> (std::process::Child, Attempt) {
     use std::os::fd::OwnedFd;
     use std::os::unix::net::UnixStream;
     use std::process::{Command, Stdio};
@@ -377,10 +375,10 @@ fn a_gate_that_is_not_pid_1_ends_the_orphans_it_adopted() {
     use fgos_process::FdSlot;
     use fgos_run_supervisor::go_channel::{read_frame, write_frame};
 
-    let token = format!("298.{}", std::process::id());
-    let mut options = Options::new("/bin/sh", &["-c", &format!("(sleep {token} &); exit 0")]);
+    let mut options = Options::new("/bin/sh", &["-c", script]);
     options.preferred = "linux-pgroup".into();
-    let attempt = Attempt::new("not-pid1", &options);
+    options.grace_ms = 200;
+    let attempt = Attempt::new(name, &options);
     let (mine, theirs) = UnixStream::pair().unwrap();
     let mut cmd = Command::new(harness());
     cmd.args([
@@ -399,24 +397,101 @@ fn a_gate_that_is_not_pid_1_ends_the_orphans_it_adopted() {
     let hello = read_frame(&mut go).unwrap();
     assert_eq!(hello["type"], "HELLO");
     write_frame(&mut go, &serde_json::json!({"type": "GO", "attemptId": attempt.attempt_id, "envelopeDigest": attempt.digest, "gateHostTuple": null})).unwrap();
-    let mut child = child;
-    let status = loop {
+    // A direct gate never watches the channel after GO: dropping it here is not a stop.
+    drop(go);
+    (child, attempt)
+}
+
+fn wait_gate(child: &mut std::process::Child) -> std::process::ExitStatus {
+    let start = Instant::now();
+    loop {
         if let Some(status) = child.try_wait().unwrap() {
-            break status;
+            return status;
         }
+        assert!(
+            start.elapsed() < Duration::from_secs(20),
+            "the gate did not end"
+        );
         sleep(Duration::from_millis(20));
-    };
-    assert!(status.success(), "gate exit: {status:?}");
-    assert_eq!(attempt.gate_exit().unwrap()["stoppedBy"], "agent");
-    let survivors: Vec<String> = fs::read_dir("/proc")
+    }
+}
+
+/// The pids of live processes whose command line holds `token`.
+fn running(token: &str) -> Vec<u32> {
+    fs::read_dir("/proc")
         .unwrap()
         .flatten()
-        .filter_map(|e| fs::read(e.path().join("cmdline")).ok())
-        .map(|c| String::from_utf8_lossy(&c).into_owned())
-        .filter(|c| c.contains(&token))
-        .collect();
+        .filter_map(|e| Some((e.file_name().to_str()?.parse::<u32>().ok()?, e.path())))
+        .filter(|(_, dir)| {
+            fs::read_to_string(dir.join("stat")).is_ok_and(|stat| !stat.contains(") Z "))
+                && fs::read(dir.join("cmdline"))
+                    .is_ok_and(|c| String::from_utf8_lossy(&c).contains(token))
+        })
+        .map(|(pid, _)| pid)
+        .collect()
+}
+
+fn wait_running(token: &str, at_least: usize) -> Vec<u32> {
+    let start = Instant::now();
+    loop {
+        let found = running(token);
+        if found.len() >= at_least {
+            return found;
+        }
+        assert!(
+            start.elapsed() < Duration::from_secs(10),
+            "{token} never ran: {found:?}"
+        );
+        sleep(Duration::from_millis(20));
+    }
+}
+
+/// Without a namespace (`linux-pgroup`, a head's sandbox) the gate is an ordinary process: it adopts orphans as a
+/// subreaper, and its tree being empty is what says the agent's tree is gone. It must end every orphan when the agent
+/// exits and when the attempt is cancelled, and never signal anything outside its own tree.
+#[test]
+fn a_gate_that_is_not_pid_1_ends_the_orphans_it_adopted() {
+    let exited = format!("298.{}", std::process::id());
+    let (mut gate, attempt) = start_pgroup_gate("not-pid1", &format!("(sleep {exited} &); exit 0"));
+    assert!(wait_gate(&mut gate).success());
+    assert_eq!(attempt.gate_exit().unwrap()["stoppedBy"], "agent");
     assert!(
-        survivors.is_empty(),
-        "the adopted orphan must be dead: {survivors:?}"
+        running(&exited).is_empty(),
+        "the adopted orphan must be dead after the agent exited"
     );
+
+    // Cancel: the supervisor's SIGTERM while the agent, its child and an orphan it left still run.
+    let cancelled = format!("297.{}", std::process::id());
+    let (mut gate, attempt) = start_pgroup_gate(
+        "not-pid1-cancel",
+        &format!("(sleep {cancelled} &); sleep {cancelled}; exit 0"),
+    );
+    wait_running(&cancelled, 2);
+    // SAFETY: SIGTERM to the gate this test started.
+    unsafe { libc::kill(gate.id() as libc::pid_t, libc::SIGTERM) };
+    assert!(wait_gate(&mut gate).success());
+    assert!(attempt.gate_exit().is_some(), "the gate published its exit");
+    assert!(
+        running(&cancelled).is_empty(),
+        "the orphan and the agent's child must be dead after a cancel"
+    );
+}
+
+/// A gate that is not pid 1 and is killed outright runs no sweep: the agent still dies with it (its parent-death
+/// signal), so a SIGKILL of the gate never leaves the agent running unsupervised.
+#[test]
+fn the_agent_of_a_gate_that_is_not_pid_1_dies_when_the_gate_is_killed() {
+    let token = format!("296.{}", std::process::id());
+    let (mut gate, _attempt) = start_pgroup_gate("not-pid1-killed", &format!("exec sleep {token}"));
+    let agent = wait_running(&token, 1);
+    gate.kill().unwrap();
+    gate.wait().unwrap();
+    let start = Instant::now();
+    while !running(&token).is_empty() {
+        assert!(
+            start.elapsed() < Duration::from_secs(10),
+            "the agent {agent:?} outlived its killed gate"
+        );
+        sleep(Duration::from_millis(20));
+    }
 }

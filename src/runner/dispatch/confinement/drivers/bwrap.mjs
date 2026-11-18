@@ -17,7 +17,7 @@ import { copyCredentialFiles, credentialWriteBackTarget, loginLifeProblem } from
 import { commandCli, credentialStoreOf, expandCredentialHome } from '../../provider-capacity.mjs';
 import { DEFAULT_SEAT_TIMEOUT_MS, resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
-import { MAILBOX_RECORD_RESOURCE } from '../workspace-paths.mjs';
+import { MAILBOX_RECORD_RESOURCE, PEER_SESSIONS_RESOURCE } from '../workspace-paths.mjs';
 import { resolveRuntimeSocketDir } from '../../../../run-supervisor/runtime-dir.mjs';
 import { computeSha256Digest } from '../../../../native/proof-helpers.mjs';
 
@@ -426,8 +426,12 @@ export function assessBwrap(request, backend) {
   const isWorkspaceWrite = policyId === 'workspace-write';
 
   const allowedResources = new Set(['run-output', 'private-home', 'executor-credentials', 'workspace-paths']);
-  // The mailbox record is a head session's grant only (session-attempt.mjs requirementOf): no other launch binds it.
-  if (request.assignmentLaunchContext?.kind === 'session') allowedResources.add(MAILBOX_RECORD_RESOURCE);
+  // The mailbox record and the peer sessions are a head session's grants only (session-attempt.mjs requirementOf): no
+  // other launch binds them, so a worker always keeps its own pid namespace.
+  if (request.assignmentLaunchContext?.kind === 'session') {
+    allowedResources.add(MAILBOX_RECORD_RESOURCE);
+    allowedResources.add(PEER_SESSIONS_RESOURCE);
+  }
   if (isWorkspaceWrite) {
     allowedResources.add('workspace');
     allowedResources.add('workspace-git-metadata');
@@ -579,14 +583,19 @@ export function prepareBwrapSync(plan, request, backend) {
 
   try {
     const executable = backend?.config?.executable || '/usr/bin/bwrap';
+    // A launch that binds peer sessions (a head's grant, assessBwrap) keeps the host pid space: inside a pid namespace
+    // a peer's pid reads 0 and its liveness cannot be checked. Its gate is then not pid 1 and the run supervisor holds
+    // it as `linux-pgroup` (direct-launch.mjs buildEnvelope); the gate adopts every orphan of the agent as a subreaper
+    // and exits only once its own tree is empty, so the gate's subreaped tree being empty means the tree is gone.
+    const hostPidSpace = (plan.resources || []).some((r) => r.resource === PEER_SESSIONS_RESOURCE);
     const bwrapArgs = [
       '--ro-bind', '/', '/',
       '--dev', '/dev',
       '--proc', '/proc',
       '--tmpfs', '/tmp',
-      // Every launch gets its own pid namespace with the launched command as pid 1, so the
+      // Every other launch gets its own pid namespace with the launched command as pid 1, so the
       // namespace is empty exactly when that command's tree is gone.
-      '--unshare-pid', '--as-pid-1',
+      ...(hostPidSpace ? [] : ['--unshare-pid', '--as-pid-1']),
       '--setenv', CONFINED_MARKER_ENV, '1',
     ];
     // Only a terminal-mode launch is tied to its launcher's lifetime. A direct attempt must
@@ -696,6 +705,8 @@ export function prepareBwrapSync(plan, request, backend) {
     const homeEnv = request.invocation?.credentialStore?.homeEnv;
     const privateHome = plan.resources?.find((r) => r.resource === 'private-home');
     if (homeEnv && privateHome) resolvedEnv[homeEnv] = privateHome.executionTarget.path;
+    // The peer sessions' socket base, named by the variable Claude Code reads it from (resources.mjs peerSessionPaths).
+    for (const res of resources) Object.assign(resolvedEnv, res.env ?? {});
 
     // Command wrap to ensure no inherited writable fds survive (R7, MED-1 fix)
     // Runs bash helper that closes all fds >= 3 before execing the child command.

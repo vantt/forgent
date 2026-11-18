@@ -15,7 +15,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { globalFgosDir } from '../../../config/facade.mjs';
 import { resolveConfinementTempRoot } from './cleanup.mjs';
-import { MAILBOX_RECORD_RESOURCE, validateWorkspacePaths } from './workspace-paths.mjs';
+import { MAILBOX_RECORD_RESOURCE, PEER_SESSIONS_RESOURCE, validateWorkspacePaths } from './workspace-paths.mjs';
 import { resolveLock } from '../../../holder-lock/registry.mjs';
 import { createGitInspect, gitPortOptions } from '../../../git/inspect.mjs';
 import { userRuntimeDir } from '../../../run-supervisor/runtime-dir.mjs';
@@ -112,6 +112,29 @@ function mailboxRecordPaths(fgosDir) {
 
 /** The directory Claude Code keeps one control socket per open session in (`<pid>.sock`). */
 export const SESSION_SOCKET_DIR = 'cc-socks';
+
+/** Where Claude Code registers each open session (`<pid>.json` and its `<pid>.<hash>.key`), under its config directory. */
+const SESSION_REGISTRY_DIR = 'sessions';
+
+/**
+ * What a peer-sessions grant binds, read-only: the host's session socket directory at its own path, and the host's
+ * session registry (`{home}/.claude/sessions`) where the head's Claude Code reads it, under its config directory: the
+ * private home when the launch has one, else the host's own. The variable that names the socket base inside is set
+ * to the host's base, so the head looks for its peers where they listen. A directory that does not exist is not
+ * bound (no session ever ran there, so there is nobody to reach); a symbolic link is followed to the real directory.
+ */
+function peerSessionPaths({ homeDir, claudeSocketBase, xdgRuntimeDir, privateHome }) {
+  const base = path.resolve(claudeSocketBase);
+  ensureSessionSocketDir(base);
+  const sockets = realPathOrNull(path.join(base, SESSION_SOCKET_DIR));
+  const registry = realPathOrNull(path.join(path.resolve(homeDir), '.claude', SESSION_REGISTRY_DIR));
+  const isDir = (p) => p !== null && fs.statSync(p).isDirectory();
+  const baseEnv = absoluteOrNull(xdgRuntimeDir) && path.resolve(xdgRuntimeDir) === base ? 'XDG_RUNTIME_DIR' : 'CLAUDE_CODE_TMPDIR';
+  return [
+    ...(isDir(sockets) ? [{ kind: 'sockets', hostPath: sockets, target: path.join(base, SESSION_SOCKET_DIR), env: { [baseEnv]: base } }] : []),
+    ...(isDir(registry) ? [{ kind: 'registry', hostPath: registry, target: privateHome ? path.join(privateHome, SESSION_REGISTRY_DIR) : registry }] : []),
+  ];
+}
 
 /**
  * Hidden roots a blind launch creates (mode 0700) when missing instead of skipping them: an
@@ -837,6 +860,29 @@ export function resolveConfinementResources({
         collect: 'none',
         access: 'read',
         allocation: 'existing',
+      });
+    }
+  }
+
+  // 5b. peer-sessions: the host's session sockets and session registry, read-only, after the private home they may
+  // land in (a bind over a directory hides every mount made in it before).
+  if (grantsByResource.has(PEER_SESSIONS_RESOURCE)) {
+    const grant = grantsByResource.get(PEER_SESSIONS_RESOURCE);
+    if (grant.access !== 'read') {
+      throw new ConfinementResourceError('confinement-grant-invalid', `${PEER_SESSIONS_RESOURCE} access must be strictly "read", got "${grant.access}".`);
+    }
+    const privateHome = resolved.find((r) => r.resource === 'private-home')?.executionTarget.path ?? null;
+    for (const { kind, hostPath: hostTarget, target, env } of peerSessionPaths({ homeDir, claudeSocketBase, xdgRuntimeDir, privateHome })) {
+      resolved.push({
+        resource: PEER_SESSIONS_RESOURCE,
+        identity: `${PEER_SESSIONS_RESOURCE}:${kind}`,
+        hostTarget,
+        executionTarget: { location: 'host', path: target },
+        delivery: 'mount',
+        collect: 'none',
+        access: 'read',
+        allocation: 'existing',
+        ...(env ? { env } : {}),
       });
     }
   }
