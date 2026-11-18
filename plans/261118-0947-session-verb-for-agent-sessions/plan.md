@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Give `fgos session` back to agent sessions: retire the session worktree lifecycle, rename `fgos head` to `fgos session`"
-status: ready
+status: done
 priority: P1
 blockedBy:
   - 261117-1856-secretary-session-spine
@@ -225,6 +225,8 @@ wanted instead.
   phase 5 restores `fgos head` while `session` stays free; reverting 3 needs 4 and 5 reverted first.
 
 ## Validation Log
+
+- 2026-11-19 live acceptance by the supervisor on release b50f36be (Miu gen 10, 11): session write to the backlog, mailbox sender name, peer ListAgents + SendMessage both ways in bypass without a held prompt, `fgos identity resolve <pane>` full record, manual rotate handoff with the last message verbatim: all pass. Plan done.
 
 - 2026-11-18 owner approved the plan. `plan-contract-check` (run with the staged addon) passes every rule but one: footprint
   overlap with the still-`ready` secretary plan; the check does not count `blockedBy`. Status stays `draft` and turns
