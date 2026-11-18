@@ -79,6 +79,10 @@ Phase 12 report; `packages/run-supervisor/contracts/gate-go.v1.json`; `docs/plat
    one frame, wait for `REPLY`; (c) `startHead(args)`: the one branch, `FGOS_CONFINED === '1'` sends through the socket
    (refused `no-request-socket` when the variable is unset, which is a confined worker), otherwise calls
    `startHeadSession` directly. Phase 15's CLI arm calls `startHead` and nothing else.
+   Phase 12 found (live) that `FGOS_CONFINED` is set on the gate only: the gate builds the agent's environment from the
+   declared allowlist, so the agent never sees it. Fix it at that one place: the gate adds `FGOS_CONFINED=1` to the
+   agent environment whenever it runs inside bwrap (the env-allowlist contract names it), so every confined agent, worker
+   or head, sees the same marker; never infer confinement from the socket variable or from a masked path.
 5. **Launch wiring**: `launchSessionAttempt` (phase 12) computes the socket path with `terminalSocketPath(<attemptId>-req)`,
    writes `session.requestSocketPath` and `session.verbs = grantOf(role).verbs` into the envelope, puts
    `FGOS_HEAD_REQUEST_SOCKET` in the launch env, and passes the path to the confinement request; `bwrap.mjs` binds it
