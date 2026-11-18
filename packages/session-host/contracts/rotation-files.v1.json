@@ -16,7 +16,7 @@
     "answered.json": { "writer": "markSuccessorAnswered", "readFields": { "gen": "integer" } },
     "context-sidecar.jsonl": {
       "writer": "a status-line wrapper, optional; none ships with fgOS",
-      "shape": { "ts": "number of epoch milliseconds, or an ISO-8601 string (YYYY-MM-DD[THH:MM[:SS[.fff]]][Z|+HH:MM], UTC without an offset)", "session_id": "string", "context_window": { "context_window_size": "integer", "current_usage": "object of input_tokens, cache_creation_input_tokens, cache_read_input_tokens" } },
+      "shape": { "ts": "number of epoch milliseconds, or an RFC 3339 string (YYYY-MM-DDTHH:MM:SS[.fff] with Z or +HH:MM) or a YYYY-MM-DD date, read through the civil-time door", "session_id": "string", "context_window": { "context_window_size": "integer", "current_usage": "object of input_tokens, cache_creation_input_tokens, cache_read_input_tokens" } },
       "readerRule": "only a record newer than the Stop hook's own timestamp is fresh; the hook waits up to 1500 ms for a newer record only when the file already holds a record of this session (a writer is running); otherwise, and after the wait, the transcript (one turn stale) is used at once"
     }
   },

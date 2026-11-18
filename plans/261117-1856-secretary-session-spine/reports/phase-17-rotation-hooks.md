@@ -36,7 +36,7 @@ Status: DONE (live check done, through the real request socket; no Claude head, 
 - Node writer `handoff-store.mjs` and the rest of the head Node modules stay: backlog p-kkkgpg6dzc.
 
 ## Review round: every case of the deleted Node tests and its Rust owner
-The sidecar poll keeps waiting for a file that does not exist yet (the first port stopped early), and a sidecar `ts` is epoch milliseconds or ISO-8601 as in Node (`parse_iso_millis`). All in `packages/session-host/rust/src/rotation/`.
+The sidecar poll keeps waiting for a file that does not exist yet (the first port stopped early), and a sidecar `ts` is epoch milliseconds or ISO-8601 as in Node (`parse_iso_millis`, through the civil-time door: RFC 3339 instants and dates; an offset-less datetime is no longer read). All in `packages/session-host/rust/src/rotation/`.
 
 `measure.test.mjs` (5 cases):
 - sidecar newer than Stop gives the fraction from its own window size: `measure::tests::a_sidecar_record_newer_than_the_stop_timestamp_gives_the_fraction_from_its_own_window_size`

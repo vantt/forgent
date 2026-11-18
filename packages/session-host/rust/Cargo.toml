@@ -10,3 +10,5 @@ fgos-terminal-control = { path = "../../terminal-control/rust" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
+# The one civil-time door: sidecar timestamps are parsed there, never by a second parser.
+fgos-host-runtime = { path = "../../host-runtime/rust" }

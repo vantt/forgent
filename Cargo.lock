@@ -530,6 +530,7 @@ name = "fgos-session-host"
 version = "0.2.0"
 dependencies = [
  "fgos-agent-protocol",
+ "fgos-host-runtime",
  "fgos-terminal-control",
  "serde",
  "serde_json",
