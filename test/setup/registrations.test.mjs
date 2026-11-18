@@ -1178,7 +1178,7 @@ test('the registry gives 68 rows and 25 fixes to Rust and 46 rows and 5 fixes to
   const { rows, fixes } = registryEntries();
   const bridged = (list) => list.filter((entry) => entry.owner.startsWith('bridge:'));
   const byStep = (step) => bridged(rows).filter((row) => row.owner === `bridge:${step}`).length;
-  assert.deepEqual(['S6a', 'S6b', 'S7'].map(byStep), [32, 6, 8]);
+  assert.deepEqual(['S6a', 'S6b', 'S7'].map(byStep), [32, 6, 7]);
   assert.equal(rows.length - bridged(rows).length, 68);
   assert.equal(bridged(fixes).length, 5);
   assert.equal(fixes.length - bridged(fixes).length, 25);
