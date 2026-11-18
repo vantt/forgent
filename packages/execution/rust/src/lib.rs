@@ -14,6 +14,7 @@
 pub mod accounts;
 pub mod agents;
 pub mod bind;
+pub mod checks;
 pub mod decide;
 pub mod executor_model;
 pub mod explain;

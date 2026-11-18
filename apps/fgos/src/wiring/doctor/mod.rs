@@ -6,6 +6,7 @@
 pub mod bridge;
 pub mod config;
 pub mod event_store;
+pub mod execution;
 pub mod git;
 pub mod holder_lock;
 pub mod identity;
@@ -216,6 +217,7 @@ const GROUPS: &[&Rows] = &[
     &config::GROUP,
     &git::GROUP,
     &event_store::GROUP,
+    &execution::GROUP,
     &holder_lock::GROUP,
     &identity::GROUP,
     &mailbox::GROUP,
@@ -550,9 +552,9 @@ mod tests {
         assert_eq!(registry.rows.len(), 110);
         assert_eq!(
             (count("S5"), count("S6a"), count("S6b"), count("S7")),
-            (8, 30, 6, 8)
+            (0, 31, 6, 8)
         );
-        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 58);
+        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 65);
         assert_eq!(registry.fixes.len(), 29);
         assert_eq!(registry.fix_ids(OwnerKind::Bridge).len(), 5);
     }
@@ -560,7 +562,7 @@ mod tests {
     #[test]
     fn every_bridged_entry_names_the_step_that_removes_it() {
         let registry = registry().unwrap();
-        let steps = ["S5", "S6a", "S6b", "S7"];
+        let steps = ["S6a", "S6b", "S7"];
         for owner in registry
             .rows
             .iter()

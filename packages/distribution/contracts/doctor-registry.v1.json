@@ -60,6 +60,13 @@
       "event-store-machine-id",
       "event-store-legacy-layout",
       "event-store-incidents",
+      "runner-generated-paths",
+      "tool-registry-configured",
+      "agy-sub-homes-configured",
+      "capability-serves-valid",
+      "omp-natives-present",
+      "executor-confinement",
+      "invocation-git-write-grants",
       "cli-version-visible",
       "project-fgos-launcher",
       "dispatch-decide-hook-wired",
@@ -111,9 +118,9 @@
     "src/run-supervisor/runtime-dir.mjs": "S6a",
     "src/run-supervisor/trust-store.mjs": "S6a",
     "src/runner/agent-definitions.mjs": "S6a",
-    "src/runner/agent-listing.mjs": "S5",
+    "src/runner/agent-listing.mjs": "S6a",
     "src/runner/dispatch/assignment-layout.mjs": "S6a",
-    "src/runner/dispatch/config.mjs": "S5",
+    "src/runner/dispatch/config.mjs": "S6a",
     "src/runner/dispatch/confinement/backend-registry.mjs": "S6a",
     "src/runner/dispatch/confinement/cleanup.mjs": "S6a",
     "src/runner/dispatch/confinement/policies.mjs": "S6a",
@@ -123,15 +130,15 @@
     "src/runner/dispatch/provider-adapter.mjs": "S6a",
     "src/runner/dispatch/provider-capacity.mjs": "S6a",
     "src/runner/dispatch/provider-credential-renewal.mjs": "S6a",
-    "src/runner/dispatch/shipped-catalog.mjs": "S5",
+    "src/runner/dispatch/shipped-catalog.mjs": "S6a",
     "src/runner/dispatch/tier-cell.mjs": "S6a",
-    "src/runner/dispatch/tool-providers.mjs": "S5",
+    "src/runner/dispatch/tool-providers.mjs": "S6a",
     "src/runner/dispatch/transport.mjs": "S6a",
-    "src/runner/execution/bind.mjs": "S5",
-    "src/runner/execution/capability-config.mjs": "S5",
+    "src/runner/execution/bind.mjs": "S6a",
+    "src/runner/execution/capability-config.mjs": "S6a",
     "src/runner/execution/dry-bind.mjs": "S6a",
-    "src/runner/execution/patterns/retired-keys.mjs": "S5",
-    "src/seat-binding/client.mjs": "S5",
+    "src/runner/execution/patterns/retired-keys.mjs": "S6a",
+    "src/seat-binding/client.mjs": "S6a",
     "src/state/drift-status.mjs": "S7",
     "src/state/frontier.mjs": "S7",
     "src/state/postland-drift.mjs": "S7",
@@ -162,10 +169,7 @@
     {
       "id": "runner-generated-paths",
       "description": "runner.generatedPaths maps generated sources to render targets with well-formed write-scope entries",
-      "owner": "bridge:S5",
-      "judge": [
-        "src/runner/dispatch/config.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "runner-patterns-config",
@@ -253,36 +257,33 @@
     },
     {
       "id": "dispatch-decide-hook-wired",
-      "description": ".claude/settings.json PreToolUse hooks enforce dispatch.mjs decide on every Agent/Task call, the decision-question template and the main-checkout delete guard on every Bash call",
+      "description": ".claude/settings.json PreToolUse hooks enforce fgos dispatch decide on every Agent/Task call, the decision-question template and the main-checkout delete guard on every Bash call",
       "owner": "rust:packaging"
     },
     {
       "id": "codex-hook-wired",
-      "description": ".codex/hooks.json PreToolUse hooks enforce dispatch.mjs decide, the decision-question template and the main-checkout delete guard",
+      "description": ".codex/hooks.json PreToolUse hooks enforce fgos dispatch decide, the decision-question template and the main-checkout delete guard",
       "owner": "rust:packaging"
     },
     {
       "id": "agy-hook-wired",
-      "description": ".agents/hooks.json PreToolUse hooks enforce dispatch.mjs decide, the decision-question template and the main-checkout delete guard",
+      "description": ".agents/hooks.json PreToolUse hooks enforce fgos dispatch decide, the decision-question template and the main-checkout delete guard",
       "owner": "rust:packaging"
     },
     {
       "id": "omp-hook-wired",
-      "description": ".omp/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide, the decision-question template and the main-checkout delete guard",
+      "description": ".omp/extensions/fgos-hooks.ts in-process extension enforces fgos dispatch decide, the decision-question template and the main-checkout delete guard",
       "owner": "rust:packaging"
     },
     {
       "id": "pi-hook-wired",
-      "description": ".pi/extensions/fgos-hooks.ts in-process extension enforces dispatch.mjs decide, the decision-question template and the main-checkout delete guard",
+      "description": ".pi/extensions/fgos-hooks.ts in-process extension enforces fgos dispatch decide, the decision-question template and the main-checkout delete guard",
       "owner": "rust:packaging"
     },
     {
       "id": "tool-registry-configured",
       "description": "tool registry posture — inactive/degraded/full",
-      "owner": "bridge:S5",
-      "judge": [
-        "src/runner/dispatch/tool-providers.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "agy-permissions-configured",
@@ -292,10 +293,7 @@
     {
       "id": "agy-sub-homes-configured",
       "description": "each agy sub-HOME an executor config or a gemini account of runner.llmAccounts names exists as a directory",
-      "owner": "bridge:S5",
-      "judge": [
-        "src/runner/dispatch/config.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "curl-available",
@@ -465,10 +463,7 @@
     {
       "id": "capability-serves-valid",
       "description": "runner.capabilities' \"serves\" attribute sets are mutually distinct (I19); the schema states their shape",
-      "owner": "bridge:S5",
-      "judge": [
-        "src/runner/execution/capability-config.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "worker-slots-ceiling-usable",
@@ -514,10 +509,7 @@
     {
       "id": "omp-natives-present",
       "description": "omp's native addon for its installed version is in the natives directory omp resolves (a confined omp cannot extract it); fails only when an executor runs omp, warns when omp is missing or unused; readiness only, no repair",
-      "owner": "bridge:S5",
-      "judge": [
-        "src/runner/dispatch/config.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "herdr-executor-kinds",
@@ -607,18 +599,12 @@
     {
       "id": "executor-confinement",
       "description": "no executor declares \"permissionMode\": \"bypass\" without privateHome, isolatedSession and ownWorktree all true",
-      "owner": "bridge:S5",
-      "judge": [
-        "src/runner/dispatch/config.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "invocation-git-write-grants",
       "description": "warns when an executor or invocation still grants git add/git commit to a worker through --allowedTools (the runner commits; workers hold no git write grant)",
-      "owner": "bridge:S5",
-      "judge": [
-        "src/runner/dispatch/config.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "rust-host-binary-present",
@@ -767,8 +753,8 @@
     },
     {
       "id": "seat-binding-route",
-      "description": "the host Seat Binding runs answers the internal seat-binding route at protocol 1",
-      "owner": "bridge:S5",
+      "description": "the host Seat Binding runs answers ladder on the internal seat-binding route at protocol 2, the protocol the Node client speaks (its message names the protocol it sent)",
+      "owner": "bridge:S6a",
       "judge": [
         "src/seat-binding/client.mjs"
       ]

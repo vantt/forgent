@@ -1,0 +1,362 @@
+{
+ "version": "checks.v1",
+ "about": "Golden vectors of the doctor rows that read the runner config or the machine it names: generated paths, executor confinement, git write grants, capability serves sets, omp natives, agy sub-HOMEs and the tool registry posture. A vector is { name, row, runner?, machine?, expect }; expect is { passed, message }, recorded from the Node judges by scripts/checks-vectors.mjs (a vector marked handRecorded states an answer written from reading the Node body, which reads the live machine). machine describes what a row reads of the machine: omp (null: not installed; { output } or { exit }: what omp --version does), env, files, dirs, platform, arch, pathCommands; paths begin with $ROOT, the directory the machine is built under, and $ROOT/home is the home.",
+ "vectors": [
+  {
+   "name": "generated paths: none declared is valid with no mappings",
+   "row": "runner-generated-paths",
+   "runner": {},
+   "expect": {"passed":true,"message":"runner.generatedPaths is valid (0 mapping(s))"}
+  },
+  {
+   "name": "generated paths: well-formed mappings are counted",
+   "row": "runner-generated-paths",
+   "runner": {"generatedPaths":[{"from":"docs/src/","also":["docs/out/*.md"]},{"from":"./gen/a.txt","also":[]}]},
+   "expect": {"passed":true,"message":"runner.generatedPaths is valid (2 mapping(s))"}
+  },
+  {
+   "name": "generated paths: a source that opens with a glob is refused",
+   "row": "runner-generated-paths",
+   "runner": {"generatedPaths":[{"from":"**/x","also":[]}]},
+   "expect": {"passed":false,"message":"runner config (runner) generatedPaths[0].from must start with a literal directory, got \"**/x\"."}
+  },
+  {
+   "name": "generated paths: an absolute also entry is refused with its position",
+   "row": "runner-generated-paths",
+   "runner": {"generatedPaths":[{"from":"docs/a","also":["docs/b","/etc"]}]},
+   "expect": {"passed":false,"message":"runner config (runner) generatedPaths[0].also[1]: write entry must be repo-relative, got absolute path \"/etc\"."}
+  },
+  {
+   "name": "generated paths: a parent step in the source is refused",
+   "row": "runner-generated-paths",
+   "runner": {"generatedPaths":[{"from":"a/../b","also":[]}]},
+   "expect": {"passed":false,"message":"runner config (runner) generatedPaths[0].from: write entry must not contain a \"..\" segment, got: \"a/../b\"."}
+  },
+  {
+   "name": "generated paths: a source of dots only names no path",
+   "row": "runner-generated-paths",
+   "runner": {"generatedPaths":[{"from":"./","also":[]}]},
+   "expect": {"passed":false,"message":"runner config (runner) generatedPaths[0].from: write entry must name a path inside the repo, got: \"./\"."}
+  },
+  {
+   "name": "confinement: no executors passes",
+   "row": "executor-confinement",
+   "runner": {},
+   "expect": {"passed":true,"message":"every invocation declaring bypass also declares full confinement"}
+  },
+  {
+   "name": "confinement: bypass with the three legacy flags on the executor passes",
+   "row": "executor-confinement",
+   "runner": {"executors":{"a":{"confinement":{"privateHome":true,"isolatedSession":true,"ownWorktree":true},"invocations":[{"id":"x","permissionMode":"bypass"}]}}},
+   "expect": {"passed":true,"message":"every invocation declaring bypass also declares full confinement"}
+  },
+  {
+   "name": "confinement: bypass without any confinement names the three flags",
+   "row": "executor-confinement",
+   "runner": {"executors":{"a":{"invocations":[{"id":"x","permissionMode":"bypass"}]}}},
+   "expect": {"passed":false,"message":"invocations declare \"permissionMode\": \"bypass\" without full confinement: a/x (missing privateHome, isolatedSession, ownWorktree)"}
+  },
+  {
+   "name": "confinement: bypass with full controls on the executor passes",
+   "row": "executor-confinement",
+   "runner": {"executors":{"a":{"confinement":{"controls":{"home":"private","session":"isolated","workspace":"own"}},"invocations":[{"id":"x","permissionMode":"bypass"}]}}},
+   "expect": {"passed":true,"message":"every invocation declaring bypass also declares full confinement"}
+  },
+  {
+   "name": "confinement: the invocation's own confinement replaces the executor's",
+   "row": "executor-confinement",
+   "runner": {"executors":{"a":{"confinement":{"privateHome":true,"isolatedSession":true,"ownWorktree":true},"invocations":[{"id":"x","permissionMode":"bypass","confinement":{"privateHome":true}}]}}},
+   "expect": {"passed":false,"message":"invocations declare \"permissionMode\": \"bypass\" without full confinement: a/x (missing isolatedSession, ownWorktree)"}
+  },
+  {
+   "name": "confinement: a non-bypass invocation is not judged",
+   "row": "executor-confinement",
+   "runner": {"executors":{"a":{"invocations":[{"id":"x","permissionMode":"default"},{"id":"y"}]}}},
+   "expect": {"passed":true,"message":"every invocation declaring bypass also declares full confinement"}
+  },
+  {
+   "name": "confinement: the executor's home, session and workspace spellings count after the config loads",
+   "row": "executor-confinement",
+   "runner": {"executors":{"a":{"confinement":{"home":"private","session":"isolated","workspace":"own"},"invocations":[{"id":"x","permissionMode":"bypass"}]}}},
+   "expect": {"passed":true,"message":"every invocation declaring bypass also declares full confinement"}
+  },
+  {
+   "name": "confinement: the invocation's home spelling is read as written, not as a flag",
+   "row": "executor-confinement",
+   "runner": {"executors":{"a":{"invocations":[{"id":"x","permissionMode":"bypass","confinement":{"home":"private","isolatedSession":true,"ownWorktree":true}}]}}},
+   "expect": {"passed":false,"message":"invocations declare \"permissionMode\": \"bypass\" without full confinement: a/x (missing privateHome)"}
+  },
+  {
+   "name": "confinement: every offender is named in the order the config declares them, an unnamed invocation as a question mark",
+   "row": "executor-confinement",
+   "runner": {"executors":{"a":{"invocations":[{"id":"x","permissionMode":"bypass","confinement":{"controls":{"home":"private"}}},{"permissionMode":"bypass"}]},"b":{"confinement":{"privateHome":true},"invocations":[{"id":"z","permissionMode":"bypass"}]}}},
+   "expect": {"passed":false,"message":"invocations declare \"permissionMode\": \"bypass\" without full confinement: a/x (missing isolatedSession, ownWorktree); a/? (missing privateHome, isolatedSession, ownWorktree); b/z (missing isolatedSession, ownWorktree)"}
+  },
+  {
+   "name": "confinement: a legacy confinement that is not a plain object is left as written",
+   "row": "executor-confinement",
+   "runner": {"executors":{"a":{"confinement":["privateHome"],"invocations":[{"id":"x","permissionMode":"bypass"}]}}},
+   "expect": {"passed":false,"message":"invocations declare \"permissionMode\": \"bypass\" without full confinement: a/x (missing privateHome, isolatedSession, ownWorktree)"}
+  },
+  {
+   "name": "grants: none declared passes",
+   "row": "invocation-git-write-grants",
+   "runner": {},
+   "expect": {"passed":true,"message":"no executor or invocation grants git add/git commit to a worker"}
+  },
+  {
+   "name": "grants: the default executor's allowlist with git commit warns naming the executor",
+   "row": "invocation-git-write-grants",
+   "runner": {"executor":{"args":["--allowedTools","Bash(git commit:*)"]}},
+   "expect": {"passed":true,"message":"warning: executor still grant git add/git commit in --allowedTools; workers no longer commit (the runner does) -- remove the grant"}
+  },
+  {
+   "name": "grants: a wrapped git add on an invocation warns naming executor and invocation",
+   "row": "invocation-git-write-grants",
+   "runner": {"executors":{"a":{"invocations":[{"id":"x","args":["-p","--allowedTools","Read,Bash(rtk git add -A)"]}]}}},
+   "expect": {"passed":true,"message":"warning: executors.a.invocations.x still grant git add/git commit in --allowedTools; workers no longer commit (the runner does) -- remove the grant"}
+  },
+  {
+   "name": "grants: git as part of a longer word is no grant",
+   "row": "invocation-git-write-grants",
+   "runner": {"executors":{"a":{"invocations":[{"id":"x","args":["--allowedTools","Bash(git commits)"]},{"id":"y","args":["--allowedTools","Bash(digit add)"]},{"id":"z","args":["--allowedTools","Bash(xgit add)"]}]}}},
+   "expect": {"passed":true,"message":"no executor or invocation grants git add/git commit to a worker"}
+  },
+  {
+   "name": "grants: an allowlist flag with nothing after it grants nothing",
+   "row": "invocation-git-write-grants",
+   "runner": {"executors":{"a":{"invocations":[{"id":"x","args":["--allowedTools"]},{"args":"git add"}]}}},
+   "expect": {"passed":true,"message":"no executor or invocation grants git add/git commit to a worker"}
+  },
+  {
+   "name": "grants: every offender is named in declared order with a question mark for a missing id",
+   "row": "invocation-git-write-grants",
+   "runner": {"executor":{"args":["--allowedTools","git add"]},"executors":{"a":{"invocations":[{"args":["--allowedTools","git commit -m x"]},{"id":"y","args":["--allowedTools","git add"]}]}}},
+   "expect": {"passed":true,"message":"warning: executor, executors.a.invocations.?, executors.a.invocations.y still grant git add/git commit in --allowedTools; workers no longer commit (the runner does) -- remove the grant"}
+  },
+  {
+   "name": "serves: no capabilities declares none",
+   "row": "capability-serves-valid",
+   "runner": {},
+   "expect": {"passed":true,"message":"0 capability entries declare a valid \"serves\" attribute set, none identical"}
+  },
+  {
+   "name": "serves: one set is valid",
+   "row": "capability-serves-valid",
+   "runner": {"capabilities":{"review":{"serves":{"a":1}}}},
+   "expect": {"passed":true,"message":"1 capability entry declares a valid \"serves\" attribute set, none identical"}
+  },
+  {
+   "name": "serves: two distinct sets are valid",
+   "row": "capability-serves-valid",
+   "runner": {"capabilities":{"review":{"serves":{"a":1}},"audit":{"serves":{"a":2}},"plain":{}}},
+   "expect": {"passed":true,"message":"2 capability entries declare a valid \"serves\" attribute set, none identical"}
+  },
+  {
+   "name": "serves: identical sets whatever the key order name both capabilities",
+   "row": "capability-serves-valid",
+   "runner": {"capabilities":{"review":{"serves":{"a":1,"b":2}},"audit":{"serves":{"b":2,"a":1}}}},
+   "expect": {"passed":false,"message":"\"review\" and \"audit\" declare the identical \"serves\" attribute set -- capability matching can never distinguish them"}
+  },
+  {
+   "name": "serves: an entry without serves is skipped",
+   "row": "capability-serves-valid",
+   "runner": {"capabilities":{"review":{"description":"x"},"audit":{"serves":{"a":1}},"scalar":"x"}},
+   "expect": {"passed":true,"message":"1 capability entry declares a valid \"serves\" attribute set, none identical"}
+  },
+  {
+   "name": "serves: attribute names sort case-insensitively before comparing",
+   "row": "capability-serves-valid",
+   "runner": {"capabilities":{"one":{"serves":{"B":1,"a":2}},"two":{"serves":{"a":2,"B":1}}}},
+   "expect": {"passed":false,"message":"\"one\" and \"two\" declare the identical \"serves\" attribute set -- capability matching can never distinguish them"}
+  },
+  {
+   "name": "serves: a list is compared by position",
+   "row": "capability-serves-valid",
+   "runner": {"capabilities":{"one":{"serves":["gitnexus"]},"two":{"serves":["gitnexus"]}}},
+   "expect": {"passed":false,"message":"\"one\" and \"two\" declare the identical \"serves\" attribute set -- capability matching can never distinguish them"}
+  },
+  {
+   "name": "omp: not installed warns with the error code",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":null},
+   "expect": {"passed":true,"message":"warning: omp is not installed or did not answer --version (ENOENT)"}
+  },
+  {
+   "name": "omp: not installed names the executors that run it",
+   "row": "omp-natives-present",
+   "runner": {"executors":{"pi":{"invocations":[{"id":"a","command":"/usr/local/bin/omp"}]},"x":{"invocations":[{"command":"claude"}]}}},
+   "machine": {"omp":null},
+   "expect": {"passed":true,"message":"warning: omp is not installed or did not answer --version (ENOENT), but executor(s) pi run it"}
+  },
+  {
+   "name": "omp: a failing --version warns with the failure message",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":{"exit":3}},
+   "expect": {"passed":true,"message":"warning: omp is not installed or did not answer --version (Command failed: omp --version)"}
+  },
+  {
+   "name": "omp: a --version without a version warns",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":{"output":"hello"}},
+   "expect": {"passed":true,"message":"warning: omp --version printed no version, so its native addon cannot be located"}
+  },
+  {
+   "name": "omp: the modern addon is found first",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":{"output":"omp 1.2.3"},"files":["$ROOT/home/.omp/natives/1.2.3/pi_natives.linux-x64-modern.node","$ROOT/home/.omp/natives/1.2.3/pi_natives.linux-x64-baseline.node"]},
+   "expect": {"passed":true,"message":"omp 1.2.3 has its native addon $ROOT/home/.omp/natives/1.2.3/pi_natives.linux-x64-modern.node"}
+  },
+  {
+   "name": "omp: the baseline addon is found when the modern one is missing",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":{"output":"omp 1.2.3"},"files":["$ROOT/home/.omp/natives/1.2.3/pi_natives.linux-x64-baseline.node"]},
+   "expect": {"passed":true,"message":"omp 1.2.3 has its native addon $ROOT/home/.omp/natives/1.2.3/pi_natives.linux-x64-baseline.node"}
+  },
+  {
+   "name": "omp: a version with a suffix is read whole up to whitespace",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":{"output":"omp v1.2.3-beta.1 (build 5)"},"files":["$ROOT/home/.omp/natives/1.2.3-beta.1/pi_natives.linux-x64.node"]},
+   "expect": {"passed":true,"message":"omp 1.2.3-beta.1 has its native addon $ROOT/home/.omp/natives/1.2.3-beta.1/pi_natives.linux-x64.node"}
+  },
+  {
+   "name": "omp: a missing addon with no executor running omp only warns",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":{"output":"1.2.3"}},
+   "expect": {"passed":true,"message":"warning: omp 1.2.3 has no native addon in $ROOT/home/.omp/natives/1.2.3 (looked for pi_natives.linux-x64-modern.node, pi_natives.linux-x64-baseline.node, pi_natives.linux-x64.node); no executor runs omp; run omp once outside the sandbox after every update"}
+  },
+  {
+   "name": "omp: a missing addon with executors running omp fails naming them",
+   "row": "omp-natives-present",
+   "runner": {"executors":{"pi":{"invocations":[{"command":"omp"}]},"q":{"invocations":[{"command":"omp"}]}}},
+   "machine": {"omp":{"output":"1.2.3"}},
+   "expect": {"passed":false,"message":"omp 1.2.3 has no native addon in $ROOT/home/.omp/natives/1.2.3 (looked for pi_natives.linux-x64-modern.node, pi_natives.linux-x64-baseline.node, pi_natives.linux-x64.node); executor(s) pi, q run omp, and a confined omp cannot extract it: run omp once outside the sandbox after every update"}
+  },
+  {
+   "name": "omp: arm64 looks for the one plain addon name",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":{"output":"1.2.3"},"platform":"darwin","arch":"arm64"},
+   "expect": {"passed":true,"message":"warning: omp 1.2.3 has no native addon in $ROOT/home/.omp/natives/1.2.3 (looked for pi_natives.darwin-arm64.node); no executor runs omp; run omp once outside the sandbox after every update"}
+  },
+  {
+   "name": "omp: a pinned absolute natives directory is cleaned and used",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":{"output":"1.2.3"},"env":{"PI_NATIVES_DIR":"$ROOT/pin/x/../nat/"},"files":["$ROOT/pin/nat/1.2.3/pi_natives.linux-x64-modern.node"]},
+   "expect": {"passed":true,"message":"omp 1.2.3 has its native addon $ROOT/pin/nat/1.2.3/pi_natives.linux-x64-modern.node"}
+  },
+  {
+   "name": "omp: a pinned directory under the home is expanded",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":{"output":"1.2.3"},"env":{"PI_NATIVES_DIR":"~/n"},"files":["$ROOT/home/n/1.2.3/pi_natives.linux-x64-modern.node"]},
+   "expect": {"passed":true,"message":"omp 1.2.3 has its native addon $ROOT/home/n/1.2.3/pi_natives.linux-x64-modern.node"}
+  },
+  {
+   "name": "omp: a pinned relative directory is ignored",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":{"output":"1.2.3"},"env":{"PI_NATIVES_DIR":"rel/dir"},"files":["$ROOT/home/.omp/natives/1.2.3/pi_natives.linux-x64-modern.node"]},
+   "expect": {"passed":true,"message":"omp 1.2.3 has its native addon $ROOT/home/.omp/natives/1.2.3/pi_natives.linux-x64-modern.node"}
+  },
+  {
+   "name": "omp: the XDG data directory is used once its omp directory exists",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":{"output":"1.2.3"},"env":{"XDG_DATA_HOME":"$ROOT/xdg"},"files":["$ROOT/xdg/omp/natives/1.2.3/pi_natives.linux-x64-modern.node"]},
+   "expect": {"passed":true,"message":"omp 1.2.3 has its native addon $ROOT/xdg/omp/natives/1.2.3/pi_natives.linux-x64-modern.node"}
+  },
+  {
+   "name": "omp: an XDG data directory without omp in it is passed over",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":{"output":"1.2.3"},"env":{"XDG_DATA_HOME":"$ROOT/xdg"},"dirs":["$ROOT/xdg"]},
+   "expect": {"passed":true,"message":"warning: omp 1.2.3 has no native addon in $ROOT/home/.omp/natives/1.2.3 (looked for pi_natives.linux-x64-modern.node, pi_natives.linux-x64-baseline.node, pi_natives.linux-x64.node); no executor runs omp; run omp once outside the sandbox after every update"}
+  },
+  {
+   "name": "agy: nothing referenced has nothing to check",
+   "row": "agy-sub-homes-configured",
+   "runner": {},
+   "expect": {"passed":true,"message":"no agy sub-HOMEs referenced in executor configs or the gemini accounts — nothing to check"}
+  },
+  {
+   "name": "agy: an executor's agy HOME that exists passes",
+   "row": "agy-sub-homes-configured",
+   "runner": {"executors":{"agy":{"invocations":[{"id":"a","command":"agy","env":{"HOME":"${HOME}/.agy-homes/one"}}]}}},
+   "machine": {"dirs":["$ROOT/home/.agy-homes/one"]},
+   "expect": {"passed":true,"message":"all 1 agy sub-HOME(s) exist (${HOME}/.agy-homes/one)"}
+  },
+  {
+   "name": "agy: a missing sub-HOME fails naming the raw and the resolved path",
+   "row": "agy-sub-homes-configured",
+   "runner": {"executors":{"agy":{"invocations":[{"id":"a","env":{"HOME":"~/.agy-homes/one"}}]}}},
+   "expect": {"passed":false,"message":"agy sub-HOME check failed (not a directory: ~/.agy-homes/one ($ROOT/home/.agy-homes/one)) — each sub-HOME an executor or a gemini account names must exist"}
+  },
+  {
+   "name": "agy: a gemini account's agy store counts and a repeated path counts once",
+   "row": "agy-sub-homes-configured",
+   "runner": {"executors":{"agy":{"invocations":[{"id":"a","env":{"HOME":"$HOME/.agy-homes/one"}}]}},"llmAccounts":{"gemini":{"g1":{"credentialStore":{"agy":"~/.agy-homes/one"}},"g2":{"credentialStore":{"agy":" ~/.agy-homes/two "}},"g3":{"credentialStore":{"agy":"  "}}}}},
+   "machine": {"dirs":["$ROOT/home/.agy-homes/one","$ROOT/home/.agy-homes/two"]},
+   "expect": {"passed":true,"message":"all 2 agy sub-HOME(s) exist ($HOME/.agy-homes/one, ~/.agy-homes/two)"}
+  },
+  {
+   "name": "agy: a HOME that is not an agy one is ignored",
+   "row": "agy-sub-homes-configured",
+   "runner": {"executors":{"claude":{"invocations":[{"id":"c","command":"claude","env":{"HOME":"/nowhere/else"}}]}}},
+   "expect": {"passed":true,"message":"no agy sub-HOMEs referenced in executor configs or the gemini accounts — nothing to check"}
+  },
+  {
+   "name": "agy: the executor named agy and an invocation id with agy count",
+   "row": "agy-sub-homes-configured",
+   "runner": {"executors":{"agy":{"invocations":[{"id":"a","env":{"HOME":"~/one"}}]},"other":{"invocations":[{"id":"my-agy-seat","env":{"HOME":"~/two"}}]}}},
+   "machine": {"dirs":["$ROOT/home/one"]},
+   "expect": {"passed":false,"message":"agy sub-HOME check failed (not a directory: ~/two ($ROOT/home/two)) — each sub-HOME an executor or a gemini account names must exist"}
+  },
+  {
+   "name": "agy: the default executor's own HOME and its invocations count",
+   "row": "agy-sub-homes-configured",
+   "runner": {"executor":{"command":"agy","env":{"HOME":"~/d1"},"invocations":[{"id":"i","env":{"HOME":"~/d2"}},{"id":"j","command":"claude","env":{"HOME":"~/d3"}}]}},
+   "machine": {"dirs":["$ROOT/home/d1"]},
+   "expect": {"passed":false,"message":"agy sub-HOME check failed (not a directory: ~/d2 ($ROOT/home/d2)) — each sub-HOME an executor or a gemini account names must exist"}
+  },
+  {
+   "name": "agy: a file in place of the sub-HOME is not a directory",
+   "row": "agy-sub-homes-configured",
+   "runner": {"executors":{"agy":{"invocations":[{"env":{"HOME":"${HOME}/agy-homes-file"}}]}}},
+   "machine": {"files":["$ROOT/home/agy-homes-file"]},
+   "expect": {"passed":false,"message":"agy sub-HOME check failed (not a directory: ${HOME}/agy-homes-file ($ROOT/home/agy-homes-file)) — each sub-HOME an executor or a gemini account names must exist"}
+  },
+  {
+   "name": "tools: none declared is inactive",
+   "row": "tool-registry-configured",
+   "runner": {"executors":{"x":{"kind":"agent"}}},
+   "machine": {},
+   "handRecorded": true,
+   "expect": {"passed":true,"message":"inactive — no tool-capable executors declared (declare one under runner.executors with fgos config set)"}
+  },
+  {
+   "name": "tools: every tool present is full",
+   "row": "tool-registry-configured",
+   "runner": {"executors":{"a":{"kind":"tool","for":["p","q"],"invocations":[{"via":"cli","command":"a"}]}}},
+   "machine": {"pathCommands":["a"]},
+   "handRecorded": true,
+   "expect": {"passed":true,"message":"full — 1/1 tool(s) present"}
+  },
+  {
+   "name": "tools: a missing tool degrades the posture and fails",
+   "row": "tool-registry-configured",
+   "runner": {"executors":{"a":{"kind":"tool","for":["p","q"],"invocations":[{"via":"cli","command":"a"}]},"b":{"kind":"tool","for":["p"],"invocations":[{"via":"cli","command":"b"}]}}},
+   "machine": {"pathCommands":["a"]},
+   "handRecorded": true,
+   "expect": {"passed":false,"message":"degraded — 1/2 tool(s) present (0 stale, 1 missing, 0 cannot be probed) — install the missing tool, or reindex the stale one; fgos dispatch decide --for <capability> shows the answer a dispatch gets"}
+  }
+ ]
+}

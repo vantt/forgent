@@ -1478,7 +1478,7 @@ fn canonicalize_write_entry(raw: &str) -> Result<String, String> {
 
 /// The rules of `runner.generatedPaths` the schema cannot state: `from` must open with a literal directory (a
 /// bare `**` or a leading glob would widen every unit's scope) and every entry must read as a write-scope entry.
-fn validate_generated_paths_shape(generated: &Value, label: &str) -> Check {
+pub fn validate_generated_paths_shape(generated: &Value, label: &str) -> Check {
     for (i, entry) in generated.as_array().into_iter().flatten().enumerate() {
         let from = entry.get("from");
         let from_text = from.and_then(Value::as_str);

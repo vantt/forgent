@@ -3491,6 +3491,78 @@ fn doctor_without_node_fails_each_bridged_row_naming_node_once_and_the_host_rows
     let _ = fs::remove_dir_all(&project);
 }
 
+/// The rows over the runner config and the machine it names are the host's: in a repository with no config of its
+/// own they answer from the standard, and none of them needs Node.
+#[cfg(unix)]
+#[test]
+fn doctor_judges_the_execution_rows_in_the_host_without_node() {
+    let project = fresh_dir("fgos_doctor_execution");
+    for args in [
+        &["init", "-q", "."][..],
+        &["commit", "-q", "--allow-empty", "-m", "init"][..],
+    ] {
+        let output = Command::new("git")
+            .current_dir(&project)
+            .args(["-c", "user.name=doors", "-c", "user.email=doors@test"])
+            .args(args)
+            .output()
+            .expect("git runs");
+        assert!(output.status.success(), "git {args:?}");
+    }
+    // The Git driver trusts only a state root that is the current user's alone, whatever the umask.
+    let state = fresh_dir("fgos_doctor_execution_state");
+    fs::set_permissions(&state, std::os::unix::fs::PermissionsExt::from_mode(0o700)).unwrap();
+    let output = doctor_in(
+        &project,
+        &path_without_node(),
+        &["--json"],
+        &[("FGOS_STATE_ROOT", state.to_str().unwrap())],
+    );
+    assert_eq!(output.status.code(), Some(0));
+    let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let checks = envelope["data"]["checks"].as_array().unwrap();
+    let row = |id: &str| {
+        checks
+            .iter()
+            .find(|row| row["id"] == id)
+            .unwrap_or_else(|| panic!("the report has no row {id}"))
+    };
+    for (id, said) in [
+        (
+            "runner-generated-paths",
+            "runner.generatedPaths is valid (0 mapping(s))",
+        ),
+        ("tool-registry-configured", "inactive"),
+        (
+            "executor-confinement",
+            "every invocation declaring bypass also declares full confinement",
+        ),
+        (
+            "invocation-git-write-grants",
+            "no executor or invocation grants git add/git commit to a worker",
+        ),
+        (
+            "agy-sub-homes-configured",
+            "no agy sub-HOMEs referenced in executor configs or the gemini accounts",
+        ),
+        (
+            "capability-serves-valid",
+            "declare a valid \"serves\" attribute set",
+        ),
+    ] {
+        let message = row(id)["message"].as_str().unwrap();
+        assert_eq!(row(id)["status"], "ok", "{id}: {message}");
+        assert!(message.contains(said), "{id}: {message}");
+    }
+    let omp = row("omp-natives-present")["message"].as_str().unwrap();
+    assert!(
+        !omp.starts_with("Node is not available"),
+        "the omp row names Node: {omp}"
+    );
+    let _ = fs::remove_dir_all(&project);
+    let _ = fs::remove_dir_all(&state);
+}
+
 /// The rows of the Node-owned layers are one call of the rows bridge: one Node process for the whole run, however
 /// many rows it judges. (That a doctor run leaves a repository with no fgOS setup untouched and starts no events
 /// child is proved through the host by `test/setup/checks-doctor-config.test.mjs`.)
