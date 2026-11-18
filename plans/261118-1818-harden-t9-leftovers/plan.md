@@ -1,7 +1,8 @@
 ---
 title: "HARDEN T9 leftovers: doctor row timing, fixture echo, empty RouterPolicy"
 description: "Three of the four T9 leftovers the root closing report listed, chosen by the owner on 2026-11-18, plus the one deliberately deferred (the admission gate)."
-status: pending
+status: done
+closedNote: "Closed 2026-11-18: doctor row timing landed 8a754445e, echo fixture out of the production catalog 817d322f6, empty RouterPolicy deleted d9fedea48. Phase 3 (admission gate) deliberately deferred by the owner and stays open as backlog p-ltwb2h3k6s."
 priority: P2
 effort: ~1d
 branch: main (plan only; each phase runs on its own track branch in its own linked worktree from origin/main)
