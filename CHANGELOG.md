@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- New secretary persona (`core/agents/secretary.yaml`, tier `standard`) and the `/handoff` skill: `fgos head start secretary --name miu` opens the owner's long-lived front session (a confined head session: the herdr socket and the user runtime directory stay masked, writes go only to its grant `plans`, `docs/backlog.md`, `docs/discussions`), and `/handoff` inside a head session asks for its replacement through `fgos head rotate`. A new core shaper (`fgos-shaping`) shapes any domain that has no shaper of its own, and `fgos-clarifying` answers "unsure" instead of defaulting to `coding`; the domain registry now names every domain under `domains/` (so `marketing` is classified).
+- Session rotation settings in the project config, registered in the standard and schema: `sessionRotation.soft` (0.4), `hard` (0.7), `keep` (10 handoff files per persona and name), `windowSize` (1000000), `answerWaitMs` (120000) and per-persona overrides under `sessionRotation.personas`. Handoff files are written, redacted and immutable, under `.fgos/runtime/session-rotation/<persona>-<name>/`.
+- Discussions moved from `docs/history/<slug>/DISCUSSION.md` to `docs/discussions/<slug>/` (Convention kind `discussion`; open questions in `QUESTIONS.md`), and `fgos questions --open` lists the open owner questions of the discussion, plan and execution stages in one batch.
+- Worker attempts are now placed through the Session Host: the run supervisor envelope carries `host` (`terminal` or `direct`) in place of `mode` and a pane is released through the host's `retire`. Nothing changes for users; an attempt record written before this still reads, and Terminal Control gained a `focus` operation that fronts the pane of a key.
+
 ## [v0.2.0-rc.11] - 2026-11-18
 
 - New `fgos head start <persona> --name <name>` and `fgos head rotate <persona> --name <name>` (the noun `head` is provisional): start the long-lived confined head session of a persona, or front the one that holds the role, and ask for its replacement by a successor; from inside a confined head both go through its request socket. Exit codes: 0 done, 2 refused, 3 rotation already in progress, 4 malformed call.
