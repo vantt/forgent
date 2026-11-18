@@ -6,8 +6,14 @@
 //!
 //! The state is Session Host's answer, copied: `unknown` is never turned into `gone`. Identity's view travels as the
 //! separate attr `fgos.head.identity`, so a pane that answers `unknown` while the role is held alive stays visible as
-//! exactly that. `retired` (a lead that ended) is declared for the supervisor plan's signal; this source emits none
-//! until that signal exists.
+//! exactly that. The role string itself (`head:<persona>-<name>`, `lead:<LANE>`) travels as `fgos.head.role`.
+//!
+//! `retired` is the signal that a head or lead ended on purpose: its owner (the project supervisor, for a lead) adds
+//! `retiredAt` (an RFC 3339 instant) to the head's `placement.json`. A placement carrying a valid `retiredAt` answers
+//! `retired` with record `ts` = `retiredAt`, and Session Host is not asked. A `retiredAt` that is not a valid instant
+//! is no signal: the head is projected as if it had none. The placement writer's schema
+//! (`{ role, gen, placement, runDir, persona, startedAt }`, session-host spec 8.4) has no field that already means
+//! retired; the next `head start` of the lineage replaces the file and so clears it.
 
 use super::HEAD_STATE_KIND;
 use fgos_observe::record::types::{AttrValue, Basis, Origin, Record, SubjectRef, RECORD_VERSION};
@@ -112,6 +118,8 @@ struct Head {
     gen: Option<i64>,
     placement: Placement,
     run_dir: PathBuf,
+    /// `retiredAt`, normalized to RFC 3339 UTC; `None` when absent or not a valid instant.
+    retired_at: Option<String>,
 }
 
 fn read_head(path: &Path) -> Option<Head> {
@@ -124,6 +132,10 @@ fn read_head(path: &Path) -> Option<Head> {
         gen: value["gen"].as_i64(),
         placement,
         run_dir: PathBuf::from(value["runDir"].as_str().unwrap_or_default()),
+        retired_at: value["retiredAt"]
+            .as_str()
+            .and_then(fgos_host_runtime::civil_time::parse_rfc3339_millis)
+            .and_then(|ms| fgos_host_runtime::civil_time::format_unix_millis_rfc3339(ms, 0)),
     })
 }
 
@@ -162,11 +174,21 @@ impl RecordSource for HeadStateSource {
         Ok(heads
             .into_iter()
             .map(|head| {
-                let state = state_name(self.facts.alive(&head.placement, &head.run_dir));
+                let (state, ts) = match head.retired_at {
+                    Some(at) => ("retired", at),
+                    None => (
+                        state_name(self.facts.alive(&head.placement, &head.run_dir)),
+                        ts.clone(),
+                    ),
+                };
                 let mut attrs = BTreeMap::from([
                     (
                         "fgos.head.state".to_owned(),
                         AttrValue::Str(state.to_owned()),
+                    ),
+                    (
+                        "fgos.head.role".to_owned(),
+                        AttrValue::Str(head.role.clone()),
                     ),
                     (
                         "fgos.head.identity".to_owned(),
@@ -189,7 +211,7 @@ impl RecordSource for HeadStateSource {
                     v: RECORD_VERSION,
                     id: format!("head-state:{}", head.role),
                     kind: HEAD_STATE_KIND.to_owned(),
-                    ts: ts.clone(),
+                    ts,
                     end_ts: None,
                     subject: SubjectRef {
                         kind: "head".to_owned(),

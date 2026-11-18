@@ -24,6 +24,10 @@ fn scratch(name: &str) -> PathBuf {
 }
 
 fn git(dir: &Path, args: &[&str]) {
+    git_env(dir, args, &[]);
+}
+
+fn git_env(dir: &Path, args: &[&str], env: &[(&str, &str)]) {
     let out = Command::new("git")
         .current_dir(dir)
         .args([
@@ -37,6 +41,7 @@ fn git(dir: &Path, args: &[&str]) {
         .args(args)
         .env("GIT_CONFIG_GLOBAL", "/dev/null")
         .env("GIT_CONFIG_SYSTEM", "/dev/null")
+        .envs(env.iter().copied())
         .output()
         .unwrap();
     assert!(
@@ -52,15 +57,51 @@ fn plan_text(status: &str, priority: &str) -> String {
     )
 }
 
-fn commit_plan(repo: &Path, dir: &str, status: &str, priority: &str) {
+fn commit_file(repo: &Path, dir: &str, text: &str, message: &str) {
     let path = repo.join("plans").join(dir);
     std::fs::create_dir_all(&path).unwrap();
-    std::fs::write(path.join("plan.md"), plan_text(status, priority)).unwrap();
+    std::fs::write(path.join("plan.md"), text).unwrap();
     git(repo, &["add", "-A"]);
-    git(
+    git(repo, &["commit", "-m", message]);
+}
+
+fn commit_plan(repo: &Path, dir: &str, status: &str, priority: &str) {
+    commit_file(
         repo,
-        &["commit", "-m", &format!("plan {status} {priority}")],
+        dir,
+        &plan_text(status, priority),
+        &format!("plan {status} {priority}"),
     );
+}
+
+/// A repository whose first commit holds no plan, so a plan's creating commit has a parent to compare with.
+fn seeded_repo(name: &str) -> PathBuf {
+    let repo = scratch(name);
+    git(&repo, &["init", "-q", "-b", "main"]);
+    std::fs::write(repo.join("README"), "seed\n").unwrap();
+    git(&repo, &["add", "-A"]);
+    git(&repo, &["commit", "-m", "seed"]);
+    repo
+}
+
+fn status_triples(records: &[Record]) -> Vec<(String, String, String)> {
+    let mut out: Vec<(String, String, String)> = records
+        .iter()
+        .filter(|r| r.kind == "fgos.plan.status")
+        .map(|r| {
+            (
+                attr(r, "fgos.plan.change").unwrap().to_owned(),
+                attr(r, "fgos.plan.from").unwrap_or("none").to_owned(),
+                attr(r, "fgos.plan.to").unwrap().to_owned(),
+            )
+        })
+        .collect();
+    out.sort();
+    out
+}
+
+fn triple(c: &str, f: &str, t: &str) -> (String, String, String) {
+    (c.to_owned(), f.to_owned(), t.to_owned())
 }
 
 fn attr<'a>(record: &'a Record, name: &str) -> Option<&'a str> {
@@ -78,9 +119,9 @@ fn all_time() -> Window {
 }
 
 #[test]
-fn a_plan_going_draft_ready_running_done_with_one_priority_change_gives_four_transitions() {
-    let repo = scratch("plan");
-    git(&repo, &["init", "-q", "-b", "main"]);
+fn a_plan_going_draft_ready_running_done_with_one_priority_change_gives_four_transitions_after_its_creation(
+) {
+    let repo = seeded_repo("plan");
     let dir = "261118-0936-fixture";
     commit_plan(&repo, dir, "draft", "P2");
     commit_plan(&repo, dir, "ready", "P2");
@@ -91,37 +132,33 @@ fn a_plan_going_draft_ready_running_done_with_one_priority_change_gives_four_tra
     let records = PlanHistorySource::with_state_root(repo.join(".fgos-state"))
         .records(&repo, &all_time())
         .unwrap();
-    let mut transitions: Vec<(String, String, String)> = records
+    assert!(records
         .iter()
         .filter(|r| r.kind == "fgos.plan.status")
-        .map(|r| {
-            assert_eq!(r.subject.id, dir);
-            (
-                attr(r, "fgos.plan.change").unwrap().to_owned(),
-                attr(r, "fgos.plan.from").unwrap().to_owned(),
-                attr(r, "fgos.plan.to").unwrap().to_owned(),
-            )
-        })
-        .collect();
-    transitions.sort();
-    let expect = |c: &str, f: &str, t: &str| (c.to_owned(), f.to_owned(), t.to_owned());
+        .all(|r| r.subject.id == dir));
     assert_eq!(
-        transitions,
+        status_triples(&records),
         [
-            expect("priority", "P2", "P1"),
-            expect("status", "draft", "ready"),
-            expect("status", "ready", "running"),
-            expect("status", "running", "done"),
-        ]
+            triple("priority", "P2", "P1"),
+            triple("priority", "none", "P2"),
+            triple("status", "draft", "ready"),
+            triple("status", "none", "draft"),
+            triple("status", "ready", "running"),
+            triple("status", "running", "done"),
+        ],
+        "the creating commit records each field from none (attr absent), then the four changes"
     );
     let activity = records
         .iter()
         .filter(|r| r.kind == "fgos.plan.activity")
         .count();
     assert_eq!(
-        activity, 4,
-        "one activity record per commit after the creating one"
+        activity, 5,
+        "one activity record per commit touching the plan"
     );
+    assert!(records
+        .iter()
+        .all(|r| attr(r, "fgos.plan.history") == Some("complete")));
 
     let again = PlanHistorySource::with_state_root(repo.join(".fgos-state"))
         .records(&repo, &all_time())
@@ -131,6 +168,110 @@ fn a_plan_going_draft_ready_running_done_with_one_priority_change_gives_four_tra
     ids.sort();
     ids_again.sort();
     assert_eq!(ids, ids_again, "ids are deterministic");
+    let _ = std::fs::remove_dir_all(&repo);
+}
+
+#[test]
+fn only_plans_under_the_contract_with_contract_values_record_status() {
+    let repo = seeded_repo("contract");
+    let legacy = "261118-0936-legacy";
+    commit_file(
+        &repo,
+        legacy,
+        "---\ntitle: t\nstatus: in-progress\n---\n",
+        "legacy",
+    );
+    commit_file(
+        &repo,
+        legacy,
+        "---\ntitle: t\nstatus: completed\n---\n",
+        "legacy done",
+    );
+    let odd = "261118-0937-odd";
+    commit_plan(&repo, odd, "ready", "P1");
+    commit_plan(&repo, odd, "blocked", "P1");
+    let records = PlanHistorySource::with_state_root(repo.join(".fgos-state"))
+        .records(&repo, &all_time())
+        .unwrap();
+    assert_eq!(
+        status_triples(&records),
+        [
+            triple("priority", "none", "P1"),
+            triple("status", "none", "ready")
+        ],
+        "a legacy plan and a value outside the contract record no status"
+    );
+    assert_eq!(
+        records
+            .iter()
+            .filter(|r| r.kind == "fgos.plan.activity" && r.subject.id == legacy)
+            .count(),
+        2,
+        "a legacy plan still has activity"
+    );
+    let _ = std::fs::remove_dir_all(&repo);
+}
+
+#[test]
+fn the_same_transition_rebased_onto_two_branches_is_one_record() {
+    let repo = seeded_repo("rebased");
+    let dir = "261118-0936-fixture";
+    commit_plan(&repo, dir, "draft", "P2");
+    git(&repo, &["branch", "stale"]);
+    let author = [("GIT_AUTHOR_DATE", "2026-11-17T10:00:00Z")];
+    std::fs::write(
+        repo.join("plans").join(dir).join("plan.md"),
+        plan_text("ready", "P2"),
+    )
+    .unwrap();
+    git(&repo, &["add", "-A"]);
+    git_env(
+        &repo,
+        &["commit", "-m", "ready"],
+        &[author[0], ("GIT_COMMITTER_DATE", "2026-11-17T10:00:00Z")],
+    );
+    git(&repo, &["checkout", "-q", "stale"]);
+    git_env(
+        &repo,
+        &["cherry-pick", "main"],
+        &[("GIT_COMMITTER_DATE", "2026-11-17T12:00:00Z")],
+    );
+    let records = PlanHistorySource::with_state_root(repo.join(".fgos-state"))
+        .records(&repo, &all_time())
+        .unwrap();
+    let ready: Vec<&Record> = records
+        .iter()
+        .filter(|r| r.kind == "fgos.plan.status" && attr(r, "fgos.plan.to") == Some("ready"))
+        .collect();
+    assert_eq!(
+        ready.len(),
+        1,
+        "one record for two copies with different shas"
+    );
+    assert_eq!(
+        ready[0].ts, "2026-11-17T10:00:00.000Z",
+        "the copy committed first is kept"
+    );
+    let _ = std::fs::remove_dir_all(&repo);
+}
+
+#[test]
+fn a_walk_stopped_by_its_bound_marks_its_records_truncated() {
+    let repo = seeded_repo("truncated");
+    let dir = "261118-0936-fixture";
+    commit_plan(&repo, dir, "draft", "P2");
+    commit_plan(&repo, dir, "ready", "P2");
+    let records = PlanHistorySource::with_state_root(repo.join(".fgos-state"))
+        .with_walk_limit(1)
+        .records(&repo, &all_time())
+        .unwrap();
+    assert_eq!(
+        status_triples(&records),
+        [triple("status", "draft", "ready")]
+    );
+    assert!(records
+        .iter()
+        .all(|r| attr(r, "fgos.plan.history") == Some("truncated")));
     let _ = std::fs::remove_dir_all(&repo);
 }
 
@@ -176,12 +317,19 @@ impl HeadFacts for FakeOwners {
 }
 
 fn head_records(answer: Liveness) -> Vec<Record> {
+    head_records_with(answer, "")
+}
+
+/// One placement as the head start writes it, with `extra` JSON members appended (e.g. `,"retiredAt":"..."`).
+fn head_records_with(answer: Liveness, extra: &str) -> Vec<Record> {
     let root = scratch("head");
     let lineage = root.join(".fgos/runtime/session-rotation/planner-x");
     std::fs::create_dir_all(&lineage).unwrap();
     std::fs::write(
         lineage.join("placement.json"),
-        r#"{"role":"head:planner-x","gen":2,"placement":{"host":"terminal","key":"cmd_1_abc"},"runDir":"/nowhere","persona":"planner","startedAt":"2026-11-18T06:58:44.815Z"}"#,
+        format!(
+            r#"{{"role":"head:planner-x","gen":2,"placement":{{"host":"terminal","key":"cmd_1_abc"}},"runDir":"/nowhere","persona":"planner","startedAt":"2026-11-18T06:58:44.815Z"{extra}}}"#
+        ),
     )
     .unwrap();
     let records = HeadStateSource::with_facts(Box::new(FakeOwners { answer }))
@@ -197,6 +345,7 @@ fn a_placement_whose_host_reports_gone_gives_gone_with_the_identity_view_alongsi
     assert_eq!(records.len(), 1);
     assert_eq!(records[0].subject.id, "head:planner-x");
     assert_eq!(attr(&records[0], "fgos.head.state"), Some("gone"));
+    assert_eq!(attr(&records[0], "fgos.head.role"), Some("head:planner-x"));
     assert_eq!(attr(&records[0], "fgos.head.identity"), Some("alive"));
     assert_eq!(attr(&records[0], "fgos.head.persona"), Some("planner"));
 }
@@ -211,6 +360,19 @@ fn an_unknown_host_answer_stays_unknown_and_a_live_one_is_live() {
         attr(&head_records(Liveness::Live)[0], "fgos.head.state"),
         Some("live")
     );
+}
+
+#[test]
+fn a_placement_with_retired_at_is_retired_at_that_instant_and_an_invalid_one_is_no_signal() {
+    let retired = head_records_with(
+        Liveness::Live,
+        r#","retiredAt":"2026-11-18T08:00:00+07:00""#,
+    );
+    assert_eq!(attr(&retired[0], "fgos.head.state"), Some("retired"));
+    assert_eq!(retired[0].ts, "2026-11-18T01:00:00.000Z");
+    assert_eq!(attr(&retired[0], "fgos.head.role"), Some("head:planner-x"));
+    let invalid = head_records_with(Liveness::Live, r#","retiredAt":"yesterday""#);
+    assert_eq!(attr(&invalid[0], "fgos.head.state"), Some("live"));
 }
 
 #[test]

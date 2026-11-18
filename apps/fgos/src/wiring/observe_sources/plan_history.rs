@@ -2,18 +2,24 @@
 //! the program board log. Nothing is stored: every query walks the history again.
 //!
 //! Commits are read from every branch tip (HEAD, local and remote branches). A merge commit is skipped: the commits
-//! it brings in are walked on their own, so a transition is recorded once, at the commit that made it. A plan file
-//! created by a commit has no earlier value and records no transition. Ids are deterministic (plan dir, change and
-//! commit), so the same commit seen from two branches is one record.
+//! it brings in are walked on their own, so a transition is recorded once, at the commit that made it. A root commit
+//! has nothing to compare with and records nothing.
 //!
-//! The walk is bounded (`WALK_LIMIT` commits). A repository with more history than that is read newest first and the
-//! older part is not seen; the bound is a stated limit, not a silent one.
+//! `fgos.plan.status` covers only plans under the plan contract (`contract: plan-v1` in the commit's front matter),
+//! and only the contract's values (`status` draft|ready|running|done|withdrawn, `priority` P0..P3). A plan created
+//! at a status, or brought under the contract by the commit, records a transition from none: attr `fgos.plan.from`
+//! is absent. The id is `(plan dir, change, from, to, author time)`, so a rebased copy of the same transition on a
+//! stale branch is one record; of the copies, the one committed first (then the smaller sha) is kept.
+//!
+//! The walk is bounded (`WALK_LIMIT` commits). Every commit record carries `fgos.plan.history`: `complete` when the
+//! walk reached the window's start or the root, `truncated` when the bound stopped it first, so older transitions
+//! missing from the answer are a stated gap, not a silent one.
 
 use super::plan_text::{log_line, plan_dir_names, plan_fields, PlanFields};
 use super::{PLAN_ACTIVITY_KIND, PLAN_STATUS_KIND};
 use fgos_git::{
-    DiffScope, DiffSides, GitDriver, HeadFact, Inspect, Oid, PathValue, ReadObject, RefPrefix,
-    RefValue, RepoHandle, ResolveRepo, WalkBounds,
+    DiffScope, DiffSides, GitDriver, HeadFact, Inspect, Oid, PathRead, PathValue, ReadObject,
+    RefPrefix, RefValue, RepoHandle, ResolveRepo, WalkBounds,
 };
 use fgos_host_runtime::civil_time::{
     days_from_civil, format_unix_millis_rfc3339, parse_rfc3339_millis,
@@ -38,10 +44,20 @@ const BOARD_LOG: &str = "plans/261017-1313-fgos-platform-program-board/log.md";
 const WINDOW_SLACK_MS: i64 = 3 * 24 * 3600 * 1000;
 
 /// Reads the plan history of the repository at the project root. `state_root` is the Git door's state directory;
-/// `None` is this process's own state root, the production choice.
-#[derive(Debug, Default, Clone)]
+/// `None` is this process's own state root, the production choice. `walk_limit` is the bound on commits walked.
+#[derive(Debug, Clone)]
 pub struct PlanHistorySource {
     state_root: Option<PathBuf>,
+    walk_limit: usize,
+}
+
+impl Default for PlanHistorySource {
+    fn default() -> Self {
+        Self {
+            state_root: None,
+            walk_limit: WALK_LIMIT,
+        }
+    }
 }
 
 impl PlanHistorySource {
@@ -53,7 +69,14 @@ impl PlanHistorySource {
     pub fn with_state_root(state_root: PathBuf) -> Self {
         Self {
             state_root: Some(state_root),
+            ..Self::default()
         }
+    }
+
+    #[cfg(test)]
+    pub fn with_walk_limit(mut self, walk_limit: usize) -> Self {
+        self.walk_limit = walk_limit;
+        self
     }
 
     fn open(&self, root: &Path) -> Result<Option<(GitDriver, RepoHandle)>, String> {
@@ -85,7 +108,8 @@ impl RecordSource for PlanHistorySource {
         let mut records = Vec::new();
         // Not a repository: no commits to read, the board log may still answer.
         if let Some((driver, repo)) = self.open(root).map_err(failed)? {
-            records.extend(commit_records(&driver, &repo, bounds.0).map_err(failed)?);
+            records
+                .extend(commit_records(&driver, &repo, bounds.0, self.walk_limit).map_err(failed)?);
         }
         records.extend(board_log_records(root, bounds.0));
         records.retain(|r| inside(&r.ts, bounds));
@@ -162,33 +186,67 @@ fn plan_path(path: &[u8]) -> Option<(String, bool)> {
     (!dir.is_empty()).then(|| (dir.to_owned(), file == "plan.md"))
 }
 
-/// One record per changed field: `from` is what the parent held, `to` what the commit holds.
+const PLAN_CONTRACT: &str = "plan-v1";
+const STATUS_VALUES: [&str; 5] = ["draft", "ready", "running", "done", "withdrawn"];
+const PRIORITY_VALUES: [&str; 4] = ["P0", "P1", "P2", "P3"];
+
+/// The two instants a commit carries, in milliseconds.
+#[derive(Debug, Clone, Copy)]
+pub struct CommitTimes {
+    pub author: i64,
+    pub committer: i64,
+}
+
+/// One record per changed contract field: `from` is what the parent held under the contract (absent when the parent
+/// held no contract plan), `to` what the commit holds. A commit whose plan is not under the contract records none.
 pub fn status_transitions(
     dir: &str,
     commit: &str,
     ts: &str,
-    before: &PlanFields,
+    author_ms: i64,
+    before: Option<&PlanFields>,
     after: &PlanFields,
 ) -> Vec<Record> {
+    let under_contract = |f: &&PlanFields| f.contract.as_deref() == Some(PLAN_CONTRACT);
+    if !under_contract(&after) {
+        return Vec::new();
+    }
+    let before = before.filter(under_contract);
     let mut out = Vec::new();
-    for (change, from, to) in [
-        ("status", &before.status, &after.status),
-        ("priority", &before.priority, &after.priority),
+    for (change, allowed, from, to) in [
+        (
+            "status",
+            &STATUS_VALUES[..],
+            before.and_then(|b| b.status.as_deref()),
+            after.status.as_deref(),
+        ),
+        (
+            "priority",
+            &PRIORITY_VALUES[..],
+            before.and_then(|b| b.priority.as_deref()),
+            after.priority.as_deref(),
+        ),
     ] {
-        let (Some(from), Some(to)) = (from, to) else {
-            continue; // A field with no value on one side is not a transition: nothing is guessed.
+        let Some(to) = to.filter(|t| allowed.contains(t)) else {
+            continue; // No contract value now: nothing is guessed.
         };
-        if from == to {
+        let from = from.filter(|f| allowed.contains(f));
+        if from == Some(to) {
             continue;
         }
-        let attrs = BTreeMap::from([
+        let mut attrs = BTreeMap::from([
             ("fgos.plan.change".to_owned(), text(change)),
-            ("fgos.plan.from".to_owned(), text(from)),
             ("fgos.plan.to".to_owned(), text(to)),
             ("fgos.git.commit".to_owned(), text(commit)),
         ]);
+        if let Some(from) = from {
+            attrs.insert("fgos.plan.from".to_owned(), text(from));
+        }
         out.push(record(
-            format!("plan-status:{dir}:{change}:{commit}"),
+            format!(
+                "plan-status:{dir}:{change}:{}:{to}:{author_ms}",
+                from.unwrap_or("")
+            ),
             PLAN_STATUS_KIND,
             ts.to_owned(),
             dir,
@@ -229,27 +287,37 @@ fn tips(driver: &GitDriver, repo: &RepoHandle) -> Result<Vec<Oid>, String> {
     Ok(tips)
 }
 
-fn blob(driver: &GitDriver, repo: &RepoHandle, commit: &Oid, path: &str) -> Option<String> {
-    let reads = driver
-        .read_paths_at(repo, commit, &[path.as_bytes().to_vec()], PLAN_FILE_BYTES)
-        .ok()?;
-    match reads.into_iter().next()?.value {
-        PathValue::Blob(bytes) => String::from_utf8(bytes).ok(),
+fn blob_text(read: Option<&PathRead>) -> Option<String> {
+    match &read?.value {
+        PathValue::Blob(bytes) => String::from_utf8(bytes.clone()).ok(),
         _ => None,
     }
+}
+
+/// A commit of the current page whose `plan.md` of `dir` changed: its two sides are read in one batch per page.
+struct PlanFileChange {
+    dir: String,
+    parent: Oid,
+    commit: Oid,
+    ts: String,
+    times: CommitTimes,
 }
 
 fn commit_records(
     driver: &GitDriver,
     repo: &RepoHandle,
     since: Option<i64>,
+    walk_limit: usize,
 ) -> Result<Vec<Record>, String> {
     let tips = tips(driver, repo)?;
     if tips.is_empty() {
         return Ok(Vec::new());
     }
     let mut out = Vec::new();
+    // Transition id → (committer time, sha, record): a rebased copy keeps the copy committed first.
+    let mut transitions: BTreeMap<String, (i64, String, Record)> = BTreeMap::new();
     let mut walked = 0usize;
+    let mut truncated = false;
     let mut cursor = None;
     loop {
         let page = driver
@@ -259,7 +327,7 @@ fn commit_records(
                 &[],
                 cursor,
                 WalkBounds {
-                    max_commits: WALK_PAGE,
+                    max_commits: WALK_PAGE.min(walk_limit).max(1),
                     max_bytes: WALK_BYTES,
                 },
             )
@@ -268,11 +336,12 @@ fn commit_records(
         let times = commit_times(driver, repo, &oids)?;
         // The walk interleaves every branch, so a page mixes old and new commits: only a page whose newest commit
         // is already older than the window ends the walk.
-        let newest_in_page = times.iter().flatten().max().copied();
+        let newest_in_page = times.iter().flatten().map(|t| t.committer).max();
+        let mut plan_files = Vec::new();
         for (commit, time) in page.commits.iter().zip(&times) {
             walked += 1;
-            let Some(ms) = *time else { continue };
-            if since.is_some_and(|s| ms < s) {
+            let Some(time) = *time else { continue };
+            if since.is_some_and(|s| time.committer < s) {
                 continue; // Outside the window: no need to diff it.
             }
             let [parent] = commit.parents.as_slice() else {
@@ -282,7 +351,9 @@ fn commit_records(
             if changed.is_empty() {
                 continue;
             }
-            let Some(ts) = utc(ms) else { continue };
+            let Some(ts) = utc(time.committer) else {
+                continue;
+            };
             let sha = commit.oid.as_str();
             let mut dirs: BTreeMap<String, bool> = BTreeMap::new();
             for (dir, is_plan_file) in changed {
@@ -300,11 +371,51 @@ fn commit_records(
                     ]),
                 ));
                 if plan_file_changed {
-                    let path = format!("plans/{dir}/plan.md");
-                    let before = blob(driver, repo, parent, &path).map(|t| plan_fields(&t));
-                    let after = blob(driver, repo, &commit.oid, &path).map(|t| plan_fields(&t));
-                    if let (Some(before), Some(after)) = (before, after) {
-                        out.extend(status_transitions(&dir, sha, &ts, &before, &after));
+                    plan_files.push(PlanFileChange {
+                        dir,
+                        parent: parent.clone(),
+                        commit: commit.oid.clone(),
+                        ts: ts.clone(),
+                        times: time,
+                    });
+                }
+            }
+        }
+        if !plan_files.is_empty() {
+            let reads: Vec<(Oid, Vec<Vec<u8>>)> = plan_files
+                .iter()
+                .flat_map(|c| {
+                    let path = format!("plans/{}/plan.md", c.dir).into_bytes();
+                    [
+                        (c.parent.clone(), vec![path.clone()]),
+                        (c.commit.clone(), vec![path]),
+                    ]
+                })
+                .collect();
+            let answers = driver
+                .read_paths_at_many(repo, &reads, PLAN_FILE_BYTES)
+                .map_err(|e| e.cause)?;
+            for (change, sides) in plan_files.iter().zip(answers.chunks(2)) {
+                let [before, after] = sides else { continue };
+                let before = blob_text(before.first()).map(|t| plan_fields(&t));
+                let Some(after) = blob_text(after.first()).map(|t| plan_fields(&t)) else {
+                    continue; // The plan file was deleted: no value to record.
+                };
+                let sha = change.commit.as_str();
+                for found in status_transitions(
+                    &change.dir,
+                    sha,
+                    &change.ts,
+                    change.times.author,
+                    before.as_ref(),
+                    &after,
+                ) {
+                    let key = (change.times.committer, sha.to_owned());
+                    match transitions.get(&found.id) {
+                        Some((ms, kept, _)) if (*ms, kept.as_str()) <= (key.0, key.1.as_str()) => {}
+                        _ => {
+                            transitions.insert(found.id.clone(), (key.0, key.1, found));
+                        }
                     }
                 }
             }
@@ -312,38 +423,51 @@ fn commit_records(
         let past_window =
             since.is_some_and(|s| newest_in_page.is_some_and(|n| n < s - WINDOW_SLACK_MS));
         match page.next_cursor {
-            Some(next) if !page.complete && !past_window && walked < WALK_LIMIT => {
-                cursor = Some(next)
+            Some(next) if !page.complete && !past_window => {
+                if walked >= walk_limit {
+                    truncated = true;
+                    break;
+                }
+                cursor = Some(next);
             }
             _ => break,
         }
     }
+    out.extend(transitions.into_values().map(|(_, _, r)| r));
+    let history = text(if truncated { "truncated" } else { "complete" });
+    for r in &mut out {
+        r.attrs
+            .insert("fgos.plan.history".to_owned(), history.clone());
+    }
     Ok(out)
 }
 
-/// The committer time of each commit in milliseconds, read from the commit objects in one batch. A commit the
-/// repository cannot show, or one with no readable committer line, is `None`.
+/// The author and committer times of each commit, read from the commit objects in one batch. A commit the
+/// repository cannot show, or one without both readable lines, is `None`.
 fn commit_times(
     driver: &GitDriver,
     repo: &RepoHandle,
     ids: &[Oid],
-) -> Result<Vec<Option<i64>>, String> {
+) -> Result<Vec<Option<CommitTimes>>, String> {
     let objects = driver
         .read_objects(repo, ids, COMMIT_OBJECT_BYTES)
         .map_err(|e| e.cause)?;
     Ok(objects
         .into_iter()
         .map(|object| match object {
-            ReadObject::Present { bytes, .. } => committer_seconds(&bytes).map(|s| s * 1000),
+            ReadObject::Present { bytes, .. } => Some(CommitTimes {
+                author: header_seconds(&bytes, b"author ")? * 1000,
+                committer: header_seconds(&bytes, b"committer ")? * 1000,
+            }),
             ReadObject::Missing => None,
         })
         .collect())
 }
 
-/// `committer Name <mail> 1700000000 +0700` in the header of a raw commit object.
-fn committer_seconds(commit: &[u8]) -> Option<i64> {
-    let header = commit.split(|b| *b == b'\n').take_while(|l| !l.is_empty());
-    let line = header.into_iter().find(|l| l.starts_with(b"committer "))?;
+/// `<field> Name <mail> 1700000000 +0700` in the header of a raw commit object.
+fn header_seconds(commit: &[u8], field: &[u8]) -> Option<i64> {
+    let mut header = commit.split(|b| *b == b'\n').take_while(|l| !l.is_empty());
+    let line = header.find(|l| l.starts_with(field))?;
     let line = std::str::from_utf8(line).ok()?;
     let mut tail = line.rsplit(' ');
     let _zone = tail.next()?;

@@ -1,9 +1,10 @@
-//! Pure readers of the two plan texts the sources project: a plan's front matter (`status`, `priority`) and a board
-//! log line (`- YYYY-MM-DD HH:MM LANE: text`, newest first).
+//! Pure readers of the two plan texts the sources project: a plan's front matter (`contract`, `status`, `priority`)
+//! and a board log line (`- YYYY-MM-DD HH:MM LANE: text`, newest first).
 
-/// The `status` and `priority` of a plan file's front matter. A key the file does not hold is `None`.
+/// The `contract`, `status` and `priority` of a plan file's front matter. A key the file does not hold is `None`.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct PlanFields {
+    pub contract: Option<String>,
     pub status: Option<String>,
     pub priority: Option<String>,
 }
@@ -14,7 +15,7 @@ fn scalar(value: &str) -> Option<String> {
     (!value.is_empty()).then(|| value.to_owned())
 }
 
-/// Reads the top-level scalar `status:` and `priority:` between the opening `---` line and the next one.
+/// Reads the top-level scalars `contract:`, `status:` and `priority:` between the opening `---` line and the next one.
 pub fn plan_fields(text: &str) -> PlanFields {
     let mut lines = text.lines();
     let mut fields = PlanFields::default();
@@ -25,7 +26,9 @@ pub fn plan_fields(text: &str) -> PlanFields {
         if line.trim_end() == "---" {
             break;
         }
-        if let Some(value) = line.strip_prefix("status:") {
+        if let Some(value) = line.strip_prefix("contract:") {
+            fields.contract = scalar(value);
+        } else if let Some(value) = line.strip_prefix("status:") {
             fields.status = scalar(value);
         } else if let Some(value) = line.strip_prefix("priority:") {
             fields.priority = scalar(value);
@@ -104,6 +107,7 @@ mod tests {
     fn front_matter_status_and_priority_are_read_and_the_body_is_ignored() {
         let text = "---\ncontract: plan-v1\nstatus: ready\npriority: \"P1\"  # top\nblockedBy: []\n---\nstatus: done\n";
         let fields = plan_fields(text);
+        assert_eq!(fields.contract.as_deref(), Some("plan-v1"));
         assert_eq!(fields.status.as_deref(), Some("ready"));
         assert_eq!(fields.priority.as_deref(), Some("P1"));
         assert_eq!(

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d9933e132d8f0d212ee93d93088f059f19898a463cd6a3b5905012fc23c2919d",
+  "payloadDigest": "1d57e2f2e0015e838cdaa8af60de6d0df44be7cce6681943c5125a13c2199f00",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -130,10 +130,15 @@
     "apps/fgos/src/wiring/mailbox_sync_unsupported.rs": "b56921a2c7999184b9eb2324992d6f7ccdcacda6b4c45b2048c838f993691995",
     "apps/fgos/src/wiring/mailbox_verbs.rs": "b083c779109aa8ae92b5ca5fd28a1c6c81881c82769a7b3ed84d77883e6d7cdc",
     "apps/fgos/src/wiring/mailbox_verbs_unsupported.rs": "8f4ceadc33463deea690b89514b083d529675f2200052f2c67d151613eed7021",
-    "apps/fgos/src/wiring/metrics_sources.rs": "fcce5be01f17cd49cad2d373942f40fe953816770c223ddfae3207a551c26c49",
-    "apps/fgos/src/wiring/mod.rs": "f43f4268f04a5a3cdee1de72638301a0f32c8eaa16afea53b7302c773184db02",
-    "apps/fgos/src/wiring/observe_declarations.rs": "6de93391cde9f3b5db6011c6ae18c2fc125616e2bc1fd2fa4c43f47de6cf5380",
-    "apps/fgos/src/wiring/observe_query.rs": "067844d8d3483d22fd621b4b25242181d8377c4b37b283986e7f0a1cb54758c9",
+    "apps/fgos/src/wiring/metrics_sources.rs": "9ba0996633ba3868307e70a82ca99b9b4db7a34c6f4fd16b0bd8ab4fbd27d1cd",
+    "apps/fgos/src/wiring/mod.rs": "ff3aa788b98af84e6b9b9d080255cd13f3843ac65dea53a8f2b58f528b9f57fd",
+    "apps/fgos/src/wiring/observe_declarations.rs": "d1e4ed05e1cf8d703dfaec67c2320b167005e2f9b168003e9ec8d1d5b294442f",
+    "apps/fgos/src/wiring/observe_query.rs": "14a143c025a7694a64b71497a6510cc1c6435942e4b116d7bea345c6c83433f3",
+    "apps/fgos/src/wiring/observe_sources/head_state.rs": "e2ae90a3785af0e5fb10ab81cc9f27448f2f63b8f056ab8d5dd882acf1dee2a3",
+    "apps/fgos/src/wiring/observe_sources/mod.rs": "d5fb81609b375af587eed807d6c81ff70565fbc7ca8cdea1f6a22f3f3149afc1",
+    "apps/fgos/src/wiring/observe_sources/plan_history.rs": "ab07623d1fc9c6c095f8f8e19c2b1407f23f663c9b6cb4a305c87f8513ca4a3a",
+    "apps/fgos/src/wiring/observe_sources/plan_text.rs": "a71317e73180193a53d3e7f9b4b19ad18aef8c989a6e8981ba41108e1b1438c3",
+    "apps/fgos/src/wiring/observe_sources/tests.rs": "f80c8aeac717f0f41ecbf887fefa40d5a5a2529fd5faba4b3dcfc48ceedb57b2",
     "apps/fgos/src/wiring/run_dirs.rs": "8248bf1a45d37e2ca03315dea11489b6b90362a47479244a10a7c71648e90f60",
     "apps/fgos/src/wiring/seat_binding.rs": "9eb8ef8e81b7314cab1d579a3e7312aa413c268405271db2d3dc64f0cfe7b1b3",
     "apps/fgos/src/wiring/session.rs": "f2569bef9f072e959f14673c2d2929e2b0b001540a4e147fd5e59082b2e64b43",
@@ -1440,7 +1445,16 @@
     "src/workflow/units-source.mjs": "e4376a8f38d0a55f2e132aa6a094b552e8117eb46b6a4d8b03b00da32d6bb2b4",
     "scripts/lib/git-one-door-declarations.v1.json": "3ff089b6fdbb59c6e58f912603ba8a3e2bae612a1ecebe94e6bc95db590e30d7"
   },
-  "sites": [],
+  "sites": [
+    {
+      "path": "apps/fgos/src/wiring/observe_sources/tests.rs",
+      "line": 31,
+      "spawn": "Command::new",
+      "binary": "git",
+      "siteId": "git_env:af1a11c7fdf0a26bbca5f63c60953e00384f77500b0d4ccdbdde31322741a46c",
+      "family": "rust"
+    }
+  ],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",
