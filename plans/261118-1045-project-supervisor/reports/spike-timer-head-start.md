@@ -65,3 +65,11 @@ Between 13:15 and 13:20 the host hit a global OOM (28.5 of 31 GB used, 15 GB sha
 ## Cleanup (process-management rule)
 
 Started and stopped by this run: baseline shell-started head 0 (supervisor 2622151, SIGTERM, tab closed); systemd units `spike-p02-1`..`spike-p02-14` and scope `spike-p02-7-scope` (all gone: `systemctl --user list-units 'spike*' --all` empty); supervisors 3165065, 3214877, 3273551, 3295046, 3323851, 3417278 (SIGTERM); all herdr tabs titled `spike-p0 · fgos-placeholder` closed (`herdr tab close`). `ps -eo pid,cmd | rg "fgos-work|head start"` shows nothing of this run. Left on disk (untracked, outside the repo): `/tmp/fgos-work/sv-p02-spike/proj` and ignored `.fgos/runtime/dev-host/*` dirs in the sv-p02 worktree.
+
+## Verify (lead, 2026-11-18)
+
+- `ps -eo pid,cmd | rg "fgos-work|head start"`: no line left from this spike.
+- `plan-contract-check --plan plans/261118-1045-project-supervisor` (git-addon env of the main checkout): `ok`.
+- Not tried, open for phase 15 / 19: the herdr-down leg (no terminal host running) and the linger-off leg. Trial 13's
+  success through the manager fallback is inferred, not proven by a dedicated trial.
+- End status: `DONE` (first verdict form; no plan decision changes).
