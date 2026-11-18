@@ -404,7 +404,6 @@
     "test/rust-host/observe-store-lock.test.mjs": 0.4,
     "test/rust-host/release-targets.test.mjs": 17.4,
     "test/rust-host/release-tree.test.mjs": 42.9,
-    "test/rust-host/verb-parity.test.mjs": 0.1,
     "test/scripts/build-domain-registry.test.mjs": 0.6,
     "test/scripts/check-decision-citation-drift.test.mjs": 4,
     "test/scripts/check-decision-codes.test.mjs": 0.4,

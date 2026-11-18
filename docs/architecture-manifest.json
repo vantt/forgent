@@ -948,7 +948,7 @@
       "allowed": [
         "src/runner/execution/capability-config.mjs"
       ],
-      "reason": "the port is the one Node reader of the capabilities section and hands out answers per field, never an entry; the seat-binding crate is the authority over binding fields and is not matched by these JS-shaped patterns"
+      "reason": "the port is the one Node reader of the capabilities section and hands out answers per field, never an entry; the Rust owner is the fgos-execution crate (executor model, bind and decide read the section through the host's config door), which these JS-shaped patterns do not match, and the seat-binding crate is the authority over binding fields"
     },
     {
       "job": "choose an executor from a capability's prefer only in the seat-binding crate; ask bind() (or purposeSeatOf in src/runner/dispatch/plan.mjs)",
@@ -962,7 +962,7 @@
         "src/runner/dispatch/config.mjs",
         "src/setup/seat-binding-checks.mjs"
       ],
-      "reason": "reading prefer here never picks an executor: the load validator checks the named executors exist, and the seat-binding checks decide which capabilities to dry-bind and then ask bind()"
+      "reason": "reading prefer here never picks an executor: the load validator checks the named executors exist, and the seat-binding checks decide which capabilities to dry-bind and then ask bind(). The chooser is the seat-binding crate's ranking, composed by packages/execution/rust/src/bind.rs; the Node seat-policy module is gone"
     },
     {
       "job": "the purpose chooser outside bind() is gone: ask purposeSeatOf in src/runner/dispatch/plan.mjs",
@@ -983,12 +983,23 @@
         "\\{[^{}]*\\bfor\\s*:[^{}]*\\}\\s*=(?!=)",
         "\\bprobeTool\\b",
         "\\bisIndexStale\\b",
-        "\\bnormalizeCapability\\b"
+        "\\bnormalizeCapability\\b",
+        "\\bfn index_is_stale\\b"
       ],
       "allowed": [
-        "src/runner/dispatch/tool-providers.mjs"
+        {
+          "path": "packages/execution/rust/src/tools.rs",
+          "reason": "the tool probe and the staleness check behind decide, explain and the tool-registry-configured doctor row"
+        }
       ],
-      "reason": "the one reader of an executor's for list and the one presence and staleness probe, so doctor and decide cannot disagree about a tool"
+      "debt": [
+        {
+          "path": "src/runner/dispatch/tool-providers.mjs",
+          "reason": "twin of tools.rs for what Node launch code still reads (the unserved-ability check, the presence probe); same cases as the crate's tests"
+        }
+      ],
+      "retiredBy": "S6a: launch stops reading the tool providers in Node",
+      "reason": "the one reader of an executor's for list and the one presence and staleness probe, so doctor and decide cannot disagree about a tool: packages/execution/rust/src/tools.rs is that owner for decide, explain and the doctor row, and src/runner/dispatch/tool-providers.mjs keeps only what Node launch code still reads, as debt"
     },
     {
       "job": "the old tool registry and its status overlay are gone: ask fgos dispatch decide --for <capability>",
@@ -1017,6 +1028,242 @@
         "src/setup/registrations.mjs"
       ],
       "reason": "catalogOf (defined in the port) is the only function that returns the whole section: run.mjs snapshots it into the run record and hash, registrations.mjs checks whether it is present"
+    },
+    {
+      "job": "bind a seat",
+      "kind": "door",
+      "patterns": [
+        "(?:function|const) (?:executorFacts|launchViewOf|accountViewOf|seatConfigOf|familyKeyed|resolvePersona)\\b",
+        "\\bfn (?:executor_facts|launch_view_of|account_view_of|seat_config_of|family_keyed|resolve_persona)\\b",
+        "\\bfgos_seat_binding::bind\\b"
+      ],
+      "allowed": [
+        {
+          "path": "packages/execution/rust/src/bind.rs",
+          "reason": "composes one seat: the persona and launch views, the family-keyed config and the account view, then calls the ranking function of the seat-binding crate (the only call of it outside that crate)"
+        },
+        {
+          "path": "packages/execution/rust/src/executor_model.rs",
+          "reason": "derives the executor facts every seat composition reads, from the executor-model contract"
+        }
+      ],
+      "debt": [],
+      "reason": "one seat composition, in Rust (packages/execution/rust/src/bind.rs) over the ranking of packages/seat-binding/rust; Node callers ask the host route through src/seat-binding/client.mjs and re-derive nothing. The names are the composition steps and the single call of the ranking function; a second composition under the same names, or a second caller of the ranking function, fails here"
+    },
+    {
+      "job": "the Node bind facade has only its named callers",
+      "kind": "door",
+      "patterns": [
+        "from '[^']*execution/bind\\.mjs'",
+        "import\\('[^']*execution/bind\\.mjs'",
+        "from '\\./bind\\.mjs'",
+        "import\\('\\./bind\\.mjs'"
+      ],
+      "allowed": [
+        {
+          "path": "src/runner/dispatch/plan.mjs",
+          "reason": "S6a: dispatch plan asks bind for the Work seat and the route for the purpose seats"
+        },
+        {
+          "path": "src/runner/dispatch/assignment-runner.mjs",
+          "reason": "S6a: the assignment runner binds each round's seat and asks the replay digest"
+        },
+        {
+          "path": "src/runner/execution/run.mjs",
+          "reason": "S6a: the run start binds the unit seats"
+        },
+        {
+          "path": "src/runner/execution/dry-bind.mjs",
+          "reason": "S6a: the dry-bind simulator asks bind for every unit seat; doctor rows seat-binding-dry-bind and blind-steps-use-proven-pools (bridge:S6b) read it"
+        },
+        {
+          "path": "src/runner/execution/account-pin.mjs",
+          "reason": "S6a: account pin asks the preflight"
+        },
+        {
+          "path": "src/runner/execution/unit-run-start.mjs",
+          "reason": "S6a: unit run start asks the preflight"
+        },
+        {
+          "path": "src/runner/execution/account-rotation.mjs",
+          "reason": "S6a: account rotation compares binding identities"
+        },
+        {
+          "path": "src/session-host/head-start.mjs",
+          "reason": "S6a: the session head start binds its seat"
+        },
+        {
+          "path": "src/runner/loop.mjs",
+          "reason": "S7: the Work runner loop binds the seat of each Work item"
+        },
+        {
+          "path": "src/setup/seat-binding-checks.mjs",
+          "reason": "doctor rows seat-binding-dry-bind and seat-binding-route, bridge:S6a"
+        },
+        {
+          "path": "src/setup/blind-steps-proven-pools.mjs",
+          "reason": "doctor row blind-steps-use-proven-pools, bridge:S6b"
+        }
+      ],
+      "debt": [],
+      "retiredBy": "S6a, S7: each caller moves with its step and asks the Rust bind directly; the facade goes with the last one",
+      "reason": "src/runner/execution/bind.mjs is the Node client of the Rust bind (host route protocol 2). Its callers are exactly these files, each named with the step that retires it; a new importer fails here, so a new Node caller of Seat Binding is a decision, not an accident"
+    },
+    {
+      "job": "derive executor facts",
+      "kind": "door",
+      "patterns": [
+        "(?:function|const) (?:withDefaultExecutor|familyOf|lookupExecutor|capabilityConfinementOf|credentialStoreOf|renderedEffortLevels|resolvePostureInvocation|decideExecutorDispatchMechanism|effectiveRigorOf|detectHerdrPresent|validateRunnerConfigShape|validateGeneratedPathsShape|loadMachineBackendRegistry|providerAccountInventory|readLlmAccounts|legacyStateKey|listAgents)\\b",
+        "\\bfn (?:with_default_executor|family_of|lookup_executor|capability_confinement_of|credential_store_of|rendered_effort_levels|resolve_posture_invocation|decide_executor_dispatch_mechanism|effective_rigor_of|detect_herdr_present|validate_runner_config_shape|validate_generated_paths_shape|load_machine_backend_registry|provider_account_inventory|read_llm_accounts|legacy_state_key|list_agents)\\b"
+      ],
+      "allowed": [
+        {
+          "path": "packages/execution/rust/src/**",
+          "reason": "the executor model, the account reads, the runner config check and the listing are derived here from the contracts under packages/execution/contracts"
+        }
+      ],
+      "debt": [
+        {
+          "path": "src/runner/dispatch/config.mjs",
+          "reason": "twin, same vectors as the contract: withDefaultExecutor, validateRunnerConfigShape and validateGeneratedPathsShape stay for Node launch code and the run snapshot"
+        },
+        {
+          "path": "src/runner/dispatch/provider-adapter.mjs",
+          "reason": "twin, same vectors as the contract: familyOf and renderedEffortLevels stay for Node launch code"
+        },
+        {
+          "path": "src/runner/dispatch/provider-capacity.mjs",
+          "reason": "twin, same vectors as the contract: credentialStoreOf and providerAccountInventory stay for Node launch code and the lease"
+        },
+        {
+          "path": "src/runner/dispatch/mechanism.mjs",
+          "reason": "twin, same vectors as the contract: decideExecutorDispatchMechanism stays for Node dispatch callers that name an executor"
+        },
+        {
+          "path": "src/runner/dispatch/resolve.mjs",
+          "reason": "twin, same vectors as the contract: lookupExecutor stays for Node launch code"
+        },
+        {
+          "path": "src/runner/dispatch/confinement/policies.mjs",
+          "reason": "twin, same vectors as the contract: resolvePostureInvocation stays for Node launch code"
+        },
+        {
+          "path": "src/runner/dispatch/confinement/backend-registry.mjs",
+          "reason": "twin, same vectors as the contract: loadMachineBackendRegistry stays for Node confinement"
+        },
+        {
+          "path": "src/runner/dispatch/llm-accounts.mjs",
+          "reason": "twin, same vectors as the contract: readLlmAccounts and legacyStateKey stay for Node account state"
+        },
+        {
+          "path": "src/runner/execution/run.mjs",
+          "reason": "twin, same vectors as the contract: detectHerdrPresent stays for the Node run start"
+        },
+        {
+          "path": "src/runner/execution/capability-config.mjs",
+          "reason": "twin, same vectors as the contract: capabilityConfinementOf stays for Node launch confinement"
+        },
+        {
+          "path": "src/runner/execution/seat-resolver.mjs",
+          "reason": "twin, same vectors as the contract: effectiveRigorOf stays for the Node workflow seat resolver"
+        },
+        {
+          "path": "src/runner/agent-listing.mjs",
+          "reason": "twin, same vectors as the contract: listAgents stays because src/setup/registrations.mjs asks it for the agent-type-names-unique row on the Node bridge"
+        }
+      ],
+      "retiredBy": "S6a",
+      "reason": "the facts about an executor (its family, lookup, confinement, credential store, effort levels, posture, account inventory, config shape) are derived once, in the fgos-execution crate, over executor-model.v1.json and its vectors. Node launch code still needs the same derivations until S6a moves launch; each Node definition is a declared twin proven on the same vectors, owned by S6a (launch code, confinement, account state, the agent-type-names-unique doctor row)"
+    },
+    {
+      "job": "decide a dispatch",
+      "kind": "door",
+      "patterns": [
+        "(?:function|const) (?:compileDispatchPlan|purposeSeatOf|decideExecutorCli)\\b",
+        "\\bfn (?:compile_dispatch_plan|purpose_seat|decide_executor_cli)\\b"
+      ],
+      "allowed": [
+        {
+          "path": "packages/execution/rust/src/decide.rs",
+          "reason": "the decider: executor id, assignment, Work hint and purpose selectors, purpose seats through bind"
+        }
+      ],
+      "debt": [
+        {
+          "path": "src/runner/dispatch/plan.mjs",
+          "reason": "bind-free selectors for launch and fanout, same vectors; the purpose seat asks the host route"
+        }
+      ],
+      "retiredBy": "S6a",
+      "reason": "fgos dispatch decide, explain and the hook are native over packages/execution/rust/src/decide.rs. Node launch and fanout still compile a plan for the selectors that bind no seat (executor id, assignment, Work hint) in src/runner/dispatch/plan.mjs, a twin on the same vectors owned by S6a"
+    },
+    {
+      "job": "execution doctor judgments",
+      "kind": "door",
+      "patterns": [
+        "(?:export )?(?:async )?function (?:checkRunnerGeneratedPathsConfig|checkToolRegistryConfigured|checkCapabilityServesValid|checkExecutorConfinement|checkInvocationGitWriteGrants|checkOmpNativesPresent|checkAgySubHomesConfigured|findAgySubHomes)\\b",
+        "\\bfn (?:runner_generated_paths|executor_confinement|invocation_git_write_grants|capability_serves_valid|omp_natives_present|agy_sub_homes_configured|tool_registry_configured|find_sub_homes)\\b"
+      ],
+      "allowed": [
+        "packages/execution/rust/src/checks.rs"
+      ],
+      "debt": [
+        {
+          "path": "src/setup/agy-permissions.mjs",
+          "reason": "findAgySubHomes is a twin of find_sub_homes in checks.rs: the person's agy permission check still reads the sub-HOMEs"
+        }
+      ],
+      "retiredBy": "S6a: the agy permission check leaves Node and its sub-HOME reader with it",
+      "reason": "seven executor-model doctor rows (runner-generated-paths, executor-confinement, invocation-git-write-grants, capability-serves-valid, omp-natives-present, agy-sub-homes-configured, tool-registry-configured) are judged in process by the host over fgos-execution checks.rs (the host adapter apps/fgos/src/wiring/doctor/execution.rs only wires them and defines none of these names), never by a Node body that asks the host back; the Node judge names are retired, and a second judge of the same row must be declared. seat-binding-route stays on the Node bridge (bridge:S6a) because it probes the binary the Node client runs"
+    },
+    {
+      "job": "capability rows hold jobs and tool abilities",
+      "kind": "door",
+      "patterns": [
+        "\\bDEFAULT_CAPABILITY_SLOTS\\b",
+        "\\bRUNNER_LOOP_CAPABILITY_USES\\b",
+        "\\bisCapabilityDeclared\\b",
+        "\\bhasPreferPool\\b"
+      ],
+      "allowed": [],
+      "debt": [],
+      "retiredBy": "S7: the kept coding rows get a proper home",
+      "reason": "core/config-standard/runner.yaml no longer holds a row per business, council or marketing capability: those names are labels that bind as unit seats, and the preference lives in runner.roles, runner.personas and the unit's own tier and rigor. The four names are the code that read the old rows (curated slot catalog, loop uses, declared and prefer-pool lookups) and may not return. The coding rows the Work path routes through (fgos-coding-implement, code:implement, code:review, code:test, code:debug, code:refactor, docs:write, coding:discover) stay in the standard as a stopgap owned by S7, backlog p-nnbfsrxcss; YAML is outside the door walk, so those rows are named here, not checked"
+    },
+    {
+      "job": "retired Node S5 code",
+      "kind": "door",
+      "patterns": [
+        "\\bdecideDispatchHook\\b",
+        "\\bexplainCapability\\b",
+        "seat-policy\\.mjs",
+        "seat-binding[^\\n]{0,24}--protocol 1\\b",
+        "dispatch\\.mjs decide\\b"
+      ],
+      "allowed": [],
+      "debt": [],
+      "reason": "the Node decide, explain and hook, the seat-policy module, the Seat Binding route at protocol 1 and the `node src/runner/dispatch.mjs decide` alias are gone; the host serves dispatch decide, dispatch explain and hook dispatch-decide, and the route speaks protocol 2. The old hook script name stays only in the agent-hook table as a marker for removing entries written by an earlier install (scripts/dispatch-decide-hook.mjs, below)"
+    },
+    {
+      "job": "retired Node S5 hook script",
+      "kind": "door",
+      "patterns": [
+        "scripts/dispatch-decide-hook\\.mjs",
+        "['\"]dispatch-decide-hook\\.mjs['\"]"
+      ],
+      "allowed": [
+        {
+          "path": "src/setup/agent-hooks.mjs",
+          "reason": "legacyMarkers: the name of the old hook script, so an install removes an entry an earlier install wrote"
+        },
+        {
+          "path": "packages/distribution/rust/src/agent_hooks.rs",
+          "reason": "legacy marker of the dispatch hook entry, same purpose as the Node table"
+        }
+      ],
+      "debt": [],
+      "retiredBy": "the legacy markers go when no install that wrote the old hook entry remains",
+      "reason": "scripts/dispatch-decide-hook.mjs is deleted; the name remains only as a legacy marker that lets the hook table recognise and replace an entry an earlier install wrote. Any other mention is a live reference to a script that does not exist"
     },
     {
       "job": "control the gateway process",

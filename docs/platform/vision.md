@@ -165,7 +165,7 @@ Known gaps against this direction:
   `preferIndependentOf` to `independentOf` in
   `src/runner/execution/loops/panel.mjs`. Today independence is a soft
   preference.
-- The councils moved out of the core workflows into the `domains/council` domain; their business capability rows move with the workflows later.
+- The councils moved out of the core workflows into the `domains/council` domain (S5, 2026-11-18).
 - Capability rows, decided by the owner on 2026-11-14 in two steps. First,
   every reader of `runner.capabilities` goes through `bind()` or its result.
   This step landed on 2026-11-14: the rule is one line in section 3 of the
@@ -182,7 +182,7 @@ Known gaps against this direction:
   no model fields (D-ADR0072). The family of the agent that is currently
   running never changes the order, because the config is the only authority
   over it.
-- Capability rows, step 2 in progress: persona and role taste moved out of the rows into `runner.personas` and `runner.roles` (D-ADR0080); the business rows go next.
+- Capability rows, step 2 done in S5 (2026-11-18): persona and role taste moved out of the rows into `runner.personas` and `runner.roles` (D-ADR0080); the council, business and marketing rows left the standard, so a capability name without a row is a label that binds as a unit seat, and a registered workflow unit declares its own `tier`. The coding rows the Work path routes through stay as a stopgap (backlog p-nnbfsrxcss, retired by S7).
 
 ## 7. Related Anchors
 

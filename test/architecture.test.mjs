@@ -1986,6 +1986,109 @@ test('door check: every name of the retired Node Git and Event Store doctor rows
   assert.deepEqual(checkDoors([row], new Map([['src/seeded.mjs', 'export function checkGitSomethingElse() {}\n']])), []);
 });
 
+// ─── Seat Binding and the Execution read door (rows added when the S5 read door closed) ──────────────────────────
+const execRow = (job) => {
+  const row = manifest.doors.find((r) => r.job === job);
+  assert.ok(row, `door row "${job}" exists`);
+  return row;
+};
+// A seeded file stands alone, so the row's other entries look stale; only a hit outside the door counts here.
+const doorHits = (row, file, text) => checkDoors([row], new Map([[file, text]])).filter((failure) => !failure.includes('no longer matches (stale)'));
+
+test('door check: a seat composition or a second call of the ranking function outside the Rust bind fails; the crate passes; a comment does not', () => {
+  const row = execRow('bind a seat');
+  const owner = 'packages/execution/rust/src/bind.rs';
+  assert.ok(row.allowed.some((e) => (e.path ?? e) === owner));
+  for (const text of ['function resolvePersona() {}\n', 'const launchViewOf = () => 1;\n', 'export function familyKeyed() {}\n', 'function executorFacts() {}\n', 'const seatConfigOf = 1;\n', 'function accountViewOf() {}\n']) {
+    assert.equal(doorHits(row, 'src/runner/seeded.mjs', text).length, 1, text);
+  }
+  for (const text of ['fn resolve_persona() {}\n', 'fn launch_view_of() {}\n', 'let out = fgos_seat_binding::bind(&input);\n']) {
+    assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', text).length, 1, text);
+    assert.deepEqual(doorHits(row, owner, text), [], text);
+  }
+  assert.deepEqual(doorHits(row, 'src/runner/seeded.mjs', '// function resolvePersona() {}\n'), []);
+});
+
+test('door check: a new importer of the Node bind facade fails, each named caller passes, and a dynamic import counts', () => {
+  const row = execRow('the Node bind facade has only its named callers');
+  const callers = row.allowed.map((e) => e.path);
+  assert.ok(callers.includes('src/runner/loop.mjs') && callers.includes('src/runner/dispatch/plan.mjs'));
+  for (const e of row.allowed) assert.match(e.reason, /^(S6a|S7|doctor row)/, `${e.path} names its owner step`);
+  for (const text of ["import { bind } from '../runner/execution/bind.mjs';\n", "const m = await import('../runner/execution/bind.mjs');\n", "import { bind } from './bind.mjs';\n"]) {
+    assert.equal(doorHits(row, 'src/verbs/seeded.mjs', text).length, 1, text);
+    assert.deepEqual(doorHits(row, 'src/runner/loop.mjs', text), [], text);
+  }
+  assert.deepEqual(doorHits(row, 'src/verbs/seeded.mjs', "import { x } from '../other/bind-helper.mjs';\n"), []);
+});
+
+test('door check: a Node or Rust twin of an executor derivation fails outside its owner, passes as declared debt, and passes in the crate', () => {
+  const row = execRow('derive executor facts');
+  assert.equal(row.retiredBy, 'S6a');
+  for (const d of row.debt) assert.match(d.reason, /^twin, same vectors as the contract/, d.path);
+  for (const text of ['export function familyOf() {}\n', 'export const lookupExecutor = () => 1;\n', 'function readLlmAccounts() {}\n', 'function detectHerdrPresent() {}\n']) {
+    assert.equal(doorHits(row, 'src/runner/seeded.mjs', text).length, 1, text);
+  }
+  assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'fn family_of() {}\n').length, 1);
+  assert.deepEqual(doorHits(row, 'packages/execution/rust/src/seeded.rs', 'pub fn family_of() {}\n'), []);
+  assert.deepEqual(doorHits(row, 'src/runner/dispatch/provider-adapter.mjs', 'export function familyOf() {}\n'), []);
+});
+
+test('door check: the decider has one Rust owner and one declared Node twin', () => {
+  const row = execRow('decide a dispatch');
+  assert.deepEqual(row.allowed.map((e) => e.path), ['packages/execution/rust/src/decide.rs']);
+  assert.deepEqual(row.debt.map((e) => e.path), ['src/runner/dispatch/plan.mjs']);
+  assert.equal(row.retiredBy, 'S6a');
+  assert.equal(doorHits(row, 'src/runner/dispatch/other.mjs', 'export function compileDispatchPlan() {}\n').length, 1);
+  assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'fn purpose_seat() {}\n').length, 1);
+  assert.deepEqual(doorHits(row, 'packages/execution/rust/src/decide.rs', 'fn purpose_seat() {}\n'), []);
+  assert.deepEqual(doorHits(row, 'src/runner/dispatch/plan.mjs', 'export function purposeSeatOf() {}\n'), []);
+});
+
+test('door check: the execution doctor judges live in checks.rs, their Node names are retired, and the agy sub-HOME reader is declared debt', () => {
+  const row = execRow('execution doctor judgments');
+  for (const name of ['checkRunnerGeneratedPathsConfig', 'checkToolRegistryConfigured', 'checkCapabilityServesValid', 'checkExecutorConfinement', 'checkInvocationGitWriteGrants', 'checkOmpNativesPresent', 'checkAgySubHomesConfigured']) {
+    assert.equal(doorHits(row, 'src/setup/seeded.mjs', `export function ${name}() {}\n`).length, 1, name);
+  }
+  for (const name of ['executor_confinement', 'agy_sub_homes_configured', 'find_sub_homes']) {
+    assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', `fn ${name}() {}\n`).length, 1, name);
+    assert.deepEqual(doorHits(row, 'packages/execution/rust/src/checks.rs', `fn ${name}() {}\n`), [], name);
+  }
+  assert.deepEqual(doorHits(row, 'src/setup/agy-permissions.mjs', 'export function findAgySubHomes() {}\n'), []);
+  assert.equal(doorHits(row, 'src/setup/seeded.mjs', 'export function findAgySubHomes() {}\n').length, 1);
+});
+
+test('door check: the retired capability-row names and the retired Node S5 names fail wherever a file brings them back', () => {
+  const rows = execRow('capability rows hold jobs and tool abilities');
+  assert.deepEqual(rows.allowed, []);
+  for (const name of ['DEFAULT_CAPABILITY_SLOTS', 'RUNNER_LOOP_CAPABILITY_USES', 'isCapabilityDeclared', 'hasPreferPool']) {
+    const failures = doorHits(rows, 'src/seeded.mjs', `export const ${name} = 1;\n`);
+    assert.equal(failures.length, 1, name);
+    assert.match(failures[0], /retired name/);
+  }
+  const retired = execRow('retired Node S5 code');
+  assert.deepEqual(retired.allowed, []);
+  for (const text of ['export function decideDispatchHook() {}\n', 'export function explainCapability() {}\n', "import x from './seat-policy.mjs';\n", "const a = 'node src/runner/dispatch.mjs decide';\n", "const a = 'seat-binding --protocol 1';\n"]) {
+    assert.equal(doorHits(retired, 'src/seeded.mjs', text).length, 1, text);
+  }
+  assert.deepEqual(doorHits(retired, 'src/seeded.mjs', "const a = 'seat-binding --protocol 2';\n"), []);
+});
+
+test('door check: the old dispatch hook script name appears only as a legacy marker of the hook table', () => {
+  const row = execRow('retired Node S5 hook script');
+  assert.equal(doorHits(row, 'src/seeded.mjs', "const hook = 'scripts/dispatch-decide-hook.mjs';\n").length, 1);
+  assert.equal(doorHits(row, 'src/seeded.mjs', "legacyMarkers: ['dispatch-decide-hook.mjs']\n").length, 1);
+  assert.deepEqual(doorHits(row, 'src/setup/agent-hooks.mjs', "legacyMarkers: ['dispatch-decide-hook.mjs']\n"), []);
+  assert.deepEqual(doorHits(row, 'packages/distribution/rust/src/agent_hooks.rs', '.legacy(&["dispatch-decide-hook.mjs"])\n'), []);
+});
+
+test('door check: the tool lookup row names tools.rs as the Rust owner and tool-providers.mjs as debt', () => {
+  const row = execRow('tool lookup by capability: ask toolProvidersOf in src/runner/dispatch/tool-providers.mjs (or fgos dispatch decide --for)');
+  assert.deepEqual(row.allowed.map((e) => e.path), ['packages/execution/rust/src/tools.rs']);
+  assert.deepEqual(row.debt.map((e) => e.path), ['src/runner/dispatch/tool-providers.mjs']);
+  assert.equal(doorHits(row, 'apps/fgos/src/wiring/seeded.rs', 'fn index_is_stale() {}\n').length, 1);
+  assert.deepEqual(doorHits(row, 'packages/execution/rust/src/tools.rs', 'fn index_is_stale() {}\n'), []);
+});
+
 // ─── The doctor registry's bridged entries (packages/distribution/contracts/doctor-registry.v1.json) ───────────────
 // A row or fix given to `bridge:<step>` is judged by Node until that step moves the layer it reads. `judge` records
 // the Node modules the row reads and `layers` the step that removes each: the label may not be earlier than a layer
