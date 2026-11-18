@@ -1,0 +1,1 @@
+{"kind":["fgos.question.asked","fgos.question.answered"],"by":["ref:question"],"agg":["span","count"],"having":[{"lhs":{"agg":{"agg":"count"}},"op":"ge","rhs":{"const":2}}]}

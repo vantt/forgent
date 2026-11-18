@@ -1,0 +1,38 @@
+{
+  "contract": "observe-kinds.v1",
+  "subjectKinds": ["question"],
+  "attrs": {
+    "fgos.outcome": { "type": "string", "values": ["pass", "fail", "partial"] },
+    "fgos.head.state": { "type": "string", "values": ["live", "gone", "retired"] },
+    "fgos.plan.status": { "type": "string", "values": ["ready", "running", "done", "blocked"] },
+    "fgos.supervisor.trigger": { "type": "string" }
+  },
+  "measures": {
+    "fgos.duration": { "unit": "ms", "aggs": ["sum", "avg", "min", "max", "p50", "p90"] },
+    "fgos.watcher.interval": { "unit": "s", "aggs": ["max"] },
+    "fgos.plans.ready": { "unit": "count", "aggs": ["max"] },
+    "fgos.plans.running": { "unit": "count", "aggs": ["max"] }
+  },
+  "kinds": {
+    "fgos.run.attempt": {
+      "subjects": ["run"],
+      "attrs": ["gen_ai.provider.name", "gen_ai.request.model", "fgos.outcome"],
+      "measures": ["gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens", "fgos.duration"]
+    },
+    "fgos.head.state": { "subjects": ["head"], "attrs": ["fgos.head.state"] },
+    "fgos.plan.status": { "subjects": ["plan"], "attrs": ["fgos.plan.status"] },
+    "fgos.plan.activity": { "subjects": ["plan"] },
+    "fgos.watcher.tick": {
+      "subjects": ["session"],
+      "measures": ["fgos.watcher.interval", "fgos.plans.ready", "fgos.plans.running"]
+    },
+    "fgos.supervisor.wake": { "subjects": ["session"], "attrs": ["fgos.supervisor.trigger"] },
+    "fgos.session.usage": {
+      "subjects": ["session"],
+      "measures": ["gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens"]
+    },
+    "fgos.question.asked": { "subjects": ["question"] },
+    "fgos.question.answered": { "subjects": ["question"] },
+    "fgos.stale.kind": { "subjects": ["run"] }
+  }
+}

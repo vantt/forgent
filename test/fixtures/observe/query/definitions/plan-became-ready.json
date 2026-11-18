@@ -1,0 +1,1 @@
+{"kind":["fgos.plan.status"],"latest_per":"subject","where_latest":[{"field":"fgos.plan.status","op":"eq","value":"ready"}],"by":["subject.id"],"agg":["age:ts"],"having":[{"lhs":{"agg":{"agg":"age:ts"}},"op":"lt","rhs":{"const":1800}}]}

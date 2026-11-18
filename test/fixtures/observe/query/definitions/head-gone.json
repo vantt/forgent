@@ -1,0 +1,1 @@
+{"kind":["fgos.head.state"],"latest_per":"subject","where_latest":[{"field":"fgos.head.state","op":"eq","value":"gone"}],"by":["subject.id"],"agg":["count"]}

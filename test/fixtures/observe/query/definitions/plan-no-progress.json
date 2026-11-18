@@ -1,0 +1,1 @@
+{"kind":["fgos.plan.status"],"latest_per":"subject","where_latest":[{"field":"fgos.plan.status","op":"eq","value":"running"}],"without":[{"kind":["fgos.plan.activity","fgos.run.attempt"],"on":"plan","within":"60m"}],"by":["subject.id"]}
