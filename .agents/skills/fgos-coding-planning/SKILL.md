@@ -212,6 +212,10 @@ Once `plan.md` is written, hand off for validation. Before Step 05 adoption, loa
 
 Violating the letter of the rules is violating the spirit of the rules.
 
+## Friction
+
+Friction met while planning (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait) is recorded per `../../../../core/skills/_shared/friction-capture.md`, with a `--ref plan:<plan dir>`; recording never stops the planning.
+
 ## References
 
 - `references/bootstrap-and-lane.md` — docsRef registration, the reclaim

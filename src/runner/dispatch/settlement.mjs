@@ -30,6 +30,8 @@ import { resolveWorkerArtifactPath } from '../../run-supervisor/worker-artifacts
 import { attributeWorkspaceChanges, evaluateAttributionPolicy } from './evidence-attribution.mjs';
 import { matchesWriteScope } from './write-scope.mjs';
 import { nativeDoor } from '../../native/door.mjs';
+import { invokeHost } from '../../util/host-bin.mjs';
+import { assignmentDir } from './assignment-layout.mjs';
 import { seatSessionDir } from './confinement/authority.mjs';
 
 export function resolveRunWorkerArtifactPath(runDir, roundPattern, legacyName) {
@@ -721,6 +723,52 @@ function withLaunchFacts(policy, { reasoningEffort, modelWarnings = [] } = {}) {
 /**
  * Unified settlement pipeline for successful or evaluated Run outcomes.
  */
+const MAX_CLAIM_FRICTIONS = 20;
+const FRICTION_STRING = /^\S[^\n]*$/;
+
+// The plan and phase the Unit run serves, read from its stored record; null when there is none.
+function unitPlanOf(root, unitRunId) {
+  if (typeof unitRunId !== 'string' || unitRunId === '') return null;
+  try {
+    const record = JSON.parse(fs.readFileSync(path.join(assignmentDir(path.join(root, '.fgos'), unitRunId), 'unit.json'), 'utf8'));
+    const plan = record?.unit?.plan;
+    return typeof plan?.dir === 'string' && plan.dir !== '' ? { dir: plan.dir, phase: plan.phase ?? null } : null;
+  } catch { return null; }
+}
+
+/**
+ * Record the frictions a worker's claim lists, through the friction door, with refs to the run and to the Unit's plan
+ * and phase. It runs after the outcome is settled: it never throws, returns nothing, and a failed or malformed record
+ * changes nothing. The host owns every value list, so a refused entry is dropped, not repaired.
+ */
+export function recordClaimFrictions({ agentClaim, root, runMeta, assignment }) {
+  try {
+    const entries = Array.isArray(agentClaim?.frictions) ? agentClaim.frictions.slice(0, MAX_CLAIM_FRICTIONS) : [];
+    if (entries.length === 0) return;
+    const plan = unitPlanOf(root, assignment?.unitRunId);
+    const subject = runMeta?.workId || assignment?.workId || assignment?.unitRunId || runMeta?.runId;
+    if (!subject) return;
+    const refs = [
+      ...(runMeta?.runId ? [{ kind: 'run', id: runMeta.runId }] : []),
+      ...(plan ? [{ kind: 'plan', id: plan.dir }, ...(plan.phase ? [{ kind: 'plan', id: `${plan.dir}#${plan.phase}` }] : [])] : []),
+    ];
+    for (const entry of entries) {
+      if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) continue;
+      const text = (value) => (typeof value === 'string' && FRICTION_STRING.test(value.trim()) ? value.trim() : undefined);
+      const flag = (name, value) => (value === undefined ? [] : [name, value]);
+      try {
+        // The friction door's own flags (the host owns every value list); the Node friction client is not imported
+        // because it reaches the Work layer through its fault log, which dispatch must not reach.
+        invokeHost([
+          'friction', 'record', '--subject', `work:${subject}`, ...flag('--kind', text(entry.kind)), ...flag('--layer', text(entry.layer)),
+          ...flag('--error-class', text(entry.errorClass)), '--disposition', 'advisory', '--producer', 'worker-claim',
+          ...refs.flatMap((ref) => ['--ref', `${ref.kind}:${ref.id}`]), '--detail-stdin',
+        ], { dir: root, input: typeof entry.detail === 'string' ? entry.detail : '' });
+      } catch { /* a refused entry is dropped; the rest still record */ }
+    }
+  } catch { /* a recording failure never changes the outcome */ }
+}
+
 export async function settleRunOutcome({
   runDir,
   runMeta,
@@ -944,6 +992,9 @@ export async function settleRunOutcome({
     }
     publishMutableProjection(runJsonPath, { ...runJsonMeta, status: opts.updateRunJson, settledAt });
   }
+
+  // After the outcome is committed, so recording can only add a friction, never move the result.
+  recordClaimFrictions({ agentClaim, root, runMeta, assignment });
 
   return { status: 'settled', settled: true, runResult: Object.freeze(settled) };
 }

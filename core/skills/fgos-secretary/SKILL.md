@@ -34,6 +34,10 @@ depth in its own chat, or applies any domain's steps.
 4. **Order.** Order the topics by the product priority in AGENTS.md (Ship Faster, Release con nguoi, DoD, Polish Sau
    DoD). A real tie goes to the owner as a question.
 
+## Friction
+
+Friction you meet or an owner reports (a workaround, conflicting rules, a missing tool, a wrong doc, a wait) is recorded per `_shared/friction-capture.md`; recording never stops the request in hand.
+
 ## Reports
 
 At most 10 lines. Put the full report in a file named with `fgos convention path --kind report` and link it.

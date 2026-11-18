@@ -242,6 +242,64 @@ test('settlement reads usage through the door for the CLI the launch ran, and a 
   assert.deepEqual(broken.outcome, healthy.outcome, 'usage never decides the outcome');
 });
 
+// A stand-in friction host: it appends each call's arguments to a log, or fails every call when asked to.
+function standInFrictionHost(t, { fail = false } = {}) {
+  const dir = mkTempDir();
+  const log = path.join(dir, 'calls.log');
+  const bin = path.join(dir, 'host');
+  fs.writeFileSync(bin, ['#!/bin/sh', 'cat > /dev/null', `printf '%s\\n' "$*" >> "${log}"`, fail ? 'echo "boom" >&2; exit 1' : 'echo \'{"contract":"fgos.v1","data":{"ok":true}}\'', ''].join('\n'), { mode: 0o755 });
+  const saved = process.env.FGOS_HOST_BIN;
+  process.env.FGOS_HOST_BIN = bin;
+  t.after(() => { if (saved === undefined) delete process.env.FGOS_HOST_BIN; else process.env.FGOS_HOST_BIN = saved; });
+  return () => (fs.existsSync(log) ? fs.readFileSync(log, 'utf8').split('\n').filter(Boolean) : []);
+}
+
+async function settleClaimWithFrictions(frictions) {
+  const root = mkTempDir();
+  const runDir = path.join(root, '.fgos', 'assignments', 'unit-run-fr1', 'producer', '1', 'runs', '01');
+  const outbox = path.join(runDir, 'worker-output', 'outbox');
+  fs.mkdirSync(outbox, { recursive: true });
+  fs.writeFileSync(path.join(root, '.fgos', 'assignments', 'unit-run-fr1', 'unit.json'), JSON.stringify({ unit: { id: 'u1', plan: { dir: 'plans/p-one', phase: '12' } } }));
+  fs.writeFileSync(path.join(outbox, 'report-1.md'), '# Findings\n\nThe module reads the config once.\n');
+  fs.writeFileSync(path.join(outbox, 'result-1.json'), JSON.stringify({ contract: { id: 'agent-result-claim', version: 2 }, status: 'done', summary: 'read the config', frictions }));
+  const { controlToken } = acquireRunControl(runDir, { controllerId: 'test-ctrl' });
+  const { runResult } = await settleRunOutcome({
+    runDir, runMeta: { runId: 'run_fr_01', assignmentId: 'unit-run-fr1/producer/1' }, assignment: { unitRunId: 'unit-run-fr1', role: 'producer' },
+    controlEpoch: 1, controlToken, exitCode: 0, settledAt: new Date().toISOString(), effectiveCwd: runDir, gitBefore: null, dirtyBefore: [],
+    resolvedExecutorId: 'openai', opts: { cwd: runDir, repoRoot: root, adapter: 'cli-spawn' },
+  });
+  return runOutcome(runResult);
+}
+
+const TWO_FRICTIONS = [
+  { kind: 'doc', layer: 'skill', errorClass: 'stale-doc', detail: 'the guide names a removed flag' },
+  { kind: 'missing', layer: 'tool', errorClass: 'no-linter', detail: 'no linter was installed' },
+];
+
+test('a claim that lists two frictions records two frictions with refs to the run, plan and phase', async (t) => {
+  // Only the worker claim carries frictions, so no other test proves settlement hands them to the friction door.
+  const calls = standInFrictionHost(t);
+  await settleClaimWithFrictions(TWO_FRICTIONS);
+  const recorded = calls().filter((line) => line.startsWith('friction record'));
+  assert.equal(recorded.length, 2);
+  for (const line of recorded) {
+    assert.match(line, /--ref run:run_fr_01/);
+    assert.match(line, /--ref plan:plans\/p-one /);
+    assert.match(line, /--ref plan:plans\/p-one#12/);
+  }
+  assert.match(recorded[0], /--error-class stale-doc/);
+  assert.match(recorded[1], /--error-class no-linter/);
+});
+
+test('a friction the host fails to store leaves the settled outcome unchanged', async (t) => {
+  // Recording is a side channel after the outcome is committed; this is the one proof that a failure cannot move it.
+  const healthy = await settleClaimWithFrictions(TWO_FRICTIONS);
+  const calls = standInFrictionHost(t, { fail: true });
+  const broken = await settleClaimWithFrictions(TWO_FRICTIONS);
+  assert.deepEqual(broken, healthy);
+  assert.equal(calls().length, 2, 'both entries were attempted');
+});
+
 test('executeAssignment backfills mutation for its own effectiveAssignment re-read when a legacy assignment.json already exists on disk (ADR-006 R7, P02.4 Red-Team HIGH fix)', async () => {
   const tempDir = mkTempDir();
 

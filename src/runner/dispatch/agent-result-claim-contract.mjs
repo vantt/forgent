@@ -17,6 +17,9 @@ export const CLAIM_FIELD_RULES = Object.freeze([
   // A request, not a write: files outside the declared write scope the worker needed and left alone.
   // Never checked, so a claim that carries it is exactly as valid as one that does not.
   Object.freeze({ path: 'needsWrites', description: 'an array of repo-relative paths if provided: files outside your write scope you needed to write and did not' }),
+  // A side channel: obstacles the worker met. Settlement records each one after the outcome is settled; a malformed
+  // entry is skipped there and never makes the claim invalid.
+  Object.freeze({ path: 'frictions', description: 'an array if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {"kind": bug|instability|missing|awkward|doc, "layer": <the layer it sits in>, "errorClass": <a signature from `fgos friction classes`, reused when one fits>, "detail": <one or two sentences>}; recording never changes your result' }),
 ]);
 
 /** The report that goes with a claim: `result-<N>.json` pairs with `report-<N>.md` beside it (the agent protocol's names). */

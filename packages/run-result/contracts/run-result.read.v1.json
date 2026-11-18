@@ -44,6 +44,19 @@
         "assignmentId": {
           "type": "string",
           "description": "Historical record field; the observation assignmentId is the assignment directory's relative path beneath assignments and may contain /."
+        },
+        "agentClaim": {
+          "type": "object",
+          "description": "The worker's validated result claim as stored in result.json. Observe does not read it for run facts; frictions the worker listed are recorded by settlement through the friction door, not by this reader.",
+          "properties": {
+            "frictions": {
+              "type": "array",
+              "description": "Optional obstacles the worker met, each {kind, layer, errorClass, detail}; settlement records each with refs to the run and the Unit's plan and phase. Never read by the run-result source scan.",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
         }
       }
     },

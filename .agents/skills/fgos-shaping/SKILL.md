@@ -151,6 +151,8 @@ into exploring and planning for an existing work item).
 - assuming a domain instead of asking one line
 - jumping to implementation
 
+Friction met while shaping is recorded per `../_shared/friction-capture.md`; recording never stops the shaping.
+
 Violating the letter of the rules is violating the spirit of the rules.
 
 `DISCUSSION.md` (and `QUESTIONS.md`) committed with `discussion: settled` or
