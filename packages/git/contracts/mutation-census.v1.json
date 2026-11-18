@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "03e0e4214a32ba84e1b53cfeb4008dd668957b139b99761241626b92201fa186",
+  "payloadDigest": "1c0819d9405e14d36ef496ee7406918ed4c67e1da6a24b832517a8aabd306ac9",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -870,10 +870,10 @@
     "packages/run-supervisor/rust/tests/support/terminal.rs": "d802d9dc85f57bd6ea3b7c5dd9998f3deb014ffd53d2368ee9c4e0d4ce147edb",
     "packages/run-supervisor/rust/tests/support/wait.rs": "1e22fed4e8fc82bbadbcdb846a3d6cb10e629f27e29f32a622e6e2d3e3ee2806",
     "packages/run-supervisor/rust/tests/unix_lease_record.rs": "a0e5eee52e0bc00552f9c1bb6f7ffb5d42d959e134ac636a51325c0cffe0b5cb",
-    "packages/seat-binding/rust/src/explain.rs": "86501b9c3cd4c2870041135d15ddf53e555e9710ac6ba8cfd6a27e4f8da77811",
+    "packages/seat-binding/rust/src/explain.rs": "fcc3628e4ce21b3e1b224c1a6b0fb564ca6df85f58a8ec13d19e7637cbc1fe97",
     "packages/seat-binding/rust/src/lib.rs": "ce5d60decfffa172ad071fd094fa12af485c7818c82c60a3e23b5abf13b9f88f",
-    "packages/seat-binding/rust/src/model.rs": "cf3d334e63118ae3534e07b0e7e3efaf6af3b3e897259cfee1530b97dea0ea68",
-    "packages/seat-binding/rust/src/policy.rs": "27cfef47914b95b9bc94ae30cbdde534cd9c21812ba005d4f8571bdbc7c33480",
+    "packages/seat-binding/rust/src/model.rs": "696b10268d1950a1564d58dd85c326a15a55d674945d9c6854174b99c00a1262",
+    "packages/seat-binding/rust/src/policy.rs": "4fa5dfc8f7500d855e3b9d7c1a47ae35c1877fd4e8def205f1dc841a22abd521",
     "packages/seat-binding/rust/src/rank.rs": "7f7aeb81c53d4bf4930ca8ccd8d61b53ac076c6e9e13c2c83f9c226d6622c590",
     "packages/seat-binding/rust/src/tier.rs": "8c13a47153cb90274751bca8b36b5d20e349c50dacbcf06631c65195c73fe24c",
     "packages/seat-binding/rust/tests/golden.rs": "3536ea649db21c346bd59829b33aa461e05e902d4f603ad15bc8db79d71eb561",

@@ -436,7 +436,7 @@ Lỗi sống ngoài spec này: `{objective}` rò vào `roleTasks` của checker 
 
 ## 15. Lịch sử quyết định
 
-### Persona pool key (runner.personas.<name>.pool) — một khoá tuỳ chọn để persona thuê account từ pool riêng; số D-ADR do `fgos identity mint d-adr` cấp khi ghi (chưa cấp: mint cần mạng và ghi git)
+### D-ADR0081 (Persona pool key: a persona leases only from its own account pool) — một khoá tuỳ chọn `runner.personas.<name>.pool` để persona thuê account từ pool riêng
 
 - **Quyết định:** `runner.personas.<name>.pool` (chỉ file project) khiến mọi ghế của persona thuê account chỉ từ pool đó, cho mọi family nó đi qua; vắng khoá = pool của cell, hành vi cũ không đổi. Backlog `p-mnymjukvqd`, quyết định OD4 của thảo luận account-lease-secretary.
 - **Vì sao không ghim account:** một ghim `pool/account` chỉ áp khi lựa chọn đầu của ghế đã thuộc pool đó và "never moves a seat to another pool" (mục 8), nên không đưa được ghế sang pool mà không cell nào gọi tên.
