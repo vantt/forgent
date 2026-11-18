@@ -56,3 +56,16 @@ phase 16.
 
 ## Rollback
 Revert the phase commit. Phase 16 then has no source to register; `discussion-settled` raises nothing.
+
+## Review change (lead:OPC, 2026-11-18): one trunk door
+
+The trunk is read through one Git door, not a copied rule. `resolve_trunk` keeps its order (explicit, then a unique
+remote HEAD, then the main checkout's attached HEAD) and its answer `TrunkFact::Known` names its source: `explicit`,
+`remote-default` or `attached-head`. Callers that must not trust a side branch treat `attached-head` as unknown: the
+discussion source emits nothing, and `fgos land` with no `--target` refuses `land-target-unknown` (same hazard).
+Identity's project handle keeps its current answer. Every Rust caller moves in the same change, and the copied rule
+in `discussion_source.rs` is deleted. Node `detectTrunk` moving onto the door is backlog `p-welrqxgcsc`. Footprint widened
+(approved by lead:OPC as Git reviewer): `packages/git/rust/src/inspect.rs` and its tests, the addon's `inspect.rs` if
+it serialises `TrunkFact`, `packages/supervision/rust/src/land.rs` and its tests, `packages/identity/rust/src/project.rs`
+(caller move only), `docs/platform/git/spec.md`, `docs/backlog.md`. It runs after phase 7c (both touch the Git crate).
+
