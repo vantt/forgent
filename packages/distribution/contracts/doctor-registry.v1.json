@@ -39,6 +39,7 @@
       "config-global-permissions",
       "config-secret-outside-private",
       "config-capability-taste-moved",
+      "config-empty-provider-accounts",
       "config-migrate-backup-stale",
       "gateway-token-configured",
       "writer-identity-resolvable",
@@ -88,6 +89,7 @@
       "config-copy-to-destination",
       "gateway-token-configured",
       "config-move-capability-taste",
+      "config-remove-empty-provider-accounts",
       "identity-machine-id",
       "identity-machine-key",
       "git-driver-directories",
@@ -226,16 +228,6 @@
       ]
     },
     {
-      "id": "llm-accounts-vs-legacy",
-      "description": "when runner.llmAccounts is declared, it carries the same accounts and login directories as runner.providers, which the lease still reads for a pool llmAccounts does not declare; warns otherwise",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/config.mjs",
-        "src/runner/dispatch/provider-adapter.mjs",
-        "src/runner/dispatch/tier-cell.mjs"
-      ]
-    },
-    {
       "id": "domain-registry-compiled",
       "description": "every compiled.json of the running fgOS's domains (the form the Work lifecycle reads) exists, parses, carries the contract this fgOS reads and matches its registry and workflow YAML",
       "owner": "bridge:S7",
@@ -299,7 +291,7 @@
     },
     {
       "id": "agy-sub-homes-configured",
-      "description": "agy sub-HOMEs referenced in executor configs have settings.json configured with toolPermission: always-proceed",
+      "description": "each agy sub-HOME an executor config or a gemini account of runner.llmAccounts names exists as a directory",
       "owner": "bridge:S5",
       "judge": [
         "src/runner/dispatch/config.mjs"

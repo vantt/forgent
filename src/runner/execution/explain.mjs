@@ -22,13 +22,7 @@ function storeOfBinding(executorEntry, invocationId) {
  * it. A pool no inventory lists runs on the executor's own login.
  */
 function accountsOf(runnerConfig, pool, cli) {
-  let accounts = {};
-  let inventoryProblem = null;
-  try {
-    accounts = providerAccountInventory(runnerConfig)?.[legacyStateKey(pool)]?.accounts ?? {};
-  } catch (err) {
-    inventoryProblem = { code: 'inventory-invalid', at: 'runner.providers', detail: err.message };
-  }
+  const accounts = providerAccountInventory(runnerConfig)?.[legacyStateKey(pool)]?.accounts ?? {};
   const declared = runnerConfig?.llmAccounts?.[pool] !== undefined;
   const { problems } = readLlmAccounts(runnerConfig);
   return {
@@ -41,7 +35,7 @@ function accountsOf(runnerConfig, pool, cli) {
           : null;
       return { id, usable: reason === null, ...(reason ? { reason } : {}) };
     }),
-    problems: [...(inventoryProblem ? [inventoryProblem] : []), ...problems.filter((p) => p.at.startsWith(`runner.llmAccounts.${pool}`) || p.at === 'runner.llmAccounts')],
+    problems: problems.filter((p) => p.at.startsWith(`runner.llmAccounts.${pool}`) || p.at === 'runner.llmAccounts'),
   };
 }
 

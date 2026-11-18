@@ -7,7 +7,7 @@
 import { loadRunnerConfigForDir, MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
 import { familyOf } from '../runner/dispatch/provider-adapter.mjs';
 import { parseTierCell } from '../runner/dispatch/tier-cell.mjs';
-import { readLlmAccounts, compareWithLegacyInventory, deriveLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
+import { readLlmAccounts, deriveLegacyInventory } from '../runner/dispatch/llm-accounts.mjs';
 import { AGENT_SKILL_DIRS } from '../util/agent-skill-dirs.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -172,22 +172,5 @@ export function checkLlmAccountsShape(cwd) {
   }
   const count = Object.values(pools).reduce((n, p) => n + Object.keys(p.accounts).length, 0);
   return { passed: true, message: `runner.llmAccounts declares ${count} accounts in ${Object.keys(pools).length} pools` };
-}
-
-/**
- * The lease reads a pool from runner.llmAccounts when it declares it and from runner.providers
- * otherwise (the transition read), so an account declared on one side only is a surprise later.
- */
-export function checkLlmAccountsVsLegacy(cwd) {
-  const { runnerConfig, skip } = loadOrExplain(cwd);
-  if (skip) return skip;
-  if (runnerConfig.llmAccounts === undefined) return { passed: true, message: 'runner.llmAccounts not declared; nothing to compare' };
-  const { onlyLegacy, onlyNew, storeMismatch } = compareWithLegacyInventory(runnerConfig);
-  const parts = [];
-  if (onlyLegacy.length > 0) parts.push(`only in runner.providers: ${onlyLegacy.map((a) => `${a.pool}/${a.account}`).join(', ')}`);
-  if (onlyNew.length > 0) parts.push(`only in runner.llmAccounts: ${onlyNew.map((a) => `${a.pool}/${a.account}`).join(', ')}`);
-  if (storeMismatch.length > 0) parts.push(`different login directories: ${storeMismatch.map((a) => `${a.pool}/${a.account}`).join(', ')}`);
-  if (parts.length > 0) return { passed: true, message: `warning: the lease reads runner.llmAccounts for a pool it declares and runner.providers for the rest; ${parts.join('; ')}` };
-  return { passed: true, message: 'runner.llmAccounts matches runner.providers' };
 }
 

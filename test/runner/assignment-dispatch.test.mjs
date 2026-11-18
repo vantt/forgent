@@ -749,7 +749,7 @@ function buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocatio
         invocations: fallbackHasConfinedInvocation
           ? [
               { id: 'cli', via: 'cli', command: process.execPath, args: [codexUnconfinedExecutor.scriptPath, '{prompt}', '--model', '{model}'] },
-              { id: 'cli-bwrap', via: 'cli', command: process.execPath, args: [codexConfinedExecutor.scriptPath, '{prompt}', '--model', '{model}'], confinement: { backend: 'bwrap' } },
+              { id: 'cli-bwrap', via: 'cli', command: process.execPath, args: [codexConfinedExecutor.scriptPath, '{prompt}', '--model', '{model}'], confinement: { backend: 'bwrap' }, credentialStore: { use: 'codex', homeEnv: 'CODEX_HOME' } },
             ]
           : [
               { id: 'cli', via: 'cli', command: process.execPath, args: [codexUnconfinedExecutor.scriptPath, '{prompt}', '--model', '{model}'] },
@@ -803,7 +803,7 @@ test('with a renewal function, a confined launch renews the login of the account
   assert.equal(calls[0].provider, 'openai-codex', 'the account of the executor the launch named');
   assert.equal(calls[0].accountId, 'codex-acct');
   assert.equal(calls[0].runtimeDir, runtimeDir);
-  assert.deepEqual(calls[0].credentialSource, { kind: 'codex-home', home: path.join(tempDir, 'codex-home') });
+  assert.deepEqual(calls[0].credentialSource, { kind: 'codex-home', home: path.join(tempDir, 'codex-home'), cli: 'codex' });
 });
 
 test('a renewal that did not leave the login fresh is reported on stderr by code; a quiet outcome is not', async () => {
@@ -828,7 +828,7 @@ test('a renewal that did not leave the login fresh is reported on stderr by code
   } finally { process.stderr.write = realWrite; }
   const reported = lines.filter((l) => l.includes('credential refresh-ahead'));
   assert.equal(reported.length, 1);
-  assert.match(reported[0], /openai-codex\/codex-acct: failed \(probe-failed\)/);
+  assert.match(reported[0], /openai-codex\/codex-acct \(codex\): failed \(probe-failed\)/);
 });
 
 test('a renewal function that throws never fails the dispatch, and an unconfined launch never calls it', async () => {

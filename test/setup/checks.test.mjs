@@ -104,7 +104,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       'tier-fallback',
       'model-policy-pools',
       'llm-accounts-shape',
-      'llm-accounts-vs-legacy',
     ].sort(),
   );
 });

@@ -200,9 +200,9 @@ function paneExecutors(providerModel = 'openai') {
 test('checkConfinedPaneAccounts fails by name when an invocation that reads a store has no account inventory', () => {
   const r = checkConfinedPaneAccounts(paneExecutors());
   assert.equal(r.passed, false);
-  assert.match(r.message, /executor "openai" invocation "codex-herdr-bwrap": no runner\.providers\.openai-codex\.accounts/);
+  assert.match(r.message, /executor "openai" invocation "codex-herdr-bwrap": no runner\.llmAccounts pool for openai-codex/);
   assert.doesNotMatch(r.message, /codex-cli/, 'only invocations that read a login store are checked');
-  assert.match(r.message, /invocation "codex-bwrap": no runner\.providers/, 'a cli invocation is covered as well as a pane, and an older binding counts');
+  assert.match(r.message, /invocation "codex-bwrap": no runner\.llmAccounts pool/, 'a cli invocation is covered as well as a pane, and an older binding counts');
 });
 
 test('checkConfinedPaneAccounts does not judge an invocation whose CLI is not installed', () => {
@@ -373,7 +373,7 @@ test('checkConfinedPaneAccounts looks providers and accounts up by own property,
     for (const name of ['constructor', '__proto__']) {
       const none = checkConfinedPaneAccounts(paneExecutors(name), { inventory: {} });
       assert.equal(none.passed, false, name);
-      assert.match(none.message, new RegExp(`no runner\\.providers\\.${name}\\.accounts`), name);
+      assert.match(none.message, new RegExp(`no runner\\.llmAccounts pool for ${name}`), name);
     }
   } finally { fs.rmSync(home, { recursive: true, force: true }); }
 });

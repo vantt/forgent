@@ -30,13 +30,11 @@ test('dispatch inspect --provider-capacity reports redacted account state from t
   const fgosHome = path.join(home, '.fgos');
   fs.mkdirSync(fgosHome, { recursive: true });
   writeAccountsFile(fgosHome, {
-    providers: {
-      'openai-codex': {
-        accounts: {
-          tetnu: {
-            label: 'Tetnu',
-            credentialSource: { kind: 'codex-home', home: path.join(home, 'codex-tetnu') },
-          },
+    llmAccounts: {
+      openai: {
+        tetnu: {
+          label: 'Tetnu',
+          credentialStore: { codex: path.join(home, 'codex-tetnu') },
         },
       },
     },

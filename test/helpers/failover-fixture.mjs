@@ -108,7 +108,7 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
   const script = path.join(repoRoot, 'worker.mjs');
   fs.writeFileSync(script, WORKER);
   const executors = {};
-  const globalProviders = {};
+  const loginPools = {};
   for (const [name, { family, logins = {} }] of Object.entries(providers)) {
     const command = path.join(repoRoot, `${name}-bin`);
     fs.symlinkSync(process.execPath, command);
@@ -129,13 +129,11 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
       }],
     };
     if (Object.keys(logins).length > 0) {
-      globalProviders[family] = {
-        accounts: Object.fromEntries(Object.entries(logins).map(([accountId, marker]) => {
-          const home = fixtureDir(`fgos-failover-acct-${accountId}-`);
-          fs.writeFileSync(path.join(home, 'login'), marker);
-          return [accountId, { label: accountId, credentialSource: { kind: 'home-files', home, files: ['login'] } }];
-        })),
-      };
+      loginPools[family] = Object.fromEntries(Object.entries(logins).map(([accountId, marker]) => {
+        const accountHome = fixtureDir(`fgos-failover-acct-${accountId}-`);
+        fs.writeFileSync(path.join(accountHome, 'login'), marker);
+        return [accountId, { credentialStore: { [family]: accountHome } }];
+      }));
     }
   }
   const poolEntries = prefer.map((name) => ({ executor: name, invocation: `${name}-cli` }));
@@ -167,12 +165,8 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
     fs.writeFileSync(path.join(accountHome, 'login'), login);
     return [accountId, { credentialStore: { [family]: accountHome } }];
   }))]));
-  // An empty container is not an account entry: the accounts file holds only what has accounts.
-  const accountPools = {
-    ...(Object.keys(globalProviders).length > 0 ? { providers: globalProviders } : {}),
-    ...(globalPools ? { llmAccounts: globalPools } : {}),
-  };
-  if (Object.keys(accountPools).length > 0) writeAccountsFile(path.join(home, '.fgos'), accountPools);
+  const accountPools = { ...loginPools, ...(globalPools ?? {}) };
+  if (Object.keys(accountPools).length > 0) writeAccountsFile(path.join(home, '.fgos'), { llmAccounts: accountPools });
 
   // Accounts that ran recently rank last, so the account a test leaves out is tried first.
   const runtimeDir = fixtureDir('fgos-failover-capacity-');
@@ -185,7 +179,7 @@ export function setup(providers, { prefer = Object.keys(providers), recentlyUsed
     };
   }
   fs.writeFileSync(path.join(runtimeDir, 'state.json'), JSON.stringify(state));
-  return { repoRoot, worktreeDir, runtimeDir, runnerConfig: { ...cfg.runner, providers: globalProviders, ...(globalPools ? { llmAccounts: globalPools } : {}) } };
+  return { repoRoot, worktreeDir, runtimeDir, runnerConfig: { ...cfg.runner, ...(Object.keys(accountPools).length > 0 ? { llmAccounts: accountPools } : {}) } };
 }
 
 export const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));

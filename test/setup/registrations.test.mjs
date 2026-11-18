@@ -1202,14 +1202,14 @@ test('the order the bodies register in is the order the registry runs them in', 
   assert.deepEqual(REGISTERED_FIX_IDS, fixes.map((fix) => fix.id).filter((id) => !FIXES_RUN_IN_RUST.includes(id)));
 });
 
-test('the registry gives 57 rows and 23 fixes to Rust and 53 rows and 5 fixes to the bridge, as measured', () => {
+test('the registry gives 58 rows and 24 fixes to Rust and 52 rows and 5 fixes to the bridge, as measured', () => {
   const { rows, fixes } = registryEntries();
   const bridged = (list) => list.filter((entry) => entry.owner.startsWith('bridge:'));
   const byStep = (step) => bridged(rows).filter((row) => row.owner === `bridge:${step}`).length;
-  assert.deepEqual(['S5', 'S6a', 'S6b', 'S7'].map(byStep), [8, 31, 6, 8]);
-  assert.equal(rows.length - bridged(rows).length, 57);
+  assert.deepEqual(['S5', 'S6a', 'S6b', 'S7'].map(byStep), [8, 30, 6, 8]);
+  assert.equal(rows.length - bridged(rows).length, 58);
   assert.equal(bridged(fixes).length, 5);
-  assert.equal(fixes.length - bridged(fixes).length, 23);
+  assert.equal(fixes.length - bridged(fixes).length, 24);
 });
 
 test('an owner is rust:<component> or bridge:<step>, and a bridged one names the step that removes it', () => {

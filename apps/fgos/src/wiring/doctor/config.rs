@@ -33,6 +33,7 @@ pub const ROW_IDS: &[&str] = &[
     "config-global-permissions",
     "config-secret-outside-private",
     "config-capability-taste-moved",
+    "config-empty-provider-accounts",
     "config-migrate-backup-stale",
     TOKEN_ID,
 ];
@@ -45,6 +46,7 @@ pub const FIX_IDS: &[&str] = &[
     "config-copy-to-destination",
     TOKEN_ID,
     "config-move-capability-taste",
+    "config-remove-empty-provider-accounts",
 ];
 
 /// The adapter the doctor registers for the config rows and fixes.

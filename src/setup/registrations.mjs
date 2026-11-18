@@ -41,7 +41,6 @@ import {
   checkTierFallback,
   checkModelPolicyPools,
   checkLlmAccountsShape,
-  checkLlmAccountsVsLegacy,
 } from './model-pool-checks.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 import { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -822,11 +821,6 @@ registerCheck({
   check: (cwd) => checkLlmAccountsShape(cwd),
 });
 
-registerCheck({
-  id: 'llm-accounts-vs-legacy',
-  check: (cwd) => checkLlmAccountsVsLegacy(cwd),
-});
-
 // The definition tiers of a shipped release cannot change after build, so `npm test` judges them
 // (test/setup/packaged-definitions.test.mjs, test/setup/registrations.test.mjs). No doctor row judges task-spec
 // claims: a project supplies no task-specs or domain agents (decision 79 Q4), only `fgos/agents`.
@@ -1187,7 +1181,7 @@ function checkProviderCapacityState() {
   const providers = Object.values(report.providers || {});
   const accounts = providers.flatMap((provider) => Object.values(provider.accounts || {}));
   if (!accounts.length) {
-    return { passed: true, message: 'inactive — no global runner.providers.*.accounts inventory configured' };
+    return { passed: true, message: 'inactive — no global runner.llmAccounts inventory configured' };
   }
   const quarantined = accounts.filter((account) => account.quarantine);
   if (!quarantined.length) {
@@ -1479,11 +1473,7 @@ export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = un
     if (providerInventory.inventoryUnreadable) return { passed: false, message: `provider account inventory is unreadable: ${providerInventory.inventoryUnreadable}` };
     inventory = providerInventory.inventory;
   } else {
-    try {
-      inventory = providerAccountInventory(runnerCfg);
-    } catch (err) {
-      return { passed: false, message: `provider account inventory is invalid: ${err.message}` };
-    }
+    inventory = providerAccountInventory(runnerCfg);
   }
   const expandHome = (value) => String(value ?? '').replace(/^\$\{HOME\}(?=\/|$)/, os.homedir()).replace(/^\$HOME(?=\/|$)/, os.homedir()).replace(/^~(?=\/|$)/, os.homedir());
   const problems = [];
@@ -1501,7 +1491,7 @@ export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = un
       const accountMap = providerEntry?.accounts;
       const accounts = accountMap && typeof accountMap === 'object' ? Object.keys(accountMap).filter((key) => Object.hasOwn(accountMap, key)).map((key) => accountMap[key]) : [];
       if (accounts.length === 0) {
-        problems.push(`${label}: no runner.providers.${provider}.accounts in the global config, so its pane starts in an empty private home, logged out`);
+        problems.push(`${label}: no runner.llmAccounts pool for ${provider} in the global config, so its pane starts in an empty private home, logged out`);
         continue;
       }
       // An account that keeps one login per CLI reaches this invocation only through the store it names.
@@ -2125,7 +2115,7 @@ function strandedByStore(copies, what) {
 
 /**
  * The machine-global provider account inventory the doctor judges store layouts by: `{ inventory }`, or
- * `{ inventoryUnreadable }` with the reason when the global config cannot be read or is invalid. The
+ * `{ inventoryUnreadable }` with the reason when the global config cannot be read. The
  * inventory lives only in the global config, so this never depends on the directory doctor runs in.
  */
 export function readDoctorProviderInventory() {
@@ -2137,11 +2127,7 @@ export function readDoctorProviderInventory() {
   } catch (err) {
     return { inventoryUnreadable: `machine config unreadable (${isConfigDoorFailure(err) ? err.message : err?.code ?? err?.name ?? 'error'})` };
   }
-  try {
-    return { inventory: providerAccountInventory(runner) };
-  } catch (err) {
-    return { inventoryUnreadable: `machine config refused by the provider inventory validator (${err?.code ?? err?.name ?? 'error'})` };
-  }
+  return { inventory: providerAccountInventory(runner) };
 }
 
 // What an interrupted staging is judged against: the source login of the store it sits in, `'stranded'` when the

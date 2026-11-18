@@ -210,10 +210,6 @@
       ],
       "debt": [
         {
-          "path": "src/setup/agy-permissions.mjs",
-          "reason": "the sub-HOME reader of the executor config's agy rows reads toolPermission in each sub-HOME; it goes with those rows (S5) and the agent CLI trust row (S6a)"
-        },
-        {
           "path": "src/cli/command-registry.mjs",
           "reason": "the wire-agents description names the settings it never sets"
         }

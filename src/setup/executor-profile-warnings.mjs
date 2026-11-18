@@ -16,7 +16,7 @@ import { hasOwnPreferPool } from '../runner/execution/capability-config.mjs';
 // Env var name patterns that look like they are trying to do Provider
 // Capacity Rotator's own job (account pool / credential home selection)
 // from inside an executor's static config, instead of through
-// `runner.providers.<provider>.accounts` (plans/260916-account-rotator/).
+// `runner.llmAccounts.<pool>` (plans/260916-account-rotator/).
 // Intentionally a name-pattern heuristic, not an exhaustive enum: the
 // specific incident this guards against (`FGOS_CODEX_CREDENTIAL_HOMES`,
 // removed in the provider-capacity-rotator slice-1 commit) is gone, but a
@@ -89,7 +89,7 @@ export function collectExecutorProfileWarnings(cfg) {
       if (ACCOUNT_POOL_ENV_NAME_PATTERN.test(envName)) {
         warnings.push({
           id: `executor.${executorId}.account-pool-env.${envName}`,
-          migrateTo: 'Provider Capacity Rotator global account inventory (plans/260916-account-rotator/, runner.providers.<provider>.accounts)',
+          migrateTo: 'Provider Capacity Rotator global account inventory (plans/260916-account-rotator/, runner.llmAccounts.<pool>)',
           detail: `executors.${executorId} declares env "${envName}", which looks like executor-owned account/credential-pool selection -- that belongs to the global Provider Capacity Rotator inventory, never a static executor env value`,
         });
       }

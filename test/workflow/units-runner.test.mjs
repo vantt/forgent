@@ -92,7 +92,7 @@ function setupRepo({ effortCli = false } = {}) {
           description: 'Test node executor',
           allowCrossProvider: true,
           providerModel: 'node',
-          invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args }],
+          invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args, credentialStore: { use: 'node', homeEnv: 'ACCOUNT_HOME', files: ['login'] } }],
         },
       },
       capabilities: { 'docs:write': { prefer: [{ executor: 'test-node' }], rigor: 'standard', tier: 'standard' } },
@@ -354,12 +354,8 @@ test('workflow with two units on different providers pins account only on matchi
   fs.writeFileSync(path.join(store, 'login'), 'token\n');
   fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
   writeAccountsFile(path.join(fakeHome, '.fgos'), {
-    providers: {
-      alpha: {
-        accounts: {
-          'acct-alpha': { label: 'acct-alpha', credentialSource: { kind: 'home-files', home: store, files: ['login'] } },
-        },
-      },
+    llmAccounts: {
+      alpha: { 'acct-alpha': { label: 'acct-alpha', credentialStore: { alpha: store } } },
     },
   });
 
@@ -372,7 +368,7 @@ test('workflow with two units on different providers pins account only on matchi
     const args = [worker, '{prompt}'];
     cfg.runner.executors[name] = {
       kind: 'agent', allowCrossProvider: true,   providerModel: name,
-      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args }],
+      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args, credentialStore: { use: name, homeEnv: 'ACCOUNT_HOME', files: ['login'] } }],
     };
     cfg.runner.modelPolicies[name] = { nano: `${name}-nano`, standard: `${name}-std`, advanced: `${name}-adv`, flagship: `${name}-flagship`, frontier: `${name}-frontier` };
   }
@@ -427,12 +423,8 @@ test('CLI workflow start --units takes --effort, --timeout and --account and rep
   fixtures.push(fakeHome);
   fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
   writeAccountsFile(path.join(fakeHome, '.fgos'), {
-    providers: {
-      node: {
-        accounts: {
-          'acct-cli': { label: 'acct-cli', credentialSource: { kind: 'home-files', home: store, files: ['login'] } },
-        },
-      },
+    llmAccounts: {
+      node: { 'acct-cli': { label: 'acct-cli', credentialStore: { node: store } } },
     },
   });
 
@@ -579,7 +571,7 @@ test('--effort, --timeout and --account reach the Unit of every step, a unit\'s 
   fixtures.push(fakeHome);
   fs.mkdirSync(path.join(fakeHome, '.fgos'), { recursive: true });
   writeAccountsFile(path.join(fakeHome, '.fgos'), {
-    providers: { node: { accounts: { 'acct-test': { label: 'acct-test', credentialSource: { kind: 'home-files', home: store, files: ['login'] } } } } },
+    llmAccounts: { node: { 'acct-test': { label: 'acct-test', credentialStore: { node: store } } } },
   });
   const prevHome = process.env.HOME;
   moveMachineKeysTo(tmp, fakeHome);

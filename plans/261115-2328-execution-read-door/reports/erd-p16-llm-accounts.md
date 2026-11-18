@@ -46,3 +46,9 @@ Rust (target `.../scratchpad/target`; `/home/vantt/projects/forgent-worktrees/s5
 ## Proposed `## [Unreleased]` line
 
 - `runner.providers.<provider>.accounts` is no longer read: declare accounts in `runner.llmAccounts`. A config that still lists accounts there is refused by name; `fgos doctor --fix` removes the empty `accounts: {}` leftovers.
+
+## Callers moved (second seat)
+
+Every caller of the deleted reader now reads `runner.llmAccounts`: `config.mjs` refuses a non-empty `providers.<p>.accounts` by name with the Rust code (`config-key-retired`, one new `validate` vector replayed by Rust and Node); `provider-account-probe.mjs` pins only the `llmAccounts` pool; `explain.mjs` lost the dead `inventory-invalid` branch (the `providers` source label stays with its Rust twin); `model-pool-checks.mjs`/`registrations.mjs` lost the `llm-accounts-vs-legacy` row and the dead validator catches; `agent_config.rs` reads the `gemini` pool of `llmAccounts` and demands only that each agy sub-HOME exists (the Node row's twin). Registry: `config-empty-provider-accounts` row and `config-remove-empty-provider-accounts` fix registered with Config's others (measured counts: Rust 58 rows / 24 fixes via bridge test, 52 bridged rows). Also touched because they follow: `docs/architecture-manifest.json` (stale agy debt entry), `apps/fgos/src/wiring/doctor/mod.rs` (measured counts), `docs/how-to/install-fgos-in-a-project-and-use-doctor.md`, and tests whose fixtures built `providers` accounts or named `openai-codex` pool/setup messages.
+
+Retired test -> owner now: none retired in this pass; fixtures converted to `llmAccounts` (invocations that read a store now declare `credentialStore`, as a derived account only serves a CLI whose store an invocation declares).

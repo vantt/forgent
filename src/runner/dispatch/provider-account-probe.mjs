@@ -87,23 +87,17 @@ export function accountInvocations(cfg, { provider, accountId, executorId = null
 }
 
 /**
- * The runner config handed to the dispatch door: the provider's inventory narrowed to the one account,
- * under whichever spelling the config declares it. Nothing else changes.
+ * The runner config handed to the dispatch door: the provider's `llmAccounts` pool narrowed to the one account.
+ * Nothing else changes.
  */
 export function configPinnedToAccount(cfg, { provider, accountId }) {
   const family = legacyStateKey(provider);
-  const providers = {};
-  for (const [key, entry] of Object.entries(cfg?.providers ?? {})) {
-    if (legacyStateKey(key) !== family) providers[key] = entry;
-    else if (entry?.accounts?.[accountId]) providers[key] = { ...entry, accounts: { [accountId]: entry.accounts[accountId] } };
-  }
-  // A pool declared in llmAccounts is the lease's source for that provider, so the pin narrows it too.
   const llmAccounts = {};
   for (const [pool, accounts] of Object.entries(cfg?.llmAccounts ?? {})) {
     if (legacyStateKey(pool) !== family) llmAccounts[pool] = accounts;
     else if (accounts?.[accountId]) llmAccounts[pool] = { [accountId]: accounts[accountId] };
   }
-  return { ...cfg, providers, ...(cfg?.llmAccounts !== undefined ? { llmAccounts } : {}) };
+  return { ...cfg, ...(cfg?.llmAccounts !== undefined ? { llmAccounts } : {}) };
 }
 
 /**
@@ -319,7 +313,7 @@ export async function runAccountProbe({
 } = {}) {
   const plan = accountInvocations(cfg, { provider, accountId, executorId });
   if (!plan.account) {
-    throw new Error(`no account "${accountId}" for provider "${plan.provider}" in runner.providers (~/.fgos/private/accounts.yaml)`);
+    throw new Error(`no account "${accountId}" for provider "${plan.provider}" in runner.llmAccounts (~/.fgos/private/accounts.yaml)`);
   }
   const directRows = leg === 'harness'
     ? []

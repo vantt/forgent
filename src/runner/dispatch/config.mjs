@@ -23,7 +23,7 @@ import { parseTierCell, REASONING_EFFORT_VALUES } from './tier-cell.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ConfigDoorError, checkConfig, readConfig } from '../../config/facade.mjs';
-import { validateProviderAccountInventory, credentialStoreProblem } from './provider-capacity.mjs';
+import { credentialStoreProblem } from './provider-capacity.mjs';
 import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, formatRetiredKeySentence } from '../execution/patterns/retired-keys.mjs';
 import {
   BUILTIN_POLICY_IDS,
@@ -466,6 +466,17 @@ const REMOVED_RUNNER_KEYS = Object.freeze({
 });
 
 /**
+ * A provider that still lists accounts is refused by name (twin of the Rust refusal in the runner config check); an
+ * empty list is a leftover shell that loads and `fgos doctor --fix` removes.
+ */
+function refuseRetiredProviderAccounts(cfg, sourceLabel) {
+  const messages = Object.entries(cfg.providers ?? {})
+    .filter(([, entry]) => entry?.accounts && typeof entry.accounts === 'object' && Object.keys(entry.accounts).length > 0)
+    .map(([provider]) => `runner config (${sourceLabel}): runner.providers.${provider}.accounts was retired; declare the accounts in runner.llmAccounts.<pool>.<account>.credentialStore instead.`);
+  if (messages.length > 0) throw new RunnerConfigError(messages.join('\n'), { code: 'config-key-retired' });
+}
+
+/**
  * The invariant binding two fields of an executor: `permissionMode: 'bypass'` hands the worker an agent that will
  * not ask before acting, which is only defensible when the worker is confined. The refusal names the missing flag,
  * because "confinement incomplete" sends a reader looking through three booleans for the one that is false.
@@ -757,7 +768,7 @@ export function validateRunnerConfigShape(cfg, sourceLabel) {
     warnIfProviderFamilyUnreliable(executorId, executor);
   }
   checkPreferTargets(cfg, sourceLabel);
-  validateProviderAccountInventory(cfg, sourceLabel);
+  refuseRetiredProviderAccounts(cfg, sourceLabel);
   if (cfg.patterns !== undefined) validateRunnerPatternsShape(cfg.patterns, `${sourceLabel} patterns`);
   if (cfg.loops !== undefined) validateRunnerLoopsShape(cfg.loops, `${sourceLabel} loops`);
   if (cfg.generatedPaths !== undefined) validateGeneratedPathsShape(cfg.generatedPaths, sourceLabel);

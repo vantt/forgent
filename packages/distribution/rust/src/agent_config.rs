@@ -484,20 +484,13 @@ pub fn find_agy_sub_homes(
             found.executor(exec, id);
         }
     }
-    // The credential homes of the declared gemini accounts: a confined invocation runs as the account the
-    // capacity layer picks, so these homes matter as much as the HOME an invocation names.
-    let accounts = runner
-        .get("providers")
-        .and_then(|p| p.get("gemini"))
-        .and_then(|g| g.get("accounts"));
-    if let Some(Value::Object(accounts)) = accounts {
+    // The credential homes of the accounts of the `gemini` pool of `runner.llmAccounts`: a confined invocation runs
+    // as the account the capacity layer picks, so these homes matter as much as the HOME an invocation names.
+    if let Some(Value::Object(accounts)) = runner.get("llmAccounts").and_then(|p| p.get("gemini")) {
         for (id, account) in accounts {
-            let source = match account.get("credentialSources") {
-                Some(sources) if !sources.is_null() => sources.get("agy"),
-                _ => account.get("credentialSource"),
-            };
-            let raw = source
-                .and_then(|s| s.get("home"))
+            let raw = account
+                .get("credentialStore")
+                .and_then(|store| store.get("agy"))
                 .and_then(Value::as_str)
                 .map(str::trim);
             if let Some(raw) = raw.filter(|r| !r.is_empty()) {
@@ -605,8 +598,9 @@ fn runner_section(cwd: &Path, env: Env) -> Result<Option<Value>, AgentHooksError
     }
 }
 
-/// Row `agy-sub-homes-configured`: each agy sub-HOME the executor config names has its own settings file with
-/// `toolPermission: "always-proceed"`.
+/// Row `agy-sub-homes-configured`: each agy sub-HOME an executor config or a `gemini` account names exists as a
+/// directory. A run passes its settings (always-proceed and the deny list) to agy as a session-only `--settings`,
+/// so no sub-HOME's own settings file is read on a run and none is demanded here.
 pub fn check_agy_sub_homes_configured(
     cwd: &Path,
     home: &str,
@@ -617,57 +611,30 @@ pub fn check_agy_sub_homes_configured(
     if sub_homes.is_empty() {
         return Ok(verdict(
             true,
-            "no agy sub-HOMEs referenced in executor configs \u{2014} nothing to check",
+            "no agy sub-HOMEs referenced in executor configs or the gemini accounts \u{2014} nothing to check",
         ));
     }
-    let (mut missing, mut misconfigured, mut passed) = (Vec::new(), Vec::new(), Vec::new());
-    for sub in &sub_homes {
-        let settings_path = agy_settings_path(&sub.resolved_path);
-        if !settings_path.exists() {
-            missing.push(format!(
-                "{} ({} not found)",
-                sub.raw_path,
-                settings_path.display()
-            ));
-            continue;
-        }
-        let settings = read_agy_settings(&sub.resolved_path);
-        if settings["toolPermission"] != "always-proceed" {
-            let seen = settings["toolPermission"].as_str().unwrap_or("missing");
-            misconfigured.push(format!(
-                "{} ({}: toolPermission is \"{seen}\", must be \"always-proceed\")",
-                sub.raw_path,
-                settings_path.display()
-            ));
-            continue;
-        }
-        passed.push(sub.raw_path.clone());
-    }
-    if !missing.is_empty() || !misconfigured.is_empty() {
-        let mut problems = Vec::new();
-        if !missing.is_empty() {
-            problems.push(format!("missing settings.json: {}", missing.join(", ")));
-        }
-        if !misconfigured.is_empty() {
-            problems.push(format!(
-                "misconfigured settings.json: {}",
-                misconfigured.join(", ")
-            ));
-        }
+    let missing: Vec<String> = sub_homes
+        .iter()
+        .filter(|sub| !sub.resolved_path.is_dir())
+        .map(|sub| format!("{} ({})", sub.raw_path, sub.resolved_path.display()))
+        .collect();
+    if !missing.is_empty() {
         return Ok(verdict(
             false,
             format!(
-                "agy sub-HOME check failed ({}) \u{2014} each sub-HOME must have .gemini/antigravity-cli/settings.json with toolPermission: \"always-proceed\"",
-                problems.join("; ")
+                "agy sub-HOME check failed (not a directory: {}) \u{2014} each sub-HOME an executor or a gemini account names must exist",
+                missing.join(", ")
             ),
         ));
     }
+    let named: Vec<&str> = sub_homes.iter().map(|sub| sub.raw_path.as_str()).collect();
     Ok(verdict(
         true,
         format!(
-            "all {} agy sub-HOME(s) configured ({}) with toolPermission=always-proceed",
+            "all {} agy sub-HOME(s) exist ({})",
             sub_homes.len(),
-            passed.join(", ")
+            named.join(", ")
         ),
     ))
 }
@@ -1259,9 +1226,9 @@ mod tests {
                     { "id": "plain", "env": { "HOME": "/plain" } } ] },
                 "agy": { "env": { "HOME": "${HOME}/.agy-homes/one" } }
             },
-            "providers": { "gemini": { "accounts": {
-                "a1": { "credentialSource": { "home": "~/gem/one" } },
-                "a2": { "credentialSources": { "agy": { "home": "~/gem/two" } } } } } }
+            "llmAccounts": { "gemini": {
+                "a1": { "credentialStore": { "agy": "~/gem/one" } },
+                "a2": { "credentialStore": { "agy": "~/gem/two" } } } }
         }});
         let found = find_agy_sub_homes(&sb.project, &home, &env, Some(&config)).unwrap();
         let resolved: Vec<_> = found.iter().map(|s| s.resolved_path.clone()).collect();
@@ -1281,42 +1248,25 @@ mod tests {
         assert!(
             verdict_missing
                 .message
-                .starts_with("agy sub-HOME check failed (missing settings.json: "),
+                .starts_with("agy sub-HOME check failed (not a directory: "),
             "{verdict_missing:?}"
         );
         for sub in &found {
-            let file = agy_settings_path(&sub.resolved_path);
-            std::fs::create_dir_all(file.parent().unwrap()).unwrap();
-            std::fs::write(&file, r#"{"toolPermission":"request-review"}"#).unwrap();
-        }
-        let wrong =
-            check_agy_sub_homes_configured(&sb.project, &home, &env, Some(&config)).unwrap();
-        assert!(
-            wrong
-                .message
-                .contains("toolPermission is \"request-review\", must be \"always-proceed\""),
-            "{wrong:?}"
-        );
-        for sub in &found {
-            std::fs::write(
-                agy_settings_path(&sub.resolved_path),
-                r#"{"toolPermission":"always-proceed"}"#,
-            )
-            .unwrap();
+            std::fs::create_dir_all(&sub.resolved_path).unwrap();
         }
         let ok = check_agy_sub_homes_configured(&sb.project, &home, &env, Some(&config)).unwrap();
         assert!(
             ok.passed
                 && ok
                     .message
-                    .starts_with("all 4 agy sub-HOME(s) configured (${HOME}/.agy-homes/one, "),
+                    .starts_with("all 4 agy sub-HOME(s) exist (${HOME}/.agy-homes/one, "),
             "{ok:?}"
         );
         let none =
             check_agy_sub_homes_configured(&sb.project, &home, &env, Some(&json!({}))).unwrap();
         assert_eq!(
             none.message,
-            "no agy sub-HOMEs referenced in executor configs \u{2014} nothing to check"
+            "no agy sub-HOMEs referenced in executor configs or the gemini accounts \u{2014} nothing to check"
         );
     }
 
