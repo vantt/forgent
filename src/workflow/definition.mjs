@@ -147,8 +147,9 @@ function normalizeTemplate(template, label, allowPrefer) {
     ...(template.timeoutMs !== undefined ? { timeoutMs: template.timeoutMs } : {}),
     ...(template.verify !== undefined ? { verify: template.verify.trim() } : {}),
     ...(template.skills !== undefined ? { skills: Object.freeze([...new Set(template.skills.map((skill) => skill.trim()))]) } : {}),
-    // Shape is checked by the Unit contract (validateUnit) before a units file gets here and again at run.
+    // Shape of prefer and plan is checked by the Unit contract (validateUnit) before a units file gets here and again at run.
     ...(allowPrefer && template.prefer !== undefined ? { prefer: Object.freeze(structuredClone(template.prefer)) } : {}),
+    ...(allowPrefer && template.plan !== undefined ? { plan: Object.freeze({ ...template.plan }) } : {}),
     params: template.params === undefined ? undefined : structuredClone(template.params),
     ...(template.seats !== undefined ? { seats: Object.freeze(template.seats.map((entry) => Object.freeze({ ...entry }))) } : {}),
     contextRefs,

@@ -529,6 +529,26 @@ test('a writing unit whose controller died between its scheduling and its Unit r
   assert.equal(next.branch, old.branch);
 });
 
+test('workflow start --plan/--phase reaches every Unit that names no plan of its own; a units file plan wins and a missing plan directory is refused before any run', async () => {
+  const tmp = setupRepo();
+  for (const dir of ['plans/261118-0900-run-plan', 'plans/261118-0901-own-plan']) fs.mkdirSync(path.join(tmp, dir), { recursive: true });
+  const file = unitsFile(tmp, [
+    { id: 'own', objective: 'Read the readme', capability: 'docs:write', plan: { dir: 'plans/261118-0901-own-plan', phase: '2' } },
+    { id: 'given', objective: 'Read the readme again', capability: 'docs:write' },
+  ]);
+  const state = await startWorkflow({ unitsPath: file, plan: 'plans/261118-0900-run-plan', phase: '3', ...opts(tmp) });
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+  assert.deepEqual(unitRecordOf(tmp, state.steps.own.units.own.unitRunId).unit.plan, { dir: 'plans/261118-0901-own-plan', phase: '2' });
+  assert.deepEqual(unitRecordOf(tmp, state.steps.given.units.given.unitRunId).unit.plan, { dir: 'plans/261118-0900-run-plan', phase: '3' });
+
+  const runsBefore = fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs')).length;
+  await assert.rejects(() => startWorkflow({ unitsPath: file, plan: 'plans/261118-0902-missing', ...opts(tmp) }), /plan "plans\/261118-0902-missing" is not an existing plan directory/);
+  await assert.rejects(() => startWorkflow({ unitsPath: file, phase: '3', ...opts(tmp) }), /--phase needs --plan/);
+  const missingOwn = unitsFile(tmp, [{ id: 'u', objective: 'x', capability: 'docs:write', plan: { dir: 'plans/261118-0903-gone' } }]);
+  await assert.rejects(() => startWorkflow({ unitsPath: missingOwn, ...opts(tmp) }), /plan "plans\/261118-0903-gone" is not an existing plan directory/);
+  assert.equal(fs.readdirSync(path.join(tmp, '.fgos', 'workflow-runs')).length, runsBefore, 'a refused start leaves no run');
+});
+
 test('a unit\'s verify in a units file reaches the Unit and runs in its worktree', async () => {
   const tmp = setupRepo();
   useTwoFamilies(tmp);

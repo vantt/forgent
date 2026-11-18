@@ -127,16 +127,18 @@ test('a unit naming syncBase is refused instead of losing the sync: a workflow u
   assert.throws(() => translateUnitsToWorkflow(file), (e) => e instanceof RunnerConfigError && /syncBase is not carried by a workflow unit/.test(e.message) && /fgos run --unit/.test(e.message));
 });
 
-test('a unit\'s verify and skills are carried into the workflow unit template', () => {
+test('a unit\'s verify, skills and plan are carried into the workflow unit template', () => {
   const file = unitsFile('checked.json', [
-    { id: 'one', objective: 'First', capability: 'docs:write', verify: 'make check', skills: ['docs-seeker', 'docs-seeker'] },
+    { id: 'one', objective: 'First', capability: 'docs:write', verify: 'make check', skills: ['docs-seeker', 'docs-seeker'], plan: { dir: 'plans/261118-0936-ops-metrics', phase: 3 } },
     { id: 'two', objective: 'Second', capability: 'docs:write' },
   ]);
   const wf = translateUnitsToWorkflow(file);
   assert.equal(wf.steps[0].units[0].template.verify, 'make check');
   assert.deepEqual([...wf.steps[0].units[0].template.skills], ['docs-seeker']);
+  assert.deepEqual(wf.steps[0].units[0].template.plan, { dir: 'plans/261118-0936-ops-metrics', phase: '3' });
   assert.equal('verify' in wf.steps[1].units[0].template, false);
   assert.equal('skills' in wf.steps[1].units[0].template, false);
+  assert.equal('plan' in wf.steps[1].units[0].template, false);
 });
 
 test('a workflow definition refuses a unit template with an empty verify or a malformed skills list', () => {

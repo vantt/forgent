@@ -2067,6 +2067,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           timeout: flags.timeout === undefined ? undefined : requireField(flags.timeout, '--timeout requires a duration, e.g. 90m or 5400s'),
           account: flags.account === undefined ? undefined : requireField(flags.account, '--account requires pool/account (an account of a pool in ~/.fgos/private/accounts.yaml, for example openai/work)'),
           request: text(flags.request),
+          // --plan <plans/dir> [--phase <id>]: recorded on every unit that names no plan of its own (checked like fgos run's).
+          plan: flags.plan,
+          phase: flags.phase,
           stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
           contextRefs: flags['context-ref'],
           // --frame k=v,k=v: narrows the guide's frame defaults for this case, never widens them.

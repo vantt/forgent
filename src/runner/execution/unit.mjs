@@ -61,6 +61,35 @@ export function normalizeWorkflowLink(value) {
   return Object.freeze({ caseId, activity, reservationId: text('reservationId') });
 }
 
+const PLAN_PHASE_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+
+/**
+ * The plan a Unit run belongs to: `{ dir, phase }`, where `dir` is the repo-relative `plans/<name>` directory
+ * (a bare `<name>` or a trailing slash reads as the same directory) and `phase` is the phase id inside it (a whole
+ * number reads as its digits), or null for a run that names the plan only. A phase without a plan is refused.
+ * Absent input reads as no plan. Only the shape is checked here: whether `<name>` is a valid plan name is the
+ * Convention rule, checked with the directory's existence by every door that takes a plan (`existingPlanRef`).
+ */
+export function normalizePlanRef(value) {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== 'object' || Array.isArray(value) || typeof value.dir !== 'string') {
+    throw new RunnerConfigError('unit.plan must be { dir, phase? } with dir a plans/<name> directory.');
+  }
+  const trimmed = value.dir.trim().replace(/^\.\//, '').replace(/\/+$/, '');
+  const dir = trimmed.startsWith('plans/') ? trimmed : `plans/${trimmed}`;
+  const name = dir.slice('plans/'.length);
+  if (!name || name.includes('/') || name.includes('\\') || name === '.' || name === '..') {
+    throw new RunnerConfigError(`unit.plan.dir must be one plans/<name> directory, got: ${JSON.stringify(value.dir)}.`);
+  }
+  if (value.phase === undefined || value.phase === null) return Object.freeze({ dir, phase: null });
+  // A YAML or JSON file writes `phase: 3` as a number; it names the same phase as "3".
+  const phase = typeof value.phase === 'string' ? value.phase.trim() : Number.isInteger(value.phase) && value.phase >= 0 ? String(value.phase) : value.phase;
+  if (typeof phase !== 'string' || !PLAN_PHASE_PATTERN.test(phase)) {
+    throw new RunnerConfigError(`unit.plan.phase must be a phase id (letters, digits, ".", "_", "-"), got: ${JSON.stringify(value.phase)}.`);
+  }
+  return Object.freeze({ dir, phase });
+}
+
 /** A safe repo-relative path: a non-empty string, not absolute, no `..` segment, backslash or null byte. */
 function isValidRepoRelativePath(p) {
   if (typeof p !== 'string' || !p.trim() || p.startsWith('/')) return false;
@@ -111,6 +140,7 @@ function isSyncRef(ref) {
  *   exit, or running past `runner.timeoutMs`, is a failed verify. Absent: nothing is verified.
  * - skills?: skill names the work needs; only executors whose `supports.skills` lists all of them bind
  *   (checker and panel roles are not asked for them)
+ * - plan?: `{ dir, phase? }`, the plans/<name> directory (and phase id) the run serves; only recorded, never read by execution
  * - syncBase?: ref the runner merges into the unit's branch before the worker runs (needs writes)
  * - syncOnly?: set when a unit with a syncBase leaves out its objective: no worker unless the merge conflicts
  * - tier?: the ladder tier a registered workflow definition recommends for every seat of the unit (unit files and stdin are refused it before this runs)
@@ -244,6 +274,8 @@ export function validateUnit(raw) {
     throw new RunnerConfigError('unit.verify must be a non-empty shell command string when present.');
   }
 
+  const plan = normalizePlanRef(raw.plan);
+
   let skills;
   if (raw.skills !== undefined) {
     if (!Array.isArray(raw.skills) || raw.skills.length === 0 || raw.skills.some((skill) => typeof skill !== 'string' || !skill.trim())) {
@@ -275,6 +307,7 @@ export function validateUnit(raw) {
     ...(raw.timeoutMs !== undefined ? { timeoutMs: raw.timeoutMs } : {}),
     ...(raw.verify !== undefined ? { verify: raw.verify.trim() } : {}),
     ...(skills !== undefined ? { skills } : {}),
+    ...(plan !== null ? { plan } : {}),
     ...(syncBase !== undefined ? { syncBase } : {}),
     ...(syncOnly ? { syncOnly: true } : {}),
     inputs: Object.freeze(inputs),

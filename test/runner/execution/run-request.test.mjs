@@ -7,6 +7,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { requestFromFlags, RunRequestError, buildRunRequest, foldRunSetting } from '../../../src/runner/execution/run-request.mjs';
 import { resolveGitRoots } from '../../../src/runner/execution/run.mjs';
+import { validateUnit } from '../../../src/runner/execution/unit.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/runner-config-error.mjs';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
@@ -350,4 +351,29 @@ test('buildRunRequest refuses a writing run from inside a dispatched worker when
   } finally {
     if (before === undefined) delete process.env.FGOS_DISPATCH_DEPTH; else process.env.FGOS_DISPATCH_DEPTH = before;
   }
+});
+
+test('buildRunRequest stores --plan and --phase on the unit a prompt stands for, and a run without them has no plan', () => {
+  const root = runRepo();
+  fs.mkdirSync(path.join(root, 'plans', '261118-0936-ops-metrics'), { recursive: true });
+  const { unitData } = build(root, { plan: 'plans/261118-0936-ops-metrics/', phase: '3' }, ['Check it']);
+  assert.deepEqual(unitData.plan, { dir: 'plans/261118-0936-ops-metrics', phase: '3' });
+  assert.deepEqual(validateUnit(unitData).plan, { dir: 'plans/261118-0936-ops-metrics', phase: '3' });
+  assert.deepEqual(build(root, { plan: '261118-0936-ops-metrics' }, ['Check it']).unitData.plan, { dir: 'plans/261118-0936-ops-metrics', phase: null });
+  assert.equal('plan' in build(root, {}, ['Check it']).unitData, false);
+});
+
+test('buildRunRequest refuses a --plan whose name breaks the Convention plan rule or that is not a real plan directory, a --phase without a plan, and plan flags beside --unit or --resume', () => {
+  const root = runRepo();
+  fs.mkdirSync(path.join(root, 'plans'));
+  refusal(root, { plan: 'plans/missing' }, ['Check it'], /plan "plans\/missing" is not a plan directory name: .*invalid-plan-dir/);
+  refusal(root, { plan: 'plans/261118-0000-missing' }, ['Check it'], /plan "plans\/261118-0000-missing" is not an existing plan directory/);
+  fs.mkdirSync(path.join(root, 'elsewhere'));
+  fs.symlinkSync(path.join(root, 'elsewhere'), path.join(root, 'plans', '261118-0001-linked'));
+  refusal(root, { plan: 'plans/261118-0001-linked' }, ['Check it'], /is not an existing plan directory/);
+  refusal(root, { plan: '../etc' }, ['Check it'], /unit\.plan\.dir must be one plans\/<name> directory/);
+  refusal(root, { plan: true }, ['Check it'], /--plan requires a plans\/<dir> directory/);
+  refusal(root, { phase: '3' }, ['Check it'], /--phase needs --plan/);
+  refusal(root, { unit: 'x.yaml', plan: 'plans/a' }, [], /--plan only applies to fgos run "<prompt>"/);
+  refusal(root, { resume: 'unit-run-1', phase: '3' }, [], /--phase only applies to fgos run "<prompt>"/);
 });

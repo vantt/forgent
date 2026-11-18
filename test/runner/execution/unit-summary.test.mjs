@@ -589,3 +589,25 @@ test('unpinned record with unknown non-null custom pattern does not fall back to
   const summary = buildUnitSummary(dir);
   assert.equal(summary.outcome, 'undetermined');
 });
+
+test('an attempt carries its account, wall time and usage as stored, and the summary carries the plan the unit named', (t) => {
+  const usage = { inputTokens: 10, outputTokens: 5, totalTokens: 15, source: 'test' };
+  const { dir } = fixture(t, {
+    unit: { id: 'question', capability: 'question:answer', pattern: 'panel', stanceOptions: ['a', 'b'], plan: { dir: 'plans/261118-0936-ops-metrics', phase: '3' } },
+    settlement: { outcome: 'pass', settledAt },
+    bindings: { 'panelist-1/1': [{ assignmentId: 'unit-run-synthetic/panelist-1/1', leaseReceipt: { accountId: 'work' }, durationMs: 1234 }] },
+  });
+  result(dir, 'panelist-1', '1', '01', { assignmentId: 'unit-run-synthetic/panelist-1/1', durationMs: 999, usage });
+  result(dir, 'synthesizer', '1', '01', { agentClaim: {} });
+  const summary = buildUnitSummary(dir);
+  assert.deepEqual(summary.plan, { dir: 'plans/261118-0936-ops-metrics', phase: '3' });
+  const [stored, bare] = summary.seats.map((seat) => seat.final);
+  assert.deepEqual([stored.accountId, stored.durationMs, stored.usage], ['work', 1234, usage], 'the binding is the one source of duration and account; the result\'s own durationMs is never read');
+  assert.deepEqual(['accountId', 'durationMs', 'usage'].map((key) => key in bare), [false, false, false], 'a fact never stored is absent, never zero or null');
+});
+
+test('a unit without a plan keeps a summary with no plan key', (t) => {
+  const { dir } = fixture(t, { settlement: { outcome: 'pass', settledAt } });
+  result(dir, 'panelist-1', '1', '01');
+  assert.equal('plan' in buildUnitSummary(dir), false);
+});

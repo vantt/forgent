@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { publishMutableProjection } from '../../native/proof-helpers.mjs';
 import { readUnitRunSeats } from './unit-run-history.mjs';
-import { normalizeWorkflowLink } from './unit.mjs';
+import { normalizeWorkflowLink, normalizePlanRef } from './unit.mjs';
 import { patternHistoryOutcome } from './loops/history-outcome.mjs';
 import { VALID_OUTCOMES, UNDETERMINED_OUTCOME } from './outcome.mjs';
 import { seatsOfRecord, collaborationOfRecord } from './legacy-seat-read.mjs';
@@ -40,6 +40,10 @@ export function extractStance(agentClaim, options = []) {
 
 function timestamp(value) {
   return typeof value === 'string' && Number.isFinite(Date.parse(value)) ? value : null;
+}
+
+function planRef(value) {
+  try { return normalizePlanRef(value); } catch { return null; }
 }
 
 function workflowLink(value) {
@@ -104,6 +108,11 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
       const executor = result.executorId ?? binding.executor ?? null;
       const settledAt = timestamp(result.settledAt) ?? timestamp(result.timestamp);
       if (settledAt) settlementTimes.push(settledAt);
+      // Facts copied as stored, each from its one source on the binding record: Execution's wall time of the attempt and
+      // the account its lease receipt named; and the token usage the settled result carries. Absent means not known, never zero.
+      const durationMs = Number.isInteger(recordedBinding?.durationMs) && recordedBinding.durationMs >= 0 ? recordedBinding.durationMs : undefined;
+      const leaseAccount = recordedBinding?.leaseReceipt?.accountId;
+      const accountId = typeof leaseAccount === 'string' && leaseAccount ? leaseAccount : null;
       return {
         assignmentId: result.assignmentId ?? attempt.assignmentId,
         runId: result.runId ?? null,
@@ -113,6 +122,9 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
         model: result.policy?.model ?? binding.model ?? null,
         outcome: attempt.outcome,
         fallbackFrom: recordedBinding?.fallbackFrom ?? binding.provenance?.fallbackFrom ?? null,
+        ...(accountId !== null ? { accountId } : {}),
+        ...(durationMs !== undefined ? { durationMs } : {}),
+        ...(result.usage && typeof result.usage === 'object' ? { usage: result.usage } : {}),
       };
     };
     return {
@@ -147,6 +159,7 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
     contract: UNIT_SUMMARY_CONTRACT,
     unitRunId,
     workflow: workflowLink(record.workflow) ?? workflowLink(legacyCompletion?.workflow),
+    ...(planRef(record.unit?.plan) ? { plan: planRef(record.unit.plan) } : {}),
     pattern: pattern === null || typeof pattern === 'string' ? pattern : decoded?.selector ?? pattern.pattern ?? null,
     capability: record.unit?.capability ?? null,
     outcome,

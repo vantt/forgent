@@ -83,6 +83,7 @@ export function translateUnitsToWorkflow(unitsPath) {
           ...(unit.timeoutMs !== undefined ? { timeoutMs: unit.timeoutMs } : {}),
           ...(unit.verify !== undefined ? { verify: unit.verify } : {}),
           ...(unit.skills !== undefined ? { skills: [...unit.skills] } : {}),
+          ...(unit.plan !== undefined ? { plan: { ...unit.plan } } : {}),
           contextRefs: [...unit.inputs],
           ...(unit.stanceOptions !== undefined ? { stanceOptions: [...unit.stanceOptions] } : {}),
           ...(unit.anonymizeInputs ? { anonymizeInputs: true } : {}),

@@ -3408,7 +3408,7 @@
     },
     {
       "name": "run",
-      "invoke": "fgos run [\"<prompt>\" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] [--input <a>,<b>] [--verify \"<cmd>\"] [--sync <ref>] | --sync <ref> --writes <a>,<b> | --unit <file|-> | --resume <unitRunId>] [--pattern <name>] [--params <json>] [--param <k=v>] [--reason <text>] [--override <json>] [--effort <low|medium|high|max>] [--timeout <dur>] [--account <pool/account>] [--worktree <wt>] [--dir <mainRoot>] [--json]",
+      "invoke": "fgos run [\"<prompt>\" [--provider <id>[,<id>...]] [--persona <name>] [--writes <a>,<b>] [--capability <c>] [--rigor <r>] [--input <a>,<b>] [--verify \"<cmd>\"] [--plan <plans/dir> [--phase <id>]] [--sync <ref>] | --sync <ref> --writes <a>,<b> | --unit <file|-> | --resume <unitRunId>] [--pattern <name>] [--params <json>] [--param <k=v>] [--reason <text>] [--override <json>] [--effort <low|medium|high|max>] [--timeout <dur>] [--account <pool/account>] [--worktree <wt>] [--dir <mainRoot>] [--json]",
       "description": "Door for one task: `fgos run \"<prompt>\"` builds one Unit from the prompt (read-only unless --writes) and runs it headless through a collaboration pattern (solo, reviewed, panel, debate); `--unit <file>` runs one Unit you wrote, `--resume` continues a unit run. Planned work -- several Units with an order, or a registered preset such as a panel discussion -- takes the other door, `fgos workflow start <preset>|--units <file>`.",
       "parameters": {
         "type": "object",
@@ -3451,6 +3451,14 @@
           "verify": {
             "type": "string",
             "description": "One-liner: shell command run in the worktree after each producing round of a reviewed run (Unit field verify); a non-zero exit, or running past runner.timeoutMs, is a failed verify. Without one, nothing is verified and the result says so."
+          },
+          "plan": {
+            "type": "string",
+            "description": "One-liner: the plan this run serves, an existing plans/<dir> directory (Unit field plan). Recorded on the unit run and its unit summary so metrics can group runs by plan; a run without it stays valid. A --unit file sets plan per Unit instead."
+          },
+          "phase": {
+            "type": "string",
+            "description": "One-liner: the phase id inside --plan this run serves (Unit field plan.phase); needs --plan."
           },
           "sync": {
             "type": "string",
@@ -5227,6 +5235,14 @@
               "request": {
                 "type": "string",
                 "description": "The owner request this run serves; every unit receives it in its objective."
+              },
+              "plan": {
+                "type": "string",
+                "description": "The plan this run serves, an existing plans/<dir> directory, recorded as Unit field plan on every unit that names no plan of its own (a units file may set plan per Unit) and on its unit summary; checked the same way as fgos run --plan."
+              },
+              "phase": {
+                "type": "string",
+                "description": "The phase id inside --plan this run serves (Unit field plan.phase); needs --plan."
               },
               "stance-options": {
                 "type": "string",

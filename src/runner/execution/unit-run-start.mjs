@@ -21,6 +21,7 @@ import { assertRunTimeoutMs, runnerOriginsOf } from '../dispatch/config.mjs';
 import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
 import { AgentNotFoundError, pinPersona } from '../agent-definitions.mjs';
 import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
+import { existingPlanRef } from './run-request.mjs';
 import { CaseAdmissionRefusedError, PORT_MISSING } from './case-admission-port.mjs';
 import { assertPinnedAccountsUsable } from './account-pin.mjs';
 import { preflightOf } from './bind.mjs';
@@ -371,6 +372,8 @@ export async function admitFreshUnit({ options, scope, mainRoot, worktreePath, c
     assertNoUnitTier(raw, 'a unit file');
   }
   const unit = validateUnit(options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.stanceOptions });
+  // A unit file's plan gets the check `--plan` gets (a prompt-built or workflow unit's plan was checked by its door).
+  if (!options.unitData) existingPlanRef(unit.plan, mainRoot);
   assertRepository(writesWorktree(unit, unit.syncBase));
 
   let collaboration;

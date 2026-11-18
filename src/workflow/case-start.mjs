@@ -23,6 +23,7 @@ import { providerAccountInventory } from '../runner/dispatch/provider-capacity.m
 import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
 import { parseAccountPin } from '../runner/execution/account-pin.mjs';
 import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
+import { existingPlanRef, planFromFlags } from '../runner/execution/run-request.mjs';
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
 import { ADVANCE_DETACHED_ENV } from './case-lock.mjs';
 import { assertWriteChains, workflowCheckout, workflowCommit } from './unit-handoff.mjs';
@@ -156,6 +157,24 @@ export function detachedResult({ mainRoot, workflowRunId, detached }) {
 }
 
 /**
+ * The definition with every unit's `plan` checked (an existing plans/<dir>) and, where a unit names none, the run's
+ * `--plan`/`--phase` given to it. A unit's own plan (a units file sets one per Unit) wins over the run's.
+ */
+function withPlan(workflow, runPlan, mainRoot) {
+  const units = workflow.steps.flatMap((step) => step.units ?? []);
+  for (const unit of units) existingPlanRef(unit.template.plan, mainRoot);
+  if (runPlan === undefined || units.every((unit) => unit.template.plan !== undefined)) return workflow;
+  return Object.freeze({
+    ...workflow,
+    steps: Object.freeze(workflow.steps.map((step) => (!step.units ? step : Object.freeze({
+      ...step,
+      units: Object.freeze(step.units.map((unit) => (unit.template.plan !== undefined ? unit
+        : Object.freeze({ ...unit, template: Object.freeze({ ...unit.template, plan: runPlan }) })))),
+    })))),
+  });
+}
+
+/**
  * Resolve everything a start needs without touching the store: the roots, the definition to run
  * (the registered one, or that one rebuilt with `params.seats`), and the shared context refs.
  * A refused request throws here, so it creates no run.
@@ -224,6 +243,8 @@ function resolveStart(params) {
     ({ workflow, provenance: seats } = expandWorkflowSeats(workflow, params.seats, { contextRefs, personas, loopOf: loopFn }));
     seats = { ...seats, refDigests: digestContextRefs(contextRefs, worktreePath) };
   }
+  // After --seats: a rebuilt definition is validated anew, which keeps no plan.
+  workflow = withPlan(workflow, planFromFlags({ plan: params.plan, phase: params.phase }, mainRoot), mainRoot);
   const allRefs = [...contextRefs, ...workflow.steps.flatMap((step) => step.units.flatMap((unit) => unit.template.contextRefs || []))];
   if (allRefs.some((ref) => !/^(unit-run:|gate-answer:)/.test(ref)) && mainRoot !== worktreePath
       && resolveGitRoots(mainRoot).mainCheckoutRoot !== resolveGitRoots(worktreePath).mainCheckoutRoot) {

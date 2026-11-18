@@ -74,6 +74,19 @@ test('an anonymized input that cannot be copied is refused before any unit direc
   assert.deepEqual(fs.existsSync(assignmentsDir) ? fs.readdirSync(assignmentsDir) : [], before);
 });
 
+test('a unit file whose plan is not an existing plan directory is refused like --plan, before any unit directory exists', async () => {
+  const { repoRoot } = setupGitRepo();
+  const unitFile = path.join(repoRoot, '.fgos', 'plan-unit.json');
+  fs.mkdirSync(path.dirname(unitFile), { recursive: true });
+  fs.writeFileSync(unitFile, JSON.stringify({ id: 'u-plan', objective: 'Read the readme', capability: 'docs:write', plan: { dir: 'plans/261118-0904-absent', phase: '1' } }));
+  await assert.rejects(
+    () => runUnit({ unitPath: unitFile, repoRoot, cwd: repoRoot, pattern: 'solo' }),
+    (err) => err instanceof RunnerConfigError && /plan "plans\/261118-0904-absent" is not an existing plan directory/.test(err.message),
+  );
+  const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
+  assert.equal(fs.existsSync(assignmentsDir) && fs.readdirSync(assignmentsDir).some((name) => name.startsWith('unit-run-')), false);
+});
+
 test('a unit-run input that cannot be resolved is refused before any unit directory exists', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');

@@ -2,6 +2,7 @@
 // `buildRunRequest`, which checks every flag of the three ways to run (a "<prompt>", --unit, --resume) and builds
 // the options `runUnit` takes, so a wrong flag leaves no unit run behind. The shell only parses flags and prints.
 
+import fs from 'node:fs';
 import path from 'node:path';
 import { randomBytes } from 'node:crypto';
 import { parseListFlag } from '../../cli/parse-args.mjs';
@@ -10,6 +11,8 @@ import { loadRunnerConfigForDir, parseRunTimeout } from '../dispatch/config.mjs'
 import { RunnerConfigError } from '../dispatch/runner-config-error.mjs';
 import { resolveAgentDefinition } from '../agent-definitions.mjs';
 import { currentDispatchDepth } from '../dispatch/adapters.mjs';
+import { normalizePlanRef } from './unit.mjs';
+import { planDirNameProblem } from '../../convention/convention-client.mjs';
 
 // A flag that is bare (`--flag` with no value) or empty means no value was given: refused, never passed on.
 function requireField(value, message) {
@@ -164,9 +167,38 @@ function overridesFromFlags(flags, resumeUnitRunId) {
 }
 
 /**
+ * A Unit's `plan` as every door that takes one checks it: `normalizePlanRef`, its name passes the Convention plan
+ * rule (asked of the Convention provider, never re-checked here), and `plans/<name>` is a real directory, not a
+ * link, under the project's main checkout. Absent input reads as no plan (null).
+ */
+export function existingPlanRef(value, mainRoot) {
+  const plan = normalizePlanRef(value);
+  if (plan === null) return null;
+  const problem = planDirNameProblem(plan.dir.slice('plans/'.length), { dir: mainRoot });
+  if (problem !== null) throw new RunnerConfigError(`plan "${value.dir}" is not a plan directory name: ${problem}`);
+  if (!fs.lstatSync(path.join(mainRoot, plan.dir), { throwIfNoEntry: false })?.isDirectory()) {
+    throw new RunnerConfigError(`plan "${value.dir}" is not an existing plan directory: ${plan.dir} is not under ${mainRoot}`);
+  }
+  return plan;
+}
+
+/**
+ * `--plan <dir> [--phase <id>]`: the plan a run serves, as the `plan` a Unit stores. The directory must exist
+ * under the project's `plans/`; no flag means no plan, and a phase without a plan is refused. Shared by
+ * `fgos run` and `fgos workflow start`.
+ */
+export function planFromFlags(flags, mainRoot) {
+  if (flags.plan === undefined && flags.phase === undefined) return undefined;
+  const dir = requireField(flags.plan, flags.plan === undefined ? '--phase needs --plan <plans/dir>: a phase is a part of a plan' : '--plan requires a plans/<dir> directory, e.g. --plan plans/261118-0936-ops-metrics');
+  const phase = flags.phase === undefined ? undefined : requireField(flags.phase, '--phase requires a phase id, e.g. --phase 3');
+  return existingPlanRef({ dir, phase: phase === undefined ? undefined : String(phase) }, mainRoot);
+}
+
+/**
  * The Unit `fgos run "<prompt>"` stands for: the prompt is its objective, `--writes` its write scope
  * (none: a read-only unit), `--provider` its soft executor preference, `--persona` its persona,
- * `--input` the files it is handed (Unit `inputs`) and `--verify` the command that checks its work.
+ * `--input` the files it is handed (Unit `inputs`), `--verify` the command that checks its work and
+ * `--plan`/`--phase` the plan and phase it serves.
  * Every flag is checked against the config and the persona tiers here. A writing unit needs a linked
  * worktree; this never creates one.
  */
@@ -209,6 +241,7 @@ function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }) {
       throw new RunnerConfigError(err.message);
     }
   }
+  const plan = planFromFlags(flags, mainRoot);
   return {
     id: `adhoc-${slugOf(syncOnly ? `sync-${syncBase}` : prompt, 'task')}-${randomBytes(2).toString('hex')}`,
     ...(syncOnly ? {} : { objective: prompt }),
@@ -220,6 +253,7 @@ function adhocUnitFromPrompt(prompt, flags, { mainRoot, isLinkedWorktree }) {
     ...(flags.persona !== undefined ? { persona: flags.persona } : {}),
     ...(inputs.length > 0 ? { inputs } : {}),
     ...(flags.verify !== undefined ? { verify: requireField(flags.verify, '--verify requires a command, e.g. --verify "npm test"') } : {}),
+    ...(plan !== undefined ? { plan } : {}),
   };
 }
 
@@ -260,7 +294,7 @@ function refuseConflictingFlags(flags, positional) {
     throw new RunnerConfigError('--sync only applies to fgos run "<prompt>" or a bare --sync <ref>; a --unit file names syncBase, and a resume keeps the sync it started with');
   }
   const buildsUnit = prompt !== undefined || flags.sync !== undefined;
-  const promptOnlyFlag = !buildsUnit && ['provider', 'persona', 'writes', 'capability', 'rigor', 'input', 'verify'].find((f) => flags[f] !== undefined);
+  const promptOnlyFlag = !buildsUnit && ['provider', 'persona', 'writes', 'capability', 'rigor', 'input', 'verify', 'plan', 'phase'].find((f) => flags[f] !== undefined);
   if (promptOnlyFlag) throw new RunnerConfigError(`--${promptOnlyFlag} only applies to fgos run "<prompt>"`);
 }
 

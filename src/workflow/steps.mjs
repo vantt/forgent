@@ -47,6 +47,7 @@ export function unitFieldsOfTemplate(template) {
     ...(template.timeoutMs !== undefined ? { timeoutMs: template.timeoutMs } : {}),
     ...(template.verify !== undefined ? { verify: template.verify } : {}),
     ...(template.skills !== undefined ? { skills: template.skills } : {}),
+    ...(template.plan !== undefined ? { plan: template.plan } : {}),
   };
 }
 

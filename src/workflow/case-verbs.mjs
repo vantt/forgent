@@ -114,6 +114,8 @@ function handOff({ mainRoot, workflowRunId, worktreePath, options }) {
  * @param {string} [params.unitsPath] Path to a units file (YAML/JSON list of Units), one step per Unit
  * @param {string} [params.effort] Reasoning effort every unit asks for (low, medium, high, max)
  * @param {string} [params.request] The owner's request this run serves; given to every unit
+ * @param {string} [params.plan] The plans/<dir> the run serves (`--plan`), recorded on every unit that names no plan of its own
+ * @param {string} [params.phase] The phase id inside `params.plan` (`--phase`); needs `params.plan`
  * @param {object | string} [params.frame] Counts and floor that narrow the guide's frame defaults, never widen them; or the `--frame` text `key=value,key=value`
  * @param {string[] | string} [params.seats] Ordered entries, or the `--seats` text split on "|" (lenses or `@name` personas): rebuild the base with one panel seat per entry (see seats.mjs)
  * @param {string} [params.repoRoot]

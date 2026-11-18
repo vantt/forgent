@@ -67,6 +67,15 @@
         }
       ]
     },
+    "plan": {
+      "description": "Optional, additive (version stays 3), like verify. The plan and phase the run was started for (fgos run or fgos workflow start --plan <dir> --phase <id>, or a unit file's plan). Absent means the run named no plan, never an unknown one; phase is null when only the plan was named.",
+      "type": "object",
+      "required": ["dir", "phase"],
+      "properties": {
+        "dir": {"type": "string", "pattern": "^plans/[^/]+$", "description": "plans/<name>; the Convention plan rule ({YYMMDD-HHMM}-{slug}) is checked by the door that took the plan (fgos run, fgos workflow start), not restated here."},
+        "phase": {"type": ["string", "null"], "minLength": 1}
+      }
+    },
     "startedAt": {"$ref": "#/definitions/nullableString", "description": "Unit creation time, used only for duration; never a substitute for settlement."},
     "settledAt": {"type": "string", "minLength": 1, "description": "Required owner settlement time; historical null timestamps are skipped, never creation-derived."},
     "stanceOptions": {"type": "array", "items": {"type": "string", "minLength": 1}},
@@ -111,6 +120,9 @@
         "persona": {"$ref": "#/definitions/nullableString"},
         "model": {"$ref": "#/definitions/nullableString"},
         "outcome": {"type": "string", "minLength": 1, "description": "Owner vocabulary: pass, findings, blocked, policy-refusal, provider-limit or execution-failure."},
+        "accountId": {"type": "string", "minLength": 1, "description": "Optional, additive. The provider account the lease named for the attempt, copied from the lease receipt Execution kept on the attempt. Absent means not recorded (no lease, or a record written before it was kept)."},
+        "durationMs": {"type": "integer", "minimum": 0, "description": "Optional, additive. Wall time of the attempt as Execution timed it, from handing the seat to Dispatch to getting its settled result back. Absent means not recorded, never zero."},
+        "usage": {"type": "object", "description": "Optional, additive. The usage object of the attempt's settled run result, passed through unchanged. Absent means the result carried none."},
         "fallbackFrom": {"$ref": "#/definitions/fallback", "description": "Original execution-owner fallback provenance object, preserved unchanged; repeated/resumed runs without fallback provenance do not count as fallback seats."}
       }
     },
