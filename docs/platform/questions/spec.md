@@ -10,6 +10,7 @@ Canonical: Yes for the scope below, from the day the plan lands
 Owner: Questions component (proposed)
 Source (planned): packages/questions/rust (crate fgos-questions)
 Contracts: packages/questions/contracts/ and packages/questions/rust/observe-kinds.json
+Provenance: docs/discussions/owner-questions/DISCUSSION.md and plans/261118-1159-owner-question-store/plan.md at 4f8243230 (2026-11-18)
 Writer type: Agent draft writer
 Canonical for: The question entity, its states, its Event Store consumer, its verbs, who may answer, ack and cancel, its refusals, its events and its receipt hook
 Use this when: Asking, answering or listing owner questions, or changing how a session learns an answer
@@ -134,7 +135,7 @@ Each refusal is a stable code with an exit category from `packages/host-runtime/
   handle, role, persona, pane and machine, the origin ref, `answeredAt`, `by` and `via`. An Observe write would stay on
   the machine that answered and keep a second copy; the projection reads what has synced.
 - The detection `question-answered` (answered and not acked, an anti-join over this source) is defined later in
-  `core/questions/definitions/`; the action belongs to the supervisor plan.
+  a planned query definition file under core/questions (plan phase 5); the action belongs to the supervisor plan.
 
 ## 8. Hook
 
