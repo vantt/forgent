@@ -18,7 +18,6 @@ const dirs = (dir) => { try { return fs.readdirSync(dir, { withFileTypes: true }
 const uniq = (xs) => [...new Set(xs.filter(Boolean))];
 const real = (p) => { try { return fs.realpathSync(p); } catch { return path.resolve(p); } };
 // Local on purpose: the reconcile import graph is an exact list, and `runner/paths.mjs` would pull the git and worktree closure into it.
-const fgosDir = (root) => fgosDirFromRoot(root);
 
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';
@@ -67,7 +66,7 @@ export function allRuns(root, opts = {}) {
     return store.get(normRoot);
   }
 
-  const base = fgosDir(root), out = [];
+  const base = fgosDirFromRoot(root), out = [];
   for (const { assignmentId, attempt, runDir } of listAssignmentRuns(base)) {
     const run = json(path.join(runDir, 'run.json'));
     out.push({ kind: 'assignment-run', assignmentId, attempt, runDir, run, malformed: !run || typeof run !== 'object' || Array.isArray(run) });
@@ -109,12 +108,12 @@ function admissions(dir) {
   return { records, corrupt };
 }
 function assignmentEvidence(root, assignmentId, all) {
-  const dir = path.join(fgosDir(root), 'assignments', assignmentId), facts = admissions(dir), records = all.filter((l) => l.assignmentId === assignmentId), malformed = records.filter((l) => l.malformed), runs = records.filter((l) => !l.malformed), byId = new Map();
+  const dir = path.join(fgosDirFromRoot(root), 'assignments', assignmentId), facts = admissions(dir), records = all.filter((l) => l.assignmentId === assignmentId), malformed = records.filter((l) => l.malformed), runs = records.filter((l) => !l.malformed), byId = new Map();
   for (const l of runs) { const candidates = byId.get(l.run.runId) ?? []; candidates.push(l); byId.set(l.run.runId, candidates); }
   const admitted = new Set(facts.records.map((record) => record.runId)), unadmitted = runs.filter((l) => !admitted.has(l.run.runId)), latest = facts.records.at(-1), currentIds = latest ? facts.records.filter((r) => r.attempt === latest.attempt && r.runId !== latest.runId ? true : r === latest).map((r) => r.runId) : [], current = currentIds.flatMap((id) => byId.get(id) ?? []), absent = currentIds.filter((id) => !byId.has(id)), duplicateCurrent = currentIds.filter((id) => (byId.get(id)?.length ?? 0) > 1);
   return { facts, records, malformed, runs, byId, unadmitted, currentIds, current, absent, duplicateCurrent, incomplete: facts.corrupt || malformed.length || unadmitted.length || absent.length };
 }
-function coordinationSessionsDir(root) { return path.join(fgosDir(root), 'coordination', 'sessions'); }
+function coordinationSessionsDir(root) { return path.join(fgosDirFromRoot(root), 'coordination', 'sessions'); }
 
 /** Which coordination session (if any) lists `assignmentId` in its
  * `assignmentRefs`, read straight off `session.json` so this read-only module
@@ -134,7 +133,7 @@ export function findCoordinationSessionOwningAssignment(root, assignmentId) {
 function owner(l, root, all) {
   if (l.malformed || !l.run?.runId) return { complete: false, reason: 'corrupt' };
   if (l.kind !== 'assignment-run') return { complete: true, kind: 'standalone-run', id: l.run.runId };
-  const dir = path.join(fgosDir(root), 'assignments', l.assignmentId), assignment = json(path.join(dir, 'assignment.json')), evidence = assignmentEvidence(root, l.assignmentId, all);
+  const dir = path.join(fgosDirFromRoot(root), 'assignments', l.assignmentId), assignment = json(path.join(dir, 'assignment.json')), evidence = assignmentEvidence(root, l.assignmentId, all);
   const admitted = evidence.facts.records.some((record) => record.runId === l.run.runId);
   if (!assignment || !admitted) return { complete: false, reason: 'missing' };
   if (assignment.assignmentId !== l.assignmentId || l.run.assignmentId !== l.assignmentId) return { complete: false, reason: 'conflicting' };
@@ -144,7 +143,7 @@ function owner(l, root, all) {
   }
   const id = l.run.coordinationId ?? l.run.coordinationSessionId;
   if (!id) return { complete: true, kind: 'standalone-run', id: l.run.runId };
-  const session = json(path.join(fgosDir(root), 'coordination', 'sessions', id, 'session.json'));
+  const session = json(path.join(fgosDirFromRoot(root), 'coordination', 'sessions', id, 'session.json'));
   if (!session) return { complete: false, reason: 'missing' };
   return session && Array.isArray(session.assignmentRefs) && session.assignmentRefs.includes(l.assignmentId) ? { complete: true, kind: 'coordination-session', id } : { complete: false, reason: 'conflicting' };
 }
@@ -250,7 +249,7 @@ const missing = (kind, id, reason) => ({ inspectionStatus: 'not-found', subject:
 
 export function validateInspectionSelector(options = {}) { const supplied = [['run', options.run], ['assignment', options.assignment], ['cwd', options.cwd]].filter(([, v]) => typeof v === 'string' && v.trim()); if (options.attention === true) supplied.push(['attention', options.since]); if (supplied.length !== 1) throw new Error('dispatch inspect requires exactly one selector: --run, --assignment, --cwd, or --attention --since <time>'); if (supplied[0][0] === 'attention') { parseAttentionSince(options.since); } else if (options.since !== undefined) throw new Error('dispatch inspect --since belongs to --attention'); return { kind: supplied[0][0], id: supplied[0][1] }; }
 export function inspectDispatchRuntime(root, options = {}, { now = () => new Date().toISOString(), bypassRunsCache = false, runsCache = null } = {}) {
-  const selector = validateInspectionSelector(options), all = allRuns(root, { bypassCache: bypassRunsCache, runsCache }), base = fgosDir(root);
+  const selector = validateInspectionSelector(options), all = allRuns(root, { bypassCache: bypassRunsCache, runsCache }), base = fgosDirFromRoot(root);
   if (selector.kind === 'run') { const found = all.filter((l) => !l.malformed && l.run.runId === selector.id); if (!found.length) return missing('run', selector.id, 'No matching Run was found in registered Assignment or ad-hoc Run repositories.'); if (found.length > 1) return { ...missing('run', selector.id, 'More than one Run repository owns this run id.'), inspectionStatus: 'ambiguous', subject: { kind: 'run', id: selector.id, locations: found.map(project) }, reconciliation: { state: 'manual-required', reason: 'More than one Run repository owns this run id.' }, links: { assignmentIds: uniq(found.map((l) => l.assignmentId)), coordinationIds: [], runIds: [selector.id] } }; return one(found[0], root, now, all); }
   if (selector.kind === 'assignment') {
     const dir = assignmentDir(base, selector.id);

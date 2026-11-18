@@ -46,7 +46,7 @@ test('resolveRepoRoot throws (validation) outside a git repository', () => {
 
 test('fgosDirFromRoot joins .fgos onto an already-resolved root', () => {
   const root = path.resolve('/some/repo/root');
-  assert.equal(fgosDirFromRoot(root), fgosDirFromRoot(root));
+  assert.equal(fgosDirFromRoot(root), root + path.sep + '.fgos');
 });
 
 test('fgosDirFromRoot resolves a relative root with path.resolve before joining', () => {

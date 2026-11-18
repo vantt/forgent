@@ -230,6 +230,9 @@ const EXPECTED_CLOSURE = [
   // ... and the capped log append provider-capacity.mjs writes its audit log through (node:fs and
   // node:path only; no process control).
   'src/util/capped-jsonl-log.mjs',
+  // ... and the T0 leaf that joins .fgos onto a project root (node:path only), which the planner and
+  // runtime inspection read their state paths through.
+  'src/util/fgos-file-registry.mjs',
   // ... and the temp-name tag that log and the lock transport name their temporaries with (node:crypto and
   // node:worker_threads only).
   'src/util/unique-tmp-tag.mjs',
