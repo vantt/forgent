@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d81383b4c0b25e604d0d9acd3dedb8ed037a24391973888278c691ec2a3703a1",
+  "payloadDigest": "d1b82d7a4af0772f16e47ee909e71557e34506e8dd11f1e7865bb66c75d02a95",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1215,14 +1215,14 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "9c406b39f7d84dcb84646522e1927fafd70d2168700d61698918f3cceb88fef7",
     "src/runner/dispatch/assignment-layout.mjs": "a14f6f1b45e7942181b7ee05b9bb4086fcd705004e70a237fc8c2d11c7e272d9",
     "src/runner/dispatch/assignment-normalizer.mjs": "1e1a922ad6d9ef2c9d8f0e7f6fec77d2c8b83b27ce9adfc8eaf3ec69e200ce6b",
-    "src/runner/dispatch/assignment-runner.mjs": "e56212a1abefc52b832752c4488d14075351bd59b4c4879d65d3b62dff4d3100",
+    "src/runner/dispatch/assignment-runner.mjs": "37f8d02674c66ec695bf840272ccf57142a59f0b453eef0c5132b7cbb906abae",
     "src/runner/dispatch/assignment.mjs": "e17a8b1dd75893d3b0607a6f333fbccc32678e9c69f9ba42caa9169ba9135d1c",
     "src/runner/dispatch/attention-view.mjs": "df39da987b880a632e06d73dc7dea1a9b8f21ec52db3182e2736407e499c1667",
     "src/runner/dispatch/brief.mjs": "c51d5398653cd6f839c2902134e627e57af7911b473fe16904478919c2d95e14",
     "src/runner/dispatch/cli.mjs": "4027bdc22b5727c3c62a01ab562b947cafbf972ba3769311237e798daf0a9a9a",
     "src/runner/dispatch/config.mjs": "5ef2c68e56400e29db7232c8f471056c6c01ec1bf5473f97c1e98c6bcf99af44",
     "src/runner/dispatch/confinement/attestation-store.mjs": "25aeaef901e6c331ec84de3f4e072224d3f14c77775ba46fe6b91348ad795805",
-    "src/runner/dispatch/confinement/authority.mjs": "b1c16190128f214b1cd6aca59df51b567ecdc764633fdeaf34d1f416490ebb2e",
+    "src/runner/dispatch/confinement/authority.mjs": "fb0f507d355a25d850116f8c17763344b43a174ba7477071f74c22687899c7ae",
     "src/runner/dispatch/confinement/backend-registry.mjs": "143f1a161187876901c7782ac2e737fb315d42e4e8947454cb3e60b1433eaa28",
     "src/runner/dispatch/confinement/bypass-pairing.mjs": "5bd577486e255d81c8b25c3df3d40b3d4f423dd0b7aaa698b6c55b17508c2e6c",
     "src/runner/dispatch/confinement/cleanup.mjs": "cc2eb8a96e4c605b1b93fb119fa7cb9d0d6e47cd64d2c5ac596f1105515c0204",
@@ -4319,14 +4319,14 @@
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
-      "line": 1552,
-      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1176",
+      "line": 1549,
+      "spawn": "awaitBinding -> src/runner/dispatch/assignment-runner.mjs:1173",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/dispatch/confinement/authority.mjs",
-      "line": 600,
+      "line": 607,
       "spawn": "verifyRequiredProbe -> src/runner/dispatch/confinement/authority.mjs:137",
       "binary": "(configuration file data)",
       "class": "configured-binary"
@@ -4334,7 +4334,7 @@
     {
       "path": "src/runner/dispatch/session-attempt.mjs",
       "line": 146,
-      "spawn": "startAndBind -> src/runner/dispatch/assignment-runner.mjs:1157",
+      "spawn": "startAndBind -> src/runner/dispatch/assignment-runner.mjs:1154",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
     },

@@ -435,15 +435,22 @@ function claimsMatchCoverage(claims, coverage) {
 const effectiveBackendOf = (request) => request.backendId ?? (request.requirement?.mode === "required" ? "bwrap" : null);
 
 /**
+ * Who delivers the controls of `request` (`controlDelivery`), judged on the request itself. The seat checks after the
+ * Authority take this same answer: the prepared-invocation record keeps only the requirement's digest, not its policy.
+ */
+export function controlDeliveryOf(request) {
+  return controlDelivery({
+    launchKind: request.assignmentLaunchContext?.kind, requirement: request.requirement, backend: effectiveBackendOf(request),
+  });
+}
+
+/**
  * Whether a declared ownWorktree cannot be honoured: the dispatch runs in the repo root itself. A head session
  * under a required backend that denies host writes is the exception (`controlDelivery`).
  */
 export function ownWorktreeUnavailable(request, hasOwnWorktree) {
   if (!hasOwnWorktree || !request.context?.repoRoot) return false;
-  const { rootWorkspaceAllowed } = controlDelivery({
-    launchKind: request.assignmentLaunchContext?.kind, requirement: request.requirement, backend: effectiveBackendOf(request),
-  });
-  if (rootWorkspaceAllowed) return false;
+  if (controlDeliveryOf(request).rootWorkspaceAllowed) return false;
   return path.resolve(request.context.cwd) === path.resolve(request.context.repoRoot);
 }
 

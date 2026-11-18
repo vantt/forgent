@@ -13,6 +13,10 @@ import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
 import { bind } from '../../src/runner/execution/bind.mjs';
 import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 import { bindHeadSeat } from '../../src/session-host/head-start.mjs';
+import { grantOf } from '../../src/session-host/head-grants.mjs';
+import { launchSessionAttempt, requirementOf } from '../../src/runner/dispatch/session-attempt.mjs';
+import { prepareSeat } from '../../src/runner/dispatch/herdr-round.mjs';
+import { controlDelivery } from '../../src/runner/dispatch/confinement/bypass-pairing.mjs';
 
 seedFileLocalBwrapRegistry();
 seedStubAgentClis('claude');
@@ -59,4 +63,47 @@ test('a project override of the secretary prefer replaces the standard list and 
   const cfg = standard({ personas: { secretary: { prefer: ['claude'] } } });
   const binding = await bindHeadSeat({ persona: 'secretary', key: 'head-secretary-miu-1', runnerConfig: cfg });
   assert.notEqual(invocationOf(cfg, binding).permissionMode, 'bypass');
+});
+
+// The launch a head start makes, run for real up to the pane: bind, the Confinement Authority, the bwrap preparation
+// and the seat's own confinement checks. The terminal config that cannot build a control stops it right after the
+// seat is prepared, so reaching that error means every confinement check let the head through.
+const PANE_REACHED = 'pane reached: the seat passed its confinement checks';
+const stopAtPane = { get unusable() { throw new Error(PANE_REACHED); } };
+const projectWith = (dirs) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-head-bypass-root-'));
+  for (const dir of dirs) fs.mkdirSync(path.join(root, dir), { recursive: true });
+  return root;
+};
+
+test('the secretary head launches bypass in the main checkout it is granted, and a worker seat with the bypass invocation there is still refused', { skip: !fs.existsSync('/usr/bin/bwrap') && 'no bwrap on this machine', timeout: 120_000 }, async () => {
+  const projectRoot = projectWith(['plans', 'docs/discussions']);
+  fs.writeFileSync(path.join(projectRoot, 'docs', 'backlog.md'), '');
+  try {
+    const cfg = standard();
+    const key = 'head-secretary-miu-1';
+    const binding = await bindHeadSeat({ persona: 'secretary', key, runnerConfig: cfg });
+    assert.equal(invocationOf(cfg, binding).permissionMode, 'bypass');
+    const role = 'head:secretary-miu';
+    await assert.rejects(launchSessionAttempt({
+      binding, runnerConfig: cfg, key, role, grant: grantOf(role), opening: 'hello', ceilingMs: 60_000, projectRoot,
+      opts: { terminalConfig: stopAtPane },
+    }), (err) => { assert.equal(err.message, PANE_REACHED, `the head was refused: ${err.message}`); return true; });
+    const [prepared] = fs.readdirSync(path.join(projectRoot, '.fgos', 'assignments', key, 'runs', '01', 'protected', 'prepared-invocation'));
+    const record = JSON.parse(fs.readFileSync(path.join(projectRoot, '.fgos', 'assignments', key, 'runs', '01', 'protected', 'prepared-invocation', prepared), 'utf8'));
+    assert.equal(record.workerInvocation.cwd, projectRoot, 'the head runs in the main checkout');
+    assert.ok(record.workerInvocation.args.includes('--dangerously-skip-permissions'), 'the head runs in bypass');
+    assert.equal(record.backend.type, 'bwrap', 'inside its sandbox');
+  } finally { fs.rmSync(projectRoot, { recursive: true, force: true }); }
+
+  // The same seat preparation with the launch context of a worker: the repo root is not a worktree of its own.
+  const workerRoot = projectWith([]);
+  try {
+    await assert.rejects(prepareSeat({
+      binding: { command: 'claude', args: ['--dangerously-skip-permissions'], env: {}, permissionMode: 'bypass', confinement: { privateHome: true, isolatedSession: true, ownWorktree: true } },
+      round: { workId: 'claude', note: () => {}, fail: (code, reason, message) => Object.assign(new Error(message), { code, reason }) },
+      runDir: fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-head-bypass-run-')), cwd: workerRoot, repoRoot: workerRoot, fullEnv: {},
+      delivery: controlDelivery({ launchKind: 'assignment', requirement: requirementOf(grantOf('head:secretary-miu')), backend: 'bwrap' }),
+    }), (err) => err.reason === 'own-worktree-unavailable');
+  } finally { fs.rmSync(workerRoot, { recursive: true, force: true }); }
 });
