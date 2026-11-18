@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "S6a worktree door: one checkout door in Rust (fgos worktree, resync-worktree, Work's create/remove as addon wrappers), landed on main as one series"
-status: ready
+status: done
 priority: P1
 blockedBy: []
 footprint:
@@ -110,8 +110,8 @@ codes and parity cases (never landed); the combined addon door (`src/native/door
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [One worktree door in Rust](phase-01-worktree-door.md) | - | packages/execution/checkout/**, Cargo.toml, apps/fgos/src/wiring/worktree.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/main.rs, apps/fgos/src/routing.rs, apps/fgos/src/cli_projector.rs, apps/fgos/Cargo.toml, apps/fgos/tests/cli_tests.rs, packages/host-runtime/rust/src/catalog.rs, src/cli/command-registry.mjs, bin/fgos.mjs, src/verbs/worktree/**, test/verbs/worktree-create.test.mjs, test/verbs/worktree-remove.test.mjs, test/e2e/resync-worktree-bare-invocation.test.mjs, test/rust-host/command-routes.test.mjs, docs/architecture-manifest.json, docs/platform/git/spec.md, CHANGELOG.md | 1 | draft |
-| 2 | [Work checkout wrappers over the addon](phase-02-work-checkout-wrappers.md) | 1 | packages/execution/checkout/**, packages/git/node-addon/**, src/native/door.mjs, src/runner/worktree.mjs, test/runner/worktree.test.mjs, test/runner/worktree-callsite-wrapper.test.mjs, test/architecture.test.mjs, docs/architecture-manifest.json | 2 | draft |
+| 1 | [One worktree door in Rust](phase-01-worktree-door.md) | - | packages/execution/checkout/**, Cargo.toml, apps/fgos/src/wiring/worktree.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/main.rs, apps/fgos/src/routing.rs, apps/fgos/src/cli_projector.rs, apps/fgos/Cargo.toml, apps/fgos/tests/cli_tests.rs, packages/host-runtime/rust/src/catalog.rs, src/cli/command-registry.mjs, bin/fgos.mjs, src/verbs/worktree/**, test/verbs/worktree-create.test.mjs, test/verbs/worktree-remove.test.mjs, test/e2e/resync-worktree-bare-invocation.test.mjs, test/rust-host/command-routes.test.mjs, docs/architecture-manifest.json, docs/platform/git/spec.md, CHANGELOG.md | 1 | done |
+| 2 | [Work checkout wrappers over the addon](phase-02-work-checkout-wrappers.md) | 1 | packages/execution/checkout/**, packages/git/node-addon/**, src/native/door.mjs, src/runner/worktree.mjs, test/runner/worktree.test.mjs, test/runner/worktree-callsite-wrapper.test.mjs, test/architecture.test.mjs, docs/architecture-manifest.json | 2 | done |
 
 Effort (lead-days): 1: 3; 2: 2.5. Total 5.5, serial.
 
@@ -180,3 +180,4 @@ Rust wrote because phase 01 keeps Node's record path, key and shape.
 - 2026-11-18 lead:S6A-LAND: S5 (`261115-2328`) is `done` on main (586765804). Status stays `draft`: plan-contract-check refuses `ready` while the footprint overlaps the active plan `261118-0936-ops-metrics`; turn `ready` when ops-metrics closes or the overlap is cleared.
 - 2026-11-18 lead:WORKTREE-DOOR: footprint widened to `packages/git/rust/src/refs.rs` and `land.rs` (callers only), approved by lead:OPC as Git reviewer: `acquire_worktree_admin(repo, held, wait)` becomes the one public worktree-admin door; `fgos-checkout` calls it instead of seeding its own scope. Also widened for gate consequences of the deletion: `docs/reading-map.md`, `scripts/lib/git-one-door-declarations.v1.json` (two configured setup-command shell sites), `test/cli/fgos-workflow-propose.test.mjs`, `test/cli/subcommand-flag-drift.test.mjs`.
 - 2026-11-18 lead:WORKTREE-DOOR: footprint widened again with lead:OPC approval: `remote.rs` and `lib.rs` of fgos-git (one more admin-door caller, the re-export), `src/runner/merge.mjs` and `test/runner/merge-target-slot-multiprocess.test.mjs` (the Git door names a busy worktree admin `worktree-admin-held`; merge maps it to lock-held).
+- 2026-11-18 lead:WORKTREE-DOOR: landed on main as one series at c5e87b849 (phases 1 and 2, Git part MERGE by lead:OPC). Series head 719fdc074: full `npm test` 8395 pass 0 fail, `cargo test --workspace` 3226 pass 0 fail; release-addon `createWorktree` steady median 83 ms vs base 75 ms (+11%, under the 20% line). Backlog rows p-qkup63kpxm (unit handoff to the checkout door, dead repo-locks helpers) and p-rjtloumx6o (scanner free-variable resolution). Build, stage and activate of a release carrying this series is left to the supervisor. Plan 0947 unblocked.
