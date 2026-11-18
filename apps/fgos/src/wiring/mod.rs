@@ -45,7 +45,6 @@ pub mod observe_query;
 pub mod observe_sources;
 pub mod run_dirs;
 pub mod seat_binding;
-pub mod session;
 #[cfg(unix)]
 pub mod session_rotation_hook;
 #[cfg(not(unix))]

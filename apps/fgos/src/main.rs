@@ -146,10 +146,6 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::events::STATUS_DESCRIPTOR,
     wiring::events::SEAL_DESCRIPTOR,
     wiring::events::EXPORT_DESCRIPTOR,
-    wiring::session::START_DESCRIPTOR,
-    wiring::session::END_DESCRIPTOR,
-    wiring::session::LIST_DESCRIPTOR,
-    wiring::session::GC_DESCRIPTOR,
     wiring::git_incidents::STATUS_DESCRIPTOR,
     wiring::git_incidents::RECOVER_DESCRIPTOR,
     wiring::lock_status::DESCRIPTOR,
@@ -369,17 +365,6 @@ fn main() {
     ] {
         service.register_provider(Arc::new(wiring::events::EventsProvider::for_descriptor(
             descriptor,
-        )));
-    }
-    for descriptor in [
-        wiring::session::START_DESCRIPTOR,
-        wiring::session::END_DESCRIPTOR,
-        wiring::session::LIST_DESCRIPTOR,
-        wiring::session::GC_DESCRIPTOR,
-    ] {
-        service.register_provider(Arc::new(wiring::session::SessionProvider::for_descriptor(
-            descriptor,
-            Arc::new(invocation_doors::EventStoreLifecycle),
         )));
     }
     for descriptor in [

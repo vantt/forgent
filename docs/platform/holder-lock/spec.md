@@ -132,7 +132,7 @@ The opaque addon handover protects acquired handles from request-data forgery; i
 
 | Kind | Mechanism | Used for |
 |---|---|---|
-| `mutex` | Kernel lock, held briefly | sessions, advance, reconcile, recovery, provider account, provider state, main checkout, `worktree-admin`, merge slot, `event-seal` (58), `event-append` (70), `repo-config`, `mailbox`; later observe, activation, install |
+| `mutex` | Kernel lock, held briefly | advance, reconcile, recovery, provider account, provider state, main checkout, `worktree-admin`, merge slot, `event-seal` (58), `event-append` (70), `repo-config`, `mailbox`; later observe, activation, install |
 | `lease` | Kernel lock, held for the length of a long job; may be handed to a gate | gateway, runner, dispatch cwd, full-suite; later the attempt lock, whose file lives in the run directory |
 | `hot-mutex` | link-created record for the fast path; the row's kernel lock (`<resource>.reclaim.lock`) only serialises cleanup of a dead holder's record (section 15) | `state`, `porting-events` |
 | `beacon` | Not a lock | the main-checkout activity file (read by the hook only when the commit is not a borrower, section 14) |
@@ -161,11 +161,11 @@ Ranks (a scope may only take a lock of a higher rank than every lock it holds):
 | 58 | `event-seal` | mutex |
 | 60 | `state`, `porting-events` | hot-mutex |
 | 70 | `event-append` | mutex |
-| 80 | leaves: `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `worker-session`, `agent-trust-store`, `identity-pins`, `observe`, `activation`, `install`, `project-config`, `global-config`, `mailbox`, `session-rotation`, `lane`, `watcher` | mutex, lease |
+| 80 | leaves: `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `worker-session`, `agent-trust-store`, `identity-pins`, `observe`, `activation`, `install`, `project-config`, `global-config`, `mailbox`, `session-rotation`, `lane`, `watcher` | mutex, lease |
 
 The ranks 58 (`event-seal`) and 70 (`event-append`) above are declared by the signed [Event Store spec §4](../event-store/spec.md#4-layering-and-locks), D-ADR0055 (event log as sealed changesets on per-machine refs); implementation has not started. They are planned additions to the shipped registry, which currently declares neither rank nor lock. They do not claim a registered kind, path or cutover. The design permits `state` (60) → `event-append` (70) and forbids seal/sync under `state`; registry and implementation must land together under the Event Store proof gates.
 
-Locks cut over by this track: `gateway`, `runner`, `sessions`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `dispatch-cwd`. Their new files live under `<fgosDir>/locks/` (repo scope), `<lockRoot>/` (machine scope) or a `locks/` directory inside the run (`<workflowRunDir>/locks/advance.lock`, `<runDir>/locks/recovery.lock`), so a run's new lock never lands on the tombstone of its legacy path. The dispatch cwd lock is keyed by the directory's identity after `realpath` (`<fgosDir>/locks/dispatch-cwd--<dev>-<ino>.lock`), so a worktree reached through a symlink is the same lock. The npm package and the staged legacy-node payload ship the registry file, because every lock of this track resolves through it. The dispatch cwd lock keeps the `fgosDir` scope; a machine-wide cwd lock is a separate item, opened only when two workspaces share one cwd for real.
+Locks cut over by this track: `gateway`, `runner`, `advance`, `reconcile`, `recovery`, `full-suite`, `provider-account`, `provider-state`, `dispatch-cwd`. Their new files live under `<fgosDir>/locks/` (repo scope), `<lockRoot>/` (machine scope) or a `locks/` directory inside the run (`<workflowRunDir>/locks/advance.lock`, `<runDir>/locks/recovery.lock`), so a run's new lock never lands on the tombstone of its legacy path. The dispatch cwd lock is keyed by the directory's identity after `realpath` (`<fgosDir>/locks/dispatch-cwd--<dev>-<ino>.lock`), so a worktree reached through a symlink is the same lock. The npm package and the staged legacy-node payload ship the registry file, because every lock of this track resolves through it. The dispatch cwd lock keeps the `fgosDir` scope; a machine-wide cwd lock is a separate item, opened only when two workspaces share one cwd for real.
 
 Locks cut over by the Rust-callers track (registry owner `4.4`), all leaves of rank 80, all mutex (their legacy paths were fenced by a tombstone directory at the cutover, section 12):
 

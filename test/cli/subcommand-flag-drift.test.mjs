@@ -194,7 +194,7 @@ const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nat
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
   assert.deepEqual(MULTI.map((e) => e.name).sort(), ['dispatch', 'goal', 'head', 'merge', 'workflow']);
-  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'config', 'convention', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'session', 'worktree']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'config', 'convention', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'worktree']);
 });
 
 // A verb that lists sub-verbs in `native` serves those in the Rust host: the Node handler holds no branch for them
@@ -276,9 +276,7 @@ test('the scanner sees what it claims to: known reads in known regions', () => {
 // config, convention, events and identity -> one parser shared by every sub-verb (cli_projector.rs),
 // mailbox -> one parser in apps/fgos/src/wiring/mailbox_verbs.rs, so
 // its flags must equal the union of the sub-verbs' schemas; its sub-verb names
-// live in mailbox_surface.rs, shared by every platform build; session -> one
-// reader of the shared parser's output (`project_session_request` in
-// apps/fgos/src/wiring/session.rs), which names a flag as `flag("item")`; worktree -> its sub-verb's match arm in
+// live in mailbox_surface.rs, shared by every platform build; worktree -> its sub-verb's match arm in
 // `project_worktree_request` (apps/fgos/src/wiring/worktree.rs), which also names a flag through its two readers
 // `named_value(&call, "x", ..)` and `truthy(&call, "x")`.
 const RUST = (rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
@@ -355,14 +353,6 @@ const NATIVE_SOURCES = {
       const src = RUST('apps/fgos/src/cli_projector.rs');
       const start = src.indexOf('fn project_config_request');
       return src.slice(start, src.indexOf('fn project_identity_request', start));
-    },
-  },
-  session: {
-    subs: RUST('apps/fgos/src/wiring/session.rs'),
-    shared: () => {
-      const src = RUST('apps/fgos/src/wiring/session.rs');
-      const start = src.indexOf('pub fn project_session_request');
-      return src.slice(start, src.indexOf('pub fn project_session_args', start));
     },
   },
   git: {

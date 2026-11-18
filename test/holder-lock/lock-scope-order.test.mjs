@@ -36,7 +36,7 @@ test('a lower rank after a higher one is refused with the held and acquiring loc
 
 test('the same rank twice in one scope is refused', () => {
   const scope = createLockScope('same');
-  scope.track(handleLike('sessions', 80));
+  scope.track(handleLike('reconcile', 80));
   assert.throws(() => scope.assertCanAcquire('advance', 80), (err) => err.code === 'lock-order-violation' && /one rank at a time/.test(err.message));
 });
 
@@ -48,7 +48,7 @@ test('ascending ranks pass, and a released lock no longer constrains the scope',
   scope.assertCanAcquire('main-checkout', 50);
   const main = handleLike('main-checkout', 50);
   scope.track(main);
-  scope.assertCanAcquire('sessions', 80);
+  scope.assertCanAcquire('reconcile', 80);
   assert.deepEqual(scope.holding(), [{ name: 'gateway', rank: 10 }, { name: 'main-checkout', rank: 50 }]);
   scope.untrack(main);
   scope.assertCanAcquire('merge-slot', 20);
@@ -70,8 +70,8 @@ test('a real acquire out of order throws before any lock file is opened', { skip
     const scope = createLockScope('real');
     const main = acquireSync(scope, 'main-checkout', { fgosDir });
     assert.equal(main.result, 'acquired');
-    const sessions = acquireSync(scope, 'sessions', { fgosDir });
-    assert.equal(sessions.result, 'acquired');
+    const reconcile = acquireSync(scope, 'reconcile', { fgosDir });
+    assert.equal(reconcile.result, 'acquired');
 
     assert.throws(
       () => acquireSync(scope, 'gateway', { fgosDir }),
@@ -85,7 +85,7 @@ test('a real acquire out of order throws before any lock file is opened', { skip
     assert.deepEqual(probe('main-checkout', { fgosDir }), { result: 'held' });
 
     gateway.handle.release();
-    sessions.handle.release();
+    reconcile.handle.release();
     main.handle.release();
     assert.deepEqual(scope.holding(), []);
   } finally {

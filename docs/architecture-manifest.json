@@ -666,7 +666,6 @@
       ],
       "debt": [
         { "path": "apps/fgos/src/wiring/mailbox_root.rs", "reason": "the mailbox picks its record root (the main checkout from CLAUDE_PROJECT_DIR or the cwd) separately from the invocation root, so a hook call needs no Git process; one door once the mailbox verbs move" },
-        { "path": "apps/fgos/src/wiring/session.rs", "reason": "`fgos session` acts on the caller's own directory and ignores `--dir`, as the Node verb did, so it asks the root door itself with no `--dir` instead of taking the root the invocation doors resolved from one; it asks the same door, with the caller-tree policy. Retires when the verb honours `--dir` (backlog p-5x37olszki, session honours --dir)" },
         { "path": "src/util/host-bin-path.mjs", "reason": "walks up from cwd for .fgos/installation/activation.json with no Git ceiling and no home exclusion, a root decision of its own for finding the host binary" },
         { "path": "src/runner/worktree.mjs", "reason": "isMainWorktree asks 'is this the main checkout' in Node while fgos-git store_admission asks it in Rust; six other Node callers (resolveMainCheckoutRoot and friends) keep it until their verbs move" }
       ],
@@ -692,7 +691,7 @@
     {
       "job": "admit store access",
       "kind": "door",
-      "patterns": ["disconnected-worktree-store", "init-in-worktree", "worktree-identity-unreadable", "\\bisSessionWorktree\\b", "fn is_session_worktree"],
+      "patterns": ["disconnected-worktree-store", "init-in-worktree", "worktree-identity-unreadable", "\\bisSessionWorktree\\b"],
       "allowed": [
         "packages/git/rust/src/store_admission.rs",
         { "path": "src/runner/worktree.mjs", "reason": "the adapter names one class itself: with no Git door loaded nothing can tell a linked worktree from the main checkout, so it refuses by `worktree-identity-unreadable` without asking the addon that carries the decision" }
@@ -742,12 +741,11 @@
       "kind": "door",
       "patterns": ["sessions\\.json", "\\bSESSIONS_FILE\\b"],
       "allowed": [
-        "apps/fgos/src/wiring/session.rs",
         { "path": "packages/identity/rust/src/resolve.rs", "reason": "reads the file read-only to confirm an env session id (one field, fail soft); the row shape is the `x-sessionRegistry` section of identity.writer.v1.json, run by both readers" },
         { "path": "src/cli/command-registry.mjs", "reason": "names the file in the description text of the `identity` verb; it reads nothing" }
       ],
       "retiredBy": "S6a: the module moves into the Execution crate if one exists then",
-      "reason": "the registry of per-session checkouts has one owner, the host's session module, which reads and writes it under the `sessions` lock through Durable File; Node's readers ask the host (`fgos session list`) and the Node writers are retired"
+      "reason": "the per-session checkout registry is retired with its writer (the host session module); the only readers left confirm an env session id read-only until Identity stops reading the file"
     },
     {
       "job": "compose Git status and recovery",
@@ -1585,7 +1583,6 @@
       "debt": [
         {"path": "src/setup/model-pool-checks.mjs", "reason": "names `worktreeSetup` in a check message; it provisions nothing"},
         {"path": "src/cli/command-registry.mjs", "reason": "names `worktreeSetup` in the description text of the `worktree` verb"},
-        {"path": "apps/fgos/src/wiring/session.rs", "reason": "the session end removes its own session checkout through the Git port directly, not through the checkout door"},
         {"path": "src/runner/repo-locks.mjs", "reason": "its creation helpers register a checkout through the Git port; their one production caller is unit-handoff, and they are deleted when it moves to the checkout door"},
         {"path": "src/workflow/unit-handoff.mjs", "reason": "unit handoff creates its checkout through repo-locks; moves to the checkout door when its Node caller is retired"},
         {"path": "src/runner/merge.mjs", "reason": "Land removes its own candidate checkout through the Git port; it moves with Land"},

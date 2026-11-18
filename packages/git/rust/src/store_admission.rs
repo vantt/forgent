@@ -4,7 +4,7 @@
 //!
 //! - `store-missing`: a `require` verb with no `.fgos/` at `dir` (the phantom-store hazard).
 //! - `disconnected-worktree-store`: a store-mutating verb from a linked worktree whose `.fgos/` is a real, frozen
-//!   snapshot, unless `--dir` named the root or it is a `fgos session` worktree (its `.fgos` links to main's).
+//!   snapshot, unless `--dir` named the root.
 //! - `init-in-worktree`: a verb that creates the store, inside a linked worktree (worktrees never carry `.fgos/`).
 //! - `worktree-identity-unreadable`: the Git state that tells a linked worktree from the main checkout could not be
 //!   read.
@@ -14,7 +14,7 @@
 //! Git is read lazily, through the one reader of the invocation-root door, and at most once: only a path that needs
 //! the worktree identity asks for it. A verb that needs no store and does not mutate, a call that named `--dir`,
 //! and a read of a store that exists all succeed when Git cannot be read. A mutating verb that needs no store
-//! (`session start`, `dispatch recover --action`) is judged like any other mutating verb once a `.fgos/` exists.
+//! (`dispatch recover --action`) is judged like any other mutating verb once a `.fgos/` exists.
 use crate::invocation_root::{read_repo_facts, realpath_or_self, FactsReader, Refusal, RepoFacts};
 use std::cell::OnceCell;
 use std::path::Path;
@@ -119,18 +119,12 @@ pub fn admit_store_access_with(
     if store_mode == StoreMode::Require && !store_exists {
         return Err(Refusal::new(STORE_MISSING_CLASS, store_missing(dir)));
     }
-    // `fgos session start` from a `.fgos/`-less stripped worktree is the legitimate case that verb serves,
-    // hence the existence check.
-    if !explicit_dir
-        && mutates
-        && store_exists
-        && !is_main()?
-        && !is_session_worktree(cwd, facts().as_ref().ok())
-    {
+    // A `.fgos/`-less stripped worktree has no store to disconnect from, hence the existence check.
+    if !explicit_dir && mutates && store_exists && !is_main()? {
         return Err(Refusal::new(
             DISCONNECTED_WORKTREE_STORE,
             format!(
-                "\"{verb}\" refused: \"{}\" is a linked worktree whose .fgos/ at \"{}\" is a real but disconnected snapshot, never the shared store outside \"fgos pick\"/\"fgos take\" (ADR0020-stripped) or \"fgos session start\" (symlinked) -- pass --dir <mainRoot> to reach the real store explicitly, e.g. `--dir \"$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)\"`.",
+                "\"{verb}\" refused: \"{}\" is a linked worktree whose .fgos/ at \"{}\" is a real but disconnected snapshot, never the shared store outside \"fgos pick\"/\"fgos take\" (ADR0020-stripped) -- pass --dir <mainRoot> to reach the real store explicitly, e.g. `--dir \"$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)\"`.",
                 cwd.display(),
                 dir.display()
             ),
@@ -156,35 +150,6 @@ pub fn admit_store_access_with(
         None
     };
     Ok(Admitted { warning })
-}
-
-/// Whether `checkout` is a genuine `fgos session`-created worktree: its `.fgos` is a symbolic link (never a
-/// checked-out copy) whose real path equals the trusted main checkout's own `.fgos`. A bare symlink check is
-/// forgeable (a worktree can carry a `.fgos` link to anywhere), so both conditions are required; the main root
-/// comes from Git, which a worktree-local link cannot redirect. Never fails: a filesystem error or a
-/// non-repository means "not a session worktree".
-fn is_session_worktree(checkout: &Path, facts: Option<&RepoFacts>) -> bool {
-    let link = checkout.join(".fgos");
-    let Ok(meta) = std::fs::symlink_metadata(&link) else {
-        return false;
-    };
-    let Some(RepoFacts::Repository {
-        trusted_main: Some(main),
-        ..
-    }) = facts
-    else {
-        return false;
-    };
-    if !meta.file_type().is_symlink() {
-        return false;
-    }
-    match (
-        std::fs::canonicalize(&link),
-        std::fs::canonicalize(realpath_or_self(main).join(".fgos")),
-    ) {
-        (Ok(linked), Ok(own)) => linked == own,
-        _ => false,
-    }
 }
 
 #[cfg(test)]
@@ -293,17 +258,17 @@ mod tests {
         let world = World::new("disconnected-none");
         let wt = world.linked("adhoc");
         let store = wt.join(".fgos");
-        let session = AdmitRequest {
-            verb: "session",
+        let recover = AdmitRequest {
+            verb: "recover",
             store_mode: StoreMode::None,
             ..submit(&store, &wt)
         };
-        let refusal = world.admit(session).unwrap_err();
+        let refusal = world.admit(recover).unwrap_err();
         assert_eq!(refusal.fault_class, DISCONNECTED_WORKTREE_STORE);
-        assert!(refusal.message.starts_with("\"session\" refused: "));
+        assert!(refusal.message.starts_with("\"recover\" refused: "));
         let read_only = AdmitRequest {
             mutates: false,
-            ..session
+            ..recover
         };
         assert_eq!(
             world.admit(read_only).unwrap(),
@@ -313,7 +278,7 @@ mod tests {
     }
 
     #[test]
-    fn the_main_checkout_an_explicit_dir_a_read_only_verb_and_a_session_worktree_are_admitted() {
+    fn the_main_checkout_an_explicit_dir_and_a_read_only_verb_are_admitted() {
         let world = World::new("admitted");
         let wt = world.linked("adhoc");
         let none = Admitted { warning: None };
@@ -334,19 +299,6 @@ mod tests {
             ..submit(&wt_store, &wt)
         };
         assert_eq!(world.admit(read_only).unwrap(), none);
-        #[cfg(unix)]
-        {
-            let session = world.linked("session");
-            std::fs::remove_dir_all(session.join(".fgos")).unwrap();
-            std::os::unix::fs::symlink(world.main.join(".fgos"), session.join(".fgos")).unwrap();
-            assert_eq!(
-                world
-                    .admit(submit(&session.join(".fgos"), &session))
-                    .unwrap(),
-                none,
-                "a genuine session worktree links to main's .fgos"
-            );
-        }
     }
 
     #[test]
@@ -424,7 +376,6 @@ mod tests {
         assert!(refusal
             .message
             .contains("\"submit\" refused: the Git state of"));
-        assert!(!is_session_worktree(&wt, world.read(&wt).as_ref().ok()));
     }
 
     #[test]
@@ -513,84 +464,5 @@ mod tests {
             cwd: &plain,
         };
         assert_eq!(world.admit(init).unwrap(), Admitted { warning: None });
-    }
-
-    #[test]
-    fn session_worktree_cases_name_the_forged_link_and_every_other_shape() {
-        let world = World::new("session");
-        let facts = |p: &Path| world.read(p).ok();
-        let genuine = |checkout: &Path| is_session_worktree(checkout, facts(checkout).as_ref());
-        // The main checkout carries a real directory, not a link.
-        assert!(
-            !genuine(&world.main),
-            "the main checkout is not itself a session worktree"
-        );
-        // An ad-hoc worktree carrying a checked-out .fgos copy.
-        let adhoc = world.linked("adhoc");
-        assert!(!genuine(&adhoc), "a real .fgos copy is not a link");
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::symlink;
-            let relink = |checkout: &Path, target: &Path| {
-                std::fs::remove_dir_all(checkout.join(".fgos")).unwrap();
-                symlink(target, checkout.join(".fgos")).unwrap();
-            };
-            // A genuine link to main's .fgos, and one through a chain of links.
-            let linked = world.linked("linked");
-            relink(&linked, &world.main.join(".fgos"));
-            assert!(genuine(&linked));
-            let chained = world.linked("chained");
-            let hop = world.base.join("hop");
-            symlink(world.main.join(".fgos"), &hop).unwrap();
-            relink(&chained, &hop);
-            assert!(
-                genuine(&chained),
-                "a chain of links that ends at main's .fgos"
-            );
-            // A link forged to point somewhere else: a bare is-a-symlink check would be fooled.
-            let forged = world.linked("forged");
-            let decoy = world.base.join("decoy");
-            std::fs::create_dir_all(&decoy).unwrap();
-            relink(&forged, &decoy);
-            assert!(
-                !genuine(&forged),
-                "a link to a directory that is not main's .fgos"
-            );
-            // A link to another repository's .fgos.
-            let other = world.base.join("other");
-            std::fs::create_dir_all(other.join(".fgos")).unwrap();
-            let foreign = world.linked("foreign");
-            relink(&foreign, &other.join(".fgos"));
-            assert!(!genuine(&foreign), "a link to another repository's .fgos");
-            // A dangling link.
-            let dangling = world.linked("dangling");
-            relink(&dangling, &world.base.join("never-existed"));
-            assert!(!genuine(&dangling));
-            // A link to main's root, not its .fgos.
-            let wrong = world.linked("wrong");
-            relink(&wrong, &world.main);
-            assert!(!genuine(&wrong), "a link to a non-.fgos directory");
-            // The main root without a .fgos at all.
-            let bare_main = world.base.join("bare-main");
-            std::fs::create_dir_all(&bare_main).unwrap();
-            git(&bare_main, &["init", "-q", "-b", "main"]);
-            git(&bare_main, &["commit", "-q", "--allow-empty", "-m", "seed"]);
-            let bare_wt = world.base.join("bare-wt");
-            git(
-                &bare_main,
-                &[
-                    "worktree",
-                    "add",
-                    "-q",
-                    "--detach",
-                    bare_wt.to_str().unwrap(),
-                    "HEAD",
-                ],
-            );
-            symlink(bare_main.join(".fgos"), bare_wt.join(".fgos")).unwrap();
-            assert!(!genuine(&bare_wt), "main has no .fgos to link to");
-        }
-        // No facts at all (an unreadable repository) is not a session worktree.
-        assert!(!is_session_worktree(&world.main, None));
     }
 }

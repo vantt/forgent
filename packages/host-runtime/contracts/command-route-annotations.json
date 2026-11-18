@@ -76,11 +76,6 @@
     "operation_id": "worktree.resync",
     "owner_path": "packages/execution/checkout"
   },
-  "session": {
-    "operation_id": "session.list",
-    "owner_path": "apps/fgos",
-    "subcommands": true
-  },
   "uninstall": {
     "operation_id": "uninstall.run",
     "owner_path": "apps/fgos"

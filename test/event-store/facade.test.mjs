@@ -57,7 +57,7 @@ test('seal-like operations require held ranks and reject ranks 58 and 80 before 
     assert.throws(() => invoke(undefined), { code: 'event-store-held-ranks-required' });
     for (const rank of [58, 70, 80]) assert.throws(() => invoke([rank]), { code: 'lock-order-violation' });
   }
-  const scope = createLockScope('sessions'); scope.track({ name: 'sessions', rank: 80 });
+  const scope = createLockScope('reconcile'); scope.track({ name: 'reconcile', rank: 80 });
   assert.throws(() => store.seal('project', scope), { code: 'lock-order-violation' });
 });
 

@@ -12,7 +12,7 @@
     "58": { "kinds": ["mutex"], "note": "event-seal" },
     "60": { "kinds": ["hot-mutex"], "note": "hot state (events + claims)" },
     "70": { "kinds": ["mutex"], "note": "event-append" },
-    "80": { "kinds": ["mutex", "lease"], "note": "leaves: sessions, advance, reconcile, recovery, observe, provider account, activation, install, full-suite, repo-config, mailbox, session-rotation" }
+    "80": { "kinds": ["mutex", "lease"], "note": "leaves: advance, reconcile, recovery, observe, provider account, activation, install, full-suite, repo-config, mailbox, session-rotation" }
   },
   "locks": [
     {
@@ -32,15 +32,6 @@
       "v3Path": "<fgosDir>/locks/runner.lock",
       "owner": "4.2",
       "note": "v1 source: src/runner/loop.mjs LOCK_FILE"
-    },
-    {
-      "name": "sessions",
-      "kind": "mutex",
-      "scope": "repo",
-      "rank": 80,
-      "v3Path": "<fgosDir>/locks/sessions.lock",
-      "owner": "4.2",
-      "note": "v1 source: the session module of the host, apps/fgos/src/wiring/session.rs"
     },
     {
       "name": "advance",

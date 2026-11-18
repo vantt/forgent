@@ -2277,53 +2277,6 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   withSubcommands({
-    name: 'session',
-    invoke: 'fgos session <start|end|list|gc>',
-    description: 'Per-session git worktree lifecycle: "start" opens a detached-HEAD worktree, "end" removes it, "list" (read-only) prints the registry, "gc" reclaims stale entries.',
-    subcommands: {
-      start: {
-        description: 'Open a detached-HEAD session worktree with a .fgos symlink to the main store.',
-        parameters: {
-          type: 'object',
-          properties: { item: { type: 'string', description: 'Optional work item id to bind the session to.' } },
-          required: [],
-        },
-        examples: ['fgos session start', 'fgos session start --item tsk-abc'],
-      },
-      end: {
-        description: 'Remove a session worktree and its registry entry.',
-        parameters: {
-          type: 'object',
-          properties: {
-            'session-id': { type: 'string', description: 'Positional: the session id to end.' },
-            force: { type: 'boolean', description: 'Force-remove a diverged (dangling-commit) session.' },
-          },
-          positional: ['session-id'],
-          required: ['session-id'],
-        },
-        examples: ['fgos session end <session-id>', 'fgos session end <session-id> --force'],
-      },
-      list: {
-        description: 'Read-only: print the session registry.',
-        parameters: { type: 'object', properties: {}, required: [] },
-        examples: ['fgos session list'],
-      },
-      gc: {
-        description: 'Reclaim entries whose worktree is gone from git or whose start-CLI pid has since exited, sparing diverged or uncommitted-work sessions.',
-        parameters: { type: 'object', properties: {}, required: [] },
-        examples: ['fgos session gc'],
-      },
-    },
-    examples: ['fgos session start', 'fgos session end <session-id>', 'fgos session list', 'fgos session gc'],
-    touchesState: true,
-    store: 'none',
-    mutatesStore: ['start', 'end', 'gc'],
-    externalEffect: false,
-    paginated: false,
-    deprecated: null,
-    native: true,
-  }),
-  withSubcommands({
     name: 'head',
     invoke: 'fgos head <start|rotate>',
     description: 'Agent head sessions (provisional noun, distinct from the worktree verb "session"): "start" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; "rotate" asks for its replacement by a successor that reads a redacted handoff. From inside a confined head both go through its request socket.',

@@ -87,7 +87,6 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("config", fgos_config::provider::AVAILABLE_SUBCOMMANDS),
     ("gateway", wiring::gateway_control::AVAILABLE_SUBCOMMANDS),
     ("events", wiring::events::AVAILABLE_SUBCOMMANDS),
-    ("session", wiring::session::AVAILABLE_SUBCOMMANDS),
     ("git", wiring::git_incidents::AVAILABLE_SUBCOMMANDS),
     ("lock", wiring::lock_fence::AVAILABLE_SUBCOMMANDS),
     ("dispatch", wiring::dispatch_decide::AVAILABLE_SUBCOMMANDS),

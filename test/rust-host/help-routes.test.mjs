@@ -184,7 +184,7 @@ test('help never runs the verb: write and spawn forms, and a help token after a 
   for (const args of [
     ['init', '--help', '--json'],
     ['init', '-h'],
-    ['session', 'start', '--help', '--json'],
+    ['worktree', 'create', '--help', '--json'],
     ['gateway', 'start', '-h'],
     ['run', 'do something', '--writes', 'x.txt', '--help', '--json'],
     ['merge', 'next', '--help'],
@@ -192,7 +192,7 @@ test('help never runs the verb: write and spawn forms, and a help token after a 
     ['init', '--foo', '-h'],
     ['init', '--', '-h'],
     ['init', '--dir', '-h'],
-    ['session', 'start', '--json', '-h'],
+    ['worktree', 'create', '--json', '-h'],
     ['dispatch', 'decide', '--help', '-h'],
   ]) {
     const result = host(args, cwd);

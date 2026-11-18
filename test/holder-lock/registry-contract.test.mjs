@@ -95,7 +95,7 @@ test('every lock rank exists in the rank table and fits the lock kind', () => {
 
 test('ranks follow the documented ordering of the locks', () => {
   const rankOf = Object.fromEntries(registry.locks.map((lock) => [lock.name, lock.rank]));
-  const strictlyIncreasing = ['gateway', 'attempt', 'merge-slot', 'dispatch-cwd', 'worktree-admin', 'main-checkout', 'state', 'sessions'];
+  const strictlyIncreasing = ['gateway', 'attempt', 'merge-slot', 'dispatch-cwd', 'worktree-admin', 'main-checkout', 'state', 'reconcile'];
   for (let i = 1; i < strictlyIncreasing.length; i += 1) {
     assert.ok(
       rankOf[strictlyIncreasing[i - 1]] < rankOf[strictlyIncreasing[i]],

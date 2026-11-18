@@ -1226,47 +1226,6 @@
     ],
     "store": "read"
   },
-  "session": {
-    "selector": "session",
-    "route_kind": "native",
-    "operation_id": "session.list",
-    "owner_path": "apps/fgos",
-    "compatibility_tests": [
-      "test/rust-host/command-routes.test.mjs"
-    ],
-    "subcommands": true,
-    "subcommand_flags": {
-      "end": [
-        "dir",
-        "json",
-        "help",
-        "session-id",
-        "force"
-      ],
-      "gc": [
-        "dir",
-        "json",
-        "help"
-      ],
-      "list": [
-        "dir",
-        "json",
-        "help"
-      ],
-      "start": [
-        "dir",
-        "json",
-        "help",
-        "item"
-      ]
-    },
-    "store": "none",
-    "mutates_store": [
-      "start",
-      "end",
-      "gc"
-    ]
-  },
   "show": {
     "selector": "show",
     "route_kind": "legacy-cli",

@@ -182,8 +182,8 @@ test('invokeHost starts the host in the cwd it is given and in this process\'s c
     const where = path.join(scratch, 'where');
     fs.mkdirSync(where);
     process.env.FGOS_HOST_BIN = host;
-    assert.equal(invokeHost(['session', 'list'], { dir: where, cwd: where }).cwd, fs.realpathSync(where));
-    assert.equal(invokeHost(['session', 'list'], { dir: where }).cwd, fs.realpathSync(process.cwd()));
+    assert.equal(invokeHost(['events', 'status'], { dir: where, cwd: where }).cwd, fs.realpathSync(where));
+    assert.equal(invokeHost(['events', 'status'], { dir: where }).cwd, fs.realpathSync(process.cwd()));
   } finally {
     if (original !== undefined) process.env.FGOS_HOST_BIN = original;
     else delete process.env.FGOS_HOST_BIN;

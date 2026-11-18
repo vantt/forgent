@@ -108,13 +108,6 @@ pub fn project_cli_invocation(
             ContractRef::from_static("mailbox.status.request", "1.0.0"),
             Box::new(crate::wiring::mailbox_verbs::project_mailbox_request(args)),
         ),
-        crate::wiring::session::START_OPERATION_ID
-        | crate::wiring::session::END_OPERATION_ID
-        | crate::wiring::session::LIST_OPERATION_ID
-        | crate::wiring::session::GC_OPERATION_ID => (
-            ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
-            Box::new(crate::wiring::session::project_session_args(args)?),
-        ),
         crate::wiring::lock_fence::OPERATION_ID => (
             ContractRef::from_static("holder-lock.fence.request", "1.0.0"),
             Box::new(crate::wiring::lock_fence::project_fence_request(
@@ -225,11 +218,6 @@ pub fn native_operation_id(
     }
     if route_operation == crate::wiring::mailbox_verbs::INBOX_OPERATION_ID {
         return Ok(crate::wiring::mailbox_verbs::project_mailbox_request(args)
-            .operation_id()
-            .to_string());
-    }
-    if route_operation == crate::wiring::session::LIST_OPERATION_ID {
-        return Ok(crate::wiring::session::project_session_args(args)?
             .operation_id()
             .to_string());
     }
