@@ -1213,7 +1213,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (assessment.failed.length > 0) {
         const reason = [...assessment.notReadyYet, ...assessment.failed].join('; ');
         const { event } = moveWork(dir, { id, to: 'blocked', expectedStatus: 'cleanup', reason, role: 'system' });
-        clearBeaconIfOwn(dir, resolveWriterIdentity(dir).id);
+        clearBeaconIfOwn(dir, resolveWriterIdentity().id);
         return { id, to: 'blocked', reason, seq: event.seq };
       }
 
@@ -1230,7 +1230,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
       }
       const { event } = moveWork(dir, { id, to: 'done', expectedStatus: 'cleanup', role: 'human' });
-      clearBeaconIfOwn(dir, resolveWriterIdentity(dir).id);
+      clearBeaconIfOwn(dir, resolveWriterIdentity().id);
       return { id, to: 'done', seq: event.seq, cleanupWarnings };
     }
 
@@ -1590,7 +1590,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
       }
       const { event } = addOutcome(dir, { id, docType, ...(docPath !== undefined ? { docPath } : {}) });
-      clearBeaconIfOwn(dir, resolveWriterIdentity(dir).id);
+      clearBeaconIfOwn(dir, resolveWriterIdentity().id);
       return { id, docType, docPath: docPath ?? null, status: item.status, seq: event.seq };
     }
 
@@ -3190,7 +3190,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // beacon early instead of leaving another session's commit to wait
         // out its window. Writer-checked (never a blind unlink, D2): only
         // removes a beacon this session's own identity wrote.
-        clearBeaconIfOwn(dir, resolveWriterIdentity(dir).id);
+        clearBeaconIfOwn(dir, resolveWriterIdentity().id);
         return { id, from: 'doing', to: 'awaiting-approval', source: 'main', aheadCount, passed: true, seq: event.seq, output: check.output, frozenJudgeHits: frozenJudge, footprintDiffHits: footprintDiff };
       }
 
@@ -3220,7 +3220,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // failed verify still means this session is done touching the main
       // checkout; the item settling to `blocked` is just as much "done with
       // the checkout" as settling to `proposed`.
-      clearBeaconIfOwn(dir, resolveWriterIdentity(dir).id);
+      clearBeaconIfOwn(dir, resolveWriterIdentity().id);
       return { id, from: 'doing', to: 'blocked', source: 'main', aheadCount, passed: false, timedOut: check.timedOut, exitStatus: check.status, output: check.output };
     }
 

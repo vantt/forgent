@@ -1,6 +1,5 @@
 // Compatibility translations only. fgos-git owns Git, custody, hooks and recovery.
 import crypto from 'node:crypto';
-import path from 'node:path';
 import { createGitScopedCommit } from '../../git/scoped-commit.mjs';
 import { createGitSync } from '../../git/sync.mjs';
 import { createGitInspect, gitWriter } from '../../git/inspect.mjs';
@@ -16,9 +15,8 @@ export function gitContext({ worktree, repoRoot, custody, loaderOptions, writer 
   return { worktree, repoRoot, custody, loaderOptions, writer };
 }
 function options(ctx) {
-  const fgosDir = path.join(ctx.repoRoot, '.fgos');
   return { stateRoot: resolveStateRoot().stateRoot, repoPath: ctx.worktree,
-    trustedMain: ctx.repoRoot, writer: ctx.writer ?? gitWriter(fgosDir) };
+    trustedMain: ctx.repoRoot, writer: ctx.writer ?? gitWriter() };
 }
 const held = ctx => ctx.custody ? [ctx.custody] : [];
 const scoped = ctx => createGitScopedCommit(options(ctx), ctx.loaderOptions);

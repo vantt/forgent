@@ -160,7 +160,7 @@ export function addWork(dir, work) {
     assertNoCycle(item, before.work);
     assertNoUnifiedCycle(item, before.work);
 
-    item.writer = resolveWriterIdentity(dir);
+    item.writer = resolveWriterIdentity();
     return tx.append({ type: 'work.add', payload: item });
   });
 }
@@ -241,7 +241,7 @@ function validateWorkPatch(view, dir, id, patch, role, writer) {
 export function editWork(dir, { id, patch, role } = {}) {
   return withStateAndRefresh(dir, (tx) => {
     const before = tx.view;
-    const writer = resolveWriterIdentity(dir);
+    const writer = resolveWriterIdentity();
     const payload = validateWorkPatch(before, dir, id, patch, role, writer);
     return tx.append({ type: 'work.edit', payload });
   });
@@ -275,7 +275,7 @@ export function resolveParkReason(dir, { id, note, role } = {}) {
     if (role !== undefined) {
       payload.role = role;
     }
-    payload.writer = resolveWriterIdentity(dir);
+    payload.writer = resolveWriterIdentity();
     return tx.append({ type: 'work.resolve-park-reason', payload });
   });
 }
@@ -622,7 +622,7 @@ function moveWorkOnce(dir, { id, to, expectedStatus, reason, ask, answer, role, 
   // post-transition stamp as role/headAtTake above, but unconditional:
   // every moveWork call records who wrote it, never blocking on a
   // malformed identity (D18).
-  rawEvent.payload.writer = resolveWriterIdentity(dir);
+  rawEvent.payload.writer = resolveWriterIdentity();
   // Pull-door claim marker (stage-decompose S2-pull D1): the host repo's HEAD
   // at claim time, additive on the SAME `to === 'doing'` move `take` writes —
   // never a separate event (single write door, D3). Ignored by status-fsm.mjs (pure,
@@ -1048,7 +1048,7 @@ export function settleClaim(dir, {
     // goes through the sanctioned stale-claim-reclaim path (claim-port.mjs,
     // gated on real liveness) — never a direct settle under a different
     // identity, however it obtained the claimId.
-    const writer = resolveWriterIdentity(dir);
+    const writer = resolveWriterIdentity();
     const currentWriterId = String(writer.id);
     if (claim.writerId !== undefined && claim.writerId !== currentWriterId) {
       throw new StoreError('conflict', `settleClaim: writer identity mismatch for "${id}" — claim acquired by writer "${claim.writerId}", settling as writer "${currentWriterId}".`);
@@ -1382,7 +1382,7 @@ export function moveStep(dir, { id, to, expectedStep, verify, role } = {}) {
     // post-transition stamp as role above, but unconditional: every
     // moveStep call records who wrote it, never blocking on a malformed
     // identity (D18).
-    rawEvent.payload.writer = resolveWriterIdentity(dir);
+    rawEvent.payload.writer = resolveWriterIdentity();
     return tx.append(rawEvent);
   });
 
@@ -1486,7 +1486,7 @@ function callEvent(dir, before, { id, toRole, reason, note, outcome, openSyncDep
   const rawEvent = result.edge.mode === 'async'
     ? { type: 'work.handoff', payload: { id, from: fromRole, to: toRole, reason, mode: 'async', note } }
     : { type: 'work.call-summary', payload: { id, calleeRole: toRole, reason, outcome } };
-  rawEvent.payload.writer = resolveWriterIdentity(dir);
+  rawEvent.payload.writer = resolveWriterIdentity();
   return rawEvent;
 }
 
@@ -1521,7 +1521,7 @@ export function recordCallReturn(dir, { id, note } = {}) {
       type: 'work.handoff',
       payload: { id, from: work.holder, to: openCall.from, reason: openCall.reason, mode: 'async', returning: true, note },
     };
-    rawEvent.payload.writer = resolveWriterIdentity(dir);
+    rawEvent.payload.writer = resolveWriterIdentity();
     return tx.append(rawEvent);
   });
 }

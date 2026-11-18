@@ -125,7 +125,7 @@ fn run(args: &[OsString]) {
         };
         fgos_identity::directory::attempt_gate(identity_root.as_deref()?, &key)
     };
-    let env = HookEnv::from_process(&fgos_dir, &gate_of);
+    let env = HookEnv::from_process(&gate_of);
     let resolve = resolver_for(adapter, facts, &env, &loaded.hook.hook);
     let project = super::mailbox_root::project_name(&fgos_dir);
     let ancestry = || ancestry_of(std::process::id());

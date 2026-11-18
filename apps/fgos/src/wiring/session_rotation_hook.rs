@@ -239,7 +239,7 @@ fn run(args: &[OsString]) {
             };
             let session_id = || {
                 let root = state_root()?;
-                fgos_identity::current_session(&root, std::process::id(), Some(&fgos_dir))
+                fgos_identity::current_session(&root, std::process::id())
                     .ok()
                     .map(|s| s.info.id)
             };

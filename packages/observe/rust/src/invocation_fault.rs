@@ -231,18 +231,16 @@ pub fn record(input: &FaultInput<'_>) -> Option<PathBuf> {
     record_with(input, &resolve_current)
 }
 
-/// [`record`] with the writer identity taken from `identify`, which receives the
-/// resolved store. The production door passes [`resolve_current`]; a caller that
+/// [`record`] with the writer identity taken from `identify`. The production door passes [`resolve_current`]; a caller that
 /// must not depend on the process environment passes its own resolution.
 pub fn record_with(
     input: &FaultInput<'_>,
-    identify: &dyn Fn(Option<&Path>) -> WriterIdentity,
+    identify: &dyn Fn() -> WriterIdentity,
 ) -> Option<PathBuf> {
     if input.fault_class.is_empty() {
         return None;
     }
     let log = log_path(input.fgos_dir, input.cwd)?;
-    let store = log.parent().and_then(Path::parent);
     let record = json!({
         "ts": now_iso(),
         "faultClass": input.fault_class,
@@ -250,7 +248,7 @@ pub fn record_with(
         "message": redact_message(input.message, input.argv, input.sub),
         "cwd": input.cwd.to_string_lossy(),
         "argv": argv_shape(input.argv, input.sub),
-        "writer": identify(store),
+        "writer": identify(),
     });
     append_capped(&log, &record).ok()?;
     Some(log)
@@ -355,12 +353,11 @@ mod tests {
         let root = scratch();
         fs::create_dir_all(root.join(".fgos")).unwrap();
         let argv = ["work", "add", "--api-key", "sk-live-0123456789abcdef"].map(String::from);
-        let identify = |dir: Option<&Path>| {
+        let identify = || {
             resolve(
                 &|key| (key == "CLAUDE_CODE_SESSION_ID").then(|| "session-under-test".to_string()),
                 &NoProcesses,
                 1,
-                dir,
             )
         };
         let written = record_with(

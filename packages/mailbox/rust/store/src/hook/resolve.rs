@@ -4,7 +4,7 @@
 //! host both call [`resolver_for`], so it exists once.
 //!
 //! - Claude Code: the writer is session identity's (from the environment
-//!   or the registry only, never a pid fallback), and the head comes from
+//!   only, never a pid fallback), and the head comes from
 //!   the session file under the shared config-directory resolver; a head
 //!   session attempt whose session file is missing takes the head position
 //!   when the payload names its writer.
@@ -22,7 +22,6 @@ use fgos_identity::resolve::{
 };
 use fgos_mailbox_core::WriterKey;
 use std::ffi::OsString;
-use std::path::Path;
 
 /// What the entry read of its environment, once.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -30,7 +29,7 @@ pub struct HookEnv {
     pub home: Option<OsString>,
     pub claude_config_dir: Option<OsString>,
     /// Session identity's writer of this process, when it came from the
-    /// environment or the registry (never one derived from a pid).
+    /// environment (never one derived from a pid).
     pub session_writer: Option<WriterKey>,
     /// The session id the entry's own environment names, if any
     /// (`FGOS_SESSION_ID`, `CODEX_THREAD_ID`, `CLAUDE_CODE_SESSION_ID`).
@@ -76,12 +75,10 @@ fn is_head_attempt(lookup: &dyn Fn(&str) -> Option<String>) -> bool {
 }
 
 impl HookEnv {
-    /// The calling process's environment; `fgos_dir` is the record's
-    /// `.fgos` directory, where session identity's registry lives, and
-    /// `gate_of` answers the gate of the runner attempt it is given by id,
+    /// The calling process's environment; `gate_of` answers the gate of the runner attempt it is given by id,
     /// from Identity's directory (asked only for a head session attempt).
-    pub fn from_process(fgos_dir: &Path, gate_of: &dyn Fn(&str) -> Option<HeadRef>) -> Self {
-        Self::from_lookup(fgos_dir, &|name: &str| std::env::var(name).ok(), gate_of)
+    pub fn from_process(gate_of: &dyn Fn(&str) -> Option<HeadRef>) -> Self {
+        Self::from_lookup(&|name: &str| std::env::var(name).ok(), gate_of)
     }
 
     /// [`HookEnv::from_process`] over `lookup`. A head session attempt
@@ -90,7 +87,6 @@ impl HookEnv {
     /// attempt id is never its writer, so the payload's `session_id` is the
     /// head's CLI session.
     fn from_lookup(
-        fgos_dir: &Path,
         lookup: &dyn Fn(&str) -> Option<String>,
         gate_of: &dyn Fn(&str) -> Option<HeadRef>,
     ) -> Self {
@@ -99,16 +95,14 @@ impl HookEnv {
             Some(id) => (WriterKey::new(id.clone()).ok(), Some(id)),
             None if head_attempt => (None, None),
             None => {
-                let identity = resolve_current(Some(fgos_dir));
+                let identity = resolve_current();
                 let writer = match (identity.id, identity.source) {
-                    (WriterId::Session(id), Source::Env | Source::Registry) => {
-                        WriterKey::new(id).ok()
-                    }
+                    (WriterId::Session(id), Source::Env) => WriterKey::new(id).ok(),
                     _ => None,
                 };
                 (
                     writer,
-                    env_identity(lookup, None).map(|identity| identity.id.to_string()),
+                    env_identity(lookup).map(|identity| identity.id.to_string()),
                 )
             }
         };
@@ -211,11 +205,7 @@ mod tests {
                 start_time: "70".into(),
             })
         };
-        let head = HookEnv::from_lookup(
-            std::path::Path::new("/nonexistent/.fgos"),
-            &env(&codex),
-            &gate,
-        );
+        let head = HookEnv::from_lookup(&env(&codex), &gate);
         assert_eq!(
             (head.session_writer.clone(), head.session_env.clone()),
             (None, None)
@@ -231,11 +221,7 @@ mod tests {
         );
         // The falsifier: a worker attempt (no head request socket) keeps its attempt id as its session, so the
         // payload's session is refused as another writer's.
-        let worker = HookEnv::from_lookup(
-            std::path::Path::new("/nonexistent/.fgos"),
-            &env(&codex[..1]),
-            &gate,
-        );
+        let worker = HookEnv::from_lookup(&env(&codex[..1]), &gate);
         assert_eq!(worker.session_env.as_deref(), Some("att-cmd_1"));
         assert_eq!(worker.head_gate, None, "a worker never asks for its gate");
         assert!(payload_writer(payload, worker.session_env.as_deref()).is_err());

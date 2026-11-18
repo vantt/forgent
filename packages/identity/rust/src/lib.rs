@@ -65,7 +65,6 @@ pub use refusal::{Candidate, Liveness, Refusal};
 pub use resolve::{
     env_identity, pi_family_cli, resolve, resolve_current, terminal_head, tree_identity, HeadRef,
     Source, WriterId, WriterIdentity, WriterKey, ENV_ORDER, MAX_ID_LENGTH, PI_SESSION_VAR,
-    REGISTRY_FILE,
 };
 #[cfg(feature = "directory")]
 pub use shared::{EntryLog, LogDoor, MachineRef, RawEvent, SharedView};

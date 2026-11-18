@@ -409,7 +409,7 @@ mod unix {
         a.project()?;
         let (roots, detectors) = (a.roots(true)?, on_path());
         let ids: Vec<&str> = a.ids.iter().map(String::as_str).collect();
-        let writer = fgos_identity::resolve_current(None);
+        let writer = fgos_identity::resolve_current();
         let done = fix_with_roots(&context(&detectors)?, &roots, &writer, &ids, a.acknowledge)?;
         let changed = done
             .applied

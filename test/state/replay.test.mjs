@@ -809,7 +809,7 @@ test('foldEvents silently skips a malformed goal.focus payload (missing/non-stri
 test("foldEvents folds writer onto the item across work.move, work.edit and work.step, latest write wins", () => {
   const base = { seq: 1, ts: "2026-07-27T00:00:00.000Z", type: "work.add", payload: { id: "a", title: "A", status: "todo" } };
   const writerA = { id: "sess-1", source: "env" };
-  const writerB = { id: "sess-2", source: "registry" };
+  const writerB = { id: "sess-2", source: "env" };
   const writerC = { id: 4242, source: "pid" };
   const moveEvent = { seq: 2, ts: "2026-07-27T00:00:01.000Z", type: "work.move", payload: { id: "a", to: "doing", writer: writerA } };
   const editEvent = { seq: 3, ts: "2026-07-27T00:00:02.000Z", type: "work.edit", payload: { id: "a", patch: { title: "A2" }, writer: writerB } };

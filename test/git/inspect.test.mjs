@@ -100,15 +100,14 @@ test('a Git port writer is text when the session identity is a process id', () =
     const env = { ...process.env, FGOS_HOST_BIN: built.hostBin, FGOS_ACTIVE_MANIFEST_PATH: built.manifest, XDG_STATE_HOME: path.join(temp, 'state') };
     for (const name of ['FGOS_SESSION_ID', 'CODEX_THREAD_ID', 'CLAUDE_CODE_SESSION_ID', 'FGOS_STATE_ROOT']) delete env[name];
     const out = execFileSync(process.execPath, ['--input-type=module', '-'], { cwd: root, env, encoding: 'utf8', input: `
-import path from 'node:path';
 import { gitPortOptions, gitWriter } from './src/git/inspect.mjs';
 import { createGitSync } from './src/git/index.mjs';
 import { resolveWriterIdentity } from './src/util/session-identity.mjs';
 const repo = ${JSON.stringify(repoPath)};
-const identity = resolveWriterIdentity(path.join(repo, '.fgos'));
+const identity = resolveWriterIdentity();
 const options = gitPortOptions(repo, { mutation: true });
 createGitSync(options);
-console.log(JSON.stringify({ identity, writer: options.writer, door: gitWriter(path.join(repo, '.fgos')) }));
+console.log(JSON.stringify({ identity, writer: options.writer, door: gitWriter() }));
 ` });
     const { identity, writer, door } = JSON.parse(out);
     assert.equal(identity.source, 'pid');

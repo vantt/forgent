@@ -336,7 +336,7 @@ async function runUnitBody(options, scope) {
 /** The unit run marked running on disk, with what every later step of it reads. */
 function openUnitRun(ctx) {
   const { options, scope, mainRoot, unit, unitRecord, unitRunId } = ctx;
-  if (writesWorktree(unit, unitRecord.sync)) unitRecord.gitWriter ??= gitWriter(path.join(mainRoot, '.fgos'));
+  if (writesWorktree(unit, unitRecord.sync)) unitRecord.gitWriter ??= gitWriter();
   if (options.resumeUnitRunId) assertSyncResumable(unitRunId, unitRecord, mainRoot, scope.custody);
   scope.unitRecord = unitRecord;
   const unitDir = path.join(ctx.assignmentsDir, unitRunId);

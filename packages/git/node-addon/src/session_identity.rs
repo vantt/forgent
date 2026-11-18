@@ -8,11 +8,11 @@ use napi_derive::napi;
 use serde_json::{json, Value};
 use std::path::Path;
 
-/// `{ id, source }` for this process: its own env, process tree and pid, with `fgos_dir`'s registry confirming an env id.
+/// `{ id, source }` for this process: its own env, process tree and pid.
 #[napi(namespace = "sessionIdentity")]
-pub fn resolve(fgos_dir: Option<String>) -> Result<Value> {
+pub fn resolve() -> Result<Value> {
     check()?;
-    serde_json::to_value(resolve_current(fgos_dir.as_deref().map(Path::new))).map_err(error)
+    serde_json::to_value(resolve_current()).map_err(error)
 }
 
 /// The judgement of the shared directory of the main checkout at `main_root`, read from its cache:

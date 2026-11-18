@@ -1,9 +1,7 @@
-//! The resolve rule. Pure apart from the [`ProcessTree`] port and one
-//! read-only look at `<fgos_dir>/sessions.json`.
+//! The resolve rule. Pure apart from the [`ProcessTree`] port.
 
 use crate::proc_tree::{os_process_tree, ProcessTree};
 use serde::Serialize;
-use std::path::Path;
 
 /// Env variables tried in order; the first usable value wins.
 pub const ENV_ORDER: [&str; 4] = [
@@ -18,21 +16,18 @@ pub const ENV_ORDER: [&str; 4] = [
 pub const PI_SESSION_VAR: &str = "PI_SESSION_ID";
 /// Longest env id accepted, in characters.
 pub const MAX_ID_LENGTH: usize = 200;
-/// Registry file under the fgos dir that can confirm an env id.
-pub const REGISTRY_FILE: &str = "sessions.json";
 /// Upper bound on parent hops, so a corrupt or cyclic parent chain stops.
 const MAX_WALK: usize = 4096;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Source {
-    Registry,
     Env,
     Pid,
     Unresolved,
 }
 
-/// A session id string (`registry`/`env`) or a process id (`pid`/`unresolved`).
+/// A session id string (`env`) or a process id (`pid`/`unresolved`).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(untagged)]
 pub enum WriterId {
@@ -53,7 +48,7 @@ impl std::fmt::Display for WriterId {
 pub struct WriterIdentity {
     pub id: WriterId,
     pub source: Source,
-    /// The env variable that gave the id (`env` and `registry` sources),
+    /// The env variable that gave the id (the `env` source),
     /// kept so a handle can name the CLI without re-reading the rule. Not
     /// part of the `{id, source}` answer.
     #[serde(skip)]
@@ -122,24 +117,8 @@ fn usable(value: &str) -> Option<&str> {
     ok.then_some(trimmed)
 }
 
-fn registry_confirms(fgos_dir: Option<&Path>, id: &str) -> bool {
-    let Some(dir) = fgos_dir else { return false };
-    let Ok(raw) = std::fs::read_to_string(dir.join(REGISTRY_FILE)) else {
-        return false;
-    };
-    let Ok(serde_json::Value::Array(rows)) = serde_json::from_str::<serde_json::Value>(&raw) else {
-        return false;
-    };
-    rows.iter()
-        .any(|row| row.get("sessionId").and_then(|v| v.as_str()) == Some(id))
-}
-
-/// Step 1: the first usable env id, confirmed against the registry when one
-/// is given. `None` means no usable env id.
-pub fn env_identity(
-    lookup: &dyn Fn(&str) -> Option<String>,
-    fgos_dir: Option<&Path>,
-) -> Option<WriterIdentity> {
+/// Step 1: the first usable env id. `None` means no usable env id.
+pub fn env_identity(lookup: &dyn Fn(&str) -> Option<String>) -> Option<WriterIdentity> {
     ENV_ORDER.iter().find_map(|key| {
         let value = lookup(key)?;
         let (_, id) = WriterKey {
@@ -147,15 +126,9 @@ pub fn env_identity(
             value: &value,
         }
         .checked()?;
-        let id = id.to_string();
-        let source = if registry_confirms(fgos_dir, &id) {
-            Source::Registry
-        } else {
-            Source::Env
-        };
         Some(WriterIdentity {
-            id: WriterId::Session(id),
-            source,
+            id: WriterId::Session(id.to_string()),
+            source: Source::Env,
             env_var: Some(*key),
             cli: None,
         })
@@ -261,9 +234,8 @@ pub fn resolve(
     lookup: &dyn Fn(&str) -> Option<String>,
     tree: &dyn ProcessTree,
     caller_pid: u32,
-    fgos_dir: Option<&Path>,
 ) -> WriterIdentity {
-    match env_identity(lookup, fgos_dir) {
+    match env_identity(lookup) {
         Some(identity) => {
             let cli = identity
                 .env_var
@@ -276,12 +248,11 @@ pub fn resolve(
 
 /// The rule for the current process, as an in-process Rust caller (Observe)
 /// sees itself: real env, real OS process tree, own pid.
-pub fn resolve_current(fgos_dir: Option<&Path>) -> WriterIdentity {
+pub fn resolve_current() -> WriterIdentity {
     let tree = os_process_tree();
     resolve(
         &|key| std::env::var(key).ok(),
         tree.as_ref(),
         std::process::id(),
-        fgos_dir,
     )
 }

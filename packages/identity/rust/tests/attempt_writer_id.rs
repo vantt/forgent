@@ -67,8 +67,7 @@ fn every_vector_case_reproduces_and_valid_ids_resolve_as_env_ids() {
             let id = id.clone();
             move |key: &str| (key == "FGOS_SESSION_ID").then(|| id.clone())
         };
-        let resolved =
-            env_identity(&env, None).unwrap_or_else(|| panic!("{name}: rule refused the id"));
+        let resolved = env_identity(&env).unwrap_or_else(|| panic!("{name}: rule refused the id"));
         assert_eq!(resolved.source, Source::Env, "{name}");
         assert_eq!(resolved.id, WriterId::Session(id), "{name}");
     }
@@ -155,7 +154,7 @@ fn an_empty_inherited_session_id_does_not_survive() {
         !env.contains_key("FGOS_PARENT_WRITER_ID"),
         "no controller id, no inherited lineage"
     );
-    let resolved = env_identity(&|k: &str| env.get(k).cloned(), None).unwrap();
+    let resolved = env_identity(&|k: &str| env.get(k).cloned()).unwrap();
     assert_eq!(resolved.id, WriterId::Session("att-a1".into()));
 }
 

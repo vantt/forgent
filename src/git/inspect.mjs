@@ -1,5 +1,4 @@
 // Typed read facade; policy, parsing and byte paths belong to fgos-git.
-import path from 'node:path';
 import { resolveStateRoot } from '../holder-lock/index.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
@@ -25,10 +24,10 @@ export function createGitInspect(options, loaderOptions) {
   return Object.freeze(facade);
 }
 
-/** The writer a Git port records for `fgosDir`'s session: the identity id as text (a `pid`
+/** The writer a Git port records for this session: the identity id as text (a `pid`
  * answer is an integer, every port's writer is a string). */
-export function gitWriter(fgosDir) {
-  return String(resolveWriterIdentity(fgosDir).id);
+export function gitWriter() {
+  return String(resolveWriterIdentity().id);
 }
 
 /** Mutation options resolve the repository once; a caller that already holds an inspect port for
@@ -40,7 +39,7 @@ export function gitPortOptions(repoPath, { mutation = false, inspect, detached =
   if (!mutation) return seed;
   const facts = (inspect ?? createGitInspect(seed)).resolveRepo();
   if (facts.notARepository) return seed;
-  return { ...seed, trustedMain: facts.trustedMainRoot, writer: gitWriter(path.join(facts.trustedMainRoot, '.fgos')) };
+  return { ...seed, trustedMain: facts.trustedMainRoot, writer: gitWriter() };
 }
 
 /** The codes of a Git door that is not there at all (no addon shipped, or none that loads), as opposed to one that answered with a refusal. */

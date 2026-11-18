@@ -379,7 +379,7 @@ fn incoming_summary(
     limits: &fgos_mailbox_core::Limits,
     now: Timestamp,
 ) -> Option<(Value, String)> {
-    let key = caller(fgos_dir)?;
+    let key = caller()?;
     let existing = Record::read_existing(fgos_dir, limits).ok()??;
     let mail: Vec<_> = existing
         .state
@@ -635,13 +635,9 @@ pub(crate) fn system_nudge(versions: &VersionSources) -> SystemNudge {
 /// The caller's writer key: session identity's, attribution only; a head
 /// session attempt is its CLI session, as its hook binds it
 /// (`head_cli_session`).
-fn caller(fgos_dir: &Path) -> Option<WriterKey> {
+fn caller() -> Option<WriterKey> {
     let id = fgos_mailbox::hook::resolve::head_cli_session(&|name| std::env::var(name).ok())
-        .unwrap_or_else(|| {
-            fgos_identity::resolve_current(Some(fgos_dir))
-                .id
-                .to_string()
-        });
+        .unwrap_or_else(|| fgos_identity::resolve_current().id.to_string());
     WriterKey::new(id).ok()
 }
 
@@ -691,7 +687,7 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
             } else {
                 None
             };
-            let Some(from) = caller(&fgos_dir) else {
+            let Some(from) = caller() else {
                 return failed(record_error_text("caller-unknown"), *json, warning);
             };
             let versions = version_sources(loaded.hook.hook.max_read_bytes);
@@ -785,11 +781,11 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
         MailboxRequest::List { long, json } => list(*long, *json),
         MailboxRequest::Status { json } => status(*json),
         MailboxRequest::Inbox { claim: false, json } => {
-            let (fgos_dir, record, loaded, warning) = match open(*json) {
+            let (_, record, loaded, warning) = match open(*json) {
                 Ok(opened) => opened,
                 Err(answer) => return *answer,
             };
-            let Some(key) = caller(&fgos_dir) else {
+            let Some(key) = caller() else {
                 return failed(record_error_text("caller-unknown"), *json, warning);
             };
             match verbs::inbox(
@@ -811,11 +807,11 @@ pub fn answer(request: &MailboxRequest) -> MailboxAnswer {
             }
         }
         MailboxRequest::Inbox { claim: true, json } => {
-            let (fgos_dir, record, loaded, warning) = match open(*json) {
+            let (_, record, loaded, warning) = match open(*json) {
                 Ok(opened) => opened,
                 Err(answer) => return *answer,
             };
-            let Some(key) = caller(&fgos_dir) else {
+            let Some(key) = caller() else {
                 return failed(record_error_text("caller-unknown"), *json, warning);
             };
             let root = state_root();

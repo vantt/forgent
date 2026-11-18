@@ -37,15 +37,14 @@ export function getMainFgosDir(dir) {
 /**
  * Run `fn(tx)` in the `state` hot mutex of the main checkout's `.fgos` — the
  * one lock for the event log and the runtime claims. Everything that needs a
- * child process (the main checkout root, the writer identity of both
- * directories) is resolved here, before the lock; `fn` reads `tx.mainFgosDir`.
+ * child process (the main checkout root, the writer identity) is resolved
+ * here, before the lock; `fn` reads `tx.mainFgosDir`.
  * `dirInput` is the `.fgos` the caller operates on; the transaction may write
  * there too when it is not the main one.
  */
 export function withMainState(dirInput, fn, options) {
   const mainFgosDir = getMainFgosDir(dirInput);
-  const writer = resolveWriterIdentity(dirInput).id;
-  if (mainFgosDir !== dirInput) resolveWriterIdentity(mainFgosDir);
+  const writer = resolveWriterIdentity().id;
   return withWorkState(dirInput, mainFgosDir, writer, fn, options);
 }
 
@@ -197,7 +196,7 @@ export function acquireClaimTx(tx, {
   // DIFFERENT session's still-live claim goes through the sanctioned
   // stale-claim-reclaim path (claim-port.mjs, gated on real liveness),
   // never a direct `return` under a different identity.
-  const writerId = String(resolveWriterIdentity(fgosDir).id);
+  const writerId = String(resolveWriterIdentity().id);
   const claimRecord = {
     claimId: `clm-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
     id,
@@ -271,7 +270,7 @@ export function releaseClaimTx(tx, args = {}) {
 
   let admin;
   if (existing.writerId !== undefined) {
-    const currentWriterId = String(resolveWriterIdentity(fgosDir).id);
+    const currentWriterId = String(resolveWriterIdentity().id);
     if (existing.writerId !== currentWriterId) {
       if (adminReason === undefined) {
         throw new ClaimError('conflict', `releaseClaim: writer identity mismatch for "${id}" — claim acquired by writer "${existing.writerId}", releasing as writer "${currentWriterId}".`);

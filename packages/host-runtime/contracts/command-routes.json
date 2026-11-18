@@ -734,7 +734,6 @@
         "json",
         "help",
         "pid",
-        "fgos-dir",
         "register",
         "role",
         "take",
@@ -744,8 +743,7 @@
         "dir",
         "json",
         "help",
-        "pid",
-        "fgos-dir"
+        "pid"
       ]
     },
     "store": "none"

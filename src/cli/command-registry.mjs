@@ -1133,7 +1133,7 @@ export const COMMAND_REGISTRY = [
   withSubcommands({
     name: 'identity',
     invoke: 'fgos identity [writer|machine|session|project|resolve|list|mint|pins]',
-    description: 'Read-only unless --alias, --init, --new, --register, --role, --drop-role, --forget, --confirm, `list --prune` or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, PI_SESSION_ID, CLAUDE_CODE_SESSION_ID in order (source env, or registry when .fgos/sessions.json lists the id); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle, its alias and the fingerprint of its signing key; `pins` lists the machine keys this machine pinned the first time it saw them, each `seen` or `confirmed`; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `session --register` puts this session in the local directory of this machine, `resolve <handle|lead:LANE|work:NAME>` names exactly one live session of it and `list` shows them; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
+    description: 'Read-only unless --alias, --init, --new, --register, --role, --drop-role, --forget, --confirm, `list --prune` or `mint`: who this process, this machine and this project are, through the native Identity component (docs/platform/identity/spec.md). Bare `fgos identity` is `writer`: which writer the calling process is, as {id, source}. Tries FGOS_SESSION_ID, CODEX_THREAD_ID, PI_SESSION_ID, CLAUDE_CODE_SESSION_ID in order (source env); otherwise the highest ancestor holding a controlling terminal, else the caller\'s session id (source pid); otherwise the caller pid (source unresolved). `machine` prints the machine id minted by `fgos doctor --fix`, its handle, its alias and the fingerprint of its signing key; `pins` lists the machine keys this machine pinned the first time it saw them, each `seen` or `confirmed`; `session` prints this session\'s full id and its stable handle (`claude-4f2a@fg-server`); `project` prints the project id every clone shares (the tracked file `.fgos/project.json`), also from a linked worktree; `session --register` puts this session in the local directory of this machine, `resolve <handle|lead:LANE|work:NAME>` names exactly one live session of it and `list` shows them; `mint <kind>` gives a new id that travels between machines. Bare also carries optional `machine` and `session` parts, `null` when unknown; it never writes.',
     subcommands: {
       writer: {
         description: 'Which writer the calling process is, as {id, source}. Same as bare `fgos identity`; the hook path reads it.',
@@ -1141,11 +1141,10 @@ export const COMMAND_REGISTRY = [
           type: 'object',
           properties: {
             pid: { type: 'number', description: 'The process asking. Defaults to the process that started fgos.' },
-            'fgos-dir': { type: 'string', description: 'The .fgos directory whose sessions.json may confirm an env id. Absent skips that confirmation.' },
           },
           required: [],
         },
-        examples: ['fgos identity writer', 'fgos identity writer --pid 4242 --fgos-dir .fgos'],
+        examples: ['fgos identity writer', 'fgos identity writer --pid 4242'],
       },
       machine: {
         description: 'This machine: {id, handle, alias, keyFingerprint}. The id and the ed25519 signing key are minted once per machine by `fgos doctor --fix`; `keyFingerprint` is `SHA256:...`, null while no key can be read; the handle is the alias when one is set, else the id without its suffix. Exit 65 [machine-id-missing] when no id was minted yet.',
@@ -1164,7 +1163,6 @@ export const COMMAND_REGISTRY = [
           type: 'object',
           properties: {
             pid: { type: 'number', description: 'The process asking. Defaults to the process that started fgos.' },
-            'fgos-dir': { type: 'string', description: 'The .fgos directory whose sessions.json may confirm an env id. Absent skips that confirmation.' },
             register: { type: 'boolean', description: 'Record this session in the local directory of the machine (refreshes an existing entry).' },
             role: { type: 'string', description: 'A role alias: `lead:<LANE>` (lane: A-Z first, then A-Z, 0-9, hyphen; at most 16) or `work:<name>` (a work item id or slug: a-z first, then a-z, 0-9, hyphen; at most 30). Implies --register.' },
             take: { type: 'boolean', description: 'With --role: move the role from the live session that holds it.' },

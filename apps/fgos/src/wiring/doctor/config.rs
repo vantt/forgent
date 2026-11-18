@@ -208,7 +208,7 @@ pub(crate) mod door {
 
     /// One repair; how many changes it made, or why it could not run.
     pub fn repair(ctx: &Context, roots: &SnapshotRequest, fix: &str) -> Result<usize, String> {
-        let writer = fgos_identity::resolve_current(None);
+        let writer = fgos_identity::resolve_current();
         fix_with_roots(ctx, roots, &writer, &[fix], false)
             .map(|report| report.applied.len())
             .map_err(|error| match error {

@@ -40,7 +40,6 @@ pub trait CallerSource {
 pub struct IdentityCaller {
     pub state_root: PathBuf,
     pub pid: u32,
-    pub fgos_dir: Option<PathBuf>,
     /// Display only; the host fills it from Session Host placement when it can be read.
     pub pane: Option<String>,
 }
@@ -51,7 +50,7 @@ fn unresolved(detail: impl Into<String>) -> Refusal {
 
 impl CallerSource for IdentityCaller {
     fn caller(&self) -> Result<Caller, Refusal> {
-        let session = current_session(&self.state_root, self.pid, self.fgos_dir.as_deref())
+        let session = current_session(&self.state_root, self.pid)
             .map_err(|r| unresolved(format!("{}: {}", r.reason, r.detail)))?;
         let machine = machine_info(&self.state_root)
             .map_err(|r| unresolved(format!("{}: {}", r.reason, r.detail)))?;

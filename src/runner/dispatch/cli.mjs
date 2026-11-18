@@ -258,7 +258,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
           timeoutMs: positiveIntFlag('--timeout-ms'),
           createAssignment: (contract) => claimAssignmentId(() => buildAssignment({
             options: { assignmentsDir },
-            provenance: { kind: 'inline', contract, caller: { writerId: String(resolveWriterIdentity(fgosDir).id) } },
+            provenance: { kind: 'inline', contract, caller: { writerId: String(resolveWriterIdentity().id) } },
           }), assignmentsDir),
           dispatch: (assignment, { runnerConfig, cliOverride }) => executeAssignment(assignment, {
             cwd,

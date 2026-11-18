@@ -737,17 +737,6 @@
       "reason": "a seal or publish child is always the host's native `events` verb, started from the two lifecycle wrappers; a second place that spells the child's argv is a second way to start one (a Node child would be refused by the native verb)"
     },
     {
-      "job": "per-session checkout registry",
-      "kind": "door",
-      "patterns": ["sessions\\.json", "\\bSESSIONS_FILE\\b"],
-      "allowed": [
-        { "path": "packages/identity/rust/src/resolve.rs", "reason": "reads the file read-only to confirm an env session id (one field, fail soft); the row shape is the `x-sessionRegistry` section of identity.writer.v1.json, run by both readers" },
-        { "path": "src/cli/command-registry.mjs", "reason": "names the file in the description text of the `identity` verb; it reads nothing" }
-      ],
-      "retiredBy": "S6a: the module moves into the Execution crate if one exists then",
-      "reason": "the per-session checkout registry is retired with its writer (the host session module); the only readers left confirm an env session id read-only until Identity stops reading the file"
-    },
-    {
       "job": "compose Git status and recovery",
       "kind": "door",
       "patterns": ["export function (?:readGitStatus|recoverGitOperations)\\b", "fn (?:read_git_status|recover_git_operations)\\b"],

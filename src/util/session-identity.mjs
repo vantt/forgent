@@ -1,6 +1,5 @@
 // Node facade over the writer identity: the rule lives in the Rust crate fgos-identity, read in process through the
 // native door (docs/platform/identity/spec.md §7a). It decides nothing about the id; no door means WriterIdentityError.
-import path from 'node:path';
 import { nativeDoor } from '../native/door.mjs';
 
 export class WriterIdentityError extends Error {
@@ -22,14 +21,13 @@ export function identityDoor() {
   }
 }
 
-/** `{ id, source }` for this process; `fgosDir`'s sessions.json may confirm an env id (source registry). */
-export function resolveWriterIdentity(fgosDir) {
-  const dir = fgosDir ? path.resolve(fgosDir) : null, envKey = JSON.stringify(ENV_ORDER.map((key) => process.env[key] ?? null));
-  const hit = kept.get(envKey) ?? kept.get(`${envKey}\n${dir}`);
+/** `{ id, source }` for this process; the answer depends on the env alone, so the env is the cache key. */
+export function resolveWriterIdentity() {
+  const envKey = JSON.stringify(ENV_ORDER.map((key) => process.env[key] ?? null));
+  const hit = kept.get(envKey);
   if (hit) return { ...hit };
-  const answer = identityDoor().resolve(dir);
-  // pid and unresolved answers depend on the env alone; env and registry answers also on the dir.
-  kept.set(['pid', 'unresolved'].includes(answer.source) ? envKey : `${envKey}\n${dir}`, answer);
+  const answer = identityDoor().resolve();
+  kept.set(envKey, answer);
   return { ...answer };
 }
 

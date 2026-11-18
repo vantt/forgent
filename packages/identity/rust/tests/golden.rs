@@ -1,11 +1,9 @@
 use fgos_identity::{
     env_identity, resolve, tree_identity, ProcStat, ProcessTree, ENV_ORDER, MAX_ID_LENGTH,
-    REGISTRY_FILE,
 };
 use serde::Deserialize;
 use serde_json::Value;
 use std::collections::HashMap;
-use std::path::PathBuf;
 
 const GOLDEN: &str = include_str!("../../contracts/identity.writer.golden.v1.json");
 const CONTRACT: &str = include_str!("../../contracts/identity.writer.v1.json");
@@ -22,7 +20,6 @@ struct Golden {
 struct EnvCase {
     name: String,
     env: HashMap<String, String>,
-    registry: Value,
     expected: Option<Value>,
 }
 
@@ -55,54 +52,15 @@ fn golden() -> Golden {
     serde_json::from_str(GOLDEN).expect("golden parses")
 }
 
-fn scratch_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!(
-        "fgos-identity-golden-{}-{}",
-        std::process::id(),
-        name.replace(|c: char| !c.is_ascii_alphanumeric(), "-")
-    ));
-    let _ = std::fs::remove_dir_all(&dir);
-    std::fs::create_dir_all(&dir).unwrap();
-    dir
-}
-
-/// Builds the registry state a case names; `None` means no fgos dir passed.
-fn registry_dir(case: &EnvCase) -> Option<PathBuf> {
-    match case.registry["kind"].as_str().unwrap() {
-        "none" => None,
-        "absent" => Some(scratch_dir(&case.name)),
-        "rows" => {
-            let dir = scratch_dir(&case.name);
-            std::fs::write(dir.join(REGISTRY_FILE), case.registry["rows"].to_string()).unwrap();
-            Some(dir)
-        }
-        "raw" => {
-            let dir = scratch_dir(&case.name);
-            std::fs::write(
-                dir.join(REGISTRY_FILE),
-                case.registry["raw"].as_str().unwrap(),
-            )
-            .unwrap();
-            Some(dir)
-        }
-        other => panic!("unknown registry kind {other}"),
-    }
-}
-
 #[test]
 fn env_cases_follow_the_golden_vectors() {
     let golden = golden();
     assert_eq!(golden.contract, "identity.writer.golden.v1");
     for case in &golden.env_cases {
-        let dir = registry_dir(case);
         let env = case.env.clone();
         let lookup = move |key: &str| env.get(key).cloned();
-        let actual =
-            env_identity(&lookup, dir.as_deref()).map(|id| serde_json::to_value(id).unwrap());
+        let actual = env_identity(&lookup).map(|id| serde_json::to_value(id).unwrap());
         assert_eq!(actual, case.expected, "env case: {}", case.name);
-        if let Some(dir) = dir {
-            let _ = std::fs::remove_dir_all(dir);
-        }
     }
 }
 
@@ -140,7 +98,7 @@ fn a_usable_env_id_wins_over_the_process_tree() {
         },
     )]));
     let lookup = |key: &str| (key == "CODEX_THREAD_ID").then(|| "thread-x".to_string());
-    let actual = serde_json::to_value(resolve(&lookup, &table, 5, None)).unwrap();
+    let actual = serde_json::to_value(resolve(&lookup, &table, 5)).unwrap();
     assert_eq!(
         actual,
         serde_json::json!({ "id": "thread-x", "source": "env" })
@@ -161,7 +119,6 @@ fn contract_names_the_same_env_order_and_limits() {
         contract["x-maxIdLength"].as_u64().unwrap() as usize,
         MAX_ID_LENGTH
     );
-    assert_eq!(contract["x-registryFile"].as_str().unwrap(), REGISTRY_FILE);
 }
 
 #[test]
@@ -173,42 +130,4 @@ fn contract_outcome_version_is_the_one_the_provider_declares() {
             .outcome_contract
             .version()
     );
-}
-
-/// The `x-sessionRegistry` rows of the writer contract: the registry `fgos session` writes, read by this reader.
-/// The session module runs the same rows (`apps/fgos/src/wiring/session.rs`).
-#[test]
-fn every_session_registry_row_confirms_only_the_ids_it_lists() {
-    let contract: Value = serde_json::from_str(CONTRACT).unwrap();
-    let rows = contract["x-sessionRegistry"]["rows"].as_array().unwrap();
-    assert!(rows.len() >= 5);
-    let scratch =
-        std::env::temp_dir().join(format!("fgos-identity-registry-{}", std::process::id()));
-    std::fs::create_dir_all(&scratch).unwrap();
-    for row in rows {
-        let name = row["name"].as_str().unwrap();
-        let file = scratch.join(REGISTRY_FILE);
-        let _ = std::fs::remove_file(&file);
-        if let Some(text) = row["registry"]["text"].as_str() {
-            std::fs::write(&file, text).unwrap();
-        }
-        let confirmed = |id: &str| {
-            let lookup = |key: &str| (key == "FGOS_SESSION_ID").then(|| id.to_owned());
-            env_identity(&lookup, Some(&scratch)).map(|identity| identity.source)
-                == Some(fgos_identity::resolve::Source::Registry)
-        };
-        for id in row["confirms"].as_array().unwrap() {
-            assert!(
-                confirmed(id.as_str().unwrap()),
-                "row {name:?} confirms {id}"
-            );
-        }
-        for id in row["rejects"].as_array().unwrap() {
-            assert!(
-                !confirmed(id.as_str().unwrap()),
-                "row {name:?} rejects {id}"
-            );
-        }
-    }
-    let _ = std::fs::remove_dir_all(&scratch);
 }

@@ -94,11 +94,9 @@ pub struct CallerInfo {
 }
 
 pub fn current_caller() -> CallerInfo {
-    let identity = fgos_identity::resolve_current(None);
+    let identity = fgos_identity::resolve_current();
     let session_id = match identity.source {
-        fgos_identity::Source::Env | fgos_identity::Source::Registry => {
-            Some(identity.id.to_string())
-        }
+        fgos_identity::Source::Env => Some(identity.id.to_string()),
         fgos_identity::Source::Pid | fgos_identity::Source::Unresolved => None,
     };
     CallerInfo {

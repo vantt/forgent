@@ -73,7 +73,7 @@ function transact(dir, fn, options = {}) {
   if (hotLockDepth() > 0) throw new HotLockError('hot-lock-reentry', 'Porting cannot open a nested state transaction');
   const main = getMainFgosDir(dir);
   // The writer identity may need a child process, so it is resolved before the mutex.
-  const writer = String(resolveWriterIdentity(main).id);
+  const writer = String(resolveWriterIdentity().id);
   const prepared = options.store ? options : { ...prepareWorkStore(dir, main), ...options };
   const cache = resolveFgosFile(main, FGOS_FILE.PORTING_STATE);
   // Every porting effect lands in the main `.fgos` cache, so the caller's directory is granted no write access.
