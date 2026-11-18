@@ -84,6 +84,9 @@ phạm vi.
 - 2026-11-18 ~12:00 — Chủ dự án: Q2, Q5 đồng ý đề xuất → OM-D6, OM-D7.
 - 2026-11-18 ~12:15 — Chủ dự án: Q8, Q9 đồng ý → OM-D8, OM-D9. Q6 đưa sang session `shaper: supervisor`; ở đây
   thiết kế để thêm pacer sau không phải đổi gì → OM-D10.
+- 2026-11-18 ~12:30 — Shaper supervisor trả lời Q6: pace = lịch tick; hai row overdue / idle-burn; cần event tick
+  mới (họ sinh), token theo head session, sự kiện trạng thái plan, placement/gone của head. Đổi tên event theo OM-D8
+  → `fgos.supervisor.tick` (§6 E).
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -240,7 +243,17 @@ ngưỡng trong config), attention view chạy chúng; Observe không biết cá
 - pace: không định nghĩa ở đây (OM-D10). Ngưỡng đứng yên: OM-D7 (config, mặc định 60 phút).
 Cơ chế chung (OM-D10): attention view đọc một danh sách định nghĩa phát hiện, mỗi định nghĩa = truy vấn có tên +
 ngưỡng (config) + kind row + lệnh gợi ý; `head-gone`, `plan-no-progress` là hai định nghĩa đầu; pacer của supervisor
-sau này là định nghĩa thứ ba. Để pacer diễn đạt được, contract phải có sẵn nguồn hoạt động của head session: sự kiện
+sau này là định nghĩa thứ ba.
+Phản hồi của shaper supervisor (2026-11-18): pace = lịch tick của supervisor (nhanh khi có plan `running` hoặc lead
+được đặt, chậm khi rảnh; tick là tiến trình không-LLM, chỉ gọi LLM khi có phát hiện). Định nghĩa thứ ba có hai kind
+row: `supervisor-overdue` (có việc chạy mà tick cuối cũ hơn k × khoảng active, k config mặc định 3) và
+`supervisor-idle-burn` (không plan chạy/ready mà tick LLM vẫn tiêu token trong cửa sổ). Producer phía supervisor ghi
+qua cửa ghi một kind mới, đặt tên theo OM-D8:
+`fgos.supervisor.tick` — `ts`/`endTs` (span); attrs `fgos.supervisor.mode` (active|idle), `fgos.supervisor.llm`
+(bool), `fgos.supervisor.outcome` (noop|lead-started|lead-reclaimed|plan-closed|question-raised|error); measures
+`fgos.supervisor.interval` (s, khoảng đang áp dụng, chép trong event để không phụ thuộc config bên kia),
+`fgos.plans.ready`, `fgos.plans.running` (count); `refs` session khi `llm` (nối token theo session); project nằm ở
+`origin`. Contract tầng 1 phải nhận kind này ngay từ registry đầu tiên. Để pacer diễn đạt được, contract phải có sẵn nguồn hoạt động của head session: sự kiện
 hoạt động theo session (statusline sidecar / transcript) và token theo session — nằm trong §6 C.
 Ngưỡng là config key mới qua standard + schema. Logic phát hiện viết bằng Rust (chủ dự án 11-18: code mới viết
 được bằng Rust thì viết Rust); view Node chỉ nối dây.
