@@ -69,6 +69,8 @@ security:
   - bearerAuth: []
 
 tags:
+  - name: questions
+    description: The owner-question store and the Work layer's waiting items, one-to-one with `fgos questions list/show/answer`. REST only; the gateway's MCP surface has no binding for any of these routes.
   - name: work
     description: Work-item lifecycle (read + write), one-to-one with `fgos list/show/submit/move/ask/answer` etc.
   - name: frontier
@@ -337,6 +339,62 @@ paths:
                 approve: { type: boolean, description: "Explicit approval signal for consent gates. When true, forwards --approve to fgos answer." }
       responses:
         '200': { $ref: '#/components/responses/WorkOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /questions:
+    get:
+      operationId: listQuestions
+      tags: [questions]
+      summary: Everything waiting on the owner (wraps `fgos questions list --json`)
+      description: |
+        One list, one count. `data.questions` are the owner-question store's open questions (headline,
+        recommended option, `blocks`, age, in plan-priority then age order); `data.work` carries the Work
+        layer's `asks` (`fgos ask` items, answered through `POST /work/{id}/answer`) and `gates` (each with
+        its `fgos workflow answer` command in `answerDoor`), or `{unavailable: <reason>}` when the Work
+        layer could not be read. `data.needsYou` counts all of them. The verb owns the set and the order;
+        the gateway adds nothing. There is NO MCP binding for these routes: answering is an owner action
+        taken over REST, never a tool an agent can call through the gateway's MCP surface.
+      responses:
+        '200': { $ref: '#/components/responses/QuestionsOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /questions/{id}:
+    parameters:
+      - $ref: '#/components/parameters/QuestionId'
+    get:
+      operationId: getQuestion
+      tags: [questions]
+      summary: One store question in full (wraps `fgos questions show <id> --json`)
+      description: |
+        `data.question` carries the five parts (what is happening, cause, options with gain, harm and cost,
+        recommendation, scope of the answer) and the record's state and answer.
+      responses:
+        '200': { $ref: '#/components/responses/QuestionsOk' }
+        default: { $ref: '#/components/responses/Error' }
+
+  /questions/{id}/answer:
+    parameters:
+      - $ref: '#/components/parameters/QuestionId'
+    post:
+      operationId: answerQuestion
+      tags: [questions]
+      summary: Answer a store question (wraps `fgos questions answer <id>`)
+      description: |
+        Passes the caller as `--source gateway:<caller>`, which the record keeps as `via`. The verb decides
+        who may answer: the detached gateway has no agent ancestor, so it passes the owner rule. A second
+        answer is refused by the verb (`conflict`); the first answer stands. At least one of `option` and
+        `text` is required (400 `validation` otherwise).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                option: { type: string, description: "The label of the chosen option." }
+                text: { type: string, description: "A free-text answer or note." }
+      responses:
+        '200': { $ref: '#/components/responses/QuestionsOk' }
         default: { $ref: '#/components/responses/Error' }
 
   /work/{id}/take:
@@ -626,6 +684,12 @@ components:
       required: true
       schema: { type: string }
       description: Work item id.
+    QuestionId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+      description: Store question id.
     Cursor:
       name: cursor
       in: query
@@ -646,6 +710,16 @@ components:
               - type: object
                 properties:
                   data: { $ref: '#/components/schemas/WorkItem' }
+    QuestionsOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Envelope'
+              - type: object
+                properties:
+                  data: { type: object, description: "The verb's own `data`: a list, one question, or `{id, state}`." }
     Error:
       description: |
         Any non-2xx. Never bodied by the plain `fgos.v1` envelope — branch

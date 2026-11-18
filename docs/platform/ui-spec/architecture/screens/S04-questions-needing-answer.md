@@ -35,11 +35,10 @@ Superseded by: None
 
 ## Purpose
 
-One list of everything currently waiting on a person, across **both**
-channels — `ask` questions and `gate-approve` questions (D4, and
-`docs/platform/herdr-web-dashboard/spec.md#spec-herdr-web-dashboard-browser-surface-for-fgos-work` Data Dictionary #4). D4's whole point
-is that these are one category to a person even though they are two
-mechanisms to the engine, so this screen never splits them into two tabs.
+One list of everything currently waiting on a person: owner-question store
+questions, `fgos ask` items and gates. The screen renders exactly what
+`GET /v1/questions` returns and makes no other list call. The answer door
+stays per kind, but the person sees one screen and one count.
 
 It is the "is there anything for me" surface. On a phone it is often the
 only screen a person opens.
@@ -48,38 +47,52 @@ only screen a person opens.
 
 ```
 ┌ TOPBAR ────────────────────────────────────────────────────┐
-│ ← Board   Needs answer · 2      ⚠ reachable on network     │
+│ ← Board   Needs answer · 3      ⚠ reachable on network     │
 ├ LIST ──────────────────────────────────────────────────────┤
+│ QUESTIONS                                                  │
 │ ┌────────────────────────────────────────────────────────┐ │
-│ │ tsk-4id · Task detail pairing            parked 2h ago │ │
-│ │ ASK                                                    │ │
-│ │ Which pairing key should the timeline use when         │ │
-│ │ askHistory and settlements have drifted by one?        │ │
-│ │                                    [ Answer ] [ Open ] │ │
+│ │ Ship the store first?                                  │ │
+│ │ QUESTION                                               │ │
+│ │ Recommended: B · blocks: phase 8 · 2h                  │ │
+│ │ Expand                                                 │ │
+│ │   What is happening / Cause                            │ │
+│ │   (o) B (recommended): wait  gain · harm · cost        │ │
+│ │   ( ) A: ship now            gain · harm · cost        │ │
+│ │   Recommendation / Scope of the answer                 │ │
+│ │   [ note field ]                           [ Answer ]  │ │
 │ └────────────────────────────────────────────────────────┘ │
+│ ASK ITEMS                                                  │
 │ ┌────────────────────────────────────────────────────────┐ │
-│ │ tsk-k4v · Webserver core                 parked 6h ago │ │
-│ │ GATE · validateApprove                                 │ │
-│ │ Plan is ready and the reality gate passed. Two CSS     │ │
-│ │ options are still standing — which one?                │ │
-│ │                                    [ Answer ] [ Open ] │ │
+│ │ tsk-4id · Task detail pairing                          │ │
+│ │ ASK                                                    │ │
+│ │ [ answer field ]                   [ Open ] [ Answer ] │ │
+│ └────────────────────────────────────────────────────────┘ │
+│ GATES                                                      │
+│ ┌────────────────────────────────────────────────────────┐ │
+│ │ workflow:r1#s1                                         │ │
+│ │ GATE                                                   │ │
+│ │ approve?                                               │ │
+│ │ fgos workflow answer r1 s1                             │ │
 │ └────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────┘
 ```
 
-The channel shows as a small tag (`ASK` / `GATE · <gate name>`) rather
-than as a section split. A person answering does not care which mechanism
-parked the item; they care what is being asked. But the tag stays visible
-because a gate question and an ask question have different weight, and
-hiding that would be flattening real information.
+Rows come in three groups, each tagged (`QUESTION` / `ASK` / `GATE`), and
+no row appears twice. The topbar count is the list's `needsYou`.
 
-**Each row carries the question text itself, not just the item title.**
-That is the readability criterion applied at list level: a person should
-be able to triage — "this one I can answer now, that one needs a laptop" —
-without opening anything.
+**Layered reading.** A store question's row shows its headline, its
+recommended option, what it blocks and its age. Expanding it fetches the
+question (`GET /v1/questions/{id}`) and shows the five parts, each option with
+its gain, harm and cost, a radio group with the recommended option
+preselected, and a note field. Answering posts `{option?, text?}` to
+`POST /v1/questions/{id}/answer`; the verb's refusal (already answered, not
+the owner) shows under the question.
 
-Rows are ordered oldest-first: the thing that has been waiting longest is
-the thing most likely to be blocking something else.
+`fgos ask` items keep the Work answer route (`POST /v1/work/{id}/answer`).
+Gates only show their `fgos workflow answer` command, because the Work
+layer is on hold.
+
+Rows follow the order the list returns: plan priority, then age.
 
 ## States
 

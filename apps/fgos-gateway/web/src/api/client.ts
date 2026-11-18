@@ -1,6 +1,9 @@
 import { GatewayApiError, GatewayUnreachableError } from './errors'
 import type {
+  AnswerQuestionBody,
   DigestEnvelope,
+  GetQuestionData,
+  ListQuestionsData,
   Envelope,
   ErrorEnvelope,
   ListReadyData,
@@ -112,6 +115,16 @@ export function createApiClient(config: ApiClientConfig) {
         `/work/${encodeURIComponent(id)}/answer`,
         jsonBody({ text, ...(approve !== undefined ? { approve } : {}) }),
       ),
+
+    // GET /questions (fgos-gateway-api-v1.yaml)
+    listQuestions: () => request<ListQuestionsData>(config, '/questions'),
+
+    // GET /questions/{id} (fgos-gateway-api-v1.yaml)
+    getQuestion: (id: string) => request<GetQuestionData>(config, `/questions/${encodeURIComponent(id)}`),
+
+    // POST /questions/{id}/answer (fgos-gateway-api-v1.yaml)
+    answerQuestion: (id: string, body: AnswerQuestionBody) =>
+      request<{ id: string; state: string }>(config, `/questions/${encodeURIComponent(id)}/answer`, jsonBody(body)),
 
     // POST /work/{id}/take (fgos-gateway-api-v1.yaml:266-289)
     takeWork: (id: string, role: 'human' | 'session' = 'session') =>

@@ -165,3 +165,80 @@ export interface PageParams {
   cursor?: string
   limit?: number
 }
+
+// GET /questions (fgos-gateway-api-v1.yaml): the owner-question store's open questions plus the
+// Work layer's `fgos ask` items and gates, as `fgos questions --json` lists them.
+export interface StoreQuestionRow {
+  id: string
+  state: string
+  headline: string
+  blocks: string
+  stage: string
+  ref: string
+  askedAt: string
+  age: string
+  asker: { handle: string; roles: string[] }
+  recommended: string | null
+  answerCommand?: string
+}
+
+export interface WorkAskRow {
+  ref: string
+  title?: string
+  question: string
+  answerDoor: string
+}
+
+export interface WorkGateRow {
+  ref: string
+  question: string
+  answerDoor: string
+}
+
+export interface QuestionsWork {
+  gates?: WorkGateRow[]
+  asks?: WorkAskRow[]
+  // Set when the Work layer could not be read; the store questions still list.
+  unavailable?: string
+}
+
+export interface ListQuestionsData {
+  needsYou: number
+  questions: StoreQuestionRow[]
+  work?: QuestionsWork
+}
+
+// GET /questions/{id}: one question in full.
+export interface QuestionOptionDetail {
+  label: string
+  does: string
+  gain: string
+  harm: string
+  cost: string
+  recommended?: boolean
+}
+
+export interface QuestionDetail {
+  state: string
+  asked: {
+    id: string
+    headline: string
+    blocks: string
+    parts: {
+      what: string
+      cause: string
+      options: QuestionOptionDetail[]
+      recommendation: string
+      scope: { allows: string; forbids: string }
+    }
+  }
+}
+
+export interface GetQuestionData {
+  question: QuestionDetail
+}
+
+export interface AnswerQuestionBody {
+  option?: string
+  text?: string
+}

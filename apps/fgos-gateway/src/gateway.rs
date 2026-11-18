@@ -982,6 +982,64 @@ async fn post_work_answer(
     Ok(Json(data))
 }
 
+/// `GET /questions`: the owner-question store's open questions plus the Work layer's `fgos ask` items
+/// and gates, exactly as `fgos questions --json` lists them (the verb owns the set, the order and the
+/// count; the gateway adds nothing).
+async fn get_questions(State(state): State<AppState>) -> Result<Json<Value>, GatewayError> {
+    let args = vec!["questions".to_string(), "list".to_string(), "--json".to_string()];
+    let data = run_verb_blocking(state.gateway, args).await?;
+    Ok(Json(data))
+}
+
+/// `GET /questions/{id}`: one question in full (the five parts, each option with its cost).
+async fn get_question_by_id(State(state): State<AppState>, AxPath(id): AxPath<String>) -> Result<Json<Value>, GatewayError> {
+    reject_leading_dash(&id, "id")?;
+    let args = vec!["questions".to_string(), "show".to_string(), id, "--json".to_string()];
+    let data = run_verb_blocking(state.gateway, args).await?;
+    Ok(Json(data))
+}
+
+#[derive(Debug, Deserialize)]
+struct AnswerQuestionBody {
+    #[serde(default)]
+    option: Option<String>,
+    #[serde(default)]
+    text: Option<String>,
+}
+
+/// `POST /questions/{id}/answer`: answers a store question through `fgos questions answer`, passing the
+/// caller as `--source gateway:<caller>` (the verb keeps it as `via`). The verb decides who may answer
+/// and refuses a second answer; the gateway only relays. No MCP binding exists for this route.
+async fn post_question_answer(
+    State(state): State<AppState>,
+    Extension(caller): Extension<Caller>,
+    AxPath(id): AxPath<String>,
+    AppJson(body): AppJson<AnswerQuestionBody>,
+) -> Result<Json<Value>, GatewayError> {
+    reject_leading_dash(&id, "id")?;
+    let blank = |value: &Option<String>| value.as_deref().map_or(true, |v| v.trim().is_empty());
+    if blank(&body.option) && blank(&body.text) {
+        return Err(GatewayError::validation("answering a question requires \"option\" and/or \"text\""));
+    }
+    if let Some(option) = &body.option {
+        reject_leading_dash(option, "option")?;
+    }
+    let mut args = vec!["questions".to_string(), "answer".to_string(), id];
+    if let Some(option) = body.option.filter(|v| !v.trim().is_empty()) {
+        args.push("--option".to_string());
+        args.push(option);
+    }
+    if let Some(text) = body.text.filter(|v| !v.trim().is_empty()) {
+        args.push("--text".to_string());
+        args.push(text);
+    }
+    args.push("--source".to_string());
+    args.push(caller.source());
+    args.push("--json".to_string());
+    let data = run_verb_blocking(state.gateway, args).await?;
+    Ok(Json(data))
+}
+
 #[derive(Debug, Deserialize, Default)]
 struct TakeWorkBody {
     role: Option<String>,
@@ -1240,6 +1298,9 @@ fn build_router_with_cap(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, r
         .route("/work/{id}/move", post(post_work_move))
         .route("/work/{id}/ask", post(post_work_ask))
         .route("/work/{id}/answer", post(post_work_answer))
+        .route("/questions", get(get_questions))
+        .route("/questions/{id}", get(get_question_by_id))
+        .route("/questions/{id}/answer", post(post_question_answer))
         .route("/work/{id}/take", post(post_work_take))
         .route("/work/{id}/return", post(post_work_return))
         .route("/work/{id}/approve", post(post_work_approve))
@@ -2112,6 +2173,88 @@ mod tests {
         )
         .await
         .unwrap()
+    }
+
+    /// Answers a store question once, then refuses with the verb's own already-answered exit code.
+    struct OnceAnswerGateway {
+        captured: std::sync::Mutex<Vec<Vec<String>>>,
+    }
+
+    impl VerbGateway for OnceAnswerGateway {
+        fn run_verb(&self, args: &[String]) -> Result<Value, GatewayError> {
+            let mut calls = self.captured.lock().unwrap();
+            let answered_before = calls.iter().any(|c| c.get(1).map(String::as_str) == Some("answer"));
+            calls.push(args.to_vec());
+            if answered_before {
+                return Err(GatewayError {
+                    status: None,
+                    category: ErrorCategory::from_exit_code(3),
+                    message: "question-already-answered".to_string(),
+                    exit_code: Some(3),
+                });
+            }
+            Ok(json!({"contract": "fgos.v1", "data": {"id": args[2], "state": "answered"}}))
+        }
+    }
+
+    async fn question_request(app: Router, method: &str, uri: &str, body: Option<Value>) -> axum::response::Response {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let builder = Request::builder()
+            .method(method)
+            .uri(uri)
+            .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+            .header(axum::http::header::CONTENT_TYPE, "application/json");
+        let body = body.map_or_else(Body::empty, |b| Body::from(serde_json::to_vec(&b).unwrap()));
+        app.oneshot(builder.body(body).unwrap()).await.unwrap()
+    }
+
+    #[tokio::test]
+    async fn answering_a_question_records_the_gateway_caller_as_source_and_refuses_a_second_answer() {
+        let once = Arc::new(OnceAnswerGateway { captured: std::sync::Mutex::new(Vec::new()) });
+        let gateway: Arc<dyn VerbGateway> = once.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        let first = question_request(app.clone(), "POST", "/v1/questions/q-abc/answer", Some(json!({"option": "A", "text": "go"}))).await;
+        assert_eq!(first.status(), StatusCode::OK);
+        let second = question_request(app, "POST", "/v1/questions/q-abc/answer", Some(json!({"option": "B"}))).await;
+        assert_eq!(second.status(), StatusCode::CONFLICT);
+
+        let calls = once.captured.lock().unwrap();
+        let args = &calls[0];
+        assert_eq!(&args[..3], ["questions", "answer", "q-abc"]);
+        assert!(args.windows(2).any(|w| w[0] == "--option" && w[1] == "A"), "args: {args:?}");
+        assert!(args.windows(2).any(|w| w[0] == "--text" && w[1] == "go"), "args: {args:?}");
+        let source = args.iter().position(|a| a == "--source").map(|i| args[i + 1].clone()).expect("--source must be passed");
+        assert!(source.starts_with("gateway:token:"), "source: {source}");
+        assert!(args.contains(&"--json".to_string()));
+    }
+
+    #[tokio::test]
+    async fn answering_a_question_needs_an_option_or_text_and_never_reaches_the_verb_without_one() {
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        let response = question_request(app, "POST", "/v1/questions/q-abc/answer", Some(json!({"text": "  "}))).await;
+        assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+        assert_eq!(capturing.captured.lock().unwrap().len(), 0);
+    }
+
+    #[tokio::test]
+    async fn the_question_reads_shell_the_questions_verb_for_the_list_and_for_one_question() {
+        let capturing = Arc::new(CapturingGateway { captured: std::sync::Mutex::new(Vec::new()), response: json!({"data": {}}) });
+        let gateway: Arc<dyn VerbGateway> = capturing.clone();
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        assert_eq!(question_request(app.clone(), "GET", "/v1/questions", None).await.status(), StatusCode::OK);
+        assert_eq!(question_request(app, "GET", "/v1/questions/q-abc", None).await.status(), StatusCode::OK);
+
+        let calls = capturing.captured.lock().unwrap();
+        assert_eq!(calls[0], ["questions", "list", "--json"]);
+        assert_eq!(calls[1], ["questions", "show", "q-abc", "--json"]);
     }
 
     #[tokio::test]
