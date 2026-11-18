@@ -10,9 +10,10 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
-  acquireAttemptLocks, attemptStepEnv, readLaunchSettings, resolveAttemptHost,
+  acquireAttemptLocks, attemptStepEnv, readLaunchSettings, resolveAttemptHost, terminalSocketPath,
 } from '../../run-supervisor/direct-launch.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
+import { HEAD_REQUEST_SOCKET_ENV } from '../../session-host/head-grants.mjs';
 import { fgosDirFromRoot } from '../paths.mjs';
 import { withDefaultExecutor } from './config.mjs';
 import { createCredentialRenewal } from './provider-credential-renewal.mjs';
@@ -94,6 +95,8 @@ export async function launchSessionAttempt({ binding, runnerConfig, key, role, g
       throw new SessionLaunchError('lease-refused', `no account could be leased for ${role}: ${lease.selection.reason}${lease.selection.detail ? ` (${lease.selection.detail})` : ''}`, { refusal: lease.selection });
     }
     attempt.lease = lease.selection;
+    // A role whose grant has no verbs gets no socket at all; one with verbs gets the socket its supervisor listens on.
+    const requestSocketPath = grant.verbs.length > 0 ? terminalSocketPath(`${attemptId}-req`) : null;
     const confinementRequirement = requirementOf(grant);
     const providerCapacity = await renewLeasedLogin(attempt.lease, { cfg, opts: launchOpts, executorId, pinnedInvocationId, confinementRequirement });
 
@@ -115,12 +118,13 @@ export async function launchSessionAttempt({ binding, runnerConfig, key, role, g
       dispatchBatchKey: beside ?? attemptId,
       mutating: false,
       settings: readLaunchSettings(projectRoot),
-      session: { role, verbs: [...grant.verbs] },
+      session: { role, verbs: [...grant.verbs], ...(requestSocketPath ? { requestSocketPath } : {}) },
+      requestSocket: requestSocketPath ?? undefined,
       ceilingMs,
       opening,
       display: display ?? undefined,
       beside: beside ?? undefined,
-      launchEnv: env,
+      launchEnv: { ...env, ...(requestSocketPath ? { [HEAD_REQUEST_SOCKET_ENV]: requestSocketPath } : {}) },
     });
 
     const { bound } = await startAndBind(attempt, { envelope });

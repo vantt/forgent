@@ -569,7 +569,8 @@ mục đó. Danh sách là dữ liệu của contract, không phải code của 
   `gateCommand`, socket supervisor đã listen trước khi pane chạy launcher), sau các mask và trước
   `--remount-ro`; không bao giờ bind thư mục `fgos/` (thư mục đó giữ socket của mọi attempt).
   `--go-socket` không nằm thẳng trong `resolveRuntimeSocketDir()` thì prepare từ chối
-  `go-socket-outside-runtime-socket-dir`, không bind. Launch direct không cần gì: kênh GO là
+  `go-socket-outside-runtime-socket-dir`, không bind. Một head session còn được `--ro-bind` lại đúng một socket nữa,
+  `requestSocket` của request (request socket của run supervisor, cùng kiểm tra và cùng mã từ chối). Launch direct không cần gì: kênh GO là
   descriptor kế thừa. Gate binary chỉ được bind lại từ `/tmp` khi là đường dẫn tuyệt đối; tên trần
   được tìm trên `PATH` trong sandbox, không bao giờ cạnh cwd.
 - `{home}/.config/herdr`, `{xdgConfigHome}/herdr` và `{herdrSocketDir}` (2026-10-24, trước đó chỉ

@@ -49,6 +49,25 @@ test('a terminal launch dies with its parent and binds back read-only only the G
   assert.equal(direct.includes(socket), false);
 });
 
+test('a head session\'s request socket is bound back read-only like the GO socket, and only from the socket directory', (t) => {
+  withRuntimeDir(t, '/run/user/4242');
+  const go = '/run/user/4242/fgos/0123456789abcdef.sock';
+  const requestSocket = '/run/user/4242/fgos/fedcba9876543210.sock';
+  const gate = ['/host/fgos', 'internal', 'gate', '--go-socket', go];
+  const args = prepare(t, { launchMode: 'terminal', attemptId: 'att-t', gateCommand: gate, requestSocket }).invocation.args;
+  const bind = args.findIndex((a, i) => a === '--ro-bind' && args[i + 1] === requestSocket);
+  assert.ok(bind >= 0 && args[bind + 2] === requestSocket);
+  assert.equal(args.includes(path.dirname(requestSocket)), false, 'never the socket directory');
+  assert.equal(prepare(t, { launchMode: 'terminal', attemptId: 'att-t', gateCommand: gate }).invocation.args.includes(requestSocket), false, 'no request socket, no bind');
+  for (const outside of ['/run/user/4242/bus', '/run/user/4242/fgos/sub/x.sock', 'fgos/x.sock']) {
+    assert.throws(
+      () => prepare(t, { launchMode: 'terminal', attemptId: 'att-t', gateCommand: gate, requestSocket: outside }),
+      (e) => e.code === 'go-socket-outside-runtime-socket-dir',
+      outside,
+    );
+  }
+});
+
 test('a GO socket outside the run supervisor\'s socket directory is refused by name, never bound back', (t) => {
   withRuntimeDir(t, '/run/user/4242');
   for (const socket of ['/run/user/4242/bus', '/run/user/4242/fgos/sub/x.sock', 'fgos/x.sock']) {

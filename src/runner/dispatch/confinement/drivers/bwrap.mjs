@@ -254,22 +254,26 @@ function machinePrivateRefusals(request, resolvedResources) {
 }
 
 /**
- * The socket a gate command dials (`--go-socket <path>`), or null when it names none. Only a socket
- * directly in the run supervisor's socket directory is bound back: any other path could re-expose
- * something the masks hide, so it is refused by name.
+ * A socket of this attempt that is bound back into the sandbox. Only a socket directly in the run supervisor's
+ * socket directory is bound back: any other path could re-expose something the masks hide, so it is refused by
+ * name. `what` names the socket in the refusal.
  */
-function gateGoSocket(gateCommand) {
-  if (!Array.isArray(gateCommand)) return null;
-  const at = gateCommand.indexOf('--go-socket');
-  if (at < 0) return null;
-  const socket = gateCommand[at + 1];
+function socketInRuntimeDir(socket, what) {
   const dir = resolveRuntimeSocketDir();
   if (typeof socket !== 'string' || !path.isAbsolute(socket) || path.dirname(path.resolve(socket)) !== dir) {
-    const err = new Error(`the gate's GO socket "${socket}" is not in the run supervisor's socket directory "${dir}"; only that is bound back into the sandbox.`);
+    const err = new Error(`the ${what} "${socket}" is not in the run supervisor's socket directory "${dir}"; only that is bound back into the sandbox.`);
     err.code = 'go-socket-outside-runtime-socket-dir';
     throw err;
   }
   return socket;
+}
+
+/** The socket a gate command dials (`--go-socket <path>`), or null when it names none. */
+function gateGoSocket(gateCommand) {
+  if (!Array.isArray(gateCommand)) return null;
+  const at = gateCommand.indexOf('--go-socket');
+  if (at < 0) return null;
+  return socketInRuntimeDir(gateCommand[at + 1], "gate's GO socket");
 }
 
 /**
@@ -654,6 +658,11 @@ export function prepareBwrapSync(plan, request, backend) {
       for (const file of request.attemptBinds ?? []) bwrapArgs.push('--bind', file, file);
       const goSocket = terminal ? gateGoSocket(request.gateCommand) : null;
       if (goSocket) bwrapArgs.push('--ro-bind', goSocket, goSocket);
+      // A head session's request socket, the same way: read-only, only this attempt's own.
+      if (terminal && request.requestSocket != null) {
+        const requestSocket = socketInRuntimeDir(request.requestSocket, 'request socket');
+        bwrapArgs.push('--ro-bind', requestSocket, requestSocket);
+      }
     };
     // A later mount over a parent hides an earlier one beneath it, so the order is the contract: mounts outside
     // every hidden root, the masks, a blind dispatch's own directory read-only, the mounts inside a hidden root

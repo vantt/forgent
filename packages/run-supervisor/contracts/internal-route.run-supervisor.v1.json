@@ -88,6 +88,14 @@
       "execution": "the host execs the Node payload of envelope.payloadRoot (resolved like apps/fgos/src/legacy_exec.rs, never PATH) with entry src/run-supervisor/attempt-step.mjs, passing stepId and the attemptDir",
       "stdout": "step-receipt.v1.json stepProcess.stdout",
       "exitCodes": { "0": "done", "65": "envelope-invalid", "66": "payload-missing", "70": "error", "75": "retry (EX_TEMPFAIL): no receipt, adopt runs the step again later" }
+    },
+    "head-request": {
+      "argv": "fgos internal head-request --protocol 1 --run-dir <attemptDir>",
+      "stdin": "the request object of head-request.v1.json ({id, verb, args}), at most 65536 bytes",
+      "execution": "the same hand-over as attempt-step (one helper): verify the envelope, refuse unless it carries session.requestSocketPath, exec the Node payload of envelope.payloadRoot with entry src/session-host/head-request.mjs and --run-dir; stdin, stdout and stderr pass through. Unix hosts only",
+      "stdout": "one JSON line: {\"result\":\"done\",\"data\":{...}} or {\"result\":\"error\",\"code\",\"message\"}",
+      "exitCodes": { "0": "done", "65": "envelope-invalid", "66": "payload-missing", "70": "error" },
+      "caller": "only the run supervisor of the attempt, for a request that passed the checks of head-request.v1.json"
     }
   }
 }

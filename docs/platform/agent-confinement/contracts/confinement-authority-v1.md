@@ -421,6 +421,12 @@ interface ConfinementRequestV1 {
 }
 ```
 
+Một launch của attempt có giám sát (có `attemptId`) mang thêm các field tuỳ chọn `launchMode`
+(`'direct' | 'terminal'`), `gateCommand` (argv của gate), `attemptBinds` (file của attempt gate được ghi) và
+`requestSocket`: đường dẫn tuyệt đối của request socket mà run supervisor của một head session listen. Chỉ launch
+`terminal` bind lại nó, `--ro-bind` và chỉ khi nó nằm thẳng trong thư mục socket của run supervisor; ngoài đó thì
+prepare từ chối `go-socket-outside-runtime-socket-dir`, cùng một kiểm tra và cùng một mã với GO socket.
+
 `assignmentLaunchContext` (field của request cho launch của một attempt có giám sát) mang đúng một discriminator,
 `kind`; vắng nghĩa là `assignment`:
 

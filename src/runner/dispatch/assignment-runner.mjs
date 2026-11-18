@@ -1023,6 +1023,7 @@ export async function prepareAttemptSeat(attempt, seat, hooks = {}) {
     launchMode: attempt.terminal ? 'terminal' : 'direct',
     gateCommand: attemptGateCommand(attempt.host.hostBin, runDir, { goSocket: terminalSocket }),
     attemptBinds: prepareAttemptFiles(runDir, attemptId),
+    ...(seat.requestSocket ? { requestSocket: seat.requestSocket } : {}),
   }), { adapterPort: opts.adapterPort });
 
   let providerCapacityEvidence = seat.providerCapacityEvidence;

@@ -4,6 +4,12 @@
 // `writes` (project-relative paths the sandbox binds writable) and the request socket reads `verbs`. A later
 // change moves the data into the standard config by changing only the body of `grantOf`.
 
+/**
+ * The variable that names a head's request socket inside its sandbox. The launch sets it for a role whose grant has
+ * verbs and the client in `head-request.mjs` reads it; it lives here, beside the verbs, so neither imports the other.
+ */
+export const HEAD_REQUEST_SOCKET_ENV = 'FGOS_HEAD_REQUEST_SOCKET';
+
 /** `head:<persona>-<name>`; the persona and the name may both hold hyphens, so the table decides where they split. */
 const ROLE_PATTERN = /^head:([a-z][a-z0-9-]*)$/;
 

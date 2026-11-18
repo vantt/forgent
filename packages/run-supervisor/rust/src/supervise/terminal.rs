@@ -45,6 +45,7 @@ use super::{
     os, request_stop, GateLink, Refusal, TerminalEnd, Watch, GATE_STOP_SLACK, HELLO_LIMIT, TICK,
 };
 use crate::go_channel::{peer_uid, read_frame, write_frame};
+use crate::head_request::HeadRequests;
 use crate::route::EXIT_ENVELOPE_INVALID;
 use crate::terminal_slot::Backend;
 
@@ -239,6 +240,11 @@ impl AttemptSocket {
             }
         }
         None
+    }
+
+    /// The listening socket, nonblocking, while it is open: what the request server polls.
+    fn listener(&self) -> Option<&UnixListener> {
+        self.listener.as_ref()
     }
 
     /// No second connection is taken once the gate is in, or when it never came.
@@ -533,6 +539,8 @@ struct Sup<'a> {
     gate_gone: bool,
     end: TerminalEnd,
     adapter: Terminal,
+    /// A head session's request socket and its server; closed (path unlinked) when the attempt is ending.
+    requests: Option<(AttemptSocket, HeadRequests)>,
 }
 
 impl Sup<'_> {
@@ -567,7 +575,13 @@ impl Sup<'_> {
         self.link
             .read_frames(self.watch, &mut self.go, self.gate_gone);
         if self.gate_gone {
+            self.requests = None;
             return;
+        }
+        if let Some((socket, server)) = &self.requests {
+            if let Some(listener) = socket.listener() {
+                server.poll(listener);
+            }
         }
         if self.last_carrier.elapsed() >= CARRIER_EVERY {
             self.carrier_check(core, key);
@@ -748,6 +762,18 @@ pub(super) fn run(
 ) -> Result<i32, Refusal> {
     let plan = Plan::from(envelope)?;
     let mut socket = AttemptSocket::bind(&plan.socket_path).map_err(Refusal::internal)?;
+    // A head session's request socket listens from before the pane is launched until the attempt closes.
+    let requests = match HeadRequests::from_envelope(envelope, run_dir).map_err(|why| Refusal {
+        exit: EXIT_ENVELOPE_INVALID,
+        code: "envelope-invalid",
+        why,
+    })? {
+        Some((path, server)) => Some((
+            AttemptSocket::bind(&path).map_err(Refusal::internal)?,
+            server,
+        )),
+        None => None,
+    };
     crate::terminal_slot::record_endpoint(run_dir);
     let backend = Backend::from_env(run_dir)
         .with_shell_ready_timeout_ms(crate::terminal_slot::shell_ready_timeout_ms(envelope));
@@ -845,6 +871,7 @@ pub(super) fn run(
         gate_gone: false,
         end: TerminalEnd::default(),
         adapter: plan.adapter,
+        requests,
     };
     drive(&plan, &core, &mut sup);
 

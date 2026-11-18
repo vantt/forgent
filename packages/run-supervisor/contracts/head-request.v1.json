@@ -1,0 +1,55 @@
+{
+  "contract": { "id": "run-supervisor-head-request", "version": 1 },
+  "description": "The request socket of one head session. A confined head cannot reach herdr, so it asks its own run supervisor, over one AF_UNIX socket the sandbox gets read-only, to perform a granted verb outside. The supervisor only transports and enforces: Identity decides who holds the role, `grantOf` (src/session-host/head-grants.mjs) is the only reader of the grant table and its answer reaches the supervisor in the digest-protected envelope (`session.verbs`), and the verb itself is the Node payload behind `fgos internal head-request` (internal-route.run-supervisor.v1.json).",
+  "framing": {
+    "frame": "as gate-go.v1.json: 4-byte unsigned big-endian length N, then N bytes of UTF-8 JSON (one object)",
+    "maxFrameBytes": 65536,
+    "oversizeOrInvalid": "the supervisor answers REPLY refused bad-frame and closes the connection",
+    "readDeadlineMs": "5000 for the whole request frame (not per read)"
+  },
+  "socket": {
+    "kind": "AF_UNIX SOCK_STREAM, listening, created by the supervisor before it asks terminal-control to launch the pane",
+    "path": "envelope.session.requestSocketPath: a socket directly in the run supervisor's socket directory, at most 107 bytes (the same rules, the same bind helper and the same bind-back check as the GO socket)",
+    "sandbox": "the launch binds this one socket read-only into the head's sandbox (confinement request field requestSocket); the directory around it stays masked. Its path is also in the agent's environment as FGOS_HEAD_REQUEST_SOCKET",
+    "absentWhen": "the role's grant has no verbs: no socket is created, no path is in the envelope, no variable is set",
+    "lifetime": "listening from before the pane launch until the gate is gone; the supervisor then unlinks the path. A client that finds the file gone reports request-socket-unavailable",
+    "peerCheck": "the peer uid must equal the supervisor's own (SO_PEERCRED, getpeereid elsewhere); pids are never compared. A wrong uid is answered REPLY refused peer-uid without reading a frame"
+  },
+  "frames": {
+    "REQUEST": { "direction": "client -> supervisor", "fields": { "type": "REQUEST", "id": "string, 1 to 64 characters of letters, digits, '.', '_' and '-'", "verb": "string, one of verbs", "args": "object" }, "rule": "one connection carries one request" },
+    "REPLY": { "direction": "supervisor -> client", "fields": { "type": "REPLY", "id": "the request's id, null when no valid id was read", "result": { "enum": ["done", "refused"] }, "data": "object, present when done: the verb's own result", "code": "refusal code, present when refused", "detail": "string, optional" } }
+  },
+  "verbs": {
+    "head start": {
+      "args": { "persona": "string, required", "name": "string, required", "beside": "string, optional: the live key of the session whose tab the new one opens next to" },
+      "does": "startHeadSession (src/session-host/head-start.mjs) in the project of the attempt's envelope (envelope.cwd); a live head of the same role is fronted instead of started",
+      "data": "the object startHeadSession returns ({already, role, key, ...})"
+    }
+  },
+  "order": [
+    "peer uid",
+    "one request frame",
+    "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed)",
+    "verb: must be one of envelope.session.verbs (verb-not-granted)",
+    "busy: at most one request runs at a time (busy)",
+    "run: `<hostBin> internal head-request --protocol 1 --run-dir <attemptDir>`, request on stdin"
+  ],
+  "run": {
+    "child": "started with exactly the step environment of the envelope, the envelope's cwd, its own process group, and the parent-death signal on Linux; stdout is its one JSON line, stderr goes to supervisor.log",
+    "verbTimeoutMs": 60000,
+    "onTimeout": "the child's process group is killed and the reply is refused verb-timeout (the head's own launch waits up to 45 s for its binding)",
+    "childLine": "{\"v\":1,\"protocol\":1,\"result\":\"done\",\"data\":{...}} or {\"result\":\"error\",\"code\":\"<the entry's code>\",\"message\":\"...\"}; an exit with no such line is detail `the route ended with exit N`",
+    "never": "the tick of the supervisor never waits on a request: every connection is served on its own thread, at most 8 at once (a further one is closed unanswered)"
+  },
+  "refusalCodes": {
+    "peer-uid": "the connection is not from the supervisor's own user",
+    "bad-frame": "oversize, not one JSON object, no REQUEST type, an id outside the rule, a verb that is not a string or args that is not an object",
+    "role-not-held": "Identity does not give this attempt's session the envelope's role",
+    "verb-not-granted": "the verb is not in envelope.session.verbs",
+    "busy": "another request is running",
+    "verb-failed": "the route child failed; detail is the entry's own code (for example head-key-used, bad-persona, start-refused) or the exit",
+    "verb-timeout": "the verb ran longer than verbTimeoutMs"
+  },
+  "log": "one line per request in supervisor.log: `head-request <id> <verb> <done|refused> <code|->`; arguments are never logged and client text is cut to 32 plain characters",
+  "client": "src/session-host/head-request.mjs: `requestHeadStart` connects to FGOS_HEAD_REQUEST_SOCKET after checking the socket file is owned by its own uid; `startHead` is the one branch (FGOS_CONFINED=1 asks through the socket, refused no-request-socket when the variable is unset, otherwise startHeadSession directly)"
+}

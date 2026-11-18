@@ -25,6 +25,7 @@ import {
   credentialScanRoots,
 } from "./backend-registry.mjs";
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
+import { CONFINED_MARKER_ENV } from "../../../config/facade.mjs";
 import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
 import { OWNERSHIP_MARKER_FILE, CREDENTIAL_HOME_KEPT, CREDENTIAL_HOME_HELD, CREDENTIAL_KEEP_MAX_ATTEMPTS, ATTEMPT_HOME_MARKER_CONTRACT, countCredentialKeep, readAttemptHomeRecord, removeAttemptHome, keepSessionTranscript, describeAttemptHome, settleHeldCredentialHomes, MAX_HOME_MARKER_BYTES } from "./cleanup.mjs";
@@ -756,7 +757,10 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   const workerCwd = request.context.cwd;
   const depth = currentDispatchDepth();
   const resolvedExecutorEnv = resolveExecutorEnv(sourceInvocation.env || {});
-  const workerEnv = { ...workerBaseEnv(), ...resolvedExecutorEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) };
+  // The agent runs under the driver's sandbox exactly when the prepared confinement has a prefix: the marker follows
+  // that result, never a caller's flag, so every confined agent (worker or head) sees the same fact.
+  const confinedMarker = preparedConfinement?.bwrapPrefix ? { [CONFINED_MARKER_ENV]: '1' } : {};
+  const workerEnv = { ...workerBaseEnv(), ...resolvedExecutorEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1), ...confinedMarker };
 
   const workerCommandDigest = computeSha256Digest({ command: workerCommand, args: workerArgs });
   const envDigest = computeSha256Digest(workerEnv);

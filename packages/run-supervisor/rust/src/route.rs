@@ -147,7 +147,10 @@ fn probe(route: &str, args: &[String]) -> i32 {
 /// Dispatch `fgos internal <route> ...` for the routes this crate owns.
 /// `None`: the route is not one of ours.
 pub fn main(route: &str, args: &[String]) -> Option<i32> {
-    if !matches!(route, "supervise" | "gate" | "adopt" | "attempt-step") {
+    if !matches!(
+        route,
+        "supervise" | "gate" | "adopt" | "attempt-step" | "head-request"
+    ) {
         return None;
     }
     if args.iter().any(|arg| arg == "--probe") {
@@ -157,8 +160,24 @@ pub fn main(route: &str, args: &[String]) -> Option<i32> {
         "supervise" => crate::supervise::run(args),
         "gate" => crate::gate::run(args),
         "adopt" => crate::adopt::run(args),
+        "head-request" => head_request(args),
         _ => crate::attempt_step::run(args),
     })
+}
+
+#[cfg(unix)]
+fn head_request(args: &[String]) -> i32 {
+    crate::head_request::run(args)
+}
+
+#[cfg(not(unix))]
+fn head_request(_args: &[String]) -> i32 {
+    report(
+        "head-request",
+        "internal",
+        "head sessions run on Unix hosts only",
+    );
+    EXIT_INTERNAL
 }
 
 #[cfg(test)]

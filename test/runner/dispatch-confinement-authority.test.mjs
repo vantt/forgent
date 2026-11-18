@@ -278,6 +278,7 @@ test("the launch door refuses a launch that is no supervised attempt, and return
     assert.equal(prepared.backendPlan.backend.type, "bwrap");
     assert.equal(prepared.backendPlan.decision, "execute");
     assert.ok(prepared.preparedConfinement, "a genuinely prepared sandbox is returned to the caller");
+    assert.equal(prepared.attempt.secretEnv.FGOS_CONFINED, "1", "the agent of a sandboxed launch carries the confined marker, set from the driver's own result");
     const record = loadAttestationRecord(req.dispatchId, "prepared", req.context);
     assert.equal(record.phase, "prepared");
     assert.equal(record.backend.id, "bwrap");
