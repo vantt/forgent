@@ -200,7 +200,7 @@ const CLAUDE_DELETE_GUARD_COMMAND = deleteGuardScript(CLAUDE_SHIM, HOOK_KINDS.DE
  * itself skips a seat the runner started. */
 const SESSION_REGISTER_ARGS = 'identity session --register';
 const SESSION_REGISTER_TIMEOUT_SEC = 10;
-/** A head session's rotation hook (served natively by the host, docs/platform/session-host/spec.md 8.8); its stop waits for the supervisor's `head answered` reply, up to its 60 s verb bound. */
+/** A head session's rotation hook (served natively by the host, docs/platform/session-host/spec.md 8.8); its stop waits for the supervisor's `session answered` reply, up to its 60 s verb bound. */
 const ROTATION_STOP_TIMEOUT_SEC = 80;
 const ROTATION_START_TIMEOUT_SEC = 10;
 const claudeRotationRow = (args, event, timeout) => ({
