@@ -67,5 +67,5 @@ Identity's project handle keeps its current answer. Every Rust caller moves in t
 in `discussion_source.rs` is deleted. Node `detectTrunk` moving onto the door is backlog `p-welrqxgcsc`. Footprint widened
 (approved by lead:OPC as Git reviewer): `packages/git/rust/src/inspect.rs` and its tests, the addon's `inspect.rs` if
 it serialises `TrunkFact`, `packages/supervision/rust/src/land.rs` and its tests, `packages/identity/rust/src/project.rs`
-(caller move only), `docs/platform/git/spec.md`, `docs/backlog.md`. It runs after phase 7c (both touch the Git crate).
+(caller move only), `docs/platform/git/spec.md`, `docs/backlog.md`, and `test/git/inspect.test.mjs` (the addon answer gains `source`). It runs after phase 7c (both touch the Git crate).
 
