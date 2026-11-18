@@ -5,10 +5,7 @@
 use fgos_distribution::doctor::{FixResult, RowOutcome, RowResult};
 use fgos_host_runtime::civil_time::{format_unix_millis_rfc3339, parse_rfc3339_millis};
 use fgos_observe::contract::{RecordSource, Window};
-use fgos_observe::record::store::{HealthSource, RECORDS_STORE};
-use fgos_observe::shard::{read_store, UnsafeShard};
-use serde_json::Value;
-use std::collections::HashSet;
+use fgos_observe::record::store::HealthSource;
 use std::path::{Path, PathBuf};
 
 pub const ROW_IDS: &[&str] = &[
@@ -22,8 +19,6 @@ pub const ROW_IDS: &[&str] = &[
 const HEALTH_LOOKBACK_MILLIS: i64 = 7 * 24 * 60 * 60 * 1000;
 const HEALTH_VERB: &str = "fgos metrics query --kind fgos.observe.health";
 const MIGRATE_VERB: &str = "fgos friction migrate --to-records";
-/// The old friction store `fgos friction migrate --to-records` copies from.
-const OLD_FRICTION_STORE: &str = "friction";
 
 fn no_fixes(_: &Path, ids: &[&str]) -> Vec<FixResult> {
     ids.iter()
@@ -129,37 +124,10 @@ pub fn write_health_row(root: &Path, now_millis: i64) -> RowOutcome {
     }
 }
 
-/// Old friction shard lines the record store does not hold yet. A line's record id is the one
-/// `fgos_observe::friction::migrate_to_records` gives it (`legacy:<shard>:<line>`); the row test runs that migration
-/// and expects zero, so the two cannot drift apart unnoticed.
-fn unmigrated_friction(root: &Path) -> Result<usize, String> {
-    let old =
-        read_store(root, OLD_FRICTION_STORE, UnsafeShard::Report).map_err(|e| e.to_string())?;
-    let mut lines = old.records.iter().filter(|stored| {
-        matches!(
-            stored.value.get("type").and_then(Value::as_str),
-            Some("friction-recorded" | "friction-resolved")
-        )
-    });
-    let Some(first) = lines.next() else {
-        return Ok(0);
-    };
-    let stored = read_store(root, RECORDS_STORE, UnsafeShard::Report).map_err(|e| e.to_string())?;
-    let ids: HashSet<&str> = stored
-        .records
-        .iter()
-        .filter_map(|r| r.value.get("id").and_then(Value::as_str))
-        .collect();
-    Ok(std::iter::once(first)
-        .chain(lines)
-        .filter(|old| !ids.contains(format!("legacy:{}:{}", old.shard, old.line).as_str()))
-        .count())
-}
-
 /// Pointer: old friction shards the record store lacks. Warns while any remain; the migration is an explicit
 /// operator command, so the row neither fails nor repairs.
 pub fn friction_migrated_row(root: &Path) -> RowOutcome {
-    match unmigrated_friction(root) {
+    match fgos_observe::friction::unmigrated_count(root) {
         Ok(0) => row(true, "friction store holds no unmigrated old shard lines".into()),
         Ok(n) => row(
             true,

@@ -824,6 +824,31 @@ fn migrated_view(events: &[Event], written: &[&Record]) -> Vec<Event> {
     kept.chain(appended).collect()
 }
 
+/// Old friction shard lines the v2 record store does not hold yet under the id `migrate_to_records` gives them
+/// (`legacy:<shard>:<line>`). Read-only: takes no lock and writes nothing; the doctor's migration pointer counts with
+/// it so the id rule lives here only.
+pub fn unmigrated_count(root: &Path) -> Result<usize, String> {
+    let old = shard::read_store(root, STORE, UnsafeShard::Fail).map_err(|e| e.to_string())?;
+    let lines: Vec<&StoredRecord> = old
+        .records
+        .iter()
+        .filter(|stored| {
+            matches!(
+                stored.value.get("type").and_then(Value::as_str),
+                Some("friction-recorded" | "friction-resolved")
+            )
+        })
+        .collect();
+    if lines.is_empty() {
+        return Ok(0);
+    }
+    let (existing, _) = stored_friction(root)?;
+    Ok(lines
+        .iter()
+        .filter(|stored| !existing.contains(&legacy_id(&stored.shard, stored.line)))
+        .count())
+}
+
 /// Copies every old `friction` shard line into the v2 record store through the record door, each under its fixed
 /// id `legacy:<shard>:<line>`. The whole run holds the observe lock, checks the ids of the whole record store (every
 /// writer's shard) before writing, and appends once, so a second run, or a run from another writer, writes nothing
