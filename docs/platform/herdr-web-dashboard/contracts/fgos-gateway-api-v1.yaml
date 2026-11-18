@@ -355,7 +355,7 @@ paths:
         the gateway adds nothing. There is NO MCP binding for these routes: answering is an owner action
         taken over REST, never a tool an agent can call through the gateway's MCP surface.
       responses:
-        '200': { $ref: '#/components/responses/QuestionsOk' }
+        '200': { $ref: '#/components/responses/QuestionsListOk' }
         default: { $ref: '#/components/responses/Error' }
 
   /questions/{id}:
@@ -369,7 +369,7 @@ paths:
         `data.question` carries the five parts (what is happening, cause, options with gain, harm and cost,
         recommendation, scope of the answer) and the record's state and answer.
       responses:
-        '200': { $ref: '#/components/responses/QuestionsOk' }
+        '200': { $ref: '#/components/responses/QuestionOk' }
         default: { $ref: '#/components/responses/Error' }
 
   /questions/{id}/answer:
@@ -393,8 +393,11 @@ paths:
               properties:
                 option: { type: string, description: "The label of the chosen option." }
                 text: { type: string, description: "A free-text answer or note." }
+              anyOf:
+                - required: [option]
+                - required: [text]
       responses:
-        '200': { $ref: '#/components/responses/QuestionsOk' }
+        '200': { $ref: '#/components/responses/QuestionAnswerOk' }
         default: { $ref: '#/components/responses/Error' }
 
   /work/{id}/take:
@@ -710,7 +713,7 @@ components:
               - type: object
                 properties:
                   data: { $ref: '#/components/schemas/WorkItem' }
-    QuestionsOk:
+    QuestionsListOk:
       description: OK
       content:
         application/json:
@@ -719,7 +722,48 @@ components:
               - $ref: '#/components/schemas/Envelope'
               - type: object
                 properties:
-                  data: { type: object, description: "The verb's own `data`: a list, one question, or `{id, state}`." }
+                  data:
+                    type: object
+                    required: [needsYou, questions]
+                    properties:
+                      needsYou: { type: integer, description: "Count of everything waiting: store questions, asks and gates." }
+                      questions: { type: array, items: { type: object }, description: "Open store questions: id, state, headline, blocks, stage, ref, askedAt, age, asker, recommended." }
+                      work:
+                        type: object
+                        description: "The Work layer's waiting items, or `{unavailable}` when it could not be read."
+                        properties:
+                          asks: { type: array, items: { type: object, description: "ref, title, question, answerDoor" } }
+                          gates: { type: array, items: { type: object, description: "ref, question, answerDoor" } }
+                          unavailable: { type: string }
+    QuestionOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Envelope'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    required: [question]
+                    properties:
+                      question: { type: object, description: "state, answer and `asked` (id, headline, blocks, the five `parts`)." }
+    QuestionAnswerOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Envelope'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    required: [id, state]
+                    properties:
+                      id: { type: string }
+                      state: { type: string, description: "`answered`." }
     Error:
       description: |
         Any non-2xx. Never bodied by the plain `fgos.v1` envelope — branch

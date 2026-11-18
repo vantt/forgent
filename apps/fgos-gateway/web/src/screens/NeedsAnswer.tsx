@@ -61,7 +61,11 @@ export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswer
       const recommended = question.asked.parts.options.find((o) => o.recommended === true)
       if (recommended) setPicked((prev) => (prev[id] ? prev : { ...prev, [id]: recommended.label }))
     } catch (err) {
-      if (err instanceof GatewayUnreachableError) setStale(true)
+      if (err instanceof GatewayUnreachableError) {
+        setStale(true)
+        return
+      }
+      setRefused((prev) => ({ ...prev, [id]: err instanceof Error ? err.message : 'refused' }))
     }
   }
 
@@ -78,9 +82,9 @@ export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswer
         setStale(true)
         return
       }
-      // The verb refuses (already answered, not the owner): show its message, never swallow it.
+      // The verb refuses (already answered, not the owner): show its message under the question and
+      // keep the row, so the refusal stays readable; the next list load settles the row.
       setRefused((prev) => ({ ...prev, [id]: err instanceof Error ? err.message : 'refused' }))
-      await fetchList()
     }
   }
 
@@ -180,6 +184,11 @@ export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswer
               >
                 {expanded[q.id] ? 'Collapse' : 'Expand'}
               </button>
+              {refused[q.id] && (
+                <p data-testid={`refused-${q.id}`} className="text-sm text-danger">
+                  {refused[q.id]}
+                </p>
+              )}
               {expanded[q.id] && detail && (
                 <div data-testid={`detail-${q.id}`} className="mt-2 space-y-2 text-sm text-ink">
                   <p>
@@ -222,11 +231,6 @@ export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswer
                     placeholder="Note (optional)"
                     className="w-full rounded-lg border border-border bg-surface p-2 text-sm text-ink"
                   />
-                  {refused[q.id] && (
-                    <p data-testid={`refused-${q.id}`} className="text-sm text-danger">
-                      {refused[q.id]}
-                    </p>
-                  )}
                   <div className="flex justify-end">
                     <button
                       data-testid={`question-submit-${q.id}`}
@@ -255,6 +259,7 @@ export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswer
               <p data-testid={`tag-${id}`} className="mt-1 inline-block rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-ink-muted">
                 ASK
               </p>
+              <p className="mt-1 text-sm text-ink">{ask.question}</p>
               <textarea
                 data-testid={`answer-input-${id}`}
                 value={answerDrafts[id] ?? ''}

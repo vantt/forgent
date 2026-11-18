@@ -127,6 +127,20 @@ describe('NeedsAnswer (S04: store questions, ask items and gates from /v1/questi
     expect(answeredUrl.endsWith('/questions/q-abc/answer')).toBe(true)
   })
 
+  it('a refused answer keeps the row and shows the verb refusal under the question', async () => {
+    stubGateway(() =>
+      jsonResponse({ category: 'conflict', message: 'question q-abc is already answered' }, { status: 409 }),
+    )
+    renderScreen()
+    await waitFor(() => expect(screen.getByTestId('expand-q-abc')).toBeTruthy())
+    fireEvent.click(screen.getByTestId('expand-q-abc'))
+    await waitFor(() => expect(screen.getByTestId('option-q-abc-A')).toBeTruthy())
+    fireEvent.click(screen.getByTestId('option-q-abc-A'))
+    fireEvent.click(screen.getByTestId('question-submit-q-abc'))
+    await waitFor(() => expect(screen.getByTestId('refused-q-abc').textContent).toContain('already answered'))
+    expect(screen.getByTestId('row-q-abc')).toBeTruthy()
+  })
+
   it('an ask item answers through the existing work answer route and Open navigates by its work id', async () => {
     let answeredUrl = ''
     stubGateway((url) => {
@@ -136,6 +150,7 @@ describe('NeedsAnswer (S04: store questions, ask items and gates from /v1/questi
     const onOpenItem = vi.fn()
     renderScreen(onOpenItem)
     await waitFor(() => expect(screen.getByTestId('answer-input-tsk-4id')).toBeTruthy())
+    expect(screen.getByTestId('row-tsk-4id').textContent).toContain('which?')
     fireEvent.change(screen.getByTestId('answer-input-tsk-4id'), { target: { value: 'the answer' } })
     fireEvent.click(screen.getByTestId('answer-submit-tsk-4id'))
     await waitFor(() => expect(answeredUrl.endsWith('/work/tsk-4id/answer')).toBe(true))
