@@ -98,7 +98,7 @@ test('a secretary launches with the paths and the verb its grant names; the line
   assert.equal(request.key, headKeyOf('secretary', 'miu', 2));
   assert.deepEqual(request.grant, grantOf('head:secretary-miu'));
   assert.deepEqual(request.grant.writes, ['plans', 'docs/backlog.md', 'docs/discussions']);
-  assert.deepEqual(request.grant.verbs, ['head start', 'head rotate', 'head answered']);
+  assert.deepEqual(request.grant.verbs, ['head start', 'head rotate', 'head answered', 'head restore role']);
   assert.deepEqual(request.env, { FGOS_HEAD_ROLE: headRoleOf('secretary', 'miu'), FGOS_HEAD_GEN: '2' });
   const kept = JSON.parse(fs.readFileSync(path.join(lineageDirOf(projectRoot, 'secretary', 'miu'), 'placement.json'), 'utf8'));
   assert.equal(kept.placement.key, out.key);
@@ -108,8 +108,8 @@ test('a secretary launches with the paths and the verb its grant names; the line
 
 test('the grant table: the persona matches a table key exactly, an unnamed persona holds nothing, a non-head role is refused', () => {
   assert.deepEqual(grantOf('head:planner-probe'), { writes: [], verbs: [] });
-  assert.deepEqual(grantOf('head:secretary-miu').verbs, ['head start', 'head rotate', 'head answered']);
-  assert.deepEqual(grantOf('head:shaper-x'), { writes: [], verbs: ['head rotate', 'head answered'] }, 'a shaper rotates but starts nothing and writes nothing');
+  assert.deepEqual(grantOf('head:secretary-miu').verbs, ['head start', 'head rotate', 'head answered', 'head restore role']);
+  assert.deepEqual(grantOf('head:shaper-x'), { writes: [], verbs: ['head rotate', 'head answered', 'head restore role'] }, 'a shaper rotates but starts nothing and writes nothing');
   assert.deepEqual(grantOf('head:secretary-miu', 'secretary'), grantOf('head:secretary-miu'));
   // `secretary-x` is another persona: asked by persona it is not the secretary, even though the role starts alike.
   assert.deepEqual(grantOf('head:secretary-x-y', 'secretary-x'), { writes: [], verbs: [] });

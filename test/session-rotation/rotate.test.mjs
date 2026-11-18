@@ -32,7 +32,7 @@ function project(t) {
  * lets the successor answer. `holder` is what Identity says holds the role at that moment.
  */
 function fakes(root, { onSleep = () => {}, holder = { live: true, session: 'old-session' }, placeFails = null, lock = undefined } = {}) {
-  const calls = { end: [], place: [], released: 0, order: [] };
+  const calls = { end: [], place: [], restore: [], released: 0, order: [] };
   let now = 0;
   let sleeps = 0;
   const ports = {
@@ -45,6 +45,8 @@ function fakes(root, { onSleep = () => {}, holder = { live: true, session: 'old-
       if (placeFails) throw Object.assign(new Error('seat refused'), { code: placeFails });
       return { role: 'head:planner-x', gen: request.gen, key: NEW.key, placement: NEW, runDir: '/run/new', cli: null, persona: 'planner' };
     },
+    closed: () => true,
+    restoreRole: (ask) => { calls.restore.push(ask); },
     config: () => ({ keep: 10, answerWaitMs: 5000 }),
     clock: { now: () => now, sleep: async (ms) => { now += ms; sleeps += 1; await onSleep(sleeps); } },
     pollMs: 1000,
@@ -232,4 +234,34 @@ test('the detached entry reads its request file, removes it and prints one resul
   assert.equal(fs.existsSync(file), false, 'the request file is consumed even when it is unusable');
   assert.equal(spawnSync(process.execPath, [entry], { encoding: 'utf8' }).status, 2, 'no request file is a usage error');
   assert.ok(root);
+});
+
+test('a late take that landed on the ended successor gives the role back to the old head, and says so when the old head is gone too', async (t) => {
+  const { root, dir } = project(t);
+  const incidents = () => fs.readFileSync(path.join(dir, 'incidents.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l).event);
+  // Identity names the old head until the successor is asked to stop; then nobody live holds the role.
+  let successorEnded = false;
+  const first = fakes(root, { holder: () => (successorEnded ? { live: false } : { live: true, session: 'old-session' }) });
+  const end = first.ports.end;
+  first.ports.end = (runDir) => { if (runDir === '/run/new') successorEnded = true; return end(runDir); };
+  const result = await rotateHeadSession(first.request, first.ports);
+  assert.equal(result.reason, 'no-answer');
+  assert.deepEqual(first.calls.restore, [{ runDir: '/run/old', persona: 'planner', name: 'x' }], 'the old head\'s own supervisor registers the role again');
+  assert.deepEqual(incidents(), ['role-restored', 'rotation-failed']);
+
+  fs.rmSync(path.join(dir, 'incidents.jsonl'));
+  successorEnded = false;
+  const second = fakes(root, { holder: () => (successorEnded ? { live: false } : { live: true, session: 'old-session' }) });
+  const end2 = second.ports.end;
+  second.ports.end = (runDir) => { if (runDir === '/run/new') successorEnded = true; return end2(runDir); };
+  second.ports.restoreRole = () => { throw Object.assign(new Error('gone'), { code: 'request-socket-unavailable' }); };
+  await rotateHeadSession({ ...second.request, stopFacts: { sessionId: 'oldsess2' } }, second.ports);
+  assert.deepEqual(incidents(), ['no-live-head', 'rotation-failed']);
+
+  // A live holder after the successor closed means nothing is restored.
+  fs.rmSync(path.join(dir, 'incidents.jsonl'));
+  const third = fakes(root);
+  await rotateHeadSession({ ...third.request, stopFacts: { sessionId: 'oldsess3' } }, third.ports);
+  assert.deepEqual(third.calls.restore, []);
+  assert.deepEqual(incidents(), ['rotation-failed']);
 });

@@ -149,6 +149,10 @@ test('the payload entry runs head rotate and head answered for the envelope\'s o
   const answered = await runHeadRequest({ runDir, request: { verb: 'head answered', args: { persona: 'planner', name: 'x', sessionId: 's1', rotationId: '0123456789abcdef', message: 'ready' } } }, ports);
   assert.deepEqual(answered, { exit: 0, line: { result: 'done', data: { accepted: true, gen: 2 } } });
   assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'answered.json'), 'utf8')).key, 'head-planner-x-2', 'the key is the attempt\'s own, never the sandbox\'s');
+  const restore = await runHeadRequest({ runDir, request: { verb: 'head restore role', args: { persona: 'planner', name: 'x' } } }, ports);
+  assert.deepEqual(restore, { exit: 0, line: { result: 'done', data: {} } });
+  const otherRestore = await runHeadRequest({ runDir, request: { verb: 'head restore role', args: { persona: 'planner', name: 'y' } } }, ports);
+  assert.equal(otherRestore.line.code, 'role-mismatch');
   const stray = await runHeadRequest({ runDir, request: { verb: 'head answered', args: { persona: 'planner', name: 'x', sessionId: 's1', rotationId: '0123456789abcdef', message: 'm', key: 'head-planner-x-9' } } }, ports);
   assert.equal(stray.line.code, 'bad-args');
 });

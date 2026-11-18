@@ -133,7 +133,7 @@ fn serve_with(
         }),
         take_role: Box::new({
             let (take, took) = (identity.take.clone(), identity.took.clone());
-            move || {
+            move |_take| {
                 *took.lock().unwrap() += 1;
                 take.clone().map_err(|code| HoldError {
                     code,
@@ -388,7 +388,15 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
         .map(String::as_str)
         .collect();
     verbs.sort();
-    assert_eq!(verbs, ["head answered", "head rotate", "head start"]);
+    assert_eq!(
+        verbs,
+        [
+            "head answered",
+            "head restore role",
+            "head rotate",
+            "head start"
+        ]
+    );
     assert_eq!(
         contract["verbs"][fgos_run_supervisor::head_request::ANSWERED_VERB]["identity"],
         "registered-then-take"
@@ -713,7 +721,7 @@ fn identity_registers_a_successor_without_the_role_and_take_moves_it_from_the_pr
         pid,
         start_time: facts::identity_of(ProcId(pid)).unwrap().start_time,
     };
-    identity_take(&root, &root, role, "att-new", &head).expect("take");
+    identity_take(&root, &root, role, "att-new", &head, true).expect("take");
     assert_eq!(identity_holds(&root, role, "att-new"), Ok(true));
     assert_eq!(identity_holds(&root, role, "att-old"), Ok(false));
 
@@ -722,4 +730,40 @@ fn identity_registers_a_successor_without_the_role_and_take_moves_it_from_the_pr
         .unwrap_err()
         .code
         .starts_with("machine-id"));
+}
+
+#[test]
+fn restore_gives_the_role_back_only_through_a_registration_without_take() {
+    let role = "head:planner-x";
+    let root = state_root("restore", true);
+    register(&root, "att-old", &[]);
+    let pid = std::process::id();
+    let head = HeadRef {
+        pid,
+        start_time: facts::identity_of(ProcId(pid)).unwrap().start_time,
+    };
+    // Nobody holds the role (a late take landed on a dead successor): the old head registers it again.
+    identity_take(&root, &root, role, "att-old", &head, false).expect("restore");
+    assert_eq!(identity_holds(&root, role, "att-old"), Ok(true));
+    // A live holder is never displaced by a restore: Identity refuses `role-held`.
+    register(&root, "att-new", &[]);
+    let refusal = identity_take(&root, &root, role, "att-new", &head, false).unwrap_err();
+    assert_eq!(refusal.code, "role-held");
+    assert_eq!(identity_holds(&root, role, "att-old"), Ok(true));
+}
+
+#[test]
+fn the_restore_verb_needs_only_a_registered_session_and_registers_after_done() {
+    let identity = Identity::default();
+    let took = identity.took.clone();
+    let served = serve_with(
+        "restore-ok",
+        DONE_LINE,
+        Ok(false),
+        identity,
+        &["head restore role"],
+        Duration::from_secs(20),
+    );
+    assert_eq!(ask(&served.socket, "head restore role")["result"], "done");
+    assert_eq!(*took.lock().unwrap(), 1);
 }

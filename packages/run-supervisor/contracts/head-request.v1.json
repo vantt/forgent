@@ -31,6 +31,13 @@
       "data": "{started: true, pid} or {started: false, reason: rotation-in-progress | spawn-failed}",
       "identity": "held"
     },
+    "head restore role": {
+      "args": { "persona": "string, required", "name": "string, required; spelled as the envelope's own role, as for head rotate" },
+      "does": "nothing in the route child (it only checks the arguments); the effect is the supervisor's: after the child reports done it registers the envelope's role for this attempt's session again, WITHOUT take. Used by the rotation executor when a failed rotation left no live session holding the role (a late take landed on the ended successor): Identity refuses role-held when any live session holds it, so a restore never displaces a holder",
+      "data": "{}",
+      "identity": "registered-then-register",
+      "rule": "same role step as head answered (this attempt's own session is registered and live, session-not-registered otherwise); a refused registration is role-take-failed with Identity's code in detail. The executor reaches this socket as the same user (peer uid)"
+    },
     "head answered": {
       "args": { "persona": "string, required", "name": "string, required; spelled as the envelope's own role, as for head rotate", "sessionId": "string, required: the successor's Identity session id", "rotationId": "string, required: 16 lowercase hex characters, the id of the pending rotation exactly as the handoff's `Rotation id:` line carries it; the successor reads it from its handoff and echoes it, no other match is made", "message": "string, required: the successor's first assistant message, kept as evidence, at most 8000 characters" },
       "does": "markSuccessorAnswered (src/session-rotation/rotate.mjs): records the answer of the successor the lineage's pending rotation waits for. The key is the attempt's own (envelope.unitRunId), never an argument. Refused no-rotation-pending when no rotation waits for that key (the executor removes its pending record before it gives up, so a late answer is refused), answer-mismatch when rotationId is not exactly the pending rotation's id; this is the one place an answer is checked",

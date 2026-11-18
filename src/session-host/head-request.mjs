@@ -24,6 +24,7 @@ const MAX_FRAME_BYTES = 65_536;
 const HEAD_START_VERB = 'head start';
 const HEAD_ROTATE_VERB = 'head rotate';
 const HEAD_ANSWERED_VERB = 'head answered';
+const HEAD_RESTORE_VERB = 'head restore role';
 /** A reply may take as long as the supervisor lets the verb run (60 s) plus its own overhead. */
 const DEFAULT_REPLY_TIMEOUT_MS = 70_000;
 
@@ -114,6 +115,9 @@ export const requestHeadRotate = (args, options) => requestHead(HEAD_ROTATE_VERB
 /** `head answered` over the socket: the successor reports its first turn; `args` is `{ persona, name, sessionId, rotationId, message }`. */
 export const requestHeadAnswered = (args, options) => requestHead(HEAD_ANSWERED_VERB, args, options);
 
+/** `head restore role` over the socket: asks that head's supervisor to register its role again (the effect is the supervisor's). */
+export const requestHeadRestoreRole = (args, options) => requestHead(HEAD_RESTORE_VERB, args, options);
+
 const confined = (env) => env[CONFINED_MARKER_ENV] === '1';
 
 /**
@@ -165,8 +169,8 @@ function ownLineage(args, envelope) {
 }
 
 /**
- * Runs the verb of one request for the attempt in `runDir`, in this attempt's project: `head start`, `head rotate` or
- * `head answered`. Returns `{ exit, line }`: the one JSON line to print, `{result: 'done', data}` or
+ * Runs the verb of one request for the attempt in `runDir`, in this attempt's project: `head start`, `head rotate`,
+ * `head answered` or `head restore role` (which only checks its arguments: the supervisor registers the role). Returns `{ exit, line }`: the one JSON line to print, `{result: 'done', data}` or
  * `{result: 'error', code, message}`, and the exit code (0 done, 70 error). Who may ask and for what was decided by
  * the supervisor before it ran this; the verb arguments are re-checked here because they come from the sandbox.
  * `head rotate` returns at once (the rotation runs detached); `head answered` is the one verb of a successor that does
@@ -197,6 +201,11 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
         exactKeys(args, ['persona', 'name', 'sessionId', 'rotationId', 'message']);
         ownLineage(args, envelope);
         data = markSuccessorAnswered({ projectRoot, persona: args.persona, name: args.name, key: envelope.unitRunId, sessionId: args.sessionId, rotationId: args.rotationId, message: args.message });
+        break;
+      case HEAD_RESTORE_VERB:
+        exactKeys(args, ['persona', 'name']);
+        ownLineage(args, envelope);
+        data = {};
         break;
       default:
         throw Object.assign(new Error(`unknown verb ${JSON.stringify(request?.verb)}`), { code: 'unknown-verb' });

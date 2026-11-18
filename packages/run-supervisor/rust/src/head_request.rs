@@ -41,6 +41,20 @@ const MAX_ID_LEN: usize = 64;
 /// The one verb of a rotation successor, which does not hold the role yet: the supervisor checks only that the
 /// attempt's own session is registered, and after the verb reports done it moves the role to that session.
 pub const ANSWERED_VERB: &str = "head answered";
+/// The verb that gives a role back to a live head when a failed rotation left nobody holding it: the same
+/// registered check, and after the route reports done the role is registered again without `take`, so Identity
+/// refuses (`role-held`) when another live session holds it.
+pub const RESTORE_VERB: &str = "head restore role";
+
+/// Verbs of a session that does not (yet) hold its role: the role check is "registered", and after the route reports
+/// done the supervisor registers the role for the attempt's session. The flag is Identity's `take`.
+fn role_move(verb: &str) -> Option<bool> {
+    match verb {
+        ANSWERED_VERB => Some(true),
+        RESTORE_VERB => Some(false),
+        _ => None,
+    }
+}
 
 /// Whether the connection's owner may use the socket: the supervisor's own uid, nothing else.
 pub(crate) fn uid_allowed(peer: Option<libc::uid_t>, own: libc::uid_t) -> bool {
@@ -69,7 +83,7 @@ fn invalid(why: impl Into<String>) -> EnvelopeError {
 }
 
 type HoldsRole = Box<dyn Fn() -> Result<bool, HoldError> + Send + Sync>;
-type TakesRole = Box<dyn Fn() -> Result<(), HoldError> + Send + Sync>;
+type TakesRole = Box<dyn Fn(bool) -> Result<(), HoldError> + Send + Sync>;
 type LogLine = Box<dyn Fn(&str) + Send + Sync>;
 
 /// What serving the socket needs, all of it from the envelope except the two ports.
@@ -88,7 +102,8 @@ pub struct Config {
     /// Is this attempt's own session registered and live in Identity (the check of [`ANSWERED_VERB`], which runs
     /// before the session holds the role). Errors are handled as for `holds_role`.
     pub registered: HoldsRole,
-    /// Moves the envelope's role to this attempt's session (Identity's `take`), after [`ANSWERED_VERB`] reported done.
+    /// Registers the envelope's role for this attempt's session after [`ANSWERED_VERB`] (`take`: true) or
+    /// [`RESTORE_VERB`] (false) reported done.
     pub take_role: TakesRole,
     /// One line per request, for `supervisor.log`.
     pub log: LogLine,
@@ -200,13 +215,13 @@ impl HeadRequests {
             }),
             take_role: Box::new({
                 let gate = gate.clone();
-                move || {
+                move |take| {
                     let head = gate.lock().unwrap_or_else(|e| e.into_inner()).clone();
                     let head = head.ok_or_else(|| HoldError {
                         code: "gate-unknown".into(),
                         detail: "the attempt's gate is not known yet".into(),
                     })?;
-                    identity_take(&state_root, &cwd, &role, &writer_id, &head)
+                    identity_take(&state_root, &cwd, &role, &writer_id, &head, take)
                 }
             }),
             log: Box::new(|line| eprintln!("fgos internal supervise: {line}")),
@@ -274,7 +289,7 @@ pub fn identity_registered(state_root: &Path, writer_id: &str) -> Result<bool, H
     }
 }
 
-/// Moves `role` to the session of `writer_id` (Identity's own `take`, the supervisor only transports the fact that
+/// Registers `role` for the session of `writer_id`; with `take` it moves from the live holder (Identity's own `take`, the supervisor only transports the fact that
 /// the attempt is that session). The gate is the head Identity records liveness against.
 pub fn identity_take(
     state_root: &Path,
@@ -282,6 +297,7 @@ pub fn identity_take(
     role: &str,
     writer_id: &str,
     head: &HeadRef,
+    take: bool,
 ) -> Result<(), HoldError> {
     let key = WriterKey {
         source: ENV_ORDER[0],
@@ -293,7 +309,7 @@ pub fn identity_take(
         &key,
         head,
         &[role.to_string()],
-        true,
+        take,
     )
     .map(|_| ())
     .map_err(hold_error)
@@ -440,8 +456,8 @@ fn read_request(reader: &mut impl Read) -> Result<Request, Option<String>> {
 
 /// The checks in contract order, then the verb.
 fn decide(cfg: &Config, busy: &AtomicBool, request: &Request) -> Outcome {
-    let answered = request.verb == ANSWERED_VERB;
-    let (check, not_so) = if answered {
+    let moves = role_move(&request.verb);
+    let (check, not_so) = if moves.is_some() {
         (&cfg.registered, "session-not-registered")
     } else {
         (&cfg.holds_role, "role-not-held")
@@ -471,8 +487,8 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request) -> Outcome {
     }
     let _busy = Busy(busy);
     let outcome = run_verb(cfg, request);
-    if answered && matches!(outcome, Outcome::Done(_)) {
-        if let Err(why) = (cfg.take_role)() {
+    if let (Some(take), Outcome::Done(_)) = (moves, &outcome) {
+        if let Err(why) = (cfg.take_role)(take) {
             (cfg.log)(&format!(
                 "head-request {} identity {}: {}",
                 request.id, why.code, why.detail

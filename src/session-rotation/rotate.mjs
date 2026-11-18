@@ -39,6 +39,7 @@ const POLL_MS = 1000;
 const MAX_TEXT = 8000;
 const MAX_LIST = 50;
 const DEFAULT_ANSWER_WAIT_MS = 120_000;
+const CLOSE_WAIT_MS = 60_000;
 const STOP_FACT_KEYS = ['sessionId', 'portfolio', 'delta', 'lastAssistantMessage', 'pendingQuestion'];
 
 export class RotationError extends Error {
@@ -152,6 +153,13 @@ function readRotationConfig(projectRoot) {
   return readConfig({ projectRoot, sections: ['sessionRotation'] }).value.sessionRotation;
 }
 
+/** Asks the old head's own supervisor, over its request socket, to register its role again; throws when it cannot. */
+async function askRestoreRole({ runDir, persona, name }) {
+  const { requestHeadRestoreRole } = await import('../session-host/head-request.mjs');
+  const socketPath = readJson(path.join(runDir, 'envelope.json'))?.session?.requestSocketPath;
+  return requestHeadRestoreRole({ persona, name }, { socketPath });
+}
+
 const realClock = { now: () => Date.now(), sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)) };
 
 // ---- the executor ----------------------------------------------------------------------------------
@@ -199,6 +207,28 @@ export async function rotateHeadSession(request, ports = {}) {
     return { rotated: true, key: successor.key, gen, oldEnded };
   };
 
+  // After a rotation outcome exactly one live head holds the role. A take that landed on the successor after it was
+  // asked to stop leaves nobody holding it: once its attempt has closed, the old head registers the role again through
+  // its own supervisor (Identity refuses when any live session holds it); if the old head is gone too, say so and stop.
+  const keepOneHolder = async () => {
+    const closed = ports.closed ?? ((runDir) => fs.existsSync(path.join(runDir, 'closed.json')));
+    const until = clock.now() + CLOSE_WAIT_MS;
+    while (!closed(successor.runDir) && clock.now() < until) await clock.sleep(ports.pollMs ?? POLL_MS);
+    if (!closed(successor.runDir)) incident(dir, { event: 'successor-not-closed', role, detail: `${successor.runDir} has no closed record after ${CLOSE_WAIT_MS} ms` });
+    let holder;
+    try { holder = await whoHolds({ role, projectRoot }); } catch (err) {
+      incident(dir, { event: 'role-unchecked', role, detail: `Identity could not say who holds the role (${err.code ?? err.message})` });
+      return;
+    }
+    if (holder.live) return;
+    try {
+      await (ports.restoreRole ?? askRestoreRole)({ runDir: old.runDir, persona, name });
+      incident(dir, { event: 'role-restored', role, detail: 'a late take landed on the ended successor; the old head registered the role again' });
+    } catch (err) {
+      incident(dir, { event: 'no-live-head', role, detail: `nobody holds the role and the old head could not take it back (${err.code ?? err.message})` });
+    }
+  };
+
   // Identity is the authority on who holds the role: a deadline that passed while the role was moving finishes the
   // rotation instead of ending the role holder. rotation.json goes first, so no later `head answered` is accepted.
   const abandon = async (code, detail) => {
@@ -214,6 +244,7 @@ export async function rotateHeadSession(request, ports = {}) {
         return complete(answered, `${code}, but Identity already named the successor holder`);
       }
       if (!end(successor.runDir)) incident(dir, { event: 'successor-not-ended', code, detail: `no stop request could be written for ${successor.runDir}` });
+      else await keepOneHolder();
     }
     incident(dir, { event: 'rotation-failed', role, code, detail, successor: successor ? 'ended' : 'none' });
     return { rotated: false, reason: code, detail };

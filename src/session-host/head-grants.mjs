@@ -15,8 +15,8 @@ const ROLE_PATTERN = /^head:([a-z][a-z0-9-]*)$/;
 
 const NONE = Object.freeze({ writes: Object.freeze([]), verbs: Object.freeze([]) });
 
-/** Every head may rotate itself and report its first turn as a successor; only the secretary may also start sessions. */
-const ROTATION_VERBS = Object.freeze(['head rotate', 'head answered']);
+/** Every head may rotate itself, report its first turn as a successor and take its role back after a failed rotation; only the secretary may also start sessions. */
+const ROTATION_VERBS = Object.freeze(['head rotate', 'head answered', 'head restore role']);
 
 const GRANTS = Object.freeze({
   secretary: Object.freeze({
