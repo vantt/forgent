@@ -1,28 +1,30 @@
 # Phase 7: Addon bindings and ABI
 
-The Node surface that Work and the scripts share. The door plan (phase 7b onward) starts after this plan lands.
+The Node surface that Work and the scripts share. It changes no consumer; the door plan starts after
+this plan lands.
 
 ## Inputs
 
-- The crates from phases 3, 4 and 5 and the Node access decision (decision 16).
-- The addon's source layout (`packages/git/node-addon/src`: `lib.rs` with its `versions()` object, `canonical_json.rs`, `agent_protocol.rs`, `git/write_scope.rs` and others) and `packages/git/node-addon/src/git/write_scope.rs` (what Node can call today).
-- `src/native/door.mjs` (`combinedAbiMatches`, `loadNativeAddon`) and `test/config/config-door.test.mjs` (the existing ABI test).
+- The `graph` crate (phase 4) and the write-scope operations exposed in phase 3.
+- The addon's source layout (`packages/git/node-addon/src`: `lib.rs` with its `versions()` object, `canonical_json.rs`, `agent_protocol.rs`, `git/write_scope.rs` and others) and the panic-containment pattern in `packages/git/node-addon/src/checkout.rs:154`.
+- `src/native/door.mjs` (`combinedAbiMatches`, `loadNativeAddon`), `test/config/config-door.test.mjs` (the existing ABI test) and `test/git/native-load.test.mjs` (pins `versions()` whole with `deepEqual`).
 - The staging helper `test/helpers/git-addon.mjs` (`ensureGitAddon()`) that later tests use to build and point at this checkout's addon.
 
 ## Files it may write
 
-`packages/git/node-addon/src/**` (new modules for `graph` and `resource-referee`, the colliding-pairs operation next to `write_scope.rs`, and the `versions()` fields; the manifest edges were declared in phase 2), `src/native/door.mjs`, and `test/config/config-door.test.mjs`. The mutation census is not touched.
+`packages/git/node-addon/src/**` (a `graph` module and the `versions()` fields; `git/write_scope.rs` was written in phase 3), `src/native/door.mjs`, `test/config/config-door.test.mjs` and `test/git/native-load.test.mjs`. The mutation census is not touched.
 
 ## Steps
 
-1. Write the addon bindings for `graph` and `resource-referee`, and expose the colliding-pairs function of phase 3 next to the four existing write-scope operations.
-2. Add a `versions()` field for each new namespace and the matching clause in `combinedAbiMatches`, so an addon from before them is refused by name and never fails at its first call.
-3. Extend the existing ABI test with a case that an addon lacking the new fields is refused by name.
-4. Run the census scan without `--write-census` and list the changed entries against this phase's footprint.
+1. Bind `graph` into the addon. There is no `resource-referee` binding: no Node caller exists (decision 16).
+2. Wrap every new entry, here and the `write_scope.rs` additions of phase 3, in the same panic-containment helper the addon already uses, answering with a named `*-internal-error`.
+3. Add a `versions()` field for `graph` and for `writeScope` and the matching clauses in `combinedAbiMatches`; make the refusal name the first missing or low field instead of the generic mismatch message.
+4. Update `test/git/native-load.test.mjs` (the one test that owns the shape of `versions()`) and extend the ABI test with cases that an addon lacking each new field is refused by name, and that a forced panic in a new entry surfaces as a thrown error, not an abort.
+5. List the census entries this phase changed against its footprint.
 
 ## Verify
 
-`cargo test -p fgos-node-addon`, then `node --test test/config/config-door.test.mjs test/git/write-scope-parity.test.mjs`.
+`cargo test -p fgos-node-addon`, then `node --test test/config/config-door.test.mjs test/git/native-load.test.mjs test/git/write-scope-parity.test.mjs`.
 
 ## Rollback
 

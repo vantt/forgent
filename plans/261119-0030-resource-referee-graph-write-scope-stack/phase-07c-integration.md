@@ -11,22 +11,23 @@ combined crate-level and owning tests there (decision 14), so this phase is the 
 
 ## Files it may write
 
-`packages/git/contracts/mutation-census.v1.json` (the only phase of this plan that regenerates it) and this plan's directory. `Cargo.lock` must come out of the merge unchanged from phase 2; a diff means a phase added a dependency it should not have.
+`packages/git/contracts/mutation-census.v1.json` (the only phase of this plan that regenerates it) and this plan's directory.
 
 ## Steps
 
-1. Merge `origin/main` into the integration branch (rebuild `Cargo.lock` after it, decision 21).
-2. Run the gates one after the other, never together: `cargo test --workspace` with `-j4` after checking `free -g`, then `npm test` (only `test/git/one-door.test.mjs` may still be red), then `node scripts/plan-contract-check.mjs --all`.
-3. Regenerate the mutation census once with `git-one-door-scan --write-census` as the last commit. Before committing it, list the entries removed and added by name (the moved `write-scope` files, the new crates and addon modules) and record the list in `reports/close.md`; any entry that is not explained by a phase is a stop. Immediately before the fast-forward, merge `origin/main` once more and re-run the census and `test/git/one-door.test.mjs`.
-4. Confirm acceptance criteria 1 to 7 one by one and write the result in `reports/close.md`.
-5. Update the board: the lane row and one line at the top of its `log.md`, naming the commit, what other lanes must know, and the lanes affected (those holding `Cargo.toml`, `packages/git`, `packages/supervision`).
-6. Check that each of the three specs carries the decision history its phase wrote.
-7. Record whether the release is activated. `fgos doctor` through the installed shim is the only gate; if the release is not activated, say so in `reports/close.md`: landing is not done. The door plan (`plans/261119-0528-resource-check-door-and-adapters`) may start once this plan is `done`.
+1. Merge `origin/main` into the integration branch, then rebuild `Cargo.lock` (decision 21).
+2. Check the lock: against merged `origin/main` it differs only by the edges phase 2 declared; verify with `cargo tree -p fgos-write-scope -p fgos-graph -p fgos-resource-referee`, not with a byte comparison.
+3. Run the gates one after the other, never together: `cargo test --workspace` with `-j4` after checking `free -g`, then `npm test` (only `test/git/one-door.test.mjs` and `test/setup/git-mutation-census.test.mjs` may be red), then `node scripts/plan-contract-check.mjs --all`.
+4. Regenerate the mutation census as the last commit with `git-one-door-scan --write-census`. Before committing it, list the entries removed and added by name (the moved `write-scope` files, the new crates and addon modules) and record the list in `reports/close.md`; any entry not explained by a phase is a stop. Then land in a loop: merge `origin/main`, regenerate the census, run `test/git/one-door.test.mjs` and `test/setup/git-mutation-census.test.mjs`, fast-forward; if the push is rejected, start again.
+5. Confirm acceptance criteria 1 to 6 one by one and write the result in `reports/close.md`.
+6. Update the board: the lane row and one line at the top of its `log.md`, naming the commit, what other lanes must know, and the lanes affected (those holding `Cargo.toml`, `packages/git`, `packages/supervision`).
+7. Check that each of the three specs carries the decision history its phase wrote.
+8. Record whether the release is activated. `fgos doctor` through the installed shim is the only gate; if the release is not activated, say so in `reports/close.md`: landing is not done. The door plan (`plans/261119-0528-resource-check-door-and-adapters`) may start once this plan is `done`.
 
 ## Verify
 
-Both suites green in sequence, the plan-contract check clean on every plan, the census matching the tree.
+Both suites green in sequence apart from the two named census tests before regeneration, the plan-contract check clean on every plan, the census matching the tree.
 
 ## Rollback
 
-Revert the landing; each earlier phase is its own commit and can be reverted in the reverse order 7c, 7, 6, 5, 4, 3, 2, 1, regenerating the census and rebuilding `Cargo.lock` at the end. If a release was activated, re-stage and re-activate the previous release and run `fgos doctor` through the shim; check that `apps/fgos-gateway` still builds from its own lock.
+Revert the landing; each earlier phase is its own commit and can be reverted in the reverse order 7c, 7, 5, 4, 3, 2, 1, regenerating the census and rebuilding `Cargo.lock` at the end. If the door plan has landed, revert it first. If a release was activated, re-stage and re-activate the previous release with `fgctl repair` and run `fgos doctor` through the shim; check that `apps/fgos-gateway` still builds from its own lock.
