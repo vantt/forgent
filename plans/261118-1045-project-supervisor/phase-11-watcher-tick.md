@@ -6,7 +6,7 @@ and stops nothing.
 
 ## Inputs
 - Waits: ops-metrics phase 4 (Observe write door, for the tick span), phase 7 (`fgos metrics query --def <file|dir>`,
-  repeatable, `--since`) and phase 14 (`core/attention/definitions/`, row shape of the attention view v2), and phase 17 (query grammar for the supervisor's definitions; `--since/--until` with `--def`, which this tick passes, is its first commit). Do not start
+  repeatable, `--since`) and phase 14 (`core/attention/definitions/`, row shape of the attention view v2), and phase 17's first commit (`--since/--until` with `--def`, which this tick passes; landed 3d3ebb1b8). Phase 13b (definitions on the rest of phase 17) is not a wait: the tick runs whatever definitions are listed, and `watcher.enabled` stays off until 13b lands (lead:OPC condition, 2026-11-18). Do not start
   before they are on `main`. Step 0 re-reads their landed names.
 - Phase 3 (crate, `observe-kinds.json`: the exact tick attr and measure names), phase 4 (keys `watcher.enabled`,
   `activeIntervalSec`, `idleIntervalSec`, `lookbackSec`, `definitions`, `defaultAction`, `actions`, `notifyTo`), phase 6
