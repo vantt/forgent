@@ -100,7 +100,7 @@ pub fn resync(request: &ResyncRequest) -> Result<Resynced> {
         .map_err(|e| Error::invalid(format!("{e:?}")))?;
     if !driver
         .ancestry(&main_repo, &last, &branch_tip)
-        .unwrap_or(false)
+        .map_err(Error::git)?
     {
         return Err(Error::new(
             ErrorKind::Provision,

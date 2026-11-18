@@ -48,18 +48,37 @@ struct Aside {
 }
 
 impl Aside {
-    fn restore(&mut self) {
+    /// Put every moved path back. The aside directory is deleted only when every put-back succeeded; otherwise it
+    /// is kept and the error names it, so the protected bytes are never lost.
+    fn restore(&mut self) -> Result<()> {
+        let mut failed: Vec<String> = vec![];
         for rel in self.emptied.drain(..).rev() {
             let _ = fs::create_dir_all(self.worktree.join(rel));
         }
         for rel in self.moved.drain(..).rev() {
             let to = self.worktree.join(&rel);
-            if let Some(parent) = to.parent() {
-                let _ = fs::create_dir_all(parent);
+            let put_back = (|| {
+                if let Some(parent) = to.parent() {
+                    fs::create_dir_all(parent)?;
+                }
+                fs::rename(self.aside.join(&rel), &to)
+            })();
+            if let Err(e) = put_back {
+                failed.push(format!("{rel} ({e})"));
             }
-            let _ = fs::rename(self.aside.join(&rel), to);
         }
-        let _ = fs::remove_dir_all(&self.aside);
+        if failed.is_empty() {
+            let _ = fs::remove_dir_all(&self.aside);
+            return Ok(());
+        }
+        Err(Error::new(
+            ErrorKind::Io,
+            format!(
+                "could not put back {}; the set-aside bytes are kept at {}",
+                failed.join(", "),
+                self.aside.display()
+            ),
+        ))
     }
 
     fn mv(&mut self, rel: &str) -> std::io::Result<()> {
@@ -154,8 +173,10 @@ fn set_provisioned_aside(
         Ok(())
     })();
     if let Err(error) = result {
-        aside.restore();
-        return Err(error);
+        return Err(match aside.restore() {
+            Ok(()) => error,
+            Err(kept) => Error::new(ErrorKind::Io, format!("{error}; {kept}")),
+        });
     }
     Ok(Some((aside, record)))
 }
@@ -257,7 +278,9 @@ pub fn remove(request: &RemoveRequest) -> Result<Removed> {
         Ok(discarded) => discarded,
         Err(error) => {
             if let Some((mut aside, _)) = aside {
-                aside.restore();
+                if let Err(kept) = aside.restore() {
+                    return Err(Error::new(ErrorKind::Io, format!("{error}; {kept}")));
+                }
             }
             return Err(error);
         }
@@ -275,4 +298,40 @@ pub fn remove(request: &RemoveRequest) -> Result<Removed> {
         discarded_files: discarded.files,
         discarded_bytes: discarded.bytes,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_failed_put_back_keeps_the_set_aside_bytes_and_names_them() {
+        let root = std::env::temp_dir().join(format!("fgos-checkout-aside-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&root);
+        let (worktree, aside) = (root.join("wt"), root.join(".wt.provisioned"));
+        fs::create_dir_all(&aside).unwrap();
+        fs::create_dir_all(worktree.join("clash")).unwrap();
+        // `clash` is a non-empty directory where the file must go back; `fine` puts back normally.
+        fs::write(worktree.join("clash/other"), "occupied").unwrap();
+        fs::write(aside.join("clash"), "protected").unwrap();
+        fs::write(aside.join("fine"), "ok").unwrap();
+        let mut set_aside = Aside {
+            worktree: worktree.clone(),
+            aside: aside.clone(),
+            moved: vec!["fine".into(), "clash".into()],
+            emptied: vec![],
+        };
+        let error = set_aside.restore().unwrap_err();
+        assert!(
+            error.message.contains(&aside.display().to_string()),
+            "{error}"
+        );
+        assert!(error.message.contains("clash"));
+        assert_eq!(
+            fs::read_to_string(aside.join("clash")).unwrap(),
+            "protected"
+        );
+        assert_eq!(fs::read_to_string(worktree.join("fine")).unwrap(), "ok");
+        fs::remove_dir_all(&root).unwrap();
+    }
 }

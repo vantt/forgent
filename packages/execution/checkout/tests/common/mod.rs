@@ -4,10 +4,13 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::Once;
+use std::sync::{Mutex, MutexGuard, Once};
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
 static HOME: Once = Once::new();
+/// Every fixture holds this for its whole life: the process environment is changed once below, and no test thread
+/// reads it while another is running.
+static SERIAL: Mutex<()> = Mutex::new(());
 
 pub fn git(path: &Path, args: &[&str]) -> String {
     let out = Command::new("git")
@@ -29,10 +32,13 @@ pub struct Fixture {
     pub root: PathBuf,
     pub repo: PathBuf,
     pub state: PathBuf,
+    _serial: MutexGuard<'static, ()>,
+    home: PathBuf,
 }
 
 impl Fixture {
     pub fn new() -> Self {
+        let serial = SERIAL.lock().unwrap_or_else(|e| e.into_inner());
         let root = std::env::temp_dir().join(format!(
             "fgos-checkout-{}-{}",
             std::process::id(),
@@ -40,10 +46,9 @@ impl Fixture {
         ));
         fs::create_dir(&root).unwrap();
         let root = fs::canonicalize(&root).unwrap();
+        let home = std::env::temp_dir().join(format!("fgos-checkout-home-{}", std::process::id()));
+        fs::create_dir_all(&home).unwrap();
         HOME.call_once(|| {
-            let home =
-                std::env::temp_dir().join(format!("fgos-checkout-home-{}", std::process::id()));
-            fs::create_dir_all(&home).unwrap();
             std::env::set_var("HOME", &home);
             // A local file dependency installs without the network.
             std::env::set_var("npm_config_offline", "true");
@@ -69,6 +74,8 @@ impl Fixture {
             state: root.join("state"),
             root,
             repo,
+            _serial: serial,
+            home,
         }
     }
 
@@ -126,5 +133,6 @@ impl Fixture {
 impl Drop for Fixture {
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.root);
+        let _ = fs::remove_dir_all(&self.home);
     }
 }
