@@ -1,5 +1,7 @@
 # Phase 9: Discovery in the contract and skills
 
+> This phase belongs to the door plan `plans/261119-0528-resource-check-door-and-adapters`. Phases 1 to 7 and 7c are in plan A (`plans/261119-0030-resource-referee-graph-write-scope-stack`), whose decisions 1 to 28 apply.
+
 A planner only uses the door if the document it already reads tells it to. The same applies to a
 developer about to write a new path or graph helper: the previous copies were written by people who did
 not know the existing door.

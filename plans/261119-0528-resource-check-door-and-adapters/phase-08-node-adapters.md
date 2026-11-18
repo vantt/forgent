@@ -1,5 +1,7 @@
 # Phase 8: Work, plan-check and plan-lint adapters
 
+> This phase belongs to the door plan `plans/261119-0528-resource-check-door-and-adapters`. Phases 1 to 7 and 7c are in plan A (`plans/261119-0030-resource-referee-graph-write-scope-stack`), whose decisions 1 to 28 apply.
+
 ## Inputs
 
 - The addon bindings and ABI clause from phase 7, the door from phase 7b, and the recorded evidence from phase 4.

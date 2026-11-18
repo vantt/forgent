@@ -1,11 +1,10 @@
 ---
 contract: plan-v1
-title: One door for resource contention and graph facts, as three independent packages every planner and engine can use
-status: draft
+title: "Three independent packages for resource contention and graph facts: write-scope, graph and resource-referee, with the supervisor adapter and the addon bindings"
+status: ready
 priority: P2
 blockedBy:
   - 261118-0947-session-verb-for-agent-sessions
-  - 261118-1159-owner-question-store
 footprint:
   - plans/261119-0030-resource-referee-graph-write-scope-stack
   - docs/platform/write-scope
@@ -13,46 +12,20 @@ footprint:
   - docs/platform/resource-referee
   - docs/platform/component-boundary.md
   - docs/platform/git/spec.md
-  - docs/reading-map.md
-  - docs/architecture-manifest.json
   - packages/write-scope
   - packages/graph
   - packages/resource-referee
   - packages/git/write-scope
   - packages/git/rust/Cargo.toml
   - packages/git/node-addon
-  - packages/git/contracts/mutation-census.v1.json
   - packages/supervision/rust
-  - packages/supervision/contracts
-  - packages/host-runtime/contracts
-  - apps/fgos
   - Cargo.toml
-  - Cargo.lock
   - src/native/door.mjs
-  - src/state/graph-metrics.mjs
-  - src/state/graph-harness.mjs
-  - src/state/graph-adapter.mjs
-  - src/state/store.mjs
-  - src/intake/plan.mjs
-  - src/report/capability-plan-lint.mjs
-  - src/cli/command-registry.mjs
-  - scripts/plan-contract-check.mjs
-  - test/state
-  - test/scripts
-  - test/intake/plan.test.mjs
-  - test/config/config-door.test.mjs
   - test/git/write-scope-parity.test.mjs
   - test/runner/write-scope.test.mjs
   - test/workflow/propose-classify.test.mjs
-  - test/rust-host
-  - test/cli/unknown-flag-rejection.test.mjs
-  - test/helpers/command-manifest.mjs
-  - test/e2e
-  - core/skills
-  - plugins/fgOS/skills
-  - .agents/skills
-  - CHANGELOG.md
-base: b8181061dbbe4a336a4daffb491e65b2908cebe4
+  - test/config/config-door.test.mjs
+base: cb03407aa33f9e35d6480c3f59584942b33ef397
 source:
   - plans/reports/research-261118-1704-pkm-graph-algorithms-for-shared-overlap-core.md
 created: 2026-11-19
@@ -62,13 +35,17 @@ created: 2026-11-19
 
 ## Outcome
 
-Any planner, in any project that has fgOS installed, can hand a list of phases (id, depends-on,
-the files each will write) to one door and get back whether the plan can be activated in parallel:
-which phases collide on files, the layers (waves) they fit in, the critical path, independent
-groups, any dependency cycle with its path, and a verdict with reasons under the planner's own
-rules. In this plan Work and the supervisor use the same three packages through thin adapters and
-none of them owns a copy; the merge conductor and the dispatch gate can adopt them later and are not
-in this plan.
+This plan delivers the foundation of one door for resource contention and graph facts: three
+independent packages, the supervisor adapter that replaces its private overlap copy, and the native
+addon bindings and ABI clause that let Node reach the packages in process. When it is done, any
+planner or engine that can call the packages can ask which phases collide on files, which layers
+(waves) they fit in, the critical path, independent groups, any dependency cycle with its path, and
+a verdict with reasons under its own rules.
+
+The planner door (`fgos resource-check`), the Work, plan-check and plan-lint adapters and the discovery
+text in the plan contract and the skills are in the second plan, `plans/261119-0528-resource-check-door-and-adapters`, which is blocked by this
+plan and by `owner-question-store`. Phases 7b, 8, 9 and 10 named anywhere in this plan's files live
+there. The merge conductor and the dispatch gate can adopt the packages later and are in neither plan.
 
 Three independent packages, each with one authority, none knowing the layer above it:
 
@@ -183,8 +160,9 @@ fgOS output must hash the same on every rebuild.
     in the main checkout or on the trunk, so every phase commits in its own linked worktree on its own
     branch. A phase branch expects `test/git/one-door.test.mjs` to be red, so each phase instead runs the
     scan without `--write-census` and lists the changed census entries; every one must lie inside that
-    phase's footprint. The lead merges finished waves into one integration branch after waves 2, 3 and 5
-    and runs the combined crate-level and owning tests there; phase 10 is the final landing.
+    phase's footprint. The lead merges finished waves into one integration branch after waves 2, 3 and 4
+    and runs the combined crate-level and owning tests there; phase 7c lands this plan and phase 10 of the
+    door plan lands the rest, each with the census as its last commit.
 15. No new external crate. Phase 2 declares `serde` and `serde_json` (`workspace = true`) for the new
     crates so `Cargo.lock` changes in phase 2 and, for the edges of `apps/fgos`, once more in phase 7b (a different wave). Tests use plain cases and, where a naive oracle helps, a
     small seeded generator in the test file (`proptest` is not in the workspace).
@@ -222,8 +200,10 @@ fgOS output must hash the same on every rebuild.
     content in an error; it is applied to the plan directory, `plan.md`, units and policy.
 24. Step zero: when a blocker lands before this plan starts, refresh `base`, re-read the file and line
     facts cited in the phases, re-run the plan check and the overlap measurement, then start.
-25. Phase 7 is split: phase 7 (addon bindings and ABI) and phase 7b (door, policy, verb tables), which
-    run in the same wave; Work adapters depend on phase 7 only, discovery on phase 7b.
+25. The work is split into two plans. This plan keeps the packages, the supervisor adapter, the addon
+    bindings and ABI (phase 7) and its own integration and landing (phase 7c). The door (phase 7b), the
+    Work, plan-check and plan-lint adapters (phase 8), discovery (phase 9) and their landing (phase 10) are
+    in `plans/261119-0528-resource-check-door-and-adapters`, blocked by this plan and by `owner-question-store`.
 26. Names (planner decision, reversible until phase 2 starts; the owner may object). The packages keep
     the names the owner chose: `write-scope`, `graph`, `resource-referee`. The compound names do not
     collide with the seat `referee` (role `judge`, `test/runner/execution/patterns/catalog.test.mjs:676`)
@@ -238,36 +218,28 @@ fgOS output must hash the same on every rebuild.
     are still not enumerated, so decision 7 stands (owner question of the validation interview,
     2026-11-19).
 
+28. `Cargo.lock` and the mutation census are generated files that every plan changes as a side effect.
+    They are owned by one phase per wave in the phase tables but are not claimed in any plan frontmatter,
+    so two plans do not block each other over a file that cargo and the scan recreate; decision 21 governs
+    rebases and the hook of decision 14 enforces the census on the trunk.
+
 ## Acceptance criteria
 
 1. `packages/git/write-scope` no longer exists; `packages/write-scope`, `packages/graph` and
-   `packages/resource-referee` build in the workspace. Proof: `cargo test --workspace` (phase 10).
-2. The overlap rule is defined only by `fgos-write-scope` (Rust) and its pinned JS port
-   `src/runner/dispatch/write-scope.mjs` (`writeScopesOverlap`). These symbols no longer define a rule
-   of their own and call the packages instead: `overlaps` in `scripts/plan-contract-check.mjs`,
-   `overlaps` in `packages/supervision/rust/src/portfolio.rs`, `pathsOverlap` in
-   `src/report/capability-plan-lint.mjs`, `footprintOverlapAmong` in `src/state/graph-metrics.mjs`.
-   Proof: phases 6 and 8, one owning test each.
-3. `fgos resource-check --plan <dir> --json` on a hand-built bad plan whose same-wave phases share a directory
-   exits non-zero and names the pair, the shared paths and the rule; on a hand-built good plan it exits
-   zero. Proof: the wiring test in phase 7b (running the door on this plan is a smoke check only).
-4. `fgos conflicts` reports a pair whose footprints are `src/state/` and `src/state/frontier.mjs`.
-   Proof: one case in `test/state`, owned by the Work adapter.
-5. `graph` passes the ported cases of `test/state/graph-metrics.test.mjs` and matches the recorded
-   verdicts on the snapshot; every intended difference is listed by name. Proof: phases 4 and 8.
-6. Each rule in the catalog has one owning test; every blocking finding code is produced by some
-   test; a truncated fact set never yields `accept`. Proof: phase 5.
-7. `plan-contract.md` section 4 tells a planner to run the door before fixing the phase table and
-   both generated skill surfaces carry it. Proof: `npm run build:skills` leaves no diff.
-8. `cargo test --workspace`, `npm test` and `node scripts/plan-contract-check.mjs --all` are green,
-   run one after the other, in phase 10.
-9. `fgos resource-check` rejects a plan with a phase that has no footprint and a footprint entry that does
-   not canonicalize, and refuses input beyond the contract `limits`, a symlinked or non-regular file,
-   by name without quoting file content. Proof: phase 5 owns the rules, phase 7b one wiring case.
-10. Work adapters call `graph` and the referee in process through the native addon, and an addon
-    lacking the new namespaces is refused by name. Proof: the adapter tests and the ABI test of phase 7.
-11. The supervisor reports `footprint-entry-invalid` for a plan with a malformed footprint entry
-    instead of excluding it silently. Proof: phase 6.
+   `packages/resource-referee` build in the workspace. Proof: `cargo test --workspace` (phase 7c).
+2. The supervisor no longer defines an overlap rule of its own: `overlaps` in
+   `packages/supervision/rust/src/portfolio.rs` calls `fgos-write-scope`, and the JS port
+   `src/runner/dispatch/write-scope.mjs` stays pinned to the Rust rule by the extended parity test. The
+   other copies are replaced in the door plan. Proof: phases 3 and 6.
+3. `graph` passes the ported cases of `test/state/graph-metrics.test.mjs` and matches the recorded
+   verdicts on the snapshot; every intended difference is listed by name. Proof: phase 4.
+4. Each rule in the catalog has one owning test; every blocking finding code is produced by some test; a
+   truncated fact set never yields `accept`. Proof: phase 5.
+5. An addon lacking the new namespaces is refused by name. Proof: the ABI test of phase 7.
+6. The supervisor reports `footprint-entry-invalid` for a plan with a malformed footprint entry instead
+   of excluding it silently. Proof: phase 6.
+7. `cargo test --workspace`, `npm test` and `node scripts/plan-contract-check.mjs --all` are green, run
+   one after the other, and the census matches the tree. Proof: phase 7c.
 
 ## Non-goals
 
@@ -282,54 +254,40 @@ fgOS output must hash the same on every rebuild.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Specs, boundary rows and contracts](phase-01-specs-and-contracts.md) | - | docs/platform/write-scope, docs/platform/graph, docs/platform/resource-referee, docs/platform/component-boundary.md, packages/graph/contracts, packages/resource-referee/contracts, plans/261119-0030-resource-referee-graph-write-scope-stack/reports | 1 | draft |
-| 2 | [Workspace scaffold and write-scope move](phase-02-scaffold-and-move.md) | - | Cargo.toml, Cargo.lock, packages/write-scope, packages/git/write-scope, packages/git/rust/Cargo.toml, packages/git/node-addon/Cargo.toml, packages/supervision/rust/Cargo.toml, packages/graph/rust, packages/resource-referee/rust, docs/platform/git/spec.md, test/workflow/propose-classify.test.mjs | 1 | draft |
-| 3 | [write-scope: colliding pairs in a set](phase-03-write-scope-pairs.md) | 1, 2 | docs/platform/write-scope, packages/write-scope, test/git/write-scope-parity.test.mjs, test/runner/write-scope.test.mjs | 2 | draft |
-| 4 | [graph crate and recorded evidence](phase-04-graph-crate.md) | 1, 2 | docs/platform/graph, packages/graph/rust | 2 | draft |
-| 5 | [resource-referee crate](phase-05-resource-referee-crate.md) | 1, 3, 4 | docs/platform/resource-referee, packages/resource-referee/rust | 3 | draft |
-| 6 | [Supervisor adapter](phase-06-supervisor-adapter.md) | 3 | packages/supervision/rust | 3 | draft |
-| 7 | [Addon bindings and ABI](phase-07-addon-bindings.md) | 3, 4, 5 | packages/git/node-addon/src, src/native/door.mjs, test/config/config-door.test.mjs | 4 | draft |
-| 7b | [Planner door, plan policy and verb tables](phase-07b-planner-door.md) | 1, 3, 4, 5, 6 | apps/fgos/Cargo.toml, Cargo.lock, apps/fgos/src, packages/host-runtime/contracts, packages/supervision/contracts, src/cli/command-registry.mjs, test/rust-host, test/cli/unknown-flag-rejection.test.mjs, test/helpers/command-manifest.mjs | 4 | draft |
-| 8 | [Work, plan-check and plan-lint adapters](phase-08-node-adapters.md) | 7, 7b | src/state/graph-metrics.mjs, src/state/graph-harness.mjs, src/state/graph-adapter.mjs, src/state/store.mjs, src/intake/plan.mjs, src/report/capability-plan-lint.mjs, scripts/plan-contract-check.mjs, docs/architecture-manifest.json, test/state, test/scripts, test/intake/plan.test.mjs | 5 | draft |
-| 9 | [Discovery in the contract and skills](phase-09-discovery.md) | 6, 7b | core/skills, plugins/fgOS/skills, .agents/skills, CHANGELOG.md, docs/reading-map.md | 5 | draft |
-| 10 | [Integration and full gate](phase-10-integration.md) | 8, 9 | packages/git/contracts/mutation-census.v1.json, test/e2e, plans/261119-0030-resource-referee-graph-write-scope-stack | 6 | draft |
+| 1 | [Specs, boundary rows and contracts](phase-01-specs-and-contracts.md) | - | docs/platform/write-scope, docs/platform/graph, docs/platform/resource-referee, docs/platform/component-boundary.md, packages/graph/contracts, packages/resource-referee/contracts, plans/261119-0030-resource-referee-graph-write-scope-stack/reports | 1 | ready |
+| 2 | [Workspace scaffold and write-scope move](phase-02-scaffold-and-move.md) | - | Cargo.toml, Cargo.lock, packages/write-scope, packages/git/write-scope, packages/git/rust/Cargo.toml, packages/git/node-addon/Cargo.toml, packages/supervision/rust/Cargo.toml, packages/graph/rust, packages/resource-referee/rust, docs/platform/git/spec.md, test/workflow/propose-classify.test.mjs | 1 | ready |
+| 3 | [write-scope: colliding pairs in a set](phase-03-write-scope-pairs.md) | 1, 2 | docs/platform/write-scope, packages/write-scope, test/git/write-scope-parity.test.mjs, test/runner/write-scope.test.mjs | 2 | ready |
+| 4 | [graph crate and recorded evidence](phase-04-graph-crate.md) | 1, 2 | docs/platform/graph, packages/graph/rust | 2 | ready |
+| 5 | [resource-referee crate](phase-05-resource-referee-crate.md) | 1, 3, 4 | docs/platform/resource-referee, packages/resource-referee/rust | 3 | ready |
+| 6 | [Supervisor adapter](phase-06-supervisor-adapter.md) | 3 | packages/supervision/rust | 3 | ready |
+| 7 | [Addon bindings and ABI](phase-07-addon-bindings.md) | 3, 4, 5 | packages/git/node-addon/src, src/native/door.mjs, test/config/config-door.test.mjs | 4 | ready |
+| 7c | [Integration and landing of the packages](phase-07c-integration.md) | 5, 6, 7 | packages/git/contracts/mutation-census.v1.json, plans/261119-0030-resource-referee-graph-write-scope-stack/reports | 5 | ready |
 
-Reading check (planner applied the contract by hand, then ran the script): every phase sits in a
-later wave than everything it depends on; the longest chain is six waves; phases 1 and 2 share wave 1,
-phases 3 and 4 wave 2, phases 5 and 6 wave 3, phases 7 and 7b wave 4, phases 8 and 9 wave 5, each
-pair with disjoint footprints. Phase 2 does not read any phase 1 output, so it runs beside it. Hot
-and generated files each have exactly one owner: `Cargo.toml`, `Cargo.lock` and the addon,
-supervisor and new-crate manifests phase 2 (it declares every dependency edge among the new crates and
-the `serde` and `serde_json` entries up front), plus `apps/fgos/Cargo.toml` and one more `Cargo.lock`
-regeneration in phase 7b for the edges the door needs; the two phases are in different waves and no
-phase adds an external crate (it stops and asks the lead), `src/native/door.mjs` and the addon sources phase 7, the verb tables and
-`command-registry.mjs` phase 7b, `mutation-census.v1.json` phase 10, `CHANGELOG.md` phase 9. Every
-phase commits in its own linked worktree on its own branch (decision 14), and rebases follow decision 21.
+Reading check (planner applied the contract by hand, then ran the script): every phase sits in a later
+wave than everything it depends on; the longest chain is five waves; phases 1 and 2 share wave 1,
+phases 3 and 4 wave 2, phases 5 and 6 wave 3, each pair with disjoint footprints. Phase 2 does not read
+any phase 1 output, so it runs beside it. Hot and generated files have exactly one owner per wave:
+`Cargo.toml`, `Cargo.lock` and the addon, supervisor and new-crate manifests phase 2 (it declares every
+dependency edge among the new crates and the `serde` and `serde_json` entries up front; a phase that
+must add an external crate stops and asks the lead), `src/native/door.mjs` and the addon sources phase 7,
+the census phase 7c. Every phase commits in its own linked worktree on its own branch (decision 14), and
+rebases follow decision 21.
 
 ## Order against other active plans
 
 Measured with the plan check's own overlap rule against every `ready` or `running` plan.
-- `261118-0947-session-verb-for-agent-sessions`: now `done`, so the owner's hard order
-  (`blockedBy` on it) is met. The entry stays in the frontmatter as the record of that order.
-- `261118-1159-owner-question-store`: `ready`, priority P1, phases 1, 2, 3 and 5 done and six phases
-  still draft. Its frontmatter footprint is the union of all its phases, including the four that
-  landed, so the plan check reports an overlap on `Cargo.toml`, `Cargo.lock` and
-  `docs/platform/component-boundary.md` that belongs to finished work. Measured against its remaining
-  phases (4, 6, 7, 8, 9, 10) only, phases 1 to 7 of this plan are free; phases 7b, 8, 9 and 10 overlap
-  (`apps/fgos/src`, `packages/host-runtime/contracts`, `src/cli/command-registry.mjs`,
-  `scripts/plan-contract-check.mjs`, `docs/architecture-manifest.json`, `core/skills`, the generated
-  skill surfaces, `CHANGELOG.md`, `docs/reading-map.md`, the census). Phase 2 moved
-  `apps/fgos/Cargo.toml` to phase 7b for this reason.
-  Owner decision (2026-11-19): hard order. This plan has `blockedBy` on it, so the plan stays `draft`
-  and, because the field is plan-level, every phase waits, including phases 1 to 7 that overlap
-  nothing. If the owner later wants those seven to start first, split them into their own plan or have
-  that lane narrow its frontmatter footprint to its remaining phases.
+- `261118-0947-session-verb-for-agent-sessions`: `done`; the `blockedBy` entry is the record of that
+  order and is met.
+- `261118-1159-owner-question-store`: `ready`, P1, phases 4, 6, 7, 8, 9 and 10 still draft. At the
+  owner's request ("tách và thu hẹp", 2026-11-19) this plan was split and that plan's frontmatter was
+  narrowed, in a separate commit (`cb03407aa`), to the files its remaining phases write. Measured per
+  phase and with a glob match in both directions, phases 1 to 7 and 7c of this plan overlap none of its
+  remaining work. The part that does overlap (the door, the adapters, discovery, the landing) is
+  `plans/261119-0528-resource-check-door-and-adapters`, which has `blockedBy` on `owner-question-store` and on this plan.
 
-`blockedBy` is a plan-level field. The check script does not honour it when it looks for overlaps:
-`activeOverlaps` in `scripts/plan-contract-check.mjs:149-157` flags any two `ready` or `running`
-plans whose footprints overlap, while the plan contract says to resolve an overlap by `blockedBy`.
-So this plan can be set `ready` only when no plan it overlaps is `ready` or `running`. The mismatch is
-recorded below as a follow-up. Step zero (decision 24) applies whenever a blocker lands before start.
+`blockedBy` is a plan-level field and the check script does not honour it when it looks for overlaps
+(`activeOverlaps` in `scripts/plan-contract-check.mjs:149-157`); recorded below as a follow-up. Step
+zero (decision 24) applies whenever a blocker lands before start.
 
 ## Recorded follow-ups (separate items, not in this plan)
 
@@ -351,8 +309,8 @@ Found while reviewing; each is a duplicate or a candidate of the same kind and i
 
 ## Owner questions
 
-None open. The order against the other active plans was decided by the owner (hard order, see "Order
-against other active plans"); the names were settled in decision 26.
+None open. The split and the order were decided by the owner (see "Order against other active
+plans"); the names were settled in decision 26.
 
 ## Risks and rollback
 
@@ -365,7 +323,7 @@ against other active plans"); the names were settled in decision 26.
 - Stricter Work advisories surface conflicts that were silently missed. There is no switch to restore
   equality-only matching; the CHANGELOG names the effect, and reverting phase 8 restores the old behaviour.
 - An addon built before phase 7 is refused by name through the ABI clause; no payload falls back silently.
-- Rollback: each phase is its own commit. Revert in the reverse order 10, 9, 8, 7b, 7, 6, 5, 4, 3, 2, 1,
+- Rollback: each phase is its own commit. Revert in the reverse order 7c, 7, 6, 5, 4, 3, 2, 1,
   regenerate the census once more and rebuild `Cargo.lock` at the end. If a release was activated,
   re-stage and re-activate the previous release and run `fgos doctor` through the shim, because the
   activated payload keeps calling the new addon functions until then; check that

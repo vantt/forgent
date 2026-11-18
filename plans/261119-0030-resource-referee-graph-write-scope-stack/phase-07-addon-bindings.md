@@ -1,6 +1,6 @@
 # Phase 7: Addon bindings and ABI
 
-The Node surface that Work and the scripts share. It runs beside phase 7b.
+The Node surface that Work and the scripts share. The door plan (phase 7b onward) starts after this plan lands.
 
 ## Inputs
 

@@ -1,7 +1,9 @@
 # Phase 7b: Planner door, plan policy and verb tables
 
+> This phase belongs to the door plan `plans/261119-0528-resource-check-door-and-adapters`. Phases 1 to 7 and 7c are in plan A (`plans/261119-0030-resource-referee-graph-write-scope-stack`), whose decisions 1 to 28 apply.
+
 This is an application. It builds claims and edges from a plan, calls the three packages and prints
-the verdict. The rules it applies are its own data, not the referee's. It runs beside phase 7.
+the verdict. The rules it applies are its own data, not the referee's. It starts after plan A has landed, so the addon bindings of its phase 7 exist.
 
 ## Inputs
 
