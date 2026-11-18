@@ -6,7 +6,7 @@ topic: backlog row p-mnymjukvqd (seat-binding / accounts)
 shaper: lead:ACCOUNT-SHAPE (claude-mkz3@fg-server2), opened by head:secretary-miu
 opened: 2026-11-18 18:08
 domain: platform (seat binding, runner accounts); không có domains/<domain>/AGENTS.md riêng
-open owner questions: QUESTIONS.md (Q1 đã trả lời B; Q2 đã trả lời (tetcu, anhdvh, van.tran), đã đăng nhập đủ ba thư mục; Q3, Q4 có mặc định)
+open owner questions: QUESTIONS.md (Q1 đã trả lời B; Q2 đã trả lời (tetcu, anhdvh, van.tran), đã đăng nhập đủ ba thư mục; Q3 có mặc định; Q4 đã trả lời A)
 ```
 
 ## Hand-off cho planner
@@ -19,7 +19,7 @@ open owner questions: QUESTIONS.md (Q1 đã trả lời B; Q2 đã trả lời (
   2. `fgos dispatch explain` cho một ghế pane bất kỳ không bao giờ liệt kê tài khoản của Miu trong walk.
   3. Một lần khởi động thật của một pane claude lease đúng một tài khoản của pool pane; một lần khởi động thật của Miu (đường đã chọn ở Q1) chạy đúng tài khoản của Miu và không tiêu quota pane.
   4. Hết quota pool pane: bằng chứng thật (hoặc ca vàng của crate) rằng ghế đổi tài khoản, rồi đổi family, rồi từ chối theo tên; Miu vẫn chạy.
-- **Open points that block only some parts.** Q1 đã trả lời B nên task `miu-start` không còn bị chặn bởi owner. Q2 đã trả lời; ba thư mục đã được chủ dự án đăng nhập (tetcu, anhdvh, van.tran), `task-pane-pool` không còn chờ owner. Q3 và Q4 có mặc định, không chặn.
+- **Open points that block only some parts.** Q1 đã trả lời B nên task `miu-start` không còn bị chặn bởi owner. Q2 đã trả lời; ba thư mục đã được chủ dự án đăng nhập (tetcu, anhdvh, van.tran), `task-pane-pool` không còn chờ owner. Q3 có mặc định, không chặn; Q4 đã trả lời A.
 - **Source ids.** p-mnymjukvqd; quyết định 86 Q2 (docs/platform/agent-confinement/spec.md mục 4 của danh sách store); RUL102, RUL105, RUL106 (docs/platform/runner/subcomponents/h-6979005beaf7/spec.md); D-ADR0072 (docs/platform/seat-binding/spec.md).
 
 ## 1. Trạng thái hiện tại
@@ -65,7 +65,7 @@ Id cục bộ của phiên shaping; planner mint D-ADR qua `fgos identity mint d
 | SD1 | Dùng nhà của cơ chế có sẵn: `llmAccounts` + cờ `disabled` + lease/quarantine/walk hiện tại. Không thêm cơ chế lease mới | F1, F10 (L10, tenet một cửa) |
 | SD2 | Tài khoản `claude/vantt` hiện có là tài khoản của Miu về mặt quota (F3): ra khỏi pool pane ngay khi pool có ít nhất một tài khoản khác. Cho tới lúc đó pane vẫn chung quota với Miu | F3 |
 | SD3 | Thêm một hàng doctor **cảnh báo, không bao giờ từ chối hay fail**, khi một store của `llmAccounts` có đường thật (realpath) trùng thư mục login mặc định của chính CLI đó, nêu rủi ro gia hạn (F15); dùng bảng `CLI_LOGIN_HOMES` có sẵn. Không từ chối cứng, vì người chỉ có một tài khoản Claude (login ở `~/.claude`) vẫn phải dùng được fgOS (chủ dự án 2026-11-18 18:22) | F11, F15, tenet "một cửa cần guard máy móc", ranh giới sứ mệnh (fgOS phục vụ project khác) |
-| SD4 | Giữ hành vi hết quota hiện tại cho pane (đổi tài khoản → đổi family → từ chối); không thêm chờ | F10 |
+| SD4 | Giữ hành vi hết quota hiện tại cho pane: chạy lại từ đầu trên tài khoản khác cùng pool, rồi family khác, rồi từ chối; ghế ghi dở không xoay mà dừng chờ người (RUL92); không thêm chờ và không tự chạy tiếp. Chủ dự án chọn A cho Q4 (2026-11-18 18:55). Việc "ghế ghi dở tự chạy tiếp" là ý tưởng ghi nhận cho sau, chỉ làm nếu thực tế hay gặp | F10, Q4 |
 
 ## 5. Q&A log
 
@@ -80,6 +80,7 @@ Id cục bộ của phiên shaping; planner mint D-ADR qua `fgos identity mint d
 - 2026-11-18 18:38 — Chủ dự án: `tetcu` đã đăng nhập. Kiểm tra chỉ đọc: thư mục `~/.fgos/private/claude-tetcu` có file login, là tài khoản Anthropic khác Miu và khác `vantt` (so định danh, chỉ in đúng/sai). Quyền thư mục là 775, trong khi `claude-vantt` là 700; nên siết về 700 (login nằm trong đó). Chưa thêm vào `accounts.yaml` (phiên shaping chỉ đọc), việc của planner.
 - 2026-11-18 18:42 — Chủ dự án: `anhdvh` đã đăng nhập; kiểm tra chỉ đọc cùng cách với `tetcu`, kết quả ghi trong báo cáo của phiên.
 - 2026-11-18 18:44 — Chủ dự án: `van.tran` đã đăng nhập (thư mục `~/.fgos/private/claude-van.tran`); kiểm tra chỉ đọc như hai tài khoản trước. Ba tài khoản pane đã sẵn sàng; `task-pane-pool` không còn chờ chủ dự án.
+- 2026-11-18 18:55 — Q4 trả lời A (SD4).
 
 ## 6. Thiết kế đã chốt {#design}
 
