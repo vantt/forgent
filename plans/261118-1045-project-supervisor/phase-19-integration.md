@@ -4,6 +4,10 @@ Joins the combined tree, writes this repo's landing config, proves the outcome o
 closes the backlog row the landing door replaces, and records the result. The only writer of the census,
 `CHANGELOG.md`, `docs/backlog.md` and `.fgos/config.yaml` in this plan (and the second writer of `docs/reading-map.md`, after phase 1).
 
+
+**Condition (lead:OPC, 2026-11-18, on 13b):** `watcher.enabled` may be turned on only after phase 16 wiring, and only once
+the supervisor (`fgos.supervisor.wake`) and discussion (`fgos.discussion.status`) kinds are measured on the host.
+
 ## Inputs
 Step 0: re-grep. All of phases 1-18 must be merged on the tree you start from (`git log --oneline -30`, plan phase
 table). The blockers (secretary spine, session verb, ops-metrics, read door, owner-question store) must be `done`.
