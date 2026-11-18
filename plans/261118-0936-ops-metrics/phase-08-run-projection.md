@@ -50,3 +50,6 @@ Revert the phase commit.
 ## Carried from the phase 1 review
 - `RecordSource::kinds()` is documented as checked by the registry, but no check exists yet. Add the check (every
   stated kind is declared) where the sources are registered, with its test.
+- From the phase 3 review: `result.json.durationMs` is still always null (`settlement.mjs`); the binding's `durationMs`
+  is the one source and reaches the unit summary. Drop the null field from the run-result record (Rust `RECORD_KEYS`
+  and fixtures) when this phase touches the run-result contract.
