@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d0267b8f92ec051753877ba7bd2a3e6a86d542550547340b1e167b3a4529d7ad",
+  "payloadDigest": "03e0e4214a32ba84e1b53cfeb4008dd668957b139b99761241626b92201fa186",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1210,7 +1210,7 @@
     "src/runner/dispatch/execution-contract.mjs": "a5b5160f4fb82aa885a961b8f6f66f353a8d455a0ab46a1bd2fe84f527e16e53",
     "src/runner/dispatch/executor-governance.mjs": "8e8f93d957741e107b0e38630d7b0816209019234c93c95140113b231e18f73e",
     "src/runner/dispatch/herdr-round.mjs": "40a2e3d9c8088ef8a5f6419be09db7e56e878ceb6cf8e047e9cdc2d666bade24",
-    "src/runner/dispatch/llm-accounts.mjs": "4858137f8cf7b2b00a6baa7e32a9331d8d0c19329c6da30c9bcde9843532b2f4",
+    "src/runner/dispatch/llm-accounts.mjs": "cdece5d6e5a9301ddf2437c3e6bc54815a01e59855af2d4fa5d17d0cd0cd6392",
     "src/runner/dispatch/mechanism.mjs": "18ffe81e94a42ca290de501777f0383c1505772c3e6254363ea101469c31cf30",
     "src/runner/dispatch/operation-prompt-templates.mjs": "f50cb0639b21f295af5be1baaca8b940527017514cbfa8000dc431fe4ab5f88e",
     "src/runner/dispatch/plan.mjs": "7236fc186bd00616b2a98c070b4a80063d15eba62e67dcf4207817c2ffe9c17c",
@@ -1326,7 +1326,7 @@
     "src/setup/instruction-registry.mjs": "0cbf5776e960d58318eb359db934bf692106c57c84fad18319ddef3fce9a6d87",
     "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
     "src/setup/model-pool-checks.mjs": "2e7570e565313df19a151d79aa6bd5ad7f1deed21ea273c61767014869e0eb28",
-    "src/setup/registrations.mjs": "09a733fa07f023d4b7966212a039b87ec000560558d381318954465088db29ed",
+    "src/setup/registrations.mjs": "dcac2138176dcd204a2449bceb4f1425d41b6a38019451ed20ec33cab01995e3",
     "src/setup/run-supervisor-checks.mjs": "31942f9b9dec0bdd009c05199f2fc1a2afe7e6b18f58c50c94d7aa18b0ad0421",
     "src/setup/seat-binding-checks.mjs": "ab0ff541e60c8e5340e87063839f954d970d889159c2aa40ac41992accd2a894",
     "src/setup/session-keep-declared.mjs": "de88967dc8c6dd6a7c460ddf264a07aa13c4c7ee3a458a07ba6be3830e52864e",
@@ -4389,41 +4389,41 @@
     {
       "path": "src/setup/doctor-bridge.mjs",
       "line": 78,
-      "spawn": "runBridged -> src/setup/registrations.mjs:250",
+      "spawn": "runBridged -> src/setup/registrations.mjs:251",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2015,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:814",
+      "line": 2038,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:837",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2062,
+      "line": 2085,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:834",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2102,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:814",
+      "line": 2125,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:837",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2109,
+      "line": 2132,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:525",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2276,
+      "line": 2299,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:160",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

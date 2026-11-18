@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- `fgos doctor` warns (row `llm-accounts-default-login-home`, never fails, no fix) when a `runner.llmAccounts` store is its CLI's own default login home, such as `~/.claude`; a pane renewing a copy of that login can make the provider revoke the real refresh token.
 - `fgos doctor --json` rows carry `elapsedMs`, the whole milliseconds the row took where it ran (the Rust host, or the Node rows bridge for bridged rows; 0 for a row its owner could not judge), so a slow row is named instead of guessed.
 - One measurement contract (`observe.record.v2`, OpenTelemetry GenAI names): `fgos metrics record --json <file|->` writes a record through a fail-open write door with per-writer health counters, and `fgos metrics query` answers questions over runs, sessions, heads, plans and friction (`--kind`, `--where`, `--ref`, `--since/--until`, `--by`, `--bucket`, `--latest-per`, `--agg`, `--having`, joins and anti-joins), or runs named `*.query.json` definitions with `--def <file|dir>`; a kind nothing declares answers `unmeasured`.
 - `fgos run` and `fgos workflow start` take `--plan <plans/dir> [--phase <id>]`; the unit summary records the plan, and each attempt its account, duration and token usage. Token counts are now parsed for claude (from its transcript), codex, pi and omp; a CLI without counts reports a named reason, never a zero. `result.json` no longer carries `durationMs: null`.
