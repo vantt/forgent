@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a2f88c5b40676bbcfaf79e3ad7cfe144403fdc6d31677f4613413bede20f4c7a",
+  "payloadDigest": "9c9c6da9d2d1ab7a084fcef9e607e28c409ab0d14b5d16869dd5bd31b91d0c1a",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -450,7 +450,7 @@
     "packages/execution/checkout/tests/common/mod.rs": "cb4308d5c88d9a89b185526a1f5cae1c6c1d98e4c4f6299a57e337bb8023adb3",
     "packages/execution/checkout/tests/record.rs": "3b5e7344c0845cc7eceb7c46f1af027ed30707e8b9ebbfa9b0435aaabdec5b70",
     "packages/execution/checkout/tests/work.rs": "bab9bb33e40e27b93f08ddf03f60400e1d18e8e02afe8267aff0d3b7a9001b38",
-    "packages/execution/rust/src/accounts.rs": "4281e003014072f28d7fa044dd282045d930f472c87b1553b677a635351880bb",
+    "packages/execution/rust/src/accounts.rs": "3d96fad4f0a809d7fe045164e1a28821f6e790010af4ecbe8cfd3ce0887f1e0e",
     "packages/execution/rust/src/agents.rs": "dffa2143d373326f72cfa5e2b2b8abc534a700e0a5fc2a563d626a699ed3c912",
     "packages/execution/rust/src/bind.rs": "184535a938751d05fa820facdc2bed07a7f73dd5ce8345894bcc520e4a3d28c3",
     "packages/execution/rust/src/checks.rs": "ab40569f5e4e9ece9ed8ab4c4fb092f7149c79aa0091419ad901b66e07a52a9e",

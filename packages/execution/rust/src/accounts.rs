@@ -525,11 +525,13 @@ fn cell_pools(cell: &Value, family: &str) -> Option<Vec<String>> {
 }
 
 /// The pools a seat may be served by and the accounts each declares, each with the CLIs it holds a login store for
-/// (never where it is kept): the pools are every family of the launch view and every pool a `modelPolicies` cell
-/// names. An unreadable inventory is no accounts. `account_state` is Dispatch's read of the lease state keyed by the
-/// lease document's provider keys (a pool reads the key `legacy_state_key` gives it): the account held (sticky), a
-/// quarantine still running at `now`, a failed probe, and a quarantine one real call may lift, which the view offers
-/// only when no account of the pool is healthy. Without it the view is the config alone.
+/// (never where it is kept): the pools are every family of the launch view, every pool a `modelPolicies` cell
+/// names, then every pool a `runner.personas.<name>.pool` names, since a persona pool no cell names is reachable
+/// only through that persona (a role never carries a pool: Seat Binding refuses one by name). An unreadable
+/// inventory is no accounts. `account_state` is Dispatch's read of the lease state keyed by the lease document's
+/// provider keys (a pool reads the key `legacy_state_key` gives it): the account held (sticky), a quarantine still
+/// running at `now`, a failed probe, and a quarantine one real call may lift, which the view offers only when no
+/// account of the pool is healthy. Without it the view is the config alone.
 pub fn account_view(
     runner: &Value,
     launch_view: &Map<String, Value>,
@@ -574,6 +576,18 @@ pub fn account_view(
                     pools.push(pool);
                 }
             }
+        }
+    }
+    for pool in runner
+        .get("personas")
+        .and_then(Value::as_object)
+        .into_iter()
+        .flatten()
+        .filter_map(|(_, persona)| persona.get("pool").and_then(Value::as_str))
+        .filter(|pool| !pool.trim().is_empty())
+    {
+        if !pools.iter().any(|known| known == pool) {
+            pools.push(pool.to_string());
         }
     }
     let empty = Map::new();
