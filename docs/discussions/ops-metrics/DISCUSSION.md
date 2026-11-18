@@ -10,7 +10,8 @@ attention view, không cảnh báo; (b) bảy thước đo §13.3 của prototyp
 bốn câu của brief (cost, time, failure rate, friction).
 
 Vòng 2: Q1 đã trả lời (OM-D2: đo token trước, tiền hoãn tới khi có hạ tầng giá). Q3/Q4 rút lại vì thiếu bối cảnh,
-hỏi lại thành Q5 (ngưỡng "plan đứng yên") và Q6 (nghĩa của "pace"). Q2 còn mở; chủ dự án xin danh sách bảy thước đo. Các phần không phụ thuộc chúng (nguồn token/duration/account, khoá plan/phase, chiều
+hỏi lại thành Q5 (ngưỡng "plan đứng yên") và Q6 (nghĩa của "pace"). Q2 còn mở; chủ dự án xin danh sách bảy thước đo.
+OM-D3 (Rust cho phần mới) đổi chỗ đặt code ở §6 A, C, E; mở Q7 (reader câu hỏi đang là Node). Các phần không phụ thuộc chúng (nguồn token/duration/account, khoá plan/phase, chiều
 `--by`, friction) shape tiếp được.
 
 ## 2. Mục tiêu & đề bài
@@ -51,6 +52,7 @@ phạm vi.
 |---|---|---|---|
 | OM-D1 | Phát hiện liveness / no-progress / pace của supervisor thuộc plan này; chỉ phát hiện, hiện trong `fgos dispatch inspect --attention`; không cảnh báo khi mailbox còn hoãn; plan portfolio-driving ghi đã chuyển | chủ dự án qua secretary | 2026-11-18 |
 | OM-D2 | Cost đo bằng token theo model/provider/account/plan/phase trước; tiền (bảng giá, tiền ước tính) hoãn vì chưa có tool/hạ tầng nào lo giá — không build trong plan này | chủ dự án, Q1 | 2026-11-18 |
+| OM-D3 | Mọi phần viết MỚI của plan này viết bằng Rust khi làm được mà không ảnh hưởng phần đang có; Node chỉ còn là caller mỏng nếu cần. Không viết lại phần đã land chỉ để đổi ngôn ngữ | chủ dự án qua secretary | 2026-11-18 |
 
 ## 5. Q&A log
 
@@ -61,17 +63,23 @@ phạm vi.
   trong attention view; ghi chuyển giao vào plan portfolio-driving; đi tiếp. → OM-D1.
 - 2026-11-18 ~10:30 — Q1: đồng ý hướng tiền ước tính nhưng chưa có hạ tầng, nếu phải build thì hoãn; đo cái khác
   trước → OM-D2. Q2: xin liệt kê bảy thước đo. Q3, Q4: hỏi không có bối cảnh → rút, hỏi lại thành Q5, Q6.
+- 2026-11-18 ~10:45 — Chủ dự án (qua secretary): phần viết mới viết Rust khi được, Node chỉ caller mỏng; áp dụng từ
+  giờ, không đổi phần đã land → OM-D3.
 
 ## 6. Thiết kế đã chốt {#design}
 
 Nháp vòng 1 — chưa chốt; các chỗ phụ thuộc câu hỏi mở được đánh dấu.
 
-Năm khối, đi từ dưới lên. Mọi dữ kiện mới sinh ở nơi đang sở hữu bản ghi; Observe chỉ đọc.
+Năm khối, đi từ dưới lên. Mọi dữ kiện mới sinh ở nơi đang sở hữu bản ghi; Observe chỉ đọc. Ngôn ngữ (OM-D3):
+logic mới (parser usage theo CLI, mọi phép gộp, `metrics plans`, đọc thời điểm câu hỏi, phát hiện liveness/đứng
+yên/pace) viết Rust; sửa Node chỉ ở chỗ đã là Node và phải đổi để nối dây: writer `unit-summary.mjs` chép thêm field,
+cờ `--plan/--phase` của `fgos run`/`workflow start`, `attention-view.mjs` gọi phần phát hiện Rust.
 
 **A. Bản ghi run đủ dữ kiện (Execution, contract `unit-summary.read.v3`, thêm field tuỳ chọn như `verify`).**
 Mỗi attempt trong `unit-summary.json` thêm: `accountId` (từ selection mà `run.mjs:866` đã đọc), `durationMs` (từ
 binding), `usage {inputTokens, outputTokens, cacheRead, cacheCreation, source}` (tiền: hoãn theo OM-D2) hoặc `usage.reason` có tên
-khi CLI không báo. Parser theo CLI trong `usage-parsers.mjs` (claude: transcript của chính session seat, hoặc
+khi CLI không báo. Parser theo CLI viết mới bằng Rust (crate `fgos-execution` hoặc `run-result`, planner chọn theo layering), settlement
+Node gọi qua host thay cho `usage-parsers.mjs`, file Node đó nghỉ theo L10 (claude: transcript của chính session seat, hoặc
 `usage`/`total_cost_usd` khi seat chạy `-p --output-format json` — chưa kiểm seat chạy kiểu nào; codex, pi, omp,
 agy theo khảo sát) — gộp p-s5mliyp335 và p-mvc3d54cda; khảo sát là bước đầu.
 `result.json.durationMs` được điền đúng hoặc bỏ field (một nguồn). Unit-summary cũng mang `plan {dir, phase}`.
@@ -92,8 +100,7 @@ có (`.fgos/runtime/tmp/sec/run-phase.sh`) và skill driving truyền cờ này.
 - Verb mới trong cùng họ: `fgos metrics plans [--plan <dir>] [--since]` — mỗi plan: trạng thái và thời điểm chuyển
   (đọc lịch sử git của `plan.md` qua cửa Git), lead time ready→done, thời gian theo phase (từ run có khoá B), token, tỉ lệ hỏng, và bảy thước đo — thước đo nào chưa có nguồn trả `unmeasured` kèm lý do (theo Q2).
 - Thời gian chờ chủ dự án: câu hỏi (QUESTIONS.md, mục câu hỏi của plan, gate) mang `asked`/`answered` thời điểm;
-  một reader duy nhất (`src/portfolio/open-questions.mjs` hiện là Node — chuyển sang Rust hay để Node cấp qua cửa
-  composition root là chi tiết của planner).
+  reader câu hỏi hiện là Node (`src/portfolio/open-questions.mjs`, 115 dòng) — cách tách theo Q7.
 
 **D. Friction (Observe).** Kind subject `plan` (p-7nqygnztum) và `backlog`, qua cửa convention; `friction list|rank
 --bucket week` cho xu hướng; `friction show plan:<dir>`; resolve bằng `--reason filed:<p-id>` để triage nối friction
