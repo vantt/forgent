@@ -1,0 +1,63 @@
+{
+  "contract": "observe-kinds.v1",
+  "subjectKinds": ["question"],
+  "attrs": {
+    "fgos.question.stage": { "type": "string" },
+    "fgos.question.origin_ref": { "type": "string" },
+    "fgos.question.asker.session": { "type": "string" },
+    "fgos.question.asker.handle": { "type": "string" },
+    "fgos.question.asker.role": { "type": "string" },
+    "fgos.question.asker.persona": { "type": "string" },
+    "fgos.question.asker.pane": { "type": "string" },
+    "fgos.question.asker.machine": { "type": "string" },
+    "fgos.question.migrated": { "type": "bool" },
+    "fgos.question.answered_at": { "type": "string" },
+    "fgos.question.by": { "type": "string" },
+    "fgos.question.via": { "type": "string" },
+    "fgos.question.reason": { "type": "string" }
+  },
+  "measures": {},
+  "kinds": {
+    "fgos.question.asked": {
+      "subjects": ["question"],
+      "attrs": [
+        "fgos.question.stage",
+        "fgos.question.origin_ref",
+        "fgos.question.asker.session",
+        "fgos.question.asker.handle",
+        "fgos.question.asker.role",
+        "fgos.question.asker.persona",
+        "fgos.question.asker.pane",
+        "fgos.question.asker.machine",
+        "fgos.question.migrated"
+      ],
+      "measures": []
+    },
+    "fgos.question.answered": {
+      "subjects": ["question"],
+      "attrs": [
+        "fgos.question.origin_ref",
+        "fgos.question.asker.session",
+        "fgos.question.asker.handle",
+        "fgos.question.asker.role",
+        "fgos.question.asker.persona",
+        "fgos.question.asker.pane",
+        "fgos.question.asker.machine",
+        "fgos.question.answered_at",
+        "fgos.question.by",
+        "fgos.question.via"
+      ],
+      "measures": []
+    },
+    "fgos.question.acked": {
+      "subjects": ["question"],
+      "attrs": ["fgos.question.by"],
+      "measures": []
+    },
+    "fgos.question.cancelled": {
+      "subjects": ["question"],
+      "attrs": ["fgos.question.by", "fgos.question.reason"],
+      "measures": []
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "contract": "questions-refusals.v1",
+  "categories": "packages/host-runtime/contracts/exit-codes.v1.json",
+  "refusals": [
+    { "code": "asker-unresolved", "category": "precondition", "verbs": ["ask"], "when": "The caller has no resolvable Identity session (and no head envelope). No flag supplies an asker." },
+    { "code": "ref-invalid", "category": "validation", "verbs": ["ask"], "when": "The --ref is not one of discussion:<topic>#Q<n>, plan:<dir>[#phase-<nn>], case:<runId>[#<gate>], or it does not exist in the caller's own checkout." },
+    { "code": "parts-incomplete", "category": "validation", "verbs": ["ask"], "when": "A required part of the five (what, cause, scope; options and recommendation unless the discovery exception applies) is absent, or the input is not valid JSON of questions-input.v1.json.", "carries": ["missing"] },
+    { "code": "question-unclear", "category": "validation", "verbs": ["ask"], "when": "A measurable shape rule of questions-input.v1.json is broken: headline length, what/cause length, option count, label length, not exactly one recommended option, blocks missing.", "carries": ["field", "rule"] },
+    { "code": "question-unknown", "category": "not-found", "verbs": ["show", "answer", "ack", "cancel"], "when": "No question has this id in the fold." },
+    { "code": "question-already-answered", "category": "conflict", "verbs": ["answer"], "when": "The question already has an answer in the local read. A second answer is never written." },
+    { "code": "question-not-open", "category": "conflict", "verbs": ["answer", "ack", "cancel"], "when": "The question is not in the state the verb needs: answer needs open; ack needs answered; cancel needs open or answered; a cancelled or acked question takes none." },
+    { "code": "answer-not-owner", "category": "precondition", "verbs": ["answer"], "when": "An agent CLI is among the caller's process ancestors, outside the secretary head's socket route. Guards against mistakes, not attack." },
+    { "code": "not-asker", "category": "precondition", "verbs": ["ack", "cancel"], "when": "The caller is neither the asker session, nor a session holding the same head role, nor (for a migrated question or one whose asker held no head role) any head session." },
+    { "code": "event-store-unsupported-platform", "category": "precondition", "verbs": ["*"], "when": "Passed through from the Event Store: the platform is not Linux.", "passThrough": true },
+    { "code": "event-store-no-repository", "category": "precondition", "verbs": ["*"], "when": "Passed through from the Event Store: no repository to hold the store.", "passThrough": true },
+    { "code": "event-store-lock-timeout", "category": "lock-timeout", "verbs": ["ask", "answer", "ack", "cancel"], "when": "Passed through from the Event Store: an append or seal lock was not obtained in time.", "passThrough": true },
+    { "code": "event-store-integrity", "category": "corrupt-log", "verbs": ["*"], "when": "Passed through from the Event Store: a read found a broken chain or seal.", "passThrough": true },
+    { "code": "event-store-io", "category": "unexpected", "verbs": ["*"], "when": "Passed through from the Event Store: an I/O failure.", "passThrough": true }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fgos.invalid/questions/questions-input.v1.json",
+  "title": "fgos questions ask --input v1",
+  "description": "The shape of `fgos questions ask --input <file|->`. This file is the rule authority for the door; every measurable limit of the question's shape is data here (`maxLength` counts characters, `minItems` and `maxItems` count options). The asker is never an input field: it is filled from Identity or from the head's envelope. A violation is refused as `question-unclear`, naming the field and the rule (`refusals.v1.json`). Discovery exception: options and the recommendation may be empty when `stage` is `discovery` or `exploring`, when the ref is a `discussion:` ref and `stage` is `shaping`, or when `migrated` is true; never on a caller flag.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["stage", "ref", "headline", "blocks", "parts"],
+  "properties": {
+    "stage": { "type": "string", "minLength": 1, "maxLength": 60 },
+    "ref": {
+      "type": "string",
+      "pattern": "^(discussion:[A-Za-z0-9._-]+#Q[0-9]+|plan:[A-Za-z0-9._-]+(#phase-[0-9]{2})?|case:[A-Za-z0-9._-]+(#[A-Za-z0-9._-]+)?)$"
+    },
+    "headline": { "type": "string", "minLength": 1, "maxLength": 120, "pattern": "^[^\\r\\n]+$" },
+    "blocks": { "type": "string", "minLength": 1 },
+    "migrated": { "type": "boolean" },
+    "supersedes": { "type": "string", "pattern": "^q-[a-z0-9]+$" },
+    "parts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["what", "cause", "scope"],
+      "properties": {
+        "what": { "type": "string", "minLength": 1, "maxLength": 600 },
+        "cause": { "type": "string", "minLength": 1, "maxLength": 600 },
+        "options": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "does", "gain", "harm", "cost"],
+            "properties": {
+              "label": { "type": "string", "minLength": 1, "maxLength": 60 },
+              "does": { "type": "string", "minLength": 1 },
+              "gain": { "type": "string", "minLength": 1 },
+              "harm": { "type": "string", "minLength": 1 },
+              "cost": { "type": "string", "minLength": 1 },
+              "recommended": { "type": "boolean" }
+            }
+          }
+        },
+        "recommendation": { "type": "string", "minLength": 1 },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["allows", "forbids"],
+          "properties": {
+            "allows": { "type": "string", "minLength": 1 },
+            "forbids": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "decided": {
+      "description": "A decision question: 2-4 options, exactly one recommended, and a recommendation.",
+      "properties": {
+        "parts": {
+          "required": ["options", "recommendation"],
+          "properties": {
+            "options": {
+              "minItems": 2,
+              "maxItems": 4,
+              "contains": { "type": "object", "required": ["recommended"], "properties": { "recommended": { "const": true } } },
+              "minContains": 1,
+              "maxContains": 1
+            }
+          }
+        }
+      }
+    }
+  },
+  "if": {
+    "not": {
+      "anyOf": [
+        { "properties": { "stage": { "enum": ["discovery", "exploring"] } } },
+        { "properties": { "stage": { "const": "shaping" }, "ref": { "pattern": "^discussion:" } }, "required": ["stage"] },
+        { "required": ["migrated"], "properties": { "migrated": { "const": true } } }
+      ]
+    }
+  },
+  "then": { "$ref": "#/$defs/decided" }
+}

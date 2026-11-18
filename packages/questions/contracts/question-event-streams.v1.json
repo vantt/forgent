@@ -1,0 +1,33 @@
+{
+  "v": 1,
+  "types": [
+    {
+      "type": "question.asked",
+      "domain": "questions",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": true
+    },
+    {
+      "type": "question.answered",
+      "domain": "questions",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": true
+    },
+    {
+      "type": "question.acked",
+      "domain": "questions",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": true
+    },
+    {
+      "type": "question.cancelled",
+      "domain": "questions",
+      "schemaVersion": 1,
+      "scope": "project",
+      "sealOnWrite": true
+    }
+  ]
+}
