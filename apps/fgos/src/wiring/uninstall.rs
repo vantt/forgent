@@ -1163,6 +1163,8 @@ mod tests {
                     home: self.home.clone(),
                     uid: 0,
                     xdg_config_home: None,
+                    tool_dirs: Vec::new(),
+                    herdr_env: Vec::new(),
                 },
                 config: &config,
                 host_bin: &host_bin,
@@ -1667,7 +1669,14 @@ mod tests {
             .iter()
             .map(|f| f["id"].as_str().unwrap().to_owned())
             .collect();
-        assert_eq!(ids, vec!["mailbox-sync-timer", "account-probe-timer"]);
+        assert_eq!(
+            ids,
+            vec![
+                "mailbox-sync-timer",
+                "account-probe-timer",
+                "watcher-tick-timer"
+            ]
+        );
     }
 
     // ----- the version rule and the Git rule of the skill guard -----

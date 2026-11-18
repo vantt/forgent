@@ -213,9 +213,10 @@ impl Schedule {
             Self::AccountProbe => vec![("PATH".to_string(), host.probe_path())],
             Self::WatcherTick => {
                 let mut vars = vec![
-                    ("PATH".to_string(), host.probe_path()),
+                    ("PATH".to_string(), host.wake_path()),
                     ("HOME".to_string(), host.home.to_string_lossy().into_owned()),
                 ];
+                vars.extend(host.herdr_env.iter().cloned());
                 if host.platform == "linux" {
                     vars.push((
                         "XDG_RUNTIME_DIR".to_string(),
@@ -529,6 +530,31 @@ pub struct Host {
     pub home: PathBuf,
     pub uid: u32,
     pub xdg_config_home: Option<String>,
+    /// Folders of the binaries a wake needs (node, herdr, the agent CLIs), resolved from the installing
+    /// environment's PATH, in PATH order, without duplicates.
+    pub tool_dirs: Vec<String>,
+    /// `HERDR_SOCKET_PATH` and `HERDR_SESSION` of the installing environment, when set and non-empty.
+    pub herdr_env: Vec<(String, String)>,
+}
+
+/// The binaries a watcher wake launches: the payload's Node, herdr and the agent CLIs the runner starts.
+const WAKE_TOOLS: [&str; 4] = ["node", "herdr", "claude", "codex"];
+
+/// The directories of `tools` found on `path_var`, first match per tool, de-duplicated.
+fn resolve_tool_dirs(path_var: &str, tools: &[&str]) -> Vec<String> {
+    let mut dirs: Vec<String> = Vec::new();
+    for tool in tools {
+        let found = path_var
+            .split(':')
+            .filter(|d| Path::new(d).is_absolute())
+            .find(|d| is_executable_path(&Path::new(d).join(tool)));
+        if let Some(dir) = found {
+            if !dirs.iter().any(|d| d == dir) {
+                dirs.push(dir.to_string());
+            }
+        }
+    }
+    dirs
 }
 
 impl Host {
@@ -539,6 +565,17 @@ impl Host {
             home: home_dir(&lookup)?,
             uid: current_uid(),
             xdg_config_home: lookup("XDG_CONFIG_HOME"),
+            tool_dirs: lookup("PATH")
+                .map(|p| resolve_tool_dirs(&p, &WAKE_TOOLS))
+                .unwrap_or_default(),
+            herdr_env: ["HERDR_SOCKET_PATH", "HERDR_SESSION"]
+                .iter()
+                .filter_map(|k| {
+                    lookup(k)
+                        .filter(|v| !v.is_empty())
+                        .map(|v| (k.to_string(), v))
+                })
+                .collect(),
         })
     }
 
@@ -556,6 +593,17 @@ impl Host {
         ];
         if self.platform == "darwin" {
             dirs.insert(1, "/opt/homebrew/bin".to_string());
+        }
+        dirs.join(":")
+    }
+
+    /// The watcher's PATH: the fixed folders, then the install-time tool folders not already among them.
+    fn wake_path(&self) -> String {
+        let mut dirs: Vec<String> = self.probe_path().split(':').map(str::to_string).collect();
+        for dir in &self.tool_dirs {
+            if !dirs.contains(dir) {
+                dirs.push(dir.clone());
+            }
         }
         dirs.join(":")
     }
@@ -1084,6 +1132,8 @@ mod tests {
             home: home.to_path_buf(),
             uid: 501,
             xdg_config_home: Some(home.join("cfg").to_string_lossy().into_owned()),
+            tool_dirs: Vec::new(),
+            herdr_env: Vec::new(),
         }
     }
 
@@ -1211,6 +1261,63 @@ mod tests {
         );
     }
 
+    #[cfg(unix)]
+    #[test]
+    fn the_watcher_unit_carries_the_install_time_tool_dirs_and_herdr_variables_when_present() {
+        let schedule = Schedule::WatcherTick;
+        let found = Found {
+            interval_sec: 45,
+            remote: None,
+        };
+        let root = PathBuf::from("/p");
+        let words = schedule.command(&found, &root);
+        let stem = unit_stem(&root, schedule);
+        let bin = scratch("tools");
+        let nvm = bin.join("nvm/bin");
+        std::fs::create_dir_all(&nvm).unwrap();
+        let node = nvm.join("node");
+        std::fs::write(&node, "#!/bin/sh\n").unwrap();
+        std::fs::set_permissions(&node, std::os::unix::fs::PermissionsExt::from_mode(0o755))
+            .unwrap();
+        let path_var = format!("{}:/usr/bin:relative", nvm.display());
+        let dirs = resolve_tool_dirs(&path_var, &WAKE_TOOLS);
+        assert_eq!(dirs, vec![nvm.to_string_lossy().into_owned()]);
+
+        for (platform, with) in [
+            ("linux", true),
+            ("darwin", true),
+            ("linux", false),
+            ("darwin", false),
+        ] {
+            let mut h = host(platform, Path::new("/home/u"));
+            if with {
+                h.tool_dirs = dirs.clone();
+                h.herdr_env = vec![("HERDR_SOCKET_PATH".to_string(), "/run/h.sock".to_string())];
+            }
+            let vars = schedule.service_vars(&h);
+            let path = &vars.iter().find(|(k, _)| k == "PATH").unwrap().1;
+            assert_eq!(path.contains(&dirs[0]), with, "{platform}");
+            assert!(path.starts_with(&h.probe_path()));
+            let spec = UnitSpec {
+                stem: &stem,
+                bin: BIN,
+                words: &words,
+                vars: &vars,
+                interval_sec: 45,
+                schedule,
+            };
+            let files = if platform == "linux" {
+                render_systemd(&spec).unwrap()
+            } else {
+                render_launchd(&spec).unwrap()
+            };
+            let text: String = files.iter().map(|(_, c)| c.as_str()).collect();
+            assert_eq!(text.contains(&dirs[0]), with, "{platform}");
+            assert_eq!(text.contains("HERDR_SOCKET_PATH"), with, "{platform}");
+            assert_eq!(text.contains("/run/h.sock"), with, "{platform}");
+        }
+    }
+
     #[test]
     fn each_platform_has_its_scheduler_directory_and_others_have_none() {
         let home = Path::new("/h");
@@ -1314,6 +1421,7 @@ mod tests {
             };
             assert_eq!(names, want, "{platform}");
             assert_eq!(vars[0].1, h.probe_path());
+            assert_eq!(vars[0].1, h.wake_path());
             assert_eq!(vars[1].1, home);
             let spec = UnitSpec {
                 stem: &stem,
