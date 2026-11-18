@@ -171,13 +171,13 @@ Settled in [DISCUSSION.md](../../discussions/owner-questions/DISCUSSION.md) sect
 
 | Id | Decision | Where it lands here |
 |---|---|---|
-| OQ-D1 | Open questions live in an operating store; the origin keeps the lasting copy and receives the answer back | sections 2, 3 |
-| OQ-D2 | A Rust component of its own, outside Observe; append-only | section 3 (storage half superseded by QP-2: Event Store, not Observe shards) |
-| OQ-D3 | The asker is filled by the verb; the caller gives a checked `--ref` | sections 2, 4 |
-| OQ-D4 | One place to view and answer: `fgos questions` and S04; gates and `fgos ask` read beside it | sections 4, 5 |
-| OQ-D5 | Receipt by hook at `UserPromptSubmit` and `Stop`; then write back and `ack` | section 8 |
-| OQ-D6 | Waking is not a question verb; `fgos.question.answered` and the detection feed the supervisor | section 7 |
-| OQ-D7 | Cutover: re-ask open questions once as `migrated`; retire the markdown reader | section 2 (`migrated`), plan phase 9 |
+| discussion §4, decision 1 | Open questions live in an operating store; the origin keeps the lasting copy and receives the answer back | sections 2, 3 |
+| discussion §4, decision 2 | A Rust component of its own, outside Observe; append-only | section 3 (storage half superseded by QP-2: Event Store, not Observe shards) |
+| discussion §4, decision 3 | The asker is filled by the verb; the caller gives a checked `--ref` | sections 2, 4 |
+| discussion §4, decision 4 | One place to view and answer: `fgos questions` and S04; gates and `fgos ask` read beside it | sections 4, 5 |
+| discussion §4, decision 5 | Receipt by hook at `UserPromptSubmit` and `Stop`; then write back and `ack` | section 8 |
+| discussion §4, decision 6 | Waking is not a question verb; `fgos.question.answered` and the detection feed the supervisor | section 7 |
+| discussion §4, decision 7 | Cutover: re-ask open questions once as `migrated`; retire the markdown reader | section 2 (`migrated`), plan phase 9 |
 | QP-1 | New area, spec, rows, crate and contracts | this file, `component-boundary.md`, `governance.md` |
 | QP-2 | Event Store consumer `questions`, four sealed project-scope types, Linux only | section 3 |
 | QP-3 | Ids from `fgos identity mint question` | section 2 |
