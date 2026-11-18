@@ -4,7 +4,7 @@ Backlog `p-zgbqe2bpig` (HIGH). Owner decision 2026-11-18 21:3x (via supervisor):
 design". The secretary head gets mailbox send and its lock, its peers' sockets under `/run/user/<uid>`, write access to
 exactly the files its skill edits, and an Identity that resolves it as a head. Everything else stays confined.
 Evidence: [debugger report](reports/debugger-261118-2130-miu-early-hard-rotation.md) §Q4 (symptoms proven, causes
-strongly suspected). Depends on phase 5 (the grant table's verbs are renamed there).
+strongly suspected). Runs first (owner priority 21:4x) on the current names (`head-grants.mjs`, `fgos head`); phase 5 renames them later.
 
 ## Inputs (read first)
 - `src/session-host/head-grants.mjs` (`GRANTS.secretary.writes`), `src/session-host/head-start.mjs` (launch, env,

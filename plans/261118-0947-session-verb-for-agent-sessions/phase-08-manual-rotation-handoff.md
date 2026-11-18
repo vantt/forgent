@@ -1,10 +1,10 @@
 # Phase 8: A manual rotation says so and hands off real context
 
 Backlog `p-ktnvgs2ozm`. Evidence: [debugger report](reports/debugger-261118-2130-miu-early-hard-rotation.md) §Q1, §Q2
-(proven). Depends on phase 7 (shares `src/session-host/**` and its tests).
+(proven). Runs before the rename (owner priority 21:4x); depends on phase 7 (shares `src/session-host/**` and its tests).
 
 ## Inputs (read first)
-- `bin/fgos.mjs` (`session rotate` after phase 5; sends `reason: 'manual'`), `src/session-host/head-request.mjs`
+- `bin/fgos.mjs` (`head rotate`, ~3462; sends `reason: 'manual'`; phase 5 renames it later), `src/session-host/head-request.mjs`
   (`rotateHead`, `stopFacts`), `src/session-rotation/rotate.mjs` (~262-273: `rotation: hard` for every non-soft reason,
   empty handoff), `src/session-rotation/handoff-store.mjs`.
 - Contract `packages/session-host/contracts/rotation-files.v1.json`; Rust reader `packages/session-host/rust/src/**`
@@ -24,7 +24,7 @@ Backlog `p-ktnvgs2ozm`. Evidence: [debugger report](reports/debugger-261118-2130
 
 ## Verify
 - Focused session-rotation/session-host Node tests; `cargo test -p` the session-host crate; clippy.
-- A manual `fgos session rotate` on a test head writes `rotation: manual` and a handoff with the last message and portfolio.
+- A manual `fgos head rotate` on a test head writes `rotation: manual` and a handoff with the last message and portfolio.
 
 ## Rollback
 `git revert`; old handoffs stay readable (the reader accepts both).
