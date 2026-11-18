@@ -7,11 +7,10 @@
 //! omp row takes its executors from it too): a config that does not load is not their finding, so they pass and
 //! say so. The rest read the effective section as the door gives it.
 
-use super::{config_refusal_text, judged, project_root_refusal, Rows};
+use super::{judged, project_root_refusal, Rows};
+use crate::wiring::dispatch_decide::HostWorkspace;
 use crate::wiring::process_env;
 use crate::wiring::seat_binding::{HostMachine, HostProbe};
-use fgos_config::detect::PathDetectors;
-use fgos_config::snapshot::SnapshotError;
 use fgos_distribution::doctor::FixResult;
 use fgos_distribution::doctor::RowOutcome;
 use fgos_execution::checks::{
@@ -19,7 +18,7 @@ use fgos_execution::checks::{
     invocation_git_write_grants, omp_executors_of, omp_natives_present, runner_generated_paths,
     tool_registry_configured, CheckResult, OmpHost, SubHomes,
 };
-use fgos_execution::decide::{load_checked_runner, DecideFailure, LoadedRunner, Workspace};
+use fgos_execution::decide::{check_loaded_runner, LoadedRunner, Workspace};
 use fgos_execution::tools::tool_posture;
 use serde_json::{json, Value};
 use std::cell::OnceCell;
@@ -59,96 +58,50 @@ fn row(result: CheckResult) -> RowOutcome {
 
 // ---- the config ------------------------------------------------------------------------------------------
 
-/// The effective runner section of the project at `root` as the config door gives it, or why it cannot.
-fn effective_runner(root: &Path) -> Result<Value, String> {
+/// The project's runner section with its origins, read through the one door `fgos dispatch decide` reads the
+/// config by, or why it cannot be read.
+fn read_runner(root: &Path) -> Result<LoadedRunner, String> {
     if let Some(refusal) = project_root_refusal(root) {
         return Err(refusal.to_owned());
     }
-    let detectors = PathDetectors {
-        path: std::env::var_os("PATH"),
-    };
-    let ctx = fgos_config::machine::context(&detectors)
-        .map_err(|refusal| config_refusal_text(&refusal))?;
-    let roots = fgos_config::provider::roots(root).map_err(|refusal| match refusal.reason {
-        "git-read-failed" => format!("config-trusted-root-unresolved ({})", refusal.detail),
-        _ => refusal.detail,
-    })?;
-    let snapshot = fgos_config::snapshot::snapshot(&ctx, &roots).map_err(|error| match error {
-        SnapshotError::Refused(list) => list
-            .iter()
-            .map(config_refusal_text)
-            .collect::<Vec<_>>()
-            .join("; "),
-        SnapshotError::Io(io) => format!("config-io ({:?})", io.kind()),
-    })?;
-    Ok(snapshot
-        .value
-        .get("runner")
-        .cloned()
-        .unwrap_or_else(|| json!({})))
+    HostWorkspace {
+        process_cwd: root.to_path_buf(),
+    }
+    .load_runner(&root.to_string_lossy())
+    .map_err(|failure| failure.message().to_owned())
 }
 
-/// The runner section read once; the runner's own semantic check runs on top of it for the rows that need a
-/// loadable config.
+/// The runner section read once; the runner's own checks run on top of it for the rows that need a loadable
+/// config.
 struct Config<'a> {
     root: &'a Path,
-    raw: OnceCell<Result<Value, String>>,
+    read: OnceCell<Result<LoadedRunner, String>>,
 }
 
 impl<'a> Config<'a> {
     fn new(root: &'a Path) -> Self {
         Config {
             root,
-            raw: OnceCell::new(),
+            read: OnceCell::new(),
         }
     }
 
-    fn raw(&self) -> &Result<Value, String> {
-        self.raw.get_or_init(|| effective_runner(self.root))
+    fn read(&self) -> &Result<LoadedRunner, String> {
+        self.read.get_or_init(|| read_runner(self.root))
+    }
+
+    fn raw(&self) -> Result<&Value, &String> {
+        self.read().as_ref().map(|loaded| &loaded.runner)
     }
 
     /// The runner config as the loader returns it, or what it refused with.
     fn loaded(&self) -> Result<Value, String> {
-        let door = LoadedDoor { config: self };
-        load_checked_runner(&door, &self.root.to_string_lossy())
+        let loaded = self.read().clone()?;
+        let root = self.root.to_string_lossy();
+        let fgos_dir = self.root.join(".fgos").to_string_lossy().into_owned();
+        check_loaded_runner(loaded, &fgos_dir, &root)
             .map(|(runner, _)| runner)
             .map_err(|failure| failure.message().to_owned())
-    }
-}
-
-/// The part of the decision's `Workspace` the runner check reads: the project's effective runner section. Nothing
-/// else of the workspace is asked of it.
-struct LoadedDoor<'a, 'b> {
-    config: &'b Config<'a>,
-}
-
-impl Workspace for LoadedDoor<'_, '_> {
-    fn repo_root(&self, dir: &str) -> Result<String, String> {
-        Ok(dir.to_owned())
-    }
-    fn main_checkout_root(&self, dir: &str) -> Option<String> {
-        Some(dir.to_owned())
-    }
-    fn process_main_checkout_root(&self) -> Option<String> {
-        None
-    }
-    fn project_config_present(&self, _root: &str) -> bool {
-        true
-    }
-    fn load_runner(&self, _root: &str) -> Result<LoadedRunner, DecideFailure> {
-        match self.config.raw() {
-            Ok(runner) => Ok(LoadedRunner {
-                runner: runner.clone(),
-                origins: Vec::new(),
-            }),
-            Err(message) => Err(DecideFailure::ConfigDoor {
-                code: "config-io".to_owned(),
-                message: message.clone(),
-            }),
-        }
-    }
-    fn fgos_dir(&self, root: &str) -> String {
-        Path::new(root).join(".fgos").to_string_lossy().into_owned()
     }
 }
 
@@ -285,7 +238,7 @@ fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
             }
             "agy-sub-homes-configured" => {
                 // A config the door refuses names no sub-HOME; the config rows report the refusal itself.
-                let runner = config.raw().as_ref().cloned().unwrap_or_else(|_| json!({}));
+                let runner = config.raw().cloned().unwrap_or_else(|_| json!({}));
                 row(agy_sub_homes_configured(
                     &runner,
                     &HostHomes {
@@ -328,8 +281,8 @@ fn tool_row(root: &Path) -> RowOutcome {
     let Some(main) = main_checkout(root) else {
         return judged(true, "not inside a git checkout \u{2014} nothing to check");
     };
-    let runner = match effective_runner(&main) {
-        Ok(runner) => runner,
+    let runner = match read_runner(&main) {
+        Ok(loaded) => loaded.runner,
         Err(message) => return judged(false, message),
     };
     let machine = HostMachine::new(None, None);

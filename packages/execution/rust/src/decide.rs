@@ -566,8 +566,18 @@ pub fn load_checked_runner(
     root: &str,
 ) -> Result<(Value, Vec<String>), DecideFailure> {
     let loaded = workspace.load_runner(root)?;
+    check_loaded_runner(loaded, &workspace.fgos_dir(root), root)
+}
+
+/// The checks [`load_checked_runner`] runs over a runner section already loaded: the global `rigorToTier` refusal
+/// and the runner config's own semantic check.
+pub fn check_loaded_runner(
+    loaded: LoadedRunner,
+    fgos_dir: &str,
+    root: &str,
+) -> Result<(Value, Vec<String>), DecideFailure> {
     refuse_global_rigor_to_tier(&loaded.origins).map_err(DecideFailure::Refused)?;
-    let label = format!("{} runner", workspace.fgos_dir(root));
+    let label = format!("{fgos_dir} runner");
     match check_runner_config(&loaded.runner, &label) {
         Ok(warnings) => Ok((loaded.runner, warnings)),
         Err(refusal) => Err(DecideFailure::Refused(attribute_runner_refusal(

@@ -247,6 +247,20 @@
    "expect": {"passed":true,"message":"warning: omp 1.2.3 has no native addon in $ROOT/home/.omp/natives/1.2.3 (looked for pi_natives.darwin-arm64.node); no executor runs omp; run omp once outside the sandbox after every update"}
   },
   {
+   "name": "omp: a Windows command path with backslashes names the executor that runs it",
+   "row": "omp-natives-present",
+   "runner": {"executors":{"win":{"invocations":[{"command":"C:\\tools\\omp"}]}}},
+   "machine": {"omp":null},
+   "expect": {"passed":true,"message":"warning: omp is not installed or did not answer --version (ENOENT), but executor(s) win run it"}
+  },
+  {
+   "name": "omp: a pinned directory climbing above the root stays at the root",
+   "row": "omp-natives-present",
+   "runner": {},
+   "machine": {"omp":{"output":"1.2.3"},"env":{"PI_NATIVES_DIR":"/../tmp"},"files":["/tmp/1.2.3/pi_natives.linux-x64-modern.node"]},
+   "expect": {"passed":true,"message":"omp 1.2.3 has its native addon /tmp/1.2.3/pi_natives.linux-x64-modern.node"}
+  },
+  {
    "name": "omp: a pinned absolute natives directory is cleaned and used",
    "row": "omp-natives-present",
    "runner": {},

@@ -3563,6 +3563,59 @@ fn doctor_judges_the_execution_rows_in_the_host_without_node() {
     let _ = fs::remove_dir_all(&state);
 }
 
+/// A global `runner.rigorToTier` is refused as the runner loads it, so the rows that judge the loaded config say
+/// the config is not loadable and name the key, as `dispatch decide` does.
+#[cfg(unix)]
+#[test]
+fn doctor_execution_rows_judge_a_global_rigor_to_tier_as_refused() {
+    let project = fresh_dir("fgos_doctor_rigor");
+    for args in [
+        &["init", "-q", "."][..],
+        &["commit", "-q", "--allow-empty", "-m", "init"][..],
+    ] {
+        let output = Command::new("git")
+            .current_dir(&project)
+            .args(["-c", "user.name=doors", "-c", "user.email=doors@test"])
+            .args(args)
+            .output()
+            .expect("git runs");
+        assert!(output.status.success(), "git {args:?}");
+    }
+    let state = fresh_dir("fgos_doctor_rigor_state");
+    fs::set_permissions(&state, std::os::unix::fs::PermissionsExt::from_mode(0o700)).unwrap();
+    let home = fresh_dir("fgos_doctor_rigor_home");
+    fs::create_dir_all(home.join(".fgos")).unwrap();
+    fs::write(
+        home.join(".fgos/config.yaml"),
+        "runner:\n  rigorToTier:\n    light: fast\n",
+    )
+    .unwrap();
+    let output = doctor_in(
+        &project,
+        &path_without_node(),
+        &["--json"],
+        &[
+            ("FGOS_STATE_ROOT", state.to_str().unwrap()),
+            ("HOME", home.to_str().unwrap()),
+        ],
+    );
+    let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let checks = envelope["data"]["checks"].as_array().unwrap();
+    let message = checks
+        .iter()
+        .find(|row| row["id"] == "executor-confinement")
+        .and_then(|row| row["message"].as_str())
+        .expect("the report has the executor-confinement row");
+    assert!(
+        message.starts_with("runner config not loadable here, confinement not evaluated:")
+            && message.contains("rigorToTier"),
+        "{message}"
+    );
+    let _ = fs::remove_dir_all(&project);
+    let _ = fs::remove_dir_all(&state);
+    let _ = fs::remove_dir_all(&home);
+}
+
 /// The rows of the Node-owned layers are one call of the rows bridge: one Node process for the whole run, however
 /// many rows it judges. (That a doctor run leaves a repository with no fgOS setup untouched and starts no events
 /// child is proved through the host by `test/setup/checks-doctor-config.test.mjs`.)

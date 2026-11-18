@@ -232,8 +232,8 @@ fn real(path: &Path) -> String {
 }
 
 /// The repository and config facts a decision reads, over the Git door and the config door.
-struct HostWorkspace {
-    process_cwd: PathBuf,
+pub(crate) struct HostWorkspace {
+    pub(crate) process_cwd: PathBuf,
 }
 
 impl HostWorkspace {

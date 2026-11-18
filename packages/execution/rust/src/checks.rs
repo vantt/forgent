@@ -265,9 +265,9 @@ const FIX_HINT: &str = "run omp once outside the sandbox after every update";
 /// The ids of the executors that run omp (an invocation whose command's file name is `omp`).
 pub fn omp_executors_of(runner: &Value) -> Vec<String> {
     let runs_omp = |command: Option<&Value>| {
-        command
-            .and_then(Value::as_str)
-            .is_some_and(|c| c.trim_end_matches('/').rsplit('/').next() == Some("omp"))
+        command.and_then(Value::as_str).is_some_and(|c| {
+            c.trim_end_matches(['/', '\\']).rsplit(['/', '\\']).next() == Some("omp")
+        })
     };
     entries_of(runner.get("executors"))
         .filter(|(_, executor)| {
@@ -284,7 +284,8 @@ pub fn cleaned(path: &Path) -> PathBuf {
         match part {
             Component::CurDir => {}
             Component::ParentDir => {
-                if !out.pop() {
+                // Above a root there is nothing to pop and nothing to keep: `/../x` is `/x`.
+                if !out.pop() && !out.has_root() {
                     out.push("..");
                 }
             }

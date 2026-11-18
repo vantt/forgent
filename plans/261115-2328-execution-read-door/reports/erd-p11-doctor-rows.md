@@ -148,3 +148,4 @@ fmt, clippy `-D warnings` (fgos, fgos-execution, fgos-distribution), `cargo test
 88/88, `cargo check -p fgos` for x86_64-pc-windows-msvc and aarch64-apple-darwin clean. Census scan: one new site (the `omp`
 spawn used `OsStr::new`) fixed by passing the name as the other tool probes do; 0 undeclared. Node: 28 files (the grep list +
 census + architecture + doc-health + citation-drift + capability-config) in two batches: 592 tests, 3 fail (release-tree, known).
+- Review fixes: omp command names match on both separators, `cleaned` drops `..` above a root, doctor execution rows read the config through the decide door (`HostWorkspace`, once per run, origins kept) so a global rigorToTier is refused.
