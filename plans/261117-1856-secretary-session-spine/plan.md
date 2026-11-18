@@ -186,6 +186,17 @@ answered `unavailable / tool.missing`, so the blast radius below is from `rg`, a
   (`adapter_for`, `await_ready`, `deliver_brief` over `AgentIo`); the Session Host reuses it through its own `PaneIo`
   and moves nothing out of the run supervisor, whose `TermIo` later wraps `PaneIo`. Hooks reach other projects only as
   `fgos hook <kind>` through the shim, so rotation is one hook kind `session-rotation`, never a repository script.
+- **Head sessions are confined like workers; one request socket (owner, 2026-11-18).** A head session gets no
+  exception from a worker: it starts through the worker's seat door (run supervisor, bwrap, account lease, private
+  home), so the herdr socket and the user runtime directory stay masked for it as for every dispatch. The difference
+  between roles is only a grant keyed by the Identity role: writable paths (bwrap binds) and allowed verbs. Verbs reach
+  the host through one request socket that the session's own run supervisor opens and binds back into that sandbox,
+  the same way the GO socket is bound back; no new daemon. The supervisor resolves the caller's role through Identity,
+  checks the grant, performs the verb outside the sandbox and logs it. This plan ships one verb, `head start`, so a
+  confined secretary can still start sessions; the secretary's writable paths are `plans/**`, `docs/backlog.md`,
+  `docs/discussions/**`. The grant schema in `core/config-standard`/`core/config-schema` and the other verbs (`land`,
+  backlog row, answering `QUESTIONS.md` and plan questions) are a follow-up plan. The role name stays
+  `head:<persona>-<name>`.
 
 ## Acceptance criteria
 
@@ -297,6 +308,10 @@ sees the second of them land sets those five phases and the plan to `ready`, aft
 
 Both answered by the owner on 2026-11-17: question 1 **(a) `fgos head`**, question 2 **(a) pull `p-pgmxt7n7hx` in**.
 Kept below as the record of what was asked.
+
+3. **(2026-11-18, answered (2))** Confine head sessions like workers and also give them one request socket with the verb
+   `head start` in phase 12 (option 2), rather than confining now and leaving the secretary unable to start sessions
+   until a later plan (option 1). Recorded under "Design settled by this plan".
 
 1. **Head-session verb name: `fgos session start` is already taken.**
    - *Chuyện gì đang xảy ra:* SM-D6 named the head-session door `fgos session start <persona> --name <name>`, but
