@@ -17,11 +17,13 @@ pub struct RefMapping {
 }
 /// The one push a Land session may make from inside its own chain: a branch holding its
 /// candidate commit to its own destination. The binding is the Land chain's, so admission
-/// exempts only that chain.
+/// exempts only that chain. The transfer sends exactly `candidate`: a source branch that no
+/// longer resolves to it refuses before anything is journalled or sent.
 pub(crate) struct LandPush {
     pub binding: String,
     pub source: RefName,
     pub destination: RefName,
+    pub candidate: Oid,
 }
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -333,6 +335,10 @@ impl GitDriver {
                 ExpectedTip::Oid(o) => o,
                 _ => return Err(failure("remote-source-absent")),
             };
+            // The push names the commit by this OID, so it is the commit sent.
+            if land.is_some_and(|l| l.candidate != next) {
+                return Err(failure("land-push-source-moved"));
+            }
             if push {
                 self.checked(
                     repo,

@@ -1104,9 +1104,16 @@ impl GitDriver {
         writer: &str,
         id: &str,
     ) -> Result<Outcome> {
+        // A main-checkout catch-up journals as RefUpdate under its own binding; its recovery
+        // holds the main-checkout authority, not a linked checkout's lease.
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
+        if wal.inspect(id)?.intent().authority_binding
+            == crate::land::catch_up_binding(wal.repository_identity(), repo)?
+        {
+            return self.recover_main_checkout_catch_up(repo, held, writer, id);
+        }
         let mut scope = acquire_worktree_admin(repo, held)?;
         crate::recovery::leaf(&mut scope, repo)?;
-        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
         let chain = wal.inspect(id)?;
         let i = chain.intent();
         if !matches!(

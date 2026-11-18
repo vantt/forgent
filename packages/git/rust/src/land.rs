@@ -907,13 +907,14 @@ impl GitDriver {
     /// Admission exempts exactly this push from the session's chain (same binding, same
     /// destination, source is the candidate pin); every other push to that ref stays refused.
     /// A rejected push (the remote moved) leaves the session droppable with nothing published.
-    pub fn push_land_candidate(
+    pub fn push_land_candidate<F: wal::FileSystem>(
         &self,
         repo: &RepoHandle,
         session: &LandSession,
         grant: &RemoteGrant,
         destination: &RefName,
         writer: &str,
+        filesystem: &F,
     ) -> Result<Receipt> {
         if session.receipt.is_some() {
             return Err(failure("land-session-settled"));
@@ -949,7 +950,8 @@ impl GitDriver {
             return Err(recovery("land-pin-changed"));
         }
         // The Remote port refuses a `refs/fgos/` source, so the candidate rides a short-lived
-        // branch that exists only for this push.
+        // branch that exists only for this push. Nothing holds that branch between its
+        // creation and the transfer, so the transfer is bound to the candidate OID itself.
         let source = RefName::parse(&format!("refs/heads/fgos-land-push-{}", session.id))
             .map_err(failure)?;
         self.ensure_branch(
@@ -964,21 +966,27 @@ impl GitDriver {
             binding: chain.intent().authority_binding.clone(),
             source: source.clone(),
             destination: destination.clone(),
+            candidate: candidate.clone(),
         };
-        let pushed = self.transfer_refs_with(
-            repo,
-            held(&session.slot)?,
-            grant,
-            &[crate::remote::RefMapping {
-                source: source.clone(),
-                destination: destination.clone(),
-            }],
-            writer,
-            &format!("{}-push", session.id),
-            true,
-            &wal::OsFileSystem,
-            Some(&land),
-        );
+        let pushed = filesystem
+            .checkpoint("land-push-source")
+            .map_err(failure)
+            .and_then(|()| {
+                self.transfer_refs_with(
+                    repo,
+                    held(&session.slot)?,
+                    grant,
+                    &[crate::remote::RefMapping {
+                        source: source.clone(),
+                        destination: destination.clone(),
+                    }],
+                    writer,
+                    &format!("{}-push", session.id),
+                    true,
+                    filesystem,
+                    Some(&land),
+                )
+            });
         // Best effort: a leftover branch is only a name for the same commit.
         let _ = self.delete_ref(
             repo,
@@ -996,9 +1004,10 @@ impl GitDriver {
     /// worktree-admin 40 and the main-checkout lock, revalidates membership, does an exact-old
     /// CAS with read-back, and updates the tree the way a Land publication does. It refuses a
     /// non-fast-forward move, a dirty path the move changes, a stale `expected_old` and any
-    /// active chain on the ref.
+    /// active chain on the ref. Its chain carries the catch-up binding, so an interrupted one
+    /// is recovered under the main-checkout authority (`recover_main_checkout_catch_up`).
     #[allow(clippy::too_many_arguments)]
-    pub fn catch_up_main_checkout(
+    pub fn catch_up_main_checkout<F: wal::FileSystem>(
         &self,
         repo: &RepoHandle,
         held: Vec<BorrowedHandle<'_>>,
@@ -1007,6 +1016,7 @@ impl GitDriver {
         remote_tracking: &RefName,
         writer: &str,
         id: &str,
+        filesystem: &F,
     ) -> Result<Receipt> {
         require_lock_scope_platform()?;
         let refused = |reason: &str| failure(format!("main-checkout-catch-up-refused: {reason}"));
@@ -1036,14 +1046,13 @@ impl GitDriver {
         }
         let old = ExpectedTip::Oid(expected_old.clone());
         let new = ExpectedTip::Oid(next.clone());
-        let wal = Wal::open_with(repo, &wal::OsFileSystem)?;
+        let wal = Wal::open_with(repo, filesystem)?;
         let resources = vec![target.as_str().to_owned()];
         crate::refs::admission(&wal, id, &resources)?;
         let kind = OperationKind::RefUpdate {
             worktree: Some(repo.trusted_main_root().to_string_lossy().into_owned()),
         };
-        let binding =
-            wal::canonical_digest(&(wal.repository_identity(), "refs", repo.trusted_main_root()))?;
+        let binding = catch_up_binding(wal.repository_identity(), repo)?;
         let intent = Intent {
             request_digest: wal::canonical_digest(&(
                 &kind,
@@ -1147,6 +1156,9 @@ impl GitDriver {
         )?;
         let before = self.checkouts(repo)?;
         let effect = (|| {
+            filesystem
+                .checkpoint("catch-up-before-cas")
+                .map_err(failure)?;
             scope.validate().map_err(failure)?;
             let cas = self.land_call(
                 repo,
@@ -1179,6 +1191,9 @@ impl GitDriver {
                 return Err(stale("compare-and-swap-stale"));
             }
             crate::refs::sync_refs(repo, target)?;
+            filesystem
+                .checkpoint("catch-up-before-read-tree")
+                .map_err(failure)?;
             let out = self.land_call(
                 repo,
                 &scope,
@@ -1239,6 +1254,121 @@ impl GitDriver {
                 crate::refs::pending(e, id)
             }
         })
+    }
+}
+/// The authority binding of a main-checkout catch-up chain. It differs from the refs port's
+/// binding, so recovery of an interrupted catch-up takes the main-checkout authority and the
+/// tree reconciliation instead of a linked checkout's dispatch-cwd lease.
+pub(crate) fn catch_up_binding(repo_identity: &str, repo: &RepoHandle) -> Result<String> {
+    Ok(wal::canonical_digest(&(
+        repo_identity,
+        "main-checkout-catch-up",
+        repo.trusted_main_root(),
+    ))?)
+}
+impl GitDriver {
+    /// Settle an interrupted main-checkout catch-up under its own authority: worktree-admin 40,
+    /// the main-checkout lock and the recovery leaf. Never repeats the CAS. A ref still at the
+    /// old tip records a loss (the CAS never ran; a retry uses a new id). A ref at the new tip
+    /// finishes the tree update only from an index still exactly at the old tree, the same
+    /// `read-tree -m -u` the door runs, and reads the result back. Anything else stays pending.
+    pub(crate) fn recover_main_checkout_catch_up(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        writer: &str,
+        id: &str,
+    ) -> Result<Outcome> {
+        require_lock_scope_platform()?;
+        let main = match self.resolve_repo(repo.trusted_main_root(), repo.trusted_main_root())? {
+            ResolveRepo::Repository(r) => r,
+            ResolveRepo::NotARepository => return Err(failure("land-main-handle-required")),
+        };
+        let operation_repo = self.checkout_repository(&main)?;
+        let repo = &operation_repo;
+        let mut scope = crate::refs::acquire_worktree_admin(repo, held)?;
+        scope
+            .acquire("main-checkout", &params(repo), Wait::Ms(5000))
+            .map_err(failure)?;
+        crate::recovery::leaf(&mut scope, repo)?;
+        let admin = scope.handle("worktree-admin").expect("acquired");
+        let wal = Wal::open_existing(repo.common_dir(), wal::OsFileSystem)?;
+        let chain = wal.inspect(id)?;
+        let i = chain.intent();
+        let main_root = repo.trusted_main_root().to_string_lossy().into_owned();
+        if !matches!(&i.kind, OperationKind::RefUpdate { worktree: Some(p) } if *p == main_root)
+            || i.writer_identity != writer
+            || i.repo_identity != wal.repository_identity()
+            || i.authority_binding != catch_up_binding(wal.repository_identity(), repo)?
+        {
+            return Err(failure("ref-authority-mismatch"));
+        }
+        if let Some(o) = chain.outcome() {
+            crate::refs::release_pin(self, repo, admin, &wal, &chain)?;
+            return Ok(o.clone());
+        }
+        let attempted = chain
+            .records()
+            .iter()
+            .any(|r| matches!(r.phase, Phase::TargetAttempt { .. }));
+        let outcome = if !attempted {
+            Outcome::AbandonedBeforeAttempt
+        } else {
+            if wal.native_lock_present(i)? {
+                return Err(recovery("ref-checkout-or-native-state-recovery-required"));
+            }
+            let (Tip::Oid(old), Tip::Oid(next)) = (&i.expected, &i.next) else {
+                return Err(recovery("ref-effect-unknown"));
+            };
+            let target = RefName::parse(&i.resource_set[0]).map_err(failure)?;
+            let observed = crate::refs::direct(self, repo, &target)?;
+            let tree = |oid: &str| {
+                self.land_text(
+                    repo,
+                    &scope,
+                    &["rev-parse", &format!("{oid}^{{tree}}")],
+                    &[],
+                )
+            };
+            if crate::refs::tip(&observed) == i.expected {
+                Outcome::Loss {
+                    observed: crate::refs::tip(&observed),
+                }
+            } else if crate::refs::tip(&observed) == i.next {
+                if !self.land_target_checkout(repo, &scope, &target)?
+                    || self.land_text(repo, &scope, &["symbolic-ref", "-q", "HEAD"], &[])?
+                        != target.as_str()
+                {
+                    return Err(recovery("ref-checkout-recovery-required"));
+                }
+                let next_tree = tree(next)?;
+                let index = self.land_text(repo, &scope, &["write-tree"], &[])?;
+                if index != next_tree {
+                    if index != tree(old)? {
+                        return Err(recovery("ref-checkout-recovery-required"));
+                    }
+                    let out =
+                        self.land_call(repo, &scope, &["read-tree", "-m", "-u", old, next], &[])?;
+                    if !out.success {
+                        return Err(out.error("checkout-recovery-required"));
+                    }
+                }
+                if self.land_text(repo, &scope, &["write-tree"], &[])? != next_tree
+                    || tree("HEAD")? != next_tree
+                {
+                    return Err(recovery("checkout-read-back-recovery-required"));
+                }
+                Outcome::Success {
+                    observed: crate::refs::tip(&observed),
+                    attribution: wal::Attribution::EffectObservedOnly,
+                }
+            } else {
+                return Err(recovery("ref-effect-unknown"));
+            }
+        };
+        let terminal = wal.append(&chain, Phase::Outcome(outcome.clone()))?;
+        crate::refs::release_pin(self, repo, admin, &wal, &terminal)?;
+        Ok(outcome)
     }
 }
 fn land_receipt(chain: &wal::Chain, repo: &RepoHandle) -> Result<Receipt> {
