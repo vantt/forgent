@@ -22,7 +22,7 @@ phase would open stops the phase with `NEEDS_CONTEXT`.
   fail only on these two refusals are the acceptance for this phase once phase 7 re-runs.
 
 ## Footprint
-`packages/git/rust/src/refs.rs`, `packages/git/rust/src/remote.rs`, `packages/git/rust/src/land.rs`,
+`packages/git/rust/src/refs.rs`, `packages/git/rust/src/remote.rs`, `packages/git/rust/src/land.rs`, `packages/git/rust/src/incidents.rs` (so `fgos git recover` settles an interrupted catch-up; added 2026-11-18),
 `packages/git/rust/tests/*land*`, `docs/platform/git/spec.md`.
 
 ## Steps
