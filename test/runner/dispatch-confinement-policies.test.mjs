@@ -15,8 +15,8 @@ import {
   validateOverrideConfinementShape,
   normalizeLegacyConfinement,
   resolveConfinementPolicy,
-  ConfinementPolicyError,
 } from '../../src/runner/dispatch/confinement/policies.mjs';
+import { ConfinementPolicyError } from '../../src/runner/dispatch/confinement/workspace-paths.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
 import {
   validateBackendInstanceConfigShape,

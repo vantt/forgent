@@ -15,7 +15,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { globalFgosDir } from '../../../config/facade.mjs';
 import { resolveConfinementTempRoot } from './cleanup.mjs';
-import { validateWorkspacePaths } from './policies.mjs';
+import { validateWorkspacePaths } from './workspace-paths.mjs';
 import { createGitInspect, gitPortOptions } from '../../../git/inspect.mjs';
 import { userRuntimeDir } from '../../../run-supervisor/runtime-dir.mjs';
 import { machineLoginStores } from '../llm-accounts.mjs';

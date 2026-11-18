@@ -10,8 +10,8 @@ import {
   normalizeLegacyConfinement,
   validateConfinementPolicyShape,
   validateOverrideConfinementShape,
-  ConfinementPolicyError,
 } from "./policies.mjs";
+import { ConfinementPolicyError } from "./workspace-paths.mjs";
 import { credentialStoreOf, credentialStoreProblem, providerCapacityForInvocation } from "../provider-capacity.mjs";
 import { capabilityConfinementOf } from "../../execution/capability-config.mjs";
 

@@ -14,8 +14,8 @@ import { buildConfinementRequest, validateConfinementRequest } from "../../src/r
 import {
   validateOverrideConfinementShape,
   resolveConfinementPolicy,
-  ConfinementPolicyError,
 } from "../../src/runner/dispatch/confinement/policies.mjs";
+import { ConfinementPolicyError } from "../../src/runner/dispatch/confinement/workspace-paths.mjs";
 import {
   ensureMachineBackendRegistryDefaults,
   resolveMachineBackendRegistryPath,

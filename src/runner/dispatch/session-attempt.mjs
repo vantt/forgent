@@ -16,7 +16,8 @@ import { adoptRun } from '../../run-supervisor/client.mjs';
 import { fgosDirFromRoot } from '../paths.mjs';
 import { withDefaultExecutor } from './config.mjs';
 import { createCredentialRenewal } from './provider-credential-renewal.mjs';
-import { BUILTIN_POLICIES, WORKSPACE_PATHS_RESOURCE } from './confinement/policies.mjs';
+import { BUILTIN_POLICIES } from './confinement/policies.mjs';
+import { WORKSPACE_PATHS_RESOURCE } from './confinement/workspace-paths.mjs';
 import {
   closeAttempt, leaseAccountForAttempt, openAttempt, prepareAttemptSeat, publishAttemptIntent,
   releaseSelectedProviderLease, renewLeasedLogin, startAndBind,

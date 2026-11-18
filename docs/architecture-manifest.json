@@ -1353,6 +1353,7 @@
     "src/runner/dispatch/confinement/authority.mjs": "infra",
     "src/runner/dispatch/confinement/request.mjs": "infra",
     "src/runner/dispatch/confinement/resources.mjs": "infra",
+    "src/runner/dispatch/confinement/workspace-paths.mjs": "infra",
     "src/runner/dispatch/confinement/cleanup.mjs": "infra",
     "src/runner/dispatch/confinement/attestation-store.mjs": "infra",
     "src/runner/dispatch/confinement/drivers/bwrap.mjs": "infra",
