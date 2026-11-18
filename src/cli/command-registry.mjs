@@ -364,6 +364,17 @@ export const COMMAND_REGISTRY = [
         },
         examples: ['fgos friction resolve --subject work:tsk-abc --reason done --by agent', 'fgos friction resolve --class verify-miss --reason filed:p-abc123 --by agent'],
       },
+      migrate: {
+        description: 'Copy every old friction shard line into the v2 record store under the fixed id legacy:<shard>:<line>. Explicit, under the observe lock, idempotent across runs and writers; the old shards are not touched. The answer reports the counts in and out and names any line that could not become a record.',
+        parameters: {
+          type: 'object',
+          properties: {
+            'to-records': { type: 'boolean', description: 'Required: migrate to v2 records.' },
+          },
+          required: ['to-records'],
+        },
+        examples: ['fgos friction migrate --to-records'],
+      },
       list: {
         description: 'List recorded frictions.',
         parameters: {

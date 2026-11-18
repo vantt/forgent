@@ -463,6 +463,12 @@
         "layer",
         "since"
       ],
+      "migrate": [
+        "dir",
+        "json",
+        "help",
+        "to-records"
+      ],
       "ping": [
         "dir",
         "json",

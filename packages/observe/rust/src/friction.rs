@@ -7,17 +7,18 @@
 
 use crate::contract::{RecordSource, SourceError, Subject, Window};
 use crate::query::{bucket_start, run, Agg, AggValue, Bucket, Query, QueryContext};
-use crate::record::registry::{EmbeddedDeclaration, Registry};
+use crate::record::registry::{load_registry, EmbeddedDeclaration, Registry};
 use crate::record::store::{new_record_id, RecordDoor, WriteOutcome, RECORDS_STORE};
 use crate::record::types::{
     AttrValue, Basis, Origin, Record, Redaction, SubjectRef, DETAIL_MAX_BYTES, RECORD_VERSION,
 };
-use crate::shard::{self, is_session_shard, StoredRecord, UnsafeShard};
+use crate::shard::{self, is_session_shard, StoredRecord, TornTail, UnsafeShard};
+use crate::store_lock::acquire_store_lock;
 use crate::time::{now_iso, ParsedWindow};
 use fgos_host_runtime::civil_time::{format_unix_millis_rfc3339, parse_rfc3339_millis};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::Path;
 
 /// The declaration of both friction kinds, for the composition root's embedded list.
@@ -280,7 +281,7 @@ impl Event {
         }
         Some(Record {
             v: RECORD_VERSION,
-            id: format!("legacy:{}:{}", self.shard, self.line),
+            id: legacy_id(&self.shard, self.line),
             kind: RECORDED_KIND.to_owned(),
             ts: self.text("ts").unwrap_or_default().to_owned(),
             end_ts: None,
@@ -297,6 +298,11 @@ impl Event {
             redaction: None,
         })
     }
+}
+
+/// The id a line of an old `friction` shard has as a v2 record, before and after migration.
+fn legacy_id(shard: &str, line: usize) -> String {
+    format!("legacy:{shard}:{line}")
 }
 
 /// The instant of a stamp. A trailing `~` (written by a past migration for a
@@ -454,6 +460,16 @@ fn read_events(root: &Path) -> Result<Vec<Event>, String> {
         }
         shard::warn_skipped(store, &invalid);
     }
+    // A migrated old line exists as a v2 record under its legacy id, and two writers may each have stored the same
+    // v2 record: every friction counts once, the v2 record first.
+    let mut seen = HashSet::new();
+    events.retain(|event| match &event.record {
+        Some(record) => seen.insert(record.id.clone()),
+        None => true,
+    });
+    events.retain(|event| {
+        event.record.is_some() || !seen.contains(&legacy_id(&event.shard, event.line))
+    });
     events.sort_by_key(|event| event.millis);
     Ok(events)
 }
@@ -652,6 +668,216 @@ pub fn record(root: &Path, input: FrictionInput) -> Result<Value, String> {
         answer["message"] = json!(message);
     }
     Ok(answer)
+}
+
+/// What `migrate_to_records` did, in numbers.
+#[derive(Default)]
+struct MigrationCounts {
+    recorded_in: usize,
+    resolved_in: usize,
+    other_lines: usize,
+    unusable: Vec<String>,
+}
+
+fn utc_stamp(millis: i64) -> Result<String, String> {
+    format_unix_millis_rfc3339(millis, 0).ok_or_else(|| "instant out of range".to_owned())
+}
+
+/// The v2 record of one old shard line, or why the line cannot become one. `after` is the stamp of the nearest
+/// earlier line of the same shard, for a resolve whose own stamp is missing.
+fn migrated_record(
+    event: &Value,
+    shard: &str,
+    line: usize,
+    after: Option<i64>,
+) -> Result<Record, String> {
+    let text = |name: &str| event.get(name).and_then(Value::as_str);
+    let resolved = event.get("type").and_then(Value::as_str) == Some("friction-resolved");
+    let subject = event.get("subject");
+    let field = |name: &str| {
+        subject
+            .and_then(|s| s.get(name))
+            .and_then(Value::as_str)
+            .filter(|v| !v.is_empty())
+            .map(str::to_owned)
+    };
+    let (Some(kind), Some(id)) = (field("kind"), field("id")) else {
+        return Err("no subject".to_owned());
+    };
+    let millis = match text("ts").and_then(stamp_millis) {
+        Some(millis) => millis,
+        None if resolved => after
+            .map(|m| m + 1)
+            .ok_or_else(|| "a resolve with no instant and no earlier line".to_owned())?,
+        None => return Err("ts is not an RFC 3339 instant".to_owned()),
+    };
+    let ts = match text("ts") {
+        Some(ts) if stamp_millis(ts) == Some(millis) && !ts.ends_with('~') => ts.to_owned(),
+        _ => utc_stamp(millis)?,
+    };
+    let mut attrs = BTreeMap::new();
+    let mut measures = BTreeMap::new();
+    let mut detail = None;
+    let mut redaction = None;
+    let record_kind = if resolved {
+        for (attr, field) in [
+            (CLASS_ATTR, "class"),
+            (PRODUCER_ATTR, "by"),
+            (REASON_ATTR, "reason"),
+        ] {
+            if let Some(value) = text(field) {
+                attrs.insert(attr.to_owned(), text_attr(value));
+            }
+        }
+        RESOLVED_KIND
+    } else {
+        for (attr, field) in [
+            (LAYER_ATTR, "layer"),
+            (CLASS_ATTR, "errorClass"),
+            (DISPOSITION_ATTR, "disposition"),
+            (PRODUCER_ATTR, "producer"),
+            (DOC_TYPE_ATTR, "docType"),
+        ] {
+            if let Some(value) = text(field) {
+                attrs.insert(attr.to_owned(), text_attr(value));
+            }
+        }
+        if let Some(attempts) = event.get("attempts").and_then(Value::as_u64) {
+            measures.insert(ATTEMPTS_MEASURE.to_owned(), attempts.into());
+        }
+        (detail, redaction) = stamped_detail(text("detail").unwrap_or_default());
+        RECORDED_KIND
+    };
+    Ok(Record {
+        v: RECORD_VERSION,
+        id: legacy_id(shard, line),
+        kind: record_kind.to_owned(),
+        ts,
+        end_ts: None,
+        subject: SubjectRef { kind, id },
+        refs: Vec::new(),
+        attrs,
+        measures,
+        basis: Basis::Reported,
+        origin: Origin {
+            source: LEGACY_ORIGIN.to_owned(),
+            component: Some("observe".to_owned()),
+            writer: current_caller().session_id,
+            ..Origin::default()
+        },
+        detail,
+        redaction,
+    })
+}
+
+/// Number of friction records in the v2 store, and the ids already there (any kind: a legacy id is never reused).
+fn stored_friction(root: &Path) -> Result<(HashSet<String>, usize), String> {
+    let read =
+        shard::read_store(root, RECORDS_STORE, UnsafeShard::Fail).map_err(|e| e.to_string())?;
+    let mut ids = HashSet::new();
+    let mut friction = 0;
+    for stored in read.records {
+        let Some(id) = stored.value.get("id").and_then(Value::as_str) else {
+            continue;
+        };
+        if ids.insert(id.to_owned())
+            && stored
+                .value
+                .get("kind")
+                .and_then(Value::as_str)
+                .is_some_and(|k| k == RECORDED_KIND || k == RESOLVED_KIND)
+        {
+            friction += 1;
+        }
+    }
+    Ok((ids, friction))
+}
+
+/// Copies every old `friction` shard line into the v2 record store, each under its fixed id `legacy:<shard>:<line>`.
+/// The whole run holds the observe lock, checks the ids of the whole record store (every writer's shard) before
+/// writing, and appends once, so a second run, or a run from another writer, writes nothing already there. The old
+/// shards are not touched. A line that cannot become a valid record is counted and named, never silently dropped.
+pub fn migrate_to_records(root: &Path) -> Result<Value, String> {
+    let _lock = acquire_store_lock(root).map_err(|e| e.to_string())?;
+    let registry = load_registry(&[FRICTION_DECLARATION], None, Some(root))
+        .map_err(|e| format!("registry load failed: {e}"))?;
+    let (existing, before) = stored_friction(root)?;
+    let old = shard::read_store(root, STORE, UnsafeShard::Fail).map_err(|e| e.to_string())?;
+
+    let mut counts = MigrationCounts::default();
+    let mut lines = Vec::new();
+    let mut already = 0;
+    let mut last: HashMap<&str, i64> = HashMap::new();
+    let mut recorded_at: HashMap<(&str, String, String), i64> = HashMap::new();
+    for StoredRecord { value, shard, line } in &old.records {
+        let kind = value.get("type").and_then(Value::as_str).unwrap_or("");
+        let resolved = match kind {
+            "friction-recorded" => {
+                counts.recorded_in += 1;
+                false
+            }
+            "friction-resolved" => {
+                counts.resolved_in += 1;
+                true
+            }
+            _ => {
+                counts.other_lines += 1;
+                continue;
+            }
+        };
+        let place = format!("{shard}:{line}");
+        let mut record =
+            match migrated_record(value, shard, *line, last.get(shard.as_str()).copied()) {
+                Ok(record) => record,
+                Err(reason) => {
+                    counts.unusable.push(format!("{place}: {reason}"));
+                    continue;
+                }
+            };
+        let mut millis = parse_rfc3339_millis(&record.ts);
+        let key = (
+            shard.as_str(),
+            record.subject.kind.clone(),
+            record.subject.id.clone(),
+        );
+        match (resolved, millis) {
+            (false, Some(m)) => {
+                recorded_at.insert(key, m);
+            }
+            // Inside a session shard an equal instant settles by file order; keep that after the lines share
+            // one shard.
+            (true, Some(m)) if recorded_at.get(&key) == Some(&m) && is_session_shard(shard) => {
+                millis = Some(m + 1);
+                record.ts = utc_stamp(m + 1)?;
+            }
+            _ => {}
+        }
+        if let Some(m) = millis {
+            last.insert(shard.as_str(), m);
+        }
+        if existing.contains(&record.id) {
+            already += 1;
+            continue;
+        }
+        if let Err(e) = registry.validate(&record) {
+            counts.unusable.push(format!("{place}: {e}"));
+            continue;
+        }
+        lines.push(shard::encode_line(&record).map_err(|e| format!("{place}: {e}"))?);
+    }
+    if !lines.is_empty() {
+        shard::append_lines(root, RECORDS_STORE, TornTail::Heal, &lines)
+            .map_err(|e| format!("append failed: {e}"))?;
+    }
+    let (_, after) = stored_friction(root)?;
+    Ok(json!({
+        "ok": counts.unusable.is_empty(),
+        "in": { "recorded": counts.recorded_in, "resolved": counts.resolved_in, "other": counts.other_lines },
+        "written": lines.len(),
+        "alreadyMigrated": already,
+        "unusable": counts.unusable,
+        "records": { "before": before, "after": after },
+    }))
 }
 
 /// Resolves friction: every unsettled friction of a subject, or of a signature. Each settled subject gets one
@@ -1516,5 +1742,156 @@ mod tests {
             );
         }
         let _ = fs::remove_dir_all(&tmp);
+    }
+
+    fn old_store(tmp: &Path) {
+        let lines = [
+            legacy_recorded("tsk-a", "shared-fault", "2026-10-01T10:00:00.000Z"),
+            legacy_recorded("tsk-b", "other-fault", "2026-10-01T11:00:00.000Z"),
+            resolved_line("tsk-a", "2026-10-02T10:00:00.000Z"),
+            json!({ "v": 1, "type": "migration", "ts": "2026-10-01T09:00:00.000Z" }).to_string(),
+        ];
+        fs::write(
+            friction_dir(tmp).join("old-writer.jsonl"),
+            format!("{}\n", lines.join("\n")),
+        )
+        .unwrap();
+    }
+
+    #[test]
+    fn migrating_old_shards_twice_stores_every_line_once() {
+        let tmp = temp_root("migrate-twice");
+        old_store(&tmp);
+        let first = migrate_to_records(&tmp).unwrap();
+        assert_eq!(first["ok"], true, "{first}");
+        assert_eq!(
+            first["in"],
+            json!({ "recorded": 2, "resolved": 1, "other": 1 })
+        );
+        assert_eq!(first["written"], 3);
+        assert_eq!(first["records"], json!({ "before": 0, "after": 3 }));
+
+        let second = migrate_to_records(&tmp).unwrap();
+        assert_eq!(second["written"], 0, "{second}");
+        assert_eq!(second["alreadyMigrated"], 3);
+        assert_eq!(second["records"], json!({ "before": 3, "after": 3 }));
+        assert_eq!(stored_records(&tmp).len(), 3);
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn a_migrated_line_keeps_its_layer_class_subject_and_has_no_kind() {
+        let tmp = temp_root("migrate-mapping");
+        old_store(&tmp);
+        migrate_to_records(&tmp).unwrap();
+        let stored = stored_records(&tmp);
+        let recorded = stored
+            .iter()
+            .find(|r| r["id"] == "legacy:old-writer:1")
+            .expect("line 1 migrates under its legacy id");
+        assert_eq!(recorded["kind"], RECORDED_KIND);
+        assert_eq!(
+            recorded["subject"],
+            json!({ "kind": "work", "id": "tsk-a" })
+        );
+        assert_eq!(recorded["attrs"][LAYER_ATTR], "verification");
+        assert_eq!(recorded["attrs"][CLASS_ATTR], "shared-fault");
+        assert_eq!(recorded["attrs"][PRODUCER_ATTR], "test");
+        assert_eq!(recorded["measures"][ATTEMPTS_MEASURE], 1);
+        assert!(recorded["attrs"].get(KIND_ATTR).is_none());
+        assert_eq!(recorded["ts"], "2026-10-01T10:00:00.000Z");
+        let resolved = stored
+            .iter()
+            .find(|r| r["id"] == "legacy:old-writer:3")
+            .expect("the resolve migrates too");
+        assert_eq!(resolved["kind"], RESOLVED_KIND);
+        assert_eq!(resolved["attrs"][REASON_ATTR], "done");
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn a_store_migrated_by_two_writers_or_half_migrated_counts_every_friction_once() {
+        let tmp = temp_root("migrate-mixed");
+        old_store(&tmp);
+        migrate_to_records(&tmp).unwrap();
+        // Another writer migrated the same lines into its own shard.
+        let records = tmp.join(".fgos/observe/records");
+        let shard = fs::read_dir(&records)
+            .unwrap()
+            .filter_map(Result::ok)
+            .find(|e| e.path().extension().is_some_and(|x| x == "jsonl"))
+            .unwrap()
+            .path();
+        fs::copy(&shard, records.join("other-writer.jsonl")).unwrap();
+
+        let listed = list(&tmp, None, None, None).unwrap();
+        assert_eq!(listed.as_array().unwrap().len(), 2, "{listed}");
+        assert_eq!(classes(&tmp).unwrap().as_array().unwrap().len(), 2);
+        assert_eq!(show(&tmp, "work:tsk-b").unwrap()["unsettled"], 1);
+        assert_eq!(show(&tmp, "work:tsk-a").unwrap()["unsettled"], 0);
+        let again = migrate_to_records(&tmp).unwrap();
+        assert_eq!(again["written"], 0);
+        assert_eq!(again["records"]["after"], 3, "{again}");
+
+        // A half migrated store: the old shard still readable, one line already a record.
+        let half = temp_root("migrate-half");
+        old_store(&half);
+        let one = temp_root("migrate-half-src");
+        old_store(&one);
+        migrate_to_records(&one).unwrap();
+        fs::copy(
+            fs::read_dir(one.join(".fgos/observe/records"))
+                .unwrap()
+                .filter_map(Result::ok)
+                .find(|e| e.path().extension().is_some_and(|x| x == "jsonl"))
+                .unwrap()
+                .path(),
+            half.join(".fgos/observe/records/other-writer.jsonl"),
+        )
+        .unwrap();
+        assert_eq!(
+            list(&half, None, None, None)
+                .unwrap()
+                .as_array()
+                .unwrap()
+                .len(),
+            2
+        );
+        for dir in [&tmp, &half, &one] {
+            let _ = fs::remove_dir_all(dir);
+        }
+    }
+
+    #[test]
+    fn recording_and_migrating_never_write_the_old_shards() {
+        let tmp = temp_root("no-v1-write");
+        old_store(&tmp);
+        let shard = friction_dir(&tmp).join("old-writer.jsonl");
+        let before = fs::read(&shard).unwrap();
+        record(&tmp, input_of("tsk-new", "fresh-fault")).unwrap();
+        resolve(
+            &tmp,
+            ResolveTarget::Class("fresh-fault".into()),
+            "done",
+            "test",
+        )
+        .unwrap();
+        migrate_to_records(&tmp).unwrap();
+        assert_eq!(fs::read(&shard).unwrap(), before);
+        assert_eq!(fs::read_dir(friction_dir(&tmp)).unwrap().count(), 1);
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn migrate_needs_the_explicit_to_records_flag() {
+        let err = crate::friction_cli::dispatch(&crate::contract::ObserveRequest {
+            operation: "friction".into(),
+            sub: "migrate".into(),
+            args: Vec::new(),
+            root: std::env::temp_dir(),
+            stdin: None,
+        })
+        .unwrap_err();
+        assert!(err.contains("--to-records"), "{err}");
     }
 }

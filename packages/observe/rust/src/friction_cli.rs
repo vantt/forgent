@@ -7,12 +7,12 @@ use crate::record::types::SubjectRef;
 use serde_json::json;
 
 pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
-    "record", "resolve", "list", "show", "rank", "classes", "ping",
+    "record", "resolve", "migrate", "list", "show", "rank", "classes", "ping",
 ];
 
 /// Whether the verb appends to the friction store.
 pub fn writes(req: &ObserveRequest) -> bool {
-    matches!(req.sub.as_str(), "record" | "resolve")
+    matches!(req.sub.as_str(), "record" | "resolve" | "migrate")
 }
 
 fn required<'a>(flags: &'a Flags, flag: &str) -> Result<&'a str, String> {
@@ -114,6 +114,13 @@ pub fn dispatch(req: &ObserveRequest) -> Result<serde_json::Value, String> {
                 required(&flags, "--reason")?,
                 required(&flags, "--by")?,
             )
+        }
+        "migrate" => {
+            let flags = parse(&[], &["--to-records"], false)?;
+            if !flags.switch("--to-records") {
+                return Err(invalid_input("migrate needs --to-records"));
+            }
+            friction::migrate_to_records(&req.root)
         }
         "list" => {
             let flags = parse(&["--kind", "--layer", "--since"], &[], false)?;
