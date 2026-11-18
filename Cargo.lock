@@ -538,6 +538,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-supervision"
+version = "0.2.0"
+dependencies = [
+ "fgos-event-store",
+ "fgos-git",
+ "fgos-holder-lock",
+ "fgos-identity",
+ "fgos-observe",
+ "fgos-write-scope",
+ "fgos-yaml-doc",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
+]
+
+[[package]]
 name = "fgos-terminal-control"
 version = "0.2.0"
 dependencies = [

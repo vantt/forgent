@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkAll, checkPlanDir, main } from '../../scripts/plan-contract-check.mjs';
+import { STATUSES, checkAll, checkPlanDir, main } from '../../scripts/plan-contract-check.mjs';
 
 const SCRIPT = fileURLToPath(new URL('../../scripts/plan-contract-check.mjs', import.meta.url));
 const SHA = 'a'.repeat(40);
@@ -113,4 +113,9 @@ test('a plan whose frontmatter is not valid YAML is legacy unless it claims the 
   assert.equal(old.legacy, true);
   assert.equal(mine.legacy, false);
   assert.ok(mine.errors[0].startsWith('frontmatter is not valid YAML'));
+});
+
+test('the script statuses equal the plan vocabulary contract', () => {
+  const vocabulary = JSON.parse(fs.readFileSync(new URL('../../packages/supervision/contracts/plan-vocabulary.v1.json', import.meta.url), 'utf8'));
+  assert.deepEqual(STATUSES, vocabulary.statuses);
 });

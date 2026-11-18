@@ -1,0 +1,48 @@
+{
+  "contract": "observe-kinds.v1",
+  "subjectKinds": ["plan", "session", "discussion"],
+  "attrs": {
+    "fgos.watcher.mode": { "type": "string", "values": ["active", "idle"] },
+    "fgos.watcher.outcome": { "type": "string", "values": ["noop", "woke-supervisor", "notified", "error", "skipped-busy"] },
+    "fgos.supervisor.trigger": { "type": "string" },
+    "fgos.supervisor.outcome": {
+      "type": "string",
+      "values": ["started", "already-live", "starting", "nothing-unhandled", "nothing-admissible", "identity-unknown", "role-held-other-project", "project-id-missing", "start-failed", "backoff"]
+    },
+    "fgos.discussion.from": { "type": "string" },
+    "fgos.discussion.to": { "type": "string" },
+    "fgos.discussion.path": { "type": "string" }
+  },
+  "measures": {
+    "fgos.watcher.interval": { "unit": "s" },
+    "fgos.plans.ready": { "unit": "1" },
+    "fgos.plans.running": { "unit": "1" },
+    "fgos.watcher.raised": { "unit": "1" },
+    "fgos.watcher.duplicate": { "unit": "1" },
+    "fgos.watcher.wakes": { "unit": "1" },
+    "fgos.watcher.notifies": { "unit": "1" },
+    "fgos.watcher.errors": { "unit": "1" },
+    "fgos.watcher.unmeasured": { "unit": "1" }
+  },
+  "kinds": {
+    "fgos.watcher.tick": {
+      "subjects": [],
+      "attrs": ["fgos.watcher.mode", "fgos.watcher.outcome"],
+      "measures": [
+        "fgos.watcher.interval", "fgos.plans.ready", "fgos.plans.running", "fgos.watcher.raised",
+        "fgos.watcher.duplicate", "fgos.watcher.wakes", "fgos.watcher.notifies", "fgos.watcher.errors",
+        "fgos.watcher.unmeasured"
+      ]
+    },
+    "fgos.supervisor.wake": {
+      "subjects": ["session"],
+      "attrs": ["fgos.supervisor.trigger", "fgos.supervisor.outcome"],
+      "measures": []
+    },
+    "fgos.discussion.status": {
+      "subjects": ["discussion"],
+      "attrs": ["fgos.discussion.from", "fgos.discussion.to", "fgos.discussion.path"],
+      "measures": []
+    }
+  }
+}
