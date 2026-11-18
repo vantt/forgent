@@ -25,8 +25,7 @@ logic beyond copying facts that are already known.
    - Validate `--plan` through the Convention door: the path is an existing `plans/<dir>`.
    - Store `unit.plan {dir, phase}` in `unit.json`. A run without a plan stays valid.
 2. In `unit-summary.mjs`, each attempt gains the optional fields `accountId` (from the selection `run.mjs:866`
-   already reads), `durationMs` (from the binding), `usage` (passed through from the run result as it is) and `slot` (the
-   worker slot the attempt ran in, copied from `runs/<n>/attempt-intent.json` `slot` when it is recorded; null otherwise). The
+   already reads), `durationMs` (from the binding) and `usage` (passed through from the run result as it is). The
    summary gains `plan {dir, phase}`. Extend `unit-summary.read.v3.json` additively, as `verify` was.
 3. Settlement takes its `durationMs` from the timer it already has, so `result.json.durationMs` stops being null. If
    that timer is the same value as the binding, keep one source and remove the null field instead.

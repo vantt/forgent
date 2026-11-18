@@ -15,9 +15,9 @@
    - `fgos.run.attempt` is a span with:
      - refs to `plan` and `phase`;
      - attrs `gen_ai.provider.name`, `gen_ai.request.model`, `fgos.account.id`, `fgos.executor.id`, `fgos.persona`,
-       `fgos.outcome`, `fgos.failure.code`, `fgos.fallback`, and the seat identity `fgos.seat.id` (seat/round/attempt
-       key), `fgos.seat.role` and `fgos.slot.id` (when phase 3 recorded one). The supervisor plan's `lane-freed`
-       trigger reads these: a lane is a pooled worker seat, freed when its attempt span ends;
+       `fgos.outcome`, `fgos.failure.code`, `fgos.fallback`, `fgos.seat.id` (seat/round/attempt key) and `fgos.seat.role`.
+       The supervisor plan's `lane-freed` trigger reads the span's `endTs`, the machine in `origin.host` and the plan
+       ref (a lane is a live worker seat counted per machine; a lane id, if one is minted later, is that plan's own attr);
      - measures for tokens and `fgos.duration`.
    - `fgos.unit.settled` is a span with attrs `fgos.workflow`, `fgos.pattern`, `fgos.outcome` and
      `fgos.infrastructure`, and measures `fgos.attempts` and `fgos.seats`.
