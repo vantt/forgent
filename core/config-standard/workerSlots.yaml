@@ -4,3 +4,5 @@
 workerSlots:
   # @fgos:doc Most work items that may run at once; a claim past it is refused, and null leaves the ceiling unarmed so no claim is refused.
   ceiling: null
+  # @fgos:doc How long a top-level worker seat waits for a free lane before it fails with lane-pool-full. In seconds. Minimum: 0. Default: 900.
+  laneWaitSec: 900

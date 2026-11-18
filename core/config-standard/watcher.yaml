@@ -1,0 +1,32 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc The project watcher: a no-LLM timer tick that runs detection definitions and records each raised event once.
+watcher:
+  # @fgos:doc Whether the watcher timer runs on this machine. Default: false.
+  enabled: false
+  # @fgos:doc Seconds between ticks while the project has live work. In seconds. Minimum: 1. Default: 60.
+  activeIntervalSec: 60
+  # @fgos:doc Seconds between ticks while the project is idle. In seconds. Minimum: 1. Default: 900.
+  idleIntervalSec: 900
+  # @fgos:doc How far before the last tick edge the definitions look. In seconds. Minimum: 0. Default: 86400.
+  lookbackSec: 86400
+  # @fgos:doc How many tick intervals may pass without a tick before the watcher counts as overdue. In ticks. Minimum: 1. Default: 3.
+  overdueFactor: 3
+  # @fgos:doc Files or directories of detection definitions, release- or repo-relative, each passed as one definition path; a project may add its own.
+  definitions:
+    - core/watcher/definitions
+    - core/attention/definitions/head-gone.query.json
+    - core/attention/definitions/plan-no-progress.query.json
+    - core/questions/definitions
+  # @fgos:doc The action for a raised row kind that has no entry in actions. Values: wake-supervisor | notify | none. Default: wake-supervisor.
+  defaultAction: wake-supervisor
+  # @fgos:doc The action per row kind.
+  actions:
+    supervisor-wake-failed: notify
+    supervisor-stuck: notify
+  # @fgos:doc The mailbox recipient of notify rows; null counts a notify row in errors as notify-unavailable.
+  notifyTo: null
+  # @fgos:doc Consecutive failed wakes before a supervisor-wake-failed row is raised. In wakes. Minimum: 1. Default: 3.
+  wakeFailureLimit: 3
+  # @fgos:doc Consecutive already-live wakes with events still unhandled before a supervisor-stuck row is raised. In wakes. Minimum: 1. Default: 15.
+  stuckWakeLimit: 15

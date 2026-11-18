@@ -1,0 +1,64 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: urn:fgos:config-schema:watcher:v1
+$comment: "owner: supervision"
+description: "The project watcher: a no-LLM timer tick that runs detection definitions and records each raised event once."
+type: object
+properties:
+  enabled:
+    description: Whether the watcher timer runs on this machine.
+    type: boolean
+    x-fgos-scope: global-only
+  activeIntervalSec:
+    description: Seconds between ticks while the project has live work. In seconds.
+    type: integer
+    minimum: 1
+    x-fgos-scope: both
+  idleIntervalSec:
+    description: Seconds between ticks while the project is idle. In seconds.
+    type: integer
+    minimum: 1
+    x-fgos-scope: both
+  lookbackSec:
+    description: How far before the last tick edge the definitions look. In seconds.
+    type: integer
+    minimum: 0
+    x-fgos-scope: both
+  overdueFactor:
+    description: How many tick intervals may pass without a tick before the watcher counts as overdue. In ticks.
+    type: integer
+    minimum: 1
+    x-fgos-scope: both
+  definitions:
+    description: Files or directories of detection definitions, release- or repo-relative, each passed as one definition path; a project may add its own.
+    type: array
+    items:
+      type: string
+      minLength: 1
+    x-fgos-scope: both
+  defaultAction:
+    description: The action for a raised row kind that has no entry in actions.
+    type: string
+    enum: [wake-supervisor, notify, none]
+    x-fgos-scope: both
+  actions:
+    description: The action per row kind.
+    type: object
+    additionalProperties:
+      description: The action for this row kind.
+      type: string
+      enum: [wake-supervisor, notify, none]
+    x-fgos-scope: both
+  notifyTo:
+    description: The mailbox recipient of notify rows; null counts a notify row in errors as notify-unavailable.
+    type: [string, "null"]
+    x-fgos-scope: both
+  wakeFailureLimit:
+    description: Consecutive failed wakes before a supervisor-wake-failed row is raised. In wakes.
+    type: integer
+    minimum: 1
+    x-fgos-scope: both
+  stuckWakeLimit:
+    description: Consecutive already-live wakes with events still unhandled before a supervisor-stuck row is raised. In wakes.
+    type: integer
+    minimum: 1
+    x-fgos-scope: both

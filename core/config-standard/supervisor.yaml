@@ -1,0 +1,6 @@
+# @fgos:v1
+# see: fgos config standard
+# @fgos:doc The project supervisor head and its lead pool.
+supervisor:
+  # @fgos:doc Most leads the supervisor runs at once; it equals the default lane count and is not derived at read time. In leads. Minimum: 1. Default: 4.
+  maxLeads: 4
