@@ -14,7 +14,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CONFINED_MARKER_ENV } from '../config/facade.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
-import { HEAD_ANSWERED_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_START_VERB, MAX_FRAME_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
+import { HEAD_ANSWERED_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_START_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
 import { headRoleOf, startHeadSession } from './head-start.mjs';
 import { markSuccessorAnswered, requestRotation, rotationHolds } from '../session-rotation/rotate.mjs';
 
@@ -124,7 +124,7 @@ async function readStdin() {
   let size = 0;
   for await (const chunk of process.stdin) {
     size += chunk.length;
-    if (size > MAX_FRAME_BYTES) throw new Error('the request is over the size limit');
+    if (size > MAX_REQUEST_BYTES) throw new Error('the request is over the size limit');
     chunks.push(chunk);
   }
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));

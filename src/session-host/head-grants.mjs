@@ -1,8 +1,9 @@
 // head-grants.mjs -- what a head session's role may write and ask for.
 //
 // One frozen table keyed by persona and one reader, `grantOf(role)`, which nothing else bypasses: the launch reads
-// `writes` (project-relative paths the sandbox binds writable), `mailbox` and `peers`, and the request socket reads `verbs`. A later
-// change moves the data into the standard config by changing only the body of `grantOf`.
+// `writes` (project-relative paths: a directory the sandbox binds writable, a file it keeps read-only that only the
+// request socket's `head write` replaces), `mailbox` and `peers`, and the request socket reads `verbs` and `writes`.
+// A later change moves the data into the standard config by changing only the body of `grantOf`.
 
 /**
  * The variable that names a head's request socket inside its sandbox. The launch sets it for a role whose grant has
@@ -23,7 +24,7 @@ export const HEAD_BIND_SESSION_VERB = 'head bind session';
 
 /**
  * Every head may bind its agent session, rotate itself, report its first turn as a successor and take its role back
- * after a failed rotation; only the secretary may also start sessions.
+ * after a failed rotation; only the secretary may also start sessions and write its granted file (the backlog).
  */
 const HEAD_VERBS = Object.freeze([HEAD_BIND_SESSION_VERB, 'head rotate', 'head answered', 'head restore role']);
 
@@ -35,7 +36,7 @@ const HEAD_VERBS = Object.freeze([HEAD_BIND_SESSION_VERB, 'head rotate', 'head a
 const GRANTS = Object.freeze({
   secretary: Object.freeze({
     writes: Object.freeze(['plans', 'docs/backlog.md', 'docs/discussions']),
-    verbs: Object.freeze(['head start', ...HEAD_VERBS]),
+    verbs: Object.freeze(['head start', 'head write', ...HEAD_VERBS]),
     mailbox: true,
     peers: true,
   }),

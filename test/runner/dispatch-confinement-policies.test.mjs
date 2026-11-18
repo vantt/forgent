@@ -715,7 +715,7 @@ test('a posture is carried only when the registered backend executable exists: a
   }
 });
 
-// ─── workspace-paths: named paths of the project root, bound writable one by one ─────
+// ─── workspace-paths: named paths of the project root, a directory bound writable, a file left read-only ─────
 
 const pathsPolicy = (paths) => ({
   ...BUILTIN_POLICIES['host-write-denied'],
@@ -738,15 +738,12 @@ test('workspace-paths: the shape takes project-relative paths and refuses empty,
   }), /unknown key "paths"/);
 });
 
-test('workspace-paths: the resolver binds a granted directory, binds the parent of a granted file read-write with its other entries bound back read-only, and refuses a missing path, a file in the project root and any symbolic link on the way', () => {
+test('workspace-paths: the resolver binds a granted directory writable, gives a granted file no bind (only the head write door writes it), and refuses a missing path and any symbolic link on the way', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-ws-paths-'));
   try {
     fs.mkdirSync(path.join(root, 'plans'));
     fs.mkdirSync(path.join(root, 'docs', 'discussions'), { recursive: true });
-    fs.mkdirSync(path.join(root, 'docs', 'sub'));
     fs.writeFileSync(path.join(root, 'docs', 'backlog.md'), '# b\n');
-    fs.writeFileSync(path.join(root, 'docs', 'other.md'), 'o\n');
-    fs.writeFileSync(path.join(root, 'docs', '.hidden'), 'h\n');
     fs.writeFileSync(path.join(root, 'top.md'), 't\n');
     fs.symlinkSync(path.join(root, 'docs'), path.join(root, 'link'));
     const resolve = (paths) => resolveConfinementResources({
@@ -755,34 +752,20 @@ test('workspace-paths: the resolver binds a granted directory, binds the parent 
       grants: [{ resource: 'workspace-paths', access: 'read-write', scope: 'dispatch', paths }],
     });
     const real = fs.realpathSync(root);
-    const docs = path.join(real, 'docs');
-    const bound = resolve(['plans', 'docs/backlog.md', 'docs/discussions']).filter((r) => r.resource === 'workspace-paths');
-    // The parent of a granted file is bound read-write (its names resolve live on the host) before the mounts it would
-    // hide; every other entry it holds, dotfiles included, is bound back read-only; the file gets no bind of its own.
-    assert.deepEqual(bound.map((r) => [r.delivery, r.hostTarget, r.access]), [
-      ['parent', docs, 'read-write'],
+    const bound = (paths) => resolve(paths).filter((r) => r.resource === 'workspace-paths').map((r) => [r.delivery, r.hostTarget, r.access]);
+    // The granted file and its directory stay read-only: no bind of the file, none of its parent.
+    assert.deepEqual(bound(['plans', 'docs/backlog.md', 'docs/discussions']), [
       ['mount', path.join(real, 'plans'), 'read-write'],
-      ['mount', path.join(docs, 'discussions'), 'read-write'],
+      ['mount', path.join(real, 'docs', 'discussions'), 'read-write'],
     ]);
-    assert.deepEqual(bound[0].kept, [
-      { path: path.join(docs, '.hidden') },
-      { path: path.join(docs, 'other.md') },
-      { path: path.join(docs, 'sub') },
-    ]);
-    // A file inside a granted directory is writable by name already: no parent, no bind of its own.
-    assert.deepEqual(resolve(['docs', 'docs/backlog.md']).filter((r) => r.resource === 'workspace-paths').map((r) => [r.delivery, r.hostTarget]), [['mount', docs]]);
+    assert.deepEqual(bound(['top.md']), [], 'a file in the project root is checked, never bound');
     assert.throws(() => resolve(['nope']), (err) => err.code === 'workspace-path-missing');
     assert.throws(() => resolve(['link']), /symbolic link/);
     assert.throws(() => resolve(['../x']), (err) => err.code === 'confinement-grant-invalid');
-    // A file directly in the project root: its parent would make the whole root writable, so it is refused.
-    assert.throws(() => resolve(['top.md']), (err) => err.code === 'confinement-grant-invalid' && /below the project root/.test(err.message));
-    // A redirected directory on the way (here one that names the project root) would bind its target's parent: refused.
+    // A redirected directory on the way (here one that names the project root): refused.
     fs.symlinkSync('.', path.join(root, 'up'));
     assert.throws(() => resolve(['up/top.md']), (err) => err.code === 'confinement-grant-invalid' && /"up" .* symbolic link/.test(err.message));
     assert.throws(() => resolve(['link/backlog.md']), (err) => err.code === 'confinement-grant-invalid');
-    // A symbolic link beside a granted file cannot be pinned read-only (a mount follows it): refused, not left writable.
-    fs.symlinkSync('other.md', path.join(root, 'docs', 'see'));
-    assert.throws(() => resolve(['docs/backlog.md']), (err) => err.code === 'confinement-grant-invalid' && /docs\/see/.test(err.message));
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

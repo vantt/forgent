@@ -206,7 +206,7 @@ export function removeAttemptIntent(runDir) {
  * Build the envelope v3 body (without digest) of one attempt.
  * `attemptId` is minted by the controller and equals the launch command id; `runDir` is the absolute
  * attempt directory (`runs/<NN>`); `attempt` is `prepareConfinementForLaunch(...).attempt`.
- * `session` (`{role, verbs, requestSocketPath?}`, terminal only) makes it a session attempt: no soft deadline, no idle
+ * `session` (`{role, verbs, writes, requestSocketPath?}`, terminal only) makes it a session attempt: no soft deadline, no idle
  * limit, no `settle-attempt` step, and `ceilingMs` (required, instead of the round-timeout ceiling) bounds it.
  * `lanes` (`{ceiling, waitMs}`, from `laneTransport`) is the lane pool of a top-level worker seat; absent for any other attempt.
  */

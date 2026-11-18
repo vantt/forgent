@@ -2278,8 +2278,8 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'head',
-    invoke: 'fgos head <start|rotate>',
-    description: 'Agent head sessions (provisional noun, distinct from the worktree verb "session"): "start" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; "rotate" asks for its replacement by a successor that reads a redacted handoff. From inside a confined head both go through its request socket.',
+    invoke: 'fgos head <start|rotate|write>',
+    description: 'Agent head sessions (provisional noun, distinct from the worktree verb "session"): "start" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; "rotate" asks for its replacement by a successor that reads a redacted handoff; "write" replaces a file of a confined head\'s grant (the secretary\'s docs/backlog.md) through its supervisor. From inside a confined head all three go through its request socket.',
     subcommands: {
       start: {
         description: 'Start head:<persona>-<name> as a confined supervised session, or front the live holder of that role.',
@@ -2307,21 +2307,33 @@ export const COMMAND_REGISTRY = [
         },
         examples: ['fgos head rotate secretary --name miu'],
       },
+      write: {
+        description: 'From inside a confined head: replace a granted file with the content on stdin. The head\'s supervisor checks the path (project-relative, named exactly by the grant, a regular file with no symbolic link on the way) and writes it atomically outside the sandbox, where the file is read-only. Answers {path, bytes}.',
+        parameters: {
+          type: 'object',
+          properties: {
+            path: { type: 'string', description: 'Positional: the project-relative path of the granted file, e.g. docs/backlog.md.' },
+          },
+          positional: ['path'],
+          required: ['path'],
+        },
+        examples: ['fgos head write docs/backlog.md < "$TMPDIR/backlog.md"'],
+      },
     },
-    examples: ['fgos head start secretary --name miu', 'fgos head rotate secretary --name miu'],
+    examples: ['fgos head start secretary --name miu', 'fgos head rotate secretary --name miu', 'fgos head write docs/backlog.md < "$TMPDIR/backlog.md"'],
     touchesState: true,
     store: 'none',
     externalEffect: true,
     paginated: false,
     deprecated: null,
     guide: {
-      changes: 'start opens a herdr tab running the persona\'s CLI and records the placement under .fgos/runtime/session-rotation/<persona>-<name>/. rotate writes a rotation request there and starts a detached executor that opens the successor beside the old session.',
-      prerequisites: 'A project, a terminal host (herdr) and a persona definition. A confined head needs the verb in its grant (request socket); a confined caller without a socket is refused.',
+      changes: 'start opens a herdr tab running the persona\'s CLI and records the placement under .fgos/runtime/session-rotation/<persona>-<name>/. rotate writes a rotation request there and starts a detached executor that opens the successor beside the old session. write replaces the named granted file of the project.',
+      prerequisites: 'A project, a terminal host (herdr) and a persona definition. A confined head needs the verb in its grant (request socket); a confined caller without a socket is refused. write works only inside a confined head (no socket: no-request-socket).',
       exitCodes: [
-        '0 started, fronted, or rotation requested',
-        '2 refused: grant, role or host precondition not met, or the start or request failed',
+        '0 started, fronted, rotation requested, or file written',
+        '2 refused: grant, role or host precondition not met (for write also path-not-granted, path-symlink, not-a-file, path-changed, write-failed), or the start or request failed',
         '3 a rotation of this head is already in progress',
-        '4 refused: missing --name or persona, or a name that does not match the pattern',
+        '4 refused: missing --name or persona, a name that does not match the pattern, or for write a missing or invalid path, content on a terminal instead of stdin, or content over 4 MiB',
       ],
       next: 'fgos identity resolve head:<persona>-<name> to see the holder.',
     },

@@ -4,8 +4,9 @@
 //! run supervisor listens on one socket (`envelope.session.requestSocketPath`), the sandbox gets it read-only, and
 //! each request is checked and performed outside. This module is only transport and enforcement: it decides
 //! nothing about who holds a role (Identity does) or what a verb means (the Node payload behind
-//! `fgos internal head-request` does), and it learns what the role may ask for from the envelope, never from a
-//! table. Contract: `packages/run-supervisor/contracts/head-request.v1.json`.
+//! `fgos internal head-request` does), and it learns what the role may ask for and write from the envelope, never
+//! from a table. One verb it performs itself: `head write`, the only way a head changes a granted file, because the
+//! sandbox keeps every granted file read-only. Contract: `packages/run-supervisor/contracts/head-request.v1.json`.
 
 use std::collections::BTreeMap;
 use std::io::{self, Read};
@@ -23,14 +24,21 @@ use fgos_process::facts::judge_here;
 use fgos_process::spawn::{run_bounded_command, Outcome as BoundedOutcome};
 use serde_json::{json, Value};
 
+use fgos_durable_file::{
+    open_beneath, open_dir_beneath, replace_durably_with_mode, BeneathError, BeneathRefusal,
+};
+
 use crate::attempt_step::exec_payload;
-use crate::go_channel::{peer_pid, peer_uid, read_frame, write_frame, FrameError};
+use crate::go_channel::{peer_pid, peer_uid, read_frame_within, write_frame, FrameError};
 use crate::route::{refuse, Flags};
 
 /// The Node payload entry the route child runs.
 pub(crate) const ENTRY: &str = "src/session-host/head-request.mjs";
 /// How long one request may run before its child is killed (the head's own launch waits up to 45 s).
 pub const VERB_TIMEOUT: Duration = Duration::from_millis(60_000);
+/// Largest request frame: a `head write` carries the whole new content of a granted file in one. Replies stay within
+/// the GO channel's limit.
+pub const MAX_REQUEST_BYTES: usize = 4 * 1024 * 1024;
 /// How long a connection has to deliver its one frame.
 const READ_DEADLINE: Duration = Duration::from_secs(5);
 /// Connections handled at once, the one running request included; a further one is dropped unanswered.
@@ -50,6 +58,10 @@ pub const RESTORE_VERB: &str = "head restore role";
 /// (`bind_agent_session`), so the head resolves as its CLI session. The role step is "registered", as for
 /// [`ANSWERED_VERB`]: a successor binds before it holds the role.
 pub const BIND_VERB: &str = "head bind session";
+/// The verb that replaces a granted file of the head's role, answered by the supervisor itself (no route child): the
+/// path must be named exactly by `envelope.session.writes` and be a regular file reached without a symlink, and the
+/// new content is installed atomically through the durable-file door ([`write_granted`]).
+pub const WRITE_VERB: &str = "head write";
 
 /// Verbs of a session that does not (yet) hold its role: the role check is "registered", and after the route reports
 /// done the supervisor registers the role for the attempt's session. The flag is Identity's `take`.
@@ -101,6 +113,9 @@ pub struct Config {
     pub env: BTreeMap<String, String>,
     /// Verbs `envelope.session.verbs` allows.
     pub verbs: Vec<String>,
+    /// Project-relative paths `envelope.session.writes` grants; [`WRITE_VERB`] writes only a regular file one names
+    /// exactly, beneath `cwd`.
+    pub writes: Vec<String>,
     pub verb_timeout: Duration,
     /// Does Identity give this session the envelope's role right now. An error is refused like a "no", and the
     /// client is told only its code.
@@ -187,6 +202,15 @@ impl HeadRequests {
                 "session.requestSocketPath is set but session.verbs is empty",
             ));
         }
+        let writes: Vec<String> = match &session["writes"] {
+            Value::Null => Vec::new(),
+            Value::Array(list) => list
+                .iter()
+                .map(|v| v.as_str().map(String::from))
+                .collect::<Option<_>>()
+                .ok_or_else(|| invalid("session.writes holds an entry that is not a string"))?,
+            _ => return Err(invalid("session.writes is not an array")),
+        };
         let role = text(&session["role"], "session.role")?;
         let writer_id = text(&envelope["identity"]["writerId"], "identity.writerId")?;
         let state_root = state_root.to_path_buf();
@@ -212,6 +236,7 @@ impl HeadRequests {
             cwd: cwd.clone(),
             env: step_env,
             verbs,
+            writes,
             verb_timeout: VERB_TIMEOUT,
             holds_role: Box::new({
                 let (state_root, role, writer_id, gate) = (
@@ -408,6 +433,93 @@ pub fn identity_bind(
     .map_err(hold_error)
 }
 
+/// Why [`write_granted`] wrote nothing, or did not finish: a refusal code of the contract and an optional detail.
+#[derive(Debug, PartialEq, Eq)]
+pub struct WriteRefusal {
+    pub code: &'static str,
+    pub detail: Option<String>,
+}
+
+fn write_refused(code: &'static str, detail: impl Into<Option<String>>) -> WriteRefusal {
+    WriteRefusal {
+        code,
+        detail: detail.into(),
+    }
+}
+
+/// A plain downward project-relative path: not empty, not absolute, only named components (no `.`, `..`, root or
+/// prefix), no backslash or NUL, no empty segment.
+fn plain_relative(path: &str) -> bool {
+    !path.is_empty()
+        && !path.contains(['\\', '\0'])
+        && path
+            .split('/')
+            .all(|part| !part.is_empty() && part != "." && part != "..")
+        && Path::new(path)
+            .components()
+            .all(|c| matches!(c, std::path::Component::Normal(_)))
+}
+
+/// [`WRITE_VERB`]: replace the granted file `args.path` beneath `root` with `args.content` (args exactly
+/// `{path, content}`, both strings). The path must be plain and relative (`path-invalid`), named exactly by an entry
+/// of `writes` (`path-not-granted`), and an existing regular file reached from `root` without a symlink at it or any
+/// directory on the way (`path-symlink`, `not-a-file`). The parent is resolved again right before the replace and must
+/// be the directory the check opened (`path-changed`). The content is installed by the durable-file door (temp file,
+/// fsync, rename over the name, parent fsync) with the old file's mode; a failure there is `write-failed`. Returns
+/// `{path, bytes}`.
+pub fn write_granted(root: &Path, writes: &[String], args: &Value) -> Result<Value, WriteRefusal> {
+    let text = |name: &str| {
+        args[name]
+            .as_str()
+            .filter(|_| args.as_object().is_some_and(|o| o.len() == 2))
+    };
+    let (Some(rel), Some(content)) = (text("path"), text("content")) else {
+        return Err(write_refused(
+            "bad-args",
+            "args must be exactly {path, content}, both strings".to_string(),
+        ));
+    };
+    if !plain_relative(rel) {
+        return Err(write_refused("path-invalid", None));
+    }
+    if !writes.iter().any(|granted| granted == rel) {
+        return Err(write_refused("path-not-granted", None));
+    }
+    let beneath = |error: BeneathError| match error {
+        BeneathError::Refused(BeneathRefusal::Symlink) => write_refused("path-symlink", None),
+        BeneathError::Refused(BeneathRefusal::Escape) => write_refused("path-invalid", None),
+        BeneathError::Refused(_) => write_refused("not-a-file", None),
+        BeneathError::Io(error) => write_refused("write-failed", error.to_string()),
+    };
+    let relative = Path::new(rel);
+    let opened = open_beneath(root, relative)
+        .map_err(beneath)?
+        .ok_or_else(|| {
+            write_refused("not-a-file", "the granted file does not exist".to_string())
+        })?;
+    let (held, mode) = (opened.parent_identity(), opened.mode().map_err(beneath)?);
+    drop(opened);
+    let parent = relative.parent().unwrap_or(Path::new(""));
+    // A file directly in the root: its parent is the root the caller trusts, there is nothing on the way to re-check.
+    if !parent.as_os_str().is_empty() {
+        let now = open_dir_beneath(root, parent)
+            .map_err(beneath)?
+            .map(|dir| dir.identity())
+            .transpose()
+            .map_err(beneath)?;
+        if now != Some(held) {
+            return Err(write_refused("path-changed", None));
+        }
+    }
+    let name = relative
+        .file_name()
+        .and_then(|n| n.to_str())
+        .ok_or_else(|| write_refused("path-invalid", None))?;
+    replace_durably_with_mode(&root.join(parent), name, content.as_bytes(), mode)
+        .map_err(|e| write_refused("write-failed", format!("{} at {}", e.source, e.step)))?;
+    Ok(json!({"path": rel, "bytes": content.len()}))
+}
+
 enum Outcome {
     Done(Value),
     Refused {
@@ -525,7 +637,7 @@ struct Request {
 
 /// One REQUEST frame; the error is the request's id when the frame carried a valid one.
 fn read_request(reader: &mut impl Read) -> Result<Request, Option<String>> {
-    let frame = match read_frame(reader) {
+    let frame = match read_frame_within(reader, MAX_REQUEST_BYTES) {
         Ok(frame) => frame,
         Err(FrameError::Closed | FrameError::Protocol) => return Err(None),
     };
@@ -594,6 +706,15 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>)
                     detail: Some(why.code),
                 }
             }
+        };
+    }
+    if request.verb == WRITE_VERB {
+        return match write_granted(&cfg.cwd, &cfg.writes, &request.args) {
+            Ok(data) => Outcome::Done(data),
+            Err(why) => Outcome::Refused {
+                code: why.code,
+                detail: why.detail,
+            },
         };
     }
     let outcome = run_verb(cfg, request);
@@ -691,6 +812,27 @@ mod tests {
         assert!(uid_allowed(Some(1000), 1000));
         assert!(!uid_allowed(Some(0), 1000));
         assert!(!uid_allowed(None, 1000));
+    }
+
+    #[test]
+    fn only_a_plain_downward_path_may_name_a_granted_file() {
+        for ok in ["docs/backlog.md", "top.md", "a/b/c"] {
+            assert!(plain_relative(ok), "{ok}");
+        }
+        for bad in [
+            "",
+            "/etc/passwd",
+            "../x",
+            "docs/../x",
+            "docs/./backlog.md",
+            "./docs",
+            "docs//backlog.md",
+            "docs/",
+            "a\\b",
+            "a\0b",
+        ] {
+            assert!(!plain_relative(bad), "{bad:?}");
+        }
     }
 
     #[test]

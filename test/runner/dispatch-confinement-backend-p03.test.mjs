@@ -1290,7 +1290,7 @@ async function waitFor(file, ms = 20000) {
   }
 }
 
-test('a launched secretary shape replaces docs/backlog.md through a temp file, follows a host-side replace of it, takes the mailbox lock and writes the record, and every other docs and .fgos path stays read-only', async (t) => {
+test('a launched secretary shape cannot write docs/backlog.md or any docs file, reads the backlog the host write door replaced, still cannot write a docs file the host replaced, and writes only its granted directories and the mailbox record', async (t) => {
   if (!HAS_WORKING_BWRAP) return t.skip('no working bwrap on this machine');
   // Outside /tmp: the sandbox mounts a private tmpfs there.
   const base = fs.mkdtempSync(path.join(fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir(), 'fgos-secretary-shape-'));
@@ -1303,27 +1303,34 @@ test('a launched secretary shape replaces docs/backlog.md through a temp file, f
     const resources = resolveConfinementResources({ dispatchId: 'disp_secretary', context: { cwd: base, repoRoot: base, fgosDir }, grants: headGrants });
     const plan = { contract: 'confinement-plan.v1', dispatchId: 'disp_secretary', decision: 'execute', coverage: {}, resources };
     const record = '.fgos/runtime/mailbox/record';
+    // Every way to change a docs file directly fails: in place, by a temp file renamed over it, removal, a new name.
+    const docsReadOnly = (file) => [
+      `[ -r ${file} ]`,
+      `! (echo x >> ${file}) 2>/dev/null`,
+      `! (echo x > ${file}.tmp) 2>/dev/null`,
+      `! rm -f ${file} 2>/dev/null`,
+      `! mv ${file} ${file}.moved 2>/dev/null`,
+    ];
     const script = [
-      // The editor's atomic write: a temp file beside the target, renamed over it.
-      'printf "new\\n" > docs/backlog.md.tmp.2 && mv -f docs/backlog.md.tmp.2 docs/backlog.md',
+      ...docsReadOnly('docs/backlog.md'),
+      ...docsReadOnly('docs/other.md'),
+      '[ "$(cat docs/.hidden)" = keep ]',
+      '! (echo x > docs/sub/x.md) 2>/dev/null',
       'echo d > docs/discussions/new.md',
       'echo p > plans/p.md',
-      '[ "$(cat docs/.hidden)" = keep ]',
-      // A non-granted sibling: no write, no removal, no rename; nor anything under a non-granted subdirectory.
-      '! (echo x >> docs/other.md) 2>/dev/null',
-      '! rm -f docs/other.md 2>/dev/null',
-      '! mv docs/other.md docs/moved.md 2>/dev/null',
-      '! (echo x > docs/sub/x.md) 2>/dev/null',
       // The mailbox: its lock opened read-write (O_CREAT), its record replaced by temp file and rename; nothing else of .fgos.
       '(exec 3<>.fgos/locks/mailbox.lock)',
       `mkdir -p ${record} && echo s > ${record}/snapshot.json.tmp && mv ${record}/snapshot.json.tmp ${record}/snapshot.json`,
       '! (exec 4<>.fgos/locks/other.lock) 2>/dev/null',
       '! (echo x > .fgos/stray) 2>/dev/null',
-      // Hand over to the host, which replaces the backlog as Git does (a new file renamed over it), and wait for it.
+      // Hand over to the host, which replaces the backlog as the head write door does and a sibling as Git does (a new
+      // file renamed over each), and wait for it.
       'echo > plans/ready',
       'while [ ! -e plans/go ]; do sleep 0.02; done',
-      '[ "$(cat docs/backlog.md)" = host ]',
-      'printf "host\\nhead\\n" > docs/backlog.md.tmp.3 && mv -f docs/backlog.md.tmp.3 docs/backlog.md',
+      '[ "$(cat docs/backlog.md)" = door ]',
+      '[ "$(cat docs/other.md)" = pulled ]',
+      ...docsReadOnly('docs/backlog.md'),
+      ...docsReadOnly('docs/other.md'),
     ].join(' && ');
     const prepared = await prepareBwrap(plan, {
       dispatchId: 'disp_secretary',
@@ -1337,14 +1344,16 @@ test('a launched secretary shape replaces docs/backlog.md through a temp file, f
     child.stderr.on('data', (chunk) => { output += chunk; });
     const exited = new Promise((resolve) => child.on('close', resolve));
     await Promise.race([waitFor(path.join(base, 'plans', 'ready')), exited.then((code) => { throw new Error(`the sandbox ended early (${code}): ${output}`); })]);
-    assert.equal(fs.readFileSync(backlog, 'utf8'), 'new\n', 'the head\'s rename landed on the host');
-    fs.writeFileSync(`${backlog}.git-tmp`, 'host\n');
-    fs.renameSync(`${backlog}.git-tmp`, backlog);
+    assert.equal(fs.readFileSync(backlog, 'utf8'), 'old\n', 'the head changed nothing in docs');
+    for (const [file, content] of [[backlog, 'door\n'], [path.join(base, 'docs', 'other.md'), 'pulled\n']]) {
+      fs.writeFileSync(`${file}.host-tmp`, content);
+      fs.renameSync(`${file}.host-tmp`, file);
+    }
     fs.writeFileSync(path.join(base, 'plans', 'go'), '');
     assert.equal(await exited, 0, output);
-    assert.equal(fs.readFileSync(backlog, 'utf8'), 'host\nhead\n', 'the head read the replaced file and its next write landed in it');
+    assert.equal(fs.readFileSync(backlog, 'utf8'), 'door\n');
+    assert.equal(fs.readFileSync(path.join(base, 'docs', 'other.md'), 'utf8'), 'pulled\n');
     assert.deepEqual(fs.readdirSync(path.join(base, 'docs')).sort(), ['.hidden', 'backlog.md', 'discussions', 'other.md', 'sub']);
-    assert.equal(fs.readFileSync(path.join(base, 'docs', 'other.md'), 'utf8'), 'keep\n');
     assert.ok(fs.existsSync(path.join(base, 'docs', 'discussions', 'new.md')));
     assert.ok(fs.existsSync(path.join(base, 'plans', 'p.md')));
     assert.equal(fs.readFileSync(path.join(base, record, 'snapshot.json'), 'utf8'), 's\n');

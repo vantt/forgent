@@ -67,12 +67,17 @@ pub fn write_frame(out: &mut impl Write, frame: &Value) -> io::Result<()> {
 }
 
 pub fn read_frame(input: &mut impl Read) -> Result<Value, FrameError> {
+    read_frame_within(input, MAX_FRAME_BYTES)
+}
+
+/// [`read_frame`] with a channel's own size limit: the head request socket takes a whole granted file in one frame.
+pub fn read_frame_within(input: &mut impl Read, max: usize) -> Result<Value, FrameError> {
     let mut head = [0u8; 4];
     input
         .read_exact(&mut head)
         .map_err(|_| FrameError::Closed)?;
     let len = u32::from_be_bytes(head) as usize;
-    if len > MAX_FRAME_BYTES {
+    if len > max {
         return Err(FrameError::Protocol);
     }
     let mut body = vec![0u8; len];

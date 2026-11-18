@@ -260,7 +260,7 @@ function requireField(value, message) {
 }
 
 // Codes of a malformed head or rotation argument: refused as validation, never as a failed start.
-const HEAD_ARGUMENT_CODES = new Set(['bad-persona', 'bad-name', 'bad-project-root', 'bad-generation', 'bad-args', 'bad-reason', 'bad-stop-facts']);
+const HEAD_ARGUMENT_CODES = new Set(['bad-persona', 'bad-name', 'bad-project-root', 'bad-generation', 'bad-args', 'bad-reason', 'bad-stop-facts', 'path-invalid', 'request-too-large']);
 
 // The sub-verb of `verb`, checked against the registry's `subcommands`: the one list of what the verb accepts.
 function requireSubVerb(verb, positional) {
@@ -3379,11 +3379,24 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // reads/writes go through the setFocus/goalFocusShow facades only, never
     // graph-metrics.mjs directly. Only `set`/`show` exist here — `clear`/
     // `list` are explicitly deferred (CONTEXT.md Deferred Ideas).
-    // Head sessions: a thin arm over the two use cases that own the behaviour. Exit codes: a malformed argument is
+    // Head sessions: a thin arm over the use cases that own the behaviour. Exit codes: a malformed argument is
     // validation (4), a refusal or a request that did not start anything is precondition (2), a rotation already
     // running is conflict (3).
     case 'head': {
       const sub = requireSubVerb('head', positional);
+      if (sub === 'write') {
+        // A confined head's one way to change a granted file: its supervisor writes it outside the sandbox.
+        const target = requireField(positional[1], 'head write requires a path: fgos head write <path> < new-content');
+        if (process.stdin.isTTY) throw new StoreError('validation', 'head write reads the new content from stdin: fgos head write <path> < new-content');
+        const { requestHeadWrite } = await import('../src/session-host/head-request-client.mjs');
+        const chunks = [];
+        for await (const chunk of process.stdin) chunks.push(chunk);
+        try {
+          return await requestHeadWrite({ path: target, content: Buffer.concat(chunks).toString('utf8') });
+        } catch (err) {
+          throw new StoreError(HEAD_ARGUMENT_CODES.has(err.code) ? 'validation' : 'precondition', `${err.code ?? 'head-refused'}: ${err.message}`);
+        }
+      }
       const persona = requireField(positional[1], `head ${sub} requires a persona: fgos head ${sub} <persona> --name <name>`);
       const name = requireField(flags.name, `head ${sub} requires --name <name>`);
       const { startHead, rotateHead } = await import('../src/session-host/head-request.mjs');

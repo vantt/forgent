@@ -22,7 +22,7 @@ use fgos_process::{facts, ProcId};
 use fgos_run_supervisor::go_channel::{read_frame, write_frame, MAX_FRAME_BYTES};
 use fgos_run_supervisor::head_request::{
     identity_bind, identity_holds, identity_registered, identity_take, Config, HeadRequests,
-    HoldError, BIND_VERB,
+    HoldError, BIND_VERB, MAX_REQUEST_BYTES, WRITE_VERB,
 };
 use serde_json::{json, Value};
 
@@ -116,6 +116,7 @@ fn serve_with(
         cwd: dir.clone(),
         env: BTreeMap::from([("OUT".to_string(), dir.to_string_lossy().into_owned())]),
         verbs: verbs.iter().map(|v| v.to_string()).collect(),
+        writes: GRANTED_WRITES.iter().map(|w| w.to_string()).collect(),
         verb_timeout: timeout,
         holds_role: Box::new(move || {
             holds.clone().map_err(|code| HoldError {
@@ -173,6 +174,16 @@ fn serve_with(
         slowest_poll: slowest,
     }
 }
+
+/// The writes grant of every test server: a granted file, a granted directory, a file behind a symlinked directory,
+/// a symlink as the file itself, and a file that does not exist.
+const GRANTED_WRITES: [&str; 5] = [
+    "docs/backlog.md",
+    "plans",
+    "link/backlog.md",
+    "docs/leaf.md",
+    "docs/missing.md",
+];
 
 const DONE_LINE: &str = r#"cat > "$OUT/stdin.json"; echo "$@" > "$OUT/argv"; echo '{"v":1,"protocol":1,"result":"done","data":{"key":"head-planner-x-1"}}'"#;
 
@@ -287,7 +298,7 @@ fn an_oversize_or_malformed_frame_gets_bad_frame_and_the_connection_closes() {
         .set_read_timeout(Some(Duration::from_secs(10)))
         .unwrap();
     oversize
-        .write_all(&((MAX_FRAME_BYTES + 1) as u32).to_be_bytes())
+        .write_all(&((MAX_REQUEST_BYTES + 1) as u32).to_be_bytes())
         .unwrap();
     let reply = read_frame(&mut oversize).expect("a refusal");
     assert_eq!(
@@ -377,8 +388,14 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
     assert_eq!(
         codes,
         [
+            "bad-args",
             "bad-frame",
             "busy",
+            "not-a-file",
+            "path-changed",
+            "path-invalid",
+            "path-not-granted",
+            "path-symlink",
             "peer-uid",
             "role-not-held",
             "role-take-failed",
@@ -386,7 +403,8 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "session-not-registered",
             "verb-failed",
             "verb-not-granted",
-            "verb-timeout"
+            "verb-timeout",
+            "write-failed"
         ]
     );
     let mut verbs: Vec<&str> = contract["verbs"]
@@ -403,14 +421,16 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "head bind session",
             "head restore role",
             "head rotate",
-            "head start"
+            "head start",
+            "head write"
         ]
     );
     assert_eq!(
         contract["verbs"][fgos_run_supervisor::head_request::ANSWERED_VERB]["identity"],
         "registered-then-take"
     );
-    assert_eq!(contract["framing"]["maxFrameBytes"], MAX_FRAME_BYTES);
+    assert_eq!(contract["framing"]["maxRequestBytes"], MAX_REQUEST_BYTES);
+    assert_eq!(contract["framing"]["maxReplyBytes"], MAX_FRAME_BYTES);
     assert_eq!(
         contract["run"]["verbTimeoutMs"],
         fgos_run_supervisor::head_request::VERB_TIMEOUT.as_millis() as u64
@@ -518,6 +538,14 @@ fn an_envelope_that_cannot_serve_a_socket_is_envelope_invalid_and_one_without_a_
     invalid(
         build(&|e| e["session"]["verbs"] = json!([])),
         "verbs is empty",
+    );
+    invalid(
+        build(&|e| e["session"]["writes"] = json!("docs/backlog.md")),
+        "session.writes is not an array",
+    );
+    invalid(
+        build(&|e| e["session"]["writes"] = json!(["docs/backlog.md", 1])),
+        "session.writes holds an entry",
     );
     invalid(
         build(&|e| e["steps"] = json!([{"stepId": "release-slot", "builtin": true}])),
@@ -645,8 +673,9 @@ fn the_answered_verb_needs_only_a_registered_session_and_moves_the_role_after_th
     let reply = ask(&served.socket, ANSWERED);
     assert_eq!(reply["result"], "done", "{reply}");
     assert_eq!(*took.lock().unwrap(), 1, "the role moves once, after done");
+    // The log line follows the reply.
     assert_eq!(
-        served.log.lock().unwrap().clone(),
+        wait_for_log(&served, "done"),
         vec!["head-request r1 head answered done -"]
     );
     // Another verb of the same successor is still checked against the role it does not hold yet.
@@ -804,6 +833,7 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_a
         cwd: dir.clone(),
         env: BTreeMap::new(),
         verbs: vec![BIND_VERB.to_string()],
+        writes: Vec::new(),
         verb_timeout: Duration::from_secs(5),
         holds_role: Box::new(move || identity_holds(&r1, role, "att-bind", Some(&g1))),
         registered: Box::new(move || identity_registered(&r2, "att-bind", Some(&g2))),
@@ -851,4 +881,160 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_a
     );
     assert_eq!(identity_holds(&root, role, "att-bind", None), Ok(false));
     let _ = fs::remove_dir_all(&dir);
+}
+
+// ---- head write: the supervisor replaces a granted file itself ---------------------------------------
+
+/// A project under the server's cwd: the granted backlog, a sibling, a granted directory, a directory reached through
+/// a symlink and a symlink as a granted file.
+fn write_project(dir: &Path) {
+    fs::create_dir_all(dir.join("docs")).unwrap();
+    fs::create_dir_all(dir.join("plans")).unwrap();
+    fs::write(dir.join("docs/backlog.md"), "old\n").unwrap();
+    fs::set_permissions(
+        dir.join("docs/backlog.md"),
+        fs::Permissions::from_mode(0o644),
+    )
+    .unwrap();
+    fs::write(dir.join("docs/other.md"), "keep\n").unwrap();
+    std::os::unix::fs::symlink("docs", dir.join("link")).unwrap();
+    std::os::unix::fs::symlink("other.md", dir.join("docs/leaf.md")).unwrap();
+}
+
+/// One request written by hand, so its frame may be larger than the GO channel's limit the reply keeps.
+fn write_request(socket: &Path, args: Value) -> Value {
+    let body = serde_json::to_vec(
+        &json!({"type": "REQUEST", "id": "w1", "verb": WRITE_VERB, "args": args}),
+    )
+    .unwrap();
+    let mut stream = UnixStream::connect(socket).unwrap();
+    stream
+        .set_read_timeout(Some(Duration::from_secs(15)))
+        .unwrap();
+    stream
+        .write_all(&(body.len() as u32).to_be_bytes())
+        .unwrap();
+    stream.write_all(&body).unwrap();
+    read_frame(&mut stream).expect("a REPLY frame")
+}
+
+#[test]
+fn head_write_replaces_a_granted_file_atomically_with_its_mode_in_one_large_frame_and_runs_no_route(
+) {
+    use std::os::unix::fs::MetadataExt;
+    let served = serve(
+        "write",
+        DONE_LINE,
+        Ok(true),
+        &[WRITE_VERB],
+        Duration::from_secs(5),
+    );
+    write_project(&served.dir);
+    let backlog = served.dir.join("docs/backlog.md");
+    let before = fs::metadata(&backlog).unwrap().ino();
+    // Larger than a GO frame: the request socket takes a whole file.
+    let content = "row\n".repeat(MAX_FRAME_BYTES / 2);
+    let reply = write_request(
+        &served.socket,
+        json!({"path": "docs/backlog.md", "content": content}),
+    );
+    assert_eq!(reply["result"], "done", "{reply}");
+    assert_eq!(
+        reply["data"],
+        json!({"path": "docs/backlog.md", "bytes": content.len()})
+    );
+    assert_eq!(fs::read_to_string(&backlog).unwrap(), content);
+    let after = fs::metadata(&backlog).unwrap();
+    assert_ne!(
+        after.ino(),
+        before,
+        "a new file renamed over the name, never written in place"
+    );
+    assert_eq!(after.mode() & 0o777, 0o644, "the old file's mode is kept");
+    let mut names: Vec<String> = fs::read_dir(served.dir.join("docs"))
+        .unwrap()
+        .map(|e| e.unwrap().file_name().to_string_lossy().into_owned())
+        .collect();
+    names.sort();
+    assert_eq!(
+        names,
+        ["backlog.md", "leaf.md", "other.md"],
+        "no temp file left"
+    );
+    assert!(!served.dir.join("argv").exists(), "no route child ran");
+    assert_eq!(
+        wait_for_log(&served, "done"),
+        vec!["head-request w1 head write done -"]
+    );
+}
+
+#[test]
+fn head_write_refuses_a_path_the_grant_does_not_name_exactly_a_climbing_path_and_any_symlink_on_the_way(
+) {
+    let served = serve(
+        "write-refused",
+        DONE_LINE,
+        Ok(true),
+        &[WRITE_VERB],
+        Duration::from_secs(5),
+    );
+    write_project(&served.dir);
+    let ask = |path: &str| {
+        write_request(&served.socket, json!({"path": path, "content": "x"}))["code"]
+            .as_str()
+            .unwrap_or("done")
+            .to_string()
+    };
+    for (path, code) in [
+        ("docs/other.md", "path-not-granted"),
+        ("docs/backlog.md/", "path-invalid"),
+        ("docs/../docs/backlog.md", "path-invalid"),
+        ("./docs/backlog.md", "path-invalid"),
+        ("/etc/passwd", "path-invalid"),
+        ("link/backlog.md", "path-symlink"),
+        ("docs/leaf.md", "path-symlink"),
+        ("plans", "not-a-file"),
+        ("docs/missing.md", "not-a-file"),
+    ] {
+        assert_eq!(ask(path), code, "{path}");
+    }
+    assert_eq!(
+        write_request(&served.socket, json!({"path": "docs/backlog.md"}))["code"],
+        "bad-args"
+    );
+    assert_eq!(
+        fs::read_to_string(served.dir.join("docs/backlog.md")).unwrap(),
+        "old\n"
+    );
+    assert_eq!(
+        fs::read_to_string(served.dir.join("docs/other.md")).unwrap(),
+        "keep\n"
+    );
+    assert!(!served.dir.join("docs/missing.md").exists());
+}
+
+#[test]
+fn head_write_needs_the_role_and_the_verb_in_the_grant_before_any_file_is_touched() {
+    for (holds, verbs, code) in [
+        (Ok(false), &[WRITE_VERB][..], "role-not-held"),
+        (Ok(true), &["head start"][..], "verb-not-granted"),
+    ] {
+        let served = serve(
+            "write-gate",
+            DONE_LINE,
+            holds,
+            verbs,
+            Duration::from_secs(5),
+        );
+        write_project(&served.dir);
+        let reply = write_request(
+            &served.socket,
+            json!({"path": "docs/backlog.md", "content": "x"}),
+        );
+        assert_eq!(reply["code"], code);
+        assert_eq!(
+            fs::read_to_string(served.dir.join("docs/backlog.md")).unwrap(),
+            "old\n"
+        );
+    }
 }

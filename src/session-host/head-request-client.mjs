@@ -1,6 +1,6 @@
 // head-request-client.mjs -- the client end of a head session's request socket, and nothing else.
 //
-// A leaf: the request socket's frame codec, the one `requestHead` call and its four verbs. `head-request.mjs` (the
+// A leaf: the request socket's frame codec, the one `requestHead` call and its verbs. `head-request.mjs` (the
 // supervisor's route entry and the per-verb branches) and `rotate.mjs` (which asks the old head's supervisor to restore
 // its role) both import it, so neither imports the other.
 
@@ -10,11 +10,15 @@ import net from 'node:net';
 import { HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
 
 export const PROTOCOL = 1;
+/** Largest reply frame (the GO channel's limit). */
 export const MAX_FRAME_BYTES = 65_536;
+/** Largest request frame: `head write` carries the whole new content of a granted file. */
+export const MAX_REQUEST_BYTES = 4 * 1024 * 1024;
 export const HEAD_START_VERB = 'head start';
 export const HEAD_ROTATE_VERB = 'head rotate';
 export const HEAD_ANSWERED_VERB = 'head answered';
 export const HEAD_RESTORE_VERB = 'head restore role';
+export const HEAD_WRITE_VERB = 'head write';
 /** A reply may take as long as the supervisor lets the verb run (60 s) plus its own overhead. */
 const DEFAULT_REPLY_TIMEOUT_MS = 70_000;
 
@@ -31,7 +35,7 @@ export class HeadRequestError extends Error {
 
 function encodeFrame(frame) {
   const body = Buffer.from(JSON.stringify(frame), 'utf8');
-  if (body.length > MAX_FRAME_BYTES) throw new HeadRequestError('request-too-large', `a request frame is at most ${MAX_FRAME_BYTES} bytes`);
+  if (body.length > MAX_REQUEST_BYTES) throw new HeadRequestError('request-too-large', `a request frame is at most ${MAX_REQUEST_BYTES} bytes`);
   const head = Buffer.alloc(4);
   head.writeUInt32BE(body.length);
   return Buffer.concat([head, body]);
@@ -79,7 +83,8 @@ export function requestHead(verb, args, { socketPath = process.env[HEAD_REQUEST_
     return Promise.reject(new HeadRequestError('request-socket-foreign', `the request socket ${socketPath} is not owned by this user`));
   }
   const id = crypto.randomBytes(8).toString('hex');
-  const request = encodeFrame({ type: 'REQUEST', id, verb, args });
+  let request;
+  try { request = encodeFrame({ type: 'REQUEST', id, verb, args }); } catch (err) { return Promise.reject(err); }
   return new Promise((resolve, reject) => {
     const socket = net.createConnection(socketPath);
     let received = Buffer.alloc(0);
@@ -120,3 +125,9 @@ export const requestHeadAnswered = (args, options) => requestHead(HEAD_ANSWERED_
 
 /** `head restore role` over the socket: asks that head's supervisor to register its role again (the effect is the supervisor's). */
 export const requestHeadRestoreRole = (args, options) => requestHead(HEAD_RESTORE_VERB, args, options);
+
+/**
+ * `head write` over the socket: the head's supervisor replaces the granted file `path` (project-relative, exactly a
+ * `writes` entry of its grant) with `content` atomically; the sandbox keeps that file read-only. Returns `{path, bytes}`.
+ */
+export const requestHeadWrite = ({ path, content }, options) => requestHead(HEAD_WRITE_VERB, { path, content }, options);

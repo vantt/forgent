@@ -652,14 +652,6 @@ export function prepareBwrapSync(plan, request, backend) {
         }
       }
 
-      // The parent of a granted file (resources.mjs fileGrantParents): bound read-write from the host, then every
-      // other entry it held at launch bound back read-only over it, in this order.
-      if (res.delivery === 'parent') {
-        bwrapArgs.push('--bind', res.hostTarget, res.executionTarget.path);
-        for (const entry of res.kept ?? []) bwrapArgs.push('--ro-bind', entry.path, entry.path);
-        return;
-      }
-
       const isWritable = res.access === 'write' || res.access === 'read-write';
       if (isWritable) {
         bwrapArgs.push('--bind', res.hostTarget, res.executionTarget.path);
@@ -690,12 +682,10 @@ export function prepareBwrapSync(plan, request, backend) {
     // every hidden root, the masks, a blind dispatch's own directory read-only, the mounts inside a hidden root
     // (outbox, own home, the program and its install directories), and last the masks made read-only.
     const insideMasked = (res) => [...hidden, ...(own ? [own] : [])].some((h) => res.executionTarget?.path && isInsideRoot(res.executionTarget.path, h.executionTarget.path));
-    // Parents of granted files first: a bind over a directory hides every mount made in it before.
-    const parentsFirst = (list) => [...list.filter((r) => r.delivery === 'parent'), ...list.filter((r) => r.delivery !== 'parent')];
-    parentsFirst(mounts.filter((r) => !insideMasked(r))).forEach(materialize);
+    mounts.filter((r) => !insideMasked(r)).forEach(materialize);
     for (const h of hidden) bwrapArgs.push('--tmpfs', h.executionTarget.path);
     if (own) bwrapArgs.push('--ro-bind', own.hostTarget, own.executionTarget.path);
-    parentsFirst(mounts.filter(insideMasked)).forEach(materialize);
+    mounts.filter(insideMasked).forEach(materialize);
     bindAttemptFiles();
     for (const h of hidden) bwrapArgs.push('--remount-ro', h.executionTarget.path);
 

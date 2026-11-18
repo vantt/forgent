@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
-import { HeadRequestError, requestHead, requestHeadStart } from '../../src/session-host/head-request-client.mjs';
+import { HeadRequestError, MAX_FRAME_BYTES, MAX_REQUEST_BYTES, requestHead, requestHeadStart, requestHeadWrite } from '../../src/session-host/head-request-client.mjs';
 import { rotateHead, runHeadRequest, startHead } from '../../src/session-host/head-request.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
 
@@ -54,6 +54,17 @@ test('the client sends one REQUEST frame, returns the data of a done reply and n
   assert.equal(seen[0].verb, 'head start');
   assert.match(seen[0].id, /^[a-f0-9]{16}$/);
   assert.deepEqual(seen[0].args, { persona: 'planner', name: 'x' });
+});
+
+test('the client sends head write with the whole content in one frame larger than a reply may be, and refuses one over the request limit', async (t) => {
+  const socketPath = path.join(scratch(t), 'req.sock');
+  const seen = serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'done', data: { path: request.args.path, bytes: request.args.content.length } }));
+  await listening();
+  const content = 'row\n'.repeat(MAX_FRAME_BYTES / 2);
+  assert.deepEqual(await requestHeadWrite({ path: 'docs/backlog.md', content }, { socketPath }), { path: 'docs/backlog.md', bytes: content.length });
+  assert.equal(seen[0].verb, 'head write');
+  assert.deepEqual(seen[0].args, { path: 'docs/backlog.md', content });
+  await assert.rejects(requestHeadWrite({ path: 'docs/backlog.md', content: 'x'.repeat(MAX_REQUEST_BYTES) }, { socketPath }), (err) => err.code === 'request-too-large');
 });
 
 test('a refused reply is a HeadRequestError carrying the supervisor\'s code, or the use case\'s own code when verb-failed wraps it', async (t) => {

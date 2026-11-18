@@ -446,60 +446,6 @@ export function isInsideRoot(target, root) {
   return target === root || target.startsWith(root.endsWith(path.sep) ? root : root + path.sep);
 }
 
-/**
- * The parents of the file entries of a workspace-paths grant. A file bound on its own cannot be replaced atomically
- * (an editor writes its temp file beside the target and renames it over, and both fail in a read-only parent), and a
- * bind pins the inode: when Git replaces the file on the host (a pull or a merge), a long-lived session would keep
- * reading the old content and writing a deleted file. So the parent of a granted file is bound read-write from the
- * host (`delivery: 'parent'`), where its names resolve live, and every other entry it holds at launch is bound back
- * read-only after it (`kept`, dotfiles included): such an entry cannot be written, and renaming or removing a mount
- * point fails busy, so an editor writing the granted file in place or by rename works and no existing non-granted
- * entry changes. The granted file itself gets no bind of its own.
- *
- * Accepted trade-offs: a name created in that parent after launch, by the session or by Git on the host, is writable
- * in the session; and a sibling the host replaces (a Git pull unlinks it or renames a new file over it) becomes
- * writable in the session until the session restarts, because Linux detaches the read-only bind whose mount point was
- * unlinked on the host, and the name then resolves to the live host file in the read-write parent. A parent holding a
- * symbolic link is refused: a link cannot be bound over (a mount follows it), so it would stay removable. A file
- * directly in the project root is refused: its parent would make the whole root writable. A file whose parent is a
- * granted directory, or lies in one, needs no parent bind. Shallow parents come first, so a deeper parent is bound
- * over the read-only entry its parent bound back.
- */
-function fileGrantParents(entries, realRoot) {
-  const dirs = entries.filter((e) => !e.isFile).map((e) => e.hostTarget);
-  const granted = new Set(entries.map((e) => e.hostTarget));
-  const parents = [...new Set(entries.filter((e) => e.isFile).map((e) => path.dirname(e.hostTarget)))]
-    .filter((parent) => !dirs.some((dir) => isInsideRoot(parent, dir)))
-    .sort((a, b) => a.split(path.sep).length - b.split(path.sep).length || a.localeCompare(b));
-  return parents.map((parent) => {
-    const rel = path.relative(realRoot, parent) || '.';
-    if (rel === '.') {
-      throw new ConfinementResourceError('confinement-grant-invalid', `workspace-paths: a granted file must lie in a directory below the project root ${realRoot}; its parent would make the whole root writable.`);
-    }
-    const kept = fs.readdirSync(parent, { withFileTypes: true })
-      .map((dirent) => path.join(parent, dirent.name))
-      .filter((entry) => !granted.has(entry))
-      .sort()
-      .map((entry) => {
-        if (fs.lstatSync(entry).isSymbolicLink()) {
-          throw new ConfinementResourceError('confinement-grant-invalid', `workspace-paths: "${path.relative(realRoot, entry)}" beside a granted file is a symbolic link, which a read-only bind cannot pin; remove it or grant its directory.`);
-        }
-        return { path: entry };
-      });
-    return {
-      resource: 'workspace-paths',
-      identity: `workspace-paths-parent:${rel}`,
-      hostTarget: parent,
-      executionTarget: { location: 'host', path: parent },
-      delivery: 'parent',
-      collect: 'none',
-      access: 'read-write',
-      allocation: 'existing',
-      kept,
-    };
-  });
-}
-
 function realPathOrNull(p) {
   try {
     return fs.realpathSync(p);
@@ -722,7 +668,8 @@ export function resolveConfinementResources({
     });
   }
 
-  // 2b. workspace-paths: named paths of the project root, each bound on its own and nothing else of the root.
+  // 2b. workspace-paths: named paths of the project root; a granted directory is bound writable on its own, a granted
+  // file stays read-only, and nothing else of the root is writable.
   if (grantsByResource.has('workspace-paths')) {
     const grant = grantsByResource.get('workspace-paths');
     const root = context.repoRoot || context.cwd;
@@ -748,9 +695,11 @@ export function resolveConfinementResources({
       canonicalizeAndVerifySubpath(hostTarget, root, 'workspace-paths');
       entries.push({ rel, hostTarget, isFile: !seen.isDirectory() });
     }
-    // The parents go first: a bind over a directory hides every mount made in it before.
-    resolved.push(...fileGrantParents(entries, fs.realpathSync(root)));
-    // A granted file gets no bind of its own: its parent or a granted directory holding it makes it writable by name.
+    // A granted file gets no bind at all: the sandbox reads it live through the read-only project, and only the head's
+    // supervisor writes it (`head write` on the request socket, head-request.v1.json), so its directory and every
+    // sibling stay read-only whatever the host replaces. A bind would pin the inode (a long-lived session would read a
+    // file Git replaced); a writable parent would let the head change siblings the host replaced or created. A granted
+    // directory is bound writable.
     for (const { rel, hostTarget } of entries.filter((e) => !e.isFile)) {
       resolved.push({
         resource: 'workspace-paths',

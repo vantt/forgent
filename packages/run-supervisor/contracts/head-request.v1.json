@@ -1,9 +1,11 @@
 {
   "contract": { "id": "run-supervisor-head-request", "version": 1 },
-  "description": "The request socket of one head session. A confined head cannot reach herdr, so it asks its own run supervisor, over one AF_UNIX socket the sandbox gets read-only, to perform a granted verb outside. The supervisor only transports and enforces: Identity decides who holds the role, `grantOf` (src/session-host/head-grants.mjs) is the only reader of the grant table and its answer reaches the supervisor in the digest-protected envelope (`session.verbs`), and the verb itself is the Node payload behind `fgos internal head-request` (internal-route.run-supervisor.v1.json).",
+  "description": "The request socket of one head session. A confined head cannot reach herdr, so it asks its own run supervisor, over one AF_UNIX socket the sandbox gets read-only, to perform a granted verb outside. The supervisor only transports and enforces: Identity decides who holds the role, `grantOf` (src/session-host/head-grants.mjs) is the only reader of the grant table and its answer reaches the supervisor in the digest-protected envelope (`session.verbs`, `session.writes`), and every verb but `head bind session` and `head write` is the Node payload behind `fgos internal head-request` (internal-route.run-supervisor.v1.json).",
   "framing": {
     "frame": "as gate-go.v1.json: 4-byte unsigned big-endian length N, then N bytes of UTF-8 JSON (one object)",
-    "maxFrameBytes": 65536,
+    "maxRequestBytes": 4194304,
+    "maxReplyBytes": 65536,
+    "sizes": "a request frame may be up to maxRequestBytes because `head write` carries a whole file; a reply stays within the GO channel's 65536",
     "oversizeOrInvalid": "the supervisor answers REPLY refused bad-frame and closes the connection",
     "readDeadlineMs": "5000 for the whole request frame (not per read)"
   },
@@ -45,6 +47,13 @@
       "identity": "registered-then-bind",
       "rule": "the role step is the registered one of head answered (a successor binds before it holds the role); a refused bind is session-bind-failed with Identity's code in detail (bad-args, peer-unknown, gate-unknown, invalid-writer-key, caller-not-under-head, attempt-not-registered, session-in-use, head-not-live, ...). The mailbox hook of a confined head sends it the first time it binds a head, instead of writing Identity's read-only directory"
     },
+    "head write": {
+      "args": { "path": "string, required: project-relative, exactly an entry of envelope.session.writes", "content": "string, required: the whole new content (UTF-8); exactly these two keys" },
+      "does": "answered by the supervisor itself, no route child: the only way a head changes a granted file, because its sandbox keeps every granted file read-only (granted directories stay bound writable). The path must be plain and relative (no empty, `.` or `..` segment, not absolute: path-invalid), named exactly by an entry of envelope.session.writes (path-not-granted), and an existing regular file reached from envelope.cwd without a symlink at it or at any directory on the way (path-symlink, not-a-file). Right before the replace its parent is resolved again and must be the directory the check opened (path-changed). The content is installed by the durable-file door (temp file beside it, fsync, rename over the name, parent fsync) with the old file's mode, so a reader sees the old or the new file, never a mix; a failure there is write-failed with the step in detail",
+      "data": "{path, bytes}",
+      "identity": "held",
+      "client": "`fgos head write <path>` with the new content on stdin (src/session-host/head-request-client.mjs requestHeadWrite)"
+    },
     "head answered": {
       "args": { "persona": "string, required", "name": "string, required; spelled as the envelope's own role, as for head rotate", "sessionId": "string, required: the successor's Identity session id", "rotationId": "string, required: 16 lowercase hex characters, the id of the pending rotation exactly as the handoff's `Rotation id:` line carries it; the successor reads it from its handoff and echoes it, no other match is made", "message": "string, required: the successor's first assistant message, kept as evidence, at most 8000 characters" },
       "does": "markSuccessorAnswered (src/session-rotation/rotate.mjs): records the answer of the successor the lineage's pending rotation waits for. The key is the attempt's own (envelope.unitRunId), never an argument. Refused no-rotation-pending when no rotation waits for that key (the executor removes its pending record before it gives up, so a late answer is refused), answer-mismatch when rotationId is not exactly the pending rotation's id; this is the one place an answer is checked",
@@ -59,7 +68,7 @@
     "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed). For `head answered`, `head restore role` and `head bind session` the step is instead: this attempt's own session is registered and live (session-not-registered, failing closed the same way)",
     "verb: must be one of envelope.session.verbs (verb-not-granted)",
     "busy: at most one request runs at a time (busy)",
-    "run: `<hostBin> internal head-request --protocol 1 --run-dir <attemptDir>`, request on stdin"
+    "run: `<hostBin> internal head-request --protocol 1 --run-dir <attemptDir>`, request on stdin; `head bind session` and `head write` are answered by the supervisor itself instead"
   ],
   "run": {
     "child": "started with exactly the step environment of the envelope, the envelope's cwd, its own process group, and the parent-death signal on Linux; stdout is its one JSON line, stderr goes to supervisor.log",
@@ -76,6 +85,13 @@
     "busy": "another request is running",
     "session-not-registered": "head answered only: Identity does not list this attempt's own session as live; when Identity could not answer the detail is its refusal code only",
     "session-bind-failed": "head bind session only: Identity refused to bind the session; detail is its code",
+    "bad-args": "head write only: args are not exactly {path, content}, both strings",
+    "path-invalid": "head write only: the path is empty, absolute, or has an empty, `.` or `..` segment",
+    "path-not-granted": "head write only: no entry of envelope.session.writes names the path exactly",
+    "path-symlink": "head write only: the file or a directory on the way to it is a symbolic link",
+    "not-a-file": "head write only: the granted path does not exist or is not a regular file (a granted directory is written in the sandbox, not here)",
+    "path-changed": "head write only: the file's directory changed between the check and the replace; nothing was written",
+    "write-failed": "head write only: the durable write failed; detail names the error and the step (a failure after the rename means the new content may already be in place)",
     "role-take-failed": "head answered only: the route recorded the answer but Identity refused to move the role to this session (detail is its code, for example gate-unknown or head-not-live); the executor then finds no holder change and retires the successor",
     "verb-failed": "the route child failed; detail is the entry's own code (for example head-key-used, bad-persona, start-refused) or the exit",
     "verb-timeout": "the verb ran longer than verbTimeoutMs"
@@ -84,6 +100,7 @@
     "refusal": "envelope-invalid (the supervisor refuses the attempt before the pane is launched)",
     "rules": [
       "session.verbs not empty and session.requestSocketPath absent, or the path present with no verbs",
+      "session.writes present and not an array of strings",
       "the socket path lies in the very directory of the attempt's GO socket (envelope.terminal.socketPath): the same rule the sandbox bind-back applies on its side",
       "identity.writerId, session.role and hostBin are non-empty strings",
       "at least one process step (not a builtin) exists: the route child starts with the environment of the first one and nothing else"

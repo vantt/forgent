@@ -123,7 +123,7 @@ export async function launchSessionAttempt({ binding, runnerConfig, key, role, g
       dispatchBatchKey: beside ?? attemptId,
       mutating: false,
       settings: readLaunchSettings(projectRoot),
-      session: { role, verbs: [...grant.verbs], ...(requestSocketPath ? { requestSocketPath } : {}) },
+      session: { role, verbs: [...grant.verbs], writes: [...grant.writes], ...(requestSocketPath ? { requestSocketPath } : {}) },
       requestSocket: requestSocketPath ?? undefined,
       ceilingMs,
       opening,
