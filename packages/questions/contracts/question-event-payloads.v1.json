@@ -66,7 +66,7 @@
   },
   "oneOf": [
     {
-      "title": "question.asked",
+      "title": "questions.asked",
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "askedAt", "asker", "stage", "ref", "headline", "blocks", "parts", "migrated"],
@@ -84,7 +84,7 @@
       }
     },
     {
-      "title": "question.answered",
+      "title": "questions.answered",
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "by", "answeredAt"],
@@ -99,7 +99,7 @@
       }
     },
     {
-      "title": "question.acked",
+      "title": "questions.acked",
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "by", "at"],
@@ -110,7 +110,7 @@
       }
     },
     {
-      "title": "question.cancelled",
+      "title": "questions.cancelled",
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "by", "reason", "at"],

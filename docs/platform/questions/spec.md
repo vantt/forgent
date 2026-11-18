@@ -51,10 +51,10 @@ copy and receive the answer back); the wake-up of an idle or gone asker (supervi
 
 | Entity | Fields | Contract |
 |---|---|---|
-| Question | `id` (`q-...`, minted by `fgos identity mint question`), `askedAt`, `asker{sessionId, handle, roles, persona?, pane?, machine}`, `stage`, `ref{value, branch, commit}`, `headline`, `blocks`, `parts{what, cause, options[{label, does, gain, harm, cost, recommended?}], recommendation, scope{allows, forbids}}`, `migrated`, `supersedes?` | payload of `question.asked`: `packages/questions/contracts/question-event-payloads.v1.json` |
-| Answer | `id`, `option?`, `text?` (at least one), `by`, `via?`, `answeredAt` | payload of `question.answered` |
-| Ack | `id`, `by`, `at` | payload of `question.acked` |
-| Cancel | `id`, `by`, `reason`, `at` | payload of `question.cancelled` |
+| Question | `id` (`q-...`, minted by `fgos identity mint question`), `askedAt`, `asker{sessionId, handle, roles, persona?, pane?, machine}`, `stage`, `ref{value, branch, commit}`, `headline`, `blocks`, `parts{what, cause, options[{label, does, gain, harm, cost, recommended?}], recommendation, scope{allows, forbids}}`, `migrated`, `supersedes?` | payload of `questions.asked`: `packages/questions/contracts/question-event-payloads.v1.json` |
+| Answer | `id`, `option?`, `text?` (at least one), `by`, `via?`, `answeredAt` | payload of `questions.answered` |
+| Ack | `id`, `by`, `at` | payload of `questions.acked` |
+| Cancel | `id`, `by`, `reason`, `at` | payload of `questions.cancelled` |
 
 - The `ask --input` shape is `packages/questions/contracts/questions-input.v1.json`. It is the rule authority for the
   door: every measurable limit is data there (headline one line, at most 120 characters; `what` and `cause` at most
@@ -95,10 +95,10 @@ copy and receive the answer back); the wake-up of an idle or gone asker (supervi
 |---|---|
 | `fgos questions [list] [--all] [--answered] [--json]` | One line per question: headline, recommended option, `blocks`, age, answer command; a "needs you" count first. Open gates and `fgos ask` items appear beside the store's questions through the doctor bridge request `work-questions`, fail-open (`work-sources: unavailable <reason>`). `--open` is not accepted. |
 | `show <id>` | The five parts, each option's cost, the asker's handle and role, any conflict. |
-| `ask --ref <ref> --input <file\|-> [--migrated] [--supersedes <id>]` | Checks shape and ref, fills the asker, mints the id, appends `question.asked`, returns the id. `--supersedes` cancels the old question with reason `superseded:<new id>`. |
-| `answer <id> [--option <label>] [--text <t>] [--source <s>]` | Appends `question.answered` once. `--source` is the caller's route (`secretary`, `gateway:<caller>`) and is kept as `via`. |
-| `ack <id>` | Appends `question.acked`. |
-| `cancel <id> --reason <t>` | Appends `question.cancelled`. |
+| `ask --ref <ref> --input <file\|-> [--migrated] [--supersedes <id>]` | Checks shape and ref, fills the asker, mints the id, appends `questions.asked`, returns the id. `--supersedes` cancels the old question with reason `superseded:<new id>`. |
+| `answer <id> [--option <label>] [--text <t>] [--source <s>]` | Appends `questions.answered` once. `--source` is the caller's route (`secretary`, `gateway:<caller>`) and is kept as `via`. |
+| `ack <id>` | Appends `questions.acked`. |
+| `cancel <id> --reason <t>` | Appends `questions.cancelled`. |
 
 **Head-socket verbs.** A confined head reaches the door through its request socket: `questions ask`, `questions ack`
 and `questions cancel` for every head, `questions answer` for the secretary only. They are declared in

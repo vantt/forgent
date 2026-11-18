@@ -1,0 +1,21 @@
+[package]
+name = "fgos-questions"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+fgos-host-runtime = { path = "../../host-runtime/rust" }
+fgos-durable-file = { path = "../../durable-file/rust" }
+fgos-git = { path = "../../git/rust" }
+fgos-holder-lock = { path = "../../holder-lock/rust" }
+fgos-identity = { path = "../../identity/rust", default-features = false, features = ["directory"] }
+fgos-observe = { path = "../../observe/rust" }
+fgos-process = { path = "../../process/rust" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+# Only the real-store test uses the Event Store, through a test-only adapter; the crate itself reaches it
+# through the QuestionLog port.
+fgos-event-store = { path = "../../event-store/rust" }

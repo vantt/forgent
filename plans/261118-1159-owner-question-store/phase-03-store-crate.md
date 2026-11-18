@@ -38,8 +38,8 @@
 2. Write `record.rs`, the four event payloads, and `pub const OBSERVE_KINDS` (`include_str!` of `observe-kinds.json`).
 3. Write `store.rs`. It has a port `QuestionLog { append, read }` (no adapter in this crate; tests use an in-memory
    log plus one test that runs over a real Event Store in a temp repo, through a test-only adapter in `tests/`), plus
-   `fold()`, which keeps the first answer in the store's reader order → per-id state `{open | answered | acked | cancelled, conflicts}`, where the earliest `answeredAt`
-   wins.
+   `fold()`, which keeps the first answer in the store's reader order (QP-4, never by timestamp) → per-id state
+   `{open | answered | acked | cancelled, conflicts}`.
 4. Write `caller.rs`. It is a port `CallerSource` that returns `{sessionId, handle, roles, persona, pane?, isAgent}`.
    - The Identity adapter gets `isAgent` from `agent_in_ancestry`, and gets the machine id.
    - The socket adapter takes the asker from a head envelope, and phase 8 supplies it.
@@ -82,3 +82,17 @@ Pass condition: all three are green.
 
 ## Rollback
 Revert the phase commit. No caller uses the crate yet.
+
+## Done notes (lead, 2026-11-18)
+- The phase 1 types `question.*` broke the Event Store rule that a type starts with its domain
+  (`packages/event-store/rust/src/registry.rs`), so they are `questions.asked|answered|acked|cancelled` now, in the
+  contracts, the spec and the plan. The Observe kinds stay `fgos.question.*`.
+- The consumer is registered without `cachePath`: the registry pairs a `cachePath` with a Node `rebuildModule`
+  (`src/event-store/consumers.mjs`), and the crate rewrites `.fgos/cache/questions.json` itself after every write and
+  read. Phase 4 decides whether `fgos events sync` refreshes it through a host rebuild.
+- No `docs/architecture-manifest.json` line: the manifest tiers Node paths only, and no crate has a layer entry.
+- A step that fails after an append (re-read, view rewrite, the cancel of a superseded question) is a `warning` on
+  `Done`, never an error, so a retry never writes twice.
+- Open for later phases (review, non-blocking): an answer folded after a cancel is dropped without a conflict; the
+  record source emits events the fold ignored (Observe keeps the first per id, so store order must hold); phase 5's
+  anti-join must also exclude cancelled questions; an unknown `--source` is kept as `via` without a check.

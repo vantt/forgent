@@ -478,6 +478,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-questions"
+version = "0.2.0"
+dependencies = [
+ "fgos-durable-file",
+ "fgos-event-store",
+ "fgos-git",
+ "fgos-holder-lock",
+ "fgos-host-runtime",
+ "fgos-identity",
+ "fgos-observe",
+ "fgos-process",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "fgos-run-result"
 version = "0.2.0"
 dependencies = [

@@ -2,28 +2,28 @@
   "v": 1,
   "types": [
     {
-      "type": "question.asked",
+      "type": "questions.asked",
       "domain": "questions",
       "schemaVersion": 1,
       "scope": "project",
       "sealOnWrite": true
     },
     {
-      "type": "question.answered",
+      "type": "questions.answered",
       "domain": "questions",
       "schemaVersion": 1,
       "scope": "project",
       "sealOnWrite": true
     },
     {
-      "type": "question.acked",
+      "type": "questions.acked",
       "domain": "questions",
       "schemaVersion": 1,
       "scope": "project",
       "sealOnWrite": true
     },
     {
-      "type": "question.cancelled",
+      "type": "questions.cancelled",
       "domain": "questions",
       "schemaVersion": 1,
       "scope": "project",

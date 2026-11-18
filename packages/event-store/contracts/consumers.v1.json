@@ -26,6 +26,10 @@
     {
       "id": "supervision",
       "contractFile": "packages/supervision/contracts/event-streams.v1.json"
+    },
+    {
+      "id": "questions",
+      "contractFile": "packages/questions/contracts/question-event-streams.v1.json"
     }
   ]
 }

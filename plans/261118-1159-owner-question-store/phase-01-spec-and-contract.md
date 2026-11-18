@@ -38,13 +38,13 @@ every running or ready plan.
 2. Add the Questions row to `component-boundary.md`, and add the holder row for the `questions` scope to
    `governance.md`.
 3. Write `packages/questions/contracts/question-event-streams.v1.json`. It declares four types, each `scope: project`,
-   `schemaVersion: 1`, `sealOnWrite: true` (QP-2). The `asker` of `question.asked` also carries `machine`. Their payloads:
-   - `question.asked`: `{id, askedAt, asker{sessionId, handle, roles, persona?, pane?}, stage, ref{value, branch,
+   `schemaVersion: 1`, `sealOnWrite: true` (QP-2). The `asker` of `questions.asked` also carries `machine`. Their payloads:
+   - `questions.asked`: `{id, askedAt, asker{sessionId, handle, roles, persona?, pane?}, stage, ref{value, branch,
      commit}, headline, blocks, parts{what, cause, options[{label, does, gain, harm, cost, recommended?}],
      recommendation, scope{allows, forbids}}, migrated, supersedes?}`
-   - `question.answered`: `{id, option?, text?, by, via?, answeredAt}`
-   - `question.acked`: `{id, by, at}`
-   - `question.cancelled`: `{id, by, reason, at}`
+   - `questions.answered`: `{id, option?, text?, by, via?, answeredAt}`
+   - `questions.acked`: `{id, by, at}`
+   - `questions.cancelled`: `{id, by, reason, at}`
 4. Write `packages/questions/contracts/questions-input.v1.json`, the `ask --input` shape. Every QP-19 limit is data
    in this file (`maxLength` counts characters, and `minItems`/`maxItems` count options). The discovery exception is
    tied to a `discussion:` ref with stage `shaping`.

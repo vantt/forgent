@@ -34,6 +34,7 @@
     "packages/identity/contracts/identity-event-streams.v1.json",
     "packages/mailbox/contracts/event-streams.v1.json",
     "packages/supervision/contracts",
+    "packages/questions/contracts/question-event-streams.v1.json",
     "packages/git/contracts/mutation-census.v1.json"
   ],
   "scripts": {
