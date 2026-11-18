@@ -77,7 +77,7 @@ plain global executor.
 
 4. **This works identically whether the executor is dispatched headlessly**
    (`spawnWorker`, the `fgos-runner` loop) **or from an in-session skill**
-   (`node src/runner/dispatch.mjs decide <executorId>` to learn the
+   (`fgos dispatch decide <executorId>` to learn the
    mechanism, then `execute <executorId>` to actually run it) — both call
    the same `resolveExecutorConfig`, so an `agentType`-only executor
    resolves the same real command/args either way.

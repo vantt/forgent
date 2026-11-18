@@ -23,7 +23,7 @@ mean?**
 A capability is a stable behavior promise or purpose — never a task
 instance, a Work item, a lifecycle stage, a skill name, or an executor
 name. It is the string a caller passes to
-`node src/runner/dispatch.mjs decide --for <capability>` to ask the
+`fgos dispatch decide --for <capability>` to ask the
 control plane which mechanism (`unavailable` / `in-process` /
 `out-of-process`) should carry out one independently executable unit.
 

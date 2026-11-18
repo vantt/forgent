@@ -1,5 +1,5 @@
 // dispatch/cli.mjs — dispatch behavior + the thin CLI doors over it (D7, tsk-2uf-1):
-// the `decide`/`probe-account`/`probe-session`/`reconcile` subcommands of `node src/runner/dispatch.mjs`
+// the `probe-account`/`probe-session`/`reconcile` subcommands of `node src/runner/dispatch.mjs`
 // (`runDispatchCli`). One task runs through `fgos run`, planned work through a Workflow;
 // the raw `execute` and `log` subcommands are gone. See `docs/history/dispatch-activation-
 // and-handoff-redesign/CONTEXT.md` D7 for the module split.
@@ -18,7 +18,7 @@ class StoreError extends Error {
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { loadRunnerConfigForDir } from './config.mjs';
 import { commandCli } from './provider-capacity.mjs';
-import { decideCommand } from './decide.mjs';
+import { registeredCapabilityOf } from '../execution/capability-config.mjs';
 import { executeAssignment } from './assignment-runner.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
 import { ACCOUNT_PROBE_LEGS, runAccountProbe, runAccountSweep } from './provider-account-probe.mjs';
@@ -148,13 +148,60 @@ export function addDirsOf(args) {
 }
 
 /**
- * Body of `node src/runner/dispatch.mjs <decide|probe-account|reconcile> ...`, called from the
- * barrel's script guard; `fgos dispatch decide|probe-account` reach it with `returnResult`.
- * `resolveWork` is the Work lookup `decide --work` needs, handed in by bin; without it
- * `decide --work` refuses. `accountProbeDoors` replaces `probe-account`'s direct call, account lock, capacity record and runner config (tests). `executionDoor` is the execution door `probe-session` runs its seat through, handed in by bin
+ * The `fgos run` command a caller uses instead of dispatching `executorId` directly, read from
+ * the config at `cwd` without writing it. `--provider` names agent executors only, and only as a
+ * preference bind may override; a tool executor has no run door, so the hint says to call the
+ * tool itself. `capability` is kept when it is a registered one.
+ */
+export function runDoorHint({ cwd = process.cwd(), executorId, capability } = {}) {
+  let cfg = null;
+  try {
+    cfg = loadRunnerConfigForDir(resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd));
+  } catch { /* no readable config: the hint names no executor */ }
+  const executor = executorId && cfg?.executors && Object.hasOwn(cfg.executors, executorId) ? cfg.executors[executorId] : null;
+  const isAgent = executor !== null && (executor.kind ?? 'agent') === 'agent';
+  const registeredCapability = capability && cfg ? registeredCapabilityOf(cfg, capability) : undefined;
+  const command = ['fgos run "<prompt>"'];
+  if (isAgent) command.push(`--provider ${executorId}`);
+  if (registeredCapability) command.push(`--capability ${registeredCapability}`);
+  command.push('[--writes <paths> --worktree <path>]');
+  const hint = `\`${command.join(' ')}\``;
+  if (isAgent) return `${hint} (--provider is a preference: bind may choose another executor that serves the capability)`;
+  if (executor) return `${hint}; "${executorId}" is a ${executor.kind} executor, which fgos run cannot name -- call that tool directly instead`;
+  return hint;
+}
+
+/**
+ * The sentence a removed `fgos dispatch` door answers with, or null for a sub-verb that is not one: each ran one
+ * task straight through dispatch and now has a runUnit door. One place says which, so every caller of
+ * `fgos dispatch` (shell, gateway, scripts) gets the same validation error before anything runs.
+ */
+export function retiredDispatchDoorMessage(sub, positional, flags) {
+  if (sub === 'execute') {
+    if (flags.assignment !== undefined) {
+      return 'fgos dispatch execute --assignment was removed: run the unit with `fgos run --unit <file>`, or planned work with `fgos workflow start <preset>|--units <file>`.';
+    }
+    const executorId = positional[1] && !String(positional[1]).startsWith('--') ? positional[1] : undefined;
+    const hint = runDoorHint({
+      cwd: typeof flags.cwd === 'string' ? flags.cwd : process.cwd(),
+      executorId,
+      capability: typeof flags.for === 'string' ? flags.for : undefined,
+    });
+    return `fgos dispatch execute was removed: run one task with ${hint}, or a unit file with \`fgos run --unit <file>\`.`;
+  }
+  if (sub === 'log') {
+    return 'fgos dispatch log was removed: every run records its own provenance under `.fgos/assignments/<unitRunId>/`; run work through `fgos run` and read it there.';
+  }
+  return null;
+}
+
+/**
+ * Body of `node src/runner/dispatch.mjs <probe-account|probe-session|reconcile> ...`, called from the
+ * barrel's script guard; `fgos dispatch probe-account|probe-session` reach it with `returnResult`.
+ * `accountProbeDoors` replaces `probe-account`'s direct call, account lock, capacity record and runner config (tests). `executionDoor` is the execution door `probe-session` runs its seat through, handed in by bin
  * for the same reason (Dispatch sits below Execution and never imports it); without it `probe-session` refuses.
  */
-export async function runDispatchCli(argv = process.argv.slice(2), { returnResult = false, resolveWork, executionDoor, accountProbeDoors = {} } = {}) {
+export async function runDispatchCli(argv = process.argv.slice(2), { returnResult = false, executionDoor, accountProbeDoors = {} } = {}) {
   const [subcommand, ...afterSubcommand] = argv;
   // Purpose-based binding (tsk-2c1): a caller with no pre-registered
   // executorId to name (a gather branch) passes `--for <purpose>` instead
@@ -179,29 +226,6 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
     return value;
   };
   switch (subcommand) {
-    case 'decide': {
-      try {
-        const decided = await decideCommand({
-          executorId,
-          cwd: flagValue('--cwd') ?? flagValue('--dir'),
-          repoRoot: flagValue('--repo-root'),
-          hasLiveTaskAccess: rest.includes('--has-live-task-access'),
-          for: flagValue('--for'),
-          workId: flagValue('--work'),
-          assignment: flagValue('--assignment'),
-          stage: flagValue('--stage'),
-          needsSoul: rest.includes('--needs-soul'),
-          resolveWork,
-        });
-        if (returnResult) return decided;
-        process.stdout.write(`${JSON.stringify(decided)}\n`);
-      } catch (err) {
-        if (returnResult) throw err;
-        process.stderr.write(`${err.message}\n`);
-        process.exitCode = 1;
-      }
-      break;
-    }
     case 'probe-account': {
       // Diagnostic: the account's own login called directly, then every CLI of one provider account at the
       // same moment through the real dispatch door; `--all` does that for every enabled account.
@@ -328,7 +352,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       break;
     }
     default: {
-      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> | probe-account (--provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] | --all) [--leg direct|harness|both] [--record] [--timeout-ms <ms>] | probe-session <executorId> [--invocation <id>]. To run a task: fgos run "<prompt>"; decide --work: fgos dispatch decide --work <workId>\n`;
+      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs reconcile <runDir> | probe-account (--provider <provider> --account <accountId> [--executor <id>] [--invocation <id,...>] | --all) [--leg direct|harness|both] [--record] [--timeout-ms <ms>] | probe-session <executorId> [--invocation <id>]. To decide a dispatch: fgos dispatch decide; to run a task: fgos run "<prompt>"\n`;
       if (returnResult) throw new StoreError('validation', msg.trim());
       process.stderr.write(msg);
       process.exitCode = 1;

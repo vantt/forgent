@@ -121,7 +121,7 @@ src/runner/dispatch.mjs), any cell that edits src/runner/dispatch/** can break
 the master's ability to launch subagents. Therefore:
 - never run two Doers concurrently on dispatch files;
 - every cell touching src/runner/dispatch/** adds a smoke command to its
-  Commands section: `node src/runner/dispatch.mjs decide --for smoke
+  Commands section: `fgos dispatch decide --for smoke
   --needs-soul --has-live-task-access` must print a `mechanism` field; the
   cell cannot close while it fails;
 - if the hook refuses a subagent launch because of the in-flight change,

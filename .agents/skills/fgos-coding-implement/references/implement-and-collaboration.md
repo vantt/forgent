@@ -5,7 +5,7 @@ The full detail behind SKILL.md's Step 2.
 
 ## The dispatch-decide branches
 
-Run `dispatch.mjs decide` first, per SKILL.md's Hard rule, and branch on
+Run `fgos dispatch decide` first, per SKILL.md's Hard rule, and branch on
 its answer:
 
 - **`unavailable`** — do your own Implement work directly: reading

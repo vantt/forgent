@@ -205,7 +205,7 @@ tốt hơn, không to hơn
 
 For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment.
 
-**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or compatibility alias `node src/runner/dispatch.mjs decide`; `--work` only through `fgos dispatch decide`) first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`.
+**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`.
 
 Four ways to call `decide`, for four different situations:
 

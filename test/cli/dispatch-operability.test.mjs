@@ -17,39 +17,6 @@ function runFgos(args, options = {}) {
   });
 }
 
-function runDispatchDirect(args, options = {}) {
-  return spawnSync(process.execPath, ['src/runner/dispatch.mjs', ...args], {
-    cwd: repo,
-    encoding: 'utf8',
-    ...options,
-  });
-}
-
-test('fgos dispatch decide returns fgos.v1 envelope with reasonCodes', () => {
-  const result = runFgos(['dispatch', 'decide', 'claude-haiku']);
-  assert.equal(result.status, 0, result.stderr);
-  const parsed = JSON.parse(result.stdout);
-  assert.equal(parsed.contract, 'fgos.v1');
-  assert.ok(parsed.generated_at);
-  assert.ok(parsed.data_hash);
-  assert.ok(parsed.data);
-  assert.equal(parsed.data.mechanism, 'unavailable');
-  assert.equal(parsed.data.configured, false);
-  assert.ok(Array.isArray(parsed.data.reasonCodes));
-  assert.ok(parsed.data.reasonCodes.includes('selector.unregistered'));
-});
-
-test('node src/runner/dispatch.mjs decide returns raw JSON without fgos.v1 envelope (compatibility alias)', () => {
-  const result = runDispatchDirect(['decide', 'claude-haiku']);
-  assert.equal(result.status, 0, result.stderr);
-  const parsed = JSON.parse(result.stdout);
-  assert.equal(parsed.contract, undefined);
-  assert.equal(parsed.mechanism, 'unavailable');
-  assert.equal(parsed.configured, false);
-  assert.ok(Array.isArray(parsed.reasonCodes));
-  assert.ok(parsed.reasonCodes.includes('selector.unregistered'));
-});
-
 test('unknown dispatch sub-verb rejects before requiring runId (exit 4 validation)', () => {
   const result = runFgos(['dispatch', 'unknown-verb']);
   assert.equal(result.status, 4, `expected exit 4, got ${result.status} (stderr: ${result.stderr})`);
@@ -111,14 +78,4 @@ test('dispatch entry in command-registry declares touchesState: true and externa
   assert.ok(entry, 'dispatch entry must exist in COMMAND_REGISTRY');
   assert.equal(entry.touchesState, true, 'dispatch touchesState must be true');
   assert.equal(entry.externalEffect, true, 'dispatch externalEffect must be true');
-});
-
-test('fgos dispatch decide and node src/runner/dispatch.mjs decide both refuse --repo-root without --cwd', () => {
-  const direct = runDispatchDirect(['decide', 'no-such-exec', '--repo-root', '/nonexistent/path/12345']);
-  assert.equal(direct.status, 1);
-  assert.match(direct.stderr, /--repo-root.*passed without --cwd/);
-
-  const fgos = runFgos(['dispatch', 'decide', 'no-such-exec', '--repo-root', '/nonexistent/path/12345']);
-  assert.equal(fgos.status, 4);
-  assert.match(fgos.stderr, /--repo-root.*passed without --cwd/);
 });

@@ -98,7 +98,7 @@ have it reviewed — writes:
 
 Neither line names a provider, model, or executor. At execution time,
 whichever session picks up each unit runs
-`node src/runner/dispatch.mjs decide --for code:implement`
+`fgos dispatch decide --for code:implement`
 (respectively `code:review`) and acts on whatever mechanism comes back.
 
 ## Static harness (P3)

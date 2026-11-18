@@ -197,17 +197,39 @@ test('the drift scan covers the verbs that branch on a positional sub-verb', () 
   assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'config', 'convention', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'session']);
 });
 
+// A verb that lists sub-verbs in `native` serves those in the Rust host: the Node handler holds no branch for them
+// (a branch would be a second path), and their flags are read from the one Rust projector instead.
+const nativeSubsOf = (entry) => (Array.isArray(entry.native) ? entry.native : []);
+const DISPATCH_NATIVE_FLAGS = () => {
+  const src = fs.readFileSync(path.join(REPO_ROOT, 'apps/fgos/src/wiring/dispatch_decide.rs'), 'utf8');
+  const start = src.indexOf('pub fn project_dispatch_request');
+  const region = src.slice(start, src.indexOf('// ---- failures', start));
+  return new Set([...region.matchAll(/\bpresent\("([a-z][a-z-]*)"\)|\btext_flag\(&call, "([a-z][a-z-]*)"\)/g)].map((m) => m[1] ?? m[2]));
+};
+
+test('dispatch: the sub-verbs it serves natively have no Node branch, and their schemas name exactly the flags the Rust projector reads', () => {
+  const entry = MULTI.find((e) => e.name === 'dispatch');
+  const natives = nativeSubsOf(entry);
+  assert.deepEqual(natives.sort(), ['decide', 'explain']);
+  const { regions } = subRegions('dispatch', verbCase('dispatch'), Object.keys(entry.subcommands));
+  for (const sub of natives) assert.equal(regions[sub], undefined, `dispatch ${sub} is native: the Node handler must not branch on it`);
+  const declared = new Set(natives.flatMap((sub) => schemaFlags(entry.subcommands[sub])).filter((name) => !GLOBAL.has(name)));
+  assert.deepEqual([...declared].sort(), [...DISPATCH_NATIVE_FLAGS()].sort());
+});
+
 for (const entry of MULTI) {
   test(`${entry.name}: flags read by each sub-verb's handler match that sub-verb's schema`, () => {
-    const subs = Object.keys(entry.subcommands);
+    const natives = nativeSubsOf(entry);
+    const subs = Object.keys(entry.subcommands).filter((sub) => !natives.includes(sub));
     const caseText = verbCase(entry.name);
-    const { regions, shared } = subRegions(entry.name, caseText, subs);
+    const { regions, shared } = subRegions(entry.name, caseText, Object.keys(entry.subcommands));
     for (const sub of subs) {
       assert.ok(regions[sub] !== undefined, `${entry.name}: the registry lists sub-verb "${sub}" but the handler has no branch for it`);
     }
     const sharedReads = regionReads(shared, `${entry.name} (shared)`);
     const problems = [];
-    const declaredAnywhere = new Set();
+    // A flag a natively served sub-verb accepts is one the verb accepts: the shared prelude may read it (the retired-door hint reads --for).
+    const declaredAnywhere = new Set(natives.flatMap((sub) => Object.keys(entry.subcommands[sub].parameters.properties)));
     for (const sub of subs) {
       const schema = entry.subcommands[sub].parameters;
       const declared = new Set(Object.keys(schema.properties));
@@ -239,7 +261,6 @@ for (const entry of MULTI) {
 test('the scanner sees what it claims to: known reads in known regions', () => {
   const dispatch = subRegions('dispatch', verbCase('dispatch'), Object.keys(MULTI.find((e) => e.name === 'dispatch').subcommands));
   assert.ok(regionReads(dispatch.regions.inspect, 'probe').has('provider-capacity'));
-  assert.ok(regionReads(dispatch.regions.decide, 'probe').has('has-live-task-access'));
   const merge = subRegions('merge', verbCase('merge'), ['list', 'next']);
   const nextReads = regionReads(merge.regions.next, 'probe');
   for (const name of ['acknowledge-iron-law', 'timeout', 'no-timeout', 'wait', 'no-wait']) assert.ok(nextReads.has(name), name);

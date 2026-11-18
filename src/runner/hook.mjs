@@ -8,13 +8,13 @@
 // which project owns the rules, so it is never read: a payload that says `/tmp` is judged as the project is.
 //
 // One rule for both formats: a payload that is empty or does not parse allows the call, and so does any failure
-// of a verdict itself; a refusal of the project's config blocks (see src/runner/dispatch/hook.mjs).
+// of a verdict itself.
 
 import fs from 'node:fs';
 import { decisionQuestionHookVerdict } from '../state/decision-question.mjs';
 
 /** Hook kinds this module judges. */
-export const IN_PROCESS_HOOK_KINDS = Object.freeze(['dispatch-decide', 'decision-question']);
+export const IN_PROCESS_HOOK_KINDS = Object.freeze(['decision-question']);
 
 const allow = Object.freeze({ blocked: false });
 const isText = (value) => typeof value === 'string' && value.trim() !== '';
@@ -62,9 +62,7 @@ export async function runHook(kind, { stdin, format = null, env = process.env, c
   const call = normalizeHookPayload(stdin, { format, env, cwd });
   if (call === null) return answer(allow, format);
   try {
-    // The dispatch verdict loads the config, plan and repository doors; the question verdict needs none of them.
-    const verdict = kind === 'dispatch-decide' ? await (await import('./dispatch/hook.mjs')).decideDispatchHook(call) : decisionQuestionHookVerdict(call);
-    return answer(verdict, call.format);
+    return answer(decisionQuestionHookVerdict(call), call.format);
   } catch {
     return answer(allow, call.format);
   }

@@ -56,7 +56,7 @@ field").
 **Read this before dispatching any of the above for real.** `claude-bwrap`,
 `agy-bwrap`, and `codex-readonly` are registered in this repository's live
 `.fgos/config.json` (`tsk-1o4`, closed by P05.2)
-(`node src/runner/dispatch.mjs decide claude-bwrap --has-live-task-access`
+(`fgos dispatch decide claude-bwrap --has-live-task-access`
 returns `{"mechanism":"out-of-process","configured":true}`). Re-run the
 `decide` check above before a real session if the config may have changed
 since. **P01.2 and P01.3, the two earlier proof sessions, predate this

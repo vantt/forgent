@@ -123,23 +123,7 @@ test('fgos dispatch log is a validation error pointing at the unit run directory
   assert.equal(eventLines(fgosDir), before);
 });
 
-test('fgos dispatch decide --work resolves the item through the Work layer handed in by bin, to the executor Seat Binding binds for its step', () => {
-  const { root, fgosDir } = mkStore();
-  writeConfig(fgosDir);
-  const out = run(FGOS, ['dispatch', 'decide', '--work', 'cand1'], root);
-  assert.equal(out.status, 0, out.stderr);
-  assert.equal(JSON.parse(out.stdout).data.executorId, 'ag1');
-});
-
-test('node src/runner/dispatch.mjs decide --work refuses and points at fgos dispatch decide --work', () => {
-  const { root } = mkStore();
-  const out = run(DISPATCH, ['decide', '--work', 'cand1'], root);
-  assert.equal(out.status, 1);
-  assert.match(out.stderr, /fgos dispatch decide/);
-  assert.equal(out.stdout, '');
-});
-
-for (const sub of ['execute', 'log', 'fanout-batch']) {
+for (const sub of ['execute', 'log', 'fanout-batch', 'decide']) {
   test(`node src/runner/dispatch.mjs ${sub} is an unknown subcommand`, () => {
     const { root, fgosDir } = mkStore();
     const before = eventLines(fgosDir);
@@ -152,7 +136,7 @@ for (const sub of ['execute', 'log', 'fanout-batch']) {
 
 test('the legacy payload refuses the native hook kinds by name instead of answering them', () => {
   const { root } = mkStore();
-  for (const kind of ['mailbox', 'mailbox-sync']) {
+  for (const kind of ['mailbox', 'mailbox-sync', 'dispatch-decide']) {
     // boundary: the refusal is the legacy payload's own exit status and streams, seen by the CLI that runs the hook line
     const out = spawnSync(process.execPath, [FGOS, 'hook', kind, '--cli', 'claude', '--event', 'stop'], {
       cwd: root,
@@ -163,32 +147,4 @@ test('the legacy payload refuses the native hook kinds by name instead of answer
     assert.equal(out.stdout, '');
     assert.match(out.stderr, new RegExp(`hook kind "${kind}" is served by the native fgos host`));
   }
-});
-
-test('fgos dispatch decide writes a refusal once, on stderr, with nothing on stdout', () => {
-  const { root, fgosDir } = mkStore();
-  writeConfig(fgosDir);
-  const out = run(FGOS, ['dispatch', 'decide', '--work', 'no-such-item'], root);
-  assert.notEqual(out.status, 0);
-  assert.equal(out.stdout, '', 'the refusal is not also printed as JSON on stdout');
-  assert.equal(out.stderr.split('\n').filter((line) => line.includes('no work item "no-such-item" found')).length, 1, out.stderr);
-  assert.match(out.stderr, /no work item "no-such-item" found/);
-});
-
-test('fgos hook dispatch-decide (agy payload) denies a subagent call whose purpose nothing can serve here, naming the decide answer and no retired door', () => {
-  const { root, fgosDir } = mkStore();
-  writeConfig(fgosDir);
-  const env = { ...process.env };
-  delete env.CLAUDE_CODE_SESSION_ID;
-  const out = spawnSync(process.execPath, [FGOS, 'hook', 'dispatch-decide', '--format=agy'], {
-    cwd: root,
-    encoding: 'utf8',
-    env,
-    input: JSON.stringify({ toolCall: { name: 'Agent', args: { subagent_type: 'blocked' } }, workspacePaths: [root] }),
-  });
-  assert.equal(out.status, 0, out.stderr);
-  const decision = JSON.parse(out.stdout.trim().split('\n').at(-1));
-  assert.equal(decision.decision, 'deny');
-  assert.match(decision.reason, /decide answered unavailable for it \(tool\.unprobeable\)/);
-  assert.doesNotMatch(decision.reason, /dispatch execute|--provider tool-only/);
 });

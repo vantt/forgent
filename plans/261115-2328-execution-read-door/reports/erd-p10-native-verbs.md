@@ -50,3 +50,19 @@ while the `agents` arm is still in `bin/fgos.mjs`). `test/rust-host/help-routes.
 Lead-owned edits: `agent-definitions.mjs` bytewise `sortedNames` (the Node twin replays the new vector; `agent-listing`
 green), `command-routes.test.mjs`, `subcommand-flag-drift.test.mjs` (agents is native, its Rust source added, dead
 single-sub-verb table removed), architecture door row for `wiring/agents.rs`, census regenerated.
+
+## Node deletions (retired test -> owner now)
+
+Deleted: the `decide`, `explain` and `agents` arms of `bin/fgos.mjs`; `src/runner/dispatch/{decide,hook}.mjs`; `src/runner/execution/explain.mjs`; the `dispatch-decide` kind of `src/runner/hook.mjs`; the `decide` case of `runDispatchCli` (the alias `src/runner/dispatch.mjs` now answers `probe-account`, `probe-session` and `reconcile` only); `scripts/dispatch-decide-hook.mjs` (checked: the packaging row `dispatch-decide-hook-wired` reports a settings file naming it as missing a canonical hook, and `install_hook` rewrites it to the shim; golden vector `claude-legacy-scripts` in `agent-hooks-vectors.json`); the Node recorder `scripts/decide-vectors.mjs` and its evaluator `test/helpers/decide-vectors.helper.mjs` (the vectors are Rust-owned now). `runDoorHint` stayed (moved with `retiredDispatchDoorMessage` into `dispatch/cli.mjs`): the retired `dispatch execute` hint calls it. No `EXIT_OF` or `ARM_STATIC_IMPORTS` line named these arms.
+
+| retired test | owner now |
+|---|---|
+| `test/runner/execution/explain.test.mjs` (file) | `golden_bind.rs` |
+| `test/scripts/dispatch-decide-hook.test.mjs` (file) | `golden_decide.rs` hook vectors and the `cli_tests.rs` hook case |
+| `test/runner/dispatch.test.mjs`: every `decideExecutorCli` case (executor id, --for, --needs-soul, tool purposes and mcp hand-back, --work, governance block, capability rows), the `dispatch.mjs decide` spawn cases (usage, --cwd, --repo-root guard), `fgos dispatch decide --work` spawn, the decide-contract replay and the vector-script test | `golden_decide.rs` (cases) and `cli_tests.rs` (wiring, incl. `--work` bridge) |
+| `test/runner/assignment-dispatch.test.mjs`: `decideExecutorCli resolves dispatch plan for an assignment` | `golden_decide.rs` (assignment vectors) |
+| `test/cli/dispatch-operability.test.mjs`: decide envelope, alias raw JSON, `--repo-root` without `--cwd` | `cli_tests.rs` and the `dispatch-decide` parity table (until it is deleted) |
+| `test/cli/dispatch-retired-doors.test.mjs`: `decide --work` through the Work layer, alias `decide --work` refusal, refusal written once, agy hook deny case | `cli_tests.rs` (bridge, refusal streams, hook) and `golden_decide.rs` hook vectors |
+| `test/runner/dispatch-governance-operability.test.mjs`: governance-blocked vs unregistered shape | `golden_decide.rs` governance vectors |
+
+Kept and changed: the retired-door test now also pins that `decide` is an unknown alias sub-command and that the legacy payload refuses the native `dispatch-decide` hook kind by name; the symlinked-entry test of `dispatch.mjs` drives `reconcile`; `subcommand-flag-drift` reads the native `dispatch` flags from `project_dispatch_request`; `plan.mjs` usage names `fgos dispatch decide`. Not run here: `verb-parity` (needs `FGOS_TEST_PARITY_BASE`, a staged base release) and `fgctl-uninstall` (needs a release `fgctl`). Historical docs (history, discussions, decisions, explanation, knowledge narratives, verification logs) still say `node src/runner/dispatch.mjs decide`; they record what was true then and are left.

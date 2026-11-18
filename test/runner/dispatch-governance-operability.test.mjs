@@ -7,13 +7,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { executeAssignment as executeAssignmentRaw } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { bindableExecute } from '../helpers/work-seat-config.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { showRunUseCase, readRunSnapshot } from '../../src/verbs/dispatch/show-run.mjs';
@@ -31,80 +29,6 @@ import {
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '..', '..');
-
-function runFgos(args, options = {}) {
-  return spawnSync(process.execPath, ['bin/fgos.mjs', ...args], {
-    cwd: REPO,
-    encoding: 'utf8',
-    ...options,
-  });
-}
-
-function runDispatchDirect(args, options = {}) {
-  return spawnSync(process.execPath, ['src/runner/dispatch.mjs', ...args], {
-    cwd: REPO,
-    encoding: 'utf8',
-    ...options,
-  });
-}
-
-// ─── 1. Governance-blocked vs Unregistered Result Shape ────────────────────────
-
-test('governance-blocked versus unregistered result shape across public CLI and compat doors', () => {
-  // 1a. Unregistered executor via CLI door: wrapped in fgos.v1 envelope, mechanism: unavailable, reasonCodes: ['selector.unregistered'], configured: false
-  const unregCli = runFgos(['dispatch', 'decide', 'unregistered-test-executor-id']);
-  assert.equal(unregCli.status, 0, unregCli.stderr);
-  const unregCliParsed = JSON.parse(unregCli.stdout);
-  assert.equal(unregCliParsed.contract, 'fgos.v1');
-  assert.equal(unregCliParsed.data.mechanism, 'unavailable');
-  assert.equal(unregCliParsed.data.configured, false);
-  assert.ok(Array.isArray(unregCliParsed.data.reasonCodes));
-  assert.ok(unregCliParsed.data.reasonCodes.includes('selector.unregistered'));
-  assert.equal(unregCliParsed.data.blockedReason, undefined);
-
-  // 1b. Unregistered executor via compat door: raw JSON without envelope
-  const unregCompat = runDispatchDirect(['decide', 'unregistered-test-executor-id']);
-  assert.equal(unregCompat.status, 0, unregCompat.stderr);
-  const unregCompatParsed = JSON.parse(unregCompat.stdout);
-  assert.equal(unregCompatParsed.contract, undefined);
-  assert.equal(unregCompatParsed.mechanism, 'unavailable');
-  assert.equal(unregCompatParsed.configured, false);
-  assert.ok(Array.isArray(unregCompatParsed.reasonCodes));
-  assert.ok(unregCompatParsed.reasonCodes.includes('selector.unregistered'));
-
-  // 1c. Governance-blocked executor via config: mechanism: unavailable, reasonCodes: ['governance.blocked'], blockedReason defined
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gov-shape-test-'));
-  spawnSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
-  const fgosDir = path.join(tmp, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
-  writeProjectConfig(tmp, {
-      runner: {
-        patterns: { seatBinding: { schema: 1 } },
-        governance: {
-          disallowedExecutors: ['blocked-worker'],
-        },
-        executors: {
-          'blocked-worker': {
-            kind: 'agent',
-            invocations: [{ id: 'blocked-worker-cli', via: 'cli', command: 'echo', args: ['blocked'] }],
-            providerModel: 'openai-codex',
-            allowCrossProvider: false,
-          },
-        },
-      },
-    });
-
-  const govCli = runFgos(['dispatch', 'decide', 'blocked-worker', '--dir', tmp]);
-  assert.equal(govCli.status, 0, govCli.stderr);
-  const govCliParsed = JSON.parse(govCli.stdout);
-  assert.equal(govCliParsed.contract, 'fgos.v1');
-  assert.equal(govCliParsed.data.mechanism, 'unavailable');
-  assert.ok(Array.isArray(govCliParsed.data.reasonCodes));
-  assert.ok(govCliParsed.data.reasonCodes.includes('governance.blocked'));
-  assert.ok(typeof govCliParsed.data.blockedReason === 'string' && govCliParsed.data.blockedReason.length > 0);
-
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
 
 // ─── 2. Cross-Provider Refusal Before Spawn ───────────────────────────────────
 

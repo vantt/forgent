@@ -13,12 +13,10 @@ import { execSync, execFileSync, execFile, spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment as executeAssignmentRaw, commitRunSettlement, settleRunOutcome, resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { bindable, bindableExecute, bindableFile } from '../helpers/work-seat-config.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { bindable, bindableExecute } from '../helpers/work-seat-config.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
-import { decideExecutorCli } from '../../src/runner/dispatch/decide.mjs';
 import { acquireRunControl, releaseRunControl } from '../../src/run-supervisor/run-lock.mjs';
 import { canonicalJson, computeSha256Digest } from '../../src/native/proof-helpers.mjs';
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
@@ -293,43 +291,6 @@ test('compileDispatchPlan produces selector.type: "assignment" and resolves exec
   assert.equal(plan.selector.value, assignment.assignmentId);
   assert.equal(plan.mechanism, 'out-of-process');
   assert.equal(plan.executorId, 'claude');
-});
-
-test('decideExecutorCli resolves dispatch plan for an assignment', async () => {
-  const tempDir = mkTempDir();
-  const assignment = buildAssignment({
-    workId: 'tsk-decide-asgn',
-    stage: 'planning',
-    operation: 'validate-plan',
-  });
-
-  // Write assignment.json under .fgos/assignments/<id>/
-  const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
-  fs.mkdirSync(asgnDir, { recursive: true });
-  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(assignment, null, 2));
-
-  // Declare the executor explicitly: with no project config, the runner
-  // bootstraps one from whichever assistant CLI the machine has on PATH, which
-  // a machine without one (a CI runner) cannot satisfy.
-  writeProjectConfig(tempDir, { runner: bindableFile({ executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] } }) });
-
-  // The runner config is read through the config door, which also reads the machine's global file: give
-  // this test an empty one rather than whatever an earlier test's child process left under HOME.
-  const prevHome = process.env.HOME;
-  process.env.HOME = mkTempDir();
-  let decided;
-  try {
-    decided = await decideExecutorCli(undefined, {
-      cwd: tempDir,
-      repoRoot: tempDir,
-      assignment: assignment.assignmentId,
-    });
-  } finally {
-    process.env.HOME = prevHome;
-  }
-
-  assert.equal(decided.mechanism, 'out-of-process');
-  assert.equal(decided.executorId, 'claude');
 });
 
 // The `missionId`-bearing declared-assignment scenario this test used to

@@ -56,13 +56,13 @@ on how you got here:
   ```bash
   fgos <verb> ...
   ```
-- **Always call `dispatch.mjs decide` first for the Implement step —
+- **Always call `fgos dispatch decide` first for the Implement step —
   never assume "I have a live Task tool, so I do it myself" as the
   default.** A `cli-spawn`-shaped executor already registered in
   `.fgos/config.json` resolves `out-of-process` *unconditionally* once
   configured — having live Task access does not change that; config
   wins, not "I already have full context so I'll do it myself". Run
-  `node src/runner/dispatch.mjs decide --for code:implement [--has-live-task-access]`
+  `fgos dispatch decide --for code:implement [--has-live-task-access]`
   as the very first action of Implement and branch on the real
   `mechanism` it returns. Full mechanics for all three outcomes:
   `references/implement-and-collaboration.md`.
@@ -122,7 +122,7 @@ Re-check live claim status if this session did not arrive via
 `implementer`. Full mechanics: `references/worker-contract-and-orient.md`.
 
 ### Step 2: Implement
-Run `dispatch.mjs decide` first (per the Hard rule above) and branch on
+Run `fgos dispatch decide` first (per the Hard rule above) and branch on
 its answer — do the work yourself, or dispatch it out-of-process. Apply
 the impact-analysis capability gate before editing a symbol. Fix a bug,
 add missing functionality, or fix a blocking issue found in the path

@@ -159,7 +159,6 @@
     "test('the committed .fgos/config.json runner section declares the gather executor (tsk-28o): for \"gather\", needs \"prompt-completion\", carries \"repo-content\" (D1, gather-executor-purpose-binding CONTEXT.md), kind cli, allowCrossProvider true, well-formed {prompt}/{model} args', () => {",
     "test('resolveExecutorCommand: attestRoot, when given, is read INSTEAD of fgosDir\\'s own root (tsk-4hl fix)', () => {",
     "test('resolveExecutorCommand still skips both the presence check and the cross-provider check for a kind:\"task\" executor, even unregistered and non-Claude-shaped (D13: kind !== \"task\" excludes task by construction)', () => {",
-    "test('decideExecutorCli omits agentType entirely for a kind:\"cli\" executor that declares none (tsk-3ik-3)', async () => {",
     "test('spawnWorker attests its OWN cwd (the dispatch worktree), never opts.fgosDir\\'s root (tsk-4hl fix)', async () => {",
     "test('resolveExecutorCommand with no executors block at all never triggers cross-provider governance, byte-identical to pre-tsk-32n behavior', () => {",
     "test('resolveExecutorCommand throws for a non-Claude \"cli\" executor even when fgosDir is given and the D6 registration/presence check already passed', () => {",

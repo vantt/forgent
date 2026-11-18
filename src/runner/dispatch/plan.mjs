@@ -526,7 +526,7 @@ export function compileDispatchPlan(
   refuseWorkItemInput(arguments[1], 'compileDispatchPlan()');
   if (!executorIdArg && !purpose && !workIdArg && !assignmentArg && !needsSoul) {
     throw new RunnerConfigError(
-      'usage: node src/runner/dispatch.mjs decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
+      'usage: fgos dispatch decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]',
     );
   }
 

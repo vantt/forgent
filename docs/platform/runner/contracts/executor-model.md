@@ -227,12 +227,12 @@ these answers `in-process` under `--needs-soul` (native dispatch by default) and
 
 The PreToolUse hook guards Agent and Task calls by running `decide` for the caller.
 
-- Payload normalization (`normalizeHookPayload`): two formats. The standard format (`tool_name`, `tool_input`,
+- Payload normalization (`normalize_hook_payload`): two formats. The standard format (`tool_name`, `tool_input`,
   `transcript_path`) and agy's (`toolCall.name`, `toolCall.args`, `workspacePaths`). The project directory a verdict is
   judged against is `CLAUDE_PROJECT_DIR` for every standard-format payload, agy's `workspacePaths[0]` for agy, else the
   directory the hook started in; a `cwd` inside a payload is never read. An empty payload, or one that is not a JSON
   object, allows the call.
-- Verdict (`decideDispatchHook`): a tool that is not Agent, Task or task allows. For an Agent or Task call it runs
+- Verdict (`dispatch_verdict`): a tool that is not Agent, Task or task allows. For an Agent or Task call it runs
   `decide --for <subagent type> --needs-soul --has-live-task-access` (the type is `subagent_type`, else `agent`, else
   `general-purpose`) and blocks unless the answer is `in-process`, naming the cause and the `fgos run` door to use.
   A project directory that does not exist blocks. A refusal of the project's config (a `config-*` refusal) blocks.

@@ -2406,7 +2406,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // imports a herdr client or a dispatch adapter, so there is no path from
     // this case to sending anything into a pane.
     case 'dispatch': {
-      const { retiredDispatchDoorMessage, decideCommand } = await import('../src/runner/dispatch/decide.mjs');
+      const { retiredDispatchDoorMessage } = await import('../src/runner/dispatch/cli.mjs');
       const retired = retiredDispatchDoorMessage(positional[0], positional, { assignment: flags.assignment, cwd: flags.cwd, for: flags.for });
       if (retired) throw new StoreError('validation', retired);
       const sub = requireSubVerb('dispatch', positional);
@@ -2423,34 +2423,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const executionDoor = (options) => runUnit({ ...options, caseAdmission: createCaseAdmissionPort({ repoRoot: options.repoRoot }) });
         return await runDispatchCli(rawArgv, { returnResult: true, executionDoor });
       }
-      if (sub === 'decide') {
-        // Dispatch holds no Work store: `decide --work` gets its Work lookup from here.
-        const { resolveWorkForDispatch } = await import('../src/runner/work-dispatch.mjs');
-        const text = (value) => (typeof value === 'string' ? value : undefined);
-        return await decideCommand({
-          executorId: positional[1],
-          cwd: text(flags.cwd) ?? text(flags.dir),
-          repoRoot: text(flags['repo-root']),
-          hasLiveTaskAccess: flags['has-live-task-access'] !== undefined,
-          for: text(flags.for),
-          workId: text(flags.work),
-          assignment: text(flags.assignment),
-          stage: text(flags.stage),
-          needsSoul: flags['needs-soul'] !== undefined,
-          resolveWork: resolveWorkForDispatch,
-        });
-      }
       const repoRootForDispatch = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
-      if (sub === 'explain') {
-        // Read-only: the config is loaded without filling in defaults, and nothing is leased or spawned.
-        const { explainCapability } = await import('../src/runner/execution/explain.mjs');
-        const { detectHerdrPresent } = await import('../src/runner/execution/run.mjs');
-        return explainCapability(loadRunnerConfigForDir(repoRootForDispatch), {
-          capability: requireField(flags.for, 'dispatch explain requires --for <capability>'),
-          rigor: flags.rigor,
-          session: { headless: true, herdrPresent: detectHerdrPresent() },
-        });
-      }
       if (sub === 'inspect') {
         return invokeDispatchInspectOperation({
           operationId: 'dispatch.runtime.inspect', effect: 'read',
@@ -3506,16 +3479,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         return goalFocusShow(dir);
       }
       throw new StoreError('validation', `unknown goal sub-verb "${sub}". Usage: fgos goal <set|show> ...`);
-    }
-
-    // Read-only listing of the personas a `--seats "@name"` seat can name; a pure read of the
-    // three definition tiers (src/runner/agent-listing.mjs), no store and no event.
-    case 'agents': {
-      requireSubVerb('agents', positional);
-      const { listAgents } = await import('../src/runner/agent-listing.mjs');
-      const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
-      const projectRoot = typeof flags.worktree === 'string' ? path.resolve(flags.worktree) : resolveGitRoots(process.cwd()).worktreeRoot;
-      return { projectRoot, ...listAgents({ projectRoot }) };
     }
 
     case 'unclaim': {
