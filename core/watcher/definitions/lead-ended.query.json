@@ -1,13 +1,47 @@
 {
   "name": "lead-ended",
-  "requires": ["fgos.head.state"],
+  "requires": [
+    "fgos.head.state"
+  ],
   "query": {
-    "kind": ["fgos.head.state"],
-    "where": [
-      { "field": "fgos.head.state", "op": "eq", "value": "retired" }
+    "kind": [
+      "fgos.head.state"
     ],
-    "by": ["subject.id"],
-    "agg": ["max:ts"]
+    "where": [
+      {
+        "field": "fgos.head.state",
+        "op": "eq",
+        "value": "retired"
+      },
+      {
+        "any": [
+          [
+            {
+              "field": "fgos.head.role",
+              "op": "prefix",
+              "value": "head:lead-"
+            }
+          ],
+          [
+            {
+              "field": "fgos.head.role",
+              "op": "prefix",
+              "value": "lead:"
+            }
+          ]
+        ]
+      }
+    ],
+    "by": [
+      "subject.id"
+    ],
+    "agg": [
+      "max:ts"
+    ]
   },
-  "row": { "kind": "lead-ended", "reason": "a head retired", "nextCommand": "fgos supervisor plans" }
+  "row": {
+    "kind": "lead-ended",
+    "reason": "a lead retired",
+    "nextCommand": "fgos supervisor plans"
+  }
 }

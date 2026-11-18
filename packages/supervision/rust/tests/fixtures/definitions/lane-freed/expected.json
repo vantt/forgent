@@ -1,8 +1,7 @@
 {
   "now": "2026-11-18T12:00:00Z",
   "group": {
-    "origin.host": "alpha",
-    "subject.id": "r1"
+    "origin.host": "alpha"
   },
   "since": "2026-11-18T10:30:00Z",
   "ts": "2026-11-18T11:00:00Z",

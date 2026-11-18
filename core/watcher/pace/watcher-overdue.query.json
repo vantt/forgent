@@ -1,12 +1,48 @@
 {
   "name": "watcher-overdue",
-  "requires": ["fgos.watcher.tick"],
+  "requires": [
+    "fgos.watcher.tick"
+  ],
+  "params": {
+    "k": {
+      "configKey": "watcher.overdueFactor"
+    }
+  },
   "query": {
-    "kind": ["fgos.watcher.tick"],
-    "agg": ["age:ts"],
+    "kind": [
+      "fgos.watcher.tick"
+    ],
+    "agg": [
+      "age:ts"
+    ],
     "having": [
-      { "lhs": { "agg": { "agg": "age:ts" } }, "op": "gt", "rhs": { "latest": { "measure": "fgos.watcher.interval", "k": 3 } } },
-      { "lhs": { "latest": { "measure": "fgos.plans.running" } }, "op": "gt", "rhs": { "const": 0 } }
+      {
+        "lhs": {
+          "agg": {
+            "agg": "age:ts"
+          }
+        },
+        "op": "gt",
+        "rhs": {
+          "latest": {
+            "measure": "fgos.watcher.interval",
+            "k": {
+              "param": "k"
+            }
+          }
+        }
+      },
+      {
+        "lhs": {
+          "latest": {
+            "measure": "fgos.plans.running"
+          }
+        },
+        "op": "gt",
+        "rhs": {
+          "const": 0
+        }
+      }
     ]
   }
 }

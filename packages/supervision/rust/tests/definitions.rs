@@ -86,17 +86,21 @@ fn scratch(name: &str) -> PathBuf {
     dir
 }
 
-/// A project root holding the test-local declarations of the upstream kinds, this crate's own kinds and `lines`.
+/// The declarations of the upstream kinds, read from the files that own them.
+const UPSTREAM_KINDS: [(&str, &str); 2] = [
+    ("heads-and-plans.json", "apps/fgos/observe-kinds.json"),
+    ("runs.json", "packages/run-result/rust/observe-kinds.json"),
+];
+
+/// A project root holding the upstream kinds as their owners declare them, this crate's own kinds and `lines`.
 fn project(name: &str, lines: &[String], declared: bool) -> PathBuf {
     let root = scratch(name);
     if declared {
         let kinds = root.join(".fgos/observe/kinds");
         std::fs::create_dir_all(&kinds).unwrap();
-        std::fs::copy(
-            fixtures().join("declarations.json"),
-            kinds.join("upstream.json"),
-        )
-        .unwrap();
+        for (name, owner) in UPSTREAM_KINDS {
+            std::fs::copy(repo().join(owner), kinds.join(name)).unwrap();
+        }
         std::fs::write(kinds.join("supervision.json"), SUPERVISION_KINDS).unwrap();
         let door = RecordDoor::new(root.clone(), environment(&[]).embedded_declarations(), None);
         for line in lines {
@@ -133,20 +137,15 @@ fn query(root: &Path, args: &[&str], env: &TestEnvironment) -> Value {
     dispatch_query(&request, env).unwrap()
 }
 
-/// The single definition `name`, answered over `root` at `now`. A window is the lookback the watcher applies as the
-/// query's `since`: the landed `--def` mode refuses a `--since` flag, so the window is written into a copy of the file.
+/// The single definition `name`, answered over `root` at `now`. `since` is the lookback the watcher passes as
+/// `--since`; a definition whose window is its own ignores it.
 fn answer(root: &Path, name: &str, now: &str, since: Option<&str>, env: &TestEnvironment) -> Value {
-    let mut file = definition_file(name);
+    let file = definition_file(name);
+    let mut args = vec!["--def", file.to_str().unwrap(), "--now", now];
     if let Some(since) = since {
-        let mut definition: Value =
-            serde_json::from_str(&std::fs::read_to_string(&file).unwrap()).unwrap();
-        definition["query"]["since"] = json!(since);
-        let dir = root.join("windowed");
-        std::fs::create_dir_all(&dir).unwrap();
-        file = dir.join(format!("{name}.query.json"));
-        std::fs::write(&file, serde_json::to_string(&definition).unwrap()).unwrap();
+        args.extend(["--since", since]);
     }
-    let all = query(root, &["--def", file.to_str().unwrap(), "--now", now], env);
+    let all = query(root, &args, env);
     let found: Vec<&Value> = all["definitions"]
         .as_array()
         .unwrap()
@@ -195,28 +194,23 @@ fn stamp(millis: i64) -> String {
     )
 }
 
-/// The instant a row stands for, which is the id of its event (the README's row-to-event rule): the newest record's
-/// instant; for a count over a run of point records, the first record of the run (`max:ts` less `span`); for one span
-/// without a count, its end (`max:ts` plus `span`).
+/// The instant a row stands for, which is the id of its event (the README's row-to-event rule): the run's first
+/// record (`min:ts`) when the row has one, else the end of the newest span (`max:end`), else the newest record
+/// (`max:ts`).
 fn row_ts(row: &Value) -> String {
     let aggs = &row["aggs"];
-    let newest = millis(aggs["max:ts"].as_str().unwrap());
-    let span = aggs
-        .get("span")
-        .and_then(Value::as_f64)
-        .map(|s| (s * 1000.0) as i64);
-    match (span, aggs.get("count").is_some()) {
-        (Some(span), true) => stamp(newest - span),
-        (Some(span), false) => stamp(newest + span),
-        (None, _) => stamp(newest),
-    }
+    ["min:ts", "max:end", "max:ts"]
+        .iter()
+        .find_map(|key| aggs.get(*key).and_then(Value::as_str))
+        .map(|instant| stamp(millis(instant)))
+        .unwrap()
 }
 
-/// Does the answer count a run of records (its instant is the run's first record)?
-fn run_count(answer: &Value) -> bool {
-    rows(answer)
-        .first()
-        .is_some_and(|r| r["aggs"].get("count").is_some() && r["aggs"].get("span").is_some())
+/// Is the definition's window its own, so the caller's `--since` does not cut it?
+fn own_window(name: &str) -> bool {
+    let file: Value =
+        serde_json::from_str(&std::fs::read_to_string(definition_file(name)).unwrap()).unwrap();
+    file["window"] == "own"
 }
 
 fn config_of(expected: &Value) -> Vec<(String, f64)> {
@@ -266,8 +260,9 @@ fn a_raised_definition_carries_its_row_template_and_a_pace_definition_carries_no
             .unwrap()
             .starts_with("fgos "));
         assert!(
-            file["query"]["since"].is_null() && file["query"]["until"].is_null(),
-            "{name}: the watcher owns the window"
+            file["query"]["until"].is_null()
+                && (file["window"] == "own" || file["query"]["since"].is_null()),
+            "{name}: the watcher owns the window unless the definition bounds itself"
         );
     }
     for name in PACE {
@@ -336,14 +331,14 @@ fn a_matching_fixture_run_again_over_an_overlapping_window_gives_the_same_subjec
             want["later"]["since"].as_str(),
             &env,
         );
-        if run_count(&first) {
-            // A run's first record is read from the window, so its instant holds only while the later window still
-            // reaches it; the README names the grammar a window-free run needs.
+        if own_window(name) {
+            // The later window starts after the run's first record: the instant holds because the caller's window
+            // never cuts this definition.
             let later_since = millis(want["later"]["since"].as_str().unwrap());
             let first_record = millis(want["ts"].as_str().unwrap());
             assert!(
-                later_since <= first_record,
-                "{name}: later window still holds the run's first record"
+                later_since > first_record,
+                "{name}: the later window starts past the run's first record"
             );
         }
         let (a, b) = (&rows(&first)[0], &rows(&second)[0]);
@@ -371,6 +366,7 @@ fn a_definition_whose_required_kind_is_undeclared_is_unmeasured_not_zero_rows() 
             &environment(&[
                 ("watcher.wakeFailureLimit", 3.0),
                 ("watcher.stuckWakeLimit", 4.0),
+                ("watcher.overdueFactor", 3.0),
             ]),
         );
         assert_eq!(
@@ -432,7 +428,7 @@ fn the_watcher_is_overdue_only_past_the_factor_times_its_interval_and_only_while
             "watcher-overdue",
             "2026-11-18T12:00:00Z",
             None,
-            &environment(&[]),
+            &environment(&[("watcher.overdueFactor", 3.0)]),
         );
         rows(&got).len()
     };
@@ -442,4 +438,99 @@ fn the_watcher_is_overdue_only_past_the_factor_times_its_interval_and_only_while
     assert_eq!(rows_for("overdue-idle", "2026-11-18T09:00:00Z", 60, 0), 0);
     // A longer interval in force moves the edge with it.
     assert_eq!(rows_for("overdue-slow", "2026-11-18T11:50:00Z", 600, 1), 0);
+}
+
+#[test]
+fn the_overdue_factor_comes_from_config_and_an_unset_key_is_unmeasured() {
+    let root = project(
+        "overdue-factor",
+        &[tick_line("t1", "2026-11-18T11:56:00Z", 60, 1)],
+        true,
+    );
+    let rows_at = |factor: f64| {
+        let got = answer(
+            &root,
+            "watcher-overdue",
+            "2026-11-18T12:00:00Z",
+            None,
+            &environment(&[("watcher.overdueFactor", factor)]),
+        );
+        rows(&got).len()
+    };
+    // The newest tick is four minutes old and the interval a minute.
+    assert_eq!(rows_at(3.0), 1);
+    assert_eq!(rows_at(5.0), 0);
+    let unset = answer(
+        &root,
+        "watcher-overdue",
+        "2026-11-18T12:00:00Z",
+        None,
+        &environment(&[]),
+    );
+    assert_eq!(unset["unmeasured"], "config-unset: watcher.overdueFactor");
+}
+
+fn head_line(id: &str, ts: &str, head: &str, state: &str, role: &str) -> String {
+    json!({
+        "v": 2, "id": id, "kind": "fgos.head.state", "ts": ts,
+        "subject": { "kind": "head", "id": head },
+        "attrs": { "fgos.head.state": state, "fgos.head.role": role },
+        "basis": "observed", "origin": { "source": "fixture" }
+    })
+    .to_string()
+}
+
+#[test]
+fn a_lead_is_recognised_by_either_role_form_and_a_non_lead_head_is_never_one() {
+    for (role, counted) in [
+        ("head:lead-ops", 1),
+        ("lead:OPS", 1),
+        ("head:secretary-miu", 0),
+        ("head:supervisor-sv", 0),
+    ] {
+        let name = format!("lead-role-{}", role.replace(':', "-"));
+        let retired = project(
+            &name,
+            &[head_line(
+                "h1",
+                "2026-11-18T11:00:00Z",
+                "h1",
+                "retired",
+                role,
+            )],
+            true,
+        );
+        let ended = answer(
+            &retired,
+            "lead-ended",
+            "2026-11-18T12:00:00Z",
+            None,
+            &environment(&[]),
+        );
+        assert_eq!(rows(&ended).len(), counted, "{role} retired");
+
+        let live = project(
+            &format!("{name}-live"),
+            &[
+                // The definition reads both kinds, so a source must serve each; this plan is merely ready.
+                json!({
+                    "v": 2, "id": "p1", "kind": "fgos.plan.status", "ts": "2026-11-18T10:00:00Z",
+                    "subject": { "kind": "plan", "id": "p1" },
+                    "attrs": { "fgos.plan.change": "status", "fgos.plan.to": "ready" },
+                    "basis": "observed", "origin": { "source": "fixture" }
+                })
+                .to_string(),
+                head_line("h1", "2026-11-18T11:00:00Z", "h1", "live", role),
+            ],
+            true,
+        );
+        let active = answer(
+            &live,
+            "watcher-active",
+            "2026-11-18T12:00:00Z",
+            None,
+            &environment(&[]),
+        );
+        assert_eq!(rows(&active).len(), counted, "{role} live");
+    }
 }
