@@ -20,14 +20,11 @@ import {
   assert,
   coexistPath,
   commitFile,
-  commitInWorktree,
   commitPending,
   commitPendingBeforeApprove,
-  createSession,
   cutMemberBranch,
   docsIndexManifestPath,
   editWork,
-  endSession,
   envelopeData,
   eventLines,
   execFileSync,
@@ -43,7 +40,6 @@ import {
   initGitCwdWithWorktree,
   initHeadlessGitCwd,
   initHeadlessGitCwdFast,
-  initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
   makeAlreadyCaughtUpItem,
@@ -57,7 +53,6 @@ import {
   makeRunnerProposedItem,
   makeRunnerProposedItemTouching,
   makeRunnerProposedLeafItem,
-  makeSessionSafeRunnerItem,
   mkLocalDependency,
   moveStep,
   moveWork,
@@ -69,7 +64,6 @@ import {
   removeAdHocWorktree,
   run,
   spawnSync,
-  startSession,
   stateView,
   tmpCwd,
   tmpCwdFast,
@@ -91,134 +85,15 @@ import {
 
 
 
-test('session list shows a started session, then omits it after it ends', () => {
-  const cwd = initGitCwdFast();
-  const { sessionId, worktreePath } = startSession(cwd, ['--item', 'work-x']);
-
-  const listed = run(cwd, ['session', 'list']);
-  assert.equal(listed.status, 0);
-  const listedData = envelopeData(listed.stdout);
-  const entry = listedData.find((e) => e.sessionId === sessionId);
-  assert.ok(entry, 'the started session id is listed');
-  assert.equal(entry.itemId, 'work-x', 'the bound item id is listed');
-  assert.equal(entry.worktreePath, worktreePath, 'the worktree path is listed');
-
-  assert.equal(run(cwd, ['session', 'end', sessionId]).status, 0);
-  const listedAfter = run(cwd, ['session', 'list']);
-  assert.equal(listedAfter.status, 0);
-  const listedAfterData = envelopeData(listedAfter.stdout);
-  assert.ok(!listedAfterData.some((e) => e.sessionId === sessionId), 'ended session no longer listed');
-  assert.deepEqual(listedAfterData, [], 'empty registry returns an empty list');
-});
 
 
-test('session end removes a non-diverged session cleanly — exit 0, worktree gone', () => {
-  const cwd = initGitCwdFast();
-  const { sessionId, worktreePath } = startSession(cwd);
-  assert.ok(fs.existsSync(worktreePath));
 
-  const ended = run(cwd, ['session', 'end', sessionId]);
-  assert.equal(ended.status, 0, `clean end should succeed: ${ended.stderr}`);
-  assert.ok(!fs.existsSync(worktreePath), 'the worktree directory is removed from disk');
-});
-
-
-test('session end on a diverged session refuses at the CLI level and names the dangling sha, exit 4', () => {
-  const cwd = initGitCwdFast();
-  const { sessionId, worktreePath } = startSession(cwd);
-  const danglingSha = commitInWorktree(worktreePath, 'change.txt');
-
-  const ended = run(cwd, ['session', 'end', sessionId]);
-  assert.equal(ended.status, 4, 'a diverged session is refused as a clean validation error, not a crash');
-  assert.ok(ended.stderr.includes(danglingSha), `the refusal names the dangling commit sha: ${ended.stderr}`);
-  assert.ok(fs.existsSync(worktreePath), 'the worktree is left in place — no silent loss of the dangling commit');
-
-  // Cleanup: only --force can remove a diverged session.
-  run(cwd, ['session', 'end', sessionId, '--force']);
-});
-
-
-test('session end --force removes a diverged session anyway, exit 0', () => {
-  const cwd = initGitCwdFast();
-  const { sessionId, worktreePath } = startSession(cwd);
-  commitInWorktree(worktreePath, 'change.txt');
-
-  const forced = run(cwd, ['session', 'end', sessionId, '--force']);
-  assert.equal(forced.status, 0, `--force should override the divergence refusal: ${forced.stderr}`);
-  assert.equal(envelopeData(forced.stdout).forced, true);
-  assert.ok(!fs.existsSync(worktreePath), 'the worktree directory is removed under --force');
-  const remaining = envelopeData(run(cwd, ['session', 'list']).stdout);
-  assert.ok(!remaining.some((e) => e.sessionId === sessionId));
-});
-
-
-test('session end on an unknown session id is a clean validation error, exit 4, no crash', () => {
-  const cwd = initGitCwdFast();
-  const result = run(cwd, ['session', 'end', 'no-such-session']);
-  assert.equal(result.status, 4);
-  assert.match(result.stderr, /unknown or already-ended session/);
-});
 
 
 test('session with no sub-verb, and an unknown sub-verb, are both rejected as validation, exit 4', () => {
   const cwd = initGitCwdFast();
   assert.equal(run(cwd, ['session']).status, 4);
   assert.equal(run(cwd, ['session', 'bogus']).status, 4);
-});
-
-
-// `session gc` (p-fgos-session-gc): reclaims registry entries whose worktree
-// is gone from git or whose one-shot `session start` CLI pid has since
-// exited — every started session qualifies for the pid half almost
-// immediately (the CLI process that started it already exited), so these
-// tests key on divergence/dirty-work to prove what gc does and does NOT
-// touch, matching test/runner/session.test.mjs's own reclaim coverage.
-
-test('session gc reclaims a clean, untouched session and reports it, exit 0', () => {
-  const cwd = initGitCwdFast();
-  const { sessionId, worktreePath } = startSession(cwd);
-
-  const gced = run(cwd, ['session', 'gc']);
-  assert.equal(gced.status, 0, `gc should succeed: ${gced.stderr}`);
-  const data = envelopeData(gced.stdout);
-  assert.deepEqual(data.reclaimed, [sessionId], 'the clean session is reclaimed');
-  assert.deepEqual(data.skipped, []);
-  assert.ok(!fs.existsSync(worktreePath), 'the reclaimed worktree is removed from disk');
-  assert.deepEqual(envelopeData(run(cwd, ['session', 'list']).stdout), [], 'registry entry dropped');
-});
-
-
-test('session gc spares a diverged session and reports it as skipped, exit 0', () => {
-  const cwd = initGitCwdFast();
-  const { sessionId, worktreePath } = startSession(cwd);
-  const danglingSha = commitInWorktree(worktreePath, 'change.txt');
-
-  const gced = run(cwd, ['session', 'gc']);
-  assert.equal(gced.status, 0);
-  const data = envelopeData(gced.stdout);
-  assert.deepEqual(data.reclaimed, []);
-  assert.deepEqual(data.skipped, [sessionId], 'the diverged session is skipped, not reclaimed');
-  assert.ok(fs.existsSync(worktreePath), 'the worktree with the dangling commit is preserved');
-
-  const ended = run(cwd, ['session', 'end', sessionId]);
-  assert.ok(ended.stderr.includes(danglingSha), 'end still names the preserved dangling commit');
-  run(cwd, ['session', 'end', sessionId, '--force']);
-});
-
-
-test('session gc spares a session with uncommitted (never-committed) changes, exit 0', () => {
-  const cwd = initGitCwdFast();
-  const { sessionId, worktreePath } = startSession(cwd);
-  fs.writeFileSync(path.join(worktreePath, 'wip.txt'), 'not committed yet\n');
-
-  const gced = run(cwd, ['session', 'gc']);
-  assert.equal(gced.status, 0);
-  const data = envelopeData(gced.stdout);
-  assert.deepEqual(data.reclaimed, [], 'nothing reclaimed — the only session is dirty');
-  assert.deepEqual(data.skipped, [sessionId], 'dirty session is skipped, not silently discarded');
-  assert.ok(fs.existsSync(path.join(worktreePath, 'wip.txt')), 'the uncommitted file survives gc');
-
-  run(cwd, ['session', 'end', sessionId, '--force']);
 });
 
 

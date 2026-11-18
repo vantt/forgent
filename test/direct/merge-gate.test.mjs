@@ -425,14 +425,17 @@ test('sync-root --no-wait with the trunk\'s merge slot held fails at once naming
 test('a failing post-land drift detection is reported beside a landed merge, never as a failed merge', async () => {
   const { landRunnerItem } = await import('../../src/runner/merge.mjs');
   const { cwd, fgosDir } = await approvableRootRepo('tsk-drift-broken');
-  // The verify breaks the session registry drift detection reads, after
-  // approve's own guards have read it and before Land publishes.
-  const registry = path.join(fgosDir, 'sessions.json');
-  const item = { id: 'tsk-drift-broken', verify: `node -e "require('fs').writeFileSync('${registry}','not json')"` };
+  // A still-open sibling whose branch ref points at a blob: the ref exists, so
+  // detection examines it, but no commit range can be computed from it.
+  addTestWork(fgosDir, 'tsk-drift-sibling', { status: 'doing' });
+  const blob = execFileSync('git', ['hash-object', '-w', '--stdin'], { cwd, encoding: 'utf8', input: 'not a commit' }).trim();
+  fs.mkdirSync(path.join(cwd, '.git', 'refs', 'heads', 'fgw'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.git', 'refs', 'heads', 'fgw', 'tsk-drift-sibling'), `${blob}\n`);
+  const item = { id: 'tsk-drift-broken', verify: 'true' };
   const result = await landRunnerItem(cwd, item, { branch: 'fgw/tsk-drift-broken', timeoutMs: 60000 });
   assert.equal(result.outcome, 'merged', JSON.stringify(result));
   assert.equal(result.landSettlement.settlementKind, 'delivered');
-  assert.match(result.postLand.error, /post-land drift detection failed: .*sessions\.json/);
+  assert.match(result.postLand.error, /post-land drift detection failed: /);
   assert.equal(execGit(cwd, ['show', 'main:produced.txt']), 'ok\n', 'the branch landed on main');
 });
 

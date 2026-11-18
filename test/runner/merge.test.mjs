@@ -1459,7 +1459,7 @@ function driftItem(id, overrides = {}) {
   return { id, verify: 'true', ...overrides };
 }
 
-test('detectPostLandDrift: no shared path produces nothing at all -- no notification, no mark', () => {
+test('detectPostLandDrift: no shared path produces nothing at all -- no mark', () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/landed', 'a.mjs', 'a\n');
   makeBranchWithCommit(repoRoot, 'fgw/leaf', 'b.mjs', 'b\n');
@@ -1473,14 +1473,12 @@ test('detectPostLandDrift: no shared path produces nothing at all -- no notifica
   const report = detectPostLandDrift(repoRoot, view, view.work.landed, {
     target: 'main',
     landedFiles: changedFiles(repoRoot, view.work.landed),
-    sessions: [{ sessionId: 'sess-1', itemId: 'leaf' }],
   });
 
-  assert.deepEqual(report.notify, []);
   assert.deepEqual(report.stale, []);
 });
 
-test('detectPostLandDrift: a shared path with a live session notifies that exact session and leaves its branch untouched', () => {
+test('detectPostLandDrift: a shared path marks the leaf stale and leaves its branch untouched', () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/landed', 'shared.mjs', 'landed\n');
   makeBranchWithCommit(repoRoot, 'fgw/leaf', 'shared.mjs', 'leaf\n');
@@ -1495,38 +1493,8 @@ test('detectPostLandDrift: a shared path with a live session notifies that exact
   const report = detectPostLandDrift(repoRoot, view, view.work.landed, {
     target: 'main',
     landedFiles: changedFiles(repoRoot, view.work.landed),
-    sessions: [
-      { sessionId: 'sess-leaf', itemId: 'leaf' },
-      { sessionId: 'sess-elsewhere', itemId: 'someone-else' },
-    ],
   });
 
-  assert.deepEqual(report.notify, [{ id: 'leaf', shared: ['shared.mjs'], sessionIds: ['sess-leaf'] }]);
-  assert.deepEqual(report.stale, []);
-  // D2: the owning session decides what to do with its own branch; detection
-  // never moves it.
-  assert.equal(tipOf(repoRoot, 'fgw/leaf'), leafTipBefore);
-});
-
-test('detectPostLandDrift: a shared path with no live session is marked stale only', () => {
-  const repoRoot = initRepo();
-  makeBranchWithCommit(repoRoot, 'fgw/landed', 'shared.mjs', 'landed\n');
-  makeBranchWithCommit(repoRoot, 'fgw/leaf', 'shared.mjs', 'leaf\n');
-  const view = {
-    work: {
-      landed: driftItem('landed', { status: 'awaiting-approval' }),
-      leaf: driftItem('leaf', { status: 'doing' }),
-    },
-  };
-  const leafTipBefore = tipOf(repoRoot, 'fgw/leaf');
-
-  const report = detectPostLandDrift(repoRoot, view, view.work.landed, {
-    target: 'main',
-    landedFiles: changedFiles(repoRoot, view.work.landed),
-    sessions: [],
-  });
-
-  assert.deepEqual(report.notify, []);
   assert.deepEqual(report.stale, [{ id: 'leaf', shared: ['shared.mjs'] }]);
   assert.equal(tipOf(repoRoot, 'fgw/leaf'), leafTipBefore);
 });
@@ -1549,7 +1517,6 @@ test('detectPostLandDrift runs no verify at all -- the whole reason this is a de
   detectPostLandDrift(repoRoot, view, view.work.landed, {
     target: 'main',
     landedFiles: changedFiles(repoRoot, view.work.landed),
-    sessions: [],
   });
 
   assert.equal(fs.existsSync(sentinel), false);
@@ -1574,7 +1541,6 @@ test('detectPostLandDrift examines exactly the open leaves sharing the target --
   const report = detectPostLandDrift(repoRoot, view, view.work.landed, {
     target: 'main',
     landedFiles: changedFiles(repoRoot, view.work.landed),
-    sessions: [],
   });
 
   assert.deepEqual(report.examined, ['live']);
@@ -1594,10 +1560,8 @@ test('detectPostLandDrift: a landed item with no branch of its own contributes n
   const report = detectPostLandDrift(repoRoot, view, view.work.landed, {
     target: 'main',
     landedFiles: changedFiles(repoRoot, view.work.landed),
-    sessions: [],
   });
 
-  assert.deepEqual(report.notify, []);
   assert.deepEqual(report.stale, []);
 });
 

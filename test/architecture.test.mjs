@@ -1691,7 +1691,6 @@ const ARM_STATIC_IMPORTS = [
   '../src/runner/main-checkout-reset-guard.mjs',
   '../src/runner/merge.mjs',
   '../src/runner/paths.mjs',
-  '../src/runner/session.mjs',
   '../src/runner/worker-log.mjs',
   '../src/runner/worktree.mjs',
   '../src/state/awaiting-context.mjs',

@@ -1333,7 +1333,7 @@
       ],
       "allowed": [],
       "debt": [],
-      "reason": "the `events`, `session` and `gateway` verbs are native in the host (apps/fgos/src/wiring/{events,session,gateway_control}.rs): the Node use cases, the session writers and the gateway control module are deleted, Node reads the registry only through `fgos session list`, and no file may bring one of these names back"
+      "reason": "the `events`, `session` and `gateway` verbs are native in the host (apps/fgos/src/wiring/{events,session,gateway_control}.rs): the Node use cases, the session writers and the gateway control module are deleted, no Node code reads the retired session registry, and no file may bring one of these names back"
     },
     {
       "job": "retired Node Git and Event Store doctor rows",
@@ -1672,7 +1672,6 @@
     "src/runner/worktree.mjs": "infra",
     "src/runner/promote-preflight.mjs": "infra",
     "src/runner/promote-engine.mjs": "infra",
-    "src/runner/session.mjs": "infra",
     "src/runner/goal-check.mjs": "infra",
     "src/runner/iron-law-gate.mjs": "infra",
     "src/runner/frozen-judge.mjs": "domain",
@@ -1682,7 +1681,6 @@
     "src/runner/main-checkout-reset-guard.mjs": "infra",
     "src/runner/github-adapter.mjs": "infra",
     "src/state/drift-status.mjs": "infra",
-    "src/state/postland-drift.mjs": "infra",
     "src/state/store-error.mjs": "kernel",
     "src/state/store.mjs": "infra",
     "src/state/gate-bypass.mjs": "infra",

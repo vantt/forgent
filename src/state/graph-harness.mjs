@@ -433,37 +433,26 @@ export function openLeavesSharingTarget(view, landedId) {
 }
 
 /**
- * D4's three-way split over REAL changed-file sets — never declared
- * `footprint`, which an item fills in by hand and can leave stale or empty
- * (`footprintOverlapAmong` above compares exactly that weaker signal; here
- * git has already given the ground truth, so nothing needs to stand in for
- * it).
+ * Which still-open leaves share a path with what just landed, over REAL
+ * changed-file sets — never declared `footprint`, which an item fills in by
+ * hand and can leave stale or empty (`footprintOverlapAmong` above compares
+ * exactly that weaker signal; here git has already given the ground truth).
  *
- * A leaf sharing no path with what just landed produces NOTHING — no
- * notification, no mark. That silence is the point: a root landing 13
- * children sequentially would otherwise pay ~78 catchup+verify rounds, and
- * most of them discover nothing collided. A leaf that does share a path
- * either goes to the session that owns it — cheapest to fix while that
- * context is still in someone's head, and the owner is the only party
- * allowed to touch that branch — or, with no session behind it, is marked
- * stale for the lazy catchup it will get when it reaches the merge queue.
+ * A leaf sharing no path with what just landed produces NOTHING — no mark.
+ * That silence is the point: a root landing 13 children sequentially would
+ * otherwise pay ~78 catchup+verify rounds, and most of them discover nothing
+ * collided. A leaf that does share a path is marked stale for the lazy
+ * catchup it will get when it reaches the merge queue.
  *
- * `leaves` entries are `{id, files, sessionIds}`; the caller supplies the
- * real diffs and the real session registry, keeping this half pure.
+ * `leaves` entries are `{id, files}`; the caller supplies the real diffs,
+ * keeping this half pure.
  */
 export function classifyPostLandDrift({ landedFiles = [], leaves = [] } = {}) {
   const landed = new Set(landedFiles);
-  const notify = [];
   const stale = [];
   for (const leaf of leaves) {
     const shared = (leaf.files ?? []).filter((file) => landed.has(file)).sort();
-    if (shared.length === 0) continue;
-    const sessionIds = leaf.sessionIds ?? [];
-    if (sessionIds.length > 0) {
-      notify.push({ id: leaf.id, shared, sessionIds });
-    } else {
-      stale.push({ id: leaf.id, shared });
-    }
+    if (shared.length > 0) stale.push({ id: leaf.id, shared });
   }
-  return { notify, stale };
+  return { stale };
 }

@@ -23,14 +23,11 @@ import {
   assert,
   coexistPath,
   commitFile,
-  commitInWorktree,
   commitPending,
   commitPendingBeforeApprove,
-  createSession,
   cutMemberBranch,
   docsIndexManifestPath,
   editWork,
-  endSession,
   envelopeData,
   eventLines,
   execFileSync,
@@ -43,7 +40,6 @@ import {
   initGitCwdMainFast,
   initGitCwdWithWorktree,
   initHeadlessGitCwdFast,
-  initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
   makeAlreadyCaughtUpItem,
@@ -57,7 +53,6 @@ import {
   makeRunnerProposedItem,
   makeRunnerProposedItemTouching,
   makeRunnerProposedLeafItem,
-  makeSessionSafeRunnerItem,
   mkLocalDependency,
   moveStep,
   moveToDurableDoingForTest,
@@ -69,7 +64,6 @@ import {
   removeAdHocWorktree,
   run,
   spawnSync,
-  startSession,
   stateView,
   tmpCwdFast,
   tmpLinkedWorktree,
@@ -1101,27 +1095,7 @@ test('return on a branch-source take: verify-fail -> doing -> blocked + friction
   assert.equal(view.frictions['branch-return-red'][0].errorClass, 'verify-miss');
 });
 
-test('return succeeds unchanged from inside a real session worktree (created via session.mjs createSession) — doing -> awaiting-approval, exit 0', () => {
-  const cwd = initSessionSafeCwd();
-  addOk(cwd, 'return-in-session', { verify: 'test -f proof.txt' });
-  run(cwd, ['take', '--id', 'return-in-session']); // headAtTake = current main HEAD
-
-  // Real detached-HEAD worktree at headAtTake, then advance it with a genuine
-  // commit made FROM INSIDE the session worktree (a real dangling commit).
-  const session = createSession(cwd, { sessionId: 'sess-return' });
-  commitInWorktree(session.worktreePath, 'proof.txt', 'work\n');
-
-  try {
-    const result = run(session.worktreePath, ['return', 'return-in-session']);
-    assert.equal(result.status, 0, `return from inside a session worktree should succeed unchanged: ${result.stdout}${result.stderr}`);
-    assert.match(result.stdout, /awaiting-approval/);
-    assert.equal(stateView(cwd).work['return-in-session'].status, 'awaiting-approval');
-  } finally {
-    endSession(cwd, session.sessionId, { force: true });
-  }
-});
-
-test('tsk-ikd: return refuses from an ad-hoc worktree never created through "fgos session start" (main-source take) — item stays doing, never reaches awaiting-approval, exit 4', () => {
+test('tsk-ikd: return refuses from any linked worktree (main-source take) — item stays doing, never reaches awaiting-approval, exit 4', () => {
   // The actual Finding 4 failure scenario: a main-source claim (via `take`)
   // returned from inside a leftover/unrelated linked worktree instead of
   // main. Before this fix, `return`'s main-source path had no guard at all
@@ -1129,10 +1103,8 @@ test('tsk-ikd: return refuses from an ad-hoc worktree never created through "fgo
   // already refuse here) -- it would read `currentHead`/run verify against
   // WHATEVER cwd happens to be, record `headAtReturn` against a sha that
   // may never actually be reachable from main's own history the way this
-  // item's claim assumes. This is deliberately the OPPOSITE fixture from
-  // the session-worktree test above: an ad-hoc worktree is never registered
-  // via "fgos session start" (no `sessions.json` entry), so it must be
-  // refused exactly like approve's own adhoc-worktree tests prove for
+  // item's claim assumes. The refusal is structural: every linked worktree
+  // is refused, exactly as approve's own ad-hoc-worktree tests prove for
   // approve.
   const cwd = initGitCwdMainFast();
   commitPending(cwd, 'state: init');
@@ -1149,9 +1121,9 @@ test('tsk-ikd: return refuses from an ad-hoc worktree never created through "fgo
   try {
     assert.equal(stateView(cwd).work['return-adhoc-mainsource'].status, 'doing', 'sanity: the ad-hoc worktree really does see the item (real committed events log)');
     const result = run(worktreePath, ['return', 'return-adhoc-mainsource']);
-    assert.equal(result.status, 4, `expected a clean validation refusal, not a return recorded against an unregistered worktree: ${result.stdout}${result.stderr}`);
-    assert.match(result.stderr, /registered "fgos session start" worktree/);
-    assert.equal(stateView(cwd).work['return-adhoc-mainsource'].status, 'doing', 'item is untouched -- never reaches awaiting-approval from an unregistered worktree');
+    assert.equal(result.status, 4, `expected a clean validation refusal, not a return recorded against a linked worktree: ${result.stdout}${result.stderr}`);
+    assert.match(result.stderr, /this is a git worktree, not the main checkout/);
+    assert.equal(stateView(cwd).work['return-adhoc-mainsource'].status, 'doing', 'item is untouched -- never reaches awaiting-approval from a linked worktree');
   } finally {
     removeAdHocWorktree(cwd, worktreePath);
   }

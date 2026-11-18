@@ -145,7 +145,6 @@
     "src/seat-binding/client.mjs": "S6a",
     "src/state/drift-status.mjs": "S7",
     "src/state/frontier.mjs": "S7",
-    "src/state/postland-drift.mjs": "S7",
     "src/state/replay.mjs": "S7",
     "src/state/store.mjs": "S7",
     "src/state/worker-slots.mjs": "S7",
@@ -354,16 +353,6 @@
         "src/state/store.mjs",
         "src/state/replay.mjs",
         "src/state/drift-status.mjs"
-      ]
-    },
-    {
-      "id": "leaf-notify-drift",
-      "description": "every live session branch has no post-land drift against its target",
-      "owner": "bridge:S7",
-      "judge": [
-        "src/state/store.mjs",
-        "src/state/replay.mjs",
-        "src/state/postland-drift.mjs"
       ]
     },
     {

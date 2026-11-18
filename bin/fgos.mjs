@@ -89,7 +89,7 @@ import { invokeDispatchInspectOperation } from '../src/verbs/dispatch/inspect.mj
 import { invokeDispatchReconcileOperation } from '../src/verbs/dispatch/reconcile.mjs';
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
-import { branchNameFor, branchExists, detectTrunk, isMainWorktree, admitStoreAccess, currentHead, realpathOrSelf as realpathOr, inspectGit, resolveRefSha, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
+import { branchNameFor, branchExists, detectTrunk, isMainWorktree, admitStoreAccess, currentHead, inspectGit, resolveRefSha, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { commitAt, pathExistsAt, readRepoFacts } from '../src/git/inspect.mjs';
@@ -97,7 +97,6 @@ import { HolderLockError } from '../src/holder-lock/index.mjs';
 import { formatLockDurationMs } from '../src/util/format-lock-duration.mjs';
 import { clearBeaconIfOwn } from '../src/runner/main-checkout-activity.mjs';
 import { resolveWriterIdentity } from '../src/util/session-identity.mjs';
-import { listSessions } from '../src/runner/session.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
 import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
@@ -241,13 +240,6 @@ function excludeDocsRefResearch(files, item) {
   const researchPath = normalizePath(path.posix.join(item.docsRef.replace(/\/+$/, ''), 'RESEARCH.md'));
   return files.filter((f) => normalizePath(f) !== researchPath);
 }
-
-// `realpathOr` is worktree.mjs's `realpathOrSelf` (imported above, tsk-49i
-// D3): a bare fs.realpathSync would throw the moment any ONE registered
-// session's worktree directory is gone from disk (a crashed session
-// hand-cleaned instead of via `fgos session end`) — crashing `return` for
-// EVERY caller, including from the main checkout. The try/catch fallback to
-// path.resolve keeps one stale registry entry from taking down the gate.
 
 // The gh binary the GitHub transport shells out to (github-adapter D2). Tests
 // substitute a fake executable through FGOS_GH_COMMAND; production leaves it
@@ -3136,45 +3128,16 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // Surfaces only much later, misdiagnosed as a force-push/history-
       // rewrite loss when cleanup's ancestry check fails.
       //
-      // A REGISTERED session worktree (`fgos session start`) is deliberately
-      // EXEMPT -- unlike `approve`, which refuses ANY worktree including a
-      // registered session (docs/platform/runner/contracts/conserved-dispatch-doctrine.md#session-participation-and-merge-isolation: "a session worktree is
-      // structurally the wrong place for a merge-into-main to happen"),
-      // `return`'s own progress check (aheadCount + verify) is spike-proven
-      // correct from inside a session worktree and is documented there as
-      // deliberately unchanged: a session worktree's `.fgos` is a symlink to
-      // the real shared store (never copied), so state writes land
-      // correctly, and `session end` (session.mjs's own divergence guard)
-      // already refuses to silently discard a dangling commit -- that is
-      // the layer responsible for making sure returned work actually reaches
-      // main, not this one. Only an UNREGISTERED worktree (an ad-hoc `git
-      // worktree add`, or -- the actual failure scenario here -- a
-      // different item's own leftover `fgw/<id>` claim checkout) is refused.
+      // Every linked worktree is refused, whatever made it: `approve`
+      // applies the same rule (docs/platform/runner/contracts/conserved-dispatch-doctrine.md#session-participation-and-merge-isolation).
       // The branch-source path above needs no such guard at all (its own
       // comment, D2: "tree người là việc của người" -- it never touches
       // `repoRoot`'s working tree, verify runs in a disposable detached
       // worktree).
-      const returnCwdReal = realpathOr(repoRoot);
-      const insideRegisteredSession = listSessions(repoRoot).some((session) => {
-        const wtReal = realpathOr(session.worktreePath);
-        return returnCwdReal === wtReal || returnCwdReal.startsWith(`${wtReal}${path.sep}`);
-      });
-      if (!insideRegisteredSession && !isMainWorktree(repoRoot)) {
-        // tsk-2t9c D18: found via a real end-to-end run -- an item claimed
-        // through `fgos take` (never `fgos pick`, which DOES stand up a
-        // registered `fgw/<id>` worktree) into an ad-hoc worktree hits
-        // this refusal with no skill's own prose warning it could happen,
-        // and the fix (`fgos session start`) is easy to miss inside a
-        // longer explanatory sentence. Naming the exact command on its
-        // own line is the same "chặn và dạy tại chỗ" discipline
-        // `handoff`'s own refusal already applies (list the legal edges,
-        // don't just say "refused"). `session start` resolves its own
-        // repoRoot from `process.cwd()`, never `--dir` (unlike every
-        // other verb here) -- run it from THIS SAME worktree, not with a
-        // `--dir` flag pointed at it.
+      if (!isMainWorktree(repoRoot)) {
         throw new StoreError(
           'validation',
-          `return: refusing to run from "${repoRoot}" — this is a git worktree (not the main checkout, and not a registered "fgos session start" worktree). Run return from the main checkout, or register this worktree first, from right here: fgos session start --item "${id}"`,
+          `return: refusing to run from "${repoRoot}" — this is a git worktree, not the main checkout. Run return from the main checkout.`,
         );
       }
 
@@ -3579,7 +3542,7 @@ function renderPlanLintReport(data) {
 // (src/cli/command-registry.mjs). Nothing here keeps a verb list of its own.
 //
 // A worktree made outside fgOS's own lifecycle (a plain `git worktree add`, an external harness's worktree tool;
-// never `fgos pick`/`take`, which strip `.fgos/` per ADR0020, nor `fgos session start`, which symlinks it) inherits
+// never `fgos pick`/`take`, which strip `.fgos/` per ADR0020) inherits
 // a real but frozen-at-branch-point `.fgos/`. Because it exists, the `store: 'require'` refusal never fires and
 // `dataDir()`'s cwd-strict resolution accepts the snapshot as the live store. Every invocation that writes the
 // shared store says so with `mutatesStore` and is refused from there. Left unmarked on purpose: `doctor`,

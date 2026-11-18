@@ -2,8 +2,7 @@
 // dataDir()-level guard added in docs/history/agent-coordination-state-root
 // (coord_state_root_rfc_20260909): a worktree made OUTSIDE fgOS's own
 // lifecycle (a plain `git worktree add`, never `fgos pick`/`take`'s
-// `createWorktree` (ADR0020-stripped) nor `fgos session start`
-// (symlinked)) can carry a real, git-tracked, but frozen-at-branch-point
+// `createWorktree` (ADR0020-stripped)) can carry a real, git-tracked, but frozen-at-branch-point
 // `.fgos/` snapshot. Because that snapshot physically exists, the
 // pre-existing `store require` ENOENT guard never fires, and a
 // mutatesStore: true verb run there without `--dir` would silently
@@ -16,8 +15,7 @@
 // (read by `test/cli/fgos-manifest.test.mjs` and `apps/fgos/src/routing.rs`).
 // This file keeps the wiring through the real CLI: one refusal from a linked
 // worktree carrying a frozen `.fgos/` copy, one explicit `--dir` that bypasses
-// it, one genuine `fgos session start` worktree that is admitted, and the
-// invocation-root cases below.
+// it, and the invocation-root cases below.
 
 import '../helpers/process-tmp-root.mjs';
 import { test } from 'node:test';
@@ -30,8 +28,6 @@ import {
   run,
   tmpCwd,
   eventLines,
-  createSession,
-  endSession,
 } from './helpers/fgos-cli-harness.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 
@@ -53,7 +49,7 @@ function initGitCwdMainWithCommittedFgos() {
   return cwd;
 }
 
-// A plain `git worktree add` -- never through `createWorktree`/`createSession`
+// A plain `git worktree add` -- never through `createWorktree`
 // -- the exact shape an external harness's own worktree tool produces (this
 // investigation's own root-cause finding).
 function addDisconnectedAdHocWorktree(cwd, branch) {
@@ -95,19 +91,6 @@ test('disconnected-worktree guard: --dir <mainRoot> bypasses the guard and the e
     assert.ok(eventLines(main).length > before, 'the event landed in the real main store via --dir');
   } finally {
     execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
-  }
-});
-
-// --- A genuine session worktree is admitted ------------------------------
-
-test('disconnected-worktree guard: a mutatesStore: true verb succeeds from a genuine "fgos session start" worktree', () => {
-  const main = initGitCwdMainWithCommittedFgos();
-  const sess = createSession(main, { sessionId: 'guard-test-session' });
-  try {
-    const result = run(sess.worktreePath, ['submit', 'a task from a session worktree', '--async']);
-    assert.equal(result.status, 0, result.stderr);
-  } finally {
-    endSession(main, sess.sessionId, { force: true });
   }
 });
 

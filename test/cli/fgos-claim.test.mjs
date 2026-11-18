@@ -20,14 +20,11 @@ import {
   assert,
   coexistPath,
   commitFile,
-  commitInWorktree,
   commitPending,
   commitPendingBeforeApprove,
-  createSession,
   cutMemberBranch,
   docsIndexManifestPath,
   editWork,
-  endSession,
   envelopeData,
   eventLines,
   execFileSync,
@@ -43,7 +40,6 @@ import {
   initGitCwdWithWorktree,
   initHeadlessGitCwd,
   initHeadlessGitCwdFast,
-  initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
   makeAlreadyCaughtUpItem,
@@ -57,7 +53,6 @@ import {
   makeRunnerProposedItem,
   makeRunnerProposedItemTouching,
   makeRunnerProposedLeafItem,
-  makeSessionSafeRunnerItem,
   mkLocalDependency,
   moveStep,
   moveWork,
@@ -69,7 +64,6 @@ import {
   removeAdHocWorktree,
   run,
   spawnSync,
-  startSession,
   stateView,
   tmpCwd,
   tmpCwdFast,
@@ -184,13 +178,6 @@ test('main-checkout-reset forward without --confirm updates clean tracked .fgos 
   assert.equal(fs.readFileSync(store, 'utf8'), 'two\n');
 });
 
-
-test('session start inside a .fgos/-less linked worktree still succeeds (D10 symlink actor exempt from the store require guard)', () => {
-  const { wt } = tmpLinkedWorktree();
-  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
-  const result = run(wt, ['session', 'start']);
-  assert.equal(result.status, 0, `session start unexpectedly refused: ${result.stderr}`);
-});
 
 
 // --- take/return: cửa pull giao–nhận việc (stage-decompose S2-pull D1) -----
@@ -712,14 +699,3 @@ test('pick --id on a blocked item with a live fgw/<id> branch claims via blocked
   );
 });
 
-
-test('session start returns a session id and an existing worktree path, exit 0', () => {
-  const cwd = initGitCwdFast();
-  const { result, sessionId, worktreePath } = startSession(cwd);
-  assert.equal(result.status, 0, `session start should succeed: ${result.stderr}`);
-  assert.ok(sessionId, 'data names a session id');
-  assert.ok(worktreePath, 'data names a worktree path to cd into');
-  assert.ok(fs.existsSync(worktreePath), 'the worktree directory actually exists on disk');
-
-  run(cwd, ['session', 'end', sessionId]);
-});

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9c9c6da9d2d1ab7a084fcef9e607e28c409ab0d14b5d16869dd5bd31b91d0c1a",
+  "payloadDigest": "615718b68ae961f21d22c24ebf6ae165897506b43c1f5101e612c231af197ed6",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -29,7 +29,7 @@
     ".agents/skills/fgos-coding-discovering/SKILL.md": "57c2111bf8a80e32637be323ff52403834b25f3f21800042b025c66f8ba162e2",
     ".agents/skills/fgos-coding-driving/SKILL.md": "7f8389bc519ea266fdc8d1ecc0a0e04ead41fb18728fb3416091886dbdaadcf0",
     ".agents/skills/fgos-coding-driving/references/caller-contract.md": "dcf13fe93461eedc708bc65b496eee323c7fca421b597f296f5d4dbeb28eca6c",
-    ".agents/skills/fgos-coding-driving/references/loop-mechanics.md": "c8afa92336735847e4f2486c272098898ec6017efa0a6588c274004588b307e1",
+    ".agents/skills/fgos-coding-driving/references/loop-mechanics.md": "227dbaec716a1a5dc1ee3566afa9753a56073c68ce5b9bb56c3b00398f56444e",
     ".agents/skills/fgos-coding-driving/references/reclaim-and-role-graph.md": "a61b76a44bfc046808e494629a298e34535861e2af676b0c370ba030855b645c",
     ".agents/skills/fgos-coding-exploring/SKILL.md": "d42b22ebdfa6017b435556206ea0349e4f35d6a3650f409b09e77986e1263cd1",
     ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md": "56cce0b6d0973da38b92b7f6380267ef826ebc6318f062b7f6a67d5a89c1df25",
@@ -81,7 +81,7 @@
     "apps/fgctl/tests/windows_holder_lock_gate.rs": "c1bfc1a2b6992cfe70c59acf9350a6da5fcce08033bb76fc1720d2c5df1091fa",
     "apps/fgos-gateway/build.rs": "0109e37c64e9474009c71bb3f3220496fad07dfd77b28c796f1f828c9d2d5671",
     "apps/fgos-gateway/src/cf_access.rs": "91dd9c6789d96baaf89d7b740ec56280c671b30a9cac9776bafe79c3d9cfd2ee",
-    "apps/fgos-gateway/src/gateway.rs": "6e5eb5d56ba1560fe8e2f50d6f0aa6efae1fcb238de940bbc24ec7dba86cc27a",
+    "apps/fgos-gateway/src/gateway.rs": "dd71beeeaeaf22eda04b77b6df808e55ec62ff2a2f5083371467be44006ba005",
     "apps/fgos-gateway/src/lib.rs": "32d594b18ae0c15f09c3b06c69d82bb142f1370e6fffb6b95d104378b0ffa3fd",
     "apps/fgos-gateway/src/main.rs": "8184c8e2edfb686747243fbb2916582781687195d602fd63e5837b4383edc47e",
     "apps/fgos-gateway/src/mcp.rs": "8fb0f82ca74811e1c73f11d35f8b09061299dac984380abd32dea85fab133fea",
@@ -160,7 +160,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "b56d98f924c1de9cb8532fb1c8fbd949a043872e71f779068add5598e1fbdb65",
+    "bin/fgos.mjs": "95888ffe090b37ffcd4711688c32e064c2ed5956be8f23a476fc65cb69b9c896",
     "core/skills/_shared/capability-catalog.md": "abb355e91c92f728f1a527777945e80b9cc97c57af82e2c1a4e3eac64b928da6",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -208,7 +208,7 @@
     "domains/coding/skills/fgos-coding-discovering/SKILL.md": "5c3dabc206fa18963ec9f8a18a16768795b008b8430aa76bdbee51156e0ce908",
     "domains/coding/skills/fgos-coding-driving/SKILL.md": "40fd302b42fd7933b8af504af34b0315121997bb2fb56da65a1def377af89d57",
     "domains/coding/skills/fgos-coding-driving/references/caller-contract.md": "e24b2edec6a8c260be7be810537e324c9dcf2a8be322f42531644a719c7cc418",
-    "domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md": "fa1d4c0f277f05e5213486db2709fda6caec91f6c4ff0e0c67028cee21275713",
+    "domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md": "9f027131c1ed6139c2fe62e4e73442e355171eeccf1c5495db2d6cd6e9b56627",
     "domains/coding/skills/fgos-coding-driving/references/reclaim-and-role-graph.md": "47e1ad800ea1f15ed59e81ef3f12149015a218fe496c2909331fa25064e7dc16",
     "domains/coding/skills/fgos-coding-exploring/SKILL.md": "9427b9e7d3bfe654519419ec2ec8632b66b69bca11218c2279238cc4f3289d3f",
     "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md": "b0bc2aeacea29dbe5f4ea8d46a684ca9f907453f8813f02accf226f1549463bc",
@@ -1308,7 +1308,7 @@
     "src/runner/loop.mjs": "4a396b6fc5252280983a1dcde6a39edf3ff6e6474074b0b0130783a4abb18076",
     "src/runner/main-checkout-activity.mjs": "d6f7169033c1fbdd46280d2075700aeda87f447ecc6fdb2da516be6ca3c0011f",
     "src/runner/main-checkout-reset-guard.mjs": "9e472e44a494761adce347f93c08c1ad20433f97e49b12c32a96105a67307256",
-    "src/runner/merge.mjs": "197d9ab75c1ea0fa082e5f1bf19eb9994891bdc33b53c1decb05860d06dbbf1a",
+    "src/runner/merge.mjs": "f940bdbdf8b97e1fba472adb4acaa7f16efd4a6c442952770239cfd5e340e472",
     "src/runner/operation-capability.mjs": "60d92af08a3aa5c5f976d1fe11920c9cb3f590f4c2f590957f043130048d6a8c",
     "src/runner/operation-choice.mjs": "135b8f6b1659c07db2e3cab2becaf69cdbb9ece08179c2dba2e1c2be27daa496",
     "src/runner/paths.mjs": "0b0c214b34893c22f3e5c0c7a7b88d80f2f19565cb4246d0a3377f3841c1c218",
@@ -1319,11 +1319,10 @@
     "src/runner/repo-locks.mjs": "08dffe06b33244e2c66418d7f3ae22e89b9b91d1ab7653f038d71c38deb30161",
     "src/runner/rigor.mjs": "f85eabe784dd24de1e2431f16cccecd6634da8a6ca6be128dc9a87a3c91258c0",
     "src/runner/root-affinity.mjs": "0e074df4c61d29f60a2ce43fb62830ec2a2eaebe0e1998fec0cbacb4cd15e871",
-    "src/runner/session.mjs": "ea58f41d4c38221e988d57ef3bf19dbf0004b3a8098c02a15546110def414526",
     "src/runner/work-compat.mjs": "f587566545425e2cd1f20390d9474ba6e2d2935f87097e48f3fccba3a24b1352",
     "src/runner/work-dispatch.mjs": "634188cf0e977de3ffd46ee334d75ce7513de649b06de1e7f1a1b050d4335edd",
     "src/runner/worker-log.mjs": "c5b978ff9fa7533a62213c77cf7b6241d7b10e43d9fd5cf07f15209b7335a793",
-    "src/runner/worktree.mjs": "856f625f11913f5ec213f4503b9dab5e9e94862d82fa1f03f692109d3de8130f",
+    "src/runner/worktree.mjs": "ac9905887bb6922a3c1ca10b1090cd958674851cc803e1378676478b2d1b1ca9",
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/seat-binding/client.mjs": "49bc74e484f4057063d6d0233615edb5e5c1cf8a9957b7b82fedc2b422736a4f",
     "src/session-host/client.mjs": "39c4a0a4b6f07b7c85eee7fe83327f2c85c89e666c0e604e0114b86a87e5336b",
@@ -1347,7 +1346,7 @@
     "src/setup/instruction-registry.mjs": "0cbf5776e960d58318eb359db934bf692106c57c84fad18319ddef3fce9a6d87",
     "src/setup/mailbox-limits.mjs": "b8ed2c018a71ee1a06582ea90c7a73ec1a7ebe29e3d931f9a2ba89108a763323",
     "src/setup/model-pool-checks.mjs": "2e7570e565313df19a151d79aa6bd5ad7f1deed21ea273c61767014869e0eb28",
-    "src/setup/registrations.mjs": "dcac2138176dcd204a2449bceb4f1425d41b6a38019451ed20ec33cab01995e3",
+    "src/setup/registrations.mjs": "16fad6661a98627587898f9da24e25ee3f5b35c69feffbd91d9bedb7e1cffdf6",
     "src/setup/run-supervisor-checks.mjs": "31942f9b9dec0bdd009c05199f2fc1a2afe7e6b18f58c50c94d7aa18b0ad0421",
     "src/setup/seat-binding-checks.mjs": "ab0ff541e60c8e5340e87063839f954d970d889159c2aa40ac41992accd2a894",
     "src/setup/session-keep-declared.mjs": "de88967dc8c6dd6a7c460ddf264a07aa13c4c7ee3a458a07ba6be3830e52864e",
@@ -1371,7 +1370,7 @@
     "src/state/fgos-file-registry.mjs": "b9e0e1f98bfbd7e1db0cfcba99eb9b3a8c93a8b8ab061a9b25f71bb99c43f0b7",
     "src/state/frontier.mjs": "977519b50fa87369d833fc478a7f3ebf8e795092cf0657a5dc4ee5a71e976756",
     "src/state/gate-bypass.mjs": "bd5c6c900973191701cec5ec9387d75904f640d94ca813afa29b1a9f9e6ee797",
-    "src/state/graph-harness.mjs": "0c4aa4d924401927595d41f42155159c0f3dcc1121c5c416ab096f146dc58fb6",
+    "src/state/graph-harness.mjs": "48354ca9d462c952d4069c033fe836358db8d177b40b980749bc50a69cdc2cb4",
     "src/state/graph-metrics.mjs": "ce0c9112f0a22ae408a442773fc91628eb225ef103bc9024a16ce926c1f0f167",
     "src/state/handoff.mjs": "352dbce5f607f2ad478bf0119fbf875bf640142f3438a745ebcead4804dd4d38",
     "src/state/hot-lock.mjs": "940e186da901c4345c6a2c375a34b1290f2841c6571cabb981b67b6f111abd3b",
@@ -1380,7 +1379,6 @@
     "src/state/plan-pool.mjs": "20c667909048853fa2dddf239b27467c29dbe8551cd7c90fef88c241143483ad",
     "src/state/porting-store.mjs": "0de78abdb96c6076d21fe51b0b5582b014f82ad2d3b22403e9eea7367444ed04",
     "src/state/porting.mjs": "4191acd3af3ca878dd7ae10bab67d859d545ca870722b3276cd39aeba9d173f3",
-    "src/state/postland-drift.mjs": "438a4e01ae6c2a6275601347bdc97bf849d4c16f9b684aedd928414359e39532",
     "src/state/priority-formula.mjs": "5ad341b4675045cf7872c796da7ba2b5fc8b3fa68382d7c021509c29619c38b7",
     "src/state/replay.mjs": "3b9e0be3aa77c9c527573e9c002c3e099ca1f6c1fce43c3ced5e256ff6229b3b",
     "src/state/retro-pool.mjs": "bed4fe7e4a09ee49d3ae019e30dc21b73bc00bbbc8a20be3eec4cdf6352140ae",
@@ -1422,7 +1420,7 @@
     "src/verbs/dispatch/watch.mjs": "e82fb8d94c5d76bc64b006bab2742e777f50785a4c4b12c91f15723864e457a3",
     "src/verbs/events/context.mjs": "6579eafcb90bf8a80d12b86e9ac132c6eb6e27f122942480b5062efbae181716",
     "src/verbs/events/rebuild.mjs": "878c422f69b2aef971be694291a2ddfa7f5c705442b662e18f8d9df61720eae5",
-    "src/verbs/merge/approve.mjs": "848bb36b933244a1505e031df39f21d6c1a497ec3c777a2343622c00e7eb207c",
+    "src/verbs/merge/approve.mjs": "72ecd7f71a0fc3627c655271cee0c825acd9bc51e31aa1fd0f37e4d1750f99a9",
     "src/verbs/merge/catchup.mjs": "3c73bf052a078cbe1ef40a271c32e7772da918637abf7cd2bbb7065dbd2be245",
     "src/verbs/merge/iron-law-level.mjs": "7535987e203033abffcc4ce72f7062489aa7673db6cbb80f0a527dc288ac6087",
     "src/verbs/merge/merge.mjs": "b3ddee42a04dc9ad25b770af00843d31bc399c7582274025c93148d0c3faaadf",
@@ -1945,20 +1943,6 @@
     {
       "path": "apps/fgctl/tests/uninstall_surface.rs",
       "line": 48,
-      "spawn": "Command::new",
-      "binary": "git",
-      "class": "rust-test"
-    },
-    {
-      "path": "apps/fgos-gateway/src/gateway.rs",
-      "line": 2768,
-      "spawn": "Command::new",
-      "binary": "? env!(\"CARGO\")",
-      "class": "rust-test"
-    },
-    {
-      "path": "apps/fgos-gateway/src/gateway.rs",
-      "line": 2801,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -2650,14 +2634,14 @@
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3068,
+      "line": 3060,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
     },
     {
       "path": "bin/fgos.mjs",
-      "line": 3212,
+      "line": 3175,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] })))",
       "class": "configured-binary"
@@ -4400,14 +4384,14 @@
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 961,
+      "line": 951,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
       "class": "configured-binary"
     },
     {
       "path": "src/runner/merge.mjs",
-      "line": 991,
+      "line": 981,
       "spawn": "runInvariantChecks -> src/runner/goal-check.mjs:180",
       "binary": "(config door value (readConfig({ projectRoot: repoRoot, sections: ['invariantChecks'] }).value.invariantChecks?.commands))",
       "class": "configured-binary"
@@ -4450,41 +4434,41 @@
     {
       "path": "src/setup/doctor-bridge.mjs",
       "line": 78,
-      "spawn": "runBridged -> src/setup/registrations.mjs:251",
+      "spawn": "runBridged -> src/setup/registrations.mjs:250",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2038,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:837",
+      "line": 2011,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:836",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2085,
+      "line": 2058,
       "spawn": "runAllConfinementProbes -> src/runner/dispatch/confinement/probes/harness.mjs:834",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2125,
-      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:837",
+      "line": 2098,
+      "spawn": "checkBwrapAvailable -> src/setup/registrations.mjs:836",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2132,
+      "line": 2105,
       "spawn": "probePeerRunHidden -> src/runner/dispatch/confinement/probes/harness.mjs:525",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/setup/registrations.mjs",
-      "line": 2299,
+      "line": 2272,
       "spawn": "createSeatBindingClient -> src/seat-binding/client.mjs:160",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"

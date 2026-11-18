@@ -104,7 +104,7 @@ Council round 1 found no named consumer yet (question 3). The first slice is the
 
 | Term | Meaning |
 |---|---|
-| Session | One live agent conversation. It has a stable identity from `docs/platform/identity/spec.md`. In this spec "session" means that, never a worktree-session of `src/runner/session.mjs`; "the CLI's own session file" is the file a CLI keeps for its running process |
+| Session | One live agent conversation. It has a stable identity from `docs/platform/identity/spec.md`. In this spec "session" means that, never the retired per-session worktree of the old `fgos session start` verb; "the CLI's own session file" is the file a CLI keeps for its running process |
 | Address | An entry in the mailbox registry for one live session on this machine, valid for that session's lifetime and released when it ends (section 5.1). Addresses that outlive a session are not part of the first slice (section 15.5). People and agents type its short name; the key is never typed (section 5.1.1) |
 | Message | An immutable envelope (section 5.1) addressed to exactly one address |
 | Checkpoint | The boundary between two steps of an agent where input may safely be inserted |

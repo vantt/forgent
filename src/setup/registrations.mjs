@@ -69,7 +69,6 @@ import {
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
-import { postLandDrift } from '../state/postland-drift.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
 import { getDomain, resolveDomainName, effectiveStep, domainSteps, skillForStep } from '../state/domain-registry.mjs';
 import { unservedToolAbilityOf } from '../runner/dispatch/tool-providers.mjs';
@@ -936,27 +935,6 @@ function checkRootDrift(cwd, run) {
   };
 }
 
-function checkLeafNotifyDrift(cwd, run) {
-  const mainCheckout = resolveMainCheckout(cwd);
-  if (mainCheckout === null) {
-    return { passed: true, message: 'not inside a git checkout — nothing to check' };
-  }
-  const view = doctorWorkView(mainCheckout, run) ?? foldEvents([]);
-  const drift = postLandDrift(mainCheckout, view, { trunk: detectTrunk(mainCheckout) });
-  const entries = Object.entries(drift);
-  if (entries.length === 0) {
-    return { passed: true, message: 'no live session branch has post-land drift against its target' };
-  }
-
-  const describe = ([id, info]) =>
-    `${id} (${info.branch} overlaps ${info.shared.join(', ')} with ${info.target})`;
-
-  return {
-    passed: false,
-    message: `live session branch(es) have post-land drift against their target: ${entries.map(describe).join(', ')}`,
-  };
-}
-
 // tsk-6ax: tsk-5wz declared the coding domain's risk/kind vocabulary
 // (DOMAINS.coding.classification) and enforced it at the write door
 // (validateWorkShape's touchedFields grandfathering), but that only blocks
@@ -1071,11 +1049,6 @@ registerCheck({
 registerCheck({
   id: 'root-drift',
   check: (cwd, run) => checkRootDrift(cwd, run),
-});
-
-registerCheck({
-  id: 'leaf-notify-drift',
-  check: (cwd, run) => checkLeafNotifyDrift(cwd, run),
 });
 
 // tsk-1l9: the LEAF-inclusive sibling of root-drift above. `root-drift` only

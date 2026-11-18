@@ -30,7 +30,7 @@ The complete verbatim Native-First rules, their 0033 narrowing, the no-extra-jud
 
 “A session worktree is structurally the wrong place for a merge-into-main to happen.” This exact quoted rule survives in `bin/fgos.mjs`'s return guard; the supposedly quoted full sentence was not present in `docs/specs/runner.md` (deleted in 97dd62aa7) at this pin and no removal from that document was found by `git log -S`. Its current behavior is conserved here rather than pretending an old paragraph was found.
 
-`approve` refuses every linked worktree, registered session included. `return` is different: a registered `fgos session start` worktree may perform its own progress check (`aheadCount` and verify); its `.fgos` is a symlink to the shared store. An unregistered worktree cannot return a main-source item. A session can therefore participate in work without becoming the merge-into-main checkout. See `bin/fgos.mjs` return, `src/verbs/merge/approve.mjs` and `src/runner/session.mjs`. The quoted sentence's recorded origin is [the return-guard research](../../../history/tsk-ikd-return-main-worktree-guard/RESEARCH.md), line 26; it is not the name of a test file.
+`approve` and `return` (main-source) refuse every linked worktree, however it was made: a merge into main never runs from a linked worktree. Branch-source `return` is unaffected. A linked worktree can therefore participate in work without becoming the merge-into-main checkout. See `bin/fgos.mjs` return and `src/verbs/merge/approve.mjs`. The quoted sentence's recorded origin is [the return-guard research](../../../history/tsk-ikd-return-main-worktree-guard/RESEARCH.md), line 26; it is not the name of a test file.
 
 ## Operation Prompt Templates
 

@@ -1031,114 +1031,16 @@ function makeBlockedBranchItem(cwd, id, extra = {}) {
   commitPending(cwd, `state: park ${id}`);
 }
 
-// --- `fgos session` (fgos-multi-session-checkout Epic 1b) -------------------
+// --- approve ad-hoc worktree guard (P44) ----------------------------------
 //
-// CLI-surface integration checks for the `session` verb family wiring
-// session.mjs's createSession/endSession/listSessions. The module's own
-// divergence/lock/worktree algorithm is proven by test/runner/session.test.mjs
-// (cell fgos-multi-session-checkout-1); these tests exercise only the CLI
-// dispatch, output shape, and exit-code surface. A session worktree is a real
-// `git worktree add --detach` on the repo's HEAD, so every test uses a
-// git-backed cwd; each started session is ended (plain or --force) so its
-// worktree never leaks.
-
-// Parses `session start`'s output into { result, sessionId, worktreePath }.
-function startSession(cwd, extraArgs = []) {
-  const result = run(cwd, ['session', 'start', ...extraArgs]);
-  assert.equal(result.status, 0, `session start failed: ${result.stderr}`);
-  const data = envelopeData(result.stdout);
-  return {
-    result,
-    sessionId: data.sessionId,
-    worktreePath: data.worktreePath,
-  };
-}
-
-// `fgos session start [--item <id>]` run in `repoRoot`; answers the session summary the verb prints. The session
-// id is the host's own (a UUID), so a caller reads it from the answer.
-function createSession(repoRoot, { itemId } = {}) {
-  const result = run(repoRoot, ['session', 'start', ...(itemId ? ['--item', itemId] : [])]);
-  if (result.status !== 0) throw new Error(`session start failed (${result.status}): ${result.stderr}`);
-  return envelopeData(result.stdout);
-}
-
-// `fgos session end <id> [--force]` run in `repoRoot`; answers the summary (with `forced`) the verb prints.
-function endSession(repoRoot, sessionId, { force = false } = {}) {
-  const result = run(repoRoot, ['session', 'end', sessionId, ...(force ? ['--force'] : [])]);
-  if (result.status !== 0) throw new Error(`session end failed (${result.status}): ${result.stderr}`);
-  return envelopeData(result.stdout);
-}
-
-// Makes a commit from INSIDE a detached-HEAD session worktree, diverging its
-// HEAD from the recorded start commit (a genuinely dangling commit). Returns
-// the new commit sha. The worktree shares the repo's git config (user set by
-// initGitCwd), so the commit needs no extra setup.
-function commitInWorktree(worktreePath, filename, content = 'inside-session\n') {
-  fs.writeFileSync(path.join(worktreePath, filename), content);
-  execFileSync('git', ['add', filename], { cwd: worktreePath });
-  execFileSync('git', ['commit', '-q', '-m', `inside: ${filename}`], { cwd: worktreePath });
-  return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: worktreePath, encoding: 'utf8' }).trim();
-}
-
-// --- approve session-nesting guard (fgos-multi-session-checkout Epic 2) ------
-//
-// approve (NOT --github) refuses when cwd is inside a registered session
-// worktree, covering BOTH non-github source paths — runner (a merge there
-// lands on the session's own detached HEAD, never main) and pull/legacy (a
-// goal-check verifies whatever cwd has checked out while claiming "verified on
-// main"). Every session below is created via session.mjs's REAL createSession
-// (not a mock) so the guard sees a genuinely registered worktree, and torn
-// down with endSession(force) so no worktree leaks.
-
-// A git-backed cwd with a `main` default branch AND `.fgos/` ENTIRELY
-// gitignored (not just state.json). The full ignore is load-bearing here:
-// createSession runs `git worktree add --detach HEAD`, so if HEAD carried a
-// committed `.fgos/` (the repo's usual convention), the new worktree would
-// materialize it and collide (EEXIST) with the `.fgos` symlink createSession
-// then creates. Gitignoring `.fgos/` keeps it out of every commit; the shared
-// store still lives on disk and is symlinked into each session worktree, and
-// isMainTreeClean already excludes `.fgos/`, so approve is unaffected.
-function initSessionSafeCwd() {
-  return initFixtureRepo(tmpCwd(), { branch: 'main', ignore: '.fgos/\n' });
-}
-
-// Builds a runner-classified proposed item (a live fgw/<id> branch with a real
-// commit, item moved doing->awaiting-approval) on an initSessionSafeCwd, WITHOUT ever
-// committing `.fgos/` into HEAD — the only difference from makeRunnerProposedItem,
-// whose `git add -A` commits would both fold `.fgos/` into HEAD (breaking the
-// session-worktree symlink) and, under a fully-ignored `.fgos/`, have nothing to
-// commit. main's HEAD stays at seed; only the fgw/<id> branch carries the produced
-// file, exactly what classifySource keys off.
-async function makeSessionSafeRunnerItem(cwd, id, extra = {}) {
-  addOk(cwd, id, extra);
-  await takeOk(cwd, id);
-  gitAtCwd(cwd, ['checkout', '-b', `fgw/${id}`]);
-  fs.writeFileSync(path.join(cwd, `${id}-produced.txt`), 'ok\n');
-  gitAtCwd(cwd, ['add', `${id}-produced.txt`]);
-  gitAtCwd(cwd, ['commit', '-q', '-m', `worker output for ${id}`]);
-  gitAtCwd(cwd, ['checkout', 'main']);
-  // The raw move below never goes through settleClaim -- release the
-  // runtime claim explicitly right after, same reasoning as
-  // makeRunnerProposedItem above.
-  moveOk(cwd, id, 'awaiting-approval', { skipReturnGuard: "test fixture setup, not exercising return's own guard" });
-  releaseClaimFor(cwd, id);
-}
-
-// --- approve ad-hoc (unregistered) worktree guard (P44) --------------------
-//
-// The registry-based guard above only catches a worktree created through
-// `fgos session start` (session.mjs's createSession). A plain `git worktree
-// add` run by hand is invisible to sessions.json, so it slipped through the
-// same guard block untouched — approve would merge/verify against that
-// worktree's checkout while still reporting the item `done`, exactly the
-// silent false-verification the registry guard exists to prevent, just from
-// an unregistered path instead of a registered one. The fix must catch ANY
-// worktree structurally — main-vs-linked, not registered-vs-not.
+// A plain `git worktree add` run by hand: approve would merge/verify against
+// that worktree's checkout while still reporting the item `done`, a silent
+// false verification. The guard must catch ANY linked worktree structurally —
+// main-vs-linked, not registered-vs-not.
 //
 // Uses initGitCwdMain (the REAL fgos convention: `.fgos/events.jsonl` tracked
-// and committed, only `.fgos/state.json` gitignored) rather than
-// initSessionSafeCwd's fully-ignored `.fgos/` — a plain `git worktree add`
-// only ever checks out tracked content, so the ad-hoc worktree must have a
+// and committed, only `.fgos/state.json` gitignored) — a plain `git worktree
+// add` only ever checks out tracked content, so the ad-hoc worktree must have a
 // genuinely committed events log to see the item at all (mirroring what a
 // real ad-hoc worktree of this repo would have on disk).
 
@@ -1181,14 +1083,11 @@ export {
   assert,
   coexistPath,
   commitFile,
-  commitInWorktree,
   commitPending,
   commitPendingBeforeApprove,
-  createSession,
   cutMemberBranch,
   docsIndexManifestPath,
   editWork,
-  endSession,
   envelopeData,
   eventLines,
   corruptEventStore,
@@ -1205,7 +1104,6 @@ export {
   initGitCwdWithWorktree,
   initHeadlessGitCwd,
   initHeadlessGitCwdFast,
-  initSessionSafeCwd,
   initFgosFixtureInProcess,
   linkFgosBinInto,
   logPath,
@@ -1220,7 +1118,6 @@ export {
   makeRunnerProposedItem,
   makeRunnerProposedItemTouching,
   makeRunnerProposedLeafItem,
-  makeSessionSafeRunnerItem,
   mkLocalDependency,
   moveStep,
   moveToDurableDoingForTest,
@@ -1235,7 +1132,6 @@ export {
   rawPersistedView,
   releaseClaimFor,
   spawnSync,
-  startSession,
   stateView,
   tmpCwd,
   tmpCwdFast,

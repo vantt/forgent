@@ -203,15 +203,12 @@ export function detectTrunk(repoRoot) {
 
 /**
  * Whether `repoRoot` IS the repo's main working tree — never a linked
- * worktree, registered through `fgos session start` (session.mjs) or ad-hoc
- * (a plain `git worktree add` run by hand, invisible to `sessions.json`).
- * `approve`'s registry-based guard only ever caught the registered case; an
- * ad-hoc worktree slipped through the exact same risk untouched — a merge
- * landing on that worktree's own checkout, or a goal-check verifying its own
- * (possibly stale/divergent) tree, while the item is still reported "done" /
- * "verified on main" (P44).
+ * worktree, however it was made (`fgos worktree` or a plain `git worktree
+ * add` run by hand). A merge landing on a linked worktree's own checkout, or
+ * a goal-check verifying its own (possibly stale/divergent) tree, would leave
+ * the item reported "done" / "verified on main" (P44).
  *
- * The check is structural, not registry-based, so it catches both: a main
+ * The check is structural, so it catches every linked worktree: a main
  * worktree's git-common-dir sits directly inside its own toplevel (its
  * parent IS the toplevel); a linked worktree's common-dir resolves to the
  * MAIN repo's `.git`, whose parent is the main repo root — never the linked
@@ -278,8 +275,7 @@ export function branchExists(repoRoot, branch) {
  * `.fgos` removal `createWorktree` itself always performs right after
  * checkout (ADR0020) — that path is this module's own known artifact,
  * never real user/worker content, and would otherwise make every checkout
- * look dirty regardless of real activity. Mirrors session.mjs's
- * `reclaimOrphanedSessions` (same `:!.fgos` pathspec exclusion). Fails
+ * look dirty regardless of real activity. Fails
  * closed (dirty) on an unreadable status — never assume clean.
  *
  * Exported (tsk-3gx-1): `promote-preflight.mjs` reuses this exact

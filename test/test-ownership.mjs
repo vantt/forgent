@@ -65,7 +65,6 @@ export const MANIFEST = [
   { id: 'state-plan-pool', status: 'shadow', pattern: 'src/state/plan-pool.mjs', directTests: ['test/state/plan-pool.test.mjs'], boundaryTests: [] },
   { id: 'state-porting', status: 'shadow', pattern: 'src/state/porting.mjs', directTests: ['test/state/porting.test.mjs'], boundaryTests: [] },
   { id: 'state-porting-store', status: 'shadow', pattern: 'src/state/porting-store.mjs', directTests: ['test/state/porting-store.test.mjs'], boundaryTests: [] },
-  { id: 'state-postland-drift', status: 'shadow', pattern: 'src/state/postland-drift.mjs', directTests: ['test/state/postland-drift.test.mjs'], boundaryTests: [] },
   { id: 'state-priority-formula', status: 'shadow', pattern: 'src/state/priority-formula.mjs', directTests: ['test/state/priority-formula.test.mjs'], boundaryTests: [] },
   { id: 'state-retro-pool', status: 'shadow', pattern: 'src/state/retro-pool.mjs', directTests: ['test/state/retro-pool.test.mjs'], boundaryTests: [] },
   { id: 'state-retrospective-doors', status: 'shadow', pattern: 'src/state/retrospective-doors.mjs', directTests: ['test/state/retrospective-doors.test.mjs'], boundaryTests: [] },

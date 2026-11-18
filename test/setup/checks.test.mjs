@@ -5,7 +5,7 @@
 // tsk-67g: 10 test dựng môi trường thật cho `fgos setup` đã dọn sang các file
 // checks-setup-*.test.mjs bên cạnh.
 //
-// tsk-25b: main đã thêm nhiều check mới (root-drift, leaf-notify-drift,
+// tsk-25b: main đã thêm nhiều check mới (root-drift,
 // events-jsonl-*, work-*-vocabulary, ...) từ sau lần chẻ đầu,
 // khiến file này lại vượt ngưỡng ~30s. Phần drift/vocabulary/index-staleness
 // của chính work-item store ở lại đây; phần config/CLI-wiring/doctor runtime
@@ -30,7 +30,6 @@ import {
   spawnSync,
   withHome,
 } from './helpers/setup-checks-harness.mjs';
-import { createSession } from '../cli/helpers/fgos-cli-harness.mjs';
 import { activateGitFixture } from '../helpers/git-fixture.mjs';
 import { ensureScriptAddon } from '../../scripts/lib/git-ports.mjs';
 
@@ -53,7 +52,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       'run-supervisor-config',
       'credential-copies-retained',
       'root-drift',
-      'leaf-notify-drift',
       'work-classification-vocabulary',
       'work-step-vocabulary',
       'work-recorded-conflicts',
@@ -185,46 +183,6 @@ test('root-drift stays silent for a wontfix root whose branch is ahead — aband
   const { passed, message } = checkById('root-drift').check(dir);
   assert.equal(passed, true);
   assert.match(message, /no root branch is drifted/);
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-test('leaf-notify-drift passes when no live session branch has post-land drift against its target', () => {
-  const dir = initRepo('checks-leaf-drift-clean-');
-  execFileSync('git', ['checkout', '-q', '-b', 'fgw/leaf'], { cwd: dir });
-  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'doing', deps: [], refs: [] });
-
-  const { passed, message } = checkById('leaf-notify-drift').check(dir);
-  assert.equal(passed, true);
-  assert.match(message, /no live session branch has post-land drift/);
-  fs.rmSync(dir, { recursive: true, force: true });
-});
-
-test('leaf-notify-drift fails and names the leaf when a live session branch overlaps files with target land', () => {
-  const dir = initRepo('checks-leaf-drift-dirty-');
-  execFileSync('git', ['checkout', '-q', '-b', 'fgw/leaf'], { cwd: dir });
-  fs.writeFileSync(path.join(dir, 'file.txt'), 'leaf work\n');
-  execFileSync('git', ['add', 'file.txt'], { cwd: dir });
-  execFileSync('git', ['commit', '-qm', 'leaf work'], { cwd: dir });
-
-  execFileSync('git', ['checkout', '-q', 'main'], { cwd: dir });
-  fs.writeFileSync(path.join(dir, 'file.txt'), 'landed work\n');
-  execFileSync('git', ['add', 'file.txt'], { cwd: dir });
-  execFileSync('git', ['commit', '-qm', 'landed work on main'], { cwd: dir });
-
-  const fgosDir = path.join(dir, '.fgos');
-  initStore(fgosDir);
-  addWork(fgosDir, { id: 'landed', title: 'landed', kind: 'feature', risk: 'light', verify: 'true', status: 'done', deps: [], refs: [] });
-  addWork(fgosDir, { id: 'leaf', title: 'leaf', kind: 'feature', risk: 'light', verify: 'true', status: 'doing', deps: [], refs: [] });
-  activateGitFixture(dir);
-  createSession(dir, { itemId: 'leaf' });
-
-  const { passed, message } = checkById('leaf-notify-drift').check(dir);
-  assert.equal(passed, false);
-  assert.match(message, /leaf/);
-  assert.match(message, /file\.txt/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 

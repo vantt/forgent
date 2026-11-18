@@ -730,54 +730,34 @@ test('openLeavesSharingTarget: an unknown landed id yields nothing rather than t
   assert.deepEqual(openLeavesSharingTarget({ work: {} }, 'nope'), []);
 });
 
-test('classifyPostLandDrift: a leaf sharing no path produces nothing at all -- no notification, no mark', () => {
+test('classifyPostLandDrift: a leaf sharing no path produces nothing at all -- no mark', () => {
   const result = classifyPostLandDrift({
     landedFiles: ['src/a.mjs'],
-    leaves: [{ id: 'leaf', files: ['src/b.mjs'], sessionIds: ['sess-1'] }],
+    leaves: [{ id: 'leaf', files: ['src/b.mjs'] }],
   });
-  assert.deepEqual(result, { notify: [], stale: [] });
+  assert.deepEqual(result, { stale: [] });
 });
 
-test('classifyPostLandDrift: a shared path with a live session notifies that exact session', () => {
-  const result = classifyPostLandDrift({
-    landedFiles: ['src/a.mjs', 'src/shared.mjs'],
-    leaves: [{ id: 'leaf', files: ['src/shared.mjs', 'src/c.mjs'], sessionIds: ['sess-1'] }],
-  });
-  assert.deepEqual(result, {
-    notify: [{ id: 'leaf', shared: ['src/shared.mjs'], sessionIds: ['sess-1'] }],
-    stale: [],
-  });
-});
-
-test('classifyPostLandDrift: a shared path reaches every session of that leaf, not just the first', () => {
+test('classifyPostLandDrift: a shared path marks the leaf stale', () => {
   const result = classifyPostLandDrift({
     landedFiles: ['src/shared.mjs'],
-    leaves: [{ id: 'leaf', files: ['src/shared.mjs'], sessionIds: ['sess-1', 'sess-2'] }],
+    leaves: [{ id: 'leaf', files: ['src/shared.mjs'] }],
   });
-  assert.deepEqual(result.notify, [{ id: 'leaf', shared: ['src/shared.mjs'], sessionIds: ['sess-1', 'sess-2'] }]);
+  assert.deepEqual(result, { stale: [{ id: 'leaf', shared: ['src/shared.mjs'] }] });
 });
 
-test('classifyPostLandDrift: a shared path with no session is marked stale only', () => {
-  const result = classifyPostLandDrift({
-    landedFiles: ['src/shared.mjs'],
-    leaves: [{ id: 'leaf', files: ['src/shared.mjs'], sessionIds: [] }],
-  });
-  assert.deepEqual(result, { notify: [], stale: [{ id: 'leaf', shared: ['src/shared.mjs'] }] });
-});
-
-test('classifyPostLandDrift: each leaf is bucketed independently', () => {
+test('classifyPostLandDrift: each leaf is judged independently', () => {
   const result = classifyPostLandDrift({
     landedFiles: ['src/shared.mjs'],
     leaves: [
-      { id: 'untouched', files: ['src/other.mjs'], sessionIds: ['sess-1'] },
-      { id: 'owned', files: ['src/shared.mjs'], sessionIds: ['sess-2'] },
-      { id: 'orphan', files: ['src/shared.mjs'], sessionIds: [] },
+      { id: 'untouched', files: ['src/other.mjs'] },
+      { id: 'a', files: ['src/shared.mjs'] },
+      { id: 'b', files: ['src/shared.mjs', 'src/x.mjs'] },
     ],
   });
-  assert.deepEqual(result.notify, [{ id: 'owned', shared: ['src/shared.mjs'], sessionIds: ['sess-2'] }]);
-  assert.deepEqual(result.stale, [{ id: 'orphan', shared: ['src/shared.mjs'] }]);
+  assert.deepEqual(result.stale, [{ id: 'a', shared: ['src/shared.mjs'] }, { id: 'b', shared: ['src/shared.mjs'] }]);
 });
 
-test('classifyPostLandDrift: no leaves and no landed files produce empty buckets', () => {
-  assert.deepEqual(classifyPostLandDrift({}), { notify: [], stale: [] });
+test('classifyPostLandDrift: no leaves and no landed files produce an empty result', () => {
+  assert.deepEqual(classifyPostLandDrift({}), { stale: [] });
 });

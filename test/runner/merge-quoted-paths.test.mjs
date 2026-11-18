@@ -9,11 +9,11 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
   changedFiles,
+  detectPostLandDrift,
   isWorkingTreeClean,
   buildOwnFileSet,
   isIgnorableStatusPath,
 } from '../../src/runner/merge.mjs';
-import { postLandDrift } from '../../src/state/postland-drift.mjs';
 import { safeGitStatusFiles } from '../../src/runner/dispatch/settlement.mjs';
 
 const VIET = 'tài liệu/ghi chú.md';
@@ -99,7 +99,7 @@ test('isWorkingTreeClean still ignores a .fgos path git would quote', (t) => {
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
-test('postLandDrift names a shared Vietnamese path and a path one side renamed away', (t) => {
+test('detectPostLandDrift names a shared Vietnamese path and a path one side renamed away', (t) => {
   const repoRoot = initRepo(t);
   write(repoRoot, VIET, 'v1\n');
   write(repoRoot, 'cũ.md', 'old\n');
@@ -114,8 +114,8 @@ test('postLandDrift names a shared Vietnamese path and a path one side renamed a
   commitAll(repoRoot, 'main');
 
   const view = { work: { landed1: { id: 'landed1', status: 'done' }, leaf1: { id: 'leaf1', status: 'doing' } } };
-  const result = postLandDrift(repoRoot, view, { trunk: 'main', sessions: [{ sessionId: 's1', itemId: 'leaf1' }] });
-  assert.deepEqual(result.leaf1?.shared, ['cũ.md', VIET].sort());
+  const result = detectPostLandDrift(repoRoot, view, view.work.landed1, { target: 'main', landedFiles: [VIET, 'cũ.md', 'mới.md'] });
+  assert.deepEqual(result.stale, [{ id: 'leaf1', shared: ['cũ.md', VIET].sort() }]);
 });
 
 test('isWorkingTreeClean and settlement answer on an untracked tree listing over 1 MiB', (t) => {

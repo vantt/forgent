@@ -125,8 +125,8 @@ Observed code:
 - `src/runner/worktree.mjs` creates `fgw/<id>` branches in fresh worktrees.
 - Worker worktrees remove checked-out `.fgos` because stale copied state is
   wrong and live symlinked state was rejected for worker execution.
-- `src/runner/session.mjs` does the opposite: it removes checked-out `.fgos` and
-  symlinks it back to main, because sessions are driver/readers of shared state.
+- The per-session worktree runner (retired 2026-11-18) did the opposite: it removed checked-out `.fgos` and
+  symlinked it back to main, because sessions were driver/readers of shared state.
 - Worktree cleanup preserves proposal branches and force-removes only stale
   checkout directories.
 

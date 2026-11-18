@@ -15,7 +15,6 @@
 // decomposition: the CLI test suite asserts on individual payload fields
 // rather than deep-equalling the whole object, so every return branch has
 // to keep its exact shape and every guard its exact order.
-import path from 'node:path';
 import crypto from 'node:crypto';
 import { gitPortOptions } from '../../git/inspect.mjs';
 import { createGitRecovery } from '../../git/recovery.mjs';
@@ -50,11 +49,9 @@ import {
   isMainWorktree,
   currentHead,
   resolveRefSha,
-  realpathOrSelf as realpathOr,
 } from '../../runner/worktree.mjs';
 import { ironLawForItem, ironLawRefusal } from '../../runner/iron-law-gate.mjs';
 import { readIronLawLevel, recordIronLawSkip, recordIronLawAcknowledge } from './iron-law-level.mjs';
-import { listSessions } from '../../runner/session.mjs';
 import { runGoalCheck } from '../../runner/goal-check.mjs';
 import { mergeGitHubPR } from '../../runner/github-adapter.mjs';
 import { recordApprovePostSuccessFault } from '../../observe/approve-fault-log.mjs';
@@ -207,53 +204,26 @@ export async function approveUseCase(
 
   const source = classifySource(repoRoot, item);
 
-  // Multi-session guard (fgos-multi-session-checkout Epic 2): approve must
-  // never run with cwd inside a registered session worktree. One refusal,
-  // covering BOTH non-github source paths, each dangerous for its own reason:
-  //   - runner: the merge below lands on the session's own detached HEAD,
-  //     never main (spike-proven) — a silent "approved" item whose code
-  //     never reaches main.
+  // Linked-worktree guard: approve must never run with cwd inside a linked
+  // worktree. One refusal, covering BOTH non-github source paths, each
+  // dangerous for its own reason:
+  //   - runner: the merge below lands on that worktree's own HEAD, never
+  //     main — a silent "approved" item whose code never reaches main.
   //   - pull/legacy: runGoalCheck below verifies whatever cwd has checked
-  //     out; a session worktree sits at its startCommit, which may predate
-  //     later advances to main, so this would verify STALE code while the
-  //     "verified on main" message claims otherwise, marking the item done
-  //     regardless — a silent false verification.
+  //     out, possibly a stale tree, while the "verified on main" message
+  //     claims otherwise — a silent false verification.
   // Refuses BEFORE any git command or verify run: the item stays proposed,
-  // main untouched. Runs BEFORE the --github branch too (approve-worktree-
-  // guard-github-fix D1): a GitHub-side merge is server-side and never
-  // touches the local tree, but the local checkout's own IDENTITY — is
-  // this even the main worktree? — is a more fundamental precondition than
-  // which transport approve uses, so it is checked first for every source.
-  // Registry-based: an ad-hoc `git worktree add` never created through
-  // `fgos session start` is invisible to this guard (CONTEXT.md Deferred
-  // Ideas — ad-hoc unregistered worktree residual risk); the structural
-  // check right below catches that case.
-  const approveCwdReal = realpathOr(repoRoot);
-  for (const session of listSessions(repoRoot)) {
-    const wtReal = realpathOr(session.worktreePath);
-    if (approveCwdReal === wtReal || approveCwdReal.startsWith(`${wtReal}${path.sep}`)) {
-      throw new StoreError(
-        'validation',
-        `approve: refusing to run from inside session "${session.sessionId}" worktree at "${wtReal}" — approve must land on the main checkout, which a session worktree structurally is not. Run approve from the main checkout, or end the session first with "fgos session end ${session.sessionId}".`,
-      );
-    }
-  }
-
-  // Structural guard (P44): the registry loop above only catches a
-  // worktree registered via `fgos session start`. A plain `git worktree
-  // add` run by hand is invisible to sessions.json, so it slipped through
-  // untouched — same false-verification risk (merge lands on that
-  // worktree's own checkout, or goal-check verifies its own possibly-stale
-  // tree, while the item is reported "done"/"verified on main"), just
-  // unregistered instead of registered. isMainWorktree reads git's own
-  // common-dir structure, so it catches ANY linked worktree regardless of
-  // how it was created. Also runs BEFORE the --github branch, same
-  // rationale as the registry loop above (approve-worktree-guard-github-
-  // fix D1).
+  // main untouched.
+  // isMainWorktree reads git's own common-dir
+  // structure, so it catches ANY linked worktree regardless of how it was
+  // created. Runs BEFORE the --github branch (approve-worktree-guard-github-
+  // fix D1): the merge lands on that worktree's own checkout, or goal-check
+  // verifies its own possibly-stale tree, while the item is reported
+  // "done"/"verified on main".
   if (!isMainWorktree(repoRoot)) {
     throw new StoreError(
       'validation',
-      `approve: refusing to run from "${repoRoot}" — this is a git worktree, not the repository's main working tree, whether or not it was created through "fgos session start". Run approve from the main checkout.`,
+      `approve: refusing to run from "${repoRoot}" — this is a git worktree, not the repository's main working tree. Run approve from the main checkout.`,
     );
   }
 

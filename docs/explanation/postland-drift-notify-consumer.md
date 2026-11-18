@@ -1,8 +1,13 @@
 ---
-authoritative_for: postLand.notify drift consumer, postLandDrift(), fgos doctor leaf-notify-drift check, fgos-coding-driving Orient surface for drift
+authoritative_for: history of the retired postLand.notify drift consumer (removed 2026-11-18)
 ---
 
 # `postLand.notify` drift is now actually consumed, not just computed
+
+> **Retired 2026-11-18.** The per-session worktree registry (`fgos session start|end|list|gc`, `.fgos/sessions.json`)
+> was removed, so no branch has an owning live session any more: post-land drift now reports only `stale`, and
+> `postLandDrift()`, the `notify` outcome and the doctor check `leaf-notify-drift` are gone. The text below is the
+> history of what existed before.
 
 `tsk-1el` closed a real gap: `tsk-2ypd` (D4) had already built the
 mechanism to classify post-land drift into `notify` (live-session

@@ -44,7 +44,6 @@ import { branchNameFor, branchExists, reclaimOrphanedCheckout, detectTrunk, insp
 import { runGoalCheck, runInvariantChecks, invariantFailureAsCheck } from './goal-check.mjs';
 import { readConfig } from '../config/facade.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
-import { listSessions } from './session.mjs';
 import { listWork, readAppliedEvents } from '../state/store.mjs';
 import { prepareWorkStore } from '../state/work-event-store.mjs';
 import { branchKey } from '../event-store/index.mjs';
@@ -332,28 +331,20 @@ export function reviewDiff(repoRoot, item, opts = {}) {
  * landing 13 children sequentially costs ~78 catchup+verify rounds, and
  * nearly all of them find nothing collided. So nothing in this path touches
  * a branch, runs a verify, or writes to `.fgos/` — it runs `git diff
- * --name-only` per candidate and returns a report. The three outcomes are
- * `classifyPostLandDrift`'s (nothing / notify the owning session / mark
- * stale); this function's own job is gathering the real inputs for it.
+ * --name-only` per candidate and returns a report. The two outcomes are
+ * `classifyPostLandDrift`'s (nothing / mark stale); this function's own job
+ * is gathering the real inputs for it.
  *
  * `target` and `landedFiles` are supplied by the caller because they can
  * only be read correctly BEFORE the merge: once the branch lands, `target`
  * contains it, so `git diff target...branch` is empty and the paths this
  * branch brought are no longer recoverable from the three-dot diff.
  *
- * `view` and `sessions` are passed in rather than read here, keeping this
+ * `view` is passed in rather than read here, keeping this
  * function's own I/O to git alone — and keeping this module's standing rule
  * that state access belongs to the caller.
  */
-export function detectPostLandDrift(repoRoot, view, landedItem, { target, landedFiles = [], sessions = [] } = {}) {
-  const sessionsByItem = new Map();
-  for (const entry of sessions) {
-    if (!entry?.itemId) continue;
-    const known = sessionsByItem.get(entry.itemId) ?? [];
-    known.push(entry.sessionId);
-    sessionsByItem.set(entry.itemId, known);
-  }
-
+export function detectPostLandDrift(repoRoot, view, landedItem, { target, landedFiles = [] } = {}) {
   const examined = [];
   const leaves = [];
   for (const id of openLeavesSharingTarget(view, landedItem.id)) {
@@ -366,7 +357,6 @@ export function detectPostLandDrift(repoRoot, view, landedItem, { target, landed
     leaves.push({
       id,
       files: changedFiles(repoRoot, view.work[id], { trunk: target }),
-      sessionIds: sessionsByItem.get(id) ?? [],
     });
   }
 
@@ -1033,7 +1023,7 @@ export async function landRunnerItem(repoRoot, item, {
   const promotion = promoteAfterLand(fgosDir, branch);
   let postLand;
   try {
-    postLand = detectPostLandDrift(repoRoot, listWork(fgosDir), item, { target, landedFiles, sessions: listSessions(repoRoot) });
+    postLand = detectPostLandDrift(repoRoot, listWork(fgosDir), item, { target, landedFiles });
   } catch (err) {
     postLand = { landed: item.id, target, landedFiles, error: `post-land drift detection failed: ${err.message}` };
   }

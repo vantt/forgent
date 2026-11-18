@@ -55,7 +55,7 @@ test('fgosDirFromRoot joins .fgos onto an already-resolved root', () => {
   assert.equal(fgosDirFromRoot(root), path.join(root, '.fgos'));
 });
 
-test('fgosDirFromRoot matches session.mjs\'s prior inline computation exactly (path.resolve + join)', () => {
+test('fgosDirFromRoot resolves a relative root with path.resolve before joining', () => {
   const root = 'relative/root';
   assert.equal(fgosDirFromRoot(root), path.join(path.resolve(root), '.fgos'));
 });
