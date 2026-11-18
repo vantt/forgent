@@ -175,13 +175,13 @@ fn main() {
             std::process::exit(fgos_session_host::route::main(&rest));
         }
         // `seat-binding <op>`: the seat binding decision the Node payload must
-        // not copy (see `fgos_seat_binding::route`).
+        // not copy (see `wiring::seat_binding`).
         if args.get(2).is_some_and(|a| a == "seat-binding") {
             let rest: Vec<String> = args[3..]
                 .iter()
                 .map(|a| a.to_string_lossy().into_owned())
                 .collect();
-            std::process::exit(fgos_seat_binding::route::main(&rest));
+            std::process::exit(wiring::seat_binding::main(&rest));
         }
         // `source-payload <root>`: the one source-payload rule, for the release builder (see
         // `fgos_distribution::source_payload`).

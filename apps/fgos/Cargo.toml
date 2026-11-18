@@ -21,6 +21,7 @@ fgos-run-supervisor = { path = "../../packages/run-supervisor/rust" }
 fgos-terminal-control = { path = "../../packages/terminal-control/rust" }
 fgos-session-host = { path = "../../packages/session-host/rust" }
 fgos-seat-binding = { path = "../../packages/seat-binding/rust" }
+fgos-execution = { path = "../../packages/execution/rust" }
 fgos-mailbox = { path = "../../packages/mailbox/rust/store" }
 fgos-mailbox-core = { path = "../../packages/mailbox/rust/core" }
 fgos-durable-file = { path = "../../packages/durable-file/rust" }

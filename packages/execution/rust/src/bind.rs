@@ -1153,9 +1153,12 @@ pub fn preflight(
     machine: &dyn Machine,
     now: u64,
 ) -> Preflight {
+    // The runner is keyed by family first, as `bind` keys it, so a pinned account's quarantine is read on the
+    // pools the bind ranks from even when `modelPolicies` spells a family by an alias.
+    let keyed = family_keyed(runner);
     let pin_quarantined_until = pin.and_then(|pin| {
-        let launch_view = launch_view_of(runner, BindSession::default(), machine);
-        let view = account_view(runner, &launch_view, account_state, now, machine);
+        let launch_view = launch_view_of(&keyed, BindSession::default(), machine);
+        let view = account_view(&keyed, &launch_view, account_state, now, machine);
         view["pools"]
             .get(&pin.pool)
             .and_then(Value::as_array)?

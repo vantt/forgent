@@ -4284,3 +4284,58 @@ fn init_without_a_home_is_a_missing_precondition_and_writes_nothing() {
     assert!(!world.fgos_file("coexistence.json").exists());
     let _ = fs::remove_dir_all(&world.base);
 }
+
+/// Runs `fgos internal seat-binding <args>` with `stdin` and returns the exit code and the one JSON answer line.
+fn seat_binding_route(args: &[&str], stdin: &str) -> (Option<i32>, serde_json::Value) {
+    use std::io::Write;
+    use std::process::Stdio;
+    let mut child = Command::new(fgos_bin())
+        .args(["internal", "seat-binding"])
+        .args(args)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("failed to execute fgos");
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(stdin.as_bytes())
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    let text = String::from_utf8_lossy(&output.stdout);
+    let line = text.trim().lines().last().unwrap_or_default();
+    let answer = serde_json::from_str(line)
+        .unwrap_or_else(|err| panic!("the route answers one JSON line, got {text:?}: {err}"));
+    (output.status.code(), answer)
+}
+
+#[test]
+fn the_seat_binding_route_refuses_an_old_protocol_by_name_before_it_reads_the_operation() {
+    for args in [
+        &["bind", "--protocol", "1"][..],
+        &["nosuchop", "--protocol", "1"][..],
+    ] {
+        let (code, line) = seat_binding_route(args, r#"{"v":1,"input":{"protocol":1}}"#);
+        assert_eq!(code, Some(3), "{args:?}");
+        assert_eq!(line["result"], "error");
+        assert_eq!(line["code"], "host-version-mismatch");
+        assert_eq!(line["protocol"], 2);
+    }
+}
+
+#[test]
+fn the_seat_binding_route_answers_protocol_two_through_the_host_wiring() {
+    let (code, line) = seat_binding_route(&["digest", "--protocol", "2"], r#"{"v":2,"runner":{}}"#);
+    assert_eq!(code, Some(0));
+    assert_eq!(line["op"], "digest");
+    assert_eq!(line["result"], "ok");
+    assert_eq!(
+        line["digest"],
+        "sha256:405336c7ec05446658dd47649864dc7c4cf220d98732218da30efdbbad744d1c"
+    );
+    let (code, line) = seat_binding_route(&["ladder", "--protocol", "2"], r#"{"v":2}"#);
+    assert_eq!(code, Some(0));
+    assert_eq!(line["ladder"]["vocabulary"].as_array().unwrap().len(), 6);
+}
