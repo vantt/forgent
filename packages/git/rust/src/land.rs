@@ -1,5 +1,6 @@
 //! Land transaction. The consumer owns verification and business settlement.
 use crate::{
+    driver::Policy,
     refs::Authority,
     scoped_commit::{checkout_resources, is_store_path, paths, require_no_native_state},
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
@@ -899,6 +900,345 @@ impl GitDriver {
         session.receipt = Some(receipt.clone());
         session.slot = LockScope::seeded(vec![]).map_err(failure)?;
         Ok(receipt)
+    }
+}
+impl GitDriver {
+    /// Push the session's own candidate to its own destination while the session is alive.
+    /// Admission exempts exactly this push from the session's chain (same binding, same
+    /// destination, source is the candidate pin); every other push to that ref stays refused.
+    /// A rejected push (the remote moved) leaves the session droppable with nothing published.
+    pub fn push_land_candidate(
+        &self,
+        repo: &RepoHandle,
+        session: &LandSession,
+        grant: &RemoteGrant,
+        destination: &RefName,
+        writer: &str,
+    ) -> Result<Receipt> {
+        if session.receipt.is_some() {
+            return Err(failure("land-session-settled"));
+        }
+        let c = session
+            .candidate
+            .as_ref()
+            .ok_or_else(|| failure("land-candidate-required"))?;
+        if destination.as_str() != session.request.destination {
+            return Err(failure("land-push-destination-mismatch"));
+        }
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
+        let wal = Wal::open_with(repo, &wal::OsFileSystem)?;
+        let chain = wal.inspect(&session.id)?;
+        if !matches!(chain.intent().kind, OperationKind::Land(_))
+            || !matches!(chain.last_state(), Phase::Prepared)
+        {
+            return Err(recovery("land-recovery-required"));
+        }
+        if chain.intent().writer_identity != writer {
+            return Err(failure("land-push-writer-mismatch"));
+        }
+        let pinned = |suffix: &str| {
+            RefName::parse(&format!(
+                "refs/fgos/git-operations/{}{suffix}/candidate",
+                session.id
+            ))
+            .map_err(failure)
+        };
+        let candidate = Oid::parse(&c.candidate, repo.object_format()).map_err(failure)?;
+        if crate::refs::direct(self, repo, &pinned("")?)? != ExpectedTip::Oid(candidate.clone()) {
+            return Err(recovery("land-pin-changed"));
+        }
+        // The Remote port refuses a `refs/fgos/` source, so the candidate rides a short-lived
+        // branch that exists only for this push.
+        let source = RefName::parse(&format!("refs/heads/fgos-land-push-{}", session.id))
+            .map_err(failure)?;
+        self.ensure_branch(
+            repo,
+            held(&session.slot)?,
+            &source,
+            &candidate,
+            writer,
+            &format!("{}-pushsrc", session.id),
+        )?;
+        let land = crate::remote::LandPush {
+            binding: chain.intent().authority_binding.clone(),
+            source: source.clone(),
+            destination: destination.clone(),
+        };
+        let pushed = self.transfer_refs_with(
+            repo,
+            held(&session.slot)?,
+            grant,
+            &[crate::remote::RefMapping {
+                source: source.clone(),
+                destination: destination.clone(),
+            }],
+            writer,
+            &format!("{}-push", session.id),
+            true,
+            &wal::OsFileSystem,
+            Some(&land),
+        );
+        // Best effort: a leftover branch is only a name for the same commit.
+        let _ = self.delete_ref(
+            repo,
+            held(&session.slot)?,
+            &source,
+            &candidate,
+            writer,
+            &format!("{}-pushsrc-drop", session.id),
+        );
+        pushed
+    }
+
+    /// Fast-forward the main checkout's checked-out trunk to a fetched remote-tracking tip.
+    /// The only door that moves the main checkout's branch outside a Land; it takes
+    /// worktree-admin 40 and the main-checkout lock, revalidates membership, does an exact-old
+    /// CAS with read-back, and updates the tree the way a Land publication does. It refuses a
+    /// non-fast-forward move, a dirty path the move changes, a stale `expected_old` and any
+    /// active chain on the ref.
+    #[allow(clippy::too_many_arguments)]
+    pub fn catch_up_main_checkout(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        target: &RefName,
+        expected_old: &Oid,
+        remote_tracking: &RefName,
+        writer: &str,
+        id: &str,
+    ) -> Result<Receipt> {
+        require_lock_scope_platform()?;
+        let refused = |reason: &str| failure(format!("main-checkout-catch-up-refused: {reason}"));
+        if !target.as_str().starts_with("refs/heads/")
+            || !remote_tracking.as_str().starts_with("refs/remotes/")
+            || writer.is_empty()
+            || !wal::valid_id(id)
+        {
+            return Err(failure("invalid-refs-request"));
+        }
+        if repo.work_tree.as_deref() != Some(repo.trusted_main_root()) {
+            return Err(failure("land-main-handle-required"));
+        }
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
+        let mut scope = crate::refs::acquire_worktree_admin(repo, held)?;
+        scope
+            .acquire("main-checkout", &params(repo), Wait::Ms(5000))
+            .map_err(failure)?;
+        let admin = scope.handle("worktree-admin").expect("acquired");
+        let next = match crate::refs::direct(self, repo, remote_tracking)? {
+            ExpectedTip::Oid(o) => o,
+            ExpectedTip::Absent => return Err(refused("remote-tracking-absent")),
+        };
+        if &next == expected_old {
+            return Err(refused("already-at-remote-tip"));
+        }
+        let old = ExpectedTip::Oid(expected_old.clone());
+        let new = ExpectedTip::Oid(next.clone());
+        let wal = Wal::open_with(repo, &wal::OsFileSystem)?;
+        let resources = vec![target.as_str().to_owned()];
+        crate::refs::admission(&wal, id, &resources)?;
+        let kind = OperationKind::RefUpdate {
+            worktree: Some(repo.trusted_main_root().to_string_lossy().into_owned()),
+        };
+        let binding =
+            wal::canonical_digest(&(wal.repository_identity(), "refs", repo.trusted_main_root()))?;
+        let intent = Intent {
+            request_digest: wal::canonical_digest(&(
+                &kind,
+                &resources,
+                &old,
+                &new,
+                writer,
+                "catch-up-main-checkout",
+            ))?,
+            kind,
+            repo_identity: wal.repository_identity().into(),
+            resource_set: resources,
+            authority_binding: binding.clone(),
+            writer_identity: writer.into(),
+            object_format: repo.object_format(),
+            expected: crate::refs::tip(&old),
+            next: crate::refs::tip(&new),
+        };
+        let authority = Authority {
+            scope: &scope,
+            binding,
+        };
+        let chain = match wal.begin(id, intent, &authority)? {
+            Begin::Created(c) => c,
+            Begin::Existing(c) => {
+                if matches!(
+                    c.outcome(),
+                    Some(Outcome::Success { .. } | Outcome::Loss { .. })
+                ) {
+                    crate::refs::release_pin(self, repo, admin, &wal, &c)?;
+                }
+                return match c.outcome() {
+                    Some(Outcome::Success { observed, .. }) => crate::refs::receipt(
+                        id,
+                        c.intent(),
+                        crate::refs::expected(observed, repo)?,
+                        false,
+                        Checkout::Reconciled,
+                        Remote::NotRequested,
+                    ),
+                    Some(Outcome::Loss { .. }) => Err(stale("compare-and-swap-stale")),
+                    _ => Err(recovery("operation-recovery-required")),
+                };
+            }
+            Begin::Compacted(_) => return Err(recovery("operation-recovery-required")),
+        };
+        // Every refusal before the pin is a record-only abandonment: no target effect happened.
+        let checked = (|| -> Result<bool> {
+            if crate::refs::direct(self, repo, target)? != old {
+                return Err(stale("compare-and-swap-stale"));
+            }
+            self.checked(
+                repo,
+                &["cat-file", "-e", &format!("{}^{{commit}}", next.as_str())],
+                Policy::Inspect,
+            )?;
+            if !self.ancestry(repo, expected_old, &next)? {
+                return Err(failure("not-fast-forward"));
+            }
+            if !self.land_target_checkout(repo, &scope, target)? {
+                return Err(refused("target-not-checked-out-in-main"));
+            }
+            if self.land_text(repo, &scope, &["symbolic-ref", "-q", "HEAD"], &[])?
+                != target.as_str()
+            {
+                return Err(refused("main-head-changed"));
+            }
+            let req = LandRequest {
+                source: next.as_str().into(),
+                target: expected_old.as_str().into(),
+                destination: target.as_str().into(),
+                message: String::new(),
+                squash: false,
+                footprint: Some(vec![]),
+                subtree: None,
+                files: vec![],
+            };
+            let (dirty, store_collision) = self.land_gate(repo, &scope, &req, next.as_str())?;
+            if store_collision {
+                return Err(refused("store-collision"));
+            }
+            Ok(dirty)
+        })();
+        let dirty = match checked {
+            Ok(dirty) => dirty,
+            Err(error) => {
+                let _ = wal.append(&chain, Phase::Outcome(Outcome::AbandonedBeforeAttempt));
+                return Err(error);
+            }
+        };
+        crate::refs::install_pin(self, repo, admin, id, &next)?;
+        let chain = wal.append(&chain, Phase::Prepared)?;
+        scope.validate().map_err(failure)?;
+        let attempted = wal.append(
+            &chain,
+            Phase::TargetAttempt {
+                prior_target_attempt: None,
+                expected: crate::refs::tip(&old),
+                next: crate::refs::tip(&new),
+            },
+        )?;
+        let before = self.checkouts(repo)?;
+        let effect = (|| {
+            scope.validate().map_err(failure)?;
+            let cas = self.land_call(
+                repo,
+                &scope,
+                &durable_args(&[
+                    "update-ref",
+                    "--no-deref",
+                    target.as_str(),
+                    next.as_str(),
+                    expected_old.as_str(),
+                ]),
+                &[],
+            )?;
+            let observed = crate::refs::direct(self, repo, target)?;
+            if crate::refs::classify_ref_attempt(
+                cas,
+                &observed,
+                &old,
+                &new,
+                &before,
+                &self.checkouts(repo)?,
+            )? {
+                let terminal = wal.append(
+                    &attempted,
+                    Phase::Outcome(Outcome::Loss {
+                        observed: crate::refs::tip(&observed),
+                    }),
+                )?;
+                crate::refs::release_pin(self, repo, admin, &wal, &terminal)?;
+                return Err(stale("compare-and-swap-stale"));
+            }
+            crate::refs::sync_refs(repo, target)?;
+            let out = self.land_call(
+                repo,
+                &scope,
+                &[
+                    "read-tree",
+                    "-m",
+                    "-u",
+                    expected_old.as_str(),
+                    next.as_str(),
+                ],
+                &[],
+            )?;
+            if !out.success {
+                return Err(out.error("checkout-recovery-required"));
+            }
+            let head_tree = self.land_text(repo, &scope, &["rev-parse", "HEAD^{tree}"], &[])?;
+            let next_tree = self.land_text(
+                repo,
+                &scope,
+                &["rev-parse", &format!("{}^{{tree}}", next.as_str())],
+                &[],
+            )?;
+            if head_tree != next_tree
+                || crate::refs::direct(self, repo, target)? != new
+                || crate::refs::direct(self, repo, remote_tracking)? != new
+            {
+                return Err(recovery("checkout-read-back-recovery-required"));
+            }
+            let index = self.land_text(repo, &scope, &["write-tree"], &[])?;
+            let checkout = if !dirty && index == next_tree {
+                Checkout::Reconciled
+            } else if dirty {
+                Checkout::Pending
+            } else {
+                Checkout::RecoveryRequired
+            };
+            let terminal = wal.append(
+                &attempted,
+                Phase::Outcome(Outcome::Success {
+                    observed: crate::refs::tip(&observed),
+                    attribution: wal::Attribution::ThisInvocationWonCas,
+                }),
+            )?;
+            crate::refs::release_pin(self, repo, admin, &wal, &terminal)?;
+            crate::refs::receipt(
+                id,
+                attempted.intent(),
+                observed,
+                true,
+                checkout,
+                Remote::NotRequested,
+            )
+        })();
+        effect.map_err(|e| {
+            if e.code == ResultCode::Stale {
+                e
+            } else {
+                crate::refs::pending(e, id)
+            }
+        })
     }
 }
 fn land_receipt(chain: &wal::Chain, repo: &RepoHandle) -> Result<Receipt> {

@@ -1,7 +1,9 @@
 //! Explicit non-event transfers. Remote transport is never enabled by another port.
 use crate::{
     driver::{Output, Policy},
-    refs::{admission, direct, pending, receipt, sync_refs, tip, zero_oid, Authority},
+    refs::{
+        admission, admission_land, direct, pending, receipt, sync_refs, tip, zero_oid, Authority,
+    },
     wal::{self, Begin, Intent, OperationKind, Outcome, Phase, Tip, Wal},
     *,
 };
@@ -10,6 +12,14 @@ use serde::Serialize;
 use std::time::Duration;
 #[derive(Debug, Clone, Serialize)]
 pub struct RefMapping {
+    pub source: RefName,
+    pub destination: RefName,
+}
+/// The one push a Land session may make from inside its own chain: a branch holding its
+/// candidate commit to its own destination. The binding is the Land chain's, so admission
+/// exempts only that chain.
+pub(crate) struct LandPush {
+    pub binding: String,
     pub source: RefName,
     pub destination: RefName,
 }
@@ -206,6 +216,23 @@ impl GitDriver {
         push: bool,
         filesystem: &F,
     ) -> Result<Receipt> {
+        self.transfer_refs_with(
+            repo, held, grant, mappings, writer, id, push, filesystem, None,
+        )
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn transfer_refs_with<F: wal::FileSystem>(
+        &self,
+        repo: &RepoHandle,
+        held: Vec<BorrowedHandle<'_>>,
+        grant: &RemoteGrant,
+        mappings: &[RefMapping],
+        writer: &str,
+        id: &str,
+        push: bool,
+        filesystem: &F,
+        land: Option<&LandPush>,
+    ) -> Result<Receipt> {
         let scope = self.remote_scope(held)?;
         if writer.is_empty() || mappings.is_empty() || mappings.len() > 256 {
             return Err(failure("invalid-remote-mappings"));
@@ -224,7 +251,19 @@ impl GitDriver {
         let (url, scheme) = self.remote_target(repo, grant)?;
         let wal = Wal::open_with(repo, filesystem)?;
         let resources: Vec<String> = destinations.into_iter().map(str::to_owned).collect();
-        admission(&wal, id, &resources)?;
+        match land {
+            Some(l) => {
+                if !push
+                    || mappings.len() != 1
+                    || mappings[0].source != l.source
+                    || mappings[0].destination != l.destination
+                {
+                    return Err(failure("invalid-remote-mappings"));
+                }
+                admission_land(&wal, id, &resources, &l.binding, self, repo)?
+            }
+            None => admission(&wal, id, &resources)?,
+        }
         let digest = wal::canonical_digest(&(push, &url, mappings, writer))?;
         // Terminal replay returns its recorded acknowledgement, without a new
         // network request. A pending id can never send a second transfer.
