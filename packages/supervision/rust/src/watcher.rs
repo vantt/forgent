@@ -261,7 +261,7 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
             r.unmeasured += 1;
         }
     }
-    let since = state.last_tick.unwrap_or(now) - settings.lookback_sec;
+    let since = state.last_full_tick.unwrap_or(now) - settings.lookback_sec;
     let rows = match ports.definitions.run(&defs, Some(since)) {
         Ok(rows) => rows,
         Err(_) => {
