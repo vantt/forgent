@@ -11,6 +11,26 @@ Decision: SV-6. Depends on phase 3 (`session.rs` was the last other caller of `r
 ## Files this phase may write
 See the phase table footprint in plan.md.
 
+## Facts re-checked on main 6de11eaf0 (lead, 2026-11-19)
+- Registry reader: `packages/identity/rust/src/resolve.rs` `REGISTRY_FILE` :22, `registry_confirms` :125,
+  `Source::Registry` :151-152, `env_identity(lookup, fgos_dir)` :141, `resolve_current(fgos_dir)` :279; `lib.rs:68`
+  re-export; `current.rs` :159/:169/:174; `provider.rs` `ResolveRequest.fgos_dir` :163 (:211, :502, :509, :523);
+  `directory.rs` `register_current` :518, `drop_current_role` :924.
+- Phase 7's identity code (`bind_agent_session`, `attempt_session`, `register_attempt_roles`, `caller_under_head`,
+  `attempt_gate`) takes no `fgos_dir` and reads no registry: not affected.
+- Callers outside the first footprint (now in row 4, all move in this phase, L10): `packages/questions/rust/src/caller.rs`
+  :43/:54; `packages/git/node-addon/src/session_identity.rs:15`, `git.rs:248`, `config.rs:412` (the addon's
+  `sessionIdentity.resolve` takes `fgos_dir` from Node); `apps/fgos/src/wiring/{mailbox_remote.rs:754,
+  session_rotation_hook.rs:242, worktree.rs:232, git_incidents.rs:150, doctor/config.rs:211}`; `packages/config/rust`
+  and `packages/observe/rust` pass `None` only. `identity.read.v1.json:13` carries `fgosDir`.
+- Mailbox hook: `hook/resolve.rs:102` `resolve_current(Some(fgos_dir))`, :104 `Source::Env | Source::Registry`;
+  `mailbox_verbs.rs:641`; `doctor/identity.rs` :165/:174-175 (`--fgos-dir`), :227 (`"registry" | "env"`), :237/:243.
+- `cli_projector.rs` :449/:460/:464/:555; `command-registry.mjs` :1136/:1144/:1167; generated manifest regenerated.
+- Node facade `src/util/session-identity.mjs:25-35` (dir-keyed cache) and 16 caller files of `resolveWriterIdentity(`.
+- Tests: `tests/session.rs:83-89`, `tests/golden.rs` (registry cases, `x-sessionRegistry` :178-198),
+  `cli_tests.rs:1534,1552`, `test/util/session-identity.test.mjs:88-110`; `test/state/replay.test.mjs:812` fixture string.
+- Docs: `docs/architecture-manifest.json:744` sessions.json door row; identity spec 115-198.
+
 ## Steps
 0. Re-grep the inputs; confirm no code branches on `source === 'registry'`.
 1. Rust: delete `registry_confirms`, `REGISTRY_FILE`, `Source::Registry`; remove the `fgos_dir` argument from `env_identity`, `resolve_current`, `current_session` and the provider request; the env step returns `source: env`.
