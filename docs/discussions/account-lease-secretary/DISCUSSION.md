@@ -6,7 +6,7 @@ topic: backlog row p-mnymjukvqd (seat-binding / accounts)
 shaper: lead:ACCOUNT-SHAPE (claude-mkz3@fg-server2), opened by head:secretary-miu
 opened: 2026-11-18 18:08
 domain: platform (seat binding, runner accounts); không có domains/<domain>/AGENTS.md riêng
-open owner questions: QUESTIONS.md (Q1 đã trả lời B; Q2 đã trả lời (tetcu, anhdvh, van.tran), đã đăng nhập đủ ba thư mục; Q3 có mặc định; Q4 đã trả lời A)
+open owner questions: QUESTIONS.md (Q1 đã trả lời B; Q2 đã trả lời (tetcu, anhdvh, van.tran), đã đăng nhập đủ ba thư mục; Q3 đã trả lời B; Q4 đã trả lời A)
 ```
 
 ## Hand-off cho planner
@@ -19,7 +19,7 @@ open owner questions: QUESTIONS.md (Q1 đã trả lời B; Q2 đã trả lời (
   2. `fgos dispatch explain` cho một ghế pane bất kỳ không bao giờ liệt kê tài khoản của Miu trong walk.
   3. Một lần khởi động thật của một pane claude lease đúng một tài khoản của pool pane; một lần khởi động thật của Miu (đường đã chọn ở Q1) chạy đúng tài khoản của Miu và không tiêu quota pane.
   4. Hết quota pool pane: bằng chứng thật (hoặc ca vàng của crate) rằng ghế đổi tài khoản, rồi đổi family, rồi từ chối theo tên; Miu vẫn chạy.
-- **Open points that block only some parts.** Q1 đã trả lời B nên task `miu-start` không còn bị chặn bởi owner. Q2 đã trả lời; ba thư mục đã được chủ dự án đăng nhập (tetcu, anhdvh, van.tran), `task-pane-pool` không còn chờ owner. Q3 có mặc định, không chặn; Q4 đã trả lời A.
+- **Open points that block only some parts.** Q1 đã trả lời B nên task `miu-start` không còn bị chặn bởi owner. Q2 đã trả lời; ba thư mục đã được chủ dự án đăng nhập (tetcu, anhdvh, van.tran), `task-pane-pool` không còn chờ owner. Q3 đã trả lời B (2026-11-18: cảnh báo cho mọi CLI trong `CLI_LOGIN_HOMES`, không bao giờ từ chối hay fail); Q4 đã trả lời A.
 - **Source ids.** p-mnymjukvqd; quyết định 86 Q2 (docs/platform/agent-confinement/spec.md mục 4 của danh sách store); RUL102, RUL105, RUL106 (docs/platform/runner/subcomponents/h-6979005beaf7/spec.md); D-ADR0072 (docs/platform/seat-binding/spec.md).
 
 ## 1. Trạng thái hiện tại
