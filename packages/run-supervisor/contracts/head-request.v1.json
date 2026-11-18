@@ -24,12 +24,25 @@
       "args": { "persona": "string, required", "name": "string, required", "beside": "string, optional: the live key of the session whose tab the new one opens next to" },
       "does": "startHeadSession (src/session-host/head-start.mjs) in the project of the attempt's envelope (envelope.cwd); a live head of the same role is fronted instead of started",
       "data": "the object startHeadSession returns ({already, role, key, ...})"
+    },
+    "head rotate": {
+      "args": { "persona": "string, required", "name": "string, required; with persona it must spell the envelope's own role (head:<persona>-<name>), otherwise role-mismatch: a head asks for its own lineage only", "reason": "soft | hard | manual, required", "stopFacts": "object, optional: sessionId, portfolio (at most 50 paths), delta, lastAssistantMessage, pendingQuestion (strings of at most 8000 characters); anything else is refused bad-stop-facts" },
+      "does": "requestRotation (src/session-rotation/rotate.mjs), the one entry that asks for a rotation (`fgos head rotate` calls the same one): checks the request, writes it under the lineage folder and starts the executor `rotateHeadSession` as a detached process through the detach door, then returns at once; the executor outlives the verb timeout",
+      "data": "{started: true, pid} or {started: false, reason: rotation-in-progress | spawn-failed}",
+      "identity": "held"
+    },
+    "head answered": {
+      "args": { "persona": "string, required", "name": "string, required; spelled as the envelope's own role, as for head rotate", "sessionId": "string, required: the successor's Identity session id", "message": "string, required: the successor's first assistant message, at most 8000 characters" },
+      "does": "markSuccessorAnswered (src/session-rotation/rotate.mjs): records the answer of the successor the lineage's pending rotation waits for. The key is the attempt's own (envelope.unitRunId), never an argument. Refused no-rotation-pending when no rotation waits for that key, answer-mismatch when the message does not name the question the old session left pending",
+      "data": "{accepted: true, gen}",
+      "identity": "registered-then-take",
+      "rule": "the one verb of a rotation successor, which does not hold the role yet: the supervisor's role step asks Identity only that this attempt's own session is registered and live (session-not-registered otherwise), and after the route child reports done the supervisor moves the envelope's role to this session with Identity's take (register_writer, take) against the gate it launched; a failed move is role-take-failed. The role never moves on a refused answer. Identity stays the only authority for who holds a role; the supervisor only transports the fact that the attempt is that session"
     }
   },
   "order": [
     "peer uid",
     "one request frame",
-    "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed)",
+    "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed). For `head answered` the step is instead: this attempt's own session is registered and live (session-not-registered, failing closed the same way)",
     "verb: must be one of envelope.session.verbs (verb-not-granted)",
     "busy: at most one request runs at a time (busy)",
     "run: `<hostBin> internal head-request --protocol 1 --run-dir <attemptDir>`, request on stdin"
@@ -47,6 +60,8 @@
     "role-not-held": "Identity does not give this attempt's session the envelope's role; when Identity could not answer the detail is its refusal code only (its text goes to supervisor.log, never to the client)",
     "verb-not-granted": "the verb is not in envelope.session.verbs",
     "busy": "another request is running",
+    "session-not-registered": "head answered only: Identity does not list this attempt's own session as live; when Identity could not answer the detail is its refusal code only",
+    "role-take-failed": "head answered only: the route recorded the answer but Identity refused to move the role to this session (detail is its code, for example gate-unknown or head-not-live); the executor then finds no holder change and retires the successor",
     "verb-failed": "the route child failed; detail is the entry's own code (for example head-key-used, bad-persona, start-refused) or the exit",
     "verb-timeout": "the verb ran longer than verbTimeoutMs"
   },
@@ -61,5 +76,5 @@
   },
   "trust": "the route reads the attempt's own run directory and its envelope as trusted because the sandbox only ever sees it read-only. The guard is the paths grant: a workspace-paths entry under `.fgos` is refused by name (confinement shape, validateWorkspacePaths), so no grant can make that directory writable",
   "log": "one line per request in supervisor.log: `head-request <id> <verb> <done|refused> <code|->`; arguments are never logged and client text is cut to 32 plain characters",
-  "client": "src/session-host/head-request.mjs: `requestHeadStart` connects to FGOS_HEAD_REQUEST_SOCKET after checking the socket file is owned by its own uid; `startHead` is the one branch (FGOS_CONFINED=1 asks through the socket, refused no-request-socket when the variable is unset, otherwise startHeadSession directly)"
+  "client": "src/session-host/head-request.mjs: `requestHeadStart` connects to FGOS_HEAD_REQUEST_SOCKET after checking the socket file is owned by its own uid; `requestHead(verb, args)` is the one client; `startHead` and `rotateHead` are the one branch per verb (FGOS_CONFINED=1 asks through the socket, refused no-request-socket when the variable is unset, otherwise startHeadSession or requestRotation directly); `requestHeadAnswered` is the successor's call"
 }

@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
-import { HeadRequestError, requestHeadStart, runHeadRequest, startHead } from '../../src/session-host/head-request.mjs';
+import { HeadRequestError, requestHead, requestHeadStart, rotateHead, runHeadRequest, startHead } from '../../src/session-host/head-request.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
 
 const scratch = (t) => {
@@ -90,6 +90,7 @@ test('the payload entry runs head start in the project of its envelope and repor
   const ports = {
     host: { front: (placement) => { calls.push(placement); return { result: 'fronted' }; } },
     identity: () => ({ live: true }),
+    rotationHolds: () => false,
   };
   // A live head is fronted instead of started: the whole use case runs, with its ports for Identity and the host faked.
   const lineage = path.join('/the/project', '.fgos', 'runtime', 'session-rotation', 'planner-x');
@@ -105,4 +106,49 @@ test('the payload entry runs head start in the project of its envelope and repor
   assert.equal(strayArg.line.code, 'bad-args', 'the sandbox cannot choose the project');
   fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: '/p', session: null }));
   assert.equal((await runHeadRequest({ runDir, request: { verb: 'head start', args: {} } }, ports)).line.code, 'envelope-invalid');
+});
+
+test('rotateHead is one branch: confined asks for head rotate through the socket, anyone else calls the one rotation entry', async () => {
+  const asked = [];
+  const request = async (args, options) => { asked.push({ args, socketPath: options.socketPath }); return { started: true, pid: 7 }; };
+  const confined = { FGOS_CONFINED: '1', [HEAD_REQUEST_SOCKET_ENV]: '/run/s.sock' };
+  assert.deepEqual(await rotateHead({ persona: 'planner', name: 'x', reason: 'soft', stopFacts: { delta: 'd' } }, { env: confined, request }), { started: true, pid: 7 });
+  assert.deepEqual(asked, [{ args: { persona: 'planner', name: 'x', reason: 'soft', stopFacts: { delta: 'd' } }, socketPath: '/run/s.sock' }]);
+  await assert.rejects(rotateHead({ persona: 'planner', name: 'x', reason: 'never', projectRoot: '/p' }, { env: {}, request }), (err) => err.code === 'bad-reason');
+  assert.equal(asked.length, 1, 'an unconfined caller never goes through the socket');
+});
+
+test('the client names any verb it is given in the REQUEST frame', async (t) => {
+  const socketPath = path.join(scratch(t), 'req.sock');
+  const seen = serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'done', data: {} }));
+  await listening();
+  await requestHead('head answered', { persona: 'planner', name: 'x' }, { socketPath });
+  assert.equal(seen[0].verb, 'head answered');
+});
+
+test('the payload entry runs head rotate and head answered for the envelope\'s own lineage only', async (t) => {
+  const project = scratch(t);
+  const runDir = scratch(t);
+  const role = 'head:planner-x';
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, unitRunId: 'head-planner-x-2', session: { role, verbs: ['head rotate', 'head answered'], requestSocketPath: '/run/s.sock' } }));
+  const spawned = [];
+  const ports = { rotation: { holds: () => false, spawn: (spec) => { spawned.push(spec); return { pid: 99 }; } } };
+
+  const rotate = await runHeadRequest({ runDir, request: { verb: 'head rotate', args: { persona: 'planner', name: 'x', reason: 'soft' } } }, ports);
+  assert.deepEqual(rotate, { exit: 0, line: { result: 'done', data: { started: true, pid: 99 } } });
+  assert.equal(spawned[0].cwd, project, 'the rotation runs in the envelope\'s project');
+  const other = await runHeadRequest({ runDir, request: { verb: 'head rotate', args: { persona: 'planner', name: 'y', reason: 'soft' } } }, ports);
+  assert.equal(other.line.code, 'role-mismatch', 'a head cannot rotate another lineage');
+  assert.equal(spawned.length, 1);
+
+  const noRotation = await runHeadRequest({ runDir, request: { verb: 'head answered', args: { persona: 'planner', name: 'x', sessionId: 's1', message: 'ready' } } }, ports);
+  assert.equal(noRotation.line.code, 'no-rotation-pending');
+  const dir = path.join(project, '.fgos', 'runtime', 'session-rotation', 'planner-x');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'rotation.json'), JSON.stringify({ successorKey: 'head-planner-x-2', gen: 2, pendingQuestion: null }));
+  const answered = await runHeadRequest({ runDir, request: { verb: 'head answered', args: { persona: 'planner', name: 'x', sessionId: 's1', message: 'ready' } } }, ports);
+  assert.deepEqual(answered, { exit: 0, line: { result: 'done', data: { accepted: true, gen: 2 } } });
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'answered.json'), 'utf8')).key, 'head-planner-x-2', 'the key is the attempt\'s own, never the sandbox\'s');
+  const stray = await runHeadRequest({ runDir, request: { verb: 'head answered', args: { persona: 'planner', name: 'x', sessionId: 's1', message: 'm', key: 'head-planner-x-9' } } }, ports);
+  assert.equal(stray.line.code, 'bad-args');
 });

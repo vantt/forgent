@@ -4,88 +4,136 @@
 Document type: BA-grade area specification
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: Define the single authority for "where does this agent session run, and is it still there"
-Design status: Draft (contract written; code lands in later phases of the secretary plan)
-Implementation: Not built. Contract: packages/session-host/contracts/host-port.v1.json
+Design status: Built (terminal adapter; head rotation executor)
+Implementation: packages/session-host/rust (port), src/session-host/ (client, head start, head request), src/session-rotation/ (rotation). Contract: packages/session-host/contracts/host-port.v1.json
 Canonical: Yes
 Owner: Session Host component
-Source: packages/session-host/rust (planned), src/session-host/client.mjs (planned)
+Source: packages/session-host/rust, src/session-host/client.mjs, src/session-rotation/rotate.mjs
 Contracts: packages/session-host/contracts/
 Provenance: First committed on branch sec/p01 (2026-11-17)
 Writer type: Human + agent coauthor
-Last reviewed: 2026-11-17
-Canonical for: the placement port (start, alive, front, retire) for worker and head sessions
-Use this when: Placing an agent session, adding a host adapter, or changing how a session opening text is delivered
+Last reviewed: 2026-11-18
+Canonical for: the placement port (open, launch, alive, front, retire) for worker and head sessions, and the head rotation executor
+Use this when: Placing an agent session, adding a host adapter, or changing how a head session is rotated
 Do not use this for: Run state, deadlines, containment (run supervisor); which pane (Terminal Control); who a session is (Identity)
 Related:
 - docs/platform/terminal-control/spec.md
 - docs/platform/run-supervisor/spec.md
 - docs/platform/component-boundary.md
+- docs/platform/holder-lock/spec.md
+- packages/run-supervisor/contracts/head-request.v1.json
 - plans/261117-1856-secretary-session-spine/reports/facts-host-port.md
 ```
 
 ## 1. Purpose
 
-Every agent session, a worker under the run supervisor or a long-lived head such as the secretary, is placed by one port with four operations: `start`, `alive`, `front`, `retire`. Today placement is split over Node dispatch (allocate), the controller (envelope `mode`) and the Rust run supervisor (launch, release). The facts are in the facts report; this spec fixes the contract.
+Every agent session, a worker under the run supervisor or a long-lived head such as the secretary, is placed by one port with five operations: `open`, `launch`, `alive`, `front`, `retire`. There is no single `start`: a controller learns the command it launches only after the slot exists (the run supervisor's gate), so placement is two halves. The facts are in the facts report; this spec fixes the contract. Section 8 adds what sits on top of the port for a head session: starting it, and replacing it before its context fills (rotation).
 
 ## 2. Ownership boundary
 
 | Owns | Does not own |
 |---|---|
-| The four operations and their refusals | Which pane a key runs in, tab grouping, layout (Terminal Control) |
-| Choosing the adapter (`terminal`, `direct`) for a start | The attempt lock, cwd lease, containment domain, deadlines, receipts (run supervisor; containment never moves) |
-| Delivering an opening text visibly in a pane, through the shared delivery step | Per-CLI screen rules and how a brief is detected as taken (`fgos-agent-protocol`) |
-| Refusing a head session on a host with no interactive surface | Who the session is, its role, whether it holds the role (Identity) |
+| The five operations and their refusals | Which pane a key runs in, tab grouping, layout (Terminal Control) |
+| The terminal adapter over Terminal Control | The attempt lock, cwd lease, containment domain, deadlines, receipts (run supervisor; containment never moves) |
+| Head start and head rotation (section 8): the two-step replacement, the lineage files, the rotation lock | Typing an opening or a brief into a pane and detecting that it was taken (`fgos-agent-protocol`, driven by the run supervisor) |
+| | Who a session is, its role, whether it holds the role (Identity alone) |
 | | Which CLI, model or account (bind(), Seat Binding) |
+| | Transporting a head's verbs out of its sandbox and enforcing its grant (run supervisor, head-request contract) |
 
 ## 3. Port contract
 
 Machine form: [host-port.v1.json](../../../packages/session-host/contracts/host-port.v1.json).
 
-- `start(spec) -> Placement{host, key, display}`; `spec = {host: terminal|direct, key, groupKey?, beside?, cwd, env, command, args, opening?: {text, delivery: typed|argument|file}, display, role?: worker|head}`.
+- `open(request) -> placed(placement, slot?)`: allocates the terminal slot of a key (`groupKey`, `beside`, `groupSize`, `cwd`, `env`, `display`) and starts nothing. A key whose pane is already live answers its placement and allocates nothing.
+- `launch(placement, spec) -> launched(identity) | not-started(reason)`: starts a prepared command in that slot through Terminal Control's durable `launched` marker and answers the launched root's process identity. `not-started` keeps the slot and never launches into it again.
 - `alive(placement) -> live | gone | unknown`. `unknown` is never turned into `gone`.
 - `front(placement) -> fronted | unsupported`.
 - `retire(placement, close|retain) -> retired | unknown`.
-- Refusals are `unsupported` or `unknown` with a named code: `head-needs-interactive-host`, `host-unsupported-here`, `opening-delivery-unsupported`, `pane-not-ready`, `placement-unknown`, `key-in-use`.
+- Refusals are `unsupported` or `unknown` with a named code: `host-unsupported-here`, `placement-unknown`.
 
 Rules:
-1. **Opening text.** In a pane the text is typed visibly as the full text, never a pointer to a file, through the shared delivery step (`fgos-agent-protocol` `adapter_for`, `await_ready`, `deliver_brief` over `AgentIo`, via the port's own `PaneIo` over Terminal Control `send/read/inspect`). A screenless host passes it by argument or file. A worker's brief is not an opening: it stays in the run supervisor's watched `drive`, so a worker `start` carries no `opening` and its command is the gate.
-2. **Head on direct is refused.** `role: head` on `host: direct` answers `unsupported: head-needs-interactive-host` until a screenless host with a message channel exists (non-goal).
-3. **Idempotent key.** A key with a live placement answers that placement; it never starts a second.
-4. **Containment.** The `direct` adapter starts a prepared, already-contained command; it never builds containment.
-5. **Close discipline.** Only a pane the port started is closed, never a tab (Terminal Control rule).
+1. **Opening text.** Not a port operation. A head's opening is typed visibly as the full text by the run supervisor through the shared delivery step (`fgos-agent-protocol` `adapter_for`, `await_ready`, `deliver_brief`) after it has launched the head's gate; the Session Host never types into a pane.
+2. **Idempotent key.** `open` of a key with a live pane answers that placement; it never allocates a second.
+3. **Containment.** The port launches a prepared, already-contained command; it never builds containment.
+4. **Close discipline.** Only a pane the port opened is closed, never a tab (Terminal Control rule).
+5. **Serial per group.** A Node caller that opens many placements serialises per group (`openAsync`, `retireAsync(close)`, one queue per coordinating process): two rounds of one batch never both open the batch's tab, and a close waits behind the earlier opens of its group.
 
 ## 4. Adapters
 
-- **terminal**: Terminal Control `allocate` + `launch` (shell-quoted `launch_line`) + when `opening` is given `await_ready` + `deliver_brief`. `front` uses the focus operation Terminal Control gains (herdr has `tab focus`; every create passes `--no-focus` today). Unsupported where the driver declares no pane capability (Windows).
-- **direct**: the run supervisor's prepared gate command started without a screen. `front` is `unsupported`; liveness is the supervisor's, passed as a handle.
+- **terminal**: Terminal Control `allocate` for `open`, `launch` with shell-quoted `launch_line` for `launch`, `inspect` for `alive`, the focus operation for `front` (herdr `tab focus`), `release` for `retire`. Unsupported where the driver declares no pane capability (Windows): answers `unsupported / host-unsupported-here`.
+- There is no screenless adapter. A screenless launch (SDK, cloud) is the run supervisor's own, and a head session needs a pane: it answers `host-unsupported-here` on a host without one.
 
-## 5. Paper check against two hosts
+## 5. Paper check against a second host
 
 | Operation | Pane host (Terminal Control + herdr) | Screenless host (Claude Agent SDK or a cloud session) |
 |---|---|---|
-| `start` | allocate + quoted launch; opening typed visibly as full text through the shared delivery step | create the session; opening passed by argument or file; `typed` answers `opening-delivery-unsupported` |
-| `alive` | `inspect` of the pane: live, gone, unknown | the host's own session handle: live, gone, unknown |
-| `front` | the focus operation (phase 5): `fronted` | `unsupported` |
-| `retire` | `release` close or retain, only a pane the port allocated | the host's own stop call; retain is a no-op that keeps the session |
-| head session | allowed | `head-needs-interactive-host` until a message channel exists |
+| `open` | allocate the slot | create the session record; `groupKey`, `beside`, `display` are ignored |
+| `launch` | quoted launch into the slot | start the session with the prepared command; identity is the host's handle |
+| `alive` | `inspect` of the pane: live, gone, unknown | the host's own session handle |
+| `front` | the focus operation: `fronted` | `unsupported` |
+| `retire` | `release` close or retain, only a pane the port opened | the host's own stop call; retain keeps the session |
 | containment | stays with the run supervisor | stays with the run supervisor |
 
-Both columns fit the four operations with no field the other column cannot fill: `groupKey`, `beside` and `display` are terminal-only hints a screenless host ignores. No cut that cannot hold was found.
+Both columns fit the five operations with no field the other column cannot fill. No cut that cannot hold was found.
 
 ## 6. Layer
 
-Above Terminal Control (L2), below the run supervisor (L4). The dependency is one way: run supervisor → Session Host → Terminal Control. Rust crate `fgos-session-host` (planned at packages/session-host/rust) with a thin Node client (planned at src/session-host/client.mjs) behind an internal route; no user verb.
+Above Terminal Control (L2), below the run supervisor (L4). The dependency is one way: run supervisor → Session Host → Terminal Control. Rust crate `fgos-session-host` (`packages/session-host/rust`) with a thin Node client (`src/session-host/client.mjs`) behind an internal route; no user verb. The head use cases (`src/session-host/head-start.mjs`, `head-request.mjs`, `src/session-rotation/rotate.mjs`) are Node use cases above the client and the run supervisor's session attempt.
 
 ## 7. Shared entities
 
 | Entity | Owner | Used here as |
 |---|---|---|
-| key | Terminal Control key shape | placement key (attempt id for a worker, `<persona>-<name>` for a head) |
+| key | Terminal Control key shape | placement key: the attempt id, for a worker and for a head |
 | allocation record | Terminal Control | the only pane record; the port writes none of its own |
-| session identity and role | Identity | read for who is alive, never decided here |
-| delivery step | `fgos-agent-protocol` | opening text typed into a pane |
+| session identity and role | Identity | read for who is alive and who holds `head:<persona>-<name>`, never decided here |
+| delivery step | `fgos-agent-protocol` | the opening text typed into a pane, by the run supervisor |
+| head grant | `src/session-host/head-grants.mjs` (`grantOf`) | the writable paths and verbs of a head role; read at launch, carried in the envelope |
+| lineage folder | this spec, section 8 | `.fgos/runtime/session-rotation/<persona>-<name>/` |
 
-## 8. Lịch sử quyết định
+## 8. Head sessions and rotation
+
+### 8.1 Starting a head
+
+A head (`head:<persona>-<name>`) is one long-lived interactive agent. `startHeadSession` checks the names, fronts the live holder of the role instead of starting a second, and otherwise calls `placeHead`, the one launch path of a head: bind a seat at the persona's tier, launch it as a confined supervised session attempt (run supervisor, sandbox, account lease, private home) with the opening typed visibly, and answer the placement. `startHeadSession` then records the placement in the lineage folder. A head is confined like a worker; what differs is its grant (`grantOf(role)`): writable project paths and allowed verbs. A head reaches the host only through its request socket (`head-request.v1.json`): `head start`, `head rotate`, `head answered`.
+
+### 8.2 Rotation: the two-step rule
+
+A head is replaced before its context fills. The replacement is two steps, never one:
+
+1. **Start the successor beside the old session.** The executor (`rotateHeadSession`) writes the handoff, then calls `placeHead` for the next generation with `beside` set to the old placement key, so the successor opens in the same tab while the old session still holds the role. The successor registers in Identity without the role (the role is held) and reads the handoff in its opening.
+2. **Move the role only after the successor answered.** The successor's own hook reports its first turn through its request socket (`head answered`): the entry records the answer (`answered.json`: generation, key, Identity session id, last assistant message) only when this lineage's pending rotation waits for that very key and the message names the question the old session left pending; then the successor's own supervisor moves the role to the successor with Identity's `take`. The executor accepts the answer only when Identity lists the successor as the holder, then records the successor's placement and retires the old session (`retire(old, close)`; the pane closes and the old session attempt ends as any session attempt does).
+
+Failure at any step (start refused, no valid answer within `sessionRotation.answerWaitMs`, an answer that does not name the question): the successor is retired, the old session stays alive and keeps its placement record, one incident line goes to `incidents.jsonl`, and the reason is returned. Nothing is ever killed with SIGKILL. If the role moved but the executor then fails, the incident names it; the next `head start` fronts whichever session Identity says holds the role.
+
+Authority: Identity alone says who holds the role. The executor owns the replacement and the lineage files. The run supervisor transports and enforces the verbs and moves the role on the one `head answered` verb. `placeHead` starts heads; there is no second launch path.
+
+### 8.3 Requesting a rotation
+
+`requestRotation` is the one entry that asks for a rotation: the request socket's `head rotate`, `fgos head rotate` and an unconfined hook all call it. It checks `{ persona, name, reason: soft|hard|manual, stopFacts }`, writes `request-<id>.json` under the lineage folder, starts the executor as a detached process through the one detach door and returns at once. `soft` and `hard` rotate when the measured fraction of the context window reaches `sessionRotation.soft` or `.hard` (`decide.mjs`; `hard` carries the pending question verbatim into the handoff); `manual` is the owner's `/handoff` and carries it too. One rotation at a time per lineage: the executor holds the `session-rotation` lock (holder-lock registry, `<fgosDir>/locks/session-rotation--<persona>-<name>.lock`), a second request finds it held and is a no-op, and `head start` refuses `rotation-in-progress` while it is held.
+
+### 8.4 Files
+
+Under `.fgos/runtime/session-rotation/<persona>-<name>/`:
+
+| File | Writer | Content |
+|---|---|---|
+| `<yymmdd-hhmm>-<sid8>.md`, `latest.json` | handoff store | immutable redacted handoffs, newest `keep` kept; `latest.json` replaced atomically after the file exists |
+| `placement.json` | `startHeadSession`, the executor | `{ role, gen, placement, persona, startedAt }` of the live head |
+| `rotation.json` | executor | the pending rotation: successor key and generation, reason, handoff, old key and session, pending question; removed when the rotation ends either way |
+| `answered.json` | `markSuccessorAnswered` | the successor's first answer |
+| `incidents.jsonl`, `rotation.log` | executor | one JSON line per failed rotation; the detached process's output |
+| `request-<id>.json` | `requestRotation` | one request until its executor reads and removes it |
+
+### 8.5 Configuration and the `/clear` fallback
+
+`sessionRotation` in `core/config-standard`: `soft` (0.4), `hard` (0.7), `keep` (10), `windowSize` (1000000), `answerWaitMs` (120000), `personas.<name>.{soft,hard,reload}`. The context fraction comes from the status line sidecar newer than the Stop hook, else the transcript sum marked one turn stale (spike report).
+
+`/clear` through Terminal Control `send` works (the spike measured 3 of 3, with a SessionStart hook re-injecting a short context) but cannot meet the two-step rule: the old context is gone before the successor answers. It is recorded only as a fallback for a host that cannot open a second session and is never used on the terminal host.
+
+## 9. Lịch sử quyết định
 
 - 2026-11-17 — Home decision, settled by evidence not asked: the port is a new foundation component Session Host, a Rust crate, layered between Terminal Control and the run supervisor. The run supervisor, which must place through it, is Rust (`supervise.rs`), so the port must be Rust to be reachable without a second path; `component-boundary.md` §4 forbids the run supervisor knowing a pane and says Terminal Control stands alone and must not know runs, so the port belongs to neither; design principle 4 (foundations in Rust). Evidence: [facts report](../../../plans/261117-1856-secretary-session-spine/reports/facts-host-port.md) sections 1 and 4. Prior art: none existed or was removed (`git log -S'placement' -- src/run-supervisor` is empty).
-- 2026-11-17 — Opening delivery reuses the one shared delivery step; nothing moves out of the run supervisor, whose `TermIo` later wraps the port's `PaneIo`.
+- 2026-11-17 — Opening delivery reuses the one shared delivery step; nothing moves out of the run supervisor, whose `TermIo` wraps the port's `PaneIo`.
+- 2026-11-18 — Worker attempts are placed through the port (`open` + `launch` replace `start`; the envelope carries `host`). The direct adapter and the port's own `start` and opening delivery were deleted: a head is started by its run supervisor as a session attempt (confined like a worker), so the port never types into a pane and a screenless launch stays the supervisor's. Evidence: phase 11 and 12 reports of the secretary plan.
+- 2026-11-18 — Head rotation is two steps (start the successor beside the old session, move the role only after the successor answered, then retire the old one). Because a confined successor can write neither `.fgos` nor Identity, its first answer travels as the verb `head answered` through the request socket and its own supervisor moves the role with Identity's `take`; the executor never moves a role. The lineage lock is a holder-lock registry row (`session-rotation`). No earlier rotation mechanism existed (`git log -S` on rotation symbols found none).

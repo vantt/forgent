@@ -10,14 +10,15 @@
 use std::collections::BTreeMap;
 use std::io::{self, Read};
 use std::os::unix::net::{UnixListener, UnixStream};
+#[cfg(target_os = "linux")]
 use std::os::unix::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use fgos_identity::resolve::{WriterKey, ENV_ORDER};
+use fgos_identity::resolve::{HeadRef, WriterKey, ENV_ORDER};
 use fgos_process::facts::judge_here;
 use fgos_process::spawn::{run_bounded_command, Outcome as BoundedOutcome};
 use serde_json::{json, Value};
@@ -37,6 +38,9 @@ const MAX_CONNECTIONS: usize = 8;
 /// Most of the route child's stdout that is kept; the contract says one JSON line.
 const STDOUT_LIMIT: u64 = 65_536;
 const MAX_ID_LEN: usize = 64;
+/// The one verb of a rotation successor, which does not hold the role yet: the supervisor checks only that the
+/// attempt's own session is registered, and after the verb reports done it moves the role to that session.
+pub const ANSWERED_VERB: &str = "head answered";
 
 /// Whether the connection's owner may use the socket: the supervisor's own uid, nothing else.
 pub(crate) fn uid_allowed(peer: Option<libc::uid_t>, own: libc::uid_t) -> bool {
@@ -65,6 +69,7 @@ fn invalid(why: impl Into<String>) -> EnvelopeError {
 }
 
 type HoldsRole = Box<dyn Fn() -> Result<bool, HoldError> + Send + Sync>;
+type TakesRole = Box<dyn Fn() -> Result<(), HoldError> + Send + Sync>;
 type LogLine = Box<dyn Fn(&str) + Send + Sync>;
 
 /// What serving the socket needs, all of it from the envelope except the two ports.
@@ -80,6 +85,11 @@ pub struct Config {
     /// Does Identity give this session the envelope's role right now. An error is refused like a "no", and the
     /// client is told only its code.
     pub holds_role: HoldsRole,
+    /// Is this attempt's own session registered and live in Identity (the check of [`ANSWERED_VERB`], which runs
+    /// before the session holds the role). Errors are handled as for `holds_role`.
+    pub registered: HoldsRole,
+    /// Moves the envelope's role to this attempt's session (Identity's `take`), after [`ANSWERED_VERB`] reported done.
+    pub take_role: TakesRole,
     /// One line per request, for `supervisor.log`.
     pub log: LogLine,
 }
@@ -90,15 +100,27 @@ pub struct HeadRequests {
     cfg: Arc<Config>,
     busy: Arc<AtomicBool>,
     connections: Arc<AtomicUsize>,
+    gate: Arc<Mutex<Option<HeadRef>>>,
 }
 
 impl HeadRequests {
     pub fn new(cfg: Config) -> HeadRequests {
+        Self::with_gate(cfg, Arc::new(Mutex::new(None)))
+    }
+
+    fn with_gate(cfg: Config, gate: Arc<Mutex<Option<HeadRef>>>) -> HeadRequests {
         HeadRequests {
             cfg: Arc::new(cfg),
             busy: Arc::new(AtomicBool::new(false)),
             connections: Arc::new(AtomicUsize::new(0)),
+            gate,
         }
+    }
+
+    /// The gate process, once the attempt has one: the head Identity records the session's liveness against.
+    /// `take_role` of an envelope-built server answers `gate-unknown` until this is called.
+    pub fn set_gate(&self, head: HeadRef) {
+        *self.gate.lock().unwrap_or_else(|e| e.into_inner()) = Some(head);
     }
 
     /// The socket path and the server an envelope asks for. `None`: no session, or a role with no verbs (no socket
@@ -144,6 +166,8 @@ impl HeadRequests {
         let role = text(&session["role"], "session.role")?;
         let writer_id = text(&envelope["identity"]["writerId"], "identity.writerId")?;
         let state_root = state_root.to_path_buf();
+        let gate: Arc<Mutex<Option<HeadRef>>> = Arc::new(Mutex::new(None));
+        let cwd = PathBuf::from(text(&envelope["cwd"], "cwd")?);
         let step_env = envelope["steps"]
             .as_array()
             .into_iter()
@@ -161,14 +185,36 @@ impl HeadRequests {
         let cfg = Config {
             run_dir: run_dir.to_path_buf(),
             host_bin: text(&envelope["hostBin"], "hostBin")?,
-            cwd: PathBuf::from(text(&envelope["cwd"], "cwd")?),
+            cwd: cwd.clone(),
             env: step_env,
             verbs,
             verb_timeout: VERB_TIMEOUT,
-            holds_role: Box::new(move || identity_holds(&state_root, &role, &writer_id)),
+            holds_role: Box::new({
+                let (state_root, role, writer_id) =
+                    (state_root.clone(), role.clone(), writer_id.clone());
+                move || identity_holds(&state_root, &role, &writer_id)
+            }),
+            registered: Box::new({
+                let (state_root, writer_id) = (state_root.clone(), writer_id.clone());
+                move || identity_registered(&state_root, &writer_id)
+            }),
+            take_role: Box::new({
+                let gate = gate.clone();
+                move || {
+                    let head = gate.lock().unwrap_or_else(|e| e.into_inner()).clone();
+                    let head = head.ok_or_else(|| HoldError {
+                        code: "gate-unknown".into(),
+                        detail: "the attempt's gate is not known yet".into(),
+                    })?;
+                    identity_take(&state_root, &cwd, &role, &writer_id, &head)
+                }
+            }),
             log: Box::new(|line| eprintln!("fgos internal supervise: {line}")),
         };
-        Ok(Some((PathBuf::from(path), HeadRequests::new(cfg))))
+        Ok(Some((
+            PathBuf::from(path),
+            HeadRequests::with_gate(cfg, gate),
+        )))
     }
 
     /// Hand every connection waiting on `listener` (nonblocking) to a thread. A connection past the limit is closed.
@@ -194,10 +240,6 @@ impl HeadRequests {
 /// Identity's answer to "does this attempt's session hold the role": the session the writer id names is the one
 /// `resolve` finds holding it. Nothing is cached; a role that rotation moved away stops answering yes at once.
 pub fn identity_holds(state_root: &Path, role: &str, writer_id: &str) -> Result<bool, HoldError> {
-    let hold_error = |r: fgos_identity::refusal::Refusal| HoldError {
-        code: r.reason.to_string(),
-        detail: r.detail,
-    };
     let key = WriterKey {
         source: ENV_ORDER[0],
         value: writer_id,
@@ -208,6 +250,53 @@ pub fn identity_holds(state_root: &Path, role: &str, writer_id: &str) -> Result<
         Err(r) if r.reason == "not-found" => Ok(false),
         Err(r) => Err(hold_error(r)),
     }
+}
+
+fn hold_error(r: fgos_identity::refusal::Refusal) -> HoldError {
+    HoldError {
+        code: r.reason.to_string(),
+        detail: r.detail,
+    }
+}
+
+/// Identity's answer to "is this attempt's session registered and live": the full id of the session the writer id
+/// names is one `resolve` finds. A session that never registered, or whose head is gone, is `Ok(false)`.
+pub fn identity_registered(state_root: &Path, writer_id: &str) -> Result<bool, HoldError> {
+    let key = WriterKey {
+        source: ENV_ORDER[0],
+        value: writer_id,
+    };
+    let own = fgos_identity::current::session_for(state_root, &key, None).map_err(hold_error)?;
+    match fgos_identity::directory::resolve(state_root, &own.info.id, &judge_here, None) {
+        Ok(found) => Ok(found.id == own.info.id),
+        Err(r) if r.reason == "not-found" => Ok(false),
+        Err(r) => Err(hold_error(r)),
+    }
+}
+
+/// Moves `role` to the session of `writer_id` (Identity's own `take`, the supervisor only transports the fact that
+/// the attempt is that session). The gate is the head Identity records liveness against.
+pub fn identity_take(
+    state_root: &Path,
+    cwd: &Path,
+    role: &str,
+    writer_id: &str,
+    head: &HeadRef,
+) -> Result<(), HoldError> {
+    let key = WriterKey {
+        source: ENV_ORDER[0],
+        value: writer_id,
+    };
+    fgos_identity::directory::register_writer(
+        state_root,
+        Some(cwd),
+        &key,
+        head,
+        &[role.to_string()],
+        true,
+    )
+    .map(|_| ())
+    .map_err(hold_error)
 }
 
 enum Outcome {
@@ -351,16 +440,22 @@ fn read_request(reader: &mut impl Read) -> Result<Request, Option<String>> {
 
 /// The checks in contract order, then the verb.
 fn decide(cfg: &Config, busy: &AtomicBool, request: &Request) -> Outcome {
-    match (cfg.holds_role)() {
+    let answered = request.verb == ANSWERED_VERB;
+    let (check, not_so) = if answered {
+        (&cfg.registered, "session-not-registered")
+    } else {
+        (&cfg.holds_role, "role-not-held")
+    };
+    match check() {
         Ok(true) => {}
-        Ok(false) => return refused("role-not-held"),
+        Ok(false) => return refused(not_so),
         Err(why) => {
             (cfg.log)(&format!(
                 "head-request {} identity {}: {}",
                 request.id, why.code, why.detail
             ));
             return Outcome::Refused {
-                code: "role-not-held",
+                code: not_so,
                 detail: Some(why.code),
             };
         }
@@ -375,7 +470,20 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request) -> Outcome {
         return refused("busy");
     }
     let _busy = Busy(busy);
-    run_verb(cfg, request)
+    let outcome = run_verb(cfg, request);
+    if answered && matches!(outcome, Outcome::Done(_)) {
+        if let Err(why) = (cfg.take_role)() {
+            (cfg.log)(&format!(
+                "head-request {} identity {}: {}",
+                request.id, why.code, why.detail
+            ));
+            return Outcome::Refused {
+                code: "role-take-failed",
+                detail: Some(why.code),
+            };
+        }
+    }
+    outcome
 }
 
 /// Run `<host> internal head-request --protocol 1 --run-dir <dir>` with the request on stdin and the step

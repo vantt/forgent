@@ -20,7 +20,9 @@ use std::time::{Duration, Instant};
 use fgos_identity::resolve::{HeadRef, WriterKey, ENV_ORDER};
 use fgos_process::{facts, ProcId};
 use fgos_run_supervisor::go_channel::{read_frame, write_frame, MAX_FRAME_BYTES};
-use fgos_run_supervisor::head_request::{identity_holds, Config, HeadRequests, HoldError};
+use fgos_run_supervisor::head_request::{
+    identity_holds, identity_registered, identity_take, Config, HeadRequests, HoldError,
+};
 use serde_json::{json, Value};
 
 struct Served {
@@ -48,6 +50,41 @@ fn serve(
     name: &str,
     script_body: &str,
     holds: Result<bool, String>,
+    verbs: &[&str],
+    timeout: Duration,
+) -> Served {
+    serve_with(
+        name,
+        script_body,
+        holds,
+        Identity::default(),
+        verbs,
+        timeout,
+    )
+}
+
+/// What the answered verb asks Identity: is the attempt registered, and the move of the role (counted).
+struct Identity {
+    registered: Result<bool, String>,
+    take: Result<(), String>,
+    took: Arc<Mutex<u32>>,
+}
+
+impl Default for Identity {
+    fn default() -> Identity {
+        Identity {
+            registered: Ok(true),
+            take: Ok(()),
+            took: Arc::new(Mutex::new(0)),
+        }
+    }
+}
+
+fn serve_with(
+    name: &str,
+    script_body: &str,
+    holds: Result<bool, String>,
+    identity: Identity,
     verbs: &[&str],
     timeout: Duration,
 ) -> Served {
@@ -84,6 +121,25 @@ fn serve(
                 code,
                 detail: "internal identity text".into(),
             })
+        }),
+        registered: Box::new({
+            let registered = identity.registered.clone();
+            move || {
+                registered.clone().map_err(|code| HoldError {
+                    code,
+                    detail: "internal identity text".into(),
+                })
+            }
+        }),
+        take_role: Box::new({
+            let (take, took) = (identity.take.clone(), identity.took.clone());
+            move || {
+                *took.lock().unwrap() += 1;
+                take.clone().map_err(|code| HoldError {
+                    code,
+                    detail: "internal identity text".into(),
+                })
+            }
         }),
         log: Box::new(move |line| sink.lock().unwrap().push(line.to_string())),
     });
@@ -318,10 +374,24 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "busy",
             "peer-uid",
             "role-not-held",
+            "role-take-failed",
+            "session-not-registered",
             "verb-failed",
             "verb-not-granted",
             "verb-timeout"
         ]
+    );
+    let mut verbs: Vec<&str> = contract["verbs"]
+        .as_object()
+        .unwrap()
+        .keys()
+        .map(String::as_str)
+        .collect();
+    verbs.sort();
+    assert_eq!(verbs, ["head answered", "head rotate", "head start"]);
+    assert_eq!(
+        contract["verbs"][fgos_run_supervisor::head_request::ANSWERED_VERB]["identity"],
+        "registered-then-take"
     );
     assert_eq!(contract["framing"]["maxFrameBytes"], MAX_FRAME_BYTES);
     assert_eq!(
@@ -531,4 +601,125 @@ echo '{"v":1,"protocol":1,"result":"done","data":{"ok":true}}'
         "{reply}"
     );
     let _ = fs::remove_dir_all(&dir);
+}
+
+// ---- the successor's verb: registered, not yet holding the role ----------------------------------
+
+const ANSWERED: &str = "head answered";
+
+fn answered_server(name: &str, body: &str, identity: Identity) -> Served {
+    // The role is held by the predecessor: the role check would refuse, the registered check must not.
+    serve_with(
+        name,
+        body,
+        Ok(false),
+        identity,
+        &[ANSWERED, "head start"],
+        Duration::from_secs(20),
+    )
+}
+
+#[test]
+fn the_answered_verb_needs_only_a_registered_session_and_moves_the_role_after_the_route_says_done()
+{
+    let identity = Identity::default();
+    let took = identity.took.clone();
+    let served = answered_server("answered-ok", DONE_LINE, identity);
+    let reply = ask(&served.socket, ANSWERED);
+    assert_eq!(reply["result"], "done", "{reply}");
+    assert_eq!(*took.lock().unwrap(), 1, "the role moves once, after done");
+    assert_eq!(
+        served.log.lock().unwrap().clone(),
+        vec!["head-request r1 head answered done -"]
+    );
+    // Another verb of the same successor is still checked against the role it does not hold yet.
+    let refused = ask(&served.socket, "head start");
+    assert_eq!(refused["code"], "role-not-held");
+    assert_eq!(
+        *took.lock().unwrap(),
+        1,
+        "only the answered verb moves a role"
+    );
+}
+
+#[test]
+fn the_answered_verb_refuses_an_unregistered_session_and_never_runs_the_route_or_moves_the_role() {
+    let identity = Identity {
+        registered: Ok(false),
+        ..Identity::default()
+    };
+    let took = identity.took.clone();
+    let served = answered_server("answered-unregistered", DONE_LINE, identity);
+    let reply = ask(&served.socket, ANSWERED);
+    assert_eq!(reply["code"], "session-not-registered");
+    assert!(!served.dir.join("argv").exists(), "the route did not run");
+    assert_eq!(*took.lock().unwrap(), 0);
+    let broken = Identity {
+        registered: Err("machine-id-missing".into()),
+        ..Identity::default()
+    };
+    let served = answered_server("answered-broken", DONE_LINE, broken);
+    let reply = ask(&served.socket, ANSWERED);
+    assert_eq!(reply["code"], "session-not-registered");
+    assert_eq!(
+        reply["detail"], "machine-id-missing",
+        "only Identity's code reaches the client"
+    );
+}
+
+#[test]
+fn a_route_that_refuses_the_answer_moves_no_role_and_a_failed_move_is_named() {
+    let identity = Identity::default();
+    let took = identity.took.clone();
+    let served = answered_server(
+        "answered-refused",
+        r#"cat > /dev/null; echo '{"v":1,"protocol":1,"result":"error","code":"answer-mismatch","message":"x"}'; exit 70"#,
+        identity,
+    );
+    let reply = ask(&served.socket, ANSWERED);
+    assert_eq!(reply["code"], "verb-failed");
+    assert_eq!(reply["detail"], "answer-mismatch");
+    assert_eq!(
+        *took.lock().unwrap(),
+        0,
+        "no role moved on a refused answer"
+    );
+
+    let failing = Identity {
+        take: Err("head-not-live".into()),
+        ..Identity::default()
+    };
+    let served = answered_server("answered-take-fails", DONE_LINE, failing);
+    let reply = ask(&served.socket, ANSWERED);
+    assert_eq!(reply["code"], "role-take-failed");
+    assert_eq!(reply["detail"], "head-not-live");
+}
+
+#[test]
+fn identity_registers_a_successor_without_the_role_and_take_moves_it_from_the_predecessor() {
+    let role = "head:planner-x";
+    let root = state_root("take", true);
+    register(&root, "att-old", &[role]);
+    register(&root, "att-new", &[]);
+    assert_eq!(identity_registered(&root, "att-new"), Ok(true));
+    assert_eq!(
+        identity_registered(&root, "att-never-registered"),
+        Ok(false)
+    );
+    assert_eq!(identity_holds(&root, role, "att-new"), Ok(false));
+
+    let pid = std::process::id();
+    let head = HeadRef {
+        pid,
+        start_time: facts::identity_of(ProcId(pid)).unwrap().start_time,
+    };
+    identity_take(&root, &root, role, "att-new", &head).expect("take");
+    assert_eq!(identity_holds(&root, role, "att-new"), Ok(true));
+    assert_eq!(identity_holds(&root, role, "att-old"), Ok(false));
+
+    let broken = state_root("take-broken", false);
+    assert!(identity_registered(&broken, "att-new")
+        .unwrap_err()
+        .code
+        .starts_with("machine-id"));
 }

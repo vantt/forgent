@@ -40,7 +40,8 @@ export const headKeyOf = (persona, name, gen) => `head-${persona}-${name}-${gen}
 /** The folder the lineage of one persona-name keeps its runtime files in (handoffs, the live placement). */
 export const lineageDirOf = (projectRoot, persona, name) => path.join(projectRoot, '.fgos', 'runtime', 'session-rotation', `${persona}-${name}`);
 
-function readPlacement(dir) {
+/** The record of where the live head of a lineage was placed (`{ role, gen, placement, persona, startedAt }`), or null. */
+export function readHeadPlacement(dir) {
   try {
     const record = JSON.parse(fs.readFileSync(path.join(dir, PLACEMENT_FILE), 'utf8'));
     return record?.placement?.key ? record : null;
@@ -50,7 +51,7 @@ function readPlacement(dir) {
   }
 }
 
-function writePlacement(dir, record) {
+export function writeHeadPlacement(dir, record) {
   fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
   replaceDurably(dir, PLACEMENT_FILE, `${JSON.stringify(record)}\n`, FILE_MODE);
 }
@@ -61,7 +62,7 @@ function writePlacement(dir, record) {
  * Whether a live session of this machine holds the role: `fgos identity resolve <role>` names exactly one live
  * session or refuses [not-found]. Identity stays the only authority for who is alive; nothing is cached here.
  */
-function identityHolder(role, projectRoot) {
+export function identityHolder(role, projectRoot) {
   const { bin } = resolveActiveHostBin();
   if (!bin) throw new HeadStartError('identity-unavailable', 'no fgos host binary found to ask Identity who holds the role');
   const res = spawnSync(bin, ['identity', 'resolve', role, '--json'], { cwd: projectRoot, env: routeEnv(), encoding: 'utf8', timeout: 20_000 });
@@ -127,7 +128,7 @@ async function defaultRunnerConfig(projectRoot) {
 }
 
 /** The generation a start without one takes: the first whose attempt directory does not exist yet. */
-function nextGeneration(projectRoot, persona, name) {
+export function nextHeadGeneration(projectRoot, persona, name) {
   let gen = 1;
   while (fs.existsSync(path.join(projectRoot, '.fgos', 'assignments', headKeyOf(persona, name, gen)))) gen += 1;
   return gen;
@@ -145,43 +146,27 @@ async function defaultHandoff({ persona, name, projectRoot }) {
 
 // ---- the use case -------------------------------------------------------------------------------
 
-/**
- * Starts the head session of `persona` and `name`, or fronts the live one.
- *
- * `gen` is the generation of the lineage (a rotation successor is the next one; absent, the first unused one); `beside`
- * is the live key of the session whose tab the successor opens next to. `ports` (all optional, for the rotation
- * executor and for tests): `host` (Session Host client, for fronting), `identity({ role, projectRoot }) -> { live }`,
- * `pin`, `handoff`, `opening`, `runnerConfig(projectRoot)`, `bind({ persona, key, runnerConfig })`,
- * `launch(request) -> { placement, runDir }`, `rotationHolds({ persona, name }) -> boolean`.
- *
- * Returns `{ already: true, role, key, fronted }` for a role a live session holds, else
- * `{ already: false, role, key, placement, runDir, cli }`. A refusal throws `HeadStartError` with a code.
- */
-export async function startHeadSession({ persona, name, projectRoot, beside = null, gen = null } = {}, ports = {}) {
+export function assertHeadArgs({ persona, name, projectRoot, gen = null }) {
   if (!PERSONA_PATTERN.test(persona ?? '')) throw new HeadStartError('bad-persona', `persona must be an agent name (a-z, 0-9, hyphen; starts with a letter), got ${JSON.stringify(persona)}`);
   if (!NAME_PATTERN.test(name ?? '')) throw new HeadStartError('bad-name', `name must be 1 to 32 characters of a-z, 0-9 and hyphen, got ${JSON.stringify(name)}`);
   if (typeof projectRoot !== 'string' || projectRoot === '') throw new HeadStartError('bad-project-root', 'projectRoot is required');
   if (gen !== null && (!Number.isInteger(gen) || gen < 1)) throw new HeadStartError('bad-generation', `gen must be a positive integer, got ${JSON.stringify(gen)}`);
+}
 
+/**
+ * Binds a seat and launches the head of `persona` and `name` as a confined supervised attempt: the one launch path
+ * of a head, with no check of who holds the role and no record of where it went. `startHeadSession` calls it for a
+ * start; the rotation executor calls it for a successor while the predecessor still holds the role, and records the
+ * placement itself once the predecessor is gone.
+ *
+ * `gen` is the generation of the lineage (absent: the first unused one); `beside` is the live key of the session whose
+ * tab the new one opens next to. `ports` as for `startHeadSession` (`pin`, `handoff`, `opening`, `runnerConfig`, `bind`,
+ * `launch`). Returns `{ role, gen, key, placement, runDir, cli, persona }`; a refusal throws `HeadStartError`.
+ */
+export async function placeHead({ persona, name, projectRoot, beside = null, gen = null } = {}, ports = {}) {
+  assertHeadArgs({ persona, name, projectRoot, gen });
   const role = headRoleOf(persona, name);
-  if (ports.rotationHolds?.({ persona, name })) {
-    throw new HeadStartError('rotation-in-progress', `a rotation of ${persona}-${name} holds its lock; start nothing until it ends`);
-  }
-
-  const lineageDir = lineageDirOf(projectRoot, persona, name);
-  const host = ports.host ?? createSessionHost();
-  const holder = (ports.identity ?? ((ask) => identityHolder(ask.role, ask.projectRoot)))({ role, projectRoot });
-  if ((await holder).live) {
-    // One live head per persona-name: bring it to the front. Terminal Control offers no lookup by key prefix, so the
-    // live key was kept in the lineage folder when it was placed.
-    const known = readPlacement(lineageDir);
-    if (!known) throw new HeadStartError('placement-unknown', `${role} is live but its placement is not recorded under ${lineageDir}; front it by hand`);
-    const answer = host.front(known.placement);
-    if (answer.result !== 'fronted') throw new HeadStartError('front-refused', `${role} is live but could not be fronted: ${answer.code ?? answer.result}${answer.detail ? ` (${answer.detail})` : ''}`);
-    return { already: true, role, key: known.placement.key, fronted: true };
-  }
-
-  const generation = gen ?? nextGeneration(projectRoot, persona, name);
+  const generation = gen ?? nextHeadGeneration(projectRoot, persona, name);
   const key = headKeyOf(persona, name, generation);
   let grant;
   try { grant = grantOf(role, persona); } catch (err) { throw new HeadStartError('grant-invalid', err.message); }
@@ -202,6 +187,39 @@ export async function startHeadSession({ persona, name, projectRoot, beside = nu
   } catch (err) {
     throw new HeadStartError('start-refused', `${role} was not started: ${err.message}`, { cause: err, refusal: err.refusal ?? null });
   }
-  writePlacement(lineageDir, { role, gen: generation, placement: launched.placement, persona: pinned.name ?? persona, startedAt: new Date().toISOString() });
-  return { already: false, role, key: launched.placement.key, placement: launched.placement, runDir: launched.runDir, cli: binding.cli ?? null };
+  return { role, gen: generation, key: launched.placement.key, placement: launched.placement, runDir: launched.runDir, cli: binding.cli ?? null, persona: pinned.name ?? persona };
+}
+
+/**
+ * Starts the head session of `persona` and `name`, or fronts the live one.
+ *
+ * `ports` (all optional, for the rotation executor and for tests): `host` (Session Host client, for fronting),
+ * `identity({ role, projectRoot }) -> { live }`, `rotationHolds({ persona, name }) -> boolean`, and those of `placeHead`.
+ *
+ * Returns `{ already: true, role, key, fronted }` for a role a live session holds, else
+ * `{ already: false, role, key, placement, runDir, cli }`. A refusal throws `HeadStartError` with a code.
+ */
+export async function startHeadSession({ persona, name, projectRoot, beside = null, gen = null } = {}, ports = {}) {
+  assertHeadArgs({ persona, name, projectRoot, gen });
+  const role = headRoleOf(persona, name);
+  if (ports.rotationHolds?.({ persona, name })) {
+    throw new HeadStartError('rotation-in-progress', `a rotation of ${persona}-${name} holds its lock; start nothing until it ends`);
+  }
+
+  const lineageDir = lineageDirOf(projectRoot, persona, name);
+  const host = ports.host ?? createSessionHost();
+  const holder = (ports.identity ?? ((ask) => identityHolder(ask.role, ask.projectRoot)))({ role, projectRoot });
+  if ((await holder).live) {
+    // One live head per persona-name: bring it to the front. Terminal Control offers no lookup by key prefix, so the
+    // live key was kept in the lineage folder when it was placed.
+    const known = readHeadPlacement(lineageDir);
+    if (!known) throw new HeadStartError('placement-unknown', `${role} is live but its placement is not recorded under ${lineageDir}; front it by hand`);
+    const answer = host.front(known.placement);
+    if (answer.result !== 'fronted') throw new HeadStartError('front-refused', `${role} is live but could not be fronted: ${answer.code ?? answer.result}${answer.detail ? ` (${answer.detail})` : ''}`);
+    return { already: true, role, key: known.placement.key, fronted: true };
+  }
+
+  const placed = await placeHead({ persona, name, projectRoot, beside, gen }, ports);
+  writeHeadPlacement(lineageDir, { role, gen: placed.gen, placement: placed.placement, persona: placed.persona, startedAt: new Date().toISOString() });
+  return { already: false, role, key: placed.key, placement: placed.placement, runDir: placed.runDir, cli: placed.cli };
 }

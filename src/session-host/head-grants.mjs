@@ -15,11 +15,15 @@ const ROLE_PATTERN = /^head:([a-z][a-z0-9-]*)$/;
 
 const NONE = Object.freeze({ writes: Object.freeze([]), verbs: Object.freeze([]) });
 
+/** Every head may rotate itself and report its first turn as a successor; only the secretary may also start sessions. */
+const ROTATION_VERBS = Object.freeze(['head rotate', 'head answered']);
+
 const GRANTS = Object.freeze({
   secretary: Object.freeze({
     writes: Object.freeze(['plans', 'docs/backlog.md', 'docs/discussions']),
-    verbs: Object.freeze(['head start']),
+    verbs: Object.freeze(['head start', ...ROTATION_VERBS]),
   }),
+  shaper: Object.freeze({ writes: Object.freeze([]), verbs: ROTATION_VERBS }),
 });
 
 export class HeadGrantError extends Error {

@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { bindHeadSeat, headKeyOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, openingText, startHeadSession } from '../../src/session-host/head-start.mjs';
+import { bindHeadSeat, headKeyOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, openingText, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
 import { grantOf } from '../../src/session-host/head-grants.mjs';
 
 seedFileLocalBwrapRegistry();
@@ -98,7 +98,7 @@ test('a secretary launches with the paths and the verb its grant names; the line
   assert.equal(request.key, headKeyOf('secretary', 'miu', 2));
   assert.deepEqual(request.grant, grantOf('head:secretary-miu'));
   assert.deepEqual(request.grant.writes, ['plans', 'docs/backlog.md', 'docs/discussions']);
-  assert.deepEqual(request.grant.verbs, ['head start']);
+  assert.deepEqual(request.grant.verbs, ['head start', 'head rotate', 'head answered']);
   assert.deepEqual(request.env, { FGOS_HEAD_ROLE: headRoleOf('secretary', 'miu'), FGOS_HEAD_GEN: '2' });
   const kept = JSON.parse(fs.readFileSync(path.join(lineageDirOf(projectRoot, 'secretary', 'miu'), 'placement.json'), 'utf8'));
   assert.equal(kept.placement.key, out.key);
@@ -108,7 +108,8 @@ test('a secretary launches with the paths and the verb its grant names; the line
 
 test('the grant table: the persona matches a table key exactly, an unnamed persona holds nothing, a non-head role is refused', () => {
   assert.deepEqual(grantOf('head:planner-probe'), { writes: [], verbs: [] });
-  assert.deepEqual(grantOf('head:secretary-miu').verbs, ['head start']);
+  assert.deepEqual(grantOf('head:secretary-miu').verbs, ['head start', 'head rotate', 'head answered']);
+  assert.deepEqual(grantOf('head:shaper-x'), { writes: [], verbs: ['head rotate', 'head answered'] }, 'a shaper rotates but starts nothing and writes nothing');
   assert.deepEqual(grantOf('head:secretary-miu', 'secretary'), grantOf('head:secretary-miu'));
   // `secretary-x` is another persona: asked by persona it is not the secretary, even though the role starts alike.
   assert.deepEqual(grantOf('head:secretary-x-y', 'secretary-x'), { writes: [], verbs: [] });
@@ -169,5 +170,18 @@ test('a launch that is refused leaves no placement record behind', async () => {
   const { ports } = fakes({ launchFails: 'no account could be leased' });
   await assert.rejects(startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports), { code: 'start-refused' });
   assert.equal(fs.existsSync(path.join(lineageDirOf(projectRoot, 'planner', 'probe'), 'placement.json')), false);
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('placeHead launches a head and leaves the holder check and the placement record to its caller', async () => {
+  const projectRoot = scratch();
+  const { calls, ports } = fakes({ live: true });
+  const placed = await placeHead({ persona: 'planner', name: 'probe', projectRoot, beside: 'cmd_old', gen: 3 }, ports);
+  assert.equal(placed.key, 'cmd_head-planner-probe-3');
+  assert.equal(placed.gen, 3);
+  assert.equal(calls.launch[0].beside, 'cmd_old');
+  assert.equal(calls.front.length, 0, 'a live holder is not fronted: the successor starts beside it');
+  assert.equal(readHeadPlacement(lineageDirOf(projectRoot, 'planner', 'probe')), null, 'the caller records where the head lives');
+  await assert.rejects(placeHead({ persona: 'Bad', name: 'x', projectRoot }, ports), { code: 'bad-persona' });
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });

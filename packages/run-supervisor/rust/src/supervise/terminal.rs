@@ -1004,6 +1004,12 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
     }
     if let Some(session) = &plan.session {
         register_session(session, &io.sup.gate);
+        if let Some((_, server)) = &io.sup.requests {
+            server.set_gate(HeadRef {
+                pid: io.sup.gate.pid.0,
+                start_time: io.sup.gate.start_time.clone(),
+            });
+        }
     }
 
     let readiness = adapter.await_ready(&mut io, READY_MS);
