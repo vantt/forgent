@@ -97,9 +97,6 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
             RefValue::Symbolic(target) if target.as_str() == "refs/heads/nowhere"
         ));
         git(&repo_path, &["symbolic-ref", "--delete", dangling.as_str()]);
-        assert!(
-            matches!(driver.resolve_trunk(&repo, None).unwrap(), TrunkFact::Known(r) if r.as_str()=="refs/heads/trunk")
-        );
         assert!(matches!(
             driver.resolve_trunk(&repo, Some(&absent)).unwrap(),
             TrunkFact::Unknown(TrunkUnknown::TargetAbsent)
@@ -275,6 +272,101 @@ fn inspect_real_repositories_byte_paths_pages_and_optional_locks() {
         ));
         fs::remove_dir_all(root).unwrap();
     }
+}
+
+/// A repository on `trunk` with one commit and a `side` branch, plus its driver and handle.
+fn trunk_fixture(
+    name: &str,
+) -> (
+    std::path::PathBuf,
+    std::path::PathBuf,
+    GitDriver,
+    RepoHandle,
+) {
+    use std::os::unix::fs::PermissionsExt;
+    let root = std::env::temp_dir().join(format!("fgos-trunk-{name}-{}", std::process::id()));
+    let _ = fs::remove_dir_all(&root);
+    fs::create_dir(&root).unwrap();
+    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    git(&root, &["init", "-q", "--initial-branch=trunk", "repo"]);
+    let path = root.join("repo");
+    git(&path, &["config", "user.name", "Fixture"]);
+    git(&path, &["config", "user.email", "fixture@example.invalid"]);
+    git(&path, &["commit", "-q", "--allow-empty", "-m", "root"]);
+    git(&path, &["branch", "side"]);
+    let driver = GitDriver::new(&root).unwrap();
+    let repo = match driver.resolve_repo(&path, &path).unwrap() {
+        ResolveRepo::Repository(r) => r,
+        _ => panic!("not a repository"),
+    };
+    (root, path, driver, repo)
+}
+
+fn known(fact: TrunkFact) -> (String, TrunkSource) {
+    match fact {
+        TrunkFact::Known { trunk, source } => (trunk.as_str().to_owned(), source),
+        other => panic!("{other:?}"),
+    }
+}
+
+#[test]
+fn an_explicit_trunk_target_wins_and_is_named_explicit() {
+    let (root, path, driver, repo) = trunk_fixture("explicit");
+    git(&path, &["update-ref", "refs/remotes/origin/trunk", "HEAD"]);
+    git(
+        &path,
+        &[
+            "symbolic-ref",
+            "refs/remotes/origin/HEAD",
+            "refs/remotes/origin/trunk",
+        ],
+    );
+    let side = RefName::parse("refs/heads/side").unwrap();
+    let fact = driver.resolve_trunk(&repo, Some(&side)).unwrap();
+    assert_eq!(
+        known(fact),
+        ("refs/heads/side".into(), TrunkSource::Explicit)
+    );
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn a_unique_remote_head_is_the_trunk_over_the_attached_branch_and_is_named_remote_default() {
+    let (root, path, driver, repo) = trunk_fixture("remote-default");
+    git(
+        &path,
+        &["update-ref", "refs/remotes/upstream/trunk", "HEAD"],
+    );
+    git(
+        &path,
+        &[
+            "symbolic-ref",
+            "refs/remotes/upstream/HEAD",
+            "refs/remotes/upstream/trunk",
+        ],
+    );
+    git(&path, &["checkout", "-q", "side"]);
+    let fact = driver.resolve_trunk(&repo, None).unwrap();
+    assert_eq!(
+        known(fact),
+        (
+            "refs/remotes/upstream/trunk".into(),
+            TrunkSource::RemoteDefault
+        )
+    );
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn without_a_remote_head_the_main_checkout_attached_branch_is_named_attached_head() {
+    let (root, path, driver, repo) = trunk_fixture("attached-head");
+    git(&path, &["checkout", "-q", "side"]);
+    let fact = driver.resolve_trunk(&repo, None).unwrap();
+    assert_eq!(
+        known(fact),
+        ("refs/heads/side".into(), TrunkSource::AttachedHead)
+    );
+    fs::remove_dir_all(root).unwrap();
 }
 
 #[test]

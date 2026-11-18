@@ -13,7 +13,7 @@ use fgos_git::{
     wal, CommitRequest, DiffScope, DiffSides, GitDriver, HeadFact, Ignored, Inspect, InspectCursor,
     LandCandidate, LandEvidence, LandFile, LandRequest, ObjectType, Oid, OperationError,
     ReadObject, RefMapping, RefName, RefValue, Remote, RemoteGrant, RepoHandle, ResolveRepo,
-    ResultCode, Submodules, TrunkFact, Untracked,
+    ResultCode, Submodules, TrunkFact, TrunkSource, Untracked,
 };
 use fgos_holder_lock::BorrowedHandle;
 use sha2::{Digest, Sha256};
@@ -261,11 +261,16 @@ impl Lander<'_> {
             .git
             .resolve_trunk(self.ports.repo, None)
             .map_err(from_git)?;
-        let TrunkFact::Known(name) = trunk else {
-            return Err(refuse(
-                "land-target-unknown",
-                "the project trunk is not known; pass a target",
-            ));
+        // The main checkout's attached branch can be a side branch: landing into it is the hazard
+        // an unknown trunk guards against, so only an explicit or remote-default trunk counts.
+        let name = match trunk {
+            TrunkFact::Known { trunk, source } if source != TrunkSource::AttachedHead => trunk,
+            _ => {
+                return Err(refuse(
+                    "land-target-unknown",
+                    "the project trunk is not known; pass a target",
+                ))
+            }
         };
         let remote_prefix = format!("refs/remotes/{}/", self.ports.remote.name);
         name.as_str()

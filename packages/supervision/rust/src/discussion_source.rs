@@ -1,9 +1,10 @@
 //! `fgos.discussion.status`: one record each time a discussion's `discussion: <state>` marker flips on the trunk.
 //!
 //! The trunk's history is read through the Git component door (`DiscussionHistory`, satisfied by
-//! `GitDiscussionHistory`); nothing is stored, every query walks the history again. The trunk is the remote-tracking
-//! `main` when it is ahead of local `main` (the watcher fetches before a full tick), else local `main`. A branch that
-//! has not landed has no discussion state.
+//! `GitDiscussionHistory`); nothing is stored, every query walks the history again. The trunk is the one the Git
+//! door's `resolve_trunk` names; a trunk it found only as the main checkout's attached branch is not trusted, and then
+//! nothing is emitted. Of the trunk branch and its remote-tracking twin, the one ahead is read (the watcher fetches
+//! before a full tick). A branch that has not landed has no discussion state.
 //!
 //! The trunk is followed along first parents through `GitDriver::walk_changes`, the one history read door, so a merge
 //! shows the flips it brought in, at the merge, and a root commit is read like any other: a discussion first committed
@@ -17,7 +18,7 @@
 
 use fgos_git::{
     GitDriver, Inspect, Oid, PathRead, PathValue, RefName, RefValue, RepoHandle, ResolveRepo,
-    WalkChanges,
+    TrunkFact, TrunkSource, WalkChanges,
 };
 use fgos_observe::record::types::{AttrValue, Basis, Origin, Record, SubjectRef, RECORD_VERSION};
 use fgos_observe::time::ParsedWindow;
@@ -246,36 +247,25 @@ impl GitDiscussionHistory {
         )
     }
 
-    /// The trunk's branch name: the remote HEAD target when it exists, else `main`, else `master`, else `main`
-    /// (the rule `detectTrunk` applies). The checkout's attached branch never names the trunk.
-    fn trunk_branch(&self) -> Result<String, String> {
-        const PREFIX: &str = "refs/remotes/origin/";
-        if let Ok(head) = RefName::parse("refs/remotes/origin/HEAD") {
-            if let RefValue::Symbolic(target) = self
-                .driver
-                .resolve_ref(&self.repo, &head)
-                .map_err(|e| e.cause)?
-            {
-                if let Some(name) = target.as_str().strip_prefix(PREFIX) {
-                    return Ok(name.to_owned());
-                }
-            }
-        }
-        for name in ["main", "master"] {
-            if self.resolve(&format!("refs/heads/{name}"))?.is_some() {
-                return Ok(name.to_owned());
-            }
-        }
-        Ok("main".to_owned())
-    }
-
-    /// The local trunk branch and its remote-tracking twin, in preference order.
+    /// The trunk read through the Git door, with its local and remote-tracking twins in preference order. A trunk
+    /// the door found only as the main checkout's attached branch is not trusted (it can be a side branch): no tips.
     fn trunk_candidates(&self) -> Result<Vec<Oid>, String> {
-        let branch = self.trunk_branch()?;
-        let names = [
-            format!("refs/heads/{branch}"),
-            format!("refs/remotes/origin/{branch}"),
-        ];
+        let trunk = match self
+            .driver
+            .resolve_trunk(&self.repo, None)
+            .map_err(|e| e.cause)?
+        {
+            TrunkFact::Known { trunk, source } if source != TrunkSource::AttachedHead => trunk,
+            _ => return Ok(Vec::new()),
+        };
+        let trunk = trunk.as_str();
+        let names = match trunk.strip_prefix("refs/remotes/") {
+            Some(rest) => match rest.split_once('/') {
+                Some((_, branch)) => vec![format!("refs/heads/{branch}"), trunk.to_owned()],
+                None => vec![trunk.to_owned()],
+            },
+            None => vec![trunk.to_owned()],
+        };
         let mut tips: Vec<Oid> = Vec::new();
         for name in names {
             if let Some(oid) = self.resolve(&name)? {
@@ -287,7 +277,7 @@ impl GitDiscussionHistory {
         Ok(tips)
     }
 
-    /// The trunk tip: local `main` unless a later candidate carries it (is ahead of it).
+    /// The trunk tip: the local trunk branch unless a later candidate carries it (is ahead of it).
     fn trunk_tip(&self) -> Result<Option<Oid>, String> {
         let tips = self.trunk_candidates()?;
         let Some((first, rest)) = tips.split_first() else {
