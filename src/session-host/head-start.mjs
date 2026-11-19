@@ -14,7 +14,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { replaceDurably } from '../native/door.mjs';
 import { createSessionHost } from './client.mjs';
-import { grantOf, HeadGrantError } from './head-grants.mjs';
+import { grantOf, HEAD_PERSONAS } from './head-grants.mjs';
 import { planOfHead } from './head-plan.mjs';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
@@ -171,20 +171,10 @@ export function nextHeadGeneration(projectRoot, persona, name) {
   return gen;
 }
 
-/** Does the persona hold a head grant (verbs to ask for, or a lead's plan directory)? Those are the personas a head starts. */
-function holdsHeadGrant(persona) {
-  try {
-    return grantOf(`head:${persona}-x`, persona).verbs.length > 0;
-  } catch (err) {
-    if (err instanceof HeadGrantError && err.code === 'plan-not-found') return true;
-    return false;
-  }
-}
-
 /** The persona names with the ones that hold a head grant first: the refusal message is cut, and these are the ones the caller wanted. */
 export function personasHeadsFirst(names) {
   const sorted = [...new Set(names)].sort();
-  return [...sorted.filter(holdsHeadGrant), ...sorted.filter((name) => !holdsHeadGrant(name))];
+  return [...sorted.filter((name) => HEAD_PERSONAS.includes(name)), ...sorted.filter((name) => !HEAD_PERSONAS.includes(name))];
 }
 
 async function defaultPin({ persona, projectRoot }) {

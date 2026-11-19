@@ -54,13 +54,13 @@ from a live run inside the secretary sandbox (head generation 16), 2026-11-19.
 
 | Verb | Door | Live result 2026-11-19 |
 |---|---|---|
-| `session start` | request socket | OK (`session start shaper --name <n>` started a shaper; an unknown persona is `persona-not-found` with the known personas) |
-| `session write` | request socket | refusal path OK (`write-base-stale` on a wrong `--base`); a good write is the backlog path in step 2 |
+| `session start` | socket, via the payload client | OK (`session start shaper --name <n>` started a shaper; an unknown persona is `persona-not-found` with the known personas) |
+| `session write` | socket, via the payload client | refusal path OK (`write-base-stale` on a wrong `--base`); a good write is the backlog path in step 2 |
 | `session bind session`, `session rotate`, `session answered`, `session restore role` | request socket | not audited (used by the rotation hooks, not typed by hand) |
-| `questions list` | request socket | OK |
-| `questions answer` | local door, answers through the socket | door reached (unknown id is `question-unknown`, exit 4); not run on a real question |
+| `questions list` | socket, routed natively by the host | OK |
+| `questions answer` | socket, via the payload client | door reached (unknown id is `question-unknown`, exit 4); not run on a real question |
 | `questions ask`, `questions ack`, `questions cancel` | local door, answers through the socket | not audited |
-| `land`, `request result` | request socket | not audited |
+| `land`, `request result` | socket, routed natively by the host | not audited |
 
 Not in your grant: `session stop` (supervisor only; a call is `verb-not-granted`), `run`, `worktree create`.
 
@@ -73,7 +73,7 @@ Local verbs, run in your own sandbox without the socket (the host routes only th
 | `fgos questions show <id>` | OK, but warns `questions.json: durable install failed ... Read-only file system` (the answer is complete; the warning is the view refresh failing, safe to ignore) |
 | `fgos mailbox send --to <role or handle>`, `fgos convention path ...` | not audited live |
 
-`TMPDIR=/tmp` is writable (OK). `fgos <verb> --help` prints the manifest entry of a verb or sub-verb.
+`TMPDIR=/tmp` is writable (OK).
 
 ## Friction
 

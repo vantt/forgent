@@ -62,6 +62,9 @@ const GRANTS = Object.freeze({
 /** A lead's verbs; its writes are its plan dir, which the caller resolves (this module reads no files). No `session start`. */
 const LEAD_VERBS = Object.freeze([...HEAD_VERBS, ...QUESTION_VERBS, 'run', 'land', 'worktree create', 'request result']);
 
+/** Every persona that holds a head grant: the table's keys and `lead`, whose grant is its plan directory. */
+export const HEAD_PERSONAS = Object.freeze([...Object.keys(GRANTS), 'lead']);
+
 export class HeadGrantError extends Error {
   constructor(code, message) {
     super(message);
