@@ -85,6 +85,10 @@ The phase table has exactly these columns (order free):
 - **Footprint**: each phase lists the files it owns (create, modify, delete). Phases in the
   same wave must have disjoint footprints (equal paths or a path inside another's count as
   overlap; a glob counts as its fixed prefix).
+- **Door check**: before fixing the phase table, run `fgos resource-check --units <file.json>` on the
+  draft (before the phase files exist) and `fgos resource-check --plan <plan dir>` after; fix the
+  colliding pairs, cycles and layers it reports before you set a wave. In a project without fgOS,
+  apply the same overlap rule by hand as stated above.
 - **Waves**: a phase's wave is later than the wave of everything it depends on. Every phase
   whose dependencies are met starts at once; layers stay serial (a lower layer lands before
   the one above it starts).
