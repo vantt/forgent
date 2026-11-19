@@ -1,5 +1,5 @@
 // Parity of every verb the host takes over from the Node payload: one table per verb
-// (`parity-cases/<name>.cases.mjs`, each file a table), each case run on the step's base release (the Node payload
+// (`parity-cases/<name>.cases.mjs`, each file a table), each case run on the step's base release (its own host
 // with that release's environment) and on the host this tree stages. The base is named by `FGOS_TEST_PARITY_BASE`, a
 // description file of the staged base release (see the recipe in `harness.mjs`). A table exports `cases` and
 // `runPreparedCase(entryA, entryB, testCase)`, which owns how one case runs (a fresh fixture per entry). A table is
@@ -10,7 +10,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseEntry, PARITY_CASES_DIR } from "./harness.mjs";
+import { parseEntry, parityBaseEntrySpec, PARITY_CASES_DIR } from "./harness.mjs";
 
 /** Every table in the cases directory, by name; none until a verb's port adds its table. */
 const TABLES = fs.existsSync(PARITY_CASES_DIR)
@@ -18,27 +18,14 @@ const TABLES = fs.existsSync(PARITY_CASES_DIR)
   : [];
 const JOBS = 4;
 
-/** The base release as the entry that serves its verbs from Node, with the environment that release was staged with. */
-function baseEntry() {
-  const file = process.env.FGOS_TEST_PARITY_BASE;
-  assert.ok(file, "FGOS_TEST_PARITY_BASE is not set: it names the description file of the staged base release (recipe in test/rust-host/harness.mjs)");
-  const base = JSON.parse(fs.readFileSync(file, "utf8"));
-  return {
-    type: "node",
-    executable: process.execPath,
-    target: path.join(base.releasePath, "bin/fgos.mjs"),
-    spec: `node:${base.releasePath}`,
-    env: { FGOS_HOST_BIN: base.hostBin, FGOS_ACTIVE_RELEASE_PATH: base.releasePath, FGOS_ACTIVE_MANIFEST_PATH: base.manifestPath },
-  };
-}
-
 for (const name of TABLES) {
   test(`the host answers like the base release for every ${name} case`, { timeout: 1800000 }, async () => {
     const hostBin = process.env.FGOS_HOST_BIN;
     assert.ok(hostBin && fs.existsSync(hostBin), `FGOS_HOST_BIN is not a built host binary (${hostBin}); run this file through node scripts/run-tests.mjs`);
     const table = await import(pathToFileURL(path.join(PARITY_CASES_DIR, `${name}.cases.mjs`)).href);
     assert.ok(table.cases.length > 0 && typeof table.runPreparedCase === "function", `${name}: no cases or no runPreparedCase`);
-    const entryA = baseEntry();
+    // The base release runs through its own host: since S5 its Node payload no longer serves the host verbs.
+    const entryA = parseEntry(parityBaseEntrySpec());
     const entryB = parseEntry(`bin:${hostBin}`);
     const failures = [];
     let next = 0;

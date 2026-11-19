@@ -39,7 +39,7 @@ use fgos_execution_engine::confinement::policy::{
     resolve_confinement_resources, validate_confinement_policy_shape, Grant, ResolveContext,
     ResolveInput, BUILTIN_POLICY_IDS,
 };
-use fgos_execution_engine::credentials::files::{now_ms, random_hex};
+use fgos_execution_engine::credentials::files::{make_dir, now_ms, random_hex};
 use fgos_execution_engine::credentials::store::{OverLimit, ResolveStore, SweepOptions};
 use fgos_execution_engine::credentials::{
     credential_write_back_target, inspect_pending_copies_over_limit,
@@ -196,7 +196,7 @@ fn machine_runner() -> Result<Value, String> {
             .map(config_refusal_text)
             .collect::<Vec<_>>()
             .join("; ")),
-        Err(other) => Err(format!("{other:?}")),
+        Err(SnapshotError::Io(io)) => Err(format!("config-io ({:?})", io.kind())),
     }
 }
 
@@ -1298,10 +1298,7 @@ fn driver_over(runtime_dir: &Path) -> Arc<dyn BackendDriver> {
 fn with_scratch<T>(prefix: &str, body: impl FnOnce(&Path) -> T) -> Result<T, String> {
     let suffix = random_hex().map_err(|error| error.to_string())?;
     let dir = std::env::temp_dir().join(format!("{prefix}{}-{suffix}", std::process::id()));
-    let mut builder = std::fs::DirBuilder::new();
-    #[cfg(unix)]
-    std::os::unix::fs::DirBuilderExt::mode(&mut builder, 0o700);
-    builder.create(&dir).map_err(|error| error.to_string())?;
+    make_dir(&dir, false).map_err(|error| error.to_string())?;
     let out = body(&dir);
     let _ = std::fs::remove_dir_all(&dir);
     Ok(out)
