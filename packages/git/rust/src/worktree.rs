@@ -1075,7 +1075,8 @@ impl GitDriver {
         let discarded = if let Some(land_id) = discarded_land {
             let land = wal.inspect(land_id)?;
             matches!(&land.intent().kind, OperationKind::Land(p) if p.candidate.worktree == path && p.candidate.candidate == handle.tip.as_str())
-                && land.intent().writer_identity == writer
+                // The caller proved its right to settle this Land (its own writer, or a
+                // writer proven dead); the removal chain records the caller.
                 && matches!(
                     land.outcome(),
                     Some(Outcome::AbandonedBeforeAttempt | Outcome::Loss { .. })

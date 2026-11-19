@@ -249,8 +249,16 @@ pub fn recover_git_operations(
             .clone()
             .unwrap_or_else(|| fgos_identity::resolve_current().id.to_string())
     };
+    let root = Path::new(&state_root);
+    let writer_is_dead = |writer: &str| {
+        fgos_identity::directory::session_proven_dead(
+            root,
+            writer,
+            &fgos_process::facts::judge_here,
+        )
+    };
     let recovered =
-        incidents::recover_git_operations(Path::new(&state_root), Path::new(&cwd), &writer_for)
+        incidents::recover_git_operations(root, Path::new(&cwd), &writer_for, &writer_is_dead)
             .map_err(fact_error)?;
     serde_json::to_value(recovered).map_err(error)
 }

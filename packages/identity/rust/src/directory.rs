@@ -616,6 +616,33 @@ pub fn by_handle(root: &Path, handle: &str, judge: Judge) -> Option<Listed> {
         .map(|row| Listed::of(&row.entry, row.verdict, judge))
 }
 
+/// Whether the session `id` is registered here and proven gone: its agent head
+/// judges dead and no process recorded for its CLI session is alive. A session
+/// the directory no longer holds, one with no liveness record, or any
+/// unreadable fact is not proven dead, so a caller keeps whatever it guards.
+pub fn session_proven_dead(root: &Path, id: &str, judge: Judge) -> bool {
+    let Ok(Scan { rows, .. }) = scan(root, judge) else {
+        return false;
+    };
+    rows.iter().any(|row| {
+        row.entry.id == id
+            && row.verdict == Verdict::Dead
+            && !row
+                .entry
+                .ids
+                .as_ref()
+                .and_then(|ids| ids.cli_session.as_ref())
+                .and_then(|cli| {
+                    Some(Record {
+                        pid: Some(ProcId(cli.pid?)),
+                        start_time: cli.start_time.clone(),
+                        ..Record::default()
+                    })
+                })
+                .is_some_and(|record| judge(&record) != Verdict::Dead)
+    })
+}
+
 /// The one entry file named after `handle`, judged; `None` when it is missing
 /// or this build cannot read it (another format version, or not ours).
 fn read_named(root: &Path, handle: &str, judge: Judge) -> Option<Row> {

@@ -466,11 +466,13 @@ fn kept_text(kept: &Kept) -> String {
 /// Recovers every interrupted Land, ScopedCommit and remote transfer of the repository `cwd` sits in, under each
 /// kind's own locks. A chain that was attempted is recovered only by the writer that started it, so the caller's
 /// writer is asked for the main checkout's `.fgos` directory, once, and only when something is pending. Nothing is
-/// merged, re-published or deleted.
+/// merged, re-published or deleted. `writer_is_dead` is the caller's positive proof that a writer session is gone
+/// and nothing live holds it; a writer it cannot prove dead (unknown included) keeps its chains.
 pub fn recover_git_operations(
     state_root: &Path,
     cwd: &Path,
     writer_for: &dyn Fn(&Path) -> String,
+    writer_is_dead: &dyn Fn(&str) -> bool,
 ) -> Result<GitRecovered, FactError> {
     let main = main_checkout_of(cwd);
     let Some((driver, repo)) = open(state_root, cwd, &main)? else {
@@ -509,17 +511,20 @@ pub fn recover_git_operations(
             }
         }
     }
-    let freed = free_own_retained_land(&driver, &repo, &own_writer, &mut kept)?;
+    let freed = free_retained_land(&driver, &repo, &own_writer, writer_is_dead, &mut kept)?;
     Ok(recovered(settled, freed, kept, merge_head(&driver, &repo)))
 }
 
 /// Releases the candidate worktree and pins of every finished Land chain the caller's writer started, the same
-/// acknowledgement a land's own consumer gives. A chain of another writer is named with its writer and left alone;
-/// a chain still pending never appears in the listing.
-fn free_own_retained_land(
+/// acknowledgement a land's own consumer gives; a chain whose checkout still reconciles loses its worktree and keeps
+/// its pins. A finished chain of another writer loses only its worktree, and only when `writer_is_dead` proves that
+/// writer gone; otherwise it is named with its writer and left alone. A chain still pending never appears in the
+/// listing.
+fn free_retained_land(
     driver: &GitDriver,
     repo: &RepoHandle,
     own_writer: &dyn Fn() -> String,
+    writer_is_dead: &dyn Fn(&str) -> bool,
     kept: &mut Vec<Kept>,
 ) -> Result<Vec<String>, FactError> {
     let listing = driver.list_retained_land(repo, SCAN_BOUND)?;
@@ -528,21 +533,29 @@ fn free_own_retained_land(
         let id = candidate["operationId"].as_str().unwrap_or_default();
         let owner = candidate["writer"].as_str().unwrap_or_default();
         let writer = own_writer();
-        if owner != writer {
-            kept.push(Kept {
-                operation_id: id.to_owned(),
-                cause: "land-authority-mismatch".to_owned(),
-                writer: Some(owner.to_owned()),
-            });
+        let own = owner == writer;
+        if !own && candidate["worktreePresent"] != true {
             continue;
         }
-        match driver.acknowledge_land(
-            repo,
-            &writer,
-            id,
-            "git-recover-retained",
-            &wal::OsFileSystem,
-        ) {
+        let result = if own {
+            driver.acknowledge_land(
+                repo,
+                &writer,
+                id,
+                "git-recover-retained",
+                &wal::OsFileSystem,
+            )
+        } else {
+            driver.release_dead_writer_land(
+                repo,
+                &writer,
+                id,
+                "git-recover-retained",
+                writer_is_dead,
+                &wal::OsFileSystem,
+            )
+        };
+        match result {
             Ok(deferred) if deferred.is_empty() => freed.push(id.to_owned()),
             Ok(deferred) => kept.push(Kept {
                 operation_id: id.to_owned(),
@@ -552,7 +565,7 @@ fn free_own_retained_land(
             Err(error) => kept.push(Kept {
                 operation_id: id.to_owned(),
                 cause: error.cause,
-                writer: None,
+                writer: (!own).then(|| owner.to_owned()),
             }),
         }
     }
