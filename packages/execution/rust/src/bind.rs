@@ -481,6 +481,32 @@ fn identity_of(binding: &Value) -> Value {
     Value::Object(out)
 }
 
+/// A bypass invocation never asks before acting, so only the launch of a head session may be bound to one: a
+/// capability, role or persona pin of it for a worker seat is refused. Every seat bind that is not a head launch
+/// applies it to the binding [`bind`] answered (the engine's bind facade and `decide`'s Work seat alike).
+pub fn bypass_outside_head_refusal(binding: &Value, runner: &Value) -> Option<Value> {
+    if binding.get("refused").is_some() {
+        return None;
+    }
+    let executor = truthy_text(binding, "executor")?;
+    let invocation = truthy_text(binding, "invocation")?;
+    let found = runner
+        .get("executors")
+        .and_then(|all| all.get(executor))
+        .and_then(|entry| entry.get("invocations"))
+        .and_then(Value::as_array)?
+        .iter()
+        .find(|i| str_of(i, "id") == Some(invocation))?;
+    if str_of(found, "permissionMode") != Some("bypass") {
+        return None;
+    }
+    Some(json!({
+        "reason": "bypass-invocation-not-allowed",
+        "detail": format!("invocation \"{executor}/{invocation}\" never asks before acting and is only for a head session's launch, not a worker seat"),
+        "fix": "name it only under runner.personas.<persona>.prefer of a head persona",
+    }))
+}
+
 /// What names one candidate of a seat's walk: executor, invocation, pool, model and effort.
 pub fn binding_identity(binding: &Value) -> String {
     ["executor", "invocation", "pool", "model", "reasoningEffort"]

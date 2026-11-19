@@ -170,43 +170,6 @@ fn overlay_of(ctx: &BindContext<'_>, now: u64) -> Option<Value> {
     ctx.accounts.map(|source| source.overlay(now))
 }
 
-/// A bypass invocation never asks before acting, so only the launch of a head session may be bound to one; a
-/// capability, role or persona pin of it for a worker seat is refused, here, the one place every seat binding
-/// goes through.
-fn bypass_outside_head_refusal(binding: &Value, runner_config: &Value) -> Option<Value> {
-    if binding.get("refused").is_some() {
-        return None;
-    }
-    let executor = binding
-        .get("executor")
-        .and_then(Value::as_str)
-        .filter(|e| !e.is_empty())?;
-    let invocation = binding
-        .get("invocation")
-        .and_then(Value::as_str)
-        .filter(|i| !i.is_empty())?;
-    let found = runner_config
-        .pointer(&format!(
-            "/executors/{}/invocations",
-            json_pointer_escape(executor)
-        ))
-        .and_then(Value::as_array)?
-        .iter()
-        .find(|i| i.get("id").and_then(Value::as_str) == Some(invocation))?;
-    if found.get("permissionMode").and_then(Value::as_str) != Some("bypass") {
-        return None;
-    }
-    Some(json!({
-        "reason": "bypass-invocation-not-allowed",
-        "detail": format!("invocation \"{executor}/{invocation}\" never asks before acting and is only for a head session's launch, not a worker seat"),
-        "fix": "name it only under runner.personas.<persona>.prefer of a head persona",
-    }))
-}
-
-fn json_pointer_escape(key: &str) -> String {
-    key.replace('~', "~0").replace('/', "~1")
-}
-
 /// The binding of one seat (one in-process call), or `{ refused: { reason, detail } }`; execution admission
 /// belongs to the calling door. `walk` says where the seat stands after a failure; `head_launch` is set by the
 /// head start alone.
@@ -239,7 +202,7 @@ fn bind_model(
     let refusal = if head_launch {
         None
     } else {
-        bypass_outside_head_refusal(&binding, ctx.runner_config)
+        bind::bypass_outside_head_refusal(&binding, ctx.runner_config)
     };
     Ok(match refusal {
         Some(refused) => json!({ "refused": refused }),

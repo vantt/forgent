@@ -13,7 +13,7 @@
 //! Ports: the tools are probed through [`ToolProbe`], Seat Binding through [`SeatBinder`], and the repository and
 //! config facts the config root rule reads through [`Workspace`]. The crate stays pure.
 
-use crate::bind::{bind, BindRequest, BindSession};
+use crate::bind::{bind, bypass_outside_head_refusal, BindRequest, BindSession};
 use crate::dispatch_policy::effective_dispatch_policy;
 use crate::executor_config::resolve_executor_config;
 use crate::executor_model::{
@@ -193,7 +193,8 @@ pub trait SeatBinder {
 }
 
 /// The Work seat through the crate's own [`crate::bind::bind`], from the config alone (no lease state is read,
-/// as `bindWorkSeat` reads none): the adapter the host gives `decide`.
+/// as `bindWorkSeat` reads none), a bypass invocation refused as for every worker seat: the adapter the host
+/// gives `decide`.
 pub struct CrateBinder<'a> {
     pub machine: &'a dyn Machine,
     /// Epoch milliseconds.
@@ -229,6 +230,10 @@ impl SeatBinder for CrateBinder<'_> {
             self.now,
         )
         .map_err(BindFailure::Failed)?;
+        let bound = match bypass_outside_head_refusal(&bound, runner) {
+            Some(refused) => json!({ "refused": refused }),
+            None => bound,
+        };
         if let Some(refused) = bound.get("refused") {
             let text = |key: &str| {
                 refused
