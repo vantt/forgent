@@ -1124,11 +1124,11 @@ mod run_loop_vectors {
 
 #[cfg(target_os = "linux")]
 mod run_loop {
-    use std::cell::RefCell;
     use std::fs;
     use std::path::{Path, PathBuf};
     use std::process::Command;
     use std::sync::atomic::{AtomicU64, Ordering};
+    use std::sync::Mutex;
     use std::time::Duration;
 
     use fgos_execution::admission::{Admission, CaseAdmission, Recheck, Refusal};
@@ -1215,7 +1215,7 @@ mod run_loop {
         binding: Value,
         admit: Admission,
         recheck: Recheck,
-        settles: RefCell<Vec<Value>>,
+        settles: Mutex<Vec<Value>>,
     }
 
     impl Port {
@@ -1224,7 +1224,7 @@ mod run_loop {
                 binding: json!({ "answer": "unbound" }),
                 admit: Admission::Refused(refusal("unused")),
                 recheck: Recheck::Ok,
-                settles: RefCell::default(),
+                settles: Mutex::default(),
             }
         }
     }
@@ -1249,7 +1249,7 @@ mod run_loop {
             Ok(self.recheck.clone())
         }
         fn settle(&self, _: &str, settle: &Value) -> Result<(), Self::Error> {
-            self.settles.borrow_mut().push(settle.clone());
+            self.settles.lock().unwrap().push(settle.clone());
             Ok(())
         }
         fn activity_unit_of(
@@ -1276,7 +1276,7 @@ mod run_loop {
         }
     }
 
-    type Agent = dyn Fn(&SeatDispatch<'_>) -> Value;
+    type Agent = dyn Fn(&SeatDispatch<'_>) -> Value + Send + Sync;
 
     /// The machine around the run: a repository, a port, an effective loop and the agent each seat stands for.
     struct Host<'a, A: CaseAdmission> {
@@ -1285,8 +1285,8 @@ mod run_loop {
         effective: Value,
         cfg: Value,
         agent: Box<Agent>,
-        dispatched: RefCell<Vec<String>>,
-        created: RefCell<Vec<String>>,
+        dispatched: Mutex<Vec<String>>,
+        created: Mutex<Vec<String>>,
     }
 
     fn passed(changed: &[&str]) -> Value {
@@ -1311,8 +1311,8 @@ mod run_loop {
                 effective,
                 cfg,
                 agent,
-                dispatched: RefCell::default(),
-                created: RefCell::default(),
+                dispatched: Mutex::default(),
+                created: Mutex::default(),
             }
         }
 
@@ -1327,7 +1327,7 @@ mod run_loop {
             self.port.as_ref()
         }
         fn on_unit_run_created(&self, id: &str) {
-            self.created.borrow_mut().push(id.into());
+            self.created.lock().unwrap().push(id.into());
         }
         fn on_case_admitted(&self, _: &str, _: &str) {}
         fn git_roots(&self, _: &Path, _: bool) -> Result<GitRoots, String> {
@@ -1466,7 +1466,8 @@ mod run_loop {
         }
         fn dispatch_seat(&self, seat: &SeatDispatch<'_>) -> Result<Value, RunUnitError> {
             self.dispatched
-                .borrow_mut()
+                .lock()
+                .unwrap()
                 .push(seat.assignment_id.to_string());
             Ok((self.agent)(seat))
         }
@@ -1541,6 +1542,12 @@ mod run_loop {
         passed(&["b.txt", "stray.txt"])
     }
 
+    fn producer_writes_only_b(seat: &SeatDispatch<'_>) -> Value {
+        let tree = PathBuf::from(seat.unit_record["worktree"].as_str().unwrap());
+        fs::write(tree.join("b.txt"), "b\n").unwrap();
+        passed(&["b.txt"])
+    }
+
     #[test]
     fn a_solo_read_only_run_passes_and_settles_its_record() {
         let repo = Repo::new();
@@ -1556,7 +1563,7 @@ mod run_loop {
         assert_eq!(result["started"], json!({ "value": true, "reason": null }));
         assert_eq!(result["settled"], json!({ "unit": true, "case": null }));
         assert_eq!(
-            *host.created.borrow(),
+            *host.created.lock().unwrap(),
             vec![result["unitRunId"].as_str().unwrap().to_string()]
         );
         let record = record_of(&repo, &result);
@@ -1621,7 +1628,7 @@ mod run_loop {
             "the stray file is reported, never committed"
         );
         assert_eq!(
-            *host.dispatched.borrow(),
+            *host.dispatched.lock().unwrap(),
             vec![
                 format!("{}/producer/1", result["unitRunId"].as_str().unwrap()),
                 format!("{}/reviewer/1", result["unitRunId"].as_str().unwrap()),
@@ -1636,10 +1643,59 @@ mod run_loop {
         assert_eq!(record["settlement"]["verify"]["ran"], json!(true));
         assert_eq!(record["gitWriter"], "fixture");
         assert_eq!(
-            host.port.as_ref().unwrap().settles.borrow().len(),
+            host.port.as_ref().unwrap().settles.lock().unwrap().len(),
             0,
             "a standalone run holds no reservation"
         );
+    }
+
+    #[test]
+    fn the_checkers_of_one_round_run_at_the_same_time_and_answer_in_order() {
+        use std::sync::{Arc, Condvar};
+        let repo = Repo::new();
+        // Each checker waits until the other one has started: run one after the other, neither would see two.
+        let met: Arc<(Mutex<usize>, Condvar)> = Arc::default();
+        let seen = met.clone();
+        let agent = move |seat: &SeatDispatch<'_>| -> Value {
+            if !seat.read_only {
+                return producer_writes_only_b(seat);
+            }
+            let (count, cv) = &*seen;
+            let mut n = count.lock().unwrap();
+            *n += 1;
+            cv.notify_all();
+            let (n, _) = cv
+                .wait_timeout_while(n, Duration::from_secs(10), |n| *n < 2)
+                .unwrap();
+            assert!(*n >= 2, "seat {} ran alone", seat.assignment_id);
+            assert_eq!(
+                seat.batch_size,
+                Some(2),
+                "a seat of a group of two is told its group"
+            );
+            passed(&[])
+        };
+        let mut host = Host::new(
+            &repo,
+            Some(Port::free()),
+            json!({ "loop": "reviewed", "params": { "maxRounds": 1 } }),
+            Box::new(agent),
+        );
+        host.cfg["capabilities"]["code:implement"]["rigor"] = json!("high");
+        let result = run_unit(&host.options(writing_unit()), &host).unwrap();
+        assert_eq!(result["outcome"], "pass", "{result:#}");
+        let seats: Vec<&str> = result["results"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|r| r["seat"].as_str().unwrap())
+            .collect();
+        assert_eq!(
+            seats,
+            ["producer", "reviewer", "red-team", "verify"],
+            "answers come back in command order"
+        );
+        assert_eq!(*met.0.lock().unwrap(), 2);
     }
 
     #[test]
@@ -1671,7 +1727,7 @@ mod run_loop {
             error,
             "the tag crosses the run-unit result"
         );
-        assert!(host.created.borrow().is_empty());
+        assert!(host.created.lock().unwrap().is_empty());
         assert!(!repo.main.join(".fgos/assignments").exists());
     }
 
@@ -1748,7 +1804,7 @@ mod run_loop {
             before,
             "nothing was committed"
         );
-        let settles = host.port.as_ref().unwrap().settles.borrow();
+        let settles = host.port.as_ref().unwrap().settles.lock().unwrap();
         assert_eq!(settles.len(), 1, "the reservation is settled once");
         assert_eq!(settles[0]["outcome"], "policy-refusal");
         assert_eq!(
@@ -1800,7 +1856,7 @@ mod run_loop {
             before,
             "nothing was committed"
         );
-        let unit_run = host.created.borrow()[0].clone();
+        let unit_run = host.created.lock().unwrap()[0].clone();
         let record: Value = serde_json::from_slice(
             &fs::read(
                 repo.main
@@ -1815,5 +1871,427 @@ mod run_loop {
         assert_eq!(record["settlement"]["infrastructureReason"], "run-error");
         assert!(record["bindings"]["producer/1"][0].get("commit").is_none());
         peer.join().unwrap();
+    }
+}
+
+// ---- whole runUnit calls recorded from Node, replayed through run_unit -------------------------------------------
+
+mod run_unit_runs {
+    use std::fs;
+    use std::path::{Path, PathBuf};
+    use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+    use std::sync::Mutex;
+
+    use fgos_execution::admission::{Admission, CaseAdmission, Recheck, Refusal};
+    use fgos_execution_engine::accounts::rotation::Rotation;
+    use fgos_execution_engine::unit_run::host::*;
+    use fgos_execution_engine::unit_run::run::run_unit;
+    use fgos_execution_engine::unit_run::run_unit_contract::{ErrorTag, RunUnitError};
+    use fgos_execution_engine::unit_run::verify::Verified;
+    use fgos_git::{GitDriver, RepoHandle};
+    use fgos_holder_lock::Handle;
+    use serde_json::{json, Map, Value};
+
+    static SERIAL: AtomicU64 = AtomicU64::new(0);
+
+    /// The port Node's run was given: its answers as recorded, every call kept as `{ op, args }`.
+    struct Port {
+        answers: Value,
+        calls: Mutex<Vec<Value>>,
+    }
+
+    impl CaseAdmission for Port {
+        type Error = std::io::Error;
+        fn resolve_binding(&self, ask: &Value) -> Result<Value, Self::Error> {
+            self.calls
+                .lock()
+                .unwrap()
+                .push(json!({ "op": "resolveBinding", "args": [ask] }));
+            Ok(self
+                .answers
+                .get("binding")
+                .cloned()
+                .unwrap_or(json!({ "answer": "unbound" })))
+        }
+        fn admit(&self, proposal: &Value) -> Result<Admission, Self::Error> {
+            self.calls
+                .lock()
+                .unwrap()
+                .push(json!({ "op": "admit", "args": [proposal] }));
+            let a = &self.answers["admit"];
+            Ok(match a.get("refused") {
+                Some(r) => Admission::Refused(Refusal {
+                    code: r["code"].as_str().unwrap().into(),
+                    condition: r["condition"].as_str().unwrap().into(),
+                    violations: None,
+                }),
+                None => Admission::Admitted {
+                    reservation_id: a["reservationId"].as_str().unwrap().into(),
+                    case_id: a["caseId"].as_str().unwrap().into(),
+                    seat_launch_ceiling: a["seatLaunchCeiling"].as_u64(),
+                },
+            })
+        }
+        fn recheck_effect(
+            &self,
+            reservation: &str,
+            case: &str,
+            paths: &[String],
+        ) -> Result<Recheck, Self::Error> {
+            self.calls.lock().unwrap().push(json!({ "op": "recheckEffect", "args": [reservation, { "caseId": case, "paths": paths }] }));
+            Ok(Recheck::Ok)
+        }
+        fn settle(&self, reservation: &str, settle: &Value) -> Result<(), Self::Error> {
+            self.calls
+                .lock()
+                .unwrap()
+                .push(json!({ "op": "settle", "args": [reservation, settle] }));
+            Ok(())
+        }
+        fn activity_unit_of(
+            &self,
+            _: &str,
+            _: &str,
+            _: &str,
+        ) -> Result<Option<Value>, Self::Error> {
+            Ok(None)
+        }
+        fn confined_write_refusal(
+            &self,
+            _: &str,
+            _: Option<&str>,
+        ) -> Result<Option<String>, Self::Error> {
+            Ok(None)
+        }
+    }
+
+    struct NoControl;
+    impl UnitControl for NoControl {
+        fn release(&mut self) -> Result<(), String> {
+            Ok(())
+        }
+    }
+
+    /// The machine around a replayed run: what Node's own doors answered for this case.
+    struct Replay {
+        root: PathBuf,
+        host: Value,
+        port: Option<Port>,
+        binds: AtomicUsize,
+    }
+
+    fn error_of(error: &Value) -> RunUnitError {
+        let tag = ErrorTag::parse(error["name"].as_str().unwrap()).unwrap_or(ErrorTag::Error);
+        let mut e = RunUnitError::config(
+            error["message"].as_str().unwrap(),
+            error["code"].as_str(),
+            error["phase"].as_str(),
+        );
+        e.tag = tag;
+        e
+    }
+
+    impl UnitRunHost for Replay {
+        type Admission = Port;
+        fn admission(&self) -> Option<&Port> {
+            self.port.as_ref()
+        }
+        fn on_unit_run_created(&self, _: &str) {}
+        fn on_case_admitted(&self, _: &str, _: &str) {}
+        fn git_roots(&self, _: &Path, _: bool) -> Result<GitRoots, String> {
+            Ok(GitRoots {
+                worktree_root: self.root.join("tree"),
+                main_checkout_root: self.root.join("repo"),
+                is_linked_worktree: true,
+                not_a_repository: false,
+            })
+        }
+        fn fgos_dir(&self, main: &Path) -> PathBuf {
+            main.join(".fgos")
+        }
+        fn sweep_attempts(&self, _: &Path) {}
+        fn load_runner_config(&self, _: &Path) -> Result<Value, RunUnitError> {
+            match self.host.get("configError").filter(|e| !e.is_null()) {
+                Some(error) => Err(error_of(error)),
+                None => Ok(json!({})),
+            }
+        }
+        fn herdr_present(&self) -> bool {
+            false
+        }
+        fn git_writer(&self) -> String {
+            "replay".into()
+        }
+        fn created_by(&self) -> String {
+            "replay".into()
+        }
+        fn shipped_catalog(&self) -> Value {
+            json!({})
+        }
+        fn git(&self, _: &Path, _: &Path) -> Result<(GitDriver, RepoHandle), String> {
+            Err("a replayed run never reaches git".into())
+        }
+        fn read_unit_source(&self, options: &Value) -> Result<Value, RunUnitError> {
+            Ok(options["unitData"].clone())
+        }
+        fn check_unit_file(&self, _: &Value) -> Result<(), RunUnitError> {
+            Ok(())
+        }
+        fn validate_unit(&self, _: &Value) -> Result<Value, RunUnitError> {
+            Ok(self.host["unit"].clone())
+        }
+        fn existing_plan_ref(&self, _: Option<&Value>, _: &Path) -> Result<(), RunUnitError> {
+            Ok(())
+        }
+        fn resolve_collaboration(&self, _: &Value) -> Result<Value, RunUnitError> {
+            Ok(self.host["collaboration"].clone())
+        }
+        fn declared_operation_fields(
+            &self,
+            _: &Value,
+            _: Option<&Path>,
+        ) -> Result<Value, RunUnitError> {
+            unreachable!()
+        }
+        fn is_main_checkout(&self, worktree: &Path) -> bool {
+            worktree == self.root.join("repo")
+        }
+        fn assert_run_timeout(&self, _: &Value) -> Result<(), RunUnitError> {
+            Ok(())
+        }
+        fn door_choices(
+            &self,
+            _: &Value,
+            _: &Value,
+            _: &Value,
+            _: &Value,
+        ) -> Result<(), RunUnitError> {
+            Ok(())
+        }
+        fn persona_pin(
+            &self,
+            _: &str,
+            _: &Path,
+            _: Option<&Value>,
+        ) -> Result<Option<Value>, RunUnitError> {
+            Ok(None)
+        }
+        fn resolve_inputs(&self, _: &Value, _: &Path, _: &Value) -> Result<Value, RunUnitError> {
+            Ok(json!({ "refs": [], "inputMap": [] }))
+        }
+        fn expand_generated(&self, writes: &Value, _: &Value) -> Value {
+            writes.clone()
+        }
+        fn acquire_unit_control(
+            &self,
+            _: &Path,
+            _: &str,
+        ) -> Result<Box<dyn UnitControl>, ControlHeld> {
+            Ok(Box::new(NoControl))
+        }
+        fn is_seat_record(&self, _: &Value) -> bool {
+            true
+        }
+        fn collaboration_of_record(&self, _: &Value) -> Result<(Value, Value), RunUnitError> {
+            unreachable!()
+        }
+        fn adopt_state(&self, _: &Path) -> String {
+            "closed".into()
+        }
+        fn current_attempt(&self, _: &Path, _: &str) -> Option<AttemptRef> {
+            None
+        }
+        fn pinned_accounts_usable(
+            &self,
+            _: &[Value],
+            _: &Value,
+            _: &str,
+        ) -> Result<(), RunUnitError> {
+            Ok(())
+        }
+        fn bind(
+            &self,
+            _: &Value,
+            _: &Value,
+            _: &Value,
+            _: &Value,
+            _: &Value,
+        ) -> Result<Value, RunUnitError> {
+            let at = self.binds.fetch_add(1, Ordering::Relaxed);
+            Ok(self.host["bind"][at].clone())
+        }
+        fn runner_config_for_binding(&self, runner: &Value, _: &Value) -> Value {
+            runner.clone()
+        }
+        fn dispatch_seat(&self, _: &SeatDispatch<'_>) -> Result<Value, RunUnitError> {
+            unreachable!("every recorded run stops before a dispatch")
+        }
+        fn account_rotation(&self, _: &Value, _: &str) -> Option<Rotation> {
+            None
+        }
+        fn audit_lease_receipt(&self, _: Option<&Value>, _: &str) -> Option<String> {
+            None
+        }
+        fn drop_assignment_record(&self, _: &str) {}
+        fn admission_generations(&self, _: &Path) -> Vec<Value> {
+            Vec::new()
+        }
+        fn report_digest(&self, _: &Value, _: &Path) -> Value {
+            Value::Null
+        }
+        fn verify(&self, _: &str, _: &Path, _: Option<u64>, _: Option<&Handle>) -> Verified {
+            unreachable!()
+        }
+        fn publish_unit_summary(&self, _: &Path) -> Result<(), String> {
+            Ok(())
+        }
+    }
+
+    fn is_time(s: &str) -> bool {
+        let b = s.as_bytes();
+        b.len() >= 20
+            && b[4] == b'-'
+            && b[10] == b'T'
+            && s.ends_with('Z')
+            && b[..4].iter().all(u8::is_ascii_digit)
+    }
+
+    /// The recorder's placeholders, written the same way on this side.
+    fn normalize(value: &Value, root: &str, unit_run_id: Option<&str>, key: Option<&str>) -> Value {
+        match value {
+            Value::String(s) if key == Some("createdBy") => {
+                let _ = s;
+                json!("<USER>")
+            }
+            Value::String(s) if is_time(s) => json!("<TIME>"),
+            Value::String(s) => {
+                let mut out = s.replace(root, "<ROOT>");
+                if let Some(id) = unit_run_id {
+                    out = out.replace(id, "<UNIT_RUN_ID>");
+                }
+                json!(out)
+            }
+            Value::Array(a) => Value::Array(
+                a.iter()
+                    .map(|v| normalize(v, root, unit_run_id, None))
+                    .collect(),
+            ),
+            Value::Object(o) => Value::Object(
+                o.iter()
+                    .map(|(k, v)| (k.clone(), normalize(v, root, unit_run_id, Some(k))))
+                    .collect(),
+            ),
+            other => other.clone(),
+        }
+    }
+
+    fn placeholders(value: &Value, root: &str) -> Value {
+        match value {
+            Value::String(s) => json!(s.replace("<ROOT>", root)),
+            Value::Array(a) => Value::Array(a.iter().map(|v| placeholders(v, root)).collect()),
+            Value::Object(o) => Value::Object(
+                o.iter()
+                    .map(|(k, v)| (k.clone(), placeholders(v, root)))
+                    .collect(),
+            ),
+            other => other.clone(),
+        }
+    }
+
+    /// A run-unit error in the recorder's shape.
+    fn recorded_error(e: &RunUnitError) -> Value {
+        let mut fields: Map<String, Value> = e.fields.clone();
+        let name = fields
+            .shift_remove("name")
+            .and_then(|n| n.as_str().map(str::to_string))
+            .unwrap_or_else(|| e.tag.as_str().into());
+        let mut out =
+            json!({ "name": name, "code": e.code, "phase": e.phase, "message": e.message });
+        if let Some(r) = &e.refusal {
+            out["refusal"] = r.clone();
+        }
+        if !fields.is_empty() {
+            out["fields"] = Value::Object(fields);
+        }
+        out
+    }
+
+    #[test]
+    fn whole_runs_recorded_from_node_replay_to_the_same_result_record_and_port_calls() {
+        let v = super::vectors("run-unit-runs.json");
+        for case in v["runs"].as_array().unwrap() {
+            let name = case["name"].as_str().unwrap();
+            let root = std::env::temp_dir().join(format!(
+                "fgos-p18-replay-{}-{}",
+                std::process::id(),
+                SERIAL.fetch_add(1, Ordering::Relaxed)
+            ));
+            fs::create_dir_all(root.join("repo")).unwrap();
+            fs::create_dir_all(root.join("tree")).unwrap();
+            let root_text = root.display().to_string();
+            let mut options = placeholders(&case["options"], &root_text);
+            let port_answers = options.as_object_mut().unwrap().shift_remove("port");
+            let host = Replay {
+                root: root.clone(),
+                host: case["host"].clone(),
+                port: port_answers.map(|answers| Port {
+                    answers,
+                    calls: Mutex::default(),
+                }),
+                binds: AtomicUsize::new(0),
+            };
+            let outcome = run_unit(&options, &host);
+            let unit_run_id = outcome
+                .as_ref()
+                .ok()
+                .and_then(|r| r["unitRunId"].as_str().map(str::to_string))
+                .or_else(|| {
+                    host.port.as_ref().and_then(|p| {
+                        p.calls
+                            .lock()
+                            .unwrap()
+                            .iter()
+                            .find(|c| c["op"] == "admit")
+                            .and_then(|c| c["args"][0]["unitRunId"].as_str().map(str::to_string))
+                    })
+                });
+            let got = match &outcome {
+                Ok(result) => json!({ "ok": result }),
+                Err(e) => json!({ "error": recorded_error(e) }),
+            };
+            let id = unit_run_id.as_deref();
+            // Compared as text: the order of keys is part of what Node wrote.
+            let text = |v: &Value| serde_json::to_string_pretty(v).unwrap();
+            assert_eq!(
+                text(&normalize(&got, &root_text, id, None)),
+                text(&case["outcome"]),
+                "{name}: outcome"
+            );
+            let record = id
+                .map(|id| {
+                    root.join("repo/.fgos/assignments")
+                        .join(id)
+                        .join("unit.json")
+                })
+                .filter(|f| f.exists())
+                .map(|f| serde_json::from_slice::<Value>(&fs::read(f).unwrap()).unwrap())
+                .unwrap_or(Value::Null);
+            assert_eq!(
+                text(&normalize(&record, &root_text, id, None)),
+                text(&case["record"]),
+                "{name}: unit.json"
+            );
+            let calls = host
+                .port
+                .as_ref()
+                .map(|p| json!(*p.calls.lock().unwrap()))
+                .unwrap_or(json!([]));
+            assert_eq!(
+                text(&normalize(&calls, &root_text, id, None)),
+                text(&case["calls"]),
+                "{name}: port calls"
+            );
+            let _ = fs::remove_dir_all(&root);
+        }
     }
 }

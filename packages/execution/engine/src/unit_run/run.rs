@@ -10,15 +10,17 @@
 //! What it writes: `unit.json` (through the durable-file door, Node's bytes) and nothing else of its own; every
 //! other file is the door's that owns it.
 
-use std::path::{Path, PathBuf};
-use std::time::Instant;
+use std::cell::OnceCell;
+use std::path::PathBuf;
+use std::sync::{Mutex, MutexGuard, PoisonError};
+use std::time::{Duration, Instant};
 
 use fgos_execution::admission::{
     brief_never_reached, no_brief_delivered, normalize_case_ref, seat_launches_used,
     unit_run_settle, CaseAdmission, Recheck, UnitFacts, SEAT_LAUNCH_CEILING,
 };
 use fgos_execution::loops::{
-    loop_runs_verify, verify_command_of, Command, LoopInput, LoopRun, RoleCall, Step,
+    loop_runs_verify, verify_command_of, Command, LoopInput, LoopResult, LoopRun, RoleCall, Step,
 };
 use fgos_execution::outcome::{
     evaluations_of, infrastructure, is_infrastructure, outcome_after_scope_rule, rebinds_on_resume,
@@ -101,7 +103,7 @@ fn warn_unit(scope: &mut RunScope, code: &str, message: String) {
 
 /// Run one unit headless and return its result as the `run-unit` result document: `{ ok: true, result }`, or an
 /// error with its type tag.
-pub fn run_unit_result<H: UnitRunHost>(options: &Value, host: &H) -> Value {
+pub fn run_unit_result<H: UnitRunHost + Sync>(options: &Value, host: &H) -> Value {
     match run_unit(options, host) {
         Ok(result) => ok_result(result),
         Err(error) => error.to_json(),
@@ -109,7 +111,7 @@ pub fn run_unit_result<H: UnitRunHost>(options: &Value, host: &H) -> Value {
 }
 
 /// Run one unit headless: the one execution door. `options` are the `run-unit` request options.
-pub fn run_unit<H: UnitRunHost>(options: &Value, host: &H) -> Res<Value> {
+pub fn run_unit<H: UnitRunHost + Sync>(options: &Value, host: &H) -> Res<Value> {
     assert_not_cancelled(host)?;
     let mut scope = RunScope::default();
     let outcome = run_unit_body(options, host, &mut scope);
@@ -239,7 +241,11 @@ fn settle_admission<H: UnitRunHost>(
     }
 }
 
-fn run_unit_body<H: UnitRunHost>(options: &Value, host: &H, scope: &mut RunScope) -> Res<Value> {
+fn run_unit_body<H: UnitRunHost + Sync>(
+    options: &Value,
+    host: &H,
+    scope: &mut RunScope,
+) -> Res<Value> {
     if options.get("resumeUnitRunId").is_some_and(|v| !v.is_null())
         && options.get("stanceOptions").is_some()
     {
@@ -264,10 +270,6 @@ fn run_unit_body<H: UnitRunHost>(options: &Value, host: &H, scope: &mut RunScope
     }
     let roots = roots?;
     let main_root = main_root.unwrap_or_else(|| roots.main_checkout_root.clone());
-    let live_config = match options.get("runnerConfig").filter(|c| !c.is_null()) {
-        Some(c) => c.clone(),
-        None => host.load_runner_config(&main_root)?,
-    };
     let case_ref = normalize_case_ref(options.get("caseRef")).map_err(|e| config(e.to_string()))?;
     let fgos_dir = host.fgos_dir(&main_root);
     let base = StartBase {
@@ -279,7 +281,7 @@ fn run_unit_body<H: UnitRunHost>(options: &Value, host: &H, scope: &mut RunScope
         fgos_dir,
         main_root,
         case_ref,
-        live_config: &live_config,
+        live: OnceCell::new(),
         not_a_repository: roots.not_a_repository,
         cwd,
     };
@@ -289,21 +291,52 @@ fn run_unit_body<H: UnitRunHost>(options: &Value, host: &H, scope: &mut RunScope
     } else {
         admit_fresh_unit(host, &base, scope)?
     };
-    let mut ctx = match Ctx::open(host, &base, scope, started, resuming) {
-        Ok(ctx) => ctx,
-        Err((error, custody)) => {
-            scope.custody = custody;
-            return Err(error);
-        }
-    };
-    let outcome = ctx.seat_state().and_then(|()| ctx.run_collaboration(scope));
+    // The custody of a writing run is held here, outside the run's shared state, so seats that run together
+    // borrow it while the record is locked by one of them at a time.
+    let custody = scope.custody.take();
+    let outcome = run_started(host, &base, scope, started, resuming, custody.as_ref());
+    scope.custody = custody;
+    outcome
+}
+
+/// What the seats of one run share: the run's record and its scope, one holder at a time.
+struct State<'h, 'c, H: UnitRunHost> {
+    ctx: Ctx<'h, 'c, H>,
+    scope: RunScope,
+}
+
+type Shared<'h, 'c, H> = Mutex<State<'h, 'c, H>>;
+
+fn lock<T>(shared: &Mutex<T>) -> MutexGuard<'_, T> {
+    shared.lock().unwrap_or_else(PoisonError::into_inner)
+}
+
+fn run_started<'h, H: UnitRunHost + Sync>(
+    host: &'h H,
+    base: &StartBase<'h>,
+    scope: &mut RunScope,
+    started: Started,
+    resuming: bool,
+    custody: Option<&Handle>,
+) -> Res<Value> {
+    let ctx = Ctx::open(host, base, scope, started, resuming, custody)?;
+    let shared = Mutex::new(State {
+        ctx,
+        scope: std::mem::take(scope),
+    });
+    let seated = lock(&shared).ctx.seat_state();
+    let outcome = seated.and_then(|()| run_collaboration(&shared, host));
+    let State {
+        mut ctx,
+        scope: mut inner,
+    } = shared.into_inner().unwrap_or_else(PoisonError::into_inner);
     let outcome = match outcome {
         Ok(result) => Ok(result),
         Err(error) => {
             // A cancelled run is not a failed one. A settlement that cannot be recorded is told beside the error.
             if !ctx.settled && error.error_class != RUN_CANCELLED {
                 let failed = json!({ "outcome": "execution-failure", "infrastructure": true, "infrastructureReason": "run-error", "refused": [] });
-                if let Err(settle_error) = ctx.settle_unit_run(scope, &failed, None) {
+                if let Err(settle_error) = ctx.settle_unit_run(&mut inner, &failed, None) {
                     eprintln!(
                         "fgos: could not record the failed settlement of unit run \"{}\": {}",
                         ctx.unit_run_id, settle_error.message
@@ -313,7 +346,7 @@ fn run_unit_body<H: UnitRunHost>(options: &Value, host: &H, scope: &mut RunScope
             Err(error)
         }
     };
-    scope.custody = ctx.custody.take();
+    *scope = inner;
     outcome
 }
 
@@ -376,10 +409,11 @@ fn attempt_suffix(round: u64, n: usize) -> String {
     }
 }
 
-struct Ctx<'h, H: UnitRunHost> {
+struct Ctx<'h, 'c, H: UnitRunHost> {
     host: &'h H,
     options: &'h Value,
-    live_config: Value,
+    /// The config read live, once (Node's `liveConfig`).
+    live: OnceCell<Value>,
     main_root: PathBuf,
     assignments_dir: PathBuf,
     unit_dir: PathBuf,
@@ -400,11 +434,11 @@ struct Ctx<'h, H: UnitRunHost> {
     verify_round: u64,
     verify_facts: Option<Value>,
     git: Option<(fgos_git::GitDriver, fgos_git::RepoHandle)>,
-    /// The unit's custody of its worktree, held from admission until the run ends (then handed back to the scope).
-    custody: Option<Handle>,
+    /// The unit's custody of its worktree, held from admission until the run ends.
+    custody: Option<&'c Handle>,
 }
 
-impl<'h, H: UnitRunHost> Ctx<'h, H> {
+impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
     /// The unit run marked running on disk, with what every later step of it reads.
     fn open(
         host: &'h H,
@@ -412,7 +446,8 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
         scope: &mut RunScope,
         started: Started,
         resuming: bool,
-    ) -> Result<Self, (RunUnitError, Option<Handle>)> {
+        custody: Option<&'c Handle>,
+    ) -> Res<Self> {
         let Started {
             unit,
             unit_run_id,
@@ -429,7 +464,7 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
         let mut ctx = Ctx {
             host,
             options: base.options,
-            live_config: base.live_config.clone(),
+            live: base.live.clone(),
             main_root: base.main_root.clone(),
             assignments_dir: base.assignments_dir.clone(),
             unit_dir,
@@ -454,12 +489,10 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
             verify_round: 0,
             verify_facts: None,
             git: None,
-            custody: scope.custody.take(),
+            custody,
         };
-        match ctx.prepare(scope, resuming) {
-            Ok(()) => Ok(ctx),
-            Err(e) => Err((e, ctx.custody.take())),
-        }
+        ctx.prepare(scope, resuming)?;
+        Ok(ctx)
     }
 
     fn prepare(&mut self, scope: &mut RunScope, resuming: bool) -> Res<()> {
@@ -526,7 +559,7 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
         self.open_git()?;
         let writer = self.writer();
         let (driver, repo) = self.git.as_ref().expect("opened");
-        let custody = if held { self.custody.as_ref() } else { None };
+        let custody = if held { self.custody } else { None };
         Ok(f(&UnitGit {
             driver,
             repo,
@@ -542,19 +575,20 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
             .unwrap_or_else(|| json!({}))
     }
 
-    fn with_accounts(&self, runner: &Value) -> Value {
-        let mut out = object(runner);
-        let source = self
-            .options
-            .get("runnerConfig")
-            .filter(|c| !c.is_null())
-            .unwrap_or(&self.live_config);
-        for key in ["llmAccounts", "providers"] {
-            if let Some(v) = source.get(key) {
-                out.insert(key.into(), v.clone());
-            }
+    fn with_accounts(&self, runner: &Value) -> Res<Value> {
+        super::start::with_accounts(self.host, self.options, &self.main_root, runner)
+    }
+
+    /// The config read live, read at first use.
+    fn live_config(&self) -> Res<Value> {
+        if let Some(cfg) = self.live.get() {
+            return Ok(cfg.clone());
         }
-        Value::Object(out)
+        let cfg = match self.options.get("runnerConfig").filter(|c| !c.is_null()) {
+            Some(c) => c.clone(),
+            None => self.host.load_runner_config(&self.main_root)?,
+        };
+        Ok(self.live.get_or_init(|| cfg).clone())
     }
 
     fn bindings_mut(&mut self) -> &mut Map<String, Value> {
@@ -1004,40 +1038,6 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
             .collect())
     }
 
-    /// The deterministic check a round ends with, bounded by `runner.timeoutMs`, under the Unit's custody.
-    fn verify_unit(&mut self) -> Res<Value> {
-        assert_not_cancelled(self.host)?;
-        let runner = self.snapshot_runner();
-        let Some(command) = verify_command_of(&self.unit, &runner) else {
-            return Ok(json!({ "pass": true }));
-        };
-        let verified = self.host.verify(
-            &command,
-            &self.worktree(),
-            runner.get("timeoutMs").and_then(Value::as_u64),
-            self.custody.as_ref(),
-        );
-        let outcome = match &verified.verdict {
-            Verdict::Pass => "pass",
-            Verdict::Findings => "findings",
-            Verdict::Infrastructure(why) => why,
-        };
-        self.verify_facts = Some(json!({
-            "command": command,
-            "outcome": outcome,
-            "exit": verified.status,
-            "passed": verified.verdict == Verdict::Pass,
-            "durationMs": verified.duration_ms,
-            "how": verified.how,
-            "outputDigest": verified.output_digest,
-        }));
-        Ok(answer_of_verify(
-            &verified,
-            "Verification command",
-            &command,
-        ))
-    }
-
     /// A unit with a syncBase merges it before any seat runs. A refusal, or a sync-only unit whose merge needed no
     /// worker, ends the run here (`Some`); a conflicted merge stays open for the producer.
     fn run_pending_sync(&mut self, scope: &mut RunScope) -> Res<Option<Value>> {
@@ -1118,7 +1118,9 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
         }
     }
 
-    fn run_collaboration(&mut self, scope: &mut RunScope) -> Res<Value> {
+    /// The record marked running and a pending sync merged; the end of the run when the sync ends it (`Err`), else
+    /// the effective loop and its input.
+    fn loop_start(&mut self, scope: &mut RunScope) -> Res<Result<(Value, LoopRun), Value>> {
         let effective = self
             .record
             .pointer("/collaboration/effective")
@@ -1126,6 +1128,8 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
             .cloned()
             .unwrap_or_else(|| json!({ "loop": text(self.record.get("pattern")).unwrap_or("solo"), "params": {} }));
         self.persist(scope)?;
+        // A unit with a syncBase merges it before any seat runs. A refusal, or a sync-only unit whose merge
+        // needed no worker, ends the run here; a conflicted merge stays open for the producer.
         if self.record.get("sync").is_some_and(truthy) {
             assert_not_cancelled(self.host)?;
             if let Some(early) = self.run_pending_sync(scope)? {
@@ -1138,14 +1142,16 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
                     .and_then(Value::as_array)
                     .cloned()
                     .unwrap_or_default();
-                return self.finish_unit(
-                    scope,
-                    text(early.get("outcome")).unwrap_or_default(),
-                    Some(json!(0)),
-                    results,
-                    Vec::new(),
-                    rest,
-                );
+                return self
+                    .finish_unit(
+                        scope,
+                        text(early.get("outcome")).unwrap_or_default(),
+                        Some(json!(0)),
+                        results,
+                        Vec::new(),
+                        rest,
+                    )
+                    .map(Err);
             }
         }
         let runner = self
@@ -1159,30 +1165,24 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
             .shipped_catalog()
             .pointer("/loops/reviewed/checkersByRigor")
             .cloned();
-        input.launch_room = self
-            .seat_launch_ceiling
-            .map(|c| c.saturating_sub(seat_launches_used(&self.record)));
-        let mut run = LoopRun::new(input)
-            .map_err(|e| RunUnitError::other("seat-resolution", e.to_string()))?;
-        let mut answers = None;
-        let pattern = loop {
-            match run
-                .step(answers.take())
-                .map_err(|e| RunUnitError::other("seat-resolution", e.to_string()))?
-            {
-                Step::Done(result) => break result,
-                Step::Dispatch(commands) => {
-                    let mut replies = Vec::with_capacity(commands.len());
-                    for command in commands {
-                        replies.push(match command {
-                            Command::Role(call) => self.run_role(scope, &call)?,
-                            Command::Verify { .. } => self.verify_unit()?,
-                        });
-                    }
-                    answers = Some(replies);
-                }
-            }
-        };
+        input.launch_room = self.launch_room();
+        let run = LoopRun::new(input).map_err(seat_resolution)?;
+        Ok(Ok((effective, run)))
+    }
+
+    /// How many more seat launches the admission's ceiling allows now (`hasLaunchRoom`), `None` without a ceiling.
+    fn launch_room(&self) -> Option<u64> {
+        self.seat_launch_ceiling
+            .map(|c| c.saturating_sub(seat_launches_used(&self.record)))
+    }
+
+    /// The end of a run whose pattern finished: the verify note, then the one settlement.
+    fn loop_end(
+        &mut self,
+        scope: &mut RunScope,
+        effective: &Value,
+        pattern: LoopResult,
+    ) -> Res<Value> {
         // A reviewed run with nothing to verify says so: a pass without a verify is not a verified pass.
         let loop_name = text(effective.get("loop"))
             .or_else(|| text(effective.get("pattern")))
@@ -1243,7 +1243,7 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
         });
         self.host.bind(
             &ask,
-            &self.with_accounts(&self.snapshot_runner()),
+            &self.with_accounts(&self.snapshot_runner())?,
             &role.session,
             &accounts,
             walk,
@@ -1339,10 +1339,11 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
         }
     }
 
-    /// One seat: bind it, then launch it; a provider limit or a dead credential is answered by
-    /// `answer_provider_limit`, each attempt on a fresh pane or process, the failed one left as it was.
-    fn run_role(&mut self, scope: &mut RunScope, call: &RoleCall) -> Res<Value> {
+    /// One seat up to its binding: seats started together bind in listed order, each seeing its earlier siblings.
+    fn prepare_role(&mut self, call: &RoleCall) -> Res<Job> {
         assert_not_cancelled(self.host)?;
+        // A seat id names a directory and a ref segment of this run; only Convention's ids reach a path.
+        assert_seat_id(call.seat.get("seat"))?;
         let seat_id = text(call.seat.get("seat")).unwrap_or_default().to_string();
         let round = call.round.unwrap_or(1);
         let unit = if call.unit.is_null() {
@@ -1375,7 +1376,7 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
             "headless".into(),
             session_text("headless").unwrap_or(json!(true)),
         );
-        let mut role = Role {
+        let role = Role {
             read_only: call.seat.pointer("/posture/readOnly") == Some(&json!(true)),
             key: format!("{seat_id}/{round}"),
             seat: call.seat.clone(),
@@ -1402,15 +1403,27 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
             }
             None => false,
         };
-        let mut n = if rebinding {
+        let n = if rebinding {
             recorded.len()
         } else {
             recorded.len().saturating_sub(1)
         };
-        let mut bound = self.bind_seat(&role, &recorded, rebinding, n)?;
+        let bound = self.bind_seat(&role, &recorded, rebinding, n)?;
         if let Some(refused) = bound.get("refused").filter(|r| truthy(r)) {
-            return Ok(role.refused(refused.clone()));
+            return Ok(Job::Done(role.refused(refused.clone())));
         }
+        Ok(Job::Role(Box::new(RoleRun {
+            role,
+            recorded,
+            rebinding,
+            n,
+            bound,
+        })))
+    }
+
+    /// A bound seat before its first launch: a resumed commit finished, the preflight of a writing seat.
+    fn role_setup(&mut self, scope: &mut RunScope, run: &mut RoleRun) -> Res<Result<Setup, Value>> {
+        let RoleRun { role, recorded, .. } = run;
         role.write_scope = effective_write_scope(&self.record);
         let mut native_baseline = recorded
             .first()
@@ -1418,21 +1431,23 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
             .filter(|b| truthy(b))
             .cloned();
         if !role.read_only && !recorded.is_empty() && native_baseline.is_none() {
-            return Ok(role.refused(json!({
+            return Ok(Err(role.refused(json!({
                 "reason": "native-baseline-missing",
                 "detail": "this writing attempt has no native pre-producer baseline; start a new Unit run",
-            })));
+            }))));
         }
         if !role.read_only && self.commit_pending(recorded.last())? {
-            return self.finish_pending_commit(scope, &role, native_baseline);
+            return self
+                .finish_pending_commit(scope, role, native_baseline)
+                .map(Err);
         }
         // Before a mutating producer is spawned: a foreign staged index refuses it, and files already dirty in scope
         // are recorded so the runner never commits them (a resumed attempt keeps what its first launch saw).
         let mut pre_existing: Vec<Value> = Vec::new();
         if !role.read_only {
-            let preflight = self.preflight(&role)?;
-            if let Some(refusal) = Self::preflight_refusal(&role, &preflight) {
-                return Ok(refusal);
+            let preflight = self.preflight(role)?;
+            if let Some(refusal) = Self::preflight_refusal(role, &preflight) {
+                return Ok(Err(refusal));
             }
             let Preflight::Clear {
                 baseline,
@@ -1449,117 +1464,107 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
                 .unwrap_or_else(|| pre_existing_in_scope.iter().map(|p| json!(p)).collect());
             native_baseline = native_baseline.or_else(|| serde_json::to_value(&baseline).ok());
         }
-        let mut last_result: Option<Value> = None;
-        loop {
-            self.bindings_mut()
-                .entry(role.key.clone())
-                .or_insert_with(|| json!([]));
-            if let Some(spent) =
-                self.launch_ceiling_spent(scope, &role, n, rebinding, last_result.as_ref(), &bound)
-            {
-                return Ok(spent);
-            }
-            let mut result = self.run_attempt(
-                scope,
-                &role,
-                n,
-                &bound,
-                &pre_existing,
-                native_baseline.as_ref(),
-            )?;
-            last_result = Some(result.clone());
-            let attempts = self.attempts(&role.key);
-            let outcome = text(result.get("outcome")).unwrap_or_default().to_string();
-            let brief_not_delivered = outcome != "provider-limit"
-                && outcome != "pass"
-                && attempts.get(n).and_then(|a| a.get("briefNotDelivered")) == Some(&json!(true));
-            if outcome != "provider-limit" && !brief_not_delivered {
-                return Ok(result);
-            }
-            let lease_conflict = is_lease_conflict(result.get("runResult"));
-            let (changed, rotation) = if lease_conflict {
-                (None, None)
-            } else {
-                let changed =
-                    self.writes_since_launch(attempts.get(n).and_then(|a| a.get("writeBaseline")));
-                let rotation = match text(bound.get("pool")).filter(|p| !p.is_empty()) {
-                    Some(pool) if !brief_not_delivered => self
-                        .host
-                        .account_rotation(&self.with_accounts(&self.snapshot_runner()), pool),
-                    _ => None,
-                };
-                (changed, rotation)
-            };
-            let answer = answer_provider_limit(&LimitAsk {
-                result: &result,
-                bound: &bound,
-                attempts: &attempts,
-                attempt_no: n,
-                brief_not_delivered,
-                rotation: rotation.as_ref(),
-                changed: changed.as_ref(),
-            });
-            if let Some(stop) = answer.get("stop") {
-                if let Some(refused) = stop.get("refused") {
-                    return Ok(role.refused(refused.clone()));
-                }
-                if let Some(retry) = stop.get("retryStopped") {
-                    self.attempt_mut(&role.key, n)["retryStopped"] = retry.clone();
-                    self.persist(scope)?;
-                }
-                if let (Some(object), Some(exhausted)) =
-                    (result.as_object_mut(), stop.get("fallbackExhausted"))
-                {
-                    object.insert("fallbackExhausted".into(), exhausted.clone());
-                }
-                return Ok(result);
-            }
-            if let Some(rebind) = answer.get("rebind") {
-                let rebound = self.bind_in_queue(&role, n + 1, rebind)?;
-                if let Some(refused) = rebound.get("refused").filter(|r| truthy(r)) {
-                    return Ok(role.refused(refused.clone()));
-                }
-                bound = rebound;
-                n += 1;
-                continue;
-            }
-            let walk = &answer["walk"];
-            if let Some(rotation) = walk.get("rotation") {
-                // The same candidate again: the lease picks the next account of its pool.
-                let again = self.bind_with(&role, n + 1, rotation)?;
-                if again.get("refused").is_none_or(|r| !truthy(r)) {
-                    bound = again;
-                    n += 1;
-                    continue;
-                }
-            }
-            if let Some(pool) = text(walk.get("faultPool")) {
-                if !self.fault_pools.iter().any(|p| p == pool) {
-                    self.fault_pools.push(pool.to_string());
-                }
-            }
-            let next = self.bind_in_queue(&role, n + 1, &walk["step"])?;
-            if let Some(refused) = next.get("refused").filter(|r| truthy(r)) {
-                let mut exhausted = Map::new();
-                exhausted.insert("from".into(), launched_from(&bound));
-                exhausted.insert(
-                    "reason".into(),
-                    refused.get("reason").cloned().unwrap_or(Value::Null),
-                );
-                if let Some(detail) = refused.get("detail") {
-                    exhausted.insert("detail".into(), detail.clone());
-                }
-                if let Some(r) = walk.get("accountRotations") {
-                    exhausted.insert("accountRotations".into(), r.clone());
-                }
-                if let Some(object) = result.as_object_mut() {
-                    object.insert("fallbackExhausted".into(), Value::Object(exhausted));
-                }
-                return Ok(result);
-            }
-            bound = next;
-            n += 1;
+        Ok(Ok(Setup {
+            pre_existing,
+            native_baseline,
+        }))
+    }
+
+    /// What the seat does after an attempt: its result, or the binding of its next attempt.
+    fn after_attempt(
+        &mut self,
+        scope: &mut RunScope,
+        role: &Role,
+        n: usize,
+        bound: &Value,
+        mut result: Value,
+    ) -> Res<Next> {
+        let attempts = self.attempts(&role.key);
+        let outcome = text(result.get("outcome")).unwrap_or_default().to_string();
+        let brief_not_delivered = outcome != "provider-limit"
+            && outcome != "pass"
+            && attempts.get(n).and_then(|a| a.get("briefNotDelivered")) == Some(&json!(true));
+        if outcome != "provider-limit" && !brief_not_delivered {
+            return Ok(Next::Done(result));
         }
+        let lease_conflict = is_lease_conflict(result.get("runResult"));
+        let (changed, rotation) = if lease_conflict {
+            (None, None)
+        } else {
+            let changed =
+                self.writes_since_launch(attempts.get(n).and_then(|a| a.get("writeBaseline")));
+            let rotation = match text(bound.get("pool")).filter(|p| !p.is_empty()) {
+                Some(pool) if !brief_not_delivered => self
+                    .host
+                    .account_rotation(&self.with_accounts(&self.snapshot_runner())?, pool),
+                _ => None,
+            };
+            (changed, rotation)
+        };
+        let answer = answer_provider_limit(&LimitAsk {
+            result: &result,
+            bound,
+            attempts: &attempts,
+            attempt_no: n,
+            brief_not_delivered,
+            rotation: rotation.as_ref(),
+            changed: changed.as_ref(),
+        });
+        if let Some(stop) = answer.get("stop") {
+            if let Some(refused) = stop.get("refused") {
+                return Ok(Next::Done(role.refused(refused.clone())));
+            }
+            if let Some(retry) = stop.get("retryStopped") {
+                self.attempt_mut(&role.key, n)["retryStopped"] = retry.clone();
+                self.persist(scope)?;
+            }
+            if let (Some(object), Some(exhausted)) =
+                (result.as_object_mut(), stop.get("fallbackExhausted"))
+            {
+                object.insert("fallbackExhausted".into(), exhausted.clone());
+            }
+            return Ok(Next::Done(result));
+        }
+        if let Some(rebind) = answer.get("rebind") {
+            let rebound = self.bind_in_queue(role, n + 1, rebind)?;
+            if let Some(refused) = rebound.get("refused").filter(|r| truthy(r)) {
+                return Ok(Next::Done(role.refused(refused.clone())));
+            }
+            return Ok(Next::Again(rebound));
+        }
+        let walk = &answer["walk"];
+        if let Some(rotation) = walk.get("rotation") {
+            // The same candidate again: the lease picks the next account of its pool.
+            let again = self.bind_with(role, n + 1, rotation)?;
+            if again.get("refused").is_none_or(|r| !truthy(r)) {
+                return Ok(Next::Again(again));
+            }
+        }
+        if let Some(pool) = text(walk.get("faultPool")) {
+            if !self.fault_pools.iter().any(|p| p == pool) {
+                self.fault_pools.push(pool.to_string());
+            }
+        }
+        let next = self.bind_in_queue(role, n + 1, &walk["step"])?;
+        if let Some(refused) = next.get("refused").filter(|r| truthy(r)) {
+            let mut exhausted = Map::new();
+            exhausted.insert("from".into(), launched_from(bound));
+            exhausted.insert(
+                "reason".into(),
+                refused.get("reason").cloned().unwrap_or(Value::Null),
+            );
+            if let Some(detail) = refused.get("detail") {
+                exhausted.insert("detail".into(), detail.clone());
+            }
+            if let Some(r) = walk.get("accountRotations") {
+                exhausted.insert("accountRotations".into(), r.clone());
+            }
+            if let Some(object) = result.as_object_mut() {
+                object.insert("fallbackExhausted".into(), Value::Object(exhausted));
+            }
+            return Ok(Next::Done(result));
+        }
+        Ok(Next::Again(next))
     }
 
     /// A launch past the admission's seat-launch ceiling does not happen.
@@ -1689,8 +1694,10 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
         serde_json::from_slice(&std::fs::read(current.dir.join(name)).ok()?).ok()
     }
 
-    /// One launch of the seat on `bound`, recorded in unit.json before and after; returns the settled result.
-    fn run_attempt(
+    /// One launch of the seat on `bound` up to its dispatch: the attempt recorded in unit.json, the worktree as the
+    /// seat launches, the admission identity; what the dispatch is handed.
+    #[allow(clippy::too_many_arguments)]
+    fn attempt_before(
         &mut self,
         scope: &mut RunScope,
         role: &Role,
@@ -1698,7 +1705,7 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
         bound: &Value,
         pre_existing: &[Value],
         native_baseline: Option<&Value>,
-    ) -> Res<Value> {
+    ) -> Res<DispatchInput<'c>> {
         let assignment_id = self.assignment_id(role, n);
         let assignment_dir = self
             .unit_dir
@@ -1779,20 +1786,56 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
         }
         self.persist(scope)?;
         assert_not_cancelled(self.host)?;
-        let started = Instant::now();
-        let run_result = self.dispatch_bound(
-            scope,
-            role,
-            bound,
-            &assignment_id,
-            &assignment_dir,
-            &objective,
-            &admission,
-        )?;
+        // A pinned account leases from an inventory holding only that account.
+        let runner = self
+            .host
+            .runner_config_for_binding(&self.with_accounts(&self.snapshot_runner())?, bound);
+        std::fs::create_dir_all(&assignment_dir).map_err(|e| {
+            RunUnitError::other(
+                "assignment-dir-not-created",
+                format!("{}: {e}", assignment_dir.display()),
+            )
+        })?;
+        Ok(DispatchInput {
+            record: self.record.clone(),
+            unit: self.unit.clone(),
+            main_root: self.main_root.clone(),
+            assignment_id,
+            assignment_dir,
+            objective,
+            admission,
+            case: scope
+                .admission
+                .as_ref()
+                .map(|h| (h.case_id.clone(), h.reservation_id.clone())),
+            runner,
+            committed: self.live_config()?,
+            custody: if role.read_only { None } else { self.custody },
+            carries_operation: self.declared_op.is_some()
+                && role.seat.pointer("/posture/writer") == Some(&json!(true)),
+            write_scope: effective_write_scope(&self.record),
+        })
+    }
+
+    /// The settled Run Result of one launch, recorded on the attempt; a passing writing round is committed.
+    #[allow(clippy::too_many_arguments)]
+    fn attempt_after(
+        &mut self,
+        scope: &mut RunScope,
+        role: &Role,
+        n: usize,
+        bound: &Value,
+        pre_existing: &[Value],
+        native_baseline: Option<&Value>,
+        assignment_id: &str,
+        run_result: Value,
+        elapsed: Duration,
+    ) -> Res<Value> {
+        let assignment_id = assignment_id.to_string();
         let mut result = role.result(outcome_of_run_result(&run_result));
         result.insert("runResult".into(), run_result.clone());
         result.insert("binding".into(), bound.clone());
-        self.attempt_mut(&role.key, n)["durationMs"] = json!(started.elapsed().as_millis() as u64);
+        self.attempt_mut(&role.key, n)["durationMs"] = json!(elapsed.as_millis() as u64);
 
         // A pass stands only when the provider record agrees the lease it names was granted.
         let receipt = self
@@ -1877,63 +1920,6 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
         self.persist(scope)?;
         self.host.drop_assignment_record(&assignment_id);
         Ok(Value::Object(result))
-    }
-
-    /// One dispatch of an already-bound seat; the settled Run Result.
-    #[allow(clippy::too_many_arguments)]
-    fn dispatch_bound(
-        &self,
-        scope: &RunScope,
-        role: &Role,
-        bound: &Value,
-        assignment_id: &str,
-        assignment_dir: &Path,
-        objective: &str,
-        admission: &Value,
-    ) -> Res<Value> {
-        let runner = self
-            .host
-            .runner_config_for_binding(&self.with_accounts(&self.snapshot_runner()), bound);
-        std::fs::create_dir_all(assignment_dir).map_err(|e| {
-            RunUnitError::other(
-                "assignment-dir-not-created",
-                format!("{}: {e}", assignment_dir.display()),
-            )
-        })?;
-        let carries_operation = self.declared_op.is_some()
-            && role.seat.pointer("/posture/writer") == Some(&json!(true));
-        let write_scope = effective_write_scope(&self.record);
-        let case = scope
-            .admission
-            .as_ref()
-            .map(|h| (h.case_id.as_str(), h.reservation_id.as_str()));
-        self.host.dispatch_seat(&SeatDispatch {
-            unit_record: &self.record,
-            unit: &self.unit,
-            main_root: &self.main_root,
-            seat: &role.seat,
-            seat_unit: &role.unit,
-            round: role.round,
-            read_only: role.read_only,
-            bound,
-            assignment_id,
-            assignment_dir,
-            objective,
-            inputs: &role.inputs,
-            admission,
-            case_context: case,
-            runner_config: &runner,
-            committed_runner_config: &self.live_config,
-            session: &role.session,
-            custody: if role.read_only {
-                None
-            } else {
-                self.custody.as_ref()
-            },
-            carries_operation,
-            write_scope: &write_scope,
-            batch_size: role.batch.filter(|b| *b > 1),
-        })
     }
 
     /// The agent already did this round's work and only the runner commit failed: commit again, never spawn the
@@ -2220,6 +2206,314 @@ impl<'h, H: UnitRunHost> Ctx<'h, H> {
             attempt["commitOperation"]["state"] = json!("settled");
         }
     }
+}
+
+/// One command of a batch, once its seat is bound.
+enum Job {
+    /// The seat's answer is already known (refused at its binding).
+    Done(Value),
+    Role(Box<RoleRun>),
+    Verify,
+}
+
+/// A bound seat and where its attempts stand.
+struct RoleRun {
+    role: Role,
+    recorded: Vec<Value>,
+    rebinding: bool,
+    n: usize,
+    bound: Value,
+}
+
+/// What a writing seat's first launch stands on.
+struct Setup {
+    pre_existing: Vec<Value>,
+    native_baseline: Option<Value>,
+}
+
+/// After an attempt: the seat's result, or the binding of its next attempt.
+enum Next {
+    Done(Value),
+    Again(Value),
+}
+
+/// What one dispatch is handed, copied out of the run's record so the dispatch runs while sibling seats record.
+struct DispatchInput<'c> {
+    record: Value,
+    unit: Value,
+    main_root: PathBuf,
+    assignment_id: String,
+    assignment_dir: PathBuf,
+    objective: String,
+    admission: Value,
+    case: Option<(String, String)>,
+    runner: Value,
+    committed: Value,
+    custody: Option<&'c Handle>,
+    carries_operation: bool,
+    write_scope: Vec<Value>,
+}
+
+fn seat_resolution(error: impl std::fmt::Display) -> RunUnitError {
+    RunUnitError::other("error", error.to_string()).with("name", json!("SeatResolutionError"))
+}
+
+/// `assertSeatId` (`convention/seat-id.mjs`): a seat id names a directory and a ref segment of a unit run, so only
+/// an id of Convention's `seat-id` rule passes; anything else is Node's `TypeError`.
+fn assert_seat_id(value: Option<&Value>) -> Res<()> {
+    let rule = fgos_convention::packaged_rules()
+        .identifier("seat-id")
+        .expect("the packaged convention rules carry the seat-id rule");
+    let problem = match value.and_then(Value::as_str) {
+        Some(id) => rule.check(id).err(),
+        None => Some("invalid-identifier"),
+    };
+    let shown = || match value {
+        None => "undefined".to_string(),
+        Some(v) => serde_json::to_string(v).unwrap_or_default(),
+    };
+    let message = match problem {
+        None => return Ok(()),
+        Some("reserved-identifier") => format!(
+            "seat id \"{}\" is reserved ({})",
+            value.and_then(Value::as_str).unwrap_or_default(),
+            rule.reserved.join(", ")
+        ),
+        Some(_) => format!(
+            "seat id {} must be 1-{} characters: a lowercase letter, then lowercase letters, digits or \"-\"",
+            shown(),
+            rule.max_length
+        ),
+    };
+    Err(RunUnitError::other("error", message).with("name", json!("TypeError")))
+}
+
+/// The pattern run over the pure loop: each dispatch's commands run, their answers handed back in command order.
+fn run_collaboration<H: UnitRunHost + Sync>(shared: &Shared<'_, '_, H>, host: &H) -> Res<Value> {
+    let (effective, mut run) = {
+        let mut guard = lock(shared);
+        let State { ctx, scope } = &mut *guard;
+        match ctx.loop_start(scope)? {
+            Ok(started) => started,
+            Err(early) => return Ok(early),
+        }
+    };
+    let mut answers = None;
+    let pattern = loop {
+        match run.step(answers.take()).map_err(seat_resolution)? {
+            Step::Done(result) => break result,
+            Step::Dispatch(commands) => answers = Some(run_batch(shared, host, commands)?),
+        }
+    };
+    let mut guard = lock(shared);
+    let State { ctx, scope } = &mut *guard;
+    ctx.loop_end(scope, &effective, pattern)
+}
+
+/// The commands of one dispatch, as Node runs them together: every seat binds first, in listed order (each sees
+/// its earlier siblings, and a group launches only once all its seats are bound), then the seats and the verify
+/// run at once, each recording under the run's lock, which no dispatch and no verify holds. The answers come
+/// back in command order; a throw of one is the batch's throw once every one has settled.
+fn run_batch<H: UnitRunHost + Sync>(
+    shared: &Shared<'_, '_, H>,
+    host: &H,
+    commands: Vec<Command>,
+) -> Res<Vec<Value>> {
+    let jobs: Vec<Res<Job>> = commands
+        .iter()
+        .map(|command| match command {
+            Command::Role(call) => {
+                let mut guard = lock(shared);
+                guard.ctx.prepare_role(call)
+            }
+            Command::Verify { .. } => Ok(Job::Verify),
+        })
+        .collect();
+    let answer = |job: Res<Job>| -> Res<Value> {
+        match job? {
+            Job::Done(value) => Ok(value),
+            Job::Role(role) => continue_role(shared, host, *role),
+            Job::Verify => verify_unit(shared, host),
+        }
+    };
+    let results: Vec<Res<Value>> = if jobs.len() <= 1 {
+        jobs.into_iter().map(answer).collect()
+    } else {
+        let answer = &answer;
+        std::thread::scope(|scope| {
+            let handles: Vec<_> = jobs
+                .into_iter()
+                .map(|job| {
+                    std::thread::Builder::new()
+                        .spawn_scoped(scope, move || answer(job))
+                        .expect("a thread for a seat of the batch")
+                })
+                .collect();
+            handles
+                .into_iter()
+                .map(|h| {
+                    h.join()
+                        .unwrap_or_else(|panic| std::panic::resume_unwind(panic))
+                })
+                .collect()
+        })
+    };
+    results.into_iter().collect()
+}
+
+/// A bound seat to its result: each attempt on a fresh pane or process, a provider limit or a dead credential
+/// answered by `answer_provider_limit`, the failed attempt left as it was.
+fn continue_role<H: UnitRunHost + Sync>(
+    shared: &Shared<'_, '_, H>,
+    host: &H,
+    mut run: RoleRun,
+) -> Res<Value> {
+    let setup = {
+        let mut guard = lock(shared);
+        let State { ctx, scope } = &mut *guard;
+        match ctx.role_setup(scope, &mut run)? {
+            Ok(setup) => setup,
+            Err(done) => return Ok(done),
+        }
+    };
+    let RoleRun {
+        role,
+        rebinding,
+        mut n,
+        mut bound,
+        ..
+    } = run;
+    let mut last_result: Option<Value> = None;
+    loop {
+        {
+            let mut guard = lock(shared);
+            let State { ctx, scope } = &mut *guard;
+            ctx.bindings_mut()
+                .entry(role.key.clone())
+                .or_insert_with(|| json!([]));
+            if let Some(spent) =
+                ctx.launch_ceiling_spent(scope, &role, n, rebinding, last_result.as_ref(), &bound)
+            {
+                return Ok(spent);
+            }
+        }
+        let result = run_attempt(shared, host, &role, n, &bound, &setup)?;
+        last_result = Some(result.clone());
+        let next = {
+            let mut guard = lock(shared);
+            let State { ctx, scope } = &mut *guard;
+            ctx.after_attempt(scope, &role, n, &bound, result)?
+        };
+        match next {
+            Next::Done(value) => return Ok(value),
+            Next::Again(next) => {
+                bound = next;
+                n += 1;
+            }
+        }
+    }
+}
+
+/// One launch of the seat on `bound`: recorded before and after under the run's lock, dispatched outside it.
+fn run_attempt<H: UnitRunHost + Sync>(
+    shared: &Shared<'_, '_, H>,
+    host: &H,
+    role: &Role,
+    n: usize,
+    bound: &Value,
+    setup: &Setup,
+) -> Res<Value> {
+    let input = {
+        let mut guard = lock(shared);
+        let State { ctx, scope } = &mut *guard;
+        ctx.attempt_before(
+            scope,
+            role,
+            n,
+            bound,
+            &setup.pre_existing,
+            setup.native_baseline.as_ref(),
+        )?
+    };
+    // The attempt's wall time: Execution's own span from handing the seat to Dispatch to its settled result.
+    let started = Instant::now();
+    let run_result = host.dispatch_seat(&SeatDispatch {
+        unit_record: &input.record,
+        unit: &input.unit,
+        main_root: &input.main_root,
+        seat: &role.seat,
+        seat_unit: &role.unit,
+        round: role.round,
+        read_only: role.read_only,
+        bound,
+        assignment_id: &input.assignment_id,
+        assignment_dir: &input.assignment_dir,
+        objective: &input.objective,
+        inputs: &role.inputs,
+        admission: &input.admission,
+        case_context: input.case.as_ref().map(|(c, r)| (c.as_str(), r.as_str())),
+        runner_config: &input.runner,
+        committed_runner_config: &input.committed,
+        session: &role.session,
+        custody: input.custody,
+        carries_operation: input.carries_operation,
+        write_scope: &input.write_scope,
+        batch_size: role.batch.filter(|b| *b > 1),
+    })?;
+    let elapsed = started.elapsed();
+    let mut guard = lock(shared);
+    let State { ctx, scope } = &mut *guard;
+    ctx.attempt_after(
+        scope,
+        role,
+        n,
+        bound,
+        &setup.pre_existing,
+        setup.native_baseline.as_ref(),
+        &input.assignment_id,
+        run_result,
+        elapsed,
+    )
+}
+
+/// The deterministic check a round ends with, bounded by `runner.timeoutMs`, under the Unit's custody; it runs
+/// outside the run's lock, beside the checkers of its round.
+fn verify_unit<H: UnitRunHost + Sync>(shared: &Shared<'_, '_, H>, host: &H) -> Res<Value> {
+    let (command, worktree, timeout, custody) = {
+        let guard = lock(shared);
+        assert_not_cancelled(host)?;
+        let runner = guard.ctx.snapshot_runner();
+        let Some(command) = verify_command_of(&guard.ctx.unit, &runner) else {
+            return Ok(json!({ "pass": true }));
+        };
+        (
+            command,
+            guard.ctx.worktree(),
+            runner.get("timeoutMs").and_then(Value::as_u64),
+            guard.ctx.custody,
+        )
+    };
+    let verified = host.verify(&command, &worktree, timeout, custody);
+    let outcome = match &verified.verdict {
+        Verdict::Pass => "pass",
+        Verdict::Findings => "findings",
+        Verdict::Infrastructure(why) => why,
+    };
+    // The verify of the current round decides the outcome, so it is the one the record keeps.
+    lock(shared).ctx.verify_facts = Some(json!({
+        "command": command,
+        "outcome": outcome,
+        "exit": verified.status,
+        "passed": verified.verdict == Verdict::Pass,
+        "durationMs": verified.duration_ms,
+        "how": verified.how,
+        "outputDigest": verified.output_digest,
+    }));
+    Ok(answer_of_verify(
+        &verified,
+        "Verification command",
+        &command,
+    ))
 }
 
 fn round_of(result: &Value) -> u64 {

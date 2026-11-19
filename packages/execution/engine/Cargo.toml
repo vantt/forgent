@@ -9,6 +9,7 @@ description = "Execution's effectful half: confinement, accounts, transport, ass
 # The pure rules stay in fgos-execution; the engine composes them with effects.
 fgos-execution = { path = "../rust" }
 fgos-checkout = { path = "../checkout" }
+fgos-convention = { path = "../../convention/rust" }
 fgos-run-supervisor = { path = "../../run-supervisor/rust" }
 fgos-seat-binding = { path = "../../seat-binding/rust" }
 fgos-agent-protocol = { path = "../../agent-protocol/rust" }

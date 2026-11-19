@@ -405,6 +405,7 @@ dependencies = [
  "fgos-canonical-json",
  "fgos-checkout",
  "fgos-config",
+ "fgos-convention",
  "fgos-durable-file",
  "fgos-execution",
  "fgos-git",

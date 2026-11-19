@@ -1,0 +1,1094 @@
+{
+  "runs": [
+    {
+      "name": "a read-only run whose seat has no executor settles policy-refusal",
+      "options": {
+        "unitData": {
+          "id": "u1",
+          "objective": "look around",
+          "capability": "code:review",
+          "writes": []
+        },
+        "cwd": "<ROOT>/tree",
+        "runnerConfig": {}
+      },
+      "host": {
+        "unit": {
+          "id": "u1",
+          "objective": "look around",
+          "capability": "code:review",
+          "writes": [],
+          "dependsOn": [],
+          "inputs": [],
+          "expectedOutputs": []
+        },
+        "collaboration": {
+          "loop": "solo",
+          "params": {},
+          "seats": [
+            {
+              "seat": "producer",
+              "role": "producer",
+              "posture": {
+                "readOnly": true,
+                "writer": true,
+                "forceOutOfProcess": false,
+                "stance": false,
+                "verdict": false
+              }
+            }
+          ],
+          "roleTasks": {},
+          "launchBound": 1,
+          "entry": {
+            "promise": "A single worker runs the task to completion.",
+            "loop": "solo"
+          },
+          "pin": {
+            "requested": null,
+            "baseline": {
+              "source": "solo",
+              "selector": "solo"
+            },
+            "pattern": {
+              "name": "solo",
+              "layer": "shipped"
+            },
+            "effective": {
+              "loop": "solo",
+              "params": {},
+              "seats": [
+                {
+                  "seat": "producer",
+                  "role": "producer",
+                  "posture": {
+                    "readOnly": true,
+                    "writer": true,
+                    "forceOutOfProcess": false,
+                    "stance": false,
+                    "verdict": false
+                  }
+                }
+              ],
+              "postures": {
+                "producer": {
+                  "readOnly": true,
+                  "writer": true,
+                  "forceOutOfProcess": false,
+                  "stance": false,
+                  "verdict": false
+                }
+              },
+              "roleTasks": {},
+              "launchBound": 1
+            },
+            "provenance": {
+              "params": {},
+              "checkers": {}
+            }
+          }
+        },
+        "bind": [
+          {
+            "refused": {
+              "reason": "headless-no-executor",
+              "detail": "No candidate executor available in headless session for capability \"code:review\""
+            }
+          }
+        ],
+        "configError": null
+      },
+      "outcome": {
+        "ok": {
+          "unitRunId": "<UNIT_RUN_ID>",
+          "outcome": "policy-refusal",
+          "rounds": 1,
+          "results": [
+            {
+              "outcome": "policy-refusal",
+              "seat": "producer",
+              "role": "producer",
+              "posture": {
+                "readOnly": true,
+                "writer": true,
+                "forceOutOfProcess": false,
+                "stance": false,
+                "verdict": false
+              },
+              "round": 1,
+              "refused": {
+                "reason": "headless-no-executor",
+                "detail": "No candidate executor available in headless session for capability \"code:review\""
+              },
+              "infrastructure": false
+            }
+          ],
+          "findings": [],
+          "infrastructure": false,
+          "outOfScope": [],
+          "outOfScopeOnBranch": [],
+          "evaluations": [],
+          "started": {
+            "value": true,
+            "reason": null
+          },
+          "launches": {
+            "ceiling": null,
+            "used": 0,
+            "ceilingHit": false
+          },
+          "settled": {
+            "unit": true,
+            "case": null
+          },
+          "warnings": []
+        }
+      },
+      "record": {
+        "unit": {
+          "id": "u1",
+          "objective": "look around",
+          "capability": "code:review",
+          "writes": [],
+          "dependsOn": [],
+          "inputs": [],
+          "expectedOutputs": []
+        },
+        "seatSchema": 2,
+        "seats": [
+          {
+            "seat": "producer",
+            "role": "producer",
+            "posture": {
+              "readOnly": true,
+              "writer": true,
+              "forceOutOfProcess": false,
+              "stance": false,
+              "verdict": false
+            }
+          }
+        ],
+        "workflow": null,
+        "collaboration": {
+          "requested": null,
+          "baseline": {
+            "source": "solo",
+            "selector": "solo"
+          },
+          "pattern": {
+            "name": "solo",
+            "layer": "shipped",
+            "digest": "62809884a975b6f9cfb1b7aff2c5fe112440029028915f28a2328b435616852c"
+          },
+          "effective": {
+            "loop": "solo",
+            "params": {},
+            "seats": [
+              {
+                "seat": "producer",
+                "role": "producer",
+                "posture": {
+                  "readOnly": true,
+                  "writer": true,
+                  "forceOutOfProcess": false,
+                  "stance": false,
+                  "verdict": false
+                }
+              }
+            ],
+            "postures": {
+              "producer": {
+                "readOnly": true,
+                "writer": true,
+                "forceOutOfProcess": false,
+                "stance": false,
+                "verdict": false
+              }
+            },
+            "roleTasks": {},
+            "launchBound": 1
+          },
+          "provenance": {
+            "params": {},
+            "checkers": {}
+          }
+        },
+        "pattern": "solo",
+        "overrides": [],
+        "configSnapshot": {
+          "hash": "4fc8f7c129a8ac8ab8ed1f588d89bcaa332c5aabc6e9577edc5c4ea0b1b49701",
+          "runner": {}
+        },
+        "writeScope": [],
+        "resolvedInputs": [],
+        "worktree": "<ROOT>/tree",
+        "createdBy": "<USER>",
+        "createdAt": "<TIME>",
+        "execution": {
+          "status": "settled"
+        },
+        "bindings": {},
+        "settlement": {
+          "outcome": "policy-refusal",
+          "infrastructure": false,
+          "infrastructureReason": null,
+          "refused": [
+            {
+              "seat": "producer",
+              "round": 1,
+              "reason": "headless-no-executor",
+              "detail": "No candidate executor available in headless session for capability \"code:review\""
+            }
+          ],
+          "settledAt": "<TIME>"
+        }
+      },
+      "calls": []
+    },
+    {
+      "name": "a case run is admitted, refused at its seat, and settled once",
+      "options": {
+        "unitData": {
+          "id": "u1",
+          "objective": "look around",
+          "capability": "code:review",
+          "writes": []
+        },
+        "cwd": "<ROOT>/tree",
+        "runnerConfig": {},
+        "caseRef": {
+          "caseId": "case-1",
+          "activity": "build"
+        },
+        "workflowId": "wf-1",
+        "port": {
+          "admit": {
+            "admitted": true,
+            "reservationId": "res-1",
+            "caseId": "case-1",
+            "seatLaunchCeiling": 2
+          }
+        }
+      },
+      "host": {
+        "unit": {
+          "id": "u1",
+          "objective": "look around",
+          "capability": "code:review",
+          "writes": [],
+          "dependsOn": [],
+          "inputs": [],
+          "expectedOutputs": []
+        },
+        "collaboration": {
+          "loop": "solo",
+          "params": {},
+          "seats": [
+            {
+              "seat": "producer",
+              "role": "producer",
+              "posture": {
+                "readOnly": true,
+                "writer": true,
+                "forceOutOfProcess": false,
+                "stance": false,
+                "verdict": false
+              }
+            }
+          ],
+          "roleTasks": {},
+          "launchBound": 1,
+          "entry": {
+            "promise": "A single worker runs the task to completion.",
+            "loop": "solo"
+          },
+          "pin": {
+            "requested": null,
+            "baseline": {
+              "source": "solo",
+              "selector": "solo"
+            },
+            "pattern": {
+              "name": "solo",
+              "layer": "shipped"
+            },
+            "effective": {
+              "loop": "solo",
+              "params": {},
+              "seats": [
+                {
+                  "seat": "producer",
+                  "role": "producer",
+                  "posture": {
+                    "readOnly": true,
+                    "writer": true,
+                    "forceOutOfProcess": false,
+                    "stance": false,
+                    "verdict": false
+                  }
+                }
+              ],
+              "postures": {
+                "producer": {
+                  "readOnly": true,
+                  "writer": true,
+                  "forceOutOfProcess": false,
+                  "stance": false,
+                  "verdict": false
+                }
+              },
+              "roleTasks": {},
+              "launchBound": 1
+            },
+            "provenance": {
+              "params": {},
+              "checkers": {}
+            }
+          }
+        },
+        "bind": [
+          {
+            "refused": {
+              "reason": "headless-no-executor",
+              "detail": "No candidate executor available in headless session for capability \"code:review\""
+            }
+          }
+        ],
+        "configError": null
+      },
+      "outcome": {
+        "ok": {
+          "unitRunId": "<UNIT_RUN_ID>",
+          "outcome": "policy-refusal",
+          "rounds": 1,
+          "results": [
+            {
+              "outcome": "policy-refusal",
+              "seat": "producer",
+              "role": "producer",
+              "posture": {
+                "readOnly": true,
+                "writer": true,
+                "forceOutOfProcess": false,
+                "stance": false,
+                "verdict": false
+              },
+              "round": 1,
+              "refused": {
+                "reason": "headless-no-executor",
+                "detail": "No candidate executor available in headless session for capability \"code:review\""
+              },
+              "infrastructure": false
+            }
+          ],
+          "findings": [],
+          "infrastructure": false,
+          "outOfScope": [],
+          "outOfScopeOnBranch": [],
+          "evaluations": [],
+          "started": {
+            "value": true,
+            "reason": null
+          },
+          "launches": {
+            "ceiling": 2,
+            "used": 0,
+            "ceilingHit": false
+          },
+          "settled": {
+            "unit": true,
+            "case": true
+          },
+          "warnings": []
+        }
+      },
+      "record": {
+        "unit": {
+          "id": "u1",
+          "objective": "look around",
+          "capability": "code:review",
+          "writes": [],
+          "dependsOn": [],
+          "inputs": [],
+          "expectedOutputs": []
+        },
+        "seatSchema": 2,
+        "seats": [
+          {
+            "seat": "producer",
+            "role": "producer",
+            "posture": {
+              "readOnly": true,
+              "writer": true,
+              "forceOutOfProcess": false,
+              "stance": false,
+              "verdict": false
+            }
+          }
+        ],
+        "workflowId": "wf-1",
+        "workflow": {
+          "caseId": "case-1",
+          "activity": "build",
+          "reservationId": "res-1"
+        },
+        "seatLaunchCeiling": 2,
+        "collaboration": {
+          "requested": null,
+          "baseline": {
+            "source": "solo",
+            "selector": "solo"
+          },
+          "pattern": {
+            "name": "solo",
+            "layer": "shipped",
+            "digest": "62809884a975b6f9cfb1b7aff2c5fe112440029028915f28a2328b435616852c"
+          },
+          "effective": {
+            "loop": "solo",
+            "params": {},
+            "seats": [
+              {
+                "seat": "producer",
+                "role": "producer",
+                "posture": {
+                  "readOnly": true,
+                  "writer": true,
+                  "forceOutOfProcess": false,
+                  "stance": false,
+                  "verdict": false
+                }
+              }
+            ],
+            "postures": {
+              "producer": {
+                "readOnly": true,
+                "writer": true,
+                "forceOutOfProcess": false,
+                "stance": false,
+                "verdict": false
+              }
+            },
+            "roleTasks": {},
+            "launchBound": 1
+          },
+          "provenance": {
+            "params": {},
+            "checkers": {}
+          }
+        },
+        "pattern": "solo",
+        "overrides": [],
+        "configSnapshot": {
+          "hash": "4fc8f7c129a8ac8ab8ed1f588d89bcaa332c5aabc6e9577edc5c4ea0b1b49701",
+          "runner": {}
+        },
+        "writeScope": [],
+        "resolvedInputs": [],
+        "worktree": "<ROOT>/tree",
+        "createdBy": "<USER>",
+        "createdAt": "<TIME>",
+        "execution": {
+          "status": "settled"
+        },
+        "bindings": {},
+        "settlement": {
+          "outcome": "policy-refusal",
+          "infrastructure": false,
+          "infrastructureReason": null,
+          "refused": [
+            {
+              "seat": "producer",
+              "round": 1,
+              "reason": "headless-no-executor",
+              "detail": "No candidate executor available in headless session for capability \"code:review\""
+            }
+          ],
+          "settledAt": "<TIME>"
+        }
+      },
+      "calls": [
+        {
+          "op": "admit",
+          "args": [
+            {
+              "unitRunId": "<UNIT_RUN_ID>",
+              "caseRef": {
+                "caseId": "case-1",
+                "activity": "build"
+              },
+              "activity": "build",
+              "writes": [],
+              "worktree": "<ROOT>/tree",
+              "readOnly": true,
+              "pattern": "solo",
+              "seatLaunches": 1,
+              "blind": false,
+              "handoffRefs": [],
+              "reason": null
+            }
+          ]
+        },
+        {
+          "op": "settle",
+          "args": [
+            "res-1",
+            {
+              "contract": {
+                "id": "unit-run-result",
+                "version": 1
+              },
+              "caseId": "case-1",
+              "outcome": "policy-refusal",
+              "unitRunId": "<UNIT_RUN_ID>",
+              "infrastructure": false,
+              "outOfScope": [],
+              "outOfScopeOnBranch": [],
+              "evaluations": [],
+              "started": {
+                "value": true,
+                "reason": null
+              },
+              "launches": {
+                "ceiling": 2,
+                "used": 0,
+                "ceilingHit": false
+              },
+              "results": [
+                {
+                  "outcome": "policy-refusal",
+                  "seat": "producer",
+                  "role": "producer",
+                  "posture": {
+                    "readOnly": true,
+                    "writer": true,
+                    "forceOutOfProcess": false,
+                    "stance": false,
+                    "verdict": false
+                  },
+                  "round": 1,
+                  "refused": {
+                    "reason": "headless-no-executor",
+                    "detail": "No candidate executor available in headless session for capability \"code:review\""
+                  },
+                  "infrastructure": false
+                }
+              ],
+              "seatLaunchesUsed": 0,
+              "frameExhausted": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "a refused admission is a CaseAdmissionRefusedError",
+      "options": {
+        "unitData": {
+          "id": "u1",
+          "objective": "look around",
+          "capability": "code:review",
+          "writes": []
+        },
+        "cwd": "<ROOT>/tree",
+        "runnerConfig": {},
+        "caseRef": {
+          "caseId": "case-1",
+          "activity": "build"
+        },
+        "port": {
+          "admit": {
+            "refused": {
+              "code": "case-admission-busy",
+              "condition": "the case is busy"
+            }
+          }
+        }
+      },
+      "host": {
+        "unit": {
+          "id": "u1",
+          "objective": "look around",
+          "capability": "code:review",
+          "writes": [],
+          "dependsOn": [],
+          "inputs": [],
+          "expectedOutputs": []
+        },
+        "collaboration": {
+          "loop": "solo",
+          "params": {},
+          "seats": [
+            {
+              "seat": "producer",
+              "role": "producer",
+              "posture": {
+                "readOnly": true,
+                "writer": true,
+                "forceOutOfProcess": false,
+                "stance": false,
+                "verdict": false
+              }
+            }
+          ],
+          "roleTasks": {},
+          "launchBound": 1,
+          "entry": {
+            "promise": "A single worker runs the task to completion.",
+            "loop": "solo"
+          },
+          "pin": {
+            "requested": null,
+            "baseline": {
+              "source": "solo",
+              "selector": "solo"
+            },
+            "pattern": {
+              "name": "solo",
+              "layer": "shipped"
+            },
+            "effective": {
+              "loop": "solo",
+              "params": {},
+              "seats": [
+                {
+                  "seat": "producer",
+                  "role": "producer",
+                  "posture": {
+                    "readOnly": true,
+                    "writer": true,
+                    "forceOutOfProcess": false,
+                    "stance": false,
+                    "verdict": false
+                  }
+                }
+              ],
+              "postures": {
+                "producer": {
+                  "readOnly": true,
+                  "writer": true,
+                  "forceOutOfProcess": false,
+                  "stance": false,
+                  "verdict": false
+                }
+              },
+              "roleTasks": {},
+              "launchBound": 1
+            },
+            "provenance": {
+              "params": {},
+              "checkers": {}
+            }
+          }
+        },
+        "bind": [],
+        "configError": null
+      },
+      "outcome": {
+        "error": {
+          "name": "CaseAdmissionRefusedError",
+          "code": "case-admission-busy",
+          "phase": null,
+          "message": "case admission refused case-admission-busy: the case is busy",
+          "refusal": {
+            "code": "case-admission-busy",
+            "condition": "the case is busy"
+          }
+        }
+      },
+      "record": null,
+      "calls": [
+        {
+          "op": "admit",
+          "args": [
+            {
+              "unitRunId": "<UNIT_RUN_ID>",
+              "caseRef": {
+                "caseId": "case-1",
+                "activity": "build"
+              },
+              "activity": "build",
+              "writes": [],
+              "worktree": "<ROOT>/tree",
+              "readOnly": true,
+              "pattern": "solo",
+              "seatLaunches": 1,
+              "blind": false,
+              "handoffRefs": [],
+              "reason": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "a writing run without a port is refused by code",
+      "options": {
+        "unitData": {
+          "id": "u1",
+          "objective": "add b",
+          "capability": "code:implement",
+          "writes": [
+            "b.txt"
+          ]
+        },
+        "cwd": "<ROOT>/tree",
+        "runnerConfig": {}
+      },
+      "host": {
+        "unit": {
+          "id": "u1",
+          "objective": "add b",
+          "capability": "code:implement",
+          "writes": [
+            "b.txt"
+          ],
+          "dependsOn": [],
+          "inputs": [],
+          "expectedOutputs": []
+        },
+        "collaboration": {
+          "loop": "solo",
+          "params": {},
+          "seats": [
+            {
+              "seat": "producer",
+              "role": "producer",
+              "posture": {
+                "readOnly": false,
+                "writer": true,
+                "forceOutOfProcess": false,
+                "stance": false,
+                "verdict": false
+              }
+            }
+          ],
+          "roleTasks": {},
+          "launchBound": 1,
+          "entry": {
+            "promise": "A single worker runs the task to completion.",
+            "loop": "solo"
+          },
+          "pin": {
+            "requested": null,
+            "baseline": {
+              "source": "solo",
+              "selector": "solo"
+            },
+            "pattern": {
+              "name": "solo",
+              "layer": "shipped"
+            },
+            "effective": {
+              "loop": "solo",
+              "params": {},
+              "seats": [
+                {
+                  "seat": "producer",
+                  "role": "producer",
+                  "posture": {
+                    "readOnly": false,
+                    "writer": true,
+                    "forceOutOfProcess": false,
+                    "stance": false,
+                    "verdict": false
+                  }
+                }
+              ],
+              "postures": {
+                "producer": {
+                  "readOnly": false,
+                  "writer": true,
+                  "forceOutOfProcess": false,
+                  "stance": false,
+                  "verdict": false
+                }
+              },
+              "roleTasks": {},
+              "launchBound": 1
+            },
+            "provenance": {
+              "params": {},
+              "checkers": {}
+            }
+          }
+        },
+        "bind": [],
+        "configError": null
+      },
+      "outcome": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": "case-admission-port-missing",
+          "phase": null,
+          "message": "runUnit: a Unit that writes (or names a case) needs the case admission port in options.caseAdmission; none was given"
+        }
+      },
+      "record": null,
+      "calls": []
+    },
+    {
+      "name": "a standalone writing run into a bound worktree is refused",
+      "options": {
+        "unitData": {
+          "id": "u1",
+          "objective": "add b",
+          "capability": "code:implement",
+          "writes": [
+            "b.txt"
+          ]
+        },
+        "cwd": "<ROOT>/tree",
+        "runnerConfig": {},
+        "port": {
+          "binding": {
+            "answer": "bound",
+            "record": {
+              "caseId": "case-9"
+            }
+          }
+        }
+      },
+      "host": {
+        "unit": {
+          "id": "u1",
+          "objective": "add b",
+          "capability": "code:implement",
+          "writes": [
+            "b.txt"
+          ],
+          "dependsOn": [],
+          "inputs": [],
+          "expectedOutputs": []
+        },
+        "collaboration": {
+          "loop": "solo",
+          "params": {},
+          "seats": [
+            {
+              "seat": "producer",
+              "role": "producer",
+              "posture": {
+                "readOnly": false,
+                "writer": true,
+                "forceOutOfProcess": false,
+                "stance": false,
+                "verdict": false
+              }
+            }
+          ],
+          "roleTasks": {},
+          "launchBound": 1,
+          "entry": {
+            "promise": "A single worker runs the task to completion.",
+            "loop": "solo"
+          },
+          "pin": {
+            "requested": null,
+            "baseline": {
+              "source": "solo",
+              "selector": "solo"
+            },
+            "pattern": {
+              "name": "solo",
+              "layer": "shipped"
+            },
+            "effective": {
+              "loop": "solo",
+              "params": {},
+              "seats": [
+                {
+                  "seat": "producer",
+                  "role": "producer",
+                  "posture": {
+                    "readOnly": false,
+                    "writer": true,
+                    "forceOutOfProcess": false,
+                    "stance": false,
+                    "verdict": false
+                  }
+                }
+              ],
+              "postures": {
+                "producer": {
+                  "readOnly": false,
+                  "writer": true,
+                  "forceOutOfProcess": false,
+                  "stance": false,
+                  "verdict": false
+                }
+              },
+              "roleTasks": {},
+              "launchBound": 1
+            },
+            "provenance": {
+              "params": {},
+              "checkers": {}
+            }
+          }
+        },
+        "bind": [],
+        "configError": null
+      },
+      "outcome": {
+        "error": {
+          "name": "CaseAdmissionRefusedError",
+          "code": "bound",
+          "phase": null,
+          "message": "case admission refused bound: worktree <ROOT>/tree is not free for a run that names no case: bound (case case-9)",
+          "refusal": {
+            "code": "bound",
+            "condition": "worktree <ROOT>/tree is not free for a run that names no case: bound (case case-9)"
+          }
+        }
+      },
+      "record": null,
+      "calls": [
+        {
+          "op": "resolveBinding",
+          "args": [
+            {
+              "worktree": "<ROOT>/tree"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "an unreadable config is refused where the run first reads it",
+      "options": {
+        "unitData": {
+          "id": "u1",
+          "objective": "look around",
+          "capability": "code:review",
+          "writes": []
+        },
+        "cwd": "<ROOT>/tree"
+      },
+      "host": {
+        "unit": {
+          "id": "u1",
+          "objective": "look around",
+          "capability": "code:review",
+          "writes": [],
+          "dependsOn": [],
+          "inputs": [],
+          "expectedOutputs": []
+        },
+        "collaboration": null,
+        "bind": [],
+        "configError": {
+          "name": "RunnerConfigError",
+          "code": "config-parse",
+          "phase": null,
+          "message": "config-parse project:config.yaml:2:1 (syntax-error)"
+        }
+      },
+      "outcome": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": "config-parse",
+          "phase": null,
+          "message": "config-parse project:config.yaml:2:1 (syntax-error)"
+        }
+      },
+      "record": null,
+      "calls": []
+    },
+    {
+      "name": "a refusal checked before the config is read wins over an unreadable config",
+      "options": {
+        "unitData": {
+          "id": "u1",
+          "objective": "look around",
+          "capability": "code:review",
+          "writes": []
+        },
+        "cwd": "<ROOT>/tree",
+        "pinInputs": [
+          "/a"
+        ]
+      },
+      "host": {
+        "unit": {
+          "id": "u1",
+          "objective": "look around",
+          "capability": "code:review",
+          "writes": [],
+          "dependsOn": [],
+          "inputs": [],
+          "expectedOutputs": []
+        },
+        "collaboration": null,
+        "bind": [],
+        "configError": {
+          "name": "RunnerConfigError",
+          "code": "config-parse",
+          "phase": null,
+          "message": "config-parse project:config.yaml:2:1 (syntax-error)"
+        }
+      },
+      "outcome": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "phase": null,
+          "message": "runUnit: pinInputs needs declared"
+        }
+      },
+      "record": null,
+      "calls": []
+    },
+    {
+      "name": "a resume of a run that does not exist",
+      "options": {
+        "cwd": "<ROOT>/tree",
+        "runnerConfig": {},
+        "resumeUnitRunId": "unit-run-1-00000000"
+      },
+      "host": {
+        "unit": null,
+        "collaboration": null,
+        "bind": [],
+        "configError": null
+      },
+      "outcome": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "phase": null,
+          "message": "cannot resume unit run \"unit-run-1-00000000\": unit.json not found at \"<ROOT>/repo/.fgos/assignments/unit-run-1-00000000/unit.json\""
+        }
+      },
+      "record": null,
+      "calls": []
+    },
+    {
+      "name": "a resume cannot change the stored question",
+      "options": {
+        "cwd": "<ROOT>/tree",
+        "runnerConfig": {},
+        "resumeUnitRunId": "unit-run-1-00000000",
+        "stanceOptions": [
+          "yes"
+        ]
+      },
+      "host": {
+        "unit": null,
+        "collaboration": null,
+        "bind": [],
+        "configError": null
+      },
+      "outcome": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "phase": null,
+          "message": "cannot provide stanceOptions when resuming a unit run: the stored question is immutable"
+        }
+      },
+      "record": null,
+      "calls": []
+    }
+  ]
+}

@@ -235,10 +235,16 @@ fn port_missing() -> RunUnitError {
     )
 }
 
-fn shared_cwd_refusal() -> RunUnitError {
+fn shared_cwd_refusal(cwd: &Value, unit: &Value) -> RunUnitError {
     coded(
         "--force-shared-cwd cannot be used with writes",
         "custody-required",
+    )
+    .with("cwd", cwd.clone())
+    .with("executorId", Value::Null)
+    .with(
+        "capability",
+        unit.get("capability").cloned().unwrap_or(Value::Null),
     )
 }
 
@@ -327,7 +333,9 @@ pub struct StartBase<'a> {
     pub assignments_dir: PathBuf,
     pub fgos_dir: PathBuf,
     pub case_ref: Option<Value>,
-    pub live_config: &'a Value,
+    /// The config this run reads live, read at first use (`liveConfig` in Node): the caller's `runnerConfig`, else
+    /// the project's, so a refusal checked before the first use is reported before a config that cannot be read.
+    pub live: std::cell::OnceCell<Value>,
     pub not_a_repository: bool,
     pub cwd: PathBuf,
 }
@@ -344,19 +352,45 @@ impl StartBase<'_> {
         Ok(())
     }
 
-    /// The runner config with the account inventory read live from the config (never from unit.json).
-    pub fn with_accounts(&self, runner: &Value) -> Value {
-        let mut out = runner.as_object().cloned().unwrap_or_default();
-        let source = self
-            .options
-            .get("runnerConfig")
-            .filter(|c| !c.is_null())
-            .unwrap_or(self.live_config);
-        for (key, value) in account_inventory_of(source) {
-            out.insert(key, value);
+    /// The config this run reads live, read once at its first use.
+    pub fn live_config<H: UnitRunHost>(&self, host: &H) -> Result<&Value, RunUnitError> {
+        if let Some(cfg) = self.live.get() {
+            return Ok(cfg);
         }
-        Value::Object(out)
+        let cfg = match self.options.get("runnerConfig").filter(|c| !c.is_null()) {
+            Some(c) => c.clone(),
+            None => host.load_runner_config(&self.main_root)?,
+        };
+        Ok(self.live.get_or_init(|| cfg))
     }
+
+    /// The runner config with the account inventory read live (never from unit.json): the caller's config, else
+    /// the project's config read again at every call (`readAccountInventory`).
+    pub fn with_accounts<H: UnitRunHost>(
+        &self,
+        host: &H,
+        runner: &Value,
+    ) -> Result<Value, RunUnitError> {
+        with_accounts(host, self.options, &self.main_root, runner)
+    }
+}
+
+/// `{ ...runner, ...readAccountInventory(mainRoot, options.runnerConfig) }`.
+pub(crate) fn with_accounts<H: UnitRunHost>(
+    host: &H,
+    options: &Value,
+    main_root: &Path,
+    runner: &Value,
+) -> Result<Value, RunUnitError> {
+    let mut out = runner.as_object().cloned().unwrap_or_default();
+    let source = match options.get("runnerConfig").filter(|c| !c.is_null()) {
+        Some(c) => c.clone(),
+        None => host.load_runner_config(main_root)?,
+    };
+    for (key, value) in account_inventory_of(&source) {
+        out.insert(key, value);
+    }
+    Ok(Value::Object(out))
 }
 
 /// `accountInventoryConfigOf`: the account inventory (where logins are kept) of a runner config.
@@ -442,8 +476,7 @@ pub struct Started {
 fn custody_of(base: &StartBase<'_>, worktree: &Path) -> Result<Handle, RunUnitError> {
     let scope = LockScope::seeded(Vec::new())
         .map_err(|e| RunUnitError::other("lock-registry-invalid", e.to_string()))?;
-    admit_successor(&scope, &base.fgos_dir, worktree)
-        .map_err(|e| RunUnitError::other(&e.code, e.message))
+    admit_successor(&scope, &base.fgos_dir, worktree).map_err(|e| RunUnitError::dispatch(&e))
 }
 
 fn realpath(path: &Path) -> String {
@@ -505,7 +538,7 @@ pub fn admit_fresh_unit<H: UnitRunHost>(
         "request": opt(options, "request"),
         "inCase": base.case_ref.is_some(),
         "reason": reason,
-        "runnerConfig": base.live_config,
+        "runnerConfig": base.live_config(host)?,
         "origins": opt(options, "runnerConfig").is_none(),
     }))?;
     let loop_name = collaboration
@@ -560,11 +593,11 @@ pub fn admit_fresh_unit<H: UnitRunHost>(
             host.assert_run_timeout(timeout)?;
         }
     }
-    let config_snapshot = snapshot_runner_config(base.live_config);
+    let config_snapshot = snapshot_runner_config(base.live_config(host)?);
     let config_snapshot_runner = config_snapshot["runner"].clone();
     host.door_choices(
         &unit,
-        &base.with_accounts(&config_snapshot["runner"]),
+        &base.with_accounts(host, &config_snapshot["runner"])?,
         options,
         &collaboration,
     )?;
@@ -594,7 +627,10 @@ pub fn admit_fresh_unit<H: UnitRunHost>(
     };
     let writing = writes_worktree(&unit, sync.as_ref());
     if writing && options.get("forceSharedCwd") == Some(&json!(true)) {
-        return Err(shared_cwd_refusal());
+        return Err(shared_cwd_refusal(
+            &json!(base.worktree.display().to_string()),
+            &unit,
+        ));
     }
     let port = host.admission();
     if (writing || base.case_ref.is_some()) && port.is_none() {
@@ -623,7 +659,7 @@ pub fn admit_fresh_unit<H: UnitRunHost>(
         // The rigor the seats will bind at (the unit's own or its capability's, the stronger).
         let rigor = fgos_execution::bind::effective_rigor(&unit, &config_snapshot_runner)
             .map_err(|e| pre_admission(e.to_string(), None))?;
-        let proposal = json!({
+        let mut proposal = json!({
             "unitRunId": unit_run_id,
             "caseRef": proposal_ref,
             "activity": case_ref.get("activity"),
@@ -634,9 +670,14 @@ pub fn admit_fresh_unit<H: UnitRunHost>(
             "seatLaunches": collaboration.get("launchBound"),
             "blind": unit.get("blind") == Some(&json!(true)),
             "handoffRefs": unit.get("inputs"),
-            "rigor": rigor,
             "reason": reason,
         });
+        if let (Some(rigor), Some(p)) = (rigor, proposal.as_object_mut()) {
+            // Before `reason`, where Node's object literal names it; an unknown rigor is left out, as undefined is.
+            let reason = p.shift_remove("reason").unwrap_or(Value::Null);
+            p.insert("rigor".into(), json!(rigor));
+            p.insert("reason".into(), reason);
+        }
         match port
             .admit(&proposal)
             .map_err(|e| RunUnitError::other("case-admission-port-failed", e.to_string()))?
@@ -897,7 +938,7 @@ pub fn load_resumed_unit<H: UnitRunHost>(
     let mut runner_for_loop: Value;
     if record.get("collaboration").is_some_and(truthy) {
         let shipped = host.shipped_catalog();
-        let live = base.live_config;
+        let live = base.live_config(host)?;
         let live_patterns = live
             .get("patterns")
             .filter(|p| !p.is_null())
@@ -977,9 +1018,10 @@ pub fn load_resumed_unit<H: UnitRunHost>(
         return Err(coded(
             format!("cannot resume unit run \"{unit_run_id}\": attempt \"{}\" is still {state} ({}); look with `{look}` and resume once it has closed", prior.run_id, prior.dir.display()),
             "attempt-still-running",
-        ));
+        )
+        .with("attemptState", json!(state)));
     }
-    let current = snapshot_runner_config(base.live_config);
+    let current = snapshot_runner_config(base.live_config(host)?);
     let recorded_hash = record.pointer("/configSnapshot/hash").cloned();
     if Some(&current["hash"]) != recorded_hash.as_ref() {
         if let Some(bindings) = record.get_mut("bindings").and_then(Value::as_object_mut) {
@@ -1023,7 +1065,7 @@ pub fn load_resumed_unit<H: UnitRunHost>(
     }
     if let Some(holder) = dispatch_cwd_holder(&base.fgos_dir, &base.worktree) {
         let e = dispatch_in_flight_error(&base.worktree, holder.pid, &holder.lock_path);
-        return Err(RunUnitError::other(&e.code, e.message));
+        return Err(RunUnitError::dispatch(&e));
     }
     assert_no_stray_commit(host, &unit_run_id, &record, base)?;
     let unpassed: Vec<Value> = last_attempts(&record)
@@ -1034,10 +1076,11 @@ pub fn load_resumed_unit<H: UnitRunHost>(
     host.pinned_accounts_usable(
         &unpassed,
         &base.with_accounts(
+            host,
             record
                 .pointer("/configSnapshot/runner")
                 .unwrap_or(&json!({})),
-        ),
+        )?,
         &format!("cannot resume unit run \"{unit_run_id}\""),
     )?;
     let declared_op = match record.get("declared").filter(|d| truthy(d)) {
@@ -1056,7 +1099,10 @@ pub fn load_resumed_unit<H: UnitRunHost>(
     };
     if writing {
         if options.get("forceSharedCwd") == Some(&json!(true)) {
-            return Err(shared_cwd_refusal());
+            return Err(shared_cwd_refusal(
+                record.get("worktree").unwrap_or(&Value::Null),
+                &unit,
+            ));
         }
         let worktree = PathBuf::from(
             record

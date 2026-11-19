@@ -2,7 +2,14 @@
 // Node modules it ports: src/runner/execution/{commit-unit-work,unit-sync,custody-door,run,unit-run-start,
 // unit-run-history}.mjs.
 // Run: node test/golden-recorders/unit-run.recorder.mjs [--check]
-// Writes under packages/execution/contracts/unit-run/: commit-subject.json, sync.json, verify.json, run-loop.json.
+// Writes under packages/execution/contracts/unit-run/: commit-subject.json, sync.json, verify.json, run-loop.json,
+// run-unit-runs.json.
+//
+// run-unit-runs.json is whole `runUnit` calls in a scratch repository: the result or the error, the unit.json they
+// leave and every case admission call, normalized (paths, ids, times). It needs the Git addon, staged from this
+// checkout the way scripts do (`ensureAddonForScript`). Every run stops before a seat would dispatch (its bind is
+// refused for want of an executor), since a dispatch starts a supervised agent; the dispatch is the assignment
+// runner's, whose own vectors are contracts/assignment-runner/.
 //
 // The run loop's own decisions that run.mjs and unit-run-start.mjs keep private (the scope rule, the reasons a
 // unit ended on infrastructure, the option checks of a fresh run and of a resume) are reached through a copy of the
@@ -17,7 +24,10 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { ensureAddonForScript } from '../../scripts/lib/git-addon-stage.mjs';
+import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const outDir = path.join(root, 'packages', 'execution', 'contracts', 'unit-run');
@@ -124,12 +134,17 @@ const start = await withPrivate(path.join(exec, 'unit-run-start.mjs'),
   { "import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';": { patterns: shippedPatterns } });
 const { outcomeOfRunResult, readUnitRunHistory } = await import(path.join(exec, 'unit-run-history.mjs'));
 
+/** A thrown error as the run-unit error carries it: its class name, code, phase, message, refusal and other fields. */
+function errorOf(e) {
+  const { code, phase, refusal, name: _name, category: _category, ...rest } = Object.fromEntries(Object.entries(e));
+  return plain({ name: e.name, code: code ?? null, phase: phase ?? null, message: e.message, ...(refusal ? { refusal } : {}),
+    ...(Object.keys(rest).length ? { fields: rest } : {}) });
+}
+
 /** What a call threw, as the run-unit error carries it; `ok` with its value when it did not throw. */
 function outcomeOf(fn) {
   try { return { ok: true, value: plain(fn()) }; }
-  catch (e) {
-    return { ok: false, error: plain({ name: e.name, code: e.code ?? null, phase: e.phase ?? null, message: e.message, ...(e.refusal ? { refusal: e.refusal } : {}) }) };
-  }
+  catch (e) { return { ok: false, error: errorOf(e) }; }
 }
 
 const bound = (extra = {}) => ({ executor: 'claude', invocation: 'claude-cli', transport: 'process', pool: 'anthropic', leaseAccount: 'a1', ...extra });
@@ -234,6 +249,101 @@ const pins = [
 const bindings = [{ answer: 'unbound' }, { answer: 'bound', record: { caseId: 'case-1' } }, null, { answer: 'bound', condition: 'held by x' }, { answer: 'stale' }]
   .map((binding) => ({ binding, answer: outcomeOf(() => start.requireFreeWorktree({ resolveBinding: () => binding }, '/w')) }));
 
+// ---- whole runUnit calls ------------------------------------------------------------------------------------
+
+ensureAddonForScript(process.env);
+const { runUnit } = await import(path.join(exec, 'run.mjs'));
+const { resolveCollaboration } = await import(path.join(exec, 'patterns', 'catalog.mjs'));
+const { validateUnit } = await import(path.join(exec, 'unit.mjs'));
+const { shippedCatalog } = await import(path.join(root, 'src', 'runner', 'dispatch', 'shipped-catalog.mjs'));
+
+/** A scratch main checkout `<ROOT>/repo` with a linked worktree `<ROOT>/tree`; `brokenConfig` leaves an unreadable config. */
+function scratch({ brokenConfig = false } = {}) {
+  const dir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'unit-run-runs-')));
+  const main = path.join(dir, 'repo');
+  fs.mkdirSync(main);
+  const git = (cwd, ...args) => execFileSync('git', ['-C', cwd, ...args], { stdio: 'ignore' });
+  git(main, 'init', '-q', '--initial-branch=trunk');
+  git(main, 'config', 'user.name', 'Fixture');
+  git(main, 'config', 'user.email', 'fixture@example.invalid');
+  fs.writeFileSync(path.join(main, 'a'), 'a\n');
+  fs.writeFileSync(path.join(main, '.gitignore'), '.fgos/\n');
+  git(main, 'add', '.');
+  git(main, 'commit', '-qm', 'base');
+  git(main, 'worktree', 'add', '-qb', 'tree', path.join(dir, 'tree'));
+  if (brokenConfig) writeRawProjectConfig(main, '{ "runner": ');
+  return dir;
+}
+
+const TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
+/** Paths under the scratch root, the unit run id, times and the user, as placeholders both sides write alike. */
+function normalize(value, dir, unitRunId) {
+  return JSON.parse(JSON.stringify(value ?? null, (key, v) => {
+    if (typeof v !== 'string') return v;
+    if (key === 'createdBy') return '<USER>';
+    if (TIME.test(v)) return '<TIME>';
+    let out = v.split(dir).join('<ROOT>');
+    if (unitRunId) out = out.split(unitRunId).join('<UNIT_RUN_ID>');
+    return out;
+  }));
+}
+
+const readOnlyUnit = { id: 'u1', objective: 'look around', capability: 'code:review', writes: [] };
+const writingUnit = { id: 'u1', objective: 'add b', capability: 'code:implement', writes: ['b.txt'] };
+const runCases = [
+  { name: 'a read-only run whose seat has no executor settles policy-refusal', unit: readOnlyUnit, options: { runnerConfig: {} } },
+  { name: 'a case run is admitted, refused at its seat, and settled once', unit: readOnlyUnit, options: { runnerConfig: {}, caseRef: { caseId: 'case-1', activity: 'build' }, workflowId: 'wf-1' },
+    port: { admit: { admitted: true, reservationId: 'res-1', caseId: 'case-1', seatLaunchCeiling: 2 } } },
+  { name: 'a refused admission is a CaseAdmissionRefusedError', unit: readOnlyUnit, options: { runnerConfig: {}, caseRef: { caseId: 'case-1', activity: 'build' } },
+    port: { admit: { refused: { code: 'case-admission-busy', condition: 'the case is busy' } } } },
+  { name: 'a writing run without a port is refused by code', unit: writingUnit, options: { runnerConfig: {} } },
+  { name: 'a standalone writing run into a bound worktree is refused', unit: writingUnit, options: { runnerConfig: {} },
+    port: { binding: { answer: 'bound', record: { caseId: 'case-9' } } } },
+  { name: 'an unreadable config is refused where the run first reads it', unit: readOnlyUnit, options: {}, brokenConfig: true },
+  { name: 'a refusal checked before the config is read wins over an unreadable config', unit: readOnlyUnit, options: { pinInputs: ['/a'] }, brokenConfig: true },
+  { name: 'a resume of a run that does not exist', unit: null, options: { runnerConfig: {}, resumeUnitRunId: 'unit-run-1-00000000' } },
+  { name: 'a resume cannot change the stored question', unit: null, options: { runnerConfig: {}, resumeUnitRunId: 'unit-run-1-00000000', stanceOptions: ['yes'] } },
+];
+
+const runs = [];
+for (const c of runCases) {
+  const dir = scratch({ brokenConfig: c.brokenConfig });
+  const tree = path.join(dir, 'tree');
+  const calls = [];
+  const answer = (op, value) => (...args) => { calls.push({ op, args }); return value; };
+  const port = c.port ? {
+    resolveBinding: answer('resolveBinding', c.port.binding ?? { answer: 'unbound' }),
+    admit: answer('admit', c.port.admit ?? null),
+    settle: answer('settle', undefined),
+    recheckEffect: answer('recheckEffect', { ok: true }),
+  } : undefined;
+  const options = { ...(c.unit ? { unitData: c.unit } : {}), cwd: tree, ...c.options, ...(port ? { caseAdmission: port } : {}) };
+  let outcome;
+  try { outcome = { ok: plain(await runUnit(options)) }; } catch (e) { outcome = { error: errorOf(e) }; }
+  const unitRunId = outcome.ok?.unitRunId ?? (calls.find((x) => x.op === 'admit')?.args[0].unitRunId) ?? null;
+  const recordFile = unitRunId ? path.join(dir, 'repo', '.fgos', 'assignments', unitRunId, 'unit.json') : null;
+  const record = recordFile && fs.existsSync(recordFile) ? JSON.parse(fs.readFileSync(recordFile, 'utf8')) : null;
+  // What the host answers in the Rust replay: the unit contract's, the collaboration's and the bind's.
+  const unit = c.unit ? plain(validateUnit(c.unit)) : null;
+  const collaboration = unit && !c.brokenConfig ? plain(resolveCollaboration({
+    unit, selectors: { callerObject: null, callerString: null, activityUnit: undefined }, request: null,
+    inCase: Boolean(c.options.caseRef), reason: null, runnerConfig: c.options.runnerConfig, shipped: shippedCatalog(), origins: null,
+  })) : null;
+  let configError = null;
+  if (c.brokenConfig) {
+    const { loadRunnerConfigForDir } = await import(path.join(root, 'src', 'runner', 'dispatch', 'config.mjs'));
+    try { loadRunnerConfigForDir(path.join(dir, 'repo')); } catch (e) { configError = errorOf(e); }
+  }
+  const bind = (outcome.ok?.results ?? []).map((r) => r.refused ? { refused: r.refused } : null);
+  runs.push(normalize({
+    name: c.name,
+    options: { ...(c.unit ? { unitData: c.unit } : {}), cwd: '<ROOT>/tree', ...c.options, ...(c.port ? { port: c.port } : {}) },
+    host: { unit, collaboration, bind, configError },
+    outcome, record, calls,
+  }, dir, unitRunId));
+  fs.rmSync(dir, { recursive: true, force: true });
+}
+
 const runLoopVectors = {
   providerLimit, snapshot: configs, outcomeOfRunResult: outcomes, corpusHistory: history, scopeRule, infrastructureReason: infra,
   refusedSeats: refused, failedUnitFacts: failedFacts,
@@ -245,6 +355,7 @@ const files = {
   'sync.json': syncCases,
   'verify.json': { subject: 'Verification command', command: 'npm test', cases: verifies },
   'run-loop.json': runLoopVectors,
+  'run-unit-runs.json': { runs },
 };
 const text = (body) => `${JSON.stringify(body, null, 2)}\n`;
 

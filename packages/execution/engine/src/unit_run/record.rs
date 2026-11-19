@@ -43,5 +43,6 @@ pub fn read_unit_record(unit_run_id: &str, unit_json: &Path) -> Result<Value, Ru
             Some("unit-record-unreadable"),
             None,
         )
+        .with("path", serde_json::json!(unit_json.display().to_string()))
     })
 }

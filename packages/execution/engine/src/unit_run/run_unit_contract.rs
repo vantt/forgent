@@ -81,6 +81,10 @@ pub struct RunUnitError {
     pub phase: Option<String>,
     /// The refusal a `CaseAdmissionRefusedError` carries: `{ code, condition, violations? }`.
     pub refusal: Option<Value>,
+    /// The other own fields of the Node error a caller may read (`path`, `cwd`, `attemptState`, a dispatch
+    /// error's details, the class `name` of an error that is neither tag): the door copies them onto the rethrown
+    /// instance. Empty for none.
+    pub fields: Map<String, Value>,
 }
 
 impl RunUnitError {
@@ -93,6 +97,7 @@ impl RunUnitError {
             message: message.into(),
             phase: phase.map(str::to_string),
             refusal: None,
+            fields: Map::new(),
         }
     }
 
@@ -114,6 +119,7 @@ impl RunUnitError {
             ),
             phase: None,
             refusal: Some(Value::Object(answer)),
+            fields: Map::new(),
         }
     }
 
@@ -126,7 +132,23 @@ impl RunUnitError {
             message: message.into(),
             phase: None,
             refusal: None,
+            fields: Map::new(),
         }
+    }
+
+    /// One more field of the Node error.
+    pub fn with(mut self, key: &str, value: Value) -> Self {
+        self.fields.insert(key.into(), value);
+        self
+    }
+
+    /// A `DispatchError` of the run supervisor: its code is its class, its details its fields.
+    pub fn dispatch(error: &fgos_run_supervisor::controller::error::DispatchError) -> Self {
+        let mut out = Self::other(&error.code, error.message.clone());
+        out.code = Some(error.code.clone());
+        out.fields = error.detail.clone();
+        out.fields.insert("name".into(), json!("DispatchError"));
+        out
     }
 
     pub fn to_json(&self) -> Value {
@@ -143,6 +165,9 @@ impl RunUnitError {
         if let Some(refusal) = &self.refusal {
             error.insert("refusal".into(), refusal.clone());
         }
+        if !self.fields.is_empty() {
+            error.insert("fields".into(), Value::Object(self.fields.clone()));
+        }
         json!({ "contract": contract(RESULT_CONTRACT_ID), "ok": false, "error": Value::Object(error) })
     }
 
@@ -156,6 +181,11 @@ impl RunUnitError {
             message: text("message")?,
             phase: text("phase"),
             refusal: error.get("refusal").cloned(),
+            fields: error
+                .get("fields")
+                .and_then(Value::as_object)
+                .cloned()
+                .unwrap_or_default(),
         })
     }
 }
@@ -181,3 +211,11 @@ pub fn request(options: &Map<String, Value>) -> Result<Value, String> {
         json!({ "contract": contract(REQUEST_CONTRACT_ID), "options": Value::Object(options.clone()) }),
     )
 }
+
+impl std::fmt::Display for RunUnitError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.message)
+    }
+}
+
+impl std::error::Error for RunUnitError {}

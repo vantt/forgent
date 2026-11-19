@@ -27,7 +27,7 @@ pub struct GitRoots {
 }
 
 /// The one controller of a unit run (`acquireUnitControl`), released once the run ends.
-pub trait UnitControl {
+pub trait UnitControl: Send {
     fn release(&mut self) -> Result<(), String>;
 }
 
