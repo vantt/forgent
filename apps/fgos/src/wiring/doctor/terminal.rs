@@ -12,7 +12,9 @@ use fgos_distribution::doctor::FixResult;
 use fgos_distribution::doctor::{timed, RowOutcome};
 use fgos_execution::decide::{check_loaded_runner, Workspace};
 use fgos_execution_engine::transport::terminal_slot::resolve_herdr_bin;
-use fgos_terminal_control::port::{AnchorPane, CapabilitiesAsk, CapabilitiesReport, Finding};
+use fgos_terminal_control::port::{
+    AnchorPane, CapabilitiesAsk, CapabilitiesReport, Finding, Refusal,
+};
 use fgos_terminal_control::route::CoreParts;
 use serde_json::{json, Map, Value};
 use std::path::Path;
@@ -82,7 +84,14 @@ pub trait Route {
     /// `config` is the route's flat settings (the explicitly set ones); `agents` also reads the agent kinds and
     /// the integration hook states.
     fn capabilities(&self, config: &Value, anchor: Option<&str>, agents: bool) -> Asked;
-    fn reconcile_scan(&self, older_than_ms: u64) -> Result<Vec<Finding>, String>;
+    fn reconcile_scan(&self, older_than_ms: u64) -> Result<Vec<Finding>, ScanFault>;
+}
+
+/// Why an allocation scan gave no findings: the core could not be built, or it answered without a scan.
+#[derive(Debug, Clone)]
+pub enum ScanFault {
+    NotAnswered(String),
+    Refused(Refusal),
 }
 
 /// The route of this machine: the core built from the same envelope the route process reads.
@@ -134,10 +143,12 @@ impl Route for HostRoute {
         }
     }
 
-    fn reconcile_scan(&self, older_than_ms: u64) -> Result<Vec<Finding>, String> {
-        let parts = self.parts(&json!({})).map_err(|(_, message)| message)?;
+    fn reconcile_scan(&self, older_than_ms: u64) -> Result<Vec<Finding>, ScanFault> {
+        let parts = self
+            .parts(&json!({}))
+            .map_err(|(_, message)| ScanFault::NotAnswered(message))?;
         let scan = parts.core().reconcile_scan(older_than_ms);
-        scan.map_err(|refusal| refusal.to_string())
+        scan.map_err(ScanFault::Refused)
     }
 }
 
@@ -396,9 +407,24 @@ fn terminal_allocations(entries: Result<Vec<Entry>, String>, route: &dyn Route) 
         return (true, "warning: terminal.allocationGraceMs is invalid (see terminal-control), allocations not scanned".to_owned());
     };
     match route.reconcile_scan(grace) {
-        Err(why) => (
+        Err(ScanFault::NotAnswered(why)) => (
             true,
             format!("warning: the terminal-control route did not answer, allocations not scanned ({why})"),
+        ),
+        Err(ScanFault::Refused(Refusal::Unsupported { capability, detail })) => (
+            true,
+            format!(
+                "info: allocations not scanned: terminal mode is unsupported here ({})",
+                if detail.is_empty() { capability } else { detail }
+            ),
+        ),
+        Err(ScanFault::Refused(Refusal::Unknown { reason })) => (
+            true,
+            if reason.is_empty() {
+                "warning: allocation scan answered unknown".to_owned()
+            } else {
+                format!("warning: allocation scan answered unknown ({reason})")
+            },
         ),
         Ok(findings) if findings.is_empty() => (
             true,
@@ -646,7 +672,7 @@ mod tests {
     struct Fake {
         answers: RefCell<Vec<Asked>>,
         configs: RefCell<Vec<Value>>,
-        scan: Result<Vec<Finding>, String>,
+        scan: Result<Vec<Finding>, ScanFault>,
     }
 
     impl Fake {
@@ -664,7 +690,7 @@ mod tests {
             self.configs.borrow_mut().push(config.clone());
             self.answers.borrow_mut().remove(0)
         }
-        fn reconcile_scan(&self, _older: u64) -> Result<Vec<Finding>, String> {
+        fn reconcile_scan(&self, _older: u64) -> Result<Vec<Finding>, ScanFault> {
             self.scan.clone()
         }
     }
@@ -937,7 +963,7 @@ mod tests {
     #[test]
     fn terminal_allocations_says_it_did_not_scan_instead_of_failing() {
         let mut route = Fake::answering(vec![]);
-        route.scan = Err("spawn herdr: ENOENT".into());
+        route.scan = Err(ScanFault::NotAnswered("spawn herdr: ENOENT".into()));
         let (passed, message) = terminal_allocations(Ok(defaults()), &route);
         assert!(passed);
         assert!(
@@ -945,6 +971,21 @@ mod tests {
                 "warning: the terminal-control route did not answer, allocations not scanned"
             ),
             "{message}"
+        );
+        route.scan = Err(ScanFault::Refused(Refusal::Unknown {
+            reason: "herdr status server reports no running socket".into(),
+        }));
+        assert_eq!(
+            terminal_allocations(Ok(defaults()), &route).1,
+            "warning: allocation scan answered unknown (herdr status server reports no running socket)"
+        );
+        route.scan = Err(ScanFault::Refused(Refusal::Unsupported {
+            capability: "pane.list".into(),
+            detail: String::new(),
+        }));
+        assert_eq!(
+            terminal_allocations(Ok(defaults()), &route).1,
+            "info: allocations not scanned: terminal mode is unsupported here (pane.list)"
         );
         let (passed, message) = terminal_allocations(Err("config-parse".into()), &route);
         assert!(passed);

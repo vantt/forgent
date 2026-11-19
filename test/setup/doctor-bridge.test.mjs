@@ -41,11 +41,11 @@ test('an id with no body refuses the whole call and judges nothing', async () =>
 
 test('rows come back in the order asked, each as one line, and the call ends with its count', async () => {
   lines.length = 0;
-  const code = await serve(JSON.stringify({ phase: 'check', ids: ['agent-type-names-unique', 'workflow-case-bindings'], dir: root }), collect());
+  const code = await serve(JSON.stringify({ phase: 'check', ids: ['domain-registry-compiled', 'workflow-case-bindings'], dir: root }), collect());
   assert.equal(code, 0);
   const kinds = lines.map((line) => JSON.parse(line.slice(RESULT_PREFIX.length)));
   assert.deepEqual(kinds.map((entry) => entry.kind), ['row', 'row', 'end']);
-  assert.deepEqual(kinds.slice(0, 2).map((entry) => entry.id), ['agent-type-names-unique', 'workflow-case-bindings']);
+  assert.deepEqual(kinds.slice(0, 2).map((entry) => entry.id), ['domain-registry-compiled', 'workflow-case-bindings']);
   assert.equal(kinds[2].count, 2);
   assert.equal(kinds[2].nodeVersion, process.version, 'the end line names the Node that ran the call');
   for (const entry of kinds.slice(0, 2)) assert.equal(typeof entry.passed, 'boolean');

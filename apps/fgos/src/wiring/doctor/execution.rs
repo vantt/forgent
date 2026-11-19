@@ -1,6 +1,7 @@
-//! The execution doctor rows: what the runner config and the machine it names say about readiness. The
-//! judgements are `fgos_execution::checks`'; this file reads the effective config through the config door and the
-//! machine through the real one, hands both in, and words nothing itself.
+//! The execution doctor rows: what the runner config and the machine it names say about readiness. The rows S5
+//! moved are judged by `fgos_execution::checks`; the executor, account, agent-definition and template rows are
+//! worded here over the execution crates' readers. This file reads the effective config through the config door and
+//! the machine through the real one.
 //!
 //! The config is read once per call (a failure is remembered, not read again per row). Two rows judge the config
 //! as the runner loads it, after its semantic check (`executor-confinement`, `invocation-git-write-grants`; the
@@ -55,6 +56,7 @@ pub const ROWS: &[&str] = &[
     "model-policy-pools",
     "llm-accounts-shape",
     "llm-accounts-default-login-home",
+    "agent-type-names-unique",
     "executor-profile-warnings",
     "session-keep-declared",
     "provider-capacity-state",
@@ -295,6 +297,12 @@ fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
                         llm_accounts_default_login_home(runner, &home_of(&env), &env)
                     })
                 }
+                "agent-type-names-unique" => row(match crate::active_payload_root() {
+                    Ok(payload) => agent_type_names_unique(root, &payload),
+                    Err(cause) => fail(format!(
+                        "the legacy payload cannot be resolved, so the tiers a project's agent definitions replace are unknown: {cause}"
+                    )),
+                }),
                 "executor-profile-warnings" => with_loaded(
                     &config,
                     "executor-profile warnings not evaluated",
@@ -309,7 +317,10 @@ fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
                 "confined-pane-accounts" => {
                     row(confined_pane_accounts_row(&config, &home_of(&env)))
                 }
-                "operation-prompt-templates-valid" => row(operation_prompt_templates_valid(root)),
+                "operation-prompt-templates-valid" => row(operation_prompt_templates_valid(
+                    root,
+                    crate::active_payload_root().unwrap_or_else(|_| root.to_path_buf()),
+                )),
                 "seat-binding-route" => row(seat_binding_route()),
                 other => unreachable!("execution group asked for row {other}"),
             })
@@ -1083,11 +1094,110 @@ fn confined_pane_accounts(
     })
 }
 
+// ---- agent definitions -------------------------------------------------------------------------------------
+
+/// Agent definition names are unique within each tier the project supplies (`fgos/agents`, and `core/agents` when
+/// the project carries its own), and every `fgos/agents` file has the shape the renderer needs. The tiers read from
+/// the installed release are judged by `npm test`, never here. A higher tier replacing a lower one is a
+/// customization, named; render warnings and installed personas the project's own `core/agents` hides are warnings
+/// in the message, never a failure. The listing is `fgos agents list`'s, read by the same tier reader.
+fn agent_type_names_unique(project: &Path, payload: &Path) -> CheckResult {
+    use crate::wiring::dispatch_decide::resolve_path;
+    let (tiers, shipped) = crate::wiring::agents::tiers_of(project, payload);
+    let listing = fgos_execution::agents::list(&tiers, shipped.as_deref());
+    // A tier is the project's when its folder is not inside the installed release.
+    let inside_install = resolve_path(&project.to_string_lossy(), Path::new("/"))
+        .starts_with(resolve_path(&payload.to_string_lossy(), Path::new("/")));
+    // The core tier is the project's own exactly when the tier reader found shipped personas it can hide.
+    let project_tier = |tier: &str| {
+        !inside_install && (tier == "workspace" || (tier == "core" && shipped.is_some()))
+    };
+    let mut problems: Vec<String> = listing
+        .duplicates
+        .iter()
+        .filter(|duplicate| project_tier(&duplicate.tier))
+        .map(|duplicate| {
+            format!(
+                "duplicate agent-type name \"{}\" in {} ({})",
+                duplicate.name,
+                duplicate.label,
+                duplicate.files.join(", ")
+            )
+        })
+        .collect();
+    let mut notes: Vec<String> = Vec::new();
+    let mut customizations: Vec<String> = Vec::new();
+    if project_tier("workspace") {
+        for agent in listing
+            .agents
+            .iter()
+            .filter(|agent| agent.tier == "workspace")
+        {
+            problems.extend(
+                agent
+                    .problems
+                    .iter()
+                    .map(|problem| format!("{}: {problem}", agent.source)),
+            );
+            notes.extend(
+                agent
+                    .warnings
+                    .iter()
+                    .map(|warning| format!("{}: {warning}", agent.source)),
+            );
+            customizations.push(match agent.shadows.first() {
+                Some(lower) => format!("{} (replaces {lower})", agent.name),
+                None => agent.name.clone(),
+            });
+        }
+        problems.extend(
+            tiers
+                .iter()
+                .filter(|tier| tier.tier == "workspace")
+                .flat_map(|tier| tier.ignored.iter())
+                .map(|rel| format!("{rel} is ignored: only .yaml files are read")),
+        );
+    }
+    let workspace_label = tiers
+        .iter()
+        .find(|tier| tier.tier == "workspace")
+        .map_or("", |tier| tier.label.as_str());
+    notes.extend(listing.masked.iter().map(|hidden| {
+        format!(
+            "installed persona \"{}\" ({}) is hidden by {}; copy it there or into {workspace_label} to seat it",
+            hidden.name, hidden.source, hidden.hidden_by
+        )
+    }));
+    if !problems.is_empty() {
+        return fail(format!("agent definitions: {}", problems.join("; ")));
+    }
+    let tail = if notes.is_empty() {
+        String::new()
+    } else {
+        format!("; warning: {}", notes.join("; "))
+    };
+    pass(if customizations.is_empty() {
+        format!(
+            "agent-type names are unique within each tier ({}){tail}",
+            tiers
+                .iter()
+                .map(|tier| tier.label.as_str())
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
+    } else {
+        format!(
+            "agent-type names are unique within each tier; {workspace_label} holds {}{tail}",
+            customizations.join(", ")
+        )
+    })
+}
+
 /// Every operation prompt template of the project tier validates against the bounded variables and schema.
-fn operation_prompt_templates_valid(root: &Path) -> CheckResult {
+fn operation_prompt_templates_valid(root: &Path, package_root: PathBuf) -> CheckResult {
     let roots = TemplateRoots {
         cwd: root.to_path_buf(),
-        package_root: crate::active_payload_root().unwrap_or_else(|_| root.to_path_buf()),
+        package_root,
     };
     match discover_project_prompt_templates(&roots) {
         Ok(found) => pass(format!(
@@ -1292,6 +1402,370 @@ mod row_tests {
                 false
             });
         assert!(skipped.passed && skipped.message.contains("not installed"));
+    }
+
+    /// A fresh directory with `files` (relative path, text) written under it.
+    fn tree(name: &str, files: &[(&str, &str)]) -> PathBuf {
+        let dir =
+            std::env::temp_dir().join(format!("fgos-agent-row-{name}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        for (rel, text) in files {
+            let file = dir.join(rel);
+            std::fs::create_dir_all(file.parent().unwrap()).unwrap();
+            std::fs::write(file, text).unwrap();
+        }
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
+    }
+
+    const PERSONA: &str = "description: a persona\n";
+
+    #[test]
+    fn a_workspace_definition_of_the_wrong_shape_or_extension_or_unparsable_fails_the_agent_row() {
+        let payload = tree("shape-payload", &[]);
+        let project = tree(
+            "shape-project",
+            &[
+                (
+                    "fgos/agents/wrong-name.yaml",
+                    "name: other\ndescription: a persona\n",
+                ),
+                ("fgos/agents/no-description.yaml", "name: no-description\n"),
+                (
+                    "fgos/agents/typo.yml",
+                    "name: typo\ndescription: a persona\n",
+                ),
+                (
+                    "fgos/agents/broken.yaml",
+                    "name: broken\ndescription: a: b\n",
+                ),
+            ],
+        );
+        let result = agent_type_names_unique(&project, &payload);
+        assert!(!result.passed, "{}", result.message);
+        for expected in [
+            "fgos/agents/wrong-name.yaml: must declare name: wrong-name",
+            "fgos/agents/no-description.yaml: must declare a non-empty description",
+            "fgos/agents/typo.yml is ignored: only .yaml files are read",
+            "fgos/agents/broken.yaml: cannot be parsed: ",
+        ] {
+            assert!(
+                result.message.contains(expected),
+                "{expected} in {}",
+                result.message
+            );
+        }
+        assert!(
+            result.message.contains("(line 2, column "),
+            "{}",
+            result.message
+        );
+        let _ = std::fs::remove_dir_all(&project);
+        let _ = std::fs::remove_dir_all(&payload);
+    }
+
+    #[test]
+    fn a_workspace_persona_replacing_an_installed_one_is_named_and_installed_duplicates_are_not_judged(
+    ) {
+        let persona = |name: &str| format!("name: {name}\n{PERSONA}");
+        let dup = persona("dup-agent");
+        let payload = tree(
+            "replace-payload",
+            &[
+                ("core/agents/dup-agent.yaml", &dup),
+                ("domains/coding/agents/dup-agent.yaml", &dup),
+                // Two domains defining one name is a duplicate of the installed release: npm test judges it.
+                ("domains/finance/agents/dup-agent.yaml", &dup),
+            ],
+        );
+        let project = tree("replace-project", &[("fgos/agents/dup-agent.yaml", &dup)]);
+        let result = agent_type_names_unique(&project, &payload);
+        assert!(result.passed, "{}", result.message);
+        assert!(
+            result.message.contains(
+                "fgos/agents holds dup-agent (replaces domains/coding/agents/dup-agent.yaml)"
+            ),
+            "{}",
+            result.message
+        );
+        let plain = tree("replace-plain", &[]);
+        let quiet = agent_type_names_unique(&plain, &payload);
+        assert_eq!(
+            quiet.message,
+            "agent-type names are unique within each tier (fgos/agents, domains/*/agents, core/agents)"
+        );
+        for dir in [project, payload, plain] {
+            let _ = std::fs::remove_dir_all(dir);
+        }
+    }
+
+    #[test]
+    fn an_installed_persona_hidden_by_the_projects_own_core_folder_is_a_warning_not_a_failure() {
+        let payload = tree(
+            "masked-payload",
+            &[(
+                "core/agents/shipped.yaml",
+                &format!("name: shipped\n{PERSONA}"),
+            )],
+        );
+        let project = tree(
+            "masked-project",
+            &[("core/agents/own.yaml", &format!("name: own\n{PERSONA}"))],
+        );
+        let result = agent_type_names_unique(&project, &payload);
+        assert!(result.passed, "{}", result.message);
+        assert!(
+            result.message.contains("; warning: installed persona \"shipped\" (core/agents/shipped.yaml) is hidden by core/agents/ of this project; copy it there or into fgos/agents to seat it"),
+            "{}",
+            result.message
+        );
+        // The release itself, judged as a project, has no tier of its own here.
+        let own = agent_type_names_unique(&payload, &payload);
+        assert!(
+            own.passed && !own.message.contains("warning"),
+            "{}",
+            own.message
+        );
+        for dir in [project, payload] {
+            let _ = std::fs::remove_dir_all(dir);
+        }
+    }
+
+    #[test]
+    fn a_project_template_with_a_forbidden_variable_fails_and_a_broken_packaged_one_is_not_read() {
+        let package = tree(
+            "templates-package",
+            &[(
+                "core/prompt-templates/broken.md",
+                "Forbidden: {forbiddenVar}",
+            )],
+        );
+        let plain = tree("templates-plain", &[]);
+        let clean = operation_prompt_templates_valid(&plain, package.clone());
+        assert!(clean.passed, "{}", clean.message);
+        assert!(
+            clean
+                .message
+                .starts_with("0 project operation prompt template"),
+            "{}",
+            clean.message
+        );
+        let project = tree(
+            "templates-project",
+            &[(
+                ".fgos/prompt-templates/invalid-tmpl.md",
+                "Forbidden: {forbiddenVar}",
+            )],
+        );
+        let broken = operation_prompt_templates_valid(&project, package.clone());
+        assert!(!broken.passed);
+        assert!(
+            broken
+                .message
+                .starts_with("malformed operation prompt template -- ")
+                && broken.message.contains("forbiddenVar"),
+            "{}",
+            broken.message
+        );
+        for dir in [package, plain, project] {
+            let _ = std::fs::remove_dir_all(dir);
+        }
+    }
+
+    fn pane_runner(files: Option<&[&str]>, store_home: &str) -> Value {
+        let mut store = json!({"use": "codex", "homeEnv": "CODEX_HOME"});
+        if let Some(files) = files {
+            store["files"] = json!(files);
+        }
+        json!({
+            "executors": {"openai": {"providerModel": "openai", "invocations": [
+                {"id": "codex-pane", "command": "codex", "credentialStore": store}]}},
+            "llmAccounts": {"openai": {"acct": {"credentialStore": {"codex": store_home}}}}
+        })
+    }
+
+    /// A machine whose person's home is `0`.
+    struct HomeMachine(String);
+    impl Machine for HomeMachine {
+        fn on_path(&self, _: &str) -> bool {
+            true
+        }
+        fn posture_backend(&self, _: &str) -> Option<fgos_execution::ports::Backend> {
+            None
+        }
+        fn herdr_present(&self) -> bool {
+            false
+        }
+        fn home_dir(&self) -> Option<String> {
+            Some(self.0.clone())
+        }
+    }
+
+    fn pane_check(runner: &Value, home: &Path) -> CheckResult {
+        let machine = HomeMachine(home.to_string_lossy().into_owned());
+        let inventory = provider_account_inventory(runner, &machine);
+        confined_pane_accounts(runner, &inventory, home, &|_| true)
+    }
+
+    #[test]
+    fn a_confined_pane_store_passes_while_some_declared_file_exists_and_fails_when_none_does() {
+        let home = tree("pane-files", &[("auth.json", "{}")]);
+        let text = home.to_string_lossy().into_owned();
+        assert!(
+            pane_check(&pane_runner(None, &text), &home).passed,
+            "an undeclared codex store is its auth.json"
+        );
+        let partial = pane_check(
+            &pane_runner(Some(&["auth.json", "models.json"]), &text),
+            &home,
+        );
+        assert!(partial.passed, "{}", partial.message);
+        assert!(
+            partial
+                .message
+                .contains("account \"acct\" has 1 of 2 credential file(s); absent: models.json"),
+            "{}",
+            partial.message
+        );
+        let none = pane_check(
+            &pane_runner(Some(&["models.json", "settings.json"]), &text),
+            &home,
+        );
+        assert!(!none.passed);
+        assert!(
+            none.message
+                .contains("account \"acct\" has none of models.json, settings.json under "),
+            "{}",
+            none.message
+        );
+        assert!(
+            none.message.contains("nothing is copied"),
+            "{}",
+            none.message
+        );
+        let all = pane_check(&pane_runner(Some(&["auth.json"]), &text), &home);
+        assert!(
+            all.message.contains("has its 1 credential file(s)"),
+            "{}",
+            all.message
+        );
+        let _ = std::fs::remove_dir_all(home);
+    }
+
+    #[test]
+    fn a_confined_pane_store_under_tilde_or_home_variables_is_read_in_the_persons_home() {
+        let home = tree("pane-home", &[("creds/auth.json", "{}")]);
+        for prefix in ["$HOME", "${HOME}", "~"] {
+            let result = pane_check(&pane_runner(None, &format!("{prefix}/creds")), &home);
+            assert!(result.passed, "{prefix}: {}", result.message);
+        }
+        let _ = std::fs::remove_dir_all(home);
+    }
+
+    #[test]
+    fn no_invocation_reading_a_login_store_leaves_the_pane_row_nothing_to_say() {
+        let runner =
+            json!({"executors": {"a": {"invocations": [{"id": "x", "adapter": "herdr-spawn"}]}}});
+        let result =
+            confined_pane_accounts(&runner, &serde_json::Map::new(), Path::new("/h"), &|_| true);
+        assert_eq!(result.message, "no confined invocation reads a login store");
+    }
+
+    #[test]
+    fn an_inventory_problem_fails_llm_accounts_shape_and_a_valid_one_counts_its_accounts() {
+        let bad = json!({"llmAccounts": {"bad@pool": {"one": {"credentialStore": {"claude": "/tmp/one"}}}}});
+        let result = llm_accounts_shape(&bad, &NoMachine);
+        assert!(!result.passed, "{}", result.message);
+        assert!(result.message.contains("bad@pool"), "{}", result.message);
+        let good = json!({"llmAccounts": {"claude": {"one": {"credentialStore": {"claude": "/tmp/one"}}}}});
+        let ok = llm_accounts_shape(&good, &NoMachine);
+        assert!(ok.passed, "{}", ok.message);
+    }
+
+    #[test]
+    fn a_store_on_a_default_login_home_warns_and_a_private_one_does_not() {
+        let home = Path::new("/home/u");
+        let on_default = json!({"llmAccounts": {"claude": {"one": {"credentialStore": {"claude": "/home/u/.claude"}}}}});
+        let warned = llm_accounts_default_login_home(&on_default, home, &[]);
+        assert!(
+            warned.passed
+                && warned
+                    .message
+                    .starts_with("warning: stores on a default login home: "),
+            "{}",
+            warned.message
+        );
+        let private = json!({"llmAccounts": {"claude": {"one": {"credentialStore": {"claude": "/home/u/logins/one"}}}}});
+        assert_eq!(
+            llm_accounts_default_login_home(&private, home, &[]).message,
+            "no runner.llmAccounts store sits on its CLI default login home"
+        );
+    }
+
+    #[test]
+    fn a_user_level_skill_counts_an_empty_one_does_not_and_an_unknown_cli_is_not_checked() {
+        let root = tree("skills-root", &[]);
+        let home = tree(
+            "skills-home",
+            &[(".claude/skills/ak-plan/SKILL.md", "body")],
+        );
+        let runner = json!({"executors": {"e": {"kind": "agent",
+            "supports": {"skills": ["ak:plan"]},
+            "invocations": [{"command": "claude"}]}}});
+        assert!(executor_skills_installed(&runner, &root, &home, &|_| true).passed);
+        std::fs::write(home.join(".claude/skills/ak-plan/SKILL.md"), "  \n").unwrap();
+        let empty = executor_skills_installed(&runner, &root, &home, &|_| true);
+        assert!(
+            !empty.passed && empty.message.contains("is empty"),
+            "{}",
+            empty.message
+        );
+        let other = json!({"executors": {"e": {"kind": "agent",
+            "supports": {"skills": ["ak:plan"]},
+            "invocations": [{"command": "/opt/bin/mystery"}]}}});
+        let unchecked = executor_skills_installed(&other, &root, &home, &|_| true);
+        assert!(
+            unchecked.passed
+                && unchecked
+                    .message
+                    .contains("not checked, no known skill directory: e (cli mystery)"),
+            "{}",
+            unchecked.message
+        );
+        for dir in [root, home] {
+            let _ = std::fs::remove_dir_all(dir);
+        }
+    }
+
+    #[test]
+    fn a_for_on_an_agent_executor_and_a_prefer_on_a_tool_served_capability_are_warned_and_a_clean_config_is_not(
+    ) {
+        let runner = json!({
+            "executors": {
+                "a": {"kind": "agent", "for": ["review"]},
+                "t": {"kind": "tool", "for": ["impact-analysis"]}},
+            "capabilities": {"impact-analysis": {"prefer": ["t"]}}
+        });
+        let result = executor_profile_warnings(&runner);
+        assert!(result.passed);
+        assert!(
+            result.message.contains("executor.a.agent-for-inert"),
+            "{}",
+            result.message
+        );
+        assert!(
+            result
+                .message
+                .contains("executor.t.tool-purpose-prefer-ignored.impact-analysis"),
+            "{}",
+            result.message
+        );
+        let clean = json!({"executors": {"a": {"kind": "agent", "invocations": [
+            {"via": "cli", "args": [], "env": {"PATH": "/bin"}}]}}});
+        assert_eq!(
+            executor_profile_warnings(&clean).message,
+            "no legacy policy-shaped executor/capability entries found"
+        );
     }
 
     #[test]

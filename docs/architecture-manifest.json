@@ -1232,11 +1232,11 @@
         },
         {
           "path": "src/runner/agent-listing.mjs",
-          "reason": "twin, same vectors as the contract: listAgents stays because src/setup/registrations.mjs asks it for the agent-type-names-unique row on the Node bridge"
+          "reason": "twin, same vectors as the contract: the agent-type-names-unique row is judged in Rust; listAgents stays only for the vector recorder (scripts/agents-vectors.mjs), its replay test and the npm test judgement of the release source tiers (test/setup/packaged-definitions.test.mjs)"
         }
       ],
       "retiredBy": "S6a",
-      "reason": "the facts about an executor (its family, lookup, confinement, credential store, effort levels, posture, account inventory, config shape) are derived once, in the fgos-execution crate, over executor-model.v1.json and its vectors. Node launch code still needs the same derivations until S6a moves launch; each Node definition is a declared twin proven on the same vectors, owned by S6a (launch code, confinement, account state, the agent-type-names-unique doctor row)"
+      "reason": "the facts about an executor (its family, lookup, confinement, credential store, effort levels, posture, account inventory, config shape) are derived once, in the fgos-execution crate, over executor-model.v1.json and its vectors. Node launch code still needs the same derivations until S6a moves launch; each Node definition is a declared twin proven on the same vectors, owned by S6a (launch code, confinement, account state, the agents vector recorder)"
     },
     {
       "job": "decide a dispatch",

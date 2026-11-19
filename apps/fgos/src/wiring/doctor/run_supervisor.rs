@@ -431,10 +431,10 @@ fn run_attempts_stuck(root: &Path) -> Check {
 /// before the gate can finish stopping the agent.
 fn run_supervisor_config(root: &Path, global_config_path: Option<&Path>) -> Check {
     let project = std::fs::canonicalize(root).unwrap_or_else(|_| root.to_path_buf());
-    let read = read_dispatch_config(Some(&project), global_config_path).and_then(|snapshot| {
+    let read = dispatch_snapshot(&project, global_config_path).and_then(|snapshot| {
         Ok((
-            resolve_gate_kill_grace(&snapshot)?,
-            resolve_cancel_wait(&snapshot)?,
+            resolve_gate_kill_grace(&snapshot).map_err(|e| e.to_string())?,
+            resolve_cancel_wait(&snapshot).map_err(|e| e.to_string())?,
         ))
     });
     let (grace, wait) = match read {
@@ -452,6 +452,28 @@ fn run_supervisor_config(root: &Path, global_config_path: Option<&Path>) -> Chec
         "{GATE_KILL_GRACE_KEY} = {} ({}); {CANCEL_WAIT_KEY} = {} ({})",
         grace.value, grace.source, wait.value, wait.source
     ))
+}
+
+/// The dispatch settings the controller reads: the project's effective config, or with `global_config_path` that
+/// file's directory as the machine config. A refusal is worded as the config rows word it (code, place, keyword).
+fn dispatch_snapshot(
+    project: &Path,
+    global_config_path: Option<&Path>,
+) -> Result<fgos_config::snapshot::Snapshot, String> {
+    use fgos_config::snapshot::SnapshotError;
+    if global_config_path.is_some() {
+        return read_dispatch_config(Some(project), global_config_path).map_err(|e| e.to_string());
+    }
+    fgos_config::machine::project_snapshot(project, |key| std::env::var(key).ok()).map_err(
+        |error| match error {
+            SnapshotError::Refused(all) => all
+                .iter()
+                .map(super::config_refusal_text)
+                .collect::<Vec<_>>()
+                .join("; "),
+            SnapshotError::Io(io) => io.to_string(),
+        },
+    )
 }
 
 // ---- the runner config -----------------------------------------------------------------------------------
@@ -857,12 +879,11 @@ fn judge(root: &Path, ids: &[&str]) -> Vec<RowOutcome> {
     ids.iter()
         .map(|id| {
             timed(|| match *id {
-                "run-supervisor-route" => match std::env::current_exe() {
-                    Ok(bin) => row(run_supervisor_route(&bin, platform(), &env)),
-                    Err(error) => row(fail(format!(
-                        "no host binary to ask for the run supervisor routes: {error}"
-                    ))),
-                },
+                "run-supervisor-route" => {
+                    // The host is this very binary; a path it cannot name fails every probe by name.
+                    let bin = std::env::current_exe().unwrap_or_default();
+                    row(run_supervisor_route(&bin, platform(), &env))
+                }
                 "runtime-socket-dir" => row(runtime_socket_dir(&env, current_uid())),
                 "run-attempts-stuck" => row(run_attempts_stuck(root)),
                 "run-supervisor-config" => row(run_supervisor_config(root, None)),
@@ -1133,7 +1154,107 @@ mod tests {
         assert!(check.passed, "{}", check.message);
     }
 
+    fn open_attempt(root: &Path, name: &str, envelope: &str) -> PathBuf {
+        let dir = root.join(".fgos/assignments").join(name).join("runs/01");
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join("envelope.json"), envelope).unwrap();
+        fs::write(dir.join("attempt.lock"), "").unwrap();
+        dir
+    }
+
+    #[test]
+    fn an_unclosed_attempt_with_a_free_lock_warns_naming_the_doors_and_writes_nothing() {
+        let root = temp("attempts-free");
+        let dir = open_attempt(&root, "free", r#"{"v":3,"attemptId":"att-free"}"#);
+        let listing = |dir: &Path| {
+            let mut names: Vec<_> = fs::read_dir(dir)
+                .unwrap()
+                .map(|e| e.unwrap().file_name())
+                .collect();
+            names.sort();
+            names
+        };
+        let before = listing(&dir);
+        let check = run_attempts_stuck(&root);
+        assert_eq!(level(&check), "warn");
+        assert_eq!(
+            check.message,
+            "warning: 1 attempt(s) have no holder and no closed.json; the next `fgos run` adopts them, or run `fgos dispatch recover`"
+        );
+        assert_eq!(listing(&dir), before, "the pointer wrote nothing");
+    }
+
+    #[test]
+    fn an_attempt_whose_release_was_removed_is_named_with_what_to_restore() {
+        let root = temp("attempts-gone");
+        let gone = root.join("pruned-release/fgos");
+        let envelope = format!(
+            r#"{{"v":3,"attemptId":"att-gone","hostBin":"{}"}}"#,
+            gone.display()
+        );
+        open_attempt(&root, "gone", &envelope);
+        let check = run_attempts_stuck(&root);
+        assert_eq!(level(&check), "warn");
+        assert!(
+            check.message.contains("; 1 cannot be closed by adopt: "),
+            "{}",
+            check.message
+        );
+        assert!(
+            check.message.contains(&format!(
+                "runs/01 (the release that wrote it was removed ({} is gone)",
+                gone.display()
+            )),
+            "{}",
+            check.message
+        );
+        assert!(check
+            .message
+            .contains("restore them at those paths, then run \"fgos run\" again"));
+    }
+
     // ---- run-supervisor-config ----
+
+    #[test]
+    fn project_overrides_global_overrides_standard_and_a_refused_value_or_a_wait_shorter_than_the_grace_fails(
+    ) {
+        let root = temp("config-merge");
+        let global_dir = temp("config-merge-global");
+        let global = global_dir.join("config.yaml");
+        let project = root.join(".fgos/config.yaml");
+        fs::create_dir_all(project.parent().unwrap()).unwrap();
+        let message = |root: &Path| run_supervisor_config(root, Some(&global));
+
+        fs::write(&global, "dispatch:\n  gateKillGraceMs: 4000\n").unwrap();
+        assert_eq!(
+            message(&root).message,
+            "dispatch.gateKillGraceMs = 4000 (global); dispatch.cancelWaitMs = 15000 (standard)"
+        );
+        fs::write(&project, "dispatch:\n  gateKillGraceMs: 2500\n").unwrap();
+        assert_eq!(
+            message(&root).message,
+            "dispatch.gateKillGraceMs = 2500 (project); dispatch.cancelWaitMs = 15000 (standard)"
+        );
+        for bad in ["999", "0", "-5", "1500.5", "'5000'"] {
+            fs::write(&project, format!("dispatch:\n  gateKillGraceMs: {bad}\n")).unwrap();
+            let check = message(&root);
+            assert_eq!(level(&check), "fail", "{bad} is refused");
+            assert!(
+                check.message.contains("unreadable: ")
+                    && check.message.contains("dispatch.gateKillGraceMs"),
+                "{}",
+                check.message
+            );
+        }
+        fs::write(
+            &project,
+            "dispatch:\n  gateKillGraceMs: 5000\n  cancelWaitMs: 2000\n",
+        )
+        .unwrap();
+        let short = message(&root);
+        assert_eq!(level(&short), "fail");
+        assert!(short.message.starts_with("dispatch.cancelWaitMs = 2000 (project) is shorter than dispatch.gateKillGraceMs = 5000 (project)"), "{}", short.message);
+    }
 
     #[test]
     fn the_standard_dispatch_values_pass_and_name_their_source() {
@@ -1286,6 +1407,45 @@ mod tests {
         assert_eq!(level(&ok), "ok");
         assert!(!ok.message.contains("secret"));
         assert_eq!(fs::read_to_string(&config).unwrap(), trusted_body);
+    }
+
+    #[test]
+    fn two_codex_homes_are_each_checked_and_only_the_untrusted_one_is_named() {
+        let machine = Path1 {
+            present: vec!["codex"],
+        };
+        let root = git_project("trust-two");
+        let dir = temp("trust-two-homes");
+        let trusted = dir.join("trusted.toml");
+        let untrusted = dir.join("untrusted.toml");
+        fs::write(
+            &trusted,
+            format!(
+                "[projects.\"{}\"]\ntrust_level = \"trusted\"\n",
+                absolute(&root).display()
+            ),
+        )
+        .unwrap();
+        let runner = json!({"executors": {
+            "one": {"invocations": [{"id": "a", "command": "codex", "interactiveMode": {"trustStore": {"kind": "codex-toml", "path": trusted.to_string_lossy()}}}]},
+            "two": {"invocations": [{"id": "b", "command": "codex", "interactiveMode": {"trustStore": {"kind": "codex-toml", "path": untrusted.to_string_lossy()}}}]}
+        }});
+        let check = agent_cli_project_trusted(&root, Ok(runner), &dir, &machine);
+        assert_eq!(level(&check), "fail");
+        assert!(
+            check.message.contains(&format!(
+                "codex config {} (two/b) has no entry",
+                untrusted.display()
+            )),
+            "{}",
+            check.message
+        );
+        assert!(
+            !check.message.contains(&trusted.display().to_string()),
+            "{}",
+            check.message
+        );
+        assert!(!untrusted.exists(), "the check wrote the store");
     }
 
     #[test]

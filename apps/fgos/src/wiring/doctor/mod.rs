@@ -561,9 +561,9 @@ mod tests {
         assert_eq!(registry.rows.len(), 116);
         assert_eq!(
             (count("S5"), count("S6a"), count("S6b"), count("S7")),
-            (0, 1, 6, 7)
+            (0, 0, 6, 7)
         );
-        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 102);
+        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 103);
         assert_eq!(registry.fixes.len(), 30);
         assert_eq!(registry.fix_ids(OwnerKind::Bridge).len(), 1);
     }

@@ -33,14 +33,6 @@ function makeProject(t) {
 const checkById = (id) => DOCTOR_CHECKS.find((check) => check.id === id).check;
 const MALFORMED_WORKFLOW = 'id: broken\nsteps:\n  - id: a\n   units: [\n';
 
-test('a malformed workspace agent is named by the agent-names check with line and column', async (t) => {
-  const { root, write } = makeProject(t);
-  write('fgos/agents/broken.yaml', 'name: broken\ndescription: a: b\n');
-  const result = await checkById('agent-type-names-unique')(root);
-  assert.equal(result.passed, false);
-  assert.match(result.message, /fgos\/agents\/broken\.yaml: cannot be parsed: .* \(line 2, column \d+\)/);
-});
-
 test('a malformed project workflow is a named problem in each check that reads workflows', async (t) => {
   const { root, write } = makeProject(t);
   write('core/workflows/broken.yaml', MALFORMED_WORKFLOW);

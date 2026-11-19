@@ -28,10 +28,8 @@ import { domainCatalog } from '../util/domain-dirs.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { checkCompiledDomains } from '../util/domain-compile.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
-import { INSTALL_ROOT, agentShapeProblem, findAgentDuplicates, readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
-import { isWithinDir } from '../runner/dispatch/assignment-layout.mjs';
+import { readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
 import { ownedSkillNames } from './skill-wrappers.mjs';
-import { agentRenderWarnings, listAgents } from '../runner/agent-listing.mjs';
 import { declaredActivities, readWorkflowCatalog, withUnreadableDefinitions } from './workflow-catalog-reader.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 
@@ -577,7 +575,7 @@ function parseTaskSpecHeaderFields(headerLine) {
 }
 
 // The definition files the one door resolves for `cwd`, in its tier order. A name is listed once: the first tier
-// that holds it wins, as listAgents resolves it. A name defined twice inside one tier is the duplicate check's finding.
+// that holds it wins, as listAgents resolves it. A name defined twice inside one tier is the agent-type-names-unique row's finding.
 export function allAgentYamlFiles(cwd) {
   const seen = new Set();
   return scanAgentTiers({ projectRoot: cwd }).flatMap((tier) => tier.entries)
@@ -661,59 +659,6 @@ export function checkAgentClaimsResolve(cwd) {
   return { passed: true, message: 'every task-spec\'s requires-skill/agent eligibility declaration resolves to real agent skills' };
 }
 
-// A name is unique within a tier (fgos/agents, domains/*/agents, core/agents); a higher tier shadows a
-// lower one by whole-file replacement (RUL13). The customer's own tier is also checked for shape.
-// `projectTiersOnly` leaves out every tier read from inside the release (a project without its own
-// domains/ or core/agents/ reads the installed ones); npm test judges those with the option off.
-export function checkAgentTypeNamesUnique(cwd, { projectTiersOnly = false, installRoot } = {}) {
-  const fullScan = scanAgentTiers({ projectRoot: cwd, ...(installRoot && { installRoot }) });
-  const scan = projectTiersOnly
-    ? fullScan.filter((tier) => !tier.dirs.some((dir) => isWithinDir(INSTALL_ROOT, dir)))
-    : fullScan;
-  const problems = findAgentDuplicates(scan).map(({ label, name, files }) => `duplicate agent-type name "${name}" in ${label} (${files.join(', ')})`);
-
-  const tierLabels = Object.fromEntries(fullScan.map((tier) => [tier.tier, tier.label]));
-  const workspace = scan.find((tier) => tier.tier === 'workspace') ?? { entries: [], ignored: [] };
-  const lowerEntries = fullScan.filter((tier) => tier.tier !== 'workspace').flatMap((tier) => tier.entries);
-  const customizations = [];
-  const notes = [];
-  for (const entry of workspace.entries) {
-    let text;
-    try {
-      text = fs.readFileSync(entry.file, 'utf8');
-    } catch (error) {
-      problems.push(`${entry.rel}: cannot be read (${error.message})`);
-      continue;
-    }
-    const problem = agentShapeProblem(entry.name, text);
-    if (problem) problems.push(`${entry.rel}: ${problem}`);
-    // Keys the renderer drops are not an error (the file still seats); they are said here because
-    // nothing else says it, and a persona that silently loses its voice or boundary is a failure.
-    for (const warning of agentRenderWarnings(text)) notes.push(`${entry.rel}: ${warning}`);
-    const shadowed = lowerEntries.find((lower) => lower.name === entry.name);
-    customizations.push(shadowed ? `${entry.name} (replaces ${shadowed.rel})` : entry.name);
-  }
-  for (const rel of workspace.ignored) problems.push(`${rel} is ignored: only .yaml files are read`);
-
-  // A project that ships its own core/agents/ is read there instead of the install, so the
-  // installed core definitions it lacks cannot be seated; this is reported, not failed, because a project may
-  // choose that.
-  for (const hidden of listAgents({ projectRoot: cwd }).masked) {
-    notes.push(`installed persona "${hidden.name}" (${hidden.source}) is hidden by ${hidden.hiddenBy}; copy it there or into ${tierLabels.workspace} to seat it`);
-  }
-
-  if (problems.length > 0) {
-    return { passed: false, message: `agent definitions: ${problems.join('; ')}` };
-  }
-  const tail = notes.length > 0 ? `; warning: ${notes.join('; ')}` : '';
-  return {
-    passed: true,
-    message: (customizations.length > 0
-      ? `agent-type names are unique within each tier; ${tierLabels.workspace} holds ${customizations.join(', ')}`
-      : `agent-type names are unique within each tier (${fullScan.map((tier) => tier.label).join(', ')})`) + tail,
-  };
-}
-
 registerCheck({
   id: 'runner-patterns-config',
   check: (cwd, run) => checkRunnerPatternsConfig(cwd, run),
@@ -737,11 +682,6 @@ export function checkDomainRegistryCompiled({ payloadRoot } = {}) {
 registerCheck({
   id: 'domain-registry-compiled',
   check: () => checkDomainRegistryCompiled(),
-});
-
-registerCheck({
-  id: 'agent-type-names-unique',
-  check: (cwd) => checkAgentTypeNamesUnique(cwd, { projectTiersOnly: true }),
 });
 
 // tsk-5m7 (docs/history/tsk-3bn-merge-conductor-harness-v2/): a real

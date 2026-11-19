@@ -73,6 +73,7 @@ add('herdr-executor-naming-an-unknown-kind', [{ do: 'confinementConfig', runner:
 add('runtime-socket-directory-fix-twice', [call([]), call(['--fix']), call(['--fix']), call([])], { disk: true });
 add('run-supervisor-wait-shorter-than-grace', [{ do: 'confinementConfig', dispatch: { gateKillGraceMs: 5000, cancelWaitMs: 2000 } }, call([])]);
 add('terminal-setting-with-a-bad-value', [{ do: 'confinementConfig', terminal: { allocationGraceMs: 'soon' } }, call([])]);
+add('workspace-agents-of-the-wrong-shape-and-a-persona-replacing-a-core-one', [{ do: 'agentFile', name: 'wrong-name.yaml', text: 'name: other\ndescription: a persona\n' }, { do: 'agentFile', name: 'typo.yml', text: 'name: typo\ndescription: a persona\n' }, call([]), { do: 'removeAgentFiles' }, { do: 'agentFile', name: 'code-reviewer.yaml', text: 'name: code-reviewer\ndescription: my reviewer\n' }, call([])]);
 add('operation-prompt-template-with-a-forbidden-variable', [{ do: 'promptTemplate', name: 'invalid-tmpl', text: 'Forbidden: {forbiddenVar}' }, call([])]);
 
 const MACHINE_ID_SLUG = os.hostname().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -189,6 +190,12 @@ function act(world, step) {
       return null;
     case 'confinementConfig':
       writeProjectConfig(world.repo, { ...(step.runner ? { runner: step.runner } : {}), ...(step.dispatch ? { dispatch: step.dispatch } : {}), ...(step.terminal ? { terminal: step.terminal } : {}) });
+      return null;
+    case 'agentFile':
+      writeAt(path.join(world.repo, 'fgos', 'agents'), step.name, step.text);
+      return null;
+    case 'removeAgentFiles':
+      fs.rmSync(path.join(world.repo, 'fgos', 'agents'), { recursive: true, force: true });
       return null;
     case 'promptTemplate':
       writeAt(path.join(world.repo, '.fgos', 'prompt-templates'), `${step.name}.md`, step.text);

@@ -11,10 +11,10 @@ import path from 'node:path';
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import {
   checkAgentClaimsResolve,
-  checkAgentTypeNamesUnique,
   checkDomainRegistryCompiled,
 } from '../../src/setup/registrations.mjs';
 import { INSTALL_ROOT } from '../../src/runner/agent-definitions.mjs';
+import { listAgents } from '../../src/runner/agent-listing.mjs';
 import { discoverOperationPromptTemplates } from '../../src/runner/dispatch/operation-prompt-templates.mjs';
 import { checkTaskSpecsResolve } from '../helpers/packaged-definitions.mjs';
 
@@ -36,10 +36,12 @@ test('every packaged domain has a compiled.json that parses and matches its YAML
   assert.match(result.message, /domain registr(y|ies) compiled/);
 });
 
-test('agent-type names are unique in every tier of the release source, including its own fgos/agents', () => {
-  const result = checkAgentTypeNamesUnique(INSTALL_ROOT);
-  assert.equal(result.passed, true, result.message);
-  assert.match(result.message, /unique within each tier/);
+test('agent-type names are unique in every tier of the release source, including its own fgos/agents, and every definition has its shape', () => {
+  const listing = listAgents({ projectRoot: INSTALL_ROOT, installRoot: INSTALL_ROOT });
+  assert.ok(listing.agents.length > 0, 'the release ships agent definitions');
+  assert.deepEqual(listing.duplicates, []);
+  assert.deepEqual(listing.ignored, []);
+  assert.deepEqual(listing.agents.filter((agent) => agent.problems.length > 0).map((agent) => `${agent.source}: ${agent.problems.join('; ')}`), []);
 });
 
 test('the packaged domain and core operation prompt templates validate', () => {
@@ -58,15 +60,3 @@ test('the domain registry row judges the running payload\'s compiled domains, in
   assert.equal(result.passed, true, result.message);
   assert.match(result.message, /domain registr(y|ies) compiled, readable and in step/);
 });
-
-test('the agent-type row judges no tier read from inside the release, so a plain project passes with nothing to judge', () => {
-  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plain-agents-'));
-  try {
-    const result = doctorRow('agent-type-names-unique').check(project);
-    assert.equal(result.passed, true, result.message);
-    assert.doesNotMatch(result.message, /fgos\/agents holds/);
-  } finally {
-    fs.rmSync(project, { recursive: true, force: true });
-  }
-});
-

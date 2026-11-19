@@ -105,6 +105,7 @@
       "model-policy-pools",
       "llm-accounts-shape",
       "llm-accounts-default-login-home",
+      "agent-type-names-unique",
       "provider-capacity-state",
       "run-supervisor-route",
       "runtime-socket-dir",
@@ -264,12 +265,7 @@
     {
       "id": "agent-type-names-unique",
       "description": "agent definition names are unique in the project's own tiers (the workspace tier, and the core tier when the project ships one); a higher tier replaces a lower one whole, and workspace-tier files have the shape the renderer needs; the installed fgOS's own domain and core tiers are judged by npm test",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/agent-definitions.mjs",
-        "src/runner/dispatch/assignment-layout.mjs",
-        "src/runner/agent-listing.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "main-checkout-hook-wired",

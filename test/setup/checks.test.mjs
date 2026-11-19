@@ -54,7 +54,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
       'workflow-capabilities-configured',
       'workflow-case-binding-sentinel',
       'workflow-case-bindings',
-      'agent-type-names-unique',
       'domain-registry-compiled',
       // Phase 01 group D: the three preconditions for an interactive dispatch.
       // Phase 07 (herdr-trust-supervisor R3): codex-toml/agy trust stores had
