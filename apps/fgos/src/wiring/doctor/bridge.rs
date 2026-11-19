@@ -185,17 +185,7 @@ impl NodeFact {
 
 /// The command that runs `doctor-bridge.mjs` from the active release's payload.
 fn payload_launch() -> Result<Command, Fault> {
-    let payload = legacy_exec::resolve_payload().map_err(|cause| {
-        Fault::Failed(format!("the legacy payload cannot be resolved: {cause}"))
-    })?;
-    let module = payload.root.join(BRIDGE_MODULE);
-    if !module.is_file() {
-        return Err(Fault::Failed(format!(
-            "the legacy payload carries no {BRIDGE_MODULE}"
-        )));
-    }
-    let module = fgos_process::path::plain_path(&module);
-    Ok(legacy_exec::payload_command(&module))
+    legacy_exec::payload_module_command(BRIDGE_MODULE).map_err(Fault::Failed)
 }
 
 impl NodeBridge {

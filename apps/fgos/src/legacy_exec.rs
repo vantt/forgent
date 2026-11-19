@@ -274,6 +274,20 @@ pub fn payload_command(script: &Path) -> Command {
     cmd
 }
 
+/// The command that runs the payload module at `module` (a path under the payload root, such as
+/// `src/setup/doctor-bridge.mjs`) with the payload's Node: the one launcher of every payload module the host talks
+/// to over the child's stdin and stdout. The module is found only under the active release's payload root, never
+/// by PATH or cwd; the error names why it could not be.
+pub fn payload_module_command(module: &str) -> Result<Command, String> {
+    let payload = resolve_payload()
+        .map_err(|cause| format!("the legacy payload cannot be resolved: {cause}"))?;
+    let script = payload.root.join(module);
+    if !script.is_file() {
+        return Err(format!("the legacy payload carries no {module}"));
+    }
+    Ok(payload_command(&fgos_process::path::plain_path(&script)))
+}
+
 /// Appends exactly one JSON-lines record to `FGOS_INVOCATION_RECORD_PATH` when set.
 pub fn emit_invocation_record(record: &InvocationLifecycleRecord) {
     if let Ok(path) = env::var("FGOS_INVOCATION_RECORD_PATH") {
