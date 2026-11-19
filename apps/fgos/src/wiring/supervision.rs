@@ -540,67 +540,93 @@ struct HostStop {
     root: PathBuf,
 }
 
-impl HostStop {
-    fn lineage(&self, persona: &str, name: &str) -> String {
-        format!("{persona}-{name}")
-    }
-
-    fn has_running_ticket(&self, lineage: &str) -> bool {
-        let dir = self.root.join(".fgos/runtime/head-tickets").join(lineage);
-        let Ok(entries) = std::fs::read_dir(dir) else {
-            return false;
+/// A head's request tickets: `Busy` when one is still `running`, `Unknown` when the directory or a ticket cannot be
+/// read (never read as "no ticket"), `None` when there is no ticket directory or no running ticket.
+fn tickets_activity(dir: &Path) -> Option<wake::Activity> {
+    let entries = match std::fs::read_dir(dir) {
+        Ok(entries) => entries,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return None,
+        Err(_) => return Some(wake::Activity::Unknown),
+    };
+    let mut unreadable = false;
+    for entry in entries {
+        let Ok(entry) = entry else {
+            unreadable = true;
+            continue;
         };
-        entries.filter_map(Result::ok).any(|e| {
-            std::fs::read(e.path())
-                .ok()
-                .and_then(|b| serde_json::from_slice::<Value>(&b).ok())
-                .is_none_or(|t| t["state"] == "running")
-        })
+        match std::fs::read(entry.path())
+            .ok()
+            .and_then(|b| serde_json::from_slice::<Value>(&b).ok())
+        {
+            Some(ticket) if ticket["state"] == "running" => return Some(wake::Activity::Busy),
+            Some(_) => {}
+            None => unreadable = true,
+        }
     }
+    unreadable.then_some(wake::Activity::Unknown)
+}
+
+/// The terminal host's answer for the head's pane: only a live pane whose agent status is `idle` is idle.
+fn pane_activity(pane_live: bool, agent_status: Option<&str>) -> wake::Activity {
+    match (pane_live, agent_status) {
+        (true, Some("idle")) => wake::Activity::Idle,
+        (true, Some("working" | "blocked")) => wake::Activity::Busy,
+        _ => wake::Activity::Unknown,
+    }
+}
+
+/// A head's activity from its lineage under `root`: tickets first, then its placement, then `pane` (the terminal
+/// host's view of that placement).
+fn head_activity(
+    root: &Path,
+    lineage: &str,
+    pane: impl FnOnce(&fgos_session_host::Placement, &Path) -> wake::Activity,
+) -> wake::Activity {
+    match tickets_activity(&root.join(".fgos/runtime/head-tickets").join(lineage)) {
+        Some(wake::Activity::Busy) => return wake::Activity::Busy,
+        Some(other) => return other,
+        None => {}
+    }
+    let file = root
+        .join(".fgos/runtime/session-rotation")
+        .join(lineage)
+        .join("placement.json");
+    let Some(value) = std::fs::read(file)
+        .ok()
+        .and_then(|b| serde_json::from_slice::<Value>(&b).ok())
+    else {
+        return wake::Activity::Unknown;
+    };
+    let Ok(placement) =
+        serde_json::from_value::<fgos_session_host::Placement>(value["placement"].clone())
+    else {
+        return wake::Activity::Unknown;
+    };
+    pane(
+        &placement,
+        Path::new(value["runDir"].as_str().unwrap_or_default()),
+    )
+}
+
+fn host_pane_activity(placement: &fgos_session_host::Placement, run_dir: &Path) -> wake::Activity {
+    let backend = fgos_run_supervisor::terminal_slot::Backend::from_env(run_dir);
+    let core = backend.core();
+    let seen = fgos_session_host::Panes::inspect(
+        &core,
+        &placement.key,
+        fgos_terminal_control::core::Want {
+            foreground: false,
+            activity: true,
+            detail: false,
+        },
+    );
+    let live = seen.pane == fgos_terminal_control::port::PaneState::Live;
+    pane_activity(live, seen.activity.as_ref().map(|a| a.state.as_str()))
 }
 
 impl wake::StopSession for HostStop {
     fn activity(&self, persona: &str, name: &str) -> wake::Activity {
-        let lineage = self.lineage(persona, name);
-        if self.has_running_ticket(&lineage) {
-            return wake::Activity::Busy;
-        }
-        let file = self
-            .root
-            .join(".fgos/runtime/session-rotation")
-            .join(&lineage)
-            .join("placement.json");
-        let Some(value) = std::fs::read(file)
-            .ok()
-            .and_then(|b| serde_json::from_slice::<Value>(&b).ok())
-        else {
-            return wake::Activity::Unknown;
-        };
-        let Ok(placement) =
-            serde_json::from_value::<fgos_session_host::Placement>(value["placement"].clone())
-        else {
-            return wake::Activity::Unknown;
-        };
-        let run_dir = PathBuf::from(value["runDir"].as_str().unwrap_or_default());
-        let backend = fgos_run_supervisor::terminal_slot::Backend::from_env(&run_dir);
-        let core = backend.core();
-        let seen = fgos_session_host::Panes::inspect(
-            &core,
-            &placement.key,
-            fgos_terminal_control::core::Want {
-                foreground: false,
-                activity: true,
-                detail: false,
-            },
-        );
-        match (seen.pane, seen.activity.map(|a| a.state)) {
-            (fgos_terminal_control::port::PaneState::Live, Some(state)) => match state.as_str() {
-                "idle" => wake::Activity::Idle,
-                "working" | "blocked" => wake::Activity::Busy,
-                _ => wake::Activity::Unknown,
-            },
-            _ => wake::Activity::Unknown,
-        }
+        head_activity(&self.root, &format!("{persona}-{name}"), host_pane_activity)
     }
 
     fn stop(&self, persona: &str, name: &str) -> Result<(), String> {
@@ -1571,6 +1597,83 @@ impl OperationProvider for SupervisionProvider {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn scratch_root(tag: &str) -> PathBuf {
+        let dir = std::env::temp_dir().join(format!("fgos-stop-{tag}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
+    }
+
+    fn with_placement(root: &Path, lineage: &str) {
+        let dir = root.join(".fgos/runtime/session-rotation").join(lineage);
+        std::fs::create_dir_all(&dir).unwrap();
+        let placement = json!({"host": "terminal", "key": "k1"});
+        let file = json!({"placement": placement, "runDir": "/x"});
+        std::fs::write(dir.join("placement.json"), file.to_string()).unwrap();
+    }
+
+    fn idle_pane(_: &fgos_session_host::Placement, _: &Path) -> wake::Activity {
+        wake::Activity::Idle
+    }
+
+    #[test]
+    fn a_running_request_ticket_makes_the_head_busy_whatever_its_pane_says() {
+        let root = scratch_root("busy");
+        with_placement(&root, "supervisor-x");
+        let tickets = root.join(".fgos/runtime/head-tickets/supervisor-x");
+        std::fs::create_dir_all(&tickets).unwrap();
+        std::fs::write(tickets.join("a.json"), r#"{"state":"done"}"#).unwrap();
+        std::fs::write(tickets.join("b.json"), r#"{"state":"running"}"#).unwrap();
+        assert_eq!(
+            head_activity(&root, "supervisor-x", idle_pane),
+            wake::Activity::Busy
+        );
+    }
+
+    #[test]
+    fn an_unreadable_ticket_directory_is_unknown_never_idle() {
+        let root = scratch_root("tickets");
+        with_placement(&root, "supervisor-x");
+        let tickets = root.join(".fgos/runtime/head-tickets");
+        std::fs::create_dir_all(&tickets).unwrap();
+        // A file where the directory should be: reading it fails with something other than not-found.
+        std::fs::write(tickets.join("supervisor-x"), "").unwrap();
+        assert_eq!(
+            head_activity(&root, "supervisor-x", idle_pane),
+            wake::Activity::Unknown
+        );
+    }
+
+    #[test]
+    fn a_missing_placement_is_unknown_never_idle() {
+        let root = scratch_root("noplacement");
+        assert_eq!(
+            head_activity(&root, "supervisor-x", idle_pane),
+            wake::Activity::Unknown
+        );
+    }
+
+    #[test]
+    fn a_gone_pane_or_an_unrecognised_agent_status_is_unknown() {
+        assert_eq!(pane_activity(false, Some("idle")), wake::Activity::Unknown);
+        assert_eq!(pane_activity(true, None), wake::Activity::Unknown);
+        assert_eq!(pane_activity(true, Some("done")), wake::Activity::Unknown);
+        assert_eq!(pane_activity(true, Some("working")), wake::Activity::Busy);
+    }
+
+    #[test]
+    fn an_idle_pane_with_no_running_ticket_is_idle() {
+        let root = scratch_root("idle");
+        with_placement(&root, "supervisor-x");
+        assert_eq!(
+            head_activity(&root, "supervisor-x", |_, _| pane_activity(
+                true,
+                Some("idle")
+            )),
+            wake::Activity::Idle
+        );
+    }
 
     #[test]
     fn the_plans_answer_names_only_the_first_unreadable_plans() {
