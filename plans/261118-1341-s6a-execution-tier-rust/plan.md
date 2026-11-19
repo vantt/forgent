@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "S6a, Execution (tier 5) in Rust: run, dispatch subs, run supervisor Node side"
-status: ready
+status: running
 priority: P1
 blockedBy:
   - 261115-2328-execution-read-door
