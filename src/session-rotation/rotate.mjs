@@ -339,8 +339,10 @@ export async function rotateHeadSession(request, ports = {}) {
     for (;;) {
       const record = readJson(path.join(dir, 'answered.json'));
       if (record && record.gen === gen && record.key === successorKey) {
-        const now = await whoHolds({ role, projectRoot });
-        if (now.live && now.session === record.sessionId) { answered = record; break; }
+        // Two holders seen while the role is being taken is transient: poll again until the deadline.
+        let now = null;
+        try { now = await whoHolds({ role, projectRoot }); } catch (err) { if (err?.code !== 'identity-ambiguous') throw err; }
+        if (now?.live && now.session === record.sessionId) { answered = record; break; }
       }
       if (clock.now() >= deadline) return await abandon('no-answer', `no valid answer from ${successorKey} within ${bound} ms`);
       await clock.sleep(ports.pollMs ?? POLL_MS);

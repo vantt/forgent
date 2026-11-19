@@ -64,6 +64,24 @@ const answer = (root, { rotationId = pendingOf(root).id, message = 'I read the h
   projectRoot: root, persona: 'planner', name: 'x', key: 'head-planner-x-2', sessionId: 'new-session', rotationId, message,
 });
 
+test('a holder poll that sees two holders once and then one completes the rotation', async (t) => {
+  const { root } = project(t);
+  let moved = false;
+  let asks = 0;
+  const { calls, ports, request } = fakes(root, {
+    holder: () => {
+      asks += 1;
+      if (!moved) return { live: true, session: 'old-session', record: OLD_RECORD };
+      if (asks % 2 === 0) throw Object.assign(new Error('ambiguous'), { code: 'identity-ambiguous' });
+      return { live: true, session: 'new-session' };
+    },
+    onSleep: (n) => { if (n === 2) { answer(root); moved = true; } },
+  });
+  const result = await rotateHeadSession({ ...request, reason: 'hard' }, ports);
+  assert.equal(result.rotated, true);
+  assert.deepEqual(calls.end, ['/run/old']);
+});
+
 test('the old session is ended only after the successor answered and Identity names it the holder', async (t) => {
   const { root, dir } = project(t);
   let moved = false;
