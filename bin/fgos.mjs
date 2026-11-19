@@ -3357,10 +3357,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const target = requireField(positional[1], 'session write requires a path: fgos session write <path> < new-content');
         if (process.stdin.isTTY) throw new StoreError('validation', 'session write reads the new content from stdin: fgos session write <path> < new-content');
         const { requestHeadWrite } = await import('../src/session-host/head-request-client.mjs');
+        // The blob id of the copy the edit was built from. Without it no base is sent and the supervisor compares
+        // against what the file held when the request arrived, so only a move during its catch-up is caught.
+        const base = optionalField(flags.base, 'session write --base requires a git blob id (git hash-object --no-filters <copy you edited>)');
         const chunks = [];
         for await (const chunk of process.stdin) chunks.push(chunk);
         try {
-          return await requestHeadWrite({ path: target, content: Buffer.concat(chunks).toString('utf8') });
+          return await requestHeadWrite({ path: target, content: Buffer.concat(chunks).toString('utf8'), base });
         } catch (err) {
           throw new StoreError(HEAD_ARGUMENT_CODES.has(err.code) ? 'validation' : 'precondition', `${err.code ?? 'head-refused'}: ${err.message}`);
         }

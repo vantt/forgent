@@ -188,9 +188,17 @@ impl Scene {
 
     /// One `session write` request over the socket.
     fn write(&self, path: &str, content: &str) -> Value {
+        self.request(json!({"path": path, "content": content}))
+    }
+
+    /// A `session write` that names the blob id of the content its writer read.
+    fn write_based(&self, path: &str, content: &str, base: &str) -> Value {
+        self.request(json!({"path": path, "content": content, "base": base}))
+    }
+
+    fn request(&self, args: Value) -> Value {
         let body = serde_json::to_vec(
-            &json!({"type": "REQUEST", "id": "w1", "verb": "session write",
-            "args": {"path": path, "content": content}}),
+            &json!({"type": "REQUEST", "id": "w1", "verb": "session write", "args": args}),
         )
         .unwrap();
         let mut stream = UnixStream::connect(&self.socket).unwrap();
@@ -244,10 +252,41 @@ fn land_config_reads_gates_with_and_without_when_and_a_regenerate() {
     );
 }
 
+/// A write based on a blob a newer remote commit replaced is refused and the newer content survives; the current
+/// blob id is accepted. (A step of the scene's one scenario: the scene holds process-wide state, so only one runs.)
+fn a_stale_base_is_refused_and_the_current_one_written(scene: &Scene) {
+    let read = git(&scene.project, &["hash-object", "docs/backlog.md"]);
+
+    // A newer row lands on the remote after the writer read the file.
+    git(
+        &scene.other,
+        &["pull", "-q", "--ff-only", "origin", "trunk"],
+    );
+    fs::write(scene.other.join("docs/backlog.md"), "old\nnewer row\n").unwrap();
+    git(&scene.other, &["commit", "-qam", "newer row"]);
+    git(&scene.other, &["push", "-q", "origin", "trunk"]);
+    let tip = scene.remote_tip();
+
+    let reply = scene.write_based("docs/backlog.md", "stale edit\n", &read);
+    assert_eq!(reply["code"], "write-base-stale", "{reply}");
+    assert_eq!(
+        fs::read_to_string(scene.project.join("docs/backlog.md")).unwrap(),
+        "old\nnewer row\n"
+    );
+    assert_eq!(scene.remote_tip(), tip, "nothing was published");
+
+    // Re-read, same edit on the new content: the current blob id is accepted.
+    let current = git(&scene.project, &["hash-object", "docs/backlog.md"]);
+    let reply = scene.write_based("docs/backlog.md", "old\nnewer row\nmine\n", &current);
+    assert_eq!(reply["result"], "done", "{reply}");
+    assert_eq!(reply["data"]["commit"], scene.remote_tip());
+}
+
 #[test]
 fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_forced_or_silently_lost(
 ) {
     let scene = Scene::new();
+    a_stale_base_is_refused_and_the_current_one_written(&scene);
 
     // 1. Published: the main checkout first catches up to the remote tip, only the written path is committed (the
     // other dirty path stays out), the subject names the head role, and the remote then holds the commit.
