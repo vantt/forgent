@@ -1,0 +1,3035 @@
+{
+ "contract": "core-unit-validate.v1",
+ "doc": "validateUnit and its normalizers as Node answers them. `host` is what the declared-seat check and the run-timeout rule answered for the same input. `$undefined` marks an absent argument. A refusal whose text ends in a write-scope sentence is compared by its prefix `unit.writes[i] must be a non-empty repo-relative path: `.",
+ "tiers": [
+  "nano",
+  "mini",
+  "standard",
+  "advanced",
+  "flagship",
+  "frontier"
+ ],
+ "rigorValues": [
+  "low",
+  "standard",
+  "high",
+  "critical"
+ ],
+ "validateUnit": [
+  {
+   "name": "minimal valid unit",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute"
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "trims every text",
+   "input": {
+    "id": "  u1 ",
+    "objective": " Do it ",
+    "capability": " code:review ",
+    "persona": " p ",
+    "verify": " npm test ",
+    "pattern": " reviewed "
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do it",
+     "capability": "code:review",
+     "writes": [],
+     "dependsOn": [],
+     "pattern": "reviewed",
+     "persona": "p",
+     "verify": "npm test",
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "not an object: null",
+   "input": null,
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit must be a non-null plain object."
+    }
+   }
+  },
+  {
+   "name": "not an object: array",
+   "input": [],
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit must be a non-null plain object."
+    }
+   }
+  },
+  {
+   "name": "not an object: string",
+   "input": "unit",
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit must be a non-null plain object."
+    }
+   }
+  },
+  {
+   "name": "refuses executor",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "executor": "x"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit violates G2 constraint: contains disallowed field \"executor\". Unit contract must not specify execution mechanics (executor, provider, model, invocation, actors, overrides)."
+    }
+   }
+  },
+  {
+   "name": "refuses provider",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "provider": "x"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit violates G2 constraint: contains disallowed field \"provider\". Unit contract must not specify execution mechanics (executor, provider, model, invocation, actors, overrides)."
+    }
+   }
+  },
+  {
+   "name": "refuses model",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "model": "x"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit violates G2 constraint: contains disallowed field \"model\". Unit contract must not specify execution mechanics (executor, provider, model, invocation, actors, overrides)."
+    }
+   }
+  },
+  {
+   "name": "refuses invocation",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "invocation": "x"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit violates G2 constraint: contains disallowed field \"invocation\". Unit contract must not specify execution mechanics (executor, provider, model, invocation, actors, overrides)."
+    }
+   }
+  },
+  {
+   "name": "refuses actors",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "actors": "x"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit violates G2 constraint: contains disallowed field \"actors\". Unit contract must not specify execution mechanics (executor, provider, model, invocation, actors, overrides)."
+    }
+   }
+  },
+  {
+   "name": "refuses overrides",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "overrides": "x"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit violates G2 constraint: contains disallowed field \"overrides\". Unit contract must not specify execution mechanics (executor, provider, model, invocation, actors, overrides)."
+    }
+   }
+  },
+  {
+   "name": "null disallowed field still refused",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "executor": null
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit violates G2 constraint: contains disallowed field \"executor\". Unit contract must not specify execution mechanics (executor, provider, model, invocation, actors, overrides)."
+    }
+   }
+  },
+  {
+   "name": "id missing",
+   "input": {
+    "objective": "o",
+    "capability": "c"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.id must be a non-empty string."
+    }
+   }
+  },
+  {
+   "name": "id blank",
+   "input": {
+    "id": "  ",
+    "objective": "Do the work",
+    "capability": "execute"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.id must be a non-empty string."
+    }
+   }
+  },
+  {
+   "name": "id not a string",
+   "input": {
+    "id": 7,
+    "objective": "Do the work",
+    "capability": "execute"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.id must be a non-empty string."
+    }
+   }
+  },
+  {
+   "name": "objective missing",
+   "input": {
+    "id": "u",
+    "capability": "c"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.objective must be a non-empty string."
+    }
+   }
+  },
+  {
+   "name": "objective blank",
+   "input": {
+    "id": "u1",
+    "objective": " ",
+    "capability": "execute"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.objective must be a non-empty string."
+    }
+   }
+  },
+  {
+   "name": "objective null",
+   "input": {
+    "id": "u1",
+    "objective": null,
+    "capability": "execute"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.objective must be a non-empty string."
+    }
+   }
+  },
+  {
+   "name": "capability missing",
+   "input": {
+    "id": "u",
+    "objective": "o"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.capability must be a non-empty string (\"domain:verb\" or \"verb\")."
+    }
+   }
+  },
+  {
+   "name": "capability blank",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": ""
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.capability must be a non-empty string (\"domain:verb\" or \"verb\")."
+    }
+   }
+  },
+  {
+   "name": "rigor each value",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "rigor": "critical"
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "rigor": "critical",
+     "writes": [],
+     "dependsOn": [],
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "rigor null is absent",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "rigor": null
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "rigor unknown",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "rigor": "extreme"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.rigor must be one of low/standard/high/critical, got: \"extreme\"."
+    }
+   }
+  },
+  {
+   "name": "rigor not a string",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "rigor": 3
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.rigor must be one of low/standard/high/critical, got: 3."
+    }
+   }
+  },
+  {
+   "name": "writes canonicalised and deduplicated",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "src/a.mjs",
+     "./src//b/",
+     "src/a.mjs",
+     " docs/** "
+    ]
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [
+      "src/a.mjs",
+      "src/b",
+      "docs/**"
+     ],
+     "dependsOn": [],
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "writes not an array",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": "src"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.writes must be an array of repo-relative paths."
+    }
+   }
+  },
+  {
+   "name": "writes null is not an array",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": null
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.writes must be an array of repo-relative paths."
+    }
+   }
+  },
+  {
+   "name": "writes absolute",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "/etc/passwd"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.writes[0] must be a non-empty repo-relative path: write entry must be repo-relative, got absolute path \"/etc/passwd\"."
+    }
+   }
+  },
+  {
+   "name": "writes parent segment",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "a/../b"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.writes[0] must be a non-empty repo-relative path: write entry must not contain a \"..\" segment, got: \"a/../b\"."
+    }
+   }
+  },
+  {
+   "name": "writes empty entry",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "  "
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.writes[0] must be a non-empty repo-relative path: write entry must name a path inside the repo, got: \"  \"."
+    }
+   }
+  },
+  {
+   "name": "writes not a string",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     5
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.writes[0] must be a non-empty repo-relative path: write entry must be a string, got: 5."
+    }
+   }
+  },
+  {
+   "name": "writes pathspec magic",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     ":(glob)x"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.writes[0] must be a non-empty repo-relative path: write entry must not start with \":\" (git pathspec magic), got: \":(glob)x\"."
+    }
+   }
+  },
+  {
+   "name": "writes loose double star",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "a**b"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.writes[0] must be a non-empty repo-relative path: \"**\" must be a whole path segment, got segment \"a**b\" in \"a**b\"."
+    }
+   }
+  },
+  {
+   "name": "writes collapses consecutive double stars",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "a/**/**/b"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [
+      "a/**/b"
+     ],
+     "dependsOn": [],
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "syncBase with writes",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "x"
+    ],
+    "syncBase": "main"
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [
+      "x"
+     ],
+     "dependsOn": [],
+     "syncBase": "main",
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "syncBase makes a sync-only unit without an objective",
+   "input": {
+    "id": "s",
+    "capability": "execute",
+    "writes": [
+     "x"
+    ],
+    "syncBase": "origin/main"
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "s",
+     "objective": "Merge origin/main into this branch.",
+     "capability": "execute",
+     "writes": [
+      "x"
+     ],
+     "dependsOn": [],
+     "syncBase": "origin/main",
+     "syncOnly": true,
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "syncBase with explicit syncOnly",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "x"
+    ],
+    "syncBase": "main",
+    "syncOnly": true
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [
+      "x"
+     ],
+     "dependsOn": [],
+     "syncBase": "main",
+     "syncOnly": true,
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "syncBase needs writes",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "syncBase": "main"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.syncBase needs writes: merging a ref changes the branch, so the unit must be a writing unit in a linked worktree."
+    }
+   }
+  },
+  {
+   "name": "syncBase bad: leading dash",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "x"
+    ],
+    "syncBase": "-x"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.syncBase must be a branch, tag or commit name (letters, digits, \".\", \"_\", \"/\", \"-\"; not starting with \"-\" or \"/\", no \"..\"), got: \"-x\"."
+    }
+   }
+  },
+  {
+   "name": "syncBase bad: range",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "x"
+    ],
+    "syncBase": "a..b"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.syncBase must be a branch, tag or commit name (letters, digits, \".\", \"_\", \"/\", \"-\"; not starting with \"-\" or \"/\", no \"..\"), got: \"a..b\"."
+    }
+   }
+  },
+  {
+   "name": "syncBase bad: lock suffix",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "x"
+    ],
+    "syncBase": "a.lock"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.syncBase must be a branch, tag or commit name (letters, digits, \".\", \"_\", \"/\", \"-\"; not starting with \"-\" or \"/\", no \"..\"), got: \"a.lock\"."
+    }
+   }
+  },
+  {
+   "name": "syncBase bad: trailing slash",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "x"
+    ],
+    "syncBase": "a/"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.syncBase must be a branch, tag or commit name (letters, digits, \".\", \"_\", \"/\", \"-\"; not starting with \"-\" or \"/\", no \"..\"), got: \"a/\"."
+    }
+   }
+  },
+  {
+   "name": "syncBase bad: leading slash",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "x"
+    ],
+    "syncBase": "/a"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.syncBase must be a branch, tag or commit name (letters, digits, \".\", \"_\", \"/\", \"-\"; not starting with \"-\" or \"/\", no \"..\"), got: \"/a\"."
+    }
+   }
+  },
+  {
+   "name": "syncBase bad: space",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "x"
+    ],
+    "syncBase": "a b"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.syncBase must be a branch, tag or commit name (letters, digits, \".\", \"_\", \"/\", \"-\"; not starting with \"-\" or \"/\", no \"..\"), got: \"a b\"."
+    }
+   }
+  },
+  {
+   "name": "syncBase bad: revision expression",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "x"
+    ],
+    "syncBase": "HEAD~1"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.syncBase must be a branch, tag or commit name (letters, digits, \".\", \"_\", \"/\", \"-\"; not starting with \"-\" or \"/\", no \"..\"), got: \"HEAD~1\"."
+    }
+   }
+  },
+  {
+   "name": "syncBase null",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "x"
+    ],
+    "syncBase": null
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.syncBase must be a branch, tag or commit name (letters, digits, \".\", \"_\", \"/\", \"-\"; not starting with \"-\" or \"/\", no \"..\"), got: null."
+    }
+   }
+  },
+  {
+   "name": "syncOnly without syncBase",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "syncOnly": true
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.syncOnly needs syncBase; it is set by leaving out the objective of a unit with a syncBase."
+    }
+   }
+  },
+  {
+   "name": "syncOnly false",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "writes": [
+     "x"
+    ],
+    "syncBase": "main",
+    "syncOnly": false
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.syncOnly needs syncBase; it is set by leaving out the objective of a unit with a syncBase."
+    }
+   }
+  },
+  {
+   "name": "dependsOn trimmed",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "dependsOn": [
+     " a ",
+     "b"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [
+      "a",
+      "b"
+     ],
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "dependsOn not an array",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "dependsOn": "a"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.dependsOn must be an array of unit ids."
+    }
+   }
+  },
+  {
+   "name": "dependsOn blank entry",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "dependsOn": [
+     "a",
+     " "
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.dependsOn[1] must be a non-empty string unit id, got: \" \"."
+    }
+   }
+  },
+  {
+   "name": "pattern null is absent",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "pattern": null
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "pattern blank",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "pattern": " "
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.pattern must be a non-empty string when present."
+    }
+   }
+  },
+  {
+   "name": "pattern not a string",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "pattern": 4
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.pattern must be a non-empty string when present."
+    }
+   }
+  },
+  {
+   "name": "inputs of every kind",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "inputs": [
+     "docs/a.md",
+     "unit-run:ur-1/producer",
+     "gate-answer:wf-1/step-2"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "inputs": [
+      "docs/a.md",
+      "unit-run:ur-1/producer",
+      "gate-answer:wf-1/step-2"
+     ],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "inputs not an array",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "inputs": "a"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.inputs must be an array of repo-relative paths or unit-run references."
+    }
+   }
+  },
+  {
+   "name": "inputs absolute path",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "inputs": [
+     "/a"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.inputs[0] must be a repo-relative path or \"unit-run:<id>/<role>\" ref (or \"gate-answer:<workflowRunId>/<stepId>\"), got: \"/a\"."
+    }
+   }
+  },
+  {
+   "name": "inputs parent segment",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "inputs": [
+     "a/../b"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.inputs[0] must be a repo-relative path or \"unit-run:<id>/<role>\" ref (or \"gate-answer:<workflowRunId>/<stepId>\"), got: \"a/../b\"."
+    }
+   }
+  },
+  {
+   "name": "inputs backslash",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "inputs": [
+     "a\\b"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.inputs[0] must be a repo-relative path or \"unit-run:<id>/<role>\" ref (or \"gate-answer:<workflowRunId>/<stepId>\"), got: \"a\\\\b\"."
+    }
+   }
+  },
+  {
+   "name": "inputs bad unit-run ref",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "inputs": [
+     "unit-run:only"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.inputs[0] must be a repo-relative path or \"unit-run:<id>/<role>\" ref (or \"gate-answer:<workflowRunId>/<stepId>\"), got: \"unit-run:only\"."
+    }
+   }
+  },
+  {
+   "name": "inputs bad unit-run ref with space",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "inputs": [
+     "unit-run:a b/c"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.inputs[0] must be a repo-relative path or \"unit-run:<id>/<role>\" ref (or \"gate-answer:<workflowRunId>/<stepId>\"), got: \"unit-run:a b/c\"."
+    }
+   }
+  },
+  {
+   "name": "inputs bad gate-answer ref",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "inputs": [
+     "gate-answer:a/b/c"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.inputs[0] must be a repo-relative path or \"unit-run:<id>/<role>\" ref (or \"gate-answer:<workflowRunId>/<stepId>\"), got: \"gate-answer:a/b/c\"."
+    }
+   }
+  },
+  {
+   "name": "inputs blank",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "inputs": [
+     " "
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.inputs[0] must be a repo-relative path or \"unit-run:<id>/<role>\" ref (or \"gate-answer:<workflowRunId>/<stepId>\"), got: \" \"."
+    }
+   }
+  },
+  {
+   "name": "inputs not a string",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "inputs": [
+     3
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.inputs[0] must be a repo-relative path or \"unit-run:<id>/<role>\" ref (or \"gate-answer:<workflowRunId>/<stepId>\"), got: 3."
+    }
+   }
+  },
+  {
+   "name": "anonymizeInputs true kept",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "anonymizeInputs": true
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "inputs": [],
+     "anonymizeInputs": true,
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "anonymizeInputs false dropped",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "anonymizeInputs": false
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "anonymizeInputs not a boolean",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "anonymizeInputs": "yes"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.anonymizeInputs must be a boolean when present."
+    }
+   }
+  },
+  {
+   "name": "blind true kept",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "blind": true
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "inputs": [],
+     "blind": true,
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "blind false dropped",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "blind": false
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "blind not a boolean",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "blind": 1
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.blind must be a boolean when present."
+    }
+   }
+  },
+  {
+   "name": "prefer strings and entries",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "prefer": [
+     " a ",
+     {
+      "executor": " b ",
+      "invocation": " i "
+     },
+     {
+      "executor": "c"
+     }
+    ]
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "prefer": [
+      "a",
+      {
+       "executor": "b",
+       "invocation": "i"
+      },
+      {
+       "executor": "c"
+      }
+     ],
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "prefer not an array",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "prefer": "a"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.prefer must be an array of executor ids or {executor, invocation?} entries."
+    }
+   }
+  },
+  {
+   "name": "prefer blank string",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "prefer": [
+     " "
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.prefer[0] must be a non-empty executor id or {executor, invocation?} with non-empty strings, got: \" \"."
+    }
+   }
+  },
+  {
+   "name": "prefer entry without executor",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "prefer": [
+     {
+      "invocation": "i"
+     }
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.prefer[0] must be a non-empty executor id or {executor, invocation?} with non-empty strings, got: {\"invocation\":\"i\"}."
+    }
+   }
+  },
+  {
+   "name": "prefer entry with an extra key",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "prefer": [
+     {
+      "executor": "a",
+      "extra": 1
+     }
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.prefer[0] must be a non-empty executor id or {executor, invocation?} with non-empty strings, got: {\"executor\":\"a\",\"extra\":1}."
+    }
+   }
+  },
+  {
+   "name": "prefer entry with a blank invocation",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "prefer": [
+     {
+      "executor": "a",
+      "invocation": " "
+     }
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.prefer[0] must be a non-empty executor id or {executor, invocation?} with non-empty strings, got: {\"executor\":\"a\",\"invocation\":\" \"}."
+    }
+   }
+  },
+  {
+   "name": "prefer entry an array",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "prefer": [
+     [
+      "a"
+     ]
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.prefer[0] must be a non-empty executor id or {executor, invocation?} with non-empty strings, got: [\"a\"]."
+    }
+   }
+  },
+  {
+   "name": "prefer entry null",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "prefer": [
+     null
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.prefer[0] must be a non-empty executor id or {executor, invocation?} with non-empty strings, got: null."
+    }
+   }
+  },
+  {
+   "name": "seats valid",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "seats": [
+     {
+      "seat": "a",
+      "role": "producer"
+     },
+     {
+      "seat": "j",
+      "role": "judge",
+      "tier": "nano",
+      "persona": " p "
+     }
+    ]
+   },
+   "host": {
+    "seats": {
+     "ok": [
+      {
+       "seat": "a",
+       "role": "producer"
+      },
+      {
+       "seat": "j",
+       "role": "judge",
+       "persona": "p",
+       "tier": "nano"
+      }
+     ]
+    }
+   },
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "seats": [
+      {
+       "seat": "a",
+       "role": "producer"
+      },
+      {
+       "seat": "j",
+       "role": "judge",
+       "persona": "p",
+       "tier": "nano"
+      }
+     ],
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "seats empty",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "seats": []
+   },
+   "host": {
+    "seats": {
+     "error": {
+      "name": "SeatResolutionError",
+      "message": "unit.seats must be a non-empty array of { seat, role }",
+      "code": "invalid-seats",
+      "detail": "must be a non-empty array of { seat, role }",
+      "at": ""
+     }
+    }
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.seats must be a non-empty array of { seat, role }"
+    }
+   }
+  },
+  {
+   "name": "seats duplicate",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "seats": [
+     {
+      "seat": "a",
+      "role": "producer"
+     },
+     {
+      "seat": "a",
+      "role": "producer"
+     }
+    ]
+   },
+   "host": {
+    "seats": {
+     "error": {
+      "name": "SeatResolutionError",
+      "message": "unit.seats[1].seat \"a\" is declared twice in this unit",
+      "code": "duplicate-seat",
+      "detail": "\"a\" is declared twice in this unit",
+      "at": "[1].seat"
+     }
+    }
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.seats[1].seat \"a\" is declared twice in this unit"
+    }
+   }
+  },
+  {
+   "name": "seats bad role",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "seats": [
+     {
+      "seat": "a",
+      "role": "boss"
+     }
+    ]
+   },
+   "host": {
+    "seats": {
+     "error": {
+      "name": "SeatResolutionError",
+      "message": "unit.seats[0].role must be one of [producer, synthesizer, reviewer, red-team, judge], got \"boss\"",
+      "code": "invalid-seat-role",
+      "detail": "must be one of [producer, synthesizer, reviewer, red-team, judge], got \"boss\"",
+      "at": "[0].role"
+     }
+    }
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.seats[0].role must be one of [producer, synthesizer, reviewer, red-team, judge], got \"boss\""
+    }
+   }
+  },
+  {
+   "name": "seats bad tier",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "seats": [
+     {
+      "seat": "a",
+      "role": "producer",
+      "tier": "nope"
+     }
+    ]
+   },
+   "host": {
+    "seats": {
+     "error": {
+      "name": "SeatResolutionError",
+      "message": "unit.seats[0].tier must be one of [nano, mini, standard, advanced, flagship, frontier], got \"nope\"",
+      "code": "invalid-seat-tier",
+      "detail": "must be one of [nano, mini, standard, advanced, flagship, frontier], got \"nope\"",
+      "at": "[0].tier"
+     }
+    }
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.seats[0].tier must be one of [nano, mini, standard, advanced, flagship, frontier], got \"nope\""
+    }
+   }
+  },
+  {
+   "name": "seats unknown key",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "seats": [
+     {
+      "seat": "a",
+      "role": "producer",
+      "x": 1
+     }
+    ]
+   },
+   "host": {
+    "seats": {
+     "error": {
+      "name": "SeatResolutionError",
+      "message": "unit.seats[0] has unknown key \"x\"; a seat declares only seat, role, persona and tier",
+      "code": "invalid-seats",
+      "detail": "has unknown key \"x\"; a seat declares only seat, role, persona and tier",
+      "at": "[0].x"
+     }
+    }
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.seats[0] has unknown key \"x\"; a seat declares only seat, role, persona and tier"
+    }
+   }
+  },
+  {
+   "name": "seats reserved id",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "seats": [
+     {
+      "seat": "verify",
+      "role": "producer"
+     }
+    ]
+   },
+   "host": {
+    "seats": {
+     "error": {
+      "name": "SeatResolutionError",
+      "message": "unit.seats[0].seat \"verify\" is a reserved seat id; reserved: [verify, verifier]",
+      "code": "param-invalid",
+      "detail": "\"verify\" is a reserved seat id; reserved: [verify, verifier]",
+      "at": "[0].seat"
+     }
+    }
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.seats[0].seat \"verify\" is a reserved seat id; reserved: [verify, verifier]"
+    }
+   }
+  },
+  {
+   "name": "tier valid",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "tier": "nano"
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "tier": "nano",
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "tier unknown",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "tier": "platinum"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.tier must be one of [nano, mini, standard, advanced, flagship, frontier], got: \"platinum\"."
+    }
+   }
+  },
+  {
+   "name": "persona blank",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "persona": " "
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.persona must be a non-empty string when present."
+    }
+   }
+  },
+  {
+   "name": "persona not a string",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "persona": 1
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.persona must be a non-empty string when present."
+    }
+   }
+  },
+  {
+   "name": "timeoutMs valid",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "timeoutMs": 600000
+   },
+   "host": {
+    "timeoutProblem": null
+   },
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "timeoutMs": 600000,
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "timeoutMs at the floor",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "timeoutMs": 60000
+   },
+   "host": {
+    "timeoutProblem": null
+   },
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "timeoutMs": 60000,
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "timeoutMs at the ceiling",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "timeoutMs": 14400000
+   },
+   "host": {
+    "timeoutProblem": null
+   },
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "timeoutMs": 14400000,
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "timeoutMs below the floor",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "timeoutMs": 59999
+   },
+   "host": {
+    "timeoutProblem": "unit.timeoutMs must be at least 1m, got 59999ms"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.timeoutMs must be at least 1m, got 59999ms"
+    }
+   }
+  },
+  {
+   "name": "timeoutMs above the ceiling",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "timeoutMs": 14400001
+   },
+   "host": {
+    "timeoutProblem": "unit.timeoutMs must be at most 4h, got 14400001ms"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.timeoutMs must be at most 4h, got 14400001ms"
+    }
+   }
+  },
+  {
+   "name": "timeoutMs fractional",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "timeoutMs": 90000.5
+   },
+   "host": {
+    "timeoutProblem": "unit.timeoutMs must be a whole number of milliseconds, got: 90000.5"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.timeoutMs must be a whole number of milliseconds, got: 90000.5"
+    }
+   }
+  },
+  {
+   "name": "timeoutMs a string",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "timeoutMs": "90m"
+   },
+   "host": {
+    "timeoutProblem": "unit.timeoutMs must be a whole number of milliseconds, got: \"90m\""
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.timeoutMs must be a whole number of milliseconds, got: \"90m\""
+    }
+   }
+  },
+  {
+   "name": "timeoutMs null",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "timeoutMs": null
+   },
+   "host": {
+    "timeoutProblem": "unit.timeoutMs must be a whole number of milliseconds, got: null"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.timeoutMs must be a whole number of milliseconds, got: null"
+    }
+   }
+  },
+  {
+   "name": "verify blank",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "verify": " "
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.verify must be a non-empty shell command string when present."
+    }
+   }
+  },
+  {
+   "name": "verify not a string",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "verify": true
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.verify must be a non-empty shell command string when present."
+    }
+   }
+  },
+  {
+   "name": "plan with phase",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "plan": {
+     "dir": "plans/260101-0000-x",
+     "phase": 3
+    }
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "plan": {
+      "dir": "plans/260101-0000-x",
+      "phase": "3"
+     },
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "plan bad shape",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "plan": "plans/x"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan must be { dir, phase? } with dir a plans/<name> directory."
+    }
+   }
+  },
+  {
+   "name": "skills deduplicated and trimmed",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "skills": [
+     " a ",
+     "b",
+     "a"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "skills": [
+      "a",
+      "b"
+     ],
+     "inputs": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "skills empty",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "skills": []
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.skills must be a non-empty array of non-empty skill names when present."
+    }
+   }
+  },
+  {
+   "name": "skills blank entry",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "skills": [
+     "a",
+     " "
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.skills must be a non-empty array of non-empty skill names when present."
+    }
+   }
+  },
+  {
+   "name": "skills not an array",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "skills": "a"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.skills must be a non-empty array of non-empty skill names when present."
+    }
+   }
+  },
+  {
+   "name": "expectedOutputs trimmed",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "expectedOutputs": [
+     " out.md "
+    ]
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "inputs": [],
+     "expectedOutputs": [
+      "out.md"
+     ]
+    }
+   }
+  },
+  {
+   "name": "expectedOutputs not an array",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "expectedOutputs": "a"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.expectedOutputs must be an array of strings."
+    }
+   }
+  },
+  {
+   "name": "expectedOutputs blank",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "expectedOutputs": [
+     ""
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.expectedOutputs[0] must be a non-empty string, got: \"\"."
+    }
+   }
+  },
+  {
+   "name": "stanceOptions trimmed",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "stanceOptions": [
+     " yes ",
+     "no"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "inputs": [],
+     "stanceOptions": [
+      "yes",
+      "no"
+     ],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "stanceOptions duplicate",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "stanceOptions": [
+     "a",
+     "a"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "stanceOptions must be unique; \"other\" is reserved."
+    }
+   }
+  },
+  {
+   "name": "stanceOptions reserved other",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "stanceOptions": [
+     "a",
+     "other"
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "stanceOptions must be unique; \"other\" is reserved."
+    }
+   }
+  },
+  {
+   "name": "stanceOptions not an array",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "stanceOptions": "a"
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "stanceOptions must be an array of non-empty strings."
+    }
+   }
+  },
+  {
+   "name": "stanceOptions null",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "stanceOptions": null
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "stanceOptions must be an array of non-empty strings."
+    }
+   }
+  },
+  {
+   "name": "stanceOptions blank",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "stanceOptions": [
+     "a",
+     " "
+    ]
+   },
+   "host": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "stanceOptions must be an array of non-empty strings."
+    }
+   }
+  },
+  {
+   "name": "stanceOptions empty list kept",
+   "input": {
+    "id": "u1",
+    "objective": "Do the work",
+    "capability": "execute",
+    "stanceOptions": []
+   },
+   "host": {},
+   "expect": {
+    "ok": {
+     "id": "u1",
+     "objective": "Do the work",
+     "capability": "execute",
+     "writes": [],
+     "dependsOn": [],
+     "inputs": [],
+     "stanceOptions": [],
+     "expectedOutputs": []
+    }
+   }
+  },
+  {
+   "name": "every field at once",
+   "input": {
+    "id": "full",
+    "objective": "o",
+    "capability": "code:implement",
+    "rigor": "high",
+    "writes": [
+     "a"
+    ],
+    "dependsOn": [
+     "x"
+    ],
+    "pattern": "panel",
+    "prefer": [
+     "e"
+    ],
+    "seats": [
+     {
+      "seat": "a",
+      "role": "producer"
+     }
+    ],
+    "tier": "nano",
+    "persona": "p",
+    "timeoutMs": 120000,
+    "verify": "v",
+    "skills": [
+     "s"
+    ],
+    "plan": {
+     "dir": "plans/260101-0000-x"
+    },
+    "syncBase": "main",
+    "inputs": [
+     "i"
+    ],
+    "anonymizeInputs": true,
+    "blind": true,
+    "stanceOptions": [
+     "y"
+    ],
+    "expectedOutputs": [
+     "e"
+    ]
+   },
+   "host": {
+    "seats": {
+     "ok": [
+      {
+       "seat": "a",
+       "role": "producer"
+      }
+     ]
+    },
+    "timeoutProblem": null
+   },
+   "expect": {
+    "ok": {
+     "id": "full",
+     "objective": "o",
+     "capability": "code:implement",
+     "rigor": "high",
+     "writes": [
+      "a"
+     ],
+     "dependsOn": [
+      "x"
+     ],
+     "pattern": "panel",
+     "prefer": [
+      "e"
+     ],
+     "seats": [
+      {
+       "seat": "a",
+       "role": "producer"
+      }
+     ],
+     "tier": "nano",
+     "persona": "p",
+     "timeoutMs": 120000,
+     "verify": "v",
+     "skills": [
+      "s"
+     ],
+     "plan": {
+      "dir": "plans/260101-0000-x",
+      "phase": null
+     },
+     "syncBase": "main",
+     "inputs": [
+      "i"
+     ],
+     "anonymizeInputs": true,
+     "blind": true,
+     "stanceOptions": [
+      "y"
+     ],
+     "expectedOutputs": [
+      "e"
+     ]
+    }
+   }
+  }
+ ],
+ "normalizers": [
+  {
+   "fn": "normalizeStanceOptions",
+   "input": [],
+   "expect": {
+    "ok": []
+   }
+  },
+  {
+   "fn": "normalizeStanceOptions",
+   "input": [
+    "a",
+    " b "
+   ],
+   "expect": {
+    "ok": [
+     "a",
+     "b"
+    ]
+   }
+  },
+  {
+   "fn": "normalizeStanceOptions",
+   "input": [
+    "a",
+    "a"
+   ],
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "stanceOptions must be unique; \"other\" is reserved."
+    }
+   }
+  },
+  {
+   "fn": "normalizeStanceOptions",
+   "input": [
+    "other"
+   ],
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "stanceOptions must be unique; \"other\" is reserved."
+    }
+   }
+  },
+  {
+   "fn": "normalizeStanceOptions",
+   "input": [
+    " "
+   ],
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "stanceOptions must be an array of non-empty strings."
+    }
+   }
+  },
+  {
+   "fn": "normalizeStanceOptions",
+   "input": [
+    "a",
+    3
+   ],
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "stanceOptions must be an array of non-empty strings."
+    }
+   }
+  },
+  {
+   "fn": "normalizeStanceOptions",
+   "input": "a",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "stanceOptions must be an array of non-empty strings."
+    }
+   }
+  },
+  {
+   "fn": "normalizeStanceOptions",
+   "input": null,
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "stanceOptions must be an array of non-empty strings."
+    }
+   }
+  },
+  {
+   "fn": "normalizeStanceOptions",
+   "input": {},
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "stanceOptions must be an array of non-empty strings."
+    }
+   }
+  },
+  {
+   "fn": "normalizeWorkflowLink",
+   "input": {
+    "$undefined": true
+   },
+   "expect": {
+    "ok": null
+   }
+  },
+  {
+   "fn": "normalizeWorkflowLink",
+   "input": null,
+   "expect": {
+    "ok": null
+   }
+  },
+  {
+   "fn": "normalizeWorkflowLink",
+   "input": {
+    "caseId": "c1",
+    "activity": "a1",
+    "reservationId": "r1"
+   },
+   "expect": {
+    "ok": {
+     "caseId": "c1",
+     "activity": "a1",
+     "reservationId": "r1"
+    }
+   }
+  },
+  {
+   "fn": "normalizeWorkflowLink",
+   "input": {
+    "runId": "run1",
+    "stepId": "step1",
+    "unitId": "u1"
+   },
+   "expect": {
+    "ok": {
+     "caseId": "run1",
+     "activity": "step1",
+     "reservationId": null
+    }
+   }
+  },
+  {
+   "fn": "normalizeWorkflowLink",
+   "input": {
+    "caseId": " c ",
+    "activity": " a "
+   },
+   "expect": {
+    "ok": {
+     "caseId": "c",
+     "activity": "a",
+     "reservationId": null
+    }
+   }
+  },
+  {
+   "fn": "normalizeWorkflowLink",
+   "input": {
+    "caseId": "c"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "workflow link requires non-empty caseId and activity."
+    }
+   }
+  },
+  {
+   "fn": "normalizeWorkflowLink",
+   "input": {
+    "activity": "a"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "workflow link requires non-empty caseId and activity."
+    }
+   }
+  },
+  {
+   "fn": "normalizeWorkflowLink",
+   "input": {
+    "caseId": "c",
+    "activity": "a",
+    "reservationId": " "
+   },
+   "expect": {
+    "ok": {
+     "caseId": "c",
+     "activity": "a",
+     "reservationId": null
+    }
+   }
+  },
+  {
+   "fn": "normalizeWorkflowLink",
+   "input": {
+    "caseId": "c",
+    "runId": "r",
+    "activity": "a",
+    "stepId": "s"
+   },
+   "expect": {
+    "ok": {
+     "caseId": "c",
+     "activity": "a",
+     "reservationId": null
+    }
+   }
+  },
+  {
+   "fn": "normalizeWorkflowLink",
+   "input": "link",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "workflow link requires non-empty caseId and activity."
+    }
+   }
+  },
+  {
+   "fn": "normalizeWorkflowLink",
+   "input": [],
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "workflow link requires non-empty caseId and activity."
+    }
+   }
+  },
+  {
+   "fn": "normalizeWorkflowLink",
+   "input": 3,
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "workflow link requires non-empty caseId and activity."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "$undefined": true
+   },
+   "expect": {
+    "ok": null
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": null,
+   "expect": {
+    "ok": null
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/260101-0000-x"
+   },
+   "expect": {
+    "ok": {
+     "dir": "plans/260101-0000-x",
+     "phase": null
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "x"
+   },
+   "expect": {
+    "ok": {
+     "dir": "plans/x",
+     "phase": null
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "./plans/x/"
+   },
+   "expect": {
+    "ok": {
+     "dir": "plans/x",
+     "phase": null
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": " plans/x// "
+   },
+   "expect": {
+    "ok": {
+     "dir": "plans/x",
+     "phase": null
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/"
+   },
+   "expect": {
+    "ok": {
+     "dir": "plans/plans",
+     "phase": null
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": ""
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.dir must be one plans/<name> directory, got: \"\"."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/a/b"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.dir must be one plans/<name> directory, got: \"plans/a/b\"."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/a\\b"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.dir must be one plans/<name> directory, got: \"plans/a\\\\b\"."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": ".."
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.dir must be one plans/<name> directory, got: \"..\"."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/.."
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.dir must be one plans/<name> directory, got: \"plans/..\"."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "."
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.dir must be one plans/<name> directory, got: \".\"."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/."
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.dir must be one plans/<name> directory, got: \"plans/.\"."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/x",
+    "phase": 3
+   },
+   "expect": {
+    "ok": {
+     "dir": "plans/x",
+     "phase": "3"
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/x",
+    "phase": "3"
+   },
+   "expect": {
+    "ok": {
+     "dir": "plans/x",
+     "phase": "3"
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/x",
+    "phase": " 6b "
+   },
+   "expect": {
+    "ok": {
+     "dir": "plans/x",
+     "phase": "6b"
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/x",
+    "phase": null
+   },
+   "expect": {
+    "ok": {
+     "dir": "plans/x",
+     "phase": null
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/x",
+    "phase": 0
+   },
+   "expect": {
+    "ok": {
+     "dir": "plans/x",
+     "phase": "0"
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/x",
+    "phase": -1
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.phase must be a phase id (letters, digits, \".\", \"_\", \"-\"), got: -1."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/x",
+    "phase": 1.5
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.phase must be a phase id (letters, digits, \".\", \"_\", \"-\"), got: 1.5."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/x",
+    "phase": ""
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.phase must be a phase id (letters, digits, \".\", \"_\", \"-\"), got: \"\"."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/x",
+    "phase": "a b"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.phase must be a phase id (letters, digits, \".\", \"_\", \"-\"), got: \"a b\"."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/x",
+    "phase": ".x"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.phase must be a phase id (letters, digits, \".\", \"_\", \"-\"), got: \".x\"."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/x",
+    "phase": "a.b_c-d"
+   },
+   "expect": {
+    "ok": {
+     "dir": "plans/x",
+     "phase": "a.b_c-d"
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": "plans/x",
+    "phase": true
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.phase must be a phase id (letters, digits, \".\", \"_\", \"-\"), got: true."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "phase": 1
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan must be { dir, phase? } with dir a plans/<name> directory."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": {
+    "dir": 4
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan must be { dir, phase? } with dir a plans/<name> directory."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": "plans/x",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan must be { dir, phase? } with dir a plans/<name> directory."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": [],
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan must be { dir, phase? } with dir a plans/<name> directory."
+    }
+   }
+  },
+  {
+   "fn": "normalizePlanRef",
+   "input": 7,
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan must be { dir, phase? } with dir a plans/<name> directory."
+    }
+   }
+  }
+ ]
+}
