@@ -385,6 +385,7 @@ dependencies = [
  "fgos-execution",
  "fgos-git",
  "fgos-holder-lock",
+ "fgos-host-runtime",
  "fgos-process",
  "fgos-run-result",
  "fgos-run-supervisor",

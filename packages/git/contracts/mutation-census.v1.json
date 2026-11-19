@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c3eee04c90703e644b6c75790ac95c32771f78922188b198e255ada376d74904",
+  "payloadDigest": "7483bc97c0dd658ccafa2fe986cfdf96a64b6fe41acd4e007323fd9d59d83df2",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -482,9 +482,18 @@
     "packages/execution/engine/src/run_result/mod.rs": "b16656bbcb23d35b382f17dbbcdad4820d24e7aeb3e2e034c027f964d0cfc288",
     "packages/execution/engine/src/settlement/mod.rs": "2f4b08233caf528dc1a321beb0da51bfa0cb767e1d5af78d1d18187a5d3fa8be",
     "packages/execution/engine/src/steps/mod.rs": "57719161b34559409bae9def07b3ba29930b970ba4e7274a71150504b05f5c40",
-    "packages/execution/engine/src/transport/mod.rs": "66e0955adb4d8e42d53c69f920d44d06f98c4cd7632791331ae9f201be61801f",
+    "packages/execution/engine/src/transport/adapters.rs": "dfd2b93af19137091a95b2320cab4ddb6a51690980dcd617fc5540ca7a74f4de",
+    "packages/execution/engine/src/transport/mechanism.rs": "343fe29df9724fbb5b595742bc9883f189e64a859104e13e764f6cfb79cf85bd",
+    "packages/execution/engine/src/transport/mod.rs": "3812dbed8ed2f30ea0230748fdbc69abfd85168c3a0d555eef0f84c5db165d14",
+    "packages/execution/engine/src/transport/provider_adapter.rs": "79d97dc1226bb538bce48dd0168cdb78be905ff46626f6a3448ee34179bea77a",
+    "packages/execution/engine/src/transport/terminal_slot.rs": "1ebd3a09dc32a09a29ae172dfdaf56d207e12aa24cf8b27ea0b03a8f93e2dc26",
+    "packages/execution/engine/src/transport/visibility_session.rs": "18ade09a85911f4551ec5058f91b45883ce43efaa7a200d5a68940814de4ca52",
+    "packages/execution/engine/src/transport/worker_home.rs": "6614a05d2bbb3e76b241aaa80fb199aac6205255d85ec8d9fbb9bb7e2a001cdf",
+    "packages/execution/engine/src/transport/worker_session.rs": "eab871222915eeaf833c45a19cc728cb839fe633e9f63b5b4c4dff30fb38cf9d",
+    "packages/execution/engine/src/transport/worker_session_boot.rs": "3131e2097312d4e58c3fe87869e48e0fcf30ea374bf24abee3cd6e44a0e969e0",
     "packages/execution/engine/src/transport_round/mod.rs": "13a34862c2cc4b8602f234f7c76428c087c2228b804bb58485f1418a1401095c",
     "packages/execution/engine/src/unit_run/mod.rs": "b0301cbcf51f52515225ceeb426148705822a5243c148b74e22559965c283bd4",
+    "packages/execution/engine/tests/transport.rs": "df814ba577505861a1e3251497398fe9466d8d15068382a68f7384f59c02c2ae",
     "packages/execution/rust/src/accounts.rs": "3d96fad4f0a809d7fe045164e1a28821f6e790010af4ecbe8cfd3ce0887f1e0e",
     "packages/execution/rust/src/admission/mod.rs": "e4efa2920d3555247d1b953009c16c4ee2f0ecc16c70245938fafd4c26097538",
     "packages/execution/rust/src/agents.rs": "dffa2143d373326f72cfa5e2b2b8abc534a700e0a5fc2a563d626a699ed3c912",
@@ -2771,6 +2780,13 @@
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
+    },
+    {
+      "path": "packages/execution/engine/src/transport/worker_session_boot.rs",
+      "line": 77,
+      "spawn": "Command::new <- packages/execution/engine/src/transport/worker_session_boot.rs:328",
+      "binary": "(uncalled new)",
+      "class": "uncalled-wrapper"
     },
     {
       "path": "packages/git/node-addon/src/holder_lock.rs",

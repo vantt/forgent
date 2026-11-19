@@ -1,0 +1,295 @@
+{
+  "note": "recorded from src/runner/dispatch/mechanism.mjs",
+  "table": [
+    {
+      "in": {
+        "hasNativeMechanism": false,
+        "hasLiveTaskAccess": false,
+        "forceCliSpawn": false
+      },
+      "out": "out-of-process"
+    },
+    {
+      "in": {
+        "hasNativeMechanism": false,
+        "hasLiveTaskAccess": false,
+        "forceCliSpawn": true
+      },
+      "out": "out-of-process"
+    },
+    {
+      "in": {
+        "hasNativeMechanism": false,
+        "hasLiveTaskAccess": true,
+        "forceCliSpawn": false
+      },
+      "out": "out-of-process"
+    },
+    {
+      "in": {
+        "hasNativeMechanism": false,
+        "hasLiveTaskAccess": true,
+        "forceCliSpawn": true
+      },
+      "out": "out-of-process"
+    },
+    {
+      "in": {
+        "hasNativeMechanism": true,
+        "hasLiveTaskAccess": false,
+        "forceCliSpawn": false
+      },
+      "out": "out-of-process"
+    },
+    {
+      "in": {
+        "hasNativeMechanism": true,
+        "hasLiveTaskAccess": false,
+        "forceCliSpawn": true
+      },
+      "out": "out-of-process"
+    },
+    {
+      "in": {
+        "hasNativeMechanism": true,
+        "hasLiveTaskAccess": true,
+        "forceCliSpawn": false
+      },
+      "out": "in-process"
+    },
+    {
+      "in": {
+        "hasNativeMechanism": true,
+        "hasLiveTaskAccess": true,
+        "forceCliSpawn": true
+      },
+      "out": "out-of-process"
+    },
+    {
+      "in": null,
+      "out": "out-of-process"
+    }
+  ],
+  "cfg": {
+    "executors": {
+      "agent-only": {
+        "kind": "agent",
+        "agentType": "judge"
+      },
+      "agent-forced": {
+        "kind": "agent",
+        "agentType": "judge",
+        "forceCliSpawn": true
+      },
+      "agent-command": {
+        "kind": "agent",
+        "command": "claude"
+      },
+      "agent-adapter": {
+        "kind": "agent",
+        "adapter": "herdr-spawn"
+      },
+      "agent-cli-invocation": {
+        "kind": "agent",
+        "invocations": [
+          {
+            "via": "cli",
+            "command": "x"
+          }
+        ]
+      },
+      "agent-task-invocation": {
+        "kind": "agent",
+        "invocations": [
+          {
+            "via": "task"
+          }
+        ]
+      },
+      "tool-only": {
+        "kind": "tool",
+        "mcpTool": "a"
+      },
+      "bare": {}
+    }
+  },
+  "executorCases": [
+    {
+      "executorId": "agent-only",
+      "hasLiveTaskAccess": false,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "agent-only",
+      "hasLiveTaskAccess": true,
+      "out": "in-process"
+    },
+    {
+      "executorId": "agent-forced",
+      "hasLiveTaskAccess": false,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "agent-forced",
+      "hasLiveTaskAccess": true,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "agent-command",
+      "hasLiveTaskAccess": false,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "agent-command",
+      "hasLiveTaskAccess": true,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "agent-adapter",
+      "hasLiveTaskAccess": false,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "agent-adapter",
+      "hasLiveTaskAccess": true,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "agent-cli-invocation",
+      "hasLiveTaskAccess": false,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "agent-cli-invocation",
+      "hasLiveTaskAccess": true,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "agent-task-invocation",
+      "hasLiveTaskAccess": false,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "agent-task-invocation",
+      "hasLiveTaskAccess": true,
+      "out": "in-process"
+    },
+    {
+      "executorId": "tool-only",
+      "hasLiveTaskAccess": false,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "tool-only",
+      "hasLiveTaskAccess": true,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "bare",
+      "hasLiveTaskAccess": false,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "bare",
+      "hasLiveTaskAccess": true,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "missing",
+      "hasLiveTaskAccess": false,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "missing",
+      "hasLiveTaskAccess": true,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": null,
+      "hasLiveTaskAccess": false,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": null,
+      "hasLiveTaskAccess": true,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": null,
+      "hasLiveTaskAccess": false,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": null,
+      "hasLiveTaskAccess": true,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "",
+      "hasLiveTaskAccess": false,
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "",
+      "hasLiveTaskAccess": true,
+      "out": "out-of-process"
+    }
+  ],
+  "lookups": [
+    {
+      "executorId": "executor",
+      "cfg": {
+        "executor": {
+          "kind": "agent",
+          "command": "claude"
+        }
+      },
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "claude",
+      "cfg": {
+        "executor": {
+          "kind": "agent",
+          "command": "claude"
+        }
+      },
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "other",
+      "cfg": {
+        "executor": {
+          "kind": "agent",
+          "command": "claude"
+        }
+      },
+      "out": "out-of-process"
+    },
+    {
+      "executorId": "inv-1",
+      "cfg": {
+        "executor": {
+          "kind": "agent",
+          "invocations": [
+            {
+              "id": "inv-1",
+              "via": "task"
+            }
+          ]
+        }
+      },
+      "out": "in-process"
+    },
+    {
+      "executorId": null,
+      "cfg": {
+        "executor": {
+          "kind": "agent",
+          "command": "claude"
+        }
+      },
+      "out": "out-of-process"
+    }
+  ]
+}

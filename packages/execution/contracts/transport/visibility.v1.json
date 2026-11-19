@@ -1,0 +1,384 @@
+{
+  "note": "recorded from src/runner/dispatch/visibility-session.mjs",
+  "states": [
+    "requested",
+    "pane-created",
+    "agent-ready",
+    "briefed",
+    "working",
+    "detached",
+    "settling",
+    "reconciled",
+    "died",
+    "blocked"
+  ],
+  "runStatuses": [
+    "running",
+    "settled",
+    "died",
+    "unknown"
+  ],
+  "classes": [
+    {
+      "name": "claim-in-outbox",
+      "liveness": "unknown",
+      "files": {
+        "run.json": {
+          "status": "running"
+        },
+        "outbox/result-2.json": "{}",
+        "outbox/result-11.json": "{}"
+      },
+      "out": {
+        "ok": {
+          "outcome": "settled",
+          "resultPath": "outbox/result-11.json",
+          "changed": true
+        }
+      }
+    },
+    {
+      "name": "claim-numeric-order",
+      "liveness": "absent",
+      "files": {
+        "run.json": {
+          "status": "running"
+        },
+        "worker-output/outbox/result-9.json": "{}",
+        "worker-output/outbox/result-11.json": "{}"
+      },
+      "out": {
+        "ok": {
+          "outcome": "settled",
+          "resultPath": "worker-output/outbox/result-11.json",
+          "changed": true
+        }
+      }
+    },
+    {
+      "name": "claim-legacy-name",
+      "liveness": "unknown",
+      "files": {
+        "run.json": {
+          "status": "running"
+        },
+        "worker-output/agent-result.json": "{}"
+      },
+      "out": {
+        "ok": {
+          "outcome": "settled",
+          "resultPath": "worker-output/agent-result.json",
+          "changed": true
+        }
+      }
+    },
+    {
+      "name": "claim-leading-zero-ignored",
+      "liveness": "absent",
+      "files": {
+        "run.json": {
+          "status": "running"
+        },
+        "outbox/result-01.json": "{}"
+      },
+      "out": {
+        "ok": {
+          "outcome": "died",
+          "resultPath": null,
+          "changed": true
+        }
+      }
+    },
+    {
+      "name": "collected-result",
+      "liveness": "absent",
+      "files": {
+        "run.json": {
+          "status": "running"
+        },
+        "result.json": "{}"
+      },
+      "out": {
+        "ok": {
+          "outcome": "settled",
+          "resultPath": "result.json",
+          "changed": true
+        }
+      }
+    },
+    {
+      "name": "settled-already",
+      "liveness": "unknown",
+      "files": {
+        "run.json": {
+          "status": "settled"
+        },
+        "result.json": "{}"
+      },
+      "out": {
+        "ok": {
+          "outcome": "settled",
+          "resultPath": "result.json",
+          "changed": false
+        }
+      }
+    },
+    {
+      "name": "died",
+      "liveness": "absent",
+      "files": {
+        "run.json": {
+          "status": "running"
+        }
+      },
+      "out": {
+        "ok": {
+          "outcome": "died",
+          "resultPath": null,
+          "changed": true
+        }
+      }
+    },
+    {
+      "name": "unknown-default",
+      "liveness": null,
+      "files": {
+        "run.json": {
+          "status": "running"
+        }
+      },
+      "out": {
+        "ok": {
+          "outcome": "unknown",
+          "resultPath": null,
+          "changed": true
+        }
+      }
+    },
+    {
+      "name": "unknown-held",
+      "liveness": "held",
+      "files": {
+        "run.json": {
+          "status": "running"
+        }
+      },
+      "out": {
+        "ok": {
+          "outcome": "unknown",
+          "resultPath": null,
+          "changed": true
+        }
+      }
+    },
+    {
+      "name": "died-already",
+      "liveness": "absent",
+      "files": {
+        "run.json": {
+          "status": "died"
+        }
+      },
+      "out": {
+        "ok": {
+          "outcome": "died",
+          "resultPath": null,
+          "changed": false
+        }
+      }
+    },
+    {
+      "name": "missing-run",
+      "liveness": "absent",
+      "files": {},
+      "out": {
+        "error": {
+          "name": "VisibilityError",
+          "code": "missing-run"
+        }
+      }
+    },
+    {
+      "name": "corrupt-run",
+      "liveness": "absent",
+      "files": {
+        "run.json": "{nope"
+      },
+      "out": {
+        "error": {
+          "name": "VisibilityError",
+          "code": "corrupt"
+        }
+      }
+    }
+  ],
+  "reconcile": [
+    {
+      "name": "settles",
+      "liveness": "unknown",
+      "files": {
+        "run.json": {
+          "status": "running",
+          "runId": "r1"
+        },
+        "outbox/result-1.json": "{}",
+        "visibility.json": {
+          "status": "working",
+          "pane": "p"
+        }
+      },
+      "out": {
+        "ok": {
+          "outcome": "settled",
+          "changed": true,
+          "resultPath": "outbox/result-1.json"
+        }
+      },
+      "run": {
+        "status": "settled",
+        "runId": "r1",
+        "workerResultPath": "outbox/result-1.json"
+      },
+      "visibility": {
+        "status": "reconciled",
+        "pane": "p"
+      }
+    },
+    {
+      "name": "dies",
+      "liveness": "absent",
+      "files": {
+        "run.json": {
+          "status": "running"
+        }
+      },
+      "out": {
+        "ok": {
+          "outcome": "died",
+          "changed": true,
+          "resultPath": null
+        }
+      },
+      "run": {
+        "status": "died"
+      },
+      "visibility": {
+        "status": "died"
+      }
+    },
+    {
+      "name": "no-visibility",
+      "liveness": "absent",
+      "files": {
+        "run.json": {
+          "status": "running"
+        }
+      },
+      "out": {
+        "ok": {
+          "outcome": "died",
+          "changed": true,
+          "resultPath": null
+        }
+      },
+      "run": {
+        "status": "died"
+      },
+      "visibility": {
+        "status": "died"
+      }
+    }
+  ],
+  "settle": [
+    {
+      "status": "settled",
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "status": "died",
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "status": "unknown",
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "status": "running",
+      "out": {
+        "ok": false
+      }
+    },
+    {
+      "status": "bogus",
+      "out": {
+        "error": {
+          "name": "VisibilityError",
+          "code": "unknown-state"
+        }
+      }
+    }
+  ],
+  "settleAgain": false,
+  "settleMissing": false,
+  "visibility": {
+    "steps": [
+      {
+        "patch": {
+          "status": "pane-created",
+          "pane": "p1"
+        },
+        "out": {
+          "status": "pane-created",
+          "pane": "p1",
+          "lastSeenAt": "2026-01-01T00:00:00.000Z"
+        }
+      },
+      {
+        "patch": {
+          "agentSession": "s1"
+        },
+        "out": {
+          "status": "pane-created",
+          "pane": "p1",
+          "lastSeenAt": "2026-01-01T00:00:00.000Z",
+          "agentSession": "s1"
+        }
+      },
+      {
+        "patch": {
+          "status": "bogus"
+        },
+        "out": {
+          "error": {
+            "name": "VisibilityError",
+            "code": "unknown-state"
+          }
+        }
+      },
+      {
+        "patch": "detached",
+        "out": {
+          "status": "detached",
+          "pane": "p1",
+          "lastSeenAt": "2026-01-01T00:00:00.000Z",
+          "agentSession": "s1"
+        }
+      },
+      {
+        "patch": "corrupt",
+        "out": {
+          "error": {
+            "name": "VisibilityError",
+            "code": "corrupt"
+          }
+        }
+      }
+    ]
+  }
+}
