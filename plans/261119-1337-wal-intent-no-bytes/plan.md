@@ -2,6 +2,7 @@
 contract: plan-v1
 title: "Land and Sync intents record declared files as path + blob OID, never bytes (backlog p-hzyvmj3zyf)"
 status: running
+lead: lead:WAL-INTENT
 priority: P1
 blockedBy: []
 footprint:
