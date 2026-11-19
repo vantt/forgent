@@ -29,7 +29,8 @@ fn refused(r: fgos_graph::Refusal) -> Failure {
 fn analyze_text(text: &str) -> std::result::Result<String, Failure> {
     guarded_as("graph-internal-error", || {
         let analysis = fgos_graph::analyze_str(text).map_err(refused)?;
-        Ok(serde_json::to_string(&analysis).unwrap_or_default())
+        // The analysis is plain owned data; a failure to serialize it is an invariant break, caught as a panic.
+        Ok(serde_json::to_string(&analysis).expect("graph analysis serializes"))
     })
 }
 
