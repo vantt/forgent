@@ -200,10 +200,12 @@ const workSeatCases = [
   { name: 'an unregistered executor pin is refused', args: { runnerConfig: runner, unit: { id: 'w1', capability: 'execute' }, overrides: [{ executor: 'nope' }] } },
   { name: 'a bypass invocation is refused with its fix', args: { runnerConfig: bypassRunner, unit: { id: 'w1', capability: 'execute' }, overrides: [pinClaude] } },
 ].map((c) => {
-  // `bindWorkSeat` states no PATH of its own, so the host reads the process's: stand the described one in for it.
-  const realPath = process.env.PATH;
+  // `bindWorkSeat` states no PATH or herdr presence of its own, so the host reads the process's: stand the
+  // described PATH in for it and drop the herdr environment, so a recording inside a herdr pane states herdr absent.
+  const realEnv = { ...process.env };
   process.env.PATH = PATH_DIR;
-  try { return { ...c, result: attempt(() => bindFacade.bindWorkSeat(c.args)) }; } finally { process.env.PATH = realPath; }
+  for (const key of Object.keys(process.env)) if (key.startsWith('HERDR_')) delete process.env[key];
+  try { return { ...c, result: attempt(() => bindFacade.bindWorkSeat(c.args)) }; } finally { Object.assign(process.env, realEnv); }
 });
 const explainCases = [
   { name: 'a plain producer seat', ask: bindAsk, walk: {} },

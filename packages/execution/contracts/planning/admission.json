@@ -1431,11 +1431,6 @@
               "admittedBy": "<holder>"
             },
             "asg/runs/": null,
-            "asg/runs/.staging-01-2147483000-aaaa/": null,
-            "asg/runs/.staging-01-2147483000-aaaa/run.json": {
-              "retryId": "rs",
-              "payloadDigest": "aaa"
-            },
             "asg/runs/.staging-01-2147483000-bbbb/": null,
             "asg/runs/.staging-01-2147483000-bbbb/run.json": {
               "retryId": "other",

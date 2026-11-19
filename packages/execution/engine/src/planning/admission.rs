@@ -209,7 +209,7 @@ fn current_valid_run_id(
 }
 
 fn now_iso() -> String {
-    fgos_identity::text::iso_utc_now()
+    fgos_host_runtime::civil_time::format_system_time_utc(std::time::SystemTime::now())
 }
 
 /// What the ledger decided: a refusal, a prior identical admission, or a new record.
@@ -539,8 +539,10 @@ fn remove_abandoned_staging(runs_dir: &Path, attempt_str: &str, record: &Value) 
         else {
             continue;
         };
-        // `stagedMeta.retryId === (record.retryId ?? null)`: a missing key is not a null one.
-        let same_retry = meta.get("retryId") == record.get("retryId");
+        // `stagedMeta.retryId === (record.retryId ?? null)`: the record's missing retry id reads as null, the staged
+        // one's does not (a staged meta without the key never matches).
+        let want_retry = record.get("retryId").cloned().unwrap_or(Value::Null);
+        let same_retry = meta.get("retryId") == Some(&want_retry);
         if same_retry
             && normalize_digest(meta.get("payloadDigest"))
                 == normalize_digest(record.get("admissionPayloadDigest"))

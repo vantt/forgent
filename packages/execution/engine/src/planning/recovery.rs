@@ -6,9 +6,9 @@
 //! the same bytes, which the recorded hashes pin.
 
 use fgos_canonical_json::canonical_json;
+use fgos_execution::handoff::sha256_hex;
 use fgos_host_runtime::civil_time::{format_unix_millis_rfc3339, parse_rfc3339_millis};
 use serde_json::{json, Value};
-use sha2::{Digest, Sha256};
 
 /// How long a fresh recommendation stays applicable.
 pub const DEFAULT_TTL_MS: i64 = 5 * 60 * 1000;
@@ -99,15 +99,14 @@ impl Verdict {
     }
 }
 
-fn sha256_hex(text: &str) -> String {
-    let digest = Sha256::digest(text.as_bytes());
-    digest.iter().map(|byte| format!("{byte:02x}")).collect()
-}
-
 /// Deterministic digest over the caller-supplied snapshot: the same facts give the same hash whatever their
 /// property insertion order.
 pub fn compute_snapshot_hash(snapshot: &Value) -> String {
-    sha256_hex(&canonical_json(snapshot).expect("a snapshot holds finite numbers"))
+    sha256_hex(
+        canonical_json(snapshot)
+            .expect("a snapshot holds finite numbers")
+            .as_bytes(),
+    )
 }
 
 fn attempt_state(snapshot: &Value) -> Option<&str> {
@@ -262,7 +261,11 @@ pub fn compute_action_key(
         "action": action,
         "expiresAt": expires_at,
     });
-    sha256_hex(&canonical_json(&bound).expect("an action key holds finite numbers"))
+    sha256_hex(
+        canonical_json(&bound)
+            .expect("an action key holds finite numbers")
+            .as_bytes(),
+    )
 }
 
 fn epoch_of(snapshot: &Value) -> Value {

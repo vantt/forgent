@@ -14,6 +14,8 @@ use fgos_execution::ports::Machine;
 use fgos_execution::seat_resolver::{workflow_tier_of, SeatLedger};
 use serde_json::{json, Map, Value};
 
+/// What names one candidate of a seat's walk (executor, invocation, pool, model, effort): the bind's own key.
+pub use fgos_execution::bind::binding_identity;
 pub use fgos_execution::bind::BIND_CONTRACT_VERSION;
 
 /// A refusal or failure of a facade call, under the class Node callers catch.
@@ -76,29 +78,6 @@ pub struct BindContext<'a> {
 /// Where a seat stands after a failure; the keys `fgos-execution::bind` reads (`tried`, `excludePools`,
 /// `failedAccounts`, `continuity`, `from`, `rotation`, `detail`, `reason`).
 pub type Walk = Value;
-
-fn identity_key(parts: [Option<&Value>; 5]) -> String {
-    parts
-        .iter()
-        .map(|part| match part {
-            None | Some(Value::Null) => String::new(),
-            Some(Value::String(text)) => text.clone(),
-            Some(other) => crate::assignment::js_str(Some(other)),
-        })
-        .collect::<Vec<_>>()
-        .join("\u{0}")
-}
-
-/// What names one candidate of a seat's walk: executor, invocation, pool, model and effort.
-pub fn binding_identity(binding: &Value) -> String {
-    identity_key([
-        binding.get("executor"),
-        binding.get("invocation"),
-        binding.get("pool"),
-        binding.get("model"),
-        binding.get("reasoningEffort"),
-    ])
-}
 
 /// What the pattern hands its seat runner: the seat, its unit, and the seats it must or would rather differ from.
 pub struct SeatRequest<'a> {
@@ -376,7 +355,9 @@ pub fn preflight_of(request: &PreflightRequest<'_>, machine: &dyn Machine, now: 
 /// How the dry bind is asked.
 #[derive(Debug, Clone, Default)]
 pub struct DryBindOptions<'a> {
-    pub session: BindSession,
+    /// The session every seat is bound in; `None` is a headless session. A stated session is taken whole, so a
+    /// caller that binds for a person states `headless: false`.
+    pub session: Option<BindSession>,
     pub overrides: Vec<Value>,
     pub raise_authorized: bool,
     pub workflow_id: Option<&'a str>,
@@ -401,10 +382,10 @@ pub fn simulate_unit_bindings(
     let blind = unit.get("blind") == Some(&json!(true));
     let ctx = BindContext {
         runner_config,
-        session: BindSession {
+        session: options.session.unwrap_or(BindSession {
             headless: true,
-            ..options.session
-        },
+            ..BindSession::default()
+        }),
         machine,
         accounts: None,
     };

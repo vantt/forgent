@@ -18,11 +18,11 @@ use std::path::{Path, PathBuf};
 
 use fgos_canonical_json::canonical_json;
 use fgos_durable_file::replace_durably_with_mode;
+use fgos_execution::handoff::sha256_hex;
 use fgos_host_runtime::civil_time::{format_unix_millis_rfc3339, parse_rfc3339_millis};
 use fgos_run_supervisor::controller::cwd_lock::dispatch_cwd_holder;
 use fgos_run_supervisor::controller::lease::list_generations;
 use serde_json::{json, Value};
-use sha2::{Digest, Sha256};
 
 pub const RECONCILE_RUN_REQUIRES_ACTION: &str = "dispatch reconcile plan with --run requires --action (e.g. collect-result or repair-projection)";
 const SETTLED_STATUS: &str = "settled";
@@ -76,8 +76,11 @@ impl std::error::Error for ReconcileError {}
 
 type Outcome = Result<Value, ReconcileError>;
 
+/// The project's `.fgos`, through the one join of a root onto it (Node's `fgosDirFromRoot`).
 pub fn fgos_dir_of(root: &Path) -> PathBuf {
-    root.join(".fgos")
+    PathBuf::from(fgos_execution::runner_config::fgos_dir_from_root(
+        &root.to_string_lossy(),
+    ))
 }
 
 fn action_log(root: &Path) -> PathBuf {
@@ -90,24 +93,17 @@ fn result_file(run_dir: &Path) -> PathBuf {
     run_dir.join("result.json")
 }
 
-fn sha256_hex(text: &str) -> String {
-    Sha256::digest(text.as_bytes())
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect()
-}
-
 fn canonical(value: &Value) -> String {
     canonical_json(value).expect("a plan holds finite numbers")
 }
 
 fn digest(value: &Value) -> String {
-    format!("sha256:{}", sha256_hex(&canonical(value)))
+    format!("sha256:{}", sha256_hex(canonical(value).as_bytes()))
 }
 
 fn action_key(snapshot: &Value, action: &Value, expires_at: &str) -> String {
     let bound = json!({ "snapshot": snapshot, "action": action, "expiresAt": expires_at });
-    format!("reconcile_{}", sha256_hex(&canonical(&bound)))
+    format!("reconcile_{}", sha256_hex(canonical(&bound).as_bytes()))
 }
 
 fn expires(now: &str, ttl_ms: i64) -> Result<String, ReconcileError> {

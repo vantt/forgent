@@ -507,10 +507,11 @@ fn bind_facade_simulates_the_seats_a_pattern_would_bind_without_running_them() {
             &v["runner"],
             &case["effective"],
             &DryBindOptions {
-                session: BindSession {
+                session: Some(BindSession {
+                    headless: true,
                     posture_at_launch: true,
                     ..BindSession::default()
-                },
+                }),
                 overrides: options["overrides"].as_array().cloned().unwrap_or_default(),
                 raise_authorized: false,
                 workflow_id: options["workflowId"].as_str(),

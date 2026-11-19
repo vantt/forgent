@@ -9,11 +9,12 @@
 //! no runner config and no binding the policy is refused (`runner-config-missing`). Rigor is recorded as the demand
 //! it is (checker count, independence) and never moves the tier or the effort.
 
-use fgos_execution::bind::effective_rigor;
+use fgos_execution::bind::{effective_rigor, EFFORTS};
 use fgos_execution::executor_model::{
     resolve_executor_governance, resolve_executor_provider, Governance,
 };
 use fgos_execution::ports::Machine;
+use fgos_execution::seat_resolver::{RIGORS, SEAT_ROLES};
 use fgos_seat_binding::Tier;
 use serde_json::{json, Map, Value};
 
@@ -22,10 +23,7 @@ use crate::assignment::work_item_input::{refuse_work_item_input, WORK_ITEM_INPUT
 use crate::assignment::{js_str, truthy};
 use crate::planning::bind_facade::{bind_work_seat, BindError};
 
-const RIGORS: [&str; 4] = ["low", "standard", "high", "critical"];
-const REASONING_EFFORTS: [&str; 4] = ["low", "medium", "high", "max"];
 const REPEAT_MODES: [&str; 2] = ["pre-delivery", "post-delivery"];
-const SEAT_ROLES: [&str; 5] = ["producer", "synthesizer", "reviewer", "red-team", "judge"];
 const TIER_PROVENANCE_SCOPES: [&str; 4] = ["actor", "assignment", "cli", "cliOverride"];
 
 fn refuse(message: String) -> BindError {
@@ -284,11 +282,11 @@ pub fn effective_dispatch_policy(
         op_policy.get("reasoningEffort"),
     ]);
     if let Some(effort) = explicit_effort {
-        if !REASONING_EFFORTS.iter().any(|e| effort.as_str() == Some(e)) {
+        if !EFFORTS.iter().any(|e| effort.as_str() == Some(e)) {
             return Err(refuse(format!(
                 "invalid reasoningEffort \"{}\". Valid values: [{}]",
                 text(Some(effort)),
-                REASONING_EFFORTS.join(", ")
+                EFFORTS.join(", ")
             )));
         }
     }

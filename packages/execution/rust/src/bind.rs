@@ -11,6 +11,7 @@ use crate::executor_model::{
 };
 use crate::js::truthy;
 use crate::ports::Machine;
+use crate::seat_resolver::capability::{entries_of, rigor_of, rigor_rank, RIGORS};
 use fgos_seat_binding::{BindInput, Tier, PROTOCOL};
 use serde::Serialize;
 use serde_json::{json, Map, Value};
@@ -20,10 +21,7 @@ use sha2::{Digest, Sha256};
 pub const BIND_CONTRACT_VERSION: &str = "v1alpha1";
 
 /// The reasoning efforts an override may name.
-const EFFORTS: [&str; 4] = ["low", "medium", "high", "max"];
-
-/// Effective rigor, weakest first.
-const RIGORS: [&str; 4] = ["low", "standard", "high", "critical"];
+pub const EFFORTS: [&str; 4] = ["low", "medium", "high", "max"];
 
 /// The run timeout floor and ceiling, in milliseconds.
 const RUN_TIMEOUT_MIN_MS: i64 = 60_000;
@@ -91,35 +89,12 @@ fn truthy_text<'a>(value: &'a Value, key: &str) -> Option<&'a str> {
 
 // ---- the capability catalog -----------------------------------------------------------------------------------
 
-/// The entries of `runner.capabilities` that apply to a capability, most specific first: its exact key, then its
-/// `<prefix>:*` key.
-fn capability_entries<'a>(runner: &'a Value, capability: Option<&str>) -> Vec<(String, &'a Value)> {
-    let (Some(capability), Some(section)) = (
-        capability.filter(|c| !c.is_empty()),
-        runner
-            .get("capabilities")
-            .filter(|s| s.is_object() || s.is_array()),
-    ) else {
-        return Vec::new();
-    };
-    let mut keys = vec![capability.to_string()];
-    if let Some((prefix, _)) = capability.split_once(':') {
-        keys.push(format!("{prefix}:*"));
-    }
-    keys.into_iter()
-        .filter_map(|key| {
-            let entry = section.get(&key)?;
-            (entry.is_object() || entry.is_array()).then_some((key, entry))
-        })
-        .collect()
-}
-
 /// The rigor a capability declares: its exact entry, else its prefix entry.
 fn capability_rigor(
     runner: &Value,
     capability: Option<&str>,
 ) -> Result<Option<&'static str>, ModelError> {
-    let Some(rigor) = capability_entries(runner, capability)
+    let Some(rigor) = entries_of(runner, capability)
         .into_iter()
         .find_map(|(_, entry)| entry.get("rigor"))
     else {
@@ -137,12 +112,6 @@ fn capability_rigor(
             ),
         )
     })
-}
-
-fn rigor_of(value: &Value) -> Option<&'static str> {
-    RIGORS
-        .into_iter()
-        .find(|rigor| value.as_str() == Some(rigor))
 }
 
 /// The effective rigor of a unit: the stronger of its own rigor and its capability's, `None` when neither names one.
@@ -163,10 +132,9 @@ pub fn effective_rigor(unit: &Value, runner: &Value) -> Result<Option<&'static s
             )
         })?),
     };
-    let rank = |rigor: &str| RIGORS.iter().position(|r| *r == rigor);
     Ok(match (own, declared) {
         (None, other) | (other, None) => other,
-        (Some(own), Some(declared)) => Some(if rank(declared) > rank(own) {
+        (Some(own), Some(declared)) => Some(if rigor_rank(declared) > rigor_rank(own) {
             declared
         } else {
             own
@@ -176,7 +144,7 @@ pub fn effective_rigor(unit: &Value, runner: &Value) -> Result<Option<&'static s
 
 /// The persona a capability defaults to, with the key that declares it.
 fn capability_persona(runner: &Value, capability: Option<&str>) -> Option<(String, String)> {
-    capability_entries(runner, capability)
+    entries_of(runner, capability)
         .into_iter()
         .find_map(|(key, entry)| {
             truthy_text(entry, "persona").map(|persona| (persona.to_string(), key))
@@ -514,7 +482,7 @@ fn identity_of(binding: &Value) -> Value {
 }
 
 /// What names one candidate of a seat's walk: executor, invocation, pool, model and effort.
-pub(crate) fn binding_identity(binding: &Value) -> String {
+pub fn binding_identity(binding: &Value) -> String {
     ["executor", "invocation", "pool", "model", "reasoningEffort"]
         .iter()
         .map(|key| match binding.get(*key) {
