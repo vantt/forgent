@@ -42,6 +42,7 @@ struct Env {
     driver: GitDriver,
     repo: RepoHandle,
     grant: RemoteGrant,
+    log_dir: PathBuf,
 }
 
 impl Env {
@@ -60,6 +61,7 @@ impl Env {
             driver,
             repo,
             grant,
+            log_dir: temp.join("land-logs"),
         }
     }
 }
@@ -197,6 +199,7 @@ fn ports<'a>(env: &'a Env, next: &'a dyn Fn() -> String, wait_ms: u64) -> LandPo
         writer: "fixture",
         operation_id: next,
         runner: &ShellRunner,
+        log_dir: &env.log_dir,
         wait_ms,
     }
 }
@@ -350,6 +353,31 @@ fn a_failing_gate_refuses_and_publishes_nothing() {
     assert!(refusal.detail.contains("boom"));
     assert_eq!(f.remote_tip(), remote_before);
     assert_eq!(f.local_tip(), local_before);
+}
+
+#[test]
+fn a_failing_gate_names_its_failing_test_keeps_the_full_log_and_settles_its_own_operation() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    let refs_before = git(&f.main, &["for-each-ref"]);
+    let noisy = "i=0; while [ $i -lt 400 ]; do echo \"   Compiling crate$i v0.1.0\" >&2; i=$((i+1)); done; \
+                 echo 'not ok 7 - the pin survives'; echo '    Finished dev profile' >&2; exit 1";
+    let refusal = f
+        .land(&branch("topic"), &config(vec![gate(noisy)]))
+        .unwrap_err();
+    assert_eq!(refusal.code, "land-gate-failed");
+    assert!(refusal.detail.contains("not ok 7 - the pin survives"));
+    assert!(!refusal.detail.contains("Compiling crate10 "));
+    let log = refusal.gate_log.clone().expect("gate log named");
+    assert!(refusal.detail.contains(log.to_str().unwrap()));
+    let full = fs::read_to_string(&log).unwrap();
+    assert!(full.contains("Compiling crate0 ") && full.contains("not ok 7"));
+    assert_eq!(git(&f.main, &["for-each-ref"]), refs_before);
+    // Nothing is left pending: a fixed branch lands at once, with no recover.
+    let fixed = f
+        .land(&branch("topic"), &config(vec![gate("true")]))
+        .unwrap();
+    assert_eq!(fixed.main_sha, f.remote_tip());
 }
 
 #[test]

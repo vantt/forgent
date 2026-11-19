@@ -1144,6 +1144,7 @@ fn run_land(root: &Path, command: &LandCommand) -> Result<Value, CategorisedRefu
     let config = effective_land_config(&main)?;
     let writer = writer();
     let next = || operation_id("land");
+    let log_dir = state_dir(&main, "land");
     let ports = LandPorts {
         git: &driver,
         repo: &repo,
@@ -1151,6 +1152,7 @@ fn run_land(root: &Path, command: &LandCommand) -> Result<Value, CategorisedRefu
         writer: &writer,
         operation_id: &next,
         runner: &ShellRunner,
+        log_dir: &log_dir,
         wait_ms: 30_000,
     };
     let landed = land(command, &config, &ports).map_err(|why| refused(&why.code, why.detail))?;

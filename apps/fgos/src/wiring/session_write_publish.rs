@@ -231,6 +231,7 @@ fn catch_up_main(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
         writer,
         operation_id: &operation_id,
         runner: &ShellRunner,
+        log_dir: &checkout.main.join(".fgos").join("runtime").join("land"),
         wait_ms: WAIT_MS,
     };
     let command = LandCommand {
@@ -255,6 +256,7 @@ fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, 
         writer,
         operation_id: &operation_id,
         runner: &ShellRunner,
+        log_dir: &checkout.main.join(".fgos").join("runtime").join("land"),
         wait_ms: WAIT_MS,
     };
     let command = LandCommand {

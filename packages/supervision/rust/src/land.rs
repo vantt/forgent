@@ -17,14 +17,20 @@ use fgos_git::{
 };
 use fgos_holder_lock::BorrowedHandle;
 use sha2::{Digest, Sha256};
-use std::io::Read;
-use std::path::Path;
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Seek, SeekFrom, Write};
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 /// Failed fetch/push retries after the first attempt before `land-retries-exhausted`.
 const MAX_RETRIES: u32 = 3;
-/// Bytes of a failing command's stderr kept in a refusal.
+/// Bytes of a failing command's output kept in a refusal.
 const TAIL_BYTES: usize = 4096;
+/// Lines of a failing command's output that name a failure, kept in a refusal.
+const FAILURE_LINES: usize = 25;
+/// Longest kept line, and the most of a log's end scanned for failure lines.
+const LINE_BYTES: usize = 300;
+const SCAN_BYTES: u64 = 4 * 1024 * 1024;
 /// Largest object (commit, tree or declared file) read while preparing a land.
 const OBJECT_LIMIT: usize = 32 * 1024 * 1024;
 
@@ -76,12 +82,15 @@ pub struct LandOutcome {
 pub struct LandRefusal {
     pub code: String,
     pub detail: String,
+    /// The full output of the gate or regeneration that failed, when one ran.
+    pub gate_log: Option<PathBuf>,
 }
 
 fn refuse(code: &str, detail: impl Into<String>) -> LandRefusal {
     LandRefusal {
         code: code.into(),
         detail: detail.into(),
+        gate_log: None,
     }
 }
 
@@ -110,6 +119,7 @@ fn from_git(e: OperationError) -> LandRefusal {
     LandRefusal {
         code: e.cause,
         detail,
+        gate_log: None,
     }
 }
 
@@ -118,52 +128,66 @@ fn tail(bytes: &[u8]) -> String {
     String::from_utf8_lossy(&bytes[start..]).trim().to_string()
 }
 
-/// What a shell command left behind.
-#[derive(Debug, Clone)]
-pub struct CommandOutput {
-    pub success: bool,
-    /// The last bytes of stderr, bounded.
-    pub stderr_tail: String,
-}
-
-/// The one door for running a gate or regeneration command.
+/// The one door for running a gate or regeneration command. Stdout and stderr both go to `output`;
+/// `true` when the command succeeded.
 pub trait CommandRunner {
-    fn run(&self, cwd: &Path, command: &str) -> std::io::Result<CommandOutput>;
+    fn run(&self, cwd: &Path, command: &str, output: &File) -> std::io::Result<bool>;
 }
 
-/// `sh -c` in `cwd` with the caller's environment; stdout is discarded and stderr keeps a bounded tail.
+/// `sh -c` in `cwd` with the caller's environment.
 pub struct ShellRunner;
 
 impl CommandRunner for ShellRunner {
-    fn run(&self, cwd: &Path, command: &str) -> std::io::Result<CommandOutput> {
-        let mut child = Command::new("sh")
+    fn run(&self, cwd: &Path, command: &str, output: &File) -> std::io::Result<bool> {
+        let status = Command::new("sh")
             .arg("-c")
             .arg(command)
             .current_dir(cwd)
             .stdin(Stdio::null())
-            .stdout(Stdio::null())
-            .stderr(Stdio::piped())
-            .spawn()?;
-        let mut kept: Vec<u8> = Vec::new();
-        if let Some(mut err) = child.stderr.take() {
-            let mut buf = [0u8; 8192];
-            loop {
-                let n = err.read(&mut buf)?;
-                if n == 0 {
-                    break;
-                }
-                kept.extend_from_slice(&buf[..n]);
-                if kept.len() > 2 * TAIL_BYTES {
-                    kept.drain(..kept.len() - TAIL_BYTES);
-                }
-            }
-        }
-        let status = child.wait()?;
-        Ok(CommandOutput {
-            success: status.success(),
-            stderr_tail: tail(&kept),
-        })
+            .stdout(Stdio::from(output.try_clone()?))
+            .stderr(Stdio::from(output.try_clone()?))
+            .status()?;
+        Ok(status.success())
     }
+}
+
+fn is_failure_line(line: &str) -> bool {
+    let t = line.trim_start();
+    t.starts_with('\u{2716}')
+        || t.starts_with("not ok")
+        || t.starts_with("\u{2139} fail")
+        || t.starts_with("failures:")
+        || t.starts_with("error[")
+        || t.starts_with("error:")
+        || (t.starts_with("test ") && t.ends_with("FAILED"))
+        || t.contains("panicked at")
+}
+
+/// What to show of a failed command's log: the lines that name failures (the last
+/// `FAILURE_LINES`), else the last `TAIL_BYTES`.
+fn failure_digest(log: &Path) -> String {
+    let read = || -> std::io::Result<Vec<u8>> {
+        let mut file = File::open(log)?;
+        let len = file.metadata()?.len();
+        file.seek(SeekFrom::Start(len.saturating_sub(SCAN_BYTES)))?;
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes)?;
+        Ok(bytes)
+    };
+    let Ok(bytes) = read() else {
+        return String::new();
+    };
+    let text = String::from_utf8_lossy(&bytes);
+    let mut hits: Vec<String> = text
+        .lines()
+        .filter(|l| is_failure_line(l))
+        .map(|l| l.trim().chars().take(LINE_BYTES).collect())
+        .collect();
+    if hits.is_empty() {
+        return tail(&bytes);
+    }
+    hits.drain(..hits.len().saturating_sub(FAILURE_LINES));
+    hits.join("\n")
 }
 
 /// Everything the use case calls out to, supplied by the composition root.
@@ -177,6 +201,8 @@ pub struct LandPorts<'a> {
     /// A fresh operation id on every call.
     pub operation_id: &'a dyn Fn() -> String,
     pub runner: &'a dyn CommandRunner,
+    /// Where a gate's full output is kept, one `<operation id>.log` per failed operation.
+    pub log_dir: &'a Path,
     /// Bound on waiting for the merge slot and the main checkout.
     pub wait_ms: u64,
 }
@@ -613,6 +639,7 @@ impl Lander<'_> {
         changed: &[String],
         tests: &[String],
         gates_run: &mut Vec<String>,
+        id: &str,
     ) -> Result<(), LandRefusal> {
         let quoted = tests
             .iter()
@@ -636,20 +663,58 @@ impl Lander<'_> {
                 continue;
             }
             let command = gate.run.replace("{tests}", &quoted);
-            let out = self
-                .ports
-                .runner
-                .run(cwd, &command)
-                .map_err(|e| refuse("land-gate-failed", format!("{}: {e}", gate.run)))?;
+            self.run_logged(cwd, &command, &gate.run, id, "land-gate-failed")?;
             gates_run.push(gate.run.clone());
-            if !out.success {
-                return Err(refuse(
-                    "land-gate-failed",
-                    format!("{}: {}", gate.run, out.stderr_tail),
-                ));
-            }
         }
         Ok(())
+    }
+
+    fn log_path(&self, id: &str, suffix: &str) -> PathBuf {
+        self.ports.log_dir.join(format!("{id}.log{suffix}"))
+    }
+
+    /// Run one command with its full output in a log. A failure seals the log under `<id>.log`, and the refusal names it with the lines that show what failed.
+    fn run_logged(
+        &self,
+        cwd: &Path,
+        command: &str,
+        shown: &str,
+        id: &str,
+        code: &str,
+    ) -> Result<(), LandRefusal> {
+        let partial = self.log_path(id, ".partial");
+        let open = || -> std::io::Result<File> {
+            std::fs::create_dir_all(self.ports.log_dir)?;
+            let mut file = OpenOptions::new()
+                .create(true)
+                .write(true)
+                .truncate(true)
+                .open(&partial)?;
+            writeln!(file, "$ {command}")?;
+            Ok(file)
+        };
+        let file = open().map_err(|e| refuse(code, format!("{shown}: output log: {e}")))?;
+        let ok = self
+            .ports
+            .runner
+            .run(cwd, command, &file)
+            .map_err(|e| refuse(code, format!("{shown}: {e}")))?;
+        if ok {
+            // A command that passed leaves no log; only the failing one is kept.
+            let _ = std::fs::remove_file(&partial);
+            return Ok(());
+        }
+        let sealed = self.log_path(id, "");
+        let (digest, gate_log) = match std::fs::rename(&partial, &sealed) {
+            Ok(()) => (failure_digest(&sealed), Some(sealed)),
+            Err(_) => (failure_digest(&partial), Some(partial)),
+        };
+        let mut refusal = refuse(code, format!("{shown}: {digest}"));
+        if let Some(path) = &gate_log {
+            refusal.detail = format!("{}\nfull output: {}", refusal.detail, path.display());
+        }
+        refusal.gate_log = gate_log;
+        Err(refusal)
     }
 
     fn land_branch(&self, command: &LandCommand, branch: &str) -> Result<LandOutcome, LandRefusal> {
@@ -704,15 +769,33 @@ impl Lander<'_> {
         Ok((session, id))
     }
 
-    /// Drop a session that published nothing and settle its chain, so an abandoned attempt does
-    /// not keep the target ref busy for the main-checkout catch-up.
+    /// Drop a session that published nothing, settle its chain and release its candidate worktree
+    /// and pins, so an abandoned attempt leaves no pending operation and keeps no target ref busy.
     fn abandon(&self, session: fgos_git::LandSession, id: &str) -> Result<(), LandRefusal> {
         drop(session);
-        self.ports
-            .git
-            .recover_land(self.ports.repo, vec![], self.ports.writer, id)
-            .map(|_| ())
-            .map_err(at("settle abandoned attempt"))
+        let (git, repo, writer) = (self.ports.git, self.ports.repo, self.ports.writer);
+        git.recover_land(repo, vec![], writer, id)
+            .map_err(at("settle abandoned attempt"))?;
+        let deferred = git
+            .acknowledge_land(
+                repo,
+                writer,
+                id,
+                "supervision-land-abandoned",
+                &wal::OsFileSystem,
+            )
+            .map_err(at("release abandoned attempt"))?;
+        if deferred.is_empty() {
+            Ok(())
+        } else {
+            Err(refuse(
+                "land-recovery-required",
+                format!(
+                    "abandoned attempt {id} kept its candidate: {}; run `fgos git recover`",
+                    deferred.join("; ")
+                ),
+            ))
+        }
     }
 
     fn branch_attempt(
@@ -798,19 +881,58 @@ impl Lander<'_> {
             }
             Err(refusal) => return Err(refusal),
         };
-        let (mut session, mut session_id) = prepared;
-        if session.candidate().is_none() {
-            return Err(refuse(
+        let mut live = Some(prepared);
+        let attempt = self.drive(
+            command,
+            (&source, &target, &dest, target_branch),
+            &mut live,
+            retries,
+        );
+        if let Some((session, id)) = live.take() {
+            // Nothing may stay pending after a refusal or a lost race: the door settles its own
+            // operation. A crash never reaches here, and `fgos git recover` owns that case.
+            if let Err(e) = self.abandon(session, &id) {
+                return match attempt {
+                    Err(mut refusal) => {
+                        refusal.detail =
+                            format!("{}; settling it failed: {}", refusal.detail, e.detail);
+                        Err(refusal)
+                    }
+                    Ok(_) => Err(e),
+                };
+            }
+        }
+        attempt
+    }
+
+    /// Everything after prepare: regenerate, gate, push, publish. `live` holds the session until
+    /// it publishes; whatever is still in it when this returns is settled by the caller.
+    fn drive(
+        &self,
+        command: &LandCommand,
+        (source, target, dest, target_branch): (&Oid, &Oid, &str, &str),
+        live: &mut Option<(fgos_git::LandSession, String)>,
+        retries: u32,
+    ) -> Result<Attempt, LandRefusal> {
+        let p = self.ports;
+        let no_candidate = || {
+            refuse(
                 "land-recovery-required",
                 "no candidate; run `fgos git recover`",
-            ));
-        }
+            )
+        };
         if let Some(regen) = &self.config.regenerate {
-            let first = self.regenerate(&session, regen)?;
+            let (session, id) = live.as_ref().ok_or_else(no_candidate)?;
+            if session.candidate().is_none() {
+                return Err(no_candidate());
+            }
+            let first = self.regenerate(session, regen, id)?;
             if let Some(files) = first {
-                self.abandon(session, &session_id)?;
-                (session, session_id) = self.prepare(command, &source, &target, &dest, files)?;
-                if self.regenerate(&session, regen)?.is_some() {
+                let (session, id) = live.take().ok_or_else(no_candidate)?;
+                self.abandon(session, &id)?;
+                *live = Some(self.prepare(command, source, target, dest, files)?);
+                let (session, id) = live.as_ref().ok_or_else(no_candidate)?;
+                if self.regenerate(session, regen, id)?.is_some() {
                     return Err(refuse(
                         "land-regenerate-failed",
                         "regeneration is not stable: a second run changed the files again",
@@ -818,17 +940,10 @@ impl Lander<'_> {
                 }
             }
         }
-        let candidate = session
-            .candidate()
-            .ok_or_else(|| {
-                refuse(
-                    "land-recovery-required",
-                    "no candidate; run `fgos git recover`",
-                )
-            })?
-            .clone();
+        let (session, session_id) = live.as_ref().ok_or_else(no_candidate)?;
+        let candidate = session.candidate().ok_or_else(no_candidate)?.clone();
         let candidate_oid = oid_of(p.repo, &candidate.candidate)?;
-        let changed = self.changed_paths(&target, &candidate_oid)?;
+        let changed = self.changed_paths(target, &candidate_oid)?;
         self.check_tests(&candidate.worktree, &command.tests)?;
         let mut gates_run = Vec::new();
         self.run_gates(
@@ -836,13 +951,13 @@ impl Lander<'_> {
             &changed,
             &command.tests,
             &mut gates_run,
+            session_id,
         )?;
         // A gate that changed tracked or staged candidate bytes means the gated tree is not the
         // candidate: refuse before anything reaches the remote.
         self.require_clean_candidate(&candidate)?;
 
-        if !self.push_candidate(&session, target_branch)? {
-            self.abandon(session, &session_id)?;
+        if !self.push_candidate(session, target_branch)? {
             return Ok(Attempt::RemoteMoved);
         }
         let digest = Sha256::digest(format!("{}\n{}", candidate.candidate, gates_run.join("\n")));
@@ -853,17 +968,12 @@ impl Lander<'_> {
             tree_digest: candidate.tree_digest.clone(),
             evidence_digest: hex(&digest),
         };
+        let (session, _) = live.as_mut().ok_or_else(no_candidate)?;
         p.git
-            .publish_land(
-                p.repo,
-                &mut session,
-                &evidence,
-                &wal::OsFileSystem,
-                p.wait_ms,
-            )
+            .publish_land(p.repo, session, &evidence, &wal::OsFileSystem, p.wait_ms)
             .map_err(at("publish"))?;
-        drop(session);
-        let main = self.resolve(&dest)?.ok_or_else(|| {
+        live.take();
+        let main = self.resolve(dest)?.ok_or_else(|| {
             refuse(
                 "land-target-unknown",
                 format!("{dest} is absent after publish"),
@@ -953,21 +1063,18 @@ impl Lander<'_> {
         &self,
         session: &fgos_git::LandSession,
         regen: &Regenerate,
+        id: &str,
     ) -> Result<Option<Vec<LandFile>>, LandRefusal> {
         let candidate = session
             .candidate()
             .ok_or_else(|| refuse("land-regenerate-failed", "no candidate worktree"))?;
-        let out = self
-            .ports
-            .runner
-            .run(&candidate.worktree, &regen.run)
-            .map_err(|e| refuse("land-regenerate-failed", format!("{}: {e}", regen.run)))?;
-        if !out.success {
-            return Err(refuse(
-                "land-regenerate-failed",
-                format!("{}: {}", regen.run, out.stderr_tail),
-            ));
-        }
+        self.run_logged(
+            &candidate.worktree,
+            &regen.run,
+            &regen.run,
+            id,
+            "land-regenerate-failed",
+        )?;
         let mut regenerated = Vec::new();
         let mut differs = false;
         for file in &regen.files {
@@ -1071,6 +1178,7 @@ impl Lander<'_> {
             paths,
             &command.tests,
             &mut gates_run,
+            &self.id(),
         )?;
         let result = p
             .git
