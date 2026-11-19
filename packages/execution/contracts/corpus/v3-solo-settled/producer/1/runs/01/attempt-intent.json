@@ -1,0 +1,111 @@
+{
+  "v": 1,
+  "attemptId": "cmd_1795056606138_efbc9592",
+  "unitRunId": "unit-run-1795056603528-44eb3ca1",
+  "runDir": "/SCRUBBED-PATH",
+  "host": "terminal",
+  "cwd": "/SCRUBBED-PATH",
+  "launch": {
+    "capture": {
+      "stdout": "SCRUBBED",
+      "stderr": "SCRUBBED"
+    },
+    "outboxDir": "/SCRUBBED-PATH"
+  },
+  "steps": [
+    {
+      "stepId": "settle-attempt",
+      "hostBin": "/SCRUBBED-PATH",
+      "payloadRoot": "/SCRUBBED-PATH",
+      "argv": [
+        "internal",
+        "attempt-step",
+        "settle-attempt",
+        "--protocol",
+        "1",
+        "--run-dir",
+        "/SCRUBBED-PATH"
+      ],
+      "cwd": "/SCRUBBED-PATH",
+      "env": {
+        "PATH": "SCRUBBED",
+        "HOME": "/SCRUBBED-PATH",
+        "LANG": "en_US.UTF-8",
+        "XDG_RUNTIME_DIR": "/run/user/1000",
+        "FGOS_ACTIVE_MANIFEST_PATH": "/SCRUBBED-PATH",
+        "FGOS_ACTIVE_RELEASE_PATH": "/SCRUBBED-PATH",
+        "FGOS_HOST_BIN": "/SCRUBBED-PATH",
+        "FGOS_STATE_ROOT": "/SCRUBBED-PATH"
+      },
+      "stepTimeoutMs": 600000
+    },
+    {
+      "stepId": "finalize-home",
+      "hostBin": "/SCRUBBED-PATH",
+      "payloadRoot": "/SCRUBBED-PATH",
+      "argv": [
+        "internal",
+        "attempt-step",
+        "finalize-home",
+        "--protocol",
+        "1",
+        "--run-dir",
+        "/SCRUBBED-PATH"
+      ],
+      "cwd": "/SCRUBBED-PATH",
+      "env": {
+        "PATH": "SCRUBBED",
+        "HOME": "/SCRUBBED-PATH",
+        "LANG": "en_US.UTF-8",
+        "XDG_RUNTIME_DIR": "/run/user/1000",
+        "FGOS_ACTIVE_MANIFEST_PATH": "/SCRUBBED-PATH",
+        "FGOS_ACTIVE_RELEASE_PATH": "/SCRUBBED-PATH",
+        "FGOS_HOST_BIN": "/SCRUBBED-PATH",
+        "FGOS_STATE_ROOT": "/SCRUBBED-PATH"
+      },
+      "stepTimeoutMs": 600000
+    },
+    {
+      "stepId": "cleanup-trust",
+      "hostBin": "/SCRUBBED-PATH",
+      "payloadRoot": "/SCRUBBED-PATH",
+      "argv": [
+        "internal",
+        "attempt-step",
+        "cleanup-trust",
+        "--protocol",
+        "1",
+        "--run-dir",
+        "/SCRUBBED-PATH"
+      ],
+      "cwd": "/SCRUBBED-PATH",
+      "env": {
+        "PATH": "SCRUBBED",
+        "HOME": "/SCRUBBED-PATH",
+        "LANG": "en_US.UTF-8",
+        "XDG_RUNTIME_DIR": "/run/user/1000",
+        "FGOS_ACTIVE_MANIFEST_PATH": "/SCRUBBED-PATH",
+        "FGOS_ACTIVE_RELEASE_PATH": "/SCRUBBED-PATH",
+        "FGOS_HOST_BIN": "/SCRUBBED-PATH",
+        "FGOS_STATE_ROOT": "/SCRUBBED-PATH"
+      },
+      "stepTimeoutMs": 600000
+    }
+  ],
+  "sideFile": "SCRUBBED",
+  "terminal": {
+    "slot": {
+      "key": "cmd_1795056606138_efbc9592",
+      "groupKey": "unit-run-1795056603528-44eb3ca1"
+    },
+    "endpointEnv": {
+      "FGOS_HERDR_BIN": "herdr",
+      "HERDR_BIN_PATH": "/SCRUBBED-PATH",
+      "HERDR_ENV": "1",
+      "HERDR_PANE_ID": "w6:p16C",
+      "HERDR_SOCKET_PATH": "/SCRUBBED-PATH",
+      "HERDR_TAB_ID": "w6:tWK",
+      "HERDR_WORKSPACE_ID": "w6"
+    }
+  }
+}

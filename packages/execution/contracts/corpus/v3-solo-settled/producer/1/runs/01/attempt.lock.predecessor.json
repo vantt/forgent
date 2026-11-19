@@ -1,0 +1,11 @@
+{
+  "domainKind": "linux-gate",
+  "domainId": {
+    "host": "fg-server2",
+    "bootId": "ae823cc8-4c70-4166-badb-6a85106c4981",
+    "pid": 933527,
+    "startTime": "327347974",
+    "pidNs": "pid:[4026531836]"
+  },
+  "v": 1
+}

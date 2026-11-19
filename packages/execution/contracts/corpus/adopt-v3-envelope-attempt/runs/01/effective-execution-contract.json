@@ -1,0 +1,85 @@
+{
+  "contract": {
+    "id": "effective-execution-contract",
+    "version": 1
+  },
+  "assignmentId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+  "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+  "mutation": "read-only",
+  "workspace": {
+    "cwd": "/SCRUBBED-PATH",
+    "writeScope": [],
+    "mainCheckout": "/SCRUBBED-PATH",
+    "posture": "main-checkout"
+  },
+  "tools": {
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    }
+  },
+  "permissions": {
+    "posture": "enforced",
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    },
+    "filesystem": {
+      "mode": "read-only",
+      "enforced": true,
+      "enforcement": "enforced",
+      "writeScope": []
+    },
+    "network": {
+      "enforced": false,
+      "enforcement": "instructed"
+    }
+  },
+  "limits": {
+    "executorTimeoutMs": 2100000
+  },
+  "resultClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "path": "SCRUBBED"
+  },
+  "provenance": {
+    "dispatchPlanHash": "sha256:4409ef4408abe5b5b48641be1503383522c50b27615a10a592b6f4e2a7edf707",
+    "configHash": "sha256:5fdecd79e6cb2e57095a6d228f80e16b6ea718b3013c5a35509f5332f3a30503",
+    "executorId": "claude",
+    "adapter": "cli-spawn",
+    "adapterFamily": "cli-spawn"
+  },
+  "providerCapacity": {
+    "contract": "provider-capacity-selection.v1",
+    "status": "selected",
+    "provider": "claude",
+    "accountId": "tetcu",
+    "accountLabel": "claude tetcu (pane pool)",
+    "selectedAt": "2026-11-18T12:05:01.126Z",
+    "lease": {
+      "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+      "assignmentId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+      "pid": 2776212
+    },
+    "leaseReceipt": {
+      "provider": "claude",
+      "accountId": "tetcu",
+      "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+      "acquiredAt": "2026-11-18T12:05:01.126Z",
+      "accountViewDigest": null
+    },
+    "credentialProvisioned": true
+  },
+  "enforcementPosture": "enforced",
+  "permissionEnforcementPosture": "enforced",
+  "executorId": "claude",
+  "adapter": "cli-spawn",
+  "adapterFamily": "cli-spawn"
+}

@@ -1,0 +1,21 @@
+{
+  "contract": "provider-capacity-selection.v1",
+  "status": "selected",
+  "provider": "openai-codex",
+  "accountId": "tetnu",
+  "accountLabel": "tetnu",
+  "selectedAt": "2026-11-18T07:30:12.288Z",
+  "lease": {
+    "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+    "assignmentId": "unit-run-1794987012087-5f3337a8/producer/1",
+    "pid": 1117917
+  },
+  "leaseReceipt": {
+    "provider": "openai-codex",
+    "accountId": "tetnu",
+    "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+    "acquiredAt": "2026-11-18T07:30:12.288Z",
+    "accountViewDigest": "sha256:a17b69933b81df8497383532422f491fa6bfc3fa328eeefebf512457db0c4e40"
+  },
+  "credentialProvisioned": true
+}

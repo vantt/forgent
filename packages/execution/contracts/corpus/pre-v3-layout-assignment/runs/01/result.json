@@ -1,0 +1,171 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+  "assignmentId": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001",
+  "workId": null,
+  "executorId": "gemini",
+  "adapter": "cli-spawn",
+  "confinement": null,
+  "role": "reviewer",
+  "policy": {
+    "role": "reviewer",
+    "persona": "code-reviewer",
+    "executorId": "gemini",
+    "providerModel": "gemini",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "gemini-3.8-flash-low",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "gemini",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "gemini"
+        }
+      },
+      "model": {
+        "value": "gemini-3.8-flash-low",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "seat-binding",
+          "id": "defaults.tier"
+        }
+      },
+      "reasoningEffort": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "persona": {
+        "value": "code-reviewer",
+        "source": {
+          "scope": "default",
+          "id": "reviewer"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "promptEnvelope": {
+    "persona": {
+      "ref": "code-reviewer",
+      "delivery": "section",
+      "applied": true,
+      "source": {
+        "scope": "default",
+        "id": "reviewer"
+      }
+    }
+  },
+  "settledAt": "2026-11-11T22:31:26.332Z",
+  "durationMs": null,
+  "settleReports": [],
+  "classification": {
+    "execution": {
+      "status": "failed",
+      "exitCode": null
+    },
+    "assessment": {
+      "verdict": "not-applicable"
+    },
+    "confidence": {
+      "level": "failed",
+      "basis": [
+        "captured-stdout",
+        "failed-exit"
+      ]
+    },
+    "failure": {
+      "family": "provider",
+      "code": "provider-capacity-refused",
+      "message": "SCRUBBED"
+    },
+    "policy": {
+      "disposition": "needs-input",
+      "code": "provider-capacity-refused"
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v3",
+    "outcome": {
+      "category": "infra",
+      "reason": "SCRUBBED"
+    }
+  },
+  "runtime": {
+    "exitCode": null,
+    "stdoutLog": ".fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001/runs/01/stderr.log"
+  },
+  "runnerNote": {
+    "summary": "SCRUBBED"
+  },
+  "usage": null,
+  "evidence": {
+    "operationMutability": "read-only",
+    "gitBefore": null,
+    "gitAfter": null,
+    "gitBeforeSource": "pre-launch",
+    "dirtyBefore": [],
+    "dirtyAfter": [],
+    "mutatedDirtyBeforeFiles": [],
+    "changedFiles": [],
+    "changedFileReasons": {},
+    "attribution": [],
+    "artifacts": [],
+    "tests": []
+  }
+}

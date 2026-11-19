@@ -1,0 +1,14 @@
+{
+  "controlToken": "SCRUBBED-TOKEN",
+  "holder": {
+    "id": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01:1503663:provider-capacity-refusal",
+    "host": "fg-server2",
+    "bootId": "ae823cc8-4c70-4166-badb-6a85106c4981",
+    "pidNs": "pid:[4026531836]",
+    "pid": 1503663,
+    "startTime": "265315751",
+    "processStartTime": "265315751"
+  },
+  "purpose": "provider-capacity-refusal",
+  "acquiredAt": 1794436286335
+}

@@ -1,0 +1,95 @@
+{
+  "contract": {
+    "id": "effective-execution-contract",
+    "version": 1
+  },
+  "assignmentId": "unit-run-1794987012087-5f3337a8/producer/1",
+  "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+  "mutation": "read-only",
+  "workspace": {
+    "cwd": "/SCRUBBED-PATH",
+    "writeScope": [],
+    "mainCheckout": "/SCRUBBED-PATH",
+    "posture": "worktree"
+  },
+  "tools": {
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    }
+  },
+  "permissions": {
+    "posture": "enforced",
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    },
+    "filesystem": {
+      "mode": "read-only",
+      "enforced": true,
+      "enforcement": "enforced",
+      "writeScope": []
+    },
+    "network": {
+      "enforced": false,
+      "enforcement": "instructed"
+    }
+  },
+  "limits": {
+    "executorTimeoutMs": 1500000
+  },
+  "resultClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "path": "/SCRUBBED-PATH"
+  },
+  "provenance": {
+    "dispatchPlanHash": "sha256:17cfb9c68f12bb49bf5ae8748913cbda66a887340b4e097f431a104be1b9d9a7",
+    "configHash": "sha256:7af2d9bd7b3454d6530e02e518f114a019fc381a151a4d65f984ffc0ba4eacea",
+    "executorId": "openai",
+    "adapter": "herdr-spawn",
+    "adapterFamily": "herdr-spawn"
+  },
+  "providerCapacity": {
+    "contract": "provider-capacity-selection.v1",
+    "status": "selected",
+    "provider": "openai-codex",
+    "accountId": "tetnu",
+    "accountLabel": "tetnu",
+    "selectedAt": "2026-11-18T07:30:12.288Z",
+    "lease": {
+      "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+      "assignmentId": "unit-run-1794987012087-5f3337a8/producer/1",
+      "pid": 1117917
+    },
+    "leaseReceipt": {
+      "provider": "openai-codex",
+      "accountId": "tetnu",
+      "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+      "acquiredAt": "2026-11-18T07:30:12.288Z",
+      "accountViewDigest": "sha256:a17b69933b81df8497383532422f491fa6bfc3fa328eeefebf512457db0c4e40"
+    },
+    "credentialProvisioned": true
+  },
+  "enforcementPosture": "enforced",
+  "permissionEnforcementPosture": "enforced",
+  "executorId": "openai",
+  "adapter": "herdr-spawn",
+  "adapterFamily": "herdr-spawn",
+  "assignment": {
+    "role": "producer",
+    "posture": {
+      "readOnly": true,
+      "writer": true,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": false
+    }
+  }
+}

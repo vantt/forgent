@@ -1,0 +1,339 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+  "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+  "controlEpoch": 1,
+  "controlToken": "SCRUBBED-TOKEN",
+  "executorId": "claude",
+  "adapter": "herdr-spawn",
+  "confinement": "bwrap",
+  "role": "producer",
+  "executorRedirected": false,
+  "policy": {
+    "role": "producer",
+    "executorId": "claude",
+    "providerModel": "claude",
+    "rigor": "standard",
+    "tier": "advanced",
+    "model": "sonnet",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "claude",
+        "source": {
+          "scope": "seat-binding",
+          "id": "unit-prefer"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "claude"
+        }
+      },
+      "model": {
+        "value": "sonnet",
+        "source": {
+          "scope": "seat-binding",
+          "id": "modelPolicies.claude.advanced"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "advanced",
+        "source": {
+          "scope": "seat-binding",
+          "id": "capabilities.\"code:*\".tier"
+        }
+      },
+      "reasoningEffort": {
+        "value": null,
+        "source": {
+          "scope": "seat-binding",
+          "id": "invocation-default"
+        }
+      },
+      "persona": {
+        "value": null,
+        "source": {
+          "scope": "seat-binding",
+          "id": "none"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1795056603528-44eb3ca1/producer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  },
+  "settledAt": "2026-11-19T02:51:30.127Z",
+  "claimSha256": "1f6e2698e3729dd53534b1371c5757da7737809a7f2919777b8e40101b04d41f",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/outbox/report-1.md",
+      "sha256": "d1a59589a1dbdbca1d71d98613b00ddb1fb115a759e7c343f20e6397cef6db86"
+    }
+  ],
+  "reportDeclaration": {
+    "complete": true,
+    "incompleteReason": null
+  },
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "pass"
+    },
+    "confidence": {
+      "level": "verified",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout",
+        "workspace-git-diff"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v3",
+    "outcome": {
+      "category": "ok",
+      "reason": "SCRUBBED"
+    }
+  },
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "status": "done",
+    "summary": "SCRUBBED",
+    "evidenceRefs": [
+      "CHANGELOG.md",
+      "docs/reading-map.md",
+      "core/skills/_shared/plan-contract.md"
+    ]
+  },
+  "runnerNote": {
+    "summary": "SCRUBBED"
+  },
+  "usage": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "cacheReadTokens": null,
+    "cacheCreationTokens": null,
+    "reasoningTokens": null,
+    "source": "transcript",
+    "reason": "SCRUBBED"
+  },
+  "evidence": {
+    "gitBefore": "63ec9b7ca8371f02ea4f442bdd9a5288d71722c5",
+    "gitAfter": "63ec9b7ca8371f02ea4f442bdd9a5288d71722c5",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [
+      ".agents/skills/_shared/plan-contract.md",
+      ".agents/skills/fgos-coding-planning/references/approach-and-shape.md",
+      ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md",
+      ".agents/skills/fgos-cook/references/reading-ak-plans.md",
+      "CHANGELOG.md",
+      "core/skills/_shared/plan-contract.md",
+      "core/skills/fgos-cook/references/reading-ak-plans.md",
+      "docs/reading-map.md",
+      "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+      "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+      "plugins/fgOS/skills/_shared/plan-contract.md",
+      "plugins/fgOS/skills/fgos-coding-planning/references/approach-and-shape.md",
+      "plugins/fgOS/skills/fgos-coding-planning/references/split-and-child-specs.md",
+      "plugins/fgOS/skills/fgos-cook/references/reading-ak-plans.md"
+    ],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [
+      {
+        "path": ".agents/skills/_shared/plan-contract.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      },
+      {
+        "path": ".agents/skills/fgos-coding-planning/references/approach-and-shape.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      },
+      {
+        "path": ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      },
+      {
+        "path": ".agents/skills/fgos-cook/references/reading-ak-plans.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      },
+      {
+        "path": "CHANGELOG.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      },
+      {
+        "path": "core/skills/_shared/plan-contract.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      },
+      {
+        "path": "core/skills/fgos-cook/references/reading-ak-plans.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      },
+      {
+        "path": "docs/reading-map.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      },
+      {
+        "path": "domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      },
+      {
+        "path": "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      },
+      {
+        "path": "plugins/fgOS/skills/_shared/plan-contract.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      },
+      {
+        "path": "plugins/fgOS/skills/fgos-coding-planning/references/approach-and-shape.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      },
+      {
+        "path": "plugins/fgOS/skills/fgos-coding-planning/references/split-and-child-specs.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      },
+      {
+        "path": "plugins/fgOS/skills/fgos-cook/references/reading-ak-plans.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": true
+      }
+    ],
+    "artifacts": [
+      ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/outbox/report-1.md",
+      ".fgos/assignments/unit-run-1795056603528-44eb3ca1/producer/1/runs/01/outbox/result-1.json"
+    ],
+    "tests": [],
+    "findingRefs": [
+      "CHANGELOG.md",
+      "docs/reading-map.md",
+      "core/skills/_shared/plan-contract.md"
+    ]
+  }
+}

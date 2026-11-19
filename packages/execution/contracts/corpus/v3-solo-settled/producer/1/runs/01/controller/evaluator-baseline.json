@@ -1,0 +1,12 @@
+{
+  "contract": "evaluator-baseline.v1",
+  "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+  "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+  "cwd": "/SCRUBBED-PATH",
+  "gitBefore": "63ec9b7ca8371f02ea4f442bdd9a5288d71722c5",
+  "gitBeforeSource": "pre-launch",
+  "dirtyBefore": [],
+  "dirtyBeforeSnapshots": {},
+  "capturedAt": "2026-11-19T02:50:06.505Z",
+  "digest": "sha256:3a23f314bcaef4f1525ff18d52096bf0bebc5142a9de9000426c31bc79322315"
+}

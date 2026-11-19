@@ -1,0 +1,231 @@
+{
+  "v": 1,
+  "attemptId": "cmd_1795056606138_efbc9592",
+  "stepId": "finalize-home",
+  "status": "done",
+  "at": "2026-11-19T02:51:31.180Z",
+  "detail": {
+    "homes": 1,
+    "transcriptPath": "protected/session",
+    "homeLayout": [
+      {
+        "path": ".claude.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 153186,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": ".credentials.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 700,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "backups",
+        "kind": "dir",
+        "files": 2,
+        "bytes": 152396,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "backups/.claude.json.backup.1795056608068",
+        "kind": "file",
+        "files": 1,
+        "bytes": 610,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "backups/.claude.json.backup.1795056688923",
+        "kind": "file",
+        "files": 1,
+        "bytes": 151786,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "cache",
+        "kind": "dir",
+        "files": 2,
+        "bytes": 1345095,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "cache/changelog.md",
+        "kind": "file",
+        "files": 1,
+        "bytes": 1345093,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "cache/my-closed-issues.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 2,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "history.jsonl",
+        "kind": "file",
+        "files": 1,
+        "bytes": 431,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "paste-cache",
+        "kind": "dir",
+        "files": 1,
+        "bytes": 7762,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "paste-cache/87a1060aa983987b.txt",
+        "kind": "file",
+        "files": 1,
+        "bytes": 7762,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "plugins",
+        "kind": "dir",
+        "files": 765,
+        "bytes": 16635071,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "plugins/installed_plugins.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 35,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "plugins/known_marketplaces.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 310,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "plugins/marketplaces",
+        "kind": "dir",
+        "files": 760,
+        "bytes": 16634297,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "plugins/synced",
+        "kind": "dir",
+        "files": 3,
+        "bytes": 429,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "policy-limits.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 473,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "policy-limits.json.signature.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 3000,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "policy-limits.json.stamp.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 223,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "projects",
+        "kind": "dir",
+        "files": 1,
+        "bytes": 847967,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "projects/-home-SCRUBBED-projects-forgent",
+        "kind": "dir",
+        "files": 0,
+        "bytes": 0,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "projects/-home-SCRUBBED-projects-forgent-worktrees-rd-p09",
+        "kind": "dir",
+        "files": 1,
+        "bytes": 847967,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "remote-settings.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 2,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "remote-settings.json.signature.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 3036,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "remote-settings.json.synced-at",
+        "kind": "file",
+        "files": 1,
+        "bytes": 13,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "session-env",
+        "kind": "dir",
+        "files": 0,
+        "bytes": 0,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "session-env/01914201-752c-44c6-b28d-d1faf6b9356a",
+        "kind": "dir",
+        "files": 0,
+        "bytes": 0,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "sessions",
+        "kind": "dir",
+        "files": 0,
+        "bytes": 0,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "shell-snapshots",
+        "kind": "dir",
+        "files": 0,
+        "bytes": 0,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "skills",
+        "kind": "dir",
+        "files": 219,
+        "bytes": 4133241,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      },
+      {
+        "path": "skills/synced",
+        "kind": "dir",
+        "files": 219,
+        "bytes": 4133241,
+        "launchCommandId": "cmd_1795056606138_efbc9592"
+      }
+    ],
+    "warnings": []
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "v": 1,
+  "attemptId": "cmd_1795003501102_de12acfd",
+  "stepId": "finalize-home",
+  "status": "done",
+  "at": "2026-11-18T12:05:16.693Z",
+  "detail": {
+    "homes": 1,
+    "transcriptPath": "protected/session",
+    "homeLayout": [
+      {
+        "path": ".claude.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 145846,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": ".credentials.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 700,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": ".last-cleanup",
+        "kind": "file",
+        "files": 1,
+        "bytes": 24,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "backups",
+        "kind": "dir",
+        "files": 1,
+        "bytes": 84,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "backups/.claude.json.backup.1795003502350",
+        "kind": "file",
+        "files": 1,
+        "bytes": 84,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "plugins",
+        "kind": "dir",
+        "files": 5,
+        "bytes": 556,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "plugins/installed_plugins.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 35,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "plugins/store",
+        "kind": "dir",
+        "files": 1,
+        "bytes": 92,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "plugins/synced",
+        "kind": "dir",
+        "files": 3,
+        "bytes": 429,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "policy-limits.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 473,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "policy-limits.json.signature.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 3000,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "policy-limits.json.stamp.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 223,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "projects",
+        "kind": "dir",
+        "files": 1,
+        "bytes": 685537,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "projects/-home-SCRUBBED-projects-forgent",
+        "kind": "dir",
+        "files": 1,
+        "bytes": 685537,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "remote-settings.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 2,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "remote-settings.json.signature.json",
+        "kind": "file",
+        "files": 1,
+        "bytes": 3036,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "remote-settings.json.synced-at",
+        "kind": "file",
+        "files": 1,
+        "bytes": 13,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "session-env",
+        "kind": "dir",
+        "files": 1,
+        "bytes": 1191,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "session-env/0d7934a8-8cca-407d-ad56-f706b0bfc53d",
+        "kind": "dir",
+        "files": 1,
+        "bytes": 1191,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "sessions",
+        "kind": "dir",
+        "files": 0,
+        "bytes": 0,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "skills",
+        "kind": "dir",
+        "files": 219,
+        "bytes": 4133245,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      },
+      {
+        "path": "skills/synced",
+        "kind": "dir",
+        "files": 219,
+        "bytes": 4133245,
+        "launchCommandId": "cmd_1795003501102_de12acfd"
+      }
+    ],
+    "warnings": []
+  }
+}

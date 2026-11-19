@@ -1,0 +1,14 @@
+{
+  "controlToken": "SCRUBBED-TOKEN",
+  "holder": {
+    "id": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01:2776212:cc803fe3-c007-437d-b559-ff26eb956d2e",
+    "host": "fg-server2",
+    "bootId": "ae823cc8-4c70-4166-badb-6a85106c4981",
+    "pidNs": "pid:[4026531836]",
+    "pid": 2776212,
+    "startTime": "322036902",
+    "processStartTime": "322036902"
+  },
+  "purpose": "worker-spawn",
+  "acquiredAt": 1795003501365
+}

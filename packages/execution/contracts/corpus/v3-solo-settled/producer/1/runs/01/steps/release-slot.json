@@ -1,0 +1,11 @@
+{
+  "v": 1,
+  "attemptId": "cmd_1795056606138_efbc9592",
+  "stepId": "release-slot",
+  "status": "done",
+  "at": "2026-11-19T02:51:31.288Z",
+  "detail": {
+    "disposition": "close",
+    "key": "cmd_1795056606138_efbc9592"
+  }
+}

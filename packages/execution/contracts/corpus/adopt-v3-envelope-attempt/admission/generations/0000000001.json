@@ -1,0 +1,19 @@
+{
+  "attempt": 1,
+  "attemptStr": "01",
+  "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+  "retryId": null,
+  "predecessorRunId": null,
+  "destination": "/SCRUBBED-PATH",
+  "admissionPayloadDigest": "f468296ed003be66acd5caad527589f9c3ae4e271599379a051113e24e0fa39e",
+  "admittedAt": "2026-11-18T12:05:01.059Z",
+  "admittedBy": {
+    "id": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01:admission:2776212",
+    "host": "fg-server2",
+    "bootId": "ae823cc8-4c70-4166-badb-6a85106c4981",
+    "pidNs": "pid:[4026531836]",
+    "pid": 2776212,
+    "startTime": "322036902",
+    "processStartTime": "322036902"
+  }
+}

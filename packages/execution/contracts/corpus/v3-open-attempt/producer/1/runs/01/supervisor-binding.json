@@ -1,0 +1,34 @@
+{
+  "v": 1,
+  "attemptId": "cmd_1794987012269_a51ae631",
+  "envelopeDigest": "sha256:5131a002f83ac4846faeda1427ff1b7437cf53a01a1f6f9e110cd4a524ed258a",
+  "supervisor": {
+    "host": "fg-server2",
+    "bootId": "ae823cc8-4c70-4166-badb-6a85106c4981",
+    "pidNs": "pid:[4026531836]",
+    "pid": 1119381,
+    "startTime": "320388507"
+  },
+  "gate": {
+    "host": "fg-server2",
+    "bootId": "ae823cc8-4c70-4166-badb-6a85106c4981",
+    "pidNs": "pid:[4026531836]",
+    "pid": 1119886,
+    "startTime": "320388557"
+  },
+  "domain": {
+    "kind": "linux-gate",
+    "id": {
+      "host": "fg-server2",
+      "bootId": "ae823cc8-4c70-4166-badb-6a85106c4981",
+      "pid": 1119886,
+      "startTime": "320388557",
+      "pidNs": "pid:[4026531836]"
+    }
+  },
+  "guarantee": {
+    "containment": "kernel",
+    "lock": "kernel"
+  },
+  "boundAt": "2026-11-18T07:30:13.768Z"
+}

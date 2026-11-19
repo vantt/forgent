@@ -1,0 +1,21 @@
+{
+  "contract": "assignment-run.v2",
+  "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+  "assignmentId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+  "attempt": 1,
+  "supersedesRunId": null,
+  "retryId": null,
+  "payloadDigest": "sha256:f468296ed003be66acd5caad527589f9c3ae4e271599379a051113e24e0fa39e",
+  "dispatchPlanDigest": "sha256:19343173450278be5f2c80fb87465829168051b5005cc469883243724c4b6757",
+  "phase": "admitted",
+  "delivery": "not-sent",
+  "executorId": "claude",
+  "dispatchPlanPath": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/dispatch-plan.json",
+  "effectiveContractPath": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/effective-execution-contract.json",
+  "cwd": "/SCRUBBED-PATH",
+  "startedAt": "2026-11-18T12:05:01.057Z",
+  "timeoutMs": 2100000,
+  "status": "settled",
+  "providerCapacitySelectionPath": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/provider-capacity-selection.json",
+  "settledAt": "2026-11-18T12:05:16.188Z"
+}

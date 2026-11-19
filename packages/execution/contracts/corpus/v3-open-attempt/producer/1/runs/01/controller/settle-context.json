@@ -1,0 +1,206 @@
+{
+  "v": 1,
+  "launchCommandId": "cmd_1794987012269_a51ae631",
+  "repoRoot": "/SCRUBBED-PATH",
+  "strayWatch": {
+    "repoRoot": "/SCRUBBED-PATH",
+    "cwd": "/SCRUBBED-PATH",
+    "before": [
+      ".claude/settings.json",
+      "docs/backlog.md",
+      "packages/git/contracts/mutation-census.v1.json",
+      ".claude/skills/instruction-audit/references/lane-prompts.md",
+      ".claude/skills/instruction-audit/references/report-template.md",
+      ".claude/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "node_trace.1.log",
+      "plans/handoffs/harden-phase-07-closing-and-handoff-20261118-1341.md",
+      "plans/reports/audit-261117-1545-supervisor-watcher-audit.md",
+      "plans/reports/debugger-261115-1400-ci-only-test-failures.md",
+      "sc.log",
+      "sh1.log",
+      "sw.log",
+      "w1.log"
+    ]
+  },
+  "resolvedExecutorId": "openai",
+  "effectivePolicy": {
+    "role": "producer",
+    "executorId": "openai",
+    "providerModel": "openai",
+    "rigor": "standard",
+    "tier": "advanced",
+    "model": "gpt-6.1-sol",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "openai",
+        "source": {
+          "scope": "seat-binding",
+          "id": "unit-prefer"
+        }
+      },
+      "provider": {
+        "value": "openai",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "openai"
+        }
+      },
+      "model": {
+        "value": "gpt-6.1-sol",
+        "source": {
+          "scope": "seat-binding",
+          "id": "modelPolicies.openai.advanced"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "advanced",
+        "source": {
+          "scope": "seat-binding",
+          "id": "capabilities.\"code:*\".tier"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "seat-binding",
+          "id": "cell"
+        }
+      },
+      "persona": {
+        "value": null,
+        "source": {
+          "scope": "seat-binding",
+          "id": "none"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1794987012087-5f3337a8/producer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "openai"
+        }
+      }
+    }
+  },
+  "reasoningEffort": {
+    "requested": "medium",
+    "command": "pi",
+    "flag": "--thinking",
+    "native": "medium",
+    "replaced": "medium"
+  },
+  "modelCheck": {
+    "requested": "gpt-6.1-sol",
+    "launched": "gpt-6.1-sol",
+    "warnings": []
+  },
+  "providerCapacitySelection": {
+    "contract": "provider-capacity-selection.v1",
+    "status": "selected",
+    "provider": "openai-codex",
+    "accountId": "tetnu",
+    "accountLabel": "tetnu",
+    "selectedAt": "2026-11-18T07:30:12.288Z",
+    "lease": {
+      "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+      "assignmentId": "unit-run-1794987012087-5f3337a8/producer/1",
+      "pid": 1117917
+    },
+    "leaseReceipt": {
+      "provider": "openai-codex",
+      "accountId": "tetnu",
+      "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+      "acquiredAt": "2026-11-18T07:30:12.288Z",
+      "accountViewDigest": "sha256:a17b69933b81df8497383532422f491fa6bfc3fa328eeefebf512457db0c4e40"
+    },
+    "credentialSource": {
+      "kind": "home-files",
+      "home": "/SCRUBBED-PATH",
+      "files": [
+        "auth.json",
+        "models-store.json",
+        "settings.json",
+        "trust.json",
+        "bin/fd",
+        "models.json"
+      ],
+      "cli": "pi"
+    },
+    "credentialSources": {
+      "codex": {
+        "kind": "codex-home",
+        "home": "/SCRUBBED-PATH",
+        "cli": "codex"
+      },
+      "pi": {
+        "kind": "home-files",
+        "home": "/SCRUBBED-PATH",
+        "files": [
+          "auth.json",
+          "models-store.json",
+          "settings.json",
+          "trust.json",
+          "bin/fd",
+          "models.json"
+        ],
+        "cli": "pi"
+      }
+    }
+  },
+  "providerCapacityEvidence": {
+    "contract": "provider-capacity-selection.v1",
+    "status": "selected",
+    "provider": "openai-codex",
+    "accountId": "tetnu",
+    "accountLabel": "tetnu",
+    "selectedAt": "2026-11-18T07:30:12.288Z",
+    "lease": {
+      "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+      "assignmentId": "unit-run-1794987012087-5f3337a8/producer/1",
+      "pid": 1117917
+    },
+    "leaseReceipt": {
+      "provider": "openai-codex",
+      "accountId": "tetnu",
+      "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+      "acquiredAt": "2026-11-18T07:30:12.288Z",
+      "accountViewDigest": "sha256:a17b69933b81df8497383532422f491fa6bfc3fa328eeefebf512457db0c4e40"
+    },
+    "credentialProvisioned": true
+  },
+  "inputDigests": [],
+  "providerCapacityRuntimeDir": null
+}

@@ -1,0 +1,22 @@
+{
+  "v": 1,
+  "attemptId": "cmd_1795056606138_efbc9592",
+  "outcome": "exited",
+  "captureDigests": {
+    "stdout": "SCRUBBED",
+    "stderr": "SCRUBBED"
+  },
+  "outboxPresent": true,
+  "outboxResult": "result-1.json",
+  "synthesizedBy": "supervisor",
+  "publishedAt": "2026-11-19T02:51:30.168Z",
+  "gateExit": {
+    "v": 1,
+    "attemptId": "cmd_1795056606138_efbc9592",
+    "exitCode": 0,
+    "signal": null,
+    "stoppedBy": "agent",
+    "cause": null,
+    "exitedAt": "2026-11-19T02:51:30.127Z"
+  }
+}

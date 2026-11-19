@@ -1,0 +1,13 @@
+{
+  "v": 1,
+  "attemptId": "cmd_1795056606138_efbc9592",
+  "envelopeDigest": "sha256:06e365b2778b65929a2f12df57145fe95af01f447b8cdc4c5994c97977b290c7",
+  "agent": {
+    "host": "fg-server2",
+    "bootId": "ae823cc8-4c70-4166-badb-6a85106c4981",
+    "pidNs": "pid:[4026532914]",
+    "pid": 2,
+    "startTime": "327347984"
+  },
+  "at": "2026-11-19T02:50:08.010Z"
+}

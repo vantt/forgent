@@ -1,0 +1,45 @@
+{
+  "contract": "confinement-finalization.v1",
+  "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+  "launchCommandId": "cmd_1795003501102_de12acfd",
+  "backend": "local-bwrap-v1",
+  "dispatchId": "disp_1795003501487_4b4aa47e",
+  "resourceOwner": "confinement-authority",
+  "preparedPlan": {
+    "planRef": "protected/confinement-finalization/cmd_1795003501102_de12acfd.json#preparedPlan",
+    "planDigest": "sha256:e2c0d0a7b7b5a6ae0de51498e7b7ba6cca59eb39182551a01d1cf61d9d27a65c"
+  },
+  "attestationPlanDigest": "sha256:e2c0d0a7b7b5a6ae0de51498e7b7ba6cca59eb39182551a01d1cf61d9d27a65c",
+  "preparedInvocationDigest": "sha256:e22ac83903a4fd5a7ace4263ce60dc89b17e70185d844261e6aff81e35c01401",
+  "finalAttestation": {
+    "state": "pending",
+    "resultRef": null,
+    "resultDigest": null
+  },
+  "resources": [
+    {
+      "kind": "temporary-directory",
+      "resourceId": "private-home",
+      "planEntryDigest": "sha256:3bb63eee9813e2d3759e7b896fe97fb15bfb6f56ec156d333c17840b03ae8447",
+      "ownershipMarkerDigest": "sha256:318513bd3b8626f28377efcd421a659927c56ee59e341ad3afb8cb7b7bfc7519",
+      "pathRef": "/tmp/fgos-confinement/disp_1795003501487_4b4aa47e/home",
+      "credentialWriteBack": {
+        "provider": "claude",
+        "accountId": "tetcu",
+        "kind": "home-files",
+        "home": "/SCRUBBED-PATH",
+        "layout": "claude-config-credentials-json",
+        "runtimeDir": "/SCRUBBED-PATH",
+        "store": "claude"
+      },
+      "sessionDir": "projects"
+    }
+  ],
+  "cleanupState": "cleaned",
+  "cleanupResult": {
+    "kind": "cleaned"
+  },
+  "retainUntil": "safe-cleanup-proof-or-manual-review",
+  "updatedAt": "2026-11-18T12:05:16.655Z",
+  "digest": "sha256:94bb0558f0dfc8ad7e4a0cca183b7177aa9dde7ca54cf428accdc0a6a0c7218f"
+}

@@ -1,0 +1,20 @@
+{
+  "contract": "assignment-run.v2",
+  "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+  "assignmentId": "unit-run-1794987012087-5f3337a8/producer/1",
+  "attempt": 1,
+  "supersedesRunId": null,
+  "retryId": "unit-run-1794987012087-5f3337a8/producer/1~7e08f9f2b100",
+  "payloadDigest": "sha256:2d40f3d7f2cbb18545c628f542c102788af0fe7e476a410ce2c2cccce0651809",
+  "dispatchPlanDigest": "sha256:de69352dd8b1a1f266db7cfc4961d0efbf8374f92dcfd4442707256b01df5165",
+  "phase": "admitted",
+  "delivery": "not-sent",
+  "executorId": "openai",
+  "dispatchPlanPath": ".fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01/dispatch-plan.json",
+  "effectiveContractPath": ".fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01/effective-execution-contract.json",
+  "cwd": "/SCRUBBED-PATH",
+  "startedAt": "2026-11-18T07:30:12.230Z",
+  "timeoutMs": 1500000,
+  "status": "running",
+  "providerCapacitySelectionPath": ".fgos/assignments/unit-run-1794987012087-5f3337a8/producer/1/runs/01/provider-capacity-selection.json"
+}

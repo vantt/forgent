@@ -1,0 +1,233 @@
+{
+  "contract": "authority-prepared-invocation.v1",
+  "dispatchId": "disp_1795056606544_8978e4f6",
+  "adapter": "herdr-spawn",
+  "run": {
+    "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+    "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+    "attempt": 1,
+    "launchCommandId": "cmd_1795056606138_efbc9592",
+    "controlEpoch": 1,
+    "controlTokenDigest": "sha256:f4320300a514c5f16994005cb54116caafb2b8766cb40b7a3ef5a4cc8c2e0b19",
+    "dispatchPlanDigest": "sha256:7ee40f82d6deb511462d9e63e4d09ca3a132703d3ef7f8a0a0d9d77bbe1d64bc",
+    "evaluatorBaselineDigest": "sha256:3a23f314bcaef4f1525ff18d52096bf0bebc5142a9de9000426c31bc79322315"
+  },
+  "requirement": {
+    "mode": "required",
+    "policyId": "workspace-write",
+    "policyDigest": "sha256:ddeb6f7c5eba524c570a085249776838bd431c5b7d3585111fb58f800d7a25a9"
+  },
+  "backend": {
+    "id": "bwrap",
+    "type": "bwrap",
+    "version": "local-bwrap-v1",
+    "configDigest": "sha256:fb887c9f31894c7df87d04c886e29f6db333a8918afc75145efa5d6eccae922b"
+  },
+  "workerInvocation": {
+    "command": "claude",
+    "args": [
+      "--model",
+      "sonnet",
+      "--add-dir",
+      "/SCRUBBED-PATH"
+    ],
+    "cwd": "/SCRUBBED-PATH",
+    "env": {
+      "PATH": "SCRUBBED",
+      "HOME": "/SCRUBBED-PATH",
+      "LANG": "en_US.UTF-8",
+      "TERM": "xterm-256color",
+      "SHELL": "/usr/bin/zsh",
+      "USER": "SCRUBBED",
+      "LOGNAME": "SCRUBBED",
+      "FGOS_DISPATCH_DEPTH": "1"
+    },
+    "envDigest": "sha256:b2a75b5c1f8071d320af52ad3062353e16949406ab24415515c730dda63b41d0",
+    "workerCommandDigest": "sha256:8c7e5aeebee6be5c74c473eb23b0237257670311babcd1a77511eb6f637eee36",
+    "stdin": "ignore",
+    "encoding": "utf8",
+    "timeoutMs": 3600000,
+    "idleTimeoutMs": 5400000,
+    "maxBuffer": 10485760
+  },
+  "resourceBindings": [
+    {
+      "resource": "run-output",
+      "access": "write",
+      "hostTargetDigest": "sha256:e01b354a00429cbdf468dfcd48c40548f96d762364cc1f630dc7245175ed0343",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "workspace",
+      "access": "read-write",
+      "hostTargetDigest": "sha256:d2c932e6743186b4d8c6d8575d6e7564141d372eb0cfa89405e3466b1dc8185a",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "workspace-git-metadata",
+      "access": "read",
+      "hostTargetDigest": "sha256:e502303debd5252c5affd9b1f4cfbc1436467495eb2f8bc65e0a59fd5eaf2494",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "private-home",
+      "access": "read-write",
+      "hostTargetDigest": "sha256:a4793fd7f2d7fc58a1c47bc770abee89b45d72d6208988bd83c0b9ff29df7eca",
+      "executionTarget": "/tmp/fgos-confinement/disp_1795056606544_8978e4f6/home",
+      "ownershipMarkerDigest": "sha256:304e376dc8b23a3a612e24a3ebea1d50f0f573cbe573f7ee8ad860df5032822b"
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:f3320b8bb8c8cbc0bdbc2ecea5ec247f2d444c89f365e80512caf41fef08045f",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:be8b8e10e9c3e9e6c46d39553d6cdaaeb1bd28c51b3ab552092cf7c15d289a23",
+      "executionTarget": "/run/user/1000",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:0d3c95de77efe28ff0fc4a1765f5c1d93579b2e52913283c8da3f50404b5a8c7",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:e0fd56eddab7adaf04d5f3ee600f860a5d1cd6ffb8e7900bf3f99186ecfd2da6",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:6776fd9b5b9dfcbcced7d17e08ea7be65504ee83bb1893f047580b32b4b28d3f",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:45d56e25ccfc709157ac0901d1e6c0124273d18c68f7f20e19216ab182cd8903",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:554a5f670aa284d174e2776c2670077c4fe8739142ec69dfab034442211871e6",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:07a6a1d9b68e7fe36648df8d3aa4d667fb0d9f50a21521e9ec349a89bc554d85",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:488861ff3648a6ede53a77ed94302aa9d7bf68930802302aa73e23b5f2562c44",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:bc2681243e4982beb1d183dcdd67cc0bd81df52a7c91a1405daaa564b669503d",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:7cf155d6a681561f3c9f006a1a4f45b76238f06b02eee98f7292d96e00dc5a71",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:78c9b7ad2e24f64742d724846ca111e99b5a2523799d0062b5b3e49f990d2e0a",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:7b47c0d36172076ac5e7760bf076827ba0b5a1405a7c2747c18b446ef4c25d62",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:2823cf7c508a04682d6cdb8c91d6190fe4974e7d44a0ffd8e0173e5ad0663390",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:ce48dc220f34b4f375bb105813500fd1d5f931fecb2be3031cd10f49839269a0",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:9c49bec04cdde2ed321ee4f7cb80e2adce85654b02e2d4fdee77ae314c109f88",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:32c75d174896b5ae03f0ea89e3248a7d311847304009934ec66f042f075c15e3",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:09b1158746eef82e62f6ef1c08548297fc105e8411d600f4986ca9c624127270",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:3007717fc078f85bf45275634ef000ac594c64084d9abd7b4c444e5335b40d7e",
+      "executionTarget": "/SCRUBBED-PATH",
+      "ownershipMarkerDigest": null
+    },
+    {
+      "resource": "hidden-root",
+      "access": "hidden",
+      "hostTargetDigest": "sha256:6dac76e4fc785b71959e7ca8f9592ed71eb8316c42c108e8dbf91df076b7cab5",
+      "executionTarget": "/tmp/fgos-confinement",
+      "ownershipMarkerDigest": null
+    }
+  ],
+  "providerCapacity": {
+    "credentialProvisioned": true
+  },
+  "proof": {
+    "confinementPlanDigest": "sha256:ce887c64a64adee38977fc7f7e7d84f20b3406035449bafd43a3b2d30bcfb55f",
+    "preparedAttestationDigest": "sha256:ce887c64a64adee38977fc7f7e7d84f20b3406035449bafd43a3b2d30bcfb55f",
+    "probeFingerprintDigest": "sha256:0b25152a133f095549c3e71006f4dadf62db9dacf00df16ec87102579182bdcd"
+  },
+  "publishedAt": "2026-11-19T02:50:06.697Z",
+  "digest": "sha256:0876f15366de8c96c9690563011b8a5fda3e82337eaff424833e410979f5c393"
+}

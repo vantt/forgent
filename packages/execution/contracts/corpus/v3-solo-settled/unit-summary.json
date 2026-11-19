@@ -1,0 +1,82 @@
+{
+  "contract": {
+    "id": "unit-summary",
+    "version": 3
+  },
+  "unitRunId": "unit-run-1795056603528-44eb3ca1",
+  "workflow": null,
+  "pattern": "solo",
+  "capability": "code:implement",
+  "outcome": "pass",
+  "infrastructure": false,
+  "infrastructureReason": null,
+  "refused": [],
+  "startedAt": "2026-11-19T02:50:03.539Z",
+  "settledAt": "2026-11-19T02:51:35.039Z",
+  "stanceOptions": [],
+  "seats": [
+    {
+      "seat": "producer",
+      "role": "producer",
+      "kind": "producer",
+      "round": 1,
+      "final": {
+        "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+        "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+        "executor": "claude",
+        "provider": "claude",
+        "persona": null,
+        "model": "sonnet",
+        "outcome": "pass",
+        "fallbackFrom": null,
+        "accountId": "tetcu",
+        "durationMs": 85416,
+        "usage": {
+          "inputTokens": null,
+          "outputTokens": null,
+          "totalTokens": null,
+          "cacheReadTokens": null,
+          "cacheCreationTokens": null,
+          "reasoningTokens": null,
+          "source": "transcript",
+          "reason": "SCRUBBED"
+        },
+        "stance": {
+          "status": "missing"
+        }
+      },
+      "attempts": [
+        {
+          "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+          "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+          "executor": "claude",
+          "provider": "claude",
+          "persona": null,
+          "model": "sonnet",
+          "outcome": "pass",
+          "fallbackFrom": null,
+          "accountId": "tetcu",
+          "durationMs": 85416,
+          "usage": {
+            "inputTokens": null,
+            "outputTokens": null,
+            "totalTokens": null,
+            "cacheReadTokens": null,
+            "cacheCreationTokens": null,
+            "reasoningTokens": null,
+            "source": "transcript",
+            "reason": "SCRUBBED"
+          }
+        }
+      ]
+    }
+  ],
+  "collaboration": {
+    "loop": "solo",
+    "params": {},
+    "provenance": {
+      "params": {},
+      "checkers": {}
+    }
+  }
+}

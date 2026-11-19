@@ -1,0 +1,24 @@
+{
+  "contract": "provider-capacity-selection.v1",
+  "status": "selected",
+  "provider": "claude",
+  "accountId": "tetcu",
+  "accountLabel": "claude tetcu (pane pool)",
+  "selectedAt": "2026-11-19T02:50:06.178Z",
+  "lease": {
+    "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+    "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+    "pid": 931311
+  },
+  "leaseReceipt": {
+    "provider": "claude",
+    "accountId": "tetcu",
+    "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+    "acquiredAt": "2026-11-19T02:50:06.178Z",
+    "accountViewDigest": "sha256:aff334903b233328e2f24661ba84071eb6e3cc50f48ebdd06c1010a180e520dc"
+  },
+  "credentialProvisioned": true,
+  "reasonCodes": [
+    "unknown-or-low-confidence"
+  ]
+}
