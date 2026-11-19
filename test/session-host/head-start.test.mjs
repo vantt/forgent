@@ -11,6 +11,7 @@ import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { bindHeadSeat, headKeyOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, openingText, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
 import { grantOf } from '../../src/session-host/head-grants.mjs';
+import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { headOf } from '../../src/runner/dispatch/session-attempt.mjs';
 
 seedFileLocalBwrapRegistry();
@@ -208,6 +209,22 @@ test('a launch that is refused leaves no placement record behind', async () => {
   const { ports } = fakes({ launchFails: 'no account could be leased' });
   await assert.rejects(startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports), { code: 'start-refused' });
   assert.equal(fs.existsSync(path.join(lineageDirOf(projectRoot, 'planner', 'probe'), 'placement.json')), false);
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('a head whose supervisor could not bind its role is refused with the supervisor\'s own code, not a generic start refusal', async () => {
+  const projectRoot = scratch();
+  const { ports } = fakes({ launchFails: 'the supervisor did not bind head:planner-probe (exited, exit 0)' });
+  const refusedRun = path.join(fgosDirFromRoot(projectRoot), 'assignments', headKeyOf('planner', 'probe', 1), 'runs', '01');
+  fs.mkdirSync(refusedRun, { recursive: true });
+  fs.writeFileSync(path.join(refusedRun, 'start-refused.json'), JSON.stringify({ v: 1, code: 'head-role-held', why: 'head:planner-probe was not bound: role-held: held by the live session x' }));
+  await assert.rejects(startHeadSession({ persona: 'planner', name: 'probe', projectRoot, gen: 1 }, ports), (err) => err.code === 'head-role-held' && /held by the live session x/.test(err.message));
+  fs.writeFileSync(path.join(refusedRun, 'start-refused.json'), JSON.stringify({ v: 1, code: 'terminal-gate-silent', why: 'no hello' }));
+  await assert.rejects(startHeadSession({ persona: 'planner', name: 'probe', projectRoot, gen: 1 }, ports), { code: 'start-refused' });
+  // The note of an earlier run is not the failed launch's: only the newest run is read.
+  fs.writeFileSync(path.join(refusedRun, 'start-refused.json'), JSON.stringify({ v: 1, code: 'head-role-held', why: 'stale' }));
+  fs.mkdirSync(path.join(path.dirname(refusedRun), '02'), { recursive: true });
+  await assert.rejects(startHeadSession({ persona: 'planner', name: 'probe', projectRoot, gen: 1 }, ports), { code: 'start-refused' });
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 

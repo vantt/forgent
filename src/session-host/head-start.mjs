@@ -141,6 +141,26 @@ async function defaultRunnerConfig(projectRoot) {
   return loadRunnerConfigForDir(projectRoot);
 }
 
+const ROLE_REFUSAL_CODES = new Set(['head-role-not-bound', 'head-role-held']);
+
+/**
+ * The role-binding refusal the head's supervisor published for this key (`start-refused.json` of the attempt's run),
+ * as `{ code, why }`, or null when it refused nothing of the kind. The supervisor binds the role in Identity before
+ * the agent exists, so a head that could not hold it never starts. Only the newest run under the key is read: it is
+ * the launch that just failed, so a note an earlier run left is never taken for this one's.
+ */
+export function roleRefusalOf(projectRoot, key) {
+  const runs = path.join(fgosDirFromRoot(projectRoot), 'assignments', key, 'runs');
+  let latest;
+  try { latest = fs.readdirSync(runs).sort().at(-1); } catch { return null; }
+  if (latest === undefined) return null;
+  try {
+    const note = JSON.parse(fs.readFileSync(path.join(runs, latest, 'start-refused.json'), 'utf8'));
+    if (ROLE_REFUSAL_CODES.has(note?.code)) return { code: note.code, why: String(note.why ?? '') };
+  } catch { /* no note in this run */ }
+  return null;
+}
+
 /** The generation a start without one takes: the first whose attempt directory does not exist yet. */
 export function nextHeadGeneration(projectRoot, persona, name) {
   let gen = 1;
@@ -205,6 +225,8 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
   try {
     launched = ports.launch ? await ports.launch(request) : await defaultLaunch(request);
   } catch (err) {
+    const unbound = roleRefusalOf(projectRoot, key);
+    if (unbound) throw new HeadStartError(unbound.code, `${role} was not started: ${unbound.why}`, { cause: err });
     throw new HeadStartError('start-refused', `${role} was not started: ${err.message}`, { cause: err, refusal: err.refusal ?? null });
   }
   return { role, gen: generation, key: launched.placement.key, placement: launched.placement, runDir: launched.runDir, cli: binding.cli ?? null, persona: pinned.name ?? persona };
