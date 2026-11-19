@@ -1,0 +1,1 @@
+//! Case admission rules.
