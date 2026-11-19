@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fixed: `fgos doctor` now reads a watcher timer unit as stale when its PATH cannot reach a tool the wake needs (for example `cargo` after a release starts needing it) and the registered fix re-renders it; an installed unit's other caller-chosen values stay pinned, so a disabled or unchanged timer is left alone.
+- Fixed: the supervisor skill now gives one numbered procedure for an answered owner question: an idle live asker is stopped and its successor started with `--for-question`, so the answer no longer leaves the asker blocked.
 - Fixed: a head session started by the watcher timer can now build the git addon during `fgos land` regeneration: the timer unit's PATH also carries the directory of the `cargo` binary found when the timer is installed. `land.regenerate` also takes an optional `when` list of path globs and then runs only when a landed path matches one (absent: every landing, as before), so a plans-only land no longer regenerates code-derived files.
 - Fixed: a lead no longer ends its turn on a running `run` or `land` ticket; the lead skill tells it to wait on `fgos request result <id> --wait 50` until the ticket settles, and to park the phase with a reason after a bounded number of waits.
 - Fixed: the `question-answered` watcher definition now carries the answer time as its row instant, so an answered owner question is raised and wakes the supervisor instead of making every watcher tick report `error`; a row that carries no subject or no instant is now reported by name (definition and missing field) in the tick result and span.

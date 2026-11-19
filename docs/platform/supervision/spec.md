@@ -128,6 +128,8 @@ Personas and grants: shaper gains writes `docs/discussions` and verb `land`; sec
 | A detection row with no subject or no instant (a definition that carries no `min:ts`, `max:end` or `max:ts` aggregate) | The watcher drops the row, counts it in `errors`, and names the definition and the missing field in the tick result (`problems`) and the tick span (`fgos.watcher.problem`); every shipped definition is proven to yield both. |
 | Footprint escape | `land` refuses `land-outside-footprint`; a lead's `land --paths` that changes its own `footprint` is refused (PS-24). |
 | Empty gate list | `land` refuses `land-gate-missing`. |
+| Unit drift | An installed watcher unit whose PATH cannot reach a wake tool (node, herdr, claude, codex, cargo) that the installing environment can reach reads `stale` in the `watcher-timer` row and the fix re-renders it; the other installed values stay pinned. |
+| Answered question | A `question-answered` event is handled by the numbered procedure in `fgos-supervisor`: a live idle asker is stopped, then its successor is started with `--for-question`; a live busy asker is left; a gone one only gets the start. The stop route allows the asker of an answered question. |
 | Windows | No timer scheduler: supervision does not run there and the `watcher-timer` doctor row says so. |
 
 ## 7. Trust boundary (PS-19, decided)
