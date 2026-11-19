@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Supervision powers, part 1: the four Rust cores (raise, drone signals, coordination evidence and prune, on-site read and type)"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 footprint:
