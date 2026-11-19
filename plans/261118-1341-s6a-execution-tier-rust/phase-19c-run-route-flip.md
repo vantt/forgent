@@ -1,0 +1,77 @@
+# Phase 19c: `fgos run` route flip, internal execution ops, attempt-step route
+
+Wave 8, last of three serial phases (19 -> 19b -> 19c). Depends on: 19b. Effort 2d. Cut-over phase: run the re-sync step of
+the phase-lead rules first. First verb cut-over: nothing in flight at landing.
+
+## Context
+
+`fgos run` is a `legacy-cli` route (Node arm `case 'run'` in `bin/fgos.mjs`, request built by
+`src/runner/execution/run-request.mjs`). Phase 19 landed the Node seam and the payload launcher; phase 19b the host ports.
+This phase serves the verb from engine `unit_run`. Node callers of `runUnit` (Workflow, Work) keep the Node path until phase 20.
+
+## Requirements
+
+- `apps/fgos/src/wiring/run.rs`: native `fgos run "<prompt>" [--provider] [--capability] [--writes --worktree] [--unit <file>]
+  [--json] ...`, argv exactly as `src/cli/command-registry.mjs` lists; envelope `data.results[-1].runResult.agentClaim.summary`
+  and `data.results[-1].commit` unchanged (AGENTS.md "Dispatch"). No new flag, hidden or not (P14).
+- Peer start (P5 = A with P13): when the run asks the port (every `--writes` run asks `resolveBinding`; `--case` asks
+  `activityUnitOf`; a confined worker's writing run asks `confinedWriteRefusal`), the host starts `src/workflow/admission-peer.mjs`
+  through `legacy_exec::payload_module_command` and speaks the peer protocol over its stdin/stdout. No `bin/fgos.mjs` arm, no
+  inherited fd. A read-only run without `--case` starts no Node.
+- `apps/fgos/src/wiring/execution_routes.rs`: `fgos internal execution <op> --protocol 1`, request on stdin, framed lines on
+  stdout. Ops: `run-unit`, `launch-session` (engine `transport` `launchSessionAttempt`, for `src/session-host/head-start.mjs:135`),
+  `custody`, `verify`, `sweep-attempts`, `cancel`; contract in `packages/execution/contracts/execution-routes/execution-routes.v1.json`.
+- `src/native/execution-door.mjs` (the rest of it): `runUnitInHost(request, {caseAdmission, onUnitRunCreated, onCaseAdmitted})`,
+  `launchSessionInHost(request)` and `executionOp(op, payload)`; asynchronous spawn (never `spawnSync`), host through
+  `src/util/host-bin-path.mjs`, protocol check `host-version-mismatch`; on child exit without `settle` it settles nothing and returns
+  `{ unsettled: { reservationId } }` (P16). Callers switch in phase 20.
+- `apps/fgos/src/wiring/attempt_step.rs` + `packages/run-supervisor/rust/src/attempt_step.rs`: the step runner calls the host route
+  with the engine's steps; Node `attempt-step.mjs` and `steps/*` lose their supervisor caller (deleted in phase 20, except
+  `steps/cleanup-trust.mjs`, which Node dispatch imports until phase 21).
+- Error classes: the Rust door must not surface engine port-raised classes (`git-error`, `case-admission-port-failed`) where Node's
+  `fanout-batch.mjs:158,181` copies `errorClass || 'error'`; map them to `'error'` as Node did. The run-unit rethrow satisfies
+  `instanceof RunnerConfigError` (`CaseAdmissionRefusedError` extends it).
+- Windows lease decision, with evidence (LockFileEx across handle inheritance, native Windows CI): Rust holder endpoint
+  (`cwdLeaseOwner`) versus custody recording on the supervisor side. Until decided, the Rust route refuses Windows
+  `--writes` runs by name and Windows stays on the Node launch route.
+- Pre-land proof (OPC): the first binary linking `fgos-execution-engine` builds natively on windows-msvc and macOS;
+  `.github/workflows/release-assets-check.yml` gains a macOS job (or uses the platform-probe macOS matrix).
+- SECRETARY-CAPS P8 edits `head_client.rs` in run-supervisor and one call each in `apps/fgos/src/wiring/{questions,
+  session_rotation_hook,supervision}.rs`: rebase onto it before editing the supervisor `attempt_step.rs` or the wiring files.
+- Doors, same change: the row "no Node from the native packaging verbs" gains `apps/fgos/src/wiring/run.rs` as an allowed path
+  with its reason (starts the admission peer through `legacy_exec`).
+- Routes: `run` native; regenerate. Delete the `run` arm in `bin/fgos.mjs` and its registry `legacy` handling; Node
+  `run-request.mjs` stays only while a Node caller remains (Workflow `case-start.mjs` uses `planFromFlags`).
+- Tests: `cli_tests.rs` wiring cases (argv to request and envelope paths only; outcomes are owned by `unit_run.rs`): prompt
+  read-only with a failing `node` on `PATH`, `--writes --worktree` (peer started), `--unit`, `--case --activity`, a confined
+  worker's writing run refused before admission; one case per internal op. `test/cli/run-verb.test.mjs` cut to its one wiring
+  proof or deleted, its behaviours owned by their Rust proofs.
+
+## Footprint
+
+`apps/fgos/src/wiring/run.rs`, `execution_routes.rs`, `attempt_step.rs`, `apps/fgos/src/main.rs`, `routing.rs`,
+`cli_projector.rs`, `apps/fgos/tests/cli_tests.rs`, `packages/host-runtime/rust/src/catalog.rs`,
+`packages/run-supervisor/rust/src/attempt_step.rs`, `packages/execution/contracts/execution-routes/**`,
+`src/cli/command-registry.mjs`, `bin/fgos.mjs`, `test/cli/run-verb.test.mjs`, `test/rust-host/**`,
+`.github/workflows/release-assets-check.yml`. `src/native/execution-door.mjs` and `docs/architecture-manifest.json` are edited
+here too (serial after 19, which owns them in the plan table); the `mod` lines in `apps/fgos/src/wiring/mod.rs` are a one-line
+serial edit after 19b.
+
+## Steps
+
+1. Re-sync from main; report table.
+2. Red: cli cases; parity table `run` (integration only); `execution-door.mjs` wiring test additions.
+3. Wire verb, peer start, internal routes, attempt-step route; flip route.
+4. Delete the Node arm; retire tests; doors edit; gates.
+
+## Validation
+
+`cargo test -p fgos --test cli_tests run`; `cargo test -p fgos-run-supervisor`; parity; `node scripts/run-tests.mjs
+test/rust-host/command-routes.test.mjs test/rust-host/internal-routes.test.mjs test/architecture.test.mjs`; route `run` native;
+macOS and windows-msvc build of the engine-linking binary green.
+
+## Risk and rollback
+
+Risk: the hook-enforced dispatch flow (`fgos run` from agents) breaks for every project at once. Parity on prompt, unit and
+writes shapes; landing precondition nothing in flight; phase 22 canary. Risk: Node missing makes every `--writes` run fail (it
+needs Node today through the legacy arm). Rollback: revert the phase (Node arm returns).
