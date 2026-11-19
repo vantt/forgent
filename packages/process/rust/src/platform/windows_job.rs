@@ -576,7 +576,8 @@ mod os {
             Err(err) => Err(err),
         };
         match thread {
-            Ok(thread) => assign_and_resume_handles(job, process, thread.0),
+            // SAFETY: `process` is the caller's open handle and `thread` was opened just above.
+            Ok(thread) => unsafe { assign_and_resume_handles(job, process, thread.0) },
             Err(err) => {
                 // SAFETY: terminating the child this handle names.
                 unsafe {
@@ -590,7 +591,15 @@ mod os {
     /// [`assign_and_resume`] for a process whose process and main-thread
     /// handles the caller already holds (the thread needs suspend/resume rights,
     /// as the handle `CreateProcessW` returns has).
-    pub fn assign_and_resume_handles(job: &Job, process: HANDLE, thread: HANDLE) -> io::Result<()> {
+    ///
+    /// # Safety
+    /// `process` and `thread` must be open handles of one suspended process and its main thread, valid for the
+    /// whole call.
+    pub unsafe fn assign_and_resume_handles(
+        job: &Job,
+        process: HANDLE,
+        thread: HANDLE,
+    ) -> io::Result<()> {
         let result = (|| {
             // SAFETY: both handles are open.
             if unsafe { AssignProcessToJobObject(job.0 .0, process) } == 0 {
@@ -852,14 +861,12 @@ mod os {
                             .members
                             .iter()
                             .for_each(|(pid, _)| named.entry(*pid).or_default().in_tree = true);
-                        if job.is_none() {
-                            if self.orphan_window.is_open(std::time::Instant::now()) {
-                                orphans_since(&procs, holder, keeper, record.declared_at, &found)
-                                    .into_iter()
-                                    .for_each(|(pid, _)| {
-                                        named.entry(pid).or_default().in_orphan = true
-                                    });
-                            }
+                        if job.is_none() && self.orphan_window.is_open(std::time::Instant::now()) {
+                            orphans_since(&procs, holder, keeper, record.declared_at, &found)
+                                .into_iter()
+                                .for_each(|(pid, _)| {
+                                    named.entry(pid).or_default().in_orphan = true
+                                });
                         }
                         unopenable.extend(found.unopenable);
                     }
