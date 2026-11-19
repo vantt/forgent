@@ -37,8 +37,8 @@ pub use copy::{copy_credential_files, CopyOptions};
 pub use files::Code;
 pub use layout::{Entry, Layout, CODEX_REFRESH_INTERVAL_MS};
 pub use ports::{
-    AccountLockGuard, AccountLocks, AccountsLocks, AccountsProbe, CredentialProbe, LockBusy,
-    NoLocks, NoSqlite, ProbeRequest, ProbeRun, SqliteAdapter,
+    AccountLockGuard, AccountLocks, AccountsLocks, AccountsProbe, CredentialProbe, LiveSeatHomes,
+    LockBusy, NoLiveSeatHomes, NoLocks, NoSqlite, ProbeRequest, ProbeRun, SqliteAdapter,
 };
 pub use renew::{refresh_ahead, RefreshOptions, RefreshOutcome, RefreshRequest};
 pub use store::{

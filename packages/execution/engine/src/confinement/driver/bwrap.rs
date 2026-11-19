@@ -6,13 +6,13 @@
 //! guarantee; the one narrow exception is provisioning a selected account's login files into a private home, which
 //! grants nothing away and is not a confinement control. Inherited file descriptors are closed inside the sandbox.
 
-use super::attestation::{assert_store_isolated, hex};
+use super::attestation::assert_store_isolated;
 use super::contract::{Assessment, BackendDriver, Mismatch, Prepared};
 use super::ports::{Credentials, EnvFn, PrivateHomeHost, ResourceResolver};
 use super::{js, DriverError, ErrorKind};
 use fgos_canonical_json::canonical_json;
+use fgos_execution::handoff::sha256_hex;
 use serde_json::{json, Map, Value};
-use sha2::{Digest, Sha256};
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
@@ -303,7 +303,7 @@ pub fn launch_digest(
 ) -> String {
     let value = json!({ "bwrapPrefix": bwrap_prefix, "gateCommand": gate_command, "agentArgv": agent_argv });
     let text = canonical_json(&value).expect("argv strings are finite JSON");
-    format!("sha256:{}", hex(&Sha256::digest(text.as_bytes())))
+    format!("sha256:{}", sha256_hex(text.as_bytes()))
 }
 
 /// The local bwrap driver: its ports are the resource resolver (confinement policy), the private-home records

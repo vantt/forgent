@@ -233,13 +233,24 @@ runner:
     # @fgos:doc The tier, executors and account pool one persona prefers. Only a persona may name a pool; a role entry refuses the key by name.
     # @fgos:why [74bda49f-655f-46ea-b76a-7a230bb878a6] owner 2026-11-19 15:24: heads on claude until 1045 closes (same invocation as the secretary head)
     supervisor:
+      # @fgos:doc One tier of the model ladder. Values: nano | mini | standard | advanced | flagship | frontier.
       tier: standard
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider.
       prefer:
         - executor: claude
           invocation: claude-herdr-bypass-bwrap
     # @fgos:doc The tier, executors and account pool one persona prefers. Only a persona may name a pool; a role entry refuses the key by name.
     # @fgos:why [74bda49f-655f-46ea-b76a-7a230bb878a6] owner 2026-11-19 15:24: heads on claude until 1045 closes (same invocation as the secretary head)
     lead:
+      # @fgos:doc One tier of the model ladder. Values: nano | mini | standard | advanced | flagship | frontier.
+      tier: standard
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider.
+      prefer:
+        - executor: claude
+          invocation: claude-herdr-bypass-bwrap
+    # @fgos:doc The tier, executors and account pool one persona prefers. Only a persona may name a pool; a role entry refuses the key by name.
+    # @fgos:why [74bda49f-655f-46ea-b76a-7a230bb878a6] owner 2026-11-19 15:24: heads on claude until 1045 closes (planner too, supervisor 2026-11-19)
+    planner:
       tier: standard
       prefer:
         - executor: claude

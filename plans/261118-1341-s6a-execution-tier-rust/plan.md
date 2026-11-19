@@ -12,7 +12,75 @@ footprint:
   - Cargo.toml
   - Cargo.lock
   - packages/execution/**
-  - packages/run-supervisor/**
+  - packages/run-supervisor/contracts/adopting.v1.json
+  - packages/run-supervisor/contracts/attempt-intent.v1.json
+  - packages/run-supervisor/contracts/cancel-requested.v1.json
+  - packages/run-supervisor/contracts/closed.v1.json
+  - packages/run-supervisor/contracts/envelope.v3.json
+  - packages/run-supervisor/contracts/gate-exit.v1.json
+  - packages/run-supervisor/contracts/gate-go.v1.json
+  - packages/run-supervisor/contracts/home-marker.v2.json
+  - packages/run-supervisor/contracts/internal-route.run-supervisor.v1.json
+  - packages/run-supervisor/contracts/receipt.v1.json
+  - packages/run-supervisor/contracts/recover-actions.v1.json
+  - packages/run-supervisor/contracts/step-receipt.v1.json
+  - packages/run-supervisor/contracts/stop-requested.v1.json
+  - packages/run-supervisor/contracts/supervisor-binding.v1.json
+  - packages/run-supervisor/contracts/unit-state.v1.json
+  - packages/run-supervisor/contracts/worker-env-allowlist.v1.json
+  - packages/run-supervisor/contracts/controller/**
+  - packages/run-supervisor/contracts/vectors/**
+  - packages/run-supervisor/rust/Cargo.toml
+  - packages/run-supervisor/rust/examples/gate_agent.rs
+  - packages/run-supervisor/rust/examples/gate_harness.rs
+  - packages/run-supervisor/rust/src/adopt.rs
+  - packages/run-supervisor/rust/src/attempt_step.rs
+  - packages/run-supervisor/rust/src/envelope.rs
+  - packages/run-supervisor/rust/src/gate.rs
+  - packages/run-supervisor/rust/src/go_channel.rs
+  - packages/run-supervisor/rust/src/go_pipe.rs
+  - packages/run-supervisor/rust/src/head_client.rs
+  - packages/run-supervisor/rust/src/lanes.rs
+  - packages/run-supervisor/rust/src/lib.rs
+  - packages/run-supervisor/rust/src/publish.rs
+  - packages/run-supervisor/rust/src/steps.rs
+  - packages/run-supervisor/rust/src/supervise.rs
+  - packages/run-supervisor/rust/src/terminal_slot.rs
+  - packages/run-supervisor/rust/src/controller/**
+  - packages/run-supervisor/rust/src/gate/**
+  - packages/run-supervisor/rust/src/supervise/unix.rs
+  - packages/run-supervisor/rust/src/supervise/windows.rs
+  - packages/run-supervisor/rust/tests/adopt_concurrency.rs
+  - packages/run-supervisor/rust/tests/adopt_matrix.rs
+  - packages/run-supervisor/rust/tests/adopt_scan_perf.rs
+  - packages/run-supervisor/rust/tests/controller_cancel.rs
+  - packages/run-supervisor/rust/tests/controller_config.rs
+  - packages/run-supervisor/rust/tests/controller_cwd_lock.rs
+  - packages/run-supervisor/rust/tests/controller_launch.rs
+  - packages/run-supervisor/rust/tests/controller_lease.rs
+  - packages/run-supervisor/rust/tests/controller_runtime_dir.rs
+  - packages/run-supervisor/rust/tests/controller_sweep.rs
+  - packages/run-supervisor/rust/tests/controller_trust_store.rs
+  - packages/run-supervisor/rust/tests/envelope_digest_vectors.rs
+  - packages/run-supervisor/rust/tests/gate_ceiling.rs
+  - packages/run-supervisor/rust/tests/gate_go.rs
+  - packages/run-supervisor/rust/tests/gate_orphan.rs
+  - packages/run-supervisor/rust/tests/gate_pid1.rs
+  - packages/run-supervisor/rust/tests/gate_portable.rs
+  - packages/run-supervisor/rust/tests/gate_terminal_socket.rs
+  - packages/run-supervisor/rust/tests/lanes.rs
+  - packages/run-supervisor/rust/tests/release_slot_step.rs
+  - packages/run-supervisor/rust/tests/steps_portable.rs
+  - packages/run-supervisor/rust/tests/steps_runner.rs
+  - packages/run-supervisor/rust/tests/supervise_crash.rs
+  - packages/run-supervisor/rust/tests/supervise_guard.rs
+  - packages/run-supervisor/rust/tests/supervise_lifecycle.rs
+  - packages/run-supervisor/rust/tests/supervise_portable.rs
+  - packages/run-supervisor/rust/tests/supervise_terminal_fake_herdr.rs
+  - packages/run-supervisor/rust/tests/unix_lease_record.rs
+  - packages/run-supervisor/rust/tests/fixtures/**
+  - packages/run-supervisor/rust/tests/portable/**
+  - packages/run-supervisor/rust/tests/support/**
   - packages/holder-lock/rust/src/port.rs
   - packages/process/rust/src/facts.rs
   - packages/process/rust/src/platform/linux.rs
@@ -21,7 +89,78 @@ footprint:
   - packages/host-runtime/**
   - packages/distribution/contracts/doctor-registry.v1.json
   - packages/git/contracts/mutation-census.v1.json
-  - apps/fgos/**
+  - apps/fgos/Cargo.toml
+  - apps/fgos/observe-kinds.json
+  - apps/fgos/examples/**
+  - apps/fgos/src/cli_presenter.rs
+  - apps/fgos/src/cli_projector.rs
+  - apps/fgos/src/help.rs
+  - apps/fgos/src/invocation_doors.rs
+  - apps/fgos/src/legacy_exec.rs
+  - apps/fgos/src/main.rs
+  - apps/fgos/src/routing.rs
+  - apps/fgos/src/wiring/agents.rs
+  - apps/fgos/src/wiring/dispatch_decide.rs
+  - apps/fgos/src/wiring/event_store_clone.rs
+  - apps/fgos/src/wiring/events.rs
+  - apps/fgos/src/wiring/gateway_control.rs
+  - apps/fgos/src/wiring/git_incidents.rs
+  - apps/fgos/src/wiring/head_questions.rs
+  - apps/fgos/src/wiring/identity_log.rs
+  - apps/fgos/src/wiring/init.rs
+  - apps/fgos/src/wiring/lock_fence.rs
+  - apps/fgos/src/wiring/lock_status.rs
+  - apps/fgos/src/wiring/mailbox_body.rs
+  - apps/fgos/src/wiring/mailbox_config.rs
+  - apps/fgos/src/wiring/mailbox_hook.rs
+  - apps/fgos/src/wiring/mailbox_hook_unsupported.rs
+  - apps/fgos/src/wiring/mailbox_identity.rs
+  - apps/fgos/src/wiring/mailbox_ingest.rs
+  - apps/fgos/src/wiring/mailbox_remote.rs
+  - apps/fgos/src/wiring/mailbox_root.rs
+  - apps/fgos/src/wiring/mailbox_surface.rs
+  - apps/fgos/src/wiring/mailbox_sync.rs
+  - apps/fgos/src/wiring/mailbox_sync_unsupported.rs
+  - apps/fgos/src/wiring/mailbox_verbs.rs
+  - apps/fgos/src/wiring/mailbox_verbs_unsupported.rs
+  - apps/fgos/src/wiring/metrics_sources.rs
+  - apps/fgos/src/wiring/mod.rs
+  - apps/fgos/src/wiring/observe_declarations.rs
+  - apps/fgos/src/wiring/observe_query.rs
+  - apps/fgos/src/wiring/questions.rs
+  - apps/fgos/src/wiring/questions_hook.rs
+  - apps/fgos/src/wiring/questions_hook_unsupported.rs
+  - apps/fgos/src/wiring/resource_check.rs
+  - apps/fgos/src/wiring/run_dirs.rs
+  - apps/fgos/src/wiring/seat_binding.rs
+  - apps/fgos/src/wiring/session_rotation_hook.rs
+  - apps/fgos/src/wiring/session_rotation_hook_unsupported.rs
+  - apps/fgos/src/wiring/supervision.rs
+  - apps/fgos/src/wiring/terminal_tabs.rs
+  - apps/fgos/src/wiring/uninstall.rs
+  - apps/fgos/src/wiring/wire_agents.rs
+  - apps/fgos/src/wiring/worktree.rs
+  - apps/fgos/src/wiring/doctor/**
+  - apps/fgos/src/wiring/observe_sources/**
+  - apps/fgos/tests/attention_definitions.rs
+  - apps/fgos/tests/cli_tests.rs
+  - apps/fgos/tests/driving_definitions.rs
+  - apps/fgos/tests/internal_lock_routes.rs
+  - apps/fgos/tests/mailbox_routes.rs
+  - apps/fgos/tests/mailbox_sync_child.rs
+  - apps/fgos/tests/questions_hook.rs
+  - apps/fgos/tests/questions_verb.rs
+  - apps/fgos/tests/supervision_verbs.rs
+  - apps/fgos/tests/windows_borrow.rs
+  - apps/fgos/tests/windows_doctor_lock_rows.rs
+  - apps/fgos/tests/windows_lock_hold_route.rs
+  - apps/fgos/tests/windows_predecessor_stress.rs
+  - apps/fgos/tests/windows_semantics_probe.rs
+  - apps/fgos/tests/windows_support/**
+  - apps/fgos/src/wiring/run.rs
+  - apps/fgos/src/wiring/execution_routes.rs
+  - apps/fgos/src/wiring/attempt_step.rs
+  - apps/fgos/src/wiring/dispatch_subs.rs
   - src/runner/execution/**
   - src/runner/dispatch/**
   - src/runner/dispatch.mjs
@@ -44,7 +183,6 @@ footprint:
   - src/native/execution-door.mjs
   - src/util/payload-root.mjs
   - src/seat-binding/client.mjs
-  - src/session-host/head-start.mjs
   - src/session-host/head-request.mjs
   - src/session-host/head-stop.mjs
   - src/runner/agent-roster.mjs
@@ -54,9 +192,7 @@ footprint:
   - src/event-store/consumers.mjs
   - src/session-rotation/rotate.mjs
   - src/report/capability-plan-lint.mjs
-  - src/cli/command-registry.mjs
   - src/cli/verb-exit.mjs
-  - bin/fgos.mjs
   - bin/fgos-runner.mjs
   - scripts/run-tests.mjs
   - scripts/run-rust-dev-host.mjs
@@ -64,11 +200,122 @@ footprint:
   - scripts/record-mailbox-hook-fixtures.mjs
   - scripts/lib/test-file-watchdog.mjs
   - scripts/lib/mailbox-live-confined.mjs
-  - test/**
+  - test/architecture.test.mjs
+  - test/install-packaging.test.mjs
+  - test/smoke.test.mjs
+  - test/suite-baseline.json
+  - test/test-ownership-mutants.mjs
+  - test/test-ownership.mjs
+  - test/cli/command-registry.test.mjs
+  - test/cli/dir-differs-from-cwd.test.mjs
+  - test/cli/dispatch-inspect.test.mjs
+  - test/cli/dispatch-operability.test.mjs
+  - test/cli/dispatch-reconcile.test.mjs
+  - test/cli/dispatch-retired-doors.test.mjs
+  - test/cli/execution-outcome-exit-codes.test.mjs
+  - test/cli/exit-code-table.test.mjs
+  - test/cli/fgos-approve.test.mjs
+  - test/cli/fgos-case-doors.test.mjs
+  - test/cli/fgos-claim-2.test.mjs
+  - test/cli/fgos-claim.test.mjs
+  - test/cli/fgos-decision-kind.test.mjs
+  - test/cli/fgos-decision.test.mjs
+  - test/cli/fgos-disconnected-worktree-guard.test.mjs
+  - test/cli/fgos-edit.test.mjs
+  - test/cli/fgos-gate-approve.test.mjs
+  - test/cli/fgos-handoff.test.mjs
+  - test/cli/fgos-intake-2.test.mjs
+  - test/cli/fgos-intake-3.test.mjs
+  - test/cli/fgos-intake-4.test.mjs
+  - test/cli/fgos-intake-5.test.mjs
+  - test/cli/fgos-intake-6.test.mjs
+  - test/cli/fgos-intake-7.test.mjs
+  - test/cli/fgos-intake.test.mjs
+  - test/cli/fgos-iron-law-gate.test.mjs
+  - test/cli/fgos-lock-fence.test.mjs
+  - test/cli/fgos-manifest.test.mjs
+  - test/cli/fgos-merge-next-idle-turn.test.mjs
+  - test/cli/fgos-merge-next-no-config-write.test.mjs
+  - test/cli/fgos-merge.test.mjs
+  - test/cli/fgos-move.test.mjs
+  - test/cli/fgos-post-merge-2.test.mjs
+  - test/cli/fgos-post-merge-3.test.mjs
+  - test/cli/fgos-post-merge-4.test.mjs
+  - test/cli/fgos-post-merge.test.mjs
+  - test/cli/fgos-read-2.test.mjs
+  - test/cli/fgos-read-3.test.mjs
+  - test/cli/fgos-read-4.test.mjs
+  - test/cli/fgos-read-5.test.mjs
+  - test/cli/fgos-read.test.mjs
+  - test/cli/fgos-return-quoted-paths.test.mjs
+  - test/cli/fgos-return.test.mjs
+  - test/cli/fgos-review-pr-precedence.test.mjs
+  - test/cli/fgos-setup.test.mjs
+  - test/cli/fgos-stage-2.test.mjs
+  - test/cli/fgos-stage-3.test.mjs
+  - test/cli/fgos-stage.test.mjs
+  - test/cli/fgos-stale-orphaned-runs.test.mjs
+  - test/cli/fgos-workflow-propose.test.mjs
+  - test/cli/fgos-workflow.test.mjs
+  - test/cli/first-run-guide.test.mjs
+  - test/cli/knowledge-attest-gate.test.mjs
+  - test/cli/knowledge-deprecation.test.mjs
+  - test/cli/knowledge-verbs.test.mjs
+  - test/cli/parse-args-vectors.test.mjs
+  - test/cli/plan-lint.test.mjs
+  - test/cli/run-verb.test.mjs
+  - test/cli/subcommand-flag-drift.test.mjs
+  - test/cli/take-pick-claim-eligibility.test.mjs
+  - test/cli/unknown-flag-rejection.test.mjs
+  - test/cli/verb-exit.test.mjs
+  - test/cli/helpers/**
+  - test/config/**
+  - test/convention/**
+  - test/direct/**
+  - test/distribution/**
+  - test/docs/**
+  - test/e2e/**
+  - test/event-store/**
+  - test/evolve/**
+  - test/fixtures/**
+  - test/git/**
+  - test/githooks/**
+  - test/golden-recorders/**
+  - test/helpers/**
+  - test/holder-lock/windows-borrow.test.mjs
+  - test/holder-lock/driver-unavailable.test.mjs
+  - test/identity/**
+  - test/install/**
+  - test/intake/**
+  - test/live/**
+  - test/observe/**
+  - test/parity/**
+  - test/plugins/**
+  - test/portfolio/**
+  - test/process/**
+  - test/report/**
+  - test/run-supervisor/**
+  - test/runner/**
+  - test/rust-host/**
+  - test/scripts/**
+  - test/seat-binding/**
+  - test/session-host/client.test.mjs
+  - test/session-host/group-queue.test.mjs
+  - test/session-host/head-permission-mode.test.mjs
+  - test/session-host/head-plan.test.mjs
+  - test/session-host/head-stop.test.mjs
+  - test/session-identity/**
+  - test/session-rotation/**
+  - test/setup/**
+  - test/skills/**
+  - test/state/**
+  - test/terminal-control/**
+  - test/util/**
+  - test/verbs/**
+  - test/workflow/**
   - docs/architecture-manifest.json
   - docs/platform/runner/**
   - docs/platform/run-supervisor/spec.md
-  - docs/platform/agent-confinement/spec.md
   - docs/platform/component-boundary.md
   - docs/reading-map.md
   - docs/backlog.md
@@ -198,10 +445,10 @@ Missing and built: a Rust unit runner, the admission peer protocol, the Executio
 | 16b | [Assignment runner](phase-16b-assignment-runner-core.md) | 7b, 8b, 10, 11, 11b, 13b, 14, 16 | packages/execution/engine/src/assignment_runner/**, packages/execution/engine/tests/assignment_runner.rs, packages/execution/contracts/assignment-runner/**, test/golden-recorders/assignment-runner.recorder.mjs | 6 | draft |
 | 17 | [Doctor rows: executor, accounts, run supervisor, terminal](phase-17-doctor-execution.md) | 5, 9, 10, 11, 11b, 13b, 15 | apps/fgos/src/wiring/doctor/**, packages/distribution/contracts/doctor-registry.v1.json, src/setup/**, src/runner/agent-definitions.mjs, src/runner/agent-listing.mjs, test/seat-binding/route-doctor-check.test.mjs, test/runner/provider-pool-lease.test.mjs, test/runner/operation-prompt-templates.test.mjs, test/setup/**, test/rust-host/parity-cases/**, docs/architecture-manifest.json | 6 | draft |
 | 18 | [Unit run core and admission peer](phase-18-unit-run-core.md) | 6b, 6c, 16b | packages/execution/engine/src/unit_run/**, packages/execution/engine/tests/unit_run.rs, packages/execution/contracts/unit-run/**, packages/execution/contracts/admission-peer/**, test/golden-recorders/unit-run.recorder.mjs | 7 | draft |
-| 19 | [`fgos run` native, internal execution routes, admission peer](phase-19-run-native.md) | 18 | apps/fgos/src/wiring/run.rs, apps/fgos/src/wiring/execution_routes.rs, apps/fgos/src/wiring/attempt_step.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/wiring/doctor/bridge.rs, apps/fgos/src/legacy_exec.rs, apps/fgos/src/main.rs, apps/fgos/src/routing.rs, apps/fgos/src/cli_projector.rs, apps/fgos/Cargo.toml, apps/fgos/tests/cli_tests.rs, packages/host-runtime/rust/src/catalog.rs, packages/run-supervisor/rust/src/attempt_step.rs, packages/execution/contracts/execution-routes/**, src/cli/command-registry.mjs, bin/fgos.mjs, src/native/execution-door.mjs, src/runner/dispatch/runner-config-error.mjs, src/runner/execution/case-admission-port.mjs, src/workflow/admission-peer.mjs, test/native/execution-door.test.mjs, test/cli/run-verb.test.mjs, test/rust-host/**, docs/architecture-manifest.json | 8 | draft |
-| 20 | [Node consumer seam; Execution Core Node deleted (23 files without a Node dispatch importer)](phase-20-node-seam.md) | 17, 19 | src/workflow/**, src/runner/execution/account-pin.mjs, src/runner/execution/case-admission-port.mjs, src/runner/execution/case-run-paths.mjs, src/runner/execution/commit-unit-work.mjs, src/runner/execution/custody-door.mjs, src/runner/execution/dry-bind.mjs, src/runner/execution/handoff-refs.mjs, src/runner/execution/loops/history-outcome.mjs, src/runner/execution/partial-writes.mjs, src/runner/execution/patterns/catalog-entries.mjs, src/runner/execution/patterns/catalog.mjs, src/runner/execution/run.mjs, src/runner/execution/run-request.mjs, src/runner/execution/unit.mjs, src/runner/execution/unit-run-record.mjs, src/runner/execution/unit-run-start.mjs, src/runner/execution/unit-summary.mjs, src/runner/execution/unit-sync.mjs, src/run-supervisor/attempt-step.mjs, src/run-supervisor/cancel-opt-in.mjs, src/run-supervisor/steps/finalize-home.mjs, src/run-supervisor/steps/settle-attempt.mjs, src/run-supervisor/step-support.mjs, src/runner/dispatch/**, src/runner/loop.mjs, src/runner/operation-choice.mjs, src/runner/work-dispatch.mjs, src/runner/fanout-batch.mjs, src/runner/work-compat.mjs, src/runner/operation-capability.mjs, src/runner/agent-definitions.mjs, src/session-host/head-start.mjs, src/session-host/head-request.mjs, src/session-host/head-stop.mjs, src/verbs/state/read.mjs, src/session-rotation/rotate.mjs, src/report/capability-plan-lint.mjs, src/cli/verb-exit.mjs, src/seat-binding/client.mjs, src/setup/**, src/native/execution-door.mjs, src/native/door.mjs, bin/fgos.mjs, bin/fgos-runner.mjs, src/verbs/dispatch/show-run.mjs, src/verbs/dispatch/recover.mjs, scripts/git/e3-bench.mjs, scripts/lib/mailbox-live-confined.mjs, scripts/backfill-unit-summaries.mjs, scripts/record-mailbox-hook-fixtures.mjs, packages/git/node-addon/**, test/golden-recorders/**, test/workflow/**, test/runner/**, test/run-supervisor/attempt-steps.test.mjs, test/helpers/**, test/session-host/**, test/setup/**, test/native/**, test/convention/seat-id.test.mjs, test/portfolio/work-questions.test.mjs, test/seat-binding/client.test.mjs, docs/architecture-manifest.json | 9 | draft |
-| 21 | [Dispatch subs native; Dispatch Node and the rest of Execution Core Node deleted](phase-21-dispatch-subs.md) | 11b, 20 | apps/fgos/src/wiring/dispatch_subs.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/main.rs, apps/fgos/src/routing.rs, apps/fgos/src/cli_projector.rs, apps/fgos/tests/cli_tests.rs, packages/host-runtime/rust/src/catalog.rs, src/cli/command-registry.mjs, bin/fgos.mjs, src/verbs/dispatch/**, src/runner/dispatch/**, src/runner/dispatch.mjs, src/runner/execution/**, src/run-supervisor/**, src/runner/agent-roster.mjs, src/report/authoritative-match.mjs, scripts/check-decision-citation-drift.baseline.json, test/golden-recorders/**, test/run-supervisor/**, test/helpers/**, test/scripts/write-wrapper-script.test.mjs, test/cli/**, test/runner/**, test/verbs/**, test/config/facade.test.mjs, test/holder-lock/windows-borrow.test.mjs, test/holder-lock/driver-unavailable.test.mjs, test/live/mailbox-wake-probe.live.mjs, test/seat-binding/client.test.mjs, test/session-identity/attempt-writer-id.test.mjs, test/state/work-size-rigor.test.mjs, test/util/session-identity.test.mjs, test/git/write-scope-parity.test.mjs, test/rust-host/**, docs/architecture-manifest.json | 10 | draft |
-| 22 | [Close: doors, docs, canary, integration gate](phase-22-close.md) | 0, 2, 3, 5, 6, 6b, 6c, 7, 7b, 8, 8b, 9, 10, 11, 11b, 12, 13, 13b, 14, 15, 16, 16b, 17, 18, 19, 20, 21 | docs/architecture-manifest.json, test/architecture.test.mjs, test/rust-host/verb-parity.test.mjs, test/rust-host/parity-cases/**, test/golden-recorders/**, docs/platform/runner/**, docs/platform/run-supervisor/spec.md, docs/platform/agent-confinement/spec.md, docs/platform/component-boundary.md, docs/reading-map.md, docs/backlog.md, CHANGELOG.md, plans/261118-1341-s6a-execution-tier-rust/reports/** | 11 | draft |
+| 19 | [`fgos run` native, internal execution routes, admission peer](phase-19-run-native.md) | 18 | apps/fgos/src/wiring/run.rs, apps/fgos/src/wiring/execution_routes.rs, apps/fgos/src/wiring/attempt_step.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/wiring/doctor/bridge.rs, apps/fgos/src/legacy_exec.rs, apps/fgos/src/main.rs, apps/fgos/src/routing.rs, apps/fgos/src/cli_projector.rs, apps/fgos/Cargo.toml, apps/fgos/tests/cli_tests.rs, packages/host-runtime/rust/src/catalog.rs, packages/run-supervisor/rust/src/attempt_step.rs, packages/execution/contracts/execution-routes/**, src/native/execution-door.mjs, src/runner/dispatch/runner-config-error.mjs, src/runner/execution/case-admission-port.mjs, src/workflow/admission-peer.mjs, test/native/execution-door.test.mjs, test/cli/run-verb.test.mjs, test/rust-host/**, docs/architecture-manifest.json | 8 | draft |
+| 20 | [Node consumer seam; Execution Core Node deleted (23 files without a Node dispatch importer)](phase-20-node-seam.md) | 17, 19 | src/workflow/**, src/runner/execution/account-pin.mjs, src/runner/execution/case-admission-port.mjs, src/runner/execution/case-run-paths.mjs, src/runner/execution/commit-unit-work.mjs, src/runner/execution/custody-door.mjs, src/runner/execution/dry-bind.mjs, src/runner/execution/handoff-refs.mjs, src/runner/execution/loops/history-outcome.mjs, src/runner/execution/partial-writes.mjs, src/runner/execution/patterns/catalog-entries.mjs, src/runner/execution/patterns/catalog.mjs, src/runner/execution/run.mjs, src/runner/execution/run-request.mjs, src/runner/execution/unit.mjs, src/runner/execution/unit-run-record.mjs, src/runner/execution/unit-run-start.mjs, src/runner/execution/unit-summary.mjs, src/runner/execution/unit-sync.mjs, src/run-supervisor/attempt-step.mjs, src/run-supervisor/cancel-opt-in.mjs, src/run-supervisor/steps/finalize-home.mjs, src/run-supervisor/steps/settle-attempt.mjs, src/run-supervisor/step-support.mjs, src/runner/dispatch/**, src/runner/loop.mjs, src/runner/operation-choice.mjs, src/runner/work-dispatch.mjs, src/runner/fanout-batch.mjs, src/runner/work-compat.mjs, src/runner/operation-capability.mjs, src/runner/agent-definitions.mjs, src/session-host/head-request.mjs, src/session-host/head-stop.mjs, src/verbs/state/read.mjs, src/session-rotation/rotate.mjs, src/report/capability-plan-lint.mjs, src/cli/verb-exit.mjs, src/seat-binding/client.mjs, src/setup/**, src/native/execution-door.mjs, src/native/door.mjs, bin/fgos-runner.mjs, src/verbs/dispatch/show-run.mjs, src/verbs/dispatch/recover.mjs, scripts/git/e3-bench.mjs, scripts/lib/mailbox-live-confined.mjs, scripts/backfill-unit-summaries.mjs, scripts/record-mailbox-hook-fixtures.mjs, packages/git/node-addon/**, test/golden-recorders/**, test/workflow/**, test/runner/**, test/run-supervisor/attempt-steps.test.mjs, test/helpers/**, test/session-host/client.test.mjs, test/session-host/group-queue.test.mjs, test/session-host/head-permission-mode.test.mjs, test/session-host/head-plan.test.mjs, test/session-host/head-stop.test.mjs, test/setup/**, test/native/**, test/convention/seat-id.test.mjs, test/portfolio/work-questions.test.mjs, test/seat-binding/client.test.mjs, docs/architecture-manifest.json | 9 | draft |
+| 21 | [Dispatch subs native; Dispatch Node and the rest of Execution Core Node deleted](phase-21-dispatch-subs.md) | 11b, 20 | apps/fgos/src/wiring/dispatch_subs.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/main.rs, apps/fgos/src/routing.rs, apps/fgos/src/cli_projector.rs, apps/fgos/tests/cli_tests.rs, packages/host-runtime/rust/src/catalog.rs, src/verbs/dispatch/**, src/runner/dispatch/**, src/runner/dispatch.mjs, src/runner/execution/**, src/run-supervisor/**, src/runner/agent-roster.mjs, src/report/authoritative-match.mjs, scripts/check-decision-citation-drift.baseline.json, test/golden-recorders/**, test/run-supervisor/**, test/helpers/**, test/scripts/write-wrapper-script.test.mjs, test/cli/command-registry.test.mjs, test/cli/dir-differs-from-cwd.test.mjs, test/cli/dispatch-inspect.test.mjs, test/cli/dispatch-operability.test.mjs, test/cli/dispatch-reconcile.test.mjs, test/cli/dispatch-retired-doors.test.mjs, test/cli/execution-outcome-exit-codes.test.mjs, test/cli/exit-code-table.test.mjs, test/cli/fgos-approve.test.mjs, test/cli/fgos-case-doors.test.mjs, test/cli/fgos-claim-2.test.mjs, test/cli/fgos-claim.test.mjs, test/cli/fgos-decision-kind.test.mjs, test/cli/fgos-decision.test.mjs, test/cli/fgos-disconnected-worktree-guard.test.mjs, test/cli/fgos-edit.test.mjs, test/cli/fgos-gate-approve.test.mjs, test/cli/fgos-handoff.test.mjs, test/cli/fgos-intake-2.test.mjs, test/cli/fgos-intake-3.test.mjs, test/cli/fgos-intake-4.test.mjs, test/cli/fgos-intake-5.test.mjs, test/cli/fgos-intake-6.test.mjs, test/cli/fgos-intake-7.test.mjs, test/cli/fgos-intake.test.mjs, test/cli/fgos-iron-law-gate.test.mjs, test/cli/fgos-lock-fence.test.mjs, test/cli/fgos-manifest.test.mjs, test/cli/fgos-merge-next-idle-turn.test.mjs, test/cli/fgos-merge-next-no-config-write.test.mjs, test/cli/fgos-merge.test.mjs, test/cli/fgos-move.test.mjs, test/cli/fgos-post-merge-2.test.mjs, test/cli/fgos-post-merge-3.test.mjs, test/cli/fgos-post-merge-4.test.mjs, test/cli/fgos-post-merge.test.mjs, test/cli/fgos-read-2.test.mjs, test/cli/fgos-read-3.test.mjs, test/cli/fgos-read-4.test.mjs, test/cli/fgos-read-5.test.mjs, test/cli/fgos-read.test.mjs, test/cli/fgos-return-quoted-paths.test.mjs, test/cli/fgos-return.test.mjs, test/cli/fgos-review-pr-precedence.test.mjs, test/cli/fgos-setup.test.mjs, test/cli/fgos-stage-2.test.mjs, test/cli/fgos-stage-3.test.mjs, test/cli/fgos-stage.test.mjs, test/cli/fgos-stale-orphaned-runs.test.mjs, test/cli/fgos-workflow-propose.test.mjs, test/cli/fgos-workflow.test.mjs, test/cli/first-run-guide.test.mjs, test/cli/knowledge-attest-gate.test.mjs, test/cli/knowledge-deprecation.test.mjs, test/cli/knowledge-verbs.test.mjs, test/cli/parse-args-vectors.test.mjs, test/cli/plan-lint.test.mjs, test/cli/run-verb.test.mjs, test/cli/subcommand-flag-drift.test.mjs, test/cli/take-pick-claim-eligibility.test.mjs, test/cli/unknown-flag-rejection.test.mjs, test/cli/verb-exit.test.mjs, test/cli/helpers/**, test/runner/**, test/verbs/**, test/config/facade.test.mjs, test/holder-lock/windows-borrow.test.mjs, test/holder-lock/driver-unavailable.test.mjs, test/live/mailbox-wake-probe.live.mjs, test/seat-binding/client.test.mjs, test/session-identity/attempt-writer-id.test.mjs, test/state/work-size-rigor.test.mjs, test/util/session-identity.test.mjs, test/git/write-scope-parity.test.mjs, test/rust-host/**, docs/architecture-manifest.json | 10 | draft |
+| 22 | [Close: doors, docs, canary, integration gate](phase-22-close.md) | 0, 2, 3, 5, 6, 6b, 6c, 7, 7b, 8, 8b, 9, 10, 11, 11b, 12, 13, 13b, 14, 15, 16, 16b, 17, 18, 19, 20, 21 | docs/architecture-manifest.json, test/architecture.test.mjs, test/rust-host/verb-parity.test.mjs, test/rust-host/parity-cases/**, test/golden-recorders/**, docs/platform/runner/**, docs/platform/run-supervisor/spec.md, docs/platform/component-boundary.md, docs/reading-map.md, docs/backlog.md, CHANGELOG.md, plans/261118-1341-s6a-execution-tier-rust/reports/** | 11 | draft |
 
 Effort (lead-days): 0: 2; 2: 1; 3: 0.75; 5: 2.5; 6: 1.5; 6b: 2; 6c: 1.5; 7: 1.5; 7b: 1.5; 8: 1.5; 8b: 1.5; 9: 2;
 10: 2; 11: 1.75; 11b: 1.25; 12: 1.5; 13: 2; 13b: 1.5; 14: 2; 15: 2; 16: 2.25; 16b: 2.5; 17: 2.5; 18: 2.25; 19: 3;
@@ -434,3 +681,6 @@ consumes that decision and keeps `src/seat-binding/client.mjs`.
 - 2026-11-19 lead:S6A: phase 19 must name the PaneScreen adapter (settlement settle_attempt.rs pane-read port, host terminal) in its footprint/steps; phase 14 implements AttemptHomeFinalizer itself over 7b/10.
 - 2026-11-19 lead:S6A: phase 7b gap: finalizeAttemptHome (authority.mjs:1008) was not ported; phase 14 ports it into confinement::request after 8b lands and builds the AttemptHomeFinalizer adapter (8b cleanup helpers + phase 10 write_back_renewed_credential).
 - 2026-11-19 lead:S6A: owner 2026-11-19 15:39 (via Miu): SQLite option (a): rusqlite (bundled) in packages/execution/engine + omp credential-renewal SQLite adapter, before phase 20; no other new crate without a new owner question. Done as follow-up branch s6/p10-sqlite.
+- 2026-11-19 lead:S6A: footprint narrowed to exclude plan 261119-1615 (SECRETARY-CAPS) files (run-supervisor head_request/route/terminal/internal_harness/head-request.v1.json + tests, apps/fgos session_write_publish + questions_head, bin/fgos.mjs, command-registry, head-start, session-verb/head-start/head-request tests); phases 19, 20, 21 re-add them when 19 starts after 1615 lands.
+- 2026-11-19 lead:S6A: docs/platform/agent-confinement/spec.md also leaves the footprint (frontmatter and row 22) while plan 261119-1615 (SECRETARY-CAPS) writes its grant audit; re-added with the others when phase 19 starts.
+- 2026-11-19 lead:S6A: frontmatter test/holder-lock/** narrowed to the two files phase 21 edits (windows-borrow, driver-unavailable); test/holder-lock/registry-contract.test.mjs belongs to plan 261119-1615 P5.

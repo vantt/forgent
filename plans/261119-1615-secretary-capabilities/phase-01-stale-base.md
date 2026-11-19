@@ -20,7 +20,7 @@ CLI `--base` flag (default: blob OID of the on-disk file) and test stubs. It is 
    docs/platform/session-host/spec.md names them.
 6. fgos-secretary skill step 2: record `git hash-object docs/backlog.md` (or `fgos`-equivalent) at copy time and pass it
    as `--base`; on `write-base-stale` re-copy, redo the edit, write again. Rebuild render surfaces (`npm run build:skills`).
-7. CHANGELOG `[Unreleased]` line.
+7. CHANGELOG `[Unreleased]` line: handed to the supervisor (CHANGELOG.md is outside this plan's footprint).
 
 ## Validation
 `cargo test -p fgos-run-supervisor` (crate name per Cargo.toml), `cargo test -p fgos --test session_write_publish`,

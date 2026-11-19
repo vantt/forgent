@@ -51,6 +51,23 @@ pub trait StartSession {
     fn start(&self, persona: &str, name: &str) -> Result<(), String>;
 }
 
+/// Whether a head is between turns. Anything the host cannot tell is `Unknown`, never `Idle`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Activity {
+    Idle,
+    /// Mid-turn, or waiting on a running request ticket.
+    Busy,
+    Unknown,
+}
+
+/// Stops a session. The adapter runs `<host> session stop supervisor --name <name>`, which writes
+/// `retiredAt`; `activity` reads the head's agent status and its request tickets, never screen text.
+pub trait StopSession {
+    fn activity(&self, persona: &str, name: &str) -> Activity;
+    /// `Err` carries the host's code.
+    fn stop(&self, persona: &str, name: &str) -> Result<(), String>;
+}
+
 /// The plans the supervisor could start, over the portfolio reader.
 pub trait Portfolio {
     fn plans(&self) -> Result<Vec<Plan>, String>;
@@ -90,6 +107,7 @@ pub struct Ports<'a> {
     pub project: &'a dyn Project,
     pub identity: &'a dyn Identity,
     pub start: &'a dyn StartSession,
+    pub stop: &'a dyn StopSession,
     pub portfolio: &'a dyn Portfolio,
     pub queue: &'a dyn Drain,
     pub log: &'a dyn WakeLog,
@@ -122,6 +140,19 @@ pub enum WakeOutcome {
     StartFailed(String),
     Backoff,
 }
+
+/// What `stop_stuck` decided about a supervisor that left events unhandled.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum StuckOutcome {
+    /// The idle live supervisor was stopped; the next tick starts a fresh one.
+    Stopped,
+    /// Live but busy or unknown: left alone, the notification already went out.
+    Kept,
+    /// No live supervisor of this project: nothing to stop.
+    NotLive,
+    /// The host's refusal code.
+    Failed(String),
+}
 impl WakeOutcome {
     pub fn as_str(&self) -> &'static str {
         match self {
@@ -149,6 +180,32 @@ pub fn supervisor_role(handle: &str) -> String {
 pub struct Trigger<'a> {
     pub trigger: &'a str,
     pub subject: &'a str,
+}
+
+/// Stop this project's supervisor when it is live and idle yet its queue is not shrinking.
+/// A busy or unknown head is never stopped: an in-progress land must finish.
+pub fn stop_stuck(ports: &Ports, trigger: Trigger) -> StuckOutcome {
+    let Some(project) = ports.project.project() else {
+        return StuckOutcome::NotLive;
+    };
+    match ports.identity.holder(&supervisor_role(&project.handle)) {
+        Holder::Live { project_id } if project_id == project.id => {}
+        _ => return StuckOutcome::NotLive,
+    }
+    let name = supervisor_name(&project.handle);
+    if ports.stop.activity("supervisor", &name) != Activity::Idle {
+        return StuckOutcome::Kept;
+    }
+    if let Err(code) = ports.stop.stop("supervisor", &name) {
+        return StuckOutcome::Failed(code);
+    }
+    ports.telemetry.emit(&WakeSpan {
+        name: "fgos.supervisor.wake",
+        subject: trigger.subject.to_owned(),
+        trigger: trigger.trigger.to_owned(),
+        outcome: "stopped-stuck",
+    });
+    StuckOutcome::Stopped
 }
 
 /// Start the supervisor if there is work for it and none is live.

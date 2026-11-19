@@ -6,8 +6,8 @@ mod common;
 
 use common::{VectorMachine, VectorProbe};
 use fgos_execution::decide::{
-    config_root_for, decide_over, guard_cwd_repo_root, run_door_hint, CrateBinder, DecideAnswer,
-    DecideFailure, DecideRequest, LoadedRunner, Workspace,
+    config_root_for, decide_over, guard_cwd_repo_root, run_door_hint, CheckoutFacts, CrateBinder,
+    DecideAnswer, DecideFailure, DecideRequest, LoadedRunner, Workspace,
 };
 use fgos_execution::executor_model::ModelError;
 use fgos_execution::hook::{
@@ -22,7 +22,7 @@ struct Layout {
     process_in: &'static str,
 }
 
-impl Workspace for Layout {
+impl CheckoutFacts for Layout {
     fn repo_root(&self, dir: &str) -> Result<String, String> {
         match dir {
             "<main>" => Ok("<main>".into()),
@@ -33,6 +33,9 @@ impl Workspace for Layout {
     fn main_checkout_root(&self, dir: &str) -> Option<String> {
         self.repo_root(dir).ok().map(|_| "<main>".into())
     }
+}
+
+impl Workspace for Layout {
     fn process_main_checkout_root(&self) -> Option<String> {
         self.main_checkout_root(self.process_in)
     }

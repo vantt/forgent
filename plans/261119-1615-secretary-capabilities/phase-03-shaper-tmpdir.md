@@ -11,8 +11,8 @@ p-ficygecgfb: `fgos session start shaper` fails `verb-failed (internal)`; there 
    DISCUSSION.md under docs/discussions, parks owner questions in the question store, hands off when settled.
 2. Grant `shaper`: writes `docs/discussions`; verbs `HEAD_VERBS` + `QUESTION_VERBS` (no answer, no session start/write,
    no land); mailbox true; peers false.
-3. `placeHead`/`pinPersona` map `AgentNotFoundError` to `persona-not-found` listing the known personas; add it to
-   `HEAD_ARGUMENT_CODES`. Test in `test/session-host/`.
+3. `placeHead`/`pinPersona` map `AgentNotFoundError` to `persona-not-found` listing the known personas; report it as a precondition (do not
+   edit `bin/fgos.mjs`; the code is a state refusal, not an argument error). Test in `test/session-host/`.
 4. A head launch exports `TMPDIR` pointing to a private, writable directory inside its sandbox (under the head's own
    runtime dir), created before launch; prove on the head shape that it is set and writable. If making it writable needs
    `src/runner/dispatch/**` or the engine (lead:S6A), stop and report.
