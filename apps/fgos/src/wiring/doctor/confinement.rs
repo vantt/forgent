@@ -1845,9 +1845,12 @@ mod tests {
 
     #[test]
     fn a_home_owned_by_a_dead_process_is_named_by_the_row_and_removed_only_by_the_fix() {
-        use std::os::unix::fs::PermissionsExt;
         let root = temp("orphans-dead");
-        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        }
         let home = root.join("disp_orphan_1/home");
         fs::create_dir_all(&home).unwrap();
         let dead = fs::read_to_string("/proc/sys/kernel/pid_max")
@@ -2031,8 +2034,13 @@ mod tests {
         }
 
         fn set_owner_only(dir: &Path) {
-            use std::os::unix::fs::PermissionsExt;
-            fs::set_permissions(dir, fs::Permissions::from_mode(0o700)).unwrap();
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::PermissionsExt;
+                fs::set_permissions(dir, fs::Permissions::from_mode(0o700)).unwrap();
+            }
+            #[cfg(not(unix))]
+            let _ = dir;
         }
 
         /// An interrupted staging named after a process that cannot be alive, three hours old.
@@ -2217,6 +2225,7 @@ mod tests {
             );
         }
 
+        #[cfg(unix)]
         #[test]
         fn the_fix_settles_a_held_home_from_its_host_record_and_never_one_without_a_record_or_through_a_link(
         ) {
@@ -2699,8 +2708,7 @@ mod tests {
         }
 
         #[test]
-        fn a_home_reached_through_two_spellings_or_a_link_of_one_root_is_counted_once_and_still_retried(
-        ) {
+        fn a_home_reached_through_two_spellings_of_one_root_is_counted_once() {
             let w = W::new("spellings");
             add_kept_home(&w, "disp_twice", CREDENTIAL_KEEP_MAX_ATTEMPTS);
             let slash = PathBuf::from(format!("{}/", w.temp_root.display()));
@@ -2712,6 +2720,11 @@ mod tests {
             )
             .1;
             assert_eq!(message.matches("private home held").count(), 1, "{message}");
+        }
+
+        #[cfg(unix)]
+        #[test]
+        fn a_link_of_one_root_is_counted_once_and_still_retried() {
             let w = W::new("alias");
             add_kept_home(&w, "disp_linked", 1);
             let alias = w.tmp.join("alias-of-confinement-root");
