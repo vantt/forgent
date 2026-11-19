@@ -282,7 +282,8 @@ footprint:
   - test/githooks/**
   - test/golden-recorders/**
   - test/helpers/**
-  - test/holder-lock/**
+  - test/holder-lock/windows-borrow.test.mjs
+  - test/holder-lock/driver-unavailable.test.mjs
   - test/identity/**
   - test/install/**
   - test/intake/**
@@ -682,3 +683,4 @@ consumes that decision and keeps `src/seat-binding/client.mjs`.
 - 2026-11-19 lead:S6A: owner 2026-11-19 15:39 (via Miu): SQLite option (a): rusqlite (bundled) in packages/execution/engine + omp credential-renewal SQLite adapter, before phase 20; no other new crate without a new owner question. Done as follow-up branch s6/p10-sqlite.
 - 2026-11-19 lead:S6A: footprint narrowed to exclude plan 261119-1615 (SECRETARY-CAPS) files (run-supervisor head_request/route/terminal/internal_harness/head-request.v1.json + tests, apps/fgos session_write_publish + questions_head, bin/fgos.mjs, command-registry, head-start, session-verb/head-start/head-request tests); phases 19, 20, 21 re-add them when 19 starts after 1615 lands.
 - 2026-11-19 lead:S6A: docs/platform/agent-confinement/spec.md also leaves the footprint (frontmatter and row 22) while plan 261119-1615 (SECRETARY-CAPS) writes its grant audit; re-added with the others when phase 19 starts.
+- 2026-11-19 lead:S6A: frontmatter test/holder-lock/** narrowed to the two files phase 21 edits (windows-borrow, driver-unavailable); test/holder-lock/registry-contract.test.mjs belongs to plan 261119-1615 P5.
