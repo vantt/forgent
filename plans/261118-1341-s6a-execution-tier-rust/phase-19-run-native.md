@@ -71,6 +71,8 @@ through `legacy_exec::payload_command` (`apps/fgos/src/wiring/doctor/bridge.rs:1
 
 - Also carried in: SECRETARY-CAPS P8 edits run-supervisor head_client.rs and one call each in apps/fgos/src/wiring/{questions,session_rotation_hook,supervision}.rs: rebase onto it before editing questions.rs's NodeBridge users. Windows lease design: decide with evidence (LockFileEx across handle inheritance, native Windows CI) between a Rust holder endpoint (cwdLeaseOwner) and moving custody recording to the supervisor side; until then the Rust route refuses Windows writes-files runs.
 
+- Also carried in: the Rust door must not surface engine port-raised error classes (git-error, case-admission-port-failed) where Node's fanout-batch (fanout-batch.mjs:158,181) copies errorClass||'error'; map them to 'error' as Node did. The run-unit rethrow must satisfy instanceof RunnerConfigError (CaseAdmissionRefusedError extends it).
+
 ## Footprint
 
 As the plan table row 19 (it holds `bin/fgos.mjs` and `src/cli/command-registry.mjs` for the `run` arm deletion and the registry edit).
