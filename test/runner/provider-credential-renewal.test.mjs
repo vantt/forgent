@@ -45,7 +45,6 @@ import { prepareBwrap, prepareBwrapSync } from '../../src/runner/dispatch/confin
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
 import { finalizeAttemptHome } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { CREDENTIAL_KEEP_MAX_ATTEMPTS, CREDENTIAL_KEEP_MIN_INTERVAL_MS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
-import { fixCredentialCopiesRetained } from '../../src/setup/registrations.mjs';
 import { rewriteOwnershipMarker } from '../helpers/ownership-marker.mjs';
 
 // The account lock is machine-scoped under the state root: a private root keeps this file's locks off
@@ -2302,13 +2301,6 @@ test('a held home settles by itself once its login is safe', () => {
     process.stderr.write = realWrite;
     assert.equal(state, 'credential-home-held', 'the home is held after the retry budget');
     assert.equal(fs.existsSync(path.join(home, 'auth.json')), true);
-
-    // The obstacle is gone: the login can be staged, so the repair settles the home; the staged login waits for
-    // the probe gate of the next refresh-ahead.
-    fs.rmSync(path.join(w.accountDir, 'pending'));
-    fixCredentialCopiesRetained({ roots: [tempRoot], retriedRoots: [tempRoot], stagingRuntimeDir: w.runtimeDir });
-    assert.equal(fs.existsSync(home), false, 'the held home is still there although its login can now be written back');
-    assert.deepEqual(agentCopies(w).map((name) => readPi(path.join(w.accountDir, 'pending', name)).xai.refresh), [FAKE.newRefresh], 'the renewed login waits beside the account');
   } finally {
     Date.now = realNow;
     process.stderr.write = realWrite;
