@@ -25,7 +25,7 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use fgos_process::control::{signal_by_identity, Signal};
-use fgos_process::facts::identity_of;
+use fgos_process::facts::{identity_of, scan, Scan, ScanFilter};
 use fgos_process::ProcId;
 use fgos_run_supervisor::controller::trust_store::{read_trust, trusted_project_entry, Json};
 
@@ -288,8 +288,8 @@ pub trait HomeSweeper {
     fn stop_inside(&self, dir: &Path) -> Vec<u32>;
 }
 
-/// The sweep of this machine: scans `/proc` where there is one (Linux; confinement is Linux-only, so the leak
-/// it closes is too), signals each process by its recorded identity so a reused pid is never hit, SIGTERM then
+/// The sweep of this machine: the process door's scan where it can scan (Linux; confinement is Linux-only, so the
+/// leak it closes is too), signals each process by its recorded identity so a reused pid is never hit, SIGTERM then
 /// SIGKILL with a grace window after each.
 #[derive(Debug, Clone, Copy)]
 pub struct ProcSweeper {
@@ -311,36 +311,38 @@ fn without_deleted_suffix(path: PathBuf) -> PathBuf {
     }
 }
 
-fn processes_inside(dir: &Path) -> Vec<u32> {
+/// The processes (other than this one and its parent) whose executable or working directory is inside `dir`, as
+/// the process door's scan saw them; the identity is `None` where it could not be read. Nothing where the
+/// platform cannot scan.
+fn processes_inside(dir: &Path) -> Vec<(u32, Option<fgos_process::facts::ProcTuple>)> {
     let root = fs::canonicalize(dir).unwrap_or_else(|_| dir.to_path_buf());
-    let (me, parent) = (std::process::id(), parent_pid());
-    let Ok(entries) = fs::read_dir("/proc") else {
+    let me = std::process::id();
+    #[cfg(unix)]
+    let parent = Some(std::os::unix::process::parent_id());
+    #[cfg(not(unix))]
+    let parent: Option<u32> = None;
+    let Scan::Views(views) = scan(&ScanFilter::default()) else {
         return Vec::new();
     };
-    let mut found: Vec<u32> = entries
-        .flatten()
-        .filter_map(|e| e.file_name().to_str()?.parse::<u32>().ok())
-        .filter(|pid| *pid != me && Some(*pid) != parent)
-        .filter(|pid| {
-            ["exe", "cwd"].iter().any(|link| {
-                fs::read_link(format!("/proc/{pid}/{link}"))
-                    .map(without_deleted_suffix)
-                    .is_ok_and(|p| p.starts_with(&root))
-            })
-        })
+    let inside = |path: &Option<PathBuf>| {
+        path.clone()
+            .map(without_deleted_suffix)
+            .is_some_and(|p| p.starts_with(&root))
+    };
+    let mut found: Vec<_> = views
+        .into_iter()
+        .filter(|view| view.pid.0 != me && Some(view.pid.0) != parent)
+        .filter(|view| inside(&view.exe) || inside(&view.cwd))
+        .map(|view| (view.pid.0, view.tuple))
         .collect();
-    found.sort_unstable();
+    found.sort_unstable_by_key(|(pid, _)| *pid);
     found
 }
 
-fn parent_pid() -> Option<u32> {
-    let stat = fs::read_to_string("/proc/self/stat").ok()?;
-    stat.rsplit_once(") ")?.1.split(' ').nth(1)?.parse().ok()
-}
-
 impl ProcSweeper {
-    fn still_there(pid: u32) -> bool {
-        identity_of(ProcId(pid)).is_some()
+    /// The recorded process still runs under its pid: a pid reused since the scan is not it.
+    fn still_there(pid: u32, tuple: &fgos_process::facts::ProcTuple) -> bool {
+        identity_of(ProcId(pid)).as_ref() == Some(tuple)
     }
 
     fn signal_and_wait(
@@ -353,13 +355,15 @@ impl ProcSweeper {
         }
         let deadline = std::time::Instant::now() + self.grace;
         while std::time::Instant::now() < deadline
-            && pids.iter().any(|(pid, _)| Self::still_there(*pid))
+            && pids
+                .iter()
+                .any(|(pid, tuple)| Self::still_there(*pid, tuple))
         {
             std::thread::sleep(Duration::from_millis(50));
         }
         pids.iter()
+            .filter(|(pid, tuple)| Self::still_there(*pid, tuple))
             .map(|(pid, _)| *pid)
-            .filter(|pid| Self::still_there(*pid))
             .collect()
     }
 }
@@ -368,8 +372,8 @@ impl HomeSweeper for ProcSweeper {
     fn stop_inside(&self, dir: &Path) -> Vec<u32> {
         let mut left = Vec::new();
         let mut known = Vec::new();
-        for pid in processes_inside(dir) {
-            match identity_of(ProcId(pid)) {
+        for (pid, tuple) in processes_inside(dir) {
+            match tuple {
                 Some(tuple) => known.push((pid, tuple)),
                 // A process without a readable identity cannot be signalled safely.
                 None => left.push(pid),

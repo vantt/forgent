@@ -79,7 +79,7 @@ fn executor_mechanism_treats_a_cli_shaped_executor_as_out_of_process_whatever_th
 {
     let v = vectors("mechanism.v1.json");
     for case in v["executorCases"].as_array().unwrap() {
-        let got = decide_executor_dispatch_mechanism(
+        let got = fgos_execution::executor_model::mechanism(
             &v["cfg"],
             opt(&case["executorId"]),
             case["hasLiveTaskAccess"].as_bool().unwrap(),
@@ -87,7 +87,8 @@ fn executor_mechanism_treats_a_cli_shaped_executor_as_out_of_process_whatever_th
         assert_eq!(got.as_str(), case["out"], "{case}");
     }
     for case in v["lookups"].as_array().unwrap() {
-        let got = decide_executor_dispatch_mechanism(&case["cfg"], opt(&case["executorId"]), true);
+        let got =
+            fgos_execution::executor_model::mechanism(&case["cfg"], opt(&case["executorId"]), true);
         assert_eq!(got.as_str(), case["out"], "{case}");
     }
 }

@@ -4,6 +4,8 @@
 //! The provider family itself (`family_of`) is the executor model's answer in `fgos-execution`; this module
 //! only asks it, so there is one spelling table.
 
+/// The effort levels a command's CLI can be told to run at: the executor model's answer, not a second table.
+pub use fgos_execution::executor_model::rendered_effort_levels;
 use fgos_execution::executor_model::{family_of, FamilySource};
 use serde_json::{json, Value};
 
@@ -164,16 +166,6 @@ fn effort_control(command_name: &str) -> Option<EffortControl> {
 fn basename(command: Option<&str>) -> &str {
     let text = command.unwrap_or("").trim_end_matches('/');
     text.rsplit('/').next().unwrap_or("")
-}
-
-/// The effort levels a command's CLI can be told to run at: all of them when fgOS knows its control, none
-/// otherwise.
-pub fn rendered_effort_levels(command: Option<&str>) -> Vec<&'static str> {
-    if effort_control(basename(command)).is_some() {
-        REASONING_EFFORT_VALUES.to_vec()
-    } else {
-        Vec::new()
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
