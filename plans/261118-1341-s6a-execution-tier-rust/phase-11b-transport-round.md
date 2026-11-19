@@ -33,11 +33,17 @@ definitions come from an injected host `metrics query --def` call); every projec
   incl. head grants, inspection and attention rows) recorded by `test/golden-recorders/transport-round.recorder.mjs`;
   an integration test drives a direct-mode attempt end to end with a stub agent binary (moved here from phase 11: it
   needs `transport.mjs`'s round).
+- Lock handover: the controller's `acquire_attempt_locks` returns holder-lock `Handle`s, while `start_supervisor`
+  (`packages/run-supervisor/rust/src/controller/launch.rs`) takes `&[&fs::File]` and `Handle::file()` is private
+  (`packages/holder-lock/rust/src/port.rs:230`). Add `pub fn try_clone_file(&self) -> io::Result<File>` on `Handle`
+  (same pattern as `supervise/unix.rs` `try_clone`) with its owning test in holder-lock, and prove the
+  acquire-then-handover path in the end-to-end test (phase 05 review, 2026-11-19).
 
 ## Footprint
 
 `packages/execution/engine/src/transport_round/**`, `packages/execution/engine/tests/transport_round.rs`,
-`packages/execution/contracts/transport-round/**`, `test/golden-recorders/transport-round.recorder.mjs`.
+`packages/execution/contracts/transport-round/**`, `test/golden-recorders/transport-round.recorder.mjs`,
+`packages/holder-lock/rust/src/port.rs`, `packages/holder-lock/rust/tests/handle_file.rs`.
 
 ## Steps
 

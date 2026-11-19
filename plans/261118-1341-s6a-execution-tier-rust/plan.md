@@ -12,6 +12,8 @@ footprint:
   - Cargo.lock
   - packages/execution/**
   - packages/run-supervisor/**
+  - packages/holder-lock/rust/src/port.rs
+  - packages/holder-lock/rust/tests/handle_file.rs
   - packages/git/node-addon/**
   - packages/host-runtime/**
   - packages/distribution/contracts/doctor-registry.v1.json
@@ -184,7 +186,7 @@ Missing and built: a Rust unit runner, the admission peer protocol, the Executio
 | 12 | [Run result and evidence](phase-12-run-result.md) | 3 | packages/execution/engine/src/run_result/**, packages/execution/engine/tests/run_result.rs, packages/execution/contracts/run-result/**, test/golden-recorders/run-result.recorder.mjs | 3 | draft |
 | 7b | [Confinement request and authority](phase-07b-confinement-request-authority.md) | 7 | packages/execution/engine/src/confinement/request/**, packages/execution/engine/tests/confinement_request.rs, packages/execution/contracts/confinement-request/**, test/golden-recorders/confinement-request.recorder.mjs | 4 | draft |
 | 8b | [Confinement cleanup and probes](phase-08b-confinement-cleanup-probes.md) | 8 | packages/execution/engine/src/confinement/cleanup/**, packages/execution/engine/tests/confinement_cleanup.rs, packages/execution/contracts/confinement-cleanup/**, test/golden-recorders/confinement-cleanup.recorder.mjs | 4 | draft |
-| 11b | [Transport round, session attempt, run inspection](phase-11b-transport-round.md) | 11 | packages/execution/engine/src/transport_round/**, packages/execution/engine/tests/transport_round.rs, packages/execution/contracts/transport-round/**, test/golden-recorders/transport-round.recorder.mjs | 4 | draft |
+| 11b | [Transport round, session attempt, run inspection](phase-11b-transport-round.md) | 11 | packages/execution/engine/src/transport_round/**, packages/execution/engine/tests/transport_round.rs, packages/execution/contracts/transport-round/**, test/golden-recorders/transport-round.recorder.mjs, packages/holder-lock/rust/src/port.rs, packages/holder-lock/rust/tests/handle_file.rs | 4 | draft |
 | 13 | [Assignment model](phase-13-assignment-model.md) | 6, 6b, 7, 9 | packages/execution/engine/src/assignment/**, packages/execution/engine/tests/assignment.rs, packages/execution/contracts/assignment/**, test/golden-recorders/assignment.recorder.mjs | 4 | draft |
 | 14 | [Settlement and post-receipt steps](phase-14-settlement-steps.md) | 5, 10, 12 | packages/execution/engine/src/settlement/**, packages/execution/engine/src/steps/**, packages/execution/engine/tests/settlement.rs, packages/execution/contracts/settlement/**, test/golden-recorders/settlement.recorder.mjs | 4 | draft |
 | 13b | [Prompt templates and execution contract](phase-13b-execution-contract.md) | 6c, 13 | packages/execution/engine/src/contract/**, packages/execution/engine/tests/contract.rs, packages/execution/contracts/execution-contract/**, test/golden-recorders/execution-contract.recorder.mjs | 5 | draft |
