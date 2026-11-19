@@ -156,7 +156,17 @@ fn admission_with_land<F: wal::FileSystem>(
                     })
             })
         {
-            return Err(pending(recovery("resource-recovery-required"), &chain.last().operation_id));
+            let op_id = &chain.last().operation_id;
+            if wal.operation_live(op_id) {
+                // A live writer owns the chain: retry, do not recover.
+                let kind = format!("{:?}", chain.intent().kind);
+                let kind = kind.split(|c: char| !c.is_alphanumeric()).next().unwrap_or_default();
+                let mut e = busy("resource-busy")
+                    .with_diagnostic(format!("operation {op_id} ({kind}) is held by a live writer"));
+                e.operation_id = Some(op_id.clone());
+                return Err(e);
+            }
+            return Err(pending(recovery("resource-recovery-required"), op_id));
         }
     }
     Ok(())
