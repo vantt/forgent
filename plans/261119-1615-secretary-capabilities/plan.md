@@ -66,7 +66,8 @@ Owner request via Miu, 2026-11-19 16:1x (urgent): the secretary head (`head:secr
 sandbox without being blocked or racing another writer.
 
 ## Acceptance criteria
-1. A head start or rotation whose role binding fails is refused by name at start (no later silent `role-not-held`).
+1. A head start or rotation whose role binding fails is refused by name at start (no later silent `role-not-held`);
+   a rotation successor's role-gated verbs wait for the handover (`role-pending-rotation`) instead of failing.
 2. `fgos session write` carries the base OID the writer read and is refused `write-base-stale` when the file moved
    (fallback: the pre-catch-up OID); a route test lands a commit between read and write (p-vwaujnak4j). The CLI and the
    fgos-secretary skill pass it.
@@ -108,7 +109,8 @@ A general backlog tool beyond add-rows; supervisor skill/route
 | 4 | [Session write add-rows](phase-04-add-rows.md) | 1 | head_request.rs, session_write_publish.rs + tests, bin/fgos.mjs, head-request-client.mjs, command-registry.mjs, fgos-secretary skill, session-host spec, docs/backlog.md (move trailing rows into the open table) | 2 | ready |
 | 5 | [A live writer's pending Git op answers resource-busy](phase-05-git-op-liveness.md) | - | packages/holder-lock/contracts/lock-registry.v1.json, docs/platform/holder-lock/spec.md, test/holder-lock/registry-contract.test.mjs, packages/git/rust/src/{wal,refs}.rs, packages/git/rust/tests/pending_op_liveness.rs, docs/platform/git/spec.md (+ src/setup/holder-lock-checks.mjs and its test only if they enumerate rows) | 1 | running |
 | 6 | [Session write waits on a live writer](phase-06-busy-retry.md) | 1, 5 | apps/fgos/src/wiring/session_write_publish.rs, apps/fgos/tests/session_write_publish.rs, session-host spec, fgos-secretary skill | 3 | ready |
-| 7 | [Live grant audit from Miu's sandbox](phase-07-grant-audit.md) | 1, 2, 3, 4, 5, 6 | core/skills/fgos-secretary/SKILL.md, docs/platform/agent-confinement/spec.md, src/session-host/head-grants.mjs (only if a gap is found) | 4 | ready |
+| 7 | [Live grant audit from Miu's sandbox](phase-07-grant-audit.md) | 1, 2, 3, 4, 5, 6, 8 | core/skills/fgos-secretary/SKILL.md, docs/platform/agent-confinement/spec.md, src/session-host/head-grants.mjs (only if a gap is found) | 4 | ready |
+| 8 | [A rotation successor's role-gated verbs wait for the role](phase-08-rotation-role-wait.md) | 1, 2 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, src/session-host/head-request-client.mjs, test/session-host/head-request.test.mjs, docs/platform/session-host/spec.md | 2 | ready |
 
 ## Owner questions
 None. Shaper persona decided by the supervisor inside the frame; Git busy design decided by lead:OPC (reviews phase 5).

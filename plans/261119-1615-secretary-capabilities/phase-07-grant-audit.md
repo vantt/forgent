@@ -1,7 +1,7 @@
 # Phase 7: Live grant audit from Miu's sandbox
 
 ## Gate
-Phases 1-6 landed, released, and Miu rotated onto that release.
+Phases 1-6 and 8 landed, released, and Miu rotated onto that release.
 
 ## Requirements
 1. After phases 1-6 are released and Miu rotated (ask the supervisor), run from her real sandbox (or a throwaway
