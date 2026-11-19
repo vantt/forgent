@@ -341,6 +341,11 @@ function normaliser(world, entry) {
       // The floor row no longer names the Node version (Node is the bridged rows' runtime, reported by them).
       .replace(/"message": "node v\d+\.\d+\.\d+, git available"/g, '"message": "git available"')
       .replace(/\(node v\d+\.\d+\.\d+, git available\)/g, '(git available)')
+      // Text the language runtime writes, not fgOS: a JSON parser's complaint (V8 against serde_json) and a binary that
+      // cannot be started (Node's spawnSync ENOENT against the host's PATH lookup). The row around it is compared.
+      .replace(/(is not valid JSON: |cannot parse machine backend registry at \\?"[^"\\]*\\?": )(?:Unexpected end of JSON input|[^"()]*? in JSON at position \d+(?: \(line \d+ column \d+\))?|[^"()]*? at line \d+ column \d+)/g, '$1<JSON-PARSE-ERROR>')
+      .replace(/spawnSync (\S+) ENOENT/g, '$1: <NOT-STARTED>')
+      .replace(/(\S+): not found on PATH/g, '$1: <NOT-STARTED>')
       .replace(UUID, '<UUID>')
       // The machine id a fix mints is random after the host's name.
       .replace(new RegExp(`${MACHINE_ID_SLUG}-[a-z2-7]{6}\\b`, 'g'), '<MACHINE-ID>')

@@ -633,6 +633,40 @@ fn the_machine_private_falsifiers_name_the_stand_ins_each_mask_hides() {
 // ---- probes against a real bwrap ---------------------------------------------------------------------------------
 
 /// The path of a bwrap that runs here, or `None`: asked of the driver's own smoke test, as doctor asks it.
+#[test]
+fn the_login_scan_adds_each_registry_root_once_and_the_reaper_roots_never_name_one() {
+    let base = scratch("scan-roots");
+    let registry = json!({ "confinementBackends": { "bwrap": {
+        "type": "bwrap",
+        "tempRoot": format!("{}/temp/", base.display()),
+        "privateHomeRoot": base.join("homes"),
+    } } });
+    let roots = cleanup::credential_scan_roots(Some(&registry));
+    assert!(
+        roots.contains(&base.join("temp")),
+        "a trailing slash does not make a second root: {roots:?}"
+    );
+    assert!(roots.contains(&base.join("homes")));
+    for root in cleanup::default_temp_roots() {
+        assert!(
+            roots.contains(&cleanup::canonical_root(&root)),
+            "the default root stays"
+        );
+    }
+    let unique: std::collections::BTreeSet<_> = roots.iter().collect();
+    assert_eq!(unique.len(), roots.len());
+    assert!(roots.iter().all(|root| root.is_absolute()));
+    assert_eq!(
+        cleanup::credential_scan_roots(None).len(),
+        cleanup::default_temp_roots().len()
+    );
+    // The orphan reaper and the root-mode check work on the default roots only: a registry root is never reaped.
+    assert!(!cleanup::default_temp_roots()
+        .iter()
+        .any(|root| root.starts_with(&base)));
+    let _ = fs::remove_dir_all(&base);
+}
+
 fn working_bwrap() -> Option<String> {
     use fgos_execution_engine::confinement::driver::bwrap::SmokeProbe;
     let path = std::env::var("PATH").unwrap_or_default();
@@ -711,14 +745,7 @@ fn each_basic_probe_passes_on_a_sound_sandbox_and_fails_on_its_red_falsifier() {
 
 // ---- the driver's home port and the driver-backed probes -----------------------------------------------------------
 
-use fgos_execution_engine::confinement::driver::bwrap::BwrapDriver;
-use fgos_execution_engine::confinement::driver::{
-    BackendDriver, Credentials, DriverError, EnvFn, ErrorKind, PrivateHomeHost, ResourceResolver,
-};
-use fgos_execution_engine::confinement::policy::{
-    resolve_confinement_resources, Grant, ResolveContext, ResolveInput,
-};
-use std::sync::Arc;
+use fgos_execution_engine::confinement::driver::{DriverError, ErrorKind, PrivateHomeHost};
 
 #[test]
 fn the_home_port_writes_the_markers_and_removes_only_a_home_its_dispatch_owns() {
@@ -754,111 +781,31 @@ fn the_home_port_writes_the_markers_and_removes_only_a_home_its_dispatch_owns() 
     let _ = fs::remove_dir_all(&base);
 }
 
-/// The policy resolver behind the driver's port: a request's JSON in, the resolved resources as JSON out.
-struct PolicyResolver;
-impl ResourceResolver for PolicyResolver {
-    fn resolve(&self, input: &Value) -> Result<Vec<Value>, DriverError> {
-        let text = |path: &[&str]| {
-            path.iter()
-                .try_fold(input, |v, k| v.get(*k))
-                .and_then(Value::as_str)
-                .map(str::to_string)
-        };
-        let context = &input["context"];
-        let ctx = |key: &str| context.get(key).and_then(Value::as_str).map(str::to_string);
-        let resolve_input = ResolveInput {
-            dispatch_id: text(&["dispatchId"]).unwrap_or_default(),
-            context: ResolveContext {
-                run_dir: ctx("runDir"),
-                fgos_dir: ctx("fgosDir"),
-                repo_root: ctx("repoRoot"),
-                cwd: ctx("cwd"),
-                assignment_launch_context: context.get("assignmentLaunchContext").is_some(),
-                ..Default::default()
-            },
-            grants: input["grants"]
-                .as_array()
-                .map(|list| {
-                    list.iter()
-                        .map(|g| Grant {
-                            resource: g["resource"].as_str().unwrap_or_default().into(),
-                            access: g["access"].as_str().unwrap_or_default().into(),
-                            ..Default::default()
-                        })
-                        .collect()
-                })
-                .unwrap_or_default(),
-            temp_root: text(&["backendConfig", "tempRoot"]),
-            default_temp_root: cleanup::resolve_confinement_temp_root(&std::env::temp_dir())
-                .to_string_lossy()
-                .into_owned(),
-            credentials_path: text(&["providerSources", "credentialsPath"]),
-            default_credentials_dir: std::env::temp_dir()
-                .join("fgos-credentials")
-                .to_string_lossy()
-                .into_owned(),
-            blind: input["blind"].as_bool().unwrap_or(false),
-            home_dir: text(&["homeDir"])
-                .unwrap_or_else(|| std::env::var("HOME").unwrap_or_default()),
-            claude_socket_base: text(&["claudeSocketBase"])
-                .unwrap_or_else(|| std::env::temp_dir().to_string_lossy().into_owned()),
-            xdg_runtime_dir: text(&["xdgRuntimeDir"]),
-            xdg_config_home: text(&["xdgConfigHome"]),
-            herdr_socket_path: text(&["herdrSocketPath"]),
-            login_stores: input["loginStores"]
-                .as_array()
-                .map(|l| {
-                    l.iter()
-                        .filter_map(|s| s.as_str().map(str::to_string))
-                        .collect()
-                })
-                .unwrap_or_default(),
-            ..Default::default()
-        };
-        let resolved = resolve_confinement_resources(&resolve_input)
-            .map_err(|e| DriverError::new(ErrorKind::Port, e.to_string()))?;
-        Ok(resolved
-            .iter()
-            .map(|r| serde_json::to_value(r).unwrap())
-            .collect())
-    }
-}
-
-/// No account login in a probe: nothing is ever copied.
-struct NoCredentials;
-impl Credentials for NoCredentials {
-    fn login_life_problem(&self, _source: &Value, _timeout_ms: u64) -> Option<String> {
-        None
-    }
-    fn copy_files(
-        &self,
-        _private_home: &Path,
-        _source_home: &Path,
-        _files: &[String],
-    ) -> Result<Vec<String>, DriverError> {
-        Ok(Vec::new())
-    }
-    fn write_back_target(&self, _capacity: &Value) -> Option<Value> {
-        None
-    }
-}
-
-fn driver_over(runtime_dir: &Path) -> Arc<dyn BackendDriver> {
-    let runtime = runtime_dir.to_string_lossy().into_owned();
-    let env: EnvFn = Arc::new(move |name| match name {
-        "XDG_RUNTIME_DIR" if !runtime.is_empty() => Some(runtime.clone()),
-        "HOME" => std::env::var("HOME").ok(),
-        _ => None,
-    });
-    // SAFETY: getuid has no failure mode and touches no memory.
-    let uid = unsafe { libc::getuid() };
-    Arc::new(BwrapDriver::new(
-        Arc::new(PolicyResolver),
-        Arc::new(cleanup::CleanupHomes::<SystemHost>::default()),
-        Arc::new(NoCredentials),
-        env,
-        uid,
-    ))
+#[test]
+fn a_probe_whose_sandbox_never_starts_says_so_in_the_node_wording_never_with_the_spawn_error() {
+    use cleanup::probes::*;
+    let base = scratch("no-sandbox");
+    let missing = base.join("no-such-bwrap").to_string_lossy().into_owned();
+    let run_dir = base.join("run");
+    fs::create_dir_all(&run_dir).unwrap();
+    // Node's `res.stderr || res.stdout || 'file not created'` on a sandbox that could not be spawned.
+    assert_eq!(
+        run_output_writable(&missing, &run_dir, false).detail,
+        "failed to write run-output: file not created"
+    );
+    let ports = ProbePorts {
+        resolver: &PolicyResolver,
+        driver_for: &driver_over,
+    };
+    let scratch = base.join("blind");
+    fs::create_dir_all(&scratch).unwrap();
+    let blind = peer_run_hidden(&missing, &scratch, std::process::id(), &ports, false);
+    assert!(!blind.passed);
+    assert_eq!(
+        blind.detail,
+        "blind read probe failed: worker reported nothing"
+    );
+    let _ = fs::remove_dir_all(&base);
 }
 
 #[test]

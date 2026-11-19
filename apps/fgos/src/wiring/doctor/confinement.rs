@@ -20,24 +20,21 @@ use fgos_execution::decide::Workspace;
 use fgos_execution::runner_config::normalize_legacy_confinement;
 use fgos_execution_engine::accounts::{Accounts, SystemHost as AccountsHost};
 use fgos_execution_engine::confinement::cleanup::probes::{
-    peer_run_hidden, run_all_confinement_probes, ProbePorts,
+    driver_over, peer_run_hidden, run_all_confinement_probes, PolicyResolver, ProbePorts,
 };
 use fgos_execution_engine::confinement::cleanup::{
-    canonical_root, default_temp_roots, judge_confinement_orphans, list_kept_credential_homes,
-    read_attempt_ownership_marker, remove_confinement_orphans, settle_held_credential_homes,
-    CleanupHomes, CleanupHost, CredentialWriteBack, KeptHome, Orphans, SystemHost,
-    WriteBackOutcome, CREDENTIAL_KEEP_MAX_ATTEMPTS,
+    canonical_root, credential_scan_roots as cleanup_scan_roots, default_temp_roots,
+    judge_confinement_orphans, list_kept_credential_homes, read_attempt_ownership_marker,
+    remove_confinement_orphans, settle_held_credential_homes, CleanupHost, CredentialWriteBack,
+    KeptHome, Orphans, SystemHost, WriteBackOutcome, CREDENTIAL_KEEP_MAX_ATTEMPTS,
 };
-use fgos_execution_engine::confinement::driver::bwrap::{BwrapDriver, SmokeProbe, SmokeResult};
+use fgos_execution_engine::confinement::driver::bwrap::{SmokeProbe, SmokeResult};
 use fgos_execution_engine::confinement::driver::registry::{
     ensure_machine_registry_defaults, load_machine_registry, registry_path, validate_registry_shape,
 };
-use fgos_execution_engine::confinement::driver::{
-    BackendDriver, Credentials, DriverError, EnvFn, ErrorKind, ResourceResolver,
-};
+use fgos_execution_engine::confinement::driver::DriverError;
 use fgos_execution_engine::confinement::policy::{
-    resolve_confinement_resources, validate_confinement_policy_shape, Grant, ResolveContext,
-    ResolveInput, BUILTIN_POLICY_IDS,
+    validate_confinement_policy_shape, BUILTIN_POLICY_IDS,
 };
 use fgos_execution_engine::credentials::files::{make_dir, now_ms, random_hex};
 use fgos_execution_engine::credentials::store::{OverLimit, ResolveStore, SweepOptions};
@@ -51,7 +48,6 @@ use fgos_host_runtime::civil_time::parse_rfc3339_millis;
 use serde_json::{json, Map, Value};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
 
 pub const ROWS: &[&str] = &[
     "confinement-policies-declared",
@@ -799,8 +795,17 @@ fn read_inventory() -> Result<Inventory, String> {
     let runner =
         machine_runner().map_err(|reason| format!("machine config unreadable ({reason})"))?;
     let accounts = provider_account_inventory(&runner, &HostMachine::new(None, None));
+    Ok(Inventory {
+        stores: stores_of(&accounts),
+        accounts,
+    })
+}
+
+/// The login store layout of each account of `accounts`: the CLIs it declares a store for, or none for an account
+/// with one store.
+fn stores_of(accounts: &Map<String, Value>) -> AccountInventory {
     let mut stores = AccountInventory::new();
-    for (provider, entry) in &accounts {
+    for (provider, entry) in accounts {
         let per_account = stores.entry(provider.clone()).or_default();
         for (id, account) in entry
             .get("accounts")
@@ -819,7 +824,7 @@ fn read_inventory() -> Result<Inventory, String> {
             );
         }
     }
-    Ok(Inventory { stores, accounts })
+    stores
 }
 
 fn runtime_dir() -> Result<PathBuf, String> {
@@ -827,35 +832,9 @@ fn runtime_dir() -> Result<PathBuf, String> {
         .ok_or_else(machine::home_unset_message)
 }
 
-/// The roots private homes live under: the default temp roots and the temp and private-home roots of the
-/// registered backends. Kept logins only.
+/// The roots kept logins are looked for under, the machine registry's included.
 fn credential_scan_roots() -> Vec<PathBuf> {
-    let mut roots: Vec<PathBuf> = Vec::new();
-    let mut add = |root: PathBuf| {
-        let root = canonical_root(&root);
-        if !roots.contains(&root) {
-            roots.push(root);
-        }
-    };
-    default_temp_roots().into_iter().for_each(&mut add);
-    if let Ok(registry) = machine_registry() {
-        for instance in registry
-            .get("confinementBackends")
-            .and_then(Value::as_object)
-            .into_iter()
-            .flatten()
-            .map(|(_, instance)| instance)
-        {
-            for key in ["tempRoot", "privateHomeRoot"] {
-                if let Some(root) = instance.get(key).and_then(Value::as_str) {
-                    if !root.trim().is_empty() {
-                        add(PathBuf::from(root));
-                    }
-                }
-            }
-        }
-    }
-    roots
+    cleanup_scan_roots(machine_registry().ok().as_ref())
 }
 
 fn copies_verdict() -> Verdict {
@@ -900,9 +879,13 @@ fn store_judgement(
         .get(provider)
         .and_then(|entry| entry.get("accounts"))
         .and_then(|accounts| accounts.get(account_id));
-    let source = account
-        .zip(store)
-        .and_then(|(account, store)| account.get("credentialSources")?.get(store));
+    // A store under stores/<cli> is read only by an account that declares that CLI; the account directory itself
+    // only by an account with one store.
+    let source = account.and_then(|account| match (store, account.get("credentialSources")) {
+        (Some(store), Some(sources)) => sources.get(store),
+        (None, None) => account.get("credentialSource"),
+        _ => None,
+    });
     let Some(source) = source.filter(|s| truthy(Some(s))) else {
         return StoreJudgement::Stranded;
     };
@@ -954,38 +937,69 @@ fn fix_credential_copies() -> (bool, String) {
         Some(locks) => locks,
         None => &no_locks,
     };
+    fix_copies_in(&CopiesFix {
+        runtime: &runtime,
+        roots: &credential_scan_roots(),
+        retried_roots: &default_temp_roots(),
+        inventory: inventory.as_ref().map(|inv| &inv.accounts),
+        home_dir: home_dir.as_deref(),
+        locks,
+    })
+}
+
+/// What the login copy repair works on, all of it read from the machine by the caller.
+struct CopiesFix<'a> {
+    runtime: &'a Path,
+    roots: &'a [PathBuf],
+    retried_roots: &'a [PathBuf],
+    /// The provider inventory; `None` when the machine config cannot be read, and then no staging is judged
+    /// against a source login.
+    inventory: Option<&'a Map<String, Value>>,
+    home_dir: Option<&'a str>,
+    locks: &'a dyn fgos_execution_engine::credentials::AccountLocks,
+}
+
+fn fix_copies_in(fix: &CopiesFix<'_>) -> (bool, String) {
     let now = now_ms();
-    let resolve = |provider: &str, account: &str, store: Option<&str>| match &inventory {
-        Some(inv) => store_judgement(
-            &inv.accounts,
-            &runtime,
-            home_dir.as_deref(),
+    let resolve = |provider: &str, account: &str, store: Option<&str>| match fix.inventory {
+        Some(inventory) => store_judgement(
+            inventory,
+            fix.runtime,
+            fix.home_dir,
             provider,
             account,
             store,
         ),
         None => StoreJudgement::Unjudged,
     };
-    let resolve_store: Option<&ResolveStore<'_>> = inventory.as_ref().map(|_| &resolve as _);
+    let resolve_store: Option<&ResolveStore<'_>> = fix.inventory.map(|_| &resolve as _);
     let stagings = sweep_interrupted_stagings(&SweepOptions {
-        runtime_dir: &runtime,
+        runtime_dir: fix.runtime,
         resolve_store,
         now,
         min_age_ms: STAGING_MIN_AGE_MS,
-        locks,
+        locks: fix.locks,
         sqlite: &NoSqlite,
     });
-    let roots = credential_scan_roots();
-    let retried: BTreeSet<PathBuf> = default_temp_roots()
+    let retried: BTreeSet<PathBuf> = fix
+        .retried_roots
         .iter()
         .map(|r| canonical_root(r))
         .collect();
-    let unretried: Vec<PathBuf> = roots
+    let unretried: Vec<PathBuf> = fix
+        .roots
         .iter()
         .filter(|root| !retried.contains(&canonical_root(root)))
         .cloned()
         .collect();
-    let settled = settle_held_credential_homes(&roots, &unretried, &StageLogin { now, locks });
+    let settled = settle_held_credential_homes(
+        fix.roots,
+        &unretried,
+        &StageLogin {
+            now,
+            locks: fix.locks,
+        },
+    );
     let homes = if settled.settled + settled.held == 0 {
         "no held private home to settle".to_owned()
     } else {
@@ -1178,121 +1192,6 @@ fn blind_read(
 }
 
 // ---- the probe ports ---------------------------------------------------------------------------------------
-
-/// The resource resolver behind the probe's driver: a request's JSON in, the resolved resources as JSON out.
-struct PolicyResolver;
-
-impl ResourceResolver for PolicyResolver {
-    fn resolve(&self, input: &Value) -> Result<Vec<Value>, DriverError> {
-        let text = |path: &[&str]| {
-            path.iter()
-                .try_fold(input, |value, key| value.get(*key))
-                .and_then(Value::as_str)
-                .map(str::to_owned)
-        };
-        let context = &input["context"];
-        let ctx = |key: &str| context.get(key).and_then(Value::as_str).map(str::to_owned);
-        let temp = std::env::temp_dir();
-        let resolve_input = ResolveInput {
-            dispatch_id: text(&["dispatchId"]).unwrap_or_default(),
-            context: ResolveContext {
-                run_dir: ctx("runDir"),
-                fgos_dir: ctx("fgosDir"),
-                repo_root: ctx("repoRoot"),
-                cwd: ctx("cwd"),
-                assignment_launch_context: context.get("assignmentLaunchContext").is_some(),
-                ..Default::default()
-            },
-            grants: input["grants"]
-                .as_array()
-                .map(|list| {
-                    list.iter()
-                        .map(|grant| Grant {
-                            resource: grant["resource"].as_str().unwrap_or_default().into(),
-                            access: grant["access"].as_str().unwrap_or_default().into(),
-                            ..Default::default()
-                        })
-                        .collect()
-                })
-                .unwrap_or_default(),
-            temp_root: text(&["backendConfig", "tempRoot"]),
-            default_temp_root:
-                fgos_execution_engine::confinement::cleanup::resolve_confinement_temp_root(&temp)
-                    .to_string_lossy()
-                    .into_owned(),
-            credentials_path: text(&["providerSources", "credentialsPath"]),
-            default_credentials_dir: temp.join("fgos-credentials").to_string_lossy().into_owned(),
-            blind: input["blind"].as_bool().unwrap_or(false),
-            home_dir: text(&["homeDir"])
-                .unwrap_or_else(|| std::env::var("HOME").unwrap_or_default()),
-            claude_socket_base: text(&["claudeSocketBase"])
-                .unwrap_or_else(|| temp.to_string_lossy().into_owned()),
-            xdg_runtime_dir: text(&["xdgRuntimeDir"]),
-            xdg_config_home: text(&["xdgConfigHome"]),
-            herdr_socket_path: text(&["herdrSocketPath"]),
-            login_stores: input["loginStores"]
-                .as_array()
-                .map(|list| {
-                    list.iter()
-                        .filter_map(|store| store.as_str().map(str::to_owned))
-                        .collect()
-                })
-                .unwrap_or_default(),
-            ..Default::default()
-        };
-        let resolved = resolve_confinement_resources(&resolve_input)
-            .map_err(|error| DriverError::new(ErrorKind::Port, error.to_string()))?;
-        Ok(resolved
-            .iter()
-            .map(|resource| {
-                serde_json::to_value(resource).expect("a resolved resource is plain data")
-            })
-            .collect())
-    }
-}
-
-/// A probe holds no account login: nothing is ever copied into its home.
-struct NoLogin;
-
-impl Credentials for NoLogin {
-    fn login_life_problem(&self, _source: &Value, _timeout_ms: u64) -> Option<String> {
-        None
-    }
-
-    fn copy_files(
-        &self,
-        _private_home: &Path,
-        _source_home: &Path,
-        _files: &[String],
-    ) -> Result<Vec<String>, DriverError> {
-        Ok(Vec::new())
-    }
-
-    fn write_back_target(&self, _capacity: &Value) -> Option<Value> {
-        None
-    }
-}
-
-fn driver_over(runtime_dir: &Path) -> Arc<dyn BackendDriver> {
-    let runtime = runtime_dir.to_string_lossy().into_owned();
-    let env: EnvFn = Arc::new(move |name| match name {
-        "XDG_RUNTIME_DIR" if !runtime.is_empty() => Some(runtime.clone()),
-        "HOME" => std::env::var("HOME").ok(),
-        _ => None,
-    });
-    #[cfg(unix)]
-    // SAFETY: getuid has no failure mode and touches no memory.
-    let uid = unsafe { libc::getuid() };
-    #[cfg(not(unix))]
-    let uid = 0;
-    Arc::new(BwrapDriver::new(
-        Arc::new(PolicyResolver),
-        Arc::new(CleanupHomes::<SystemHost>::default()),
-        Arc::new(NoLogin),
-        env,
-        uid,
-    ))
-}
 
 /// Runs `body` with a fresh owner-only scratch directory, removed afterwards.
 fn with_scratch<T>(prefix: &str, body: impl FnOnce(&Path) -> T) -> Result<T, String> {
@@ -1759,8 +1658,10 @@ mod tests {
                 "bwrap backend status: ready (Linux, binary \"bwrap\" working, enabled)".into()
             )
         );
-        let unreadable: Result<Value, DriverError> =
-            Err(DriverError::new(ErrorKind::Registry, "bad"));
+        let unreadable: Result<Value, DriverError> = Err(DriverError::new(
+            fgos_execution_engine::confinement::driver::ErrorKind::Registry,
+            "bad",
+        ));
         assert!(bwrap_platform(&unreadable, "linux", &smoke_ok)
             .1
             .contains("not readable or malformed (bad)"));
@@ -1907,10 +1808,964 @@ mod tests {
     }
 
     #[test]
+    fn a_policy_the_machine_declares_is_known_and_an_unreadable_config_fails_policies_and_readiness(
+    ) {
+        let custom = Ok(json!({
+            "confinementPolicies": { "custom-isolated": { "contract": "confinement-policy.v1", "controls": { "hostWrite": "deny", "hostRead": "allow", "networkEgress": "deny", "process": "isolated", "home": "private", "session": "isolated", "workspace": "own" }, "grants": [] } },
+            "capabilities": { "code:implement": { "confinement": { "mode": "required", "policy": "custom-isolated" } } },
+        }));
+        assert_eq!(
+            policies_declared(&custom),
+            (
+                true,
+                "all capability confinement policies are declared".into()
+            )
+        );
+        let ready = (true, "bwrap backend status: ready (x)".to_owned());
+        assert_eq!(
+            strict_readiness(&Err("boom".into()), &ready),
+            (false, "runner config not readable: boom".into())
+        );
+    }
+
+    #[test]
+    fn the_registry_fix_skips_a_registry_it_cannot_parse_and_leaves_it_in_place() {
+        let dir = temp("registry-corrupt");
+        let path = dir.join("confinement-backends.json");
+        fs::write(&path, "not json").unwrap();
+        let (changed, message) = fix_backend_registry(Ok(path.clone()));
+        assert!(!changed, "{message}");
+        assert!(
+            message.starts_with("skipped -- cannot parse machine backend registry"),
+            "{message}"
+        );
+        assert_eq!(fs::read_to_string(&path).unwrap(), "not json");
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn a_home_owned_by_a_dead_process_is_named_by_the_row_and_removed_only_by_the_fix() {
+        use std::os::unix::fs::PermissionsExt;
+        let root = temp("orphans-dead");
+        fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        let home = root.join("disp_orphan_1/home");
+        fs::create_dir_all(&home).unwrap();
+        let dead = fs::read_to_string("/proc/sys/kernel/pid_max")
+            .ok()
+            .and_then(|text| text.trim().parse::<u32>().ok())
+            .unwrap_or(4_194_304)
+            + 1;
+        fgos_execution_engine::confinement::cleanup::write_ownership_marker(
+            &home,
+            "disp_orphan_1",
+            "private-home",
+            dead,
+        )
+        .unwrap();
+        let roots = vec![root.clone()];
+        let host = SystemHost::default();
+        let (ok, message) = orphans_row(
+            &roots,
+            &judge_confinement_orphans(&roots, now_millis(), &host),
+        );
+        assert!(
+            !ok && message.contains("1 confinement resource dir(s) owned by a dead process"),
+            "{message}"
+        );
+        assert!(home.exists(), "a check never removes");
+        let (changed, message) = fix_orphans(&roots, &host);
+        assert!(
+            changed && message.contains("removed 1 home(s) left by a dead dispatch"),
+            "{message}"
+        );
+        assert!(!home.exists());
+        assert!(
+            orphans_row(
+                &roots,
+                &judge_confinement_orphans(&roots, now_millis(), &host)
+            )
+            .0
+        );
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
     fn the_group_lists_the_rows_and_fixes_the_registry_names() {
         assert_eq!(ROWS.len(), 9);
         assert!(FIXES.iter().all(|fix| ROWS.contains(fix)));
         assert_eq!(format_age(5.0 * 3_600_000.0), "5h");
         assert_eq!(format_age(72.0 * 3_600_000.0), "3d");
+    }
+
+    /// The login copy row and its repair over a scratch provider runtime and confinement root: what the row says of
+    /// each kind of copy, and what the repair removes, settles or leaves.
+    mod copies {
+        use super::*;
+        use fgos_execution_engine::confinement::cleanup::{
+            write_attempt_home_record, write_ownership_marker, write_ownership_marker_v2,
+            OWNERSHIP_MARKER_FILE,
+        };
+        use fgos_host_runtime::civil_time::format_unix_millis_rfc3339;
+        use std::time::{Duration, SystemTime};
+
+        const HOUR: f64 = 3_600_000.0;
+        const DAY: f64 = 24.0 * HOUR;
+        const TOKEN: &str = "FAKE-REFRESH-TOKEN-DO-NOT-PRINT";
+
+        struct W {
+            tmp: PathBuf,
+            runtime: PathBuf,
+            temp_root: PathBuf,
+        }
+
+        impl W {
+            fn new(label: &str) -> W {
+                let tmp = temp(label);
+                let w = W {
+                    runtime: tmp.join("runtime"),
+                    temp_root: tmp.join("fgos-confinement"),
+                    tmp,
+                };
+                fs::create_dir_all(&w.runtime).unwrap();
+                fs::create_dir_all(&w.temp_root).unwrap();
+                w
+            }
+
+            fn account(&self, provider: &str, account: &str) -> PathBuf {
+                self.runtime
+                    .join("account-locks")
+                    .join(provider)
+                    .join(account)
+            }
+        }
+
+        impl Drop for W {
+            fn drop(&mut self) {
+                let _ = fs::remove_dir_all(&self.tmp);
+            }
+        }
+
+        fn stamp(at: f64) -> String {
+            format!("{:015}", at as i64)
+        }
+
+        fn iso(at: f64) -> String {
+            format_unix_millis_rfc3339(at as i64, 0).unwrap()
+        }
+
+        /// A login copy in `pending/` of the store `sub` of an account (`""` for the account directory itself).
+        fn add_pending_in(w: &W, provider: &str, account: &str, sub: &str, staged_at: f64) {
+            let mut dir = w.account(provider, account);
+            if !sub.is_empty() {
+                dir = dir.join(sub);
+            }
+            let dir = dir
+                .join("pending")
+                .join(format!("{}-abcd0123", stamp(staged_at)));
+            fs::create_dir_all(&dir).unwrap();
+            fs::write(
+                dir.join("auth.json"),
+                json!({ "refresh": TOKEN }).to_string(),
+            )
+            .unwrap();
+        }
+
+        fn add_pending(w: &W, provider: &str, account: &str, staged_at: f64) {
+            add_pending_in(w, provider, account, "", staged_at);
+        }
+
+        fn patch_marker(dir: &Path, fields: Value) {
+            let file = dir.join(OWNERSHIP_MARKER_FILE);
+            let mut marker: Value =
+                serde_json::from_str(&fs::read_to_string(&file).unwrap()).unwrap();
+            marker
+                .as_object_mut()
+                .unwrap()
+                .extend(fields.as_object().unwrap().clone());
+            fs::write(file, marker.to_string()).unwrap();
+        }
+
+        /// A private home an older release kept in its own marker after `attempts` failed stagings, 50 hours ago.
+        fn add_kept_home_under(
+            w: &W,
+            root: &Path,
+            dispatch: &str,
+            attempts: u64,
+            since: f64,
+        ) -> PathBuf {
+            let dir = root.join(dispatch).join("home");
+            fs::create_dir_all(&dir).unwrap();
+            write_ownership_marker(&dir, dispatch, "private-home", std::process::id()).unwrap();
+            patch_marker(
+                &dir,
+                json!({
+                    "credentialWriteBack": { "provider": "xai", "accountId": "acct", "home": w.tmp.join("secret-source-home"), "layout": "pi-auth-json", "runtimeDir": w.runtime },
+                    "credentialKept": { "attempts": attempts, "since": iso(since) },
+                }),
+            );
+            dir
+        }
+
+        fn add_kept_home(w: &W, dispatch: &str, attempts: u64) -> PathBuf {
+            add_kept_home_under(
+                w,
+                &w.temp_root.clone(),
+                dispatch,
+                attempts,
+                now_ms() - 50.0 * HOUR,
+            )
+        }
+
+        fn aged(path: &Path) {
+            let then = SystemTime::now() - Duration::from_secs(3 * 3600);
+            fs::File::open(path).unwrap().set_modified(then).unwrap();
+        }
+
+        /// A process id above the kernel's limit: no process ever has it.
+        fn dead_pid() -> u64 {
+            fs::read_to_string("/proc/sys/kernel/pid_max")
+                .ok()
+                .and_then(|text| text.trim().parse::<u64>().ok())
+                .unwrap_or(4_194_304)
+                + 1
+        }
+
+        fn set_owner_only(dir: &Path) {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(dir, fs::Permissions::from_mode(0o700)).unwrap();
+        }
+
+        /// An interrupted staging named after a process that cannot be alive, three hours old.
+        fn add_staging(store: &Path, tag: &str, content: Option<&str>) -> PathBuf {
+            let target = store
+                .join("pending")
+                .join(format!(".tmp-{}-{tag}", dead_pid()));
+            fs::create_dir_all(&target).unwrap();
+            if let Some(content) = content {
+                fs::write(target.join("auth.json"), content).unwrap();
+                aged(&target.join("auth.json"));
+            }
+            aged(&target);
+            target
+        }
+
+        /// The inventory that reads every account directory on disk the way its own layout says: one with
+        /// `stores/<cli>` declares those CLIs, any other has one store.
+        fn inventory_of_disk(w: &W) -> Map<String, Value> {
+            let names = |dir: &Path| -> Vec<String> {
+                sub_dirs(dir)
+                    .into_iter()
+                    .map(|d| d.file_name().unwrap().to_string_lossy().into_owned())
+                    .collect()
+            };
+            let root = w.runtime.join("account-locks");
+            let mut inventory = Map::new();
+            for provider in names(&root) {
+                let mut accounts = Map::new();
+                for account in names(&root.join(&provider)) {
+                    let clis = names(&root.join(&provider).join(&account).join("stores"));
+                    let entry = if clis.is_empty() {
+                        json!({ "credentialSource": { "kind": "codex-home", "home": "/x" } })
+                    } else {
+                        let sources: Map<String, Value> = clis
+                            .into_iter()
+                            .map(|cli| (cli, json!({ "kind": "codex-home", "home": "/x" })))
+                            .collect();
+                        json!({ "credentialSources": sources })
+                    };
+                    accounts.insert(account, entry);
+                }
+                inventory.insert(provider, json!({ "accounts": accounts }));
+            }
+            inventory
+        }
+
+        fn per_cli() -> Value {
+            json!({ "credentialSources": { "codex": { "kind": "codex-home", "home": "/x" }, "pi": { "kind": "home-files", "home": "/y" } } })
+        }
+
+        fn single() -> Value {
+            json!({ "credentialSource": { "kind": "codex-home", "home": "/x" } })
+        }
+
+        fn inventory(provider: &str, account: &str, entry: Value) -> Map<String, Value> {
+            json!({ provider: { "accounts": { account: entry } } })
+                .as_object()
+                .unwrap()
+                .clone()
+        }
+
+        fn row_with(
+            w: &W,
+            roots: Vec<PathBuf>,
+            now: f64,
+            inventory: Result<&Map<String, Value>, &str>,
+        ) -> Verdict {
+            credential_copies_row(&CopiesFacts {
+                runtime_dir: w.runtime.clone(),
+                roots,
+                retried_roots: vec![w.temp_root.clone()],
+                now,
+                min_age_ms: RETAINED_COPY_REPORT_AFTER_MS,
+                inventory: inventory.map(stores_of).map_err(str::to_owned),
+            })
+        }
+
+        fn run(w: &W, now: f64) -> Verdict {
+            row_with(w, vec![w.temp_root.clone()], now, Ok(&inventory_of_disk(w)))
+        }
+
+        fn run_inv(w: &W, inv: &Map<String, Value>, now: f64) -> Verdict {
+            row_with(w, vec![w.temp_root.clone()], now, Ok(inv))
+        }
+
+        fn unreadable(w: &W, now: f64) -> Verdict {
+            row_with(
+                w,
+                vec![w.temp_root.clone()],
+                now,
+                Err("global config unreadable (test) at /x"),
+            )
+        }
+
+        /// The repair under the real account lock of a scratch lock directory, as a doctor run takes it.
+        fn fix_in(
+            w: &W,
+            roots: Vec<PathBuf>,
+            inventory: Option<&Map<String, Value>>,
+        ) -> (bool, String) {
+            let host = AccountsHost::new();
+            let accounts = Accounts::new(&w.runtime, w.tmp.join("locks"), &host);
+            fix_copies_in(&CopiesFix {
+                runtime: &w.runtime,
+                roots: &roots,
+                retried_roots: std::slice::from_ref(&w.temp_root),
+                inventory,
+                home_dir: None,
+                locks: &AccountsLocks(&accounts),
+            })
+        }
+
+        #[test]
+        fn a_clean_machine_passes() {
+            let w = W::new("clean");
+            assert!(run(&w, now_ms()).0);
+        }
+
+        #[test]
+        fn a_pending_copy_a_day_old_is_reported_by_provider_account_and_age_and_a_young_one_is_not()
+        {
+            let w = W::new("pending-age");
+            let now = now_ms();
+            add_pending(&w, "xai", "acct", now - 3.0 * DAY);
+            add_pending(&w, "xai", "acct", now - 30.0 * DAY);
+            add_pending(&w, "codex", "young", now - HOUR);
+            let (ok, message) = run(&w, now);
+            assert!(ok && message.starts_with("warning: "), "{message}");
+            assert!(message.contains("xai/acct: 2 pending login copy(ies) waiting for a renewal (a dispatch for that account applies them), oldest 30d"), "{message}");
+            assert!(!message.contains("young"));
+        }
+
+        #[test]
+        fn a_held_home_fails_with_its_hand_recovery_a_retried_one_is_only_noted_and_the_marker_is_never_repeated(
+        ) {
+            let w = W::new("held");
+            let held = add_kept_home(&w, "disp_held", CREDENTIAL_KEEP_MAX_ATTEMPTS);
+            let (ok, message) = run(&w, now_ms());
+            assert!(!ok, "{message}");
+            assert!(
+                message.contains("private home held after repeated staging failures, 2d old, at "),
+                "{message}"
+            );
+            assert!(message.contains(&held.display().to_string()));
+            assert!(
+                message.contains("Recover by hand: ")
+                    && message.contains("protected/confinement-finalization/<launch>.json names")
+                    && message.contains("then delete the home")
+            );
+            for agent_word in [TOKEN, "secret-source-home", "xai/acct"] {
+                assert!(!message.contains(agent_word), "{agent_word}");
+            }
+            fs::remove_dir_all(w.temp_root.join("disp_held")).unwrap();
+            add_kept_home(&w, "disp_retry", 1);
+            let (ok, message) = run(&w, now_ms());
+            assert!(ok && message.starts_with("warning: "), "{message}");
+            assert!(message.contains("1 private home(s) kept after a staging failure, retried by the finalize-home step of their attempt, oldest 2d"), "{message}");
+        }
+
+        #[test]
+        fn the_orphan_count_skips_a_held_home_of_a_dead_process_but_counts_one_only_being_retried()
+        {
+            let w = W::new("orphan-held");
+            let roots = vec![w.temp_root.clone()];
+            set_owner_only(&w.temp_root);
+            let dead = dead_pid();
+            let held = add_kept_home(&w, "disp_held", CREDENTIAL_KEEP_MAX_ATTEMPTS);
+            patch_marker(&held, json!({ "pid": dead }));
+            let found = judge_confinement_orphans(&roots, now_millis(), &SystemHost::default());
+            assert!(
+                orphans_row(&roots, &found).0,
+                "a held home is reported by its own row, not as an orphan"
+            );
+            let retrying = add_kept_home(&w, "disp_retry", 1);
+            patch_marker(&retrying, json!({ "pid": dead }));
+            let found = judge_confinement_orphans(&roots, now_millis(), &SystemHost::default());
+            let (ok, message) = orphans_row(&roots, &found);
+            assert!(
+                !ok && message.contains("1 confinement resource dir(s) owned by a dead process"),
+                "{message}"
+            );
+        }
+
+        #[test]
+        fn the_fix_settles_a_held_home_from_its_host_record_and_never_one_without_a_record_or_through_a_link(
+        ) {
+            let w = W::new("settle");
+            let now = now_ms();
+            let source = w.tmp.join("secret-source-home");
+            fs::create_dir_all(&source).unwrap();
+            let login = |refresh: &str, expires: f64| {
+                json!({ "xai": { "type": "oauth", "refresh": refresh, "expires": expires as i64 } })
+                    .to_string()
+            };
+            fs::write(
+                source.join("auth.json"),
+                login("FAKE-REFRESH-OLD", now + HOUR),
+            )
+            .unwrap();
+            let before = fs::read_to_string(source.join("auth.json")).unwrap();
+            let renewed = login("FAKE-REFRESH-NEW", now + 12.0 * HOUR);
+            let gone = add_kept_home(&w, "disp_gone", CREDENTIAL_KEEP_MAX_ATTEMPTS);
+            let unrecorded = add_kept_home(&w, "disp_renewed", CREDENTIAL_KEEP_MAX_ATTEMPTS);
+            fs::write(unrecorded.join("auth.json"), &renewed).unwrap();
+            let recorded = w.temp_root.join("disp_recorded/home");
+            fs::create_dir_all(&recorded).unwrap();
+            fs::write(recorded.join("auth.json"), &renewed).unwrap();
+            let run_dir = w.tmp.join("run");
+            fs::create_dir_all(run_dir.join("protected/confinement-finalization")).unwrap();
+            fs::write(
+                run_dir.join("protected/confinement-finalization/att-recorded.json"),
+                json!({
+                    "contract": "confinement-finalization.v1", "launchCommandId": "att-recorded",
+                    "resources": [{ "pathRef": recorded, "resourceId": "private-home", "credentialWriteBack": { "provider": "xai", "accountId": "acct", "kind": "home-files", "home": source, "layout": "pi-auth-json", "runtimeDir": w.runtime } }],
+                })
+                .to_string(),
+            )
+            .unwrap();
+            let kept = json!({ "attempts": CREDENTIAL_KEEP_MAX_ATTEMPTS, "since": iso(now - 50.0 * HOUR), "lastCountedAt": now as i64 });
+            write_attempt_home_record(&recorded, &json!({ "attemptId": "att-recorded", "runDir": run_dir, "dispatchId": "disp_recorded", "launchCommandId": "att-recorded", "credentialKept": kept })).unwrap();
+            let linked = w.temp_root.join("disp_linked/home");
+            fs::create_dir_all(&linked).unwrap();
+            fs::write(linked.join("auth.json"), &renewed).unwrap();
+            let elsewhere = w.tmp.join("elsewhere/disp_linked/home");
+            fs::create_dir_all(&elsewhere).unwrap();
+            let planted = write_attempt_home_record(&elsewhere, &json!({ "attemptId": "att-recorded", "runDir": run_dir, "dispatchId": "disp_linked", "launchCommandId": "att-recorded", "credentialKept": kept })).unwrap();
+            std::os::unix::fs::symlink(&planted, w.temp_root.join("disp_linked/attempt-home.json"))
+                .unwrap();
+            assert!(run(&w, now).1.contains("disp_recorded/home. Its host record names where its login goes: \"fgos doctor --fix\""));
+
+            let (changed, message) = fix_in(&w, vec![w.temp_root.clone()], None);
+            assert!(changed, "{message}");
+            assert!(message.contains("held private home(s): 1 settled, 2 still held (one without a host record is recovered by hand)"), "{message}");
+            assert!(
+                linked.exists(),
+                "a home whose record is a link is not settled"
+            );
+            assert!(
+                !w.temp_root.join("disp_recorded").exists(),
+                "the recorded home, its record and its dispatch directory are gone"
+            );
+            let pending = w.account("xai", "acct").join("pending");
+            let staged: Vec<String> = sub_dirs(&pending)
+                .iter()
+                .map(|dir| fs::read_to_string(dir.join("auth.json")).unwrap())
+                .collect();
+            assert_eq!(
+                staged,
+                vec![renewed],
+                "its login waits beside the store its record names"
+            );
+            assert_eq!(
+                fs::read_to_string(source.join("auth.json")).unwrap(),
+                before,
+                "nothing is applied by the fix"
+            );
+            assert!(gone.exists() && unrecorded.exists());
+        }
+
+        #[test]
+        fn an_account_over_the_pending_limit_is_reported_even_when_its_copies_are_young() {
+            let w = W::new("over-limit");
+            let now = now_ms();
+            for i in 0..6 {
+                add_pending(&w, "xai", "acct", now - f64::from(i) * 1000.0);
+            }
+            add_pending(&w, "codex", "other", now - 1000.0);
+            let (ok, message) = run(&w, now);
+            assert!(ok && message.starts_with("warning: "), "{message}");
+            assert!(message.contains("xai/acct: 6 pending login copies waiting, over the limit of 5 (the limit drops only copies identical to another"), "{message}");
+            assert!(!message.contains("codex/other") && !message.contains(TOKEN));
+        }
+
+        fn add_torn(store: &Path, name: &str, content: Option<&str>) {
+            let dir = store.join("torn").join(name);
+            fs::create_dir_all(&dir).unwrap();
+            if let Some(content) = content {
+                fs::write(dir.join("auth.json"), content).unwrap();
+            }
+        }
+
+        #[test]
+        fn a_half_written_copy_is_reported_for_hand_recovery_at_any_age() {
+            let w = W::new("torn");
+            let now = now_ms();
+            add_torn(
+                &w.account("xai", "acct"),
+                &format!("{}-abcd0123", stamp(now - 3.0 * DAY)),
+                Some(&format!("{{\"refresh\": \"{TOKEN}")),
+            );
+            let (ok, message) = run(&w, now);
+            assert!(ok, "{message}");
+            assert!(message.contains("xai/acct: 1 half-written login copy(ies) kept for hand recovery (never applied or dropped automatically), oldest 3d"), "{message}");
+            assert!(!message.contains(TOKEN));
+            let young = W::new("torn-young");
+            add_torn(
+                &young.account("xai", "acct"),
+                &format!("{}-abcd0123", stamp(now - 1000.0)),
+                Some("{\"refresh\""),
+            );
+            assert!(run(&young, now)
+                .1
+                .contains("xai/acct: 1 half-written login copy(ies) kept for hand recovery"));
+        }
+
+        #[test]
+        fn an_agent_copy_set_aside_after_empty_renewals_has_its_own_wording() {
+            let w = W::new("set-aside");
+            let now = now_ms();
+            add_torn(
+                &w.account("xai", "acct"),
+                &format!("{}-agent-abcd0123", stamp(now - 1000.0)),
+                Some(&json!({ "refresh": TOKEN }).to_string()),
+            );
+            let message = run(&w, now).1;
+            assert!(message.contains("xai/acct: 1 login copy(ies) renewed inside a private home and set aside after renewals that returned nothing"), "{message}");
+            assert!(!message.contains("half-written") && !message.contains(TOKEN));
+        }
+
+        #[test]
+        fn copies_in_a_store_the_layout_no_longer_reads_are_named_for_hand_recovery_at_any_age() {
+            let now = now_ms();
+            // Left at the account root after the account moved to one store per CLI.
+            let w = W::new("stranded-root");
+            add_pending(&w, "openai", "acct", now - 3.0 * DAY);
+            let (ok, message) = run_inv(&w, &inventory("openai", "acct", per_cli()), now);
+            assert!(!ok, "{message}");
+            assert!(
+                message.contains("openai/acct: 1 login copy(ies) that no dispatch applies"),
+                "{message}"
+            );
+            assert!(message.contains(&format!("at {} ", w.account("openai", "acct").display())));
+            assert!(message.contains("recover the login from them by hand"));
+            assert!(
+                !message.contains("a dispatch for that account applies them")
+                    && !message.contains(TOKEN)
+            );
+            // Under stores/<cli> after the account went back to one store, or of a CLI it no longer declares.
+            for (label, entry) in [
+                ("stranded-single", single()),
+                (
+                    "stranded-cli",
+                    json!({ "credentialSources": { "codex": { "kind": "codex-home", "home": "/x" } } }),
+                ),
+            ] {
+                let w = W::new(label);
+                add_pending_in(&w, "openai", "acct", "stores/pi", now - 3.0 * DAY);
+                let (ok, message) = run_inv(&w, &inventory("openai", "acct", entry), now);
+                assert!(!ok, "{label}: {message}");
+                assert!(
+                    message.contains(&format!(
+                        "at {} ",
+                        w.account("openai", "acct").join("stores/pi").display()
+                    )),
+                    "{label}: {message}"
+                );
+                assert!(!message.contains("a dispatch for that account applies them"));
+            }
+            // An account the inventory no longer lists; a young one fails as well.
+            let w = W::new("stranded-gone");
+            add_pending(&w, "openai", "gone", now - HOUR);
+            let (ok, message) = run_inv(&w, &inventory("openai", "acct", single()), now);
+            assert!(
+                !ok && message
+                    .contains("openai/gone: 1 login copy(ies) that no dispatch applies, oldest 1h"),
+                "{message}"
+            );
+        }
+
+        #[test]
+        fn copies_in_a_store_the_inventory_still_reads_keep_the_waiting_wording() {
+            let now = now_ms();
+            let w = W::new("in-store-cli");
+            add_pending_in(&w, "openai", "acct", "stores/pi", now - 3.0 * DAY);
+            let (ok, message) = run_inv(&w, &inventory("openai", "acct", per_cli()), now);
+            assert!(ok && message.contains("openai/acct: 1 pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)"), "{message}");
+            let w = W::new("in-store-single");
+            add_pending(&w, "openai", "acct", now - 3.0 * DAY);
+            let (ok, message) = run_inv(&w, &inventory("openai", "acct", single()), now);
+            assert!(
+                ok && message
+                    .contains("openai/acct: 1 pending login copy(ies) waiting for a renewal"),
+                "{message}"
+            );
+            assert!(!message.contains("not checked"));
+        }
+
+        #[test]
+        fn without_a_readable_inventory_the_row_fails_lists_every_copy_and_promises_nothing_of_a_dispatch(
+        ) {
+            let now = now_ms();
+            let w = W::new("unread");
+            add_pending_in(&w, "openai", "acct", "stores/pi", now - 3.0 * DAY);
+            for i in 0..6 {
+                add_pending(&w, "openai", "other", now - f64::from(3 + i) * DAY);
+            }
+            let (ok, message) = unreadable(&w, now);
+            assert!(!ok);
+            assert!(
+                message.contains(
+                    "login store layout not checked: global config unreadable (test) at /x"
+                ),
+                "{message}"
+            );
+            assert!(
+                !message.contains("a dispatch for that account applies them")
+                    && !message.contains("a dispatch for that account re-checks them")
+            );
+            assert!(message.contains("openai/acct: 1 login copy(ies) kept"));
+            assert!(message.contains("openai/other: 6 pending login copies, over the limit"));
+            let young = W::new("unread-young");
+            add_pending(&young, "openai", "acct", now - 60_000.0);
+            let (ok, message) = unreadable(&young, now);
+            assert!(
+                !ok && message.contains("openai/acct: 1 login copy(ies) kept"),
+                "{message}"
+            );
+            assert!(unreadable(&W::new("unread-empty"), now).0);
+        }
+
+        #[test]
+        fn an_interrupted_staging_is_reported_and_the_fix_removes_only_one_provably_not_needed() {
+            let w = W::new("staging");
+            let account = w.account("xai", "acct");
+            add_pending(&w, "xai", "acct", now_ms() - 3.0 * HOUR);
+            let kept = sub_dirs(&account.join("pending")).remove(0);
+            fs::write(kept.join("auth.json"), TOKEN).unwrap();
+            let same = add_staging(&account, "same", Some(TOKEN));
+            let only = add_staging(&account, "only", Some("ONLY-COPY-BYTES"));
+            let message = run(&w, now_ms()).1;
+            assert!(
+                message.contains("xai/acct: 2 interrupted staging(s)"),
+                "{message}"
+            );
+            assert!(!message.contains(TOKEN) && !message.contains("ONLY-COPY-BYTES"));
+            let (changed, message) = fix_in(&w, vec![w.temp_root.clone()], None);
+            assert!(
+                changed && message.contains("interrupted staging(s): 1 removed, 1 kept"),
+                "{message}"
+            );
+            assert!(!same.exists() && only.exists());
+            assert!(run(&w, now_ms())
+                .1
+                .contains("xai/acct: 1 interrupted staging(s)"));
+        }
+
+        #[test]
+        fn a_staging_in_a_stranded_store_is_reported_once_for_hand_recovery_and_the_fix_leaves_it()
+        {
+            let w = W::new("staging-stranded");
+            let staging = add_staging(&w.account("openai", "acct"), "stranded", None);
+            let inv = inventory("openai", "acct", per_cli());
+            let (ok, message) = run_inv(&w, &inv, now_ms());
+            assert!(
+                !ok && message.contains("openai/acct: 1 login copy(ies) that no dispatch applies"),
+                "{message}"
+            );
+            assert!(!message.contains("interrupted staging"));
+            assert_eq!(
+                message
+                    .split(';')
+                    .filter(|row| row.contains("openai/acct"))
+                    .count(),
+                1
+            );
+            let (changed, _) = fix_in(&w, vec![w.temp_root.clone()], Some(&inv));
+            assert!(!changed && staging.exists());
+        }
+
+        #[test]
+        fn the_fix_judges_a_staging_against_the_source_login_of_its_store_through_the_inventory() {
+            let w = W::new("staging-source");
+            let now = now_ms();
+            let source = w.tmp.join("source-home");
+            fs::create_dir_all(&source).unwrap();
+            let doc = |expires: f64, refresh: &str| {
+                json!({ "xai": { "type": "oauth", "access": "FAKE-ACCESS", "refresh": refresh, "expires": expires as i64 } }).to_string()
+            };
+            fs::write(
+                source.join("auth.json"),
+                doc(now + 6.0 * HOUR, "FAKE-REFRESH-A"),
+            )
+            .unwrap();
+            let account = w.account("xai", "acct");
+            let older = add_staging(&account, "older", Some(&doc(now + HOUR, "FAKE-REFRESH-A")));
+            let no_source = add_staging(
+                &w.account("xai", "other"),
+                "older",
+                Some(&doc(now + HOUR, "FAKE-REFRESH-A")),
+            );
+            let newer = add_staging(
+                &account,
+                "newer",
+                Some(&doc(now + 12.0 * HOUR, "FAKE-REFRESH-B")),
+            );
+            let inv = json!({ "xai": { "accounts": {
+                "acct": { "credentialSource": { "kind": "home-files", "home": source, "files": ["auth.json"] } },
+                "other": { "credentialSource": { "kind": "home-files", "home": source, "files": ["other.json"] } },
+            } } });
+            let (_, message) = fix_in(&w, vec![w.temp_root.clone()], inv.as_object());
+            assert!(!older.exists(), "{message}");
+            assert!(
+                newer.exists(),
+                "a staging the source cannot show to be no newer stays"
+            );
+            assert!(
+                no_source.exists(),
+                "a store with no source login to judge by keeps its staging"
+            );
+        }
+
+        #[test]
+        fn the_fix_never_sweeps_a_stores_constructor_staging_the_row_calls_stranded() {
+            let w = W::new("staging-constructor");
+            let staging = add_staging(
+                &w.account("openai", "acct").join("stores/constructor"),
+                "proto",
+                Some("ONLY-COPY-BYTES"),
+            );
+            let inv = inventory("openai", "acct", per_cli());
+            assert!(run_inv(&w, &inv, now_ms())
+                .1
+                .contains("that no dispatch applies"));
+            fix_in(&w, vec![w.temp_root.clone()], Some(&inv));
+            assert!(staging.exists());
+        }
+
+        #[test]
+        fn an_interrupted_staging_row_offers_no_source_judgement_without_an_inventory() {
+            let w = W::new("staging-unread");
+            add_staging(&w.account("xai", "acct"), "x", Some("PART"));
+            let message = unreadable(&w, now_ms()).1;
+            assert!(message.contains("interrupted staging(s)"), "{message}");
+            assert!(message.contains("cannot judge one against the source login of the account until the provider inventory can be read"));
+            assert!(!message.contains("shown by the source login of the account to be no newer"));
+        }
+
+        #[test]
+        fn an_over_limit_store_is_named_by_its_cli_and_a_stranded_one_promises_no_re_check() {
+            let w = W::new("over-cli");
+            let store = w.account("openai", "acct").join("stores/codex/pending");
+            for i in 0..6 {
+                fs::create_dir_all(store.join(format!("{:015}-copy", 1000 + i))).unwrap();
+            }
+            assert!(run(&w, now_ms()).1.contains(
+                "openai/acct (store codex): 6 pending login copies waiting, over the limit"
+            ));
+            let w = W::new("over-stranded");
+            let now = now_ms();
+            for i in 0..7 {
+                add_pending(&w, "openai", "acct", now - f64::from(i + 1) * 1000.0);
+            }
+            let (ok, message) = run_inv(&w, &inventory("openai", "acct", per_cli()), now);
+            assert!(!ok, "{message}");
+            assert!(message.contains(&format!("openai/acct: 7 pending login copies at {}, over the limit of 5, in a directory the account's login store layout no longer reads (no dispatch re-checks or drops them", w.account("openai", "acct").display())), "{message}");
+            assert!(!message.contains("a dispatch for that account re-checks them"));
+        }
+
+        #[test]
+        fn a_scratch_home_or_a_half_written_copy_in_a_stranded_directory_names_that_directory() {
+            let now = now_ms();
+            let w = W::new("scratch-stranded");
+            let scratch = w.account("openai", "acct").join("scratch-abcd");
+            fs::create_dir_all(&scratch).unwrap();
+            fs::write(
+                scratch.join("auth.json"),
+                json!({ "refresh": TOKEN }).to_string(),
+            )
+            .unwrap();
+            let (ok, message) = run_inv(&w, &inventory("openai", "acct", per_cli()), now);
+            assert!(
+                !ok && message.contains(&format!("at {} ", w.account("openai", "acct").display())),
+                "{message}"
+            );
+            assert!(!message.contains(TOKEN));
+            let w = W::new("torn-stranded");
+            add_torn(
+                &w.account("openai", "acct"),
+                &format!("{}-abcd0123", stamp(now - 1000.0)),
+                None,
+            );
+            let (ok, message) = run_inv(&w, &inventory("openai", "acct", per_cli()), now);
+            assert!(!ok && message.contains("openai/acct: 1 half-written login copy(ies) kept for hand recovery, oldest 0h, at "), "{message}");
+            assert!(message.contains(&format!("at {} ", w.account("openai", "acct").display())));
+        }
+
+        #[test]
+        fn an_id_that_names_an_object_built_in_is_not_found_in_the_inventory() {
+            let w = W::new("builtin-ids");
+            let now = now_ms();
+            add_pending(&w, "openai", "constructor", now - 3.0 * DAY);
+            add_pending(&w, "toString", "acct", now - 3.0 * DAY);
+            let (ok, message) = run_inv(&w, &inventory("openai", "acct", single()), now);
+            assert!(!ok);
+            assert!(
+                message.contains("openai/constructor: 1 login copy(ies) that no dispatch applies"),
+                "{message}"
+            );
+            assert!(
+                message.contains("toString/acct: 1 login copy(ies) that no dispatch applies"),
+                "{message}"
+            );
+        }
+
+        #[test]
+        fn the_fix_leaves_a_stranded_copy_in_place() {
+            let w = W::new("fix-stranded");
+            let now = now_ms();
+            add_pending(&w, "openai", "acct", now - 3.0 * DAY);
+            let inv = inventory("openai", "acct", per_cli());
+            fix_in(&w, vec![w.temp_root.clone()], Some(&inv));
+            assert_eq!(
+                sub_dirs(&w.account("openai", "acct").join("pending")).len(),
+                1
+            );
+            assert!(!run_inv(&w, &inv, now).0);
+        }
+
+        #[test]
+        fn the_inventory_the_machine_config_gives_names_accounts_by_state_key_and_keeps_declared_stores_waiting(
+        ) {
+            let w = W::new("machine-inventory");
+            let runner = json!({ "llmAccounts": { "openai": { "acct": { "credentialStore": { "codex": "/x" } } } } });
+            let inv = provider_account_inventory(&runner, &HostMachine::new(None, None));
+            let now = now_ms();
+            add_pending(&w, "openai-codex", "acct", now - 3.0 * DAY);
+            let (ok, message) = run_inv(&w, &inv, now);
+            assert!(
+                !ok && message
+                    .contains("openai-codex/acct: 1 login copy(ies) that no dispatch applies"),
+                "{message}"
+            );
+            add_pending_in(&w, "openai-codex", "acct", "stores/codex", now - 3.0 * DAY);
+            let message = run_inv(&w, &inv, now).1;
+            assert!(message.contains("openai-codex/acct: 1 pending login copy(ies) waiting for a renewal (a dispatch for that account applies them)"), "{message}");
+            assert!(!message.contains(&format!(
+                "{} ",
+                w.account("openai-codex", "acct")
+                    .join("stores/codex")
+                    .display()
+            )));
+        }
+
+        #[test]
+        fn a_kept_home_under_a_root_nothing_retries_is_held_at_once() {
+            let w = W::new("scan-only");
+            let scan_only = w.tmp.join("scan-only");
+            let retried = add_kept_home(&w, "disp_retried", 1);
+            let dir = add_kept_home_under(&w, &scan_only, "disp_scan_only", 1, now_ms() - HOUR);
+            let (ok, message) = row_with(
+                &w,
+                vec![w.temp_root.clone(), scan_only],
+                now_ms(),
+                Ok(&Map::new()),
+            );
+            assert!(
+                !ok && message.contains(&dir.display().to_string()),
+                "{message}"
+            );
+            assert!(message.contains("under a root that nothing retries by itself"));
+            assert!(!message.contains(&retried.display().to_string()));
+            assert!(message.contains("1 private home(s) kept after a staging failure, retried"));
+        }
+
+        #[test]
+        fn a_home_reached_through_two_spellings_or_a_link_of_one_root_is_counted_once_and_still_retried(
+        ) {
+            let w = W::new("spellings");
+            add_kept_home(&w, "disp_twice", CREDENTIAL_KEEP_MAX_ATTEMPTS);
+            let slash = PathBuf::from(format!("{}/", w.temp_root.display()));
+            let message = row_with(
+                &w,
+                vec![w.temp_root.clone(), slash],
+                now_ms(),
+                Ok(&Map::new()),
+            )
+            .1;
+            assert_eq!(message.matches("private home held").count(), 1, "{message}");
+            let w = W::new("alias");
+            add_kept_home(&w, "disp_linked", 1);
+            let alias = w.tmp.join("alias-of-confinement-root");
+            std::os::unix::fs::symlink(&w.temp_root, &alias).unwrap();
+            let (ok, message) = row_with(
+                &w,
+                vec![w.temp_root.clone(), alias.clone()],
+                now_ms(),
+                Ok(&Map::new()),
+            );
+            assert!(ok, "{message}");
+            assert_eq!(
+                message
+                    .matches("private home(s) kept after a staging failure")
+                    .count(),
+                1
+            );
+            assert!(!message.contains("under a root that nothing retries by itself"));
+            assert!(
+                row_with(&w, vec![alias], now_ms(), Ok(&Map::new())).0,
+                "reached through the link alone it is still a retried root"
+            );
+        }
+
+        #[test]
+        fn an_attempt_home_whose_run_has_neither_envelope_nor_intent_fails_naming_the_attempt() {
+            let w = W::new("unfinalized");
+            let run_dir = w.tmp.join("runs/01");
+            fs::create_dir_all(&run_dir).unwrap();
+            let home = w.temp_root.join("disp_orphan/home");
+            fs::create_dir_all(&home).unwrap();
+            let run_text = run_dir.to_string_lossy().into_owned();
+            write_ownership_marker_v2(
+                &home,
+                Some("att-orphan"),
+                Some(&run_text),
+                Some("disp_orphan"),
+                "private-home",
+            )
+            .unwrap();
+            fs::write(run_dir.join("attempt-intent.json"), "{}").unwrap();
+            assert!(
+                run(&w, now_ms()).0,
+                "the adopt door finalizes a home whose run still has its intent"
+            );
+            fs::remove_file(run_dir.join("attempt-intent.json")).unwrap();
+            let (ok, message) = run(&w, now_ms());
+            assert!(!ok, "{message}");
+            assert!(
+                message.contains("private home of attempt att-orphan at ")
+                    && message.contains("disp_orphan")
+                    && message.contains("neither envelope.json nor attempt-intent.json"),
+                "{message}"
+            );
+        }
     }
 }
