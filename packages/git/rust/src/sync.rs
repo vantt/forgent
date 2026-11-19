@@ -11,6 +11,41 @@ use crate::{
 use fgos_holder_lock::{BorrowedHandle, LockScope};
 use serde::Serialize;
 use std::fs;
+
+/// The request digest Sync has always bound: its intent kind with the declared
+/// bytes themselves rather than their blob OIDs, so ids compacted by earlier
+/// releases still match their retry.
+fn sync_request_digest(
+    intent: &wal::SyncIntent,
+    files: &[LandFile],
+    writer: &str,
+) -> Result<String> {
+    #[derive(Serialize)]
+    enum Kind<'a> {
+        Sync(Request<'a>),
+    }
+    #[derive(Serialize)]
+    #[serde(rename_all = "camelCase")]
+    struct Request<'a> {
+        #[serde(skip_serializing_if = "Option::is_none")]
+        reference: Option<&'a str>,
+        worktree: &'a str,
+        head: &'a str,
+        target: &'a str,
+        message: &'a str,
+        #[serde(skip_serializing_if = "<[LandFile]>::is_empty")]
+        files: &'a [LandFile],
+    }
+    let kind = Kind::Sync(Request {
+        reference: intent.reference.as_deref(),
+        worktree: &intent.worktree,
+        head: &intent.head,
+        target: &intent.target,
+        message: &intent.message,
+        files,
+    });
+    Ok(wal::canonical_digest(&(&kind, writer))?)
+}
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SyncResult {
@@ -99,27 +134,33 @@ impl GitDriver {
         let scope = scope(repo, held)?;
         let wal = Wal::open(repo)?;
         if let Some(compact) = wal.compacted(id)? {
-            let kind = OperationKind::Sync(Box::new(wal::SyncIntent {
+            let intent = wal::SyncIntent {
                 reference: compact.reference.clone(),
                 worktree: root(repo)?.to_string_lossy().into(),
                 head: compact.expected.clone(),
                 target: target.as_str().into(),
                 message: message.into(),
-                files: files.to_vec(),
-            }));
-            if compact.request != wal::canonical_digest(&(&kind, writer))? {
+                files: vec![],
+            };
+            if compact.request != sync_request_digest(&intent, files, writer)? {
                 return Err(failure("operation-id-reused"));
             }
             return self.continue_sync_scoped(repo, &scope, &wal, writer, id, false);
         }
+        let declared = self.intent_files(repo, files)?;
         if wal.known_id(id)? {
             let previous = wal.inspect(id)?;
-            match &previous.intent().kind {
-                OperationKind::Sync(payload)
-                    if payload.target == target.as_str()
+            let same = match &previous.intent().kind {
+                OperationKind::Sync(payload) => {
+                    payload.target == target.as_str()
                         && payload.message == message
-                        && payload.files == files => {}
-                _ => return Err(failure("operation-id-reused")),
+                        && self.declared_blobs(repo, &payload.files)?
+                            == self.declared_blobs(repo, &declared)?
+                }
+                _ => false,
+            };
+            if !same {
+                return Err(failure("operation-id-reused"));
             }
             return self.continue_sync_scoped(repo, &scope, &wal, writer, id, false);
         }
@@ -164,15 +205,17 @@ impl GitDriver {
         let resources = checkout_resources(repo)?;
         crate::refs::admission(&wal, id, &resources)?;
         let binding = binding(handle(&scope, repo)?)?;
-        let kind = OperationKind::Sync(Box::new(wal::SyncIntent {
+        let mut sync = wal::SyncIntent {
             reference: Some(reference),
             worktree: root(repo)?.to_string_lossy().into_owned(),
             head: head.clone(),
             target: target.as_str().into(),
             message: message.into(),
-            files: files.to_vec(),
-        }));
-        let request_digest = wal::canonical_digest(&(&kind, writer))?;
+            files: vec![],
+        };
+        let request_digest = sync_request_digest(&sync, files, writer)?;
+        sync.files = declared;
+        let kind = OperationKind::Sync(Box::new(sync));
         let intent = Intent::of(
             &wal,
             repo,
@@ -1188,5 +1231,36 @@ mod tests {
             assert!(has_conflict_markers(m));
         }
         assert!(!has_conflict_markers(b"\0<<<<<<< left"));
+    }
+    /// Earlier releases hashed the intent kind with the bytes in it; an id they
+    /// compacted must still match the same request retried now.
+    #[test]
+    fn request_digest_still_hashes_the_declared_bytes_form() {
+        use crate::{wal, LandFile};
+        let files = vec![
+            LandFile {
+                path: "store".into(),
+                bytes: Some(b"resolution\n".to_vec()),
+            },
+            LandFile {
+                path: "gone".into(),
+                bytes: None,
+            },
+        ];
+        let mut intent = wal::SyncIntent {
+            reference: Some("refs/heads/producer".into()),
+            worktree: "/tree".into(),
+            head: "a".repeat(40),
+            target: "b".repeat(40),
+            message: "sync".into(),
+            files: vec![],
+        };
+        let digest = super::sync_request_digest(&intent, &files, "writer").unwrap();
+        intent.files = files.into_iter().map(wal::IntentFile::Bytes).collect();
+        let earlier = wal::OperationKind::Sync(Box::new(intent));
+        assert_eq!(
+            digest,
+            wal::canonical_digest(&(&earlier, "writer")).unwrap()
+        );
     }
 }

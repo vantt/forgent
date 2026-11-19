@@ -969,10 +969,20 @@ fn declared_resolution_bytes_are_frozen_before_consumer_verification() {
     git(&f.main, &["commit", "-qam", "target disagreement"]);
     let mut request = f.request.clone();
     request.target = git(&f.main, &["rev-parse", "HEAD"]);
-    request.files = vec![LandFile {
-        path: "a".into(),
-        bytes: Some(b"consumer resolution\n".to_vec()),
-    }];
+    // A declared file far above the 64 KiB WAL record bound: the intent
+    // records its blob OID, never its bytes.
+    let large = "large resolution\n".repeat(80 * 1024);
+    request.files = vec![
+        LandFile {
+            path: "a".into(),
+            bytes: Some(b"consumer resolution\n".to_vec()),
+        },
+        LandFile {
+            path: "large".into(),
+            bytes: Some(large.clone().into_bytes()),
+        },
+    ];
+    assert!(large.len() > 1024 * 1024);
     let mut session = f
         .driver
         .prepare_land(
@@ -985,7 +995,28 @@ fn declared_resolution_bytes_are_frozen_before_consumer_verification() {
             0,
         )
         .unwrap();
+    let chain = wal::Wal::open(&f.repo)
+        .unwrap()
+        .inspect("resolved")
+        .unwrap();
+    let wal::OperationKind::Land(payload) = &chain.intent().kind else {
+        panic!("not a land intent")
+    };
+    assert!(serde_json::to_vec(&chain.records()[0]).unwrap().len() < 64 * 1024);
     let candidate = session.candidate().unwrap();
+    let declared = |path: &str| {
+        wal::IntentFile::Blob(wal::DeclaredBlob {
+            path: path.into(),
+            blob: Some(git(
+                &candidate.worktree,
+                &["hash-object", "--no-filters", "--", path],
+            )),
+        })
+    };
+    assert_eq!(
+        payload.request.files,
+        vec![declared("a"), declared("large")]
+    );
     assert_eq!(
         fs::read_to_string(candidate.worktree.join("a")).unwrap(),
         "consumer resolution\n"
@@ -1018,6 +1049,7 @@ fn declared_resolution_bytes_are_frozen_before_consumer_verification() {
         fs::read_to_string(f.main.join("a")).unwrap(),
         "consumer resolution\n"
     );
+    assert_eq!(fs::read_to_string(f.main.join("large")).unwrap(), large);
 }
 
 #[test]

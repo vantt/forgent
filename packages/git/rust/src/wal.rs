@@ -247,15 +247,75 @@ pub struct SyncIntent {
     pub head: String,
     pub target: String,
     pub message: String,
-    /// Consumer-declared literal bytes applied after the merge (prepare only).
+    /// Consumer-declared files applied after the merge (prepare only).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub files: Vec<crate::LandFile>,
+    pub files: Vec<IntentFile>,
+}
+/// One consumer-declared file as an intent records it: its path and the blob
+/// OID of its declared bytes, `None` declaring an absence. The bytes live only
+/// in the caller's request and the tree built from it, never in the WAL.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DeclaredBlob {
+    pub path: String,
+    pub blob: Option<String>,
+}
+/// The one reader of a recorded declared file. Records written before the
+/// blob form carry the bytes themselves; they stay verbatim so their record
+/// digest still verifies, and are only ever read as their blob OID.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum IntentFile {
+    Blob(DeclaredBlob),
+    Bytes(crate::LandFile),
+}
+fn intent_files_valid(files: &[IntentFile], format: ObjectFormat) -> bool {
+    files.iter().all(|file| match file {
+        IntentFile::Blob(b) => {
+            crate::land::declared_path_valid(&b.path)
+                && b.blob
+                    .as_ref()
+                    .is_none_or(|o| Oid::parse(o, format).is_ok())
+        }
+        IntentFile::Bytes(f) => crate::land::declared_path_valid(&f.path),
+    })
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct LandIntent {
-    pub request: crate::LandRequest,
+    pub request: LandIntentRequest,
     pub candidate: crate::LandCandidate,
+}
+/// The Land request as its intent records it: the caller's `LandRequest`
+/// with each declared file as its blob OID.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct LandIntentRequest {
+    pub source: String,
+    #[serde(default)]
+    pub target: String,
+    pub destination: String,
+    pub message: String,
+    #[serde(default)]
+    pub squash: bool,
+    pub footprint: Option<Vec<String>>,
+    pub subtree: Option<String>,
+    #[serde(default)]
+    pub files: Vec<IntentFile>,
+}
+impl LandIntentRequest {
+    pub fn of(req: &crate::LandRequest, files: Vec<IntentFile>) -> Self {
+        Self {
+            source: req.source.clone(),
+            target: req.target.clone(),
+            destination: req.destination.clone(),
+            message: req.message.clone(),
+            squash: req.squash,
+            footprint: req.footprint.clone(),
+            subtree: req.subtree.clone(),
+            files,
+        }
+    }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OperationKind {
@@ -590,6 +650,7 @@ impl Intent {
                 || self.expected != Tip::Oid(r.target.clone())
                 || self.next != Tip::Oid(c.candidate.clone())
                 || canonical_digest(&c.tree)? != c.tree_digest
+                || !intent_files_valid(&r.files, self.object_format)
             {
                 return Err(corrupt("land binding"));
             }
@@ -631,7 +692,7 @@ impl Intent {
                 || reference
                     .as_ref()
                     .is_some_and(|r| RefName::parse(r).is_err())
-                || crate::land::validate_declared_files(files, "sync").is_err()
+                || !intent_files_valid(files, self.object_format)
             {
                 return Err(corrupt("sync binding"));
             }
@@ -3440,6 +3501,53 @@ mod tests {
         assert_eq!(wal.scan(10).unwrap().unresolved, 0);
     }
 
+    #[test]
+    fn intent_recorded_with_declared_bytes_by_an_earlier_release_reads_and_compacts() {
+        let t = Temp::new();
+        let w = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
+        let worktree = t.0.join("tree").to_string_lossy().into_owned();
+        let declared = |path: &str, bytes: Option<Vec<u8>>| {
+            IntentFile::Bytes(crate::LandFile {
+                path: path.into(),
+                bytes,
+            })
+        };
+        let mut i = intent(&w);
+        i.kind = OperationKind::Sync(Box::new(SyncIntent {
+            reference: Some("refs/heads/producer".into()),
+            worktree: worktree.clone(),
+            head: "a".repeat(40),
+            target: "b".repeat(40),
+            message: "sync".into(),
+            files: vec![
+                declared(".fgos/events/s.jsonl", Some(b"1\n2\n".to_vec())),
+                declared("gone", None),
+            ],
+        }));
+        i.resource_set = vec![format!("worktree:{worktree}")];
+        i.expected = Tip::Oid("a".repeat(40));
+        i.next = Tip::Oid("b".repeat(40));
+        let Begin::Created(written) = w.begin("legacy", i, &Authority).unwrap() else {
+            panic!()
+        };
+        // The record carries the bytes exactly as earlier releases wrote them.
+        let raw = fs::read_to_string(w.root.path().join("legacy").join(record_name(0))).unwrap();
+        assert!(raw.contains(r#""bytes":[49,10,50,10]"#) && !raw.contains("blob"));
+        let read = w.inspect("legacy").unwrap();
+        assert_eq!(read.intent(), written.intent());
+        let c = w
+            .append(&read, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
+            .unwrap();
+        let mut r = reader(c.intent());
+        r.pin = ObservedRef::Direct(Tip::Absent);
+        let compact = w.compact(&c, &r, &Authority).unwrap();
+        assert!(!w.root.path().join("legacy").exists());
+        assert_eq!(compact.request, written.intent().request_digest);
+        assert_eq!(
+            w.compacted("legacy").unwrap().unwrap().digest,
+            compact.digest
+        );
+    }
     #[test]
     fn compact_retains_binding_and_receipt_before_deletion() {
         let t = Temp::new();

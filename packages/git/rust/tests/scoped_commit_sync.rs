@@ -298,52 +298,44 @@ fn sync_prepare_applies_declared_bytes_for_a_store_path_the_producer_deleted() {
         git(&f.main, &["commit", "-qam", "target grows the shard"]);
         let head = git(&f.tree, &["rev-parse", "HEAD"]);
         let oid = Oid::parse(&git(&f.main, &["rev-parse", "HEAD"]), ObjectFormat::Sha1).unwrap();
+        // Far above the 64 KiB WAL record bound: the intent records the blob OID.
+        let declared = format!("1\n2\n{}", "3\n".repeat(600 * 1024));
         let files = vec![LandFile {
             path: shard.into(),
-            bytes: Some(b"1\n2\n".to_vec()),
+            bytes: Some(declared.clone().into_bytes()),
         }];
-        let prepared = f
-            .driver
-            .prepare_sync(
+        let prepare = |files: &[LandFile]| {
+            f.driver.prepare_sync(
                 &f.repo,
                 f.held(),
                 &oid,
                 "catch-up",
-                &files,
+                files,
                 "fixture",
                 "declared",
             )
-            .unwrap();
+        };
+        let prepared = prepare(&files).unwrap();
         assert_eq!(prepared.state, "prepared");
         assert!(prepared.resolver_grant.is_empty());
         assert!(prepared.staged.contains(&shard.to_string()));
-        assert_eq!(git(&f.tree, &["show", &format!(":{shard}")]), "1\n2");
-        let other = vec![LandFile {
-            path: shard.into(),
-            bytes: None,
-        }];
-        assert_eq!(
-            f.driver
-                .prepare_sync(
-                    &f.repo,
-                    f.held(),
-                    &oid,
-                    "catch-up",
-                    &other,
-                    "fixture",
-                    "declared"
-                )
-                .unwrap_err()
-                .cause,
-            "operation-id-reused"
-        );
+        assert!(git(&f.tree, &["show", &format!(":{shard}")]) == declared.trim_end());
+        // The same id with the same bytes continues the open operation.
+        assert_eq!(prepare(&files).unwrap().state, "in-progress");
+        for other in [None, Some(format!("{declared}4\n").into_bytes())] {
+            let other = vec![LandFile {
+                path: shard.into(),
+                bytes: other,
+            }];
+            assert_eq!(prepare(&other).unwrap_err().cause, "operation-id-reused");
+        }
         if finish {
             let done = f
                 .driver
                 .continue_sync(&f.repo, f.held(), "fixture", "declared")
                 .unwrap();
             assert_eq!(done.state, "done");
-            assert_eq!(git(&f.tree, &["show", &format!("HEAD:{shard}")]), "1\n2");
+            assert!(git(&f.tree, &["show", &format!("HEAD:{shard}")]) == declared.trim_end());
             assert_eq!(
                 git(&f.tree, &["show", "-s", "--format=%P"]),
                 format!("{head} {}", oid.as_str())

@@ -42,19 +42,62 @@ pub struct LandFile {
 /// Consumer-declared paths are literal, relative and outside `.git`; `kind`
 /// names the refusal (`invalid-land-file`, `invalid-sync-file`).
 pub(crate) fn validate_declared_files(files: &[LandFile], kind: &str) -> Result<()> {
-    for file in files {
-        let path = std::path::Path::new(&file.path);
-        if path.is_absolute()
-            || file.path.is_empty()
-            || path
-                .components()
-                .any(|c| !matches!(c, std::path::Component::Normal(_)))
-            || file.path.split('/').any(|s| s == ".git")
-        {
-            return Err(failure(format!("invalid-{kind}-file")));
-        }
+    if files.iter().all(|f| declared_path_valid(&f.path)) {
+        Ok(())
+    } else {
+        Err(failure(format!("invalid-{kind}-file")))
     }
-    Ok(())
+}
+pub(crate) fn declared_path_valid(raw: &str) -> bool {
+    let path = std::path::Path::new(raw);
+    !raw.is_empty()
+        && !path.is_absolute()
+        && path
+            .components()
+            .all(|c| matches!(c, std::path::Component::Normal(_)))
+        && !raw.split('/').any(|s| s == ".git")
+}
+impl GitDriver {
+    /// The intent form of declared files: each path with the blob OID of its
+    /// bytes, hashed without writing the object. Land and Sync record only this.
+    pub(crate) fn intent_files(
+        &self,
+        repo: &RepoHandle,
+        files: &[LandFile],
+    ) -> Result<Vec<wal::IntentFile>> {
+        files
+            .iter()
+            .map(|f| Ok(wal::IntentFile::Blob(self.declared_blob(repo, f)?)))
+            .collect()
+    }
+    /// Recorded declared files as path and blob OID, whichever shape wrote them.
+    pub(crate) fn declared_blobs(
+        &self,
+        repo: &RepoHandle,
+        files: &[wal::IntentFile],
+    ) -> Result<Vec<wal::DeclaredBlob>> {
+        files
+            .iter()
+            .map(|file| match file {
+                wal::IntentFile::Blob(b) => Ok(b.clone()),
+                wal::IntentFile::Bytes(f) => self.declared_blob(repo, f),
+            })
+            .collect()
+    }
+    fn declared_blob(&self, repo: &RepoHandle, file: &LandFile) -> Result<wal::DeclaredBlob> {
+        let blob = match &file.bytes {
+            Some(bytes) => Some(
+                self.hash_object(repo, ObjectType::Blob, bytes)?
+                    .as_str()
+                    .into(),
+            ),
+            None => None,
+        };
+        Ok(wal::DeclaredBlob {
+            path: file.path.clone(),
+            blob,
+        })
+    }
 }
 /// Write one declared file's literal bytes under `root`, or remove it when it
 /// declares an absence. Git never interprets them. Symlink ancestors and
@@ -631,7 +674,7 @@ impl GitDriver {
             resources.extend(checkout_resources(&candidate_repo)?);
             crate::refs::admission_land(&wal, id, &resources, &land_binding, self, repo)?;
             let kind = OperationKind::Land(Box::new(wal::LandIntent {
-                request: req.clone(),
+                request: wal::LandIntentRequest::of(req, self.intent_files(repo, &req.files)?),
                 candidate: view.clone(),
             }));
             let binding =
@@ -1556,7 +1599,7 @@ fn compact_land_intent<F: wal::FileSystem>(
     // The compact binding deliberately retains the destination and writer, not
     // the disposable candidate directory's inode. No effect uses this view.
     let kind = OperationKind::Land(Box::new(wal::LandIntent {
-        request: LandRequest {
+        request: wal::LandIntentRequest {
             source: c.next.clone(),
             target: c.expected.clone(),
             destination: destination.clone(),
