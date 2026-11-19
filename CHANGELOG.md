@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- New verb `fgos questions [list]|show|ask|answer|ack|cancel` over the owner-question store (Linux): one door for every question that waits for the owner, each in the five-part decision form. `fgos questions --open` is removed; the bare verb that `head-start` already printed now works. `fgos identity mint question` mints question ids.
+- Head socket verbs `questions ask|ack|cancel` for every head and `questions answer` for the secretary only.
+- A receipt hook (Claude `UserPromptSubmit`/`Stop`, Codex `Stop`) tells a session its question was answered.
+- The S04 view and the gateway `/v1/questions` list every question and answer store questions.
+- `fgos session write` now commits and pushes what it writes through the same paths as `fgos land`: the reply names the commit, and a write is refused as `write-path-dirty`, `write-branch-ahead` or `write-catch-up-refused`.
+- This repo's `land.gates` run only for code paths.
 - `fgos session` now means an agent head session: `fgos session start|rotate|write` are the verbs that were `fgos head start|rotate|write`, and `fgos head` is gone (no alias). The per-session worktree verbs `fgos session start|end|list|gc` are retired; make and remove a checkout with `fgos worktree create|remove`. Leftover `.fgos/sessions.json` files and `<tmp>/fgos-sessions` directories are no longer read and may be deleted. `fgos identity` no longer takes `--fgos-dir` and no longer reports `source: registry`. The gateway routes `POST /v1/sessions`, `DELETE /v1/sessions/{id}` and `GET /v1/sessions/{id}/slots` answer 501 without running `fgos`. The `fgos doctor` row `leaf-notify-drift` is removed.
 - `fgos identity resolve` takes any identifier a session has (herdr pane or tab, tab label, CLI session id, name or socket, handle, role, mailbox address, pid) and returns its one record; the sender's role is visible through `fgos identity resolve` on the sender, and `fgos mailbox send --to` reaches a head by any of those identifiers.
 - The secretary head runs in the leads' permission mode (bypass, inside its sandbox), so a peer's message to it is no longer held for approval; other personas still ask. Pinned by `runner.personas.secretary` in the release standard.
