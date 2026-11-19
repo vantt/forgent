@@ -1395,7 +1395,7 @@ pub fn send_confined(call: Result<crate::routing::ConfinedCall, String>) -> i32 
             println!("{data}");
             fgos_host_runtime::exit_codes::ok()
         }
-        Err(error) => refuse(&error.code, &error.detail.unwrap_or_default()),
+        Err(error) => refuse(&error.code, &error.explanation()),
     }
 }
 

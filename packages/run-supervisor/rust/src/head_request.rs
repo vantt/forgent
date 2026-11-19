@@ -108,6 +108,7 @@ fn invalid(why: impl Into<String>) -> EnvelopeError {
 }
 
 type HoldsRole = Box<dyn Fn() -> Result<bool, HoldError> + Send + Sync>;
+type PendingRotation = Box<dyn Fn() -> Result<Option<String>, HoldError> + Send + Sync>;
 type TakesRole = Box<dyn Fn(bool) -> Result<(), HoldError> + Send + Sync>;
 type BindsSession = Box<dyn Fn(&Value, Option<u32>) -> Result<Value, HoldError> + Send + Sync>;
 type ChecksPeer = Box<dyn Fn(Option<u32>) -> Result<(), HoldError> + Send + Sync>;
@@ -138,6 +139,11 @@ pub struct Config {
     /// Does Identity give this session the envelope's role right now. An error is refused like a "no", and the
     /// client is told only its code.
     pub holds_role: HoldsRole,
+    /// Asked only after `holds_role` said no: is this attempt a rotation successor whose role is still held by the
+    /// live earlier generation of the same head (same persona and name, a lower generation), the rotation that moves
+    /// it not done yet. `Some(detail)` names that predecessor; the request is then refused `role-pending-rotation`,
+    /// retryable, instead of `role-not-held`. `None` and errors leave `role-not-held`.
+    pub pending_rotation: PendingRotation,
     /// Is this attempt's own session registered and live in Identity (the check of [`ANSWERED_VERB`], which runs
     /// before the session holds the role). Errors are handled as for `holds_role`.
     pub registered: HoldsRole,
@@ -253,6 +259,18 @@ impl HeadRequests {
         let writer_id = text(&envelope["identity"]["writerId"], "identity.writerId")?;
         let state_root = state_root.to_path_buf();
         let gate: Arc<Mutex<Option<HeadRef>>> = Arc::new(Mutex::new(None));
+        let own_head = match (
+            session["persona"].as_str(),
+            session["name"].as_str(),
+            session["gen"].as_u64(),
+        ) {
+            (Some(persona), Some(name), Some(gen)) => Some(fgos_identity::directory::HeadIds {
+                persona: persona.to_string(),
+                name: name.to_string(),
+                gen,
+            }),
+            _ => None,
+        };
         let cwd = PathBuf::from(text(&envelope["cwd"], "cwd")?);
         let step_env = envelope["steps"]
             .as_array()
@@ -284,6 +302,10 @@ impl HeadRequests {
                     gate.clone(),
                 );
                 move || identity_holds(&state_root, &role, &writer_id, known(&gate).as_ref())
+            }),
+            pending_rotation: Box::new({
+                let (state_root, role, own) = (state_root.clone(), role.clone(), own_head.clone());
+                move || identity_pending_rotation(&state_root, &role, own.as_ref())
             }),
             registered: Box::new({
                 let (state_root, writer_id, gate) =
@@ -427,6 +449,41 @@ pub fn identity_holds(
     ) {
         Ok(holder) => Ok(holder.id == own),
         Err(r) if r.reason == "not-found" => Ok(false),
+        Err(r) => Err(hold_error(r)),
+    }
+}
+
+/// Identity's answer to "is this head a rotation successor still waiting for its role": the role's live holder is the
+/// earlier generation of `own` (same persona and name, a lower generation), the one case a successor registers
+/// without the role (the supervisor's start step). Names that predecessor; `None` for any other holder or none.
+pub fn identity_pending_rotation(
+    state_root: &Path,
+    role: &str,
+    own: Option<&fgos_identity::directory::HeadIds>,
+) -> Result<Option<String>, HoldError> {
+    let Some(own) = own else {
+        return Ok(None);
+    };
+    match fgos_identity::directory::resolve(
+        state_root,
+        role,
+        &judge_here,
+        None,
+        &fgos_identity::directory::NoTerminal,
+    ) {
+        Ok(holder) => Ok(holder
+            .ids
+            .and_then(|ids| ids.head)
+            .filter(|held| {
+                held.persona == own.persona && held.name == own.name && held.gen < own.gen
+            })
+            .map(|held| {
+                format!(
+                    "{}-{} generation {} still holds the role",
+                    held.persona, held.name, held.gen
+                )
+            })),
+        Err(r) if r.reason == "not-found" => Ok(None),
         Err(r) => Err(hold_error(r)),
     }
 }
@@ -790,6 +847,12 @@ fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
 
 enum Outcome {
     Done(Value),
+    /// The route child ended with its own refusal: `code` is its code (the reply's detail), `message` its text,
+    /// bounded and on one line, which the client may show.
+    RouteRefused {
+        code: String,
+        message: Option<String>,
+    },
     Refused {
         code: &'static str,
         detail: Option<String>,
@@ -895,6 +958,13 @@ fn serve(cfg: &Config, busy: &AtomicBool, large: &AtomicBool, mut stream: UnixSt
         Outcome::Done(data) => {
             json!({"type": "REPLY", "id": id, "result": "done", "data": data})
         }
+        Outcome::RouteRefused { code, message } => {
+            let mut reply = json!({"type": "REPLY", "id": id, "result": "refused", "code": "verb-failed", "detail": code});
+            if let Some(message) = message {
+                reply["message"] = json!(message);
+            }
+            reply
+        }
         Outcome::Refused { code, detail } => {
             let mut reply = json!({"type": "REPLY", "id": id, "result": "refused", "code": code});
             if let Some(detail) = detail {
@@ -922,6 +992,11 @@ fn serve(cfg: &Config, busy: &AtomicBool, large: &AtomicBool, mut stream: UnixSt
     }
     let (result, code, detail) = match &outcome {
         Outcome::Done(_) => ("done", "-", String::new()),
+        Outcome::RouteRefused { code, .. } => (
+            "refused",
+            "verb-failed",
+            format!(": {}", loggable_detail(code)),
+        ),
         Outcome::Refused { code, detail } => (
             "refused",
             *code,
@@ -1098,7 +1173,17 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>)
     };
     match check() {
         Ok(true) => {}
-        Ok(false) => return refused(not_so),
+        Ok(false) => {
+            if not_so == "role-not-held" {
+                if let Ok(Some(detail)) = (cfg.pending_rotation)() {
+                    return Outcome::Refused {
+                        code: "role-pending-rotation",
+                        detail: Some(detail),
+                    };
+                }
+            }
+            return refused(not_so);
+        }
         Err(why) => {
             (cfg.log)(&format!(
                 "head-request {} identity {}: {}",
@@ -1204,16 +1289,20 @@ fn run_verb(cfg: &Config, request: &Request) -> Outcome {
             Outcome::Done(line.get("data").cloned().unwrap_or_else(|| json!({})))
         }
         (_, Some(line)) if line["code"].is_string() => {
-            // The client is told the code; the route's own message, which says why, goes to the log.
-            if let Some(message) = line["message"].as_str() {
+            // The client is told the code and the route's message, bounded to one plain line; the log keeps both.
+            let message = line["message"].as_str().map(loggable_detail);
+            if let Some(message) = &message {
                 (cfg.log)(&format!(
                     "head-request {} route {}: {}",
                     request.id,
                     loggable(line["code"].as_str().unwrap_or_default()),
-                    loggable_detail(message)
+                    message
                 ));
             }
-            failed(line["code"].as_str().unwrap_or_default().to_string())
+            Outcome::RouteRefused {
+                code: line["code"].as_str().unwrap_or_default().to_string(),
+                message,
+            }
         }
         _ => failed(format!(
             "the route ended {}",

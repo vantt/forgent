@@ -822,7 +822,10 @@ fn through_socket(
     let data = retry_busy(BUSY_RETRIES, BUSY_PAUSE, || {
         request_head(socket, verb, &args, &id, REPLY_TIMEOUT)
     })
-    .map_err(|e| refused(&Refusal::new(e.code, e.detail.unwrap_or_default())))?;
+    .map_err(|e| {
+        let text = e.explanation();
+        refused(&Refusal::new(e.code, text))
+    })?;
     let text = head_text(&request.verb, &data);
     Ok(present(request, data, text))
 }
@@ -1051,6 +1054,7 @@ mod tests {
         let busy = || ClientError {
             code: "busy".into(),
             detail: None,
+            message: None,
         };
         let mut calls = 0;
         let out: Result<(), _> = retry_busy(BUSY_RETRIES, std::time::Duration::ZERO, || {
@@ -1074,6 +1078,7 @@ mod tests {
             Err(ClientError {
                 code: "verb-not-granted".into(),
                 detail: None,
+                message: None,
             })
         });
         assert_eq!(
