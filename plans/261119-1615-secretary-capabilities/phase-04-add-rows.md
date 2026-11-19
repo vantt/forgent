@@ -1,5 +1,9 @@
 # Phase 4: Session write add-rows
 
+## Gate
+Waits for the work-data-model discussion (supervisor, 2026-11-19): if the backlog becomes one file per row, this
+phase is withdrawn.
+
 ## Context
 After phase 1, `session write` replaces a whole file under a base check. Adding one backlog row should not need a copy
 of the whole file. No backlog writer exists. docs/backlog.md has one open table (lines 3-267), a `## Done / Declined`
