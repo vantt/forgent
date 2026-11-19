@@ -80,7 +80,7 @@ the hand-off block are required.
 
 ## Owner questions
 
-Ask the owner only with `fgos questions ask` (five-part form of `../_shared/decision-question.md`). Inside a head the
+Ask the owner only with `fgos questions ask --input <file|-> --ref <origin>` (five-part form of `../_shared/decision-question.md`). Inside a head the
 CLI goes through the request socket, which carries `questions ask`, `questions ack` and `questions cancel` for every
 head and `questions answer` for the secretary only. A shaper never answers; the owner does, through the secretary or
 S04.
@@ -89,7 +89,7 @@ S04.
   question does not block.
 - On the hook line that delivers the answer, write the answer and the decision back to the origin (§4, or §3 if it
   only clarifies), then run `fgos questions ack <id>`.
-- When a question is no longer needed, `fgos questions cancel <id>`, or ask the replacement with `--supersedes`.
+- When a question is no longer needed, `fgos questions cancel <id> --reason <why>`, or ask the replacement with `--supersedes`.
 - Old `QUESTIONS.md` rows were re-asked through the verb; do not add new rows there.
 
 ## Flow

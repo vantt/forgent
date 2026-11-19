@@ -104,7 +104,8 @@ escape hatch): `references/approach-and-shape.md`.
 ### Step 3: Shape
 Write (or enrich) `plan.md` scaled to the mode — a direct note for
 `tiny`, a fuller map for `high-risk`. End with the exact `## Outstanding
-questions` heading, body `None` when nothing is outstanding. Full
+questions` heading; its body is `None`, or the `q-` ids (each with its headline) of questions asked with
+`fgos questions ask`, never prose questions. Full
 mechanics: `references/approach-and-shape.md`.
 
 ### Step 4: Decide the split, if any

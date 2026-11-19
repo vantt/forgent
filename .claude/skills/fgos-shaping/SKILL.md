@@ -3,8 +3,8 @@ name: fgos-shaping
 user-invocable: false
 description: >-
   Hold an open-ended, multi-day-resumable design discussion with a person,
-  in any domain, and keep one coherent DISCUSSION.md per feature plus a
-  QUESTIONS.md of open owner questions, instead of locking decisions
+  in any domain, and keep one coherent DISCUSSION.md per feature plus open
+  owner questions kept in the owner question store, instead of locking decisions
   Socratically round by round. Domain-free: the domain's own doctrine is read
   from domains/<domain>/AGENTS.md. Use when a request needs real back-and-forth
   exploration before anything should be locked, or when an existing design

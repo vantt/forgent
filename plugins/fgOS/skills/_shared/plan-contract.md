@@ -66,10 +66,9 @@ Headings (any level) for each, in this order:
 2. **Acceptance criteria**: checks a stranger can run; each names its command or file.
 3. **Non-goals**: what is deliberately left out.
 4. **Phases**: the phase table (section 4).
-5. **Owner questions**: only what the owner alone can answer, batched in one place, each
-   in the five-part form of [decision-question.md](decision-question.md) (what is
-   happening, cause, options with cost, recommendation, scope of the answer). Decide
-   whatever the evidence settles instead of asking.
+5. **Owner questions**: only what the owner alone can answer. Ask each with `fgos questions ask`
+   (five-part form of [decision-question.md](decision-question.md)) and list the `q-` ids here,
+   each with its headline. Decide whatever the evidence settles instead of asking.
 6. **Risks and rollback**: failure modes and the single revert path.
 
 ## 4. Organize for parallel work

@@ -52,8 +52,8 @@ At most 10 lines. Put the full report in a file named with `fgos convention path
 
 ## Owner questions
 
-Read the open questions with `fgos questions` (the owner question store). Show at most 5 at a time, ordered by what
-each blocks, then plan priority, then age, headline first. Every question is in the five-part form of
+Read the open questions with `fgos questions` (the owner question store). Show at most 5 at a time, ordered by plan priority,
+then age (what a question blocks is shown, not a sort key), headline first. Every question is in the five-part form of
 `core/skills/_shared/decision-question.md`, in the owner's plain words (see its "Make it easy to answer" section).
 Rewrite a question that breaks that guide before showing it. Record the owner's reply with `fgos questions answer
 <id>`; only the secretary answers. Workflow gates keep their own door (`answerDoor` of the item).
