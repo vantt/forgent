@@ -219,6 +219,7 @@ fn a_seat_may_not_start_on_a_login_that_would_refresh_inside_its_home() {
         };
         let got = login_life_problem(
             &source,
+            None,
             case["timeoutMs"].as_f64(),
             case["now"].as_f64().unwrap(),
             &NoSqlite,
@@ -277,6 +278,7 @@ fn write_back_target_is_chosen_from_the_source_and_refused_when_unsafe() {
                 args["accountId"].as_str().unwrap(),
                 &s,
                 Path::new(args["runtimeDir"].as_str().unwrap()),
+                None,
             )
         });
         assert_eq!(
@@ -525,6 +527,7 @@ fn a_pending_copy_survives_an_interrupted_staging_and_is_applied_by_the_next_ren
             account_id: "acct",
             credential_source: &source_pi(&source),
             runtime_dir: &runtime,
+            home_dir: None,
         },
         &RefreshOptions::new(&Free, &probe, &NoSqlite, &now),
     );
@@ -674,6 +677,7 @@ fn refresh_ahead_renews_inside_a_scratch_copy_and_applies_it_to_the_source() {
         account_id: "acct",
         credential_source: &source_pi(&source),
         runtime_dir: &runtime,
+        home_dir: None,
     };
     let outcome = refresh_ahead(
         &request,
@@ -735,6 +739,7 @@ fn a_renewal_that_returns_nothing_cools_the_account_and_leaves_the_source_untouc
         account_id: "acct",
         credential_source: &source_pi(&source),
         runtime_dir: &runtime,
+        home_dir: None,
     };
     let first = refresh_ahead(
         &request,
@@ -783,6 +788,7 @@ fn a_busy_account_lock_skips_the_renewal_and_a_copy_without_a_probe_never_touche
         account_id: "acct",
         credential_source: &source_pi(&source),
         runtime_dir: &runtime,
+        home_dir: None,
     };
     let busy = refresh_ahead(
         &request,
@@ -810,21 +816,71 @@ fn a_busy_account_lock_skips_the_renewal_and_a_copy_without_a_probe_never_touche
 }
 
 #[test]
-fn home_expands_only_a_leading_home_marker_and_dates_parse_as_iso() {
-    let home = std::env::var("HOME").unwrap_or_default();
-    assert_eq!(
-        expand_credential_home("~/x").unwrap().to_string_lossy(),
-        format!("{home}/x")
-    );
-    assert_eq!(
-        expand_credential_home("$HOME").unwrap().to_string_lossy(),
-        home
-    );
-    assert!(expand_credential_home("${HOME}x").is_none() || !home.is_empty());
-    assert!(expand_credential_home("relative").is_none() && expand_credential_home("  ").is_none());
+fn login_dates_parse_and_print_as_iso_and_tokens_encode_as_base64url() {
     assert_eq!(parse_date_ms("2026-06-01T12:00:00Z"), Some(NOW));
     assert_eq!(parse_date_ms("2026-06-01T13:00:00+01:00"), Some(NOW));
     assert_eq!(parse_date_ms("not a date"), None);
     assert_eq!(iso_from_ms(NOW + 123.0), "2026-06-01T12:00:00.123Z");
     assert_eq!(b64url_encode(b"{\"exp\":1}"), "eyJleHAiOjF9");
+}
+
+#[test]
+fn the_accounts_module_serves_the_lock_and_probe_ports_on_the_account_directory_renewal_uses() {
+    // The adapters are the only path from renewal to the real account lock and probe; nothing else proves that the
+    // lock they take guards the directory renewal keeps its copies in.
+    let root = scratch("accounts-wiring");
+    let runtime = root.join("runtime");
+    let host = fgos_execution_engine::accounts::SystemHost::new();
+    let accounts =
+        fgos_execution_engine::accounts::Accounts::new(&runtime, root.join("locks"), &host);
+    let locks = AccountsLocks(&accounts);
+    let held = locks
+        .acquire(&runtime, "openai-codex", "work", 1000)
+        .expect("a free account lock is taken");
+    assert_eq!(
+        Some(held.account_dir().to_path_buf()),
+        fgos_execution_engine::accounts::state::credential_store_dir(
+            &runtime,
+            "openai-codex",
+            "work",
+            None
+        )
+    );
+    assert!(
+        locks
+            .try_acquire(&runtime, "openai-codex", "work")
+            .is_none(),
+        "a held account lock is not taken twice"
+    );
+    assert!(
+        locks
+            .try_acquire(&root.join("elsewhere"), "openai-codex", "other")
+            .is_none(),
+        "a runtime directory other than the accounts' own is never locked"
+    );
+    let source = CredentialSource {
+        kind: "home-files".into(),
+        home: root.to_string_lossy().into_owned(),
+        files: vec!["unknown.json".into()],
+        cli: None,
+    };
+    let probe = AccountsProbe {
+        home_dir: None,
+        inherited: BTreeMap::new(),
+    };
+    let request = ProbeRequest {
+        source: &source,
+        home: &root,
+        no_tools: true,
+        timeout_ms: 1000,
+    };
+    assert!(matches!(
+        probe.run(&request, held.as_ref()),
+        ProbeRun::NoProbe
+    ));
+    drop(held);
+    assert!(locks
+        .try_acquire(&runtime, "openai-codex", "work")
+        .is_some());
+    fs::remove_dir_all(root).unwrap();
 }

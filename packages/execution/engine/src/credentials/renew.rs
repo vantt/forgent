@@ -16,9 +16,8 @@ use super::ports::{
 };
 use super::store::*;
 use super::{
-    credential_layout, credential_store_dir, default_refresh_ahead_threshold_ms,
-    expand_credential_home, CredentialSource, DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS,
-    DEFAULT_RENEWAL_COOLDOWN_MS,
+    credential_home, credential_layout, credential_store_dir, default_refresh_ahead_threshold_ms,
+    CredentialSource, DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS, DEFAULT_RENEWAL_COOLDOWN_MS,
 };
 
 const LOCK_MARGIN_MS: u64 = 30_000;
@@ -82,6 +81,8 @@ pub struct RefreshRequest<'a> {
     pub account_id: &'a str,
     pub credential_source: &'a CredentialSource,
     pub runtime_dir: &'a Path,
+    /// The user's home directory a leading `~`, `$HOME` or `${HOME}` of the credential home stands for.
+    pub home_dir: Option<&'a str>,
 }
 
 /// Renew the login of `credential_source` once, in an fgOS-held scratch copy, when it is closer to expiry than the
@@ -90,7 +91,7 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
     let source = request.credential_source;
     let (Some(layout), Some(home)) = (
         credential_layout(source),
-        expand_credential_home(&source.home),
+        credential_home(&source.home, request.home_dir),
     ) else {
         return outcome("skipped", "unsupported-layout");
     };

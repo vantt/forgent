@@ -18,8 +18,9 @@
 //! read and proves the copy is not newer, or when the copy itself is unusable; otherwise it is kept for the next
 //! holder of the account lock. Nothing here prints, logs or returns a token value; results carry fixed codes.
 //!
-//! The account lock, the credential probe and the SQLite engine are ports ([`ports`]); the files and directory
-//! names are the ones the previous Node release reads, byte for byte.
+//! The account lock, the credential probe and the SQLite engine are ports ([`ports`]); the accounts module serves the
+//! first two ([`ports::AccountsLocks`], [`ports::AccountsProbe`]), the account directories and the home reading are
+//! its own. The files and directory names are the ones the previous Node release reads, byte for byte.
 
 pub mod apply;
 pub mod copy;
@@ -36,8 +37,8 @@ pub use copy::{copy_credential_files, CopyOptions};
 pub use files::Code;
 pub use layout::{Entry, Layout, CODEX_REFRESH_INTERVAL_MS};
 pub use ports::{
-    AccountLockGuard, AccountLocks, CredentialProbe, LockBusy, NoLocks, NoSqlite, ProbeRequest,
-    ProbeRun, SqliteAdapter,
+    AccountLockGuard, AccountLocks, AccountsLocks, AccountsProbe, CredentialProbe, LockBusy,
+    NoLocks, NoSqlite, ProbeRequest, ProbeRun, SqliteAdapter,
 };
 pub use renew::{refresh_ahead, RefreshOptions, RefreshOutcome, RefreshRequest};
 pub use store::{
@@ -46,7 +47,8 @@ pub use store::{
     AccountInventory, InventoryAccount, RetainedCopy, StoreJudgement, WriteBackOutcome,
 };
 
-use files::{path_str, MINUTE_MS};
+pub(crate) use crate::accounts::state::credential_store_dir;
+use files::MINUTE_MS;
 
 pub const DEFAULT_REFRESH_AHEAD_MIN_THRESHOLD_MS: f64 = 60.0 * MINUTE_MS;
 pub const DEFAULT_RENEWAL_COOLDOWN_MS: f64 = 30.0 * MINUTE_MS;
@@ -94,61 +96,10 @@ pub fn credential_layout(source: &CredentialSource) -> Option<Layout> {
     }
 }
 
-/// An absolute credential home: `$HOME`, `${HOME}` and `~` expand to the user's home; relative is `None`.
-pub fn expand_credential_home(home: &str) -> Option<PathBuf> {
-    if home.trim().is_empty() {
-        return None;
-    }
-    let user = std::env::var_os("HOME")
-        .or_else(|| std::env::var_os("USERPROFILE"))
-        .map(|h| path_str(Path::new(&h)));
-    let rest = ["${HOME}", "$HOME", "~"].iter().find_map(|p| {
-        let tail = home.strip_prefix(p)?;
-        (tail.is_empty() || tail.starts_with('/')).then_some(tail)
-    });
-    let expanded = match (rest, user) {
-        (Some(tail), Some(user)) => format!("{user}{tail}"),
-        _ => home.to_owned(),
-    };
-    Path::new(&expanded)
-        .is_absolute()
-        .then(|| PathBuf::from(expanded))
-}
-
-fn account_key_is_safe(value: &str) -> bool {
-    let mut chars = value.chars();
-    chars.next().is_some_and(|c| c.is_ascii_alphanumeric())
-        && chars.all(|c| c.is_ascii_alphanumeric() || matches!(c, '_' | '.' | '-'))
-}
-
-/// The directory that holds everything about one account's login; `None` for an unsafe provider or account id.
-pub fn provider_account_dir(
-    runtime_dir: &Path,
-    provider: &str,
-    account_id: &str,
-) -> Option<PathBuf> {
-    (account_key_is_safe(provider) && account_key_is_safe(account_id)).then(|| {
-        runtime_dir
-            .join("account-locks")
-            .join(provider)
-            .join(account_id)
-    })
-}
-
-/// Where the copies of one login store wait: the account directory for an account with one store;
-/// `stores/<cli>` under it for a store of an account that keeps one per CLI. `None` for an unsafe id or key.
-pub fn credential_store_dir(
-    runtime_dir: &Path,
-    provider: &str,
-    account_id: &str,
-    cli: Option<&str>,
-) -> Option<PathBuf> {
-    let account = provider_account_dir(runtime_dir, provider, account_id)?;
-    match cli {
-        None => Some(account),
-        Some(cli) if account_key_is_safe(cli) => Some(account.join("stores").join(cli)),
-        Some(_) => None,
-    }
+/// A credential home as a path, read through the execution rules' one reading of it (a leading `~`, `$HOME` or
+/// `${HOME}` is `home_dir`); `None` when it is empty or not absolute once expanded.
+pub(crate) fn credential_home(home: &str, home_dir: Option<&str>) -> Option<PathBuf> {
+    fgos_execution::accounts::expand_credential_home(home, home_dir).map(PathBuf::from)
 }
 
 /// One expiry entry of a credential home; values are never part of it.
@@ -184,12 +135,13 @@ pub fn read_credential_expiry(
 /// the source's token. Unreadable is the copy step's business, not a refusal here. Names and numbers only.
 pub fn login_life_problem(
     source: &CredentialSource,
+    home_dir: Option<&str>,
     timeout_ms: Option<f64>,
     now: f64,
     sqlite: &dyn SqliteAdapter,
 ) -> Option<String> {
     let layout = credential_layout(source)?;
-    let home = expand_credential_home(&source.home)?;
+    let home = credential_home(&source.home, home_dir)?;
     let timeout = timeout_ms.filter(|t| t.is_finite())?;
     if !layout.seat_must_not_refresh() {
         return None;

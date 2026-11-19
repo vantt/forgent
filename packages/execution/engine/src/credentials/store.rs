@@ -20,8 +20,8 @@ use super::files::*;
 use super::layout::{sidecar_bytes, Layout};
 use super::ports::{AccountLocks, SqliteAdapter};
 use super::{
-    credential_layout, credential_store_dir, expand_credential_home, CredentialSource,
-    MAX_PENDING_COPIES, STAGING_MIN_AGE_MS,
+    credential_home, credential_layout, credential_store_dir, CredentialSource, MAX_PENDING_COPIES,
+    STAGING_MIN_AGE_MS,
 };
 
 pub const COOLDOWN_FILE: &str = "cooldown.json";
@@ -700,9 +700,10 @@ pub fn credential_write_back_target(
     account_id: &str,
     source: &CredentialSource,
     runtime_dir: &Path,
+    home_dir: Option<&str>,
 ) -> Option<Value> {
     let layout = credential_layout(source)?;
-    let home = expand_credential_home(&source.home)?;
+    let home = credential_home(&source.home, home_dir)?;
     if !runtime_dir.is_absolute() {
         return None;
     }

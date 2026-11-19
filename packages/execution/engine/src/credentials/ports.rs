@@ -1,9 +1,16 @@
 //! The seams credential renewal reaches the machine through. The account lock and the credential probe belong
-//! to the accounts module; SQLite is an adapter. Each is a replaceable driver behind a port.
+//! to the accounts module, which serves them here ([`AccountsLocks`], [`AccountsProbe`]); SQLite is an adapter.
+//! Each is a replaceable driver behind a port.
 
+use std::collections::BTreeMap;
 use std::path::Path;
 
+use serde_json::json;
+
+use super::files::path_str;
 use super::CredentialSource;
+use crate::accounts::credential_probe::{credential_probe_command, run_credential_probe};
+use crate::accounts::{AccountLock, Accounts};
 
 /// One held account lock; the lock is released when the guard is dropped.
 pub trait AccountLockGuard {
@@ -51,6 +58,101 @@ impl AccountLocks for NoLocks {
     }
     fn try_acquire(&self, _: &Path, _: &str, _: &str) -> Option<Box<dyn AccountLockGuard>> {
         None
+    }
+}
+
+impl AccountLockGuard for AccountLock {
+    fn account_dir(&self) -> &Path {
+        &self.dir
+    }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+/// The accounts module's per-account lock behind the port. Any failure to take it reads as "busy", as the Node
+/// module's callers read it; a runtime directory other than the one the accounts live in is never locked.
+pub struct AccountsLocks<'a, 'h>(pub &'a Accounts<'h>);
+
+impl AccountLocks for AccountsLocks<'_, '_> {
+    fn acquire(
+        &self,
+        runtime_dir: &Path,
+        provider: &str,
+        account_id: &str,
+        wait_ms: u64,
+    ) -> Result<Box<dyn AccountLockGuard>, LockBusy> {
+        if runtime_dir != self.0.runtime_dir {
+            return Err(LockBusy);
+        }
+        self.0
+            .acquire_account_lock(provider, account_id, Some(wait_ms))
+            .map(|lock| Box::new(lock) as Box<dyn AccountLockGuard>)
+            .map_err(|_| LockBusy)
+    }
+    fn try_acquire(
+        &self,
+        runtime_dir: &Path,
+        provider: &str,
+        account_id: &str,
+    ) -> Option<Box<dyn AccountLockGuard>> {
+        if runtime_dir != self.0.runtime_dir {
+            return None;
+        }
+        self.0
+            .try_acquire_account_lock(provider, account_id)
+            .ok()
+            .flatten()
+            .map(|lock| Box::new(lock) as Box<dyn AccountLockGuard>)
+    }
+}
+
+/// The accounts module's credential probe behind the port: the CLI is pointed at the copy, and on unix the call
+/// holds the account lock the caller took for as long as it and what it left behind live. A lock that is not the
+/// accounts module's own is never lent, so no call runs on unix without it.
+pub struct AccountsProbe {
+    /// The user's home directory a leading `~` of a credential home stands for.
+    pub home_dir: Option<String>,
+    /// The environment the call's shell basics are taken from.
+    pub inherited: BTreeMap<String, String>,
+}
+
+impl CredentialProbe for AccountsProbe {
+    fn run(&self, request: &ProbeRequest<'_>, lock: &dyn AccountLockGuard) -> ProbeRun {
+        let source = json!({
+            "kind": request.source.kind,
+            "home": path_str(request.home),
+            "files": request.source.files,
+        });
+        let Some(plan) =
+            credential_probe_command(&source, request.no_tools, None, self.home_dir.as_deref())
+        else {
+            return ProbeRun::NoProbe;
+        };
+        let held = lock.as_any().downcast_ref::<AccountLock>();
+        #[cfg(unix)]
+        let judged = match held {
+            Some(held) => run_credential_probe(
+                &plan,
+                &crate::accounts::credential_probe::HoldingRunner(held),
+                request.timeout_ms,
+                &self.inherited,
+            ),
+            None => return ProbeRun::Ran { ok: false },
+        };
+        #[cfg(not(unix))]
+        let judged = {
+            let _ = held;
+            run_credential_probe(
+                &plan,
+                &crate::accounts::credential_probe::ProcessRunner,
+                request.timeout_ms,
+                &self.inherited,
+            )
+        };
+        ProbeRun::Ran {
+            ok: judged["ok"] == true,
+        }
     }
 }
 
