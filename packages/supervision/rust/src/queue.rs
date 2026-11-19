@@ -138,7 +138,10 @@ impl RaisedEvent {
         if self.kind.starts_with("coordination-")
             && !COORDINATION_KINDS.contains(&self.kind.as_str())
         {
-            return Err(bad(&format!("unsupported coordination kind: {}", self.kind)));
+            return Err(bad(&format!(
+                "unsupported coordination kind: {}",
+                self.kind
+            )));
         }
         Ok(())
     }

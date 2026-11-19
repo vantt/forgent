@@ -336,10 +336,7 @@ fn caller_coordination_event_id_derives_from_watcher_event_id() {
         ts,
     )
     .unwrap();
-    assert_eq!(
-        event.id,
-        event_id("coordination-handoff", "plan-alpha", ts)
-    );
+    assert_eq!(event.id, event_id("coordination-handoff", "plan-alpha", ts));
     assert_eq!(event.kind, "coordination-handoff");
     assert_eq!(event.subject, "plan-alpha");
     assert_eq!(event.ts, ts);
@@ -412,7 +409,10 @@ fn caller_coordination_event_raise_once_raise_twice_and_handled_leaves_queue() {
         assert_eq!(unhandled[0].subject, format!("subject-for-{kind}"));
 
         // Handled event leaves the queue
-        assert_eq!(q.mark_handled(&[event.id.clone()], "supervisor").unwrap(), 1);
+        assert_eq!(
+            q.mark_handled(&[event.id.clone()], "supervisor").unwrap(),
+            1
+        );
         assert_eq!(q.unhandled_count().unwrap(), 0);
         assert!(q.unhandled().unwrap().is_empty());
 
