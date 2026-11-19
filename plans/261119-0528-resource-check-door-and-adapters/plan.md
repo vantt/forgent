@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: The planner door resource-check, the supervisor, plan-check, plan-lint and Work adapters, and discovery, on top of the three packages
-status: draft
+status: ready
 priority: P2
 blockedBy:
   - 261119-0030-resource-referee-graph-write-scope-stack
@@ -43,7 +43,7 @@ footprint:
   - .agents/skills
   - .claude/skills
   - CHANGELOG.md
-base: f3c32fb891d0237a4c5392b307a499ce8380a95c
+base: e5ea2c754940704d6bc37bca1815d3340c6ce9bc
 source:
   - plans/261119-0030-resource-referee-graph-write-scope-stack
 created: 2026-11-19
@@ -112,7 +112,7 @@ in plan A.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 8b | [Supervisor adapter and the honest phase-table reader](phase-08b-supervisor-adapter.md) | - | packages/supervision/rust | 1 | draft |
+| 8b | [Supervisor adapter and the honest phase-table reader](phase-08b-supervisor-adapter.md) | - | packages/supervision/rust | 1 | done |
 | 8 | [Work, plan-check and plan-lint adapters](phase-08-node-adapters.md) | 8b | src/state/graph-metrics.mjs, src/state/graph-harness.mjs, src/state/graph-adapter.mjs, src/state/store.mjs, src/intake/plan.mjs, src/report/capability-plan-lint.mjs, scripts/plan-contract-check.mjs, docs/architecture-manifest.json, test/state, test/scripts, test/report/capability-plan-lint.test.mjs, test/cli/plan-lint.test.mjs, test/direct/fgos-merge.test.mjs, test/direct/fgos-read.test.mjs, test/parity/read-parity.test.mjs, test/cli/fgos-read-5.test.mjs, test/cli/fgos-intake-*.test.mjs, test/intake/plan.test.mjs | 2 | draft |
 | 7b | [Planner door, default policy and verb tables](phase-07b-planner-door.md) | 8b | apps/fgos/Cargo.toml, Cargo.lock, apps/fgos/src, packages/host-runtime/contracts, src/cli/command-registry.mjs, test/rust-host, test/cli/unknown-flag-rejection.test.mjs, test/helpers/command-manifest.mjs | 2 | draft |
 | 9 | [Discovery in the contract and skills](phase-09-discovery.md) | 7b, 8, 8b | core/skills, domains/coding/skills, plugins/fgOS/skills, .agents/skills, .claude/skills, CHANGELOG.md, docs/reading-map.md | 3 | draft |

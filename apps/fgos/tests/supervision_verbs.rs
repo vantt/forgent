@@ -113,7 +113,7 @@ impl Scene {
         fs::create_dir_all(project.join(format!("plans/{PLAN}"))).unwrap();
         fs::write(
             project.join(format!("plans/{PLAN}/plan.md")),
-            "---\ncontract: plan-v1\ntitle: demo\nstatus: ready\npriority: P2\nfootprint:\n  - src/**\ncreated: 2026-01-01\n---\n\n# Demo\n",
+            "---\ncontract: plan-v1\ntitle: demo\nstatus: ready\npriority: P2\nfootprint:\n  - src/**\ncreated: 2026-01-01\n---\n\n# Demo\n\n| id | title | dependson | footprint | wave | status |\n|---|---|---|---|---|---|\n| 1 | one | - | `src/**` | 1 | ready |\n",
         )
         .unwrap();
         fs::create_dir_all(project.join("docs/discussions/demo")).unwrap();
@@ -363,6 +363,30 @@ fn plans_lists_the_trunk_portfolio_with_what_the_supervisor_may_start() {
     assert_eq!(plans[0]["status"], "ready");
     assert_eq!(plans[0]["admissible"], true);
     assert_eq!(view["maxLeads"], 4);
+}
+
+#[test]
+fn one_malformed_plan_is_named_and_does_not_hide_the_other_plans() {
+    let scene = Scene::new("plans-malformed", WATCHER_CONFIG);
+    let project = scene.project();
+    fs::create_dir_all(project.join("plans/broken")).unwrap();
+    fs::write(
+        project.join("plans/broken/plan.md"),
+        "---\ncontract: plan-v1\ntitle: broken\nstatus: sideways\npriority: P2\nfootprint:\n  - src/**\ncreated: 2026-01-01\n---\n\n# Broken\n",
+    )
+    .unwrap();
+    git(&project, &["add", "-f", "plans/broken/plan.md"]);
+    git(&project, &["commit", "-q", "-m", "broken plan"]);
+    git(&project, &["push", "-q", "origin", "main"]);
+    let view = scene.data(&["supervisor", "plans", "--json"]);
+    let plans = view["plans"].as_array().unwrap();
+    assert_eq!(plans.len(), 1, "{view}");
+    assert_eq!(plans[0]["dir"], PLAN);
+    assert_eq!(plans[0]["admissible"], true);
+    let unreadable = view["unreadable"].as_array().unwrap();
+    assert_eq!(unreadable.len(), 1, "{view}");
+    assert_eq!(unreadable[0]["dir"], "broken");
+    assert_eq!(unreadable[0]["code"], "plan-status-unknown");
 }
 
 #[test]

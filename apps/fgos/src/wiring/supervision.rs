@@ -7,6 +7,7 @@
 //! `session start`, `mailbox send`) as child processes of this binary, so each verb keeps one door; the rest are
 //! in-process reads of the owner (Identity directory, Git door, Event Store, the question store).
 
+use super::agents::PayloadRoot;
 use crate::routing::Call;
 use fgos_config::provider::effective_value;
 use fgos_git::{
@@ -366,6 +367,12 @@ struct HostPortfolio {
 
 impl HostPortfolio {
     fn read(&self) -> Result<Vec<Plan>, String> {
+        self.read_with_refusals().map(|(plans, _)| plans)
+    }
+
+    /// The plans the supervisor can read, and the ones it cannot: a plan that breaks its contract is skipped and
+    /// named, never a reason to hide the rest.
+    fn read_with_refusals(&self) -> Result<(Vec<Plan>, Vec<Value>), String> {
         let Some((driver, repo)) = GitDriver::open_at(&self.root).map_err(|e| e.cause)? else {
             return Err("not a repository".to_owned());
         };
@@ -393,20 +400,26 @@ impl HostPortfolio {
             .read_paths_at(&repo, &tip, &paths, 256 * 1024)
             .map_err(|e| e.cause)?;
         let mut plans: Vec<Plan> = Vec::new();
+        let mut refused: Vec<Value> = Vec::new();
         for ((dir, _), read) in files.iter().zip(reads) {
             let PathValue::Blob(bytes) = read.value else {
                 continue;
             };
             let Ok(text) = String::from_utf8(bytes) else {
+                refused.push(
+                    json!({"dir": dir, "code": "plan-not-utf8", "detail": "plan.md is not UTF-8"}),
+                );
                 continue;
             };
-            // A plan that breaks its contract is not a plan the supervisor can start; the plan checks name it.
-            if let Ok(plan) = portfolio::read_plan(dir, &text) {
-                plans.push(plan);
+            match portfolio::read_plan(dir, &text) {
+                Ok(plan) => plans.push(plan),
+                Err(why) => {
+                    refused.push(json!({"dir": dir, "code": why.code(), "detail": why.to_string()}))
+                }
             }
         }
         portfolio::order(&mut plans);
-        Ok(plans)
+        Ok((plans, refused))
     }
 
     fn done(plans: &[Plan]) -> Vec<String> {
@@ -580,11 +593,11 @@ fn open_queue(root: &Path) -> Result<Queue, CategorisedRefusal> {
 // ---------------------------------------------------------------------------------------------
 // Telemetry: one record per tick and per wake, through the Observe write door
 
-fn record_door(root: &Path) -> RecordDoor {
+fn record_door(root: &Path, payload_root: PayloadRoot) -> RecordDoor {
     RecordDoor::new(
         root.to_path_buf(),
         super::observe_declarations::embedded_declarations(),
-        crate::legacy_exec::resolve_payload().ok().map(|p| p.root),
+        payload_root().ok(),
     )
 }
 
@@ -624,6 +637,7 @@ fn span_record(
 
 struct HostTelemetry {
     root: PathBuf,
+    payload_root: PayloadRoot,
 }
 
 impl watcher::Telemetry for HostTelemetry {
@@ -641,7 +655,7 @@ impl watcher::Telemetry for HostTelemetry {
             span.measures.clone(),
         );
         // The write door counts its own failures; a lost span never changes the tick's outcome.
-        let _ = record_door(&self.root).write(record);
+        let _ = record_door(&self.root, self.payload_root).write(record);
     }
 }
 
@@ -667,7 +681,7 @@ impl wake::Telemetry for HostTelemetry {
             ],
             Vec::new(),
         );
-        let _ = record_door(&self.root).write(record);
+        let _ = record_door(&self.root, self.payload_root).write(record);
     }
 }
 
@@ -769,6 +783,7 @@ impl watcher::Fetch for FetchTrunk {
 /// The detection definitions: `<host> metrics query --def <path>... --since <instant> --json`, mapped to rows.
 struct QueryDefinitions {
     root: PathBuf,
+    payload_root: PayloadRoot,
 }
 
 impl QueryDefinitions {
@@ -779,9 +794,7 @@ impl QueryDefinitions {
         if given.is_absolute() {
             return given.exists().then(|| given.to_path_buf());
         }
-        let payload = crate::legacy_exec::resolve_payload()
-            .ok()
-            .map(|p| p.root.join(path));
+        let payload = (self.payload_root)().ok().map(|root| root.join(path));
         [payload, Some(self.root.join(path))]
             .into_iter()
             .flatten()
@@ -843,13 +856,14 @@ const PACE_ROW_DEFINITIONS: [&str; 2] = [
 ];
 
 /// The names of the pace definitions that answer a row now, or why they could not be run.
-pub fn pace_findings(root: &Path) -> Result<Vec<String>, String> {
+pub fn pace_findings(root: &Path, payload_root: PayloadRoot) -> Result<Vec<String>, String> {
     let defs: Vec<String> = PACE_ROW_DEFINITIONS
         .iter()
         .map(|d| (*d).to_owned())
         .collect();
     let answer = QueryDefinitions {
         root: root.to_path_buf(),
+        payload_root,
     }
     .answer(&defs, None)?;
     Ok(answer["definitions"]
@@ -971,11 +985,12 @@ impl watcher::QuestionsView for QuestionsRefresh {
 /// The wake door, in process: the same ports `supervisor wake` runs on.
 struct WakeInProcess {
     root: PathBuf,
+    payload_root: PayloadRoot,
 }
 
 impl watcher::Wake for WakeInProcess {
     fn wake(&self, kind: &str, subject: &str) -> watcher::WakeOutcome {
-        match run_wake(&self.root, kind, subject) {
+        match run_wake(&self.root, self.payload_root, kind, subject) {
             Ok(outcome) => match outcome {
                 wake::WakeOutcome::StartFailed(_)
                 | wake::WakeOutcome::IdentityUnknown
@@ -991,6 +1006,7 @@ impl watcher::Wake for WakeInProcess {
 
 fn run_wake(
     root: &Path,
+    payload_root: PayloadRoot,
     trigger: &str,
     subject: &str,
 ) -> Result<wake::WakeOutcome, CategorisedRefusal> {
@@ -1009,6 +1025,7 @@ fn run_wake(
     };
     let telemetry = HostTelemetry {
         root: root.to_path_buf(),
+        payload_root,
     };
     let ports = wake::Ports {
         project: &project,
@@ -1027,16 +1044,21 @@ fn run_wake(
     ))
 }
 
-fn run_tick(root: &Path) -> Result<watcher::TickReport, CategorisedRefusal> {
+fn run_tick(
+    root: &Path,
+    payload_root: PayloadRoot,
+) -> Result<watcher::TickReport, CategorisedRefusal> {
     let queue = open_queue(root)?;
     let fetch = FetchTrunk {
         root: root.to_path_buf(),
     };
     let definitions = QueryDefinitions {
         root: root.to_path_buf(),
+        payload_root,
     };
     let wake_adapter = WakeInProcess {
         root: root.to_path_buf(),
+        payload_root,
     };
     let notifier = MailboxNotifier::new(
         host_binary().to_string_lossy().into_owned(),
@@ -1053,6 +1075,7 @@ fn run_tick(root: &Path) -> Result<watcher::TickReport, CategorisedRefusal> {
     };
     let telemetry = HostTelemetry {
         root: root.to_path_buf(),
+        payload_root,
     };
     let lock = WatcherLock {
         root: root.to_path_buf(),
@@ -1240,7 +1263,10 @@ fn live_leads() -> Vec<String> {
 }
 
 /// Runs one request and shapes the answer.
-pub fn answer(request: &SupervisionRequest) -> Result<VerbAnswer, CategorisedRefusal> {
+pub fn answer(
+    request: &SupervisionRequest,
+    payload_root: PayloadRoot,
+) -> Result<VerbAnswer, CategorisedRefusal> {
     let root = request.root.as_path();
     let done = |data: Value, text: String| VerbAnswer {
         data,
@@ -1249,7 +1275,7 @@ pub fn answer(request: &SupervisionRequest) -> Result<VerbAnswer, CategorisedRef
     };
     match &request.verb {
         Verb::Tick => {
-            let report = run_tick(root)?;
+            let report = run_tick(root, payload_root)?;
             let text = format!(
                 "watcher tick: {} ({})",
                 report.outcome.as_str(),
@@ -1258,7 +1284,7 @@ pub fn answer(request: &SupervisionRequest) -> Result<VerbAnswer, CategorisedRef
             Ok(done(tick_json(&report), text))
         }
         Verb::Wake => {
-            let outcome = run_wake(root, "manual", "")?;
+            let outcome = run_wake(root, payload_root, "manual", "")?;
             let text = format!("supervisor wake: {}", outcome.as_str());
             let mut data = json!({"outcome": outcome.as_str()});
             if let wake::WakeOutcome::StartFailed(code) = &outcome {
@@ -1270,8 +1296,8 @@ pub fn answer(request: &SupervisionRequest) -> Result<VerbAnswer, CategorisedRef
             let portfolio = HostPortfolio {
                 root: root.to_path_buf(),
             };
-            let plans = portfolio
-                .read()
+            let (plans, unreadable) = portfolio
+                .read_with_refusals()
                 .map_err(|e| refused("portfolio-unreadable", e))?;
             let project = wake::Project::project(&HostProject {
                 root: root.to_path_buf(),
@@ -1291,7 +1317,7 @@ pub fn answer(request: &SupervisionRequest) -> Result<VerbAnswer, CategorisedRef
                 &live_leads(),
                 max_leads,
             );
-            let text = view
+            let mut lines: Vec<String> = view
                 .rows
                 .iter()
                 .map(|r| {
@@ -1303,9 +1329,17 @@ pub fn answer(request: &SupervisionRequest) -> Result<VerbAnswer, CategorisedRef
                         if r.admissible { " admissible" } else { "" }
                     )
                 })
-                .collect::<Vec<_>>()
-                .join("\n");
-            Ok(done(view.to_json(), text))
+                .collect();
+            lines.extend(unreadable.iter().map(|u| {
+                format!(
+                    "{} unreadable: {}",
+                    u["dir"].as_str().unwrap_or_default(),
+                    u["detail"].as_str().unwrap_or_default()
+                )
+            }));
+            let mut data = view.to_json();
+            data["unreadable"] = Value::Array(unreadable);
+            Ok(done(data, lines.join("\n")))
         }
         Verb::Queue => {
             let queue = open_queue(root)?;
@@ -1362,11 +1396,15 @@ pub fn answer(request: &SupervisionRequest) -> Result<VerbAnswer, CategorisedRef
 /// The provider of the supervision operations.
 pub struct SupervisionProvider {
     descriptor: ProviderDescriptor,
+    payload_root: PayloadRoot,
 }
 
 impl SupervisionProvider {
-    pub fn for_descriptor(descriptor: ProviderDescriptor) -> Self {
-        Self { descriptor }
+    pub fn for_descriptor(descriptor: ProviderDescriptor, payload_root: PayloadRoot) -> Self {
+        Self {
+            descriptor,
+            payload_root,
+        }
     }
 }
 
@@ -1390,7 +1428,7 @@ impl OperationProvider for SupervisionProvider {
                 .ok_or_else(|| {
                     ProviderError::SemanticValidation("input is not SupervisionRequest".into())
                 })?;
-            let output: Box<dyn std::any::Any + Send> = match answer(request) {
+            let output: Box<dyn std::any::Any + Send> = match answer(request, self.payload_root) {
                 Ok(done) => Box::new(done),
                 Err(refusal) => Box::new(refusal),
             };

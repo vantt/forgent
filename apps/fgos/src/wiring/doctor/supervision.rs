@@ -64,7 +64,7 @@ fn pace(root: &Path) -> RowOutcome {
     if !supervision::watcher_enabled(root) {
         return judged(true, "watcher.enabled is false: the pace is not judged");
     }
-    match supervision::pace_findings(root) {
+    match supervision::pace_findings(root, crate::active_payload_root) {
         Ok(found) if found.is_empty() => judged(true, "the watcher ticks on time and no supervisor start was idle"),
         Ok(found) => judged(
             true,

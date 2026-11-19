@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Three independent packages for resource contention and graph facts: write-scope, graph and resource-referee, with the addon bindings"
-status: ready
+status: done
 priority: P2
 blockedBy:
   - 261118-0947-session-verb-for-agent-sessions
@@ -351,7 +351,7 @@ fgOS output must hash the same on every rebuild.
 | 4 | [graph crate](phase-04-graph-crate.md) | 1, 2 | docs/platform/graph, packages/graph/rust | 2 | done |
 | 5 | [resource-referee crate](phase-05-resource-referee-crate.md) | 1, 3, 4 | docs/platform/resource-referee, packages/resource-referee/rust | 3 | done |
 | 7 | [Addon bindings and ABI](phase-07-addon-bindings.md) | 3, 4 | packages/git/node-addon/src, packages/git/contracts/ports.v1.json, src/native/door.mjs, test/config/config-door.test.mjs, test/git/native-load.test.mjs | 3 | done |
-| 7c | [Integration and landing of the packages](phase-07c-integration.md) | 5, 7 | packages/git/contracts/mutation-census.v1.json, plans/261119-0030-resource-referee-graph-write-scope-stack/reports | 4 | ready |
+| 7c | [Integration and landing of the packages](phase-07c-integration.md) | 5, 7 | packages/git/contracts/mutation-census.v1.json, plans/261119-0030-resource-referee-graph-write-scope-stack/reports | 4 | done |
 
 Reading check (planner applied the contract by hand, then ran the script, which reads frontmatter and
 this table only): every phase sits in a later wave than everything it depends on; the longest chain is

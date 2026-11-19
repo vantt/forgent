@@ -178,7 +178,7 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
 ];
 
 /// The legacy payload root of the running release, for the verbs that read what it ships (its skills, its scripts).
-fn active_payload_root() -> Result<std::path::PathBuf, String> {
+pub(crate) fn active_payload_root() -> Result<std::path::PathBuf, String> {
     legacy_exec::resolve_payload().map(|payload| payload.root)
 }
 
@@ -438,7 +438,10 @@ fn main() {
         wiring::supervision::SLOTS_DESCRIPTOR,
     ] {
         service.register_provider(Arc::new(
-            wiring::supervision::SupervisionProvider::for_descriptor(descriptor),
+            wiring::supervision::SupervisionProvider::for_descriptor(
+                descriptor,
+                active_payload_root,
+            ),
         ));
     }
     service.register_provider(Arc::new(wiring::lock_status::LockStatusProvider::new()));

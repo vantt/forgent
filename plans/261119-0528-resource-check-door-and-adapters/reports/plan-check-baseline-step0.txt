@@ -1,0 +1,142 @@
+   Compiling arraydeque v0.5.1 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/yaml-doc/third-party/arraydeque-0.5.1)
+   Compiling fgos-write-scope v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/write-scope)
+   Compiling fgos-process v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/process/rust)
+   Compiling fgos-canonical-json v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/canonical-json/rust)
+   Compiling fgos-event-store v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/event-store/rust)
+   Compiling fgos-node-addon v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/git/node-addon)
+   Compiling fgos-graph v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/graph/rust)
+   Compiling fgos-durable-file v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/durable-file/rust)
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+   Compiling saphyr-parser v0.2.2 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/yaml-doc/third-party/saphyr-parser-0.2.2)
+   Compiling fgos-agent-protocol v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/agent-protocol/rust)
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+   Compiling fgos-holder-lock v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/holder-lock/rust)
+   Compiling fgos-yaml-doc v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/yaml-doc/rust)
+   Compiling fgos-host-runtime v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/host-runtime/rust)
+   Compiling fgos-git v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/git/rust)
+   Compiling fgos-convention v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/convention/rust)
+   Compiling fgos-identity v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/identity/rust)
+   Compiling fgos-observe v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/observe/rust)
+   Compiling fgos-config v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/config/rust)
+   Compiling fgos-checkout v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/execution/checkout)
+   Compiling fgos-run-result v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/run-result/rust)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 13.30s
+    Blocking waiting for file lock on build directory
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+   Compiling fgos-process v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/process/rust)
+   Compiling fgos-canonical-json v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/canonical-json/rust)
+   Compiling fgos-mailbox-core v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/mailbox/rust/core)
+   Compiling fgos-event-store v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/event-store/rust)
+   Compiling fgos-execution v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/execution/rust)
+   Compiling fgos-holder-lock v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/holder-lock/rust)
+   Compiling fgos-git v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/git/rust)
+   Compiling fgos-terminal-control v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/terminal-control/rust)
+   Compiling fgos-session-host v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/session-host/rust)
+   Compiling fgos-identity v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/identity/rust)
+   Compiling fgos-observe v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/observe/rust)
+   Compiling fgos-config v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/config/rust)
+   Compiling fgos-mailbox v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/mailbox/rust/store)
+   Compiling fgos-run-supervisor v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/run-supervisor/rust)
+   Compiling fgos-checkout v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/execution/checkout)
+   Compiling fgos-distribution v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/distribution/rust)
+   Compiling fgos-supervision v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/supervision/rust)
+   Compiling fgos-questions v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/questions/rust)
+   Compiling fgos-run-result v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/run-result/rust)
+   Compiling fgos-work-state v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/packages/work-state/rust)
+   Compiling fgos v0.2.0 (/home/vantt/projects/forgent-worktrees/lead-resource-door/apps/fgos)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 18.57s
+ERROR 261118-1117-external-ui-integration-multica: source must be a list of paths or backlog ids
+ERROR 261118-1117-external-ui-integration-multica: missing section: outcome
+ERROR 261118-1117-external-ui-integration-multica: missing section: acceptance criteria
+ERROR 261118-1117-external-ui-integration-multica: missing section: non-goals
+ERROR 261118-1117-external-ui-integration-multica: missing section: phases
+ERROR 261118-1117-external-ui-integration-multica: missing section: owner questions
+ERROR 261118-1117-external-ui-integration-multica: missing section: risks and rollback
+ERROR 261118-1117-external-ui-integration-multica: no phase table with a footprint column
+plans 128: under contract 15 (failing 1), legacy 113 (5 with frontmatter that is not valid YAML; would migrate to unreadable 5, draft 15, done 69, unmapped 16, running 6, ready 2)
+WARN legacy plans are not checked; add `contract: plan-v1` when a plan is next planned
