@@ -586,6 +586,31 @@ fn a_refused_request_logs_its_detail_and_the_routes_message_on_one_line() {
 }
 
 #[test]
+fn a_successors_read_allowance_names_only_the_routes_read_verbs() {
+    let contract: Value =
+        serde_json::from_str(include_str!("../../contracts/head-request.v1.json")).unwrap();
+    let verbs = contract["verbs"].as_object().unwrap();
+    let reads: Vec<&str> = verbs
+        .iter()
+        .filter(|(_, v)| v["read"] == json!(true))
+        .map(|(k, _)| k.as_str())
+        .collect();
+    assert!(!reads.is_empty(), "the contract marks no read verb");
+    for verb in &reads {
+        assert!(
+            verb.starts_with("questions "),
+            "read verb {verb} is not a question store verb"
+        );
+    }
+    for verb in fgos_run_supervisor::head_request::SUCCESSOR_READ_VERBS {
+        assert!(
+            reads.contains(verb),
+            "SUCCESSOR_READ_VERBS names {verb}, which the contract does not mark as a read"
+        );
+    }
+}
+
+#[test]
 fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
     let contract: Value =
         serde_json::from_str(include_str!("../../contracts/head-request.v1.json")).unwrap();
@@ -1772,4 +1797,60 @@ fn a_role_gated_verb_from_a_pending_successor_is_refused_role_pending_rotation_n
         "planner-x generation 1 still holds the role"
     );
     assert!(!served.dir.join("argv").exists(), "no route child ran");
+}
+
+fn serve_pending(name: &str, pending: Option<&str>, holds: bool) -> Served {
+    serve_with(
+        name,
+        DONE_LINE,
+        Ok(holds),
+        Identity {
+            pending: pending.map(str::to_string),
+            ..Identity::default()
+        },
+        &["questions list", "session start"],
+        Duration::from_secs(5),
+    )
+}
+
+#[test]
+fn a_pending_successor_reads_the_question_store_but_its_write_verbs_keep_waiting_for_the_role() {
+    let served = serve_pending(
+        "pending-successor-read",
+        Some("planner-x generation 1 still holds the role"),
+        false,
+    );
+    let read = ask(&served.socket, "questions list");
+    assert_eq!(
+        read["code"],
+        serde_json::Value::Null,
+        "read answered: {read}"
+    );
+    assert!(
+        served.dir.join("argv").exists(),
+        "the read ran its route child"
+    );
+    let write = ask(&served.socket, "session start");
+    assert_eq!(write["code"], "role-pending-rotation");
+    assert_eq!(
+        write["detail"],
+        "planner-x generation 1 still holds the role"
+    );
+}
+
+#[test]
+fn a_caller_that_is_no_successor_of_the_role_gets_no_read_either() {
+    let served = serve_pending("not-a-successor-read", None, false);
+    let read = ask(&served.socket, "questions list");
+    assert_eq!(read["code"], "role-not-held");
+    assert!(!served.dir.join("argv").exists(), "no route child ran");
+}
+
+#[test]
+fn a_successor_that_holds_the_role_after_the_hand_over_gets_reads_and_writes_alike() {
+    let served = serve_pending("handed-over-read", None, true);
+    for verb in ["questions list", "session start"] {
+        let reply = ask(&served.socket, verb);
+        assert_eq!(reply["code"], serde_json::Value::Null, "{verb}: {reply}");
+    }
 }

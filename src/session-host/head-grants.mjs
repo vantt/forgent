@@ -33,6 +33,8 @@ const HEAD_VERBS = Object.freeze([HEAD_BIND_SESSION_VERB, 'session rotate', 'ses
  * ask, acknowledge and cancel its own through the socket (`head-request.v1.json`); answering is the owner's, and only
  * the secretary, which carries the owner's reply, may do it. The shared list is the one place these four are named.
  */
+// The read-only subset a rotation successor may use before it holds the role is `SUCCESSOR_READ_VERBS` in
+// packages/run-supervisor/rust/src/head_request.rs; keep it inside these verbs.
 export const QUESTION_VERBS = Object.freeze(['questions list', 'questions ask', 'questions ack', 'questions cancel']);
 /** The verb only the secretary head holds: it records the owner's answer with source `secretary`. */
 export const QUESTION_ANSWER_VERB = 'questions answer';

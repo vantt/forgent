@@ -71,6 +71,13 @@ pub const BIND_VERB: &str = "session bind session";
 /// new content is installed atomically through the durable-file door ([`install_granted`]), then published through [`WritePublisher`].
 pub const WRITE_VERB: &str = "session write";
 
+/// The role-gated verbs that only read, which a rotation successor may use before the role moves to it (its first turn
+/// reads the question store). Every verb outside this list keeps waiting for the role (`role-pending-rotation`).
+/// Mirrors the grant lists in `src/session-host/head-grants.mjs` (`QUESTION_VERBS`); each entry must be a verb the
+/// contract marks `"read": true`.
+/// `questions show` is not a socket verb (reads of one question go straight to the store), so only the list is here.
+pub const SUCCESSOR_READ_VERBS: &[&str] = &["questions list"];
+
 /// Verbs of a session that does not (yet) hold its role: the role check is "registered", and after the route reports
 /// done the supervisor registers the role for the attempt's session. The flag is Identity's `take`.
 fn role_move(verb: &str) -> Option<bool> {
@@ -1190,15 +1197,22 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>)
     match check() {
         Ok(true) => {}
         Ok(false) => {
+            let mut pending_read = false;
             if not_so == "role-not-held" {
                 if let Ok(Some(detail)) = (cfg.pending_rotation)() {
-                    return Outcome::Refused {
-                        code: "role-pending-rotation",
-                        detail: Some(detail),
-                    };
+                    if SUCCESSOR_READ_VERBS.contains(&request.verb.as_str()) {
+                        pending_read = true;
+                    } else {
+                        return Outcome::Refused {
+                            code: "role-pending-rotation",
+                            detail: Some(detail),
+                        };
+                    }
                 }
             }
-            return refused(not_so);
+            if !pending_read {
+                return refused(not_so);
+            }
         }
         Err(why) => {
             (cfg.log)(&format!(
