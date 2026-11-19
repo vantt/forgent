@@ -15,4 +15,15 @@ pub mod confinement {
     pub mod policy;
     pub mod request;
 }
-pub mod accounts credentials transport transport_round run_result assignment contract settlement steps planning assignment_runner unit_run;
+pub mod accounts;
+pub mod credentials;
+pub mod transport;
+pub mod transport_round;
+pub mod run_result;
+pub mod assignment;
+pub mod contract;
+pub mod settlement;
+pub mod steps;
+pub mod planning;
+pub mod assignment_runner;
+pub mod unit_run;
