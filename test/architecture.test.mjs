@@ -1687,7 +1687,6 @@ const ARM_STATIC_IMPORTS = [
   '../src/state/store.mjs',
   '../src/state/work.mjs',
   '../src/state/work.mjs',
-  '../src/state/worker-slots.mjs',
   '../src/util/fgos-file-registry.mjs',
   '../src/util/format-lock-duration.mjs',
   '../src/util/git-paths.mjs',
