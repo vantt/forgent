@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fixed: `fgos session write` now carries the blob id of the file content the edit was based on (`--base <oid>`, the `git hash-object --no-filters` id of the copy that was edited) and is refused `write-base-stale`, writing nothing, when the file differs after the supervisor's catch-up, so a whole-file backlog write built from an older copy can no longer delete newer rows when the writer passes `--base` (without it only a move during the catch-up is caught); a `--base` that is not a 40 or 64 digit hex blob id is refused as a bad argument.
 - Fixed: a seat start no longer spends a single-use login refresh token that a running seat still holds. While a running seat shares the account's refresh token, refresh-ahead leaves the renewal to that seat (`live-seat-owns-renewal`) and takes the seat's renewed pair on a later start; a running seat's login near its own expiry is never probed, so the probe cannot renew it either.
 - Changed: `fgos dispatch decide` refusals that come from the runner config name the file they read (`config.yaml` or `config.json`) instead of `<file>`, as the Node dispatch path did.
 - Fixed: `fgos dispatch decide` now refuses a seat bound to a bypass invocation (`bypass-invocation-not-allowed`), as the Node dispatch path did, instead of answering it.
