@@ -236,9 +236,8 @@ fn slot_excludes_same_destination_through_verification() {
             0
         )
         .err()
-        .unwrap()
-        .cause
-        .contains("lock-acquire"));
+        .map(|e| (e.cause, e.retryable))
+        .eq(&Some(("merge-slot-busy".to_string(), true))));
     drop(s);
 }
 #[test]
@@ -259,9 +258,8 @@ fn a_held_merge_slot_excludes_a_land_of_its_target_and_a_live_land_excludes_the_
             0
         )
         .err()
-        .unwrap()
-        .cause
-        .contains("lock-acquire"));
+        .map(|e| (e.cause, e.retryable))
+        .eq(&Some(("merge-slot-busy".to_string(), true))));
     drop(slot);
     let s = f
         .driver
@@ -286,6 +284,43 @@ fn a_held_merge_slot_excludes_a_land_of_its_target_and_a_live_land_excludes_the_
         "a busy merge slot is retryable like worktree-admin-held"
     );
     drop(s);
+}
+#[test]
+fn a_held_main_checkout_answers_busy_at_publication() {
+    use fgos_holder_lock::Wait;
+    let f = Fixture::new();
+    let mut s = f
+        .driver
+        .prepare_land(
+            &f.repo,
+            vec![],
+            &f.request,
+            "fixture",
+            "behind-main-checkout",
+            &wal::OsFileSystem,
+            0,
+        )
+        .unwrap();
+    let e = evidence(&s);
+    let mut holder = fgos_holder_lock::LockScope::seeded(vec![]).unwrap();
+    let params = std::collections::BTreeMap::from([(
+        "fgosDir".to_string(),
+        f.main.join(".fgos").to_string_lossy().into_owned(),
+    )]);
+    holder
+        .acquire("main-checkout", &params, Wait::Ms(0))
+        .unwrap();
+    let busy = f
+        .driver
+        .publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0)
+        .err()
+        .unwrap();
+    assert_eq!(busy.cause, "main-checkout-busy");
+    assert!(busy.retryable, "a busy main checkout is retryable");
+    drop(holder);
+    f.driver
+        .publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0)
+        .unwrap();
 }
 #[test]
 fn held_custody_refuses_before_effect() {

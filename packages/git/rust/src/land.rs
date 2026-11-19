@@ -10,6 +10,29 @@ use fgos_holder_lock::{BorrowedHandle, LockScope, Wait};
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, path::PathBuf};
 
+/// Take lock `name`; a holder still there after `wait_ms` (Held or Timeout) is `busy_code`
+/// (Busy, retryable), any other lock error stays a refusal.
+fn acquire_or_busy(
+    scope: &mut LockScope,
+    name: &str,
+    params: &BTreeMap<String, String>,
+    wait_ms: u64,
+    busy_code: &str,
+) -> Result<()> {
+    match scope.acquire(name, params, Wait::Ms(wait_ms)) {
+        Ok(_) => Ok(()),
+        Err(fgos_holder_lock::ScopeError::Acquire(acquire))
+            if matches!(
+                *acquire,
+                fgos_holder_lock::Acquire::Held { .. } | fgos_holder_lock::Acquire::Timeout { .. }
+            ) =>
+        {
+            Err(busy(busy_code))
+        }
+        Err(other) => Err(failure(other)),
+    }
+}
+
 /// The one refusal for a dirty main-checkout path the land would write.
 fn dirty_overlap(path: &str) -> OperationError {
     failure("main-checkout-dirty-overlap")
@@ -456,10 +479,13 @@ impl GitDriver {
             replay_land_receipt(session.receipt.as_ref().unwrap())?;
             return Ok(session);
         }
-        session
-            .slot
-            .acquire("merge-slot", &p, Wait::Ms(wait_ms))
-            .map_err(failure)?;
+        acquire_or_busy(
+            &mut session.slot,
+            "merge-slot",
+            &p,
+            wait_ms,
+            "merge-slot-busy",
+        )?;
         let observed = crate::refs::direct(self, repo, &destination)?;
         let mut pinned_request = req.clone();
         if pinned_request.target.is_empty() {
@@ -795,19 +821,8 @@ impl GitDriver {
         }
         let mut slot = LockScope::seeded(vec![]).map_err(failure)?;
         let p = merge_slot_params(repo, destination.as_str());
-        match slot.acquire("merge-slot", &p, Wait::Ms(wait_ms)) {
-            Ok(_) => Ok(MergeSlot { slot }),
-            Err(fgos_holder_lock::ScopeError::Acquire(acquire))
-                if matches!(
-                    *acquire,
-                    fgos_holder_lock::Acquire::Held { .. }
-                        | fgos_holder_lock::Acquire::Timeout { .. }
-                ) =>
-            {
-                Err(busy("merge-slot-busy"))
-            }
-            Err(other) => Err(failure(other)),
-        }
+        acquire_or_busy(&mut slot, "merge-slot", &p, wait_ms, "merge-slot-busy")?;
+        Ok(MergeSlot { slot })
     }
     /// Waits at most `wait_ms` for the main checkout; publication itself is never retried.
     pub fn publish_land<F: wal::FileSystem>(
@@ -847,9 +862,13 @@ impl GitDriver {
             held(&session.slot)?,
             fgos_holder_lock::Wait::Ms(5000),
         )?;
-        scope
-            .acquire("main-checkout", &params(repo), Wait::Ms(wait_ms))
-            .map_err(failure)?;
+        acquire_or_busy(
+            &mut scope,
+            "main-checkout",
+            &params(repo),
+            wait_ms,
+            "main-checkout-busy",
+        )?;
         let candidate_repo = match self.resolve_repo(&c.worktree, repo.trusted_main_root())? {
             ResolveRepo::Repository(r) => self.checkout_repository(&r)?,
             _ => return Err(recovery("land-candidate-missing")),
