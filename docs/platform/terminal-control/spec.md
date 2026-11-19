@@ -150,7 +150,7 @@ The research's 85×20 and "at most 4" are not used; nobody measured them.
 - **Directory.** `<stateRoot>/terminal` (mode 0700), the parent of one record directory per driver, is created with everything under it by the allocation store on first use; setup has no fix for it. The state root is the single resolution of the holder-lock spec. Deleting it closes no pane: nobody closes a pane that has no record.
 - **No new environment variable.** `FGOS_HERDR_ANCHOR_PANE` stays as the input of `attach`; `FGOS_HERDR_BIN` stays as the herdr binary the caller resolved. `DISABLE_AUTO_UPDATE=true` is injected directly into created panes as a quiet shell default: this is not an fgOS config key, env var fgOS reads, file or tool dependency, so nothing registers with `fgos setup` or `fgos doctor`.
 - **Other releases.** Checked 2026-10-18: the release active in the forgentX, mdview and mcp-skill-hub workspaces (one digest) accepts a `terminal` section in the global and in the project config, so setup writes the key like `lock`. A release that refused unknown keys would have to be given the key in the project config only, until every workspace ran the new release.
-- **Doctor checks** (`src/setup/terminal-control-checks.mjs`; two rows, no `--fix`, all read-only):
+- **Doctor checks** (`apps/fgos/src/wiring/doctor/terminal.rs`; two rows, no `--fix`, all read-only):
 
 | Check | What it does | Result |
 |---|---|---|

@@ -33,7 +33,6 @@ import { bindableExecute } from '../helpers/work-seat-config.mjs';
 const executeAssignment = bindableExecute(executeAssignmentRaw);
 const loadCoordinationProtocol = () => null;
 const discoverCoordinationProtocols = () => [];
-import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 
 function createTempDir(prefix = 'fgos-template-test-') {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -680,24 +679,6 @@ test('retry/replay attribution stability: snapshot and digests remain determinis
     const run2Resolution = resolveAndRenderOperationPrompt(assignment, { cwd: tmpDir });
     assert.notEqual(run2Resolution.templateProvenance.contentDigest, originalContentDigest, 'new resolution sees new disk digest');
     assert.notEqual(run2Resolution.templateProvenance.renderedPromptDigest, originalRenderedDigest, 'new resolution sees new prompt digest');
-  } finally {
-    fs.rmSync(tmpDir, { recursive: true, force: true });
-  }
-});
-
-test('operation-prompt-templates-valid doctor check fails when a malformed template is present', () => {
-  const check = DOCTOR_CHECKS.find((c) => c.id === 'operation-prompt-templates-valid');
-  const tmpDir = createTempDir('fgos-doc-fail-');
-  try {
-    const projectTemplatesDir = path.join(tmpDir, '.fgos', 'prompt-templates');
-    fs.mkdirSync(projectTemplatesDir, { recursive: true });
-    // Write a template with forbidden variable
-    fs.writeFileSync(path.join(projectTemplatesDir, 'invalid-tmpl.md'), 'Forbidden: {forbiddenVar}');
-
-    const result = check.check(tmpDir);
-    assert.equal(result.passed, false);
-    assert.match(result.message, /malformed operation prompt template/);
-    assert.match(result.message, /forbiddenVar/);
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

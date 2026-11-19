@@ -119,7 +119,10 @@ fn domain_names(payload: &Path) -> Vec<String> {
 
 /// The three tiers of a project, in lookup order, and the shipped core personas the project's own `core/agents`
 /// hides (`None` when it hides nothing: the project has no core folder of its own, or is the install itself).
-fn tiers_of(project: &Path, payload: &Path) -> (Vec<TierFiles>, Option<Vec<ShippedCore>>) {
+pub(crate) fn tiers_of(
+    project: &Path,
+    payload: &Path,
+) -> (Vec<TierFiles>, Option<Vec<ShippedCore>>) {
     let mut workspace = TierFiles {
         tier: "workspace".into(),
         label: "fgos/agents".into(),

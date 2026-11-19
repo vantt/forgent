@@ -27,7 +27,7 @@ Superseded by: None
 Target vocabulary from design.md §3.7 of
 `archive/plans/260915-executor-policy-dispatch-seams/design.md` — documented here so
 config/doctor warnings (`executor-profile-warnings` check,
-`src/setup/executor-profile-warnings.mjs`) have a named migration target to
+judged in Rust by `apps/fgos/src/wiring/doctor/execution.rs`) have a named migration target to
 point at. The **Invocation** half of this vocabulary was already real config
 before this section existed (`executors.<id>.invocations[]`, each entry's
 own `via`/`command`/`args`/`adapter` — `src/runner/dispatch/config.mjs`'s

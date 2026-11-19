@@ -1153,7 +1153,7 @@
         },
         {
           "path": "src/setup/seat-binding-checks.mjs",
-          "reason": "doctor rows seat-binding-dry-bind and seat-binding-route, bridge:S6a"
+          "reason": "doctor row seat-binding-dry-bind, bridge:S6b; the seat-binding-route row is judged in Rust"
         },
         {
           "path": "src/setup/blind-steps-proven-pools.mjs",
@@ -1232,11 +1232,11 @@
         },
         {
           "path": "src/runner/agent-listing.mjs",
-          "reason": "twin, same vectors as the contract: listAgents stays because src/setup/registrations.mjs asks it for the agent-type-names-unique row on the Node bridge"
+          "reason": "twin, same vectors as the contract: the agent-type-names-unique row is judged in Rust; listAgents stays only for the vector recorder (scripts/agents-vectors.mjs), its replay test and the npm test judgement of the release source tiers (test/setup/packaged-definitions.test.mjs)"
         }
       ],
       "retiredBy": "S6a",
-      "reason": "the facts about an executor (its family, lookup, confinement, credential store, effort levels, posture, account inventory, config shape) are derived once, in the fgos-execution crate, over executor-model.v1.json and its vectors. Node launch code still needs the same derivations until S6a moves launch; each Node definition is a declared twin proven on the same vectors, owned by S6a (launch code, confinement, account state, the agent-type-names-unique doctor row)"
+      "reason": "the facts about an executor (its family, lookup, confinement, credential store, effort levels, posture, account inventory, config shape) are derived once, in the fgos-execution crate, over executor-model.v1.json and its vectors. Node launch code still needs the same derivations until S6a moves launch; each Node definition is a declared twin proven on the same vectors, owned by S6a (launch code, confinement, account state, the agents vector recorder)"
     },
     {
       "job": "decide a dispatch",
@@ -1627,10 +1627,10 @@
         "apps/fgos/src/wiring/worktree.rs",
         "packages/git/node-addon/src/checkout.rs",
         {"path": "packages/git/node-addon/src/git/worktree.rs", "reason": "carries the Git worktree port to Node: its create, remove and prune entries call the driver and decide nothing"},
-        {"path": "packages/config/rust/src/bundle.rs", "reason": "names the `worktreeSetup` config section in the bundle's section list; it runs nothing"}
+        {"path": "packages/config/rust/src/bundle.rs", "reason": "names the `worktreeSetup` config section in the bundle's section list; it runs nothing"},
+        {"path": "apps/fgos/src/wiring/doctor/execution.rs", "reason": "names `worktreeSetup` in a check message; it provisions nothing"}
       ],
       "debt": [
-        {"path": "src/setup/model-pool-checks.mjs", "reason": "names `worktreeSetup` in a check message; it provisions nothing"},
         {"path": "src/cli/command-registry.mjs", "reason": "names `worktreeSetup` in the description text of the `worktree` verb"},
         {"path": "src/runner/repo-locks.mjs", "reason": "its creation helpers register a checkout through the Git port; their one production caller is unit-handoff, and they are deleted when it moves to the checkout door"},
         {"path": "src/workflow/unit-handoff.mjs", "reason": "unit handoff creates its checkout through repo-locks; moves to the checkout door when its Node caller is retired"},
@@ -1854,17 +1854,11 @@
     "src/setup/agent-hooks.mjs": "infra",
     "src/setup/mailbox-limits.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
-    "src/setup/run-supervisor-checks.mjs": "infra",
-    "src/setup/terminal-control-checks.mjs": "infra",
-    "src/setup/agent-cli-trust.mjs": "infra",
     "src/setup/blind-steps-proven-pools.mjs": "use-case",
     "src/setup/workflow-catalog-reader.mjs": "use-case",
-    "src/setup/model-pool-checks.mjs": "use-case",
     "src/setup/seat-binding-checks.mjs": "use-case",
     "src/setup/checks.mjs": "use-case",
     "src/setup/doctor-bridge.mjs": "use-case",
-    "src/setup/executor-profile-warnings.mjs": "infra",
-    "src/setup/session-keep-declared.mjs": "infra",
     "src/setup/registrations.mjs": "use-case",
     "src/state/knowledge-registry.mjs": "domain",
     "src/report/knowledge-resolver.mjs": "domain",

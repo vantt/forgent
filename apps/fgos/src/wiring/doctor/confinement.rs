@@ -174,7 +174,7 @@ fn read_runner(root: &Path) -> Result<Value, String> {
 }
 
 /// The runner section of the machine config alone, where the provider account inventory lives.
-fn machine_runner() -> Result<Value, String> {
+pub(crate) fn machine_runner() -> Result<Value, String> {
     let lookup = |key: &str| std::env::var(key).ok();
     let global = machine::global_dir(lookup).ok_or_else(machine::home_unset_message)?;
     let detectors = PathDetectors {
