@@ -1,0 +1,2894 @@
+{
+ "contract": "core-run-request.v1",
+ "doc": "The flag-to-request rules of `fgos run` as Node answers them, with the shell side (working directory, git roots, case admission) injected as recorded in each vector. An id ending in -HEX4 stands for four random hex digits.",
+ "requestFromFlags": [
+  {
+   "flags": {
+    "$undefined": true
+   },
+   "expect": {
+    "ok": {
+     "scalars": []
+    }
+   }
+  },
+  {
+   "flags": {},
+   "expect": {
+    "ok": {
+     "scalars": []
+    }
+   }
+  },
+  {
+   "flags": {
+    "params": "{\"a\":1,\"b\":[2]}"
+   },
+   "expect": {
+    "ok": {
+     "scalars": [],
+     "params": {
+      "a": 1,
+      "b": [
+       2
+      ]
+     }
+    }
+   }
+  },
+  {
+   "flags": {
+    "params": "{}"
+   },
+   "expect": {
+    "ok": {
+     "scalars": [],
+     "params": {}
+    }
+   }
+  },
+  {
+   "flags": {
+    "params": "[1]"
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "--params must parse to a plain JSON object",
+     "code": "param-invalid"
+    }
+   }
+  },
+  {
+   "flags": {
+    "params": "null"
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "--params must parse to a plain JSON object",
+     "code": "param-invalid"
+    }
+   }
+  },
+  {
+   "flags": {
+    "params": "\"s\""
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "--params must parse to a plain JSON object",
+     "code": "param-invalid"
+    }
+   }
+  },
+  {
+   "flags": {
+    "params": "{bad"
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "--params must be valid JSON: Expected property name or '}' in JSON at position 1 (line 1 column 2)",
+     "code": "param-invalid"
+    }
+   }
+  },
+  {
+   "flags": {
+    "params": true
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "--params must be a JSON string",
+     "code": "param-invalid"
+    }
+   }
+  },
+  {
+   "flags": {
+    "params": 5
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "--params must be a JSON string",
+     "code": "param-invalid"
+    }
+   }
+  },
+  {
+   "flags": {
+    "param": "k=v"
+   },
+   "expect": {
+    "ok": {
+     "scalars": [
+      {
+       "key": "k",
+       "raw": "v"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "flags": {
+    "param": [
+     "a=1",
+     "b=two=2"
+    ]
+   },
+   "expect": {
+    "ok": {
+     "scalars": [
+      {
+       "key": "a",
+       "raw": "1"
+      },
+      {
+       "key": "b",
+       "raw": "two=2"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "flags": {
+    "param": true
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "--param requires a key=value pair",
+     "code": "param-invalid"
+    }
+   }
+  },
+  {
+   "flags": {
+    "param": 7
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "--param value must be a string key=value pair",
+     "code": "param-invalid"
+    }
+   }
+  },
+  {
+   "flags": {
+    "param": [
+     1
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "--param value must be a string key=value pair",
+     "code": "param-invalid"
+    }
+   }
+  },
+  {
+   "flags": {
+    "param": "novalue"
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "--param \"novalue\" missing \"=\" delimiter",
+     "code": "param-invalid"
+    }
+   }
+  },
+  {
+   "flags": {
+    "param": "=v"
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "--param \"=v\" key cannot be empty",
+     "code": "param-invalid"
+    }
+   }
+  },
+  {
+   "flags": {
+    "param": "k="
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "--param \"k=\" value cannot be empty",
+     "code": "param-invalid"
+    }
+   }
+  },
+  {
+   "flags": {
+    "param": [
+     "a=1",
+     "a=2"
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "parameter \"a\" specified more than once in --param",
+     "code": "param-request-conflict"
+    }
+   }
+  },
+  {
+   "flags": {
+    "params": "{\"a\":1}",
+    "param": "a=2"
+   },
+   "expect": {
+    "error": {
+     "name": "RunRequestError",
+     "message": "parameter \"a\" specified in both --params and --param",
+     "code": "param-request-conflict"
+    }
+   }
+  },
+  {
+   "flags": {
+    "params": "{\"a\":1}",
+    "param": "b=2"
+   },
+   "expect": {
+    "ok": {
+     "scalars": [
+      {
+       "key": "b",
+       "raw": "2"
+      }
+     ],
+     "params": {
+      "a": 1
+     }
+    }
+   }
+  },
+  {
+   "flags": {
+    "param": []
+   },
+   "expect": {
+    "ok": {
+     "scalars": []
+    }
+   }
+  },
+  {
+   "flags": {
+    "params": "{\"__proto__\":1}",
+    "param": "constructor=x"
+   },
+   "expect": {
+    "ok": {
+     "scalars": [
+      {
+       "key": "constructor",
+       "raw": "x"
+      }
+     ],
+     "params": {
+      "__proto__": 1
+     }
+    }
+   }
+  }
+ ],
+ "foldRunSetting": [
+  {
+   "overrides": [],
+   "key": "timeoutMs",
+   "value": 90000,
+   "inputUnchanged": true,
+   "expect": {
+    "ok": [
+     {
+      "timeoutMs": 90000
+     }
+    ]
+   }
+  },
+  {
+   "overrides": [
+    {
+     "scope": "producer"
+    }
+   ],
+   "key": "reasoningEffort",
+   "value": "high",
+   "inputUnchanged": true,
+   "expect": {
+    "ok": [
+     {
+      "scope": "producer",
+      "reasoningEffort": "high"
+     },
+     {
+      "reasoningEffort": "high"
+     }
+    ]
+   }
+  },
+  {
+   "overrides": [
+    {
+     "scope": "producer",
+     "reasoningEffort": "low"
+    }
+   ],
+   "key": "reasoningEffort",
+   "value": "high",
+   "inputUnchanged": true,
+   "expect": {
+    "ok": [
+     {
+      "scope": "producer",
+      "reasoningEffort": "low"
+     },
+     {
+      "reasoningEffort": "high"
+     }
+    ]
+   }
+  },
+  {
+   "overrides": [
+    {
+     "reasoningEffort": "low"
+    },
+    {
+     "scope": "x"
+    }
+   ],
+   "key": "reasoningEffort",
+   "value": "high",
+   "inputUnchanged": true,
+   "expect": {
+    "ok": [
+     {
+      "reasoningEffort": "low"
+     },
+     {
+      "scope": "x",
+      "reasoningEffort": "high"
+     }
+    ]
+   }
+  },
+  {
+   "overrides": [
+    {
+     "scope": "a"
+    },
+    {
+     "scope": "b",
+     "account": "p/x"
+    }
+   ],
+   "key": "account",
+   "value": "openai/work",
+   "inputUnchanged": true,
+   "expect": {
+    "ok": [
+     {
+      "scope": "a",
+      "account": "openai/work"
+     },
+     {
+      "scope": "b",
+      "account": "p/x"
+     },
+     {
+      "account": "openai/work"
+     }
+    ]
+   }
+  },
+  {
+   "overrides": [
+    null,
+    {
+     "scope": "a"
+    }
+   ],
+   "key": "timeoutMs",
+   "value": 60000,
+   "inputUnchanged": true,
+   "expect": {
+    "ok": [
+     null,
+     {
+      "scope": "a",
+      "timeoutMs": 60000
+     },
+     {
+      "timeoutMs": 60000
+     }
+    ]
+   }
+  },
+  {
+   "overrides": [
+    "text",
+    {}
+   ],
+   "key": "timeoutMs",
+   "value": 60000,
+   "inputUnchanged": true,
+   "expect": {
+    "ok": [
+     "text",
+     {
+      "timeoutMs": 60000
+     }
+    ]
+   }
+  },
+  {
+   "overrides": [
+    {
+     "tier": "t"
+    }
+   ],
+   "key": "account",
+   "value": "p/a",
+   "inputUnchanged": true,
+   "expect": {
+    "ok": [
+     {
+      "tier": "t",
+      "account": "p/a"
+     }
+    ]
+   }
+  }
+ ],
+ "planFromFlags": [
+  {
+   "flags": {},
+   "mainRoot": "/repo",
+   "expect": {
+    "ok": null
+   }
+  },
+  {
+   "flags": {
+    "phase": "3"
+   },
+   "mainRoot": "/repo",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--phase needs --plan <plans/dir>: a phase is a part of a plan"
+    }
+   }
+  },
+  {
+   "flags": {
+    "plan": true
+   },
+   "mainRoot": "/repo",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--plan requires a plans/<dir> directory, e.g. --plan plans/261118-0936-ops-metrics"
+    }
+   }
+  },
+  {
+   "flags": {
+    "plan": ""
+   },
+   "mainRoot": "/repo",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--plan requires a plans/<dir> directory, e.g. --plan plans/261118-0936-ops-metrics"
+    }
+   }
+  },
+  {
+   "flags": {
+    "plan": "plans/x",
+    "phase": true
+   },
+   "mainRoot": "/repo",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--phase requires a phase id, e.g. --phase 3"
+    }
+   }
+  },
+  {
+   "flags": {
+    "plan": "plans/x",
+    "phase": ""
+   },
+   "mainRoot": "/repo",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--phase requires a phase id, e.g. --phase 3"
+    }
+   }
+  },
+  {
+   "flags": {
+    "plan": "a/b"
+   },
+   "mainRoot": "/repo",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.dir must be one plans/<name> directory, got: \"a/b\"."
+    }
+   }
+  },
+  {
+   "flags": {
+    "plan": ".."
+   },
+   "mainRoot": "/repo",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.dir must be one plans/<name> directory, got: \"..\"."
+    }
+   }
+  },
+  {
+   "flags": {
+    "plan": "plans/x",
+    "phase": "a b"
+   },
+   "mainRoot": "/repo",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.phase must be a phase id (letters, digits, \".\", \"_\", \"-\"), got: \"a b\"."
+    }
+   }
+  },
+  {
+   "flags": {
+    "plan": "plans/."
+   },
+   "mainRoot": "/repo",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.dir must be one plans/<name> directory, got: \"plans/.\"."
+    }
+   }
+  }
+ ],
+ "buildRunRequest": [
+  {
+   "name": "a prompt builds a read-only unit",
+   "flags": {},
+   "positional": [
+    "Summarise the repo"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-summarise-the-repo-HEX4",
+      "objective": "Summarise the repo",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "prompt with every unit flag but the ones that read config",
+   "flags": {
+    "writes": "src/a.mjs, docs",
+    "input": "a.md,b.md",
+    "capability": "code:implement",
+    "rigor": "high",
+    "verify": "npm test"
+   },
+   "positional": [
+    "Fix it"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-fix-it-HEX4",
+      "objective": "Fix it",
+      "capability": "code:implement",
+      "writes": [
+       "src/a.mjs",
+       "docs"
+      ],
+      "rigor": "high",
+      "inputs": [
+       "a.md",
+       "b.md"
+      ],
+      "verify": "npm test"
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "prompt id slug folds accents and punctuation",
+   "flags": {},
+   "positional": [
+    "  Sửa lỗi đăng nhập — Ünïcode!! "
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-sua-loi-dang-nhap-unicode-HEX4",
+      "objective": "  Sửa lỗi đăng nhập — Ünïcode!! ",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "prompt id slug falls back to task",
+   "flags": {},
+   "positional": [
+    "!!!"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-task-HEX4",
+      "objective": "!!!",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "prompt id slug is cut at forty characters",
+   "flags": {},
+   "positional": [
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bbbbbbbbb-HEX4",
+      "objective": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "empty prompt",
+   "flags": {},
+   "positional": [
+    ""
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "fgos run \"<prompt>\" needs a non-empty prompt"
+    }
+   }
+  },
+  {
+   "name": "blank prompt",
+   "flags": {},
+   "positional": [
+    "   "
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "fgos run \"<prompt>\" needs a non-empty prompt"
+    }
+   }
+  },
+  {
+   "name": "no way to say what to run",
+   "flags": {},
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "fgos run requires --unit <file|-> or --resume <unitRunId>, a \"<prompt>\", or --sync <ref>"
+    }
+   }
+  },
+  {
+   "name": "prompt and --unit",
+   "flags": {
+    "unit": "u.json"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "fgos run takes either a \"<prompt>\", --unit or --resume, not more than one"
+    }
+   }
+  },
+  {
+   "name": "prompt and --resume",
+   "flags": {
+    "resume": "ur-1"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "fgos run takes either a \"<prompt>\", --unit or --resume, not more than one"
+    }
+   }
+  },
+  {
+   "name": "--unit and --resume",
+   "flags": {
+    "unit": "u.json",
+    "resume": "ur-1"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "fgos run takes either a \"<prompt>\", --unit or --resume, not more than one"
+    }
+   }
+  },
+  {
+   "name": "two prompts",
+   "flags": {},
+   "positional": [
+    "a",
+    "b"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "fgos run takes one prompt; quote the prompt (\"a b\")"
+    }
+   }
+  },
+  {
+   "name": "--unit file",
+   "flags": {
+    "unit": "u.json"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitPath": "u.json",
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--unit from stdin with a directory and a worktree",
+   "flags": {
+    "unit": "-",
+    "dir": "/other",
+    "worktree": "/wt"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitPath": "-",
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/other"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "repoRoot": "/other",
+     "cwd": "/repo/work",
+     "worktree": "/wt"
+    }
+   }
+  },
+  {
+   "name": "--resume",
+   "flags": {
+    "resume": "ur-9"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "resumeUnitRunId": "ur-9",
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--sync alone builds a sync-only unit",
+   "flags": {
+    "sync": "main",
+    "writes": "src"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-sync-main-HEX4",
+      "syncBase": "main",
+      "capability": "execute",
+      "writes": [
+       "src"
+      ]
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--sync with a prompt",
+   "flags": {
+    "sync": "main",
+    "writes": "src"
+   },
+   "positional": [
+    "merge it"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-merge-it-HEX4",
+      "objective": "merge it",
+      "syncBase": "main",
+      "capability": "execute",
+      "writes": [
+       "src"
+      ]
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--sync needs --writes",
+   "flags": {
+    "sync": "main"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "fgos run --sync needs --writes: merging a ref changes the branch, so the unit is a writing unit in a linked worktree (the conflicted paths join the scope by themselves)"
+    }
+   }
+  },
+  {
+   "name": "--sync needs a ref",
+   "flags": {
+    "sync": true,
+    "writes": "src"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--sync requires a ref to merge (a branch, tag or commit, e.g. main)"
+    }
+   }
+  },
+  {
+   "name": "--sync with --unit",
+   "flags": {
+    "sync": "main",
+    "unit": "u.json"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--sync only applies to fgos run \"<prompt>\" or a bare --sync <ref>; a --unit file names syncBase, and a resume keeps the sync it started with"
+    }
+   }
+  },
+  {
+   "name": "--sync with --resume",
+   "flags": {
+    "sync": "main",
+    "resume": "ur"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--sync only applies to fgos run \"<prompt>\" or a bare --sync <ref>; a --unit file names syncBase, and a resume keeps the sync it started with"
+    }
+   }
+  },
+  {
+   "name": "prompt-only flag with --unit: writes",
+   "flags": {
+    "unit": "u.json",
+    "writes": "a"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--writes only applies to fgos run \"<prompt>\""
+    }
+   }
+  },
+  {
+   "name": "prompt-only flag with --resume: provider",
+   "flags": {
+    "resume": "ur",
+    "provider": "x"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--provider only applies to fgos run \"<prompt>\""
+    }
+   }
+  },
+  {
+   "name": "prompt-only flag with --unit: plan",
+   "flags": {
+    "unit": "u.json",
+    "plan": "plans/x"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--plan only applies to fgos run \"<prompt>\""
+    }
+   }
+  },
+  {
+   "name": "prompt-only flag with --unit: phase",
+   "flags": {
+    "unit": "u.json",
+    "phase": "2"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--phase only applies to fgos run \"<prompt>\""
+    }
+   }
+  },
+  {
+   "name": "prompt-only flag with --unit: verify",
+   "flags": {
+    "unit": "u.json",
+    "verify": "x"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--verify only applies to fgos run \"<prompt>\""
+    }
+   }
+  },
+  {
+   "name": "--writes needs a path",
+   "flags": {
+    "writes": ","
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "fgos run \"<prompt>\" --writes needs at least one path; omit it for a read-only unit"
+    }
+   }
+  },
+  {
+   "name": "--writes bare",
+   "flags": {
+    "writes": true
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "fgos run \"<prompt>\" --writes needs at least one path; omit it for a read-only unit"
+    }
+   }
+  },
+  {
+   "name": "--writes needs a linked worktree",
+   "flags": {
+    "writes": "src"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/nowhere"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "fgos run \"<prompt>\" --writes needs a linked worktree: create one with `git worktree add <path>` and pass --worktree <path> (or run from inside it)"
+    }
+   }
+  },
+  {
+   "name": "--writes --worktree names where it runs",
+   "flags": {
+    "writes": "src",
+    "worktree": "/repo/wt/../wt2"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/wt2"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": [
+       "src"
+      ]
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work",
+     "worktree": "/repo/wt/../wt2"
+    }
+   }
+  },
+  {
+   "name": "--input needs a path",
+   "flags": {
+    "input": " , "
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "fgos run \"<prompt>\" --input needs at least one repo-relative path (comma-separated); omit it for a unit with no input files"
+    }
+   }
+  },
+  {
+   "name": "--input bare",
+   "flags": {
+    "input": true
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "fgos run \"<prompt>\" --input needs at least one repo-relative path (comma-separated); omit it for a unit with no input files"
+    }
+   }
+  },
+  {
+   "name": "--capability bare",
+   "flags": {
+    "capability": true
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--capability requires a capability name"
+    }
+   }
+  },
+  {
+   "name": "--rigor empty",
+   "flags": {
+    "rigor": ""
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--rigor requires a level"
+    }
+   }
+  },
+  {
+   "name": "--verify bare",
+   "flags": {
+    "verify": true
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--verify requires a command, e.g. --verify \"npm test\""
+    }
+   }
+  },
+  {
+   "name": "--dir is normalised and git is not asked",
+   "flags": {
+    "dir": "/abs/rel/../proj"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work",
+    "gitFails": true
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/abs/proj"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "repoRoot": "/abs/rel/../proj",
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "no --dir and git cannot say",
+   "flags": {},
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work",
+    "gitFails": true
+   },
+   "expect": {
+    "error": {
+     "name": "Error",
+     "message": "not a git repository"
+    }
+   }
+  },
+  {
+   "name": "--dir with dot segments and a trailing slash",
+   "flags": {
+    "dir": "/up/./proj/"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/up/proj"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "repoRoot": "/up/./proj/",
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--effort folds into a reasoningEffort override",
+   "flags": {
+    "effort": "high"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [
+      {
+       "reasoningEffort": "high"
+      }
+     ],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--effort bare",
+   "flags": {
+    "effort": true
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--effort requires a level (low, medium, high, max)"
+    }
+   }
+  },
+  {
+   "name": "--effort empty",
+   "flags": {
+    "effort": ""
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--effort requires a level (low, medium, high, max)"
+    }
+   }
+  },
+  {
+   "name": "--timeout parses a duration",
+   "hostTimeout": {
+    "ok": 5400000
+   },
+   "flags": {
+    "timeout": "90m"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [
+      {
+       "timeoutMs": 5400000
+      }
+     ],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--timeout in seconds and hours",
+   "hostTimeout": {
+    "ok": 7200000
+   },
+   "flags": {
+    "timeout": "2h",
+    "override": "{\"scope\":\"producer\"}"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [
+      {
+       "scope": "producer",
+       "timeoutMs": 7200000
+      },
+      {
+       "timeoutMs": 7200000
+      }
+     ],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--timeout below the floor",
+   "hostTimeout": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--timeout must be at least 1m, got 30000ms"
+    }
+   },
+   "flags": {
+    "timeout": "30s"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--timeout must be at least 1m, got 30000ms"
+    }
+   }
+  },
+  {
+   "name": "--timeout above the ceiling",
+   "hostTimeout": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--timeout must be at most 4h, got 18000000ms"
+    }
+   },
+   "flags": {
+    "timeout": "5h"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--timeout must be at most 4h, got 18000000ms"
+    }
+   }
+  },
+  {
+   "name": "--timeout without a unit",
+   "hostTimeout": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--timeout takes a whole number and a unit (ms, s, m or h), e.g. 90m or 5400s; got: \"90\""
+    }
+   },
+   "flags": {
+    "timeout": "90"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--timeout takes a whole number and a unit (ms, s, m or h), e.g. 90m or 5400s; got: \"90\""
+    }
+   }
+  },
+  {
+   "name": "--timeout bare",
+   "flags": {
+    "timeout": true
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--timeout requires a duration, e.g. 90m or 5400s"
+    }
+   }
+  },
+  {
+   "name": "--timeout on a resumed run",
+   "hostTimeout": {
+    "ok": 5400000
+   },
+   "flags": {
+    "resume": "ur",
+    "timeout": "90m"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--timeout cannot change a resumed unit run: it keeps the timeout it was started with"
+    }
+   }
+  },
+  {
+   "name": "--timeout too large to count",
+   "hostTimeout": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--timeout is too large: 99999999999999999999h (at most 4h)"
+    }
+   },
+   "flags": {
+    "timeout": "99999999999999999999h"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--timeout is too large: 99999999999999999999h (at most 4h)"
+    }
+   }
+  },
+  {
+   "name": "--timeout in milliseconds",
+   "hostTimeout": {
+    "ok": 600000
+   },
+   "flags": {
+    "timeout": "600000ms"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [
+      {
+       "timeoutMs": 600000
+      }
+     ],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--account pins the account",
+   "flags": {
+    "account": "openai/work"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [
+      {
+       "account": "openai/work"
+      }
+     ],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--account bare",
+   "flags": {
+    "account": true
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--account requires pool/account (an account of a pool in ~/.fgos/private/accounts.yaml, for example openai/work)"
+    }
+   }
+  },
+  {
+   "name": "--account on a resumed run",
+   "flags": {
+    "resume": "ur",
+    "account": "a/b"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--account cannot change a resumed unit run: it keeps the account its seats were bound to"
+    }
+   }
+  },
+  {
+   "name": "--effort --timeout --account fold together over an --override list",
+   "hostTimeout": {
+    "ok": 3600000
+   },
+   "flags": {
+    "override": "[{\"scope\":\"producer\",\"reasoningEffort\":\"low\"},{\"tier\":\"high\"}]",
+    "effort": "max",
+    "timeout": "60m",
+    "account": "p/a"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [
+      {
+       "scope": "producer",
+       "reasoningEffort": "low",
+       "timeoutMs": 3600000,
+       "account": "p/a"
+      },
+      {
+       "tier": "high",
+       "reasoningEffort": "max",
+       "timeoutMs": 3600000,
+       "account": "p/a"
+      }
+     ],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--override one object",
+   "flags": {
+    "override": "{\"scope\":\"checker\",\"model\":\"m\"}"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [
+      {
+       "scope": "checker",
+       "model": "m"
+      }
+     ],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--override bad JSON",
+   "flags": {
+    "override": "{nope"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "invalid JSON for --override: Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+    }
+   }
+  },
+  {
+   "name": "--override JSON null",
+   "flags": {
+    "override": "null"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [
+      null
+     ],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--override empty",
+   "flags": {
+    "override": ""
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--params and --param become a request",
+   "flags": {
+    "params": "{\"maxRounds\":3}",
+    "param": [
+     "rebuttal=true"
+    ]
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "request": {
+      "scalars": [
+       {
+        "key": "rebuttal",
+        "raw": "true"
+       }
+      ],
+      "params": {
+       "maxRounds": 3
+      }
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--param conflict",
+   "flags": {
+    "param": [
+     "a=1",
+     "a=2"
+    ]
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "param-request-conflict: parameter \"a\" specified more than once in --param",
+     "code": "param-request-conflict",
+     "phase": "pre-admission"
+    }
+   }
+  },
+  {
+   "name": "--param conflicts with --params",
+   "flags": {
+    "params": "{\"a\":1}",
+    "param": "a=2"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "param-request-conflict: parameter \"a\" specified in both --params and --param",
+     "code": "param-request-conflict",
+     "phase": "pre-admission"
+    }
+   }
+  },
+  {
+   "name": "--params invalid",
+   "flags": {
+    "params": "[]"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "param-invalid: --params must parse to a plain JSON object",
+     "code": "param-invalid",
+     "phase": "pre-admission"
+    }
+   }
+  },
+  {
+   "name": "--param bare",
+   "flags": {
+    "param": true
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "param-invalid: --param requires a key=value pair",
+     "code": "param-invalid",
+     "phase": "pre-admission"
+    }
+   }
+  },
+  {
+   "name": "--params on a resumed run",
+   "flags": {
+    "resume": "ur",
+    "params": "{}"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--params cannot change a resumed unit run: it keeps the request it was started with"
+    }
+   }
+  },
+  {
+   "name": "--param on a resumed run",
+   "flags": {
+    "resume": "ur",
+    "param": "a=1"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--param cannot change a resumed unit run: it keeps the request it was started with"
+    }
+   }
+  },
+  {
+   "name": "--pattern and --stance-options pass through",
+   "flags": {
+    "pattern": "panel",
+    "stance-options": "yes|no|maybe"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "pattern": "panel",
+     "stanceOptions": [
+      "yes",
+      "no",
+      "maybe"
+     ],
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--stance-options bare",
+   "flags": {
+    "stance-options": true
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--stance-options requires pipe-separated option labels"
+    }
+   }
+  },
+  {
+   "name": "--stance-options empty",
+   "flags": {
+    "stance-options": ""
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--stance-options requires pipe-separated option labels"
+    }
+   }
+  },
+  {
+   "name": "--case names the case and its activity",
+   "flags": {
+    "case": "c-1",
+    "activity": "review",
+    "route": "should",
+    "reason": "because"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work",
+    "activityUnit": {
+     "objective": "from the guide"
+    }
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "caseRef": {
+      "caseId": "c-1",
+      "activity": "review",
+      "route": "should",
+      "reason": "because"
+     },
+     "activityUnit": {
+      "objective": "from the guide",
+      "caseId": "c-1",
+      "activity": "review"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--case without an activity unit answer",
+   "flags": {
+    "case": "c-1",
+    "activity": "review"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "caseRef": {
+      "caseId": "c-1",
+      "activity": "review"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--case needs --activity",
+   "flags": {
+    "case": "c-1"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--case needs --activity <id>: the activity of the case's guide this run is"
+    }
+   }
+  },
+  {
+   "name": "--activity needs --case",
+   "flags": {
+    "activity": "review"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--activity needs --case <caseId>: activity only apply to a run that names a case"
+    }
+   }
+  },
+  {
+   "name": "--route needs --case",
+   "flags": {
+    "route": "should"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--route needs --case <caseId>: route only apply to a run that names a case"
+    }
+   }
+  },
+  {
+   "name": "--reason needs --case",
+   "flags": {
+    "reason": "r"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--reason needs --case <caseId>: reason only apply to a run that names a case"
+    }
+   }
+  },
+  {
+   "name": "--route unknown",
+   "flags": {
+    "case": "c",
+    "activity": "a",
+    "route": "must"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--route must be should, may-instead or unlisted"
+    }
+   }
+  },
+  {
+   "name": "--reason bare",
+   "flags": {
+    "case": "c",
+    "activity": "a",
+    "reason": true
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--reason requires text"
+    }
+   }
+  },
+  {
+   "name": "--case bare",
+   "flags": {
+    "case": true,
+    "activity": "a"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--activity needs --case <caseId>: case, activity only apply to a run that names a case"
+    }
+   }
+  },
+  {
+   "name": "--case on a resumed run",
+   "flags": {
+    "resume": "ur",
+    "case": "c",
+    "activity": "a"
+   },
+   "positional": [],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--case cannot change a resumed unit run: it keeps the case it was admitted into"
+    }
+   }
+  },
+  {
+   "name": "--case route may-instead and unlisted",
+   "flags": {
+    "case": "c",
+    "activity": "a",
+    "route": "unlisted"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "caseRef": {
+      "caseId": "c",
+      "activity": "a",
+      "route": "unlisted"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "--plan bare is refused before the config is read",
+   "flags": {
+    "plan": true
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--plan requires a plans/<dir> directory, e.g. --plan plans/261118-0936-ops-metrics"
+    }
+   }
+  },
+  {
+   "name": "--phase without --plan",
+   "flags": {
+    "phase": "3"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--phase needs --plan <plans/dir>: a phase is a part of a plan"
+    }
+   }
+  },
+  {
+   "name": "--phase bare",
+   "flags": {
+    "plan": "plans/x",
+    "phase": true
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "--phase requires a phase id, e.g. --phase 3"
+    }
+   }
+  },
+  {
+   "name": "--plan with a nested directory",
+   "flags": {
+    "plan": "a/b"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "unit.plan.dir must be one plans/<name> directory, got: \"a/b\"."
+    }
+   }
+  },
+  {
+   "name": "a writing run from a confined worker is refused",
+   "flags": {
+    "writes": "src"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work",
+    "confined": "the ledger is read-only here"
+   },
+   "dispatchDepth": "2",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "nested-write-from-confined-worker: a writing dispatch from inside a confined worker is refused: the ledger is read-only here; a confined worker may dispatch read-only work only",
+     "code": "nested-write-from-confined-worker",
+     "phase": "pre-admission"
+    }
+   }
+  },
+  {
+   "name": "a read-only run from a confined worker goes on",
+   "flags": {},
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work",
+    "confined": "never asked"
+   },
+   "dispatchDepth": "1",
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "a confined writing run names its case",
+   "flags": {
+    "writes": "src",
+    "case": "c-7",
+    "activity": "a"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work",
+    "confined": "case c-7 is sealed"
+   },
+   "dispatchDepth": "1",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "nested-write-from-confined-worker: a writing dispatch from inside a confined worker is refused: case c-7 is sealed; a confined worker may dispatch read-only work only",
+     "code": "nested-write-from-confined-worker",
+     "phase": "pre-admission"
+    }
+   }
+  },
+  {
+   "name": "dispatch depth zero is not confined",
+   "flags": {
+    "writes": "src"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work",
+    "confined": "never asked"
+   },
+   "dispatchDepth": "0",
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": [
+       "src"
+      ]
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "dispatch depth garbage reads as zero",
+   "flags": {
+    "writes": "src"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work",
+    "confined": "never asked"
+   },
+   "dispatchDepth": "abc",
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-x-HEX4",
+      "objective": "x",
+      "capability": "execute",
+      "writes": [
+       "src"
+      ]
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
+   "name": "a confined writing run when git cannot say asks with the working directory",
+   "flags": {
+    "writes": "src"
+   },
+   "positional": [
+    "x"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work",
+    "gitFails": true,
+    "confined": "sealed"
+   },
+   "dispatchDepth": "1",
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "message": "nested-write-from-confined-worker: a writing dispatch from inside a confined worker is refused: sealed; a confined worker may dispatch read-only work only",
+     "code": "nested-write-from-confined-worker",
+     "phase": "pre-admission"
+    }
+   }
+  }
+ ]
+}
