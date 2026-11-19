@@ -115,6 +115,7 @@ fn outside_a_repository_status_says_so_and_recovery_finds_nothing_and_points_now
         recovered,
         json!({
             "recovered": [],
+            "freed": [],
             "kept": [],
             "message": "no interrupted Land, ScopedCommit or remote transfer operation"
         })
@@ -126,6 +127,11 @@ fn status_lists_an_interrupted_land_and_changes_nothing_and_recovery_settles_it_
     let f = Fixture::new();
     interrupt_land(&f, "wired-land");
     let first = status(&f);
+    assert_eq!(
+        first["retainedLand"]["candidates"],
+        json!([]),
+        "a pending chain is not a retained one"
+    );
     assert_eq!(
         first["pendingOperations"],
         json!([{"operationId": "wired-land", "kind": "Land", "writer": WRITER}])
@@ -142,7 +148,9 @@ fn status_lists_an_interrupted_land_and_changes_nothing_and_recovery_settles_it_
     assert_eq!(recovered["kept"], json!([]));
     assert_eq!(
         recovered["message"],
-        json!("recovered interrupted Git operations: wired-land")
+        json!(
+            "recovered interrupted Git operations: wired-land; released retained Land candidates: wired-land"
+        )
     );
     assert_eq!(
         recover(&f)["recovered"],
@@ -152,28 +160,78 @@ fn status_lists_an_interrupted_land_and_changes_nothing_and_recovery_settles_it_
 
     let settled = status(&f);
     assert_eq!(settled["journal"]["pendingCount"], json!(0));
-    // The Land chain and its candidate worktree's own chain are both finished and retained.
-    assert_eq!(settled["journal"]["retention"]["retainedChains"], json!(2));
-    assert!(settled["journal"]["retention"]["oldestRetainedAtMs"].is_u64());
-    // The finished Land still holds its candidate: it is listed with the pins it keeps, and fails nothing.
-    let candidates = settled["retainedLand"]["candidates"].as_array().unwrap();
-    assert_eq!(candidates.len(), 1, "{settled}");
-    assert_eq!(candidates[0]["operationId"], json!("wired-land"));
-    let mut pins: Vec<&str> = candidates[0]["pins"]
+    // The finished Land's candidate was the caller's own, so the same pass released it.
+    assert_eq!(recovered["freed"], json!(["wired-land"]), "{recovered}");
+    assert_eq!(
+        settled["retainedLand"]["candidates"],
+        json!([]),
+        "{settled}"
+    );
+}
+
+/// A Land `writer` started under `id` and dropped before publishing: pending, candidate held.
+fn interrupt_land_as(f: &Fixture, id: &str, writer: &str) -> PathBuf {
+    let session = f
+        .driver
+        .prepare_land(
+            &f.repo,
+            vec![],
+            &f.request,
+            writer,
+            id,
+            &wal::OsFileSystem,
+            0,
+        )
+        .unwrap();
+    session.candidate().unwrap().worktree.clone()
+}
+
+fn retained_ids(f: &Fixture) -> Vec<String> {
+    status(f)["retainedLand"]["candidates"]
         .as_array()
         .unwrap()
         .iter()
-        .map(|pin| pin.as_str().unwrap())
-        .collect();
-    pins.sort_unstable();
+        .map(|c| c["operationId"].as_str().unwrap().to_owned())
+        .collect()
+}
+
+#[test]
+fn recovery_releases_the_callers_retained_land_and_only_names_another_writers() {
+    let f = Fixture::new();
+    let own = interrupt_land_as(&f, "own-retained", WRITER);
+    f.driver
+        .recover_land(&f.repo, vec![], WRITER, "own-retained")
+        .unwrap();
+    let other = interrupt_land_as(&f, "other-retained", "someone-else");
+    f.driver
+        .recover_land(&f.repo, vec![], "someone-else", "other-retained")
+        .unwrap();
     assert_eq!(
-        pins,
-        [
-            "refs/fgos/git-operations/wired-land/candidate",
-            "refs/fgos/git-operations/wired-land/source/candidate",
-            "refs/fgos/git-operations/wired-land/target/candidate"
-        ]
+        retained_ids(&f).len(),
+        2,
+        "two finished chains hold a candidate"
     );
+
+    let recovered = recover(&f);
+    assert_eq!(recovered["freed"], json!(["own-retained"]), "{recovered}");
+    assert!(!own.exists(), "own candidate worktree is removed");
+    assert!(other.exists(), "another writer's candidate is untouched");
+    let kept: Vec<(&str, &str)> = recovered["kept"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|k| {
+            (
+                k["operationId"].as_str().unwrap(),
+                k["writer"].as_str().unwrap(),
+            )
+        })
+        .collect();
+    assert!(
+        kept.contains(&("other-retained", "someone-else")),
+        "{recovered}"
+    );
+    assert_eq!(retained_ids(&f), ["other-retained"]);
 }
 
 #[test]

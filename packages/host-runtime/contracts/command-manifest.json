@@ -5675,7 +5675,7 @@
           }
         },
         "recover": {
-          "description": "Recover interrupted Land, ScopedCommit and remote-transfer operations; an attempted chain is recovered only by the writer that started it. Answers recovered, kept and message, and for a merge in progress the fgos main-checkout-reset command to run (never run for you).",
+          "description": "Recover interrupted Land, ScopedCommit and remote-transfer operations; an attempted chain is recovered only by the writer that started it. Also releases the candidate checkout of every finished Land started by the calling writer. Answers recovered, freed, kept and message, and for a merge in progress the fgos main-checkout-reset command to run (never run for you).",
           "examples": [
             "fgos git recover --json"
           ],
