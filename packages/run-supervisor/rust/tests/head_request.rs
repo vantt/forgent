@@ -82,6 +82,8 @@ struct Identity {
 struct Publish {
     caught_up: Result<(), CatchUpRefusal>,
     clean: Result<bool, PublishRefusal>,
+    /// Content a commit landing during the catch-up puts in the file (the catch-up fast-forwards the checkout).
+    landed_by_catch_up: Option<String>,
     commit: Result<String, PublishRefusal>,
     calls: Arc<Mutex<Vec<String>>>,
 }
@@ -91,6 +93,7 @@ impl Default for Publish {
         Publish {
             caught_up: Ok(()),
             clean: Ok(true),
+            landed_by_catch_up: None,
             commit: Ok("c0ffee".to_string()),
             calls: Arc::new(Mutex::new(Vec::new())),
         }
@@ -98,10 +101,19 @@ impl Default for Publish {
 }
 
 /// The port of a server whose test sends no session write.
+/// A 40-hex stand-in for a blob id: equal content gives an equal id.
+fn stub_oid(content: &str) -> String {
+    use std::hash::{Hash, Hasher};
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    content.hash(&mut hasher);
+    format!("{:040x}", hasher.finish())
+}
+
 fn no_publisher() -> WritePublisher {
     WritePublisher {
         catch_up: Arc::new(|_, _| unreachable!("no session write in this test")),
         path_clean: Arc::new(|_, _| unreachable!("no session write in this test")),
+        path_oid: Arc::new(|_, _| unreachable!("no session write in this test")),
         publish: Arc::new(|_, _, _, _| unreachable!("no session write in this test")),
     }
 }
@@ -213,8 +225,11 @@ fn serve_with(
         }),
         catch_up: Box::new({
             let publish = identity.publish.clone();
-            move |_root| {
+            move |root| {
                 publish.calls.lock().unwrap().push("catch up".into());
+                if let Some(landed) = &publish.landed_by_catch_up {
+                    fs::write(root.join("docs/backlog.md"), landed).unwrap();
+                }
                 publish.caught_up.clone()
             }
         }),
@@ -229,6 +244,22 @@ fn serve_with(
                     .push(format!("clean {path} {seen:?}"));
                 publish.clean.clone()
             }
+        }),
+        // The stub's blob id of a file is a hex digest of its content, so a test names the id it read.
+        // Like the real adapter, it refuses a symlink or a non-file, so a test shows the request checks the granted
+        // path before reading its content.
+        path_oid: Box::new(|root, path| {
+            let file = root.join(path);
+            if !fs::symlink_metadata(&file)
+                .map(|m| m.is_file())
+                .unwrap_or(false)
+            {
+                return Err(PublishRefusal {
+                    code: "write-path-unreadable".into(),
+                    detail: format!("{path} is not a regular file"),
+                });
+            }
+            Ok(stub_oid(&fs::read_to_string(file).unwrap_or_default()))
         }),
         publish_write: Box::new({
             let publish = identity.publish.clone();
@@ -573,6 +604,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "verb-failed",
             "verb-not-granted",
             "verb-timeout",
+            "write-base-stale",
             "write-branch-ahead",
             "write-catch-up-refused",
             "write-failed",
@@ -1037,6 +1069,7 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_r
         caller_under_gate: Box::new(|_| unreachable!("no session write in this test")),
         catch_up: Box::new(|_| unreachable!("no session write in this test")),
         path_clean: Box::new(|_, _| unreachable!("no session write in this test")),
+        path_oid: Box::new(|_, _| unreachable!("no session write in this test")),
         publish_write: Box::new(|_, _| unreachable!("no session write in this test")),
         log: Box::new(|_| {}),
     });
@@ -1238,6 +1271,89 @@ fn head_write_catches_up_then_checks_the_path_is_clean_before_it_writes_and_publ
             r#"clean docs/backlog.md "old\n""#,
             r#"publish docs/backlog.md "new\n""#
         ]
+    );
+}
+
+#[test]
+fn head_write_based_on_the_content_the_file_still_has_is_written() {
+    let publish = Publish::default();
+    let served = write_served("write-base-current", &publish);
+    let reply = write_request(
+        &served.socket,
+        json!({"path": "docs/backlog.md", "content": "new\n", "base": stub_oid("old\n")}),
+    );
+    assert_eq!(reply["data"]["commit"], "c0ffee", "{reply}");
+    assert_eq!(
+        fs::read_to_string(served.dir.join("docs/backlog.md")).unwrap(),
+        "new\n"
+    );
+}
+
+#[test]
+fn head_write_based_on_content_a_newer_commit_replaced_is_refused_and_leaves_the_file_unchanged() {
+    let publish = Publish::default();
+    let served = write_served("write-base-stale", &publish);
+    let reply = write_request(
+        &served.socket,
+        json!({"path": "docs/backlog.md", "content": "new\n", "base": stub_oid("older\n")}),
+    );
+    assert_eq!(reply["result"], "refused");
+    assert_eq!(reply["code"], "write-base-stale", "{reply}");
+    let detail = reply["detail"].as_str().unwrap();
+    assert!(
+        detail.contains(&stub_oid("old\n")) && detail.contains(&stub_oid("older\n")),
+        "names the current and the given id: {detail}"
+    );
+    assert_eq!(
+        fs::read_to_string(served.dir.join("docs/backlog.md")).unwrap(),
+        "old\n"
+    );
+    assert!(!publish
+        .calls
+        .lock()
+        .unwrap()
+        .iter()
+        .any(|call| call.starts_with("publish")));
+}
+
+#[test]
+fn head_write_with_a_base_that_is_not_a_blob_id_is_refused_as_a_bad_argument_and_writes_nothing() {
+    let publish = Publish::default();
+    let served = write_served("write-base-malformed", &publish);
+    for base in [
+        "oid:old",
+        "ABCDEF0123456789ABCDEF0123456789ABCDEF01",
+        "abc123",
+        "",
+    ] {
+        let reply = write_request(
+            &served.socket,
+            json!({"path": "docs/backlog.md", "content": "new\n", "base": base}),
+        );
+        assert_eq!(reply["code"], "bad-args", "{base}: {reply}");
+    }
+    assert_eq!(
+        fs::read_to_string(served.dir.join("docs/backlog.md")).unwrap(),
+        "old\n"
+    );
+}
+
+#[test]
+fn head_write_without_a_base_is_refused_when_the_catch_up_changed_the_file_since_the_request_arrived(
+) {
+    let publish = Publish {
+        landed_by_catch_up: Some("newer row\n".to_string()),
+        ..Publish::default()
+    };
+    let served = write_served("write-base-absent-moved", &publish);
+    let reply = write_request(
+        &served.socket,
+        json!({"path": "docs/backlog.md", "content": "new\n"}),
+    );
+    assert_eq!(reply["code"], "write-base-stale", "{reply}");
+    assert_eq!(
+        fs::read_to_string(served.dir.join("docs/backlog.md")).unwrap(),
+        "newer row\n"
     );
 }
 

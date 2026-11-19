@@ -1112,3 +1112,121 @@ fn a_seat_login_older_than_the_store_or_whose_call_fails_is_never_installed_and_
         fs::remove_dir_all(dir).unwrap();
     }
 }
+
+#[test]
+fn a_running_seat_login_near_its_own_expiry_is_never_probed() {
+    let (source, runtime, seats) = (
+        scratch("near-source"),
+        scratch("near-runtime"),
+        scratch("near-seats"),
+    );
+    let store = claude_auth("spent", NOW - 60_000.0);
+    fs::write(source.join(".credentials.json"), &store).unwrap();
+    // Ahead of now, but not by one probe call plus the margin.
+    let homes = Seats(vec![seat(
+        &seats,
+        "a",
+        &claude_auth("seat", NOW + 5.0 * 60_000.0),
+    )]);
+    let probe = Answers {
+        seen: RefCell::new(vec![]),
+        ok: false,
+    };
+    let credential_source = source_claude(&source);
+    let now = || NOW;
+    refresh_ahead(
+        &RefreshRequest {
+            provider: "claude-miu",
+            account_id: "acct",
+            credential_source: &credential_source,
+            runtime_dir: &runtime,
+            home_dir: None,
+        },
+        &RefreshOptions {
+            live_seat_homes: &homes,
+            ..RefreshOptions::new(&Free, &probe, &NoSqlite, &now)
+        },
+    );
+    assert!(
+        probe
+            .seen
+            .borrow()
+            .iter()
+            .all(|home| home.starts_with("scratch-")),
+        "no call ran on a copy of the seat login"
+    );
+    assert_eq!(
+        fs::read_to_string(source.join(".credentials.json")).unwrap(),
+        store
+    );
+    for dir in [source, runtime, seats] {
+        fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+#[test]
+fn while_a_running_seat_shares_the_store_refresh_token_nothing_renews_it_and_its_renewed_pair_is_taken_later(
+) {
+    let (source, runtime, seats) = (
+        scratch("share-source"),
+        scratch("share-runtime"),
+        scratch("share-seats"),
+    );
+    let store = claude_auth("shared", NOW + 10.0 * 60_000.0);
+    fs::write(source.join(".credentials.json"), &store).unwrap();
+    let home = seat(&seats, "a", &store);
+    let homes = Seats(vec![home.clone()]);
+    let credential_source = source_claude(&source);
+    let request = RefreshRequest {
+        provider: "claude-miu",
+        account_id: "acct",
+        credential_source: &credential_source,
+        runtime_dir: &runtime,
+        home_dir: None,
+    };
+    let now = || NOW;
+    let probe = Answers {
+        seen: RefCell::new(vec![]),
+        ok: true,
+    };
+    let options = RefreshOptions {
+        live_seat_homes: &homes,
+        ..RefreshOptions::new(&Free, &probe, &NoSqlite, &now)
+    };
+    let shared = refresh_ahead(&request, &options);
+    assert_eq!(
+        (shared.status, shared.reason.as_str()),
+        ("skipped", "live-seat-owns-renewal")
+    );
+    assert!(
+        probe.seen.borrow().is_empty(),
+        "the shared refresh token is not spent"
+    );
+    assert_eq!(
+        fs::read_to_string(source.join(".credentials.json")).unwrap(),
+        store
+    );
+
+    // The seat renews inside its home: the store's refresh token is spent, the seat holds the new pair.
+    fs::write(
+        home.join(".credentials.json"),
+        claude_auth("seat-renewed", NOW + 7.0 * HOUR),
+    )
+    .unwrap();
+    let taken = refresh_ahead(&request, &options);
+    assert_eq!(
+        (taken.status, taken.reason.as_str()),
+        ("renewed", "live-seat")
+    );
+    assert!(fs::read_to_string(source.join(".credentials.json"))
+        .unwrap()
+        .contains("\"seat-renewed\""));
+    let reported = format!("{shared:?}{taken:?}");
+    assert!(
+        !reported.contains("FAKE-ACCESS") && !reported.contains("seat-renewed"),
+        "no credential value in a result"
+    );
+    for dir in [source, runtime, seats] {
+        fs::remove_dir_all(dir).unwrap();
+    }
+}

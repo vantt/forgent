@@ -1,17 +1,23 @@
-//! The slice of the capability catalog (`runner.capabilities`) the seat rules read: per field, never an entry.
-//! Two lookups: the exact key, then its `<prefix>:*` entry (the text before the first colon).
+//! The slice of the capability catalog (`runner.capabilities`) the seat rules and the bind read: per field, never an
+//! entry. Two lookups: the exact key, then its `<prefix>:*` entry (the text before the first colon). It also owns the
+//! one rigor scale both read.
 
 use super::value::{get, str_at};
 use serde_json::Value;
 
-const RIGOR_VALUES: [&str; 4] = ["low", "standard", "high", "critical"];
+/// Effective rigor, weakest first.
+pub const RIGORS: [&str; 4] = ["low", "standard", "high", "critical"];
 
 /// Rank of a rigor on the one scale: low 1 .. critical 4.
 pub fn rigor_rank(rigor: &str) -> Option<u8> {
-    RIGOR_VALUES
-        .iter()
-        .position(|r| *r == rigor)
-        .map(|i| i as u8 + 1)
+    RIGORS.iter().position(|r| *r == rigor).map(|i| i as u8 + 1)
+}
+
+/// The rigor a value names, when it names one of the scale.
+pub fn rigor_of(value: &Value) -> Option<&'static str> {
+    RIGORS
+        .into_iter()
+        .find(|rigor| value.as_str() == Some(rigor))
 }
 
 fn is_entry(value: &Value) -> bool {
@@ -25,7 +31,7 @@ fn section(cfg: &Value) -> Option<&serde_json::Map<String, Value>> {
 }
 
 /// The entries that apply to a capability, most specific first: exact key, then `<prefix>:*`.
-fn entries_of<'a>(cfg: &'a Value, capability: Option<&str>) -> Vec<(String, &'a Value)> {
+pub(crate) fn entries_of<'a>(cfg: &'a Value, capability: Option<&str>) -> Vec<(String, &'a Value)> {
     let Some(capability) = capability.filter(|c| !c.is_empty()) else {
         return Vec::new();
     };

@@ -5,6 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
+import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
 import { FGOS, initGitCwd, run, tmpCwd } from './helpers/fgos-cli-harness.mjs';
@@ -103,4 +104,41 @@ test('a published session write prints the commit it landed as one line', async 
   } finally {
     server.close();
   }
+});
+
+test('a session write sends no base unless --base names one, and passes that one through unchanged', async () => {
+  const cwd = project();
+  fs.mkdirSync(path.join(cwd, 'docs'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, 'docs/backlog.md'), 'old\n');
+  const socketPath = path.join(cwd, 'req.sock');
+  const seen = [];
+  const server = net.createServer((conn) => {
+    let received = Buffer.alloc(0);
+    conn.on('data', (chunk) => {
+      received = Buffer.concat([received, chunk]);
+      if (received.length < 4 || received.length < 4 + received.readUInt32BE(0)) return;
+      const request = JSON.parse(received.subarray(4, 4 + received.readUInt32BE(0)).toString('utf8'));
+      seen.push(request.args);
+      const body = Buffer.from(JSON.stringify({ type: 'REPLY', id: request.id, result: 'done', data: { path: request.args.path, bytes: 4, commit: 'c0ffee' } }));
+      const head = Buffer.alloc(4);
+      head.writeUInt32BE(body.length);
+      conn.end(Buffer.concat([head, body]));
+    });
+  });
+  await new Promise((resolve) => server.listen(socketPath, resolve));
+  const write = async (extra) => {
+    const child = spawn(process.execPath, [FGOS, 'session', 'write', 'docs/backlog.md', ...extra], {
+      cwd, env: { ...process.env, FGOS_CONFINED: '1', FGOS_HEAD_REQUEST_SOCKET: socketPath },
+    });
+    child.stdin.end('new\n');
+    return new Promise((resolve) => child.on('close', resolve));
+  };
+  try {
+    assert.equal(await write([]), 0);
+    assert.equal(await write(['--base', 'abc123']), 0);
+  } finally {
+    server.close();
+  }
+  assert.equal('base' in seen[0], false);
+  assert.equal(seen[1].base, 'abc123');
 });

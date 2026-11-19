@@ -2436,3 +2436,43 @@ test('a seat lease renews through the login a running seat on the same account h
     }
   } finally { w.cleanup(); }
 });
+
+test('a running seat login near its own expiry is never probed: the probe would renew it and spend the seat\'s refresh token', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    writeClaude(w.home, claudeDoc(now - 60 * 1000));
+    const root = path.join(w.tmp, 'confinement');
+    // Ahead of now, but not by one probe call plus the margin.
+    seatHome(root, { name: 'a', target: claudeTarget(w), login: claudeDoc(now + 5 * 60 * 1000, { refresh: FAKE.newRefresh }) });
+    const probe = answers();
+    await refreshAhead({ provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home), runtimeDir: w.runtimeDir, spawnFn: probe.spawnFn, liveSeatHomes: (t) => listLiveSeatHomes(t, { tempRoots: [root] }) });
+    assert.ok(probe.starts.every((start) => path.basename(start.homeDir).startsWith('scratch-')), 'no call ran on a copy of the seat login');
+    assert.equal(readClaude(w.home).claudeAiOauth.refreshToken, FAKE.oldRefresh, 'the seat login is not installed');
+  } finally { w.cleanup(); }
+});
+
+test('while a running seat shares the store\'s refresh token nothing renews it; once the seat renewed, its pair is taken', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    writeClaude(w.home, claudeDoc(now + 10 * 60 * 1000));
+    const original = sha(path.join(w.home, CLAUDE_LOGIN));
+    const root = path.join(w.tmp, 'confinement');
+    const seat = seatHome(root, { name: 'a', target: claudeTarget(w), login: claudeDoc(now + 10 * 60 * 1000) });
+    const liveSeatHomes = (t) => listLiveSeatHomes(t, { tempRoots: [root] });
+    const probe = fakeSpawn({ layoutName: 'claude' });
+    const shared = await refreshAhead({ provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home), runtimeDir: w.runtimeDir, spawnFn: probe.spawnFn, liveSeatHomes });
+    assert.deepEqual(shared, { status: 'skipped', reason: 'live-seat-owns-renewal' });
+    assert.equal(probe.starts.length, 0, 'the shared refresh token is not spent');
+    assert.equal(sha(path.join(w.home, CLAUDE_LOGIN)), original);
+
+    // The seat renews inside its home: the store's refresh token is spent, the seat holds the new pair.
+    writeClaude(seat, claudeDoc(now + 7 * HOUR, { access: FAKE.newAccess, refresh: FAKE.newRefresh }));
+    const answering = answers();
+    const taken = await refreshAhead({ provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home), runtimeDir: w.runtimeDir, spawnFn: answering.spawnFn, liveSeatHomes });
+    assert.deepEqual(taken, { status: 'renewed', reason: 'live-seat' });
+    assert.equal(readClaude(w.home).claudeAiOauth.refreshToken, FAKE.newRefresh);
+    assert.equal(FAKE_FRAGMENTS.some((value) => JSON.stringify([shared, taken]).includes(value)), false, 'no credential value in a result');
+  } finally { w.cleanup(); }
+});

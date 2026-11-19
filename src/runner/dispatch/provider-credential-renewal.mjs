@@ -56,6 +56,9 @@ export const DEFAULT_REFRESH_AHEAD_MIN_THRESHOLD_MS = 60 * MINUTE_MS;
 export const DEFAULT_RENEWAL_COOLDOWN_MS = 30 * MINUTE_MS;
 const THRESHOLD_MARGIN_MS = 5 * MINUTE_MS;
 const LOCK_MARGIN_MS = 30 * 1000;
+// Access-token life a running seat's login must still have beyond one probe call before it is taken: the call then
+// uses that token as it is and never renews the copy, which would spend the seat's single-use refresh token.
+const LIVE_SEAT_LIFE_MARGIN_MS = 10 * 60 * 1000;
 
 const COOLDOWN_FILE = 'cooldown.json';
 const PENDING_DIR = 'pending';
@@ -1271,7 +1274,8 @@ async function takeLiveSeatLogin({ accountDir, layout, layoutName, provider, cre
   for (const dir of homes) {
     try {
       const entry = entryIn(dir);
-      if (!entry || !(entry.expiresMs > now())) continue;
+      // A login near its own expiry is left to its seat, which renews it; the next refresh-ahead takes the newer pair.
+      if (!entry || !(entry.expiresMs - now() > probeTimeoutMs + LIVE_SEAT_LIFE_MARGIN_MS)) continue;
       if (judgeCopy({ layout, provider, sourceHome: home, copyHome: dir, now: now(), loadSqlite }) !== 'newer') continue;
       if (sameAccount({ layout, provider, sourceHome: home, copyHome: dir, loadSqlite }) === false) continue;
       if (!best || entry.expiresMs > best.expiresMs) best = { dir, expiresMs: entry.expiresMs };
@@ -1302,6 +1306,22 @@ async function takeLiveSeatLogin({ accountDir, layout, layoutName, provider, cre
   } finally { dropCopy(probeHome); }
 }
 
+// A refresh token as a digest, so two stores are compared without holding the value side by side; never printed.
+const refreshDigest = (refresh) => (refresh === null || refresh === undefined ? null : crypto.createHash('sha256').update(refresh).digest('hex'));
+
+// Whether a running seat still holds the store's own refresh token for `key`: every seat starts on the store's pair,
+// and the token is single use, so a renewal here would leave that seat with a spent token at its next refresh.
+function liveSeatSharesRefresh({ layout, homes, key, refresh, loadSqlite }) {
+  const own = refreshDigest(refresh);
+  if (own === null) return false;
+  return homes.some((dir) => {
+    try {
+      const read = layout.read(dir, { loadSqlite, agent: true });
+      return read.ok && refreshDigest(read.entries.find((entry) => entry.key === key)?.refresh) === own;
+    } catch { return false; }
+  });
+}
+
 // ---------------------------------------------------------------------------------------------------
 // Refresh-ahead
 // ---------------------------------------------------------------------------------------------------
@@ -1311,7 +1331,8 @@ async function takeLiveSeatLogin({ accountDir, layout, layoutName, provider, cre
  * than `thresholdMs`; apply the renewed entry to the real store. Never throws and never returns a value
  * of a credential: `{status: 'fresh'|'renewed'|'failed'|'cooldown'|'skipped', reason}`. `liveSeatHomes(target)`
  * names the private homes of seats still running on this store; the newest valid login one of them renewed is
- * taken first (takeLiveSeatLogin), so a store whose refresh token a running seat already spent is not renewed with it.
+ * taken first (takeLiveSeatLogin), so a store whose refresh token a running seat already spent is not renewed with it;
+ * while a running seat still shares the store's refresh token nothing is renewed (`live-seat-owns-renewal`).
  */
 export async function refreshAhead({
   provider,
@@ -1379,6 +1400,11 @@ export async function refreshAhead({
       const entry = entryOf(source);
       if (!entry.ok) return { status: 'skipped', reason: entry.code };
       if (!inWindow(entry.entry)) return taken ? { status: 'renewed', reason: 'live-seat' } : { status: 'fresh', reason: 'outside-window' };
+      // A running seat that shares the store's refresh token owns its renewal: the next refresh-ahead after the seat
+      // renewed takes its newer pair (takeLiveSeatLogin).
+      if (liveSeatSharesRefresh({ layout, homes, key: entry.entry.key, refresh: entry.entry.refresh, loadSqlite })) {
+        return { status: 'skipped', reason: 'live-seat-owns-renewal' };
+      }
       if (inCooldown(accountDir, cooldownMs, now())) return { status: 'cooldown', reason: 'recent-failure' };
       return await renewInScratch({
         layout, layoutName, provider, credentialSource, home, accountDir, key: entry.entry.key, lock, probeTimeoutMs, spawnFn, env, loadSqlite, now,
