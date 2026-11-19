@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "9c89c840d2ce58503e602ad79ff3817a98c6667f99cea5bfeca5a05c284e8360",
+  "payloadDigest": "164606af957b8f8e7c9ce7d4563a4ea6be64f03a0b4f55dbd67571d0c1f44975",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1204,7 +1204,7 @@
     "packages/supervision/rust/src/lib.rs": "8070f2ae2159030a71567ae0ce2da103178415a0703b3de3b9b0f8d76b4cdf15",
     "packages/supervision/rust/src/notify.rs": "2a8ce19013396e3a31c915a903c4762889cc3f902137279e6378c3deb84e8edd",
     "packages/supervision/rust/src/portfolio.rs": "ac2dcf763b35bc47e3954fd5aafa430f1c45d356af395b90f5fa6651350f5421",
-    "packages/supervision/rust/src/queue.rs": "23d7cf84d1bd3dd53e29d76741970b57910b28ef27951e6969a7d2ce91cabacb",
+    "packages/supervision/rust/src/queue.rs": "bdf9b9dac6246575bb9a2ae9690050778f055e63b244f7634c895597f85262d1",
     "packages/supervision/rust/src/supervisor.rs": "dde5f8af422b134edb3322bfd8883f0fb0997e7c590808f012639952c3e2d7c4",
     "packages/supervision/rust/src/wake.rs": "a13206df2d30b25293db75f080d6de26472069a1c47aa72953b03b47efe6576b",
     "packages/supervision/rust/src/watcher.rs": "6c9da881261aaa866e5b89465b2a5c80a14997e8fbf6a96d82aa47a69a34fae1",
@@ -1212,7 +1212,7 @@
     "packages/supervision/rust/tests/discussion_source.rs": "f083e37ab0509dd978b17e1982323b8e1d2aa3000c02bb44d418e228fa140848",
     "packages/supervision/rust/tests/land.rs": "6d2509a9c02a0d00d09e450a9976369e550ca7797fa373eba65321e8f0ee16cd",
     "packages/supervision/rust/tests/portfolio.rs": "55b779e72ad9328e52fd36ed6969929dfc6cf2135e498bd128b428d8d80f5e62",
-    "packages/supervision/rust/tests/queue.rs": "64318ef31e520f9123cf018d0d66ab43ab67e75f8850f99a7d4112333a5bd60e",
+    "packages/supervision/rust/tests/queue.rs": "65ddc71a204003a4e1a62077f6741728cdcaa96d7ee751e31d78bd420d572698",
     "packages/supervision/rust/tests/wake.rs": "6d20df94a3bb0e29a907765ceb3cf0d420b80f8f1c67b11ba1ca6057b0be186c",
     "packages/supervision/rust/tests/watcher.rs": "52b4fe1ce86b1af3d7377a0e1fa928dbd95188f6d834d97c0497b835915590d5",
     "packages/terminal-control/rust/src/core.rs": "0fa67399b5c1e59ac6accc448f58675cae90255659685254b48f428631ab66eb",
@@ -4040,21 +4040,21 @@
     },
     {
       "path": "packages/supervision/rust/tests/queue.rs",
-      "line": 17,
+      "line": 18,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/supervision/rust/tests/queue.rs",
-      "line": 254,
+      "line": 255,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
     },
     {
       "path": "packages/supervision/rust/tests/queue.rs",
-      "line": 260,
+      "line": 261,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
