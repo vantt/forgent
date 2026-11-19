@@ -5,7 +5,7 @@ discussion: open
 ## 1. Trạng thái hiện tại
 
 2026-11-19: discussion opened from backlog row `p-mc25x5pfi6` (owner approval via Miu). Starting point scouted
-(§2, §3). Nothing settled yet. Round 7: discussions get a minted id (round 5 objection withdrawn); plan id open. Round 6: linking mechanism backlog ← discussion ← plan proposed under §3. Round 5: owner agreed proposal point 1; naming/placement answered under §3. Round 4: whole proposal written under §3, waiting for the owner's reaction. Round 2: owner agreed #2 and #3; merged #4/#5; shaper reported that Work keeps a full item store (1215 items) plus gates, outcomes, learnings, docs/topics and decisions in the Event Store, side by side with the backlog. Round 1 done: owner reframed #1 (content of a row, not its storage); shaper proposed a short row + link and a 5-value backlog status list, explained #3–#5. Waiting for the owner's reaction. Plan 261119-1615 phase 4 (add-rows) is on hold
+(§2, §3). Nothing settled yet. Round 8: separator `id-slug` recommended. Round 7: discussions get a minted id (round 5 objection withdrawn); plan id open. Round 6: linking mechanism backlog ← discussion ← plan proposed under §3. Round 5: owner agreed proposal point 1; naming/placement answered under §3. Round 4: whole proposal written under §3, waiting for the owner's reaction. Round 2: owner agreed #2 and #3; merged #4/#5; shaper reported that Work keeps a full item store (1215 items) plus gates, outcomes, learnings, docs/topics and decisions in the Event Store, side by side with the backlog. Round 1 done: owner reframed #1 (content of a row, not its storage); shaper proposed a short row + link and a 5-value backlog status list, explained #3–#5. Waiting for the owner's reaction. Plan 261119-1615 phase 4 (add-rows) is on hold
 until the backlog shape is decided here.
 
 ## 2. Mục tiêu & đề bài
@@ -64,6 +64,8 @@ Round 7 (owner: why not give discussions an id, for easier linking). Shaper revi
 - Proposal: discussions get a minted random id (prefix e.g. `ds-`, final prefix by the identity crate rules), directory `<id>-<slug>/`, id in frontmatter. `source:` then holds ids only (`p-…`, `ds-…`), never paths, so moving a directory never breaks a link; this also makes "move discussions next to plans" a cheap, separate choice.
 - Plans: their directory name `YYMMDD-HHMM-slug` is already unique and is what `blockedBy` and the supervision reader use; whether plans also get a minted id for uniformity is asked of the owner (round 7).
 
+Round 8 (owner: `id_slug` or `id-slug`, since both id and slug use `-`). Shaper's answer, not settled: `id-slug`. Every convention template already joins with `-` and has the same shape (plan `{YYMMDD-HHMM}-{slug}`, report `{type}-{YYMMDD-HHMM}-{slug}` in `packages/convention/contracts/convention.rules.v1.json`); repo rule is kebab-case file names. The split is unambiguous because the id has a fixed length (`<prefix>-<10 base32>`, identity spec line 103), e.g. `^(p-[a-z2-7]{10})-(.+)$`; names come from `fgos convention path`, and readers take the id from frontmatter, never by splitting the name. `_` would be the only underscore in portfolio names. Plan-id question (round 7) still open; default if unanswered: plans keep their directory name as their id.
+
 ## 4. Quyết định đã chốt
 
 | D-ID | Decision | Date | Source |
@@ -80,6 +82,7 @@ Round 7 (owner: why not give discussions an id, for easier linking). Shaper revi
 - 2026-11-19 18:4x — owner round 5: agrees point 1 (three kinds, one-direction links); asks backlog vs backlogs, discussion vs discussions, id-slug for both, whether items stay one file each, and `plans/backlog.md`. Shaper answered under §3 (round 5 block).
 - 2026-11-19 19:0x — owner round 6: does the discussion not relate to the backlog? there should be a mechanism linking backlog, discussion and plan. Shaper scouted current links (prose only) and answered under §3 (round 6 block).
 - 2026-11-19 19:2x — owner round 7: why not give discussions an id for easier linking. Shaper checked the identity mint decision and agreed, revising round 5 (§3 round 7 block).
+- 2026-11-19 19:3x — owner round 8: `id_slug` or `id-slug`? Shaper recommended `id-slug` (§3 round 8 block).
 
 ## 6. Thiết kế đã chốt {#design}
 
