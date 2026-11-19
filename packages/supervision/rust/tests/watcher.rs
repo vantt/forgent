@@ -4,8 +4,8 @@ use fgos_supervision::{
     queue::{QueueError, Raised, RaisedEvent},
     watcher::{
         event_id, tick, Action, Clock, Definitions, EventSink, Fetch, Mode, Outcome, Portfolio,
-        Ports, QuestionsView, Row, Settings, Span, State, Telemetry, TickLock, TickState, Wake,
-        WakeOutcome,
+        Ports, QuestionsView, Row, Settings, Span, State, StopOutcome, Telemetry, TickLock,
+        TickState, Wake, WakeOutcome,
     },
 };
 use std::{any::Any, cell::RefCell, collections::BTreeMap};
@@ -32,6 +32,9 @@ struct World {
     busy: RefCell<bool>,
     spans: RefCell<Vec<Span>>,
     notifier_refuses: RefCell<bool>,
+    /// What the supervisor looks like to the stop door: `None` is no live supervisor.
+    supervisor_idle: RefCell<Option<bool>>,
+    stops: RefCell<u32>,
 }
 
 impl Clock for World {
@@ -64,6 +67,17 @@ impl Wake for World {
     fn wake(&self, kind: &str, subject: &str) -> WakeOutcome {
         self.wakes.borrow_mut().push(format!("{kind} {subject}"));
         WakeOutcome::Woken
+    }
+    fn stop_stuck(&self, _subject: &str) -> StopOutcome {
+        let idle = *self.supervisor_idle.borrow();
+        match idle {
+            Some(true) => {
+                *self.stops.borrow_mut() += 1;
+                *self.supervisor_idle.borrow_mut() = None;
+                StopOutcome::Stopped
+            }
+            _ => StopOutcome::Kept,
+        }
     }
 }
 impl Notifier for World {
@@ -504,4 +518,61 @@ fn an_edge_between_an_idle_tick_and_the_next_full_tick_is_raised_with_no_lookbac
     let runs = w.runs.borrow();
     let (_, since) = runs.iter().find(|(d, _)| d == &[DEF.to_owned()]).unwrap();
     assert_eq!(*since, Some(1000));
+}
+
+fn stuck_world() -> (World, Settings) {
+    let w = World::default();
+    at(&w, 1000);
+    w.rows
+        .borrow_mut()
+        .push(row("supervisor-stuck", "supervisor", "t1"));
+    (w, settings(Action::WakeSupervisor))
+}
+
+#[test]
+fn a_stuck_row_stops_an_idle_supervisor_and_leaves_the_wake_to_the_next_tick() {
+    let (w, mut s) = stuck_world();
+    s.actions.insert("supervisor-stuck".into(), Action::Notify);
+    *w.supervisor_idle.borrow_mut() = Some(true);
+    let r = run(&w, None, &s);
+    assert_eq!((*w.stops.borrow(), r.wakes), (1, 0));
+    assert_eq!(*w.notified.borrow(), ["supervisor-stuck"]);
+}
+
+#[test]
+fn a_stuck_row_leaves_a_busy_supervisor_running_and_asks_again_once_it_is_idle() {
+    let (w, mut s) = stuck_world();
+    s.actions.insert("supervisor-stuck".into(), Action::Notify);
+    *w.supervisor_idle.borrow_mut() = Some(false);
+    let busy = run(&w, None, &s);
+    assert_eq!((*w.stops.borrow(), busy.notifies), (0, 1));
+    at(&w, 1700);
+    *w.supervisor_idle.borrow_mut() = Some(true);
+    let idle = run(&w, None, &s);
+    assert_eq!((*w.stops.borrow(), idle.duplicate), (1, 1));
+}
+
+#[test]
+fn after_a_stuck_stop_the_next_tick_wakes_a_fresh_supervisor_for_the_waiting_event() {
+    let (w, mut s) = stuck_world();
+    s.actions.insert("supervisor-stuck".into(), Action::Notify);
+    w.raised.borrow_mut().insert(
+        "e2".into(),
+        RaisedEvent {
+            id: "e2".into(),
+            kind: "plan-ready".into(),
+            subject: "p2".into(),
+            ts: "t0".into(),
+            reason: String::new(),
+            next_command: String::new(),
+        },
+    );
+    *w.supervisor_idle.borrow_mut() = Some(true);
+    run(&w, None, &s);
+    assert!(w.wakes.borrow().is_empty());
+    w.rows.borrow_mut().clear();
+    at(&w, 1700);
+    let next = run(&w, None, &s);
+    assert_eq!(next.wakes, 1);
+    assert_eq!(w.wakes.borrow().len(), 1);
 }

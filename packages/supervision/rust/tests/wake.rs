@@ -4,8 +4,9 @@ use fgos_supervision::{
     queue::{QueueError, RaisedEvent},
     supervisor::{self, Asker, Askers},
     wake::{
-        wake, Clock, Drain, Holder, Identity, Portfolio, Ports, Project, ProjectInfo, Settings,
-        StartSession, Telemetry, Trigger, WakeLog, WakeOutcome, WakeSpan, WakeState,
+        stop_stuck, wake, Activity, Clock, Drain, Holder, Identity, Portfolio, Ports, Project,
+        ProjectInfo, Settings, StartSession, StopSession, StuckOutcome, Telemetry, Trigger,
+        WakeLog, WakeOutcome, WakeSpan, WakeState,
     },
 };
 use std::cell::{Cell, RefCell};
@@ -24,6 +25,9 @@ struct Fake {
     plans: Vec<Plan>,
     started: RefCell<Vec<(String, String)>>,
     start_error: RefCell<Option<String>>,
+    activity: Cell<Option<Activity>>,
+    stop_error: RefCell<Option<String>>,
+    stopped: RefCell<Vec<(String, String)>>,
     state: Cell<WakeState>,
     now: Cell<i64>,
     spans: RefCell<Vec<WakeSpan>>,
@@ -52,6 +56,7 @@ impl Fake {
             project: self,
             identity: self,
             start: self,
+            stop: self,
             portfolio: self,
             queue: self,
             log: self,
@@ -103,6 +108,17 @@ impl StartSession for Fake {
             .borrow_mut()
             .push((persona.into(), name.into()));
         self.start_error.borrow().clone().map_or(Ok(()), Err)
+    }
+}
+impl StopSession for Fake {
+    fn activity(&self, _persona: &str, _name: &str) -> Activity {
+        self.activity.get().unwrap_or(Activity::Unknown)
+    }
+    fn stop(&self, persona: &str, name: &str) -> Result<(), String> {
+        self.stopped
+            .borrow_mut()
+            .push((persona.into(), name.into()));
+        self.stop_error.borrow().clone().map_or(Ok(()), Err)
     }
 }
 impl Portfolio for Fake {
@@ -367,4 +383,63 @@ fn successor_of_an_answered_event_is_the_askers_persona_name_and_question() {
         ("fgos-placeholder", "forgent-p12", "q1")
     );
     assert!(supervisor::successor(&Roles, &event("0000000000000002", "plan-done", "q1")).is_none());
+}
+
+fn stuck(f: &Fake) -> StuckOutcome {
+    stop_stuck(
+        &f.ports(),
+        Trigger {
+            trigger: "supervisor-stuck",
+            subject: "r1",
+        },
+    )
+}
+
+fn live_with(activity: Activity) -> Fake {
+    let f = Fake::new();
+    *f.holder.borrow_mut() = Some(Holder::Live {
+        project_id: "p1".into(),
+    });
+    f.activity.set(Some(activity));
+    f
+}
+
+#[test]
+fn an_idle_live_supervisor_is_stopped_and_the_wake_span_says_stopped_stuck() {
+    let f = live_with(Activity::Idle);
+    assert_eq!(stuck(&f), StuckOutcome::Stopped);
+    assert_eq!(
+        *f.stopped.borrow(),
+        vec![("supervisor".to_owned(), supervisor_name(HANDLE))]
+    );
+    assert_eq!(f.spans.borrow()[0].outcome, "stopped-stuck");
+}
+
+#[test]
+fn a_busy_or_unknown_supervisor_is_never_stopped() {
+    for activity in [Activity::Busy, Activity::Unknown] {
+        let f = live_with(activity);
+        assert_eq!(stuck(&f), StuckOutcome::Kept);
+        assert!(f.stopped.borrow().is_empty() && f.spans.borrow().is_empty());
+    }
+}
+
+#[test]
+fn no_live_supervisor_of_this_project_means_nothing_to_stop() {
+    let f = live_with(Activity::Idle);
+    *f.holder.borrow_mut() = Some(Holder::NotLive);
+    assert_eq!(stuck(&f), StuckOutcome::NotLive);
+    *f.holder.borrow_mut() = Some(Holder::Live {
+        project_id: "other".into(),
+    });
+    assert_eq!(stuck(&f), StuckOutcome::NotLive);
+    assert!(f.stopped.borrow().is_empty());
+}
+
+#[test]
+fn a_refused_stop_reports_the_hosts_code_and_records_no_span() {
+    let f = live_with(Activity::Idle);
+    *f.stop_error.borrow_mut() = Some("stop-refused".into());
+    assert_eq!(stuck(&f), StuckOutcome::Failed("stop-refused".into()));
+    assert!(f.spans.borrow().is_empty());
 }

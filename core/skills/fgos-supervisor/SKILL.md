@@ -20,7 +20,11 @@ chat with the owner.
    is done run `fgos supervisor handled <id>`. A crash mid-drain leaves the event unhandled, so the next wake redoes
    it; make every action safe to redo (check before you start a session).
 2. Admit plans (below), then close and restart work the events name.
-3. `fgos supervisor done` last. It refuses while an event is unhandled; on an empty queue it ends this session.
+3. `fgos supervisor done` last, and always: every wake ends with it, and a turn never ends without it. Handle every
+   event first: mark handled what needs no further action. A still-running ticket or lead is not a reason to stay or to
+   leave the event open: the next wake reads `fgos request result` and the plan state. An idle open session is never
+   woken again (nothing types into a live pane), so events queued behind it would be stranded. If `done` refuses,
+   handle the events it names and call it again. On an empty queue it ends this session.
 
 ## Admit ready plans
 

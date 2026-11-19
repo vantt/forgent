@@ -123,7 +123,7 @@ Personas and grants: shaper gains writes `docs/discussions` and verb `land`; sec
 | A clone with no remote HEAD (`git remote set-head origin -a` never run) | The trunk is only the checkout's attached branch, which is not trusted: the discussion source emits nothing and `fgos land` without `--target` refuses `land-target-unknown`, naming the fix. Run `git remote set-head origin -a` once. |
 | Lane leak | Lanes are kernel locks: a killed run supervisor frees its lane. `fgos slots` reads the OS state. |
 | Two supervisors | The Identity role is unique per project; a second start for the same role refuses. |
-| Stuck supervisor | A live supervisor leaving events unhandled for `watcher.stuckWakeLimit` ticks raises `supervisor-stuck` (notify). |
+| Stuck supervisor | A live supervisor leaving events unhandled for `watcher.stuckWakeLimit` ticks raises `supervisor-stuck` (notify); an idle one is then stopped (`session stop`, span outcome `stopped-stuck`) so the next tick wakes a fresh one, while a busy or unknown one (mid-turn, or a request ticket still `running`) is only notified. |
 | Late or foreign commits, lost state | Each full tick fetches the trunk; edge windows reach back `watcher.lookbackSec`; a missing state uses `now - lookbackSec`; stable ids dedupe the overlap (PS-21). |
 | Footprint escape | `land` refuses `land-outside-footprint`; a lead's `land --paths` that changes its own `footprint` is refused (PS-24). |
 | Empty gate list | `land` refuses `land-gate-missing`. |
@@ -145,7 +145,7 @@ Dated 2026-11-18, from [the plan](../../../plans/261118-1045-project-supervisor/
 - PS-6: `fgos land --paths` commits exact main-checkout edits of a confined head, the one way a portfolio edit reaches `main`.
 - PS-7: the pre-commit census refusal applies only to main-checkout or trunk-checked-out commits; `fgos land` regenerates and gates the census.
 - PS-8: one supervisor per project is the Identity role `head:supervisor-<project handle>`, not a lock; the watcher takes repo lock `watcher`.
-- PS-9: delivery to a live supervisor is the queue; `supervisor done` refuses while events are unhandled; `supervisor-stuck` after `watcher.stuckWakeLimit` ticks.
+- PS-9: delivery to a live supervisor is the queue; `supervisor done` refuses while events are unhandled; `supervisor-stuck` after `watcher.stuckWakeLimit` ticks; an idle stuck supervisor is stopped so the next tick wakes a fresh one, busy or unknown is notify only (2026-11-19: a head ended its turn without `supervisor done`, stranding its queue; the skill now ends every wake with `done`).
 - PS-10: long request verbs answer at once with a ticket read by `request result`.
 - PS-11: head names stay within 32 characters by cutting handle and plan directory; limits live in one contract read by Rust and Node.
 - PS-12: lane count is held machine-scope lane locks taken by a top-level worker seat; a head and a nested dispatch take none; the Work-item slot count is retired (L10).
