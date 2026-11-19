@@ -1,0 +1,4322 @@
+{
+ "version": "core-loops-seats.v1",
+ "about": "Seat resolution, recorded from src/runner/execution/seat-resolver.mjs. A case is { id, fn, args, expected }; resolveSeats takes the options object with unit, runnerConfig, params, floors and shippedCheckersByRigor as given.",
+ "tables": {
+  "roles": [
+   "producer",
+   "synthesizer",
+   "reviewer",
+   "red-team",
+   "judge"
+  ],
+  "loops": [
+   "solo",
+   "reviewed",
+   "panel",
+   "debate"
+  ],
+  "checkerSeats": {
+   "reviewer": {
+    "role": "reviewer",
+    "verdict": true
+   },
+   "red-team": {
+    "role": "red-team",
+    "verdict": true
+   },
+   "tester": {
+    "role": "reviewer",
+    "verdict": false
+   }
+  },
+  "reserved": [
+   "verify",
+   "verifier"
+  ],
+  "verifySeat": "verify",
+  "syncSeat": "sync"
+ },
+ "cases": [
+  {
+   "id": "resolveSeats: solo default writes",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: solo default read only",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [],
+      "capability": "review"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: loop from pattern string",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "pattern": "solo",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: loop from pattern object with params",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "solo",
+      "params": {
+       "seats": [
+        {
+         "seat": "maker",
+         "role": "producer",
+         "persona": " sage "
+        }
+       ]
+      }
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "maker",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      },
+      "persona": "sage"
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: solo declared tier and persona",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": [
+       {
+        "seat": "maker",
+        "role": "producer",
+        "persona": "sage",
+        "tier": "high"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "maker",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      },
+      "persona": "sage",
+      "tier": "high"
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: solo declared two seats",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": [
+       {
+        "seat": "a",
+        "role": "producer"
+       },
+       {
+        "seat": "b",
+        "role": "producer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seat-multiplicity",
+     "message": "a solo unit declares exactly one seat, with role \"producer\""
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: solo declared wrong role",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": [
+       {
+        "seat": "a",
+        "role": "judge"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seat-multiplicity",
+     "message": "a solo unit declares exactly one seat, with role \"producer\""
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: seats from the unit",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement",
+      "seats": [
+       {
+        "seat": "own",
+        "role": "producer"
+       }
+      ]
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "own",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: seats preresolved pass through",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": [
+       {
+        "seat": "x",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": true,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "x",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: seats not an array",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": "x"
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "invalid-seats",
+     "message": "params.seats must be a non-empty array of { seat, role }",
+     "at": "",
+     "detail": "must be a non-empty array of { seat, role }"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: seats empty",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": []
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "invalid-seats",
+     "message": "params.seats must be a non-empty array of { seat, role }",
+     "at": "",
+     "detail": "must be a non-empty array of { seat, role }"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: seat entry not object",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": [
+       "a"
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "invalid-seats",
+     "message": "params.seats[0] must be an object { seat, role, persona?, tier? }",
+     "at": "[0]",
+     "detail": "must be an object { seat, role, persona?, tier? }"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: seat unknown key",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": [
+       {
+        "seat": "a",
+        "role": "producer",
+        "extra": 1
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "invalid-seats",
+     "message": "params.seats[0] has unknown key \"extra\"; a seat declares only seat, role, persona and tier",
+     "at": "[0].extra",
+     "detail": "has unknown key \"extra\"; a seat declares only seat, role, persona and tier"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: seat reserved id verify",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": [
+       {
+        "seat": "verify",
+        "role": "producer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "param-invalid",
+     "message": "params.seats[0].seat \"verify\" is a reserved seat id; reserved: [verify, verifier]",
+     "at": "[0].seat",
+     "detail": "\"verify\" is a reserved seat id; reserved: [verify, verifier]"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: seat reserved layout id",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": [
+       {
+        "seat": "runs",
+        "role": "producer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "invalid-seat-id",
+     "message": "params.seats[0].seat \"runs\" is reserved (runs, outbox, inbox, inputs, unit-control, control, sync, verify, verifier)",
+     "at": "[0].seat",
+     "detail": "\"runs\" is reserved (runs, outbox, inbox, inputs, unit-control, control, sync, verify, verifier)"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: seat id with capitals",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": [
+       {
+        "seat": "Maker",
+        "role": "producer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "invalid-seat-id",
+     "message": "params.seats[0].seat \"Maker\" must be 1-40 characters: a lowercase letter, then lowercase letters, digits or \"-\"",
+     "at": "[0].seat",
+     "detail": "\"Maker\" must be 1-40 characters: a lowercase letter, then lowercase letters, digits or \"-\""
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: seat id missing",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": [
+       {
+        "role": "producer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "invalid-seat-id",
+     "message": "params.seats[0].seat undefined must be 1-40 characters: a lowercase letter, then lowercase letters, digits or \"-\"",
+     "at": "[0].seat",
+     "detail": "undefined must be 1-40 characters: a lowercase letter, then lowercase letters, digits or \"-\""
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: seat id duplicate",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "panel",
+     "params": {
+      "seats": [
+       {
+        "seat": "a",
+        "role": "producer"
+       },
+       {
+        "seat": "a",
+        "role": "synthesizer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "duplicate-seat",
+     "message": "params.seats[1].seat \"a\" is declared twice in this unit",
+     "at": "[1].seat",
+     "detail": "\"a\" is declared twice in this unit"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: seat role unknown",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": [
+       {
+        "seat": "a",
+        "role": "wizard"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "invalid-seat-role",
+     "message": "params.seats[0].role must be one of [producer, synthesizer, reviewer, red-team, judge], got \"wizard\"",
+     "at": "[0].role",
+     "detail": "must be one of [producer, synthesizer, reviewer, red-team, judge], got \"wizard\""
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: seat persona blank",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "solo",
+     "params": {
+      "seats": [
+       {
+        "seat": "a",
+        "role": "producer",
+        "persona": "  "
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "invalid-seats",
+     "message": "params.seats[0].persona must be a non-empty string",
+     "at": "[0].persona",
+     "detail": "must be a non-empty string"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed default high rigor",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "red-team",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed default critical read only",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [],
+      "capability": "review"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "red-team",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed low falls back to standard row",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "unit": {
+      "id": "u",
+      "objective": "x",
+      "rigor": "low"
+     },
+     "runnerConfig": {
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "standard": [
+          "reviewer"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed shipped table",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "unit": {
+      "id": "u",
+      "objective": "x"
+     },
+     "runnerConfig": {},
+     "shippedCheckersByRigor": {
+      "standard": [
+       "reviewer"
+      ],
+      "high": [
+       "reviewer",
+       "red-team"
+      ]
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed missing table",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "unit": {
+      "id": "u",
+      "objective": "x"
+     },
+     "runnerConfig": {}
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "configuration-error",
+     "message": "missing checkersByRigor for rigor \"standard\" (neither runnerConfig nor shippedCheckersByRigor defines it)"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed low missing table",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "unit": {
+      "id": "u",
+      "objective": "x",
+      "rigor": "low"
+     },
+     "runnerConfig": {}
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "configuration-error",
+     "message": "missing checkersByRigor for rigor \"low\" (neither runnerConfig nor shippedCheckersByRigor defines it or a standard row)"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed capability minCheckers string tester",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "unit": {
+      "id": "u",
+      "objective": "x",
+      "capability": "docs"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "tester",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed prefix capability minCheckers",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "unit": {
+      "id": "u",
+      "objective": "x",
+      "capability": "code:other"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     },
+     "shippedCheckersByRigor": {
+      "standard": [
+       "reviewer"
+      ],
+      "high": [
+       "reviewer",
+       "red-team"
+      ]
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed code default red-team",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "unit": {
+      "id": "u",
+      "objective": "x",
+      "capability": "code"
+     },
+     "runnerConfig": {},
+     "shippedCheckersByRigor": {
+      "standard": [
+       "reviewer"
+      ],
+      "high": [
+       "reviewer",
+       "red-team"
+      ]
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "red-team",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed requested checkers",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "params": {
+      "minCheckers": [
+       "tester",
+       "red-team"
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "x"
+     },
+     "runnerConfig": {},
+     "shippedCheckersByRigor": {
+      "standard": [
+       "reviewer"
+      ],
+      "high": [
+       "reviewer",
+       "red-team"
+      ]
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "tester",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "red-team",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed requested one string",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "params": {
+      "minCheckers": "tester"
+     },
+     "unit": {
+      "id": "u",
+      "objective": "x"
+     },
+     "runnerConfig": {},
+     "shippedCheckersByRigor": {
+      "standard": [
+       "reviewer"
+      ],
+      "high": [
+       "reviewer",
+       "red-team"
+      ]
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "tester",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed requested unknown checker",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "params": {
+      "minCheckers": [
+       "wizard"
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "x"
+     },
+     "runnerConfig": {},
+     "shippedCheckersByRigor": {
+      "standard": [
+       "reviewer"
+      ],
+      "high": [
+       "reviewer",
+       "red-team"
+      ]
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "param-invalid",
+     "message": "\"wizard\" is not a checker seat; valid: [reviewer, red-team, tester]"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed floors",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "floors": {
+      "minCheckers": [
+       {
+        "name": "red-team",
+        "source": "gate"
+       },
+       "tester"
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "x"
+     },
+     "runnerConfig": {},
+     "shippedCheckersByRigor": {
+      "standard": [
+       "reviewer"
+      ],
+      "high": [
+       "reviewer",
+       "red-team"
+      ]
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "red-team",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "tester",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed bad capability rigor",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "unit": {
+      "id": "u",
+      "objective": "x",
+      "capability": "weird:x"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "RangeError",
+     "code": "",
+     "message": "invalid capability rigor \"bogus\" for \"weird:x\". Valid rigors: [low, standard, high, critical]"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed bad unit rigor",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "unit": {
+      "id": "u",
+      "objective": "x",
+      "rigor": "extreme"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "RangeError",
+     "code": "",
+     "message": "invalid rigor \"extreme\". Valid rigors: [low, standard, high, critical]"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed declared seats match",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "params": {
+      "seats": [
+       {
+        "seat": "maker",
+        "role": "producer"
+       },
+       {
+        "seat": "look",
+        "role": "reviewer",
+        "tier": "x"
+       },
+       {
+        "seat": "poke",
+        "role": "red-team"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "maker",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "look",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      },
+      "tier": "x"
+     },
+     {
+      "seat": "poke",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed declared tester takes reviewer role",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "params": {
+      "minCheckers": [
+       "tester"
+      ],
+      "seats": [
+       {
+        "seat": "maker",
+        "role": "producer"
+       },
+       {
+        "seat": "look",
+        "role": "reviewer"
+       },
+       {
+        "seat": "poke",
+        "role": "red-team"
+       },
+       {
+        "seat": "run",
+        "role": "reviewer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "maker",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "look",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "poke",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "run",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed declared missing checker",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "params": {
+      "seats": [
+       {
+        "seat": "maker",
+        "role": "producer"
+       },
+       {
+        "seat": "look",
+        "role": "reviewer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seat-multiplicity",
+     "message": "a reviewed unit's checker seats must be exactly [reviewer, red-team] (checkersByRigor for its effective rigor plus minCheckers); missing [red-team]"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed declared extra checker",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "params": {
+      "seats": [
+       {
+        "seat": "maker",
+        "role": "producer"
+       },
+       {
+        "seat": "look",
+        "role": "reviewer"
+       },
+       {
+        "seat": "poke",
+        "role": "red-team"
+       },
+       {
+        "seat": "more",
+        "role": "reviewer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seat-multiplicity",
+     "message": "a reviewed unit's checker seats must be exactly [reviewer, red-team] (checkersByRigor for its effective rigor plus minCheckers); extra [reviewer]"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed declared weakens invariant",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "floors": {
+      "minCheckers": [
+       {
+        "name": "red-team",
+        "source": "gate"
+       }
+      ]
+     },
+     "params": {
+      "seats": [
+       {
+        "seat": "maker",
+        "role": "producer"
+       },
+       {
+        "seat": "look",
+        "role": "reviewer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "x"
+     },
+     "runnerConfig": {},
+     "shippedCheckersByRigor": {
+      "standard": [
+       "reviewer"
+      ],
+      "high": [
+       "reviewer",
+       "red-team"
+      ]
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "pattern-invariant-weakened",
+     "message": "declared seats weaken pattern invariant pattern-invariant:gate: missing required checker role(s) [red-team]"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: reviewed declared two producers",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "reviewed",
+     "params": {
+      "seats": [
+       {
+        "seat": "a",
+        "role": "producer"
+       },
+       {
+        "seat": "b",
+        "role": "producer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seat-multiplicity",
+     "message": "a reviewed unit declares exactly one seat with role \"producer\", has 2"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: panel declared",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "panel",
+     "params": {
+      "seats": [
+       {
+        "seat": "m1",
+        "role": "producer"
+       },
+       {
+        "seat": "m2",
+        "role": "producer"
+       },
+       {
+        "seat": "sum",
+        "role": "synthesizer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "m1",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "m2",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "sum",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: panel read only synthesizer",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "panel",
+     "params": {
+      "seats": [
+       {
+        "seat": "m1",
+        "role": "producer"
+       },
+       {
+        "seat": "sum",
+        "role": "synthesizer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [],
+      "capability": "review"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "m1",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "sum",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: panel without seats",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "panel",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seats-required",
+     "message": "a panel unit must declare its seats: producers as members and one synthesizer"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: panel no synthesizer",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "panel",
+     "params": {
+      "seats": [
+       {
+        "seat": "m1",
+        "role": "producer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seat-multiplicity",
+     "message": "a panel unit needs 1 seat(s) with role \"synthesizer\", has 0"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: panel stray role",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "panel",
+     "params": {
+      "seats": [
+       {
+        "seat": "m1",
+        "role": "producer"
+       },
+       {
+        "seat": "s",
+        "role": "synthesizer"
+       },
+       {
+        "seat": "j",
+        "role": "judge"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seat-multiplicity",
+     "message": "a panel unit has no use for a seat with role \"judge\""
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: research-fan-out becomes a panel",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "research-fan-out",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [],
+      "capability": "review"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "member-1",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "member-2",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "member-3",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "synthesizer",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: debate declared order",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "debate",
+     "params": {
+      "seats": [
+       {
+        "seat": "j",
+        "role": "judge"
+       },
+       {
+        "seat": "pro",
+        "role": "producer"
+       },
+       {
+        "seat": "con",
+        "role": "producer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "pro",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "con",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "j",
+      "role": "judge",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "resolveSeats: debate one side",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "debate",
+     "params": {
+      "seats": [
+       {
+        "seat": "pro",
+        "role": "producer"
+       },
+       {
+        "seat": "j",
+        "role": "judge"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seat-multiplicity",
+     "message": "a debate unit needs 2 seat(s) with role \"producer\", has 1"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: debate without seats",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "debate",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seats-required",
+     "message": "a debate unit must declare its seats: two producer sides and one judge"
+    }
+   }
+  },
+  {
+   "id": "resolveSeats: unknown loop",
+   "fn": "resolveSeats",
+   "args": [
+    {
+     "loop": "swarm",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "unknown-pattern",
+     "message": "Unknown collaboration pattern: \"swarm\""
+    }
+   }
+  },
+  {
+   "id": "checkDeclaredSeats: trims persona, keeps tier",
+   "fn": "checkDeclaredSeats",
+   "args": [
+    [
+     {
+      "seat": "a",
+      "role": "producer",
+      "persona": " p ",
+      "tier": "x"
+     }
+    ],
+    "seats",
+    {
+     "tiers": [
+      "x",
+      "y"
+     ]
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "a",
+      "role": "producer",
+      "persona": "p",
+      "tier": "x"
+     }
+    ]
+   }
+  },
+  {
+   "id": "checkDeclaredSeats: tier outside the ladder",
+   "fn": "checkDeclaredSeats",
+   "args": [
+    [
+     {
+      "seat": "a",
+      "role": "producer",
+      "tier": "z"
+     }
+    ],
+    "seats",
+    {
+     "tiers": [
+      "x",
+      "y"
+     ]
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "invalid-seat-tier",
+     "message": "seats[0].tier must be one of [x, y], got \"z\"",
+     "at": "[0].tier",
+     "detail": "must be one of [x, y], got \"z\""
+    }
+   }
+  },
+  {
+   "id": "checkDeclaredSeats: label shows in the message",
+   "fn": "checkDeclaredSeats",
+   "args": [
+    [
+     {
+      "seat": "a",
+      "role": "nope"
+     }
+    ],
+    "unit.seats"
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "invalid-seat-role",
+     "message": "unit.seats[0].role must be one of [producer, synthesizer, reviewer, red-team, judge], got \"nope\"",
+     "at": "[0].role",
+     "detail": "must be one of [producer, synthesizer, reviewer, red-team, judge], got \"nope\""
+    }
+   }
+  },
+  {
+   "id": "checkDeclaredSeats: not an array",
+   "fn": "checkDeclaredSeats",
+   "args": [
+    {},
+    "seats"
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "invalid-seats",
+     "message": "seats must be a non-empty array of { seat, role }",
+     "at": "",
+     "detail": "must be a non-empty array of { seat, role }"
+    }
+   }
+  },
+  {
+   "id": "checkDeclaredSeats: seat id of the wrong type",
+   "fn": "checkDeclaredSeats",
+   "args": [
+    [
+     {
+      "seat": 5,
+      "role": "producer"
+     }
+    ],
+    "seats"
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "invalid-seat-id",
+     "message": "seats[0].seat 5 must be 1-40 characters: a lowercase letter, then lowercase letters, digits or \"-\"",
+     "at": "[0].seat",
+     "detail": "5 must be 1-40 characters: a lowercase letter, then lowercase letters, digits or \"-\""
+    }
+   }
+  },
+  {
+   "id": "seatLaunchesOf: solo",
+   "fn": "seatLaunchesOf",
+   "args": [
+    {
+     "loop": "solo",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": 1
+   }
+  },
+  {
+   "id": "seatLaunchesOf: reviewed default rounds",
+   "fn": "seatLaunchesOf",
+   "args": [
+    {
+     "loop": "reviewed",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": 6
+   }
+  },
+  {
+   "id": "seatLaunchesOf: reviewed three rounds",
+   "fn": "seatLaunchesOf",
+   "args": [
+    {
+     "loop": "reviewed",
+     "params": {
+      "maxRounds": 3
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     },
+     "runnerConfig": {
+      "capabilities": {
+       "code:implement": {
+        "rigor": "high",
+        "verify": "npm test"
+       },
+       "code:*": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "review": {
+        "rigor": "critical",
+        "minCheckers": []
+       },
+       "docs": {
+        "rigor": "low",
+        "minCheckers": "tester",
+        "verify": "   "
+       },
+       "weird:x": {
+        "rigor": "bogus"
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "reviewer"
+         ],
+         "standard": [
+          "reviewer"
+         ],
+         "high": [
+          "reviewer",
+          "red-team"
+         ],
+         "critical": [
+          "reviewer",
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": 9
+   }
+  },
+  {
+   "id": "seatLaunchesOf: panel",
+   "fn": "seatLaunchesOf",
+   "args": [
+    {
+     "loop": "panel",
+     "params": {
+      "seats": [
+       {
+        "seat": "m1",
+        "role": "producer"
+       },
+       {
+        "seat": "m2",
+        "role": "producer"
+       },
+       {
+        "seat": "s",
+        "role": "synthesizer"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": 3
+   }
+  },
+  {
+   "id": "seatLaunchesOf: debate with rebuttal",
+   "fn": "seatLaunchesOf",
+   "args": [
+    {
+     "loop": "debate",
+     "params": {
+      "seats": [
+       {
+        "seat": "p",
+        "role": "producer"
+       },
+       {
+        "seat": "c",
+        "role": "producer"
+       },
+       {
+        "seat": "j",
+        "role": "judge"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": 5
+   }
+  },
+  {
+   "id": "seatLaunchesOf: debate without rebuttal",
+   "fn": "seatLaunchesOf",
+   "args": [
+    {
+     "loop": "debate",
+     "params": {
+      "rebuttal": false,
+      "seats": [
+       {
+        "seat": "p",
+        "role": "producer"
+       },
+       {
+        "seat": "c",
+        "role": "producer"
+       },
+       {
+        "seat": "j",
+        "role": "judge"
+       }
+      ]
+     },
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": 3
+   }
+  },
+  {
+   "id": "seatLaunchesOf: unknown loop is null",
+   "fn": "seatLaunchesOf",
+   "args": [
+    {
+     "loop": "swarm",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "seatLaunchesOf: error from the resolver",
+   "fn": "seatLaunchesOf",
+   "args": [
+    {
+     "loop": "panel",
+     "unit": {
+      "id": "u",
+      "objective": "do",
+      "writes": [
+       "src"
+      ],
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seats-required",
+     "message": "a panel unit must declare its seats: producers as members and one synthesizer"
+    }
+   }
+  },
+  {
+   "id": "seatKind {\"role\":\"producer\",\"posture\":{\"readOnly\":false,\"writer\":false,\"forceOutOfProcess\":false,\"stance\":true,\"verdict\":false}}",
+   "fn": "seatKind",
+   "args": [
+    {
+     "role": "producer",
+     "posture": {
+      "readOnly": false,
+      "writer": false,
+      "forceOutOfProcess": false,
+      "stance": true,
+      "verdict": false
+     }
+    }
+   ],
+   "expected": {
+    "ok": "panelist"
+   }
+  },
+  {
+   "id": "seatKind {\"role\":\"synthesizer\"}",
+   "fn": "seatKind",
+   "args": [
+    {
+     "role": "synthesizer"
+    }
+   ],
+   "expected": {
+    "ok": "synthesizer"
+   }
+  },
+  {
+   "id": "seatKind {\"role\":\"judge\"}",
+   "fn": "seatKind",
+   "args": [
+    {
+     "role": "judge"
+    }
+   ],
+   "expected": {
+    "ok": "judge"
+   }
+  },
+  {
+   "id": "seatKind {\"role\":\"producer\",\"posture\":{\"readOnly\":false,\"writer\":false,\"forceOutOfProcess\":false,\"stance\":false,\"verdict\":false}}",
+   "fn": "seatKind",
+   "args": [
+    {
+     "role": "producer",
+     "posture": {
+      "readOnly": false,
+      "writer": false,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": false
+     }
+    }
+   ],
+   "expected": {
+    "ok": "producer"
+   }
+  },
+  {
+   "id": "seatKind {\"role\":\"red-team\"}",
+   "fn": "seatKind",
+   "args": [
+    {
+     "role": "red-team"
+    }
+   ],
+   "expected": {
+    "ok": "checker"
+   }
+  },
+  {
+   "id": "seatKind {\"role\":\"reviewer\",\"posture\":{\"stance\":false}}",
+   "fn": "seatKind",
+   "args": [
+    {
+     "role": "reviewer",
+     "posture": {
+      "stance": false
+     }
+    }
+   ],
+   "expected": {
+    "ok": "checker"
+   }
+  },
+  {
+   "id": "bindSeatOf: a recorded seat with its own tier",
+   "fn": "bindSeatOf",
+   "args": [
+    {
+     "unit": {
+      "id": "unit-1",
+      "tier": "fast"
+     },
+     "workflowId": "wf",
+     "seats": [
+      {
+       "seat": "maker",
+       "role": "producer",
+       "posture": {
+        "readOnly": false,
+        "writer": true,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": false
+       },
+       "persona": "sage",
+       "tier": "high"
+      },
+      {
+       "seat": "look",
+       "role": "reviewer",
+       "posture": {
+        "readOnly": true,
+        "writer": false,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": false
+       }
+      }
+     ]
+    },
+    "maker"
+   ],
+   "expected": {
+    "ok": {
+     "seat": "maker",
+     "role": "producer",
+     "posture": {
+      "readOnly": false,
+      "writer": true,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": false
+     },
+     "persona": "sage",
+     "workflowTier": {
+      "tier": "high",
+      "source": "workflow:wf/unit-1/maker"
+     }
+    }
+   }
+  },
+  {
+   "id": "bindSeatOf: a recorded seat takes its unit tier",
+   "fn": "bindSeatOf",
+   "args": [
+    {
+     "unit": {
+      "id": "unit-1",
+      "tier": "fast"
+     },
+     "workflowId": "wf",
+     "seats": [
+      {
+       "seat": "maker",
+       "role": "producer",
+       "posture": {
+        "readOnly": false,
+        "writer": true,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": false
+       },
+       "persona": "sage",
+       "tier": "high"
+      },
+      {
+       "seat": "look",
+       "role": "reviewer",
+       "posture": {
+        "readOnly": true,
+        "writer": false,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": false
+       }
+      }
+     ]
+    },
+    "look"
+   ],
+   "expected": {
+    "ok": {
+     "seat": "look",
+     "role": "reviewer",
+     "posture": {
+      "readOnly": true,
+      "writer": false,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": false
+     },
+     "workflowTier": {
+      "tier": "fast",
+      "source": "workflow:wf/unit-1"
+     }
+    }
+   }
+  },
+  {
+   "id": "bindSeatOf: an unlisted seat is the producer",
+   "fn": "bindSeatOf",
+   "args": [
+    {
+     "unit": {
+      "id": "unit-1",
+      "tier": "fast"
+     },
+     "workflowId": "wf",
+     "seats": [
+      {
+       "seat": "maker",
+       "role": "producer",
+       "posture": {
+        "readOnly": false,
+        "writer": true,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": false
+       },
+       "persona": "sage",
+       "tier": "high"
+      },
+      {
+       "seat": "look",
+       "role": "reviewer",
+       "posture": {
+        "readOnly": true,
+        "writer": false,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": false
+       }
+      }
+     ]
+    },
+    "other"
+   ],
+   "expected": {
+    "ok": {
+     "seat": "other",
+     "role": "producer",
+     "posture": {
+      "readOnly": false,
+      "writer": true,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": false
+     },
+     "workflowTier": {
+      "tier": "fast",
+      "source": "workflow:wf/unit-1"
+     }
+    }
+   }
+  },
+  {
+   "id": "bindSeatOf: no tier anywhere",
+   "fn": "bindSeatOf",
+   "args": [
+    {
+     "seats": []
+    },
+    "x"
+   ],
+   "expected": {
+    "ok": {
+     "seat": "x",
+     "role": "producer",
+     "posture": {
+      "readOnly": false,
+      "writer": true,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": false
+     }
+    }
+   }
+  },
+  {
+   "id": "workflowTierOf: no workflow id",
+   "fn": "workflowTierOf",
+   "args": [
+    {
+     "seat": "s",
+     "tier": "t"
+    },
+    {
+     "id": "u"
+    },
+    null
+   ],
+   "expected": {
+    "ok": {
+     "tier": "t",
+     "source": "workflow:u/s"
+    }
+   }
+  },
+  {
+   "id": "assertNoSeatTier: clean",
+   "fn": "assertNoSeatTier",
+   "args": [
+    [
+     {
+      "seat": "a"
+     }
+    ],
+    "unit file"
+   ],
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "assertNoSeatTier: carries a tier",
+   "fn": "assertNoSeatTier",
+   "args": [
+    [
+     {
+      "seat": "a",
+      "tier": "x"
+     }
+    ],
+    "unit file"
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seat-tier-not-allowed",
+     "message": "unit file cannot carry seats[].tier: a seat's tier is a recommendation only a registered workflow definition may make"
+    }
+   }
+  },
+  {
+   "id": "assertNoUnitTier: carries a tier",
+   "fn": "assertNoUnitTier",
+   "args": [
+    {
+     "tier": "x"
+    },
+    "stdin"
+   ],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "unit-tier-not-allowed",
+     "message": "stdin cannot carry tier: a unit's tier is a recommendation only a registered workflow definition may make"
+    }
+   }
+  },
+  {
+   "id": "assertNoUnitTier: clean",
+   "fn": "assertNoUnitTier",
+   "args": [
+    {},
+    "stdin"
+   ],
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "effectiveRigorOf: unit rigor wins",
+   "fn": "effectiveRigorOf",
+   "args": [
+    {
+     "rigor": "critical",
+     "capability": "docs"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "rigor": "high",
+       "verify": "npm test"
+      },
+      "code:*": {
+       "minCheckers": [
+        "reviewer"
+       ]
+      },
+      "review": {
+       "rigor": "critical",
+       "minCheckers": []
+      },
+      "docs": {
+       "rigor": "low",
+       "minCheckers": "tester",
+       "verify": "   "
+      },
+      "weird:x": {
+       "rigor": "bogus"
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "low": [
+         "reviewer"
+        ],
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ],
+        "critical": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    },
+    {
+     "fallback": "standard"
+    }
+   ],
+   "expected": {
+    "ok": "critical"
+   }
+  },
+  {
+   "id": "effectiveRigorOf: capability rigor stronger",
+   "fn": "effectiveRigorOf",
+   "args": [
+    {
+     "rigor": "low",
+     "capability": "code:implement"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "rigor": "high",
+       "verify": "npm test"
+      },
+      "code:*": {
+       "minCheckers": [
+        "reviewer"
+       ]
+      },
+      "review": {
+       "rigor": "critical",
+       "minCheckers": []
+      },
+      "docs": {
+       "rigor": "low",
+       "minCheckers": "tester",
+       "verify": "   "
+      },
+      "weird:x": {
+       "rigor": "bogus"
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "low": [
+         "reviewer"
+        ],
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ],
+        "critical": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    },
+    {
+     "fallback": "standard"
+    }
+   ],
+   "expected": {
+    "ok": "high"
+   }
+  },
+  {
+   "id": "effectiveRigorOf: fallback",
+   "fn": "effectiveRigorOf",
+   "args": [
+    {},
+    {},
+    {
+     "fallback": "standard"
+    }
+   ],
+   "expected": {
+    "ok": "standard"
+   }
+  },
+  {
+   "id": "effectiveRigorOf: bad value",
+   "fn": "effectiveRigorOf",
+   "args": [
+    {
+     "rigor": "x"
+    },
+    {},
+    {
+     "fallback": "standard"
+    }
+   ],
+   "expected": {
+    "error": {
+     "class": "RangeError",
+     "code": "",
+     "message": "invalid rigor \"x\". Valid rigors: [low, standard, high, critical]"
+    }
+   }
+  },
+  {
+   "id": "effectiveRigorOf: no fallback",
+   "fn": "effectiveRigorOf",
+   "args": [
+    {},
+    {},
+    {}
+   ],
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "requiresDistinctFamilies: high",
+   "fn": "requiresDistinctFamilies",
+   "args": [
+    {
+     "id": "u",
+     "objective": "do",
+     "writes": [
+      "src"
+     ],
+     "capability": "code:implement"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "rigor": "high",
+       "verify": "npm test"
+      },
+      "code:*": {
+       "minCheckers": [
+        "reviewer"
+       ]
+      },
+      "review": {
+       "rigor": "critical",
+       "minCheckers": []
+      },
+      "docs": {
+       "rigor": "low",
+       "minCheckers": "tester",
+       "verify": "   "
+      },
+      "weird:x": {
+       "rigor": "bogus"
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "low": [
+         "reviewer"
+        ],
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ],
+        "critical": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "requiresDistinctFamilies: critical",
+   "fn": "requiresDistinctFamilies",
+   "args": [
+    {
+     "id": "u",
+     "objective": "do",
+     "writes": [],
+     "capability": "review"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "rigor": "high",
+       "verify": "npm test"
+      },
+      "code:*": {
+       "minCheckers": [
+        "reviewer"
+       ]
+      },
+      "review": {
+       "rigor": "critical",
+       "minCheckers": []
+      },
+      "docs": {
+       "rigor": "low",
+       "minCheckers": "tester",
+       "verify": "   "
+      },
+      "weird:x": {
+       "rigor": "bogus"
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "low": [
+         "reviewer"
+        ],
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ],
+        "critical": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "requiresDistinctFamilies: low",
+   "fn": "requiresDistinctFamilies",
+   "args": [
+    {
+     "capability": "docs"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "rigor": "high",
+       "verify": "npm test"
+      },
+      "code:*": {
+       "minCheckers": [
+        "reviewer"
+       ]
+      },
+      "review": {
+       "rigor": "critical",
+       "minCheckers": []
+      },
+      "docs": {
+       "rigor": "low",
+       "minCheckers": "tester",
+       "verify": "   "
+      },
+      "weird:x": {
+       "rigor": "bogus"
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "low": [
+         "reviewer"
+        ],
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ],
+        "critical": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "requiresDistinctFamilies: none",
+   "fn": "requiresDistinctFamilies",
+   "args": [
+    {},
+    {
+     "capabilities": {
+      "code:implement": {
+       "rigor": "high",
+       "verify": "npm test"
+      },
+      "code:*": {
+       "minCheckers": [
+        "reviewer"
+       ]
+      },
+      "review": {
+       "rigor": "critical",
+       "minCheckers": []
+      },
+      "docs": {
+       "rigor": "low",
+       "minCheckers": "tester",
+       "verify": "   "
+      },
+      "weird:x": {
+       "rigor": "bogus"
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "low": [
+         "reviewer"
+        ],
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ],
+        "critical": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "checkerPlanOf: contributions by source",
+   "fn": "checkerPlanOf",
+   "args": [
+    {
+     "id": "u",
+     "capability": "code:implement",
+     "rigor": "critical"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "rigor": "high",
+       "verify": "npm test"
+      },
+      "code:*": {
+       "minCheckers": [
+        "reviewer"
+       ]
+      },
+      "review": {
+       "rigor": "critical",
+       "minCheckers": []
+      },
+      "docs": {
+       "rigor": "low",
+       "minCheckers": "tester",
+       "verify": "   "
+      },
+      "weird:x": {
+       "rigor": "bogus"
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "low": [
+         "reviewer"
+        ],
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ],
+        "critical": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    },
+    {
+     "requested": [
+      "tester",
+      {
+       "name": "red-team",
+       "source": "by-hand"
+      }
+     ],
+     "floors": {
+      "minCheckers": [
+       "reviewer"
+      ]
+     },
+     "slot": "workflow",
+     "shippedCheckersByRigor": {
+      "standard": [
+       "reviewer"
+      ],
+      "high": [
+       "reviewer",
+       "red-team"
+      ]
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "reviewer",
+      "contributions": [
+       "rigor:critical",
+       "capability:code:*",
+       "pattern-invariant:pattern-invariant"
+      ]
+     },
+     {
+      "seat": "red-team",
+      "contributions": [
+       "rigor:critical",
+       "by-hand"
+      ]
+     },
+     {
+      "seat": "tester",
+      "contributions": [
+       "param:workflow"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "checkerPlanOf: a request slot",
+   "fn": "checkerPlanOf",
+   "args": [
+    {
+     "id": "u"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "rigor": "high",
+       "verify": "npm test"
+      },
+      "code:*": {
+       "minCheckers": [
+        "reviewer"
+       ]
+      },
+      "review": {
+       "rigor": "critical",
+       "minCheckers": []
+      },
+      "docs": {
+       "rigor": "low",
+       "minCheckers": "tester",
+       "verify": "   "
+      },
+      "weird:x": {
+       "rigor": "bogus"
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "low": [
+         "reviewer"
+        ],
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ],
+        "critical": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    },
+    {
+     "requested": [
+      "tester"
+     ],
+     "slot": "request"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "reviewer",
+      "contributions": [
+       "rigor:standard"
+      ]
+     },
+     {
+      "seat": "tester",
+      "contributions": [
+       "request"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "checkerPlanOf: a param slot",
+   "fn": "checkerPlanOf",
+   "args": [
+    {
+     "id": "u"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "rigor": "high",
+       "verify": "npm test"
+      },
+      "code:*": {
+       "minCheckers": [
+        "reviewer"
+       ]
+      },
+      "review": {
+       "rigor": "critical",
+       "minCheckers": []
+      },
+      "docs": {
+       "rigor": "low",
+       "minCheckers": "tester",
+       "verify": "   "
+      },
+      "weird:x": {
+       "rigor": "bogus"
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "low": [
+         "reviewer"
+        ],
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ],
+        "critical": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    },
+    {
+     "requested": [
+      "tester"
+     ],
+     "slot": "param:x"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "reviewer",
+      "contributions": [
+       "rigor:standard"
+      ]
+     },
+     {
+      "seat": "tester",
+      "contributions": [
+       "param:x"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "checkerPlanOf: an array is the request",
+   "fn": "checkerPlanOf",
+   "args": [
+    {
+     "id": "u"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "rigor": "high",
+       "verify": "npm test"
+      },
+      "code:*": {
+       "minCheckers": [
+        "reviewer"
+       ]
+      },
+      "review": {
+       "rigor": "critical",
+       "minCheckers": []
+      },
+      "docs": {
+       "rigor": "low",
+       "minCheckers": "tester",
+       "verify": "   "
+      },
+      "weird:x": {
+       "rigor": "bogus"
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "low": [
+         "reviewer"
+        ],
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ],
+        "critical": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    },
+    [
+     "tester"
+    ]
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "reviewer",
+      "contributions": [
+       "rigor:standard"
+      ]
+     },
+     {
+      "seat": "tester",
+      "contributions": [
+       "request"
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,5915 @@
+{
+ "version": "core-loops-legacy.v1",
+ "about": "The legacy seat read, recorded from src/runner/execution/legacy-seat-read.mjs: which seats a record written before seats existed had, whether a record is fenced, and how a record without `collaboration` decodes. collaborationOfRecord is given { shipped } as its second argument.",
+ "cases": [
+  {
+   "id": "legacySeatsOf: solo by name",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": "solo",
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: solo by name",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": "solo",
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: solo by name",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": "solo",
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: solo by name",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "solo",
+     "unit": {
+      "id": "u"
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "solo",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "solo",
+       "params": {
+        "seats": [
+         {
+          "seat": "producer",
+          "role": "producer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer",
+         "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "solo",
+      "params": {
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": true,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "solo"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: solo from unit pattern",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "unit": {
+      "id": "u",
+      "pattern": "solo"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: solo from unit pattern",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "unit": {
+      "id": "u",
+      "pattern": "solo"
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: solo from unit pattern",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "unit": {
+      "id": "u",
+      "pattern": "solo"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: solo from unit pattern",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "unit": {
+      "id": "u",
+      "pattern": "solo"
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "solo",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "solo",
+       "params": {
+        "seats": [
+         {
+          "seat": "producer",
+          "role": "producer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer",
+         "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "solo",
+      "params": {
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": true,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "solo"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: consult preset names its role",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": "consult"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "advisor",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: consult preset names its role",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": "consult"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: consult preset names its role",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": "consult"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "advisor",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: consult preset names its role",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "consult"
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "consult",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "solo",
+       "params": {
+        "role": "advisor",
+        "seats": [
+         {
+          "seat": "advisor",
+          "role": "producer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "advisor",
+         "role": "producer",
+         "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "solo",
+      "params": {
+       "role": "advisor",
+       "seats": [
+        {
+         "seat": "advisor",
+         "role": "producer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "advisor",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": true,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "consult"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: object pattern with params",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "solo",
+      "params": {
+       "role": "advisor"
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "advisor",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: object pattern with params",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "solo",
+      "params": {
+       "role": "advisor"
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: object pattern with params",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "solo",
+      "params": {
+       "role": "advisor"
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "advisor",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: object pattern with params",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "solo",
+      "params": {
+       "role": "advisor"
+      }
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "solo",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "solo",
+       "params": {
+        "role": "advisor",
+        "seats": [
+         {
+          "seat": "advisor",
+          "role": "producer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "advisor",
+         "role": "producer",
+         "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "solo",
+      "params": {
+       "role": "advisor",
+       "seats": [
+        {
+         "seat": "advisor",
+         "role": "producer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "advisor",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": true,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "solo"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: no pattern at all",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": []
+   }
+  },
+  {
+   "id": "isSeatRecord: no pattern at all",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: no pattern at all",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": []
+   }
+  },
+  {
+   "id": "collaborationOfRecord: no pattern at all",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "unit": {
+      "id": "u"
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "solo",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "solo",
+       "params": {},
+       "seats": []
+      }
+     },
+     "effective": {
+      "loop": "solo",
+      "params": {},
+      "seats": []
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": false,
+     "selector": null
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: reviewed standard unit",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": "reviewed",
+     "unit": {
+      "id": "u",
+      "capability": "docs"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: reviewed standard unit",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": "reviewed",
+     "unit": {
+      "id": "u",
+      "capability": "docs"
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: reviewed standard unit",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": "reviewed",
+     "unit": {
+      "id": "u",
+      "capability": "docs"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: reviewed standard unit",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "reviewed",
+     "unit": {
+      "id": "u",
+      "capability": "docs"
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "reviewed",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "reviewed",
+       "params": {
+        "maxRounds": 2,
+        "seats": [
+         {
+          "seat": "producer",
+          "role": "producer"
+         },
+         {
+          "seat": "reviewer",
+          "role": "reviewer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer",
+         "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": true
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "reviewed",
+      "params": {
+       "maxRounds": 2,
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer"
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": true,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "reviewer",
+        "role": "reviewer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": true
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "reviewed"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: reviewed high rigor in code",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": "reviewed",
+     "unit": {
+      "id": "u",
+      "rigor": "high",
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "red-team",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: reviewed high rigor in code",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": "reviewed",
+     "unit": {
+      "id": "u",
+      "rigor": "high",
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: reviewed high rigor in code",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": "reviewed",
+     "unit": {
+      "id": "u",
+      "rigor": "high",
+      "capability": "code:implement"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "red-team",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: reviewed high rigor in code",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "reviewed",
+     "unit": {
+      "id": "u",
+      "rigor": "high",
+      "capability": "code:implement"
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "reviewed",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "reviewed",
+       "params": {
+        "maxRounds": 2,
+        "seats": [
+         {
+          "seat": "producer",
+          "role": "producer"
+         },
+         {
+          "seat": "reviewer",
+          "role": "reviewer"
+         },
+         {
+          "seat": "red-team",
+          "role": "red-team"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer",
+         "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": true
+         }
+        },
+        {
+         "seat": "red-team",
+         "role": "red-team",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": true
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "reviewed",
+      "params": {
+       "maxRounds": 2,
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer"
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer"
+        },
+        {
+         "seat": "red-team",
+         "role": "red-team"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": true,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "reviewer",
+        "role": "reviewer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": true
+        }
+       },
+       {
+        "seat": "red-team",
+        "role": "red-team",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": true
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "reviewed"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: reviewed with snapshot table and params",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "reviewed",
+      "params": {
+       "minCheckers": [
+        "tester",
+        "reviewer"
+       ]
+      }
+     },
+     "unit": {
+      "id": "u",
+      "rigor": "low"
+     },
+     "configSnapshot": {
+      "runner": {
+       "patterns": {
+        "reviewed": {
+         "checkersByRigor": {
+          "low": [
+           "red-team"
+          ]
+         },
+         "maxRounds": 5
+        }
+       },
+       "capabilities": {
+        "docs": {
+         "minCheckers": [
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "red-team",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "tester",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: reviewed with snapshot table and params",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "reviewed",
+      "params": {
+       "minCheckers": [
+        "tester",
+        "reviewer"
+       ]
+      }
+     },
+     "unit": {
+      "id": "u",
+      "rigor": "low"
+     },
+     "configSnapshot": {
+      "runner": {
+       "patterns": {
+        "reviewed": {
+         "checkersByRigor": {
+          "low": [
+           "red-team"
+          ]
+         },
+         "maxRounds": 5
+        }
+       },
+       "capabilities": {
+        "docs": {
+         "minCheckers": [
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: reviewed with snapshot table and params",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "reviewed",
+      "params": {
+       "minCheckers": [
+        "tester",
+        "reviewer"
+       ]
+      }
+     },
+     "unit": {
+      "id": "u",
+      "rigor": "low"
+     },
+     "configSnapshot": {
+      "runner": {
+       "patterns": {
+        "reviewed": {
+         "checkersByRigor": {
+          "low": [
+           "red-team"
+          ]
+         },
+         "maxRounds": 5
+        }
+       },
+       "capabilities": {
+        "docs": {
+         "minCheckers": [
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "red-team",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "tester",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: reviewed with snapshot table and params",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "reviewed",
+      "params": {
+       "minCheckers": [
+        "tester",
+        "reviewer"
+       ]
+      }
+     },
+     "unit": {
+      "id": "u",
+      "rigor": "low"
+     },
+     "configSnapshot": {
+      "runner": {
+       "patterns": {
+        "reviewed": {
+         "checkersByRigor": {
+          "low": [
+           "red-team"
+          ]
+         },
+         "maxRounds": 5
+        }
+       },
+       "capabilities": {
+        "docs": {
+         "minCheckers": [
+          "red-team"
+         ]
+        }
+       }
+      }
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "reviewed",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "reviewed",
+       "params": {
+        "minCheckers": [
+         "tester",
+         "reviewer"
+        ],
+        "maxRounds": 5,
+        "seats": [
+         {
+          "seat": "producer",
+          "role": "producer"
+         },
+         {
+          "seat": "red-team",
+          "role": "red-team"
+         },
+         {
+          "seat": "tester",
+          "role": "reviewer"
+         },
+         {
+          "seat": "reviewer",
+          "role": "reviewer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer",
+         "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "red-team",
+         "role": "red-team",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": true
+         }
+        },
+        {
+         "seat": "tester",
+         "role": "reviewer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": true
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "reviewed",
+      "params": {
+       "minCheckers": [
+        "tester",
+        "reviewer"
+       ],
+       "maxRounds": 5,
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer"
+        },
+        {
+         "seat": "red-team",
+         "role": "red-team"
+        },
+        {
+         "seat": "tester",
+         "role": "reviewer"
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": true,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "red-team",
+        "role": "red-team",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": true
+        }
+       },
+       {
+        "seat": "tester",
+        "role": "reviewer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "reviewer",
+        "role": "reviewer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": true
+        }
+       }
+      ]
+     },
+     "runner": {
+      "patterns": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "red-team"
+         ]
+        },
+        "maxRounds": 5
+       }
+      },
+      "capabilities": {
+       "docs": {
+        "minCheckers": [
+         "red-team"
+        ]
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "checkersByRigor": {
+         "low": [
+          "red-team"
+         ]
+        },
+        "maxRounds": 5
+       }
+      }
+     },
+     "recognized": true,
+     "selector": "reviewed"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: reviewed min checkers as one string",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "reviewed",
+      "params": {
+       "minCheckers": "tester"
+      }
+     },
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "tester",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: reviewed min checkers as one string",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "reviewed",
+      "params": {
+       "minCheckers": "tester"
+      }
+     },
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: reviewed min checkers as one string",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "reviewed",
+      "params": {
+       "minCheckers": "tester"
+      }
+     },
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "tester",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: reviewed min checkers as one string",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "reviewed",
+      "params": {
+       "minCheckers": "tester"
+      }
+     },
+     "unit": {
+      "id": "u"
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "reviewed",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "reviewed",
+       "params": {
+        "minCheckers": "tester",
+        "maxRounds": 2,
+        "seats": [
+         {
+          "seat": "producer",
+          "role": "producer"
+         },
+         {
+          "seat": "reviewer",
+          "role": "reviewer"
+         },
+         {
+          "seat": "tester",
+          "role": "reviewer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer",
+         "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": true
+         }
+        },
+        {
+         "seat": "tester",
+         "role": "reviewer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": false
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "reviewed",
+      "params": {
+       "minCheckers": "tester",
+       "maxRounds": 2,
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer"
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer"
+        },
+        {
+         "seat": "tester",
+         "role": "reviewer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": true,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "reviewer",
+        "role": "reviewer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": true
+        }
+       },
+       {
+        "seat": "tester",
+        "role": "reviewer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "reviewed"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: code-change preset",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": "code-change",
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "red-team",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: code-change preset",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": "code-change",
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: code-change preset",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": "code-change",
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "red-team",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: code-change preset",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "code-change",
+     "unit": {
+      "id": "u"
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "code-change",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "reviewed",
+       "params": {
+        "minCheckers": [
+         "reviewer",
+         "red-team"
+        ],
+        "maxRounds": 2,
+        "seats": [
+         {
+          "seat": "producer",
+          "role": "producer"
+         },
+         {
+          "seat": "reviewer",
+          "role": "reviewer"
+         },
+         {
+          "seat": "red-team",
+          "role": "red-team"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer",
+         "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": true
+         }
+        },
+        {
+         "seat": "red-team",
+         "role": "red-team",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": true
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "reviewed",
+      "params": {
+       "minCheckers": [
+        "reviewer",
+        "red-team"
+       ],
+       "maxRounds": 2,
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer"
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer"
+        },
+        {
+         "seat": "red-team",
+         "role": "red-team"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": true,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "reviewer",
+        "role": "reviewer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": true
+        }
+       },
+       {
+        "seat": "red-team",
+        "role": "red-team",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": true
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "code-change"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: rfc preset",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": "rfc",
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "red-team",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: rfc preset",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": "rfc",
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: rfc preset",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": "rfc",
+     "unit": {
+      "id": "u"
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "red-team",
+      "role": "red-team",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: rfc preset",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "rfc",
+     "unit": {
+      "id": "u"
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "rfc",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "reviewed",
+       "params": {
+        "maxRounds": 1,
+        "minCheckers": [
+         "reviewer",
+         "red-team"
+        ],
+        "seats": [
+         {
+          "seat": "producer",
+          "role": "producer"
+         },
+         {
+          "seat": "reviewer",
+          "role": "reviewer"
+         },
+         {
+          "seat": "red-team",
+          "role": "red-team"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer",
+         "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": true
+         }
+        },
+        {
+         "seat": "red-team",
+         "role": "red-team",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": true
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "reviewed",
+      "params": {
+       "maxRounds": 1,
+       "minCheckers": [
+        "reviewer",
+        "red-team"
+       ],
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer"
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer"
+        },
+        {
+         "seat": "red-team",
+         "role": "red-team"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": true,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "reviewer",
+        "role": "reviewer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": true
+        }
+       },
+       {
+        "seat": "red-team",
+        "role": "red-team",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": true
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "rfc"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: panel default three",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": "panel"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "panelist-1",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "panelist-2",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "panelist-3",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "synthesizer",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: panel default three",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": "panel"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: panel default three",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": "panel"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "panelist-1",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "panelist-2",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "panelist-3",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "synthesizer",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: panel default three",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "panel"
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "panel",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "panel",
+       "params": {
+        "seats": [
+         {
+          "seat": "panelist-1",
+          "role": "producer"
+         },
+         {
+          "seat": "panelist-2",
+          "role": "producer"
+         },
+         {
+          "seat": "panelist-3",
+          "role": "producer"
+         },
+         {
+          "seat": "synthesizer",
+          "role": "synthesizer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "panelist-1",
+         "role": "producer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": true,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "panelist-2",
+         "role": "producer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": true,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "panelist-3",
+         "role": "producer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": true,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "synthesizer",
+         "role": "synthesizer",
+         "posture": {
+          "readOnly": false,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": false
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "panel",
+      "params": {
+       "seats": [
+        {
+         "seat": "panelist-1",
+         "role": "producer"
+        },
+        {
+         "seat": "panelist-2",
+         "role": "producer"
+        },
+        {
+         "seat": "panelist-3",
+         "role": "producer"
+        },
+        {
+         "seat": "synthesizer",
+         "role": "synthesizer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "panelist-1",
+        "role": "producer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": true,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "panelist-2",
+        "role": "producer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": true,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "panelist-3",
+        "role": "producer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": true,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "synthesizer",
+        "role": "synthesizer",
+        "posture": {
+         "readOnly": false,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "panel"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: panel with member count from the snapshot",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": "panel",
+     "configSnapshot": {
+      "runner": {
+       "patterns": {
+        "panel": {
+         "members": 2
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "panelist-1",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "panelist-2",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "synthesizer",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: panel with member count from the snapshot",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": "panel",
+     "configSnapshot": {
+      "runner": {
+       "patterns": {
+        "panel": {
+         "members": 2
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: panel with member count from the snapshot",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": "panel",
+     "configSnapshot": {
+      "runner": {
+       "patterns": {
+        "panel": {
+         "members": 2
+        }
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "panelist-1",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "panelist-2",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "synthesizer",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: panel with member count from the snapshot",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "panel",
+     "configSnapshot": {
+      "runner": {
+       "patterns": {
+        "panel": {
+         "members": 2
+        }
+       }
+      }
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "panel",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "panel",
+       "params": {
+        "seats": [
+         {
+          "seat": "panelist-1",
+          "role": "producer"
+         },
+         {
+          "seat": "panelist-2",
+          "role": "producer"
+         },
+         {
+          "seat": "synthesizer",
+          "role": "synthesizer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "panelist-1",
+         "role": "producer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": true,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "panelist-2",
+         "role": "producer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": true,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "synthesizer",
+         "role": "synthesizer",
+         "posture": {
+          "readOnly": false,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": false
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "panel",
+      "params": {
+       "seats": [
+        {
+         "seat": "panelist-1",
+         "role": "producer"
+        },
+        {
+         "seat": "panelist-2",
+         "role": "producer"
+        },
+        {
+         "seat": "synthesizer",
+         "role": "synthesizer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "panelist-1",
+        "role": "producer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": true,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "panelist-2",
+        "role": "producer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": true,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "synthesizer",
+        "role": "synthesizer",
+        "posture": {
+         "readOnly": false,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "runner": {
+      "patterns": {
+       "panel": {
+        "members": 2
+       }
+      },
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "panel"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: research fan out",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": "research-fan-out"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "researcher-1",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "researcher-2",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "researcher-3",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "synthesizer",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: research fan out",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": "research-fan-out"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: research fan out",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": "research-fan-out"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "researcher-1",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "researcher-2",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "researcher-3",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "synthesizer",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: research fan out",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "research-fan-out"
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "research-fan-out",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "panel",
+       "params": {
+        "members": 3,
+        "role": "researcher",
+        "synthesizeRole": "synthesizer",
+        "seats": [
+         {
+          "seat": "researcher-1",
+          "role": "producer"
+         },
+         {
+          "seat": "researcher-2",
+          "role": "producer"
+         },
+         {
+          "seat": "researcher-3",
+          "role": "producer"
+         },
+         {
+          "seat": "synthesizer",
+          "role": "synthesizer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "researcher-1",
+         "role": "producer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": true,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "researcher-2",
+         "role": "producer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": true,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "researcher-3",
+         "role": "producer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": true,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "synthesizer",
+         "role": "synthesizer",
+         "posture": {
+          "readOnly": false,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": false
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "panel",
+      "params": {
+       "members": 3,
+       "role": "researcher",
+       "synthesizeRole": "synthesizer",
+       "seats": [
+        {
+         "seat": "researcher-1",
+         "role": "producer"
+        },
+        {
+         "seat": "researcher-2",
+         "role": "producer"
+        },
+        {
+         "seat": "researcher-3",
+         "role": "producer"
+        },
+        {
+         "seat": "synthesizer",
+         "role": "synthesizer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "researcher-1",
+        "role": "producer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": true,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "researcher-2",
+        "role": "producer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": true,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "researcher-3",
+        "role": "producer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": true,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "synthesizer",
+        "role": "synthesizer",
+        "posture": {
+         "readOnly": false,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "research-fan-out"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: research fan out gated with role list",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "research-fan-out-gated",
+      "params": {
+       "role": [
+        "alpha",
+        "beta"
+       ]
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "alpha",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "beta",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "synthesizer",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: research fan out gated with role list",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "research-fan-out-gated",
+      "params": {
+       "role": [
+        "alpha",
+        "beta"
+       ]
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: research fan out gated with role list",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "research-fan-out-gated",
+      "params": {
+       "role": [
+        "alpha",
+        "beta"
+       ]
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "alpha",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "beta",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "synthesizer",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: research fan out gated with role list",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "research-fan-out-gated",
+      "params": {
+       "role": [
+        "alpha",
+        "beta"
+       ]
+      }
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "research-fan-out",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "panel",
+       "params": {
+        "members": 3,
+        "role": [
+         "alpha",
+         "beta"
+        ],
+        "synthesizeRole": "synthesizer",
+        "seats": [
+         {
+          "seat": "alpha",
+          "role": "producer"
+         },
+         {
+          "seat": "beta",
+          "role": "producer"
+         },
+         {
+          "seat": "synthesizer",
+          "role": "synthesizer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "alpha",
+         "role": "producer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": true,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "beta",
+         "role": "producer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": true,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "synthesizer",
+         "role": "synthesizer",
+         "posture": {
+          "readOnly": false,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": false
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "panel",
+      "params": {
+       "members": 3,
+       "role": [
+        "alpha",
+        "beta"
+       ],
+       "synthesizeRole": "synthesizer",
+       "seats": [
+        {
+         "seat": "alpha",
+         "role": "producer"
+        },
+        {
+         "seat": "beta",
+         "role": "producer"
+        },
+        {
+         "seat": "synthesizer",
+         "role": "synthesizer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "alpha",
+        "role": "producer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": true,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "beta",
+        "role": "producer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": true,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "synthesizer",
+        "role": "synthesizer",
+        "posture": {
+         "readOnly": false,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "research-fan-out-gated"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: debate",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": "debate"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "thesis",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "antithesis",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "judge",
+      "role": "judge",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: debate",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": "debate"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: debate",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": "debate"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "thesis",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "antithesis",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "judge",
+      "role": "judge",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: debate",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "debate"
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "debate",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "debate",
+       "params": {
+        "seats": [
+         {
+          "seat": "thesis",
+          "role": "producer"
+         },
+         {
+          "seat": "antithesis",
+          "role": "producer"
+         },
+         {
+          "seat": "judge",
+          "role": "judge"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "thesis",
+         "role": "producer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "antithesis",
+         "role": "producer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "judge",
+         "role": "judge",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": false
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "debate",
+      "params": {
+       "seats": [
+        {
+         "seat": "thesis",
+         "role": "producer"
+        },
+        {
+         "seat": "antithesis",
+         "role": "producer"
+        },
+        {
+         "seat": "judge",
+         "role": "judge"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "thesis",
+        "role": "producer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "antithesis",
+        "role": "producer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "judge",
+        "role": "judge",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "debate"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: unknown pattern",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "pattern": "swarm"
+    }
+   ],
+   "expected": {
+    "ok": []
+   }
+  },
+  {
+   "id": "isSeatRecord: unknown pattern",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "pattern": "swarm"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: unknown pattern",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "pattern": "swarm"
+    }
+   ],
+   "expected": {
+    "ok": []
+   }
+  },
+  {
+   "id": "collaborationOfRecord: unknown pattern",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "swarm"
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "swarm",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "solo",
+       "params": {},
+       "seats": []
+      }
+     },
+     "effective": {
+      "loop": "solo",
+      "params": {},
+      "seats": []
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": false,
+     "selector": "swarm"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: a fenced record keeps its seats",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "seatSchema": 2,
+     "seats": [
+      {
+       "seat": "x",
+       "role": "producer",
+       "posture": {
+        "readOnly": false,
+        "writer": false,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": false
+       }
+      }
+     ],
+     "pattern": "debate"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "thesis",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "antithesis",
+      "role": "producer",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "judge",
+      "role": "judge",
+      "posture": {
+       "readOnly": true,
+       "writer": false,
+       "forceOutOfProcess": true,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: a fenced record keeps its seats",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "seatSchema": 2,
+     "seats": [
+      {
+       "seat": "x",
+       "role": "producer",
+       "posture": {
+        "readOnly": false,
+        "writer": false,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": false
+       }
+      }
+     ],
+     "pattern": "debate"
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "seatsOfRecord: a fenced record keeps its seats",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "seatSchema": 2,
+     "seats": [
+      {
+       "seat": "x",
+       "role": "producer",
+       "posture": {
+        "readOnly": false,
+        "writer": false,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": false
+       }
+      }
+     ],
+     "pattern": "debate"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "x",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: a fenced record keeps its seats",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "seatSchema": 2,
+     "seats": [
+      {
+       "seat": "x",
+       "role": "producer",
+       "posture": {
+        "readOnly": false,
+        "writer": false,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": false
+       }
+      }
+     ],
+     "pattern": "debate"
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "debate",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "debate",
+       "params": {
+        "seats": [
+         {
+          "seat": "x",
+          "role": "producer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "x",
+         "role": "producer",
+         "posture": {
+          "readOnly": false,
+          "writer": false,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "debate",
+      "params": {
+       "seats": [
+        {
+         "seat": "x",
+         "role": "producer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "x",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": false,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "debate"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: seatSchema zero is pre-fence",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "seatSchema": 0,
+     "pattern": "solo"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "isSeatRecord: seatSchema zero is pre-fence",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "seatSchema": 0,
+     "pattern": "solo"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: seatSchema zero is pre-fence",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "seatSchema": 0,
+     "pattern": "solo"
+    }
+   ],
+   "expected": {
+    "ok": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collaborationOfRecord: seatSchema zero is pre-fence",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "seatSchema": 0,
+     "pattern": "solo"
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "solo",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "solo",
+       "params": {
+        "seats": [
+         {
+          "seat": "producer",
+          "role": "producer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer",
+         "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "solo",
+      "params": {
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": true,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "solo"
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: a fenced record with no seat list",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "seatSchema": 1
+    }
+   ],
+   "expected": {
+    "ok": []
+   }
+  },
+  {
+   "id": "isSeatRecord: a fenced record with no seat list",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "seatSchema": 1
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "seatsOfRecord: a fenced record with no seat list",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "seatSchema": 1
+    }
+   ],
+   "expected": {
+    "ok": []
+   }
+  },
+  {
+   "id": "collaborationOfRecord: a fenced record with no seat list",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "seatSchema": 1
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "solo",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "solo",
+       "params": {},
+       "seats": []
+      }
+     },
+     "effective": {
+      "loop": "solo",
+      "params": {},
+      "seats": []
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": false,
+     "selector": null
+    }
+   }
+  },
+  {
+   "id": "legacySeatsOf: stored collaboration is returned as is",
+   "fn": "legacySeatsOf",
+   "args": [
+    {
+     "collaboration": {
+      "pattern": {
+       "name": "solo"
+      },
+      "effective": {
+       "loop": "solo",
+       "params": {},
+       "seats": []
+      }
+     },
+     "configSnapshot": {
+      "runner": {
+       "a": 1
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": []
+   }
+  },
+  {
+   "id": "isSeatRecord: stored collaboration is returned as is",
+   "fn": "isSeatRecord",
+   "args": [
+    {
+     "collaboration": {
+      "pattern": {
+       "name": "solo"
+      },
+      "effective": {
+       "loop": "solo",
+       "params": {},
+       "seats": []
+      }
+     },
+     "configSnapshot": {
+      "runner": {
+       "a": 1
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatsOfRecord: stored collaboration is returned as is",
+   "fn": "seatsOfRecord",
+   "args": [
+    {
+     "collaboration": {
+      "pattern": {
+       "name": "solo"
+      },
+      "effective": {
+       "loop": "solo",
+       "params": {},
+       "seats": []
+      }
+     },
+     "configSnapshot": {
+      "runner": {
+       "a": 1
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": []
+   }
+  },
+  {
+   "id": "collaborationOfRecord: stored collaboration is returned as is",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "collaboration": {
+      "pattern": {
+       "name": "solo"
+      },
+      "effective": {
+       "loop": "solo",
+       "params": {},
+       "seats": []
+      }
+     },
+     "configSnapshot": {
+      "runner": {
+       "a": 1
+      }
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "solo"
+      },
+      "effective": {
+       "loop": "solo",
+       "params": {},
+       "seats": []
+      }
+     },
+     "effective": {
+      "loop": "solo",
+      "params": {},
+      "seats": []
+     },
+     "runner": {
+      "a": 1
+     }
+    }
+   }
+  },
+  {
+   "id": "collaborationOfRecord: a shipped catalog without a patterns key",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "review"
+    },
+    {
+     "shipped": {
+      "solo": {
+       "loop": "solo"
+      },
+      "review": {
+       "loop": "reviewed",
+       "defaults": {
+        "minCheckers": [
+         "reviewer"
+        ]
+       },
+       "params": {
+        "maxRounds": 4
+       }
+      },
+      "custom": {
+       "loop": "panel",
+       "defaults": {
+        "rebuttal": true
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "review",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "reviewed",
+       "params": {
+        "minCheckers": [
+         "reviewer"
+        ],
+        "maxRounds": 4
+       },
+       "seats": []
+      }
+     },
+     "effective": {
+      "loop": "reviewed",
+      "params": {
+       "minCheckers": [
+        "reviewer"
+       ],
+       "maxRounds": 4
+      },
+      "seats": []
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "review"
+    }
+   }
+  },
+  {
+   "id": "collaborationOfRecord: no shipped catalog",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "reviewed"
+    },
+    {}
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "reviewed",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "reviewed",
+       "params": {
+        "seats": [
+         {
+          "seat": "producer",
+          "role": "producer"
+         },
+         {
+          "seat": "reviewer",
+          "role": "reviewer"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer",
+         "posture": {
+          "readOnly": false,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer",
+         "posture": {
+          "readOnly": true,
+          "writer": false,
+          "forceOutOfProcess": true,
+          "stance": false,
+          "verdict": true
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "reviewed",
+      "params": {
+       "seats": [
+        {
+         "seat": "producer",
+         "role": "producer"
+        },
+        {
+         "seat": "reviewer",
+         "role": "reviewer"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "producer",
+        "role": "producer",
+        "posture": {
+         "readOnly": false,
+         "writer": true,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       },
+       {
+        "seat": "reviewer",
+        "role": "reviewer",
+        "posture": {
+         "readOnly": true,
+         "writer": false,
+         "forceOutOfProcess": true,
+         "stance": false,
+         "verdict": true
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "reviewed"
+    }
+   }
+  },
+  {
+   "id": "collaborationOfRecord: a shipped pattern whose defaults the selector overrides",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": {
+      "pattern": "review",
+      "params": {
+       "maxRounds": 9
+      }
+     }
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "review",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "reviewed",
+       "params": {
+        "minCheckers": [
+         "reviewer"
+        ],
+        "maxRounds": 9
+       },
+       "seats": []
+      }
+     },
+     "effective": {
+      "loop": "reviewed",
+      "params": {
+       "minCheckers": [
+        "reviewer"
+       ],
+       "maxRounds": 9
+      },
+      "seats": []
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "review"
+    }
+   }
+  },
+  {
+   "id": "collaborationOfRecord: custom pattern with stored seats",
+   "fn": "collaborationOfRecord",
+   "args": [
+    {
+     "pattern": "custom",
+     "seatSchema": 2,
+     "seats": [
+      {
+       "seat": "a",
+       "role": "producer",
+       "persona": "p",
+       "tier": "t",
+       "posture": {
+        "readOnly": false,
+        "writer": false,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": false
+       }
+      }
+     ]
+    },
+    {
+     "shipped": {
+      "patterns": {
+       "solo": {
+        "loop": "solo"
+       },
+       "review": {
+        "loop": "reviewed",
+        "defaults": {
+         "minCheckers": [
+          "reviewer"
+         ]
+        },
+        "params": {
+         "maxRounds": 4
+        }
+       },
+       "custom": {
+        "loop": "panel",
+        "defaults": {
+         "rebuttal": true
+        }
+       }
+      },
+      "loops": {
+       "reviewed": {
+        "maxRounds": 2
+       }
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "collaboration": {
+      "pattern": {
+       "name": "custom",
+       "layer": "shipped"
+      },
+      "effective": {
+       "loop": "panel",
+       "params": {
+        "rebuttal": true,
+        "seats": [
+         {
+          "seat": "a",
+          "role": "producer",
+          "persona": "p",
+          "tier": "t"
+         }
+        ]
+       },
+       "seats": [
+        {
+         "seat": "a",
+         "role": "producer",
+         "persona": "p",
+         "tier": "t",
+         "posture": {
+          "readOnly": false,
+          "writer": false,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+         }
+        }
+       ]
+      }
+     },
+     "effective": {
+      "loop": "panel",
+      "params": {
+       "rebuttal": true,
+       "seats": [
+        {
+         "seat": "a",
+         "role": "producer",
+         "persona": "p",
+         "tier": "t"
+        }
+       ]
+      },
+      "seats": [
+       {
+        "seat": "a",
+        "role": "producer",
+        "persona": "p",
+        "tier": "t",
+        "posture": {
+         "readOnly": false,
+         "writer": false,
+         "forceOutOfProcess": false,
+         "stance": false,
+         "verdict": false
+        }
+       }
+      ]
+     },
+     "runner": {
+      "loops": {}
+     },
+     "recognized": true,
+     "selector": "custom"
+    }
+   }
+  },
+  {
+   "id": "isVerdictResult {\"seat\":\"producer\"}",
+   "fn": "isVerdictResult",
+   "args": [
+    {
+     "seat": "producer"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isVerifyResult {\"seat\":\"producer\"}",
+   "fn": "isVerifyResult",
+   "args": [
+    {
+     "seat": "producer"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatKeyOf {\"seat\":\"producer\"}",
+   "fn": "seatKeyOf",
+   "args": [
+    {
+     "seat": "producer"
+    }
+   ],
+   "expected": {
+    "ok": "producer"
+   }
+  },
+  {
+   "id": "isVerdictResult {\"role\":\"reviewer\"}",
+   "fn": "isVerdictResult",
+   "args": [
+    {
+     "role": "reviewer"
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "isVerifyResult {\"role\":\"reviewer\"}",
+   "fn": "isVerifyResult",
+   "args": [
+    {
+     "role": "reviewer"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatKeyOf {\"role\":\"reviewer\"}",
+   "fn": "seatKeyOf",
+   "args": [
+    {
+     "role": "reviewer"
+    }
+   ],
+   "expected": {
+    "ok": "reviewer"
+   }
+  },
+  {
+   "id": "isVerdictResult {\"seat\":null,\"role\":\"judge\"}",
+   "fn": "isVerdictResult",
+   "args": [
+    {
+     "seat": null,
+     "role": "judge"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isVerifyResult {\"seat\":null,\"role\":\"judge\"}",
+   "fn": "isVerifyResult",
+   "args": [
+    {
+     "seat": null,
+     "role": "judge"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatKeyOf {\"seat\":null,\"role\":\"judge\"}",
+   "fn": "seatKeyOf",
+   "args": [
+    {
+     "seat": null,
+     "role": "judge"
+    }
+   ],
+   "expected": {
+    "ok": "judge"
+   }
+  },
+  {
+   "id": "isVerdictResult {}",
+   "fn": "isVerdictResult",
+   "args": [
+    {}
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isVerifyResult {}",
+   "fn": "isVerifyResult",
+   "args": [
+    {}
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatKeyOf {}",
+   "fn": "seatKeyOf",
+   "args": [
+    {}
+   ],
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "isVerdictResult {\"seat\":\"verify\"}",
+   "fn": "isVerdictResult",
+   "args": [
+    {
+     "seat": "verify"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isVerifyResult {\"seat\":\"verify\"}",
+   "fn": "isVerifyResult",
+   "args": [
+    {
+     "seat": "verify"
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "seatKeyOf {\"seat\":\"verify\"}",
+   "fn": "seatKeyOf",
+   "args": [
+    {
+     "seat": "verify"
+    }
+   ],
+   "expected": {
+    "ok": "verify"
+   }
+  },
+  {
+   "id": "isVerdictResult {\"seat\":\"verifier\"}",
+   "fn": "isVerdictResult",
+   "args": [
+    {
+     "seat": "verifier"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isVerifyResult {\"seat\":\"verifier\"}",
+   "fn": "isVerifyResult",
+   "args": [
+    {
+     "seat": "verifier"
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "seatKeyOf {\"seat\":\"verifier\"}",
+   "fn": "seatKeyOf",
+   "args": [
+    {
+     "seat": "verifier"
+    }
+   ],
+   "expected": {
+    "ok": "verifier"
+   }
+  },
+  {
+   "id": "isVerdictResult {\"role\":\"verify\"}",
+   "fn": "isVerdictResult",
+   "args": [
+    {
+     "role": "verify"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isVerifyResult {\"role\":\"verify\"}",
+   "fn": "isVerifyResult",
+   "args": [
+    {
+     "role": "verify"
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "seatKeyOf {\"role\":\"verify\"}",
+   "fn": "seatKeyOf",
+   "args": [
+    {
+     "role": "verify"
+    }
+   ],
+   "expected": {
+    "ok": "verify"
+   }
+  },
+  {
+   "id": "isVerdictResult {\"seat\":\"verify2\"}",
+   "fn": "isVerdictResult",
+   "args": [
+    {
+     "seat": "verify2"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isVerifyResult {\"seat\":\"verify2\"}",
+   "fn": "isVerifyResult",
+   "args": [
+    {
+     "seat": "verify2"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatKeyOf {\"seat\":\"verify2\"}",
+   "fn": "seatKeyOf",
+   "args": [
+    {
+     "seat": "verify2"
+    }
+   ],
+   "expected": {
+    "ok": "verify2"
+   }
+  },
+  {
+   "id": "isVerdictResult {\"seat\":\"red-team-2\"}",
+   "fn": "isVerdictResult",
+   "args": [
+    {
+     "seat": "red-team-2"
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "isVerifyResult {\"seat\":\"red-team-2\"}",
+   "fn": "isVerifyResult",
+   "args": [
+    {
+     "seat": "red-team-2"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatKeyOf {\"seat\":\"red-team-2\"}",
+   "fn": "seatKeyOf",
+   "args": [
+    {
+     "seat": "red-team-2"
+    }
+   ],
+   "expected": {
+    "ok": "red-team-2"
+   }
+  },
+  {
+   "id": "isVerdictResult {\"seat\":\"checker-a\"}",
+   "fn": "isVerdictResult",
+   "args": [
+    {
+     "seat": "checker-a"
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "isVerifyResult {\"seat\":\"checker-a\"}",
+   "fn": "isVerifyResult",
+   "args": [
+    {
+     "seat": "checker-a"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatKeyOf {\"seat\":\"checker-a\"}",
+   "fn": "seatKeyOf",
+   "args": [
+    {
+     "seat": "checker-a"
+    }
+   ],
+   "expected": {
+    "ok": "checker-a"
+   }
+  },
+  {
+   "id": "isVerdictResult {\"seat\":\"reviewer\",\"posture\":{\"readOnly\":false,\"writer\":false,\"forceOutOfProcess\":false,\"stance\":false,\"verdict\":true}}",
+   "fn": "isVerdictResult",
+   "args": [
+    {
+     "seat": "reviewer",
+     "posture": {
+      "readOnly": false,
+      "writer": false,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": true
+     }
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "isVerifyResult {\"seat\":\"reviewer\",\"posture\":{\"readOnly\":false,\"writer\":false,\"forceOutOfProcess\":false,\"stance\":false,\"verdict\":true}}",
+   "fn": "isVerifyResult",
+   "args": [
+    {
+     "seat": "reviewer",
+     "posture": {
+      "readOnly": false,
+      "writer": false,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": true
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatKeyOf {\"seat\":\"reviewer\",\"posture\":{\"readOnly\":false,\"writer\":false,\"forceOutOfProcess\":false,\"stance\":false,\"verdict\":true}}",
+   "fn": "seatKeyOf",
+   "args": [
+    {
+     "seat": "reviewer",
+     "posture": {
+      "readOnly": false,
+      "writer": false,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": true
+     }
+    }
+   ],
+   "expected": {
+    "ok": "reviewer"
+   }
+  },
+  {
+   "id": "isVerdictResult {\"seat\":\"reviewer\",\"posture\":{\"readOnly\":false,\"writer\":false,\"forceOutOfProcess\":false,\"stance\":false,\"verdict\":false}}",
+   "fn": "isVerdictResult",
+   "args": [
+    {
+     "seat": "reviewer",
+     "posture": {
+      "readOnly": false,
+      "writer": false,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": false
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isVerifyResult {\"seat\":\"reviewer\",\"posture\":{\"readOnly\":false,\"writer\":false,\"forceOutOfProcess\":false,\"stance\":false,\"verdict\":false}}",
+   "fn": "isVerifyResult",
+   "args": [
+    {
+     "seat": "reviewer",
+     "posture": {
+      "readOnly": false,
+      "writer": false,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": false
+     }
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatKeyOf {\"seat\":\"reviewer\",\"posture\":{\"readOnly\":false,\"writer\":false,\"forceOutOfProcess\":false,\"stance\":false,\"verdict\":false}}",
+   "fn": "seatKeyOf",
+   "args": [
+    {
+     "seat": "reviewer",
+     "posture": {
+      "readOnly": false,
+      "writer": false,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": false
+     }
+    }
+   ],
+   "expected": {
+    "ok": "reviewer"
+   }
+  },
+  {
+   "id": "isVerdictResult {\"seat\":\"tester\",\"posture\":{}}",
+   "fn": "isVerdictResult",
+   "args": [
+    {
+     "seat": "tester",
+     "posture": {}
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isVerifyResult {\"seat\":\"tester\",\"posture\":{}}",
+   "fn": "isVerifyResult",
+   "args": [
+    {
+     "seat": "tester",
+     "posture": {}
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "seatKeyOf {\"seat\":\"tester\",\"posture\":{}}",
+   "fn": "seatKeyOf",
+   "args": [
+    {
+     "seat": "tester",
+     "posture": {}
+    }
+   ],
+   "expected": {
+    "ok": "tester"
+   }
+  },
+  {
+   "id": "legacyFamilyOf: from the run policy",
+   "fn": "legacyFamilyOf",
+   "args": [
+    {
+     "runResult": {
+      "policy": {
+       "providerModel": "codex"
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": "codex"
+   }
+  },
+  {
+   "id": "legacyFamilyOf: none",
+   "fn": "legacyFamilyOf",
+   "args": [
+    {}
+   ],
+   "expected": {
+    "ok": null
+   }
+  }
+ ]
+}
