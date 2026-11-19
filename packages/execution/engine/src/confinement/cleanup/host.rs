@@ -2,8 +2,7 @@
 //! directory about to be deleted. The default is this machine; a test passes its own.
 
 use crate::transport::worker_home::{HomeSweeper, ProcSweeper};
-use fgos_process::facts::identity_of;
-use fgos_process::ProcId;
+use fgos_process::facts::{judge_here, Record, Verdict};
 use std::path::Path;
 
 pub trait CleanupHost {
@@ -25,7 +24,9 @@ impl CleanupHost for SystemHost {
         self.sweeper.stop_inside(dir)
     }
 
+    /// The process door's judgement of a `{pid}` record, as Node's `resolveHolderLiveness`: only `Dead` is death; a
+    /// pid that cannot be read, or one judged from another PID namespace, is not.
     fn owner_is_dead(&self, pid: u32) -> bool {
-        identity_of(ProcId(pid)).is_none()
+        judge_here(&Record::from_json(&serde_json::json!({ "pid": pid }))) == Verdict::Dead
     }
 }

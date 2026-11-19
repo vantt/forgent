@@ -51,24 +51,35 @@ pub fn json(value: Option<&Value>) -> String {
     value.map_or_else(|| "undefined".into(), Value::to_string)
 }
 
-/// `path.resolve(base, p)`: `p` made absolute against `base` and normalised without touching the file system.
-pub fn resolve(base: &Path, p: &str) -> String {
-    let joined = if Path::new(p).is_absolute() {
-        PathBuf::from(p)
+/// `path.resolve(base, p)` on paths: `p` made absolute against `base`, then against the working directory, and
+/// normalised without touching the file system.
+pub fn resolve_path(base: &Path, p: &Path) -> PathBuf {
+    let joined = base.join(p);
+    let absolute = if joined.is_absolute() {
+        joined
     } else {
-        base.join(p)
+        std::env::current_dir()
+            .unwrap_or_else(|_| PathBuf::from("/"))
+            .join(joined)
     };
-    let mut parts: Vec<String> = Vec::new();
-    for component in joined.components() {
-        match component {
-            Component::Normal(name) => parts.push(name.to_string_lossy().into_owned()),
+    let mut out = PathBuf::new();
+    for part in absolute.components() {
+        match part {
             Component::ParentDir => {
-                parts.pop();
+                out.pop();
             }
-            _ => {}
+            Component::CurDir => {}
+            other => out.push(other.as_os_str()),
         }
     }
-    format!("/{}", parts.join("/"))
+    out
+}
+
+/// `path.resolve(base, p)` as text.
+pub fn resolve(base: &Path, p: &str) -> String {
+    resolve_path(base, Path::new(p))
+        .to_string_lossy()
+        .into_owned()
 }
 
 /// `path.resolve(p)` against the working directory.

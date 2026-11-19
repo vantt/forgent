@@ -222,8 +222,11 @@ pub fn judge_confinement_orphans(
                 let live = marker
                     .get("pid")
                     .and_then(Value::as_u64)
-                    .filter(|pid| *pid > 0 && *pid <= u64::from(u32::MAX))
-                    .is_some_and(|pid| !host.owner_is_dead(pid as u32));
+                    .filter(|pid| *pid > 0)
+                    // A pid no process can have proves no death, as Node's judge reads it: the home stays.
+                    .is_some_and(|pid| {
+                        u32::try_from(pid).map_or(true, |pid| !host.owner_is_dead(pid))
+                    });
                 if !live {
                     let id = marker
                         .get("dispatchId")

@@ -165,8 +165,15 @@ fn normalise(text: &str, base: &Path) -> String {
     text
 }
 
+/// `"pid": <pid>` (pretty) and `"pid":<pid>` (compact) both become the token.
 fn replace_pid(text: &str, pid: u32, token: &str) -> String {
-    let needle = format!("\"pid\": {pid}");
+    ["\": ", "\":"].iter().fold(text.to_string(), |text, sep| {
+        replace_pid_with(&text, pid, token, sep)
+    })
+}
+
+fn replace_pid_with(text: &str, pid: u32, token: &str, sep: &str) -> String {
+    let needle = format!("\"pid{sep}{pid}");
     let mut out = String::new();
     let mut rest = text;
     while let Some(at) = rest.find(&needle) {
@@ -177,7 +184,7 @@ fn replace_pid(text: &str, pid: u32, token: &str) -> String {
             .is_none_or(|c| !c.is_ascii_digit());
         out.push_str(&rest[..at]);
         out.push_str(&if boundary {
-            format!("\"pid\": \"{token}\"")
+            format!("\"pid{sep}\"{token}\"")
         } else {
             needle.clone()
         });
@@ -318,23 +325,6 @@ fn run_op(op: &str, base: &Path, args: &Value) -> Op {
     }
 }
 
-/// Pids in a returned marker are the recorder's own: compare them as one token.
-fn blank_pids(value: &mut Value) {
-    match value {
-        Value::Object(map) => {
-            for (key, v) in map.iter_mut() {
-                if key == "pid" && v.is_number() {
-                    *v = json!("$PID");
-                } else {
-                    blank_pids(v);
-                }
-            }
-        }
-        Value::Array(list) => list.iter_mut().for_each(blank_pids),
-        _ => {}
-    }
-}
-
 fn outcome(result: Op) -> Value {
     match result {
         Ok(value) => json!({ "ok": value }),
@@ -363,15 +353,13 @@ fn every_recorded_cleanup_vector_gives_the_same_answer_and_leaves_the_same_tree(
         let base = scratch(&format!("v-{}", name.len()));
         build(&base, case["fixture"].as_array().unwrap());
         let result = run_op(case["op"].as_str().unwrap(), &base, &case["args"]);
-        let mut got: Value =
+        let got: Value =
             serde_json::from_str(&normalise(&outcome(result).to_string(), &base)).unwrap();
-        let mut want = case["out"].clone();
-        blank_pids(&mut got);
-        blank_pids(&mut want);
+        let want = &case["out"];
         let mut tree = Vec::new();
         dump(&base, &base, &mut tree);
         let _ = fs::remove_dir_all(&base);
-        if got != want {
+        if got != *want {
             failures.push(format!("{name}: out {got} != {want}"));
         } else if Value::Array(tree.clone()) != case["tree"] {
             failures.push(format!(

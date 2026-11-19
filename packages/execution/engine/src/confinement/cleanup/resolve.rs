@@ -1,27 +1,11 @@
 //! `path.resolve` for the paths this module compares as text: made absolute against the working directory and
 //! normalised without touching the file system.
 
-use std::path::{Component, Path, PathBuf};
+use std::path::{Path, PathBuf};
 
+/// `path.resolve(path)` against the working directory: the driver's one `path.resolve`.
 pub fn resolve(path: &Path) -> PathBuf {
-    let absolute = if path.is_absolute() {
-        path.to_path_buf()
-    } else {
-        std::env::current_dir()
-            .unwrap_or_else(|_| PathBuf::from("/"))
-            .join(path)
-    };
-    let mut out = PathBuf::new();
-    for part in absolute.components() {
-        match part {
-            Component::ParentDir => {
-                out.pop();
-            }
-            Component::CurDir => {}
-            other => out.push(other.as_os_str()),
-        }
-    }
-    out
+    crate::confinement::driver::js::resolve_path(Path::new(""), path)
 }
 
 /// The uid of this process where the platform has one.

@@ -239,7 +239,7 @@
           "creator": "fgos-confinement",
           "resource": "private-home",
           "dispatchId": "d1",
-          "pid": 7681
+          "pid": "$SELF"
         }
       },
       "tree": [

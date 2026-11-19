@@ -106,8 +106,8 @@ function normalise(text, base) {
     .replaceAll(base, '<root>')
     .replace(/"createdAt": "[^"]+"/g, '"createdAt": "<iso>"')
     .replace(/"since": "[^"]+"/g, '"since": "<iso>"')
-    .replace(new RegExp(`"pid": ${process.pid}\\b`, 'g'), '"pid": "$SELF"')
-    .replace(new RegExp(`"pid": ${DEAD_PID}\\b`, 'g'), '"pid": "$DEAD"');
+    .replace(new RegExp(`"pid":( ?)${process.pid}\\b`, 'g'), '"pid":$1"$SELF"')
+    .replace(new RegExp(`"pid":( ?)${DEAD_PID}\\b`, 'g'), '"pid":$1"$DEAD"');
 }
 
 function dump(base, dir = base, out = []) {
