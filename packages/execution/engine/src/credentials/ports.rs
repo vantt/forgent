@@ -1,5 +1,6 @@
 //! The seams credential renewal reaches the machine through. The account lock and the credential probe belong
-//! to the accounts module, which serves them here ([`AccountsLocks`], [`AccountsProbe`]); SQLite is an adapter.
+//! to the accounts module, which serves them here ([`AccountsLocks`], [`AccountsProbe`]); SQLite is an adapter
+//! ([`super::sqlite::BundledSqlite`]).
 //! Each is a replaceable driver behind a port.
 
 use std::collections::BTreeMap;
