@@ -108,6 +108,8 @@ const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
 const REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$/;
 const SELF_PATH = fileURLToPath(import.meta.url);
 const HOST_VERB_TIMEOUT_MS = 55_000;
+/** A reply frame holds 65536 bytes with its own envelope; a host answer over this is refused rather than lost. */
+const HOST_ANSWER_MAX_BYTES = 60_000;
 const RESULT_WAIT_MAX_S = 50;
 const RESULT_POLL_MS = 200;
 const RESULT_MAX_CHARS = 20_000;
@@ -180,7 +182,13 @@ function hostCall({ envelope, projectRoot, argv }, ports) {
   const call = { hostBin: hostBinOf(envelope), cwd: projectRoot, argv };
   const run = ports.hostCall ? ports.hostCall(call) : spawnSync(call.hostBin, argv, { cwd: projectRoot, encoding: 'utf8', timeout: HOST_VERB_TIMEOUT_MS, maxBuffer: MAX_REQUEST_BYTES });
   const line = lastJsonLine(run.stdout);
-  if (run.status === 0) return line?.data ?? line ?? {};
+  if (run.status === 0) {
+    if (line === null) throw Object.assign(new Error('the host verb printed no JSON document'), { code: 'host-output-unreadable' });
+    const data = line.data ?? line;
+    const size = Buffer.byteLength(JSON.stringify(data));
+    if (size > HOST_ANSWER_MAX_BYTES) throw Object.assign(new Error(`the host verb answered ${size} bytes, over the ${HOST_ANSWER_MAX_BYTES} one reply carries`), { code: 'reply-too-large' });
+    return data;
+  }
   // The host prints a refusal as `fgos: <message> [<code>]` on stderr and nothing on stdout.
   const refusal = /^fgos: (.*) \[([a-z][a-z0-9-]*)\]$/.exec(String(run.stderr ?? '').trim().split('\n').pop() ?? '');
   const code = line?.code ?? line?.error?.code ?? refusal?.[2];

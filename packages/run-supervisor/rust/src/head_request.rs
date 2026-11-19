@@ -808,7 +808,9 @@ fn serve(cfg: &Config, busy: &AtomicBool, large: &AtomicBool, mut stream: UnixSt
             Err(Unread::Bad(id)) => (id, None, refused("bad-frame")),
         }
     };
-    let reply = match &outcome {
+    // A reply is one GO-sized frame. A `done` whose whole reply does not fit is answered as a refusal that names the
+    // size, never dropped: the client would otherwise wait for a frame that was never written.
+    let reply_of = |outcome: &Outcome| match outcome {
         Outcome::Done(data) => {
             json!({"type": "REPLY", "id": id, "result": "done", "data": data})
         }
@@ -820,7 +822,23 @@ fn serve(cfg: &Config, busy: &AtomicBool, large: &AtomicBool, mut stream: UnixSt
             reply
         }
     };
-    let _ = write_frame(&mut stream, &reply);
+    let mut reply = reply_of(&outcome);
+    let size = serde_json::to_vec(&reply).map_or(usize::MAX, |bytes| bytes.len());
+    let outcome = if size > MAX_FRAME_BYTES {
+        let too_large = Outcome::Refused {
+            code: "reply-too-large",
+            detail: Some(format!(
+                "the answer is {size} bytes, over the {MAX_FRAME_BYTES} a reply may carry"
+            )),
+        };
+        reply = reply_of(&too_large);
+        too_large
+    } else {
+        outcome
+    };
+    if let Err(error) = write_frame(&mut stream, &reply) {
+        (cfg.log)(&format!("head-request reply not written: {error}"));
+    }
     let (result, code) = match &outcome {
         Outcome::Done(_) => ("done", "-"),
         Outcome::Refused { code, .. } => ("refused", *code),

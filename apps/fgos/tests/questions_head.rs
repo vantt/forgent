@@ -400,7 +400,8 @@ fn a_confined_supervisor_reads_its_queue_plans_and_lanes_and_marks_several_event
     fs::write(
         &forwarder,
         format!(
-            "#!/bin/sh\nif [ \"$1\" = internal ] && [ \"$2\" = head-request ]; then\n  shift 2\n  [ \"$1\" = --protocol ] && shift 2\n  exec node {} \"$@\"\nfi\nexec {} \"$@\"\n",
+            "#!/bin/sh\necho \"$@\" >> {}\nif [ \"$1\" = internal ] && [ \"$2\" = head-request ]; then\n  shift 2\n  [ \"$1\" = --protocol ] && shift 2\n  exec node {} \"$@\"\nfi\nexec {} \"$@\"\n",
+            scene.root.join("host-argv.log").display(),
             repo.join("src/session-host/head-request.mjs").display(),
             fgos_bin().display()
         ),
@@ -475,4 +476,11 @@ fn a_confined_supervisor_reads_its_queue_plans_and_lanes_and_marks_several_event
     // Both ids reached the host verb, which names the first one it does not know.
     assert!(!handled.status.success());
     assert_eq!(json_of(&handled)["code"], "event-unknown", "{handled:?}");
+    let host_calls = fs::read_to_string(scene.root.join("host-argv.log")).unwrap();
+    assert!(
+        host_calls
+            .lines()
+            .any(|l| l == "supervisor handled no-such-a no-such-b --json"),
+        "both ids reach the host verb: {host_calls}"
+    );
 }

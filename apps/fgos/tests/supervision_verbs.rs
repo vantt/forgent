@@ -385,6 +385,7 @@ fn one_malformed_plan_is_named_and_does_not_hide_the_other_plans() {
     assert_eq!(plans[0]["admissible"], true);
     let unreadable = view["unreadable"].as_array().unwrap();
     assert_eq!(unreadable.len(), 1, "{view}");
+    assert_eq!(view["unreadableCount"], 1, "{view}");
     assert_eq!(unreadable[0]["dir"], "broken");
     assert_eq!(unreadable[0]["code"], "plan-status-unknown");
 }

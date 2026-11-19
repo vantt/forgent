@@ -1262,6 +1262,16 @@ fn live_leads() -> Vec<String> {
         .collect()
 }
 
+/// How many unreadable plans `supervisor plans` names; the answer also carries the full count. An old repository can
+/// hold dozens, and a confined caller's reply is one frame of at most 64 KiB.
+const UNREADABLE_SHOWN: usize = 10;
+
+/// The first [`UNREADABLE_SHOWN`] unreadable plans.
+fn shown_unreadable(mut unreadable: Vec<Value>) -> Vec<Value> {
+    unreadable.truncate(UNREADABLE_SHOWN);
+    unreadable
+}
+
 /// Runs one request and shapes the answer.
 pub fn answer(
     request: &SupervisionRequest,
@@ -1317,6 +1327,8 @@ pub fn answer(
                 &live_leads(),
                 max_leads,
             );
+            let unreadable_count = unreadable.len();
+            let unreadable = shown_unreadable(unreadable);
             let mut lines: Vec<String> = view
                 .rows
                 .iter()
@@ -1339,6 +1351,7 @@ pub fn answer(
             }));
             let mut data = view.to_json();
             data["unreadable"] = Value::Array(unreadable);
+            data["unreadableCount"] = json!(unreadable_count);
             Ok(done(data, lines.join("\n")))
         }
         Verb::Queue => {
@@ -1443,6 +1456,14 @@ impl OperationProvider for SupervisionProvider {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn the_plans_answer_names_only_the_first_unreadable_plans() {
+        let many: Vec<Value> = (0..25).map(|n| json!({"dir": format!("p{n}")})).collect();
+        let shown = shown_unreadable(many);
+        assert_eq!(shown.len(), UNREADABLE_SHOWN);
+        assert_eq!(shown[0]["dir"], "p0");
+    }
 
     #[test]
     fn a_definition_answer_maps_to_one_row_per_group_with_the_readme_precedence() {
