@@ -1,7 +1,8 @@
 ---
 contract: plan-v1
 title: "Throwaway: the supervisor's live run (plan 261118-1045 phase 19 step 5); one phase writes one scratch file"
-status: ready
+status: running
+lead: head:lead-forgent-261119-1142-supervisor-l
 priority: P3
 blockedBy: []
 footprint:
