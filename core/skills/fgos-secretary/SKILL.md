@@ -52,8 +52,8 @@ At most 10 lines. Put the full report in a file named with `fgos convention path
 
 ## Owner questions
 
-Collect open questions of all three stages (discussion `QUESTIONS.md`, draft plans, workflow gates) with the reader
-verb `fgos questions --open`. Present them as one batch, every question in the five-part form of
-`core/skills/_shared/decision-question.md` (what is happening, cause, options with cost, recommendation, scope of the
-answer), grouped by topic, so one return of the owner answers the most. Answer each in its own stage's door
-(`answerDoor` of the item); never copy the stores into one.
+Read the open questions with `fgos questions` (the owner question store). Show at most 5 at a time, ordered by what
+each blocks, then plan priority, then age, headline first. Every question is in the five-part form of
+`core/skills/_shared/decision-question.md`, in the owner's plain words (see its "Make it easy to answer" section).
+Rewrite a question that breaks that guide before showing it. Record the owner's reply with `fgos questions answer
+<id>`; only the secretary answers. Workflow gates keep their own door (`answerDoor` of the item).

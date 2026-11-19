@@ -37,6 +37,17 @@ Socratic questions in fgos-coding-exploring/-shaping) need only parts 1, 2 and
 5: their options are not known yet, and inventing them defeats the question.
 Write each part as a heading or as a label followed by ":" (`**Cause:** ...`).
 
+## Make it easy to answer
+
+- Plain words in the owner's language; define every term the first time it appears.
+- The recommendation comes first, then the other options.
+- Give the cost in numbers (lines, days, paths).
+- Say what happens if the owner does not answer yet.
+
+Owner questions are asked only with `fgos questions ask`, which checks the measurable rules (one-line headline of at
+most 120 characters, 2-4 options with a recommended one, scope allows/forbids, what it blocks). This guide holds the
+rules a program cannot measure.
+
 When to ask and how to batch: AGENTS.md product priority #2. Headings may be
 Vietnamese or the English names above. `fgos ask` and the AskUserQuestion hook
 check the parts through `src/state/decision-question.mjs`.

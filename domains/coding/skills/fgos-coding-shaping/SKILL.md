@@ -17,7 +17,7 @@ description: >-
 # fgos-coding-shaping
 
 Coding overlay of `fgos-shaping`. Load the `fgos-shaping` skill and follow it for everything shared: the conversational rules,
-the seven-section `DISCUSSION.md` shape, `QUESTIONS.md`, the `discussion:`
+the seven-section `DISCUSSION.md` shape, owner questions through `fgos questions ask`, the `discussion:`
 marker, resumable rounds, distill mode and the settled/paused exits. Read
 `domains/coding/AGENTS.md` as the domain doctrine. This file keeps only what is
 specific to coding work; nothing generic is repeated here.
