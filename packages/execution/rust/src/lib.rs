@@ -12,25 +12,25 @@
 //! come through the one trait the host implements, [`ports::Machine`].
 
 pub mod accounts;
+pub mod admission;
 pub mod agents;
 pub mod bind;
+pub mod case_paths;
 pub mod checks;
 pub mod decide;
 pub mod executor_model;
 pub mod explain;
+pub mod handoff;
 pub mod hook;
+pub mod loops;
+pub mod outcome;
+pub mod patterns;
 pub mod ports;
+pub mod run_facts;
+pub mod run_request;
 pub mod runner_check;
+pub mod runner_config;
+pub mod seat_resolver;
 pub mod tools;
 pub mod unit;
-pub mod run_request;
-pub mod patterns;
-pub mod outcome;
-pub mod loops;
-pub mod seat_resolver;
-pub mod case_paths;
-pub mod handoff;
 pub mod unit_record;
-pub mod admission;
-pub mod runner_config;
-pub mod run_facts;
