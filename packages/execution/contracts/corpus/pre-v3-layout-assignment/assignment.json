@@ -1,0 +1,57 @@
+{
+  "assignmentId": "asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001",
+  "workId": null,
+  "role": "reviewer",
+  "dispatch": "assignment",
+  "objective": "SCRUBBED",
+  "contextRefs": [],
+  "expectedOutputs": [
+    "SCRUBBED"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-11-11T22:31:26.224Z",
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "SCRUBBED",
+        "contextRefs": [],
+        "constraints": [],
+        "expectedOutputs": [
+          "SCRUBBED"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "capabilities": [],
+        "budget": {
+          "timeoutMs": 180000,
+          "maxRuns": 1
+        }
+      },
+      "caller": {
+        "writerId": "8e8e56bb-00a0-4158-ad04-ec29cabf8204"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "reported"
+  },
+  "binding": {
+    "executor": "gemini",
+    "invocation": "omp-cli-bwrap",
+    "posture": "read-only"
+  },
+  "policy": {
+    "preferExecutor": "gemini",
+    "preferInvocation": "omp-cli-bwrap"
+  }
+}

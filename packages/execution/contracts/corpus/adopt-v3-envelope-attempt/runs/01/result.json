@@ -1,0 +1,396 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+  "assignmentId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+  "workId": null,
+  "controlEpoch": 1,
+  "controlToken": "SCRUBBED-TOKEN",
+  "executorId": "claude",
+  "adapter": "cli-spawn",
+  "confinement": "bwrap",
+  "role": "reviewer",
+  "executorRedirected": false,
+  "policy": {
+    "role": "reviewer",
+    "persona": "code-reviewer",
+    "executorId": "claude",
+    "providerModel": "claude",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "fable",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "claude",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "claude"
+        }
+      },
+      "model": {
+        "value": "fable",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "seat-binding",
+          "id": "defaults.tier"
+        }
+      },
+      "reasoningEffort": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "persona": {
+        "value": "code-reviewer",
+        "source": {
+          "scope": "default",
+          "id": "reviewer"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  },
+  "promptEnvelope": {
+    "persona": {
+      "ref": "code-reviewer",
+      "delivery": "section",
+      "applied": true,
+      "source": {
+        "scope": "default",
+        "id": "reviewer"
+      }
+    }
+  },
+  "settledAt": "2026-11-18T12:05:16.188Z",
+  "durationMs": null,
+  "claimSha256": "c6dee099ab510a442e2fec838f889afe92007372a4642d4b4bf9f1f1776cbb92",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/report-1.md",
+      "sha256": "51d7dd3f8263fc4da7c698d836c104131a75b2bfe42813d3bf690e0f1db4c7db"
+    }
+  ],
+  "reportDeclaration": {
+    "complete": true,
+    "incompleteReason": null
+  },
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "pass"
+    },
+    "confidence": {
+      "level": "reported",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v3",
+    "outcome": {
+      "category": "ok",
+      "reason": "SCRUBBED"
+    }
+  },
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "status": "done",
+    "summary": "SCRUBBED",
+    "assessment": {
+      "verdict": "not-applicable"
+    }
+  },
+  "runnerNote": {
+    "summary": "SCRUBBED"
+  },
+  "usage": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "cacheReadTokens": null,
+    "cacheCreationTokens": null,
+    "source": "transcript"
+  },
+  "evidence": {
+    "gitBefore": "1ba5ecbd3ce59ad64bebdd34d380bd1aee0f8297",
+    "gitAfter": "1ba5ecbd3ce59ad64bebdd34d380bd1aee0f8297",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [
+      {
+        "path": ".claude/settings.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": ".claude/skills/instruction-audit/references/lane-prompts.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": ".claude/skills/instruction-audit/references/report-template.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": ".claude/skills/instruction-audit/scripts/instruction-audit.mjs",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "docs/backlog.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "node_trace.1.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/handoffs/harden-phase-07-closing-and-handoff-20261118-1341.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/reports/audit-261117-1545-supervisor-watcher-audit.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/reports/debugger-261115-1400-ci-only-test-failures.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/reports/review-261118-1850-harden-plan-review.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "sc.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "sh1.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "sw.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "w1.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      }
+    ],
+    "artifacts": [
+      ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/report-1.md",
+      ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/result-1.json"
+    ],
+    "tests": []
+  }
+}

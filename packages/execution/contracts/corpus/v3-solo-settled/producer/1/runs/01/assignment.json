@@ -1,0 +1,267 @@
+{
+  "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+  "unitRunId": "unit-run-1795056603528-44eb3ca1",
+  "seat": "producer",
+  "role": "producer",
+  "posture": {
+    "readOnly": false,
+    "writer": true,
+    "forceOutOfProcess": false,
+    "stance": false,
+    "verdict": false
+  },
+  "round": 1,
+  "objective": "SCRUBBED",
+  "mutation": "mutating",
+  "binding": {
+    "contractVersion": "v1alpha1",
+    "executor": "claude",
+    "invocation": "claude-herdr-bwrap",
+    "transport": "herdr",
+    "family": "claude",
+    "pool": "claude",
+    "tier": "advanced",
+    "model": "sonnet",
+    "persona": null,
+    "reasoningEffort": null,
+    "timeoutMs": 3600000,
+    "mechanism": "out-of-process",
+    "posture": "workspace-write",
+    "provenance": {
+      "executor": {
+        "value": "claude",
+        "source": "unit-prefer"
+      },
+      "invocation": {
+        "value": "claude-herdr-bwrap",
+        "source": "unit-prefer"
+      },
+      "transport": {
+        "value": "herdr",
+        "source": "herdr-invocation-present"
+      },
+      "tier": {
+        "value": "advanced",
+        "source": "capabilities.\"code:*\".tier",
+        "maxTier": {
+          "value": "frontier",
+          "source": "maxTier",
+          "applied": false
+        }
+      },
+      "model": {
+        "value": "sonnet",
+        "source": "modelPolicies.claude.advanced"
+      },
+      "persona": {
+        "value": null,
+        "source": "none"
+      },
+      "reasoningEffort": {
+        "value": null,
+        "source": "invocation-default"
+      },
+      "timeoutMs": {
+        "value": 3600000,
+        "source": "override"
+      },
+      "mechanism": {
+        "value": "out-of-process",
+        "source": "decideExecutorDispatchMechanism"
+      },
+      "posture": {
+        "value": "workspace-write",
+        "source": "producer-writes-declared"
+      },
+      "pool": {
+        "value": "claude",
+        "source": "modelPolicies.claude.advanced"
+      }
+    },
+    "bindingInput": {
+      "protocol": 1,
+      "ask": {
+        "capability": "code:implement",
+        "seat": "producer",
+        "role": "producer",
+        "persona": null,
+        "label": "adhoc-you-are-the-leader-for-phase-9-of-plan-p-2f19",
+        "workflow": null,
+        "selectors": {
+          "persona": null
+        },
+        "raiseAuthorized": false,
+        "override": null,
+        "posture": {
+          "readOnly": false,
+          "forceOutOfProcess": false,
+          "blind": false
+        },
+        "effectiveRigor": "standard",
+        "independence": {
+          "hard": [],
+          "hardCheckers": [],
+          "soft": []
+        },
+        "requiredSkills": [],
+        "unitPrefer": [
+          "claude"
+        ]
+      },
+      "peers": [],
+      "walk": {
+        "tried": [],
+        "excludePools": [],
+        "failedAccounts": [],
+        "continuity": null
+      },
+      "accountViewDigest": "sha256:aff334903b233328e2f24661ba84071eb6e3cc50f48ebdd06c1010a180e520dc",
+      "configDigest": "sha256:c212a1a6e7c95226fb5f086fda4e30d910cfd0e8a56f054723e20a01f1110737",
+      "hostVersion": "0.2.0"
+    },
+    "leaseAccount": "tetcu"
+  },
+  "provenance": {
+    "kind": "unit-run",
+    "unitRunId": "unit-run-1795056603528-44eb3ca1",
+    "seat": "producer",
+    "role": "producer",
+    "posture": {
+      "readOnly": false,
+      "writer": true,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": false
+    },
+    "round": 1,
+    "binding": {
+      "contractVersion": "v1alpha1",
+      "executor": "claude",
+      "invocation": "claude-herdr-bwrap",
+      "transport": "herdr",
+      "family": "claude",
+      "pool": "claude",
+      "tier": "advanced",
+      "model": "sonnet",
+      "persona": null,
+      "reasoningEffort": null,
+      "timeoutMs": 3600000,
+      "mechanism": "out-of-process",
+      "posture": "workspace-write",
+      "provenance": {
+        "executor": {
+          "value": "claude",
+          "source": "unit-prefer"
+        },
+        "invocation": {
+          "value": "claude-herdr-bwrap",
+          "source": "unit-prefer"
+        },
+        "transport": {
+          "value": "herdr",
+          "source": "herdr-invocation-present"
+        },
+        "tier": {
+          "value": "advanced",
+          "source": "capabilities.\"code:*\".tier",
+          "maxTier": {
+            "value": "frontier",
+            "source": "maxTier",
+            "applied": false
+          }
+        },
+        "model": {
+          "value": "sonnet",
+          "source": "modelPolicies.claude.advanced"
+        },
+        "persona": {
+          "value": null,
+          "source": "none"
+        },
+        "reasoningEffort": {
+          "value": null,
+          "source": "invocation-default"
+        },
+        "timeoutMs": {
+          "value": 3600000,
+          "source": "override"
+        },
+        "mechanism": {
+          "value": "out-of-process",
+          "source": "decideExecutorDispatchMechanism"
+        },
+        "posture": {
+          "value": "workspace-write",
+          "source": "producer-writes-declared"
+        },
+        "pool": {
+          "value": "claude",
+          "source": "modelPolicies.claude.advanced"
+        }
+      },
+      "bindingInput": {
+        "protocol": 1,
+        "ask": {
+          "capability": "code:implement",
+          "seat": "producer",
+          "role": "producer",
+          "persona": null,
+          "label": "adhoc-you-are-the-leader-for-phase-9-of-plan-p-2f19",
+          "workflow": null,
+          "selectors": {
+            "persona": null
+          },
+          "raiseAuthorized": false,
+          "override": null,
+          "posture": {
+            "readOnly": false,
+            "forceOutOfProcess": false,
+            "blind": false
+          },
+          "effectiveRigor": "standard",
+          "independence": {
+            "hard": [],
+            "hardCheckers": [],
+            "soft": []
+          },
+          "requiredSkills": [],
+          "unitPrefer": [
+            "claude"
+          ]
+        },
+        "peers": [],
+        "walk": {
+          "tried": [],
+          "excludePools": [],
+          "failedAccounts": [],
+          "continuity": null
+        },
+        "accountViewDigest": "sha256:aff334903b233328e2f24661ba84071eb6e3cc50f48ebdd06c1010a180e520dc",
+        "configDigest": "sha256:c212a1a6e7c95226fb5f086fda4e30d910cfd0e8a56f054723e20a01f1110737",
+        "hostVersion": "0.2.0"
+      },
+      "leaseAccount": "tetcu"
+    }
+  },
+  "expectedOutputs": [],
+  "contextRefs": [],
+  "writes": [
+    "core/skills",
+    "domains/coding/skills",
+    "plugins/fgOS/skills",
+    ".agents/skills",
+    ".claude/skills",
+    "CHANGELOG.md",
+    "docs/reading-map.md",
+    "AGENTS.md",
+    ".agents/skills/**",
+    "plugins/fgOS/skills/**",
+    ".claude/skills/**"
+  ],
+  "policy": {
+    "tier": "advanced",
+    "preferExecutor": "claude",
+    "preferInvocation": "claude-herdr-bwrap",
+    "preferPersona": null
+  }
+}

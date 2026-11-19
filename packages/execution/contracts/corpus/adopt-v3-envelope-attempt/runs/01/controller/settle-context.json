@@ -1,0 +1,165 @@
+{
+  "v": 1,
+  "launchCommandId": "cmd_1795003501102_de12acfd",
+  "repoRoot": "/SCRUBBED-PATH",
+  "strayWatch": {
+    "repoRoot": "/SCRUBBED-PATH",
+    "cwd": "/SCRUBBED-PATH",
+    "before": []
+  },
+  "resolvedExecutorId": "claude",
+  "effectivePolicy": {
+    "role": "reviewer",
+    "persona": "code-reviewer",
+    "executorId": "claude",
+    "providerModel": "claude",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "fable",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "claude",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "claude"
+        }
+      },
+      "model": {
+        "value": "fable",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "seat-binding",
+          "id": "defaults.tier"
+        }
+      },
+      "reasoningEffort": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "persona": {
+        "value": "code-reviewer",
+        "source": {
+          "scope": "default",
+          "id": "reviewer"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  },
+  "modelCheck": {
+    "requested": "fable",
+    "launched": "fable",
+    "warnings": []
+  },
+  "providerCapacitySelection": {
+    "contract": "provider-capacity-selection.v1",
+    "status": "selected",
+    "provider": "claude",
+    "accountId": "tetcu",
+    "accountLabel": "claude tetcu (pane pool)",
+    "selectedAt": "2026-11-18T12:05:01.126Z",
+    "lease": {
+      "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+      "assignmentId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+      "pid": 2776212
+    },
+    "leaseReceipt": {
+      "provider": "claude",
+      "accountId": "tetcu",
+      "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+      "acquiredAt": "2026-11-18T12:05:01.126Z",
+      "accountViewDigest": null
+    },
+    "credentialSource": {
+      "kind": "home-files",
+      "home": "/SCRUBBED-PATH",
+      "files": [
+        ".credentials.json"
+      ],
+      "cli": "claude"
+    },
+    "credentialSources": {
+      "claude": {
+        "kind": "home-files",
+        "home": "/SCRUBBED-PATH",
+        "files": [
+          ".credentials.json"
+        ],
+        "cli": "claude"
+      }
+    }
+  },
+  "providerCapacityEvidence": {
+    "contract": "provider-capacity-selection.v1",
+    "status": "selected",
+    "provider": "claude",
+    "accountId": "tetcu",
+    "accountLabel": "claude tetcu (pane pool)",
+    "selectedAt": "2026-11-18T12:05:01.126Z",
+    "lease": {
+      "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+      "assignmentId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+      "pid": 2776212
+    },
+    "leaseReceipt": {
+      "provider": "claude",
+      "accountId": "tetcu",
+      "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+      "acquiredAt": "2026-11-18T12:05:01.126Z",
+      "accountViewDigest": null
+    },
+    "credentialProvisioned": true
+  },
+  "inputDigests": [],
+  "providerCapacityRuntimeDir": null
+}

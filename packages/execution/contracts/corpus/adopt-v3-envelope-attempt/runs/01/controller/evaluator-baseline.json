@@ -1,0 +1,124 @@
+{
+  "contract": "evaluator-baseline.v1",
+  "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+  "assignmentId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+  "cwd": "/SCRUBBED-PATH",
+  "gitBefore": "1ba5ecbd3ce59ad64bebdd34d380bd1aee0f8297",
+  "gitBeforeSource": "pre-launch",
+  "dirtyBefore": [
+    ".claude/settings.json",
+    "docs/backlog.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+    ".claude/skills/instruction-audit/references/lane-prompts.md",
+    ".claude/skills/instruction-audit/references/report-template.md",
+    ".claude/skills/instruction-audit/scripts/instruction-audit.mjs",
+    "node_trace.1.log",
+    "plans/handoffs/harden-phase-07-closing-and-handoff-20261118-1341.md",
+    "plans/reports/audit-261117-1545-supervisor-watcher-audit.md",
+    "plans/reports/debugger-261115-1400-ci-only-test-failures.md",
+    "plans/reports/review-261118-1850-harden-plan-review.md",
+    "sc.log",
+    "sh1.log",
+    "sw.log",
+    "w1.log"
+  ],
+  "dirtyBeforeSnapshots": {
+    ".claude/settings.json": {
+      "exists": true,
+      "sha256": "c68ec73eea5e656015143deb80ef87db64d9f0f47de0c1f476551d819314c7b1"
+    },
+    "docs/backlog.md": {
+      "exists": true,
+      "sha256": "9a9a72efe83f963e087e5f5aef4c22734e99a4d3c5a9fbebe85a255be6f04c90"
+    },
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md": {
+      "exists": true,
+      "sha256": "78d1bf3b75eab06a05527ed68f96565bf4440a37e41a49c039c8286c1d42b1cb"
+    },
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md": {
+      "exists": true,
+      "sha256": "4c611af6cd8bdee3acda37697869b7ecc50c83c046eb4f1c1d868d6eeb6a6b11"
+    },
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md": {
+      "exists": true,
+      "sha256": "78068a2d784bcdf5e3f02f07abde8c176fe0ee7906b0ea48bef449d66e2c3c9b"
+    },
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md": {
+      "exists": true,
+      "sha256": "94af2c5da13ef359bd18b0bd39ee1b79e4b6b53bcf9fa7a404ed153c5de0202d"
+    },
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md": {
+      "exists": true,
+      "sha256": "bc7d1dbfec6a4e91fc6b367f9f10a540c4d5ebc2a58a4369b612b0bd83197cd5"
+    },
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md": {
+      "exists": true,
+      "sha256": "4f7bbaf06fe2242cf47b456b7dde7ad8e823cf2552bbca4101c5ec381126bd93"
+    },
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md": {
+      "exists": true,
+      "sha256": "ae22d85912957c0d06b9eb2750e56ae3fd9c2375dbb0ca6400abf6eca8032734"
+    },
+    "plans/261021-1118-harden-low-layers-bottom-up/plan.md": {
+      "exists": true,
+      "sha256": "7459eea6e8b718608adb4567d43c8daf289a7f9b834d60bc640b9b744806d2b9"
+    },
+    ".claude/skills/instruction-audit/references/lane-prompts.md": {
+      "exists": true,
+      "sha256": "adac8362adbb7eb04c163fbcf3cdb16aa566e61a6f4a6a9351c07d4fc4d08d52"
+    },
+    ".claude/skills/instruction-audit/references/report-template.md": {
+      "exists": true,
+      "sha256": "9d3b7abfd876d88e8a6a7e1820ea6a2aaf02472a75a69603921344fa0db699d6"
+    },
+    ".claude/skills/instruction-audit/scripts/instruction-audit.mjs": {
+      "exists": true,
+      "sha256": "d634de90f1b9835d00d13c059c2a439c18b4aa6fbd3a97fcc4763435845df490"
+    },
+    "node_trace.1.log": {
+      "exists": true,
+      "sha256": "c4a2725779c0cbeb338b3fb1d5d0b471c18e04de5073c174f12f837c3747db8c"
+    },
+    "plans/handoffs/harden-phase-07-closing-and-handoff-20261118-1341.md": {
+      "exists": true,
+      "sha256": "bdb227cdf82ac6b36e961a31f45e9d50494fa325b44d6f6fa1496014ece2e83c"
+    },
+    "plans/reports/audit-261117-1545-supervisor-watcher-audit.md": {
+      "exists": true,
+      "sha256": "24eb04fce1d29ce2dafa500beaa12a89eeb6b890c15d2a589de71486f9920710"
+    },
+    "plans/reports/debugger-261115-1400-ci-only-test-failures.md": {
+      "exists": true,
+      "sha256": "9ff842b6372300f7cb4b6e819b31b0528b3ee70bd6369060c1b5373b76c462e7"
+    },
+    "plans/reports/review-261118-1850-harden-plan-review.md": {
+      "exists": true,
+      "sha256": "9648ed3815031507801067e1c1744972262f5e6fc1bf1db5c78aa7fe9672fee4"
+    },
+    "sc.log": {
+      "exists": true,
+      "sha256": "2f72b1fc4c3c75e62e6af2bacb62d3a9caa2de1dea55e229d83d367347ff19d1"
+    },
+    "sh1.log": {
+      "exists": true,
+      "sha256": "2c457f148601bf8bbe72f2326b03c6f018831d46fd503b815cf8b58911de9e12"
+    },
+    "sw.log": {
+      "exists": true,
+      "sha256": "40cfa48f3bbf1147c0d7ce3ec13eec68a5705a07b6ca2d909c92b7ae1dec99d7"
+    },
+    "w1.log": {
+      "exists": true,
+      "sha256": "0c813ec67187ed0dbf30b5268d184effe562bf87368a9000d8300d77cca796b9"
+    }
+  },
+  "capturedAt": "2026-11-18T12:05:01.456Z",
+  "digest": "sha256:27311961a1171fcc0000579e5a5aa75da015e060b3e04105680e7e98c28f9fca"
+}

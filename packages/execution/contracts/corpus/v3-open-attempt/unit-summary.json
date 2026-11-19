@@ -1,0 +1,26 @@
+{
+  "contract": {
+    "id": "unit-summary",
+    "version": 3
+  },
+  "unitRunId": "unit-run-1794987012087-5f3337a8",
+  "workflow": null,
+  "pattern": "solo",
+  "capability": "code:review",
+  "outcome": "execution-failure",
+  "infrastructure": true,
+  "infrastructureReason": "run-error",
+  "refused": [],
+  "startedAt": "2026-11-18T07:30:12.087Z",
+  "settledAt": "2026-11-18T07:31:50.789Z",
+  "stanceOptions": [],
+  "seats": [],
+  "collaboration": {
+    "loop": "solo",
+    "params": {},
+    "provenance": {
+      "params": {},
+      "checkers": {}
+    }
+  }
+}

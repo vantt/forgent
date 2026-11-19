@@ -1,0 +1,183 @@
+{
+  "v": 1,
+  "launchCommandId": "cmd_1795056606138_efbc9592",
+  "repoRoot": "/SCRUBBED-PATH",
+  "strayWatch": {
+    "repoRoot": "/SCRUBBED-PATH",
+    "cwd": "/SCRUBBED-PATH",
+    "before": [
+      ".claude/settings.json",
+      "node_trace.1.log",
+      "plans/handoffs/harden-phase-07-closing-and-handoff-20261118-1341.md",
+      "plans/handoffs/SCRUBBED-restart-handoff-20261118-2055.md",
+      "plans/reports/audit-261117-1545-supervisor-watcher-audit.md",
+      "plans/reports/debugger-261115-1400-ci-only-test-failures.md",
+      "plans/reports/debugger-261118-2130-SCRUBBED-early-hard-rotation.md",
+      "plans/reports/review-261118-1850-harden-plan-review.md",
+      "plans/reports/secretary-261119-0904-SCRUBBED-progress-and-next.md",
+      "plans/reports/secretary-handoff-261118-2330.md",
+      "sc.log",
+      "sh1.log",
+      "sw.log",
+      "w1.log"
+    ]
+  },
+  "resolvedExecutorId": "claude",
+  "effectivePolicy": {
+    "role": "producer",
+    "executorId": "claude",
+    "providerModel": "claude",
+    "rigor": "standard",
+    "tier": "advanced",
+    "model": "sonnet",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "claude",
+        "source": {
+          "scope": "seat-binding",
+          "id": "unit-prefer"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "claude"
+        }
+      },
+      "model": {
+        "value": "sonnet",
+        "source": {
+          "scope": "seat-binding",
+          "id": "modelPolicies.claude.advanced"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "advanced",
+        "source": {
+          "scope": "seat-binding",
+          "id": "capabilities.\"code:*\".tier"
+        }
+      },
+      "reasoningEffort": {
+        "value": null,
+        "source": {
+          "scope": "seat-binding",
+          "id": "invocation-default"
+        }
+      },
+      "persona": {
+        "value": null,
+        "source": {
+          "scope": "seat-binding",
+          "id": "none"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1795056603528-44eb3ca1/producer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  },
+  "modelCheck": {
+    "requested": "sonnet",
+    "launched": "sonnet",
+    "warnings": []
+  },
+  "providerCapacitySelection": {
+    "contract": "provider-capacity-selection.v1",
+    "status": "selected",
+    "provider": "claude",
+    "accountId": "tetcu",
+    "accountLabel": "claude tetcu (pane pool)",
+    "selectedAt": "2026-11-19T02:50:06.178Z",
+    "lease": {
+      "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+      "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+      "pid": 931311
+    },
+    "leaseReceipt": {
+      "provider": "claude",
+      "accountId": "tetcu",
+      "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+      "acquiredAt": "2026-11-19T02:50:06.178Z",
+      "accountViewDigest": "sha256:aff334903b233328e2f24661ba84071eb6e3cc50f48ebdd06c1010a180e520dc"
+    },
+    "credentialSource": {
+      "kind": "home-files",
+      "home": "/SCRUBBED-PATH",
+      "files": [
+        ".credentials.json"
+      ],
+      "cli": "claude"
+    },
+    "credentialSources": {
+      "claude": {
+        "kind": "home-files",
+        "home": "/SCRUBBED-PATH",
+        "files": [
+          ".credentials.json"
+        ],
+        "cli": "claude"
+      }
+    }
+  },
+  "providerCapacityEvidence": {
+    "contract": "provider-capacity-selection.v1",
+    "status": "selected",
+    "provider": "claude",
+    "accountId": "tetcu",
+    "accountLabel": "claude tetcu (pane pool)",
+    "selectedAt": "2026-11-19T02:50:06.178Z",
+    "lease": {
+      "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+      "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+      "pid": 931311
+    },
+    "leaseReceipt": {
+      "provider": "claude",
+      "accountId": "tetcu",
+      "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+      "acquiredAt": "2026-11-19T02:50:06.178Z",
+      "accountViewDigest": "sha256:aff334903b233328e2f24661ba84071eb6e3cc50f48ebdd06c1010a180e520dc"
+    },
+    "credentialProvisioned": true
+  },
+  "inputDigests": [],
+  "providerCapacityRuntimeDir": null
+}

@@ -1,0 +1,12 @@
+{
+  "status": "pane-created",
+  "agentName": "fgos-run_unit-run-1794987a8345eb",
+  "round": 1,
+  "terminalKey": "cmd_1794987012269_a51ae631",
+  "lastSeenAt": "2026-11-18T07:30:13.089Z",
+  "confinement": {
+    "status": "unconfined",
+    "confined": false
+  },
+  "paneId": "w6:p12K"
+}

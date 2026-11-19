@@ -1,0 +1,12 @@
+{
+  "v": 1,
+  "attemptId": "cmd_1795056606138_efbc9592",
+  "closedBy": "supervisor",
+  "steps": [
+    "settle-attempt",
+    "finalize-home",
+    "cleanup-trust",
+    "release-slot"
+  ],
+  "at": "2026-11-19T02:51:31.303Z"
+}

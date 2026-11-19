@@ -1,0 +1,12 @@
+{
+  "v": 1,
+  "attemptId": "cmd_1795056606138_efbc9592",
+  "stepId": "settle-attempt",
+  "status": "done",
+  "at": "2026-11-19T02:51:30.878Z",
+  "detail": {
+    "settled": "now",
+    "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+    "status": "settled"
+  }
+}

@@ -1,0 +1,276 @@
+{
+  "operationMutability": "read-only",
+  "gitBefore": "1ba5ecbd3ce59ad64bebdd34d380bd1aee0f8297",
+  "gitAfter": "1ba5ecbd3ce59ad64bebdd34d380bd1aee0f8297",
+  "gitBeforeSource": "pre-launch",
+  "dirtyBefore": [
+    ".claude/settings.json",
+    "docs/backlog.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+    ".claude/skills/instruction-audit/references/lane-prompts.md",
+    ".claude/skills/instruction-audit/references/report-template.md",
+    ".claude/skills/instruction-audit/scripts/instruction-audit.mjs",
+    "node_trace.1.log",
+    "plans/handoffs/harden-phase-07-closing-and-handoff-20261118-1341.md",
+    "plans/reports/audit-261117-1545-supervisor-watcher-audit.md",
+    "plans/reports/debugger-261115-1400-ci-only-test-failures.md",
+    "plans/reports/review-261118-1850-harden-plan-review.md",
+    "sc.log",
+    "sh1.log",
+    "sw.log",
+    "w1.log"
+  ],
+  "dirtyAfter": [
+    ".claude/settings.json",
+    "docs/backlog.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md",
+    "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+    ".claude/skills/instruction-audit/references/lane-prompts.md",
+    ".claude/skills/instruction-audit/references/report-template.md",
+    ".claude/skills/instruction-audit/scripts/instruction-audit.mjs",
+    "node_trace.1.log",
+    "plans/handoffs/harden-phase-07-closing-and-handoff-20261118-1341.md",
+    "plans/reports/audit-261117-1545-supervisor-watcher-audit.md",
+    "plans/reports/debugger-261115-1400-ci-only-test-failures.md",
+    "plans/reports/review-261118-1850-harden-plan-review.md",
+    "sc.log",
+    "sh1.log",
+    "sw.log",
+    "w1.log"
+  ],
+  "mutatedDirtyBeforeFiles": [],
+  "changedFiles": [],
+  "changedFileReasons": {},
+  "attribution": [
+    {
+      "path": ".claude/settings.json",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": ".claude/skills/instruction-audit/references/lane-prompts.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": ".claude/skills/instruction-audit/references/report-template.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": ".claude/skills/instruction-audit/scripts/instruction-audit.mjs",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "docs/backlog.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "node_trace.1.log",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-00-baseline-and-test-investigation.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-01-t0-process-facts-and-leaf-crates.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-02-t1-holder-lock-identity-convention.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-03-t2-git-terminal-control.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-04-t3-agent-protocol-observe-event-store.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-05-t4-run-supervisor-launch-gate.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "plans/261021-1118-harden-low-layers-bottom-up/phase-06-t5-execution-core-dispatch-seat-run-result.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "plans/261021-1118-harden-low-layers-bottom-up/plan.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "plans/handoffs/harden-phase-07-closing-and-handoff-20261118-1341.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "plans/reports/audit-261117-1545-supervisor-watcher-audit.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "plans/reports/debugger-261115-1400-ci-only-test-failures.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "plans/reports/review-261118-1850-harden-plan-review.md",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "sc.log",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "sh1.log",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "sw.log",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    },
+    {
+      "path": "w1.log",
+      "firstObserved": "pre-launch",
+      "level": "excluded",
+      "basis": [
+        "pre-launch-git-status"
+      ],
+      "coverageMatched": false
+    }
+  ],
+  "artifacts": [
+    {
+      "path": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/report-1.md",
+      "kind": "agent-report",
+      "valid": true
+    },
+    {
+      "path": ".fgos/assignments/asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001/runs/01/worker-output/outbox/result-1.json",
+      "kind": "agent-result",
+      "valid": true
+    }
+  ],
+  "tests": [],
+  "providerCapacity": {
+    "provider": "claude",
+    "accountId": "tetcu",
+    "action": "evidence-only",
+    "reasonCode": "unknown-or-low-confidence"
+  }
+}

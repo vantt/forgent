@@ -1,0 +1,99 @@
+{
+  "contract": {
+    "id": "effective-execution-contract",
+    "version": 1
+  },
+  "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+  "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+  "mutation": "mutating",
+  "workspace": {
+    "cwd": "/SCRUBBED-PATH",
+    "writeScope": [
+      "/SCRUBBED-PATH"
+    ],
+    "mainCheckout": "/SCRUBBED-PATH",
+    "posture": "worktree"
+  },
+  "tools": {
+    "shell": {
+      "mode": "worktree-write",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    }
+  },
+  "permissions": {
+    "posture": "enforced",
+    "shell": {
+      "mode": "worktree-write",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    },
+    "filesystem": {
+      "mode": "workspace-write",
+      "enforced": true,
+      "enforcement": "enforced",
+      "writeScope": [
+        "/SCRUBBED-PATH"
+      ]
+    },
+    "network": {
+      "enforced": false,
+      "enforcement": "instructed"
+    }
+  },
+  "limits": {
+    "executorTimeoutMs": 3600000
+  },
+  "resultClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "path": "/SCRUBBED-PATH"
+  },
+  "provenance": {
+    "dispatchPlanHash": "sha256:9d9fb6e1c7358713e17dba959731a87c61f5454c7d7c78ea7752d07c5a3ed5d4",
+    "configHash": "sha256:71bb7a87e8f0b4b6ab0c86f644ebbcb4013e0472db7902b951edfd33cfd258a5",
+    "executorId": "claude",
+    "adapter": "herdr-spawn",
+    "adapterFamily": "herdr-spawn"
+  },
+  "providerCapacity": {
+    "contract": "provider-capacity-selection.v1",
+    "status": "selected",
+    "provider": "claude",
+    "accountId": "tetcu",
+    "accountLabel": "claude tetcu (pane pool)",
+    "selectedAt": "2026-11-19T02:50:06.178Z",
+    "lease": {
+      "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+      "assignmentId": "unit-run-1795056603528-44eb3ca1/producer/1",
+      "pid": 931311
+    },
+    "leaseReceipt": {
+      "provider": "claude",
+      "accountId": "tetcu",
+      "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+      "acquiredAt": "2026-11-19T02:50:06.178Z",
+      "accountViewDigest": "sha256:aff334903b233328e2f24661ba84071eb6e3cc50f48ebdd06c1010a180e520dc"
+    },
+    "credentialProvisioned": true
+  },
+  "enforcementPosture": "enforced",
+  "permissionEnforcementPosture": "enforced",
+  "executorId": "claude",
+  "adapter": "herdr-spawn",
+  "adapterFamily": "herdr-spawn",
+  "assignment": {
+    "role": "producer",
+    "posture": {
+      "readOnly": false,
+      "writer": true,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": false
+    }
+  }
+}

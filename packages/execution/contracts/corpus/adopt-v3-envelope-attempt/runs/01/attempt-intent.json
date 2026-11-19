@@ -1,0 +1,66 @@
+{
+  "v": 1,
+  "attemptId": "cmd_1795003501102_de12acfd",
+  "unitRunId": "asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001",
+  "runDir": "/SCRUBBED-PATH",
+  "host": "direct",
+  "cwd": "/SCRUBBED-PATH",
+  "launch": {
+    "capture": {
+      "stdout": "SCRUBBED",
+      "stderr": "SCRUBBED"
+    },
+    "outboxDir": "SCRUBBED"
+  },
+  "steps": [
+    {
+      "stepId": "settle-attempt",
+      "hostBin": "/SCRUBBED-PATH:abe41ad0e5644e1e56eaf34a074ec2ae7735400477a340e84750e0d4fc31e044/bin/fgos",
+      "payloadRoot": "SCRUBBED",
+      "argv": [
+        "internal",
+        "attempt-step",
+        "settle-attempt",
+        "--protocol",
+        "1",
+        "--run-dir",
+        "/SCRUBBED-PATH"
+      ],
+      "cwd": "/SCRUBBED-PATH",
+      "env": {
+        "PATH": "SCRUBBED",
+        "HOME": "/SCRUBBED-PATH",
+        "LANG": "en_US.UTF-8",
+        "XDG_RUNTIME_DIR": "/run/user/1000",
+        "FGOS_HOST_BIN": "/SCRUBBED-PATH:abe41ad0e5644e1e56eaf34a074ec2ae7735400477a340e84750e0d4fc31e044/bin/fgos",
+        "FGOS_STATE_ROOT": "/SCRUBBED-PATH"
+      },
+      "stepTimeoutMs": 600000
+    },
+    {
+      "stepId": "finalize-home",
+      "hostBin": "/SCRUBBED-PATH:abe41ad0e5644e1e56eaf34a074ec2ae7735400477a340e84750e0d4fc31e044/bin/fgos",
+      "payloadRoot": "SCRUBBED",
+      "argv": [
+        "internal",
+        "attempt-step",
+        "finalize-home",
+        "--protocol",
+        "1",
+        "--run-dir",
+        "/SCRUBBED-PATH"
+      ],
+      "cwd": "/SCRUBBED-PATH",
+      "env": {
+        "PATH": "SCRUBBED",
+        "HOME": "/SCRUBBED-PATH",
+        "LANG": "en_US.UTF-8",
+        "XDG_RUNTIME_DIR": "/run/user/1000",
+        "FGOS_HOST_BIN": "/SCRUBBED-PATH:abe41ad0e5644e1e56eaf34a074ec2ae7735400477a340e84750e0d4fc31e044/bin/fgos",
+        "FGOS_STATE_ROOT": "/SCRUBBED-PATH"
+      },
+      "stepTimeoutMs": 600000
+    }
+  ],
+  "sideFile": "SCRUBBED"
+}

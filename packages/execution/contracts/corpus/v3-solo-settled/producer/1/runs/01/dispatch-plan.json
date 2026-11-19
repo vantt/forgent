@@ -1,0 +1,202 @@
+{
+  "selector": {
+    "type": "assignment",
+    "value": "unit-run-1795056603528-44eb3ca1/producer/1"
+  },
+  "caller": {
+    "role": "driver"
+  },
+  "mechanism": "out-of-process",
+  "executorId": "claude",
+  "capability": "claude",
+  "invocation": {
+    "via": "cli",
+    "adapter": "herdr-spawn",
+    "protocol": "prompt-stdout-v1"
+  },
+  "governance": {
+    "providerFamily": "claude",
+    "egress": {
+      "kind": "same-provider",
+      "target": "claude",
+      "content": "SCRUBBED"
+    }
+  },
+  "reasonCodes": [
+    "native-first.0033.cli-spawn-shaped"
+  ],
+  "configured": true,
+  "bindingSource": "executor-id",
+  "tier": "advanced",
+  "model": "sonnet",
+  "providerModel": "claude",
+  "provenance": {
+    "executor": {
+      "value": "claude",
+      "source": {
+        "scope": "seat-binding",
+        "id": "unit-prefer"
+      }
+    },
+    "provider": {
+      "value": "claude",
+      "source": {
+        "scope": "registeredExecutor",
+        "id": "claude"
+      }
+    },
+    "model": {
+      "value": "sonnet",
+      "source": {
+        "scope": "seat-binding",
+        "id": "modelPolicies.claude.advanced"
+      }
+    },
+    "rigor": {
+      "value": "standard",
+      "source": {
+        "scope": "default"
+      }
+    },
+    "tier": {
+      "value": "advanced",
+      "source": {
+        "scope": "seat-binding",
+        "id": "capabilities.\"code:*\".tier"
+      }
+    },
+    "reasoningEffort": {
+      "value": null,
+      "source": {
+        "scope": "seat-binding",
+        "id": "invocation-default"
+      }
+    },
+    "persona": {
+      "value": null,
+      "source": {
+        "scope": "seat-binding",
+        "id": "none"
+      }
+    },
+    "visibility": {
+      "value": "headless",
+      "source": {
+        "scope": "default"
+      }
+    },
+    "repeatMode": {
+      "value": null,
+      "source": {
+        "scope": "default"
+      }
+    },
+    "constraints": {
+      "value": {
+        "requiresSkills": []
+      },
+      "source": {
+        "scope": "assignment",
+        "id": "unit-run-1795056603528-44eb3ca1/producer/1"
+      }
+    },
+    "governance": {
+      "value": "allowed",
+      "source": {
+        "scope": "governance",
+        "id": "claude"
+      }
+    }
+  },
+  "policy": {
+    "role": "producer",
+    "executorId": "claude",
+    "providerModel": "claude",
+    "rigor": "standard",
+    "tier": "advanced",
+    "model": "sonnet",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "claude",
+        "source": {
+          "scope": "seat-binding",
+          "id": "unit-prefer"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "claude"
+        }
+      },
+      "model": {
+        "value": "sonnet",
+        "source": {
+          "scope": "seat-binding",
+          "id": "modelPolicies.claude.advanced"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "advanced",
+        "source": {
+          "scope": "seat-binding",
+          "id": "capabilities.\"code:*\".tier"
+        }
+      },
+      "reasoningEffort": {
+        "value": null,
+        "source": {
+          "scope": "seat-binding",
+          "id": "invocation-default"
+        }
+      },
+      "persona": {
+        "value": null,
+        "source": {
+          "scope": "seat-binding",
+          "id": "none"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1795056603528-44eb3ca1/producer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  }
+}

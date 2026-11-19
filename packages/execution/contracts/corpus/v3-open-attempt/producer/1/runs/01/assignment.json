@@ -1,0 +1,255 @@
+{
+  "assignmentId": "unit-run-1794987012087-5f3337a8/producer/1",
+  "unitRunId": "unit-run-1794987012087-5f3337a8",
+  "seat": "producer",
+  "role": "producer",
+  "posture": {
+    "readOnly": true,
+    "writer": true,
+    "forceOutOfProcess": false,
+    "stance": false,
+    "verdict": false
+  },
+  "round": 1,
+  "objective": "SCRUBBED",
+  "mutation": "read-only",
+  "binding": {
+    "contractVersion": "v1alpha1",
+    "executor": "openai",
+    "invocation": "pi-herdr-bwrap",
+    "transport": "herdr",
+    "family": "openai",
+    "pool": "openai",
+    "tier": "advanced",
+    "model": "gpt-6.1-sol",
+    "persona": null,
+    "reasoningEffort": "medium",
+    "timeoutMs": 1500000,
+    "mechanism": "out-of-process",
+    "posture": "read-only",
+    "provenance": {
+      "executor": {
+        "value": "openai",
+        "source": "unit-prefer"
+      },
+      "invocation": {
+        "value": "pi-herdr-bwrap",
+        "source": "unit-prefer"
+      },
+      "transport": {
+        "value": "herdr",
+        "source": "herdr-invocation-present"
+      },
+      "tier": {
+        "value": "advanced",
+        "source": "capabilities.\"code:*\".tier",
+        "maxTier": {
+          "value": "frontier",
+          "source": "maxTier",
+          "applied": false
+        }
+      },
+      "model": {
+        "value": "gpt-6.1-sol",
+        "source": "modelPolicies.openai.advanced"
+      },
+      "persona": {
+        "value": null,
+        "source": "none"
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": "cell"
+      },
+      "timeoutMs": {
+        "value": 1500000,
+        "source": "override"
+      },
+      "mechanism": {
+        "value": "out-of-process",
+        "source": "decideExecutorDispatchMechanism"
+      },
+      "posture": {
+        "value": "read-only",
+        "source": "read-only-ask-or-writes-empty"
+      },
+      "pool": {
+        "value": "openai",
+        "source": "modelPolicies.openai.advanced"
+      }
+    },
+    "bindingInput": {
+      "protocol": 1,
+      "ask": {
+        "capability": "code:review",
+        "seat": "producer",
+        "role": "producer",
+        "persona": null,
+        "label": "adhoc-re-review-the-fix-commit-7c1635dc0-on-br-17ad",
+        "workflow": null,
+        "selectors": {
+          "persona": null
+        },
+        "raiseAuthorized": false,
+        "override": null,
+        "posture": {
+          "readOnly": true,
+          "forceOutOfProcess": false,
+          "blind": false
+        },
+        "effectiveRigor": "standard",
+        "independence": {
+          "hard": [],
+          "hardCheckers": [],
+          "soft": []
+        },
+        "requiredSkills": [],
+        "unitPrefer": [
+          "openai"
+        ]
+      },
+      "peers": [],
+      "walk": {
+        "tried": [],
+        "excludePools": [],
+        "failedAccounts": [],
+        "continuity": null
+      },
+      "accountViewDigest": "sha256:a17b69933b81df8497383532422f491fa6bfc3fa328eeefebf512457db0c4e40",
+      "configDigest": "sha256:34be9896f643b6d48385eae8de9da98711d7c22509c60092bf7691d678d9df78",
+      "hostVersion": "0.2.0"
+    },
+    "leaseAccount": "tetnu"
+  },
+  "provenance": {
+    "kind": "unit-run",
+    "unitRunId": "unit-run-1794987012087-5f3337a8",
+    "seat": "producer",
+    "role": "producer",
+    "posture": {
+      "readOnly": true,
+      "writer": true,
+      "forceOutOfProcess": false,
+      "stance": false,
+      "verdict": false
+    },
+    "round": 1,
+    "binding": {
+      "contractVersion": "v1alpha1",
+      "executor": "openai",
+      "invocation": "pi-herdr-bwrap",
+      "transport": "herdr",
+      "family": "openai",
+      "pool": "openai",
+      "tier": "advanced",
+      "model": "gpt-6.1-sol",
+      "persona": null,
+      "reasoningEffort": "medium",
+      "timeoutMs": 1500000,
+      "mechanism": "out-of-process",
+      "posture": "read-only",
+      "provenance": {
+        "executor": {
+          "value": "openai",
+          "source": "unit-prefer"
+        },
+        "invocation": {
+          "value": "pi-herdr-bwrap",
+          "source": "unit-prefer"
+        },
+        "transport": {
+          "value": "herdr",
+          "source": "herdr-invocation-present"
+        },
+        "tier": {
+          "value": "advanced",
+          "source": "capabilities.\"code:*\".tier",
+          "maxTier": {
+            "value": "frontier",
+            "source": "maxTier",
+            "applied": false
+          }
+        },
+        "model": {
+          "value": "gpt-6.1-sol",
+          "source": "modelPolicies.openai.advanced"
+        },
+        "persona": {
+          "value": null,
+          "source": "none"
+        },
+        "reasoningEffort": {
+          "value": "medium",
+          "source": "cell"
+        },
+        "timeoutMs": {
+          "value": 1500000,
+          "source": "override"
+        },
+        "mechanism": {
+          "value": "out-of-process",
+          "source": "decideExecutorDispatchMechanism"
+        },
+        "posture": {
+          "value": "read-only",
+          "source": "read-only-ask-or-writes-empty"
+        },
+        "pool": {
+          "value": "openai",
+          "source": "modelPolicies.openai.advanced"
+        }
+      },
+      "bindingInput": {
+        "protocol": 1,
+        "ask": {
+          "capability": "code:review",
+          "seat": "producer",
+          "role": "producer",
+          "persona": null,
+          "label": "adhoc-re-review-the-fix-commit-7c1635dc0-on-br-17ad",
+          "workflow": null,
+          "selectors": {
+            "persona": null
+          },
+          "raiseAuthorized": false,
+          "override": null,
+          "posture": {
+            "readOnly": true,
+            "forceOutOfProcess": false,
+            "blind": false
+          },
+          "effectiveRigor": "standard",
+          "independence": {
+            "hard": [],
+            "hardCheckers": [],
+            "soft": []
+          },
+          "requiredSkills": [],
+          "unitPrefer": [
+            "openai"
+          ]
+        },
+        "peers": [],
+        "walk": {
+          "tried": [],
+          "excludePools": [],
+          "failedAccounts": [],
+          "continuity": null
+        },
+        "accountViewDigest": "sha256:a17b69933b81df8497383532422f491fa6bfc3fa328eeefebf512457db0c4e40",
+        "configDigest": "sha256:34be9896f643b6d48385eae8de9da98711d7c22509c60092bf7691d678d9df78",
+        "hostVersion": "0.2.0"
+      },
+      "leaseAccount": "tetnu"
+    }
+  },
+  "expectedOutputs": [],
+  "contextRefs": [],
+  "writes": [],
+  "policy": {
+    "tier": "advanced",
+    "preferExecutor": "openai",
+    "preferInvocation": "pi-herdr-bwrap",
+    "preferPersona": null
+  }
+}

@@ -1,0 +1,1335 @@
+{
+  "unit": {
+    "id": "adhoc-re-review-the-fix-commit-7c1635dc0-on-br-17ad",
+    "objective": "SCRUBBED",
+    "capability": "code:review",
+    "writes": [],
+    "dependsOn": [],
+    "prefer": [
+      "openai"
+    ],
+    "inputs": [],
+    "expectedOutputs": []
+  },
+  "seatSchema": 2,
+  "seats": [
+    {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+        "readOnly": true,
+        "writer": true,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": false
+      }
+    }
+  ],
+  "workflow": null,
+  "collaboration": {
+    "requested": null,
+    "baseline": {
+      "source": "solo",
+      "selector": "solo"
+    },
+    "pattern": {
+      "name": "solo",
+      "layer": "shipped",
+      "digest": "62809884a975b6f9cfb1b7aff2c5fe112440029028915f28a2328b435616852c"
+    },
+    "effective": {
+      "loop": "solo",
+      "params": {},
+      "seats": [
+        {
+          "seat": "producer",
+          "role": "producer",
+          "posture": {
+            "readOnly": true,
+            "writer": true,
+            "forceOutOfProcess": false,
+            "stance": false,
+            "verdict": false
+          }
+        }
+      ],
+      "postures": {
+        "producer": {
+          "readOnly": true,
+          "writer": true,
+          "forceOutOfProcess": false,
+          "stance": false,
+          "verdict": false
+        }
+      },
+      "roleTasks": {},
+      "launchBound": 1
+    },
+    "provenance": {
+      "params": {},
+      "checkers": {}
+    }
+  },
+  "pattern": "solo",
+  "overrides": [
+    {
+      "timeoutMs": 1500000
+    }
+  ],
+  "configSnapshot": {
+    "hash": "4a44cedd294dd7ceec2f59b9ef5126eee0378cac4c27ac9ec5c724d6e5460d0a",
+    "runner": {
+      "capabilities": {
+        "impact-analysis": {
+          "prefer": "gitnexus",
+          "description": "SCRUBBED",
+          "aliases": [
+            "impact_analysis",
+            "Impact Analysis"
+          ]
+        },
+        "advise": {
+          "prefer": [
+            {
+              "executor": "claude",
+              "invocation": "claude-cli-bwrap"
+            }
+          ],
+          "description": "SCRUBBED",
+          "confinement": {
+            "mode": "required",
+            "policy": "host-write-denied"
+          },
+          "serves": {
+            "outputKind": "decision",
+            "mutates": false
+          }
+        },
+        "execute": {
+          "prefer": [
+            {
+              "executor": "gemini"
+            },
+            {
+              "executor": "deepseek"
+            },
+            {
+              "executor": "glm"
+            },
+            "claude"
+          ],
+          "description": "SCRUBBED",
+          "serves": {
+            "outputKind": "change",
+            "mutates": true
+          },
+          "tier": "advanced"
+        },
+        "fgos-coding-implement": {
+          "description": "SCRUBBED",
+          "prefer": [
+            {
+              "executor": "gemini",
+              "invocation": "agy-herdr-bwrap"
+            },
+            {
+              "executor": "deepseek"
+            },
+            {
+              "executor": "glm"
+            },
+            "claude"
+          ],
+          "tier": "advanced"
+        },
+        "code:implement": {
+          "prefer": [
+            {
+              "executor": "gemini",
+              "invocation": "agy-herdr-bwrap"
+            },
+            {
+              "executor": "deepseek"
+            },
+            {
+              "executor": "glm"
+            },
+            "claude"
+          ],
+          "description": "SCRUBBED",
+          "serves": {
+            "outputKind": "change",
+            "domain": "code",
+            "mutates": true
+          }
+        },
+        "code:test": {
+          "prefer": [
+            {
+              "executor": "gemini"
+            },
+            {
+              "executor": "deepseek"
+            },
+            {
+              "executor": "glm"
+            },
+            "claude"
+          ],
+          "description": "SCRUBBED",
+          "serves": {
+            "outputKind": "verification",
+            "domain": "code"
+          }
+        },
+        "code:refactor": {
+          "prefer": [
+            {
+              "executor": "gemini"
+            },
+            {
+              "executor": "deepseek"
+            },
+            {
+              "executor": "glm"
+            },
+            "claude"
+          ],
+          "description": "SCRUBBED",
+          "serves": {
+            "outputKind": "change",
+            "domain": "code",
+            "mutates": true,
+            "behaviorPreserving": true
+          }
+        },
+        "coding:implement": {
+          "prefer": [
+            {
+              "executor": "gemini",
+              "invocation": "agy-herdr-bwrap"
+            },
+            {
+              "executor": "deepseek"
+            },
+            {
+              "executor": "glm"
+            },
+            "claude"
+          ]
+        },
+        "pane-labeling": {
+          "description": "SCRUBBED"
+        },
+        "review": {
+          "description": "SCRUBBED",
+          "confinement": {
+            "mode": "required",
+            "policy": "host-write-denied"
+          },
+          "serves": {
+            "outputKind": "finding",
+            "mutates": false
+          }
+        },
+        "code:review": {
+          "description": "SCRUBBED",
+          "prefer": [
+            {
+              "executor": "openai",
+              "invocation": "codex-cli-bwrap"
+            },
+            {
+              "executor": "claude",
+              "invocation": "claude-cli-bwrap"
+            }
+          ],
+          "confinement": {
+            "mode": "required",
+            "policy": "host-write-denied"
+          },
+          "serves": {
+            "outputKind": "finding",
+            "domain": "code",
+            "mutates": false
+          }
+        },
+        "code:debug": {
+          "description": "SCRUBBED",
+          "prefer": [
+            {
+              "executor": "openai",
+              "invocation": "codex-cli-bwrap"
+            },
+            {
+              "executor": "claude",
+              "invocation": "claude-cli-bwrap"
+            }
+          ],
+          "confinement": {
+            "mode": "required",
+            "policy": "host-write-denied"
+          },
+          "serves": {
+            "outputKind": "finding",
+            "domain": "code"
+          }
+        },
+        "coding:*": {
+          "tier": "advanced"
+        },
+        "coding:discover": {
+          "prefer": [
+            {
+              "executor": "claude"
+            },
+            {
+              "executor": "openai"
+            },
+            {
+              "executor": "gemini"
+            },
+            {
+              "executor": "xai"
+            },
+            {
+              "executor": "glm",
+              "invocation": "pi-cli-bwrap"
+            }
+          ],
+          "description": "SCRUBBED"
+        },
+        "docs:write": {
+          "description": "SCRUBBED",
+          "serves": {
+            "outputKind": "change",
+            "domain": "docs",
+            "mutates": true
+          },
+          "tier": "flagship",
+          "prefer": [
+            "openai",
+            "claude"
+          ]
+        },
+        "code:*": {
+          "tier": "advanced"
+        }
+      },
+      "executors": {
+        "gitnexus": {
+          "kind": "tool",
+          "description": "SCRUBBED",
+          "for": [
+            "impact-analysis"
+          ],
+          "scanTarget": ".gitnexus",
+          "responsibility": "Verification",
+          "invocations": [
+            {
+              "via": "mcp",
+              "command": "mcp:gitnexus",
+              "tools": {
+                "impact-analysis": "mcp__gitnexus__impact"
+              }
+            }
+          ]
+        },
+        "herdr": {
+          "kind": "tool",
+          "for": [
+            "pane-labeling"
+          ],
+          "responsibility": "Chrome",
+          "description": "SCRUBBED",
+          "invocations": [
+            {
+              "via": "cli",
+              "command": "herdr",
+              "args": []
+            }
+          ]
+        },
+        "gemini": {
+          "description": "SCRUBBED",
+          "supports": {
+            "skills": [
+              "ak:cook"
+            ]
+          },
+          "invocations": [
+            {
+              "id": "agy-herdr-bwrap",
+              "via": "cli",
+              "adapter": "herdr-spawn",
+              "confinement": {
+                "backend": "bwrap"
+              },
+              "command": "agy",
+              "credentialStore": {
+                "use": "agy",
+                "homeEnv": "HOME",
+                "files": [
+                  ".gemini/antigravity-cli/antigravity-oauth-token",
+                  ".gemini/antigravity-cli/settings.json",
+                  ".gemini/antigravity-cli/installation_id",
+                  ".gemini/antigravity-cli/jetski_state.pbtxt",
+                  ".gemini/antigravity-cli/cache/onboarding.json"
+                ]
+              },
+              "args": [
+                "--mode",
+                "accept-edits",
+                "--new-project",
+                "--settings",
+                "SCRUBBED",
+                "--model",
+                "{model}"
+              ],
+              "interactiveMode": {
+                "exitCommand": "/exit",
+                "kind": "agy",
+                "trustStore": {
+                  "kind": "agy"
+                }
+              }
+            },
+            {
+              "id": "agy-cli-bwrap",
+              "via": "cli",
+              "adapter": "cli-spawn",
+              "command": "agy",
+              "credentialStore": {
+                "use": "agy",
+                "homeEnv": "HOME",
+                "files": [
+                  ".gemini/antigravity-cli/antigravity-oauth-token",
+                  ".gemini/antigravity-cli/settings.json",
+                  ".gemini/antigravity-cli/installation_id",
+                  ".gemini/antigravity-cli/jetski_state.pbtxt",
+                  ".gemini/antigravity-cli/cache/onboarding.json"
+                ]
+              },
+              "args": [
+                "--settings",
+                "SCRUBBED",
+                "-p",
+                "{prompt}",
+                "--model",
+                "{model}"
+              ],
+              "confinement": {
+                "backend": "bwrap"
+              }
+            }
+          ],
+          "kind": "agent",
+          "allowCrossProvider": true,
+          "providerModel": "gemini"
+        },
+        "xai": {
+          "description": "SCRUBBED",
+          "supports": {
+            "skills": [
+              "ak:cook"
+            ]
+          },
+          "kind": "agent",
+          "allowCrossProvider": true,
+          "providerModel": "xai",
+          "invocations": [
+            {
+              "id": "omp-cli-bwrap",
+              "via": "cli",
+              "adapter": "cli-spawn",
+              "command": "omp",
+              "credentialStore": {
+                "use": "omp",
+                "homeEnv": "PI_CODING_AGENT_DIR",
+                "sessionDir": "sessions",
+                "files": [
+                  "agent.db",
+                  "config.yml",
+                  "models.db"
+                ]
+              },
+              "env": {
+                "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
+              },
+              "args": [
+                "--model",
+                "{model}",
+                "--thinking",
+                "medium",
+                "--tools",
+                "read,write,edit,bash,grep,glob",
+                "--mode",
+                "json",
+                "--auto-approve",
+                "-p",
+                "{prompt}"
+              ],
+              "confinement": {
+                "backend": "bwrap"
+              }
+            },
+            {
+              "id": "omp-herdr-bwrap",
+              "via": "cli",
+              "adapter": "herdr-spawn",
+              "confinement": {
+                "backend": "bwrap"
+              },
+              "command": "omp",
+              "credentialStore": {
+                "use": "omp",
+                "homeEnv": "PI_CODING_AGENT_DIR",
+                "sessionDir": "sessions",
+                "files": [
+                  "agent.db",
+                  "config.yml",
+                  "models.db"
+                ]
+              },
+              "env": {
+                "PI_CONFIG_DIR": "../../tmp/fgos-omp-config"
+              },
+              "args": [
+                "--model",
+                "{model}",
+                "--thinking",
+                "medium",
+                "--tools",
+                "read,write,edit,bash,grep,glob",
+                "--auto-approve"
+              ],
+              "interactiveMode": {
+                "exitCommand": "/exit",
+                "kind": "omp"
+              }
+            }
+          ]
+        },
+        "claude": {
+          "supports": {
+            "skills": [
+              "ak:cook"
+            ],
+            "providerFamilies": [
+              "claude"
+            ],
+            "reasoningEffort": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "systemPrompt": false,
+            "toolGating": "allowedTools"
+          },
+          "kind": "agent",
+          "providerModel": "claude",
+          "description": "SCRUBBED",
+          "identity": {
+            "principalRef": "principal://claude",
+            "runtimeBackendRef": "backend://claude-cli",
+            "trustDomain": "local-operator",
+            "egressClass": "unrestricted"
+          },
+          "invocations": [
+            {
+              "id": "claude-cli",
+              "via": "cli",
+              "adapter": "cli-spawn",
+              "command": "claude",
+              "args": [
+                "-p",
+                "{prompt}",
+                "--model",
+                "{model}",
+                "--permission-mode",
+                "acceptEdits"
+              ]
+            },
+            {
+              "id": "claude-cli-bwrap",
+              "via": "cli",
+              "adapter": "cli-spawn",
+              "command": "claude",
+              "args": [
+                "-p",
+                "{prompt}",
+                "--model",
+                "{model}",
+                "--permission-mode",
+                "acceptEdits"
+              ],
+              "credentialStore": {
+                "use": "claude",
+                "homeEnv": "CLAUDE_CONFIG_DIR",
+                "sessionDir": "projects",
+                "files": [
+                  ".credentials.json"
+                ]
+              },
+              "env": {
+                "CLAUDE_CODE_FORCE_SESSION_PERSISTENCE": "1"
+              },
+              "confinement": {
+                "backend": "bwrap"
+              }
+            },
+            {
+              "id": "claude-herdr-bwrap",
+              "via": "cli",
+              "adapter": "herdr-spawn",
+              "command": "claude",
+              "args": [
+                "--model",
+                "{model}"
+              ],
+              "credentialStore": {
+                "use": "claude",
+                "homeEnv": "CLAUDE_CONFIG_DIR",
+                "sessionDir": "projects",
+                "files": [
+                  ".credentials.json"
+                ]
+              },
+              "env": {
+                "CLAUDE_CODE_FORCE_SESSION_PERSISTENCE": "1"
+              },
+              "confinement": {
+                "backend": "bwrap"
+              },
+              "interactiveMode": {
+                "exitCommand": "/exit",
+                "kind": "claude",
+                "trustStore": {
+                  "kind": "claude-json"
+                }
+              }
+            }
+          ]
+        },
+        "glm": {
+          "supports": {
+            "skills": [
+              "ak:cook"
+            ]
+          },
+          "kind": "agent",
+          "description": "SCRUBBED",
+          "allowCrossProvider": true,
+          "invocations": [
+            {
+              "id": "pi-cli-bwrap",
+              "via": "cli",
+              "adapter": "cli-spawn",
+              "command": "pi",
+              "credentialStore": {
+                "use": "pi",
+                "homeEnv": "PI_CODING_AGENT_DIR",
+                "sessionDir": "sessions",
+                "files": [
+                  "auth.json",
+                  "models-store.json",
+                  "settings.json",
+                  "trust.json",
+                  "bin/fd",
+                  "models.json"
+                ]
+              },
+              "args": [
+                "--model",
+                "{model}",
+                "--thinking",
+                "medium",
+                "--tools",
+                "read,write,edit,bash,grep,find,ls",
+                "--mode",
+                "json",
+                "--approve",
+                "-p",
+                "{prompt}"
+              ],
+              "confinement": {
+                "backend": "bwrap"
+              }
+            }
+          ],
+          "providerModel": "z-ai"
+        },
+        "openai": {
+          "supports": {
+            "skills": [
+              "ak:cook"
+            ]
+          },
+          "invocations": [
+            {
+              "id": "pi-herdr-bwrap",
+              "via": "cli",
+              "adapter": "herdr-spawn",
+              "confinement": {
+                "backend": "bwrap"
+              },
+              "command": "pi",
+              "credentialStore": {
+                "use": "pi",
+                "homeEnv": "PI_CODING_AGENT_DIR",
+                "sessionDir": "sessions",
+                "files": [
+                  "auth.json",
+                  "models-store.json",
+                  "settings.json",
+                  "trust.json",
+                  "bin/fd",
+                  "models.json"
+                ]
+              },
+              "args": [
+                "--model",
+                "{model}",
+                "--thinking",
+                "medium",
+                "--tools",
+                "read,write,edit,bash,grep,find,ls",
+                "--approve"
+              ],
+              "interactiveMode": {
+                "exitCommand": "/quit",
+                "kind": "pi"
+              }
+            },
+            {
+              "id": "pi-cli-bwrap",
+              "via": "cli",
+              "adapter": "cli-spawn",
+              "command": "pi",
+              "credentialStore": {
+                "use": "pi",
+                "homeEnv": "PI_CODING_AGENT_DIR",
+                "sessionDir": "sessions",
+                "files": [
+                  "auth.json",
+                  "models-store.json",
+                  "settings.json",
+                  "trust.json",
+                  "bin/fd"
+                ]
+              },
+              "args": [
+                "--model",
+                "{model}",
+                "--thinking",
+                "medium",
+                "--tools",
+                "read,write,edit,bash,grep,find,ls",
+                "--mode",
+                "json",
+                "--approve",
+                "-p",
+                "{prompt}"
+              ],
+              "confinement": {
+                "backend": "bwrap"
+              }
+            },
+            {
+              "id": "codex-herdr-bwrap",
+              "via": "cli",
+              "adapter": "herdr-spawn",
+              "confinement": {
+                "backend": "bwrap"
+              },
+              "command": "codex",
+              "credentialStore": {
+                "use": "codex",
+                "homeEnv": "CODEX_HOME"
+              },
+              "args": [
+                "-s",
+                "danger-full-access",
+                "-a",
+                "never",
+                "--no-daemon",
+                "--model",
+                "{model}"
+              ],
+              "interactiveMode": {
+                "exitCommand": "/quit",
+                "kind": "codex",
+                "trustStore": {
+                  "kind": "codex-toml"
+                }
+              }
+            },
+            {
+              "id": "codex-cli-bwrap",
+              "via": "cli",
+              "adapter": "cli-spawn",
+              "command": "codex",
+              "credentialStore": {
+                "use": "codex",
+                "homeEnv": "CODEX_HOME"
+              },
+              "args": [
+                "exec",
+                "--skip-git-repo-check",
+                "-s",
+                "danger-full-access",
+                "--model",
+                "{model}",
+                "{prompt}"
+              ],
+              "confinement": {
+                "backend": "bwrap"
+              }
+            }
+          ],
+          "kind": "agent",
+          "description": "SCRUBBED",
+          "providerModel": "openai",
+          "allowCrossProvider": true
+        },
+        "deepseek": {
+          "supports": {
+            "skills": [
+              "ak:cook"
+            ]
+          },
+          "kind": "agent",
+          "description": "SCRUBBED",
+          "allowCrossProvider": true,
+          "providerModel": "deepseek",
+          "invocations": [
+            {
+              "id": "pi-cli-bwrap",
+              "via": "cli",
+              "adapter": "cli-spawn",
+              "command": "pi",
+              "credentialStore": {
+                "use": "pi",
+                "homeEnv": "PI_CODING_AGENT_DIR",
+                "sessionDir": "sessions",
+                "files": [
+                  "auth.json",
+                  "models-store.json",
+                  "settings.json",
+                  "trust.json",
+                  "bin/fd",
+                  "models.json"
+                ]
+              },
+              "args": [
+                "--model",
+                "{model}",
+                "--thinking",
+                "medium",
+                "--tools",
+                "read,write,edit,bash,grep,find,ls",
+                "--mode",
+                "json",
+                "--approve",
+                "-p",
+                "{prompt}"
+              ],
+              "confinement": {
+                "backend": "bwrap"
+              }
+            },
+            {
+              "id": "pi-herdr-bwrap",
+              "via": "cli",
+              "adapter": "herdr-spawn",
+              "confinement": {
+                "backend": "bwrap"
+              },
+              "command": "pi",
+              "credentialStore": {
+                "use": "pi",
+                "homeEnv": "PI_CODING_AGENT_DIR",
+                "sessionDir": "sessions",
+                "files": [
+                  "auth.json",
+                  "models-store.json",
+                  "settings.json",
+                  "trust.json",
+                  "bin/fd",
+                  "models.json"
+                ]
+              },
+              "args": [
+                "--model",
+                "{model}",
+                "--thinking",
+                "medium",
+                "--tools",
+                "read,write,edit,bash,grep,find,ls",
+                "--approve"
+              ],
+              "interactiveMode": {
+                "exitCommand": "/quit",
+                "kind": "pi"
+              }
+            }
+          ]
+        }
+      },
+      "timeoutMs": 2100000,
+      "maxTier": "frontier",
+      "generatedPaths": [
+        {
+          "from": "core/skills/**",
+          "also": [
+            ".agents/skills/**",
+            "plugins/fgOS/skills/**",
+            ".claude/skills/**"
+          ]
+        }
+      ],
+      "idleTimeoutMs": 5400000,
+      "modelPolicies": {
+        "deepseek": {
+          "advanced": [
+            "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive",
+            "deepseek/deepseek-v4.1-flash@openrouter"
+          ],
+          "flagship": [
+            "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive",
+            "deepseek/deepseek-v4.1-flash@openrouter"
+          ],
+          "frontier": [
+            "thehive/deepseek-ai/deepseek-v4.1-flash-1017@thehive",
+            "deepseek/deepseek-v4.1-flash@openrouter"
+          ],
+          "nano": "deepseek/deepseek-v4.1-flash@openrouter",
+          "standard": "deepseek/deepseek-v4.1-flash@openrouter",
+          "mini": "deepseek/deepseek-v4.1-flash@openrouter"
+        },
+        "z-ai": {
+          "advanced": [
+            "thehive/zai-org/glm-5.3-flash@thehive",
+            "z-ai/glm-5.3-flash@openrouter"
+          ],
+          "flagship": [
+            "thehive/zai-org/glm-5.3-flash@thehive",
+            "z-ai/glm-5.3-flash@openrouter"
+          ],
+          "frontier": [
+            "thehive/zai-org/glm-5.3-flash@thehive",
+            "z-ai/glm-5.3-flash@openrouter"
+          ],
+          "nano": "z-ai/glm-5.3-flash@openrouter",
+          "standard": "z-ai/glm-5.3-flash@openrouter",
+          "mini": "z-ai/glm-5.3-flash@openrouter"
+        },
+        "gemini": {
+          "nano": [
+            "gemini-3.8-flash-low",
+            "gemini-3.8-flash-low@gemini-lite"
+          ],
+          "mini": [
+            "gemini-3.8-flash-low",
+            "gemini-3.8-flash-low@gemini-lite"
+          ],
+          "standard": [
+            "gemini-3.8-flash-medium",
+            "gemini-3.8-flash-medium@gemini-lite"
+          ],
+          "advanced": [
+            "gemini-3.8-flash-high",
+            "gemini-3.8-flash-high@gemini-lite"
+          ],
+          "flagship": [
+            "gemini-3.8-flash-high"
+          ],
+          "frontier": [
+            "gemini-3.8-flash-high"
+          ]
+        },
+        "claude": {
+          "nano": "haiku",
+          "standard": "sonnet",
+          "advanced": "sonnet",
+          "flagship": "opus",
+          "frontier": "fable",
+          "mini": {
+            "model": "haiku",
+            "effort": "high"
+          }
+        },
+        "openai": {
+          "nano": {
+            "model": "gpt-6-luna",
+            "effort": "low"
+          },
+          "standard": "gpt-5.6-terra",
+          "advanced": {
+            "model": "gpt-6.1-sol",
+            "effort": "medium"
+          },
+          "flagship": {
+            "model": "gpt-6.1-sol",
+            "effort": "high"
+          },
+          "frontier": "gpt-6-astra",
+          "mini": {
+            "model": "gpt-6-luna",
+            "effort": "high"
+          }
+        },
+        "xai": {
+          "nano": "grok-4.3",
+          "standard": "grok-4.3",
+          "advanced": "grok-4.5",
+          "flagship": "grok-4.7",
+          "frontier": "grok-4.7",
+          "mini": "grok-4.3"
+        }
+      },
+      "roles": {
+        "red-team": {
+          "prefer": [
+            "openai",
+            "xai",
+            "claude",
+            "gemini"
+          ]
+        },
+        "reviewer": {
+          "prefer": [
+            "xai",
+            "openai",
+            "claude",
+            "gemini"
+          ]
+        }
+      },
+      "executor": {
+        "command": "claude",
+        "args": [
+          "-p",
+          "{prompt}",
+          "--model",
+          "{model}",
+          "--permission-mode",
+          "acceptEdits",
+          "--allowedTools",
+          "SCRUBBED"
+        ]
+      },
+      "coordination": {
+        "orgPolicy": {
+          "dischargeOn": [
+            "accepted"
+          ]
+        }
+      },
+      "tierFallback": {
+        "nano": [
+          "gemini",
+          "deepseek",
+          "z-ai",
+          "claude",
+          "openai"
+        ],
+        "standard": [
+          "gemini",
+          "deepseek",
+          "z-ai",
+          "claude",
+          "openai"
+        ],
+        "advanced": [
+          "gemini",
+          "deepseek",
+          "z-ai",
+          "claude",
+          "openai"
+        ],
+        "flagship": [
+          "claude",
+          "openai",
+          "gemini",
+          "xai",
+          "deepseek",
+          "z-ai"
+        ],
+        "frontier": [
+          "claude",
+          "openai",
+          "gemini",
+          "xai",
+          "deepseek",
+          "z-ai"
+        ],
+        "mini": [
+          "gemini",
+          "deepseek",
+          "z-ai",
+          "claude",
+          "openai"
+        ]
+      },
+      "defaults": {
+        "tier": "standard"
+      },
+      "parallel": {
+        "maxRoots": 4,
+        "maxLeavesPerRoot": 4
+      },
+      "confinement": {
+        "strict": false
+      },
+      "loops": {
+        "reviewed": {
+          "maxRounds": 2,
+          "checkersByRigor": {
+            "standard": [
+              "reviewer"
+            ],
+            "high": [
+              "reviewer",
+              "red-team"
+            ],
+            "critical": [
+              "reviewer",
+              "red-team",
+              "tester"
+            ]
+          }
+        }
+      },
+      "patterns": {
+        "seatBinding": {
+          "schema": 2
+        },
+        "solo": {
+          "promise": "A single worker runs the task to completion.",
+          "loop": "solo"
+        },
+        "reviewed": {
+          "promise": "A producer executes the task followed by checker review rounds until acceptance or budget exhaustion.",
+          "loop": "reviewed"
+        },
+        "panel": {
+          "promise": "Multiple independent producers execute the task in parallel and a synthesizer combines their results.",
+          "loop": "panel"
+        },
+        "debate": {
+          "promise": "Multiple agents debate opposing viewpoints across rounds before reaching a conclusion.",
+          "loop": "debate"
+        },
+        "code-change": {
+          "promise": "A producer changes code with reviewer and red-team review.",
+          "loop": "reviewed",
+          "invariants": {
+            "minCheckers": {
+              "atLeast": [
+                "reviewer",
+                "red-team"
+              ]
+            }
+          }
+        },
+        "consult": {
+          "promise": "An advisor provides specialized guidance without file mutations.",
+          "loop": "solo",
+          "invariants": {
+            "seats": {
+              "fixed": [
+                {
+                  "seat": "advisor",
+                  "role": "producer"
+                }
+              ]
+            }
+          }
+        },
+        "rfc": {
+          "promise": "A document or decision proposal reviewed by a reviewer and red-team against specification.",
+          "loop": "reviewed",
+          "invariants": {
+            "minCheckers": {
+              "atLeast": [
+                "reviewer",
+                "red-team"
+              ]
+            }
+          },
+          "defaults": {
+            "maxRounds": 1,
+            "roleTasks": {
+              "reviewer": "SCRUBBED",
+              "red-team": "SCRUBBED"
+            }
+          }
+        },
+        "research-fan-out": {
+          "promise": "Multiple researchers investigate a topic independently in parallel and a synthesizer produces the unified finding.",
+          "loop": "panel",
+          "defaults": {
+            "seats": [
+              {
+                "seat": "researcher-1",
+                "role": "producer"
+              },
+              {
+                "seat": "researcher-2",
+                "role": "producer"
+              },
+              {
+                "seat": "researcher-3",
+                "role": "producer"
+              },
+              {
+                "seat": "synthesizer",
+                "role": "synthesizer"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "writeScope": [],
+  "resolvedInputs": [],
+  "worktree": "/SCRUBBED-PATH",
+  "createdBy": "SCRUBBED",
+  "createdAt": "2026-11-18T07:30:12.087Z",
+  "execution": {
+    "status": "settled"
+  },
+  "bindings": {
+    "producer/1": [
+      {
+        "seat": "producer",
+        "role": "producer",
+        "round": 1,
+        "assignmentId": "unit-run-1794987012087-5f3337a8/producer/1",
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "openai",
+          "invocation": "pi-herdr-bwrap",
+          "transport": "herdr",
+          "family": "openai",
+          "pool": "openai",
+          "tier": "advanced",
+          "model": "gpt-6.1-sol",
+          "persona": null,
+          "reasoningEffort": "medium",
+          "timeoutMs": 1500000,
+          "mechanism": "out-of-process",
+          "posture": "read-only",
+          "provenance": {
+            "executor": {
+              "value": "openai",
+              "source": "unit-prefer"
+            },
+            "invocation": {
+              "value": "pi-herdr-bwrap",
+              "source": "unit-prefer"
+            },
+            "transport": {
+              "value": "herdr",
+              "source": "herdr-invocation-present"
+            },
+            "tier": {
+              "value": "advanced",
+              "source": "capabilities.\"code:*\".tier",
+              "maxTier": {
+                "value": "frontier",
+                "source": "maxTier",
+                "applied": false
+              }
+            },
+            "model": {
+              "value": "gpt-6.1-sol",
+              "source": "modelPolicies.openai.advanced"
+            },
+            "persona": {
+              "value": null,
+              "source": "none"
+            },
+            "reasoningEffort": {
+              "value": "medium",
+              "source": "cell"
+            },
+            "timeoutMs": {
+              "value": 1500000,
+              "source": "override"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "decideExecutorDispatchMechanism"
+            },
+            "posture": {
+              "value": "read-only",
+              "source": "read-only-ask-or-writes-empty"
+            },
+            "pool": {
+              "value": "openai",
+              "source": "modelPolicies.openai.advanced"
+            }
+          },
+          "bindingInput": {
+            "protocol": 1,
+            "ask": {
+              "capability": "code:review",
+              "seat": "producer",
+              "role": "producer",
+              "persona": null,
+              "label": "adhoc-re-review-the-fix-commit-7c1635dc0-on-br-17ad",
+              "workflow": null,
+              "selectors": {
+                "persona": null
+              },
+              "raiseAuthorized": false,
+              "override": null,
+              "posture": {
+                "readOnly": true,
+                "forceOutOfProcess": false,
+                "blind": false
+              },
+              "effectiveRigor": "standard",
+              "independence": {
+                "hard": [],
+                "hardCheckers": [],
+                "soft": []
+              },
+              "requiredSkills": [],
+              "unitPrefer": [
+                "openai"
+              ]
+            },
+            "peers": [],
+            "walk": {
+              "tried": [],
+              "excludePools": [],
+              "failedAccounts": [],
+              "continuity": null
+            },
+            "accountViewDigest": "sha256:a17b69933b81df8497383532422f491fa6bfc3fa328eeefebf512457db0c4e40",
+            "configDigest": "sha256:34be9896f643b6d48385eae8de9da98711d7c22509c60092bf7691d678d9df78",
+            "hostVersion": "0.2.0"
+          },
+          "leaseAccount": "tetnu"
+        },
+        "transport": "herdr",
+        "invocation": "pi-herdr-bwrap",
+        "fallbackFrom": null,
+        "boundAt": "2026-11-18T07:30:12.176Z",
+        "configHash": "4a44cedd294dd7ceec2f59b9ef5126eee0378cac4c27ac9ec5c724d6e5460d0a",
+        "dispatchRetryId": "unit-run-1794987012087-5f3337a8/producer/1~7e08f9f2b100"
+      }
+    ]
+  },
+  "settlement": {
+    "outcome": "execution-failure",
+    "infrastructure": true,
+    "infrastructureReason": "run-error",
+    "refused": [],
+    "settledAt": "2026-11-18T07:31:50.789Z"
+  }
+}

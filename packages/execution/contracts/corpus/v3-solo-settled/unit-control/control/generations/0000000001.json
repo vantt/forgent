@@ -1,0 +1,14 @@
+{
+  "controlToken": "SCRUBBED-TOKEN",
+  "holder": {
+    "id": "unit-run-1795056603528-44eb3ca1:controller:931311",
+    "host": "fg-server2",
+    "bootId": "ae823cc8-4c70-4166-badb-6a85106c4981",
+    "pidNs": "pid:[4026531836]",
+    "pid": 931311,
+    "startTime": "327347286",
+    "processStartTime": "327347286"
+  },
+  "purpose": "unit-controller",
+  "acquiredAt": 1795056603839
+}
