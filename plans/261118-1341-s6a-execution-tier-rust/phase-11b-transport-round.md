@@ -35,7 +35,7 @@ definitions come from an injected host `metrics query --def` call); every projec
   needs `transport.mjs`'s round).
 - Lock handover: the controller's `acquire_attempt_locks` returns holder-lock `Handle`s, while `start_supervisor`
   (`packages/run-supervisor/rust/src/controller/launch.rs`) takes `&[&fs::File]` and `Handle::file()` is private
-  (`packages/holder-lock/rust/src/port.rs:230`). Add `pub fn try_clone_file(&self) -> io::Result<File>` on `Handle`
+  (`packages/holder-lock/rust/src/port.rs:230`). Add `pub fn hand_over(self) -> io::Result<File>` (move, exclusive mode, unix only; replaces the earlier hand_over) on `Handle`
   (same pattern as `supervise/unix.rs` `try_clone`) with its owning test in holder-lock, and prove the
   acquire-then-handover path in the end-to-end test (phase 05 review, 2026-11-19). Holder-lock is a lower layer:
   lead:OPC reviews that diff before this phase lands (supervisor, 2026-11-19).
