@@ -2,7 +2,7 @@
 contract: plan-v1
 title: "Supervision powers, part 1: the four Rust cores (raise, drone signals, coordination evidence and prune, on-site read and type)"
 status: running
-lead: lead:forgent-261119-1730-supervision-
+lead: head:lead-forgent-261119-1730-supervision-
 base: 2bc1ed73f3932fc2ecc1bbccf4344019181757c7
 priority: P1
 blockedBy: []
