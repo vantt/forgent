@@ -18,6 +18,8 @@ tool-scope:
   - Read
   - Write
   - Bash
+on_wake: >-
+  Do not end this turn after the start ritual. Continue in this same turn: run the planning skill from step 1, write the plan from the settled discussion, and end by landing it with `fgos land --paths`. A wake is one turn; never end it before the plan is landed.
 skills:
   - fgos-coding-planning
   - fgos-coding-exploring

@@ -266,3 +266,18 @@ test('a persona with no definition is refused persona-not-found and the known pe
   );
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
+
+test('a wakeable head persona opening ends by telling it to continue in the same turn up to its done step; secretary and shaper carry none', async () => {
+  const { renderOnWake, renderPersonaSection } = await import('../../src/runner/agent-definitions.mjs');
+  const done = { supervisor: 'fgos supervisor done', lead: 'fgos land --paths', planner: 'fgos land --paths' };
+  for (const [persona, step] of Object.entries(done)) {
+    const text = openingText({ persona, name: 'x', personaLines: renderPersonaSection(persona, { projectRoot: process.cwd() }), onWake: renderOnWake(persona, { projectRoot: process.cwd() }) });
+    const tail = text.slice(text.indexOf('# On wake'));
+    assert.match(tail, /same turn/, persona);
+    assert.ok(tail.includes(step), `${persona} names ${step}`);
+    assert.match(text, /then continue/);
+  }
+  for (const persona of ['secretary', 'shaper']) {
+    assert.equal(renderOnWake(persona, { projectRoot: process.cwd() }), null, persona);
+  }
+});

@@ -21,6 +21,8 @@ are locked and before `fgos-coding-validating`'s reality check. "Shaping"
 and "proving" are a judgment split inside the one `planning` stage, never
 two separate stage values.
 
+A wake is one turn: never end it before your done step (the plan landed with `fgos land --paths`).
+
 ## Hard rules
 
 - Call `fgos` subcommands directly:
