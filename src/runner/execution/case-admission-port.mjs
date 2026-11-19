@@ -103,14 +103,8 @@ export function assertCaseAdmissionPort(port) {
   return port;
 }
 
-/** The refusal `runUnit` throws when the port refuses; the port's own answer rides along as `refusal`. */
-export class CaseAdmissionRefusedError extends RunnerConfigError {
-  constructor(refusal) {
-    super(`case admission refused ${refusal.code}: ${refusal.condition}`, { code: refusal.code });
-    this.name = 'CaseAdmissionRefusedError';
-    this.refusal = refusal;
-  }
-}
+/** The refusal `runUnit` throws when the port refuses: one class with the one a native unit run's refusal is rethrown as. */
+export { CaseAdmissionRefusedError } from '../../native/execution-door.mjs';
 
 /** The case a Unit names: `{ caseId, activity }` plus the optional unit id and the route the proposer says it takes. */
 export function normalizeCaseRef(value) {
