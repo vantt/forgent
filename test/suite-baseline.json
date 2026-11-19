@@ -223,6 +223,7 @@
     "test/runner/assignment.test.mjs": 0.3,
     "test/runner/attestation-guard.test.mjs": 2.5,
     "test/runner/claim-liveness.test.mjs": 1.8,
+    "test/runner/claim-lock-window.test.mjs": 2,
     "test/runner/claim-port.test.mjs": 17.2,
     "test/runner/cli-spawn-reconciliation.test.mjs": 0.3,
     "test/runner/concurrent-claim-eventlog-loss.test.mjs": 4,

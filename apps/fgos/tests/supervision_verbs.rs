@@ -419,18 +419,14 @@ fn land_gates_a_branch_pushes_it_and_fast_forwards_local_main() {
 }
 
 #[test]
-fn slots_answers_the_lane_view_and_an_unarmed_pool_has_no_ceiling() {
+fn slots_answers_the_lane_view_of_the_standard_pool_of_four() {
     let scene = Scene::new("slots", WATCHER_CONFIG);
     let view = scene.data(&["slots", "--json"]);
     let lanes = &view["lanes"];
-    assert!(lanes["ceiling"].is_null(), "{view}");
+    assert_eq!(lanes["ceiling"], 4, "{view}");
+    assert_eq!(lanes["free"], 4, "{view}");
     assert_eq!(lanes["live"], 0, "{view}");
     assert!(lanes["seats"].is_array(), "{view}");
-
-    let armed = Scene::new("slots-armed", "# @fgos:v1\nworkerSlots:\n  ceiling: 3\n");
-    let lanes = armed.data(&["slots", "--json"])["lanes"].clone();
-    assert_eq!(lanes["ceiling"], 3, "{lanes}");
-    assert_eq!(lanes["free"], 3, "{lanes}");
 }
 
 /// A fake request socket: answers the first request with `reply` and returns the request it read.

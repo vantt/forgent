@@ -2,8 +2,7 @@
 // (tsk-2t9c D1/D3/D4/D5/D8, D25/D28). LAYER: domain, same tier as
 // step-fsm.mjs -- this file's OWN code never imports fs, never reads
 // config. Cap, open-call-depth, and open-sync-depth are always
-// caller-supplied (`hasWorkerSlotRoom({ ceiling })`'s own purity
-// precedent, src/state/worker-slots.mjs) so every function here stays a
+// caller-supplied so every function here stays a
 // pure function of its arguments, testable with no store, no lock, no
 // disk touched by the CALL. Note (review finding M3, tsk-397): its one
 // import, kernel-layer domain-registry.mjs (`legalCallEdges`),

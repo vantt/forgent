@@ -16,7 +16,7 @@
 //     carve-out ("leaf modules ... that do not include shared
 //     event/store/replay/schema core"). Higher-fan-in or core-adjacent
 //     modules (events, store, replay, envelope, work, frontier,
-//     workflow-stage-graphs, worker-slots, runtime-coordination, and
+//     workflow-stage-graphs, runtime-coordination, and
 //     others) are deliberately left OUT of this manifest -- they fall
 //     through to the unknown-path -> full default, same effective safety
 //     as an explicit full-trigger, without needing to enumerate them twice.
