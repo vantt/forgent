@@ -472,7 +472,7 @@ fn record_rules_replay() {
             "seatLaunchesUsed" => Ok(json!(admission::seat_launches_used(a0))),
             "caseAdmissionRefusedMessage" => Ok(json!(
                 admission::CaseAdmissionRefused {
-                    refusal: admission::Refusal { code: text(&a0["code"]).into(), condition: text(&a0["condition"]).into(), violations: None }
+                    refusal: admission::Refusal { code: text(&a0["code"]).into(), condition: text(&a0["condition"]).into(), violations: None, answer: None }
                 }
                 .to_string()
             )),

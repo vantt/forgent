@@ -2096,6 +2096,40 @@
         }
       },
       {
+        "binding": {},
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "CaseAdmissionRefusedError",
+            "code": "binding-view-unavailable",
+            "phase": null,
+            "message": "case admission refused binding-view-unavailable: worktree /w is not free for a run that names no case: binding-view-unavailable",
+            "refusal": {
+              "code": "binding-view-unavailable",
+              "condition": "worktree /w is not free for a run that names no case: binding-view-unavailable"
+            }
+          }
+        }
+      },
+      {
+        "binding": {
+          "condition": "no view"
+        },
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "CaseAdmissionRefusedError",
+            "code": "binding-view-unavailable",
+            "phase": null,
+            "message": "case admission refused binding-view-unavailable: no view",
+            "refusal": {
+              "code": "binding-view-unavailable",
+              "condition": "no view"
+            }
+          }
+        }
+      },
+      {
         "binding": {
           "answer": "bound",
           "condition": "held by x"

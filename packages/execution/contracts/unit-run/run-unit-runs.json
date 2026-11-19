@@ -600,7 +600,10 @@
           "admit": {
             "refused": {
               "code": "case-admission-busy",
-              "condition": "the case is busy"
+              "condition": "the case is busy",
+              "holder": {
+                "caseId": "case-2"
+              }
             }
           }
         }
@@ -692,7 +695,10 @@
           "message": "case admission refused case-admission-busy: the case is busy",
           "refusal": {
             "code": "case-admission-busy",
-            "condition": "the case is busy"
+            "condition": "the case is busy",
+            "holder": {
+              "caseId": "case-2"
+            }
           }
         }
       },

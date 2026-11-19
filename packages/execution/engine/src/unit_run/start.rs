@@ -225,6 +225,7 @@ pub fn require_free_worktree<A: CaseAdmission>(
         code: answer.to_string(),
         condition,
         violations: None,
+        answer: None,
     }))
 }
 

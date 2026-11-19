@@ -246,7 +246,7 @@ const pins = [
   collaboration: collaboration === undefined ? '<absent>' : collaboration,
   answer: outcomeOf(() => start.assertCollaborationPinUsable('unit-run-1', collaboration, snapshot, { runner: { patterns: { live: {} } } })),
 }));
-const bindings = [{ answer: 'unbound' }, { answer: 'bound', record: { caseId: 'case-1' } }, null, { answer: 'bound', condition: 'held by x' }, { answer: 'stale' }]
+const bindings = [{ answer: 'unbound' }, { answer: 'bound', record: { caseId: 'case-1' } }, null, {}, { condition: 'no view' }, { answer: 'bound', condition: 'held by x' }, { answer: 'stale' }]
   .map((binding) => ({ binding, answer: outcomeOf(() => start.requireFreeWorktree({ resolveBinding: () => binding }, '/w')) }));
 
 // ---- whole runUnit calls ------------------------------------------------------------------------------------
@@ -295,7 +295,7 @@ const runCases = [
   { name: 'a case run is admitted, refused at its seat, and settled once', unit: readOnlyUnit, options: { runnerConfig: {}, caseRef: { caseId: 'case-1', activity: 'build' }, workflowId: 'wf-1' },
     port: { admit: { admitted: true, reservationId: 'res-1', caseId: 'case-1', seatLaunchCeiling: 2 } } },
   { name: 'a refused admission is a CaseAdmissionRefusedError', unit: readOnlyUnit, options: { runnerConfig: {}, caseRef: { caseId: 'case-1', activity: 'build' } },
-    port: { admit: { refused: { code: 'case-admission-busy', condition: 'the case is busy' } } } },
+    port: { admit: { refused: { code: 'case-admission-busy', condition: 'the case is busy', holder: { caseId: 'case-2' } } } } },
   { name: 'a writing run without a port is refused by code', unit: writingUnit, options: { runnerConfig: {} } },
   { name: 'a standalone writing run into a bound worktree is refused', unit: writingUnit, options: { runnerConfig: {} },
     port: { binding: { answer: 'bound', record: { caseId: 'case-9' } } } },

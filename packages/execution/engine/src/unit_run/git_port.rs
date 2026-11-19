@@ -270,7 +270,7 @@ impl<'a> UnitGit<'a> {
     pub fn commit_unit_work(
         &self,
         args: &CommitArgs<'_>,
-        on_prepared: &mut dyn FnMut(&PreparedCommit),
+        on_prepared: &mut dyn FnMut(&PreparedCommit) -> Result<(), String>,
     ) -> Value {
         let mut base = json!({ "outOfScope": [], "preExistingInScope": args.exclude_paths });
         if let (Some(needs), Some(object)) = (
@@ -293,7 +293,7 @@ impl<'a> UnitGit<'a> {
         &self,
         args: &CommitArgs<'_>,
         base: &mut Value,
-        on_prepared: &mut dyn FnMut(&PreparedCommit),
+        on_prepared: &mut dyn FnMut(&PreparedCommit) -> Result<(), String>,
     ) -> Result<Value, OperationError> {
         let fs = wal::OsFileSystem;
         let mut recovered: Option<fgos_git::CommitResult> = None;
@@ -396,12 +396,25 @@ impl<'a> UnitGit<'a> {
             }
         };
         if recovered.is_none() {
+            // The caller records the operation before the commit runs; a record that cannot be written stops the
+            // commit (Node's `onPrepared` throws inside the commit's own refusal handling).
             on_prepared(&PreparedCommit {
                 operation_id: operation_id.clone(),
                 request: request.clone(),
                 expected_paths: in_scope.clone(),
                 base: base.clone(),
-            });
+            })
+            .map_err(|cause| OperationError {
+                code: ResultCode::Refused,
+                cause,
+                retryable: false,
+                operation_id: None,
+                receipt: None,
+                exit_code: None,
+                signal: None,
+                stderr: vec![],
+                detail: None,
+            })?;
         } else if let Some(resume) = args.resume {
             if let (Some(into), Some(from)) = (base.as_object_mut(), resume.base.as_object()) {
                 into.extend(from.clone());

@@ -270,6 +270,7 @@ fn refusal_of(value: &Value, op: &str) -> Result<Refusal, PeerError> {
         code: string_field(value, "code", op)?,
         condition: string_field(value, "condition", op)?,
         violations: value.get("violations").and_then(Value::as_array).cloned(),
+        answer: Some(value.clone()),
     })
 }
 
@@ -293,9 +294,9 @@ impl CaseAdmission for PeerAdmission {
     type Error = PeerError;
 
     fn resolve_binding(&self, ask: &Value) -> Result<Value, PeerError> {
-        let answer = self.channel.request(OP_RESOLVE_BINDING, ask.clone())?;
-        string_field(&answer, "answer", OP_RESOLVE_BINDING)?;
-        Ok(answer)
+        // The answer is the port's as it gave it: a view without an `answer` is refused by the caller as
+        // `binding-view-unavailable`, as Node's `requireFreeWorktree` refuses it.
+        self.channel.request(OP_RESOLVE_BINDING, ask.clone())
     }
 
     fn admit(&self, proposal: &Value) -> Result<Admission, PeerError> {
@@ -325,19 +326,19 @@ impl CaseAdmission for PeerAdmission {
             OP_RECHECK_EFFECT,
             json!({ "reservationId": reservation_id, "caseId": case_id, "paths": paths }),
         )?;
-        if let Some(refused) = answer.get("refused") {
-            let r = refusal_of(refused, OP_RECHECK_EFFECT)?;
-            return Ok(Recheck::Refused {
-                code: r.code,
-                condition: r.condition,
-            });
-        }
-        if answer.get("ok") == Some(&Value::Bool(true)) {
-            Ok(Recheck::Ok)
-        } else {
-            Err(PeerError::Malformed(
-                "recheckEffect: neither ok nor refused".into(),
-            ))
+        // Any answer that does not refuse is consent, as Node reads it (`verdict?.refused`).
+        match answer
+            .get("refused")
+            .filter(|r| crate::unit_run::start::truthy(r))
+        {
+            Some(refused) => {
+                let r = refusal_of(refused, OP_RECHECK_EFFECT)?;
+                Ok(Recheck::Refused {
+                    code: r.code,
+                    condition: r.condition,
+                })
+            }
+            None => Ok(Recheck::Ok),
         }
     }
 

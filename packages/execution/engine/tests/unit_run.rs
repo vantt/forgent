@@ -409,6 +409,32 @@ fn a_stray_unprefixed_line_is_never_read_as_a_message() {
 }
 
 #[test]
+fn a_binding_view_without_an_answer_reaches_the_caller_and_any_unrefused_recheck_is_consent() {
+    let (port, peer) = with_peer(LONG, |mut p| {
+        let ask = p.request();
+        p.answer(&ask, json!({ "condition": "no view" }));
+        let recheck = p.request();
+        p.answer(&recheck, json!({}));
+        let recheck = p.request();
+        p.answer(&recheck, json!({ "refused": null }));
+    });
+    // The run refuses it by name (`binding-view-unavailable`): the port does not.
+    assert_eq!(
+        port.resolve_binding(&json!({ "worktree": "/w" })).unwrap(),
+        json!({ "condition": "no view" })
+    );
+    assert_eq!(
+        port.recheck_effect("res-1", "case-1", &[]).unwrap(),
+        fgos_execution::admission::Recheck::Ok
+    );
+    assert_eq!(
+        port.recheck_effect("res-1", "case-1", &[]).unwrap(),
+        fgos_execution::admission::Recheck::Ok
+    );
+    peer.join().unwrap();
+}
+
+#[test]
 fn a_peer_that_dies_mid_run_fails_the_call_closed() {
     let (port, peer) = with_peer(LONG, |mut p| {
         let _ = p.request();
@@ -723,11 +749,12 @@ mod git_backed {
         fs::write(f.tree.join("src/new.txt"), "in\n").unwrap();
         fs::write(f.tree.join("stray.txt"), "out\n").unwrap();
         let mut prepared = Vec::new();
-        let out = f
-            .unit()
-            .commit_unit_work(&args(&scope, Some(&baseline), "op-commit-1"), &mut |p| {
-                prepared.push(p.clone())
-            });
+        let out =
+            f.unit()
+                .commit_unit_work(&args(&scope, Some(&baseline), "op-commit-1"), &mut |p| {
+                    prepared.push(p.clone());
+                    Ok(())
+                });
         assert_eq!(out["status"], "committed", "{out}");
         assert_eq!(out["subject"], "feat(x): add the thing");
         assert_eq!(out["files"], json!(["src/new.txt"]));
@@ -758,7 +785,9 @@ mod git_backed {
         let baseline = clear(&f, &scope);
         let out = f
             .unit()
-            .commit_unit_work(&args(&scope, Some(&baseline), "op-commit-2"), &mut |_| {});
+            .commit_unit_work(&args(&scope, Some(&baseline), "op-commit-2"), &mut |_| {
+                Ok(())
+            });
         assert_eq!(out["status"], "no-changes", "{out}");
     }
 
@@ -768,7 +797,7 @@ mod git_backed {
         let scope = scope(&["src/**"]);
         let out = f
             .unit()
-            .commit_unit_work(&args(&scope, None, "op-commit-3"), &mut |_| {});
+            .commit_unit_work(&args(&scope, None, "op-commit-3"), &mut |_| Ok(()));
         assert_eq!(out["status"], "failed");
         assert_eq!(out["reason"], "baseline-required");
     }
@@ -1234,6 +1263,7 @@ mod run_loop {
             code: code.into(),
             condition: format!("{code} says no"),
             violations: None,
+            answer: None,
         }
     }
 
@@ -1355,7 +1385,7 @@ mod run_loop {
             "tester".into()
         }
         fn shipped_catalog(&self) -> Value {
-            json!({})
+            json!({ "patterns": { "solo": {}, "reviewed": {} } })
         }
         fn git(&self, worktree: &Path, main: &Path) -> Result<(GitDriver, RepoHandle), String> {
             let driver = GitDriver::new(&self.repo.temp).map_err(|e| e.cause)?;
@@ -1469,7 +1499,15 @@ mod run_loop {
                 .lock()
                 .unwrap()
                 .push(seat.assignment_id.to_string());
-            Ok((self.agent)(seat))
+            let answer = (self.agent)(seat);
+            // A scripted failure of the dispatch itself, after a delay: `{ "fail": <class>, "afterMs": n }`.
+            if let Some(class) = answer.get("fail").and_then(Value::as_str) {
+                std::thread::sleep(Duration::from_millis(
+                    answer["afterMs"].as_u64().unwrap_or(0),
+                ));
+                return Err(RunUnitError::other(class, format!("{class} failed")));
+            }
+            Ok(answer)
         }
         fn account_rotation(&self, _: &Value, _: &str) -> Option<Rotation> {
             None
@@ -1741,6 +1779,114 @@ mod run_loop {
     }
 
     #[test]
+    fn the_commit_operation_is_recorded_before_the_commit_so_a_resume_recovers_it_and_never_reruns_the_seat(
+    ) {
+        use std::os::unix::fs::PermissionsExt;
+        let repo = Repo::new();
+        // The commit's own hook copies unit.json as it stands while the commit runs: the record a controller that
+        // died at that moment leaves behind.
+        let snapshot = repo.temp.join("unit-at-commit.json");
+        let hook = repo.main.join(".git/hooks/pre-commit");
+        fs::write(
+            &hook,
+            format!(
+                "#!/bin/sh\nfor f in {}/.fgos/assignments/*/unit.json; do cp \"$f\" {}; done\n",
+                repo.main.display(),
+                snapshot.display()
+            ),
+        )
+        .unwrap();
+        fs::set_permissions(&hook, fs::Permissions::from_mode(0o755)).unwrap();
+        let host = Host::new(
+            &repo,
+            Some(Port::free()),
+            json!({ "loop": "solo", "params": {} }),
+            Box::new(producer_writes_only_b),
+        );
+        let first = run_unit(&host.options(writing_unit()), &host).unwrap();
+        let commit = &first["results"][0]["commit"];
+        assert_eq!(commit["status"], "committed", "{first:#}");
+        let at_commit: Value =
+            serde_json::from_slice(&fs::read(&snapshot).expect("the hook ran during the commit"))
+                .unwrap();
+        let operation = &at_commit["bindings"]["producer/1"][0]["commitOperation"];
+        assert_eq!(
+            operation["state"], "pending",
+            "persisted before the commit ran: {at_commit:#}"
+        );
+        assert_eq!(
+            operation["nativeRequest"]["operationId"],
+            commit["operationId"]
+        );
+
+        // The controller dies right there: the record on disk is the one the hook saw. The resume recovers that
+        // operation by its id, and never dispatches the seat again on top of the committed work.
+        let id = first["unitRunId"].as_str().unwrap();
+        let unit_json = repo
+            .main
+            .join(".fgos/assignments")
+            .join(id)
+            .join("unit.json");
+        fs::write(&unit_json, fs::read(&snapshot).unwrap()).unwrap();
+        fs::remove_file(&hook).unwrap();
+        let head = git(&repo.tree, &["rev-parse", "HEAD"]);
+        let mut options = host.options(writing_unit());
+        options.as_object_mut().unwrap().remove("unitData");
+        options["resumeUnitRunId"] = json!(id);
+        let resumed = run_unit(&options, &host).unwrap();
+        assert_eq!(
+            host.dispatched.lock().unwrap().len(),
+            1,
+            "the seat ran once, before the death only"
+        );
+        assert_eq!(resumed["outcome"], "pass", "{resumed:#}");
+        assert_eq!(
+            git(&repo.tree, &["rev-parse", "HEAD"]),
+            head,
+            "no second commit"
+        );
+        let record = record_of(&repo, &resumed);
+        assert_eq!(
+            record["bindings"]["producer/1"][0]["commitOperation"]["state"],
+            "settled"
+        );
+        assert!(
+            resumed["results"][0].get("runResult").is_none(),
+            "no settled round on disk: no runResult"
+        );
+    }
+
+    #[test]
+    fn a_batch_throws_the_failure_that_came_first_in_time_not_first_in_order() {
+        let repo = Repo::new();
+        let agent = |seat: &SeatDispatch<'_>| -> Value {
+            if !seat.read_only {
+                return producer_writes_only_b(seat);
+            }
+            // The reviewer is first in command order but fails last.
+            if seat.assignment_id.contains("/reviewer/") {
+                json!({ "fail": "reviewer-late", "afterMs": 400 })
+            } else {
+                json!({ "fail": "red-team-early", "afterMs": 10 })
+            }
+        };
+        let mut host = Host::new(
+            &repo,
+            Some(Port::free()),
+            json!({ "loop": "reviewed", "params": { "maxRounds": 1 } }),
+            Box::new(agent),
+        );
+        host.cfg["capabilities"]["code:implement"]["rigor"] = json!("high");
+        let error = run_unit(&host.options(writing_unit()), &host).unwrap_err();
+        assert_eq!(error.error_class, "red-team-early", "{error:?}");
+        assert_eq!(
+            host.dispatched.lock().unwrap().len(),
+            3,
+            "every seat of the batch ran to its end"
+        );
+    }
+
+    #[test]
     fn a_refused_admission_is_a_case_admission_refused_error_and_no_unit_run_exists() {
         let repo = Repo::new();
         let port = Port {
@@ -1966,6 +2112,7 @@ mod run_unit_runs {
                     code: r["code"].as_str().unwrap().into(),
                     condition: r["condition"].as_str().unwrap().into(),
                     violations: None,
+                    answer: Some(r.clone()),
                 }),
                 None => Admission::Admitted {
                     reservation_id: a["reservationId"].as_str().unwrap().into(),

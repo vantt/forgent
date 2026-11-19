@@ -12,6 +12,7 @@
 
 use std::cell::OnceCell;
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicUsize, Ordering as AtomicOrdering};
 use std::sync::{Mutex, MutexGuard, PoisonError};
 use std::time::{Duration, Instant};
 
@@ -1999,7 +2000,10 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
         }
         self.persist(scope)?;
         let mut result = role.result(outcome);
-        result.insert("runResult".into(), run_result.unwrap_or(Value::Null));
+        // `runResult: prior?.runResult`: absent, not null, when no settled round is on disk.
+        if let Some(run_result) = run_result {
+            result.insert("runResult".into(), run_result);
+        }
         result.insert(
             "binding".into(),
             last.get("binding").cloned().unwrap_or(Value::Null),
@@ -2122,42 +2126,57 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
             .cloned();
         let unit_id = text(role.unit.get("id")).unwrap_or_default().to_string();
         let objective = text(role.unit.get("objective")).map(str::to_string);
-        let mut prepared_record: Option<Value> = None;
         let baseline_json = baseline.as_ref().and_then(|b| serde_json::to_value(b).ok());
-        let commit = self.with_git(true, |g| {
-            g.commit_unit_work(
-                &CommitArgs {
-                    unit_id: &unit_id,
-                    summary: summary.as_deref(),
-                    objective: objective.as_deref(),
-                    scope: &scope_paths,
-                    baseline: baseline.as_ref(),
-                    changed_files: changed.as_deref(),
-                    exclude_paths: &exclude_paths,
-                    needs_writes: needs.as_ref(),
-                    operation_id: &operation_id,
-                    resume: resume.as_ref(),
-                },
-                &mut |prepared| {
-                    prepared_record = Some(json!({
-                        "nativeRequest": {
-                            "baseline": baseline_json,
-                            "request": { "writes": prepared.request.writes, "message": prepared.request.message },
-                            "operationId": prepared.operation_id,
-                        },
-                        "expectedPaths": prepared.expected_paths,
-                        "base": prepared.base,
-                        "state": "pending",
-                    }));
-                },
-            )
-        })?;
-        if let Some(op) = prepared_record {
-            // Node records the operation on the attempt (and persists) before the commit runs; the record is written
-            // here, before the commit result is, so a controller that died in between resumes the same operation.
-            let last = self.attempts(&key).len() - 1;
-            self.attempt_mut(&key, last)["commitOperation"] = op;
-        }
+        let last = self.attempts(&key).len().saturating_sub(1);
+        self.open_git()?;
+        let writer = self.writer();
+        let custody = self.custody;
+        // Field by field, so the commit's `on_prepared` writes the record while the Git door is borrowed.
+        let (driver, repo) = self.git.as_ref().expect("opened");
+        let record = &mut self.record;
+        let unit_dir = &self.unit_dir;
+        let git = UnitGit {
+            driver,
+            repo,
+            custody,
+            writer: &writer,
+        };
+        let commit = git.commit_unit_work(
+            &CommitArgs {
+                unit_id: &unit_id,
+                summary: summary.as_deref(),
+                objective: objective.as_deref(),
+                scope: &scope_paths,
+                baseline: baseline.as_ref(),
+                changed_files: changed.as_deref(),
+                exclude_paths: &exclude_paths,
+                needs_writes: needs.as_ref(),
+                operation_id: &operation_id,
+                resume: resume.as_ref(),
+            },
+            &mut |prepared| {
+                // Recorded and persisted before the commit runs (Node's `onPrepared`): a controller that dies from
+                // here on leaves the operation pending, and the resume recovers this operation, never re-runs the seat.
+                let operation = json!({
+                    "nativeRequest": {
+                        "baseline": baseline_json,
+                        "request": { "writes": prepared.request.writes, "message": prepared.request.message },
+                        "operationId": prepared.operation_id,
+                    },
+                    "expectedPaths": prepared.expected_paths,
+                    "base": prepared.base,
+                    "state": "pending",
+                });
+                if let Some(attempt) = record
+                    .get_mut("bindings")
+                    .and_then(|b| b.get_mut(&key))
+                    .and_then(|a| a.get_mut(last))
+                {
+                    attempt["commitOperation"] = operation;
+                }
+                publish_unit_record(unit_dir, record)
+            },
+        );
         let commit = match merge {
             None => commit,
             Some(m) => {
@@ -2342,29 +2361,41 @@ fn run_batch<H: UnitRunHost + Sync>(
             Job::Verify => verify_unit(shared, host),
         }
     };
-    let results: Vec<Res<Value>> = if jobs.len() <= 1 {
-        jobs.into_iter().map(answer).collect()
-    } else {
-        let answer = &answer;
-        std::thread::scope(|scope| {
-            let handles: Vec<_> = jobs
-                .into_iter()
-                .map(|job| {
-                    std::thread::Builder::new()
-                        .spawn_scoped(scope, move || answer(job))
-                        .expect("a thread for a seat of the batch")
-                })
-                .collect();
-            handles
-                .into_iter()
-                .map(|h| {
-                    h.join()
-                        .unwrap_or_else(|panic| std::panic::resume_unwind(panic))
-                })
-                .collect()
-        })
-    };
-    results.into_iter().collect()
+    if jobs.len() <= 1 {
+        return jobs.into_iter().map(answer).collect();
+    }
+    // Every job runs to its end; the batch throws the rejection that came first in time, as `Promise.all` does.
+    let finished = AtomicUsize::new(0);
+    let answer = &answer;
+    let finished = &finished;
+    let results: Vec<(usize, Res<Value>)> = std::thread::scope(|scope| {
+        let handles: Vec<_> = jobs
+            .into_iter()
+            .map(|job| {
+                std::thread::Builder::new()
+                    .spawn_scoped(scope, move || {
+                        let out = answer(job);
+                        (finished.fetch_add(1, AtomicOrdering::SeqCst), out)
+                    })
+                    .expect("a thread for a seat of the batch")
+            })
+            .collect();
+        handles
+            .into_iter()
+            .map(|h| {
+                h.join()
+                    .unwrap_or_else(|panic| std::panic::resume_unwind(panic))
+            })
+            .collect()
+    });
+    if let Some((_, Err(first))) = results
+        .iter()
+        .filter(|(_, r)| r.is_err())
+        .min_by_key(|(at, _)| *at)
+    {
+        return Err(first.clone());
+    }
+    Ok(results.into_iter().filter_map(|(_, r)| r.ok()).collect())
 }
 
 /// A bound seat to its result: each attempt on a fresh pane or process, a provider limit or a dead credential
