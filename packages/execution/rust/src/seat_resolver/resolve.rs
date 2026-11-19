@@ -1,6 +1,4 @@
-use super::capability::{
-    capability_of, capability_rigor_of, min_checkers_of, resolve_stronger_rigor, rigor_rank,
-};
+use super::capability::{capability_of, min_checkers_of, rigor_rank};
 use super::value::{get, items, js_json, nn, str_at, truthy};
 use super::SeatResolutionError;
 use serde_json::{json, Map, Value};
@@ -51,15 +49,19 @@ fn no_writes(unit: &Value) -> bool {
 
 // ---- rigor and checker composition ------------------------------------------------------------------
 
-/// The rigor a unit runs at: the stronger of its own and its capability's; `fallback` when neither says one.
-pub fn effective_rigor_of(
+/// The rigor a unit runs at, `fallback` when neither the unit nor its capability names one. The rigor itself is
+/// the bind's answer ([`crate::bind::effective_rigor`]), the one derivation of effective rigor in the crate.
+pub fn unit_rigor(
     unit: &Value,
     runner_config: &Value,
     fallback: Option<&str>,
 ) -> Result<Option<String>, SeatResolutionError> {
-    let cap = capability_rigor_of(runner_config, capability_of(unit))?;
-    Ok(resolve_stronger_rigor(unit.get("rigor"), cap.as_deref())?
-        .or_else(|| fallback.map(str::to_string)))
+    let rigor =
+        crate::bind::effective_rigor(unit, runner_config).map_err(|error| SeatResolutionError {
+            class: error.name,
+            ..SeatResolutionError::range(error.message)
+        })?;
+    Ok(rigor.or(fallback).map(str::to_string))
 }
 
 /// One checker of a reviewed unit's plan with the provenance strings that put it there.
@@ -109,7 +111,7 @@ pub fn checker_plan_of(
 
     // 1. The rigor row of checkersByRigor, configured then shipped; a rigor below standard with no row of its own
     // falls back to the standard row of the same tables.
-    let rigor = effective_rigor_of(unit, runner_config, Some("standard"))?.unwrap_or_default();
+    let rigor = unit_rigor(unit, runner_config, Some("standard"))?.unwrap_or_default();
     let configured = get(runner_config, "loops")
         .and_then(|l| get(l, "reviewed"))
         .and_then(|r| get(r, "checkersByRigor"))
@@ -255,7 +257,7 @@ pub fn requires_distinct_families(
     unit: &Value,
     runner_config: &Value,
 ) -> Result<bool, SeatResolutionError> {
-    let rigor = effective_rigor_of(unit, runner_config, Some("standard"))?;
+    let rigor = unit_rigor(unit, runner_config, Some("standard"))?;
     Ok(matches!(rigor.as_deref(), Some("high" | "critical")))
 }
 

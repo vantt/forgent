@@ -266,7 +266,7 @@ pub fn plain_input_name(index: usize, source: &Path, fgos_dir: &Path) -> String 
         .unwrap_or_default();
     if rel.first().map(String::as_str) == Some("assignments") && rel.len() > 4 {
         what = format!("{}-r{}", rel[2], rel[3]);
-    } else if rel.first().map(String::as_str) == Some("workflow-runs")
+    } else if source.starts_with(crate::case_paths::runs_root(fgos_dir))
         && rel.get(2).map(String::as_str) == Some("gate-answers")
     {
         what = format!("gate-{what}");

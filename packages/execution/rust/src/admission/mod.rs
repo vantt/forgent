@@ -112,20 +112,38 @@ pub enum Recheck {
 }
 
 /// The case admission port, as the peer protocol carries it. Payloads are the documents of the unit-run-result
-/// contract, kept as JSON.
+/// contract, kept as JSON. Every operation can fail on its own account (the Workflow's ledger, or a peer that
+/// died or timed out); such a failure is `Err` and the run fails closed, distinct from a refusal, which is an
+/// answer.
 pub trait CaseAdmission {
+    /// Why the port could not answer.
+    type Error: std::error::Error;
     /// `{ worktree, caseId? }` to `{ answer, record? }`.
-    fn resolve_binding(&self, ask: &Value) -> Value;
+    fn resolve_binding(&self, ask: &Value) -> Result<Value, Self::Error>;
     /// A proposal to its admission or refusal.
-    fn admit(&self, proposal: &Value) -> Admission;
+    fn admit(&self, proposal: &Value) -> Result<Admission, Self::Error>;
     /// Whether the consent the admission stood on still holds for `paths` of `case_id`.
-    fn recheck_effect(&self, reservation_id: &str, case_id: &str, paths: &[String]) -> Recheck;
+    fn recheck_effect(
+        &self,
+        reservation_id: &str,
+        case_id: &str,
+        paths: &[String],
+    ) -> Result<Recheck, Self::Error>;
     /// The one settle of a reservation (see [`unit_run_settle`]).
-    fn settle(&self, reservation_id: &str, settle: &Value);
+    fn settle(&self, reservation_id: &str, settle: &Value) -> Result<(), Self::Error>;
     /// `{ pattern, params }` of an activity's Unit, or `None` when the case or activity has none.
-    fn activity_unit_of(&self, main_root: &str, case_id: &str, activity: &str) -> Option<Value>;
+    fn activity_unit_of(
+        &self,
+        main_root: &str,
+        case_id: &str,
+        activity: &str,
+    ) -> Result<Option<Value>, Self::Error>;
     /// Why this process may not write the case's ledger and bindings; `None` when it may.
-    fn confined_write_refusal(&self, main_root: &str, case_id: Option<&str>) -> Option<String>;
+    fn confined_write_refusal(
+        &self,
+        main_root: &str,
+        case_id: Option<&str>,
+    ) -> Result<Option<String>, Self::Error>;
 }
 
 /// The refusal a run reports when the port refuses; the port's own answer rides along as `refusal`.
