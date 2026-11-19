@@ -194,14 +194,17 @@ function hostCall({ envelope, projectRoot, argv }, ports) {
 }
 
 /**
- * The host's refusal of a failed run: its JSON line's `code`/`message` (also under `error`), else the stderr line
- * `fgos: <message> [<code>]` the host prints with nothing on stdout. A field the host did not give is undefined.
+ * The host's refusal of a failed run: its JSON line's `code`/`message` (also under `error`), else the last stderr line
+ * `fgos: <message> [<code>]` or `fgos: <code>: <message>` or `fgos: <message>` the host prints with nothing on stdout
+ * (the "invocation fault recorded" note after it is not the refusal). A field the host did not give is undefined.
  */
 function refusalOf(run, line) {
-  const refusal = /^fgos: (.*) \[([a-z][a-z0-9-]*)\]$/.exec(String(run.stderr ?? '').trim().split('\n').pop() ?? '');
-  const code = line?.code ?? line?.error?.code ?? refusal?.[2];
-  const message = line?.message ?? line?.error?.message ?? refusal?.[1];
-  return { code: /^[a-z][a-z0-9-]*$/.test(code ?? '') ? code : undefined, message: typeof message === 'string' ? message : undefined };
+  const printed = String(run.stderr ?? '').split('\n').filter((l) => l.startsWith('fgos: ') && !l.startsWith('fgos: invocation fault recorded')).pop()?.slice(6).trim();
+  const bracketed = printed === undefined ? null : /^(.*) \[([a-z][a-z0-9-]*)\]$/.exec(printed);
+  const prefixed = printed === undefined || bracketed ? null : /^([a-z][a-z0-9-]*): (.*)$/.exec(printed);
+  const code = line?.code ?? line?.error?.code ?? bracketed?.[2] ?? prefixed?.[1];
+  const message = line?.message ?? line?.error?.message ?? bracketed?.[1] ?? prefixed?.[2] ?? printed;
+  return { code: /^[a-z][a-z0-9-]*$/.test(code ?? '') ? code : undefined, message: typeof message === 'string' && message !== '' ? message : undefined };
 }
 
 // -- tickets
@@ -312,7 +315,8 @@ async function runVerb({ args, envelope, projectRoot, id, ports }) {
   }
   if (args.writes !== undefined && !isStringArray(args.writes)) throw badArgs('writes must be an array of strings');
   for (const p of args.writes ?? []) noDash('writes', p);
-  const argv = ['run', '--json', args.prompt];
+  // The prompt leads: the CLI parser reads a value after `--flag` as that flag's value, so `--json` goes last.
+  const argv = ['run', args.prompt];
   if (args.writes?.length) {
     const plan = await planOfCaller(envelope, projectRoot, ports);
     for (const p of args.writes) {
@@ -323,6 +327,7 @@ async function runVerb({ args, envelope, projectRoot, id, ports }) {
   if (args.provider !== undefined) argv.push('--provider', args.provider);
   if (args.capability !== undefined) argv.push('--capability', args.capability);
   if (args.worktree !== undefined) argv.push('--worktree', args.worktree);
+  argv.push('--json');
   return startTicket({ id, verb: HEAD_RUN_VERB, argv, envelope, projectRoot, ports });
 }
 
