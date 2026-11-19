@@ -12,6 +12,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { HeadRequestError, MAX_FRAME_BYTES, MAX_REQUEST_BYTES, requestHead, requestHeadStart, requestHeadWrite } from '../../src/session-host/head-request-client.mjs';
 import { rotateHead, runHeadRequest, runStopSelf, runTicket, startHead } from '../../src/session-host/head-request.mjs';
+import { parseArgs } from '../../src/cli/parse-args.mjs';
 import { lineageDirOf, openingText, writeHeadPlacement } from '../../src/session-host/head-start.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
@@ -336,7 +337,7 @@ test('a failed host run leaves its argv and the host refusal code and message in
   runTicket(ticketFile('t1'), { selfRecord: SELF, exec: () => ({ status: 4, stdout: '{"result":"error","code":"writes-need-worktree","message":"--writes needs a linked worktree"}\n', stderr: '' }) });
   const failed = (await ask('request result', { id: 't1' }, 'r1')).line.data;
   assert.deepEqual([failed.state, failed.exit, failed.code, failed.message], ['failed', 4, 'writes-need-worktree', '--writes needs a linked worktree']);
-  assert.deepEqual(failed.argv, ['run', '--json', 'do it', '--writes', 'src/a/b.mjs', '--worktree', '../wt']);
+  assert.deepEqual(failed.argv, ['run', 'do it', '--writes', 'src/a/b.mjs', '--worktree', '../wt', '--json']);
   assert.equal(JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8')).code, 'writes-need-worktree');
 });
 
@@ -347,6 +348,27 @@ test('a host refusal printed only on stderr as `fgos: <message> [<code>]` is par
   const failed = (await ask('request result', { id: 't1' }, 'r1')).line.data;
   assert.deepEqual([failed.code, failed.message, failed.exit], ['provider-unknown', 'unknown provider "zz"', 4]);
   assert.match(failed.stderrTail, /provider-unknown/);
+});
+
+test('a run argv leads with the prompt and ends with --json, so the CLI parser reads the prompt as its positional', async (t) => {
+  const { ask, ticketFile } = headCase(t);
+  await ask('run', { prompt: 'do it', provider: 'p1', capability: 'judge' });
+  const { argv } = JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8'));
+  assert.equal(argv[1], 'do it');
+  assert.equal(argv.at(-1), '--json');
+  const parsed = parseArgs(argv.slice(1));
+  assert.equal(parsed.positional[0], 'do it');
+  assert.equal(parsed.flags.json, true);
+  assert.equal(parsed.flags.provider, 'p1');
+});
+
+test('the refusal the Node run verb prints on stderr (`fgos: <message>` then the fault-recorded note) is kept as the ticket message', async (t) => {
+  const { ask, ticketFile } = headCase(t);
+  await ask('run', { prompt: 'x' });
+  const stderr = 'fgos: fgos run "<prompt>" needs a non-empty prompt\nfgos: invocation fault recorded to /p/.fgos/faults/f1.json\n';
+  runTicket(ticketFile('t1'), { selfRecord: SELF, exec: () => ({ status: 4, stdout: '', stderr }) });
+  const failed = (await ask('request result', { id: 't1' }, 'r1')).line.data;
+  assert.deepEqual([failed.code, failed.message, failed.exit], ['exit-4', 'fgos run "<prompt>" needs a non-empty prompt', 4]);
 });
 
 test('a failed ticket bounds the stored message and stderr tail, and an unreadable failure keeps exit-N', async (t) => {
@@ -400,7 +422,7 @@ test('a run ticket starts fgos run without the dispatch depth marker, with the p
   t.after(() => { delete process.env.FGOS_DISPATCH_DEPTH; });
   await ask('run', { prompt: 'do the work', writes: ['src/a/b.mjs'], provider: 'codex', worktree: '../wt' });
   const ticket = JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8'));
-  assert.deepEqual(ticket.argv, ['run', '--json', 'do the work', '--writes', 'src/a/b.mjs', '--provider', 'codex', '--worktree', '../wt']);
+  assert.deepEqual(ticket.argv, ['run', 'do the work', '--writes', 'src/a/b.mjs', '--provider', 'codex', '--worktree', '../wt', '--json']);
   let seen;
   runTicket(ticketFile('t1'), { selfRecord: () => ({ pid: 1, startTime: 1 }), exec: (bin, argv, options) => { seen = { bin, argv, env: options.env }; return { status: 0, stdout: '{}' }; } });
   assert.equal(seen.bin, '/the/fgos');
