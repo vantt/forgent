@@ -366,10 +366,37 @@ dependencies = [
  "fgos-canonical-json",
  "fgos-convention",
  "fgos-seat-binding",
+ "fgos-write-scope",
  "fgos-yaml-doc",
  "serde",
  "serde_json",
  "sha2",
+]
+
+[[package]]
+name = "fgos-execution-engine"
+version = "0.2.0"
+dependencies = [
+ "fgos-agent-protocol",
+ "fgos-canonical-json",
+ "fgos-checkout",
+ "fgos-config",
+ "fgos-durable-file",
+ "fgos-execution",
+ "fgos-git",
+ "fgos-holder-lock",
+ "fgos-process",
+ "fgos-run-result",
+ "fgos-run-supervisor",
+ "fgos-seat-binding",
+ "fgos-secrets",
+ "fgos-session-host",
+ "fgos-terminal-control",
+ "fgos-write-scope",
+ "serde",
+ "serde_json",
+ "sha2",
+ "thiserror",
 ]
 
 [[package]]
