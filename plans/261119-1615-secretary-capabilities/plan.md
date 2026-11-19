@@ -33,11 +33,29 @@ footprint:
   - docs/platform/session-host/spec.md
   - docs/platform/agent-confinement/spec.md
   - docs/backlog.md
+  - packages/holder-lock/contracts/lock-registry.v1.json
+  - docs/platform/holder-lock/spec.md
+  - test/holder-lock/registry-contract.test.mjs
+  - src/setup/holder-lock-checks.mjs
+  - test/setup/holder-lock-checks.test.mjs
+  - packages/git/rust/src/wal.rs
+  - packages/git/rust/src/refs.rs
+  - packages/git/rust/tests/pending_op_liveness.rs
+  - docs/platform/git/spec.md
   - CHANGELOG.md
 base: a33b7c9f047a1c3aabbea339633d3c7e92a44939
 source:
   - .fgos/runtime/tmp/sc-lead-brief.md
   - docs/backlog.md
+  - packages/holder-lock/contracts/lock-registry.v1.json
+  - docs/platform/holder-lock/spec.md
+  - test/holder-lock/registry-contract.test.mjs
+  - src/setup/holder-lock-checks.mjs
+  - test/setup/holder-lock-checks.test.mjs
+  - packages/git/rust/src/wal.rs
+  - packages/git/rust/src/refs.rs
+  - packages/git/rust/tests/pending_op_liveness.rs
+  - docs/platform/git/spec.md
 created: 2026-11-19
 ---
 
@@ -55,7 +73,8 @@ sandbox without being blocked or racing another writer.
 3. `fgos session write <file> --add-rows` inserts table rows into the current file under the same route (merge slot,
    catch-up, one publish) without rewriting other rows; a duplicate id or a malformed row is refused by name.
 4. While a live writer's Git op is pending, session write waits/retries and then reports a retryable busy code, not
-   `write-catch-up-refused (resource-recovery-required)` (session-write side of p-k6apgwaddh; Git side owned by lead:OPC).
+   `write-catch-up-refused (resource-recovery-required)`; Git admission answers `resource-busy` when the pending op's
+   per-operation lock is held, `resource-recovery-required` only when it is free (p-k6apgwaddh; design lead:OPC).
 5. `fgos session start shaper --name <n>` starts a shaper head from the secretary's grant; an unknown persona is refused
    `persona-not-found` listing the known personas (p-ficygecgfb).
 6. A head launch has `TMPDIR` set to a private writable dir inside its sandbox (p-d3ub553ogh).
@@ -65,7 +84,7 @@ sandbox without being blocked or racing another writer.
 8. `npm test` and `cargo test --workspace` green; Rust land gate (clippy -D warnings, msvc check, one-door census).
 
 ## Non-goals
-The Git core change for live pending writers (lead:OPC); a general backlog tool beyond add-rows; supervisor skill/route
+A general backlog tool beyond add-rows; supervisor skill/route
 (lead:SUPERVISION, plan 1045); `src/runner/dispatch/**` and the engine (lead:S6A, plan 1341).
 
 ## Prior art (reused)
@@ -87,18 +106,20 @@ The Git core change for live pending writers (lead:OPC); a general backlog tool 
 | 2 | [Role bound at head start and rotation](phase-02-role-binding.md) | - | packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_role_binding.rs, src/session-host/head-start.mjs (start refusal only) | 1 | running |
 | 3 | [Shaper persona, persona-not-found, head TMPDIR](phase-03-shaper-tmpdir.md) | 2 | core/agents/shaper.yaml, src/session-host/head-start.mjs, src/session-host/head-grants.mjs, test/session-host/head-start.test.mjs, test/session-host/head-request.test.mjs, bin/fgos.mjs (HEAD_ARGUMENT_CODES only) | 2 | ready |
 | 4 | [Session write add-rows](phase-04-add-rows.md) | 1 | head_request.rs, session_write_publish.rs + tests, bin/fgos.mjs, head-request-client.mjs, command-registry.mjs, fgos-secretary skill, session-host spec, docs/backlog.md (move trailing rows into the open table) | 2 | ready |
-| 5 | [Session write waits on a live writer](phase-05-busy-retry.md) | 1 | apps/fgos/src/wiring/session_write_publish.rs + test, session-host spec | 3 | ready |
-| 6 | [Live grant audit from Miu's sandbox](phase-06-grant-audit.md) | 1, 2, 3, 4, 5 | core/skills/fgos-secretary/SKILL.md, docs/platform/agent-confinement/spec.md, src/session-host/head-grants.mjs (only if a gap is found) | 4 | ready |
+| 5 | [A live writer's pending Git op answers resource-busy](phase-05-git-op-liveness.md) | - | packages/holder-lock/contracts/lock-registry.v1.json, docs/platform/holder-lock/spec.md, test/holder-lock/registry-contract.test.mjs, packages/git/rust/src/{wal,refs}.rs, packages/git/rust/tests/pending_op_liveness.rs, docs/platform/git/spec.md (+ src/setup/holder-lock-checks.mjs and its test only if they enumerate rows) | 1 | running |
+| 6 | [Session write waits on a live writer](phase-06-busy-retry.md) | 1, 5 | apps/fgos/src/wiring/session_write_publish.rs, apps/fgos/tests/session_write_publish.rs, session-host spec, fgos-secretary skill | 3 | ready |
+| 7 | [Live grant audit from Miu's sandbox](phase-07-grant-audit.md) | 1, 2, 3, 4, 5, 6 | core/skills/fgos-secretary/SKILL.md, docs/platform/agent-confinement/spec.md, src/session-host/head-grants.mjs (only if a gap is found) | 4 | ready |
 
 ## Owner questions
-None. Shaper persona decided by the supervisor inside the frame; Git busy semantics decided by lead:OPC.
+None. Shaper persona decided by the supervisor inside the frame; Git busy design decided by lead:OPC (reviews phase 5).
 
 ## Shared files
 Shared with active plan 261118-1341 (lead:S6A), coordinated by the supervisor: packages/run-supervisor/rust/src/{head_request,route,supervise/terminal}.rs,
 packages/run-supervisor/rust/tests/{head_request,head_role_binding}.rs, packages/run-supervisor/rust/examples/internal_harness.rs,
 packages/run-supervisor/contracts/head-request.v1.json, apps/fgos/src/wiring/session_write_publish.rs,
 apps/fgos/tests/{session_write_publish,questions_head}.rs, bin/fgos.mjs, src/cli/command-registry.mjs,
-src/session-host/head-start.mjs, test/cli/session-verb.test.mjs, test/session-host/{head-start,head-request}.test.mjs.
+src/session-host/head-start.mjs, test/cli/session-verb.test.mjs, test/session-host/{head-start,head-request}.test.mjs,
+src/setup/holder-lock-checks.mjs, test/setup/holder-lock-checks.test.mjs, test/holder-lock/registry-contract.test.mjs (phase 5).
 `bin/fgos.mjs` is touched by phases 1, 3, 4 (different blocks; later phases rebase). `packages/git/contracts/mutation-census.v1.json`
 is regenerated at land time on top of main. Supervisor skill and route belong to lead:SUPERVISION; `src/runner/dispatch/**`
 to lead:S6A: a phase that needs them stops and asks.
