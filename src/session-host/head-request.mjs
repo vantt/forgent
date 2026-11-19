@@ -15,7 +15,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { CONFINED_MARKER_ENV } from '../config/facade.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
-import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_START_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_SUPERVISOR_HANDLED_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
+import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_START_VERB, HEAD_SLOTS_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_SUPERVISOR_HANDLED_VERB, HEAD_SUPERVISOR_PLANS_VERB, HEAD_SUPERVISOR_QUEUE_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
 import { assertHeadArgs, headRoleOf, startHeadSession } from './head-start.mjs';
 import { HeadPlanError, isPlanHeadName, planOfHead } from './head-plan.mjs';
 import { stopHeadSession } from './head-stop.mjs';
@@ -112,6 +112,7 @@ const RESULT_WAIT_MAX_S = 50;
 const RESULT_POLL_MS = 200;
 const RESULT_MAX_CHARS = 20_000;
 const LIST_MAX = 50;
+const HANDLED_MAX = 50;
 const RUNNER_TIMEOUT_MS = 2 * 60 * 60 * 1000;
 const STOP_WAIT_MS = 15_000;
 const STOP_GRACE_MS = 1_000;
@@ -162,7 +163,10 @@ function hostBinOf(envelope) {
 }
 
 const lastJsonLine = (text) => {
-  for (const line of String(text ?? '').trim().split('\n').reverse()) {
+  const whole = String(text ?? '').trim();
+  // A host verb's `--json` answer is one pretty-printed document; the route lines (questions, tests) are one line each.
+  try { const v = JSON.parse(whole); if (v !== null && typeof v === 'object') return v; } catch { /* more than one document: read it line by line */ }
+  for (const line of whole.split('\n').reverse()) {
     try { const v = JSON.parse(line); if (v !== null && typeof v === 'object') return v; } catch { /* not the JSON line */ }
   }
   return null;
@@ -177,8 +181,10 @@ function hostCall({ envelope, projectRoot, argv }, ports) {
   const run = ports.hostCall ? ports.hostCall(call) : spawnSync(call.hostBin, argv, { cwd: projectRoot, encoding: 'utf8', timeout: HOST_VERB_TIMEOUT_MS, maxBuffer: MAX_REQUEST_BYTES });
   const line = lastJsonLine(run.stdout);
   if (run.status === 0) return line?.data ?? line ?? {};
-  const code = line?.code ?? line?.error?.code;
-  throw Object.assign(new Error(String(line?.message ?? line?.error?.message ?? run.error?.message ?? `the host verb ended with exit ${run.status}`).slice(0, 500)), { code: /^[a-z][a-z0-9-]*$/.test(code ?? '') ? code : 'host-failed' });
+  // The host prints a refusal as `fgos: <message> [<code>]` on stderr and nothing on stdout.
+  const refusal = /^fgos: (.*) \[([a-z][a-z0-9-]*)\]$/.exec(String(run.stderr ?? '').trim().split('\n').pop() ?? '');
+  const code = line?.code ?? line?.error?.code ?? refusal?.[2];
+  throw Object.assign(new Error(String(line?.message ?? line?.error?.message ?? refusal?.[1] ?? run.error?.message ?? `the host verb ended with exit ${run.status}`).slice(0, 500)), { code: /^[a-z][a-z0-9-]*$/.test(code ?? '') ? code : 'host-failed' });
 }
 
 // -- tickets
@@ -518,9 +524,17 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
         data = await stopVerb({ args, envelope, projectRoot, ports });
         break;
       case HEAD_SUPERVISOR_HANDLED_VERB:
-        exactKeys(args, ['event']);
-        if (typeof args.event !== 'string' || !ID_PATTERN.test(args.event)) throw badArgs('event must be an event id');
-        data = hostCall({ envelope, projectRoot, argv: ['supervisor', 'handled', args.event, '--json'] }, ports);
+        exactKeys(args, ['events']);
+        if (!Array.isArray(args.events) || args.events.length < 1 || args.events.length > HANDLED_MAX || !args.events.every((id) => typeof id === 'string' && ID_PATTERN.test(id))) {
+          throw badArgs(`events must be 1 to ${HANDLED_MAX} event ids`);
+        }
+        data = hostCall({ envelope, projectRoot, argv: ['supervisor', 'handled', ...args.events, '--json'] }, ports);
+        break;
+      case HEAD_SUPERVISOR_QUEUE_VERB:
+      case HEAD_SUPERVISOR_PLANS_VERB:
+      case HEAD_SLOTS_VERB:
+        exactKeys(args, []);
+        data = hostCall({ envelope, projectRoot, argv: [...request.verb.split(' '), '--json'] }, ports);
         break;
       case HEAD_SUPERVISOR_DONE_VERB:
         exactKeys(args, []);

@@ -356,6 +356,17 @@ fn a_placement_whose_host_reports_gone_gives_gone_with_the_identity_view_alongsi
 }
 
 #[test]
+fn a_gone_head_keeps_the_instant_of_its_placement_on_every_tick_so_its_event_id_holds() {
+    let first = head_records(Liveness::Gone);
+    std::thread::sleep(std::time::Duration::from_millis(20));
+    let later = head_records(Liveness::Gone);
+    assert_eq!(first[0].ts, "2026-11-18T06:58:44.815Z");
+    assert_eq!(first[0].ts, later[0].ts);
+    // A live head is still stamped with the tick that read it.
+    assert_ne!(head_records(Liveness::Live)[0].ts, first[0].ts);
+}
+
+#[test]
 fn an_unknown_host_answer_stays_unknown_and_a_live_one_is_live() {
     assert_eq!(
         attr(&head_records(Liveness::Unknown)[0], "fgos.head.state"),

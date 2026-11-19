@@ -444,6 +444,8 @@ pub fn render_systemd(spec: &UnitSpec) -> Result<Vec<(String, String)>, String> 
         "[Timer]".to_string(),
         "OnBootSec=60".to_string(),
         format!("OnUnitActiveSec={}", spec.interval_sec),
+        // systemd's default accuracy is one minute: a 60 s timer would then fire about every 120 s.
+        "AccuracySec=1s".to_string(),
         String::new(),
         "[Install]".to_string(),
         "WantedBy=timers.target".to_string(),
@@ -1600,6 +1602,7 @@ mod tests {
                     "{text}"
                 );
                 assert!(text.contains("OnUnitActiveSec=45"), "{text}");
+                assert!(text.contains("AccuracySec=1s"), "{text}");
             } else {
                 assert!(text.contains("<string>watcher</string>"), "{text}");
                 assert!(text.contains("<string>tick</string>"), "{text}");

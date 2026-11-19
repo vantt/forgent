@@ -8,6 +8,9 @@
 //! separate attr `fgos.head.identity`, so a pane that answers `unknown` while the role is held alive stays visible as
 //! exactly that. The role string itself (`head:<persona>-<name>`, `lead:<LANE>`) travels as `fgos.head.role`.
 //!
+//! A `gone` record carries the placement's `startedAt` as its `ts`, so the head-gone event keeps one id while the
+//! head stays gone (the definition reads its own 30-day window); every other state is stamped with the tick.
+//!
 //! `retired` is the signal that a head or lead ended on purpose: its owner (the project supervisor, for a lead) adds
 //! `retiredAt` (an RFC 3339 instant) to the head's `placement.json`. A placement carrying a valid `retiredAt` answers
 //! `retired` with record `ts` = `retiredAt`, and Session Host is not asked. A `retiredAt` that is not a valid instant
@@ -120,6 +123,16 @@ struct Head {
     run_dir: PathBuf,
     /// `retiredAt`, normalized to RFC 3339 UTC; `None` when absent or not a valid instant.
     retired_at: Option<String>,
+    /// `startedAt` of the placement, normalized the same way: when this generation of the head was placed.
+    started_at: Option<String>,
+}
+
+/// An RFC 3339 instant of the placement file, normalized to UTC, or `None` when absent or not a valid instant.
+fn instant_of(value: &Value) -> Option<String> {
+    value
+        .as_str()
+        .and_then(fgos_host_runtime::civil_time::parse_rfc3339_millis)
+        .and_then(|ms| fgos_host_runtime::civil_time::format_unix_millis_rfc3339(ms, 0))
 }
 
 fn read_head(path: &Path) -> Option<Head> {
@@ -132,10 +145,8 @@ fn read_head(path: &Path) -> Option<Head> {
         gen: value["gen"].as_i64(),
         placement,
         run_dir: PathBuf::from(value["runDir"].as_str().unwrap_or_default()),
-        retired_at: value["retiredAt"]
-            .as_str()
-            .and_then(fgos_host_runtime::civil_time::parse_rfc3339_millis)
-            .and_then(|ms| fgos_host_runtime::civil_time::format_unix_millis_rfc3339(ms, 0)),
+        retired_at: instant_of(&value["retiredAt"]),
+        started_at: instant_of(&value["startedAt"]),
     })
 }
 
@@ -176,10 +187,17 @@ impl RecordSource for HeadStateSource {
             .map(|head| {
                 let (state, ts) = match head.retired_at {
                     Some(at) => ("retired", at),
-                    None => (
-                        state_name(self.facts.alive(&head.placement, &head.run_dir)),
-                        ts.clone(),
-                    ),
+                    None => {
+                        let state = state_name(self.facts.alive(&head.placement, &head.run_dir));
+                        // A gone head is one incident for as long as it stays gone: its instant is the placement
+                        // it belongs to, not the tick that noticed, so the event id the watcher derives from it
+                        // (`kind|subject|ts`) is the same on every tick and a handled incident is not raised again.
+                        let at = match (state, head.started_at) {
+                            ("gone", Some(placed)) => placed,
+                            _ => ts.clone(),
+                        };
+                        (state, at)
+                    }
                 };
                 let mut attrs = BTreeMap::from([
                     (

@@ -509,6 +509,9 @@ pub fn confined_head_call(cli_args: &[OsString]) -> Option<Result<ConfinedCall, 
         ("session", Some("stop")) => "session stop",
         ("supervisor", Some("handled")) => "supervisor handled",
         ("supervisor", Some("done")) => "supervisor done",
+        ("supervisor", Some("queue")) => "supervisor queue",
+        ("supervisor", Some("plans")) => "supervisor plans",
+        ("slots", _) => "slots",
         _ => return None,
     };
     let built = (|| -> Result<Value, String> {
@@ -617,10 +620,15 @@ pub fn confined_head_call(cli_args: &[OsString]) -> Option<Result<ConfinedCall, 
                 text(&mut args, "reason", "reason")?;
             }
             "supervisor handled" => {
-                let [event] = words.as_slice() else {
-                    return Err("bad-args: supervisor handled takes one event id".to_owned());
-                };
-                args.insert("event".to_owned(), json!(event));
+                if words.is_empty() {
+                    return Err(
+                        "bad-args: supervisor handled takes one or more event ids".to_owned()
+                    );
+                }
+                args.insert("events".to_owned(), json!(words));
+            }
+            "supervisor queue" | "supervisor plans" | "slots" if !words.is_empty() => {
+                return Err(format!("bad-args: {verb} takes no arguments"));
             }
             _ => {}
         }
@@ -1131,10 +1139,25 @@ mod confined_tests {
     #[test]
     fn the_other_contract_verbs_map_their_words_and_flags() {
         assert_eq!(
-            built(&["supervisor", "handled", "ab12"]).args,
-            json!({"event": "ab12"})
+            built(&["supervisor", "handled", "ab12", "cd34", "--json"]).args,
+            json!({"events": ["ab12", "cd34"]})
         );
+        assert!(confined(&["supervisor", "handled"]).unwrap().is_err());
         assert_eq!(built(&["supervisor", "done"]).verb, "supervisor done");
+        for (words, verb) in [
+            (&["supervisor", "queue", "--json"][..], "supervisor queue"),
+            (&["supervisor", "plans", "--json"][..], "supervisor plans"),
+            (&["slots", "--json"][..], "slots"),
+        ] {
+            assert_eq!(
+                built(words),
+                ConfinedCall {
+                    verb,
+                    args: json!({})
+                }
+            );
+        }
+        assert!(confined(&["supervisor", "queue", "x"]).unwrap().is_err());
         assert_eq!(
             built(&["session", "stop", "lead", "--name", "p-x", "--reason", "done"]).args,
             json!({"persona": "lead", "name": "p-x", "reason": "done"})
@@ -1158,8 +1181,7 @@ mod confined_tests {
     fn a_verb_the_contract_does_not_name_takes_its_own_route() {
         assert!(confined(&["worktree", "remove", "../w"]).is_none());
         assert!(confined(&["session", "start", "lead"]).is_none());
-        assert!(confined(&["supervisor", "queue"]).is_none());
         assert!(confined(&["questions", "ask"]).is_none());
-        assert!(confined(&["slots"]).is_none());
+        assert!(confined(&["supervisor", "wake"]).is_none());
     }
 }

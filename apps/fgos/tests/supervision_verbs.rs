@@ -476,6 +476,48 @@ fn a_confined_land_goes_through_the_request_socket_and_never_runs_the_native_ver
 }
 
 #[test]
+fn a_confined_queue_read_and_a_multi_id_handled_go_through_the_request_socket() {
+    let scene = Scene::new("confined-queue", WATCHER_CONFIG);
+    let socket = scene.root.join("head.sock");
+    let server = fake_socket(
+        &socket,
+        serde_json::json!({"type": "REPLY", "result": "done", "data": {"events": [{"id": "e1"}]}}),
+    );
+    let out = scene
+        .command(&["supervisor", "queue", "--json"])
+        .env("FGOS_CONFINED", "1")
+        .env("FGOS_HEAD_REQUEST_SOCKET", &socket)
+        .output()
+        .unwrap();
+    assert!(out.status.success(), "{}", text(&out));
+    let request = server.join().unwrap();
+    assert_eq!(request["verb"], "supervisor queue");
+    assert_eq!(request["args"], serde_json::json!({}));
+    let printed: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(printed["events"][0]["id"], "e1");
+    assert!(scene.payload_calls().is_empty());
+
+    std::fs::remove_file(&socket).unwrap();
+    let server = fake_socket(
+        &socket,
+        serde_json::json!({"type": "REPLY", "result": "done", "data": {"handled": 3}}),
+    );
+    let out = scene
+        .command(&["supervisor", "handled", "a1", "b2", "c3", "--json"])
+        .env("FGOS_CONFINED", "1")
+        .env("FGOS_HEAD_REQUEST_SOCKET", &socket)
+        .output()
+        .unwrap();
+    assert!(out.status.success(), "{}", text(&out));
+    let request = server.join().unwrap();
+    assert_eq!(request["verb"], "supervisor handled");
+    assert_eq!(
+        request["args"],
+        serde_json::json!({"events": ["a1", "b2", "c3"]})
+    );
+}
+
+#[test]
 fn a_confined_refusal_keeps_the_sockets_code_and_session_stop_is_asked_the_same_way() {
     let scene = Scene::new("confined-stop", WATCHER_CONFIG);
     let socket = scene.root.join("head.sock");

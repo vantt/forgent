@@ -1412,7 +1412,7 @@ export const COMMAND_REGISTRY = [
   withSubcommands({
     name: 'supervisor',
     invoke: 'fgos supervisor <wake|plans|queue|handled|done>',
-    description: 'The plan supervisor\'s verbs, served natively by the Rust host. `wake` starts the supervisor head when an event is unhandled and none is live (answers nothing-unhandled, starting or started); `plans` lists the ready plans of the trunk tip; `queue` lists the unhandled supervision events; `handled` marks events handled; `done` ends the supervisor\'s run and refuses while an event is unhandled. From inside a confined head `handled` and `done` go through its request socket.',
+    description: 'The plan supervisor\'s verbs, served natively by the Rust host. `wake` starts the supervisor head when an event is unhandled and none is live (answers nothing-unhandled, starting or started); `plans` lists the ready plans of the trunk tip; `queue` lists the unhandled supervision events; `handled` marks events handled; `done` ends the supervisor\'s run and refuses while an event is unhandled. From inside a confined head `queue`, `plans`, `handled` and `done` (and `fgos slots`) go through its request socket.',
     subcommands: {
       wake: { description: 'Start the supervisor head when an event is unhandled and no supervisor is live; records the wake.', parameters: { type: 'object', properties: {}, required: [] }, examples: ['fgos supervisor wake'] },
       plans: { description: 'Read-only: the plans of the trunk tip with their status, from each plan.md.', parameters: { type: 'object', properties: {}, required: [] }, examples: ['fgos supervisor plans --json'] },
