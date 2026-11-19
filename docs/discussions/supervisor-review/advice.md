@@ -12,6 +12,17 @@ Its weak point is where the decisions sit. Mechanical work (admission, starting,
 live-run windows failed exactly there. Merging also had no owner outside a plan, and no independent review inside one.
 Five owner decisions (SR-D1..SR-D5) fix the direction.
 
+## Round 2 update (rounds 8-19, 2026-11-19)
+
+Round 1 put more mechanics into code: admission, a merge queue. Round 2 reverses that part.
+- The live-run windows 1-5 stopped four times on the harness itself (confinement, a door refusal, a harness logic bug)
+  and once on a weak head executor, not on the agents' judgement.
+- The fix is not more rails. The supervisor and the plan layer stay domain-agnostic; each domain injects its own phase
+  mechanics (SR-D7). The skeleton owns actors and time, never work states, unlike Work's fixed state table (SR-D8). The
+  frame is a wide road with checkpoints, agents drive inside it, and the harness makes each step reliable (SR-D9).
+- Standing: SR-D4, SR-D5, SR-D6..SR-D10. Superseded: SR-D1, SR-D2, SR-D3 (DISCUSSION.md §4).
+- The foundation questions continue in a new discussion, `orchestration-skeleton`.
+
 ## Strengths
 - **State outside the LLM; the supervisor is a stateless wake.** Matches Anthropic's long-running harness: a progress
   file, git and a feature list, re-read by each fresh session (V,
@@ -67,5 +78,5 @@ Five owner decisions (SR-D1..SR-D5) fix the direction.
 - No public postmortem of a confined supervisor exists to compare against.
 
 ## Follow-ups
-DISCUSSION.md §7: T0 small corrections; T1 admission in code; T2 head preflight; T3 merge queue with independent
-review; T4 failure ladder and caps; T5 integration phase and dormant switch in the plan contract.
+DISCUSSION.md §7: ready now T0 small corrections, T2 harness preflight for heads, T6 repeated second doors; T7 opens
+the discussion `orchestration-skeleton`; T1, T3, T4 and T5 wait for it.
