@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "7b14f76f8aef5f077307c821ee0de545696514731d57275711bfa07974746d43",
+  "payloadDigest": "a71cc710e66fdb252f1472a992530c899bacbbf4605765e1c74759028193260c",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -535,7 +535,7 @@
     "packages/execution/engine/src/transport_round/mod.rs": "13a34862c2cc4b8602f234f7c76428c087c2228b804bb58485f1418a1401095c",
     "packages/execution/engine/src/unit_run/mod.rs": "b0301cbcf51f52515225ceeb426148705822a5243c148b74e22559965c283bd4",
     "packages/execution/engine/tests/accounts.rs": "64de846e42e43c21da93c3cb1b289306f52c14bb600ed9aafd8658245b3b082c",
-    "packages/execution/engine/tests/confinement_driver.rs": "49c81f01ef2b75770fb86ea51d5865ef9c55d31f5f7235f715fa0a251cf39e6d",
+    "packages/execution/engine/tests/confinement_driver.rs": "0427170d7821a2cf8a71dfa8cf2a511449235a42d59223035ba6f8ac725b5d72",
     "packages/execution/engine/tests/confinement_policy.rs": "2aafe069d5a694c97044ed28f47ec36ee98950f8c79babfacd0bbc11f9cb5f05",
     "packages/execution/engine/tests/credentials.rs": "cb8af55bea7492072a3fae536006d2a279b1fd001cf5ce42115c7c91a307e979",
     "packages/execution/engine/tests/run_result.rs": "98880a45e8766c03eaef29a505852edb0048528caecc2ee9d9197416911d895b",
