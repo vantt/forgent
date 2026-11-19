@@ -1,8 +1,8 @@
 ---
 contract: plan-v1
 title: "Work data model: the shape of the portfolio data"
-status: draft
-base: 6471fa5d8310fadd1da0675d4ed7a58606a4bb6c
+status: ready
+base: 55550adc0f8b249c9647e7e7ec3521a226449b52
 priority: P1
 blockedBy: []
 footprint:
