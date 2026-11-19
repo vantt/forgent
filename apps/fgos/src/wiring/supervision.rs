@@ -534,6 +534,93 @@ impl wake::StartSession for HostStart {
     }
 }
 
+/// Stops a head with the host's own verb (`<host> session stop <persona> --name <name> --json`) and reads its
+/// activity from the terminal host's agent status plus the head's running request tickets.
+struct HostStop {
+    root: PathBuf,
+}
+
+impl HostStop {
+    fn lineage(&self, persona: &str, name: &str) -> String {
+        format!("{persona}-{name}")
+    }
+
+    fn has_running_ticket(&self, lineage: &str) -> bool {
+        let dir = self.root.join(".fgos/runtime/head-tickets").join(lineage);
+        let Ok(entries) = std::fs::read_dir(dir) else {
+            return false;
+        };
+        entries.filter_map(Result::ok).any(|e| {
+            std::fs::read(e.path())
+                .ok()
+                .and_then(|b| serde_json::from_slice::<Value>(&b).ok())
+                .is_none_or(|t| t["state"] == "running")
+        })
+    }
+}
+
+impl wake::StopSession for HostStop {
+    fn activity(&self, persona: &str, name: &str) -> wake::Activity {
+        let lineage = self.lineage(persona, name);
+        if self.has_running_ticket(&lineage) {
+            return wake::Activity::Busy;
+        }
+        let file = self
+            .root
+            .join(".fgos/runtime/session-rotation")
+            .join(&lineage)
+            .join("placement.json");
+        let Some(value) = std::fs::read(file)
+            .ok()
+            .and_then(|b| serde_json::from_slice::<Value>(&b).ok())
+        else {
+            return wake::Activity::Unknown;
+        };
+        let Ok(placement) =
+            serde_json::from_value::<fgos_session_host::Placement>(value["placement"].clone())
+        else {
+            return wake::Activity::Unknown;
+        };
+        let run_dir = PathBuf::from(value["runDir"].as_str().unwrap_or_default());
+        let backend = fgos_run_supervisor::terminal_slot::Backend::from_env(&run_dir);
+        let core = backend.core();
+        let seen = fgos_session_host::Panes::inspect(
+            &core,
+            &placement.key,
+            fgos_terminal_control::core::Want {
+                foreground: false,
+                activity: true,
+                detail: false,
+            },
+        );
+        match (seen.pane, seen.activity.map(|a| a.state)) {
+            (fgos_terminal_control::port::PaneState::Live, Some(state)) => match state.as_str() {
+                "idle" => wake::Activity::Idle,
+                "working" | "blocked" => wake::Activity::Busy,
+                _ => wake::Activity::Unknown,
+            },
+            _ => wake::Activity::Unknown,
+        }
+    }
+
+    fn stop(&self, persona: &str, name: &str) -> Result<(), String> {
+        let out = Command::new(host_binary())
+            .args(["session", "stop", persona, "--name", name, "--json"])
+            .current_dir(&self.root)
+            .stdin(Stdio::null())
+            .output()
+            .map_err(|e| format!("session-stop-unavailable: {e}"))?;
+        if out.status.success() {
+            return Ok(());
+        }
+        let line = String::from_utf8_lossy(&out.stdout);
+        Err(serde_json::from_str::<Value>(line.trim())
+            .ok()
+            .and_then(|v| v["code"].as_str().map(str::to_owned))
+            .unwrap_or_else(|| format!("session-stop-exit-{}", out.status.code().unwrap_or(-1))))
+    }
+}
+
 struct WakeLogFile {
     root: PathBuf,
 }
@@ -1002,6 +1089,25 @@ impl watcher::Wake for WakeInProcess {
             Err(_) => watcher::WakeOutcome::Refused,
         }
     }
+
+    fn stop_stuck(&self, subject: &str) -> watcher::StopOutcome {
+        let outcome = with_wake_ports(&self.root, self.payload_root, |ports| {
+            wake::stop_stuck(
+                ports,
+                wake::Trigger {
+                    trigger: watcher::STUCK_KIND,
+                    subject,
+                },
+            )
+        });
+        match outcome {
+            Ok(wake::StuckOutcome::Stopped) => watcher::StopOutcome::Stopped,
+            Ok(wake::StuckOutcome::Kept | wake::StuckOutcome::NotLive) => {
+                watcher::StopOutcome::Kept
+            }
+            Ok(wake::StuckOutcome::Failed(_)) | Err(_) => watcher::StopOutcome::Refused,
+        }
+    }
 }
 
 fn run_wake(
@@ -1010,11 +1116,29 @@ fn run_wake(
     trigger: &str,
     subject: &str,
 ) -> Result<wake::WakeOutcome, CategorisedRefusal> {
+    with_wake_ports(root, payload_root, |ports| {
+        wake::wake(
+            ports,
+            &wake_settings(root),
+            wake::Trigger { trigger, subject },
+        )
+    })
+}
+
+/// Builds the wake door's real ports once and hands them to `run`.
+fn with_wake_ports<T>(
+    root: &Path,
+    payload_root: PayloadRoot,
+    run: impl FnOnce(&wake::Ports) -> T,
+) -> Result<T, CategorisedRefusal> {
     let queue = open_queue(root)?;
     let project = HostProject {
         root: root.to_path_buf(),
     };
     let start = HostStart {
+        root: root.to_path_buf(),
+    };
+    let stop = HostStop {
         root: root.to_path_buf(),
     };
     let portfolio = HostPortfolio {
@@ -1031,17 +1155,14 @@ fn run_wake(
         project: &project,
         identity: &HostIdentity,
         start: &start,
+        stop: &stop,
         portfolio: &portfolio,
         queue: &queue,
         log: &log,
         clock: &Clock,
         telemetry: &telemetry,
     };
-    Ok(wake::wake(
-        &ports,
-        &wake_settings(root),
-        wake::Trigger { trigger, subject },
-    ))
+    Ok(run(&ports))
 }
 
 fn run_tick(
