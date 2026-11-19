@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: The planner door resource-check, the supervisor, plan-check, plan-lint and Work adapters, and discovery, on top of the three packages
-status: ready
+status: done
 priority: P2
 blockedBy:
   - 261119-0030-resource-referee-graph-write-scope-stack
@@ -120,7 +120,7 @@ in plan A.
 | 8 | [Work, plan-check and plan-lint adapters](phase-08-node-adapters.md) | 8b | src/state/graph-metrics.mjs, src/state/graph-harness.mjs, src/state/graph-adapter.mjs, src/state/store.mjs, src/intake/plan.mjs, src/report/capability-plan-lint.mjs, scripts/plan-contract-check.mjs, docs/architecture-manifest.json, test/state, test/scripts, test/report/capability-plan-lint.test.mjs, test/cli/plan-lint.test.mjs, test/direct/fgos-merge.test.mjs, test/direct/fgos-read.test.mjs, test/parity/read-parity.test.mjs, test/cli/fgos-read-5.test.mjs, test/cli/fgos-intake-2.test.mjs, test/cli/fgos-intake-3.test.mjs, test/cli/fgos-intake-4.test.mjs, test/cli/fgos-intake-5.test.mjs, test/cli/fgos-intake-6.test.mjs, test/cli/fgos-intake-7.test.mjs, test/intake/plan.test.mjs | 2 | done |
 | 7b | [Planner door, default policy and verb tables](phase-07b-planner-door.md) | 8b | apps/fgos/Cargo.toml, Cargo.lock, apps/fgos/src, packages/host-runtime/contracts, packages/host-runtime/rust/src/catalog.rs, src/cli/command-registry.mjs, test/rust-host, test/cli/unknown-flag-rejection.test.mjs, test/helpers/command-manifest.mjs | 2 | done |
 | 9 | [Discovery in the contract and skills](phase-09-discovery.md) | 7b, 8, 8b | core/skills, domains/coding/skills, plugins/fgOS/skills, .agents/skills, .claude/skills, CHANGELOG.md, docs/reading-map.md | 3 | done |
-| 10 | [Integration and full gate](phase-10-integration.md) | 8, 8b, 9 | packages/git/contracts/mutation-census.v1.json, plans/261119-0528-resource-check-door-and-adapters/reports | 4 | draft |
+| 10 | [Integration and full gate](phase-10-integration.md) | 8, 8b, 9 | packages/git/contracts/mutation-census.v1.json, plans/261119-0528-resource-check-door-and-adapters/reports | 4 | done |
 
 Reading check (planner applied the contract by hand, then ran the script, which reads frontmatter and
 this table only): every phase sits in a later wave than everything it depends on; the longest chain is
