@@ -380,6 +380,7 @@ const REFUSALS = [
   ['a land path that climbs out of the grant', 'land', { paths: ['plans/p/../../x'], message: 'm' }, 'path-outside-grant'],
   ['a run write outside the footprint', 'run', { prompt: 'x', writes: ['src/other/b.mjs'] }, 'write-outside-footprint'],
   ['a run write glob wider than the footprint glob', 'run', { prompt: 'x', writes: ['src/a/**/*.mjs', 'src/**'] }, 'write-outside-footprint'],
+  ['a literal run write whose subtree the footprint glob does not cover', 'run', { prompt: 'x', writes: ['src/a/b'] }, 'write-outside-footprint', { planOf: async () => ({ dir: 'p', footprint: ['src/a/*'] }) }],
   ['a run with a unit file', 'run', { unit: 'plans/p/u.json' }, 'bad-args'],
   ['a land of both a branch and paths', 'land', { branch: 'b', paths: ['plans/p/a'], message: 'm' }, 'bad-args'],
   ['a land with an unknown key', 'land', { paths: ['plans/p/a'], message: 'm', extra: 1 }, 'bad-args'],
@@ -392,10 +393,10 @@ const REFUSALS = [
   ['a land test path that starts with a dash', 'land', { paths: ['plans/p/a.md'], message: 'm', tests: ['--x'] }, 'bad-args'],
   ['a land branch that starts with a dash', 'land', { branch: '--footprint' }, 'bad-args'],
 ];
-for (const [what, verb, args, code] of REFUSALS) {
+for (const [what, verb, args, code, extra] of REFUSALS) {
   test(`the route refuses ${what} with ${code}`, async (t) => {
     const { ask, spawned } = headCase(t);
-    assert.equal((await ask(verb, args)).line.code, code);
+    assert.equal((await ask(verb, args, 't1', extra)).line.code, code);
     assert.equal(spawned.length, 0);
   });
 }
@@ -517,6 +518,12 @@ test('session stop of a persona-name that is no plan head of this project is ref
 test('session stop of the asker of an answered question is allowed', async (t) => {
   const { ask, ports } = stopCase(t);
   const answered = await ask('session stop', { persona: 'secretary', name: 'miu' }, 's4', { ...ports, askerAnswered: (role) => role === 'head:secretary-miu' });
+  assert.equal(answered.line.data.stopped, false);
+});
+
+test('session stop by the asker of an answered question works in a project with no handle', async (t) => {
+  const { ask, ports } = stopCase(t);
+  const answered = await ask('session stop', { persona: 'secretary', name: 'miu' }, 's4b', { ...ports, plan: {}, askerAnswered: (role) => role === 'head:secretary-miu' });
   assert.equal(answered.line.data.stopped, false);
 });
 

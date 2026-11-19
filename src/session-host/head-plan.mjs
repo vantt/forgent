@@ -8,8 +8,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { readFrontmatter } from '../util/yaml.mjs';
+import { readRepoFacts } from '../git/inspect.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 const VOCABULARY = JSON.parse(fs.readFileSync(new URL('../../packages/supervision/contracts/plan-vocabulary.v1.json', import.meta.url), 'utf8'));
@@ -35,8 +35,8 @@ export class HeadPlanError extends Error {
 export function projectHandleOf(projectRoot) {
   const candidates = [path.join(fgosDirFromRoot(projectRoot), 'project.json')];
   try {
-    const common = execFileSync('git', ['-C', projectRoot, 'rev-parse', '--path-format=absolute', '--git-common-dir'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    candidates.push(path.join(fgosDirFromRoot(path.dirname(common)), 'project.json'));
+    const { trustedMainRoot } = readRepoFacts(projectRoot);
+    if (trustedMainRoot) candidates.push(path.join(fgosDirFromRoot(trustedMainRoot), 'project.json'));
   } catch { /* not a git checkout: only the first candidate */ }
   for (const file of candidates) {
     let record;

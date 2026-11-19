@@ -45,10 +45,10 @@ test('a group key the placement does not carry falls back to its slot key', asyn
   assert.equal(host.closes[0].groupKey, 'head-lead-x-1');
 });
 
-test('a pane that will not close is refused by name and leaves no retired stamp', async (t) => {
+test('a pane that will not close is refused by name and keeps the retired stamp of the requested stop', async (t) => {
   const { projectRoot, dir } = lineage(t);
   await assert.rejects(stopHeadSession({ persona: 'lead', name: 'x', projectRoot }, { host: hostOf({ result: 'refused', code: 'busy' }), ...endedHead(), identity: () => ({ live: true }) }), (err) => err.code === 'retire-refused');
-  assert.equal(readHeadPlacement(dir).retiredAt, undefined);
+  assert.ok(readHeadPlacement(dir).retiredAt);
 });
 
 test('retiredAt is on disk before the supervisor is asked to end the head, so a head stopping its own role keeps the stamp', async (t) => {
@@ -58,17 +58,18 @@ test('retiredAt is on disk before the supervisor is asked to end the head, so a 
   assert.ok(stampWhenEnded);
 });
 
-test('a head that does not end after its stop request is refused stop-not-ended, keeps its pane and its record', async (t) => {
+test('a head that does not end after its stop request is refused stop-not-ended, keeps its pane and the retired stamp of the requested stop', async (t) => {
   const { projectRoot, dir } = lineage(t);
   const host = hostOf();
   await assert.rejects(stopHeadSession({ persona: 'lead', name: 'x', projectRoot }, { host, identity: () => ({ live: true }), end: () => true, closed: () => false, sleep: async () => {}, waitMs: 0 }), (err) => err.code === 'stop-not-ended');
   assert.deepEqual(host.closes, []);
-  assert.equal(readHeadPlacement(dir).retiredAt, undefined);
+  assert.ok(readHeadPlacement(dir).retiredAt);
 });
 
-test('a stop request that cannot be written is refused stop-not-ended', async (t) => {
-  const { projectRoot } = lineage(t);
+test('a stop request that cannot be written is refused stop-not-ended and leaves no retired stamp', async (t) => {
+  const { projectRoot, dir } = lineage(t);
   await assert.rejects(stopHeadSession({ persona: 'lead', name: 'x', projectRoot }, { host: hostOf(), identity: () => ({ live: true }), end: () => false }), (err) => err.code === 'stop-not-ended');
+  assert.equal(readHeadPlacement(dir).retiredAt, undefined);
 });
 
 test('a role no live session holds stops nothing, whether or not a placement is recorded', async (t) => {

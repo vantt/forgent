@@ -17,7 +17,7 @@ import { CONFINED_MARKER_ENV } from '../config/facade.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
 import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_START_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_SUPERVISOR_HANDLED_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
 import { assertHeadArgs, headRoleOf, startHeadSession } from './head-start.mjs';
-import { footprintOfPlanText, isPlanHeadName, planOfHead } from './head-plan.mjs';
+import { footprintOfPlanText, HeadPlanError, isPlanHeadName, planOfHead } from './head-plan.mjs';
 import { stopHeadSession } from './head-stop.mjs';
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
 import { judge, observe, selfRecord } from '../native/process-identity.mjs';
@@ -139,7 +139,7 @@ const hasGlob = (segment) => segment.includes('*');
 function entryWithin(e, f) {
   const es = canonicalizeWriteEntry(e).split('/');
   const fs_ = canonicalizeWriteEntry(f).split('/');
-  if (!es.some(hasGlob)) return matchesWriteScope(es.join('/'), [f]);
+  if (!es.some(hasGlob)) return matchesWriteScope(es.join('/'), [f]) && matchesWriteScope(`${es.join('/')}/x`, [f]);
   if (es.join('/') === fs_.join('/')) return true;
   const firstGlob = fs_.findIndex(hasGlob);
   const prefix = firstGlob === -1 ? fs_ : fs_.slice(0, firstGlob);
@@ -426,7 +426,13 @@ async function stopVerb({ args, envelope, projectRoot, ports }) {
   if (args.reason !== undefined && (typeof args.reason !== 'string' || args.reason.length > 200)) throw badArgs('reason must be a string of at most 200 characters');
   assertHeadArgs({ persona: args.persona, name: args.name, projectRoot });
   const role = headRoleOf(args.persona, args.name);
-  const allowed = role === envelope.session.role || isPlanHeadName(projectRoot, args.persona, args.name, ports.plan ?? {}) || askerAnswered({ envelope, projectRoot, role, ports });
+  const planHead = () => {
+    try { return isPlanHeadName(projectRoot, args.persona, args.name, ports.plan ?? {}); } catch (err) {
+      if (err instanceof HeadPlanError) return false; // a project without a handle has no plan heads; the other rules still apply
+      throw err;
+    }
+  };
+  const allowed = role === envelope.session.role || planHead() || askerAnswered({ envelope, projectRoot, role, ports });
   if (!allowed) throw roleErr(`${role} is not a lead or planner of this project, the asker of an answered question, or this session's own role`);
   return stopHeadSession({ persona: args.persona, name: args.name, projectRoot, reason: args.reason ?? null }, ports.stop ?? {});
 }
