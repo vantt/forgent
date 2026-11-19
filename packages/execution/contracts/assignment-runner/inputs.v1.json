@@ -1,0 +1,127 @@
+{
+  "contract": "assignment-runner-inputs.v1",
+  "roots": [
+    "$ROOT/main"
+  ],
+  "pins": [
+    {
+      "name": "file in the main checkout",
+      "pins": [
+        "$ROOT/main/plan.md"
+      ],
+      "digests": [
+        {
+          "path": "$ROOT/main/plan.md",
+          "root": "$ROOT/main",
+          "rel": "plan.md",
+          "sha256": "f15bd2fbadca3d6b8d84090cff410652d911d7533659bfb2d227e4f5cc7f751b"
+        }
+      ]
+    },
+    {
+      "name": "file in a linked worktree",
+      "pins": [
+        "$ROOT/linked/sub/doc.md"
+      ],
+      "digests": [
+        {
+          "path": "$ROOT/linked/sub/doc.md",
+          "sha256": null,
+          "warning": "pin-outside-allowed-roots"
+        }
+      ]
+    },
+    {
+      "name": "outside every allowed root",
+      "pins": [
+        "$ROOT/outside.md"
+      ],
+      "digests": [
+        {
+          "path": "$ROOT/outside.md",
+          "sha256": null,
+          "warning": "pin-outside-allowed-roots"
+        }
+      ]
+    },
+    {
+      "name": "missing",
+      "pins": [
+        "$ROOT/main/nope.md"
+      ],
+      "digests": [
+        {
+          "path": "$ROOT/main/nope.md",
+          "sha256": null,
+          "warning": "pin-missing"
+        }
+      ]
+    },
+    {
+      "name": "a directory",
+      "pins": [
+        "$ROOT/main/adir"
+      ],
+      "digests": [
+        {
+          "path": "$ROOT/main/adir",
+          "root": "$ROOT/main",
+          "rel": "adir",
+          "sha256": null,
+          "warning": "pin-not-a-file"
+        }
+      ]
+    },
+    {
+      "name": "several",
+      "pins": [
+        "$ROOT/main/plan.md",
+        "$ROOT/outside.md",
+        "$ROOT/linked/sub/doc.md"
+      ],
+      "digests": [
+        {
+          "path": "$ROOT/main/plan.md",
+          "root": "$ROOT/main",
+          "rel": "plan.md",
+          "sha256": "f15bd2fbadca3d6b8d84090cff410652d911d7533659bfb2d227e4f5cc7f751b"
+        },
+        {
+          "path": "$ROOT/outside.md",
+          "sha256": null,
+          "warning": "pin-outside-allowed-roots"
+        },
+        {
+          "path": "$ROOT/linked/sub/doc.md",
+          "sha256": null,
+          "warning": "pin-outside-allowed-roots"
+        }
+      ]
+    },
+    {
+      "name": "none",
+      "pins": [],
+      "digests": []
+    }
+  ],
+  "snapshots": {
+    "files": {
+      "dirty.txt": "dirty"
+    },
+    "dirtyBefore": [
+      "dirty.txt",
+      "gone.txt"
+    ],
+    "result": {
+      "dirty.txt": {
+        "exists": true,
+        "hash": "d0c92c764c5647d43d7166efc3e7d350751de063c1388bd2e113fab4865529d3"
+      },
+      "gone.txt": {
+        "exists": false,
+        "hash": null
+      }
+    },
+    "expectedDirtySha256": "d0c92c764c5647d43d7166efc3e7d350751de063c1388bd2e113fab4865529d3"
+  }
+}

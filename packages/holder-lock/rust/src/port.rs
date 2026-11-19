@@ -193,6 +193,8 @@ pub struct Handle {
     /// Release alone decides whether any description copy remains.
     #[cfg_attr(not(unix), allow(dead_code))]
     since: Marks,
+    /// Set once a copy was lent to a child: from then on the release only closes this copy.
+    lent: std::sync::atomic::AtomicBool,
 }
 
 /// The per-spawn scan floor and the start of the latest successful proof.
@@ -231,21 +233,20 @@ impl Handle {
         self.file.as_ref().expect("live handle owns its file")
     }
 
-    /// Moves an exclusive lock to a child: the returned `File` is the holder's own descriptor, to be passed to the
-    /// child's spawn as an inherited descriptor (the `&[&File]` of a supervisor start). The child marks it
-    /// close-on-exec before anything else, as the supervisor route does. The handle keeps nothing, so its drop
-    /// settles at once; dropping the returned `File` after the spawn leaves the child's copy as the last one,
-    /// and if the spawn fails that drop closes the last descriptor and the kernel frees the lock.
+    /// Lends an exclusive lock to a child: the returned `File` is a close-on-exec copy of the holder's description,
+    /// to be passed to the child's spawn as an inherited descriptor (the `&[&File]` of a supervisor start); drop it
+    /// right after the spawn. The handle stays held and keeps excluding every other holder for as long as the
+    /// caller keeps it, but from here its release only closes its own copy: no unlock (flock state is per open
+    /// file description, so an unlock would end the child's lock too), no wait for the child and no kill of it.
+    /// The lock lasts as long as the last copy, the child's or the handle's. A lent handle is never borrowed again.
     ///
-    /// Nothing here unlocks the description: flock state is per open file description, so an explicit unlock
-    /// would end the child's lock too. A shared handle is refused (a second shared holder could still be in this
-    /// process), and so is every platform without `flock`, where a lock does not pass to a child with its handle;
-    /// a refused handle is released as by [`release`].
-    pub fn hand_over(mut self) -> io::Result<File> {
+    /// A shared handle is refused (a second shared holder could still be in this process), and so is every platform
+    /// without `flock`, where a lock does not pass to a child with its handle.
+    pub fn lend(&self) -> io::Result<File> {
         if self.mode != Mode::Ex {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "only an exclusive holder hands its lock over",
+                "only an exclusive holder lends its lock",
             ));
         }
         if !cfg!(unix) {
@@ -254,13 +255,24 @@ impl Handle {
                 "a lock passes to a child only where flock holds it",
             ));
         }
-        Ok(self.file.take().expect("live handle owns its file"))
+        let copy = self.file().try_clone()?;
+        self.lent.store(true, std::sync::atomic::Ordering::SeqCst);
+        Ok(copy)
+    }
+
+    fn is_lent(&self) -> bool {
+        self.lent.load(std::sync::atomic::Ordering::SeqCst)
     }
 
     fn settle_release(&mut self) -> Release {
         let Some(file) = self.file.take() else {
             return Release::Released { killed: 0 };
         };
+        if self.is_lent() {
+            // The child's copy is the lock now; this copy only closes.
+            drop(file);
+            return Release::Released { killed: 0 };
+        }
         #[cfg(target_os = "linux")]
         if self.mode == Mode::Ex {
             return driver::flock::settle_release(file, Duration::from_millis(self.kill_wait_ms));
@@ -348,6 +360,7 @@ impl<'a> BorrowedHandle<'a> {
                     .lock()
                     .map_err(|_| BorrowError::InvalidSpec("lock-history-poisoned".into()))?,
             ),
+            lent: std::sync::atomic::AtomicBool::new(false),
         };
         let borrowed = Self {
             handle,
@@ -396,6 +409,7 @@ impl BorrowedHandle<'static> {
             kill_wait_ms,
             terminate_grace_ms: 3000,
             since: std::sync::Mutex::new((since, since)),
+            lent: std::sync::atomic::AtomicBool::new(false),
         };
         let loan = Self {
             handle,
@@ -921,6 +935,7 @@ fn acquire_traced(
             kill_wait_ms,
             terminate_grace_ms: 3000,
             since: std::sync::Mutex::new((opened_after, opened_after)),
+            lent: std::sync::atomic::AtomicBool::new(false),
         });
     }
 }
@@ -936,6 +951,12 @@ pub fn validate(handle: &Handle) -> Result<(), BorrowError> {
     if handle.mode != Mode::Ex {
         return Err(BorrowError::InvalidSpec(
             "only an exclusive lock can be borrowed".into(),
+        ));
+    }
+    if handle.is_lent() {
+        // A borrow drain would end the child the lock was lent to.
+        return Err(BorrowError::InvalidSpec(
+            "a lock lent to a child is not borrowed".into(),
         ));
     }
     if !drv.same_file(handle.file(), &handle.resource.path) {

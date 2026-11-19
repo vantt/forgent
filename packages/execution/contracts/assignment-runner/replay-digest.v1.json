@@ -1,0 +1,81 @@
+{
+  "contract": "assignment-runner-replay-digest.v1",
+  "cases": [
+    {
+      "runnerConfig": {},
+      "digest": "sha256:405336c7ec05446658dd47649864dc7c4cf220d98732218da30efdbbad744d1c"
+    },
+    {
+      "runnerConfig": {
+        "executors": {
+          "a": {
+            "kind": "agent",
+            "command": "claude",
+            "args": [
+              "{prompt}"
+            ]
+          }
+        }
+      },
+      "digest": "sha256:405336c7ec05446658dd47649864dc7c4cf220d98732218da30efdbbad744d1c"
+    },
+    {
+      "runnerConfig": {
+        "capabilities": {
+          "code:implement": {
+            "tier": "standard",
+            "maxTier": "high",
+            "prefer": [
+              "a"
+            ],
+            "ignored": 1
+          }
+        },
+        "roles": {
+          "producer": {
+            "tier": "high",
+            "pool": "main",
+            "note": "x"
+          }
+        }
+      },
+      "digest": "sha256:24c0a25704a2e06f59e5de3199f5c5204c2434ffc63897460367db32976ac6b0"
+    },
+    {
+      "runnerConfig": {
+        "capabilities": {
+          "code:implement": {
+            "tier": "high"
+          }
+        },
+        "roles": {
+          "producer": {
+            "tier": "high",
+            "pool": "main"
+          }
+        },
+        "personas": {
+          "reviewer": {
+            "tier": "low",
+            "prefer": [
+              "b"
+            ]
+          }
+        }
+      },
+      "digest": "sha256:db1e7f6ca12d4110ea0ce3e3fe8b69c61d741d61f4dd6ab9b5ba43cc309a5b67"
+    },
+    {
+      "runnerConfig": {
+        "runner": {
+          "capabilities": {
+            "code:review": {
+              "tier": "low"
+            }
+          }
+        }
+      },
+      "digest": "sha256:418e9aafb15e3beb582a3d7db104cbd091a18cc25e620ed0a012d9f4c0c6a521"
+    }
+  ]
+}

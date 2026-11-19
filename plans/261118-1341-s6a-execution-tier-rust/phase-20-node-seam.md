@@ -90,6 +90,8 @@ survivors need no edit here.
   `src/session-host/head-start.mjs:121`, `src/setup/seat-binding-checks.mjs:3`, `src/setup/blind-steps-proven-pools.mjs:13`)
   switch to the client or the door here; `bind.mjs` keeps only its dispatch importers and goes in phase 21.
 
+- Precondition (supervisor 2026-11-19): SECRETARY-CAPS phase 9 (rotation race fix in src/session-rotation/rotate.mjs, src/session-host/head-start.mjs, test/session-rotation/*, identity directory.rs) is in main first; build on it, else tell the supervisor. S5's runner_check.rs js_trim/js_number/js_json copies and its private confinement policy-id list fold into the shared fgos-execution helpers when this phase touches runner_check.rs.
+
 ## Footprint
 
 As the plan table row 20 (the 23 files by name, never the two directories; `test/run-supervisor/attempt-steps.test.mjs`
