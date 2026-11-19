@@ -66,7 +66,9 @@ pub fn compute_platform_digest(bwrap_executable: &str) -> String {
 /// What [`compute_probe_fingerprint`] takes; `Default` is the Node defaults.
 #[derive(Debug, Clone)]
 pub struct FingerprintInput {
-    pub policy: String,
+    /// The policy a probe proves, as the request names it (a policy object, or an id), digested as Node's
+    /// `JSON.stringify(policy)` reads it.
+    pub policy: Value,
     pub driver_version: String,
     pub backend_config: Value,
     pub bwrap_executable: String,
@@ -76,7 +78,7 @@ pub struct FingerprintInput {
 impl Default for FingerprintInput {
     fn default() -> Self {
         Self {
-            policy: "host-write-denied".into(),
+            policy: json!("host-write-denied"),
             driver_version: BWRAP_DRIVER_VERSION.into(),
             backend_config: json!({}),
             bwrap_executable: "/usr/bin/bwrap".into(),
@@ -90,7 +92,7 @@ pub fn compute_probe_fingerprint(input: &FingerprintInput) -> Value {
         |value: &Value| serde_json::to_string(value).expect("a JSON value always serialises");
     let mut fingerprint = json!({
         "contract": "confinement-probe-fingerprint.v1",
-        "policyDigest": sha256_text(&compact(&Value::String(input.policy.clone()))),
+        "policyDigest": sha256_text(&compact(&input.policy)),
         "driverVersion": input.driver_version,
         "backendConfigDigest": sha256_text(&compact(&input.backend_config)),
         "platformDigest": compute_platform_digest(&input.bwrap_executable),

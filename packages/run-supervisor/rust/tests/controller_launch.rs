@@ -495,6 +495,99 @@ fn a_second_attempt_lock_is_refused_by_name_and_a_mutating_attempt_also_takes_th
 
 #[cfg(unix)]
 #[test]
+fn under_custody_the_callers_lease_is_lent_to_the_supervisor_which_survives_a_borrow_and_the_callers_drop(
+) {
+    use fgos_run_supervisor::controller::cwd_lock::acquire_dispatch_cwd_lock;
+    let dir = scratch("custody");
+    let fgos_dir = dir.join(".fgos");
+    let (cwd, other) = (dir.join("work"), dir.join("other"));
+    std::fs::create_dir_all(&cwd).unwrap();
+    std::fs::create_dir_all(&other).unwrap();
+    let assignment = dir.join("assignment");
+    let custody = acquire_dispatch_cwd_lock(&fgos_dir, &cwd).unwrap();
+    let lock = |attempt: &str, custody| {
+        acquire_attempt_locks(AttemptLockRequest {
+            fgos_dir: &fgos_dir,
+            assignment_dir: &assignment,
+            attempt_str: attempt,
+            cwd: &cwd,
+            mutating: true,
+            custody,
+            executor_id: None,
+            capability: None,
+        })
+    };
+    let mut locks = lock("01", Some(&custody)).unwrap();
+    assert!(locks.cwd_lease.is_none() && locks.cwd_lease_is_custody);
+    assert_eq!(locks.cwd_lease_file().as_deref(), Some(custody.path()));
+    // The caller's handle is lent: until the child it went to is recorded, it is no borrow source.
+    let copy = locks
+        .custody_copy
+        .take()
+        .expect("descriptor 4 is a copy of the caller's lease");
+    assert!(fgos_holder_lock::validate(&custody).is_err());
+    let mut supervisor = std::process::Command::new("sleep")
+        .arg("30")
+        .stdin(std::process::Stdio::from(copy))
+        .spawn()
+        .unwrap();
+    custody.lent_to(
+        fgos_process::facts::identity_of_child(fgos_process::ProcId(supervisor.id())).unwrap(),
+    );
+    // A verify under custody borrows the lease while the supervisor holds its copy, and the supervisor lives on.
+    let io = fgos_holder_lock::BorrowIo {
+        stdin: Vec::new(),
+        stdout_limit: 1024,
+        stderr_limit: 1024,
+        deadline: std::time::Instant::now() + std::time::Duration::from_secs(20),
+    };
+    let spec = fgos_holder_lock::BorrowSpec {
+        argv: vec!["sh".into(), "-c".into(), "exit 0".into()],
+        ..Default::default()
+    };
+    let verified = fgos_holder_lock::run_borrowed_io(&custody, &spec, &io).unwrap();
+    assert_eq!(verified.outcome.exit, Some(0));
+    assert!(
+        supervisor.try_wait().unwrap().is_none(),
+        "the supervisor survives the borrow"
+    );
+    locks.release();
+    assert_eq!(
+        acquire_dispatch_cwd_lock(&fgos_dir, &cwd).unwrap_err().code,
+        "dispatch-in-flight",
+        "the caller keeps its lease after the attempt lets go"
+    );
+    let elsewhere = acquire_dispatch_cwd_lock(&fgos_dir, &other).unwrap();
+    assert_eq!(
+        lock("02", Some(&elsewhere)).unwrap_err().code,
+        "custody-required"
+    );
+    // The caller's handle drops while the supervisor lives: it only closes, no wait and no kill.
+    let dropping = std::time::Instant::now();
+    drop(custody);
+    assert!(
+        dropping.elapsed()
+            < std::time::Duration::from_millis(fgos_holder_lock::DEFAULT_KILL_WAIT_MS / 4)
+    );
+    assert!(
+        supervisor.try_wait().unwrap().is_none(),
+        "the supervisor survives the drop"
+    );
+    assert_eq!(
+        acquire_dispatch_cwd_lock(&fgos_dir, &cwd).unwrap_err().code,
+        "dispatch-in-flight",
+        "the supervisor's copy still holds the lease"
+    );
+    supervisor.kill().unwrap();
+    supervisor.wait().unwrap();
+    assert!(
+        acquire_dispatch_cwd_lock(&fgos_dir, &cwd).is_ok(),
+        "the lease ends with the last copy"
+    );
+}
+
+#[cfg(unix)]
+#[test]
 fn a_supervisor_that_binds_is_seen_bound_one_that_exits_is_seen_exited_and_a_failed_start_removes_the_secrets(
 ) {
     use std::os::unix::fs::PermissionsExt;

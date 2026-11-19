@@ -211,12 +211,22 @@ fn deadline_kills_and_drains_even_when_child_never_reads_stdin() {
     io.deadline = Instant::now() + Duration::from_millis(200);
     let error = run_borrowed_io(
         &handle,
-        &shell("sleep 30 & echo $$ $! > pids; wait", &dir),
+        &shell(
+            "echo early; echo late >&2; sleep 30 & echo $$ $! > pids; wait",
+            &dir,
+        ),
         &io,
     )
     .unwrap_err();
-    assert!(matches!(error, BorrowError::Deadline { .. }), "{error}");
     assert_eq!(error.to_string(), "borrow-deadline: terminated");
+    // What the child wrote before the deadline stays with the error.
+    let BorrowError::Deadline { stdout, stderr, .. } = &error else {
+        panic!("{error}")
+    };
+    assert_eq!(
+        (stdout.as_slice(), stderr.as_slice()),
+        (&b"early\n"[..], &b"late\n"[..])
+    );
     pids_gone(&dir);
     assert!(matches!(
         release(handle),
@@ -1118,7 +1128,7 @@ while True: time.sleep(.01)
             Termination::KilledAfterGrace
         };
         assert!(
-            matches!(error, BorrowError::Deadline { termination } if termination == expected),
+            matches!(error, BorrowError::Deadline { termination, .. } if termination == expected),
             "{error}"
         );
         assert_eq!(dir.join("index.lock").exists(), !cooperative);

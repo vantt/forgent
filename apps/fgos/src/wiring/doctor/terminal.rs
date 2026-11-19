@@ -215,6 +215,12 @@ fn route_config(entries: &[Entry]) -> Value {
     Value::Object(config)
 }
 
+/// `terminalRouteConfig(repoRoot)` (`src/terminal-control/config.mjs:80`): the route `config` of the project at
+/// `root`, `{}` when its settings cannot be read.
+pub(crate) fn project_route_config(root: &Path) -> Value {
+    read_entries(root).map_or_else(|_| json!({}), |entries| route_config(&entries))
+}
+
 /// One sentence per breach of the two rules whose inputs are not the core's: the dispatch ready timeout and the
 /// round's retain time. The core refuses the rest.
 fn config_problems(entries: &[Entry]) -> Vec<String> {

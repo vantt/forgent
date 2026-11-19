@@ -839,7 +839,7 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
             .map_err(|e| e.message)?
     }
 
-    fn activity_of(&self, result: &Value) -> Value {
+    fn activity_of(&self, result: &Value) -> Res<Value> {
         let key = format!(
             "{}/{}",
             text(result.get("seat")).unwrap_or_default(),
@@ -849,7 +849,9 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
             .attempts(&key)
             .last()
             .and_then(|a| text(a.get("assignmentId")).map(str::to_string))
-            .and_then(|id| self.host.current_attempt(&self.assignments_dir, &id))
+            .map(|id| self.host.current_attempt(&self.assignments_dir, &id))
+            .transpose()?
+            .flatten()
             .map(|a| a.dir);
         let kept = dir.as_ref().and_then(|d| {
             let bytes = std::fs::read(d.join("steps").join("finalize-home.json")).ok()?;
@@ -862,7 +864,7 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
             (Some(d), Some(k)) => json!(d.join(k).display().to_string()),
             _ => Value::Null,
         };
-        json!({ "turns": Value::Null, "toolUses": Value::Null, "transcriptPath": transcript })
+        Ok(json!({ "turns": Value::Null, "toolUses": Value::Null, "transcriptPath": transcript }))
     }
 
     fn duration_of(&self, result: &Value) -> Value {
@@ -924,7 +926,7 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
         };
         let attempts: Vec<Value> = results
             .iter()
-            .map(|result| {
+            .map(|result| -> Res<Value> {
                 let mut out = object(result);
                 out.insert(
                     "infrastructure".into(),
@@ -932,16 +934,16 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
                 );
                 if let Some(run_result) = result.get("runResult").filter(|r| truthy(r)) {
                     let mut extended = object(run_result);
-                    extended.insert("activity".into(), self.activity_of(result));
+                    extended.insert("activity".into(), self.activity_of(result)?);
                     extended.insert("durationMs".into(), self.duration_of(result));
                     out.insert("runResult".into(), Value::Object(extended));
                 }
                 if let Some(output) = self.output_of(result) {
                     out.insert("output".into(), output);
                 }
-                Value::Object(out)
+                Ok(Value::Object(out))
             })
-            .collect();
+            .collect::<Res<_>>()?;
         let started_value = started["value"] == json!(true);
         let final_outcome = if started_value {
             ruled.clone()
@@ -1019,7 +1021,7 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
         let mut pending = Vec::new();
         for (key, last) in entries {
             if self.commit_pending(last.as_ref())?
-                || left_by_dead_controller(self.host, last.as_ref(), &self.assignments_dir)
+                || left_by_dead_controller(self.host, last.as_ref(), &self.assignments_dir)?
             {
                 pending.push(key);
             }
@@ -1633,7 +1635,7 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
     fn admission_identity(&self, attempt: &Value, assignment_id: &str) -> Res<Value> {
         let current = self
             .host
-            .current_attempt(&self.assignments_dir, assignment_id);
+            .current_attempt(&self.assignments_dir, assignment_id)?;
         let abandoned = || {
             let Some(current) = &current else {
                 return false;
@@ -1666,7 +1668,7 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
                 .join(assignment_id)
                 .join("admission")
                 .join("generations"),
-        );
+        )?;
         let retry = attempt.get("dispatchRetryId");
         let admitted = retry.is_some() && generations.iter().any(|g| g.get("retryId") == retry);
         let continuing = attempt.get("outcome").is_none() && admitted && !abandoned();
@@ -1691,7 +1693,8 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
     fn attempt_json(&self, assignment_id: &str, name: &str) -> Option<Value> {
         let current = self
             .host
-            .current_attempt(&self.assignments_dir, assignment_id)?;
+            .current_attempt(&self.assignments_dir, assignment_id)
+            .ok()??;
         serde_json::from_slice(&std::fs::read(current.dir.join(name)).ok()?).ok()
     }
 
@@ -1814,6 +1817,7 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
             custody: if role.read_only { None } else { self.custody },
             carries_operation: self.declared_op.is_some()
                 && role.seat.pointer("/posture/writer") == Some(&json!(true)),
+            declared_op: self.declared_op.clone(),
             write_scope: effective_write_scope(&self.record),
         })
     }
@@ -2270,6 +2274,7 @@ struct DispatchInput<'c> {
     committed: Value,
     custody: Option<&'c Handle>,
     carries_operation: bool,
+    declared_op: Option<Value>,
     write_scope: Vec<Value>,
 }
 
@@ -2494,6 +2499,7 @@ fn run_attempt<H: UnitRunHost + Sync>(
         session: &role.session,
         custody: input.custody,
         carries_operation: input.carries_operation,
+        declared_op: input.declared_op.as_ref(),
         write_scope: &input.write_scope,
         batch_size: role.batch.filter(|b| *b > 1),
     })?;

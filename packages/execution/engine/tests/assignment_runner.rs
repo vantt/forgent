@@ -799,6 +799,8 @@ fn an_attempt_that_never_reached_its_supervisor_gives_back_the_pane_then_the_hom
         attempt: None,
         cwd_lease: None,
         cwd_lease_is_custody: true,
+        custody_copy: None,
+        custody_path: None,
     });
     attempt.lease = Some(json!({ "status": "selected", "provider": "p", "accountId": "acct" }));
     attempt.control = Some(Control {
@@ -824,6 +826,8 @@ fn a_supervised_attempt_that_never_produced_its_result_keeps_its_lease_and_contr
         attempt: None,
         cwd_lease: None,
         cwd_lease_is_custody: true,
+        custody_copy: None,
+        custody_path: None,
     });
     attempt.lease = Some(json!({ "status": "selected", "provider": "p", "accountId": "acct" }));
     attempt.control = Some(Control {
@@ -917,7 +921,7 @@ fn the_attempt_lock_is_lent_to_the_supervisor_and_the_controller_closes_its_copy
 
     let handing = std::time::Instant::now();
     let (bound, mut started) =
-        start_and_bind(&mut attempt, &envelope, &Map::new()).expect("started");
+        start_and_bind(&mut attempt, &envelope, &Map::new(), None).expect("started");
     assert_eq!(bound, Binding::Bound);
     assert!(attempt.handed_over);
     assert!(
@@ -1458,7 +1462,7 @@ mod end_to_end {
         })
     }
 
-    fn options(root: &Path) -> ExecuteOptions {
+    fn options(root: &Path) -> ExecuteOptions<'static> {
         ExecuteOptions {
             cwd: Some(root.to_path_buf()),
             repo_root: Some(root.to_path_buf()),

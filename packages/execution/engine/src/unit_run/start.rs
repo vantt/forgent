@@ -878,16 +878,19 @@ pub fn left_by_dead_controller<H: UnitRunHost>(
     host: &H,
     attempt: Option<&Value>,
     assignments_dir: &Path,
-) -> bool {
-    let Some(attempt) = attempt else { return false };
+) -> Result<bool, RunUnitError> {
+    let Some(attempt) = attempt else {
+        return Ok(false);
+    };
     let Some(id) = attempt.get("assignmentId").and_then(Value::as_str) else {
-        return false;
+        return Ok(false);
     };
     if attempt.get("outcome").is_some() {
-        return false;
+        return Ok(false);
     }
-    host.current_attempt(assignments_dir, id)
-        .is_some_and(|prior| prior.dir.join("envelope.json").exists())
+    Ok(host
+        .current_attempt(assignments_dir, id)?
+        .is_some_and(|prior| prior.dir.join("envelope.json").exists()))
 }
 
 /// A unit run taken up again from its `unit.json`, under one controller; whatever makes it unsafe is refused by name.
@@ -998,11 +1001,11 @@ pub fn load_resumed_unit<H: UnitRunHost>(
         )));
     }
     for attempt in last_attempts(&record) {
-        if !left_by_dead_controller(host, Some(attempt), &base.assignments_dir) {
+        if !left_by_dead_controller(host, Some(attempt), &base.assignments_dir)? {
             continue;
         }
         let id = attempt["assignmentId"].as_str().unwrap_or_default();
-        let Some(prior) = host.current_attempt(&base.assignments_dir, id) else {
+        let Some(prior) = host.current_attempt(&base.assignments_dir, id)? else {
             continue;
         };
         let state = host.adopt_state(&prior.dir);

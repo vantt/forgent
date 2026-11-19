@@ -72,6 +72,8 @@ pub struct SeatDispatch<'a> {
     pub session: &'a Value,
     pub custody: Option<&'a Handle>,
     pub carries_operation: bool,
+    /// The operation fields a unit carrying a declared operation stamps on its writer seat (`ctx.declaredOp`).
+    pub declared_op: Option<&'a Value>,
     pub write_scope: &'a [Value],
     pub batch_size: Option<usize>,
 }
@@ -163,7 +165,11 @@ pub trait UnitRunHost {
     fn collaboration_of_record(&self, record: &Value) -> Result<(Value, Value), RunUnitError>;
     /// The state the adopt door judges a run directory in (`closed`, `legacy-run`, ...), read-only.
     fn adopt_state(&self, run_dir: &Path) -> String;
-    fn current_attempt(&self, assignments_dir: &Path, assignment_id: &str) -> Option<AttemptRef>;
+    fn current_attempt(
+        &self,
+        assignments_dir: &Path,
+        assignment_id: &str,
+    ) -> Result<Option<AttemptRef>, RunUnitError>;
     /// `assertPinnedAccountsUsable`.
     fn pinned_accounts_usable(
         &self,
@@ -190,8 +196,9 @@ pub trait UnitRunHost {
     /// Why the receipt a passing attempt left differs from what the provider record granted, or `None`.
     fn audit_lease_receipt(&self, receipt: Option<&Value>, assignment_id: &str) -> Option<String>;
     fn drop_assignment_record(&self, assignment_id: &str);
-    /// The records of an admission ledger's generations, oldest first.
-    fn admission_generations(&self, dir: &Path) -> Vec<Value>;
+    /// The records of an admission ledger's generations, oldest first; a missing ledger has none, any other
+    /// failure to read it is the run's error.
+    fn admission_generations(&self, dir: &Path) -> Result<Vec<Value>, RunUnitError>;
     /// The digest of the report a result names (`reportDigestOf`).
     fn report_digest(&self, result: &Value, main_root: &Path) -> Value;
     /// The verify command run under the unit's custody.

@@ -168,14 +168,14 @@ fn read_agent(tier: &str, file: &AgentFile) -> Agent {
 
 /// A definition file read once: its mapping (`None` when it is not valid YAML or not a mapping), the parse
 /// failure when there is one, the declared name and the description as text.
-struct Definition {
-    data: Option<Vec<(String, Value)>>,
-    error: Option<String>,
+pub struct Definition {
+    pub data: Option<Vec<(String, Value)>>,
+    pub error: Option<String>,
     name: Option<String>,
     description: String,
 }
 
-fn read_definition(bytes: &[u8], file: &str) -> Definition {
+pub fn read_definition(bytes: &[u8], file: &str) -> Definition {
     // A file is read as UTF-8 text, undecodable bytes replaced, as the Node door reads it.
     let text = String::from_utf8_lossy(bytes);
     let value = match parse(text.as_bytes(), Profile::Tool, file) {
@@ -215,7 +215,7 @@ fn read_definition(bytes: &[u8], file: &str) -> Definition {
     }
 }
 
-fn shape_problem(name: &str, read: &Definition) -> Option<String> {
+pub fn shape_problem(name: &str, read: &Definition) -> Option<String> {
     if let Some(error) = &read.error {
         return Some(error.clone());
     }
@@ -243,7 +243,7 @@ fn shape_problem(name: &str, read: &Definition) -> Option<String> {
 
 /// Values in the rendered sections that the renderer would silently drop because they are not text: a mapping
 /// where text belongs (typically an unquoted ": " inside a list item or a value) or a list where one text belongs.
-fn non_text_values(data: &[(String, Value)]) -> Vec<String> {
+pub fn non_text_values(data: &[(String, Value)]) -> Vec<String> {
     let kind = |value: &Value| {
         if matches!(value, Value::Seq(_)) {
             "a list"

@@ -123,11 +123,14 @@ impl Spawned {
     /// its main thread, so it runs its first instruction inside the job. On
     /// failure the suspended process is ended.
     pub fn assign_and_resume(&self, job: &Job) -> io::Result<()> {
-        assign_and_resume_handles(
-            job,
-            self.process.as_raw_handle() as HANDLE,
-            self.thread.as_raw_handle() as HANDLE,
-        )
+        // SAFETY: both handles are this child's, owned by `self` and open for the whole call.
+        unsafe {
+            assign_and_resume_handles(
+                job,
+                self.process.as_raw_handle() as HANDLE,
+                self.thread.as_raw_handle() as HANDLE,
+            )
+        }
     }
 
     fn exit_code(&self) -> io::Result<u32> {
@@ -168,11 +171,11 @@ fn append_arg(line: &mut Vec<u16>, arg: &OsStr) {
         } else {
             backslashes
         };
-        line.extend(std::iter::repeat(backslash).take(escaped));
+        line.extend(std::iter::repeat_n(backslash, escaped));
         backslashes = 0;
         line.push(unit);
     }
-    line.extend(std::iter::repeat(backslash).take(backslashes * 2));
+    line.extend(std::iter::repeat_n(backslash, backslashes * 2));
     line.push(quote);
 }
 

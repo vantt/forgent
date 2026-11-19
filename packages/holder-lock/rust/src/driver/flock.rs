@@ -241,14 +241,15 @@ impl LockDriver for FlockDriver {
         kill_wait: Duration,
         since: Option<CreationMark>,
         protected_roots: &[u32],
+        members: &[u32],
     ) -> Result<u32, Leftovers> {
         #[cfg(target_os = "linux")]
         {
-            end_listed_holders(file, child_pid, kill_wait, since, protected_roots)
+            end_listed_holders(file, child_pid, kill_wait, since, protected_roots, members)
         }
         #[cfg(not(target_os = "linux"))]
         {
-            let _ = (file, since, protected_roots);
+            let _ = (file, since, protected_roots, members);
             end_process_group(child_pid, kill_wait)
         }
     }
@@ -263,6 +264,7 @@ fn end_listed_holders(
     kill_wait: Duration,
     since: Option<CreationMark>,
     protected_roots: &[u32],
+    members: &[u32],
 ) -> Result<u32, Leftovers> {
     drain_description(
         file,
@@ -271,6 +273,7 @@ fn end_listed_holders(
         kill_wait,
         Reach::of(since)?,
         protected_roots,
+        members,
     )
 }
 
@@ -280,6 +283,7 @@ pub(crate) fn wait_unborrowed(
     file: &File,
     kill_wait: Duration,
     since: Option<CreationMark>,
+    members: &[u32],
 ) -> Result<(), Leftovers> {
     drain_description(
         file,
@@ -288,6 +292,7 @@ pub(crate) fn wait_unborrowed(
         kill_wait,
         Reach::of(since)?,
         &[],
+        members,
     )
     .map(|_| ())
 }
@@ -547,6 +552,7 @@ pub(crate) fn drain_description(
     kill_wait: Duration,
     reach: Reach,
     protected_roots: &[u32],
+    members: &[u32],
 ) -> Result<u32, Leftovers> {
     use fgos_process::facts::{file_key, lock_holders, lock_holders_among, Holders};
     use fgos_process::ProcId;
@@ -594,7 +600,8 @@ pub(crate) fn drain_description(
         let holders = match listed {
             Holders::List(list) if list.iter().any(|t| t.pid.0 == me) => list
                 .into_iter()
-                .filter(|t| t.pid.0 != me && t.pid.0 != owner)
+                // A child the holder lent its description to keeps it: it is the holder's member.
+                .filter(|t| t.pid.0 != me && t.pid.0 != owner && !members.contains(&t.pid.0))
                 .collect::<Vec<_>>(),
             // Absence of our known locked description is not proof of an
             // empty holder set (Publication admission also requires self).

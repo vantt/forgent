@@ -860,7 +860,7 @@ fn transport_of(
 }
 
 /// Why a run timeout is not usable (whole milliseconds inside the floor and ceiling), or `None` when it is.
-fn run_timeout_problem(value: &Value, label: &str) -> Option<String> {
+pub fn run_timeout_problem(value: &Value, label: &str) -> Option<String> {
     const SAFE: i64 = 9_007_199_254_740_991;
     let whole = value.as_i64().filter(|ms| ms.abs() <= SAFE);
     let Some(ms) = whole else {

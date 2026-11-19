@@ -33,11 +33,14 @@ fn launch_failed(message: String) -> RunnerConfigError {
 
 /// The first half of `await_binding`, callable alone: hand the attempt to the supervisor and wait only for its
 /// binding. A Ctrl-C from the handover until the binding is known waits for the binding and then cancels the
-/// attempt; one that came earlier refuses the launch. Only the attempt copy of the locks closes here.
+/// attempt; one that came earlier refuses the launch. Only the attempt copy of the locks closes here. `custody` is
+/// the caller's cwd lease the attempt runs under, lent when the locks were taken: like the attempt's own locks, it
+/// records the supervisor it went to right after the spawn.
 pub fn start_and_bind(
     attempt: &mut Attempt,
     envelope: &Value,
     extra_env: &Map<String, Value>,
+    custody: Option<&fgos_holder_lock::Handle>,
 ) -> Result<(Binding, StartedSupervisor), RunnerConfigError> {
     let run_dir = absolute(&attempt.run_dir);
     begin_launch(&run_dir).map_err(|e| RunnerConfigError::coded(e.to_string(), "run-cancelled"))?;
@@ -69,6 +72,13 @@ pub fn start_and_bind(
             let mut descriptors = vec![lent(attempt_lock)?];
             if let Some(lease) = locks.cwd_lease.as_ref() {
                 descriptors.push(lent(lease)?);
+            } else if let Some(copy) = locks.custody_copy.as_ref() {
+                // Under custody the caller's lease goes over through the copy lent when the locks were taken.
+                descriptors.push(copy.try_clone().map_err(|e| {
+                    launch_failed(format!(
+                        "executeAssignment: the custody lease could not be handed to the supervisor ({e})"
+                    ))
+                })?);
             }
             let handover: Vec<&std::fs::File> = descriptors.iter().collect();
             let started = start_supervisor(envelope, &handover, &attempt.step_env, extra_env)
@@ -78,6 +88,18 @@ pub fn start_and_bind(
                     ))
                 })?;
             drop(descriptors);
+            // The supervisor now holds every lent copy: each lent handle records it, so a later borrow of the
+            // custody lets it keep its copy and drains any other holder.
+            if let Some(child) =
+                fgos_process::facts::identity_of_child(fgos_process::ProcId(started.child.id()))
+            {
+                let lent = std::iter::once(attempt_lock)
+                    .chain(locks.cwd_lease.as_ref())
+                    .chain(custody.filter(|_| locks.custody_copy.is_some()));
+                for handle in lent {
+                    handle.lent_to(child.clone());
+                }
+            }
             started
         };
         #[cfg(not(unix))]
@@ -115,6 +137,8 @@ pub struct AwaitInput<'a> {
     pub on_chunk: &'a mut dyn FnMut(&str, &str),
     /// Stops the pane screen a person watching this controller sees, once the answer is read.
     pub stop_screen: Option<Box<dyn FnOnce() + 'a>>,
+    /// The caller's cwd lease the attempt runs under (its custody), lent to the supervisor with the locks.
+    pub custody: Option<&'a fgos_holder_lock::Handle>,
 }
 
 fn adopt_run(run_dir: &Path) -> Result<String, String> {
@@ -143,7 +167,7 @@ pub fn await_binding(
 ) -> Result<InterpretedRunResult, RunnerConfigError> {
     let run_dir = absolute(&attempt.run_dir);
     let run_id = attempt.run_id.clone();
-    let (bound, mut started) = start_and_bind(attempt, input.envelope, &Map::new())?;
+    let (bound, mut started) = start_and_bind(attempt, input.envelope, &Map::new(), input.custody)?;
     await_settled(attempt, &run_dir, &run_id, bound, &mut started.child, input)
 }
 

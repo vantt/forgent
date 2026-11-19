@@ -62,7 +62,9 @@ pub trait LockDriver: Sync {
     /// description (it was opened after it, or a drain that began there
     /// proved it), so a driver may read only processes created since.
     /// Linux refuses a missing mark. `protected_roots` names concurrent
-    /// sibling domains which may be waited on, never signalled.
+    /// sibling domains which may be waited on, never signalled. `members`
+    /// are processes the holder lent its description to (checked live by the
+    /// caller): they keep their copy and are neither waited on nor signalled.
     fn end_leftovers(
         &self,
         file: &File,
@@ -70,6 +72,7 @@ pub trait LockDriver: Sync {
         kill_wait: Duration,
         since: Option<fgos_process::facts::CreationMark>,
         protected_roots: &[u32],
+        members: &[u32],
     ) -> Result<u32, Leftovers>;
     /// Called by the port right before it closes or abandons a description
     /// that holds a lock. POSIX: nothing (a lock lives with the open file

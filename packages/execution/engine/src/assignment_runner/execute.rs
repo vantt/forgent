@@ -99,7 +99,7 @@ impl From<AdmissionError> for ExecuteError {
 
 /// What the caller states beside the assignment.
 #[derive(Default)]
-pub struct ExecuteOptions {
+pub struct ExecuteOptions<'a> {
     pub cwd: Option<PathBuf>,
     pub repo_root: Option<PathBuf>,
     pub runner_config: Option<Value>,
@@ -114,6 +114,8 @@ pub struct ExecuteOptions {
     pub force_shared_cwd: bool,
     pub pin_inputs: Vec<String>,
     pub dispatch_batch_key: Option<String>,
+    /// Seats launched together as one group (more than one): their panes share the tab in equal parts.
+    pub dispatch_batch_size: Option<u32>,
     pub retry_id: Option<String>,
     pub predecessor_run_id: Option<String>,
     pub destination: Option<String>,
@@ -122,7 +124,9 @@ pub struct ExecuteOptions {
     pub force_new_attempt: bool,
     pub refuse_if_settled: bool,
     pub launch_command_id: Option<String>,
-    pub custody: bool,
+    /// The held lease of the cwd the caller keeps across attempts and commit (a unit run's custody): the attempt
+    /// runs under it and takes no lease of its own.
+    pub custody: Option<&'a fgos_holder_lock::Handle>,
     pub provider_capacity_runtime_dir: Option<PathBuf>,
     pub control_ttl_ms: Option<u64>,
     pub committed_runner_config: Option<Value>,
@@ -225,7 +229,7 @@ fn json_text(value: &Value) -> String {
 }
 
 fn legality_options<'a>(
-    opts: &'a ExecuteOptions,
+    opts: &'a ExecuteOptions<'a>,
     cwd: &'a str,
     pinned: Option<&'a str>,
 ) -> LegalityOptions<'a> {
@@ -732,7 +736,7 @@ pub fn execute_assignment(
         cwd: cwd_text.clone(),
         host,
         step_env: ports.step_env(),
-        custody: opts.custody,
+        custody: opts.custody.is_some(),
         lease_runtime_dir: opts.provider_capacity_runtime_dir.clone(),
         session: false,
     });
@@ -817,7 +821,7 @@ fn run_admitted(
             attempt_str,
             cwd: Path::new(&cwd),
             mutating: effective_mutation == "mutating",
-            custody: None,
+            custody: opts.custody,
             executor_id: Some(executor_id),
             capability: compiled_plan.get("capability").and_then(Value::as_str),
         })?;
@@ -1081,6 +1085,7 @@ fn run_admitted(
         .case_context
         .as_ref()
         .map(|(a, b)| (a.as_str(), b.as_str()));
+    let work_label = crate::transport::terminal_slot::work_label_of(assignment);
     let seat = SeatInput {
         cfg,
         root,
@@ -1107,6 +1112,8 @@ fn run_admitted(
             None
         },
         dispatch_batch_key,
+        dispatch_batch_size: opts.dispatch_batch_size,
+        work_label: Some(&work_label),
         launch_env: None,
         blind: opts.blind,
         mutating: mutating && !opts.force_shared_cwd,
@@ -1171,6 +1178,7 @@ fn run_admitted(
             gate_kill_grace_ms: settings.gate_kill_grace_ms,
             on_chunk,
             stop_screen,
+            custody: opts.custody,
         },
     )?;
     Ok(settled)

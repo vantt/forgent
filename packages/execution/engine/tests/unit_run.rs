@@ -1468,8 +1468,8 @@ mod run_loop {
         fn adopt_state(&self, _: &Path) -> String {
             "closed".into()
         }
-        fn current_attempt(&self, _: &Path, _: &str) -> Option<AttemptRef> {
-            None
+        fn current_attempt(&self, _: &Path, _: &str) -> Result<Option<AttemptRef>, RunUnitError> {
+            Ok(None)
         }
         fn pinned_accounts_usable(
             &self,
@@ -1516,8 +1516,8 @@ mod run_loop {
             None
         }
         fn drop_assignment_record(&self, _: &str) {}
-        fn admission_generations(&self, _: &Path) -> Vec<Value> {
-            Vec::new()
+        fn admission_generations(&self, _: &Path) -> Result<Vec<Value>, RunUnitError> {
+            Ok(Vec::new())
         }
         fn report_digest(&self, _: &Value, _: &Path) -> Value {
             Value::Null
@@ -2287,8 +2287,8 @@ mod run_unit_runs {
         fn adopt_state(&self, _: &Path) -> String {
             "closed".into()
         }
-        fn current_attempt(&self, _: &Path, _: &str) -> Option<AttemptRef> {
-            None
+        fn current_attempt(&self, _: &Path, _: &str) -> Result<Option<AttemptRef>, RunUnitError> {
+            Ok(None)
         }
         fn pinned_accounts_usable(
             &self,
@@ -2322,8 +2322,8 @@ mod run_unit_runs {
             None
         }
         fn drop_assignment_record(&self, _: &str) {}
-        fn admission_generations(&self, _: &Path) -> Vec<Value> {
-            Vec::new()
+        fn admission_generations(&self, _: &Path) -> Result<Vec<Value>, RunUnitError> {
+            Ok(Vec::new())
         }
         fn report_digest(&self, _: &Value, _: &Path) -> Value {
             Value::Null
