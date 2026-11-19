@@ -1720,6 +1720,11 @@ impl<F: FileSystem> Wal<F> {
         &self,
         id: &str,
     ) -> Option<std::collections::BTreeMap<String, String>> {
+        // The id becomes a path segment that remove_operation deletes: an id
+        // with '/' or '..' must never reach the template, whatever its source.
+        if !valid_id(id) {
+            return None;
+        }
         Some(std::collections::BTreeMap::from([
             ("common".to_owned(), self.common.path().to_str()?.to_owned()),
             ("operationId".to_owned(), id.to_owned()),
