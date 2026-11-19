@@ -107,8 +107,8 @@
       "class": "blocking",
       "params": {},
       "reads": "exclusions, nodes[].layer",
-      "codes": [ "exclusion-in-one-layer" ],
-      "note": "Applies to declared layers only; vacuous when no node declares one."
+      "codes": [ "exclusion-in-one-layer", "exclusion-layer-undeclared" ],
+      "note": "Vacuous when no node declares a layer. Once any node declares one, a colliding pair with an end that declares none is the blocking `exclusion-layer-undeclared`, so omitting layers never switches the check off."
     },
     {
       "check": "declared-layers-valid",
@@ -140,6 +140,7 @@
     { "code": "read-only-with-claims", "class": "blocking", "nodes": "the node", "evidence": "the claims listed beside `readOnly: true`" },
     { "code": "facts-truncated", "class": "blocking", "nodes": [], "evidence": "reason, limit and source of the truncation" },
     { "code": "exclusion-in-one-layer", "class": "blocking", "nodes": "the pair", "evidence": "the shared entries and the layer" },
+    { "code": "exclusion-layer-undeclared", "class": "blocking", "nodes": "the pair", "evidence": "the shared entries" },
     { "code": "layer-order-violation", "class": "per rule", "nodes": "the node and the dependency", "evidence": "both declared layers" },
     { "code": "layer-missing", "class": "per rule", "nodes": "the node", "evidence": "other units declare layers; this one does not" },
     { "code": "layer-width-exceeded", "class": "per rule", "nodes": "the nodes of the layer", "evidence": "the layer, its width and the maximum" }
@@ -154,7 +155,7 @@
   ],
   "verdictFields": {
     "verdict": "one of verdicts",
-    "findings": "list of findings ordered by check order in the catalog, then by node input position",
+    "findings": "list of findings ordered by check order in the catalog, then by the input position of the finding's first node (a finding with no node last); a repeated dependsOn entry counts once",
     "policy": "the identity the caller passed, echoed verbatim, or null when the caller passed none",
     "counts": "{ nodes, readOnlyNodes, declaredLayers }",
     "readOnlyNodes": "ids of the nodes that asserted readOnly, listed because the assertion is the caller's and is not verified",
@@ -171,6 +172,7 @@
     "claim-malformed",
     "node-malformed",
     "duplicate-node-id",
+    "unknown-node-id",
     "id-too-long",
     "check-unknown",
     "param-unknown",

@@ -10,6 +10,7 @@ decision_boundary:
   can_decide:
     - The concrete shape of a plan, given already-locked product decisions
     - Which open product-decision gap is material enough to ask a person about
+    - As a head session, the plan it writes from a settled discussion; it writes only plans and docs/discussions and lands them with `land --paths`
   must_escalate:
     - A product decision with no grounding in the item's own CONTEXT.md
 rigor: standard

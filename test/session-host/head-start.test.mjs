@@ -84,7 +84,8 @@ test('the session launches with its role, its grant and the opening verbatim as 
   assert.match(request.opening, /# Start ritual/);
   assert.match(request.opening, /which pending question you resumed/);
   assert.equal(request.role, 'head:planner-probe');
-  assert.deepEqual(request.grant, { writes: [], verbs: [], mailbox: false, peers: false });
+  assert.deepEqual(request.grant, grantOf('head:planner-probe'));
+  assert.deepEqual(request.grant.writes, ['plans', 'docs/discussions']);
   assert.equal(request.ceilingMs, HEAD_HARD_CEILING_MS);
   assert.deepEqual(request.display, { id: 'probe', title: 'planner' });
   assert.deepEqual(request.binding, { executor: 'alpha', key: 'head-planner-probe-1' });
@@ -99,7 +100,7 @@ test('a secretary launches with the paths and the verb its grant names; the line
   assert.equal(request.key, headKeyOf('secretary', 'miu', 2));
   assert.deepEqual(request.grant, grantOf('head:secretary-miu'));
   assert.deepEqual(request.grant.writes, ['plans', 'docs/backlog.md', 'docs/discussions']);
-  assert.deepEqual(request.grant.verbs, ['session start', 'session write', 'session bind session', 'session rotate', 'session answered', 'session restore role', 'questions ask', 'questions ack', 'questions cancel', 'questions answer']);
+  assert.deepEqual(request.grant.verbs, ['session start', 'session write', 'session bind session', 'session rotate', 'session answered', 'session restore role', 'questions ask', 'questions ack', 'questions cancel', 'questions answer', 'land', 'request result']);
   assert.equal(request.grant.mailbox, true, 'the secretary sends and receives mail');
   assert.deepEqual(request.env, { FGOS_HEAD_ROLE: headRoleOf('secretary', 'miu'), FGOS_HEAD_PERSONA: 'secretary', FGOS_HEAD_NAME: 'miu', FGOS_HEAD_GEN: '2' });
   // The supervisor records this head in the session's Identity entry from the envelope's session fields.
@@ -112,10 +113,20 @@ test('a secretary launches with the paths and the verb its grant names; the line
 });
 
 test('the grant table: the persona matches a table key exactly, an unnamed persona holds nothing, a non-head role is refused', () => {
-  assert.deepEqual(grantOf('head:planner-probe'), { writes: [], verbs: [], mailbox: false, peers: false });
-  assert.deepEqual(grantOf('head:secretary-miu').verbs, ['session start', 'session write', 'session bind session', 'session rotate', 'session answered', 'session restore role', 'questions ask', 'questions ack', 'questions cancel', 'questions answer']);
+  assert.deepEqual(grantOf('head:secretary-miu').verbs, ['session start', 'session write', 'session bind session', 'session rotate', 'session answered', 'session restore role', 'questions ask', 'questions ack', 'questions cancel', 'questions answer', 'land', 'request result']);
   assert.equal(grantOf('head:secretary-miu').peers, true, 'only the secretary reaches the peer sessions of its machine');
-  assert.deepEqual(grantOf('head:shaper-x'), { writes: [], verbs: ['session bind session', 'session rotate', 'session answered', 'session restore role', 'questions ask', 'questions ack', 'questions cancel'], mailbox: false, peers: false }, 'a shaper binds its session, rotates and asks, acks and cancels its own questions but starts nothing, answers nothing, writes nothing, has no mailbox and reaches no peer session');
+  const base = ['session bind session', 'session rotate', 'session answered', 'session restore role', 'questions ask', 'questions ack', 'questions cancel'];
+  assert.deepEqual(grantOf('head:shaper-x'), { writes: ['docs/discussions'], verbs: [...base, 'land', 'request result'], mailbox: false, peers: false }, 'a shaper writes its discussions and lands them but starts nothing, answers nothing, has no mailbox and reaches no peer session');
+  assert.deepEqual(grantOf('head:planner-x'), { writes: ['plans', 'docs/discussions'], verbs: [...base, 'land', 'request result'], mailbox: false, peers: false });
+  assert.deepEqual(grantOf('head:supervisor-x'), { writes: ['plans', 'docs/backlog.md'], verbs: ['session start', 'session stop', 'session write', ...base, 'land', 'request result', 'supervisor handled', 'supervisor done'], mailbox: false, peers: false });
+  assert.ok(!grantOf('head:supervisor-x').verbs.includes('run'), 'a supervisor never runs a unit');
+  const lead = grantOf('head:lead-sv-p09', 'lead', { planDir: '261118-1045-project-supervisor' });
+  assert.deepEqual(lead, { writes: ['plans/261118-1045-project-supervisor'], verbs: [...base, 'run', 'land', 'worktree create', 'request result'], mailbox: false, peers: false });
+  assert.ok(!lead.verbs.includes('session start'), 'a lead starts no session');
+  assert.throws(() => grantOf('head:lead-sv-p09', 'lead'), { code: 'plan-not-found' });
+  assert.throws(() => grantOf('head:lead-sv-p09'), { code: 'plan-not-found' });
+  assert.deepEqual(grantOf('head:planner-x', 'planner', { planDir: 'ignored' }), grantOf('head:planner-x'), 'only a lead reads the plan directory');
+  assert.deepEqual(grantOf('head:other-x'), { writes: [], verbs: [], mailbox: false, peers: false });
   assert.deepEqual(grantOf('head:secretary-miu', 'secretary'), grantOf('head:secretary-miu'));
   // `secretary-x` is another persona: asked by persona it is not the secretary, even though the role starts alike.
   assert.deepEqual(grantOf('head:secretary-x-y', 'secretary-x'), { writes: [], verbs: [], mailbox: false, peers: false });
@@ -123,6 +134,22 @@ test('the grant table: the persona matches a table key exactly, an unnamed perso
   assert.throws(() => grantOf('lead:MAIL'), { code: 'role-invalid' });
   assert.throws(() => grantOf('head:secretary'), { code: 'role-invalid' });
   assert.throws(() => grantOf(undefined), { code: 'role-invalid' });
+});
+
+test('a lead launches with its plan dir as the only write, a rotation resolves the same grant, a resolver refusal is grant-invalid', async () => {
+  const projectRoot = scratch();
+  const { calls, ports } = fakes();
+  const seen = [];
+  const planOfHead = (root, persona, name) => { seen.push([persona, name]); return { dir: '261118-1045-project-supervisor', footprint: [] }; };
+  await startHeadSession({ persona: 'lead', name: 'sv-p09', projectRoot }, { ...ports, planOfHead });
+  assert.deepEqual(calls.launch[0].grant.writes, ['plans/261118-1045-project-supervisor']);
+  assert.deepEqual(seen, [['lead', 'sv-p09']]);
+  await placeHead({ persona: 'lead', name: 'sv-p09', projectRoot, gen: 2 }, { ...ports, planOfHead });
+  assert.deepEqual(calls.launch[1].grant, calls.launch[0].grant, 'a rotation resolves the same lead grant');
+  const refuse = () => { throw Object.assign(new Error('no plan'), { code: 'plan-not-found' }); };
+  await assert.rejects(() => placeHead({ persona: 'lead', name: 'sv-none', projectRoot }, { ...ports, planOfHead: refuse }), { code: 'grant-invalid' });
+  assert.equal(calls.launch.length, 2, 'a refused grant launches nothing');
+  fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 
 test('a start without a generation takes the first one whose attempt directory is unused', async () => {
