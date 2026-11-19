@@ -575,8 +575,6 @@ struct Sup<'a> {
     adapter: Terminal,
     /// A head session's request socket and its server; closed (path unlinked) when the attempt is ending.
     requests: Option<(AttemptSocket, HeadRequests)>,
-    /// The slot key, tab and pane the attempt was placed in, as the terminal store recorded them.
-    placed: Option<TerminalIds>,
 }
 
 impl Sup<'_> {
@@ -891,6 +889,20 @@ pub(super) fn run(
         let _ = domain_kill_all(&domain);
         return Err(Refusal::internal(why));
     }
+    if let Some(session) = &plan.session {
+        if let Err(refusal) = register_session(session, &gate, placed.as_ref()) {
+            // The head must hold its role before the agent exists; without GO the gate runs nothing.
+            let _ = domain_kill_all(&domain);
+            return super::not_started(
+                envelope,
+                run_dir,
+                watch,
+                locks,
+                refusal.code,
+                &format!("{} was not bound: {}", session.role, refusal.why),
+            );
+        }
+    }
     let go_frame = json!({"type": "GO", "attemptId": watch.attempt_id, "envelopeDigest": watch.digest, "gateHostTuple": gate.to_record().to_json()});
     if let Err(why) = send_frame_with_fds(&stream, &go_frame, &locks.raw_fds()) {
         // Without GO the gate runs nothing and leaves by itself; make sure.
@@ -921,7 +933,6 @@ pub(super) fn run(
         end: TerminalEnd::default(),
         adapter: plan.adapter,
         requests,
-        placed,
     };
     drive(&plan, &core, &mut sup);
 
@@ -948,14 +959,46 @@ pub(super) fn run(
     super::finish(envelope, run_dir, watch, locks, false, &end)
 }
 
+/// A head attempt's role binding that Identity refused: the code the start is refused with and what Identity said.
+struct RoleRefusal {
+    code: &'static str,
+    why: String,
+}
+
+/// Whether the live holder of `role` is the earlier generation of this very head (same persona and name, a lower
+/// generation): the one case a starting attempt may register without the role, because rotation moves it later.
+fn holder_is_predecessor(state_root: &Path, session: &SessionPlan) -> bool {
+    let Some(own) = &session.head else {
+        return false;
+    };
+    fgos_identity::directory::resolve(
+        state_root,
+        &session.role,
+        &facts::judge_here,
+        None,
+        &fgos_identity::directory::NoTerminal,
+    )
+    .ok()
+    .and_then(|holder| holder.ids)
+    .and_then(|ids| ids.head)
+    .is_some_and(|held| held.persona == own.persona && held.name == own.name && held.gen < own.gen)
+}
+
 /// Registers a session attempt in Identity under its role, from outside the sandbox: Identity stays the only
 /// authority for who holds a role, and the supervisor only transports the fact that this attempt is that session.
 /// The head is the gate, which lives exactly as long as the attempt's domain. The entry carries the identifiers
 /// the supervisor owns: `terminal` (the slot key, tab and pane it was placed in) and `head` (persona, name and
-/// generation from the envelope), which a later bind of the agent session moves with the roles. A role a live
-/// session still holds (a rotation successor starting before its predecessor ended) registers the session
-/// without it; any other refusal is one log line and the attempt goes on.
-fn register_session(session: &SessionPlan, gate: &ProcTuple, placed: Option<&TerminalIds>) {
+/// generation from the envelope), which a later bind of the agent session moves with the roles.
+///
+/// Runs before the gate is told to go, so a head never starts without its role: a dead holder is swept by Identity
+/// and the role is taken; a live holder refuses the start (`head-role-held`) unless it is the earlier generation of
+/// this head, which a rotation successor registers beside without the role (rotation moves it); any other refusal
+/// is `head-role-not-bound` carrying Identity's code.
+fn register_session(
+    session: &SessionPlan,
+    gate: &ProcTuple,
+    placed: Option<&TerminalIds>,
+) -> Result<(), RoleRefusal> {
     let state_root = fgos_holder_lock::state_root::state_root().0;
     let key = WriterKey {
         // The attempt's writer id is the first variable of Identity's rule, the one the gate exports.
@@ -983,17 +1026,26 @@ fn register_session(session: &SessionPlan, gate: &ProcTuple, placed: Option<&Ter
         )
     };
     let refused = match register(std::slice::from_ref(&session.role)) {
-        Ok(_) => return,
-        Err(refusal) if refusal.reason == "role-held" => match register(&[]) {
-            Ok(_) => return,
-            Err(refusal) => refusal,
-        },
+        Ok(_) => return Ok(()),
         Err(refusal) => refusal,
     };
-    eprintln!(
-        "fgos internal supervise: session {} was not registered for {}: {}: {}",
-        session.writer_id, session.role, refused.reason, refused.detail
-    );
+    let why = format!("{}: {}", refused.reason, refused.detail);
+    if refused.reason == "role-held" {
+        if holder_is_predecessor(&state_root, session) {
+            return register(&[]).map(|_| ()).map_err(|refusal| RoleRefusal {
+                code: "head-role-not-bound",
+                why: format!("{}: {}", refusal.reason, refusal.detail),
+            });
+        }
+        return Err(RoleRefusal {
+            code: "head-role-held",
+            why,
+        });
+    }
+    Err(RoleRefusal {
+        code: "head-role-not-bound",
+        why,
+    })
 }
 
 /// The stop an unreadable result ends in: the contract's cause and the receipt reason it names.
@@ -1046,8 +1098,7 @@ fn drive(plan: &Plan, core: &Core, sup: &mut Sup) {
     if io.sup.finished() {
         return;
     }
-    if let Some(session) = &plan.session {
-        register_session(session, &io.sup.gate, io.sup.placed.as_ref());
+    if plan.session.is_some() {
         if let Some((_, server)) = &io.sup.requests {
             server.set_gate(HeadRef {
                 pid: io.sup.gate.pid.0,
