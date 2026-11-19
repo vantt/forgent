@@ -242,6 +242,11 @@ Open:
 - whether the lead may submit a dependent phase stacked on an unlanded one, or must wait;
 - reviewer independence when only one provider is available;
 - the integrate port's contract, and where the coding adapter lives (Git crate or a coding crate).
+- what the verdict binds to: the branch head SHA forces a new review after every clean trunk merge into the branch;
+  binding to the author's own diff (e.g. `git patch-id` of `trunk...branch` minus trunk merges) would keep a verdict
+  across clean trunk merges, but a conflict resolution still needs a new review;
+- throughput: only the merge slot section (fetch, candidate, path-scoped gates, push) stays serial, as today; batching
+  in the GitHub `merge_group` style waits for a measured queue.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
