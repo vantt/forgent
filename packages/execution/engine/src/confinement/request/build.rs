@@ -248,7 +248,7 @@ fn request_context(context: &Value, blind: bool) -> Value {
 }
 
 /// The executor's registered confinement (`cfg.executors[execId].confinement`).
-fn executor_confinement<'a>(cfg: Option<&'a Value>, exec_id: &str) -> Option<&'a Value> {
+fn registered_confinement<'a>(cfg: Option<&'a Value>, exec_id: &str) -> Option<&'a Value> {
     cfg.and_then(|c| at(c, &["executors", exec_id, "confinement"]))
 }
 
@@ -322,7 +322,7 @@ pub fn build_confinement_request(
             given_override,
             coalesce(
                 at(invocation, &["confinement", "override"]),
-                executor_confinement(cfg, exec_id).and_then(|c| get(c, "override")),
+                registered_confinement(cfg, exec_id).and_then(|c| get(c, "override")),
             ),
         )
     };
@@ -374,7 +374,7 @@ pub fn build_confinement_request(
     // registration (or an explicit caller argument).
     let backend = coalesce(
         get(args, "backendId"),
-        executor_confinement(cfg, exec_id).and_then(|c| get(c, "backend")),
+        registered_confinement(cfg, exec_id).and_then(|c| get(c, "backend")),
     );
     req.insert("backendId".into(), backend.cloned().unwrap_or(Value::Null));
     for key in ["authorityScope", "assignmentLaunchContext"] {

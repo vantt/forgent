@@ -8,7 +8,6 @@
 use std::path::{Path, PathBuf};
 
 use serde_json::{json, Map, Value};
-use sha2::{Digest, Sha256};
 
 use super::attestation::build_confinement_attestation;
 use super::delivery::{effective_backend_of, own_worktree_unavailable};
@@ -30,6 +29,7 @@ use crate::transport::adapters::{
 };
 use fgos_canonical_json::canonical_json;
 use fgos_durable_file::{install_once_with_mode, replace_durably_with_mode};
+use fgos_execution::handoff::sha256_hex;
 
 /// The file a temporary directory carries to say whose it is. Confinement cleanup owns the name; the pipeline only
 /// reads the marker to bind it into the launch records.
@@ -138,11 +138,7 @@ fn digest(value: &Value) -> String {
 }
 
 fn digest_text(text: &str) -> String {
-    let hex: String = Sha256::digest(text.as_bytes())
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect();
-    format!("sha256:{hex}")
+    format!("sha256:{}", sha256_hex(text.as_bytes()))
 }
 
 fn pretty(record: &Value) -> Vec<u8> {
