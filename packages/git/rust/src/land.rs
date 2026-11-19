@@ -10,6 +10,12 @@ use fgos_holder_lock::{BorrowedHandle, LockScope, Wait};
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, path::PathBuf};
 
+/// The one refusal for a dirty main-checkout path the land would write.
+fn dirty_overlap(path: &str) -> OperationError {
+    failure("main-checkout-dirty-overlap")
+        .with_diagnostic(format!("dirty path {path} is written by the land"))
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct LandRequest {
@@ -21,7 +27,7 @@ pub struct LandRequest {
     pub message: String,
     #[serde(default)]
     pub squash: bool,
-    /// Absent means every non-store path; an explicit empty set still includes the commit diff.
+    /// Extra paths counted as dirty-main-checkout scope on top of the commit diff; absent and empty both mean the commit diff alone.
     pub footprint: Option<Vec<String>>,
     pub subtree: Option<String>,
     #[serde(default)]
@@ -231,6 +237,10 @@ impl GitDriver {
         }
         Ok(())
     }
+    /// Refuses only a dirty main-checkout path the land would write: a path that
+    /// differs between the target tip and the candidate, or one in the declared
+    /// footprint. Every other dirty path stays untouched through the two-tree
+    /// `read-tree -m -u`. Land and catch-up share this one rule.
     fn land_gate(
         &self,
         repo: &RepoHandle,
@@ -282,11 +292,10 @@ impl GitDriver {
                 {
                     continue;
                 }
-                if req.footprint.is_none()
-                    || own.iter().any(|s| fgos_write_scope::overlaps(s, p))
+                if own.iter().any(|s| fgos_write_scope::overlaps(s, p))
                     || fgos_write_scope::matches(p.as_bytes(), &matcher).map_err(failure)?
                 {
-                    return Err(failure("main-checkout-dirty-mid-merge"));
+                    return Err(dirty_overlap(p));
                 }
             }
             if page.complete {
@@ -300,7 +309,7 @@ impl GitDriver {
             if is_store_path(path) {
                 store_collision = true;
             } else {
-                return Err(failure("main-checkout-dirty-mid-merge"));
+                return Err(dirty_overlap(path));
             }
         }
         Ok((dirty, store_collision))

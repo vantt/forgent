@@ -733,7 +733,7 @@ export async function approveUseCase(
       return { id, mode: 'merge', to: 'blocked', reason: 'merge-blocked-other-item', target: 'main' };
     }
 
-    if (result.outcome === 'main-checkout-dirty-mid-merge') {
+    if (result.outcome === 'main-checkout-dirty-overlap') {
       // A path in the item's own file set was clean at the pre-check above
       // (before the CAS worktree merge+verify, which can take minutes) but
       // was found dirty again by the second check taken under
@@ -746,17 +746,17 @@ export async function approveUseCase(
       const detail = hadChildren
         ? `cross-root integration attempt at main@${currentHead(repoRoot)}; ${dirtied}; merge of ${result.branch} was stopped before update-ref`
         : `${dirtied}; merge of ${result.branch} was stopped before update-ref`;
-      const conflict = moveBlockedOrConflict(dir, { id, reason: 'main-checkout-dirty-mid-merge', role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
+      const conflict = moveBlockedOrConflict(dir, { id, reason: 'main-checkout-dirty-overlap', role: 'system' }, { repoRoot, landSettlement: result.landSettlement });
       if (conflict) return conflict;
       recordFriction(dir, {
         id,
         disposition: 'blocked',
-        errorClass: 'main-checkout-dirty-mid-merge',
+        errorClass: 'main-checkout-dirty-overlap',
         layer: 'state',
         attempts: 1,
         detail,
       });
-      return { id, mode: 'merge', to: 'blocked', reason: 'main-checkout-dirty-mid-merge', target: 'main' };
+      return { id, mode: 'merge', to: 'blocked', reason: 'main-checkout-dirty-overlap', target: 'main' };
     }
 
     if (result.outcome === 'fgos-write-rejected') {

@@ -101,46 +101,65 @@ fn mismatch_and_candidate_edits_never_publish() {
 }
 #[test]
 fn dirty_nonoverlap_is_preserved_and_reported_lagging() {
-    let f = Fixture::new();
-    fs::write(f.main.join("b"), "keep local\n").unwrap();
-    let mut s = f
-        .driver
-        .prepare_land(
-            &f.repo,
-            vec![],
-            &f.request,
-            "fixture",
-            "dirty",
-            &wal::OsFileSystem,
-            0,
-        )
-        .unwrap();
-    let e = evidence(&s);
-    let candidate = s.candidate().unwrap().candidate.clone();
-    let r = f
-        .driver
-        .publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0)
-        .unwrap();
-    assert!(matches!(r.checkout, Checkout::Pending));
-    assert_eq!(
-        git(&f.main, &["rev-parse", "HEAD"]),
-        candidate,
-        "the ref moves; only the checkout lags"
-    );
-    assert_eq!(
-        fs::read_to_string(f.main.join("b")).unwrap(),
-        "keep local\n"
-    );
+    // Two unrelated dirty tracked files (the live shape), with an empty and an absent footprint:
+    // both mean the commit diff alone, so neither file blocks and both keep their edits.
+    for footprint in [Some(vec![]), None] {
+        let f = Fixture::new();
+        let mut request = f.request.clone();
+        request.footprint = footprint.clone();
+        fs::write(f.main.join("b"), "keep local\n").unwrap();
+        fs::write(f.main.join("c"), "keep local too\n").unwrap();
+        let mut s = f
+            .driver
+            .prepare_land(
+                &f.repo,
+                vec![],
+                &request,
+                "fixture",
+                "dirty",
+                &wal::OsFileSystem,
+                0,
+            )
+            .unwrap();
+        let e = evidence(&s);
+        let candidate = s.candidate().unwrap().candidate.clone();
+        let r = f
+            .driver
+            .publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0)
+            .unwrap();
+        assert!(matches!(r.checkout, Checkout::Pending), "{footprint:?}");
+        assert_eq!(
+            git(&f.main, &["rev-parse", "HEAD"]),
+            candidate,
+            "the ref moves; only the checkout lags"
+        );
+        assert_eq!(
+            fs::read_to_string(f.main.join("b")).unwrap(),
+            "keep local\n"
+        );
+        assert_eq!(
+            fs::read_to_string(f.main.join("c")).unwrap(),
+            "keep local too\n"
+        );
+        assert_eq!(
+            fs::read_to_string(f.main.join("a")).unwrap(),
+            "incoming\n",
+            "the path the land writes is checked out"
+        );
+    }
 }
 #[test]
 fn dirty_own_paths_block_before_cas() {
     // An own path edited, the same edit staged (the index alone differs), and a declared footprint
     // path renamed away (the rename source counts).
-    for case in ["edited", "staged", "renamed"] {
+    for case in ["edited", "staged", "renamed", "edited-absent-footprint"] {
         let f = Fixture::new();
         let mut request = f.request.clone();
         if case == "renamed" {
             request.footprint = Some(vec!["b".into()]);
+        }
+        if case == "edited-absent-footprint" {
+            request.footprint = None;
         }
         let mut s = f
             .driver
@@ -164,13 +183,17 @@ fn dirty_own_paths_block_before_cas() {
             git(&f.main, &["add", "a"]);
         }
         let e = evidence(&s);
-        assert_eq!(
-            f.driver
-                .publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0)
-                .unwrap_err()
-                .cause,
-            "main-checkout-dirty-mid-merge",
-            "{case}"
+        let refusal = f
+            .driver
+            .publish_land(&f.repo, &mut s, &e, &wal::OsFileSystem, 0)
+            .unwrap_err();
+        assert_eq!(refusal.cause, "main-checkout-dirty-overlap", "{case}");
+        let named = if case == "renamed" { "b" } else { "a" };
+        assert!(
+            serde_json::to_string(&refusal.detail)
+                .unwrap()
+                .contains(&format!("dirty path {named} ")),
+            "{case}: the detail names the intersecting path"
         );
         assert_eq!(
             git(&f.main, &["rev-parse", "HEAD"]),

@@ -47,7 +47,7 @@ test('ignored incoming collisions preserve bytes and block before CAS', async ()
     // The source introduces b/new while main has an ignored untracked directory there.
     f.git('checkout', '-q', 'source'); fs.mkdirSync(path.join(f.repo, 'ignored-dir')); fs.writeFileSync(path.join(f.repo, 'ignored-dir/new'), 'incoming'); f.git('add', 'ignored-dir/new'); f.git('commit', '-qm', 'ignored incoming'); f.request.source = f.git('rev-parse', 'HEAD'); f.git('checkout', '-q', 'trunk');
     fs.writeFileSync(path.join(f.repo, '.git/info/exclude'), 'ignored-dir/\n'); fs.mkdirSync(path.join(f.repo, 'ignored-dir')); fs.writeFileSync(path.join(f.repo, 'ignored-dir/new'), 'keep ignored');
-    await assert.rejects(async () => f.port().prepare({ operationId: 'ignored', request: f.request }), /main-checkout-dirty-mid-merge/);
+    await assert.rejects(async () => f.port().prepare({ operationId: 'ignored', request: f.request }), /main-checkout-dirty-overlap/);
     assert.equal(fs.readFileSync(path.join(f.repo, 'ignored-dir/new'), 'utf8'), 'keep ignored'); assert.equal(f.git('rev-parse', 'HEAD'), f.request.target);
   } finally { f.close(); }
 });
@@ -90,11 +90,13 @@ test('a conflict aborts only the operation candidate and preserves both refs and
     const candidates = path.join(f.repo, '.fgos/runtime/git-candidates'); for (const name of fs.readdirSync(candidates)) assert.equal(execFileSync('git', ['-C', path.join(candidates, name), 'status', '--porcelain'], { encoding: 'utf8' }), '');
   } finally { f.close(); }
 });
-test('missing footprint fails safe while a return subtree leaves unrelated dirt alone', async () => {
+test('a missing footprint refuses only a dirty path the land writes and leaves unrelated dirt alone', async () => {
   const f = fixture(); try {
     fs.writeFileSync(path.join(f.repo, 'b'), 'keep outside subtree');
-    await assert.rejects(async () => f.port().prepare({ operationId: 'no-footprint', request: { ...f.request, footprint: null } }), /main-checkout-dirty-mid-merge/);
-    const p = f.port(); const { candidate: c } = await p.prepare({ operationId: 'subtree', request: { ...f.request, footprint: null, subtree: 'a' } }); assert.equal((await p.publish(evidence(c))).checkout, 'pending'); assert.equal(fs.readFileSync(path.join(f.repo, 'b'), 'utf8'), 'keep outside subtree');
+    fs.writeFileSync(path.join(f.repo, 'a'), 'dirty written path');
+    await assert.rejects(async () => f.port().prepare({ operationId: 'no-footprint', request: { ...f.request, footprint: null } }), /main-checkout-dirty-overlap/);
+    f.git('checkout', '--', 'a');
+    const p = f.port(); const { candidate: c } = await p.prepare({ operationId: 'unrelated', request: { ...f.request, footprint: null } }); assert.equal((await p.publish(evidence(c))).checkout, 'pending'); assert.equal(fs.readFileSync(path.join(f.repo, 'b'), 'utf8'), 'keep outside subtree');
   } finally { f.close(); }
 });
 test('an ignored store collision publishes once with a pending checkout and preserves its local bytes', async () => {
@@ -109,7 +111,7 @@ test('an ignored store collision publishes once with a pending checkout and pres
 test('a dirty file obstructing an incoming directory belongs to the clean gate', async () => {
   const f = fixture(); try {
     f.git('checkout', '-q', 'source'); fs.mkdirSync(path.join(f.repo, 'incoming-dir')); fs.writeFileSync(path.join(f.repo, 'incoming-dir/file'), 'incoming'); f.git('add', 'incoming-dir/file'); f.git('commit', '-qm', 'incoming directory'); f.request.source = f.git('rev-parse', 'HEAD'); f.git('checkout', '-q', 'trunk'); fs.writeFileSync(path.join(f.repo, 'incoming-dir'), 'keep obstructing bytes');
-    await assert.rejects(async () => f.port().prepare({ operationId: 'obstruction', request: f.request }), /main-checkout-dirty-mid-merge/); assert.equal(f.git('rev-parse', 'HEAD'), f.request.target); assert.equal(fs.readFileSync(path.join(f.repo, 'incoming-dir'), 'utf8'), 'keep obstructing bytes');
+    await assert.rejects(async () => f.port().prepare({ operationId: 'obstruction', request: f.request }), /main-checkout-dirty-overlap/); assert.equal(f.git('rev-parse', 'HEAD'), f.request.target); assert.equal(fs.readFileSync(path.join(f.repo, 'incoming-dir'), 'utf8'), 'keep obstructing bytes');
   } finally { f.close(); }
 });
 test('abandoned prepare never blocks a fresh identity and remains recoverable', async () => {

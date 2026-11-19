@@ -418,7 +418,7 @@ fn a_git_refusal_passes_through_with_its_own_code() {
     let mut cmd = branch("topic");
     cmd.footprint = Some(vec!["a".into()]);
     let refusal = f.land(&cmd, &config(vec![gate("true")])).unwrap_err();
-    assert_eq!(refusal.code, "main-checkout-dirty-mid-merge");
+    assert_eq!(refusal.code, "main-checkout-dirty-overlap");
 }
 
 #[test]

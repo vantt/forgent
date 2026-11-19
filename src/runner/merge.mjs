@@ -985,7 +985,7 @@ export async function landRunnerItem(repoRoot, item, {
       return verified;
     }
     if (cause === 'land-conflict-aborted') return settled({ outcome: 'conflict', branch });
-    if (cause === 'main-checkout-dirty-mid-merge') return settled({ outcome: cause, branch });
+    if (cause === 'main-checkout-dirty-overlap') return settled({ outcome: cause, branch });
     if (cause === 'foreign-target-checkout') {
       throw new MergeError(`cannot merge "${branch}" into "${target}": "${target}" is checked out in another worktree, and Land never moves a branch behind another index. Finish or remove that checkout, then retry.`, {
         branch, targetRef: target, code: cause,
