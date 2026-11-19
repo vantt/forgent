@@ -221,6 +221,10 @@ test('a head whose supervisor could not bind its role is refused with the superv
   await assert.rejects(startHeadSession({ persona: 'planner', name: 'probe', projectRoot, gen: 1 }, ports), (err) => err.code === 'head-role-held' && /held by the live session x/.test(err.message));
   fs.writeFileSync(path.join(refusedRun, 'start-refused.json'), JSON.stringify({ v: 1, code: 'terminal-gate-silent', why: 'no hello' }));
   await assert.rejects(startHeadSession({ persona: 'planner', name: 'probe', projectRoot, gen: 1 }, ports), { code: 'start-refused' });
+  // The note of an earlier run is not the failed launch's: only the newest run is read.
+  fs.writeFileSync(path.join(refusedRun, 'start-refused.json'), JSON.stringify({ v: 1, code: 'head-role-held', why: 'stale' }));
+  fs.mkdirSync(path.join(path.dirname(refusedRun), '02'), { recursive: true });
+  await assert.rejects(startHeadSession({ persona: 'planner', name: 'probe', projectRoot, gen: 1 }, ports), { code: 'start-refused' });
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 

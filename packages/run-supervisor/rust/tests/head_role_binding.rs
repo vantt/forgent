@@ -186,5 +186,19 @@ fn a_rotation_successor_starts_beside_its_live_predecessor_and_leaves_it_the_rol
         "the role moves only when rotation moves it"
     );
     assert!(run.json("start-refused.json").is_none(), "{}", run.log());
+    // The successor has its own Identity entry with no roles: the record a later bind of its agent session moves them to.
+    let listed =
+        fgos_identity::directory::list(&herdr.state_root, None, false, &facts::judge_here, None)
+            .unwrap_or_else(|r| panic!("list: {} {}", r.reason, r.detail));
+    let own = listed
+        .sessions
+        .iter()
+        .find(|s| s.id.ends_with(&format!("/att-{}", run.attempt_id)))
+        .expect("the successor is registered in Identity");
+    assert!(
+        own.roles.is_empty(),
+        "the successor holds no role yet: {:?}",
+        own.roles
+    );
     ends_when_pane_goes(&herdr, supervisor, &run);
 }

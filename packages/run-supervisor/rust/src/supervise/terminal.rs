@@ -965,12 +965,11 @@ struct RoleRefusal {
     why: String,
 }
 
-/// Whether the live holder of `role` is the earlier generation of this very head (same persona and name, a lower
-/// generation): the one case a starting attempt may register without the role, because rotation moves it later.
-fn holder_is_predecessor(state_root: &Path, session: &SessionPlan) -> bool {
-    let Some(own) = &session.head else {
-        return false;
-    };
+/// The live holder of the session's role, as Identity resolves it: None when it is gone (it died after the refusal).
+fn live_holder(
+    state_root: &Path,
+    session: &SessionPlan,
+) -> Option<fgos_identity::directory::Listed> {
     fgos_identity::directory::resolve(
         state_root,
         &session.role,
@@ -979,9 +978,21 @@ fn holder_is_predecessor(state_root: &Path, session: &SessionPlan) -> bool {
         &fgos_identity::directory::NoTerminal,
     )
     .ok()
-    .and_then(|holder| holder.ids)
-    .and_then(|ids| ids.head)
-    .is_some_and(|held| held.persona == own.persona && held.name == own.name && held.gen < own.gen)
+}
+
+/// Whether `holder` is the earlier generation of this very head (same persona and name, a lower generation): the one
+/// case a starting attempt may register without the role, because rotation moves it later.
+fn holder_is_predecessor(holder: &fgos_identity::directory::Listed, session: &SessionPlan) -> bool {
+    let Some(own) = &session.head else {
+        return false;
+    };
+    holder
+        .ids
+        .as_ref()
+        .and_then(|ids| ids.head.as_ref())
+        .is_some_and(|held| {
+            held.persona == own.persona && held.name == own.name && held.gen < own.gen
+        })
 }
 
 /// Registers a session attempt in Identity under its role, from outside the sandbox: Identity stays the only
@@ -1031,11 +1042,23 @@ fn register_session(
     };
     let why = format!("{}: {}", refused.reason, refused.detail);
     if refused.reason == "role-held" {
-        if holder_is_predecessor(&state_root, session) {
-            return register(&[]).map(|_| ()).map_err(|refusal| RoleRefusal {
-                code: "head-role-not-bound",
-                why: format!("{}: {}", refusal.reason, refusal.detail),
-            });
+        match live_holder(&state_root, session) {
+            // The holder died between the refusal and now: the role is free, take it once more.
+            None => {
+                return register(std::slice::from_ref(&session.role))
+                    .map(|_| ())
+                    .map_err(|refusal| RoleRefusal {
+                        code: "head-role-held",
+                        why: format!("{}: {}", refusal.reason, refusal.detail),
+                    });
+            }
+            Some(holder) if holder_is_predecessor(&holder, session) => {
+                return register(&[]).map(|_| ()).map_err(|refusal| RoleRefusal {
+                    code: "head-role-not-bound",
+                    why: format!("{}: {}", refusal.reason, refusal.detail),
+                });
+            }
+            Some(_) => {}
         }
         return Err(RoleRefusal {
             code: "head-role-held",

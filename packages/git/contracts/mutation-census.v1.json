@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "c8e43ede5b51771b03405387980bdb68df32577ef3423c128b1f868e1f647c4a",
+  "payloadDigest": "c9ef83ea0a977b85d24c99841363564bdc955e042ecf7063ae2a624613d0e234",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1054,7 +1054,7 @@
     "packages/run-supervisor/rust/src/route.rs": "069356702d9b981333f44c2b7c58d746c1e75cf9c017ca1c4f1693fa6b42a73d",
     "packages/run-supervisor/rust/src/steps.rs": "444b8f91a8bc04ee0a0baefedf9a7a61069d2864ebc33cbb32e84f185d725cd9",
     "packages/run-supervisor/rust/src/supervise.rs": "f20ec3ddf1eb369afc4922821aed1fd9eca6059e4623a87a77819760f59a9d55",
-    "packages/run-supervisor/rust/src/supervise/terminal.rs": "dc6cc6f5d66d1dc47d8f3e355f29334e9dd697c1d19d45f463c7097cfa6f3277",
+    "packages/run-supervisor/rust/src/supervise/terminal.rs": "c9bd9158958f954844b6e3f1a695275969e9686b442214e05728a9ddc3850810",
     "packages/run-supervisor/rust/src/supervise/unix.rs": "d9510693da158bf18e139257b3672c6641247b76cf5ac68a9dd892792e7509ad",
     "packages/run-supervisor/rust/src/supervise/windows.rs": "6b7de2b3ee80cb63ea33e77a6837e3838eb558223f34a8b83e79c7861ab4e4a4",
     "packages/run-supervisor/rust/src/terminal_slot.rs": "20698d58c30356a6be8250ce27107c588c5e99db31c04c977c48be33a9304c23",
@@ -1079,6 +1079,7 @@
     "packages/run-supervisor/rust/tests/gate_portable.rs": "1a97989cd9fbebc519506651eb3a79c7c577e0ffb199abb71bd07a0e133cc0db",
     "packages/run-supervisor/rust/tests/gate_terminal_socket.rs": "cba60e64b6f41309553c78216e66937d164b70bc2f1b37e49d657882daf2ce00",
     "packages/run-supervisor/rust/tests/head_request.rs": "1dc41ac2e2f8f0551a44318d6a676d013f88cc1ee12f44db3b4d2af0f2f877d3",
+    "packages/run-supervisor/rust/tests/head_role_binding.rs": "86928b9c8303a3633b9865081bd195d949b6295c14839f277c1471eb33fab110",
     "packages/run-supervisor/rust/tests/lanes.rs": "982d01cd1ad9217eb89164c3a15286c123268908582fab81a0cd59dbc8926d95",
     "packages/run-supervisor/rust/tests/portable/mod.rs": "6153ea7719f18ef0cc293fde0d603101df1308a4b2980edcc8dff57ad6d37363",
     "packages/run-supervisor/rust/tests/portable/supervisor.rs": "7c927cf97a970c37493f26e5ffedf3aefd59e294254d3b73583ab3db4cada1b2",
@@ -1539,7 +1540,7 @@
     "src/session-host/head-plan.mjs": "9e7f591a9bf2ebb52061e61526d3b11e81b8ceb30e6c7c9a6c8bdaae4a0713b1",
     "src/session-host/head-request-client.mjs": "73ca578954e7182e808e11c0cbc877d608d93e7db9408f08b3d55a069d3c0f03",
     "src/session-host/head-request.mjs": "bea76843c1a99b72749a496ca36a439c547ec08a2dd5e0f5bf43b47569428eee",
-    "src/session-host/head-start.mjs": "23545622ab95cfbc3b033b7f08826cf96d71269a9ef22cf6a133423b95e450c2",
+    "src/session-host/head-start.mjs": "e1fcaf0ca6d0767cd5829505805c9aa7d66f257d3cd37255ca1995a2a2d0136e",
     "src/session-host/head-stop.mjs": "4284bc2638e3ac4a71d151763c981d220a017c4f948cefc829115be5a6221ad3",
     "src/session-rotation/handoff-store.mjs": "3d1385774aa7c09573a6e298f82e7bf75d55beb436d9caa7c266cc1735c46128",
     "src/session-rotation/rotate.mjs": "933fb64dc09eaf6ac214ed305ef11236b7750455b1b2f9879da017d6ec124f64",
