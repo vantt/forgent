@@ -1,18 +1,8 @@
 //! The confinement of an executor entry, brought to the one policy shape the runner reads. Ported from
 //! `normalizeLegacyConfinement` (`confinement/policies.mjs`) and `normalizeConfigConfinement` (`dispatch/config.mjs`).
 
+use crate::js::truthy;
 use serde_json::{json, Map, Value};
-
-/// JavaScript truthiness of a JSON value.
-pub(crate) fn truthy(value: Option<&Value>) -> bool {
-    match value {
-        None | Some(Value::Null) => false,
-        Some(Value::Bool(flag)) => *flag,
-        Some(Value::Number(number)) => number.as_f64().is_some_and(|n| n != 0.0 && !n.is_nan()),
-        Some(Value::String(text)) => !text.is_empty(),
-        Some(_) => true,
-    }
-}
 
 /// `value ?? default`: a missing or null field takes the default.
 fn or_default(value: Option<&Value>, default: &str) -> Value {
@@ -28,7 +18,8 @@ fn is_text(value: Option<&Value>, text: &str) -> bool {
 
 /// The legacy `{ privateHome, isolatedSession, ownWorktree }` flags, the short `{ home, session, workspace }`
 /// form and a bare `controls` object, as a `confinement-policy.v1` policy; `None` for a value that is none of them.
-fn normalize_legacy_confinement(confinement: &Value) -> Option<Value> {
+/// A value already in the v1 shape (a `contract` and truthy `controls`) comes back as it is.
+pub fn normalize_legacy_confinement(confinement: &Value) -> Option<Value> {
     let fields = confinement.as_object()?;
     let is_legacy = [
         "privateHome",

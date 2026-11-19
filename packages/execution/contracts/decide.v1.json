@@ -1,7 +1,7 @@
 {
  "version": "decide.v1",
- "about": "Golden vectors of fgos dispatch decide and of the PreToolUse dispatch hook, recorded from the Node code that answered them before it was retired; the replay of packages/execution/rust/tests/golden_decide.rs owns them now. A vector is { name, fact, runner?, machine?, args, expect, nativeExpect? }. fact decide: the decision over a loaded runner section (the semantic config check under the label 'vector runner' first, then the default executor layered on and the answer), args the selectors (executorId, for, workId with workHint, assignment with assignmentItem, needsSoul, hasLiveTaskAccess), machine what the tool probe reads as in executor-model.v1.json. fact configRoot: whose config a decide reads over a main checkout and one linked worktree. fact repoRootGuard: --repo-root without --cwd. fact hookPayload: the normalized hook call. fact hookVerdict: the hook's verdict for a call, decide answering args.decided or failing with args.failure. fact hookAnswer: what the hook prints and exits with. expect is the answer, a refusal being { error: { name, code?, message } }. nativeExpect, where present, is the native answer where it differs on purpose (the usage text names fgos dispatch decide, not the retired Node alias). The rules of the semantic config check itself are proven by the validate vectors of executor-model.v1.json and are not repeated here.",
- "facts": ["decide","configRoot","repoRootGuard","hookPayload","hookVerdict","hookAnswer","attribute","globalRigorToTier"],
+ "about": "Golden vectors of fgos dispatch decide and of the PreToolUse dispatch hook, recorded from the Node code that answered them before it was retired; the replay of packages/execution/rust/tests/golden_decide.rs owns them now. A vector is { name, fact, runner?, machine?, args, expect, nativeExpect? }. fact decide: the decision over a loaded runner section (the semantic config check under the label 'vector runner' first, then the default executor layered on and the answer), args the selectors (executorId, for, workId with workHint, assignment with assignmentItem, needsSoul, hasLiveTaskAccess), machine what the tool probe reads as in executor-model.v1.json. fact configRoot: whose config a decide reads over a main checkout and one linked worktree. fact repoRootGuard: --repo-root without --cwd. fact hookPayload: the normalized hook call. fact hookVerdict: the hook's verdict for a call, decide answering args.decided or failing with args.failure. fact hookAnswer: what the hook prints and exits with. expect is the answer, a refusal being { error: { name, code?, message } }. nativeExpect, where present, is the native answer where it differs on purpose (the usage text names fgos dispatch decide, not the retired Node alias). The rules of the semantic config check itself are proven by the validate vectors of executor-model.v1.json and are not repeated here. The global rigorToTier refusal and the attribution of a runner refusal to the file and line its value came from are the runner config loader's, proven by the vectors of core-runner-config/core-runner-config.v1.json (packages/execution/rust/tests/core_runner_config.rs).",
+ "facts": ["decide","configRoot","repoRootGuard","hookPayload","hookVerdict","hookAnswer"],
  "vectors": [
   {
    "name": "decide: no selector is refused with the usage",
@@ -525,66 +525,6 @@
    "expect": {"exitCode":0,"stdout":"{\"decision\":\"deny\",\"reason\":\"BLOCKED: why \\\"quoted\\\"\\nline\"}\n","stderr":""}
   },
   {
-   "name": "attribute: a refusal at a path with its own origin names that file and line",
-   "fact": "attribute",
-   "args": {"error":{"message":"runner config (/p/.fgos runner patterns.reviewed) uses reserved name \"x\".","path":"runner.patterns.reviewed","detail":"uses reserved name \"x\"."},"origins":[{"path":"runner.patterns.reviewed","layer":"project","file":"project:config.yaml","line":7,"column":1}],"projectDir":"/p"},
-   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos/config.yaml:7 patterns.reviewed) uses reserved name \"x\"."}}
-  },
-  {
-   "name": "attribute: a refusal under a value with no origin of its own names its nearest ancestor's",
-   "fact": "attribute",
-   "args": {"error":{"message":"m","path":"runner.loops.reviewed.bounds.maxRounds","detail":"is not a parameter."},"origins":[{"path":"runner.loops.reviewed","layer":"global","file":"global:config.yaml","line":3,"column":1}],"projectDir":"/p"},
-   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (~/.fgos/config.yaml:3 loops.reviewed.bounds.maxRounds) is not a parameter."}}
-  },
-  {
-   "name": "attribute: a refusal of a container names the origins under it, once per location",
-   "fact": "attribute",
-   "args": {"error":{"message":"m","path":"runner.patterns","detail":"d."},"origins":[{"path":"runner.patterns.a.loop","layer":"project","file":"project:config.yaml","line":4,"column":1},{"path":"runner.patterns.b.loop","layer":"standard","file":null,"line":9,"column":1},{"path":"runner.patterns.a.promise","layer":"project","file":"project:config.yaml","line":4,"column":1}],"projectDir":"/p"},
-   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos/config.yaml:4, <standard>:9 patterns) d."}}
-  },
-  {
-   "name": "attribute: a refusal of two paths names their common parent",
-   "fact": "attribute",
-   "args": {"error":{"message":"m","code":"config-key-retired","paths":["runner.loops.reviewed.bounds.maxRounds.min","runner.loops.reviewed.bounds.maxRounds.max"],"detail":"min (5) must be <= max (2)."},"origins":[{"path":"runner.loops.reviewed.bounds.maxRounds.min","layer":"project","file":"project:config.yaml","line":5,"column":1},{"path":"runner.loops.reviewed.bounds.maxRounds.max","layer":"project","file":"project:config.yaml","line":6,"column":1}],"projectDir":"/p"},
-   "expect": {"error":{"name":"RunnerConfigError","code":"config-key-retired","message":"runner config (/p/.fgos/config.yaml:5, /p/.fgos/config.yaml:6 loops.reviewed.bounds.maxRounds) min (5) must be <= max (2)."}}
-  },
-  {
-   "name": "attribute: a missing key deep in an entry names the first line of its nearest existing parent per file",
-   "fact": "attribute",
-   "args": {"error":{"message":"m","path":"runner.patterns.reviewed.defaults.seats","detail":"d."},"origins":[{"path":"runner.patterns.reviewed.promise","layer":"project","file":"project:config.yaml","line":9,"column":1},{"path":"runner.patterns.reviewed.loop","layer":"project","file":"project:config.yaml","line":8,"column":1},{"path":"runner.patterns.reviewed.loop","layer":"global","file":"global:config.yaml","line":4,"column":1}],"projectDir":"/p"},
-   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos/config.yaml:8, ~/.fgos/config.yaml:4 patterns.reviewed.defaults.seats) d."}}
-  },
-  {
-   "name": "attribute: a refusal no origin locates keeps its own message",
-   "fact": "attribute",
-   "args": {"error":{"message":"runner config (/p/.fgos runner executors.a) \"trustStore\" was removed.","path":"runner.executors.a.trustStore","detail":"\"trustStore\" was removed."},"origins":[{"path":"runner.patterns.a","layer":"project","file":"project:config.yaml","line":4,"column":1}],"projectDir":"/p"},
-   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos runner executors.a) \"trustStore\" was removed."}}
-  },
-  {
-   "name": "attribute: a refusal without a path keeps its own message",
-   "fact": "attribute",
-   "args": {"error":{"message":"runner config (/p/.fgos runner) strict mode requires explicit capabilities declared (confinement-policy-missing)."},"origins":[{"path":"runner.patterns.a","layer":"project","file":"project:config.yaml","line":4,"column":1}],"projectDir":"/p"},
-   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos runner) strict mode requires explicit capabilities declared (confinement-policy-missing)."}}
-  },
-  {
-   "name": "globalRigorToTier: rigorToTier in the global file is refused naming its file, line and column",
-   "fact": "globalRigorToTier",
-   "args": {"origins":[{"path":"runner.rigorToTier.high","layer":"global","file":"global:config.yaml","line":12,"column":5}]},
-   "expect": {"error":{"name":"RunnerConfigError","message":"~/.fgos/config.yaml:12:5 runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key."}}
-  },
-  {
-   "name": "globalRigorToTier: rigorToTier in the project file is left to the semantic check",
-   "fact": "globalRigorToTier",
-   "args": {"origins":[{"path":"runner.rigorToTier","layer":"project","file":"project:config.yaml","line":2,"column":1}]},
-   "expect": {"ok":true}
-  },
-  {
-   "name": "attribute: a missing key whose parent entries hold no origin keeps its own message",
-   "fact": "attribute",
-   "args": {"error":{"message":"m","path":"runner.patterns.reviewed.defaults.seats","detail":"d."},"origins":[{"path":"runner.modelPolicies.claude.standard","layer":"project","file":"project:config.yaml","line":2,"column":1}],"projectDir":"/p"},
-   "expect": {"error":{"name":"RunnerConfigError","message":"m"}}
-  },
-  {
    "name": "decide: an assignment record whose policy is not an object is refused",
    "fact": "decide",
    "runner": {"executors":{"vec-agent":{"kind":"agent","providerModel":"claude","agentType":"vec-agent-type"}},"modelPolicies":{"claude":{"standard":"sonnet"}}},
@@ -672,20 +612,6 @@
    "fact": "hookVerdict",
    "args": {"call":{"format":"standard","toolName":"Task","toolInput":{"subagent_type":"﻿"},"transcriptPath":null,"projectDir":"/p"},"projectDirExists":true,"decided":{"mechanism":"unavailable","configured":true,"reasonCodes":["x"]}},
    "expect": {"blocked":true,"reason":"this Task call cannot be dispatched: \"general-purpose\" has executors of its own and decide answered unavailable for it (x). Fix that cause (run `fgos dispatch decide --for \"general-purpose\" --needs-soul --has-live-task-access` to see it), or use a subagent type that has no executors of its own. (decided via: decide --for \"general-purpose\" --needs-soul --has-live-task-access)"}
-  },
-  {
-   "name": "globalRigorToTier: an origin with no file is named config.json by Node and left unnamed natively, the adapter names every file",
-   "fact": "globalRigorToTier",
-   "args": {"origins":[{"path":"runner.rigorToTier","layer":"global","file":null,"line":12,"column":5}]},
-   "expect": {"error":{"name":"RunnerConfigError","message":"~/.fgos/config.json:12:5 runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key."}},
-   "nativeExpect": {"error":{"name":"RunnerConfigError","message":"~/.fgos/<file>:12:5 runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key."}}
-  },
-  {
-   "name": "attribute: a project origin with no file is named config.yaml by Node and left unnamed natively, the adapter names every file",
-   "fact": "attribute",
-   "args": {"error":{"message":"m","path":"runner.patterns.reviewed","detail":"d."},"origins":[{"path":"runner.patterns.reviewed","layer":"project","file":null,"line":7,"column":1}],"projectDir":"/p"},
-   "expect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos/config.yaml:7 patterns.reviewed) d."}},
-   "nativeExpect": {"error":{"name":"RunnerConfigError","message":"runner config (/p/.fgos/<file>:7 patterns.reviewed) d."}}
   }
  ]
 }

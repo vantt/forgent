@@ -875,6 +875,40 @@
    }
   },
   {
+   "name": "a project origin with no file names config.yaml under the project .fgos",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "patterns": {
+      "reviewed": {
+       "maxRounds": 3
+      }
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.patterns.reviewed.maxRounds",
+      "layer": "project",
+      "role": "value",
+      "line": 7,
+      "column": 3
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "runner config ($ROOT/project/.fgos/config.yaml:7 patterns.reviewed.maxRounds) runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.",
+     "paths": [
+      "runner.patterns.reviewed.maxRounds"
+     ],
+     "detail": "runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead."
+    }
+   }
+  },
+  {
    "name": "an origin with no layer is told by its file prefix",
    "root": "$ROOT/project",
    "door": {

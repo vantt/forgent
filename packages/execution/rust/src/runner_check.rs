@@ -11,6 +11,7 @@
 
 use crate::accounts::{is_cli_key, is_inside, refuse_retired_provider_accounts};
 use crate::executor_model::{capability_confinement, registered_capability_of, ModelError};
+use crate::js::truthy;
 use fgos_convention::packaged_rules;
 use serde_json::{Map, Value};
 use std::fmt;
@@ -145,17 +146,6 @@ fn js_display(value: Option<&Value>) -> String {
             .collect::<Vec<_>>()
             .join(","),
         Some(Value::Object(_)) => "[object Object]".to_string(),
-    }
-}
-
-/// ECMAScript truthiness of a value that may be absent.
-fn js_truthy(value: Option<&Value>) -> bool {
-    match value {
-        None | Some(Value::Null) => false,
-        Some(Value::Bool(flag)) => *flag,
-        Some(Value::Number(number)) => number.as_f64().is_some_and(|x| x != 0.0 && !x.is_nan()),
-        Some(Value::String(text)) => !text.is_empty(),
-        Some(_) => true,
     }
 }
 
@@ -693,7 +683,7 @@ fn check_confinement_against_policies(runner: &Value, source_label: &str) -> Che
     for name in names {
         let declared = capability_confinement(runner, name)
             .and_then(|c| c.get("mode"))
-            .is_some_and(|mode| js_truthy(Some(mode)));
+            .is_some_and(|mode| truthy(Some(mode)));
         if !declared {
             return Err(RunnerCheckError::config(format!(
                 "runner config ({source_label} capabilities.{name}) missing required explicit confinement in strict mode (confinement-policy-missing)."
@@ -898,7 +888,7 @@ fn check_invocation(
         let confinement =
             present(invocation, "confinement").or(executor_confinement.filter(|c| !c.is_null()));
         if str_of(invocation, "via") != Some("cli")
-            || !js_truthy(confinement.and_then(|c| c.get("backend")))
+            || !truthy(confinement.and_then(|c| c.get("backend")))
         {
             return Err(RunnerCheckError::config(format!(
                 "runner config ({label}) declares \"credentialStore\" without a confinement backend. A store is handed to the launch through its private home, so only a confined \"cli\" invocation can read one; an unconfined invocation reads its store through \"env\"."
@@ -1005,7 +995,7 @@ fn check_prefer_targets(runner: &Value, source_label: &str) -> Check {
                     other => js_display(Some(other)),
                 })
                 .and_then(|key| runner.get("executors").and_then(|all| all.get(&key)))
-                .filter(|entry| js_truthy(Some(entry)));
+                .filter(|entry| truthy(Some(entry)));
             let Some(registered) = registered else {
                 return Err(RunnerCheckError::config(format!(
                     "runner config ({site_name}) \"prefer\" names \"{named}\" but no such executor is registered."
@@ -1082,7 +1072,7 @@ impl Site<'_> {
 
     /// A refusal that names two paths: the text shows their common dotted parent.
     fn fail_across(&self, rel_paths: [&str; 2], detail: &str) -> RunnerCheckError {
-        let parent = common_dotted_parent(rel_paths);
+        let parent = common_dotted_parent(&rel_paths);
         let shown = if parent.is_empty() {
             self.label.to_string()
         } else {
@@ -1106,13 +1096,16 @@ impl Site<'_> {
     }
 }
 
-/// The leading dotted segments two paths share.
-fn common_dotted_parent(paths: [&str; 2]) -> String {
-    paths[0]
+/// The leading dotted segments every path shares (Node's `commonDottedParent`).
+pub(crate) fn common_dotted_parent(paths: &[&str]) -> String {
+    let Some((first, rest)) = paths.split_first() else {
+        return String::new();
+    };
+    first
         .split('.')
-        .zip(paths[1].split('.'))
-        .take_while(|(a, b)| a == b)
-        .map(|(a, _)| a)
+        .enumerate()
+        .take_while(|(i, segment)| rest.iter().all(|p| p.split('.').nth(*i) == Some(*segment)))
+        .map(|(_, segment)| segment)
         .collect::<Vec<_>>()
         .join(".")
 }

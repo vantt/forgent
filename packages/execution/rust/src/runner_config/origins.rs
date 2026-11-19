@@ -3,6 +3,7 @@
 //! (`dispatch/config.mjs`); the file shown for the project layer is the project root joined onto `.fgos`.
 
 use serde_json::Value;
+use std::path::{Path, PathBuf};
 
 fn path_of(origin: &Value) -> Option<&str> {
     origin.get("path").and_then(Value::as_str)
@@ -23,52 +24,21 @@ pub(crate) fn line_of(origin: &Value) -> Option<i64> {
         .or_else(|| line.as_f64().filter(|f| f.fract() == 0.0).map(|f| f as i64))
 }
 
-/// A position value as JavaScript prints it inside a template string: absent is `undefined`.
-pub(crate) fn print_member(origin: &Value, key: &str) -> String {
-    match origin.get(key) {
-        None => "undefined".into(),
-        Some(Value::String(text)) => text.clone(),
-        Some(other) => other.to_string(),
-    }
-}
-
-/// The one join of a project root onto its `.fgos`: the root as given (already absolute), without a trailing
-/// separator, then `.fgos`.
+/// The one join of a project root onto its `.fgos` (Node's `fgosDirFromRoot`): the root as given (already
+/// absolute), with the platform's separator.
 pub fn fgos_dir_from_root(root: &str) -> String {
     join(root, ".fgos")
 }
 
-/// `path.posix.join`: the parts joined and normalized (`.` and `..` segments and repeated separators folded).
-pub(crate) fn join(base: &str, rest: &str) -> String {
-    let joined = format!("{base}/{rest}");
-    let absolute = joined.starts_with('/');
-    let trailing = joined.ends_with('/');
-    let mut kept: Vec<&str> = Vec::new();
-    for segment in joined.split('/') {
-        match segment {
-            "" | "." => {}
-            ".." => {
-                if kept.last().is_some_and(|last| *last != "..") {
-                    kept.pop();
-                } else if !absolute {
-                    kept.push("..");
-                }
-            }
-            other => kept.push(other),
-        }
-    }
-    let mut out = kept.join("/");
-    if out.is_empty() && !absolute {
-        out.push('.');
-    }
-    if trailing && !out.is_empty() && out != "/" {
-        out.push('/');
-    }
-    if absolute {
-        format!("/{out}")
-    } else {
-        out
-    }
+/// `path.join` on this platform: the parts joined with its separator, `.` segments, repeated and trailing
+/// separators folded (the root and the file names a config origin carries hold no `..`).
+fn join(base: &str, rest: &str) -> String {
+    Path::new(base)
+        .join(rest)
+        .components()
+        .collect::<PathBuf>()
+        .to_string_lossy()
+        .into_owned()
 }
 
 /// The origins an error path points at, each as `file:line`, listed once.

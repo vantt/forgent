@@ -12,9 +12,14 @@
 mod confinement;
 mod origins;
 
+pub use confinement::normalize_legacy_confinement;
 pub use origins::{fgos_dir_from_root, resolve_origin_locations};
 
-use crate::runner_check::{check_runner_config, retired_pattern_key_at, RunnerCheckError};
+use crate::executor_model::ModelError;
+use crate::js;
+use crate::runner_check::{
+    check_runner_config, common_dotted_parent, retired_pattern_key_at, RunnerCheckError,
+};
 use serde_json::{json, Map, Value};
 use std::fmt;
 
@@ -44,86 +49,60 @@ pub struct RunnerConfig {
     pub warnings: Vec<String>,
 }
 
-/// The refusal: Node's `RunnerConfigError` (or the class of the confinement rule that refused), with the optional
-/// `code`, `phase`, `path`, `paths` and `detail` it carries.
+/// The refusal: the door's (a `RunnerConfigError` carrying the door's failure id, or `config-key-retired`), or the
+/// loader's and the check's (Node's `RunnerConfigError`, or the class of the confinement rule that refused, with
+/// the `path`, `paths` and `detail` it carries).
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RunnerConfigError {
-    pub name: String,
-    pub code: Option<String>,
-    pub phase: Option<String>,
+pub enum RunnerConfigError {
+    Door(DoorRefusal),
+    Config(RunnerCheckError),
+}
+
+/// A refusal of the config door as the runner words it: the door's failure id (or `config-key-retired`) and text.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DoorRefusal {
+    pub code: String,
     pub message: String,
-    pub path: Option<String>,
-    pub paths: Option<Vec<String>>,
-    pub detail: Option<String>,
 }
 
 const RUNNER_CONFIG_ERROR: &str = "RunnerConfigError";
 
 impl RunnerConfigError {
-    fn plain(message: String, code: Option<&str>) -> Self {
-        RunnerConfigError {
-            name: RUNNER_CONFIG_ERROR.into(),
-            code: code.map(str::to_string),
-            phase: None,
-            message,
-            path: None,
-            paths: None,
-            detail: None,
+    pub fn message(&self) -> &str {
+        match self {
+            RunnerConfigError::Door(door) => &door.message,
+            RunnerConfigError::Config(failure) => &failure.error.message,
         }
     }
 
-    fn of_check(failure: RunnerCheckError) -> Self {
-        RunnerConfigError {
-            name: failure.error.name.to_string(),
-            code: failure.error.code.map(str::to_string),
-            phase: None,
-            message: failure.error.message,
-            paths: if failure.paths.is_empty() {
-                failure.path.clone().map(|path| vec![path])
-            } else {
-                Some(failure.paths)
-            },
-            path: failure.path,
-            detail: failure.detail,
-        }
-    }
-
-    /// Node's `deriveSubpath`: the common dotted parent of the paths, without the leading `runner.`.
-    fn subpath(&self) -> Option<String> {
-        let paths: Vec<&String> = match (&self.paths, &self.path) {
-            (Some(paths), _) if !paths.is_empty() => paths.iter().collect(),
-            (_, Some(path)) => vec![path],
-            _ => return None,
-        };
-        let strip = |text: &str| text.strip_prefix("runner.").unwrap_or(text).to_string();
-        let shown = if paths.len() == 1 {
-            strip(paths[0])
-        } else {
-            strip(&common_dotted_parent(&paths))
-        };
-        (!shown.is_empty()).then_some(shown)
-    }
-
-    /// The refusal as the vectors state it: `{ name, category?, code?, phase?, message, path?, paths?, detail? }`.
+    /// The refusal as the vectors state it: `{ name, category?, code?, message, path?, paths?, detail? }`.
     pub fn to_json(&self) -> Value {
         let mut out = Map::new();
-        out.insert("name".into(), json!(self.name));
-        if self.name == RUNNER_CONFIG_ERROR {
+        let failure = match self {
+            RunnerConfigError::Door(door) => {
+                out.insert("name".into(), json!(RUNNER_CONFIG_ERROR));
+                out.insert("category".into(), json!("validation"));
+                out.insert("code".into(), json!(door.code));
+                out.insert("message".into(), json!(door.message));
+                return Value::Object(out);
+            }
+            RunnerConfigError::Config(failure) => failure,
+        };
+        out.insert("name".into(), json!(failure.error.name));
+        if failure.error.name == RUNNER_CONFIG_ERROR {
             out.insert("category".into(), json!("validation"));
         }
-        for (key, value) in [("code", &self.code), ("phase", &self.phase)] {
-            if let Some(value) = value {
-                out.insert(key.into(), json!(value));
-            }
+        if let Some(code) = failure.error.code {
+            out.insert("code".into(), json!(code));
         }
-        out.insert("message".into(), json!(self.message));
-        if let Some(path) = &self.path {
+        out.insert("message".into(), json!(failure.error.message));
+        if let Some(path) = &failure.path {
             out.insert("path".into(), json!(path));
         }
-        if let Some(paths) = &self.paths {
+        if let Some(paths) = paths_of(failure) {
             out.insert("paths".into(), json!(paths));
         }
-        if let Some(detail) = &self.detail {
+        if let Some(detail) = &failure.detail {
             out.insert("detail".into(), json!(detail));
         }
         Value::Object(out)
@@ -132,32 +111,44 @@ impl RunnerConfigError {
 
 impl fmt::Display for RunnerConfigError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.message)
+        f.write_str(self.message())
     }
 }
 
 impl std::error::Error for RunnerConfigError {}
 
-/// The dotted segments the paths share from the start (`commonDottedParent`).
-fn common_dotted_parent(paths: &[&String]) -> String {
-    let split: Vec<Vec<&str>> = paths.iter().map(|p| p.split('.').collect()).collect();
-    let Some(first) = split.first() else {
-        return String::new();
-    };
-    let mut common: Vec<&str> = Vec::new();
-    for (i, segment) in first.iter().enumerate() {
-        if split.iter().all(|p| p.get(i) == Some(segment)) {
-            common.push(segment);
-        } else {
-            break;
-        }
+/// The paths a refusal points at: its `paths`, else its one `path`.
+fn paths_of(failure: &RunnerCheckError) -> Option<Vec<String>> {
+    if failure.paths.is_empty() {
+        failure.path.clone().map(|path| vec![path])
+    } else {
+        Some(failure.paths.clone())
     }
-    common.join(".")
+}
+
+/// Node's `deriveSubpath`: the common dotted parent of the paths, without the leading `runner.`.
+fn subpath(paths: &[String]) -> Option<String> {
+    let strip = |text: &str| text.strip_prefix("runner.").unwrap_or(text).to_string();
+    let shown = match paths {
+        [] => return None,
+        [one] => strip(one),
+        many => strip(&common_dotted_parent(
+            &many.iter().map(String::as_str).collect::<Vec<_>>(),
+        )),
+    };
+    (!shown.is_empty()).then_some(shown)
+}
+
+/// The position `:line:column` of an origin or refusal that has a whole line, as Node's template prints it.
+fn position(entry: &Value) -> String {
+    origins::line_of(entry)
+        .map(|line| format!(":{line}:{}", js::text(entry.get("column"))))
+        .unwrap_or_default()
 }
 
 /// `runner.rigorToTier` is retired. Set in the global file it is refused here, naming that file (the shape check
 /// names the project directory, which is not where the key is).
-fn refuse_global_rigor_to_tier(origins: &[Value]) -> Result<(), RunnerConfigError> {
+fn refuse_global_rigor_to_tier(origins: &[Value]) -> Result<(), RunnerCheckError> {
     let at = origins.iter().find(|o| {
         o.get("layer").and_then(Value::as_str) == Some("global")
             && o.get("path")
@@ -172,22 +163,26 @@ fn refuse_global_rigor_to_tier(origins: &[Value]) -> Result<(), RunnerConfigErro
         .and_then(Value::as_str)
         .unwrap_or("config.json");
     let file = format!("~/.fgos/{}", file.strip_prefix("global:").unwrap_or(file));
-    let position = origins::line_of(at)
-        .map(|line| format!(":{line}:{}", origins::print_member(at, "column")))
-        .unwrap_or_default();
-    Err(RunnerConfigError::plain(
-        format!("{file}{position} runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key."),
-        None,
-    ))
+    Err(RunnerCheckError {
+        error: ModelError::runner(format!(
+            "{file}{} runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key.",
+            position(at)
+        )),
+        path: None,
+        paths: Vec::new(),
+        detail: None,
+    })
 }
 
-/// A refusal of the door that points at a retired key says what replaced it, with the file and position of each.
-fn retired_key_refusal(
+/// A refusal of the config door, as the runner reads it: when it points at a retired `runner.patterns` key it says
+/// what replaced the key, with the file and position of each (code `config-key-retired`; the config check's
+/// findings first, then the refusals, one sentence per key and file); otherwise the door's own code and message.
+pub fn door_refusal(
     code: &str,
     message: &str,
     refusals: &[Value],
     check_findings: &[Value],
-) -> RunnerConfigError {
+) -> DoorRefusal {
     let mut messages: Vec<String> = Vec::new();
     let mut seen: Vec<String> = Vec::new();
     for entry in check_findings.iter().chain(refusals) {
@@ -206,56 +201,55 @@ fn retired_key_refusal(
             Some(f) if f.starts_with("global:") => format!("~/.fgos/{}", &f["global:".len()..]),
             other => other.unwrap_or("<file>").to_string(),
         };
-        let position = origins::line_of(entry)
-            .map(|line| format!(":{line}:{}", origins::print_member(entry, "column")))
-            .unwrap_or_default();
         let dedupe = format!("{key}@{}", file.unwrap_or(""));
         if !seen.contains(&dedupe) {
             seen.push(dedupe);
             messages.push(format!(
-                "{shown}{position}: {key} was retired; {instruction}."
+                "{shown}{}: {key} was retired; {instruction}.",
+                position(entry)
             ));
         }
     }
     if messages.is_empty() {
-        RunnerConfigError::plain(message.to_string(), Some(code))
+        DoorRefusal {
+            code: code.to_string(),
+            message: message.to_string(),
+        }
     } else {
-        RunnerConfigError::plain(messages.join("\n"), Some("config-key-retired"))
+        DoorRefusal {
+            code: "config-key-retired".into(),
+            message: messages.join("\n"),
+        }
     }
 }
 
 /// A refusal of the shape check, attributed to the file and line the values came from when the origins name them.
-fn attribute(
-    error: &RunnerConfigError,
-    origins: &[Value],
-    project_dir: &str,
-) -> Option<RunnerConfigError> {
-    if error.name != RUNNER_CONFIG_ERROR {
-        return None;
+fn attribute(failure: RunnerCheckError, origins: &[Value], project_dir: &str) -> RunnerCheckError {
+    if failure.error.name != RUNNER_CONFIG_ERROR {
+        return failure;
     }
-    let paths: Vec<String> = match (&error.paths, &error.path) {
-        (Some(paths), _) if !paths.is_empty() => paths.clone(),
-        (_, Some(path)) => vec![path.clone()],
-        _ => return None,
+    let Some(paths) = paths_of(&failure) else {
+        return failure;
     };
     let locations = resolve_origin_locations(origins, &paths, project_dir);
     if locations.is_empty() {
-        return None;
+        return failure;
     }
-    let subpath = error
-        .subpath()
+    let shown = subpath(&paths)
         .map(|sub| format!(" {sub}"))
         .unwrap_or_default();
-    let detail = error.detail.as_deref().unwrap_or(&error.message);
-    Some(RunnerConfigError {
-        name: error.name.clone(),
-        code: error.code.clone(),
-        phase: error.phase.clone(),
-        message: format!("runner config ({}{subpath}) {detail}", locations.join(", ")),
-        path: error.path.clone(),
-        paths: error.paths.clone(),
-        detail: error.detail.clone(),
-    })
+    let detail = failure
+        .detail
+        .clone()
+        .unwrap_or_else(|| failure.error.message.clone());
+    RunnerCheckError {
+        error: ModelError {
+            message: format!("runner config ({}{shown}) {detail}", locations.join(", ")),
+            ..failure.error
+        },
+        paths: paths_of(&failure).unwrap_or_default(),
+        ..failure
+    }
 }
 
 /// The checked runner config of the project at `project_root` (an absolute path) from what the config door answered:
@@ -273,20 +267,18 @@ pub fn load_runner_config(
             refusals,
             check_findings,
         } => {
-            return Err(retired_key_refusal(
+            return Err(RunnerConfigError::Door(door_refusal(
                 &code,
                 &message,
                 &refusals,
                 &check_findings,
-            ))
+            )))
         }
     };
-    refuse_global_rigor_to_tier(&origins)?;
+    refuse_global_rigor_to_tier(&origins).map_err(RunnerConfigError::Config)?;
     let label = format!("{} runner", fgos_dir_from_root(project_root));
-    let warnings = check_runner_config(&runner, &label).map_err(|failure| {
-        let error = RunnerConfigError::of_check(failure);
-        attribute(&error, &origins, project_root).unwrap_or(error)
-    })?;
+    let warnings = check_runner_config(&runner, &label)
+        .map_err(|failure| RunnerConfigError::Config(attribute(failure, &origins, project_root)))?;
     let mut config = runner;
     confinement::normalize_config_confinement(&mut config);
     Ok(RunnerConfig {

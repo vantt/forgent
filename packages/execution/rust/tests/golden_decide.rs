@@ -6,15 +6,14 @@ mod common;
 
 use common::{VectorMachine, VectorProbe};
 use fgos_execution::decide::{
-    attribute_runner_refusal, config_root_for, decide_over, guard_cwd_repo_root,
-    refuse_global_rigor_to_tier, run_door_hint, CrateBinder, DecideAnswer, DecideFailure,
-    DecideRequest, LoadedRunner, RunnerOrigin, Workspace,
+    config_root_for, decide_over, guard_cwd_repo_root, run_door_hint, CrateBinder, DecideAnswer,
+    DecideFailure, DecideRequest, LoadedRunner, Workspace,
 };
 use fgos_execution::executor_model::ModelError;
 use fgos_execution::hook::{
     dispatch_verdict, hook_answer, normalize_hook_payload, Format, HookCall, Verdict,
 };
-use fgos_execution::runner_check::{check_runner_config, RunnerCheckError};
+use fgos_execution::runner_check::check_runner_config;
 use serde_json::{json, Value};
 
 /// A main checkout `<main>`, one linked worktree `<worktree>` of it (with a `sub` directory) and `<outside>`.
@@ -43,9 +42,6 @@ impl Workspace for Layout {
     fn load_runner(&self, _: &str) -> Result<LoadedRunner, DecideFailure> {
         unreachable!("the layout vectors read no config")
     }
-    fn fgos_dir(&self, root: &str) -> String {
-        format!("{root}/.fgos")
-    }
 }
 
 fn place(name: &str) -> &'static str {
@@ -68,24 +64,6 @@ fn flag(value: &Value, key: &str) -> bool {
 
 fn refusal(error: &ModelError) -> Value {
     json!({ "error": error.to_json() })
-}
-
-fn origins_of(args: &Value) -> Vec<RunnerOrigin> {
-    args["origins"]
-        .as_array()
-        .into_iter()
-        .flatten()
-        .map(|origin| RunnerOrigin {
-            path: text(origin, "path").unwrap_or_default(),
-            layer: text(origin, "layer").unwrap_or_default(),
-            file: text(origin, "file"),
-            line: origin.get("line").and_then(Value::as_u64).map(|n| n as u32),
-            column: origin
-                .get("column")
-                .and_then(Value::as_u64)
-                .map(|n| n as u32),
-        })
-        .collect()
 }
 
 fn leak(text: &str) -> &'static str {
@@ -248,36 +226,6 @@ fn evaluate(vector: &Value) -> Value {
             let answer = hook_answer(&verdict, format);
             json!({ "exitCode": answer.exit_code, "stdout": answer.stdout, "stderr": answer.stderr })
         }
-        "attribute" => {
-            let error = &args["error"];
-            let raised = RunnerCheckError {
-                error: ModelError {
-                    name: "RunnerConfigError",
-                    code: error.get("code").and_then(Value::as_str).map(leak),
-                    message: text(error, "message").unwrap_or_default(),
-                },
-                path: text(error, "path"),
-                paths: error["paths"]
-                    .as_array()
-                    .map(|p| {
-                        p.iter()
-                            .filter_map(|s| s.as_str().map(str::to_string))
-                            .collect()
-                    })
-                    .unwrap_or_default(),
-                detail: text(error, "detail"),
-            };
-            let project_dir = args["projectDir"].as_str().unwrap_or_default();
-            refusal(&attribute_runner_refusal(
-                raised,
-                &origins_of(&args),
-                project_dir,
-            ))
-        }
-        "globalRigorToTier" => match refuse_global_rigor_to_tier(&origins_of(&args)) {
-            Ok(()) => json!({ "ok": true }),
-            Err(error) => refusal(&error),
-        },
         other => panic!("vector names the unknown fact {other:?}"),
     };
     answer

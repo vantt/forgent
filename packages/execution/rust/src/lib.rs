@@ -22,6 +22,7 @@ pub mod executor_model;
 pub mod explain;
 pub mod handoff;
 pub mod hook;
+mod js;
 pub mod loops;
 pub mod outcome;
 pub mod patterns;

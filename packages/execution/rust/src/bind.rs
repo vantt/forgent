@@ -9,6 +9,7 @@ use crate::executor_model::{
     agent_cli_missing_refusal, array_of, executor_family, executors_of, family_of, launch_facts,
     missing_clis, present, str_of, AgentCliMissing, FamilySource, ModelError, Session,
 };
+use crate::js::truthy;
 use crate::ports::Machine;
 use fgos_seat_binding::{BindInput, Tier, PROTOCOL};
 use serde::Serialize;
@@ -75,16 +76,6 @@ pub struct AccountPin {
 }
 
 // ---- reading the JSON -----------------------------------------------------------------------------------------
-
-/// The truthiness of a JSON value.
-fn truthy(value: Option<&Value>) -> bool {
-    match value {
-        None | Some(Value::Null) | Some(Value::Bool(false)) => false,
-        Some(Value::String(text)) => !text.is_empty(),
-        Some(Value::Number(n)) => n.as_f64().is_some_and(|n| n != 0.0),
-        Some(_) => true,
-    }
-}
 
 /// A value as a template literal prints it.
 fn text_of(value: &Value) -> String {
