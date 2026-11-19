@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Supervision powers, part 2: verbs, request-socket entries, grants, personas and the live grant audit"
-status: ready
+status: draft
 priority: P1
 blockedBy:
   - 261119-1730-supervision-powers-cores
@@ -93,6 +93,9 @@ readers. The work-management data model (its decision may change the backlog wri
 Phase 1 is the one writer of the hot files (registry, manifest, head-request contract) so the plan stays serial on them
 by design. The plan is `draft` until both blockers are `done`; it is then set `ready` with a fresh `base` (the shared files
 move under the caps lane meanwhile). Checked with `node scripts/plan-contract-check.mjs` and `fgos resource-check --plan`.
+
+## Admission note
+Owner-approved 2026-11-20 (4baa754d5). Held at `draft` by the supervisor until it can pass plan-contract-check as `ready`: it is blocked by part 1 (cores) and by plan 261119-1615 (done), it needs a `base` sha when ready, and its footprint overlaps plan 261118-1341 (S6A) on docs/platform/agent-confinement/spec.md, src/cli/command-registry.mjs, src/session-host/head-request.mjs and test/session-host/head-request.test.mjs, which S6A phase 20 edits. Flip to `ready` with a fresh `base` once cores is done and the overlap with S6A is sequenced (either S6A phase 20 has landed, or this plan lands first and S6A rebases on it).
 
 ## Owner questions
 None.
