@@ -1,0 +1,4 @@
+{
+  "note": "recorded from src/runner/dispatch/worker-session-boot.mjs (constants only; the boot is effectful and proven in the Rust test with fakes)",
+  "defaultWorkerSession": "fgos-worker"
+}

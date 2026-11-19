@@ -1,0 +1,898 @@
+{
+  "note": "recorded from src/runner/dispatch/provider-adapter.mjs; familyOf has its owner in fgos-execution and is not recorded here",
+  "knownFlags": {
+    "claude": [
+      "--model",
+      "--effort",
+      "--allowedTools",
+      "--permission-mode",
+      "--dangerously-skip-permissions"
+    ],
+    "openai": [
+      "--model",
+      "-s",
+      "-s read-only",
+      "-s danger-full-access",
+      "--dangerously-bypass-approvals-and-sandbox",
+      "--dangerously-skip-permissions",
+      "--skip-git-repo-check"
+    ],
+    "gemini": [
+      "--model",
+      "--mode",
+      "--effort"
+    ],
+    "pi": [
+      "--provider",
+      "--model",
+      "--tools",
+      "--approve",
+      "--mode"
+    ],
+    "z-ai": [
+      "--model",
+      "--effort",
+      "--allowedTools",
+      "--permission-mode",
+      "--dangerously-skip-permissions"
+    ],
+    "glm": [
+      "--model",
+      "--effort",
+      "--allowedTools",
+      "--permission-mode",
+      "--dangerously-skip-permissions"
+    ]
+  },
+  "extract": [
+    {
+      "args": [
+        "--model",
+        "x",
+        "--effort",
+        "high",
+        "-p",
+        "{prompt}"
+      ],
+      "family": "claude",
+      "out": [
+        "--model",
+        "--effort"
+      ]
+    },
+    {
+      "args": [
+        "exec",
+        "-s",
+        "read-only",
+        "--skip-git-repo-check",
+        "{prompt}"
+      ],
+      "family": "claude",
+      "out": [
+        "-s",
+        "-s read-only",
+        "--skip-git-repo-check"
+      ]
+    },
+    {
+      "args": [
+        "-s",
+        "--model",
+        "m"
+      ],
+      "family": "claude",
+      "out": [
+        "-s",
+        "--model"
+      ]
+    },
+    {
+      "args": [
+        "-s"
+      ],
+      "family": "claude",
+      "out": [
+        "-s"
+      ]
+    },
+    {
+      "args": [
+        "--dangerously-skip-permissions",
+        "--dangerously-skip-permissions"
+      ],
+      "family": "claude",
+      "out": [
+        "--dangerously-skip-permissions"
+      ]
+    },
+    {
+      "args": [
+        "--provider",
+        "p",
+        "--tools",
+        "t",
+        "--approve",
+        "--mode",
+        "auto",
+        "--allowedTools",
+        "a",
+        "--permission-mode",
+        "plan"
+      ],
+      "family": "claude",
+      "out": [
+        "--provider",
+        "--tools",
+        "--approve",
+        "--mode",
+        "--allowedTools",
+        "--permission-mode"
+      ]
+    },
+    {
+      "args": [
+        "--dangerously-bypass-approvals-and-sandbox"
+      ],
+      "family": "claude",
+      "out": [
+        "--dangerously-bypass-approvals-and-sandbox"
+      ]
+    },
+    {
+      "args": [],
+      "family": "claude",
+      "out": []
+    },
+    {
+      "args": "not-an-array",
+      "family": "claude",
+      "out": []
+    }
+  ],
+  "policyFlagsFor": [
+    {
+      "family": "claude",
+      "out": [
+        "--model",
+        "--effort",
+        "--allowedTools",
+        "--permission-mode",
+        "--dangerously-skip-permissions"
+      ]
+    },
+    {
+      "family": "openai",
+      "out": [
+        "--model",
+        "-s",
+        "-s read-only",
+        "-s danger-full-access",
+        "--dangerously-bypass-approvals-and-sandbox",
+        "--dangerously-skip-permissions",
+        "--skip-git-repo-check"
+      ]
+    },
+    {
+      "family": "codex",
+      "out": [
+        "--model",
+        "-s",
+        "-s read-only",
+        "-s danger-full-access",
+        "--dangerously-bypass-approvals-and-sandbox",
+        "--dangerously-skip-permissions",
+        "--skip-git-repo-check"
+      ]
+    },
+    {
+      "family": "glm",
+      "out": [
+        "--model",
+        "--effort",
+        "--allowedTools",
+        "--permission-mode",
+        "--dangerously-skip-permissions"
+      ]
+    },
+    {
+      "family": "agy",
+      "out": [
+        "--model",
+        "--mode",
+        "--effort"
+      ]
+    },
+    {
+      "family": "pi",
+      "out": [
+        "--provider",
+        "--model",
+        "--tools",
+        "--approve",
+        "--mode"
+      ]
+    },
+    {
+      "family": "z-ai",
+      "out": [
+        "--model",
+        "--effort",
+        "--allowedTools",
+        "--permission-mode",
+        "--dangerously-skip-permissions"
+      ]
+    },
+    {
+      "family": "gemini",
+      "out": [
+        "--model",
+        "--mode",
+        "--effort"
+      ]
+    },
+    {
+      "family": "nope",
+      "out": []
+    },
+    {
+      "family": "",
+      "out": []
+    }
+  ],
+  "policyFlagsByCommand": [
+    {
+      "command": "codex",
+      "out": [
+        "--model",
+        "-s",
+        "-s read-only",
+        "-s danger-full-access",
+        "--dangerously-bypass-approvals-and-sandbox",
+        "--dangerously-skip-permissions",
+        "--skip-git-repo-check"
+      ]
+    },
+    {
+      "out": []
+    }
+  ],
+  "disallowed": [
+    {
+      "deny": [
+        "codex",
+        "glm",
+        " ",
+        5,
+        "Claude"
+      ],
+      "candidate": "openai",
+      "out": {
+        "disallowed": true,
+        "canonicalProvider": "openai"
+      }
+    },
+    {
+      "deny": [
+        "codex"
+      ],
+      "candidate": "claude",
+      "out": {
+        "disallowed": false,
+        "canonicalProvider": "claude"
+      }
+    },
+    {
+      "deny": [
+        "pi"
+      ],
+      "command": "pi",
+      "out": {
+        "disallowed": true,
+        "canonicalProvider": "pi"
+      }
+    },
+    {
+      "deny": [],
+      "candidate": "claude",
+      "out": {
+        "disallowed": false,
+        "canonicalProvider": "claude"
+      }
+    },
+    {
+      "deny": null,
+      "candidate": "claude",
+      "out": {
+        "disallowed": false,
+        "canonicalProvider": "claude"
+      }
+    },
+    {
+      "deny": [
+        "claude"
+      ],
+      "candidate": "",
+      "command": "",
+      "out": {
+        "disallowed": false,
+        "canonicalProvider": ""
+      }
+    }
+  ],
+  "normalized": [
+    {
+      "deny": [
+        "codex",
+        "openai",
+        "glm",
+        "",
+        "  agy  ",
+        7
+      ],
+      "out": [
+        "gemini",
+        "openai",
+        "z-ai"
+      ]
+    }
+  ],
+  "effortLevels": [
+    {
+      "command": "claude",
+      "out": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ]
+    },
+    {
+      "command": "/x/y/pi",
+      "out": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ]
+    },
+    {
+      "command": "omp",
+      "out": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ]
+    },
+    {
+      "command": "agy",
+      "out": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ]
+    },
+    {
+      "command": "codex",
+      "out": [
+        "low",
+        "medium",
+        "high",
+        "max"
+      ]
+    },
+    {
+      "command": "zzz",
+      "out": []
+    },
+    {
+      "command": "",
+      "out": []
+    },
+    {
+      "command": null,
+      "out": []
+    }
+  ],
+  "effort": [
+    {
+      "command": "claude",
+      "args": [
+        "-p",
+        "{prompt}"
+      ],
+      "effort": "high",
+      "out": {
+        "args": [
+          "--effort",
+          "high",
+          "-p",
+          "{prompt}"
+        ],
+        "control": {
+          "command": "claude",
+          "flag": "--effort",
+          "native": "high"
+        }
+      }
+    },
+    {
+      "command": "/usr/bin/claude",
+      "args": [
+        "--effort",
+        "low",
+        "-p"
+      ],
+      "effort": "max",
+      "out": {
+        "args": [
+          "--effort",
+          "max",
+          "-p"
+        ],
+        "control": {
+          "command": "claude",
+          "flag": "--effort",
+          "native": "max",
+          "replaced": "low"
+        }
+      }
+    },
+    {
+      "command": "claude",
+      "args": [
+        "--effort"
+      ],
+      "effort": "high",
+      "out": {
+        "args": [
+          "--effort",
+          "high",
+          "--effort"
+        ],
+        "control": {
+          "command": "claude",
+          "flag": "--effort",
+          "native": "high"
+        }
+      }
+    },
+    {
+      "command": "pi",
+      "args": [
+        "--thinking",
+        "low"
+      ],
+      "effort": "xhigh",
+      "out": {
+        "args": [
+          "--thinking",
+          "xhigh"
+        ],
+        "control": {
+          "command": "pi",
+          "flag": "--thinking",
+          "native": "xhigh",
+          "replaced": "low"
+        }
+      }
+    },
+    {
+      "command": "omp",
+      "args": [],
+      "effort": "medium",
+      "out": {
+        "args": [
+          "--thinking",
+          "medium"
+        ],
+        "control": {
+          "command": "omp",
+          "flag": "--thinking",
+          "native": "medium"
+        }
+      }
+    },
+    {
+      "command": "agy",
+      "args": [
+        "x"
+      ],
+      "effort": "low",
+      "out": {
+        "args": [
+          "--effort",
+          "low",
+          "x"
+        ],
+        "control": {
+          "command": "agy",
+          "flag": "--effort",
+          "native": "low"
+        }
+      }
+    },
+    {
+      "command": "codex",
+      "args": [
+        "exec",
+        "{prompt}"
+      ],
+      "effort": "max",
+      "out": {
+        "args": [
+          "exec",
+          "-c",
+          "model_reasoning_effort=xhigh",
+          "{prompt}"
+        ],
+        "control": {
+          "command": "codex",
+          "flag": "-c model_reasoning_effort",
+          "native": "xhigh"
+        }
+      }
+    },
+    {
+      "command": "codex",
+      "args": [
+        "exec",
+        "-c",
+        "model_reasoning_effort=low",
+        "{prompt}"
+      ],
+      "effort": "high",
+      "out": {
+        "args": [
+          "exec",
+          "-c",
+          "model_reasoning_effort=high",
+          "{prompt}"
+        ],
+        "control": {
+          "command": "codex",
+          "flag": "-c model_reasoning_effort",
+          "native": "high",
+          "replaced": "low"
+        }
+      }
+    },
+    {
+      "command": "codex",
+      "args": [
+        "{prompt}"
+      ],
+      "effort": "low",
+      "out": {
+        "args": [
+          "-c",
+          "model_reasoning_effort=low",
+          "{prompt}"
+        ],
+        "control": {
+          "command": "codex",
+          "flag": "-c model_reasoning_effort",
+          "native": "low"
+        }
+      }
+    },
+    {
+      "command": "codex",
+      "args": [
+        "-c",
+        "model_reasoning_effort=high"
+      ],
+      "effort": "medium",
+      "out": {
+        "args": [
+          "-c",
+          "model_reasoning_effort=medium"
+        ],
+        "control": {
+          "command": "codex",
+          "flag": "-c model_reasoning_effort",
+          "native": "medium",
+          "replaced": "high"
+        }
+      }
+    },
+    {
+      "command": "unknown",
+      "args": [],
+      "effort": "high",
+      "out": null
+    },
+    {
+      "args": [],
+      "effort": "high",
+      "out": null
+    }
+  ],
+  "modelChecks": [
+    {
+      "requested": "a",
+      "launched": "b",
+      "args": [
+        "--model",
+        "b"
+      ],
+      "out": {
+        "requested": "a",
+        "launched": "b",
+        "warnings": [
+          {
+            "code": "model-overridden",
+            "requested": "a",
+            "launched": "b",
+            "message": "requested model \"a\" was replaced by \"b\" before launch"
+          }
+        ]
+      }
+    },
+    {
+      "requested": "a",
+      "launched": "a",
+      "args": [
+        "-p"
+      ],
+      "out": {
+        "requested": "a",
+        "launched": "a",
+        "warnings": [
+          {
+            "code": "model-not-passed",
+            "launched": "a",
+            "message": "the invocation's argv never carries model \"a\"; the CLI runs whatever model its own config names"
+          }
+        ]
+      }
+    },
+    {
+      "requested": "a",
+      "launched": "a",
+      "args": [
+        "--model",
+        "a"
+      ],
+      "out": {
+        "requested": "a",
+        "launched": "a",
+        "warnings": []
+      }
+    },
+    {
+      "requested": null,
+      "launched": "a",
+      "args": [],
+      "out": {
+        "launched": "a",
+        "warnings": []
+      }
+    },
+    {
+      "requested": "a",
+      "launched": null,
+      "args": [],
+      "out": {
+        "requested": "a",
+        "warnings": []
+      }
+    },
+    {
+      "requested": "a",
+      "launched": "b",
+      "out": {
+        "requested": "a",
+        "launched": "b",
+        "warnings": [
+          {
+            "code": "model-overridden",
+            "requested": "a",
+            "launched": "b",
+            "message": "requested model \"a\" was replaced by \"b\" before launch"
+          },
+          {
+            "code": "model-not-passed",
+            "launched": "b",
+            "message": "the invocation's argv never carries model \"b\"; the CLI runs whatever model its own config names"
+          }
+        ]
+      }
+    }
+  ],
+  "modelWarnings": [
+    {
+      "output": {
+        "stdout": "",
+        "stderr": "model agy-1 is not recognized as a known model"
+      },
+      "check": {
+        "requested": "a",
+        "launched": "b",
+        "args": [
+          "--model",
+          "b"
+        ]
+      },
+      "out": [
+        {
+          "code": "model-overridden",
+          "requested": "a",
+          "launched": "b",
+          "message": "requested model \"a\" was replaced by \"b\" before launch"
+        },
+        {
+          "code": "model-unsupported",
+          "model": "agy-1",
+          "message": "the provider CLI does not recognize model \"agy-1\"",
+          "evidence": "model agy-1 is not recognized as a known model"
+        }
+      ]
+    },
+    {
+      "output": {
+        "stdout": "",
+        "stderr": "Model \"foo\" not found"
+      },
+      "check": {
+        "requested": "a",
+        "launched": "b",
+        "args": [
+          "--model",
+          "b"
+        ]
+      },
+      "out": [
+        {
+          "code": "model-overridden",
+          "requested": "a",
+          "launched": "b",
+          "message": "requested model \"a\" was replaced by \"b\" before launch"
+        },
+        {
+          "code": "model-unsupported",
+          "model": "foo",
+          "message": "the provider CLI does not recognize model \"foo\"",
+          "evidence": "Model \"foo\" not found"
+        }
+      ]
+    },
+    {
+      "output": {
+        "stdout": "",
+        "stderr": "Model metadata for `bar` not found"
+      },
+      "check": {
+        "requested": "a",
+        "launched": "b",
+        "args": [
+          "--model",
+          "b"
+        ]
+      },
+      "out": [
+        {
+          "code": "model-overridden",
+          "requested": "a",
+          "launched": "b",
+          "message": "requested model \"a\" was replaced by \"b\" before launch"
+        },
+        {
+          "code": "model-unsupported",
+          "model": "bar",
+          "message": "the provider CLI does not recognize model \"bar\"",
+          "evidence": "Model metadata for `bar` not found"
+        }
+      ]
+    },
+    {
+      "output": {
+        "stdout": "model: stdout-only",
+        "stderr": ""
+      },
+      "check": {
+        "requested": "a",
+        "launched": "b",
+        "args": [
+          "--model",
+          "b"
+        ]
+      },
+      "out": [
+        {
+          "code": "model-overridden",
+          "requested": "a",
+          "launched": "b",
+          "message": "requested model \"a\" was replaced by \"b\" before launch"
+        }
+      ]
+    },
+    {
+      "output": {
+        "stdout": "",
+        "stderr": "x\nmodel: other-model\ny"
+      },
+      "check": {
+        "requested": "a",
+        "launched": "b",
+        "args": [
+          "--model",
+          "b"
+        ]
+      },
+      "out": [
+        {
+          "code": "model-overridden",
+          "requested": "a",
+          "launched": "b",
+          "message": "requested model \"a\" was replaced by \"b\" before launch"
+        },
+        {
+          "code": "model-reported-different",
+          "launched": "b",
+          "reported": "other-model",
+          "message": "launched with model \"b\" but the CLI reports running \"other-model\""
+        }
+      ]
+    },
+    {
+      "output": {
+        "stdout": "",
+        "stderr": "model: b"
+      },
+      "check": {
+        "requested": "a",
+        "launched": "b",
+        "args": [
+          "--model",
+          "b"
+        ]
+      },
+      "out": [
+        {
+          "code": "model-overridden",
+          "requested": "a",
+          "launched": "b",
+          "message": "requested model \"a\" was replaced by \"b\" before launch"
+        }
+      ]
+    },
+    {
+      "output": {
+        "stdout": "Model \"q\" not found",
+        "stderr": "model: zzz"
+      },
+      "check": {
+        "requested": "a",
+        "launched": "b",
+        "args": [
+          "--model",
+          "b"
+        ]
+      },
+      "out": [
+        {
+          "code": "model-overridden",
+          "requested": "a",
+          "launched": "b",
+          "message": "requested model \"a\" was replaced by \"b\" before launch"
+        },
+        {
+          "code": "model-unsupported",
+          "model": "q",
+          "message": "the provider CLI does not recognize model \"q\"",
+          "evidence": "Model \"q\" not found"
+        },
+        {
+          "code": "model-reported-different",
+          "launched": "b",
+          "reported": "zzz",
+          "message": "launched with model \"b\" but the CLI reports running \"zzz\""
+        }
+      ]
+    }
+  ],
+  "modelWarningsNoCheck": []
+}

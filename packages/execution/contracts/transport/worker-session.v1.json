@@ -1,0 +1,224 @@
+{
+  "note": "recorded from src/runner/dispatch/worker-session.mjs",
+  "assert": [
+    {
+      "target": "fgos-worker",
+      "env": {},
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "target": "default",
+      "env": {},
+      "out": {
+        "error": {
+          "name": "WorkerSessionError",
+          "code": "operator-session"
+        }
+      }
+    },
+    {
+      "target": "mine",
+      "env": {
+        "HERDR_SESSION": "mine"
+      },
+      "out": {
+        "error": {
+          "name": "WorkerSessionError",
+          "code": "operator-session"
+        }
+      }
+    },
+    {
+      "target": "fgos-worker",
+      "env": {
+        "HERDR_SESSION": "cockpit"
+      },
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "target": "default",
+      "env": {
+        "HERDR_SESSION": "cockpit"
+      },
+      "out": {
+        "error": {
+          "name": "WorkerSessionError",
+          "code": "operator-session"
+        }
+      }
+    },
+    {
+      "target": "a",
+      "env": {
+        "HERDR_SESSION": "cockpit"
+      },
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "target": "A",
+      "env": {
+        "HERDR_SESSION": "cockpit"
+      },
+      "out": {
+        "error": {
+          "name": "A",
+          "code": "invalid-session-name"
+        }
+      }
+    },
+    {
+      "target": "1a",
+      "env": {
+        "HERDR_SESSION": "cockpit"
+      },
+      "out": {
+        "error": {
+          "name": "1a",
+          "code": "invalid-session-name"
+        }
+      }
+    },
+    {
+      "target": "",
+      "env": {
+        "HERDR_SESSION": "cockpit"
+      },
+      "out": {
+        "error": {
+          "name": "",
+          "code": "invalid-session-name"
+        }
+      }
+    },
+    {
+      "target": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "env": {
+        "HERDR_SESSION": "cockpit"
+      },
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "target": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "env": {
+        "HERDR_SESSION": "cockpit"
+      },
+      "out": {
+        "error": {
+          "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "code": "invalid-session-name"
+        }
+      }
+    },
+    {
+      "target": "a_b-c",
+      "env": {
+        "HERDR_SESSION": "cockpit"
+      },
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "target": "a/b",
+      "env": {
+        "HERDR_SESSION": "cockpit"
+      },
+      "out": {
+        "error": {
+          "name": "a/b",
+          "code": "invalid-session-name"
+        }
+      }
+    },
+    {
+      "target": null,
+      "env": {
+        "HERDR_SESSION": "cockpit"
+      },
+      "out": {
+        "error": {
+          "name": null,
+          "code": "invalid-session-name"
+        }
+      }
+    }
+  ],
+  "forSession": [
+    {
+      "base": {
+        "HERDR_SOCKET_PATH": "/s",
+        "A": "1"
+      },
+      "name": "w",
+      "out": {
+        "A": "1",
+        "HERDR_SESSION": "w"
+      }
+    },
+    {
+      "base": null,
+      "name": "w",
+      "out": {
+        "HERDR_SESSION": "w"
+      }
+    }
+  ],
+  "isolated": [
+    {
+      "caller": {
+        "HERDR_SESSION": "cockpit",
+        "HERDR_SOCKET_PATH": "/s",
+        "HERDR_PANE_ID": "p",
+        "HERDR_TAB_ID": "t",
+        "HERDR_WORKSPACE_ID": "w",
+        "HOME": "/h"
+      },
+      "target": "fgos-worker",
+      "out": {
+        "ok": {
+          "HERDR_SESSION": "fgos-worker",
+          "HOME": "/h"
+        }
+      }
+    },
+    {
+      "caller": {
+        "HERDR_SESSION": "cockpit"
+      },
+      "target": "cockpit",
+      "out": {
+        "error": {
+          "name": "WorkerSessionError",
+          "code": "operator-session"
+        }
+      }
+    },
+    {
+      "caller": null,
+      "target": "default",
+      "out": {
+        "error": {
+          "name": "WorkerSessionError",
+          "code": "operator-session"
+        }
+      }
+    },
+    {
+      "caller": null,
+      "target": "ok",
+      "out": {
+        "ok": {
+          "HERDR_SESSION": "ok"
+        }
+      }
+    }
+  ]
+}
