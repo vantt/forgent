@@ -13,7 +13,7 @@ Round 0 (2026-11-19 16:2x). Scout done; nothing settled. Starting picture: Miu a
 hands. Miu is always on, does little herself, but must be able to coordinate anything (delegate, queue) and have a fast
 route for small urgent chores. The supervisor is woken, not always on, and covers the large cyclic coordination.
 Round 1: the owner asked why the supervisor can do anything; it is the interim unconfined session, not the designed head (§3 row 9). Open next: which reach is the target (§3 row 9), then the urgent-chore route (§3 row 1).
-Round 2: owner gave a provisional picture of the supervisor (§3 row 10): observe, wake, open, ask, help every session; never do a session's work unless it is stuck. Row 9 deferred by the owner. Round 3: owner described Miu (§3 row 11): cognitive-load reducer at the owner's side, large authority over priority and order, life-and-death over sessions used rarely; the supervisor carries on what Miu arranged. Next: the channel between them (§3 row 12).
+Round 2: owner gave a provisional picture of the supervisor (§3 row 10): observe, wake, open, ask, help every session; never do a session's work unless it is stuck. Row 9 deferred by the owner. Round 3: owner described Miu (§3 row 11): cognitive-load reducer at the owner's side, large authority over priority and order, life-and-death over sessions used rarely; the supervisor carries on what Miu arranged. Round 4: channel agreed as C (§3 row 12); SP-D1, SP-D2 minted. Next: the urgent-chore route (§3 row 1) in the light of SP-D1 (Miu rarely orders directly).
 
 ## 2. Mục tiêu & đề bài
 
@@ -35,7 +35,7 @@ the door it goes through and how it is proven from the sandbox. Code and plans a
 |---|---|---|
 | 1 | Urgent-chore fast route for Miu: what it is, its limits, how its result reaches main | open |
 | 2 | Miu delegating/queuing work to the supervisor: a door to enqueue and wake (today Miu can only start sessions or message peers) | open |
-| 3 | Miu stopping sessions she started (no `session stop` in her grant) | leaning (round 3): Miu holds life-and-death over sessions (start and stop any), used rarely; needs `session stop` in her grant |
+| 3 | Miu stopping sessions she started (no `session stop` in her grant) | settled SP-D1: needs `session stop` in her grant |
 | 4 | Miu reading the portfolio the supervisor reads (`supervisor plans`, `slots`, queue) for status | open |
 | 5 | Mismatches between persona text and grant: Miu's skill says "never lands work" but her grant has `land`; persona says "hands a ready plan to a supervisor" while the skill says the watcher does | open |
 | 6 | Supervisor reach beyond plans: owning backlog rows, mailbox/peers, waking on Miu's request | open |
@@ -43,13 +43,15 @@ the door it goes through and how it is proven from the sandbox. Code and plans a
 | 9 | Two supervisors exist today: the interim hand-started one (`forgent-1d`, Claude opus, unconfined, role `lead:SUPERVISOR`, brief `.fgos/runtime/tmp/supervisor-brief-portfolio.md`) does anything a person can; the designed head (`head:supervisor-<handle>`, confined, grant table, woken by the watcher) does only its grant verbs and has not yet carried a plan ready to done. Which one is the target reach for "the supervisor" | open |
 | 10 | Supervisor reach, owner's provisional picture (round 2, "anh cũng chưa rõ trong đầu"): high-level executive, authority without hands-on. It observes and wakes every session, opens new ones, asks an existing one, even helps it; it never does a session's work unless that session is stuck. Door map today: observe = `fgos identity list --project` (who, role, liveness only; no door reads what a session is doing or whether it is stuck beyond watcher events `head-gone`, `plan-no-progress`, `supervisor-stuck`); wake = no fgos door (mailbox reaches a session only during a turn; idle sessions are woken by herdr `pane send-text` or SendMessage, neither in the supervisor grant); open = `session start` (held); ask/help = mailbox or SendMessage (secretary grant only, not the supervisor); take over a stuck one = `session stop` + successor start or `session rotate` (held). Provisional; reversal trigger: the owner's own list of what `forgent-1d` does that must not be lost | provisional |
 | 11 | Miu's role, owner's provisional picture (round 3): always runs alongside the owner; reduces the owner's cognitive load: makes clear what is the priority, gives context and explains the problem so the owner chooses and decides. Large authority over priority and plan order, and life-and-death over sessions, but rarely gives direct orders unless truly needed. The supervisor usually carries on what Miu arranged. They work very closely, as the owner's right and left hands, both cross-domain. Implication found: the supervisor head has no channel back to Miu today (no mailbox, no peers), and Miu has no door to wake the supervisor (`supervisor wake` is not in her grant; only plan/discussion events wake it) | provisional |
-| 12 | Miu-supervisor channel: how what Miu arranges reaches the supervisor at once, and how the supervisor reports back | open (asked round 3) |
+| 12 | Miu-supervisor channel: how what Miu arranges reaches the supervisor at once, and how the supervisor reports back | agreed round 4 (option C): every decision is written to portfolio files, which stay the truth; messages only wake and point ("read file X"); Miu gains `supervisor wake`; the supervisor gains a back channel to Miu for results, stuck work and decisions only. Mint after it holds one more round |
 | 8 | Proof: each power named with its door and a sandbox proof (ties to supervisor-review T2 head-start preflight, `p-2wb2lfgky3`, and caps phase 6 grant audit) | open |
 
 ## 4. Quyết định đã chốt
 
 | ID | Decision | Basis | Date |
 |---|---|---|---|
+| SP-D1 | Miu sits at the owner's side to reduce the owner's cognitive load (what is the priority, the context, the problem) so the owner chooses. She has large authority over priority and plan order and life-and-death over sessions (start and stop any), and rarely gives direct orders unless truly needed. Both Miu and the supervisor are cross-domain | Owner round 3 (quoted in §5), held unrevised through round 4 | 2026-11-19 |
+| SP-D2 | The supervisor usually carries on what Miu arranged; the two work very closely as the owner's right and left hands | Owner round 3, held unrevised through round 4 (the channel choice in round 4 builds on it) | 2026-11-19 |
 
 ## 5. Q&A log
 
@@ -77,6 +79,10 @@ the door it goes through and how it is proven from the sandbox. Code and plans a
   quyền sinh sát nhưng nó sẽ ít khi ra lệnh trực tiếp trừ khi thật sự cần. thường supervisor sẽ lo tiếp phần mà miu đã
   sắp xếp. miu và supervisor sẽ làm rất gần. 2 đứa nhu tay phải và trái của anh và làm cross domain." Recorded as §3
   row 11 (provisional); rows 3 and 7 now lean; opened row 12 (the channel between them).
+
+- 2026-11-19 17:1x — Asked the channel question (A files only, B direct two-way messages, C files are the truth and
+  messages only wake and point). Owner: "C". §3 row 12 agreed; SP-D1 and SP-D2 minted from round 3 (held unrevised).
+  Local ids follow the SM-D*/SR-D* precedent.
 
 ## 6. Thiết kế đã chốt {#design}
 
