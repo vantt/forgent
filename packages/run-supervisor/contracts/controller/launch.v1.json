@@ -1,0 +1,678 @@
+{
+  "note": "recorded from src/run-supervisor/direct-launch.mjs; envelope clock fields are offsets from createdAt in whole seconds",
+  "paths": {
+    "runDir": "/r/run",
+    "sideFile": "/r/run/protected/attempt-secrets.json",
+    "captureDir": "/r/run/protected/capture/a1",
+    "stdout": "/r/run/protected/capture/a1/stdout.log",
+    "stderr": "/r/run/protected/capture/a1/stderr.log",
+    "gateExit": "/r/run/gate-exit.json",
+    "outboxDir": "/r/run/worker-output/outbox"
+  },
+  "gate": {
+    "direct": [
+      "/h/fgos",
+      "internal",
+      "gate",
+      "--protocol",
+      "1",
+      "--envelope",
+      "/r/run/envelope.json",
+      "--go-fd",
+      "5"
+    ],
+    "terminal": [
+      "/h/fgos",
+      "internal",
+      "gate",
+      "--protocol",
+      "1",
+      "--envelope",
+      "/r/run/envelope.json",
+      "--go-socket",
+      "/run/u/s.sock"
+    ]
+  },
+  "laneTransport": [
+    {
+      "lanes": {
+        "ceiling": 4,
+        "laneWaitSec": 3
+      },
+      "depth": 0,
+      "out": {
+        "ceiling": 4,
+        "waitMs": 3000
+      }
+    },
+    {
+      "lanes": {
+        "ceiling": 4,
+        "laneWaitSec": 3
+      },
+      "depth": 1,
+      "out": null
+    },
+    {
+      "lanes": {
+        "ceiling": null,
+        "laneWaitSec": 3
+      },
+      "depth": 0,
+      "out": {
+        "ceiling": null,
+        "waitMs": 3000
+      }
+    },
+    {
+      "lanes": null,
+      "depth": 0,
+      "out": null
+    }
+  ],
+  "waits": [
+    {
+      "envelope": {
+        "lanes": {
+          "ceiling": 4,
+          "waitMs": 3000
+        }
+      },
+      "laneWaitMs": 3000,
+      "bindingWaitMs": 48000,
+      "settlementCeilingMs": 124500
+    },
+    {
+      "envelope": {
+        "lanes": {
+          "ceiling": null,
+          "waitMs": 3000
+        }
+      },
+      "laneWaitMs": 0,
+      "bindingWaitMs": 45000,
+      "settlementCeilingMs": 121500
+    },
+    {
+      "envelope": {},
+      "laneWaitMs": 0,
+      "bindingWaitMs": 45000,
+      "settlementCeilingMs": 121500
+    }
+  ],
+  "envelopes": [
+    {
+      "label": "direct-confined-mutating",
+      "envelope": {
+        "v": 3,
+        "attemptId": "att-1",
+        "unitRunId": "ur-1",
+        "runDir": "/r/run",
+        "host": "direct",
+        "protocolId": 1,
+        "hostBin": "/h/fgos",
+        "payloadRoot": "/h/payload",
+        "cwd": "/w",
+        "mutation": "mutating",
+        "launch": {
+          "command": "/bin/agent",
+          "args": [
+            "-p"
+          ],
+          "env": {
+            "A": "1"
+          },
+          "stdinPolicy": "null",
+          "briefPath": null,
+          "outboxDir": "/r/run/worker-output/outbox",
+          "maxOutputBytes": 4096,
+          "capture": {
+            "stdout": "/r/run/protected/capture/att-1/stdout.log",
+            "stderr": "/r/run/protected/capture/att-1/stderr.log"
+          }
+        },
+        "containment": {
+          "preferred": "linux-gate",
+          "bwrapPrefix": [
+            "/usr/bin/bwrap",
+            "--unshare-pid",
+            "--"
+          ]
+        },
+        "deadlines": {
+          "softAt": {
+            "bootId": "<boot>",
+            "afterSec": 1
+          },
+          "idleMs": 500,
+          "hardCeiling": {
+            "bootId": "<boot>",
+            "afterSec": 18
+          },
+          "gateKillGraceMs": 2000,
+          "killWaitMs": 300
+        },
+        "agentProtocol": {
+          "cli": "claude"
+        },
+        "identity": null,
+        "steps": [
+          {
+            "stepId": "settle-attempt",
+            "hostBin": "/h/fgos",
+            "payloadRoot": "/h/payload",
+            "argv": [
+              "internal",
+              "attempt-step",
+              "settle-attempt",
+              "--protocol",
+              "1",
+              "--run-dir",
+              "/r/run"
+            ],
+            "cwd": "/r/run",
+            "env": {
+              "PATH": "/bin"
+            },
+            "stepTimeoutMs": 600000
+          },
+          {
+            "stepId": "finalize-home",
+            "hostBin": "/h/fgos",
+            "payloadRoot": "/h/payload",
+            "argv": [
+              "internal",
+              "attempt-step",
+              "finalize-home",
+              "--protocol",
+              "1",
+              "--run-dir",
+              "/r/run"
+            ],
+            "cwd": "/r/run",
+            "env": {
+              "PATH": "/bin"
+            },
+            "stepTimeoutMs": 600000
+          }
+        ],
+        "sideFile": "/r/run/protected/attempt-secrets.json",
+        "createdAt": {
+          "bootId": "<boot>"
+        },
+        "cwdLeaseFile": "/l/cwd.lock"
+      }
+    },
+    {
+      "label": "direct-readonly-unconfined",
+      "envelope": {
+        "v": 3,
+        "attemptId": "att-1",
+        "unitRunId": "ur-1",
+        "runDir": "/r/run",
+        "host": "direct",
+        "protocolId": 1,
+        "hostBin": "/h/fgos",
+        "payloadRoot": "/h/payload",
+        "cwd": "/w",
+        "mutation": "read-only",
+        "launch": {
+          "command": "/bin/agent",
+          "args": [],
+          "env": {},
+          "stdinPolicy": "null",
+          "briefPath": null,
+          "outboxDir": "/r/run/worker-output/outbox",
+          "capture": {
+            "stdout": "/r/run/protected/capture/att-1/stdout.log",
+            "stderr": "/r/run/protected/capture/att-1/stderr.log"
+          }
+        },
+        "containment": {
+          "preferred": "linux-pgroup"
+        },
+        "deadlines": {
+          "softAt": null,
+          "idleMs": null,
+          "hardCeiling": {
+            "bootId": "<boot>",
+            "afterSec": 617
+          },
+          "gateKillGraceMs": 2000,
+          "killWaitMs": 300
+        },
+        "agentProtocol": {
+          "cli": "claude"
+        },
+        "identity": null,
+        "steps": [
+          {
+            "stepId": "settle-attempt",
+            "hostBin": "/h/fgos",
+            "payloadRoot": "/h/payload",
+            "argv": [
+              "internal",
+              "attempt-step",
+              "settle-attempt",
+              "--protocol",
+              "1",
+              "--run-dir",
+              "/r/run"
+            ],
+            "cwd": "/r/run",
+            "env": {
+              "PATH": "/bin"
+            },
+            "stepTimeoutMs": 600000
+          },
+          {
+            "stepId": "finalize-home",
+            "hostBin": "/h/fgos",
+            "payloadRoot": "/h/payload",
+            "argv": [
+              "internal",
+              "attempt-step",
+              "finalize-home",
+              "--protocol",
+              "1",
+              "--run-dir",
+              "/r/run"
+            ],
+            "cwd": "/r/run",
+            "env": {
+              "PATH": "/bin"
+            },
+            "stepTimeoutMs": 600000
+          }
+        ],
+        "sideFile": "/r/run/protected/attempt-secrets.json",
+        "createdAt": {
+          "bootId": "<boot>"
+        }
+      }
+    },
+    {
+      "label": "direct-lanes",
+      "envelope": {
+        "v": 3,
+        "attemptId": "att-1",
+        "unitRunId": "ur-1",
+        "runDir": "/r/run",
+        "host": "direct",
+        "protocolId": 1,
+        "hostBin": "/h/fgos",
+        "payloadRoot": "/h/payload",
+        "cwd": "/w",
+        "mutation": "mutating",
+        "launch": {
+          "command": "/bin/agent",
+          "args": [
+            "-p"
+          ],
+          "env": {
+            "A": "1"
+          },
+          "stdinPolicy": "null",
+          "briefPath": null,
+          "outboxDir": "/r/run/worker-output/outbox",
+          "maxOutputBytes": 4096,
+          "capture": {
+            "stdout": "/r/run/protected/capture/att-1/stdout.log",
+            "stderr": "/r/run/protected/capture/att-1/stderr.log"
+          }
+        },
+        "containment": {
+          "preferred": "linux-gate",
+          "bwrapPrefix": [
+            "/usr/bin/bwrap",
+            "--unshare-pid",
+            "--"
+          ]
+        },
+        "deadlines": {
+          "softAt": {
+            "bootId": "<boot>",
+            "afterSec": 4
+          },
+          "idleMs": 500,
+          "hardCeiling": {
+            "bootId": "<boot>",
+            "afterSec": 21
+          },
+          "gateKillGraceMs": 2000,
+          "killWaitMs": 300
+        },
+        "agentProtocol": {
+          "cli": "claude"
+        },
+        "identity": null,
+        "steps": [
+          {
+            "stepId": "settle-attempt",
+            "hostBin": "/h/fgos",
+            "payloadRoot": "/h/payload",
+            "argv": [
+              "internal",
+              "attempt-step",
+              "settle-attempt",
+              "--protocol",
+              "1",
+              "--run-dir",
+              "/r/run"
+            ],
+            "cwd": "/r/run",
+            "env": {
+              "PATH": "/bin"
+            },
+            "stepTimeoutMs": 600000
+          },
+          {
+            "stepId": "finalize-home",
+            "hostBin": "/h/fgos",
+            "payloadRoot": "/h/payload",
+            "argv": [
+              "internal",
+              "attempt-step",
+              "finalize-home",
+              "--protocol",
+              "1",
+              "--run-dir",
+              "/r/run"
+            ],
+            "cwd": "/r/run",
+            "env": {
+              "PATH": "/bin"
+            },
+            "stepTimeoutMs": 600000
+          }
+        ],
+        "sideFile": "/r/run/protected/attempt-secrets.json",
+        "createdAt": {
+          "bootId": "<boot>"
+        },
+        "lanes": {
+          "ceiling": 4,
+          "waitMs": 3000
+        },
+        "cwdLeaseFile": "/l/cwd.lock"
+      }
+    },
+    {
+      "label": "terminal-lanes-extra-step",
+      "envelope": {
+        "v": 3,
+        "attemptId": "att-1",
+        "unitRunId": "ur-1",
+        "runDir": "/r/run",
+        "host": "terminal",
+        "protocolId": 1,
+        "hostBin": "/h/fgos",
+        "payloadRoot": "/h/payload",
+        "cwd": "/w",
+        "mutation": "mutating",
+        "launch": {
+          "command": "/bin/agent",
+          "args": [
+            "-p"
+          ],
+          "env": {
+            "A": "1"
+          },
+          "stdinPolicy": "null",
+          "briefPath": "/r/brief.md",
+          "outboxDir": "/r/out",
+          "maxOutputBytes": 4096,
+          "capture": {
+            "stdout": "/r/run/protected/capture/att-1/stdout.log",
+            "stderr": "/r/run/protected/capture/att-1/stderr.log"
+          }
+        },
+        "containment": {
+          "preferred": "linux-gate",
+          "bwrapPrefix": [
+            "/usr/bin/bwrap",
+            "--unshare-pid",
+            "--"
+          ]
+        },
+        "deadlines": {
+          "softAt": {
+            "bootId": "<boot>",
+            "afterSec": 4
+          },
+          "idleMs": 500,
+          "hardCeiling": {
+            "bootId": "<boot>",
+            "afterSec": 21
+          },
+          "gateKillGraceMs": 2000,
+          "killWaitMs": 300
+        },
+        "agentProtocol": {
+          "cli": "claude"
+        },
+        "identity": null,
+        "steps": [
+          {
+            "stepId": "settle-attempt",
+            "hostBin": "/h/fgos",
+            "payloadRoot": "/h/payload",
+            "argv": [
+              "internal",
+              "attempt-step",
+              "settle-attempt",
+              "--protocol",
+              "1",
+              "--run-dir",
+              "/r/run"
+            ],
+            "cwd": "/r/run",
+            "env": {
+              "PATH": "/bin"
+            },
+            "stepTimeoutMs": 600000
+          },
+          {
+            "stepId": "finalize-home",
+            "hostBin": "/h/fgos",
+            "payloadRoot": "/h/payload",
+            "argv": [
+              "internal",
+              "attempt-step",
+              "finalize-home",
+              "--protocol",
+              "1",
+              "--run-dir",
+              "/r/run"
+            ],
+            "cwd": "/r/run",
+            "env": {
+              "PATH": "/bin"
+            },
+            "stepTimeoutMs": 600000
+          },
+          {
+            "stepId": "cleanup-trust",
+            "hostBin": "/h/fgos",
+            "payloadRoot": "/h/payload",
+            "argv": [
+              "internal",
+              "attempt-step",
+              "cleanup-trust",
+              "--protocol",
+              "1",
+              "--run-dir",
+              "/r/run"
+            ],
+            "cwd": "/r/run",
+            "env": {
+              "PATH": "/bin"
+            },
+            "stepTimeoutMs": 600000
+          },
+          {
+            "stepId": "release-slot",
+            "builtin": true,
+            "disposition": {
+              "onSuccess": "close",
+              "onFailure": "retain"
+            }
+          }
+        ],
+        "sideFile": "/r/run/protected/attempt-secrets.json",
+        "createdAt": {
+          "bootId": "<boot>"
+        },
+        "slot": {
+          "key": "att-1",
+          "groupKey": "g1"
+        },
+        "terminal": {
+          "socketPath": "/run/u/fgos/abc.sock",
+          "exitCommand": null,
+          "orphanSettleMs": 100,
+          "retainFailedPaneMs": 5000
+        },
+        "lanes": {
+          "ceiling": 4,
+          "waitMs": 3000
+        },
+        "cwdLeaseFile": "/l/cwd.lock"
+      }
+    },
+    {
+      "label": "session",
+      "envelope": {
+        "v": 3,
+        "attemptId": "att-1",
+        "unitRunId": "ur-1",
+        "runDir": "/r/run",
+        "host": "terminal",
+        "protocolId": 1,
+        "hostBin": "/h/fgos",
+        "payloadRoot": "/h/payload",
+        "cwd": "/w",
+        "mutation": "mutating",
+        "launch": {
+          "command": "/bin/agent",
+          "args": [
+            "-p"
+          ],
+          "env": {
+            "A": "1"
+          },
+          "stdinPolicy": "null",
+          "briefPath": "/r/brief.md",
+          "outboxDir": "/r/out",
+          "maxOutputBytes": 4096,
+          "capture": {
+            "stdout": "/r/run/protected/capture/att-1/stdout.log",
+            "stderr": "/r/run/protected/capture/att-1/stderr.log"
+          }
+        },
+        "containment": {
+          "preferred": "linux-gate",
+          "bwrapPrefix": [
+            "/usr/bin/bwrap",
+            "--unshare-pid",
+            "--"
+          ]
+        },
+        "deadlines": {
+          "softAt": null,
+          "idleMs": null,
+          "hardCeiling": {
+            "bootId": "<boot>",
+            "afterSec": 26
+          },
+          "gateKillGraceMs": 2000,
+          "killWaitMs": 300
+        },
+        "agentProtocol": {
+          "cli": "claude"
+        },
+        "identity": null,
+        "steps": [
+          {
+            "stepId": "finalize-home",
+            "hostBin": "/h/fgos",
+            "payloadRoot": "/h/payload",
+            "argv": [
+              "internal",
+              "attempt-step",
+              "finalize-home",
+              "--protocol",
+              "1",
+              "--run-dir",
+              "/r/run"
+            ],
+            "cwd": "/r/run",
+            "env": {
+              "PATH": "/bin"
+            },
+            "stepTimeoutMs": 600000
+          },
+          {
+            "stepId": "release-slot",
+            "builtin": true,
+            "disposition": {
+              "onSuccess": "close",
+              "onFailure": "retain"
+            }
+          }
+        ],
+        "sideFile": "/r/run/protected/attempt-secrets.json",
+        "createdAt": {
+          "bootId": "<boot>"
+        },
+        "slot": {
+          "key": "att-1",
+          "groupKey": "g1"
+        },
+        "terminal": {
+          "socketPath": "/run/u/fgos/abc.sock",
+          "exitCommand": null,
+          "orphanSettleMs": 100,
+          "retainFailedPaneMs": 5000
+        },
+        "session": {
+          "role": "head:a-b",
+          "verbs": []
+        },
+        "cwdLeaseFile": "/l/cwd.lock"
+      }
+    },
+    {
+      "label": "session-needs-terminal",
+      "error": {
+        "code": "session-needs-terminal",
+        "message": "a session attempt runs in a pane",
+        "runDir": "/r/run"
+      }
+    },
+    {
+      "label": "session-needs-ceiling",
+      "error": {
+        "code": "session-needs-ceiling",
+        "message": "a session attempt names its hard ceiling in milliseconds",
+        "runDir": "/r/run"
+      }
+    },
+    {
+      "label": "too-many-steps",
+      "error": {
+        "code": "too-many-steps",
+        "message": "an attempt runs at most 3 steps",
+        "runDir": "/r/run"
+      }
+    },
+    {
+      "label": "pid-namespace-required",
+      "error": {
+        "code": "pid-namespace-required",
+        "message": "a direct attempt runs in a pid namespace of its own",
+        "runDir": "/r/run"
+      }
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "v": 1,
+  "source": "src/run-supervisor/gate-kill-grace.mjs (dispatch keys through the config door); layering recorded from the contract",
+  "cases": [
+    {
+      "name": "standard only",
+      "global": null,
+      "project": null,
+      "gateKillGrace": {
+        "value": 10000,
+        "source": "standard"
+      },
+      "cancelWait": {
+        "value": 15000,
+        "source": "standard"
+      }
+    },
+    {
+      "name": "global overrides the grace",
+      "global": {
+        "gateKillGraceMs": 2000
+      },
+      "project": null,
+      "gateKillGrace": {
+        "value": 2000,
+        "source": "global"
+      },
+      "cancelWait": {
+        "value": 15000,
+        "source": "standard"
+      }
+    },
+    {
+      "name": "project overrides the wait, global the grace",
+      "global": {
+        "gateKillGraceMs": 2000
+      },
+      "project": {
+        "cancelWaitMs": 3000
+      },
+      "gateKillGrace": {
+        "value": 2000,
+        "source": "global"
+      },
+      "cancelWait": {
+        "value": 3000,
+        "source": "project"
+      }
+    },
+    {
+      "name": "project beats global",
+      "global": {
+        "cancelWaitMs": 9000
+      },
+      "project": {
+        "cancelWaitMs": 3000
+      },
+      "gateKillGrace": {
+        "value": 10000,
+        "source": "standard"
+      },
+      "cancelWait": {
+        "value": 3000,
+        "source": "project"
+      }
+    }
+  ]
+}
