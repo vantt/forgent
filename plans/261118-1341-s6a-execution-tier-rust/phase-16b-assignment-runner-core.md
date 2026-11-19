@@ -24,26 +24,24 @@ attempt: plan, lease, prompt, confinement request, envelope, handover, settle.
 - Golden vectors under `packages/execution/contracts/assignment-runner/` recorded by
   `test/golden-recorders/assignment-runner.recorder.mjs`.
 
-- Attempt lock on Windows (decided 2026-11-19, review of 16b): no Windows handover is built and the controller does
-  not hold the attempt lock for the child's lifetime. It releases its attempt copy right after the supervisor is
-  spawned (`launch.rs` `start_and_bind`, `cfg(not(unix))`), and the Windows supervisor takes `attempt.lock` itself
-  once it read the envelope, waiting up to `LOCK_WAIT_MS` (10 s) for the controller's release
-  (`packages/run-supervisor/rust/src/supervise/windows.rs`, module doc and `Locks::complete`). This is what Node does
-  (`assignment-runner.mjs` `startAndBind`: `if (process.platform === 'win32') attempt.locks.releaseAttempt()`;
-  `direct-launch.mjs` `startSupervisor` hands over no descriptor on win32). Holding it for the child's lifetime would
-  make the supervisor's own take wait out its 10 s and refuse. Proof: msvc `cargo check` of the `cfg(not(unix))`
-  path; a runtime proof waits for a Windows runner (no Windows machine on the lane).
+- Attempt locks at the handover (decided 2026-11-19, OPC). Unix, as Node's `spawnWithLocks([attempt, cwdLease])`
+  (`direct-launch.mjs` `startSupervisor`, handles marked handed-over at `src/holder-lock/index.mjs` `spawnWithLocks`):
+  `Handle::lend` gives the supervisor a copy of the attempt lock as descriptor 3 and, for an attempt that writes, of
+  the cwd lease as descriptor 4. The controller keeps both handles, lent: the attempt copy closes once the binding
+  is known, the cwd lease at `closeAttempt` after its custody record; closing a lent handle never waits on the
+  supervisor or ends it. `lend` replaced `hand_over` (one handover primitive; holder-lock spec rule 9). Proof:
+  `packages/holder-lock/rust/tests/handle_file.rs` and the engine end-to-end test of an assignment that writes
+  passing the supervisor's descriptor 3 and 4 check.
+- Windows. A read-only attempt launches as Node does: the controller releases its attempt copy right after the
+  spawn and the supervisor takes `attempt.lock` itself (`supervise/windows.rs`, `LOCK_WAIT_MS` 10 s); holding it for
+  the child's lifetime would make that take time out. A mutating attempt is refused before admission with
+  `windows-cwd-lease-holder-missing` (`execute::mutating_launch_refusal`): Node holds the cwd lease in a lock-hold
+  helper and names it as `cwdLeaseOwner`, and the Rust controller has no holder endpoint to name, so Windows
+  mutating launches stay on the Node launch route until a Windows lease design exists (a later item). Proof: msvc
+  `cargo check` and the refusal's unit test; a runtime proof waits for a Windows runner.
 - Write-then-exec: the runner writes no script it executes. Tests that do write their stub agent/supervisor with
   `std::fs::write` (opened `O_CLOEXEC`, closed on return) and take `SCRIPT_EXEC` around the write and the exec, so a
   fork in a sibling test cannot hold the write descriptor at exec (ETXTBSY seen in the phase-8 smoke tests).
-- Open (review 2026-11-19, blocking a mutating launch): the cwd lease does not reach the supervisor. Unix: the
-  supervisor needs the lease as descriptor 4 (`supervise/unix.rs` `Locks::complete`), Node passes a shared copy
-  (`spawnWithLocks([attempt, cwdLease])`, the controller keeps its own through commit); `start_and_bind` passes only
-  descriptor 3, and `fgos-holder-lock` has no door that lends a held exclusive description to a child while the
-  holder keeps it (`hand_over` moves). Windows: Node names the lease holder (`cwdLeaseOwner` = the helper's
-  `domainEndpoint()`); `seat.rs` passes `cwd_lease_owner: None`, so the supervisor tries to take a lease the
-  controller still holds. Fix needs a `fgos-holder-lock` door (lend a copy to a child on unix; a holder endpoint on
-  Windows) and an end-to-end mutating test.
 - Ports the host implements (named for phases 18/19): `ExecutePorts` + `SeatPorts` (the composite, no impl yet),
   `TerminalPrep` and `CredentialRenewal` (no impl yet); `CheckoutFacts` (`apps/fgos/src/wiring/dispatch_decide.rs`
   `HostWorkspace`), `Machine` (`apps/fgos/src/wiring/seat_binding.rs` `HostMachine`), `SettlementGit`

@@ -2,11 +2,11 @@
 //! its settle step writes. Whatever the outcome, only the attempt copy of the locks closes here; the controller
 //! keeps cwd custody.
 //!
-//! The attempt lock goes to the supervisor as a descriptor, so the supervisor holds it for the attempt's life and
-//! the controller keeps no copy. Where a lock does not pass to a child with its handle (Windows), the controller
-//! stays the attempt lock holder until the supervisor is spawned and bound: it releases its copy right after the
-//! spawn, as the supervisor declares its job on the same lease without reacquiring it, so nothing in the
-//! controller waits on the child.
+//! The attempt lock and, for an attempt that writes, the cwd lease are lent to the supervisor as descriptors 3 and 4
+//! (`Handle::lend`): the supervisor holds them for the attempt's life, and the controller's lent handles only close,
+//! never waiting on the child. Where a lock does not pass to a child with its handle (Windows), the controller
+//! releases its attempt copy right after the spawn and the supervisor takes the attempt lock itself; a mutating
+//! attempt is refused before admission there (`execute::mutating_launch_refusal`).
 
 use std::path::Path;
 use std::process::Child;
@@ -44,28 +44,40 @@ pub fn start_and_bind(
     let outcome = (|| {
         #[cfg(unix)]
         let mut started = {
-            let handle = attempt
-                .locks
-                .as_mut()
-                .and_then(|locks| locks.attempt.take())
-                .ok_or_else(|| {
-                    launch_failed(
-                        "executeAssignment: the attempt holds no attempt lock to hand over".into(),
-                    )
-                })?;
-            let descriptor = handle.hand_over().map_err(|e| {
-                launch_failed(format!(
-                    "executeAssignment: the attempt lock could not be handed over ({e})"
-                ))
+            // Node's `spawnWithLocks([attempt, cwdLease])`: the supervisor gets a copy of the attempt lock as descriptor
+            // 3 and, for an attempt that writes, of the cwd lease as descriptor 4. Both handles stay here, lent: the
+            // attempt copy closes once the binding is known, the cwd lease stays until the attempt is closed (its
+            // custody record), and closing a lent copy never waits on the supervisor or ends it.
+            let locks = attempt.locks.as_ref().ok_or_else(|| {
+                launch_failed(
+                    "executeAssignment: the attempt holds no attempt lock to hand over".into(),
+                )
             })?;
-            let started = start_supervisor(envelope, &[&descriptor], &attempt.step_env, extra_env)
+            let lent = |handle: &fgos_holder_lock::Handle| {
+                handle.lend().map_err(|e| {
+                    launch_failed(format!(
+                        "executeAssignment: the {} lock could not be lent to the supervisor ({e})",
+                        handle.name()
+                    ))
+                })
+            };
+            let attempt_lock = locks.attempt.as_ref().ok_or_else(|| {
+                launch_failed(
+                    "executeAssignment: the attempt holds no attempt lock to hand over".into(),
+                )
+            })?;
+            let mut descriptors = vec![lent(attempt_lock)?];
+            if let Some(lease) = locks.cwd_lease.as_ref() {
+                descriptors.push(lent(lease)?);
+            }
+            let handover: Vec<&std::fs::File> = descriptors.iter().collect();
+            let started = start_supervisor(envelope, &handover, &attempt.step_env, extra_env)
                 .map_err(|e| {
                     launch_failed(format!(
                         "executeAssignment: the supervisor did not start ({e})"
                     ))
                 })?;
-            // The supervisor's copy is the last one from here on.
-            drop(descriptor);
+            drop(descriptors);
             started
         };
         #[cfg(not(unix))]

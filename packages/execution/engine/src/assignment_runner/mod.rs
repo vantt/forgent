@@ -24,13 +24,15 @@
 //! - [`execute`]: the loop itself, over the machine behind [`execute::ExecutePorts`] (the decision door's plan, the
 //!   config of a project, the prompt, the accounts, the pane, git), which the host wires.
 //!
-//! The attempt lock and Windows. Where `flock` holds (unix) the attempt lock moves to the supervisor as descriptor 3
-//! (`Handle::hand_over`): the controller keeps no copy, so nothing in it waits on the child. A lock does not pass to a
-//! child with its handle on Windows, so there the controller stays the attempt lock holder only until the supervisor
-//! is spawned and bound, releases its own copy right after the spawn, and the supervisor declares its job on the same
-//! lease (the cwd lease the envelope names) without reacquiring it. Nothing here writes a script and then executes
-//! it; a caller that does, in a host with other threads, opens it close-on-exec and closes it before the exec (the
-//! tests take one lock around such a pair).
+//! The attempt locks and Windows. Where `flock` holds (unix) the attempt lock and, for an attempt that writes, the
+//! cwd lease are lent to the supervisor as descriptors 3 and 4 (`Handle::lend`); the controller keeps both handles
+//! (the attempt copy until the binding, the cwd lease until the attempt is closed) and closing a lent handle never
+//! waits on the child. A lock does not pass to a child with its handle on Windows: the controller releases its
+//! attempt copy right after the spawn and the supervisor takes the attempt lock itself, as Node does; a mutating
+//! attempt is refused there by name (`windows-cwd-lease-holder-missing`), since the Rust controller has no cwd
+//! lease holder endpoint to name to the supervisor, and stays on the Node launch route. Nothing here writes a
+//! script and then executes it; a caller that does, in a host with other threads, opens it close-on-exec and closes
+//! it before the exec (the tests take one lock around such a pair).
 //!
 //! Golden vectors: `packages/execution/contracts/assignment-runner/`, replayed by `tests/assignment_runner.rs`.
 

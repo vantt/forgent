@@ -207,6 +207,19 @@ fn absolute(path: &Path) -> PathBuf {
     std::path::absolute(path).unwrap_or_else(|_| path.to_path_buf())
 }
 
+/// Why a mutating attempt cannot launch from this route on this platform. On Windows a lock does not pass to a
+/// child with its handle: Node holds the cwd lease in a lock-hold helper and names it to the supervisor
+/// (`cwdLeaseOwner`), and the Rust controller has no such holder endpoint yet, so the supervisor would try to take a
+/// lease the controller still holds. Windows mutating launches stay on the Node route until that design exists.
+pub fn mutating_launch_refusal(windows: bool) -> Option<DispatchError> {
+    windows.then(|| {
+        DispatchError::new(
+            "windows-cwd-lease-holder-missing",
+            "a mutating attempt cannot launch from the native route on Windows: the controller has no cwd lease holder endpoint to name to the supervisor (cwdLeaseOwner); Windows runs it through the Node launch route",
+        )
+    })
+}
+
 fn json_text(value: &Value) -> String {
     serde_json::to_string(value).unwrap_or_default()
 }
@@ -555,6 +568,15 @@ pub fn execute_assignment(
         .with("executorId", json!(resolved_executor_id))
         .with("capability", capability.clone())
         .into());
+    }
+    if effective_mutation == "mutating" {
+        if let Some(refusal) = mutating_launch_refusal(cfg!(windows)) {
+            return Err(refusal
+                .with("cwd", json!(cwd_text))
+                .with("executorId", json!(resolved_executor_id))
+                .with("capability", capability.clone())
+                .into());
+        }
     }
     let timeout_ms = opts
         .timeout_ms

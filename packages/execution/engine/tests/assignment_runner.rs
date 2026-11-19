@@ -842,7 +842,7 @@ static SCRIPT_EXEC: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
 #[cfg(unix)]
 #[test]
-fn the_attempt_lock_moves_to_the_supervisor_and_the_controller_keeps_no_copy() {
+fn the_attempt_lock_is_lent_to_the_supervisor_and_the_controller_closes_its_copy_at_the_binding() {
     use fgos_execution_engine::assignment_runner::launch::start_and_bind;
     use fgos_holder_lock::{probe, Probe, Resource};
     use fgos_run_supervisor::controller::launch::{
@@ -904,7 +904,7 @@ fn the_attempt_lock_moves_to_the_supervisor_and_the_controller_keeps_no_copy() {
     );
     assert!(
         attempt.locks.as_ref().unwrap().attempt.is_none(),
-        "the controller keeps no copy of the attempt lock"
+        "the controller closed its copy of the attempt lock at the binding"
     );
     assert_eq!(
         probe(&Resource::new("attempt", &lock_path)).unwrap(),
@@ -1442,6 +1442,61 @@ mod end_to_end {
             timeout_ms: Some(30_000),
             ..Default::default()
         }
+    }
+
+    #[test]
+    fn an_assignment_that_writes_lends_the_supervisor_its_attempt_lock_and_cwd_lease_as_descriptors_3_and_4(
+    ) {
+        let _exec = SCRIPT_EXEC.lock().unwrap_or_else(|e| e.into_inner());
+        let (ports, root, run_dir) = rig("e2e-writes", 0.0);
+        // The supervisor's own descriptor check (`supervise/unix.rs` `Locks`): descriptor 3 is the attempt lock and
+        // descriptor 4 the cwd lease the envelope names, each still locked (another description cannot take it).
+        // Anything else and it exits before binding, as the real supervisor refuses `fd-invalid`.
+        std::fs::write(
+            &ports.host_bin,
+            "#!/usr/bin/env python3\nimport errno, fcntl, json, os, subprocess, sys, time\nenvelope = json.load(open(sys.argv[4]))\nrun = envelope['runDir']\ndef held(fd, path):\n    fcntl.fcntl(fd, fcntl.F_SETFD, fcntl.FD_CLOEXEC)\n    mine, named = os.fstat(fd), os.stat(path)\n    if (mine.st_dev, mine.st_ino) != (named.st_dev, named.st_ino):\n        sys.exit(71)\n    other = os.open(path, os.O_RDONLY)\n    try:\n        fcntl.flock(other, fcntl.LOCK_EX | fcntl.LOCK_NB)\n        sys.exit(72)\n    except OSError as e:\n        if e.errno not in (errno.EWOULDBLOCK, errno.EAGAIN):\n            sys.exit(73)\n    finally:\n        os.close(other)\nif envelope.get('mutation') != 'mutating':\n    sys.exit(74)\nheld(3, os.path.join(run, 'attempt.lock'))\nheld(4, envelope['cwdLeaseFile'])\nopen(os.path.join(run, 'supervisor-binding.json'), 'w').close()\nlaunch = envelope['launch']\nsubprocess.call([launch['command']] + launch['args'], cwd=run)\nfor _ in range(600):\n    if os.path.exists(os.path.join(run, 'result.json')):\n        break\n    time.sleep(0.05)\n",
+        )
+        .unwrap();
+        let committer = commit_when_the_agent_ran(run_dir.clone());
+        let mut opts = options(&root);
+        opts.is_read_only_mode = Some(false);
+        let settled = execute_assignment(&declared("mutating"), &opts, &ports, &mut |_, _| {})
+            .unwrap_or_else(|e| {
+                let log =
+                    std::fs::read_to_string(run_dir.join("supervisor.log")).unwrap_or_default();
+                panic!("the run is refused: {e}\n{log}")
+            });
+        committer.join().unwrap();
+        assert_eq!(settled.record["runId"], "run_a1_01");
+        assert_eq!(
+            std::fs::read_to_string(run_dir.join("agent-ran")).unwrap(),
+            "do the thing",
+            "the supervisor passed its descriptor check and ran the agent"
+        );
+        // The controller closed its lent copies when the attempt closed: nothing holds the cwd lease any more.
+        let envelope: Value =
+            serde_json::from_str(&std::fs::read_to_string(run_dir.join("envelope.json")).unwrap())
+                .unwrap();
+        let lease = fgos_holder_lock::Resource::new(
+            "dispatch-cwd",
+            envelope["cwdLeaseFile"].as_str().unwrap(),
+        );
+        assert_eq!(
+            fgos_holder_lock::probe(&lease).unwrap(),
+            fgos_holder_lock::Probe::Free
+        );
+    }
+
+    #[test]
+    fn a_mutating_launch_is_refused_by_name_where_no_cwd_lease_holder_can_be_named() {
+        let refusal = mutating_launch_refusal(true).expect("Windows refuses");
+        assert_eq!(refusal.code, "windows-cwd-lease-holder-missing");
+        assert!(
+            refusal.message.contains("Node launch route"),
+            "{}",
+            refusal.message
+        );
+        assert!(mutating_launch_refusal(false).is_none());
     }
 
     #[test]
