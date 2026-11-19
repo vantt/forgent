@@ -32,6 +32,9 @@ export const LEGACY_STATUS = {
 const PRIORITIES = VOCABULARY.priorities;
 const TABLE_COLUMNS = VOCABULARY.tableColumns;
 
+// An Identity role: `<kind>:<name>`, e.g. `lead:S6A` or `head:lead-forgent-261119-1142-supervisor-l`.
+const LEAD_ROLE = /^[a-z]+:[A-Za-z0-9][A-Za-z0-9._-]*$/;
+
 const strings = (v) => Array.isArray(v) && v.every((s) => typeof s === 'string' && s.trim() !== '');
 
 /**
@@ -181,6 +184,7 @@ export function checkPlanDir(dir, { plansRoot = path.dirname(path.resolve(dir)) 
   if (typeof meta.created !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(meta.created)) errors.push('created must be a YYYY-MM-DD string');
   if (meta.footprint !== undefined && !strings(meta.footprint)) errors.push('footprint must be a list of repo-relative paths or globs');
   if (meta.base !== undefined && !(typeof meta.base === 'string' && /^[0-9a-f]{40}$/.test(meta.base))) errors.push('base must be a full 40-character commit sha');
+  if (meta.lead !== undefined && !(typeof meta.lead === 'string' && LEAD_ROLE.test(meta.lead))) errors.push('lead must be an Identity role such as lead:S6A or head:lead-<handle>-<plan>');
   if (meta.status === 'ready' || meta.status === 'running') {
     if (!Array.isArray(meta.footprint) || meta.footprint.length === 0) errors.push(`footprint is required when status is ${meta.status}`);
     if (meta.base === undefined) errors.push(`base is required when status is ${meta.status}`);
@@ -190,7 +194,8 @@ export function checkPlanDir(dir, { plansRoot = path.dirname(path.resolve(dir)) 
   }
   for (const [name] of PLAN_SECTIONS) if (!hasSection(body, name)) errors.push(`missing section: ${name}`);
   checkPhaseTable(body, errors, meta.status);
-  return { dir, legacy: false, meta, errors };
+  const warnings = meta.status === 'running' && meta.lead === undefined ? ['a running plan names its lead: write `lead: <role>` with status running'] : [];
+  return { dir, legacy: false, meta, errors, warnings };
 }
 
 /** Checks every plan directory under `root`; returns per-plan results plus cross-plan footprint overlaps. */
@@ -234,6 +239,7 @@ export function main(argv, out = console.log) {
       const others = r.legacy ? [] : activeOverlaps([r, ...siblings(dir, flags.root)]).filter((p) => p.includes(path.basename(dir)));
       for (const [a, b] of others) errors.push(`footprint overlaps another active plan: ${a} and ${b}`);
       for (const e of errors) out(`ERROR ${path.basename(dir)}: ${e}`);
+      for (const w of r.warnings ?? []) out(`WARN ${path.basename(dir)}: ${w}`);
       if (!errors.length) out(`ok ${path.basename(dir)}`);
       return errors.length ? 1 : 0;
     }
@@ -242,6 +248,7 @@ export function main(argv, out = console.log) {
     const marked = results.filter((r) => !r.legacy);
     const failing = marked.filter((r) => r.errors.length);
     for (const r of failing) for (const e of r.errors) out(`ERROR ${path.basename(r.dir)}: ${e}`);
+    for (const r of marked) for (const w of r.warnings ?? []) out(`WARN ${path.basename(r.dir)}: ${w}`);
     for (const [a, b] of clashes) out(`ERROR active plans ${a} and ${b} have overlapping footprints`);
     const byStatus = {};
     for (const r of legacy) {

@@ -25,7 +25,7 @@ chat with the owner.
 ## Admit ready plans
 
 `fgos supervisor plans --json` returns `plans` (each with `dir`, `status`, `priority`, `admissible`, `headName` and, for
-a running plan, `leadLive`) plus `leadsLive` and `maxLeads`. Rows come in start order. Take the rows with
+a running plan, `leadLive` or `leadUnnamed`) plus `leadsLive` and `maxLeads`. Rows come in start order. Take the rows with
 `admissible: true` in listing order while `leadsLive` < `maxLeads` (admissible already excludes a footprint overlap
 with a running plan) and `fgos slots --json` shows `lanes.free` above zero (null means no ceiling is armed: no limit,
 not zero). For each:
@@ -38,7 +38,9 @@ owner.
 
 ## Running plans
 
-A `running` plan with `leadLive: false`, or an event `head-gone` or `plan-no-progress`: read the phase table and the
+A `running` plan with `leadUnnamed: true` names no lead: do not start a lead for it (one may already run), report it to the
+owner, and leave it held. Restart only a `running` plan whose `leadLive` is `false` (its named `lead` role has no live
+holder in this project). Handle `leadLive: false`, or an event `head-gone` or `plan-no-progress`: read the phase table and the
 plan directory, then restart the lead (`fgos session start lead --name <headName>`; the lead resumes from the phase
 table and `fgos request result`), park the plan with a reason in its phase table, or ask the owner. Only the supervisor
 stops a lead (`fgos session stop lead --name <headName> --reason "<why>"`); a lead never does.

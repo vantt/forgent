@@ -292,19 +292,57 @@ fn done_refuses_while_an_event_is_unhandled_and_passes_after_handled() {
     assert!(supervisor::done(&f).is_ok());
 }
 
+fn running(dir: &str, lead: Option<&str>) -> Plan {
+    let key = lead.map(|l| format!("lead: {l}\n")).unwrap_or_default();
+    let text = format!(
+        "---\ntitle: {dir}\nstatus: running\npriority: P2\ncreated: 2026-11-01\n{key}footprint:\n  - {dir}/\n---\n\n| ID | Title | DependsOn | Footprint | Wave | Status |\n|---|---|---|---|---|---|\n| 1 | t | - | `{dir}/` | 1 | todo |\n"
+    );
+    read_plan(dir, &text).unwrap()
+}
+
+fn holders(role: &str) -> Holder {
+    match role {
+        "lead:S1" => Holder::Live {
+            project_id: "p1".into(),
+        },
+        "lead:OTHER" => Holder::Live {
+            project_id: "p2".into(),
+        },
+        _ => Holder::NotLive,
+    }
+}
+
 #[test]
-fn plans_reports_leads_live_max_leads_and_lead_live_of_a_running_plan() {
+fn a_running_plan_reads_its_named_leads_liveness_in_this_project() {
     let plans = vec![
-        plan("alpha", "running"),
-        plan("beta", "running"),
-        plan("gamma", "ready"),
+        running("alpha", Some("lead:S1")),
+        running("beta", Some("lead:GONE")),
+        running("gamma", Some("lead:OTHER")),
+        plan("delta", "ready"),
     ];
-    let live = vec![fgos_supervision::portfolio::head_name(HANDLE, "alpha")];
-    let view = supervisor::plans(&plans, &[], HANDLE, &live, 4);
+    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &holders, 4);
     assert_eq!((view.leads_live, view.max_leads), (1, 4));
-    assert_eq!(view.rows[0].lead_live, Some(true));
-    assert_eq!(view.rows[1].lead_live, Some(false));
-    assert_eq!(view.rows[2].lead_live, None);
+    let live: Vec<_> = view.rows.iter().map(|r| r.lead_live).collect();
+    assert_eq!(live, [Some(true), Some(false), Some(false), None]);
+    assert!(view.rows.iter().all(|r| !r.lead_unnamed));
+}
+
+#[test]
+fn a_running_plan_naming_no_lead_is_held_and_never_a_restart_candidate() {
+    let plans = vec![running("alpha", None)];
+    let view = supervisor::plans(&plans, &[], HANDLE, "p1", &holders, 4);
+    assert_eq!(view.rows[0].lead_live, None);
+    assert!(view.rows[0].lead_unnamed && !view.rows[0].admissible);
+    assert_eq!(view.to_json()["plans"][0]["leadUnnamed"], true);
+}
+
+#[test]
+fn a_plan_reads_its_lead_role_from_frontmatter() {
+    assert_eq!(
+        running("alpha", Some("lead:S1")).lead.as_deref(),
+        Some("lead:S1")
+    );
+    assert_eq!(plan("beta", "ready").lead, None);
 }
 
 struct Roles;

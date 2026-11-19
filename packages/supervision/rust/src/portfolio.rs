@@ -117,6 +117,9 @@ pub struct Plan {
     pub blocked_by: Vec<String>,
     pub footprint: Vec<String>,
     pub source: Vec<String>,
+    /// The Identity role of the lead running the plan (`lead` frontmatter key); `None` when the
+    /// plan does not name one.
+    pub lead: Option<String>,
     pub phases: Vec<Phase>,
 }
 
@@ -191,6 +194,7 @@ pub fn read_plan(dir: &str, text: &str) -> Result<Plan, PlanRefusal> {
         blocked_by,
         footprint,
         source,
+        lead: Some(scalar("lead")).filter(|l| !l.is_empty()),
         phases,
     })
 }

@@ -366,6 +366,47 @@ fn plans_lists_the_trunk_portfolio_with_what_the_supervisor_may_start() {
 }
 
 #[test]
+fn a_running_plan_whose_named_lead_role_is_held_by_a_live_non_head_session_reports_lead_live() {
+    let scene = Scene::new("plans-lead", WATCHER_CONFIG);
+    let project = scene.project();
+    let plan = project.join(format!("plans/{PLAN}/plan.md"));
+    let text = fs::read_to_string(&plan).unwrap();
+    fs::write(
+        &plan,
+        text.replace("status: ready\n", "status: running\nlead: lead:S6A\n"),
+    )
+    .unwrap();
+    git(&project, &["add", "-f", "."]);
+    git(&project, &["commit", "-q", "-m", "take plan"]);
+    git(&project, &["push", "-q", "origin", "main"]);
+    let state = scene.root.join("state");
+    let info = fgos_identity::session_for(
+        &state,
+        &fgos_identity::resolve::WriterKey {
+            source: "CLAUDE_CODE_SESSION_ID",
+            value: "lead-session",
+        },
+        None,
+    )
+    .unwrap()
+    .info;
+    let entry = fgos_identity::directory::Entry::new(
+        info.id,
+        info.handle,
+        "claude".to_string(),
+        Some(PROJECT_ID.to_string()),
+        None,
+        vec!["lead:S6A".to_string()],
+        fgos_identity::current::os_record(std::process::id()),
+    );
+    fgos_identity::directory::register(&state, entry, false, &fgos_process::facts::judge_here)
+        .unwrap();
+    let view = scene.data(&["supervisor", "plans", "--json"]);
+    assert_eq!(view["plans"][0]["leadLive"], true, "{view}");
+    assert_eq!(view["leadsLive"], 1, "{view}");
+}
+
+#[test]
 fn one_malformed_plan_is_named_and_does_not_hide_the_other_plans() {
     let scene = Scene::new("plans-malformed", WATCHER_CONFIG);
     let project = scene.project();

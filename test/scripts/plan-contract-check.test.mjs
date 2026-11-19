@@ -154,6 +154,16 @@ test('a list key that is not a list is refused by name', () => {
   assert.ok(errorsOf(planText({ fm: { footprint: 'src/a/' } })).includes('footprint must be a list of repo-relative paths or globs'));
 });
 
+test('a lead role must be an Identity role string, and a running plan without one only warns', () => {
+  assert.ok(errorsOf(planText({ fm: { lead: 'not a role' } })).some((e) => e.startsWith('lead must be an Identity role')));
+  const r = root({ named: planText({ fm: { status: 'running', lead: 'lead:S6A' } }), bare: planText({ fm: { status: 'running' } }) });
+  const named = checkPlanDir(path.join(r, 'named'));
+  const bare = checkPlanDir(path.join(r, 'bare'), { plansRoot: r });
+  assert.deepEqual([named.errors, named.warnings], [[], []]);
+  assert.deepEqual(bare.errors, []);
+  assert.equal(bare.warnings.length, 1);
+});
+
 test('a pair scan that stops at its cap is an error, never a clean verdict', () => {
   const rows = Array.from({ length: 460 }, (_, n) => `| ${n + 1} | t | - | \`src/a/\` | 1 | ready |`);
   assert.ok(errorsOf(planText({ rows })).some((e) => e.startsWith('footprint overlap scan stopped at its')));

@@ -18,6 +18,8 @@ in its plan file.
 
 ## Start
 
+0. Taking a plan: in the same `fgos land --paths` commit that sets its `status: running`, write `lead: <your role>` (for
+   example `lead:S6A` or your `head:lead-...` role) into its frontmatter, so the supervisor can read your liveness.
 1. `fgos request result` with no id lists this role's tickets. A restarted lead reads them first and resumes runs
    already started instead of starting them again.
 2. Read `plan.md` (outcome, footprint, phase table) and the phase files of the next wave. Phases not `done` and whose

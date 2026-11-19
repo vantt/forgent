@@ -45,6 +45,7 @@ the YAML door (`src/util/yaml.mjs`), never a private parser.
 | `blockedBy` | list of plan dir names | each must exist under `plans/`; `[]` when none |
 | `footprint` | list of repo-relative paths or globs | everything the plan may write: code, tests, docs, CHANGELOG, the plan dir. Required when `ready` or `running` |
 | `base` | 40-char commit sha | the commit the plan was written against; required when `ready` or `running` |
+| `lead` | Identity role string, e.g. `lead:S6A` or `head:lead-<handle>-<plan>` | the role of the lead that runs the plan; written in the same commit that sets `status: running`. The check warns when a `running` plan lacks it; the supervisor holds a running plan with no `lead` and never restarts it |
 | `source` | list of strings | the DISCUSSION.md path and/or backlog ids the plan answers |
 | `created` | `YYYY-MM-DD` | |
 

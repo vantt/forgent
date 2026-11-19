@@ -1254,16 +1254,6 @@ pub fn send_confined(call: Result<crate::routing::ConfinedCall, String>) -> i32 
 // ---------------------------------------------------------------------------------------------
 // The verbs
 
-fn live_leads() -> Vec<String> {
-    role_holders()
-        .unwrap_or_default()
-        .iter()
-        .filter(|s| !matches!(s.liveness, fgos_identity::Liveness::Remote))
-        .flat_map(|s| s.roles.iter())
-        .filter_map(|r| r.strip_prefix("head:lead-").map(str::to_owned))
-        .collect()
-}
-
 /// How many unreadable plans `supervisor plans` names; the answer also carries the full count. An old repository can
 /// hold dozens, and a confined caller's reply is one frame of at most 64 KiB.
 const UNREADABLE_SHOWN: usize = 10;
@@ -1326,7 +1316,8 @@ pub fn answer(
                 &plans,
                 &HostPortfolio::done(&plans),
                 &project.handle,
-                &live_leads(),
+                &project.id,
+                &|role| wake::Identity::holder(&HostIdentity, role),
                 max_leads,
             );
             let unreadable_count = unreadable.len();

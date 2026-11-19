@@ -62,7 +62,7 @@ fgOS coordinates the plans of the project it runs on with no person sitting by. 
 
 | Entity | Meaning | Owner |
 |---|---|---|
-| Plan | A directory under `plans/` whose frontmatter carries `status`, `priority`, `blockedBy`, `footprint`, `source`. Admissible when `status` is `ready` and every `blockedBy` plan is `done`. | plan contract (this area reads it) |
+| Plan | A directory under `plans/` whose frontmatter carries `status`, `priority`, `blockedBy`, `footprint`, `source` and, once `running`, `lead` (the Identity role of its lead). Admissible when `status` is `ready` and every `blockedBy` plan is `done`. | plan contract (this area reads it) |
 | Event | One raised detection row, recorded once by a stable id, with a `handled` flag the supervisor sets (`supervisor handled`). | Supervision over Event Store |
 | Lane | One held machine-scope lock `<lockRoot>/lane/<k>.lock` of a top-level worker seat. Lane count = held lane locks. | Supervision reads; run supervisor takes and releases |
 | Lead | A confined head session, persona `lead`, one per admitted plan. Its footprint bound is the plan's `footprint` read from the trunk tip. | Session Host starts it; this area names it |
@@ -165,5 +165,7 @@ Dated 2026-11-18, from [the plan](../../../plans/261118-1045-project-supervisor/
 - `run` through the request socket takes no `unit`: a unit file written by a sandboxed head cannot be bound by the supervisor, so only `--writes` runs are served.
 - The commit-time footprint check reads only the frontmatter footprint of the tree being committed, before the push.
 - The supervisor grant holds `session write` for its own backlog file, so a confined supervisor edits it through its supervisor and not through a shell.
+
+- A lead writes `lead: <its role>` into the plan with `status: running` in one `land --paths` commit; `supervisor plans` reports `leadLive` from that role's live holder in this project, and holds a running plan with no `lead` (`leadUnnamed`, never restarted), because a non-head lead's role never matched the head name and the supervisor nearly started a second lead.
 
 Three deliberate departures from the settled wording, reported to the owner: the landing door serialises through the Git Land port's merge slot instead of a `land` holder-lock (PS-2); the supervisor singleton is an Identity role instead of a holder-lock (PS-8); the supervisor, which the settled design says never lands, lands portfolio edits with `land --paths` only, never code (PS-6, PS-14). Item 4 of the settled design (the plan's footprint as sandbox writes) was amended by Q1 (PS-24).

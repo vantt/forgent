@@ -3,7 +3,7 @@
 use crate::{
     portfolio::{admissible, head_name, Plan},
     queue::{QueueError, RaisedEvent},
-    wake::Drain,
+    wake::{Drain, Holder},
 };
 
 /// One portfolio row as the supervisor sees it.
@@ -14,9 +14,11 @@ pub struct PlanRow {
     pub priority: String,
     pub admissible: bool,
     pub head_name: String,
-    /// For a `running` plan only: a live lead holds its head name. A running plan with none is
-    /// what the supervisor restarts.
+    /// For a `running` plan that names its lead: whether that role is held by a live session of
+    /// this project. `false` is what the supervisor restarts; `None` also when Identity cannot say.
     pub lead_live: Option<bool>,
+    /// A `running` plan that names no lead: held, never restarted.
+    pub lead_unnamed: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -26,23 +28,32 @@ pub struct PlansView {
     pub max_leads: usize,
 }
 
-/// The portfolio rows in the order given (the caller orders them), with `live_heads` the head
-/// names holding a live role now. Lane freedom is not read here; `fgos slots` owns it.
+/// The portfolio rows in the order given (the caller orders them), with `holder` answering who
+/// holds a role now and `project_id` this project's id. Lane freedom is not read here; `fgos
+/// slots` owns it.
 pub fn plans(
     plans: &[Plan],
     done_dirs: &[String],
     project_handle: &str,
-    live_heads: &[String],
+    project_id: &str,
+    holder: &dyn Fn(&str) -> Holder,
     max_leads: usize,
 ) -> PlansView {
     let open = admissible(plans, done_dirs);
-    let live = |name: &str| live_heads.iter().any(|h| h == name);
     let mut leads_live = 0;
     let rows = plans
         .iter()
         .map(|p| {
             let name = head_name(project_handle, &p.dir);
-            let lead_live = (p.status == "running").then(|| live(&name));
+            let running = p.status == "running";
+            let lead_live = match (running, p.lead.as_deref()) {
+                (true, Some(role)) => match holder(role) {
+                    Holder::Live { project_id: id } => Some(id == project_id),
+                    Holder::NotLive => Some(false),
+                    Holder::Unknown => None,
+                },
+                _ => None,
+            };
             if lead_live == Some(true) {
                 leads_live += 1;
             }
@@ -53,6 +64,7 @@ pub fn plans(
                 admissible: open.iter().any(|a| a.dir == p.dir),
                 head_name: name,
                 lead_live,
+                lead_unnamed: running && p.lead.is_none(),
             }
         })
         .collect();
@@ -168,6 +180,9 @@ impl PlansView {
                 });
                 if let Some(live) = r.lead_live {
                     v["leadLive"] = live.into();
+                }
+                if r.lead_unnamed {
+                    v["leadUnnamed"] = true.into();
                 }
                 v
             })
