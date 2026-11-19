@@ -1,0 +1,25 @@
+{
+  "v": 1,
+  "source": "src/run-supervisor/cwd-lock.mjs",
+  "lockPathShape": "locks/dispatch-cwd--<cwdDevIno>.lock",
+  "inFlight": [
+    {
+      "pid": 123,
+      "code": "dispatch-in-flight",
+      "errorClass": "dispatch-in-flight",
+      "message": "dispatch for cwd \"/w/tree\" is already in flight (held by process 123)."
+    },
+    {
+      "pid": null,
+      "code": "dispatch-in-flight",
+      "errorClass": "dispatch-in-flight",
+      "message": "dispatch for cwd \"/w/tree\" is already in flight (held)."
+    }
+  ],
+  "missingCwd": {
+    "cwd": "/absent/dir",
+    "code": "worker-spawn-fail",
+    "errorClass": "worker-spawn-fail",
+    "message": "dispatch cwd \"/absent/dir\" does not exist."
+  }
+}

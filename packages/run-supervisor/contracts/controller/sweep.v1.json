@@ -1,0 +1,16 @@
+{
+  "note": "listOpenAttemptDirs over a fixture tree; closed attempt dirs, files and non-run dirs are left out; the result is sorted",
+  "tree": [
+    "a/producer/1/runs/02",
+    "a/producer/1/runs/01",
+    "a/producer/1/runs/00 (closed)",
+    "b/runs/01",
+    "b/runs/file.txt",
+    "c/nothing"
+  ],
+  "open": [
+    "a/producer/1/runs/01",
+    "a/producer/1/runs/02",
+    "b/runs/01"
+  ]
+}

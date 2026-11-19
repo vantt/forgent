@@ -1,0 +1,1022 @@
+{
+  "recordedFrom": "src/run-supervisor/trust-store.mjs",
+  "cases": [
+    {
+      "name": "claude read: trusted",
+      "files": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "call": {
+        "fn": "readTrust",
+        "path": "c.json",
+        "project": "/repo"
+      },
+      "result": true,
+      "after": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude read: declined",
+      "files": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": false,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "call": {
+        "fn": "readTrust",
+        "path": "c.json",
+        "project": "/repo"
+      },
+      "result": false,
+      "after": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": false,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude read: absent",
+      "files": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {}\n}\n"
+      },
+      "call": {
+        "fn": "readTrust",
+        "path": "c.json",
+        "project": "/repo"
+      },
+      "result": null,
+      "after": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {}\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude read: missing store",
+      "files": {},
+      "call": {
+        "fn": "readTrust",
+        "path": "c.json",
+        "project": "/repo"
+      },
+      "error": {
+        "code": "missing-store"
+      },
+      "after": {},
+      "modes": {}
+    },
+    {
+      "name": "claude read: corrupt store",
+      "files": {
+        "c.json": "{\"projects\":"
+      },
+      "call": {
+        "fn": "readTrust",
+        "path": "c.json",
+        "project": "/repo"
+      },
+      "error": {
+        "code": "unreadable-store"
+      },
+      "after": {
+        "c.json": "{\"projects\":"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude read: schema drift",
+      "files": {
+        "c.json": "{\"projects\":[]}"
+      },
+      "call": {
+        "fn": "readTrust",
+        "path": "c.json",
+        "project": "/repo"
+      },
+      "error": {
+        "code": "schema-drift"
+      },
+      "after": {
+        "c.json": "{\"projects\":[]}"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude seed: derived from trusted root keeps key order",
+      "files": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"zeta\": [],\n  \"alpha\": {\n    \"b\": 1,\n    \"a\": [\n      1,\n      2\n    ]\n  },\n  \"note\": \"é\\u0001\\\"\\\\/\",\n  \"projects\": {\n    \"/other\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": [\n        {\n          \"display\": \"x\",\n          \"n\": 1.5\n        }\n      ]\n    },\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "call": {
+        "fn": "seedTrust",
+        "path": "c.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "result": true,
+      "after": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"zeta\": [],\n  \"alpha\": {\n    \"b\": 1,\n    \"a\": [\n      1,\n      2\n    ]\n  },\n  \"note\": \"é\\u0001\\\"\\\\/\",\n  \"projects\": {\n    \"/other\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": [\n        {\n          \"display\": \"x\",\n          \"n\": 1.5\n        }\n      ]\n    },\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    },\n    \"/repo-wt/a\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude seed: already seeded writes nothing",
+      "files": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    },\n    \"/repo-wt/a\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "call": {
+        "fn": "seedTrust",
+        "path": "c.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "result": false,
+      "after": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    },\n    \"/repo-wt/a\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude seed: declined entry is replaced in place",
+      "files": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    },\n    \"/repo-wt/a\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": false,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    },\n    \"/z\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "call": {
+        "fn": "seedTrust",
+        "path": "c.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "result": true,
+      "after": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    },\n    \"/repo-wt/a\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    },\n    \"/z\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude seed: untrusted root",
+      "files": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": false,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "call": {
+        "fn": "seedTrust",
+        "path": "c.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "error": {
+        "code": "untrusted-root"
+      },
+      "after": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": false,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude seed: root absent",
+      "files": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {}\n}\n"
+      },
+      "call": {
+        "fn": "seedTrust",
+        "path": "c.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "error": {
+        "code": "untrusted-root"
+      },
+      "after": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {}\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude seed: relative project path",
+      "files": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "call": {
+        "fn": "seedTrust",
+        "path": "c.json",
+        "project": "rel/a",
+        "repoRoot": "/repo"
+      },
+      "error": {
+        "code": "invalid-path"
+      },
+      "after": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude seed: relative root",
+      "files": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "call": {
+        "fn": "seedTrust",
+        "path": "c.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "repo"
+      },
+      "error": {
+        "code": "invalid-path"
+      },
+      "after": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude seed: missing store",
+      "files": {},
+      "call": {
+        "fn": "seedTrust",
+        "path": "c.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "error": {
+        "code": "missing-store"
+      },
+      "after": {},
+      "modes": {}
+    },
+    {
+      "name": "claude seed: keeps the store mode",
+      "files": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "modeFiles": {
+        "c.json": 416
+      },
+      "call": {
+        "fn": "seedTrust",
+        "path": "c.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "result": true,
+      "after": {
+        "c.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    },\n    \"/repo-wt/a\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "modes": {
+        "c.json": 416
+      }
+    },
+    {
+      "name": "claude config: new private config",
+      "files": {
+        "root.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "call": {
+        "fn": "seedClaudeConfigTrust",
+        "path": "cfg/.claude.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo",
+        "root": "root.json"
+      },
+      "result": true,
+      "after": {
+        "cfg/.claude.json": "{\n  \"hasCompletedOnboarding\": true,\n  \"theme\": \"dark\",\n  \"projects\": {\n    \"/repo-wt/a\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n",
+        "root.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude config: existing config keeps every key",
+      "files": {
+        "root.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n",
+        "cfg/.claude.json": "{\n  \"oauthAccount\": {\n    \"id\": \"u\"\n  },\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/x\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "call": {
+        "fn": "seedClaudeConfigTrust",
+        "path": "cfg/.claude.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo",
+        "root": "root.json"
+      },
+      "result": true,
+      "after": {
+        "cfg/.claude.json": "{\n  \"oauthAccount\": {\n    \"id\": \"u\"\n  },\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/x\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    },\n    \"/repo-wt/a\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  },\n  \"hasCompletedOnboarding\": true\n}\n",
+        "root.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude config: already complete",
+      "files": {
+        "root.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n",
+        "cfg/.claude.json": "{\n  \"hasCompletedOnboarding\": true,\n  \"projects\": {\n    \"/repo-wt/a\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "call": {
+        "fn": "seedClaudeConfigTrust",
+        "path": "cfg/.claude.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo",
+        "root": "root.json"
+      },
+      "result": false,
+      "after": {
+        "cfg/.claude.json": "{\n  \"hasCompletedOnboarding\": true,\n  \"projects\": {\n    \"/repo-wt/a\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n",
+        "root.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {\n    \"/repo\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "claude config: root not trusted",
+      "files": {
+        "root.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {}\n}\n"
+      },
+      "call": {
+        "fn": "seedClaudeConfigTrust",
+        "path": "cfg/.claude.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo",
+        "root": "root.json"
+      },
+      "error": {
+        "code": "untrusted-root"
+      },
+      "after": {
+        "root.json": "{\n  \"numStartups\": 7,\n  \"theme\": \"light\",\n  \"projects\": {}\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex read: trusted section",
+      "files": {
+        "config.toml": "model = \"x\"\n[projects.\"/repo\"]\ntrust_level = \"trusted\"\n"
+      },
+      "call": {
+        "fn": "readCodexTrust",
+        "path": "config.toml",
+        "project": "/repo"
+      },
+      "result": true,
+      "after": {
+        "config.toml": "model = \"x\"\n[projects.\"/repo\"]\ntrust_level = \"trusted\"\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex read: section without trust level",
+      "files": {
+        "config.toml": "[projects.\"/repo\"]\ntrust_level = \"untrusted\"\n"
+      },
+      "call": {
+        "fn": "readCodexTrust",
+        "path": "config.toml",
+        "project": "/repo"
+      },
+      "result": false,
+      "after": {
+        "config.toml": "[projects.\"/repo\"]\ntrust_level = \"untrusted\"\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex read: trust level of the next section does not count",
+      "files": {
+        "config.toml": "[projects.\"/repo\"]\nnote = [1,\n  2]\n[projects.\"/b\"]\ntrust_level = \"trusted\"\n"
+      },
+      "call": {
+        "fn": "readCodexTrust",
+        "path": "config.toml",
+        "project": "/repo"
+      },
+      "result": false,
+      "after": {
+        "config.toml": "[projects.\"/repo\"]\nnote = [1,\n  2]\n[projects.\"/b\"]\ntrust_level = \"trusted\"\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex read: absent path and missing file",
+      "files": {
+        "config.toml": "[projects.\"/repo\"]\ntrust_level = \"trusted\"\n"
+      },
+      "call": {
+        "fn": "readCodexTrust",
+        "path": "config.toml",
+        "project": "/nope"
+      },
+      "result": null,
+      "after": {
+        "config.toml": "[projects.\"/repo\"]\ntrust_level = \"trusted\"\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex read: no config file",
+      "files": {},
+      "call": {
+        "fn": "readCodexTrust",
+        "path": "config.toml",
+        "project": "/repo"
+      },
+      "result": null,
+      "after": {},
+      "modes": {}
+    },
+    {
+      "name": "codex read: relative path",
+      "files": {},
+      "call": {
+        "fn": "readCodexTrust",
+        "path": "config.toml",
+        "project": "repo"
+      },
+      "error": {
+        "code": "invalid-path"
+      },
+      "after": {},
+      "modes": {}
+    },
+    {
+      "name": "codex seed: append derived entry",
+      "files": {
+        "config.toml": "model = \"x\"\n\n\n[projects.\"/repo\"]\ntrust_level = \"trusted\"\n"
+      },
+      "call": {
+        "fn": "seedCodexTrust",
+        "path": "config.toml",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "result": true,
+      "after": {
+        "config.toml": "model = \"x\"\n\n\n[projects.\"/repo\"]\ntrust_level = \"trusted\"\n\n[projects.\"/repo-wt/a\"]\ntrust_level = \"trusted\"\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex seed: path with quote and backslash escapes",
+      "files": {
+        "config.toml": "[projects.\"/repo\"]\ntrust_level = \"trusted\"\n"
+      },
+      "call": {
+        "fn": "seedCodexTrust",
+        "path": "config.toml",
+        "project": "/repo-wt/a\"b\\c",
+        "repoRoot": "/repo"
+      },
+      "result": true,
+      "after": {
+        "config.toml": "[projects.\"/repo\"]\ntrust_level = \"trusted\"\n\n[projects.\"/repo-wt/a\\\"b\\\\c\\u007f\"]\ntrust_level = \"trusted\"\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex seed: already trusted",
+      "files": {
+        "config.toml": "[projects.\"/repo\"]\ntrust_level = \"trusted\"\n\n[projects.\"/repo-wt/a\"]\ntrust_level = \"trusted\"\n"
+      },
+      "call": {
+        "fn": "seedCodexTrust",
+        "path": "config.toml",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "result": false,
+      "after": {
+        "config.toml": "[projects.\"/repo\"]\ntrust_level = \"trusted\"\n\n[projects.\"/repo-wt/a\"]\ntrust_level = \"trusted\"\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex seed: private config created from the account root",
+      "files": {
+        "root.toml": "[projects.\"/repo\"]\ntrust_level = \"trusted\"\n"
+      },
+      "call": {
+        "fn": "seedCodexTrust",
+        "path": "home/config.toml",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo",
+        "root": "root.toml"
+      },
+      "result": true,
+      "after": {
+        "home/config.toml": "\n\n[projects.\"/repo-wt/a\"]\ntrust_level = \"trusted\"\n",
+        "root.toml": "[projects.\"/repo\"]\ntrust_level = \"trusted\"\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex seed: untrusted root",
+      "files": {
+        "config.toml": "model = \"x\"\n"
+      },
+      "call": {
+        "fn": "seedCodexTrust",
+        "path": "config.toml",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "error": {
+        "code": "untrusted-root"
+      },
+      "after": {
+        "config.toml": "model = \"x\"\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex seed: no config and no separate root",
+      "files": {},
+      "call": {
+        "fn": "seedCodexTrust",
+        "path": "config.toml",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "error": {
+        "code": "untrusted-root"
+      },
+      "after": {},
+      "modes": {}
+    },
+    {
+      "name": "codex remove: drops the section only",
+      "files": {
+        "config.toml": "a = 1\n[projects.\"/repo\"]\ntrust_level = \"trusted\"\n\n[projects.\"/b\"]\ntrust_level = \"trusted\"\n"
+      },
+      "call": {
+        "fn": "removeCodexTrust",
+        "path": "config.toml",
+        "project": "/repo"
+      },
+      "result": true,
+      "after": {
+        "config.toml": "a = 1\n[projects.\"/b\"]\ntrust_level = \"trusted\"\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex remove: absent entry",
+      "files": {
+        "config.toml": "[projects.\"/repo\"]\ntrust_level = \"trusted\"\n"
+      },
+      "call": {
+        "fn": "removeCodexTrust",
+        "path": "config.toml",
+        "project": "/zzz"
+      },
+      "result": false,
+      "after": {
+        "config.toml": "[projects.\"/repo\"]\ntrust_level = \"trusted\"\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex hash: plain command",
+      "files": {},
+      "call": {
+        "fn": "codexHookTrustHash",
+        "event": "pre_tool_use",
+        "matcher": "Bash",
+        "handler": {
+          "type": "command",
+          "command": "echo hi"
+        },
+        "platform": "linux"
+      },
+      "result": "sha256:3bbce6504b48cc6f0d7fe24bd36273633d1bfa5879bc87f4ed7ccd16f24d1415",
+      "after": {},
+      "modes": {}
+    },
+    {
+      "name": "codex hash: stop drops its matcher and keeps status message",
+      "files": {},
+      "call": {
+        "fn": "codexHookTrustHash",
+        "event": "stop",
+        "matcher": "*",
+        "handler": {
+          "type": "command",
+          "command": "x",
+          "timeout": 5,
+          "async": true,
+          "statusMessage": "busy"
+        },
+        "platform": "linux"
+      },
+      "result": "sha256:2b3ee40f73a9c4b7c42dd4b3c61052ef5bc261dc42500c1cb201cd5e4d575e8b",
+      "after": {},
+      "modes": {}
+    },
+    {
+      "name": "codex hash: commandWindows is ignored on linux",
+      "files": {},
+      "call": {
+        "fn": "codexHookTrustHash",
+        "event": "session_start",
+        "handler": {
+          "type": "command",
+          "command": "a",
+          "commandWindows": "b"
+        },
+        "platform": "linux"
+      },
+      "result": "sha256:cacbffbe3785e6e556ebb9b1191c8f38ab8d9c74012f17303a5dbb9a461fe8db",
+      "after": {},
+      "modes": {}
+    },
+    {
+      "name": "codex hash: commandWindows replaces on win32",
+      "files": {},
+      "call": {
+        "fn": "codexHookTrustHash",
+        "event": "session_start",
+        "handler": {
+          "type": "command",
+          "command": "a",
+          "command_windows": "b"
+        },
+        "platform": "win32"
+      },
+      "result": "sha256:eeda598232bd3d8be9c72de949d2b2ea74feb41821471d2ab526fa734938a05e",
+      "after": {},
+      "modes": {}
+    },
+    {
+      "name": "codex hooks: entries and skipped",
+      "files": {
+        ".codex/hooks.json": "{\"hooks\":{\"PreToolUse\":[{\"matcher\":\"Bash\",\"hooks\":[{\"type\":\"command\",\"command\":\"one\"},{\"type\":\"prompt\"}]}],\"UserPromptSubmit\":[{\"matcher\":\"*\",\"hooks\":[{\"type\":\"command\",\"command\":\"two\",\"timeout\":9}]}],\"SessionEnd\":[{\"hooks\":[{\"type\":\"command\",\"command\":\"e\"}]}],\"Stop\":[{\"hooks\":[{\"type\":\"command\",\"command\":\"c\",\"additionalContextLimit\":1}]}]}}"
+      },
+      "call": {
+        "fn": "codexHookTrustEntries",
+        "path": ".codex/hooks.json",
+        "platform": "linux"
+      },
+      "result": {
+        "entries": [
+          {
+            "key": "$DIR/.codex/hooks.json:pre_tool_use:0:0",
+            "hash": "sha256:3ab63aed3423b0b35697c0bc115dcde2a89ab0569f2a7277a584ad565e0311cc"
+          },
+          {
+            "key": "$DIR/.codex/hooks.json:user_prompt_submit:0:0",
+            "hash": "sha256:fdbb5abe43607e10ad0877c00c0a77398c7ec59d70a77fc205255c08b311b6e9"
+          }
+        ],
+        "skipped": [
+          {
+            "key": "$DIR/.codex/hooks.json:pre_tool_use:0:1",
+            "reason": "handler type \"prompt\" is not a command"
+          },
+          {
+            "key": "$DIR/.codex/hooks.json:session_end:0:0",
+            "reason": "event session_end is not hashed here"
+          },
+          {
+            "key": "$DIR/.codex/hooks.json:stop:0:0",
+            "reason": "additionalContextLimit is not normalised here"
+          }
+        ]
+      },
+      "after": {
+        ".codex/hooks.json": "{\"hooks\":{\"PreToolUse\":[{\"matcher\":\"Bash\",\"hooks\":[{\"type\":\"command\",\"command\":\"one\"},{\"type\":\"prompt\"}]}],\"UserPromptSubmit\":[{\"matcher\":\"*\",\"hooks\":[{\"type\":\"command\",\"command\":\"two\",\"timeout\":9}]}],\"SessionEnd\":[{\"hooks\":[{\"type\":\"command\",\"command\":\"e\"}]}],\"Stop\":[{\"hooks\":[{\"type\":\"command\",\"command\":\"c\",\"additionalContextLimit\":1}]}]}}"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex hooks: no file",
+      "files": {},
+      "call": {
+        "fn": "codexHookTrustEntries",
+        "path": ".codex/hooks.json",
+        "platform": "linux"
+      },
+      "result": {
+        "entries": [],
+        "skipped": []
+      },
+      "after": {},
+      "modes": {}
+    },
+    {
+      "name": "codex hooks: corrupt file",
+      "files": {
+        ".codex/hooks.json": "{"
+      },
+      "call": {
+        "fn": "codexHookTrustEntries",
+        "path": ".codex/hooks.json",
+        "platform": "linux"
+      },
+      "error": {
+        "code": "unreadable-store"
+      },
+      "after": {
+        ".codex/hooks.json": "{"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex hook seed: both files, idempotent keys left alone",
+      "files": {
+        "root.toml": "[projects.\"$DIR/wt\"]\ntrust_level = \"trusted\"\n",
+        "wt/.codex/hooks.json": "{\"hooks\":{\"PreToolUse\":[{\"matcher\":\"Bash\",\"hooks\":[{\"type\":\"command\",\"command\":\"one\"}]}]}}",
+        "home/config.toml": "[hooks.state.\"$DIR/wt/.codex/hooks.json:pre_tool_use:0:0\"]\ntrusted_hash = \"sha256:old\"\n"
+      },
+      "call": {
+        "fn": "seedCodexHookTrust",
+        "path": "home/config.toml",
+        "project": "$DIR/wt",
+        "repoRoot": "$DIR/wt",
+        "root": "root.toml"
+      },
+      "result": {
+        "keys": [],
+        "skipped": []
+      },
+      "after": {
+        "home/config.toml": "[hooks.state.\"$DIR/wt/.codex/hooks.json:pre_tool_use:0:0\"]\ntrusted_hash = \"sha256:old\"\n",
+        "root.toml": "[projects.\"$DIR/wt\"]\ntrust_level = \"trusted\"\n",
+        "wt/.codex/hooks.json": "{\"hooks\":{\"PreToolUse\":[{\"matcher\":\"Bash\",\"hooks\":[{\"type\":\"command\",\"command\":\"one\"}]}]}}"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex hook seed: new keys appended",
+      "files": {
+        "root.toml": "[projects.\"$DIR/wt\"]\ntrust_level = \"trusted\"\n",
+        "wt/.codex/hooks.json": "{\"hooks\":{\"PreToolUse\":[{\"matcher\":\"Bash\",\"hooks\":[{\"type\":\"command\",\"command\":\"one\"}]}],\"Stop\":[{\"hooks\":[{\"type\":\"command\",\"command\":\"two\"}]}]}}"
+      },
+      "call": {
+        "fn": "seedCodexHookTrust",
+        "path": "home/config.toml",
+        "project": "$DIR/wt",
+        "repoRoot": "$DIR/wt",
+        "root": "root.toml"
+      },
+      "result": {
+        "keys": [
+          "$DIR/wt/.codex/hooks.json:pre_tool_use:0:0",
+          "$DIR/wt/.codex/hooks.json:stop:0:0"
+        ],
+        "skipped": []
+      },
+      "after": {
+        "home/config.toml": "\n\n[hooks.state.\"$DIR/wt/.codex/hooks.json:pre_tool_use:0:0\"]\ntrusted_hash = \"sha256:3ab63aed3423b0b35697c0bc115dcde2a89ab0569f2a7277a584ad565e0311cc\"\n\n[hooks.state.\"$DIR/wt/.codex/hooks.json:stop:0:0\"]\ntrusted_hash = \"sha256:502ee22a26491a64282b27b7598bea9daa0c5cb30e211c9527e932986fa8d3c0\"\n",
+        "root.toml": "[projects.\"$DIR/wt\"]\ntrust_level = \"trusted\"\n",
+        "wt/.codex/hooks.json": "{\"hooks\":{\"PreToolUse\":[{\"matcher\":\"Bash\",\"hooks\":[{\"type\":\"command\",\"command\":\"one\"}]}],\"Stop\":[{\"hooks\":[{\"type\":\"command\",\"command\":\"two\"}]}]}}"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex hook seed: untrusted root",
+      "files": {
+        "root.toml": "a = 1\n",
+        "wt/.codex/hooks.json": "{\"hooks\":{\"Stop\":[{\"hooks\":[{\"type\":\"command\",\"command\":\"two\"}]}]}}"
+      },
+      "call": {
+        "fn": "seedCodexHookTrust",
+        "path": "home/config.toml",
+        "project": "$DIR/wt",
+        "repoRoot": "$DIR/wt",
+        "root": "root.toml"
+      },
+      "error": {
+        "code": "untrusted-root"
+      },
+      "after": {
+        "root.toml": "a = 1\n",
+        "wt/.codex/hooks.json": "{\"hooks\":{\"Stop\":[{\"hooks\":[{\"type\":\"command\",\"command\":\"two\"}]}]}}"
+      },
+      "modes": {}
+    },
+    {
+      "name": "codex hook seed: no hooks",
+      "files": {},
+      "call": {
+        "fn": "seedCodexHookTrust",
+        "path": "home/config.toml",
+        "project": "$DIR/wt",
+        "repoRoot": "$DIR/wt",
+        "root": "root.toml"
+      },
+      "result": {
+        "keys": [],
+        "skipped": []
+      },
+      "after": {},
+      "modes": {}
+    },
+    {
+      "name": "agy read: trusted through a normalised path",
+      "files": {
+        "s.json": "{\"trustedWorkspaces\":[\"/a/b/../repo/\"]}"
+      },
+      "call": {
+        "fn": "readAgyTrust",
+        "path": "s.json",
+        "project": "/a/repo"
+      },
+      "result": true,
+      "after": {
+        "s.json": "{\"trustedWorkspaces\":[\"/a/b/../repo/\"]}"
+      },
+      "modes": {}
+    },
+    {
+      "name": "agy read: absent list",
+      "files": {
+        "s.json": "{}"
+      },
+      "call": {
+        "fn": "readAgyTrust",
+        "path": "s.json",
+        "project": "/a/repo"
+      },
+      "result": null,
+      "after": {
+        "s.json": "{}"
+      },
+      "modes": {}
+    },
+    {
+      "name": "agy read: corrupt file reads as unknown",
+      "files": {
+        "s.json": "{"
+      },
+      "call": {
+        "fn": "readAgyTrust",
+        "path": "s.json",
+        "project": "/a/repo"
+      },
+      "result": null,
+      "after": {
+        "s.json": "{"
+      },
+      "modes": {}
+    },
+    {
+      "name": "agy store: array is schema drift",
+      "files": {
+        "s.json": "[]"
+      },
+      "call": {
+        "fn": "readAgyStore",
+        "path": "s.json"
+      },
+      "error": {
+        "code": "schema-drift"
+      },
+      "after": {
+        "s.json": "[]"
+      },
+      "modes": {}
+    },
+    {
+      "name": "agy store: missing file is empty",
+      "files": {},
+      "call": {
+        "fn": "readAgyStore",
+        "path": "s.json"
+      },
+      "result": {},
+      "after": {},
+      "modes": {}
+    },
+    {
+      "name": "agy seed: appended after the trusted root",
+      "files": {
+        "s.json": "{\"other\":{\"k\":[1]},\"trustedWorkspaces\":[\"/repo\"]}"
+      },
+      "call": {
+        "fn": "seedAgyTrust",
+        "path": "s.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "result": true,
+      "after": {
+        "s.json": "{\n  \"other\": {\n    \"k\": [\n      1\n    ]\n  },\n  \"trustedWorkspaces\": [\n    \"/repo\",\n    \"/repo-wt/a\"\n  ]\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "agy seed: already seeded",
+      "files": {
+        "s.json": "{\"trustedWorkspaces\":[\"/repo\",\"/repo-wt/a\"]}"
+      },
+      "call": {
+        "fn": "seedAgyTrust",
+        "path": "s.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "result": false,
+      "after": {
+        "s.json": "{\"trustedWorkspaces\":[\"/repo\",\"/repo-wt/a\"]}"
+      },
+      "modes": {}
+    },
+    {
+      "name": "agy seed: private home written from the account settings",
+      "files": {
+        "root.json": "{\"trustedWorkspaces\":[\"/repo\"]}"
+      },
+      "call": {
+        "fn": "seedAgyTrust",
+        "path": "home/s.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo",
+        "root": "root.json"
+      },
+      "result": true,
+      "after": {
+        "home/s.json": "{\n  \"trustedWorkspaces\": [\n    \"/repo-wt/a\"\n  ]\n}\n",
+        "root.json": "{\"trustedWorkspaces\":[\"/repo\"]}"
+      },
+      "modes": {}
+    },
+    {
+      "name": "agy seed: untrusted root",
+      "files": {
+        "s.json": "{\"trustedWorkspaces\":[]}"
+      },
+      "call": {
+        "fn": "seedAgyTrust",
+        "path": "s.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "error": {
+        "code": "untrusted-root"
+      },
+      "after": {
+        "s.json": "{\"trustedWorkspaces\":[]}"
+      },
+      "modes": {}
+    },
+    {
+      "name": "agy seed: no settings yet",
+      "files": {},
+      "call": {
+        "fn": "seedAgyTrust",
+        "path": "s.json",
+        "project": "/repo-wt/a",
+        "repoRoot": "/repo"
+      },
+      "error": {
+        "code": "untrusted-root"
+      },
+      "after": {},
+      "modes": {}
+    },
+    {
+      "name": "agy seed: relative project path",
+      "files": {
+        "s.json": "{\"trustedWorkspaces\":[\"/repo\"]}"
+      },
+      "call": {
+        "fn": "seedAgyTrust",
+        "path": "s.json",
+        "project": "rel",
+        "repoRoot": "/repo"
+      },
+      "error": {
+        "code": "invalid-path"
+      },
+      "after": {
+        "s.json": "{\"trustedWorkspaces\":[\"/repo\"]}"
+      },
+      "modes": {}
+    },
+    {
+      "name": "agy remove: drops one entry",
+      "files": {
+        "s.json": "{\"trustedWorkspaces\":[\"/repo\",\"/repo-wt/a\"],\"x\":1}"
+      },
+      "call": {
+        "fn": "removeAgyTrust",
+        "path": "s.json",
+        "project": "/repo-wt/a"
+      },
+      "result": true,
+      "after": {
+        "s.json": "{\n  \"trustedWorkspaces\": [\n    \"/repo\"\n  ],\n  \"x\": 1\n}\n"
+      },
+      "modes": {}
+    },
+    {
+      "name": "agy remove: absent entry",
+      "files": {
+        "s.json": "{\"trustedWorkspaces\":[\"/repo\"]}"
+      },
+      "call": {
+        "fn": "removeAgyTrust",
+        "path": "s.json",
+        "project": "/zzz"
+      },
+      "result": false,
+      "after": {
+        "s.json": "{\"trustedWorkspaces\":[\"/repo\"]}"
+      },
+      "modes": {}
+    }
+  ]
+}
