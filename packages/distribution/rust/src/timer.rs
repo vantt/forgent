@@ -1004,6 +1004,27 @@ fn pin_installed_caller_env(
                 .collect()
         })
         .unwrap_or_default();
+    // A wake tool the installed PATH cannot reach at all (a release that starts needing one) is the one
+    // thing the caller adds, so such a unit reads as drifted and the fix renders it once.
+    let reaches = |dirs: &[String], tool: &str| {
+        dirs.iter()
+            .chain(fixed.iter())
+            .any(|d| is_executable_path(&Path::new(d).join(tool)))
+    };
+    for tool in WAKE_TOOLS {
+        if reaches(&pinned.tool_dirs, tool) {
+            continue;
+        }
+        if let Some(dir) = host
+            .tool_dirs
+            .iter()
+            .find(|d| is_executable_path(&Path::new(d).join(tool)))
+        {
+            if !pinned.tool_dirs.contains(dir) {
+                pinned.tool_dirs.push(dir.clone());
+            }
+        }
+    }
     pinned.herdr_env = vars
         .into_iter()
         .filter(|(k, _)| k == "HERDR_SOCKET_PATH" || k == "HERDR_SESSION")
@@ -1409,6 +1430,73 @@ mod tests {
         assert_eq!(unit(&service), installed);
         assert!(fix_with(schedule, &root, on(schedule), &other).fixed);
         assert_eq!(unit(&service), installed);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_watcher_unit_whose_path_misses_a_wake_tool_reads_drifted_and_the_fix_rerenders_it_once() {
+        let w = World::new();
+        let root = PathBuf::from("/p");
+        let schedule = Schedule::WatcherTick;
+        let tools = scratch("drift-tools");
+        let node_dir = tools.join("nvm/bin");
+        let cargo_dir = tools.join("cargo/bin");
+        for (dir, tool) in [(&node_dir, "node"), (&cargo_dir, "cargo")] {
+            std::fs::create_dir_all(dir).unwrap();
+            let file = dir.join(tool);
+            std::fs::write(&file, "#!/bin/sh\n").unwrap();
+            std::fs::set_permissions(&file, std::os::unix::fs::PermissionsExt::from_mode(0o755))
+                .unwrap();
+        }
+        let run = |_: &str, _: &[String]| -> Result<(), String> { Ok(()) };
+        let bin = move |_: &Path| Some(PathBuf::from(BIN));
+        let env = |dirs: &[&Path]| {
+            let mut h = host("linux", &w.home);
+            h.tool_dirs = dirs
+                .iter()
+                .map(|d| d.to_string_lossy().into_owned())
+                .collect();
+            TimerEnv {
+                host: h,
+                config: &|_| Ok(None),
+                host_bin: &bin,
+                run: &run,
+            }
+        };
+        let before = env(&[&node_dir]);
+        let after = env(&[&node_dir, &cargo_dir]);
+        let unit = || {
+            std::fs::read_to_string(
+                w.units()
+                    .join(format!("{}.service", unit_stem(&root, schedule))),
+            )
+            .unwrap()
+        };
+
+        assert!(fix_with(schedule, &root, on(schedule), &before).fixed);
+        assert!(!unit().contains("cargo/bin"));
+        assert!(
+            check_with(schedule, &root, on(schedule), &before)
+                .unwrap()
+                .passed
+        );
+
+        let drifted = check_with(schedule, &root, on(schedule), &after).unwrap();
+        assert!(
+            !drifted.passed && drifted.message.contains("stale"),
+            "{}",
+            drifted.message
+        );
+        assert!(fix_with(schedule, &root, on(schedule), &after).fixed);
+        let rendered = unit();
+        assert!(rendered.contains("cargo/bin"));
+        assert!(
+            check_with(schedule, &root, on(schedule), &after)
+                .unwrap()
+                .passed
+        );
+        assert!(fix_with(schedule, &root, on(schedule), &after).fixed);
+        assert_eq!(unit(), rendered, "the fix is idempotent");
     }
 
     #[cfg(unix)]

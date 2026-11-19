@@ -63,14 +63,17 @@ plan). Stop the planner with `fgos session stop planner --name <name> --reason "
 
 ## Answered owner question
 
-Event `question-answered`:
+Event `question-answered` carries `successor` (`persona`, `name`, `forQuestion`). Follow these steps in order; never
+finish the event without step 4:
 
-- A live busy asker needs nothing: its own hooks show it the answer.
-- An idle or gone asker: `fgos session stop <persona> --name <name> --reason "<why>"` the idle holder, then start the successor from the event's `successor`
-  field: `fgos session start <persona> --name <name> --for-question <question id>`. Use the asker's own persona and
-  name so the successor holds the asker's `head:` role (Identity has no `answers:` role). The successor writes the
-  answer back where the question was asked and runs `fgos questions ack|cancel <id>`. The supervisor never acks or
-  cancels a question.
+1. Read `fgos supervisor queue --json` and take the event's `successor`. Check whether a live role holds
+   `head:<persona>-<name>` and whether it is busy or idle.
+2. Live and busy: leave it; its own hooks show the answer on its next turn. Go to step 4.
+3. Live and idle: `fgos session stop <persona> --name <name> --reason "answer ready"`, then
+   `fgos session start <persona> --name <name> --for-question <question id>`. Gone: only the start. The successor holds
+   the asker's `head:` role, writes the answer back where the question was asked and runs `fgos questions ack|cancel <id>`.
+   An idle asker left running stays blocked: its answer never reaches it, so do not skip the stop and the start.
+4. `fgos supervisor handled <event id>`. The supervisor never acks or cancels a question.
 
 ## Never
 
