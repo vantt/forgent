@@ -129,7 +129,8 @@ fn git_deadline_removes_index_lock(namespaced: bool) {
         matches!(
             error,
             BorrowError::Deadline {
-                termination: Termination::Terminated
+                termination: Termination::Terminated,
+                ..
             }
         ),
         "{error}"

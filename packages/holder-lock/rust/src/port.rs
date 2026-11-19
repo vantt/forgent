@@ -190,10 +190,11 @@ pub struct Handle {
     /// Cooperative termination grace before forced child cleanup.
     pub(crate) terminate_grace_ms: u64,
     /// Lagged per-spawn scan floor and latest successful proof start.
-    /// Release alone decides whether any description copy remains.
+    /// Release alone decides whether any description copy remains. Boxed with the lend below: a handle rides in
+    /// enums whose other variants are small.
     #[cfg_attr(not(unix), allow(dead_code))]
-    since: Marks,
-    /// Whether a copy was lent to a child, and to which one (boxed: a handle rides in large enums).
+    since: Box<Marks>,
+    /// Whether a copy was lent to a child, and to which one.
     lend: Box<std::sync::Mutex<Lend>>,
 }
 
@@ -403,12 +404,9 @@ impl<'a> BorrowedHandle<'a> {
             mode: owner.mode,
             kill_wait_ms: owner.kill_wait_ms,
             terminate_grace_ms: owner.terminate_grace_ms,
-            since: std::sync::Mutex::new(
-                *owner
-                    .since
-                    .lock()
-                    .map_err(|_| BorrowError::InvalidSpec("lock-history-poisoned".into()))?,
-            ),
+            since: Box::new(std::sync::Mutex::new(*owner.since.lock().map_err(
+                |_| BorrowError::InvalidSpec("lock-history-poisoned".into()),
+            )?)),
             lend: lend_of(owner.lent_member_tuple()),
         };
         let borrowed = Self {
@@ -457,7 +455,7 @@ impl BorrowedHandle<'static> {
             mode: Mode::Ex,
             kill_wait_ms,
             terminate_grace_ms: 3000,
-            since: std::sync::Mutex::new((since, since)),
+            since: Box::new(std::sync::Mutex::new((since, since))),
             lend: lend_of(None),
         };
         let loan = Self {
@@ -681,6 +679,10 @@ pub enum BorrowError {
     Deadline {
         /// Whether the child honored termination before the grace expired.
         termination: Termination,
+        /// What the child wrote to stdout before it was ended (bounded I/O only).
+        stdout: Vec<u8>,
+        /// What the child wrote to stderr before it was ended (bounded I/O only).
+        stderr: Vec<u8>,
     },
     /// Reading or writing explicit I/O failed; cleanup has completed.
     Io(io::Error),
@@ -718,7 +720,7 @@ impl std::fmt::Display for BorrowError {
                 write!(f, "borrow-io-unsupported: explicit I/O requires Unix")
             }
             BorrowError::OutputLimit(stream) => write!(f, "borrow-output-limit: {stream}"),
-            BorrowError::Deadline { termination } => {
+            BorrowError::Deadline { termination, .. } => {
                 write!(f, "borrow-deadline: {}", termination.as_str())
             }
             BorrowError::Io(err) => write!(f, "borrow-io-failed: {err}"),
@@ -983,7 +985,7 @@ fn acquire_traced(
             mode,
             kill_wait_ms,
             terminate_grace_ms: 3000,
-            since: std::sync::Mutex::new((opened_after, opened_after)),
+            since: Box::new(std::sync::Mutex::new((opened_after, opened_after))),
             lend: lend_of(None),
         });
     }
@@ -1317,6 +1319,8 @@ fn run_borrowed_io_posix(
             if Instant::now() >= io.deadline {
                 return Err(BorrowError::Deadline {
                     termination: Termination::KilledAfterGrace,
+                    stdout: Vec::new(),
+                    stderr: Vec::new(),
                 });
             }
             if out_open {
@@ -1419,12 +1423,28 @@ fn run_borrowed_io_posix(
                 } else {
                     Termination::KilledAfterGrace
                 },
+                stdout: Vec::new(),
+                stderr: Vec::new(),
             });
         }
     }
     // Every path after spawn uses the original release rule, including I/O
     // setup/read/write failures. Keep the root unreaped during leftover cleanup.
     let outcome = finish_borrowed(handle, &mut child)?;
+    if let Err(BorrowError::Deadline { termination, .. }) = transfer {
+        // What the child wrote before it was ended goes with the deadline (the pipes hold the rest of it now).
+        while capture_chunk(&mut stdout, &mut out, io.stdout_limit, "stdout").ok()
+            == Some(Some(true))
+        {}
+        while capture_chunk(&mut stderr, &mut err, io.stderr_limit, "stderr").ok()
+            == Some(Some(true))
+        {}
+        return Err(BorrowError::Deadline {
+            termination,
+            stdout: out,
+            stderr: err,
+        });
+    }
     transfer?;
     // Drain bytes already in the pipes after root exit and leftover cleanup.
     while capture_chunk(&mut stdout, &mut out, io.stdout_limit, "stdout")? == Some(true) {}
