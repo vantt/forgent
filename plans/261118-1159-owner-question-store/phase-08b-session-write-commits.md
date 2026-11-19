@@ -69,7 +69,12 @@ See the phase table in `plan.md`, row 8b.
    or `apps/fgos/tests/session_write_publish.rs`, whichever can drive the real supervisor socket with the real
    composition. It uses a temp repo with a bare remote. Move or retire any existing case that the new proof now owns;
    the stub-port unit tests stay as the order's proof.
-6. `docs/platform/session-host/spec.md`: the write verb publishes through the paths land; name the refusals.
+6. This repo's gates (supervisor decision A): `land.gates` in `.fgos/config.yaml`, set through the config door
+   (`fgos config set land.gates ... --reason "<why>"`, never a hand edit of the live file), with the land-branch.sh
+   gate commands and `when` globs `src/**`, `apps/**`, `packages/**`, `bin/**`, `scripts/**`, `test/**` only. A docs,
+   backlog or plans write therefore runs no gate. Commit only `.fgos/config.yaml` for this step. Plan 1045 phase 19
+   extends this list rather than creating it.
+7. `docs/platform/session-host/spec.md`: the write verb publishes through the paths land; name the refusals.
    Regenerate the census.
 
 ## Verify
@@ -77,7 +82,8 @@ See the phase table in `plan.md`, row 8b.
 - `test/session-host/head-request.test.mjs` and `test/cli/session-verb.test.mjs` through the repo test runner
 - clippy `-D warnings`, the msvc check, and the census scan
 
-Pass condition: all are green, and acceptance 11 holds.
+Pass condition: all are green, and acceptance 11 holds. Live acceptance after the release is installed: a Miu backlog
+write comes back with a commit sha that is on origin.
 
 ## Rollback
 Revert the phase commit. `session write` then writes without publishing, as before.
