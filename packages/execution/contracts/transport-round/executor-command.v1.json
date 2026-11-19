@@ -1,0 +1,578 @@
+{
+  "note": "recorded from src/runner/dispatch/transport.mjs and config.mjs; `executor` is resolveExecutorConfig of the same request, the input of the Rust function",
+  "cfg": {
+    "executor": {
+      "kind": "agent",
+      "command": "claude",
+      "args": [
+        "-p",
+        "{prompt}",
+        "--model",
+        "{model}"
+      ],
+      "supports": {
+        "reasoningEffort": [
+          "low",
+          "high"
+        ]
+      },
+      "env": {
+        "A": "1"
+      },
+      "provider": "anthropic"
+    },
+    "executors": {
+      "plain": {
+        "kind": "agent",
+        "command": "my-agent",
+        "allowCrossProvider": true,
+        "args": [
+          "run",
+          "--model={model}",
+          "{prompt}",
+          "{prompt}"
+        ]
+      },
+      "herdr": {
+        "kind": "agent",
+        "command": "claude",
+        "adapter": "herdr-spawn",
+        "args": [
+          "{prompt}"
+        ],
+        "promptDelivery": "file-pointer",
+        "permissionMode": "ask"
+      }
+    }
+  },
+  "commands": [
+    {
+      "request": {
+        "executorId": "executor",
+        "prompt": "hello; rm -rf / $(whoami) \"q\" 's'",
+        "model": "opus"
+      },
+      "executor": {
+        "kind": "agent",
+        "command": "claude",
+        "args": [
+          "-p",
+          "{prompt}",
+          "--model",
+          "{model}"
+        ],
+        "supports": {
+          "reasoningEffort": [
+            "low",
+            "high"
+          ]
+        },
+        "env": {
+          "A": "1"
+        },
+        "provider": "anthropic",
+        "governance": {
+          "providerFamily": "anthropic",
+          "egress": {
+            "kind": "same-provider",
+            "target": "claude",
+            "content": "repo-content"
+          }
+        }
+      },
+      "out": {
+        "ok": {
+          "command": "claude",
+          "args": [
+            "-p",
+            "hello; rm -rf / $(whoami) \"q\" 's'",
+            "--model",
+            "opus"
+          ],
+          "argsTemplate": [
+            "-p",
+            "{prompt}",
+            "--model",
+            "{model}"
+          ],
+          "env": {
+            "A": "1"
+          },
+          "adapter": "cli-spawn",
+          "provider": "anthropic",
+          "baseCommit": null,
+          "headRef": null,
+          "governance": {
+            "providerFamily": "anthropic",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "repo-content"
+            }
+          },
+          "credentialStore": null,
+          "modelCheck": {
+            "launched": "opus",
+            "warnings": []
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "executorId": "plain",
+        "prompt": "p {model}",
+        "model": "m1"
+      },
+      "executor": {
+        "kind": "agent",
+        "command": "my-agent",
+        "allowCrossProvider": true,
+        "args": [
+          "run",
+          "--model={model}",
+          "{prompt}",
+          "{prompt}"
+        ],
+        "governance": {
+          "providerFamily": "my-agent",
+          "egress": {
+            "kind": "cross-provider",
+            "target": "my-agent",
+            "content": "repo-content"
+          }
+        }
+      },
+      "out": {
+        "ok": {
+          "command": "my-agent",
+          "args": [
+            "run",
+            "--model=m1",
+            "p m1",
+            "p m1"
+          ],
+          "argsTemplate": [
+            "run",
+            "--model={model}",
+            "{prompt}",
+            "{prompt}"
+          ],
+          "adapter": "cli-spawn",
+          "provider": "my-agent",
+          "baseCommit": null,
+          "headRef": null,
+          "governance": {
+            "providerFamily": "my-agent",
+            "egress": {
+              "kind": "cross-provider",
+              "target": "my-agent",
+              "content": "repo-content"
+            }
+          },
+          "credentialStore": null,
+          "modelCheck": {
+            "launched": "m1",
+            "warnings": []
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "executorId": "herdr",
+        "prompt": "x",
+        "model": "sonnet"
+      },
+      "executor": {
+        "kind": "agent",
+        "command": "claude",
+        "adapter": "herdr-spawn",
+        "args": [
+          "{prompt}"
+        ],
+        "promptDelivery": "file-pointer",
+        "permissionMode": "ask",
+        "governance": {
+          "providerFamily": "claude",
+          "egress": {
+            "kind": "same-provider",
+            "target": "claude",
+            "content": "repo-content"
+          }
+        }
+      },
+      "out": {
+        "ok": {
+          "command": "claude",
+          "args": [
+            "x"
+          ],
+          "argsTemplate": [
+            "{prompt}"
+          ],
+          "adapter": "herdr-spawn",
+          "promptDelivery": "file-pointer",
+          "permissionMode": "ask",
+          "provider": "claude",
+          "baseCommit": null,
+          "headRef": null,
+          "governance": {
+            "providerFamily": "claude",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "repo-content"
+            }
+          },
+          "credentialStore": null,
+          "modelCheck": {
+            "launched": "sonnet",
+            "warnings": []
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "executorId": "executor",
+        "prompt": "x",
+        "model": "opus",
+        "reasoningEffort": "high",
+        "requestedModel": "sonnet"
+      },
+      "executor": {
+        "kind": "agent",
+        "command": "claude",
+        "args": [
+          "-p",
+          "{prompt}",
+          "--model",
+          "{model}"
+        ],
+        "supports": {
+          "reasoningEffort": [
+            "low",
+            "high"
+          ]
+        },
+        "env": {
+          "A": "1"
+        },
+        "provider": "anthropic",
+        "governance": {
+          "providerFamily": "anthropic",
+          "egress": {
+            "kind": "same-provider",
+            "target": "claude",
+            "content": "repo-content"
+          }
+        }
+      },
+      "out": {
+        "ok": {
+          "command": "claude",
+          "args": [
+            "--effort",
+            "high",
+            "-p",
+            "x",
+            "--model",
+            "opus"
+          ],
+          "argsTemplate": [
+            "--effort",
+            "high",
+            "-p",
+            "{prompt}",
+            "--model",
+            "{model}"
+          ],
+          "env": {
+            "A": "1"
+          },
+          "adapter": "cli-spawn",
+          "provider": "anthropic",
+          "baseCommit": null,
+          "headRef": null,
+          "governance": {
+            "providerFamily": "anthropic",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "repo-content"
+            }
+          },
+          "credentialStore": null,
+          "reasoningEffort": {
+            "requested": "high",
+            "command": "claude",
+            "flag": "--effort",
+            "native": "high"
+          },
+          "modelCheck": {
+            "requested": "sonnet",
+            "launched": "opus",
+            "warnings": [
+              {
+                "code": "model-overridden",
+                "requested": "sonnet",
+                "launched": "opus",
+                "message": "requested model \"sonnet\" was replaced by \"opus\" before launch"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "request": {
+        "executorId": "executor",
+        "prompt": "x",
+        "model": "opus",
+        "reasoningEffort": "max"
+      },
+      "executor": {
+        "kind": "agent",
+        "command": "claude",
+        "args": [
+          "-p",
+          "{prompt}",
+          "--model",
+          "{model}"
+        ],
+        "supports": {
+          "reasoningEffort": [
+            "low",
+            "high"
+          ]
+        },
+        "env": {
+          "A": "1"
+        },
+        "provider": "anthropic",
+        "governance": {
+          "providerFamily": "anthropic",
+          "egress": {
+            "kind": "same-provider",
+            "target": "claude",
+            "content": "repo-content"
+          }
+        }
+      },
+      "out": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "executor \"executor\" supports reasoningEffort [low, high], not \"max\""
+        }
+      }
+    },
+    {
+      "request": {
+        "executorId": "executor",
+        "prompt": "x",
+        "model": "opus",
+        "reasoningEffort": "turbo"
+      },
+      "executor": {
+        "kind": "agent",
+        "command": "claude",
+        "args": [
+          "-p",
+          "{prompt}",
+          "--model",
+          "{model}"
+        ],
+        "supports": {
+          "reasoningEffort": [
+            "low",
+            "high"
+          ]
+        },
+        "env": {
+          "A": "1"
+        },
+        "provider": "anthropic",
+        "governance": {
+          "providerFamily": "anthropic",
+          "egress": {
+            "kind": "same-provider",
+            "target": "claude",
+            "content": "repo-content"
+          }
+        }
+      },
+      "out": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "invalid reasoningEffort \"turbo\". Valid values: [low, medium, high, max]"
+        }
+      }
+    },
+    {
+      "request": {
+        "executorId": "plain",
+        "prompt": "x",
+        "model": "m",
+        "reasoningEffort": "low"
+      },
+      "executor": {
+        "kind": "agent",
+        "command": "my-agent",
+        "allowCrossProvider": true,
+        "args": [
+          "run",
+          "--model={model}",
+          "{prompt}",
+          "{prompt}"
+        ],
+        "governance": {
+          "providerFamily": "my-agent",
+          "egress": {
+            "kind": "cross-provider",
+            "target": "my-agent",
+            "content": "repo-content"
+          }
+        }
+      },
+      "out": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "executor \"plain\" runs \"my-agent\", which has no reasoning-effort control fgOS can set -- drop --effort or pick an invocation whose CLI takes one (claude, codex, agy, pi, omp)."
+        }
+      }
+    }
+  ],
+  "argvCases": [
+    {
+      "argsTemplate": [
+        "-p",
+        "{prompt}",
+        "--model",
+        "{model}",
+        "x{prompt}y"
+      ],
+      "args": [],
+      "prompt": "P",
+      "model": "M",
+      "out": [
+        "-p",
+        "--model",
+        "M"
+      ]
+    },
+    {
+      "argsTemplate": null,
+      "args": [
+        "a",
+        "the prompt text",
+        "b"
+      ],
+      "prompt": "the prompt text",
+      "model": "M",
+      "out": [
+        "a",
+        "b"
+      ]
+    },
+    {
+      "argsTemplate": null,
+      "args": [
+        "a",
+        "b"
+      ],
+      "prompt": "",
+      "model": "M",
+      "out": [
+        "a",
+        "b"
+      ]
+    },
+    {
+      "argsTemplate": [
+        "--m={model}"
+      ],
+      "args": [],
+      "prompt": "P",
+      "model": null,
+      "out": [
+        "--m="
+      ]
+    }
+  ],
+  "efforts": [
+    {
+      "value": "high",
+      "supported": [
+        "low",
+        "high"
+      ],
+      "executorId": "ex",
+      "out": {
+        "ok": "high"
+      }
+    },
+    {
+      "value": "max",
+      "supported": [
+        "low",
+        "high"
+      ],
+      "executorId": "ex",
+      "out": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "executor \"ex\" supports reasoningEffort [low, high], not \"max\""
+        }
+      }
+    },
+    {
+      "value": "turbo",
+      "supported": null,
+      "executorId": "ex",
+      "out": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "invalid reasoningEffort \"turbo\". Valid values: [low, medium, high, max]"
+        }
+      }
+    },
+    {
+      "value": "low",
+      "supported": null,
+      "executorId": "ex",
+      "out": {
+        "ok": "low"
+      }
+    },
+    {
+      "value": "low",
+      "supported": [],
+      "executorId": "ex",
+      "out": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "executor \"ex\" supports reasoningEffort [], not \"low\""
+        }
+      }
+    }
+  ]
+}

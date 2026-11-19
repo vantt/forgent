@@ -1,0 +1,559 @@
+{
+  "note": "recorded from src/runner/dispatch/herdr-round.mjs and normalizeAgentName of src/native/proof-helpers.mjs; HOME of the trust cases is /home/u",
+  "home": "/home/u",
+  "constants": {
+    "PANE_IDLE_TIMEOUT_MS": 1200000,
+    "ORPHAN_SETTLE_MS": 5000
+  },
+  "withoutPaneEnv": [
+    {
+      "env": {},
+      "out": {}
+    },
+    {
+      "env": {
+        "TERM": "x",
+        "PATH": "/bin",
+        "HERDR_SOCKET_PATH": "/s",
+        "HERDR_SESSION": "a",
+        "COLORTERM": "c",
+        "TERM_PROGRAM": "p",
+        "TERM_PROGRAM_VERSION": "1",
+        "KEEP": "k",
+        "term": "lower"
+      },
+      "out": {
+        "PATH": "/bin",
+        "KEEP": "k",
+        "term": "lower"
+      }
+    }
+  ],
+  "screens": [
+    {
+      "previous": "",
+      "next": "",
+      "out": ""
+    },
+    {
+      "previous": "a\nb\nc",
+      "next": "b\nc\nd",
+      "out": "d"
+    },
+    {
+      "previous": "a\nb",
+      "next": "a\nb",
+      "out": ""
+    },
+    {
+      "previous": "a\nb",
+      "next": "x\ny",
+      "out": "x\ny"
+    },
+    {
+      "previous": "one",
+      "next": "one\ntwo",
+      "out": "two"
+    },
+    {
+      "previous": "a\nb\nc\nd",
+      "next": "c\nd\ne\nf",
+      "out": "e\nf"
+    },
+    {
+      "previous": "a\na\na",
+      "next": "a\na\nb",
+      "out": "b"
+    },
+    {
+      "previous": null,
+      "next": "x",
+      "out": "x"
+    }
+  ],
+  "names": [
+    {
+      "raw": "fgos-run_1-cmd_1795081120288_abcdef12",
+      "out": "fgos-run_1-cmd_179508112638a5c98"
+    },
+    {
+      "raw": "Short Name!",
+      "out": "short-name"
+    },
+    {
+      "raw": "",
+      "out": "fgos-agent"
+    },
+    {
+      "raw": "---",
+      "out": "fgos-agent"
+    },
+    {
+      "raw": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "out": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "raw": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "out": "aaaaaaaaaaaaaaaaaaaaaaaa2368a1ac"
+    },
+    {
+      "raw": "fgos-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "out": "fgos-xxxxxxxxxxxxxxxxxxx5a737e82"
+    },
+    {
+      "raw": "ÜÑí cödé",
+      "out": "c-d"
+    },
+    {
+      "raw": "a  b__c--d",
+      "out": "a-b__c--d"
+    }
+  ],
+  "trustCases": [
+    {
+      "trustStore": {
+        "kind": "claude-json"
+      },
+      "fullEnv": {},
+      "workerEnv": null,
+      "accountSource": null,
+      "out": {
+        "ok": {
+          "root": "/home/u/.claude.json",
+          "target": "/home/u/.claude.json"
+        }
+      }
+    },
+    {
+      "trustStore": {
+        "kind": "claude-json"
+      },
+      "fullEnv": {
+        "CLAUDE_CONFIG_DIR": "/cfg"
+      },
+      "workerEnv": null,
+      "accountSource": null,
+      "out": {
+        "ok": {
+          "root": "/cfg/.claude.json",
+          "target": "/cfg/.claude.json"
+        }
+      }
+    },
+    {
+      "trustStore": {
+        "kind": "claude-json"
+      },
+      "fullEnv": {
+        "CLAUDE_CONFIG_DIR": "/cfg"
+      },
+      "workerEnv": {
+        "CLAUDE_CONFIG_DIR": "/priv/.claude"
+      },
+      "accountSource": null,
+      "out": {
+        "ok": {
+          "root": "/cfg/.claude.json",
+          "target": "/priv/.claude/.claude.json"
+        }
+      }
+    },
+    {
+      "trustStore": {
+        "kind": "claude-json",
+        "path": "/declared/.claude.json"
+      },
+      "fullEnv": {},
+      "workerEnv": {
+        "CLAUDE_CONFIG_DIR": "/priv/.claude"
+      },
+      "accountSource": null,
+      "out": {
+        "ok": {
+          "root": "/declared/.claude.json",
+          "target": "/priv/.claude/.claude.json"
+        }
+      }
+    },
+    {
+      "trustStore": {
+        "kind": "codex-toml"
+      },
+      "fullEnv": {},
+      "workerEnv": null,
+      "accountSource": null,
+      "out": {
+        "ok": {
+          "root": "/home/u/.codex/config.toml",
+          "target": "/home/u/.codex/config.toml"
+        }
+      }
+    },
+    {
+      "trustStore": {
+        "kind": "codex-toml"
+      },
+      "fullEnv": {
+        "CODEX_HOME": "/cx"
+      },
+      "workerEnv": {
+        "CODEX_HOME": "/priv/cx"
+      },
+      "accountSource": null,
+      "out": {
+        "ok": {
+          "root": "/cx/config.toml",
+          "target": "/priv/cx/config.toml"
+        }
+      }
+    },
+    {
+      "trustStore": {
+        "kind": "codex-toml"
+      },
+      "fullEnv": {
+        "CODEX_HOME": "/cx"
+      },
+      "workerEnv": {
+        "CODEX_HOME": "/cx"
+      },
+      "accountSource": null,
+      "out": {
+        "ok": {
+          "root": "/cx/config.toml",
+          "target": "/cx/config.toml"
+        }
+      }
+    },
+    {
+      "trustStore": {
+        "kind": "codex-toml"
+      },
+      "fullEnv": {
+        "CODEX_HOME": "/cx"
+      },
+      "workerEnv": {
+        "CODEX_HOME": "/priv/cx"
+      },
+      "accountSource": {
+        "kind": "codex-home",
+        "home": "/acct/cx"
+      },
+      "out": {
+        "ok": {
+          "root": "/acct/cx/config.toml",
+          "target": "/priv/cx/config.toml"
+        }
+      }
+    },
+    {
+      "trustStore": {
+        "kind": "codex-toml"
+      },
+      "fullEnv": {
+        "CODEX_HOME": "/cx"
+      },
+      "workerEnv": {
+        "CODEX_HOME": "/priv/cx"
+      },
+      "accountSource": {
+        "kind": "codex-home",
+        "home": "~/acct"
+      },
+      "out": {
+        "ok": {
+          "root": "/home/u/acct/config.toml",
+          "target": "/priv/cx/config.toml"
+        }
+      }
+    },
+    {
+      "trustStore": {
+        "kind": "agy"
+      },
+      "fullEnv": {},
+      "workerEnv": null,
+      "accountSource": null,
+      "out": {
+        "ok": {
+          "root": "/home/u/.gemini/antigravity-cli/settings.json",
+          "target": "/home/u/.gemini/antigravity-cli/settings.json"
+        }
+      }
+    },
+    {
+      "trustStore": {
+        "kind": "agy-json"
+      },
+      "fullEnv": {
+        "HOME": "/h1"
+      },
+      "workerEnv": {
+        "HOME": "/priv/h"
+      },
+      "accountSource": null,
+      "out": {
+        "ok": {
+          "root": "/h1/.gemini/antigravity-cli/settings.json",
+          "target": "/priv/h/.gemini/antigravity-cli/settings.json"
+        }
+      }
+    },
+    {
+      "trustStore": {
+        "kind": "agy"
+      },
+      "fullEnv": {
+        "HOME": "/h1"
+      },
+      "workerEnv": {
+        "HOME": "/priv/h"
+      },
+      "accountSource": {
+        "kind": "home-files",
+        "home": "/acct/h"
+      },
+      "out": {
+        "ok": {
+          "root": "/acct/h/.gemini/antigravity-cli/settings.json",
+          "target": "/priv/h/.gemini/antigravity-cli/settings.json"
+        }
+      }
+    },
+    {
+      "trustStore": {
+        "kind": "agy",
+        "path": "/declared/settings.json"
+      },
+      "fullEnv": {
+        "HOME": "/h1"
+      },
+      "workerEnv": {
+        "HOME": "/priv/h"
+      },
+      "accountSource": null,
+      "out": {
+        "ok": {
+          "root": "/declared/settings.json",
+          "target": "/priv/h/.gemini/antigravity-cli/settings.json"
+        }
+      }
+    }
+  ],
+  "confinementCases": [
+    {
+      "confinement": {
+        "privateHome": true,
+        "isolatedSession": true,
+        "ownWorktree": true
+      },
+      "permissionMode": "bypass",
+      "cwd": "/repo/root",
+      "delivery": null,
+      "repoRoot": "/repo/root",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": "invalid-config",
+          "reason": "own-worktree-unavailable",
+          "message": "executor for work \"w1\" refused: confinement declares ownWorktree, but this dispatch runs in the repo root itself (/repo/root) rather than a worktree of its own."
+        }
+      }
+    },
+    {
+      "confinement": {
+        "privateHome": true
+      },
+      "permissionMode": "bypass",
+      "cwd": "/repo/wt",
+      "delivery": null,
+      "repoRoot": "/repo/root",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": "invalid-config",
+          "reason": "bypass-confinement-incomplete",
+          "message": "executor for work \"w1\" refused: permissionMode \"bypass\" requires full confinement (missing: session: isolated (isolatedSession), workspace: own (ownWorktree))."
+        }
+      }
+    },
+    {
+      "confinement": {
+        "ownWorktree": true
+      },
+      "permissionMode": "bypass",
+      "cwd": "/repo/wt",
+      "delivery": null,
+      "repoRoot": "/repo/root",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": "invalid-config",
+          "reason": "bypass-confinement-incomplete",
+          "message": "executor for work \"w1\" refused: permissionMode \"bypass\" requires full confinement (missing: home: private (privateHome), session: isolated (isolatedSession))."
+        }
+      }
+    },
+    {
+      "confinement": {
+        "controls": {
+          "home": "private",
+          "session": "isolated",
+          "workspace": "own"
+        }
+      },
+      "permissionMode": "bypass",
+      "cwd": "/repo/root",
+      "delivery": null,
+      "repoRoot": "/repo/root",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": "invalid-config",
+          "reason": "own-worktree-unavailable",
+          "message": "executor for work \"w1\" refused: confinement declares ownWorktree, but this dispatch runs in the repo root itself (/repo/root) rather than a worktree of its own."
+        }
+      }
+    },
+    {
+      "confinement": {
+        "ownWorktree": true
+      },
+      "permissionMode": "ask",
+      "cwd": "/repo/root",
+      "delivery": null,
+      "repoRoot": "/repo/root",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": "invalid-config",
+          "reason": "own-worktree-unavailable",
+          "message": "executor for work \"w1\" refused: confinement declares ownWorktree, but this dispatch runs in the repo root itself (/repo/root) rather than a worktree of its own."
+        }
+      }
+    },
+    {
+      "confinement": {
+        "ownWorktree": true
+      },
+      "permissionMode": "ask",
+      "cwd": "/repo/root",
+      "delivery": {
+        "rootWorkspaceAllowed": true
+      },
+      "repoRoot": "/repo/root",
+      "out": {
+        "ok": {
+          "workerHomePath": null,
+          "sessionEnv": {
+            "HOME": "/nonexistent-home-for-vectors"
+          },
+          "confined": false,
+          "status": "partial"
+        }
+      }
+    },
+    {
+      "confinement": {
+        "ownWorktree": true
+      },
+      "permissionMode": "ask",
+      "cwd": "/repo/wt",
+      "delivery": null,
+      "repoRoot": "/repo/root",
+      "out": {
+        "ok": {
+          "workerHomePath": null,
+          "sessionEnv": {
+            "HOME": "/nonexistent-home-for-vectors"
+          },
+          "confined": false,
+          "status": "partial"
+        }
+      }
+    },
+    {
+      "confinement": {
+        "ownWorktree": true
+      },
+      "permissionMode": "ask",
+      "cwd": "/repo/wt",
+      "delivery": {
+        "backendDelivers": true
+      },
+      "repoRoot": "/repo/root",
+      "out": {
+        "ok": {
+          "workerHomePath": null,
+          "sessionEnv": {
+            "HOME": "/nonexistent-home-for-vectors"
+          },
+          "confined": true,
+          "status": "confined"
+        }
+      }
+    },
+    {
+      "confinement": {
+        "privateHome": true,
+        "isolatedSession": true,
+        "ownWorktree": true
+      },
+      "permissionMode": "bypass",
+      "cwd": "/repo/wt",
+      "delivery": {
+        "backendDelivers": true
+      },
+      "repoRoot": "/repo/root",
+      "out": {
+        "ok": {
+          "workerHomePath": null,
+          "sessionEnv": {
+            "HOME": "/nonexistent-home-for-vectors"
+          },
+          "confined": true,
+          "status": "confined"
+        }
+      }
+    },
+    {
+      "confinement": null,
+      "permissionMode": "ask",
+      "cwd": "/repo/wt",
+      "delivery": null,
+      "repoRoot": "/repo/root",
+      "out": {
+        "ok": {
+          "workerHomePath": null,
+          "sessionEnv": {
+            "HOME": "/nonexistent-home-for-vectors"
+          },
+          "confined": false,
+          "status": "unconfined"
+        }
+      }
+    },
+    {
+      "confinement": {},
+      "permissionMode": null,
+      "cwd": "/repo/wt",
+      "delivery": null,
+      "repoRoot": "/repo/root",
+      "out": {
+        "ok": {
+          "workerHomePath": null,
+          "sessionEnv": {
+            "HOME": "/nonexistent-home-for-vectors"
+          },
+          "confined": false,
+          "status": "unconfined"
+        }
+      }
+    }
+  ]
+}
