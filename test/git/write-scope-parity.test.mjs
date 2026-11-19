@@ -20,3 +20,14 @@ const source=fs.readFileSync(new URL('../runner/write-scope.test.mjs',import.met
   .replace('../helpers/process-tmp-root.mjs',new URL('../helpers/process-tmp-root.mjs',import.meta.url).href);
 await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
 await import('../runner/write-scope.test.mjs');
+import test from 'node:test';
+import assert from 'node:assert/strict';
+const { loadNativeAddon } = await import(pathToFileURL(root + '/src/git/native.mjs').href);
+const native = loadNativeAddon({ descriptor: { manifest: JSON.parse(fs.readFileSync(built.manifest)), releaseRoot: root } });
+// Wiring proof of the set-level binding; the cases of the function itself are owned by the crate's Rust tests.
+test('the addon collidingPairs binding returns colliding pairs and reports an item without scopes as scope-empty', () => {
+  const found = native.writeScope('collidingPairs', { items: [{ id: 'a', scopes: ['src'] }, { id: 'b', scopes: ['src/x.mjs'] }, { id: 'c' }] });
+  assert.deepEqual(found.pairs.map((p) => [p.a, p.b]), [['a', 'b']]);
+  assert.deepEqual(found.problems.map((p) => [p.item, p.code]), [['c', 'scope-empty']]);
+  assert.equal(found.truncated, null);
+});

@@ -65,7 +65,12 @@ pub fn write_scope(method: String, args: Value) -> Result<Value> {
                             .as_str()
                             .ok_or_else(|| error("invalid item id"))?
                             .to_owned(),
-                        scopes: serde_json::from_value(i["scopes"].clone()).map_err(error)?,
+                        // A missing footprint is an item with no entries (`scope-empty`), never a refusal of the set.
+                        scopes: if i["scopes"].is_null() {
+                            Vec::new()
+                        } else {
+                            serde_json::from_value(i["scopes"].clone()).map_err(error)?
+                        },
                     })
                 })
                 .collect::<Result<Vec<_>>>()?;
