@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: The planner door resource-check, the supervisor, plan-check, plan-lint and Work adapters, and discovery, on top of the three packages
-status: draft
+status: ready
 priority: P2
 blockedBy:
   - 261119-0030-resource-referee-graph-write-scope-stack
