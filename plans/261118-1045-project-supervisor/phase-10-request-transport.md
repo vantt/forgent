@@ -44,7 +44,7 @@ at 60 s, so a long verb must not run inside the request.
 
 ## Footprint
 `packages/run-supervisor/contracts/head-request.v1.json`, `packages/run-supervisor/rust/src/head_request.rs`,
-`packages/run-supervisor/rust/tests/head_request*.rs`, `src/session-host/head-request.mjs`,
+`packages/run-supervisor/rust/tests/head_request.rs`, `src/session-host/head-request.mjs`,
 `src/session-host/head-request-client.mjs`, `src/session-host/head-stop.mjs` (new), `src/session-host/head-plan.mjs`
 (new), `src/session-host/head-start.mjs`, `test/session-host/head-request.test.mjs`,
 `test/session-host/head-stop.test.mjs` (new), `test/session-host/head-plan.test.mjs` (new),
