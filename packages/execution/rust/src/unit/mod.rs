@@ -107,9 +107,35 @@ pub(crate) fn js_trim(text: &str) -> &str {
     text.trim_matches(is_js_space)
 }
 
-/// `JSON.stringify(value)` for the values a flag or a Unit field holds.
+/// `JSON.stringify(value)` for the values a flag or a Unit field holds. Node parses every number into one IEEE-754
+/// double and writes it back as ECMAScript does (`3.0` as `3`, `-0` as `0`, `1e21` as `1e+21`), and writes the
+/// array-index keys of an object first, in ascending order, before the other keys in insertion order.
 pub(crate) fn js_json(value: &Value) -> String {
-    value.to_string()
+    match value {
+        // The canonical-JSON door writes a number the ECMAScript way.
+        Value::Number(n) => {
+            fgos_canonical_json::canonical_json(value).unwrap_or_else(|_| n.to_string())
+        }
+        Value::Array(items) => format!(
+            "[{}]",
+            items.iter().map(js_json).collect::<Vec<_>>().join(",")
+        ),
+        Value::Object(map) => {
+            let index = |key: &str| -> Option<u32> {
+                let n: u32 = key.parse().ok()?;
+                (n != u32::MAX && n.to_string() == key).then_some(n)
+            };
+            let mut keys: Vec<&String> = map.keys().collect();
+            // A stable sort keeps the other keys in insertion order behind the indices.
+            keys.sort_by_key(|key| index(key).map_or((1, 0), |n| (0, n)));
+            let fields: Vec<String> = keys
+                .into_iter()
+                .map(|key| format!("{}:{}", Value::String(key.clone()), js_json(&map[key])))
+                .collect();
+            format!("{{{}}}", fields.join(","))
+        }
+        other => other.to_string(),
+    }
 }
 
 fn text_of(value: &Value) -> Option<&str> {
@@ -739,4 +765,21 @@ pub fn validate_unit(raw: &Value, host: &dyn UnitHost) -> Result<Unit, Refusal> 
         stance_options,
         expected_outputs,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::js_json;
+
+    /// A refusal quotes the value it refuses as Node's `JSON.stringify` writes it; serde_json keeps a float's
+    /// fraction, prints `-0` and never uses an exponent, so the vectors (written by `JSON.stringify`) cannot show it.
+    #[test]
+    fn js_json_writes_numbers_and_key_order_as_json_stringify_does() {
+        let raw = r#"[3.0, -0, 1e21, 1.5e-7, 123456789012345680000, 0.000001, 9007199254740993, -2.50, {"b":1,"2":2,"1":3,"01":4,"4294967295":5}]"#;
+        let value: serde_json::Value = serde_json::from_str(raw).unwrap();
+        assert_eq!(
+            js_json(&value),
+            r#"[3,0,1e+21,1.5e-7,123456789012345680000,0.000001,9007199254740992,-2.5,{"1":3,"2":2,"b":1,"01":4,"4294967295":5}]"#
+        );
+    }
 }

@@ -358,25 +358,24 @@ pub fn plan_from_flags(
     existing_plan_ref(&Value::Object(value), main_root, host)
 }
 
-/// A POSIX `path.resolve` of one path against `base`: absolute, with `.` and `..` segments and repeated or trailing
-/// slashes resolved.
+/// Node's `path.resolve(base, path)` on this platform: `path` joined onto `base` (an absolute `path`, or on Windows one
+/// with its own drive, stands alone; a rooted one keeps only the drive of `base`), with `.` and `..` segments and
+/// repeated or trailing separators resolved lexically, never past the root. The result uses the platform separator.
 fn resolve_path(base: &str, path: &str) -> String {
-    let joined = if path.starts_with('/') {
-        path.to_string()
-    } else {
-        format!("{base}/{path}")
-    };
-    let mut parts: Vec<&str> = Vec::new();
-    for segment in joined.split('/') {
-        match segment {
-            "" | "." => {}
-            ".." => {
-                parts.pop();
+    use std::path::{Component, Path, PathBuf};
+    let mut out = PathBuf::new();
+    for component in Path::new(base).join(path).components() {
+        match component {
+            Component::CurDir => {}
+            Component::ParentDir => {
+                if matches!(out.components().next_back(), Some(Component::Normal(_))) {
+                    out.pop();
+                }
             }
-            other => parts.push(other),
+            other => out.push(other.as_os_str()),
         }
     }
-    format!("/{}", parts.join("/"))
+    out.to_string_lossy().into_owned()
 }
 
 /// Where a writing unit would run: `--worktree`, else here. Only a linked worktree may be written.
@@ -818,4 +817,31 @@ pub fn build_run_request(
         cwd: host.cwd(),
         worktree: worktree.cloned(),
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::resolve_path;
+
+    /// `--dir` and `--worktree` resolve as Node's `path.resolve` does on the platform the CLI runs on.
+    #[cfg(unix)]
+    #[test]
+    fn resolve_path_resolves_as_node_path_resolve_on_posix() {
+        assert_eq!(resolve_path("/work/repo", "../wt//x/./"), "/work/wt/x");
+        assert_eq!(resolve_path("/work/repo", "/abs/../b"), "/b");
+        assert_eq!(resolve_path("/work", "../../.."), "/");
+        assert_eq!(resolve_path("/work", ""), "/work");
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn resolve_path_resolves_as_node_path_resolve_on_windows() {
+        assert_eq!(
+            resolve_path(r"C:\work\repo", "../wt//x/./"),
+            r"C:\work\wt\x"
+        );
+        assert_eq!(resolve_path(r"C:\work", r"D:\other\.\y"), r"D:\other\y");
+        assert_eq!(resolve_path(r"C:\work\repo", r"\top"), r"C:\top");
+        assert_eq!(resolve_path(r"C:\work", r"..\..\.."), r"C:\");
+    }
 }
