@@ -22,7 +22,7 @@ use fgos_process::{facts, ProcId};
 use fgos_run_supervisor::go_channel::{read_frame, write_frame, MAX_FRAME_BYTES};
 use fgos_run_supervisor::head_request::{
     identity_bind, identity_holds, identity_registered, identity_take, Config, HeadRequests,
-    HoldError, BIND_VERB, MAX_REQUEST_BYTES, MAX_REQUEST_VALUES, WRITE_VERB,
+    HoldError, PublishRefusal, BIND_VERB, MAX_REQUEST_BYTES, MAX_REQUEST_VALUES, WRITE_VERB,
 };
 use serde_json::{json, Value};
 
@@ -71,6 +71,33 @@ struct Identity {
     take: Result<(), String>,
     took: Arc<Mutex<u32>>,
     gate: HeadRef,
+    publish: Publish,
+}
+
+/// The publish port of a session write, stubbed: whether the path is clean, what the publish answers, and the calls it
+/// got in order (`clean <path>`, `publish <path> <role> <writer>`) with the file's content at the moment of each.
+#[derive(Clone)]
+struct Publish {
+    clean: Result<bool, PublishRefusal>,
+    commit: Result<String, PublishRefusal>,
+    calls: Arc<Mutex<Vec<String>>>,
+}
+
+impl Default for Publish {
+    fn default() -> Publish {
+        Publish {
+            clean: Ok(true),
+            commit: Ok("c0ffee".to_string()),
+            calls: Arc::new(Mutex::new(Vec::new())),
+        }
+    }
+}
+
+fn refusal(code: &str, detail: &str) -> PublishRefusal {
+    PublishRefusal {
+        code: code.to_string(),
+        detail: detail.to_string(),
+    }
 }
 
 fn head_of(pid: u32) -> HeadRef {
@@ -87,6 +114,7 @@ impl Default for Identity {
             take: Ok(()),
             took: Arc::new(Mutex::new(0)),
             gate: head_of(std::process::id()),
+            publish: Publish::default(),
         }
     }
 }
@@ -168,6 +196,30 @@ fn serve_with(
                         detail: r.detail,
                     }
                 })
+            }
+        }),
+        path_clean: Box::new({
+            let publish = identity.publish.clone();
+            move |root, path| {
+                let seen = fs::read_to_string(root.join(path)).unwrap_or_default();
+                publish
+                    .calls
+                    .lock()
+                    .unwrap()
+                    .push(format!("clean {path} {seen:?}"));
+                publish.clean.clone()
+            }
+        }),
+        publish_write: Box::new({
+            let publish = identity.publish.clone();
+            move |root, path| {
+                let seen = fs::read_to_string(root.join(path)).unwrap_or_default();
+                publish
+                    .calls
+                    .lock()
+                    .unwrap()
+                    .push(format!("publish {path} {seen:?}"));
+                publish.commit.clone()
             }
         }),
         log: Box::new(move |line| sink.lock().unwrap().push(line.to_string())),
@@ -425,7 +477,9 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "verb-failed",
             "verb-not-granted",
             "verb-timeout",
-            "write-failed"
+            "write-failed",
+            "write-path-dirty",
+            "write-path-unreadable"
         ]
     );
     let mut verbs: Vec<&str> = contract["verbs"]
@@ -871,6 +925,8 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_r
             identity_bind(&r4, &r4, "att-bind", &g4, args, peer)
         }),
         caller_under_gate: Box::new(|_| unreachable!("no session write in this test")),
+        path_clean: Box::new(|_, _| unreachable!("no session write in this test")),
+        publish_write: Box::new(|_, _| unreachable!("no session write in this test")),
         log: Box::new(|_| {}),
     });
     let stop = Arc::new(AtomicBool::new(false));
@@ -1011,7 +1067,7 @@ fn head_write_replaces_a_granted_file_atomically_with_its_mode_in_one_large_fram
     assert_eq!(reply["result"], "done", "{reply}");
     assert_eq!(
         reply["data"],
-        json!({"path": "docs/backlog.md", "bytes": content.len()})
+        json!({"path": "docs/backlog.md", "bytes": content.len(), "commit": "c0ffee"})
     );
     assert_eq!(fs::read_to_string(&backlog).unwrap(), content);
     let after = fs::metadata(&backlog).unwrap();
@@ -1035,6 +1091,107 @@ fn head_write_replaces_a_granted_file_atomically_with_its_mode_in_one_large_fram
     assert_eq!(
         wait_for_log(&served, "done"),
         vec!["head-request w1 session write done -"]
+    );
+}
+
+fn write_served(name: &str, publish: &Publish) -> Served {
+    let served = serve_with(
+        name,
+        DONE_LINE,
+        Ok(true),
+        Identity {
+            publish: publish.clone(),
+            ..Identity::default()
+        },
+        &[WRITE_VERB],
+        Duration::from_secs(5),
+    );
+    write_project(&served.dir);
+    served
+}
+
+#[test]
+fn head_write_checks_the_path_is_clean_before_it_writes_and_publishes_the_new_content_after() {
+    let publish = Publish::default();
+    let served = write_served("write-order", &publish);
+    let reply = write_request(
+        &served.socket,
+        json!({"path": "docs/backlog.md", "content": "new\n"}),
+    );
+    assert_eq!(reply["data"]["commit"], "c0ffee", "{reply}");
+    assert_eq!(
+        *publish.calls.lock().unwrap(),
+        [
+            r#"clean docs/backlog.md "old\n""#,
+            r#"publish docs/backlog.md "new\n""#
+        ]
+    );
+}
+
+#[test]
+fn head_write_of_a_path_with_an_uncommitted_change_is_refused_and_writes_and_publishes_nothing() {
+    let publish = Publish {
+        clean: Ok(false),
+        ..Publish::default()
+    };
+    let served = write_served("write-dirty", &publish);
+    let reply = write_request(
+        &served.socket,
+        json!({"path": "docs/backlog.md", "content": "new\n"}),
+    );
+    assert_eq!(reply["result"], "refused");
+    assert_eq!(reply["code"], "write-path-dirty", "{reply}");
+    assert_eq!(
+        fs::read_to_string(served.dir.join("docs/backlog.md")).unwrap(),
+        "old\n"
+    );
+    assert_eq!(
+        publish.calls.lock().unwrap().len(),
+        1,
+        "only the clean check ran"
+    );
+}
+
+#[test]
+fn head_write_whose_path_state_cannot_be_read_is_refused_by_name_and_writes_nothing() {
+    let publish = Publish {
+        clean: Err(refusal("write-status-unreadable", "git failed")),
+        ..Publish::default()
+    };
+    let served = write_served("write-unreadable", &publish);
+    let reply = write_request(
+        &served.socket,
+        json!({"path": "docs/backlog.md", "content": "new\n"}),
+    );
+    assert_eq!(reply["code"], "write-path-unreadable", "{reply}");
+    assert_eq!(reply["detail"], "write-status-unreadable: git failed");
+    assert_eq!(
+        fs::read_to_string(served.dir.join("docs/backlog.md")).unwrap(),
+        "old\n"
+    );
+}
+
+#[test]
+fn head_write_whose_publish_is_refused_replies_with_the_refusal_by_name_and_leaves_the_file_written(
+) {
+    let publish = Publish {
+        commit: Err(refusal("land-remote-diverged", "remote moved")),
+        ..Publish::default()
+    };
+    let served = write_served("write-unpublished", &publish);
+    let reply = write_request(
+        &served.socket,
+        json!({"path": "docs/backlog.md", "content": "new\n"}),
+    );
+    assert_eq!(reply["result"], "done", "{reply}");
+    assert_eq!(
+        reply["data"],
+        json!({"path": "docs/backlog.md", "bytes": 4,
+               "publish": {"refusal": "land-remote-diverged", "detail": "remote moved"}})
+    );
+    assert_eq!(
+        fs::read_to_string(served.dir.join("docs/backlog.md")).unwrap(),
+        "new\n"
     );
 }
 

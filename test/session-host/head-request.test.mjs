@@ -58,13 +58,26 @@ test('the client sends one REQUEST frame, returns the data of a done reply and n
 
 test('the client sends session write with the whole content in one frame larger than a reply may be, and refuses one over the request limit', async (t) => {
   const socketPath = path.join(scratch(t), 'req.sock');
-  const seen = serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'done', data: { path: request.args.path, bytes: request.args.content.length } }));
+  const seen = serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'done', data: { path: request.args.path, bytes: request.args.content.length, commit: 'c0ffee' } }));
   await listening();
   const content = 'row\n'.repeat(MAX_FRAME_BYTES / 2);
-  assert.deepEqual(await requestHeadWrite({ path: 'docs/backlog.md', content }, { socketPath }), { path: 'docs/backlog.md', bytes: content.length });
+  assert.deepEqual(await requestHeadWrite({ path: 'docs/backlog.md', content }, { socketPath }), { path: 'docs/backlog.md', bytes: content.length, commit: 'c0ffee' });
   assert.equal(seen[0].verb, 'session write');
   assert.deepEqual(seen[0].args, { path: 'docs/backlog.md', content });
   await assert.rejects(requestHeadWrite({ path: 'docs/backlog.md', content: 'x'.repeat(MAX_REQUEST_BYTES) }, { socketPath }), (err) => err.code === 'request-too-large');
+});
+
+test('a write that was made but not published is a HeadRequestError naming the land refusal, with the reply kept', async (t) => {
+  const socketPath = path.join(scratch(t), 'req.sock');
+  const publish = { refusal: 'land-remote-diverged', detail: 'the remote moved' };
+  serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'done', data: { path: request.args.path, bytes: 1, publish } }));
+  await listening();
+  await assert.rejects(
+    requestHeadWrite({ path: 'docs/backlog.md', content: 'x' }, { socketPath }),
+    (err) => err instanceof HeadRequestError && err.code === 'write-not-published'
+      && err.message === 'written, not published: land-remote-diverged the remote moved'
+      && err.refusal === 'land-remote-diverged' && err.data.bytes === 1,
+  );
 });
 
 test('a refused reply is a HeadRequestError carrying the supervisor\'s code, or the use case\'s own code when verb-failed wraps it', async (t) => {

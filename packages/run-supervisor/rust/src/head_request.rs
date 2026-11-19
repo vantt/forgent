@@ -16,7 +16,7 @@ use std::os::unix::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
 use fgos_identity::cli_dirs::{claude_config_dir, read_claude_session};
@@ -68,7 +68,7 @@ pub const RESTORE_VERB: &str = "session restore role";
 pub const BIND_VERB: &str = "session bind session";
 /// The verb that replaces a granted file of the head's role, answered by the supervisor itself (no route child): the
 /// path must be named exactly by `envelope.session.writes` and be a regular file reached without a symlink, and the
-/// new content is installed atomically through the durable-file door ([`write_granted`]).
+/// new content is installed atomically through the durable-file door ([`install_granted`]), then published through [`WritePublisher`].
 pub const WRITE_VERB: &str = "session write";
 
 /// Verbs of a session that does not (yet) hold its role: the role check is "registered", and after the route reports
@@ -112,6 +112,44 @@ type TakesRole = Box<dyn Fn(bool) -> Result<(), HoldError> + Send + Sync>;
 type BindsSession = Box<dyn Fn(&Value, Option<u32>) -> Result<Value, HoldError> + Send + Sync>;
 type ChecksPeer = Box<dyn Fn(Option<u32>) -> Result<(), HoldError> + Send + Sync>;
 type LogLine = Box<dyn Fn(&str) + Send + Sync>;
+type PathCleanFn = dyn Fn(&Path, &str) -> Result<bool, PublishRefusal> + Send + Sync;
+type PublishFn = dyn Fn(&Path, &str, &str, &str) -> Result<String, PublishRefusal> + Send + Sync;
+type PathClean = Box<PathCleanFn>;
+type PublishesWrite = Box<dyn Fn(&Path, &str) -> Result<String, PublishRefusal> + Send + Sync>;
+
+/// Why the publish port could not answer: the code it names itself (a land refusal keeps its own name) and one line
+/// of detail.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PublishRefusal {
+    pub code: String,
+    pub detail: String,
+}
+
+/// The one port [`WRITE_VERB`] publishes through, filled by the composition root (`apps/fgos`) with the paths land:
+/// `path_clean(root, path)` says whether the path has no uncommitted change in the main checkout, and
+/// `publish(root, path, role, writer)` fast-forwards it, commits only that path, pushes without force and returns the
+/// commit. This crate commits, fetches and pushes nothing itself.
+#[derive(Clone)]
+pub struct WritePublisher {
+    pub path_clean: Arc<PathCleanFn>,
+    pub publish: Arc<PublishFn>,
+}
+
+static WRITE_PUBLISHER: OnceLock<WritePublisher> = OnceLock::new();
+
+/// Installs the publisher every envelope-built server of this process uses; the first call wins. The supervisor
+/// route is entered through `route::main`, which has no parameter for it, so the composition root installs it before
+/// that call.
+pub fn install_write_publisher(publisher: WritePublisher) -> bool {
+    WRITE_PUBLISHER.set(publisher).is_ok()
+}
+
+fn publisher_missing() -> PublishRefusal {
+    PublishRefusal {
+        code: "publisher-not-installed".into(),
+        detail: "this host binary installed no write publisher".into(),
+    }
+}
 
 /// What serving the socket needs, all of it from the envelope except the two ports.
 pub struct Config {
@@ -142,6 +180,12 @@ pub struct Config {
     /// attempt's gate, so the request comes from the agent the supervisor launched and not from another process of the
     /// same user. An error is refused `caller-not-under-gate` with its code as the detail.
     pub caller_under_gate: ChecksPeer,
+    /// [`WRITE_VERB`], before the write: does `path` (granted, beneath `cwd`) have no uncommitted change in the main
+    /// checkout. An error is refused `write-path-unreadable`.
+    pub path_clean: PathClean,
+    /// [`WRITE_VERB`], after the write: publishes `path` and returns the commit. A refusal comes back in the reply by
+    /// its own name, the file stays written, nothing is forced.
+    pub publish_write: PublishesWrite,
     /// One line per request, for `supervisor.log`.
     pub log: LogLine,
 }
@@ -286,6 +330,17 @@ impl HeadRequests {
                     let head = known(&gate).ok_or_else(gate_unknown)?;
                     let peer = peer.ok_or_else(peer_unknown)?;
                     fgos_identity::directory::caller_under_head(&head, peer).map_err(hold_error)
+                }
+            }),
+            path_clean: Box::new(|root, path| match WRITE_PUBLISHER.get() {
+                Some(publisher) => (publisher.path_clean)(root, path),
+                None => Err(publisher_missing()),
+            }),
+            publish_write: Box::new({
+                let (role, writer_id) = (role.clone(), writer_id.clone());
+                move |root, path| match WRITE_PUBLISHER.get() {
+                    Some(publisher) => (publisher.publish)(root, path, &role, &writer_id),
+                    None => Err(publisher_missing()),
                 }
             }),
             take_role: Box::new({
@@ -550,7 +605,7 @@ fn gate_child_above(gate: u32, mut pid: u32) -> Option<u32> {
     None
 }
 
-/// Why [`write_granted`] wrote nothing, or did not finish: a refusal code of the contract and an optional detail.
+/// Why [`granted_write`] or [`install_granted`] wrote nothing, or did not finish: a refusal code of the contract and an optional detail.
 #[derive(Debug, PartialEq, Eq)]
 pub struct WriteRefusal {
     pub code: &'static str,
@@ -577,14 +632,13 @@ fn plain_relative(path: &str) -> bool {
             .all(|c| matches!(c, std::path::Component::Normal(_)))
 }
 
-/// [`WRITE_VERB`]: replace the granted file `args.path` beneath `root` with `args.content` (args exactly
-/// `{path, content}`, both strings). The path must be plain and relative (`path-invalid`), named exactly by an entry
-/// of `writes` (`path-not-granted`), and an existing regular file reached from `root` without a symlink at it or any
-/// directory on the way (`path-symlink`, `not-a-file`). Its directory is opened once and the content is installed
-/// through that descriptor by the durable-file door (`Dir::replace`: temp file, the old file's exact mode, fsync,
-/// rename over the name, directory fsync), so nothing is resolved by path after the check; a failure there is
-/// `write-failed`. Returns `{path, bytes}`.
-pub fn write_granted(root: &Path, writes: &[String], args: &Value) -> Result<Value, WriteRefusal> {
+/// [`WRITE_VERB`], the checks: `args` is exactly `{path, content}`, both strings (`bad-args`), the path is plain and
+/// relative (`path-invalid`) and named exactly by an entry of `writes` (`path-not-granted`). Returns the path and the
+/// content.
+pub fn granted_write<'a>(
+    writes: &[String],
+    args: &'a Value,
+) -> Result<(&'a str, &'a str), WriteRefusal> {
     let text = |name: &str| {
         args[name]
             .as_str()
@@ -602,6 +656,16 @@ pub fn write_granted(root: &Path, writes: &[String], args: &Value) -> Result<Val
     if !writes.iter().any(|granted| granted == rel) {
         return Err(write_refused("path-not-granted", None));
     }
+    Ok((rel, content))
+}
+
+/// [`WRITE_VERB`], the write: replace the granted file `rel` beneath `root` with `content`. It must be an existing
+/// regular file reached from `root` without a symlink at it or any directory on the way (`path-symlink`,
+/// `not-a-file`). Its directory is opened once and the content is installed through that descriptor by the
+/// durable-file door (`Dir::replace`: temp file, the old file's exact mode, fsync, rename over the name, directory
+/// fsync), so nothing is resolved by path after the check; a failure there is `write-failed`. Returns the bytes
+/// written.
+pub fn install_granted(root: &Path, rel: &str, content: &str) -> Result<usize, WriteRefusal> {
     let beneath = |error: BeneathError| match error {
         BeneathError::Refused(BeneathRefusal::Symlink) => write_refused("path-symlink", None),
         BeneathError::Refused(BeneathRefusal::Escape) => write_refused("path-invalid", None),
@@ -626,7 +690,46 @@ pub fn write_granted(root: &Path, writes: &[String], args: &Value) -> Result<Val
     let mode = dir.file_mode(name).map_err(beneath)?.ok_or_else(missing)?;
     dir.replace(name, content.as_bytes(), mode)
         .map_err(|e| write_refused("write-failed", format!("{} at {}", e.source, e.step)))?;
-    Ok(json!({"path": rel, "bytes": content.len()}))
+    Ok(content.len())
+}
+
+/// [`WRITE_VERB`] in full, in contract order: the grant checks, the path has no uncommitted change
+/// (`write-path-dirty`, nothing written), the atomic write, then the publish. A publish refusal is a reply that names
+/// it beside the bytes written, not a refusal of the request.
+fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
+    let refuse_with = |why: WriteRefusal| Outcome::Refused {
+        code: why.code,
+        detail: why.detail,
+    };
+    let (rel, content) = match granted_write(&cfg.writes, args) {
+        Ok(granted) => granted,
+        Err(why) => return refuse_with(why),
+    };
+    match (cfg.path_clean)(&cfg.cwd, rel) {
+        Ok(true) => {}
+        Ok(false) => return refused("write-path-dirty"),
+        Err(why) => {
+            return Outcome::Refused {
+                code: "write-path-unreadable",
+                detail: Some(format!("{}: {}", why.code, why.detail)),
+            }
+        }
+    }
+    let bytes = match install_granted(&cfg.cwd, rel, content) {
+        Ok(bytes) => bytes,
+        Err(why) => return refuse_with(why),
+    };
+    Outcome::Done(match (cfg.publish_write)(&cfg.cwd, rel) {
+        Ok(commit) => json!({"path": rel, "bytes": bytes, "commit": commit}),
+        Err(why) => {
+            (cfg.log)(&format!(
+                "head-request write {} not published {}",
+                loggable(rel),
+                loggable(&why.code)
+            ));
+            json!({"path": rel, "bytes": bytes, "publish": {"refusal": why.code, "detail": why.detail}})
+        }
+    })
 }
 
 enum Outcome {
@@ -951,13 +1054,7 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>)
         };
     }
     if request.verb == WRITE_VERB {
-        return match write_granted(&cfg.cwd, &cfg.writes, &request.args) {
-            Ok(data) => Outcome::Done(data),
-            Err(why) => Outcome::Refused {
-                code: why.code,
-                detail: why.detail,
-            },
-        };
+        return write_and_publish(cfg, &request.args);
     }
     let outcome = run_verb(cfg, request);
     if let (Some(take), Outcome::Done(_)) = (moves, &outcome) {

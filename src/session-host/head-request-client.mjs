@@ -25,6 +25,8 @@ export const HEAD_QUESTIONS_CANCEL_VERB = 'questions cancel';
 export const HEAD_QUESTIONS_ANSWER_VERB = 'questions answer';
 /** A reply may take as long as the supervisor lets the verb run (60 s) plus its own overhead. */
 const DEFAULT_REPLY_TIMEOUT_MS = 70_000;
+/** A write is also published (fetch, gates, commit, push), which waits on the target's merge slot and the network. */
+const WRITE_REPLY_TIMEOUT_MS = 180_000;
 
 export class HeadRequestError extends Error {
   constructor(code, message, extra = {}) {
@@ -132,6 +134,16 @@ export const requestHeadRestoreRole = (args, options) => requestHead(HEAD_RESTOR
 
 /**
  * `session write` over the socket: the head's supervisor replaces the granted file `path` (project-relative, exactly a
- * `writes` entry of its grant) with `content` atomically; the sandbox keeps that file read-only. Returns `{path, bytes}`.
+ * `writes` entry of its grant) with `content` atomically, then publishes it through the paths land; the sandbox keeps
+ * that file read-only. Returns `{path, bytes, commit}` once the commit is pushed. A file that was written but not
+ * published is a HeadRequestError `write-not-published` (message `written, not published: <refusal> <detail>`,
+ * `refusal`, `detail` and `data` on the error): the file stays written and uncommitted.
  */
-export const requestHeadWrite = ({ path, content }, options) => requestHead(HEAD_WRITE_VERB, { path, content }, options);
+export async function requestHeadWrite({ path, content }, options = {}) {
+  const data = await requestHead(HEAD_WRITE_VERB, { path, content }, { timeoutMs: WRITE_REPLY_TIMEOUT_MS, ...options });
+  if (data?.publish) {
+    const { refusal, detail } = data.publish;
+    throw new HeadRequestError('write-not-published', `written, not published: ${refusal} ${detail}`, { refusal, detail, data });
+  }
+  return data;
+}
