@@ -20,7 +20,12 @@ No second commit, fetch or push path is written. The supervisor crate stays tran
 port, and the composition root (`apps/fgos`) fills it with the paths land. That is the one place `fgos-supervision`
 is composed into the host until plan 1045 phase 16 wires `fgos land`, which then reuses the same composition.
 
-Order and refusals:
+Order and refusals (amended after review, 2026-11-19: catch up before the write, so a remote change to the same
+path never meets a freshly dirtied file; and a local branch ahead of its remote is refused before writing):
+0. Catch the main checkout up to the remote tip through the land use case's own sync step, made public as
+   `fgos_supervision::land::catch_up` (the existing private `sync_target`, not a new mechanism). Its refusal comes back
+   by name and nothing is written. A local branch ahead of its remote (a commit an earlier publish could not push)
+   is refused `write-branch-ahead`.
 1. Grant and path checks as today (`write_granted`, `head_request.rs:587`).
 2. **The path has no uncommitted change** in the main checkout before the write. Otherwise refuse
    `write-path-dirty` (new, in `head-request.v1.json`) and write nothing.
@@ -45,6 +50,13 @@ Order and refusals:
 - Tests that own `session write` now: `packages/run-supervisor/rust/tests/head_request.rs:952-1033`,
   `test/session-host/head-request.test.mjs`, `test/cli/session-verb.test.mjs`.
 - `src/session-host/head-request-client.mjs` `requestHeadWrite`: prints the reply of `fgos session write <path>`.
+
+The publisher reaches `Config` as a parameter threaded from `apps/fgos/src/main.rs` through `route::main`,
+`supervise::run`, `supervise`, `supervise_terminal`, `terminal::run` and `HeadRequests::from_envelope`; no global.
+A publish refusal states its true outcome: `land-paths-push-rejected` and a hook-changed commit leave a local commit
+(the next write is then refused `write-branch-ahead`); every other land refusal leaves the file written and
+uncommitted. Gates run only for paths their `when` matches; this repo's head grants are docs and plans, which match
+none.
 
 ## Footprint
 See the phase table in `plan.md`, row 8b.
