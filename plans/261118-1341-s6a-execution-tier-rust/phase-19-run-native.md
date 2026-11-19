@@ -73,7 +73,7 @@ through `legacy_exec::payload_command` (`apps/fgos/src/wiring/doctor/bridge.rs:1
 
 ## Footprint
 
-As the plan table row 19. The row leaves out `bin/fgos.mjs`, `src/cli/command-registry.mjs` and the SECRETARY-CAPS files (plan 261119-1615: `packages/run-supervisor/rust/src/{head_request,route}.rs`, `rust/src/supervise/terminal.rs`, `rust/tests/{head_request,head_role_binding}.rs`, `rust/examples/internal_harness.rs`, `contracts/head-request.v1.json`, `apps/fgos/src/wiring/session_write_publish.rs`, `apps/fgos/tests/{session_write_publish,questions_head}.rs`, `src/session-host/head-start.mjs`, `test/cli/session-verb.test.mjs`, `test/session-host/{head-start,head-request}.test.mjs`) while plan 261119-1615 (lead:SECRETARY-CAPS) owns them. Re-add them (plan footprint and row) when this phase starts after 1615 lands; the `run` arm deletion in `bin/fgos.mjs` and the registry edit happen then.
+As the plan table row 19 (it holds `bin/fgos.mjs` and `src/cli/command-registry.mjs` for the `run` arm deletion and the registry edit).
 
 ## Steps
 

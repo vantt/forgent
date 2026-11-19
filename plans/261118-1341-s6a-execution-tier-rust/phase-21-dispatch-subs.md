@@ -77,7 +77,7 @@ transitively, e.g. `assignment-runner.mjs:10,13,44,46,47,69,92-96`, `plan.mjs:19
 ## Footprint
 
 As the plan table row 21, which holds `src/runner/execution/**`, `src/run-supervisor/**`, `test/run-supervisor/**` and
-`test/helpers/**` in addition to the dispatch paths. The row leaves out `bin/fgos.mjs` and `src/cli/command-registry.mjs` (re-add after plan 261119-1615, lead:SECRETARY-CAPS, lands; phase 19 re-adds them when it starts) and `test/cli/session-verb.test.mjs`, which 1615 owns.
+`test/helpers/**` in addition to the dispatch paths.
 
 ## Steps
 

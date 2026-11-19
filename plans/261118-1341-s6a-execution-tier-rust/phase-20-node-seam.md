@@ -95,7 +95,7 @@ survivors need no edit here.
 ## Footprint
 
 As the plan table row 20 (the 23 files by name, never the two directories; `test/run-supervisor/attempt-steps.test.mjs`
-only, not `test/run-supervisor/**`). `src/session-host/head-start.mjs` and `test/session-host/head-start.test.mjs` are left out of the row while plan 261119-1615 (lead:SECRETARY-CAPS) owns them; re-add them when phase 19 starts after 1615 lands.
+only, not `test/run-supervisor/**`).
 
 ## Steps
 
