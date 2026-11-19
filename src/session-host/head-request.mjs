@@ -420,6 +420,9 @@ function worktreeCreate({ args, envelope, projectRoot, ports }) {
   if (typeof args.path !== 'string' || args.path === '' || args.path.startsWith('-')) throw badArgs('path must be a path');
   if (typeof args.branch !== 'string' || !REF_PATTERN.test(args.branch)) throw badArgs('branch is required: a detached worktree is not this door\'s');
   if (args.base !== undefined && (typeof args.base !== 'string' || !REF_PATTERN.test(args.base))) throw badArgs('base must be a ref');
+  if (!path.isAbsolute(args.path)) throw badArgs('path must be absolute, in the sibling worktrees directory of the project (<project dir>-worktrees/<plan dir>-p<NN>)');
+  const inside = (parent) => { const rel = path.relative(parent, path.resolve(args.path)); return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel)); };
+  if (inside(projectRoot)) throw badArgs('path must be outside the project root (it holds the sandbox writes of the head)');
   const argv = ['worktree', 'create', args.path, '--branch', args.branch, ...(args.base ? ['--base', args.base] : []), '--json'];
   try {
     const answer = hostCall({ envelope, projectRoot, argv }, ports);

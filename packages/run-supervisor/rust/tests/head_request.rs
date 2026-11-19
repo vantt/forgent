@@ -516,6 +516,28 @@ fn a_failing_route_child_is_verb_failed_with_its_own_code_in_the_detail() {
 }
 
 #[test]
+fn a_refused_request_logs_its_detail_and_the_routes_message_on_one_line() {
+    let served = granted(
+        "detail-log",
+        r#"cat > /dev/null; echo '{"v":1,"protocol":1,"result":"error","code":"worktree-admin-name-in-use","message":"the git admin name wt is taken\u000aby another worktree"}'; exit 70"#,
+    );
+    let reply = ask(&served.socket, "session start");
+    assert_eq!(reply["detail"], "worktree-admin-name-in-use");
+    let lines = wait_for_log(&served, "refused verb-failed");
+    assert!(
+        lines.contains(&"head-request r1 route worktree-admin-name-in-use: the git admin name wt is taken by another worktree".to_string()),
+        "{lines:?}"
+    );
+    assert!(
+        lines.contains(
+            &"head-request r1 session start refused verb-failed: worktree-admin-name-in-use"
+                .to_string()
+        ),
+        "{lines:?}"
+    );
+}
+
+#[test]
 fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
     let contract: Value =
         serde_json::from_str(include_str!("../../contracts/head-request.v1.json")).unwrap();

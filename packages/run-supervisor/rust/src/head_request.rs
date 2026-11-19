@@ -111,6 +111,9 @@ type HoldsRole = Box<dyn Fn() -> Result<bool, HoldError> + Send + Sync>;
 type TakesRole = Box<dyn Fn(bool) -> Result<(), HoldError> + Send + Sync>;
 type BindsSession = Box<dyn Fn(&Value, Option<u32>) -> Result<Value, HoldError> + Send + Sync>;
 type ChecksPeer = Box<dyn Fn(Option<u32>) -> Result<(), HoldError> + Send + Sync>;
+/// Longest refusal detail a log line carries.
+const DETAIL_LOG_CHARS: usize = 300;
+
 type LogLine = Box<dyn Fn(&str) + Send + Sync>;
 type CatchesUp = Box<dyn Fn(&Path) -> Result<(), CatchUpRefusal> + Send + Sync>;
 type PathClean = Box<dyn Fn(&Path, &str) -> Result<bool, PublishRefusal> + Send + Sync>;
@@ -777,6 +780,20 @@ fn loggable(text: &str) -> String {
     }
 }
 
+/// A refusal's detail for the log: one plain line of at most [`DETAIL_LOG_CHARS`] characters, so a person reading
+/// `supervisor.log` sees why a request was refused without a forged line or an unbounded one.
+fn loggable_detail(text: &str) -> String {
+    let mut plain: String = text
+        .chars()
+        .take(DETAIL_LOG_CHARS)
+        .map(|c| if c.is_control() { ' ' } else { c })
+        .collect();
+    if text.chars().count() > DETAIL_LOG_CHARS {
+        plain.push_str("...");
+    }
+    plain
+}
+
 struct Busy<'a>(&'a AtomicBool);
 
 impl Drop for Busy<'_> {
@@ -839,12 +856,18 @@ fn serve(cfg: &Config, busy: &AtomicBool, large: &AtomicBool, mut stream: UnixSt
     if let Err(error) = write_frame(&mut stream, &reply) {
         (cfg.log)(&format!("head-request reply not written: {error}"));
     }
-    let (result, code) = match &outcome {
-        Outcome::Done(_) => ("done", "-"),
-        Outcome::Refused { code, .. } => ("refused", *code),
+    let (result, code, detail) = match &outcome {
+        Outcome::Done(_) => ("done", "-", String::new()),
+        Outcome::Refused { code, detail } => (
+            "refused",
+            *code,
+            detail
+                .as_deref()
+                .map_or(String::new(), |d| format!(": {}", loggable_detail(d))),
+        ),
     };
     (cfg.log)(&format!(
-        "head-request {} {} {result} {code}",
+        "head-request {} {} {result} {code}{detail}",
         id.as_deref().unwrap_or("-"),
         verb.as_deref().map_or("-".into(), loggable),
     ));
@@ -1117,6 +1140,15 @@ fn run_verb(cfg: &Config, request: &Request) -> Outcome {
             Outcome::Done(line.get("data").cloned().unwrap_or_else(|| json!({})))
         }
         (_, Some(line)) if line["code"].is_string() => {
+            // The client is told the code; the route's own message, which says why, goes to the log.
+            if let Some(message) = line["message"].as_str() {
+                (cfg.log)(&format!(
+                    "head-request {} route {}: {}",
+                    request.id,
+                    loggable(line["code"].as_str().unwrap_or_default()),
+                    loggable_detail(message)
+                ));
+            }
             failed(line["code"].as_str().unwrap_or_default().to_string())
         }
         _ => failed(format!(

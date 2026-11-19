@@ -26,7 +26,13 @@ in its plan file.
 
 For each phase of the wave whose footprint is disjoint from the others in it:
 
-1. `fgos worktree create <path> --branch <name>`.
+1. `fgos worktree create <path> --branch <name>`. The path is absolute, in the sibling worktrees directory of the
+   project (`<parent of the project root>/<project directory name>-worktrees/`, e.g.
+   `/home/me/projects/forgent-worktrees/`), never inside the project root or your plan directory. One worktree per
+   phase. Its last segment must be unique in the repository (git keys the worktree by it) and is named from the plan
+   and phase: `<plan dir name>-p<NN>`. The branch is `<plan slug>/p<NN>`.
+   Read a refusal's code and message before anything else. A refused verb is reported in the plan file or with
+   `fgos questions ask`; never investigate it in the host's source.
 2. `fgos run "<prompt naming the phase file>" --provider <id> --capability <purpose> --worktree <path> --writes <paths>`
    (only these pass), with `--writes` inside the plan footprint.
 3. Read the outcome with `fgos request result <id> --wait <seconds>` (at most 50). A failed or blocked result is read, not retried blind.

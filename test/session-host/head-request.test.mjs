@@ -461,13 +461,32 @@ test('worktree create without a branch is refused, with one it runs the host ver
   const { ask } = headCase(t);
   const calls = [];
   const hostCall = (call) => { calls.push(call); return { status: 0, stdout: '{"data":{"path":"/wt","branch":"task/x"}}\n' }; };
-  assert.equal((await ask('worktree create', { path: '../wt' }, 'w1', { hostCall })).line.code, 'bad-args');
+  assert.equal((await ask('worktree create', { path: '/w/p-wt' }, 'w1', { hostCall })).line.code, 'bad-args');
   assert.equal(calls.length, 0);
-  const done = await ask('worktree create', { path: '../wt', branch: 'task/x', base: 'main' }, 'w2', { hostCall });
+  const done = await ask('worktree create', { path: '/w/p-wt', branch: 'task/x', base: 'main' }, 'w2', { hostCall });
   assert.deepEqual(done.line.data, { path: '/wt', branch: 'task/x' });
-  assert.deepEqual(calls[0].argv, ['worktree', 'create', '../wt', '--branch', 'task/x', '--base', 'main', '--json']);
-  const failing = await ask('worktree create', { path: '../wt', branch: 'task/x' }, 'w3', { hostCall: () => ({ status: 1, stdout: '' }) });
+  assert.deepEqual(calls[0].argv, ['worktree', 'create', '/w/p-wt', '--branch', 'task/x', '--base', 'main', '--json']);
+  const failing = await ask('worktree create', { path: '/w/p-wt', branch: 'task/x' }, 'w3', { hostCall: () => ({ status: 1, stdout: '' }) });
   assert.equal(failing.line.code, 'worktree-create-failed');
+});
+
+test('worktree create refuses a relative path and a path inside the project root, naming why', async (t) => {
+  const { ask, project } = headCase(t);
+  const hostCall = () => { throw new Error('the host must not be called'); };
+  const relative = await ask('worktree create', { path: '../wt', branch: 'task/x' }, 'w1', { hostCall });
+  assert.equal(relative.line.code, 'bad-args');
+  assert.match(relative.line.message, /absolute/);
+  const inside = await ask('worktree create', { path: path.join(project, 'wt'), branch: 'task/x' }, 'w2', { hostCall });
+  assert.equal(inside.line.code, 'bad-args');
+  assert.match(inside.line.message, /outside the project root/);
+});
+
+test('worktree create keeps the host refusal code in the answer', async (t) => {
+  const { ask } = headCase(t);
+  const hostCall = () => ({ status: 1, stdout: '', stderr: 'fgos: the git admin name wt is in use [worktree-admin-name-in-use]\n' });
+  const refused = await ask('worktree create', { path: '/w/wt', branch: 'task/x' }, 'w1', { hostCall });
+  assert.equal(refused.line.code, 'worktree-admin-name-in-use');
+  assert.match(refused.line.message, /admin name/);
 });
 
 test('supervisor done on an empty queue answers stopping and starts the stop of the caller own role', async (t) => {
