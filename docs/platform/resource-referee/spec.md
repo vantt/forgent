@@ -5,10 +5,10 @@ Document type: BA-grade area specification
 Audience: Owner, maintainer, implementation agent
 Purpose: One authority for applying a ruleset, given as data, to facts about a set of units and their resource claims, and returning findings and a verdict. It never acts
 Design status: Settled by the owner in the discussion of plans/261119-0030-resource-referee-graph-write-scope-stack (decisions 1-5, 7, 10-13, 16, 17, 22, 23, 26); the catalog and limits were fixed in phase 1
-Implementation: Spec and contract only (plan phase 1). The crate packages/resource-referee/rust is a skeleton from phase 2 and is filled in phase 5; no Node binding exists until a Node caller does
+Implementation: The crate packages/resource-referee/rust (fgos-resource-referee) implements the evaluator, the closed catalog and the floor; `evaluate(facts, ruleset, policy)` takes JSON values and returns a verdict or a named refusal. No Node binding exists until a Node caller does
 Canonical: Yes for the scope below, from the day the plan lands
 Owner: Resource-referee component (proposed)
-Source (planned): packages/resource-referee/rust (crate fgos-resource-referee)
+Source: packages/resource-referee/rust (crate fgos-resource-referee)
 Contracts: packages/resource-referee/contracts/resource-referee.v1.json
 Provenance: plans/261119-0030-resource-referee-graph-write-scope-stack/plan.md and reports/facts.md at base 40949614f077844005a986ca1f0f75c0c5e8f508 (2026-11-19)
 Writer type: Agent draft writer
@@ -101,13 +101,13 @@ and to keep stable).
 | `no-dangling-edges` | yes | blocking | none | every dependency names a unit |
 | `claims-declared` | yes | blocking | none | every unit declares claims or `readOnly`; entries canonicalize; per-item limits hold |
 | `facts-not-truncated` | yes | blocking | none | no fact was cut short by a cap |
-| `no-exclusion-in-one-layer` | yes | blocking | none | no colliding pair sits in one declared layer |
+| `no-exclusion-in-one-layer` | yes | blocking | none | no colliding pair sits in one declared layer, and once any unit declares a layer no colliding pair has an end without one |
 | `declared-layers-valid` | no | blocking | none | every unit is declared in a layer later than all it depends on |
 | `max-layer-width` | no | advisory | `max` (integer from 1, required) | no declared layer holds more than `max` non-read-only units |
 
 **The floor takes no parameters and is always blocking.** A ruleset may name a floor check only bare or with params `{}` (a no-op); any parameter key, or a `class`, is refused by name (`floor-check-not-configurable`); a policy therefore cannot
 turn the collision check into a warning. The floor runs whether or not the ruleset names its checks. The
-layer checks judge the layers the author declared, and are vacuous when no unit declares one. The hot-file
+layer checks judge the layers the author declared, and are vacuous when no unit declares one; the collision check stops being vacuous the moment one does, so leaving a colliding unit out of the layers never switches it off. The hot-file
 rule needs no check of its own: two phases that list the same file in one layer collide under the footprint
 rule (plan decision 11).
 
@@ -127,12 +127,13 @@ attribute check (phase size, risk) and alone-in-layer.
 | `read-only-with-claims` | blocking | `claims-declared` | `readOnly: true` beside a non-empty `claims` (absent or `[]` claims beside `readOnly: true` is fine) |
 | `facts-truncated` | blocking | `facts-not-truncated` | the `truncated` fact is set |
 | `exclusion-in-one-layer` | blocking | `no-exclusion-in-one-layer` | a colliding pair is declared in one layer |
+| `exclusion-layer-undeclared` | blocking | `no-exclusion-in-one-layer` | some unit declares a layer and an end of a colliding pair declares none, so the pair cannot be shown to sit in different layers |
 | `layer-order-violation` | per rule | `declared-layers-valid` | a unit is not later than a unit it depends on |
 | `layer-missing` | per rule | `declared-layers-valid` | some unit declares a layer and this one does not |
 | `layer-width-exceeded` | per rule | `max-layer-width` | a declared layer is wider than `max` |
 
 Codes are stable: one code, one meaning, never reused. Every finding has the shape
-`{ code, class, check, nodes, evidence }`.
+`{ code, class, check, nodes, evidence }`. Findings are ordered by check in catalog order, then by the input position of their first node (a finding with no node last); a repeated `dependsOn` entry counts once.
 
 **Verdict derivation, from classes only.** Any blocking finding gives `reject`. No blocking and at least one
 advisory finding gives `accept-with-advice`. No finding gives `accept`. A truncated fact set always gives
@@ -184,7 +185,7 @@ this package returns values raw and never builds human text from file content.
 
 ## 8. Boundaries
 
-The referee sits above `graph` and `write-scope` and below every application. It imports neither; the
+The referee sits above `graph` and `write-scope` and below every application. It imports neither at run time (both are dev-dependencies, used by the wiring proof only); the
 caller passes it their outputs as facts, so it can be tested with hand-built facts and replaced in no other
 package. The door plan owns the door `fgos resource-check --plan <dir> | --units <file.json> [--policy
 <file>]`, the default policy, the phase-table reader, the file readers and the human output.
@@ -243,3 +244,5 @@ rule the plan check, the supervisor and the door need is expressed, and the rest
 | plan decision 22 | The path rule is lexical and every verdict says so | section 5 |
 | plan decision 31 | A plan with zero phases is a blocking finding in the door, never `accept` | contract `emptyFacts` |
 | phase 1 | The registry holds `path`, `ref` and `port`; the codes, limits and gap list were fixed here | sections 3, 5, 7, 9 |
+| phase 5 | The evaluator takes facts and ruleset as JSON values and imports neither graph nor write-scope types (they are dev-dependencies, used by one wiring test); a refusal is a struct of code, field and index; per-item limits give `claims-over-limit` and the rest is still evaluated; a `problems` entry whose code is not `entry-invalid`, and a `policy` that is not `{ source, sha256 }` strings, are refused; the floor runs in catalog order first, then the chosen non-floor rules in catalog order | sections 4, 5, 6, 7 |
+| phase 5 review | Findings are ordered by check, then by the first node's input position; a refusal quotes at most 1024 bytes of any input-derived name, cut on a character boundary; once any unit declares a layer, a colliding pair with an undeclared end is the blocking `exclusion-layer-undeclared`, so collisions cannot be switched off by omitting layers; evaluation is linear (one id map, no repeated scans); a repeated `dependsOn` entry gives one finding; an exclusion or problem naming an unknown unit is refused as `unknown-node-id` | sections 4, 5, 7 |
