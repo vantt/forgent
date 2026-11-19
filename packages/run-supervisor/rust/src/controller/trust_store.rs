@@ -640,25 +640,15 @@ pub fn trusted_project_entry() -> Json {
 /// checkout that owns it. Never invents a root.
 pub fn trust_roots(project_path: &Path, repo_root: &str) -> Vec<String> {
     let mut roots = vec![repo_root.to_string()];
-    let common = std::process::Command::new("git")
-        .arg("-C")
-        .arg(project_path)
-        .args(["rev-parse", "--path-format=absolute", "--git-common-dir"])
-        .env("GIT_OPTIONAL_LOCKS", "0")
-        .stdin(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
-        .output();
-    if let Ok(output) = common {
-        if output.status.success() {
-            let common_dir = PathBuf::from(
-                String::from_utf8_lossy(&output.stdout).trim_end_matches(['\n', '\r']),
-            );
-            if common_dir.file_name().is_some_and(|name| name == ".git") {
-                if let Some(owner) = common_dir.parent() {
-                    let owner = owner.to_string_lossy().into_owned();
-                    if !roots.contains(&owner) {
-                        roots.push(owner);
-                    }
+    // The Git port's disk-only topology read: no Git child, no state root; a non-repository or an untrusted
+    // layout adds no root.
+    if let Ok(Some(repo)) = fgos_git::GitDriver::topology_at(project_path) {
+        let common_dir = repo.common_dir();
+        if common_dir.file_name().is_some_and(|name| name == ".git") {
+            if let Some(owner) = common_dir.parent() {
+                let owner = owner.to_string_lossy().into_owned();
+                if !roots.contains(&owner) {
+                    roots.push(owner);
                 }
             }
         }
