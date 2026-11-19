@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a59cf37568f91ec001ae31d71517b2d74e2e33b4a6c1045dacfe96b7bf60d353",
+  "payloadDigest": "328cc266ee6e9971c57e6b7d22f5258751573ca11b87cdb67c7f6059ded2378b",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -482,13 +482,29 @@
     "packages/execution/engine/src/accounts/time.rs": "d448a71cc36f9cf29a821f43894977cf8b1507d5941913fc02facad2a1d50cc1",
     "packages/execution/engine/src/assignment/mod.rs": "5d1d8fcd460a713876ec7f777187045876d75122840a7d3f4f248d0916989edb",
     "packages/execution/engine/src/assignment_runner/mod.rs": "ed5a6982668cea4aaa63a62a6949cf9fffc8c42fc4b95d8275551b4d094af6b2",
-    "packages/execution/engine/src/confinement/cleanup/mod.rs": "ab112524133f115c9a1c3f323be99497d3322ea8e3f9aa4464f520dd039dc018",
+    "packages/execution/engine/src/confinement/cleanup/agent_file.rs": "feb73818eb1e3247f9e2bd5ea7e8e521a4eab4462477f80d999116737f752e99",
+    "packages/execution/engine/src/confinement/cleanup/error.rs": "fc949d29711e4ef2662fa9109ebb39240db0576bb0d684ef63a427cb07ccf77b",
+    "packages/execution/engine/src/confinement/cleanup/homes.rs": "e791731ba02dbb76148df71105faf4aa53b26338f97752643a064680ef47ca26",
+    "packages/execution/engine/src/confinement/cleanup/host.rs": "9dc5243113e7416fa0c6fa39e96d176b7027ba93605c871f6b7b260578f0a654",
+    "packages/execution/engine/src/confinement/cleanup/marker.rs": "54329a39713e7797ede3ec1b9522fddc460f9ecb68c5dc305b44316cb0076220",
+    "packages/execution/engine/src/confinement/cleanup/mod.rs": "7c8a5d8eb80121bbc390faa2af346195eb99f5120fd51a5c053d6e7127ebcd7c",
+    "packages/execution/engine/src/confinement/cleanup/orphans.rs": "984fbe7d970d1621a252d365baaadd329ba85bef5319e60a7e129834425ed462",
+    "packages/execution/engine/src/confinement/cleanup/probes/all.rs": "45b6bed38e675e99d7d3b2c75a3db3756f85dd246bfd81b4f0bc8f507f9d757c",
+    "packages/execution/engine/src/confinement/cleanup/probes/basic.rs": "be4f14abbd4ea0ffc797689c0c8dc15744c99c89cdd478e8e213627ffce02ebb",
+    "packages/execution/engine/src/confinement/cleanup/probes/fingerprint.rs": "f622195c130821ae08e2b3d4f42abd500dbe678bc1042a0162c15f66dcc02b37",
+    "packages/execution/engine/src/confinement/cleanup/probes/machine_private.rs": "bb558a19d3d481d4c6c77bdbfee0fcd176f76cd6af977258b05fa09428b9519f",
+    "packages/execution/engine/src/confinement/cleanup/probes/mod.rs": "9d4f22a3c6d8aba1175117d5fbec8a8786b44ef3a64eada38b41aefdd0735f69",
+    "packages/execution/engine/src/confinement/cleanup/probes/peer.rs": "6b774e7405d1d1e9a0ec72bf8acc0608bddc028e9d91a93b15698a3cf2ac368b",
+    "packages/execution/engine/src/confinement/cleanup/probes/sandbox.rs": "e1cebaa4658622430de29c333531909e1ce2694830893d3b2a0bbe93c3e4a9f3",
+    "packages/execution/engine/src/confinement/cleanup/record.rs": "186df16c780e064e0ad74b8991d683eac6c17718066fab388fc092299896f27a",
+    "packages/execution/engine/src/confinement/cleanup/remove.rs": "1903103cd9863b77ddb863c32260d5cf6da47117b55503dd21f94e0c5b6b2929",
+    "packages/execution/engine/src/confinement/cleanup/resolve.rs": "daea21018d570945913f14b4da1f4bc3761c225d8c3eb11a5498b5689246a45e",
     "packages/execution/engine/src/confinement/driver/attestation.rs": "8eb8c7abd8ec90738ad0c9d8f5e743a7c750ae025cfa92ff59ea66d8492f6878",
     "packages/execution/engine/src/confinement/driver/bwrap.rs": "ae94045578b8214718e9b4eccb0c3d6b0827b77958e3bfc5ab56e9ee432146cf",
     "packages/execution/engine/src/confinement/driver/contract.rs": "8906bc40a040950f7723843148ad11c60eff051da5787e72b8a07d8dedc5320a",
     "packages/execution/engine/src/confinement/driver/error.rs": "ef745b1f465e88c079cfb874df207184d4dd41bf8d62fb4ae815d1d59b59abad",
-    "packages/execution/engine/src/confinement/driver/js.rs": "ca4987ae8e1b795675fb2a3cc8495c7ed51dd254bd8a452ae319747bd0448ab9",
-    "packages/execution/engine/src/confinement/driver/mod.rs": "948d8c0f1011616b16eec7e942b136274e23a48d6a5e8fec031f531cb48f8b04",
+    "packages/execution/engine/src/confinement/driver/js.rs": "ed6f2f51491091b5092ad502f4ff6cf86e5861461a7c0e1eff7525d5ca45102e",
+    "packages/execution/engine/src/confinement/driver/mod.rs": "90c4eeaa8fec0e916829207a79238988b375002cff5ea77c97c89c9993f3ad67",
     "packages/execution/engine/src/confinement/driver/ports.rs": "715ad7e3eaf6bf8febcb8e4adc41336b66a159c6aeee540928f4b293c5f0746c",
     "packages/execution/engine/src/confinement/driver/registry.rs": "70214e53ec8f9ac9e1830bfc1fccb1692fc037ec712679eba654a69e6946b1e6",
     "packages/execution/engine/src/confinement/policy/bypass.rs": "5de46825d04c3166a50be491fdacd18a3544167731c6be2a82f234139b9ba710",
@@ -544,6 +560,7 @@
     "packages/execution/engine/src/transport_round/mod.rs": "13a34862c2cc4b8602f234f7c76428c087c2228b804bb58485f1418a1401095c",
     "packages/execution/engine/src/unit_run/mod.rs": "b0301cbcf51f52515225ceeb426148705822a5243c148b74e22559965c283bd4",
     "packages/execution/engine/tests/accounts.rs": "64de846e42e43c21da93c3cb1b289306f52c14bb600ed9aafd8658245b3b082c",
+    "packages/execution/engine/tests/confinement_cleanup.rs": "3dbbafd2ca6e0f9fa20eacc34fb00a8b2b11c8f907fad9fa0d1b5c70687399a3",
     "packages/execution/engine/tests/confinement_driver.rs": "0427170d7821a2cf8a71dfa8cf2a511449235a42d59223035ba6f8ac725b5d72",
     "packages/execution/engine/tests/confinement_policy.rs": "2aafe069d5a694c97044ed28f47ec36ee98950f8c79babfacd0bbc11f9cb5f05",
     "packages/execution/engine/tests/confinement_request.rs": "e372cdb36dd9d160a6fff775c346352fcfe5d48635c2fc63e0f196f72c43cb30",
@@ -2863,6 +2880,27 @@
       "class": "rust-test"
     },
     {
+      "path": "packages/execution/engine/src/confinement/cleanup/probes/all.rs",
+      "line": 30,
+      "spawn": "Command::new <- packages/process/rust/src/spawn.rs:141",
+      "binary": "(uncalled run_all_confinement_probes)",
+      "class": "uncalled-wrapper"
+    },
+    {
+      "path": "packages/execution/engine/src/confinement/cleanup/probes/machine_private.rs",
+      "line": 437,
+      "spawn": "Command::new <- packages/process/rust/src/spawn.rs:141",
+      "binary": "(parsed configuration (prepared .invocation .get(\"command\") .and_then(Value::as_str))",
+      "class": "configured-binary"
+    },
+    {
+      "path": "packages/execution/engine/src/confinement/cleanup/probes/peer.rs",
+      "line": 111,
+      "spawn": "Command::new <- packages/process/rust/src/spawn.rs:141",
+      "binary": "(parsed configuration (prepared .invocation .get(\"command\") .and_then(Value::as_str))",
+      "class": "configured-binary"
+    },
+    {
       "path": "packages/execution/engine/src/confinement/driver/bwrap.rs",
       "line": 1167,
       "spawn": "Command::new <- packages/process/rust/src/spawn.rs:141",
@@ -3507,6 +3545,14 @@
       "binary": ".fgos",
       "class": "argv-runner",
       "resolvedAt": "packages/distribution/rust/src/agent_hooks.rs:1595"
+    },
+    {
+      "path": "packages/process/rust/src/spawn.rs",
+      "line": 141,
+      "spawn": "Command::new",
+      "binary": "/usr/bin/bwrap",
+      "class": "argv-runner",
+      "resolvedAt": "packages/execution/engine/src/confinement/cleanup/probes/fingerprint.rs:85"
     },
     {
       "path": "packages/process/rust/src/spawn.rs",
