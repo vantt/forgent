@@ -22,7 +22,6 @@ use fgos_git::{
     GitDriver, HeadFact, Ignored, Inspect, RemoteGrant, RepoHandle, ResolveRepo, Submodules,
     Untracked,
 };
-use fgos_run_supervisor::head_request::WRITE_BUSY;
 use fgos_run_supervisor::route::{CatchUpRefusal, PublishRefusal, WritePublisher};
 use fgos_supervision::land::{
     catch_up, land, Gate, LandCommand, LandConfig, LandPorts, Regenerate, ShellRunner,
@@ -33,12 +32,11 @@ use serde_json::Value;
 const REMOTE: &str = "origin";
 /// How long the land waits for the target's merge slot and the main checkout.
 const WAIT_MS: u64 = 30_000;
-/// The land refusals whose class is Busy (retryable): a live writer's operation is pending (`resource-busy`), or the
-/// merge slot or the main checkout is held. `LandRefusal` carries only the code, so the class is read from the code.
-const BUSY_CODES: [&str; 3] = ["resource-busy", "merge-slot-busy", "main-checkout-busy"];
-/// How long one catch-up attempt waits for the merge slot while retrying, and how long the retries run in all: under
-/// the head request's own 60 s verb timeout even when the last attempt starts at the end of the budget.
+/// How long one catch-up attempt waits for the merge slot while retrying.
 const BUSY_ATTEMPT_WAIT_MS: u64 = 5_000;
+/// How long the retries run in all. The last attempt may start at the end of it and itself wait a few seconds per lock
+/// (worktree-admin, merge slot, main checkout), so a write answers within about 60 s: far inside the client's 180 s
+/// write reply timeout. `session write` has no route child, so the 60 s verb timeout does not bound it.
 const BUSY_BUDGET: Duration = Duration::from_millis(45_000);
 /// Pause before the next attempt: doubles from the first up to the cap.
 const BUSY_BACKOFF_FIRST: Duration = Duration::from_millis(500);
@@ -255,9 +253,10 @@ fn grant(checkout: &Checkout) -> Result<RemoteGrant, PublishRefusal> {
     })
 }
 
-/// Runs `attempt` until it does not refuse Busy, pausing with doubling backoff between tries, for at most `budget`.
-/// A Busy that outlasts the budget comes back as `write-busy` naming the last code; any other result is returned as
-/// it is. `sleep` and `now` are parameters so the schedule is provable without waiting.
+/// Runs `attempt` until it does not refuse Busy (Git's retryable class, carried as [`CatchUpRefusal::Busy`]), pausing
+/// with doubling backoff between tries, for at most `budget`. A Busy that outlasts the budget comes back as that last
+/// Busy; any other result is returned as it is. `sleep` and `now` are parameters so the schedule is provable without
+/// waiting.
 pub fn retry_busy(
     budget: Duration,
     mut attempt: impl FnMut() -> Result<(), CatchUpRefusal>,
@@ -267,15 +266,13 @@ pub fn retry_busy(
     let start = now();
     let mut pause = BUSY_BACKOFF_FIRST;
     loop {
-        let why = match attempt() {
-            Err(CatchUpRefusal::Refused(why)) if BUSY_CODES.contains(&why.code.as_str()) => why,
+        match attempt() {
+            Err(busy @ CatchUpRefusal::Busy { .. }) => {
+                if now().duration_since(start) + pause > budget {
+                    return Err(busy);
+                }
+            }
             other => return other,
-        };
-        if now().duration_since(start) + pause > budget {
-            return Err(CatchUpRefusal::Refused(refusal(
-                WRITE_BUSY,
-                format!("{}: {}", why.code, why.detail),
-            )));
         }
         sleep(pause);
         pause = (pause * 2).min(BUSY_BACKOFF_CAP);
@@ -283,10 +280,19 @@ pub fn retry_busy(
 }
 
 /// Fast-forwards the main checkout of `root` to its remote tip as `writer`, under the target's merge slot. A Busy
-/// refusal (a live writer's operation pending, the slot or the checkout held) is retried within [`BUSY_BUDGET`].
+/// refusal (a live writer's operation pending, a lock held) is retried within [`BUSY_BUDGET`].
 fn catch_up_main(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
+    catch_up_main_within(root, writer, BUSY_BUDGET)
+}
+
+/// [`catch_up_main`] with its own retry budget, for a caller that must bound the wait.
+pub fn catch_up_main_within(
+    root: &Path,
+    writer: &str,
+    budget: Duration,
+) -> Result<(), CatchUpRefusal> {
     retry_busy(
-        BUSY_BUDGET,
+        budget,
         || catch_up_once(root, writer),
         std::thread::sleep,
         Instant::now,
@@ -313,6 +319,10 @@ fn catch_up_once(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
     };
     catch_up(&command, &ports).map_err(|why| match why.code.as_str() {
         "land-target-ahead" => CatchUpRefusal::BranchAhead(why.detail),
+        _ if why.retryable => CatchUpRefusal::Busy {
+            code: why.code,
+            detail: why.detail,
+        },
         _ => CatchUpRefusal::Refused(refusal(&why.code, why.detail)),
     })
 }

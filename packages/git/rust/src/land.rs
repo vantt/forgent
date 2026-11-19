@@ -1201,9 +1201,13 @@ impl GitDriver {
         let repo = &operation_repo;
         let mut scope =
             crate::refs::acquire_worktree_admin(repo, held, fgos_holder_lock::Wait::Ms(5000))?;
-        scope
-            .acquire("main-checkout", &params(repo), Wait::Ms(5000))
-            .map_err(failure)?;
+        acquire_or_busy(
+            &mut scope,
+            "main-checkout",
+            &params(repo),
+            5000,
+            "main-checkout-busy",
+        )?;
         let admin = scope.handle("worktree-admin").expect("acquired");
         let next = match crate::refs::direct(self, repo, remote_tracking)? {
             ExpectedTip::Oid(o) => o,

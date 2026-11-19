@@ -1431,7 +1431,10 @@ fn head_write_whose_catch_up_is_refused_is_refused_by_name_before_the_clean_chec
             "main-checkout-catch-up-refused: dirty",
         ),
         (
-            CatchUpRefusal::Refused(refusal("write-busy", "resource-busy: fetch op-1 pending")),
+            CatchUpRefusal::Busy {
+                code: "resource-busy".into(),
+                detail: "fetch op-1 pending".into(),
+            },
             "write-busy",
             "resource-busy: fetch op-1 pending",
         ),

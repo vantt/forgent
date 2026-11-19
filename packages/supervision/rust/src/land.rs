@@ -89,6 +89,9 @@ pub struct LandRefusal {
     /// Trouble releasing the door's own scratch after this refusal. Secondary: `code` and `detail`
     /// always name the primary refusal.
     pub cleanup_note: Option<String>,
+    /// Git's own Busy class: the refusal came from a held lock or a live writer's pending operation, and the same
+    /// request may succeed later.
+    pub retryable: bool,
 }
 
 impl LandRefusal {
@@ -107,6 +110,7 @@ fn refuse(code: &str, detail: impl Into<String>) -> LandRefusal {
         detail: detail.into(),
         gate_log: None,
         cleanup_note: None,
+        retryable: false,
     }
 }
 
@@ -137,6 +141,7 @@ fn from_git(e: OperationError) -> LandRefusal {
         detail,
         gate_log: None,
         cleanup_note: None,
+        retryable: e.retryable,
     }
 }
 

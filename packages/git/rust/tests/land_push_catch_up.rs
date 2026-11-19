@@ -279,6 +279,28 @@ fn catch_up_fast_forwards_a_clean_behind_main_checkout() {
 }
 
 #[test]
+fn catch_up_answers_busy_while_the_main_checkout_is_held() {
+    use fgos_holder_lock::{LockScope, Wait};
+    let f = Fixture::new();
+    let tip = commit_ahead(&f, "ahead", "c");
+    git(&f.main, &["update-ref", "refs/remotes/origin/trunk", &tip]);
+    let mut holder = LockScope::seeded(vec![]).unwrap();
+    let params = std::collections::BTreeMap::from([(
+        "fgosDir".to_string(),
+        f.main.join(".fgos").to_string_lossy().into_owned(),
+    )]);
+    holder
+        .acquire("main-checkout", &params, Wait::Ms(0))
+        .unwrap();
+    let busy = catch_up(&f, &f.request.target, "held").unwrap_err();
+    assert_eq!(busy.cause, "main-checkout-busy");
+    assert!(busy.retryable, "a held main checkout is retryable");
+    drop(holder);
+    catch_up(&f, &f.request.target, "released").unwrap();
+    assert_eq!(git(&f.main, &["rev-parse", "refs/heads/trunk"]), tip);
+}
+
+#[test]
 fn catch_up_refuses_a_non_fast_forward_move() {
     let f = Fixture::new();
     // Trunk and the tracking tip diverge from the same base.

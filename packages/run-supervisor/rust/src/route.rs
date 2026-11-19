@@ -27,6 +27,9 @@ pub enum CatchUpRefusal {
     /// The checked-out branch has commits its remote lacks (an earlier publish committed but could not push); the
     /// detail names both tips.
     BranchAhead(String),
+    /// The catch-up stayed Busy (Git's retryable class: a live writer's operation pending, a lock held) through the
+    /// publisher's retries; `code` is the last refusal's own code. Nothing was written; the write may be retried later.
+    Busy { code: String, detail: String },
     /// Any other refusal of the land's catch-up, by its own name.
     Refused(PublishRefusal),
 }

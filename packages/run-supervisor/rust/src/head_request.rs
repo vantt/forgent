@@ -37,8 +37,6 @@ use crate::route::{refuse, Flags};
 /// The Node payload entry the route child runs.
 pub(crate) const ENTRY: &str = "src/session-host/head-request.mjs";
 /// How long one request may run before its child is killed (the head's own launch waits up to 45 s).
-/// The code a `WritePublisher::catch_up` refusal carries when it stayed Busy through its retries.
-pub const WRITE_BUSY: &str = "write-busy";
 pub const VERB_TIMEOUT: Duration = Duration::from_millis(60_000);
 /// Largest request frame: a `session write` carries the whole new content of a granted file in one. Only a `session write`
 /// may exceed the GO channel's limit ([`MAX_FRAME_BYTES`]), and only one such large request is read or run at a time;
@@ -807,12 +805,11 @@ fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
                 detail: Some(detail),
             }
         }
-        // The publisher's own name for a catch-up that stayed Busy to the end of its retries: retryable, never a
-        // refusal of the catch-up itself.
-        Err(CatchUpRefusal::Refused(why)) if why.code == WRITE_BUSY => {
+        // A catch-up that stayed Busy to the end of its retries: retryable, never a refusal of the catch-up itself.
+        Err(CatchUpRefusal::Busy { code, detail }) => {
             return Outcome::Refused {
                 code: "write-busy",
-                detail: Some(why.detail),
+                detail: Some(format!("{code}: {detail}")),
             }
         }
         Err(CatchUpRefusal::Refused(why)) => {
