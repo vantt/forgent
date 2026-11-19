@@ -5,7 +5,7 @@ discussion: open
 ## 1. Trạng thái hiện tại
 
 2026-11-19: discussion opened from backlog row `p-mc25x5pfi6` (owner approval via Miu). Starting point scouted
-(§2, §3). Nothing settled yet. Round 11: mandatory backlog source chosen. Still open: the ~273 open Work items. Round 10: discussions move to `plans/discussions/` proposed. Round 9: plans keep their directory name as id. Open: mandatory backlog `source:` for new discussions/plans (round 6), the ~273 open Work items (round 2), discussions location. Round 8: separator `id-slug` recommended. Round 7: discussions get a minted id (round 5 objection withdrawn); plan id open. Round 6: linking mechanism backlog ← discussion ← plan proposed under §3. Round 5: owner agreed proposal point 1; naming/placement answered under §3. Round 4: whole proposal written under §3, waiting for the owner's reaction. Round 2: owner agreed #2 and #3; merged #4/#5; shaper reported that Work keeps a full item store (1215 items) plus gates, outcomes, learnings, docs/topics and decisions in the Event Store, side by side with the backlog. Round 1 done: owner reframed #1 (content of a row, not its storage); shaper proposed a short row + link and a 5-value backlog status list, explained #3–#5. Waiting for the owner's reaction. Plan 261119-1615 phase 4 (add-rows) is on hold
+(§2, §3). Nothing settled yet. Round 12: Work items → separate triage item. §6 and §7 drafted from all agreed points; waiting for the owner to confirm before settling. Round 11: mandatory backlog source chosen. Still open: the ~273 open Work items. Round 10: discussions move to `plans/discussions/` proposed. Round 9: plans keep their directory name as id. Open: mandatory backlog `source:` for new discussions/plans (round 6), the ~273 open Work items (round 2), discussions location. Round 8: separator `id-slug` recommended. Round 7: discussions get a minted id (round 5 objection withdrawn); plan id open. Round 6: linking mechanism backlog ← discussion ← plan proposed under §3. Round 5: owner agreed proposal point 1; naming/placement answered under §3. Round 4: whole proposal written under §3, waiting for the owner's reaction. Round 2: owner agreed #2 and #3; merged #4/#5; shaper reported that Work keeps a full item store (1215 items) plus gates, outcomes, learnings, docs/topics and decisions in the Event Store, side by side with the backlog. Round 1 done: owner reframed #1 (content of a row, not its storage); shaper proposed a short row + link and a 5-value backlog status list, explained #3–#5. Waiting for the owner's reaction. Plan 261119-1615 phase 4 (add-rows) is on hold
 until the backlog shape is decided here.
 
 ## 2. Mục tiêu & đề bài
@@ -75,6 +75,8 @@ Round 10 (owner: why not move discussions into plans). Shaper agrees, not settle
 
 Round 11: **owner chose (a)**: a new discussion or plan must carry `source:` naming at least one backlog item, the check fails without it; files existing when the check is switched on are warned only.
 
+Round 12: **owner chose (a)** for the ~273 open Work items: a separate backlog item triages them (agent classifies keep / already done / obsolete with evidence, owner approves the list); kept ones become backlog items noting their old `tsk-` id. Work code and the 942 closed items are untouched.
+
 ## 4. Quyết định đã chốt
 
 | D-ID | Decision | Date | Source |
@@ -95,11 +97,66 @@ Round 11: **owner chose (a)**: a new discussion or plan must carry `source:` nam
 - 2026-11-19 19:4x — owner round 9: plans keep their id as today.
 - 2026-11-19 19:5x — owner round 10: why not move discussions into plans. Shaper scouted path references and agreed (§3 round 10 block).
 - 2026-11-19 20:0x — owner round 11: (a), mandatory backlog `source:` for new discussions and plans.
+- 2026-11-19 20:1x — owner round 12: (a), open Work items go to a separate triage backlog item. Shaper drafted §6 and §7 from all agreed points.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Nothing settled yet.
+Draft synthesis of every point the owner agreed in rounds 1–12, waiting for the owner's confirmation before `discussion: settled`.
+
+**Three authored kinds, one root.** All portfolio records live under `plans/`; `docs/` keeps evergreen docs only.
+
+| Kind | Answers | Path | Id |
+|---|---|---|---|
+| Backlog item | why, done when | `plans/backlog/<p-id>-<slug>.md` | minted `p-<10 base32>` (exists) |
+| Discussion | open shaping | `plans/discussions/<ds-id>-<slug>/DISCUSSION.md` | minted random, new kind (e.g. `ds-`) through `fgos identity mint` |
+| Plan | what, how | `plans/<YYMMDD-HHMM>-<slug>/plan.md` | directory name, unchanged |
+| Index | generated | `plans/backlog.md` | — |
+
+Names join with `-`; paths come only from `fgos convention path`; readers take the id from frontmatter.
+
+**Frontmatter.** Backlog item: `id, title, status, priority (P0..P3), area, created`; body `Why`, `Done when`, `Notes` (pre-plan detail only; no landing notes). Discussion: `id, title, status, source, created`. Plan: plan-v1 as today.
+
+**Statuses (one word each).** Backlog `proposed | parked | in-flight | done | dropped`; discussion `open | paused | settled`; plan `draft | ready | running | done | withdrawn`.
+
+**Links: one direction, downstream owns.** Discussion and plan carry `source:` with ids (`p-…`, `ds-…`), never paths. The reverse view is the generated index. A new discussion or plan must cite at least one backlog item.
+
+**One write door, one check.** Writes go through one `fgos` door (Rust); Miu and the supervisor write one item file through `session write`. The check fails on: unknown status, a `source:` id that does not exist, an `in-flight` item no discussion/plan cites, a new discussion/plan without a backlog source, an index out of date, item `done` with a citing plan running or `in-flight` with every citing plan ended. Files existing at switch-on are warned only. The landing step that sets a plan `done` sets its source items `done` in the same commit.
+
+**Files vs Event Store.** Files hold what people author. The Event Store keeps what happens (questions, supervision, run attempts, identity, mail), unchanged; no new portfolio stream. `running` + `lead:` stay in plan frontmatter. The old Work item store is frozen as history; a later Work/UI reads the portfolio files through an adapter.
+
+**Migration (once).** Backlog rows → item files; discussions → `plans/discussions/<ds-id>-<slug>/` with frontmatter; legacy plan statuses by the plan-v1 map (owner decides `partial`, `deferred`); old text references rewritten from an old→new map; hard-coded `docs/discussions` / `docs/backlog.md` paths in code replaced by the convention door; other projects get the same migration as an upgrade verb.
+
+```mermaid
+flowchart LR
+  B["plans/backlog/p-…-slug.md<br/>why, done when"] 
+  D["plans/discussions/ds-…-slug/<br/>DISCUSSION.md"] -- "source: p-…" --> B
+  P["plans/YYMMDD-HHMM-slug/plan.md"] -- "source: p-…, ds-…" --> B
+  P -- "source: ds-…" --> D
+  I["plans/backlog.md (generated)"] -. reads .-> B & D & P
+  E[("Event Store: questions, supervision,<br/>run attempts, identity, mail")]
+```
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-None yet.
+Draft order: 1 → 2 → 3 → (5, 6); 4 and 7 independent.
+
+### Identity and convention for the new kinds {#task-ids-and-paths}
+Mint kind for discussions; convention rules for backlog item, discussion under `plans/`, index. Verify: `cargo test -p fgos-identity -p fgos-convention`.
+
+### Item contract, check and generated index {#task-item-check}
+Frontmatter schema for item and discussion, the check (rules above), index generation, one write door. Verify: the new check on fixtures + `npm test`.
+
+### Migration of backlog and discussions {#task-migration}
+Rows → files, discussions → `plans/discussions/`, reference rewrite, hard-coded paths → convention door, upgrade verb for other projects. Verify: check passes on the migrated repo; `git grep docs/discussions` finds only history; `npm test`, `cargo test --workspace`.
+
+### Plan statuses held to plan-v1 {#task-plan-status}
+Migrate legacy statuses, make `plan-contract-check --all` fail, require `source:` for new plans. Verify: `node scripts/plan-contract-check.mjs --all` exits 0.
+
+### Landing writes item done {#task-landing-done}
+The plan landing step sets source items `done` in the same commit. Verify: landing test with a cited item.
+
+### Replace plan 261119-1615 phase 4 {#task-1615-phase4}
+Withdraw add-rows; `session write` creates one item file; grants `docs/backlog.md` → `plans/backlog*`, `docs/discussions` → `plans/discussions`. Verify: phase test in `apps/fgos/tests/session_write_publish.rs`.
+
+### Triage the open Work items {#task-work-triage}
+~273 open `tsk-` items classified keep / done / obsolete with evidence; owner approves; kept ones become backlog items. Verify: owner-approved list in the item's report.
