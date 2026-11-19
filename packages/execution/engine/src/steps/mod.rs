@@ -17,7 +17,9 @@ pub mod stray_writes;
 pub mod worker_artifacts;
 
 pub use cleanup_trust::cleanup_trust;
-pub use finalize_home::{finalize_home, AttemptHomeFinalizer, FinalizedHome, HomeState};
+pub use finalize_home::{
+    finalize_home, AttemptHomeFinalizer, ConfinementHomes, FinalizedHome, HomeState,
+};
 pub use settle_attempt::{
     provider_stop_of, settle_attempt, terminal_stop_message, PaneScreen, ProviderStop, StepPorts,
 };

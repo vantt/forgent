@@ -41,29 +41,9 @@ pub struct StepPorts<'a> {
 
 /// The tail of a capture file the agent can write: never through a link, never past the cap.
 fn read_tail(file: &Path) -> String {
-    let Ok(meta) = std::fs::symlink_metadata(file) else {
+    let Ok((mut open, opened)) = crate::confinement::cleanup::open_agent_file(file) else {
         return String::new();
     };
-    if meta.file_type().is_symlink() || !meta.is_file() {
-        return String::new();
-    }
-    let Ok(mut open) = std::fs::File::open(file) else {
-        return String::new();
-    };
-    let Ok(opened) = open.metadata() else {
-        return String::new();
-    };
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::MetadataExt;
-        // The name must still be the file that was looked at: a link swapped in between is no capture.
-        if meta.dev() != opened.dev() || meta.ino() != opened.ino() {
-            return String::new();
-        }
-    }
-    if !opened.is_file() {
-        return String::new();
-    }
     let size = opened.len();
     let length = size.min(CAPTURE_TAIL_BYTES);
     if open.seek(SeekFrom::Start(size - length)).is_err() {

@@ -7978,6 +7978,1029 @@
       "ok": "$ROOT/h1/a"
     }
   ],
+  "finalizeAttemptHome": [
+    {
+      "name": "no finalization descriptors",
+      "files": {},
+      "descriptors": {},
+      "homes": {},
+      "ok": {
+        "state": "cleaned",
+        "homes": 0,
+        "transcriptPath": null,
+        "homeLayout": [],
+        "warnings": []
+      },
+      "stderr": [],
+      "run": [],
+      "homesAfter": []
+    },
+    {
+      "name": "a descriptor that is not JSON",
+      "files": {
+        "run/protected/confinement-finalization/cmd1.json": "nope"
+      },
+      "descriptors": {},
+      "homes": {},
+      "error": "finalization-descriptor-unreadable: cmd1.json cannot be read",
+      "code": "finalization-descriptor-unreadable",
+      "stderr": [],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "664",
+          "body": "nope"
+        }
+      ],
+      "homesAfter": []
+    },
+    {
+      "name": "a home already gone",
+      "files": {},
+      "descriptors": {
+        "cmd1": {
+          "contract": "confinement-finalization.v1",
+          "cleanupState": "pending",
+          "resources": [
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h1",
+              "sessionDir": ".codex/sessions"
+            }
+          ]
+        }
+      },
+      "homes": {},
+      "ok": {
+        "state": "cleaned",
+        "homes": 0,
+        "transcriptPath": null,
+        "homeLayout": [],
+        "warnings": []
+      },
+      "stderr": [],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "644",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "cleanupState": "cleaned",
+            "resources": [
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h1",
+                "sessionDir": ".codex/sessions"
+              }
+            ],
+            "cleanupResult": {
+              "kind": "cleaned"
+            },
+            "updatedAt": "<now>"
+          }
+        }
+      ],
+      "homesAfter": []
+    },
+    {
+      "name": "the session is kept and the home removed",
+      "files": {},
+      "descriptors": {
+        "cmd1": {
+          "contract": "confinement-finalization.v1",
+          "cleanupState": "pending",
+          "resources": [
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h1",
+              "sessionDir": ".codex/sessions"
+            }
+          ]
+        }
+      },
+      "homes": {
+        "d1/h1": {
+          "files": {
+            ".codex/sessions/s1.jsonl": "{\"turn\":1}\n",
+            ".codex/sessions/deep/s2.jsonl": "two\n",
+            "notes.txt": "n"
+          },
+          "marker": {}
+        }
+      },
+      "ok": {
+        "state": "cleaned",
+        "homes": 1,
+        "transcriptPath": "protected/session",
+        "homeLayout": [
+          {
+            "path": ".codex",
+            "kind": "dir",
+            "files": 2,
+            "bytes": 15,
+            "launchCommandId": "cmd1"
+          },
+          {
+            "path": ".codex/sessions",
+            "kind": "dir",
+            "files": 2,
+            "bytes": 15,
+            "launchCommandId": "cmd1"
+          },
+          {
+            "path": "notes.txt",
+            "kind": "file",
+            "files": 1,
+            "bytes": 1,
+            "launchCommandId": "cmd1"
+          }
+        ],
+        "warnings": []
+      },
+      "stderr": [],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "644",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "cleanupState": "cleaned",
+            "resources": [
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h1",
+                "sessionDir": ".codex/sessions"
+              }
+            ],
+            "cleanupResult": {
+              "kind": "cleaned"
+            },
+            "updatedAt": "<now>"
+          }
+        },
+        {
+          "path": "protected/session/deep/s2.jsonl",
+          "mode": "600",
+          "body": "two\n"
+        },
+        {
+          "path": "protected/session/s1.jsonl",
+          "mode": "600",
+          "body": {
+            "turn": 1
+          }
+        }
+      ],
+      "homesAfter": []
+    },
+    {
+      "name": "no session folder declared",
+      "files": {},
+      "descriptors": {
+        "cmd1": {
+          "contract": "confinement-finalization.v1",
+          "cleanupState": "pending",
+          "resources": [
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h1"
+            }
+          ]
+        }
+      },
+      "homes": {
+        "d1/h1": {
+          "files": {
+            "a.txt": "a"
+          },
+          "marker": {}
+        }
+      },
+      "ok": {
+        "state": "cleaned",
+        "homes": 1,
+        "transcriptPath": null,
+        "homeLayout": [
+          {
+            "path": "a.txt",
+            "kind": "file",
+            "files": 1,
+            "bytes": 1,
+            "launchCommandId": "cmd1"
+          }
+        ],
+        "warnings": [
+          {
+            "code": "session-dir-undeclared",
+            "message": "the executor declares no session directory",
+            "launchCommandId": "cmd1"
+          }
+        ]
+      },
+      "stderr": [
+        "fgos: session transcript not kept (session-dir-undeclared): the executor declares no session directory\n"
+      ],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "644",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "cleanupState": "cleaned",
+            "resources": [
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h1"
+              }
+            ],
+            "cleanupResult": {
+              "kind": "cleaned"
+            },
+            "updatedAt": "<now>"
+          }
+        }
+      ],
+      "homesAfter": []
+    },
+    {
+      "name": "the CLI wrote no session",
+      "files": {},
+      "descriptors": {
+        "cmd1": {
+          "contract": "confinement-finalization.v1",
+          "cleanupState": "pending",
+          "resources": [
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h1",
+              "sessionDir": ".codex/sessions"
+            }
+          ]
+        }
+      },
+      "homes": {
+        "d1/h1": {
+          "files": {
+            "a.txt": "a"
+          },
+          "marker": {}
+        }
+      },
+      "ok": {
+        "state": "cleaned",
+        "homes": 1,
+        "transcriptPath": null,
+        "homeLayout": [
+          {
+            "path": "a.txt",
+            "kind": "file",
+            "files": 1,
+            "bytes": 1,
+            "launchCommandId": "cmd1"
+          }
+        ],
+        "warnings": [
+          {
+            "code": "session-not-written",
+            "message": "the CLI wrote nothing under \".codex/sessions\" in its home",
+            "launchCommandId": "cmd1"
+          }
+        ]
+      },
+      "stderr": [
+        "fgos: session transcript not kept (session-not-written): the CLI wrote nothing under \".codex/sessions\" in its home\n"
+      ],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "644",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "cleanupState": "cleaned",
+            "resources": [
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h1",
+                "sessionDir": ".codex/sessions"
+              }
+            ],
+            "cleanupResult": {
+              "kind": "cleaned"
+            },
+            "updatedAt": "<now>"
+          }
+        }
+      ],
+      "homesAfter": []
+    },
+    {
+      "name": "a session folder that escapes",
+      "files": {},
+      "descriptors": {
+        "cmd1": {
+          "contract": "confinement-finalization.v1",
+          "cleanupState": "pending",
+          "resources": [
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h1",
+              "sessionDir": "../x"
+            }
+          ]
+        }
+      },
+      "homes": {
+        "d1/h1": {
+          "files": {
+            "a.txt": "a"
+          },
+          "marker": {}
+        }
+      },
+      "ok": {
+        "state": "cleaned",
+        "homes": 1,
+        "transcriptPath": null,
+        "homeLayout": [
+          {
+            "path": "a.txt",
+            "kind": "file",
+            "files": 1,
+            "bytes": 1,
+            "launchCommandId": "cmd1"
+          }
+        ],
+        "warnings": [
+          {
+            "code": "session-copy-failed",
+            "message": "session directory \"../x\" must be a relative path without \"..\"",
+            "launchCommandId": "cmd1"
+          }
+        ]
+      },
+      "stderr": [
+        "fgos: session transcript not kept (session-copy-failed): session directory \"../x\" must be a relative path without \"..\"\n"
+      ],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "644",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "cleanupState": "cleaned",
+            "resources": [
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h1",
+                "sessionDir": "../x"
+              }
+            ],
+            "cleanupResult": {
+              "kind": "cleaned"
+            },
+            "updatedAt": "<now>"
+          }
+        }
+      ],
+      "homesAfter": []
+    },
+    {
+      "name": "a home of another attempt stops everything",
+      "files": {},
+      "descriptors": {
+        "cmd1": {
+          "contract": "confinement-finalization.v1",
+          "cleanupState": "pending",
+          "resources": [
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h1",
+              "sessionDir": ".codex/sessions"
+            },
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h2",
+              "sessionDir": ".codex/sessions"
+            }
+          ]
+        }
+      },
+      "homes": {
+        "d1/h1": {
+          "files": {
+            ".codex/sessions/s1.jsonl": "{\"turn\":1}\n",
+            ".codex/sessions/deep/s2.jsonl": "two\n",
+            "notes.txt": "n"
+          },
+          "marker": {}
+        },
+        "d1/h2": {
+          "files": {},
+          "marker": {
+            "attemptId": "other"
+          }
+        }
+      },
+      "error": "home-marker-mismatch: $ROOT/tmp/d1/h2 is not a version 2 home of attempt att1 in $ROOT/run",
+      "code": "home-marker-mismatch",
+      "stderr": [],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "664",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "cleanupState": "pending",
+            "resources": [
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h1",
+                "sessionDir": ".codex/sessions"
+              },
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h2",
+                "sessionDir": ".codex/sessions"
+              }
+            ]
+          }
+        }
+      ],
+      "homesAfter": [
+        "d1/h1",
+        "d1/h2"
+      ]
+    },
+    {
+      "name": "a home without a marker stops everything",
+      "files": {},
+      "descriptors": {
+        "cmd1": {
+          "contract": "confinement-finalization.v1",
+          "cleanupState": "pending",
+          "resources": [
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h1",
+              "sessionDir": ".codex/sessions"
+            }
+          ]
+        }
+      },
+      "homes": {
+        "d1/h1": {
+          "files": {
+            "a.txt": "a"
+          }
+        }
+      },
+      "error": "home-marker-unreadable: $ROOT/tmp/d1/h1 has no readable ownership marker",
+      "code": "home-marker-unreadable",
+      "stderr": [],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "664",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "cleanupState": "pending",
+            "resources": [
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h1",
+                "sessionDir": ".codex/sessions"
+              }
+            ]
+          }
+        }
+      ],
+      "homesAfter": [
+        "d1/h1"
+      ]
+    },
+    {
+      "name": "a marker of another run",
+      "files": {},
+      "descriptors": {
+        "cmd1": {
+          "contract": "confinement-finalization.v1",
+          "cleanupState": "pending",
+          "resources": [
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h1",
+              "sessionDir": ".codex/sessions"
+            }
+          ]
+        }
+      },
+      "homes": {
+        "d1/h1": {
+          "files": {},
+          "marker": {
+            "runDir": "/elsewhere"
+          }
+        }
+      },
+      "error": "home-marker-mismatch: $ROOT/tmp/d1/h1 is not a version 2 home of attempt att1 in $ROOT/run",
+      "code": "home-marker-mismatch",
+      "stderr": [],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "664",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "cleanupState": "pending",
+            "resources": [
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h1",
+                "sessionDir": ".codex/sessions"
+              }
+            ]
+          }
+        }
+      ],
+      "homesAfter": [
+        "d1/h1"
+      ]
+    },
+    {
+      "name": "a write-back target that is not valid still removes the home",
+      "files": {},
+      "descriptors": {
+        "cmd1": {
+          "contract": "confinement-finalization.v1",
+          "cleanupState": "pending",
+          "resources": [
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h1",
+              "sessionDir": ".codex/sessions",
+              "credentialWriteBack": {
+                "layout": "nope"
+              }
+            }
+          ]
+        }
+      },
+      "homes": {
+        "d1/h1": {
+          "files": {
+            ".codex/sessions/s1.jsonl": "{\"turn\":1}\n",
+            ".codex/sessions/deep/s2.jsonl": "two\n",
+            "notes.txt": "n"
+          },
+          "marker": {}
+        }
+      },
+      "ok": {
+        "state": "cleaned",
+        "homes": 1,
+        "transcriptPath": "protected/session",
+        "homeLayout": [
+          {
+            "path": ".codex",
+            "kind": "dir",
+            "files": 2,
+            "bytes": 15,
+            "launchCommandId": "cmd1"
+          },
+          {
+            "path": ".codex/sessions",
+            "kind": "dir",
+            "files": 2,
+            "bytes": 15,
+            "launchCommandId": "cmd1"
+          },
+          {
+            "path": "notes.txt",
+            "kind": "file",
+            "files": 1,
+            "bytes": 1,
+            "launchCommandId": "cmd1"
+          }
+        ],
+        "warnings": []
+      },
+      "stderr": [
+        "fgos: credential write-back not done (invalid-target)\n"
+      ],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "644",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "cleanupState": "cleaned",
+            "resources": [
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h1",
+                "sessionDir": ".codex/sessions",
+                "credentialWriteBack": {
+                  "layout": "nope"
+                }
+              }
+            ],
+            "cleanupResult": {
+              "kind": "cleaned"
+            },
+            "updatedAt": "<now>"
+          }
+        },
+        {
+          "path": "protected/session/deep/s2.jsonl",
+          "mode": "600",
+          "body": "two\n"
+        },
+        {
+          "path": "protected/session/s1.jsonl",
+          "mode": "600",
+          "body": {
+            "turn": 1
+          }
+        }
+      ],
+      "homesAfter": []
+    },
+    {
+      "name": "a home whose staging budget is used up is held",
+      "files": {},
+      "descriptors": {
+        "cmd1": {
+          "contract": "confinement-finalization.v1",
+          "cleanupState": "pending",
+          "resources": [
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h1",
+              "sessionDir": ".codex/sessions"
+            }
+          ]
+        }
+      },
+      "homes": {
+        "d1/h1": {
+          "files": {
+            ".codex/sessions/s1.jsonl": "{\"turn\":1}\n",
+            ".codex/sessions/deep/s2.jsonl": "two\n",
+            "notes.txt": "n"
+          },
+          "marker": {},
+          "record": {
+            "credentialKept": {
+              "attempts": 5,
+              "since": "2026-01-01T00:00:00.000Z",
+              "lastCountedAt": 1
+            }
+          }
+        }
+      },
+      "ok": {
+        "state": "credential-home-held",
+        "homes": 1,
+        "transcriptPath": null,
+        "homeLayout": [],
+        "warnings": []
+      },
+      "stderr": [],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "644",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "cleanupState": "retained",
+            "resources": [
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h1",
+                "sessionDir": ".codex/sessions"
+              }
+            ],
+            "cleanupResult": {
+              "kind": "retained"
+            },
+            "updatedAt": "<now>"
+          }
+        }
+      ],
+      "homesAfter": []
+    },
+    {
+      "name": "a descriptor already in its final state is not rewritten",
+      "files": {},
+      "descriptors": {
+        "cmd1": {
+          "contract": "confinement-finalization.v1",
+          "cleanupState": "cleaned",
+          "resources": [
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h1",
+              "sessionDir": ".codex/sessions"
+            }
+          ],
+          "updatedAt": "then"
+        }
+      },
+      "homes": {
+        "d1/h1": {
+          "files": {
+            ".codex/sessions/s1.jsonl": "{\"turn\":1}\n",
+            ".codex/sessions/deep/s2.jsonl": "two\n",
+            "notes.txt": "n"
+          },
+          "marker": {}
+        }
+      },
+      "ok": {
+        "state": "cleaned",
+        "homes": 1,
+        "transcriptPath": "protected/session",
+        "homeLayout": [
+          {
+            "path": ".codex",
+            "kind": "dir",
+            "files": 2,
+            "bytes": 15,
+            "launchCommandId": "cmd1"
+          },
+          {
+            "path": ".codex/sessions",
+            "kind": "dir",
+            "files": 2,
+            "bytes": 15,
+            "launchCommandId": "cmd1"
+          },
+          {
+            "path": "notes.txt",
+            "kind": "file",
+            "files": 1,
+            "bytes": 1,
+            "launchCommandId": "cmd1"
+          }
+        ],
+        "warnings": []
+      },
+      "stderr": [],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "664",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "cleanupState": "cleaned",
+            "resources": [
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h1",
+                "sessionDir": ".codex/sessions"
+              }
+            ],
+            "updatedAt": "<now>"
+          }
+        },
+        {
+          "path": "protected/session/deep/s2.jsonl",
+          "mode": "600",
+          "body": "two\n"
+        },
+        {
+          "path": "protected/session/s1.jsonl",
+          "mode": "600",
+          "body": {
+            "turn": 1
+          }
+        }
+      ],
+      "homesAfter": []
+    },
+    {
+      "name": "two launches, each home once",
+      "files": {},
+      "descriptors": {
+        "cmd1": {
+          "contract": "confinement-finalization.v1",
+          "cleanupState": "pending",
+          "resources": [
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h1",
+              "sessionDir": ".codex/sessions"
+            }
+          ]
+        },
+        "cmd2": {
+          "contract": "confinement-finalization.v1",
+          "cleanupState": "pending",
+          "resources": [
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d1/h1",
+              "sessionDir": ".codex/sessions"
+            },
+            {
+              "resourceId": "private-home",
+              "pathRef": "$ROOT/tmp/d2/h2",
+              "sessionDir": "sess"
+            }
+          ]
+        }
+      },
+      "homes": {
+        "d1/h1": {
+          "files": {
+            ".codex/sessions/s1.jsonl": "{\"turn\":1}\n",
+            ".codex/sessions/deep/s2.jsonl": "two\n",
+            "notes.txt": "n"
+          },
+          "marker": {}
+        },
+        "d2/h2": {
+          "files": {
+            "sess/x.log": "x"
+          },
+          "marker": {}
+        }
+      },
+      "ok": {
+        "state": "cleaned",
+        "homes": 2,
+        "transcriptPath": "protected/session",
+        "homeLayout": [
+          {
+            "path": ".codex",
+            "kind": "dir",
+            "files": 2,
+            "bytes": 15,
+            "launchCommandId": "cmd1"
+          },
+          {
+            "path": ".codex/sessions",
+            "kind": "dir",
+            "files": 2,
+            "bytes": 15,
+            "launchCommandId": "cmd1"
+          },
+          {
+            "path": "notes.txt",
+            "kind": "file",
+            "files": 1,
+            "bytes": 1,
+            "launchCommandId": "cmd1"
+          },
+          {
+            "path": "sess",
+            "kind": "dir",
+            "files": 1,
+            "bytes": 1,
+            "launchCommandId": "cmd2"
+          },
+          {
+            "path": "sess/x.log",
+            "kind": "file",
+            "files": 1,
+            "bytes": 1,
+            "launchCommandId": "cmd2"
+          }
+        ],
+        "warnings": []
+      },
+      "stderr": [],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "644",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "cleanupState": "cleaned",
+            "resources": [
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h1",
+                "sessionDir": ".codex/sessions"
+              }
+            ],
+            "cleanupResult": {
+              "kind": "cleaned"
+            },
+            "updatedAt": "<now>"
+          }
+        },
+        {
+          "path": "protected/confinement-finalization/cmd2.json",
+          "mode": "644",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "cleanupState": "cleaned",
+            "resources": [
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d1/h1",
+                "sessionDir": ".codex/sessions"
+              },
+              {
+                "resourceId": "private-home",
+                "pathRef": "$ROOT/tmp/d2/h2",
+                "sessionDir": "sess"
+              }
+            ],
+            "cleanupResult": {
+              "kind": "cleaned"
+            },
+            "updatedAt": "<now>"
+          }
+        },
+        {
+          "path": "protected/session/deep/s2.jsonl",
+          "mode": "600",
+          "body": "two\n"
+        },
+        {
+          "path": "protected/session/s1.jsonl",
+          "mode": "600",
+          "body": {
+            "turn": 1
+          }
+        },
+        {
+          "path": "protected/session/x.log",
+          "mode": "600",
+          "body": "x"
+        }
+      ],
+      "homesAfter": []
+    },
+    {
+      "name": "an older descriptor names temporary directories",
+      "files": {},
+      "descriptors": {
+        "cmd1": {
+          "contract": "confinement-finalization.v1",
+          "temporaryDirectories": [
+            {
+              "path": "$ROOT/tmp/d1/h1"
+            }
+          ]
+        }
+      },
+      "homes": {
+        "d1/h1": {
+          "files": {
+            "a.txt": "a"
+          },
+          "marker": {}
+        }
+      },
+      "ok": {
+        "state": "cleaned",
+        "homes": 1,
+        "transcriptPath": null,
+        "homeLayout": [
+          {
+            "path": "a.txt",
+            "kind": "file",
+            "files": 1,
+            "bytes": 1,
+            "launchCommandId": "cmd1"
+          }
+        ],
+        "warnings": [
+          {
+            "code": "session-dir-undeclared",
+            "message": "the executor declares no session directory",
+            "launchCommandId": "cmd1"
+          }
+        ]
+      },
+      "stderr": [
+        "fgos: session transcript not kept (session-dir-undeclared): the executor declares no session directory\n"
+      ],
+      "run": [
+        {
+          "path": "protected/confinement-finalization/cmd1.json",
+          "mode": "644",
+          "body": {
+            "contract": "confinement-finalization.v1",
+            "temporaryDirectories": [
+              {
+                "path": "$ROOT/tmp/d1/h1"
+              }
+            ],
+            "cleanupState": "cleaned",
+            "cleanupResult": {
+              "kind": "cleaned"
+            },
+            "updatedAt": "<now>"
+          }
+        }
+      ],
+      "homesAfter": []
+    }
+  ],
   "launch": [
     {
       "name": "unconfined launch at depth zero",

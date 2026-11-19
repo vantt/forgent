@@ -592,6 +592,59 @@ const recorded = [];
 for (const spec of pipelineCases) recorded.push(await recordPipeline(spec));
 fs.rmSync(PIPELINE_ROOT, { recursive: true, force: true });
 
+// ---------------------------------------------------------------- finalize an attempt's homes
+
+// A case lays a run directory and its homes under one fixture root (`$ROOT/run`, homes at `$ROOT/tmp/<dispatch>/<home>`),
+// finalizes attempt `att1` and keeps the answer, the run directory's files and which homes are still there. `marker`
+// writes a version 2 ownership marker (of `att1` unless it names another attempt); `record` writes the host record.
+const cleanupMod = await import(path.join(confinement, 'cleanup.mjs'));
+const home = (rel, over = {}) => ({ resourceId: 'private-home', pathRef: `$ROOT/tmp/${rel}`, sessionDir: '.codex/sessions', ...over });
+const descriptor = (resources, over = {}) => ({ contract: 'confinement-finalization.v1', cleanupState: 'pending', resources, ...over });
+const SESSION = { '.codex/sessions/s1.jsonl': '{"turn":1}\n', '.codex/sessions/deep/s2.jsonl': 'two\n', 'notes.txt': 'n' };
+const finalizeCases = [
+  ['no finalization descriptors', {}],
+  ['a descriptor that is not JSON', { files: { 'run/protected/confinement-finalization/cmd1.json': 'nope' } }],
+  ['a home already gone', { descriptors: { cmd1: descriptor([home('d1/h1')]) } }],
+  ['the session is kept and the home removed', { descriptors: { cmd1: descriptor([home('d1/h1')]) }, homes: { 'd1/h1': { files: SESSION, marker: {} } } }],
+  ['no session folder declared', { descriptors: { cmd1: descriptor([home('d1/h1', { sessionDir: undefined })]) }, homes: { 'd1/h1': { files: { 'a.txt': 'a' }, marker: {} } } }],
+  ['the CLI wrote no session', { descriptors: { cmd1: descriptor([home('d1/h1')]) }, homes: { 'd1/h1': { files: { 'a.txt': 'a' }, marker: {} } } }],
+  ['a session folder that escapes', { descriptors: { cmd1: descriptor([home('d1/h1', { sessionDir: '../x' })]) }, homes: { 'd1/h1': { files: { 'a.txt': 'a' }, marker: {} } } }],
+  ['a home of another attempt stops everything', { descriptors: { cmd1: descriptor([home('d1/h1'), home('d1/h2')]) }, homes: { 'd1/h1': { files: SESSION, marker: {} }, 'd1/h2': { files: {}, marker: { attemptId: 'other' } } } }],
+  ['a home without a marker stops everything', { descriptors: { cmd1: descriptor([home('d1/h1')]) }, homes: { 'd1/h1': { files: { 'a.txt': 'a' } } } }],
+  ['a marker of another run', { descriptors: { cmd1: descriptor([home('d1/h1')]) }, homes: { 'd1/h1': { files: {}, marker: { runDir: '/elsewhere' } } } }],
+  ['a write-back target that is not valid still removes the home', { descriptors: { cmd1: descriptor([home('d1/h1', { credentialWriteBack: { layout: 'nope' } })]) }, homes: { 'd1/h1': { files: SESSION, marker: {} } } }],
+  ['a home whose staging budget is used up is held', { descriptors: { cmd1: descriptor([home('d1/h1')]) }, homes: { 'd1/h1': { files: SESSION, marker: {}, record: { credentialKept: { attempts: 5, since: '2026-01-01T00:00:00.000Z', lastCountedAt: 1 } } } } }],
+  ['a descriptor already in its final state is not rewritten', { descriptors: { cmd1: descriptor([home('d1/h1')], { cleanupState: 'cleaned', updatedAt: 'then' }) }, homes: { 'd1/h1': { files: SESSION, marker: {} } } }],
+  ['two launches, each home once', { descriptors: { cmd1: descriptor([home('d1/h1')]), cmd2: descriptor([home('d1/h1'), home('d2/h2', { sessionDir: 'sess' })]) }, homes: { 'd1/h1': { files: SESSION, marker: {} }, 'd2/h2': { files: { 'sess/x.log': 'x' }, marker: {} } } }],
+  ['an older descriptor names temporary directories', { descriptors: { cmd1: { contract: 'confinement-finalization.v1', temporaryDirectories: [{ path: '$ROOT/tmp/d1/h1' }] } }, homes: { 'd1/h1': { files: { 'a.txt': 'a' }, marker: {} } } }],
+].map(([name, c]) => {
+  const root = fixtureRoot('cr-fin-');
+  const runDir = path.join(root, 'run');
+  const errors = [];
+  const realError = process.stderr.write.bind(process.stderr);
+  try {
+    fs.mkdirSync(runDir, { recursive: true });
+    writeFiles(root, c.files);
+    for (const [id, body] of Object.entries(c.descriptors ?? {})) writeFiles(runDir, { [`protected/confinement-finalization/${id}.json`]: unscrub(body, root) });
+    for (const [rel, h] of Object.entries(c.homes ?? {})) {
+      const dir = path.join(root, 'tmp', rel);
+      fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+      writeFiles(dir, h.files);
+      const dispatchId = path.basename(path.dirname(dir));
+      if (h.marker) cleanupMod.writeOwnershipMarkerV2(dir, { attemptId: 'att1', runDir, dispatchId, ...h.marker });
+      if (h.record) cleanupMod.writeAttemptHomeRecord(dir, { attemptId: 'att1', runDir, dispatchId, launchCommandId: 'cmd1', ...h.record });
+    }
+    process.stderr.write = (chunk) => { errors.push(scrubText(String(chunk), root)); return true; };
+    const answer = observe(() => authority.finalizeAttemptHome({ runDir, attemptId: 'att1' }));
+    process.stderr.write = realError;
+    const homesAfter = Object.keys(c.homes ?? {}).filter((rel) => fs.existsSync(path.join(root, 'tmp', rel)));
+    return { name, files: c.files ?? {}, descriptors: c.descriptors ?? {}, homes: c.homes ?? {}, ...scrub(answer, root), stderr: errors, run: scrubClock(scrub(tree(runDir), root)), homesAfter };
+  } finally {
+    process.stderr.write = realError;
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 // ---------------------------------------------------------------- write
 
 fs.mkdirSync(outDir, { recursive: true });
@@ -612,6 +665,7 @@ const authorityVectors = {
   controlDelivery: deliveryCases,
   ownWorktreeUnavailable: worktreeCases,
   seatSessionDir: sessionDirCases,
+  finalizeAttemptHome: finalizeCases,
   launch: recorded,
 };
 write('request.v1.json', requestVectors);

@@ -17,8 +17,8 @@ use fgos_execution_engine::settlement::{
 use fgos_execution_engine::steps::{
     cleanup_trust, finalize_home, find_worker_claim, provider_stop_of,
     resolve_worker_artifact_path, run_attempt_step, settle_attempt, terminal_stop_message,
-    watch_writes_outside_workspace, AttemptHomeFinalizer, FinalizedHome, HomeState, PaneScreen,
-    StepError, StepOutcome, StepPorts,
+    watch_writes_outside_workspace, AttemptHomeFinalizer, ConfinementHomes, FinalizedHome,
+    HomeState, PaneScreen, StepError, StepOutcome, StepPorts,
 };
 use fgos_run_supervisor::controller::lease::{
     acquire_run_control, build_run_control_holder, settle_run_control, AcquireOptions,
@@ -1056,4 +1056,138 @@ fn finalize_home_retries_a_kept_home_and_removes_the_side_file_only_once_the_hom
         &Homes(Ok(HomeState::Cleaned)),
     );
     assert_eq!(refused.unwrap_err().code, "envelope-invalid");
+}
+
+/// A real attempt home on disk: a pi login renewed inside it, an ownership marker of the attempt, the finalization
+/// descriptor that names where the login goes back to, and the side file of the attempt.
+struct RealHome {
+    root: PathBuf,
+    run_dir: PathBuf,
+    home: PathBuf,
+    side: PathBuf,
+    pending: PathBuf,
+}
+
+fn real_home(label: &str, marker_attempt: &str) -> RealHome {
+    use fgos_execution_engine::confinement::cleanup::write_ownership_marker_v2;
+    let root = std::fs::canonicalize(scratch(label)).unwrap();
+    let (run_dir, source, runtime) = (root.join("run"), root.join("source"), root.join("runtime"));
+    let home = root.join("tmp").join("d1").join("h1");
+    for dir in [&run_dir, &source, &home] {
+        std::fs::create_dir_all(dir).unwrap();
+    }
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_millis() as f64;
+    let login = |refresh: &str, expires: f64| {
+        json!({ "openai-codex": { "type": "oauth", "access": "a", "refresh": refresh, "expires": expires } })
+            .to_string()
+    };
+    std::fs::write(source.join("auth.json"), login("old", now + 3_600_000.0)).unwrap();
+    std::fs::write(
+        home.join("auth.json"),
+        login("renewed", now + 8.0 * 3_600_000.0),
+    )
+    .unwrap();
+    std::fs::create_dir_all(home.join("sessions")).unwrap();
+    std::fs::write(home.join("sessions").join("s1.jsonl"), "{\"turn\":1}\n").unwrap();
+    write_ownership_marker_v2(
+        &home,
+        Some(marker_attempt),
+        Some(run_dir.to_str().unwrap()),
+        Some("d1"),
+        "private-home",
+    )
+    .unwrap();
+    let target = json!({ "provider": "openai-codex", "accountId": "acct", "kind": "home-files", "home": source, "layout": "pi-auth-json", "runtimeDir": runtime });
+    let descriptor = json!({ "contract": "confinement-finalization.v1", "cleanupState": "pending", "resources": [
+        { "resourceId": "private-home", "pathRef": home, "sessionDir": "sessions", "credentialWriteBack": target }
+    ] });
+    let dir = run_dir.join("protected").join("confinement-finalization");
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(dir.join("attempt-1.json"), descriptor.to_string()).unwrap();
+    let side = run_dir.join("side.json");
+    std::fs::write(&side, "{}").unwrap();
+    let pending = runtime.join("account-locks/openai-codex/acct/pending");
+    RealHome {
+        root,
+        run_dir,
+        home,
+        side,
+        pending,
+    }
+}
+
+#[test]
+fn finalize_home_stages_a_renewed_login_keeps_the_session_and_removes_a_real_attempt_home() {
+    use fgos_execution_engine::confinement::request::StageRenewedLogin;
+    use fgos_execution_engine::credentials::{NoLocks, NoSqlite};
+    let stage = StageRenewedLogin {
+        sqlite: &NoSqlite,
+        locks: &NoLocks,
+    };
+    let homes = ConfinementHomes { stage: &stage };
+    let envelope =
+        |h: &RealHome| json!({ "runDir": h.run_dir, "attemptId": "attempt-1", "sideFile": h.side });
+
+    // The renewed login goes back beside the account's store, the session is kept, the home and side file go.
+    let h = real_home("real-home-staged", "attempt-1");
+    let done = step_json(finalize_home(&envelope(&h), &homes));
+    assert_eq!(done["result"], "done", "{done}");
+    assert_eq!(done["detail"]["homes"], 1);
+    assert_eq!(done["detail"]["transcriptPath"], "protected/session");
+    assert!(!h.home.exists() && !h.side.exists());
+    assert!(h.run_dir.join("protected/session/s1.jsonl").exists());
+    let staged: Vec<PathBuf> = std::fs::read_dir(&h.pending)
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .collect();
+    assert_eq!(staged.len(), 1);
+    assert!(std::fs::read_to_string(staged[0].join("auth.json"))
+        .unwrap()
+        .contains("renewed"));
+    let descriptor: Value = serde_json::from_str(
+        &std::fs::read_to_string(
+            h.run_dir
+                .join("protected/confinement-finalization/attempt-1.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(descriptor["cleanupState"], "cleaned");
+    // Run again after a crash: nothing left to finalize, still done.
+    assert_eq!(
+        step_json(finalize_home(&envelope(&h), &homes))["result"],
+        "done"
+    );
+    let _ = std::fs::remove_dir_all(&h.root);
+
+    // Staging fails where no copy is safe yet: the home and side file stay and the step asks to be run again.
+    let h = real_home("real-home-kept", "attempt-1");
+    std::fs::create_dir_all(h.pending.parent().unwrap()).unwrap();
+    std::fs::write(&h.pending, "not a directory").unwrap();
+    let kept = step_json(finalize_home(&envelope(&h), &homes));
+    assert_eq!(
+        kept,
+        json!({"result": "retry", "reason": "credential-home-kept"})
+    );
+    assert!(h.home.join("auth.json").exists() && h.side.exists());
+    let record: Value = serde_json::from_str(
+        &std::fs::read_to_string(h.home.parent().unwrap().join("attempt-home.json")).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(record["credentialKept"]["attempts"], 1);
+    let _ = std::fs::remove_dir_all(&h.root);
+
+    // A home of another attempt is refused before anything is removed.
+    let h = real_home("real-home-other", "attempt-2");
+    let refused = step_json(finalize_home(&envelope(&h), &homes));
+    assert_eq!(refused["error"]["code"], "internal");
+    assert!(refused["error"]["message"]
+        .as_str()
+        .unwrap()
+        .starts_with("home-marker-mismatch: "));
+    assert!(h.home.join("auth.json").exists() && h.side.exists());
+    let _ = std::fs::remove_dir_all(&h.root);
 }

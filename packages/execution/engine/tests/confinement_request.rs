@@ -594,3 +594,96 @@ fn a_launch_is_refused_or_prepared_and_its_records_published_as_the_original_did
     }
     report.finish("launch pipeline");
 }
+
+// ------------------------------------------------------------------ finalizing an attempt's homes
+
+#[test]
+fn finalizing_an_attempts_homes_keeps_the_session_removes_its_own_homes_and_refuses_anothers() {
+    use fgos_execution_engine::confinement::cleanup::{
+        write_attempt_home_record, write_ownership_marker_v2,
+    };
+    use fgos_execution_engine::credentials::{NoLocks, NoSqlite};
+
+    let file = vectors("authority.v1.json");
+    let mut report = Report::default();
+    let stage = StageRenewedLogin {
+        sqlite: &NoSqlite,
+        locks: &NoLocks,
+    };
+    for case in cases(&file, "finalizeAttemptHome") {
+        let root = scratch("finalize");
+        let root_text = root.to_string_lossy().to_string();
+        let run_dir = root.join("run");
+        let run_text = run_dir.to_string_lossy().to_string();
+        fs::create_dir_all(&run_dir).unwrap();
+        write_files(&root, &case["files"]);
+        for (id, body) in case["descriptors"].as_object().into_iter().flatten() {
+            let body = swap_root(body, "$ROOT", &root_text);
+            write_files(
+                &run_dir,
+                &json!({ format!("protected/confinement-finalization/{id}.json"): body }),
+            );
+        }
+        for (rel, home) in case["homes"].as_object().into_iter().flatten() {
+            let dir = root.join("tmp").join(rel);
+            fs::create_dir_all(&dir).unwrap();
+            write_files(&dir, &home["files"]);
+            let dispatch = dir
+                .parent()
+                .unwrap()
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .to_string();
+            if let Some(marker) = home.get("marker") {
+                let text = |key: &str, or: &str| marker[key].as_str().unwrap_or(or).to_string();
+                write_ownership_marker_v2(
+                    &dir,
+                    Some(&text("attemptId", "att1")),
+                    Some(&text("runDir", &run_text)),
+                    Some(&dispatch),
+                    "private-home",
+                )
+                .unwrap();
+            }
+            if let Some(record) = home.get("record") {
+                let mut fields = json!({ "attemptId": "att1", "runDir": run_text, "dispatchId": dispatch, "launchCommandId": "cmd1" });
+                for (key, value) in record.as_object().unwrap() {
+                    fields[key] = value.clone();
+                }
+                write_attempt_home_record(&dir, &fields).unwrap();
+            }
+        }
+        let answer = match finalize_attempt_home(&run_dir, "att1", &stage, 1_767_323_045_000) {
+            Ok(done) => json!({ "ok": {
+                "state": done.state,
+                "homes": done.homes,
+                "transcriptPath": done.transcript_path,
+                "homeLayout": done.home_layout,
+                "warnings": done.warnings,
+            } }),
+            Err(err) => json!({ "error": err.message, "code": err.code }),
+        };
+        let homes_after: Vec<&String> = case["homes"]
+            .as_object()
+            .into_iter()
+            .flatten()
+            .map(|(rel, _)| rel)
+            .filter(|rel| root.join("tmp").join(rel).exists())
+            .collect();
+        let mut actual = scrubbed(&answer, &root_text);
+        actual["run"] = scrubbed(&json!(tree(&run_dir)), &root_text);
+        actual["homesAfter"] = json!(homes_after);
+        let mut expected = json!({ "run": case["run"], "homesAfter": case["homesAfter"] });
+        match case.get("error") {
+            Some(error) => {
+                expected["error"] = error.clone();
+                expected["code"] = case["code"].clone();
+            }
+            None => expected["ok"] = case["ok"].clone(),
+        }
+        report.expect(case, actual, &expected);
+        let _ = fs::remove_dir_all(&root);
+    }
+    report.finish("finalize attempt home");
+}

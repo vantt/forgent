@@ -11,6 +11,8 @@ use std::path::Path;
 use serde_json::{json, Value};
 
 use super::{StepError, StepOutcome, StepResult};
+use crate::confinement::cleanup::CredentialWriteBack;
+use crate::confinement::request::finalize_attempt_home;
 
 /// How [`AttemptHomeFinalizer::finalize`] left the attempt's homes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,6 +39,37 @@ pub struct FinalizedHome {
 /// The Confinement Authority's finalization of an attempt's homes.
 pub trait AttemptHomeFinalizer {
     fn finalize(&self, run_dir: &Path, attempt_id: &str) -> Result<FinalizedHome, StepError>;
+}
+
+/// The Confinement Authority's finalization ([`finalize_attempt_home`]), staging a renewed login through `stage`
+/// (credential renewal's write-back with the host's SQLite engine and account locks).
+pub struct ConfinementHomes<'a> {
+    pub stage: &'a dyn CredentialWriteBack,
+}
+
+impl AttemptHomeFinalizer for ConfinementHomes<'_> {
+    fn finalize(&self, run_dir: &Path, attempt_id: &str) -> Result<FinalizedHome, StepError> {
+        let now_ms = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_or(0, |d| d.as_millis() as i64);
+        let done =
+            finalize_attempt_home(run_dir, attempt_id, self.stage, now_ms).map_err(|err| {
+                // The step entry names an OS fault `io` and anything else `internal`; the message keeps the code.
+                let io = matches!(err.code.as_deref(), Some("ENOSPC" | "EACCES" | "EIO"));
+                StepError::new(if io { "io" } else { "internal" }, err.message)
+            })?;
+        Ok(FinalizedHome {
+            state: match done.state {
+                "credential-home-kept" => HomeState::CredentialHomeKept,
+                "credential-home-held" => HomeState::CredentialHomeHeld,
+                _ => HomeState::Cleaned,
+            },
+            homes: done.homes,
+            transcript_path: done.transcript_path.map(str::to_string),
+            home_layout: done.home_layout,
+            warnings: done.warnings,
+        })
+    }
 }
 
 pub fn finalize_home(envelope: &Value, finalizer: &dyn AttemptHomeFinalizer) -> StepResult {

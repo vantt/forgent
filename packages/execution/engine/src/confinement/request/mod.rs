@@ -5,13 +5,14 @@
 //! Requests are JSON values here, as they are at the other boundaries of the dispatch seam, judged as Node judged
 //! them. What other modules own is reached through them: policy shapes and legacy flags (`confinement::policy`),
 //! the driver, registry and attestation store (`confinement::driver`), the executor model, runner check and
-//! canonical JSON. Twin of `src/runner/dispatch/confinement/{request,authority}.mjs`; the golden vectors under
+//! canonical JSON; finalizing an attempt's homes goes through the cleanup module and credential renewal. Twin of `src/runner/dispatch/confinement/{request,authority}.mjs`; the golden vectors under
 //! `packages/execution/contracts/confinement-request/` hold both to the same answers.
 
 mod attestation;
 mod build;
 mod delivery;
 mod error;
+mod finalize;
 mod js;
 mod launch;
 mod launch_context;
@@ -22,6 +23,7 @@ pub use attestation::build_confinement_attestation;
 pub use build::{build_confinement_request, system_clock_parts, BuildClock};
 pub use delivery::{control_delivery_of, effective_backend_of, own_worktree_unavailable};
 pub use error::RequestError;
+pub use finalize::{finalize_attempt_home, FinalizedAttemptHome, StageRenewedLogin};
 pub use launch::{prepare_confinement_for_launch, Launch, LaunchHost, ProbeVerdict, Probes};
 pub use launch_context::{
     cross_check_assignment_launch_context, validate_assignment_launch_context,
