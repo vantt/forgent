@@ -159,8 +159,7 @@ fn admission_with_land<F: wal::FileSystem>(
             let op_id = &chain.last().operation_id;
             if wal.operation_live(op_id) {
                 // A live writer owns the chain: retry, do not recover.
-                let kind = format!("{:?}", chain.intent().kind);
-                let kind = kind.split(|c: char| !c.is_alphanumeric()).next().unwrap_or_default();
+                let kind = chain.intent().kind.name();
                 let mut e = busy("resource-busy")
                     .with_diagnostic(format!("operation {op_id} ({kind}) is held by a live writer"));
                 e.operation_id = Some(op_id.clone());

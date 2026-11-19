@@ -56,6 +56,34 @@ pub fn rank(name: &str) -> Result<u64, ScopeError> {
         .ok_or_else(|| ScopeError::Registry(name.into()))
 }
 
+/// Resolve registry lock `name`'s template with `params`: every placeholder
+/// needs a non-empty value without `<` or `>`, and the result is absolute.
+/// The only place the template is filled; `acquire` and probes share it.
+pub fn lock_path(name: &str, params: &BTreeMap<String, String>) -> Result<PathBuf, ScopeError> {
+    let row = entry(name)?;
+    let mut path = row["v3Path"]
+        .as_str()
+        .ok_or_else(|| ScopeError::Registry(name.into()))?
+        .to_owned();
+    while let Some(start) = path.find('<') {
+        let end = path[start..]
+            .find('>')
+            .map(|n| start + n)
+            .ok_or_else(|| ScopeError::Registry("malformed template".into()))?;
+        let key = &path[start + 1..end];
+        let value = params
+            .get(key)
+            .filter(|v| !v.is_empty() && !v.contains(['<', '>']))
+            .ok_or_else(|| ScopeError::Registry(format!("lock-path-param-missing: {key}")))?;
+        path.replace_range(start..=end, value);
+    }
+    let path = PathBuf::from(path);
+    if !path.is_absolute() {
+        return Err(ScopeError::Registry("absolute lock path required".into()));
+    }
+    Ok(path)
+}
+
 /// Owns acquired locks and close-only copies of the caller's verified holds.
 /// No global rank set; dropping the scope closes every description it owns.
 #[derive(Debug)]
@@ -139,26 +167,7 @@ impl<'a> LockScope<'a> {
                 "hot-mutex requires the hot-state port".into(),
             ));
         }
-        let mut path = row["v3Path"]
-            .as_str()
-            .ok_or_else(|| ScopeError::Registry(name.into()))?
-            .to_owned();
-        while let Some(start) = path.find('<') {
-            let end = path[start..]
-                .find('>')
-                .map(|n| start + n)
-                .ok_or_else(|| ScopeError::Registry("malformed template".into()))?;
-            let key = &path[start + 1..end];
-            let value = params
-                .get(key)
-                .filter(|v| !v.is_empty() && !v.contains(['<', '>']))
-                .ok_or_else(|| ScopeError::Registry(format!("lock-path-param-missing: {key}")))?;
-            path.replace_range(start..=end, value);
-        }
-        let path = PathBuf::from(path);
-        if !path.is_absolute() {
-            return Err(ScopeError::Registry("absolute lock path required".into()));
-        }
+        let path = lock_path(name, params)?;
         std::fs::create_dir_all(
             path.parent()
                 .ok_or_else(|| ScopeError::Registry("lock parent missing".into()))?,

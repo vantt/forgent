@@ -360,6 +360,26 @@ pub enum OperationKind {
         targets: Vec<(String, Tip, Tip)>,
     },
 }
+impl OperationKind {
+    /// Stable variant name for diagnostics.
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::Land(_) => "Land",
+            Self::Restore(_) => "Restore",
+            Self::ScopedCommit(_) => "ScopedCommit",
+            Self::Sync(_) => "Sync",
+            Self::PublicationCas => "PublicationCas",
+            Self::WorktreeCreate { .. } => "WorktreeCreate",
+            Self::WorktreeMove { .. } => "WorktreeMove",
+            Self::WorktreeRemove { .. } => "WorktreeRemove",
+            Self::RefUpdate { .. } => "RefUpdate",
+            Self::RefDelete => "RefDelete",
+            Self::ConfigChange(_) => "ConfigChange",
+            Self::RemoteFetch { .. } => "RemoteFetch",
+            Self::RemotePush { .. } => "RemotePush",
+        }
+    }
+}
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct Intent {
@@ -1691,24 +1711,19 @@ impl<F: FileSystem> Wal<F> {
             Installed::AlreadyExists => self.existing(id, &intent),
         }
     }
-    /// Registry path of operation `id`'s `git-operation` lock; the template
-    /// is the only place the layout is written down.
+    /// Registry path of operation `id`'s `git-operation` lock, from the
+    /// holder-lock door.
     fn operation_lock_path(&self, id: &str) -> Option<PathBuf> {
-        if !valid_id(id) {
-            return None;
-        }
-        let registry: serde_json::Value = serde_json::from_str(include_str!(
-            "../../../holder-lock/contracts/lock-registry.v1.json"
-        ))
-        .ok()?;
-        let template = registry["locks"]
-            .as_array()?
-            .iter()
-            .find(|row| row["name"] == "git-operation")?["v3Path"]
-            .as_str()?
-            .replace("<common>", self.common.path().to_str()?)
-            .replace("<operationId>", id);
-        Some(PathBuf::from(template))
+        fgos_holder_lock::lock_path("git-operation", &self.operation_lock_params(id)?).ok()
+    }
+    fn operation_lock_params(
+        &self,
+        id: &str,
+    ) -> Option<std::collections::BTreeMap<String, String>> {
+        Some(std::collections::BTreeMap::from([
+            ("common".to_owned(), self.common.path().to_str()?.to_owned()),
+            ("operationId".to_owned(), id.to_owned()),
+        ]))
     }
     /// Take `git-operation` for a chain this Wal just created, in a scope of
     /// its own (operations take worktree-admin and main-checkout after
@@ -1719,16 +1734,10 @@ impl<F: FileSystem> Wal<F> {
         let Ok(mut scope) = fgos_holder_lock::LockScope::seeded(vec![]) else {
             return;
         };
-        let (Some(common), Ok(mut held)) = (
-            self.common.path().to_str().map(str::to_owned),
-            self.op_locks.lock(),
-        ) else {
+        let (Some(params), Ok(mut held)) = (self.operation_lock_params(id), self.op_locks.lock())
+        else {
             return;
         };
-        let params = std::collections::BTreeMap::from([
-            ("common".to_owned(), common),
-            ("operationId".to_owned(), id.to_owned()),
-        ]);
         if scope
             .acquire("git-operation", &params, fgos_holder_lock::Wait::Ms(0))
             .is_ok()
@@ -2539,6 +2548,14 @@ impl<F: FileSystem> Wal<F> {
         self.fs.checkpoint("removed-records-fsync")?;
         fs::remove_dir(self.root.path().join(id))?;
         self.fs.checkpoint("remove-operation")?;
+        // The lock was released at the outcome; an absent file probes free.
+        if let Some(lock) = self.operation_lock_path(id) {
+            match fs::remove_file(lock) {
+                Ok(()) => {}
+                Err(e) if e.kind() == io::ErrorKind::NotFound => {}
+                Err(e) => return Err(e.into()),
+            }
+        }
         fgos_durable_file::sync_directory(&self.root.path())?;
         Ok(self.fs.checkpoint("removed-operation-parent-fsync")?)
     }

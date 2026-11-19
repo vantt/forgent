@@ -138,6 +138,21 @@ fn a_live_writers_pending_operation_answers_busy_and_a_killed_one_recovery_requi
     assert_eq!(dead.operation_id.as_deref(), Some("pushing"));
     fs::remove_dir_all(&temp).unwrap();
 }
+/// A compaction caller with no candidate ref and an always-valid borrow.
+struct NoCandidate;
+impl wal::RecoveryReader for NoCandidate {
+    fn read_ref(&self, _: &str) -> wal::WalResult<wal::ObservedRef> {
+        Ok(wal::ObservedRef::Direct(wal::Tip::Absent))
+    }
+    fn candidate_intact(&self, _: &wal::Intent) -> wal::WalResult<bool> {
+        Ok(false)
+    }
+}
+impl wal::PublicationAuthority for NoCandidate {
+    fn validate_publication_borrow(&self, _: &wal::Intent) -> wal::WalResult<()> {
+        Ok(())
+    }
+}
 #[test]
 fn the_operation_lock_is_released_once_the_operation_has_finished() {
     let f = Fixture::new();
@@ -160,5 +175,18 @@ fn the_operation_lock_is_released_once_the_operation_has_finished() {
     drop(s);
     let common = fs::canonicalize(f.main.join(".git")).unwrap();
     let wal = wal::Wal::open_existing(&common, wal::OsFileSystem).unwrap();
+    assert!(!wal.operation_live("finished"));
+    let lock = common.join("fgos/git/locks/op--finished.lock");
+    assert!(
+        lock.exists(),
+        "the lock file outlives the outcome until compaction"
+    );
+    wal.compact(
+        &wal.inspect("finished").unwrap(),
+        &NoCandidate,
+        &NoCandidate,
+    )
+    .unwrap();
+    assert!(!lock.exists(), "compaction removes the operation lock file");
     assert!(!wal.operation_live("finished"));
 }
