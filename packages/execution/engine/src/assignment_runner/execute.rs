@@ -1178,6 +1178,7 @@ fn run_admitted(
             gate_kill_grace_ms: settings.gate_kill_grace_ms,
             on_chunk,
             stop_screen,
+            custody: opts.custody,
         },
     )?;
     Ok(settled)

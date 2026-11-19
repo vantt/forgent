@@ -654,9 +654,9 @@ pub struct AttemptLocks {
     pub cwd_lease: Option<Handle>,
     /// The caller holds the cwd lease (custody) and keeps it; the attempt never acquires one.
     pub cwd_lease_is_custody: bool,
-    /// Under custody, the copy of the caller's lease that goes to the supervisor as descriptor 4: lent from a
-    /// close-only duplicate of the caller's handle (`Handle::lend`), so the caller's own handle stays its own, as
-    /// Node's `spawnWithLocks([attempt, custody])` hands the custody description over without taking it.
+    /// Under custody, the copy of the caller's lease that goes to the supervisor as descriptor 4, lent from the
+    /// caller's handle (`Handle::lend`), as Node's `spawnWithLocks([attempt, custody])` hands the custody
+    /// description over: the caller keeps holding it and its release only closes.
     pub custody_copy: Option<fs::File>,
     /// Under custody, the lock file of the caller's lease, which the envelope names.
     pub custody_path: Option<PathBuf>,
@@ -783,17 +783,16 @@ pub fn acquire_attempt_locks(request: AttemptLockRequest) -> Result<AttemptLocks
     })
 }
 
-/// The supervisor's copy of the caller's cwd lease: a close-only duplicate of the caller's handle, lent, so the
-/// caller's handle is neither lent nor released (a later borrow of its custody stays possible). Where a lock does
-/// not pass to a child with its handle (Windows) there is no copy: the attempt that writes is refused there first.
+/// The supervisor's copy of the caller's cwd lease: the caller's own handle is lent (`Handle::lend`), so its later
+/// release only closes its copy and never waits on or ends the supervisor. The launch records the supervisor on
+/// the handle right after the spawn (`Handle::lent_to`); from then on a borrow of the custody (the verify, the
+/// commit) lets the supervisor keep its copy. Where a lock does not pass to a child with its handle (Windows) there
+/// is no copy: the attempt that writes is refused there first.
 fn lend_custody(custody: &Handle) -> Result<Option<fs::File>, DispatchError> {
     if !cfg!(unix) {
         return Ok(None);
     }
-    let duplicate = BorrowedHandle::new(custody)
-        .map_err(|e| DispatchError::new("lock-handle-invalid", format!("custody: {e:?}")))?;
-    duplicate
-        .as_ref()
+    custody
         .lend()
         .map(Some)
         .map_err(|e| DispatchError::new("lock-handle-invalid", format!("custody: {e}")))

@@ -921,7 +921,7 @@ fn the_attempt_lock_is_lent_to_the_supervisor_and_the_controller_closes_its_copy
 
     let handing = std::time::Instant::now();
     let (bound, mut started) =
-        start_and_bind(&mut attempt, &envelope, &Map::new()).expect("started");
+        start_and_bind(&mut attempt, &envelope, &Map::new(), None).expect("started");
     assert_eq!(bound, Binding::Bound);
     assert!(attempt.handed_over);
     assert!(

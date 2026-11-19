@@ -359,7 +359,9 @@ fn writing_run() {
     std::fs::write(scratch.0.join("write-me"), "b").unwrap();
     let settle = settle_when_ran(main.join(".fgos/assignments"), vec!["b".into()]);
     let options = json!({
-        "unitData": { "id": "u2", "objective": "add b", "capability": "execute", "writes": ["b"] },
+        // The verify borrows the run's custody, which went to the supervisor lent: it runs only because the launch
+        // recorded the supervisor on the lent handle.
+        "unitData": { "id": "u2", "objective": "add b", "capability": "execute", "writes": ["b"], "verify": "test -f b" },
         "cwd": tree, "runnerConfig": runner(&bin),
         "session": { "pathEnv": bin, "herdrPresent": false, "postureAtLaunch": true, "headless": true },
     });
