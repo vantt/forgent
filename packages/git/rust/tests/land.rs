@@ -991,6 +991,56 @@ fn a_prepare_that_fails_after_the_candidate_exists_removes_it_and_names_the_refu
     assert_eq!(git(&f.main, &["worktree", "list"]).lines().count(), 1);
 }
 
+struct FailAt(&'static str);
+impl wal::FileSystem for FailAt {
+    fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+        if step == self.0 {
+            Err(std::io::Error::other("interrupted at production boundary"))
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[test]
+fn a_candidate_a_land_chain_names_survives_a_failed_prepare_and_recovery_removes_it() {
+    let f = Fixture::new();
+    let error = f
+        .driver
+        .prepare_land(
+            &f.repo,
+            vec![],
+            &f.request,
+            "fixture",
+            "named",
+            &FailAt("land-pin-candidate"),
+            0,
+        )
+        .err()
+        .unwrap();
+    let diagnostics = String::from_utf8_lossy(&error.stderr).into_owned();
+    assert!(
+        diagnostics.contains("Land candidate retained at"),
+        "{diagnostics}"
+    );
+    let candidates = f.main.join(".fgos/runtime/git-candidates");
+    let dirs: Vec<_> = fs::read_dir(&candidates)
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .collect();
+    assert_eq!(dirs.len(), 1, "the chained candidate is not removed");
+    f.driver
+        .recover_land(&f.repo, vec![], "fixture", "named")
+        .unwrap();
+    assert!(f
+        .driver
+        .acknowledge_land(&f.repo, "fixture", "named", "test", &wal::OsFileSystem)
+        .unwrap()
+        .is_empty());
+    assert!(!dirs[0].exists());
+    assert_eq!(git(&f.main, &["worktree", "list"]).lines().count(), 1);
+}
+
 #[test]
 fn declared_resolution_bytes_are_frozen_before_consumer_verification() {
     let f = Fixture::new();
