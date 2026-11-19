@@ -380,6 +380,32 @@ fn a_failing_gate_names_its_failing_test_keeps_the_full_log_and_settles_its_own_
     assert_eq!(fixed.main_sha, f.remote_tip());
 }
 
+#[test]
+fn a_failing_gate_that_leaves_ignored_bytes_names_the_gate_first_and_leaves_no_candidate() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    let exclude = f.main.join(".git/info/exclude");
+    fs::create_dir_all(exclude.parent().unwrap()).unwrap();
+    fs::write(&exclude, "*.out\n").unwrap();
+    let refusal = f
+        .land(
+            &branch("topic"),
+            &config(vec![gate("echo junk > build.out; echo boom >&2; exit 1")]),
+        )
+        .unwrap_err();
+    assert_eq!(refusal.code, "land-gate-failed");
+    assert!(refusal.detail.starts_with("echo junk"));
+    assert!(refusal.detail.contains("boom"));
+    assert_eq!(refusal.cleanup_note, None);
+    let candidates = f.main.join(".fgos/runtime/git-candidates");
+    let left = fs::read_dir(&candidates).map(|d| d.count()).unwrap_or(0);
+    assert_eq!(
+        left, 0,
+        "the candidate checkout is removed with its ignored bytes"
+    );
+    assert_eq!(git(&f.main, &["worktree", "list"]).lines().count(), 1);
+}
+
 fn pins(f: &Fixture) -> String {
     git(&f.main, &["for-each-ref", "refs/fgos/git-operations"])
 }

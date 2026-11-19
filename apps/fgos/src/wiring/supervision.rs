@@ -1155,7 +1155,8 @@ fn run_land(root: &Path, command: &LandCommand) -> Result<Value, CategorisedRefu
         log_dir: &log_dir,
         wait_ms: 30_000,
     };
-    let landed = land(command, &config, &ports).map_err(|why| refused(&why.code, why.detail))?;
+    let landed =
+        land(command, &config, &ports).map_err(|why| refused(&why.code, why.detail_with_note()))?;
     Ok(json!({
         "mainSha": landed.main_sha, "landedPaths": landed.landed_paths,
         "retries": landed.retries, "gatesRun": landed.gates_run,

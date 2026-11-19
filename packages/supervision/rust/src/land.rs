@@ -86,6 +86,19 @@ pub struct LandRefusal {
     pub detail: String,
     /// The full output of the gate or regeneration that failed, when one ran.
     pub gate_log: Option<PathBuf>,
+    /// Trouble releasing the door's own scratch after this refusal. Secondary: `code` and `detail`
+    /// always name the primary refusal.
+    pub cleanup_note: Option<String>,
+}
+
+impl LandRefusal {
+    /// The primary detail first, then the cleanup note when one exists.
+    pub fn detail_with_note(&self) -> String {
+        match &self.cleanup_note {
+            Some(note) => format!("{}\ncleanup note: {note}", self.detail),
+            None => self.detail.clone(),
+        }
+    }
 }
 
 fn refuse(code: &str, detail: impl Into<String>) -> LandRefusal {
@@ -93,6 +106,7 @@ fn refuse(code: &str, detail: impl Into<String>) -> LandRefusal {
         code: code.into(),
         detail: detail.into(),
         gate_log: None,
+        cleanup_note: None,
     }
 }
 
@@ -122,6 +136,7 @@ fn from_git(e: OperationError) -> LandRefusal {
         code: e.cause,
         detail,
         gate_log: None,
+        cleanup_note: None,
     }
 }
 
@@ -912,8 +927,7 @@ impl Lander<'_> {
             if let Err(e) = self.abandon(session, &id) {
                 return match attempt {
                     Err(mut refusal) => {
-                        refusal.detail =
-                            format!("{}; settling it failed: {}", refusal.detail, e.detail);
+                        refusal.cleanup_note = Some(format!("settling it failed: {}", e.detail));
                         Err(refusal)
                     }
                     Ok(_) => Err(e),
