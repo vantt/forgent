@@ -1662,18 +1662,15 @@ fn a_prepared_attempt_is_handed_over_with_its_lock_and_a_stub_agent_settles_on_t
     std::fs::write(&side, "{}").unwrap();
     let envelope = json!({ "runDir": rig.run_dir.to_string_lossy(), "hostBin": supervisor.to_string_lossy(), "sideFile": side.to_string_lossy() });
 
-    // 3. The handover moves the held lock to the supervisor: the controller keeps no copy, so nothing waits on
-    // the child (a copy left in the controller would settle only after the kill wait).
+    // 3. The handover lends the held lock to the supervisor and the controller drops its handle: a lent handle only
+    // closes, so nothing waits on the child (an unlent copy would settle only after the kill wait).
     let handing = std::time::Instant::now();
-    let handover = locks
-        .attempt
-        .take()
-        .unwrap()
-        .hand_over()
-        .expect("the attempt lock hands over");
+    let attempt_lock = locks.attempt.take().unwrap();
+    let handover = attempt_lock.lend().expect("the attempt lock is lent");
     let mut started = start_supervisor(&envelope, &[&handover], &Map::new(), &Map::new())
         .expect("supervisor started");
     drop(handover);
+    drop(attempt_lock);
     let handed = handing.elapsed();
     assert!(
         handed < std::time::Duration::from_millis(fgos_holder_lock::DEFAULT_KILL_WAIT_MS / 4),

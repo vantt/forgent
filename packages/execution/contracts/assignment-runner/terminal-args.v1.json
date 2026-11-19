@@ -1,0 +1,302 @@
+{
+  "contract": "assignment-runner-terminal-args.v1",
+  "cases": [
+    {
+      "name": "claude pane",
+      "input": {
+        "resolvedCmd": {
+          "command": "claude",
+          "args": [
+            "-p",
+            "hello",
+            "--model",
+            "m"
+          ],
+          "argsTemplate": [
+            "-p",
+            "{prompt}",
+            "--model",
+            "{model}"
+          ],
+          "interactiveMode": {
+            "kind": "claude"
+          }
+        },
+        "prompt": "hello",
+        "model": "m",
+        "runDir": "$ROOT/unit/runs/01",
+        "writerId": "w1",
+        "caseContext": null
+      },
+      "args": [
+        "-p",
+        "--model",
+        "m",
+        "--add-dir",
+        "$ROOT/unit/runs/01",
+        "$ROOT/unit/inputs",
+        "$ROOT/sibling"
+      ],
+      "delivery": "inline"
+    },
+    {
+      "name": "claude pane keeps operator add-dir",
+      "input": {
+        "resolvedCmd": {
+          "command": "/usr/bin/claude",
+          "args": [
+            "--add-dir",
+            "/op"
+          ],
+          "argsTemplate": [
+            "--add-dir",
+            "/op"
+          ],
+          "interactiveMode": {
+            "kind": "claude"
+          }
+        },
+        "prompt": "hello",
+        "model": "m",
+        "runDir": "$ROOT/unit/runs/01",
+        "writerId": "w1",
+        "caseContext": null
+      },
+      "args": [
+        "--add-dir",
+        "$ROOT/unit/runs/01",
+        "$ROOT/unit/inputs",
+        "$ROOT/sibling",
+        "/op"
+      ],
+      "delivery": "inline"
+    },
+    {
+      "name": "codex pane with a case",
+      "input": {
+        "resolvedCmd": {
+          "command": "codex",
+          "args": [
+            "exec",
+            "hello"
+          ],
+          "argsTemplate": [
+            "exec",
+            "{prompt}"
+          ],
+          "interactiveMode": {
+            "kind": "codex"
+          },
+          "promptDelivery": "file-pointer"
+        },
+        "prompt": "hello",
+        "model": "m",
+        "runDir": "$ROOT/unit/runs/01",
+        "writerId": "w2",
+        "caseContext": {
+          "caseId": "c1",
+          "reservationId": "r1"
+        }
+      },
+      "args": [
+        "exec",
+        "-c",
+        "shell_environment_policy.set={FGOS_SESSION_ID=\"w2\",FGOS_CASE_ID=\"c1\",FGOS_CASE_RESERVATION=\"r1\"}"
+      ],
+      "delivery": "file-pointer"
+    },
+    {
+      "name": "codex pane without a case",
+      "input": {
+        "resolvedCmd": {
+          "command": "codex",
+          "args": [
+            "exec",
+            "hello"
+          ],
+          "argsTemplate": [
+            "exec",
+            "{prompt}"
+          ],
+          "interactiveMode": {
+            "kind": "codex"
+          }
+        },
+        "prompt": "hello",
+        "model": "m",
+        "runDir": "$ROOT/unit/runs/01",
+        "writerId": "w2",
+        "caseContext": null
+      },
+      "args": [
+        "exec",
+        "-c",
+        "shell_environment_policy.set={FGOS_SESSION_ID=\"w2\"}"
+      ],
+      "delivery": "inline"
+    },
+    {
+      "name": "other agent without a template compares the prompt",
+      "input": {
+        "resolvedCmd": {
+          "command": "pi",
+          "args": [
+            "hello",
+            "--x"
+          ],
+          "interactiveMode": {
+            "kind": "pi"
+          }
+        },
+        "prompt": "hello",
+        "model": "m",
+        "runDir": "$ROOT/unit/runs/01",
+        "writerId": "w3",
+        "caseContext": null
+      },
+      "args": [
+        "--x"
+      ],
+      "delivery": "inline"
+    },
+    {
+      "name": "cli-spawn claude gets its outbox",
+      "accessInput": {
+        "adapter": "cli-spawn",
+        "command": "claude",
+        "args": [
+          "-p",
+          "x"
+        ],
+        "outboxDir": "$ROOT/out"
+      },
+      "args": [
+        "-p",
+        "x",
+        "--add-dir",
+        "$ROOT/out"
+      ]
+    },
+    {
+      "name": "cli-spawn other cli gets nothing",
+      "accessInput": {
+        "adapter": "cli-spawn",
+        "command": "codex",
+        "args": [
+          "x"
+        ],
+        "outboxDir": "$ROOT/out"
+      },
+      "args": [
+        "x"
+      ]
+    },
+    {
+      "name": "cli-spawn without an outbox",
+      "accessInput": {
+        "adapter": "cli-spawn",
+        "command": "claude",
+        "args": [
+          "x"
+        ]
+      },
+      "args": [
+        "x"
+      ]
+    },
+    {
+      "name": "cli-spawn keeps an operator add-dir",
+      "accessInput": {
+        "adapter": "cli-spawn",
+        "command": "claude",
+        "args": [
+          "--add-dir",
+          "/op",
+          "-p"
+        ],
+        "outboxDir": "$ROOT/out"
+      },
+      "args": [
+        "--add-dir",
+        "$ROOT/out",
+        "/op",
+        "-p"
+      ]
+    },
+    {
+      "name": "herdr claude",
+      "accessInput": {
+        "adapter": "herdr-spawn",
+        "interactiveMode": {
+          "kind": "claude"
+        },
+        "args": [
+          "a"
+        ],
+        "runDir": "$ROOT/unit/runs/01"
+      },
+      "args": [
+        "a",
+        "--add-dir",
+        "$ROOT/unit/runs/01",
+        "$ROOT/unit/inputs",
+        "$ROOT/sibling"
+      ]
+    },
+    {
+      "name": "herdr non-claude",
+      "accessInput": {
+        "adapter": "herdr-spawn",
+        "interactiveMode": {
+          "kind": "codex"
+        },
+        "args": [
+          "a"
+        ],
+        "runDir": "$ROOT/unit/runs/01"
+      },
+      "args": [
+        "a"
+      ]
+    }
+  ],
+  "addDirs": [
+    {
+      "argv": [],
+      "dirs": []
+    },
+    {
+      "argv": [
+        "--add-dir",
+        "a",
+        "b",
+        "--x",
+        "c"
+      ],
+      "dirs": [
+        "a",
+        "b"
+      ]
+    },
+    {
+      "argv": [
+        "--add-dir=d",
+        "e"
+      ],
+      "dirs": [
+        "d"
+      ]
+    },
+    {
+      "argv": [
+        "-p",
+        "x",
+        "--add-dir",
+        "f"
+      ],
+      "dirs": [
+        "f"
+      ]
+    }
+  ]
+}
