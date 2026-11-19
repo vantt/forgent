@@ -1063,6 +1063,7 @@ fn an_attempt_binds_its_agent_session_on_its_head_and_the_role_moves_to_it_under
     let _ = fs::remove_dir_all(root);
 }
 
+#[cfg(unix)]
 #[test]
 fn a_bind_from_outside_the_head_of_an_unregistered_attempt_with_an_attempt_key_or_another_heads_session_is_refused(
 ) {
@@ -1104,6 +1105,7 @@ fn a_bind_from_outside_the_head_of_an_unregistered_attempt_with_an_attempt_key_o
 }
 
 /// The first child of `parent`, waited for.
+#[cfg(target_os = "linux")]
 fn child_of(parent: u32) -> u32 {
     let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
     loop {

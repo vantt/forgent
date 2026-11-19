@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "164606af957b8f8e7c9ce7d4563a4ea6be64f03a0b4f55dbd67571d0c1f44975",
+  "payloadDigest": "c831205be51e6acdd9d70bc3451a258eb02170bd2cbb491bd7a88b58cf7de578",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -868,13 +868,13 @@
     "packages/identity/rust/src/signing.rs": "65a7416bd747708cd5994b485017f982b723fa2534d0532a847661f04cbac173",
     "packages/identity/rust/src/text.rs": "15f0c4a6239d61df0a2e284608fd506e58450d405026eb09c5f9cb6d4605831a",
     "packages/identity/rust/tests/attempt_writer_id.rs": "4379502e1aef260e9f08c09e892b9dfe4a741528751aea8c340e76aadaf55b81",
-    "packages/identity/rust/tests/directory.rs": "f90a17edb63017927b9618d977e0796ac93566823cd9e858f4d7d0063f5726b3",
+    "packages/identity/rust/tests/directory.rs": "07ff3cd2c417e8b3755184ef4b0158003ab4a8efb6030b20cbd6451f9797620e",
     "packages/identity/rust/tests/golden.rs": "42e7257988117fa5157033dd00b07430534efd5349ecbbb122a1b236e00e7ff5",
     "packages/identity/rust/tests/machine.rs": "8198639cd6b66d41b7976e8ae68835530c79b25db1f84f1a235609fc59c3d4c7",
     "packages/identity/rust/tests/mint.rs": "4877f605825bff0b3397b327eae37bfd7602b4efbe6e7aa44a8a68cc0525edf4",
     "packages/identity/rust/tests/project.rs": "25a1b4cc6ac4f0c3986487e3faa5d80af82260d079a9aecbc537722a422eed02",
     "packages/identity/rust/tests/register_current.rs": "8c0d694a371b4629460c7a43770de8c04fccb8dd3ed05785df1a964cdfa6f56d",
-    "packages/identity/rust/tests/session.rs": "8f08083ca8db2605f0de3a1932625271a1ff6b66e02fdd5e1030d39616a2c40d",
+    "packages/identity/rust/tests/session.rs": "9eedd3c72c42477956df247547e4ee901d0c7743561a1ca323d1a660adfe367e",
     "packages/identity/rust/tests/shared.rs": "8d8bb1cf336cda7a1d1378fe3af466a15851f143802b236944471230822851d4",
     "packages/identity/rust/tests/signing.rs": "4e4cfad4ce06ea0cb2559c916b80a10c935c36cdf6741c7048aeeaab1a27e7c1",
     "packages/mailbox/rust/core/src/ack.rs": "16979ddf83d7d2da0200bac5c77c6140cf43888c3b9ebfd9169cbe5b8ade9ddf",
@@ -3449,14 +3449,14 @@
     },
     {
       "path": "packages/identity/rust/tests/directory.rs",
-      "line": 1145,
+      "line": 1147,
       "spawn": "Command::new",
       "binary": "/bin/sh",
       "class": "rust-test"
     },
     {
       "path": "packages/identity/rust/tests/directory.rs",
-      "line": 1162,
+      "line": 1164,
       "spawn": "Command::new",
       "binary": "/bin/sh",
       "class": "rust-test"
