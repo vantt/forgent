@@ -374,6 +374,13 @@ const shippedRigor = { standard: ['reviewer'], high: ['reviewer', 'red-team'] };
   run('reviewed a ceiling with room lets the second round run', chk({
     launchRoom: 5, results: { 'producer/1': rres('producer', 1, 'pass'), 'reviewer/1': rres('reviewer', 1, 'findings', { findings: ['a'] }), 'producer/2': rres('producer', 2, 'pass'), 'reviewer/2': rres('reviewer', 2, 'pass') }, verify: [{ pass: true }, { pass: true }],
   }));
+  // A ceiling read when the round starts: round 1 spent 2 of 3 launches, so round 2 (producer and reviewer) does not fit.
+  run('reviewed a ceiling spent by the first round stops the second', chk({
+    launchCeiling: 3, results: { 'producer/1': rres('producer', 1, 'pass'), 'reviewer/1': rres('reviewer', 1, 'findings', { findings: ['a'] }) }, verify: [{ pass: true }],
+  }));
+  run('reviewed a ceiling left with room for the second round', chk({
+    launchCeiling: 4, results: { 'producer/1': rres('producer', 1, 'pass'), 'reviewer/1': rres('reviewer', 1, 'findings', { findings: ['a'] }), 'producer/2': rres('producer', 2, 'pass'), 'reviewer/2': rres('reviewer', 2, 'pass') }, verify: [{ pass: true }, { pass: true }],
+  }));
   run('reviewed declared seats with a tester', chk({
     unit: noVerifyUnit, cfg: { loops: verifyCfg.loops }, params: { maxRounds: 1, minCheckers: ['tester'], seats: seatsDecl(['maker', 'producer'], ['look', 'reviewer'], ['run', 'reviewer']) },
     results: { 'maker/1': rres('maker', 1, 'pass'), 'look/1': rres('look', 1, 'pass'), 'run/1': rres('run', 1, 'findings') },
@@ -416,8 +423,15 @@ const shippedRigor = { standard: ['reviewer'], high: ['reviewer', 'red-team'] };
   for (const scenario of runs) {
     const calls = [];
     const verifyAnswers = [...(scenario.verify ?? [])];
+    // A ceiling the engine counts against: the launches the loop made so far, as run.mjs's hasLaunchRoom reads them.
+    let launched = 0;
+    let ceilingHit = false;
+    const roomOf = scenario.launchCeiling !== undefined
+      ? (n) => { const room = launched + n <= scenario.launchCeiling; if (!room) ceilingHit = true; return room; }
+      : scenario.launchRoom !== undefined ? (n) => n <= scenario.launchRoom : undefined;
     const hooks = {
       runRole: async (args) => {
+        launched += 1;
         calls.push(describeCall(args));
         const key = `${args.seat.seat}/${args.round ?? 1}`;
         if (!Object.hasOwn(scenario.results, key)) throw new Error(`recorder script has no result for ${key}`);
@@ -429,17 +443,18 @@ const shippedRigor = { standard: ['reviewer'], high: ['reviewer', 'red-team'] };
         return verifyAnswers.shift();
       },
       history: scenario.history ?? [],
-      ...(scenario.launchRoom !== undefined ? { hasLaunchRoom: (n) => n <= scenario.launchRoom } : {}),
+      ...(roomOf ? { hasLaunchRoom: roomOf } : {}),
       ...(scenario.shipped ? { shippedCheckersByRigor: scenario.shipped } : {}),
     };
     const effective = scenario.effectiveSeats ? { loop: scenario.loop, params: scenario.params, seats: scenario.effectiveSeats } : { loop: scenario.loop, params: scenario.params };
     let expected;
     try {
-      expected = { ok: JSON.parse(JSON.stringify(await loops.runLoop(effective, scenario.unit, scenario.cfg, hooks))), calls };
+      expected = { ok: JSON.parse(JSON.stringify(await loops.runLoop(effective, scenario.unit, scenario.cfg, hooks))), calls,
+        ...(scenario.launchCeiling !== undefined ? { ceilingHit } : {}) };
     } catch (error) {
       expected = { error: { class: error.name === 'SeatResolutionError' ? 'SeatResolutionError' : error.name, code: error.code ?? '', message: error.message, ...(error.at !== undefined ? { at: error.at } : {}), ...(error.detail !== undefined ? { detail: error.detail } : {}) }, calls };
     }
-    recorded.push({ id: scenario.id, loop: scenario.loop, unit: scenario.unit, cfg: scenario.cfg, effective, history: scenario.history ?? [], launchRoom: scenario.launchRoom ?? null, shippedCheckersByRigor: scenario.shipped ?? null, results: scenario.results, verify: scenario.verify ?? [], expected });
+    recorded.push({ id: scenario.id, loop: scenario.loop, unit: scenario.unit, cfg: scenario.cfg, effective, history: scenario.history ?? [], launchRoom: scenario.launchRoom ?? null, ...(scenario.launchCeiling !== undefined ? { launchCeiling: scenario.launchCeiling } : {}), shippedCheckersByRigor: scenario.shipped ?? null, results: scenario.results, verify: scenario.verify ?? [], expected });
   }
 
   // ---- history outcomes

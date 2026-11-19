@@ -2300,6 +2300,9 @@ fn run_collaboration<H: UnitRunHost + Sync>(shared: &Shared<'_, '_, H>, host: &H
     };
     let mut answers = None;
     let pattern = loop {
+        // The room is read again before every step, from the launches the run made so far, so a round that would
+        // start under a spent ceiling does not (Node's `hasLaunchRoom`, asked when the round starts).
+        run.set_launch_room(lock(shared).ctx.launch_room());
         match run.step(answers.take()).map_err(seat_resolution)? {
             Step::Done(result) => break result,
             Step::Dispatch(commands) => answers = Some(run_batch(shared, host, commands)?),
@@ -2307,6 +2310,9 @@ fn run_collaboration<H: UnitRunHost + Sync>(shared: &Shared<'_, '_, H>, host: &H
     };
     let mut guard = lock(shared);
     let State { ctx, scope } = &mut *guard;
+    if run.ceiling_hit() {
+        scope.ceiling_hit = true;
+    }
     ctx.loop_end(scope, &effective, pattern)
 }
 

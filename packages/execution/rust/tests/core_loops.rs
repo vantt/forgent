@@ -314,7 +314,8 @@ fn loop_helpers_replay() {
     }
 }
 
-/// The engine's part, played from the scenario's table of answers.
+/// The engine's part, played from the scenario's table of answers. A scenario with a `launchCeiling` answers the
+/// launch room before every step from the launches made so far, as the engine does; its run reports `ceilingHit`.
 fn play(scenario: &Value) -> (Answer, Vec<Value>) {
     let input = {
         let mut input = LoopInput::from_effective(
@@ -339,16 +340,28 @@ fn play(scenario: &Value) -> (Answer, Vec<Value>) {
         Err(e) => return (Err(seat_err(e)), calls),
     };
     let mut answers: Option<Vec<Value>> = None;
+    let ceiling = scenario["launchCeiling"].as_u64();
+    let mut launched = 0u64;
     loop {
+        if let Some(ceiling) = ceiling {
+            run.set_launch_room(Some(ceiling.saturating_sub(launched)));
+        }
         match run.step(answers.take()) {
             Err(e) => return (Err(seat_err(e)), calls),
-            Ok(Step::Done(done)) => return (Ok(done.to_value()), calls),
+            Ok(Step::Done(done)) => {
+                let mut value = done.to_value();
+                if ceiling.is_some() {
+                    value["ceilingHit"] = json!(run.ceiling_hit());
+                }
+                return (Ok(value), calls);
+            }
             Ok(Step::Dispatch(commands)) => {
                 let mut out = Vec::new();
                 for command in commands {
                     let mut described = command.to_value();
                     match &command {
                         Command::Role(call) => {
+                            launched += 1;
                             let key =
                                 format!("{}/{}", text(&call.seat["seat"]), call.round.unwrap_or(1));
                             out.push(
@@ -381,7 +394,13 @@ fn scripted_loop_runs_replay() {
         let (got, calls) = play(scenario);
         let want = &scenario["expected"];
         match (&got, want.get("ok"), want.get("error")) {
-            (Ok(v), Some(ok), _) => assert_eq!(v, ok, "run result: {id}"),
+            (Ok(v), Some(ok), _) => {
+                let mut v = v.clone();
+                if let Some(hit) = v.as_object_mut().and_then(|o| o.remove("ceilingHit")) {
+                    assert_eq!(Some(&hit), want.get("ceilingHit"), "ceiling hit: {id}");
+                }
+                assert_eq!(&v, ok, "run result: {id}")
+            }
             (Err(e), _, Some(error)) => assert_eq!(e, error, "run error: {id}"),
             _ => panic!("run {id}: got {got:?}, recorded {want}"),
         }

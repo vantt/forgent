@@ -1699,6 +1699,48 @@ mod run_loop {
     }
 
     #[test]
+    fn a_round_that_no_longer_fits_under_the_ceiling_does_not_start_and_the_run_says_so() {
+        let repo = Repo::new();
+        let port = Port {
+            admit: Admission::Admitted {
+                reservation_id: "res-1".into(),
+                case_id: "case-1".into(),
+                seat_launch_ceiling: Some(3),
+            },
+            ..Port::free()
+        };
+        let agent = |seat: &SeatDispatch<'_>| -> Value {
+            if !seat.read_only {
+                return producer_writes_only_b(seat);
+            }
+            json!({
+                "runId": "run-2",
+                "classification": { "outcome": { "category": "verdict", "reason": "findings" }, "assessment": { "verdict": "findings" } },
+                "agentClaim": { "summary": "found one" },
+            })
+        };
+        let host = Host::new(
+            &repo,
+            Some(port),
+            json!({ "loop": "reviewed", "params": { "maxRounds": 3 } }),
+            Box::new(agent),
+        );
+        let mut options = host.options(writing_unit());
+        options["caseRef"] = json!({ "caseId": "case-1", "activity": "build" });
+        let result = run_unit(&options, &host).unwrap();
+        // Round 1 spent 2 of 3 launches; round 2 needs 2, so it never starts.
+        assert_eq!(result["outcome"], "findings", "{result:#}");
+        assert_eq!(result["rounds"], 1);
+        assert_eq!(
+            result["launches"],
+            json!({ "ceiling": 3, "used": 2, "ceilingHit": true })
+        );
+        assert_eq!(host.dispatched.lock().unwrap().len(), 2);
+        let settles = host.port.as_ref().unwrap().settles.lock().unwrap();
+        assert_eq!(settles[0]["frameExhausted"], json!(true));
+    }
+
+    #[test]
     fn a_refused_admission_is_a_case_admission_refused_error_and_no_unit_run_exists() {
         let repo = Repo::new();
         let port = Port {

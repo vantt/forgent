@@ -107,7 +107,8 @@ pub struct LoopInput {
     /// Prior settled attempts of the run (seat results), for a resume.
     pub history: Vec<Value>,
     pub shipped_checkers_by_rigor: Option<Value>,
-    /// How many more seat launches the Unit's ceiling allows; `None` means no ceiling is held.
+    /// How many more seat launches the Unit's ceiling allows when the loop starts; `None` means no ceiling is held.
+    /// The engine answers it again before every step ([`LoopRun::set_launch_room`]), since its seats spend it.
     pub launch_room: Option<u64>,
 }
 
@@ -283,6 +284,21 @@ impl LoopRun {
                 ))
             }
         })
+    }
+
+    /// The launch room as it stands now (Node's `hasLaunchRoom` answer, which reads the launches spent so far):
+    /// the engine sets it before each step, and a loop that would start another round asks it with the seats that
+    /// round launches. Only the reviewed loop starts rounds under a ceiling; the others ignore it.
+    pub fn set_launch_room(&mut self, room: Option<u64>) {
+        if let LoopRun::Reviewed(l) = self {
+            l.set_launch_room(room);
+        }
+    }
+
+    /// Whether the loop ended a run because the next round did not fit under the seat-launch ceiling (the
+    /// `ceilingHit` a `hasLaunchRoom` that answered no sets in Node).
+    pub fn ceiling_hit(&self) -> bool {
+        matches!(self, LoopRun::Reviewed(l) if l.ceiling_hit())
     }
 
     /// The next step: `None` answers for the first call, then one answer per command of the last dispatch.
