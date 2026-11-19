@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "1958f4b273daa8a4e68d83573e4da1de71f4187e662f1feb1e6f4f65cf090a96",
+  "payloadDigest": "12ae051b01bd6e94f29cb2d6cb64ce5668829baa35a771bca9a71831894e20a7",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -586,7 +586,12 @@
     "packages/execution/engine/src/transport/worker_home.rs": "6614a05d2bbb3e76b241aaa80fb199aac6205255d85ec8d9fbb9bb7e2a001cdf",
     "packages/execution/engine/src/transport/worker_session.rs": "eab871222915eeaf833c45a19cc728cb839fe633e9f63b5b4c4dff30fb38cf9d",
     "packages/execution/engine/src/transport/worker_session_boot.rs": "3131e2097312d4e58c3fe87869e48e0fcf30ea374bf24abee3cd6e44a0e969e0",
-    "packages/execution/engine/src/transport_round/mod.rs": "13a34862c2cc4b8602f234f7c76428c087c2228b804bb58485f1418a1401095c",
+    "packages/execution/engine/src/transport_round/attention.rs": "5eaf76b19f4905b1f2b5475cb4264534cda7873c962b3a68cc686f142451516e",
+    "packages/execution/engine/src/transport_round/executor_command.rs": "dfcc8fc9a8a1149239ed51a46579a28deffd02e495f29b8f7b8d9e664403eeff",
+    "packages/execution/engine/src/transport_round/inspection.rs": "48e8cbfabf201c9461d30f7941575c46b9cae077156b2ebfeadb8ef767a68214",
+    "packages/execution/engine/src/transport_round/mod.rs": "a6faa521b6b67d61f4879f2baf285a63e255ab81db61362eb8bb7c5d00df34ca",
+    "packages/execution/engine/src/transport_round/round.rs": "8516ae176a7b4581d92cf9fb0d2e5840616cdd965defd01e8e673c1dd11c6bd8",
+    "packages/execution/engine/src/transport_round/session_attempt.rs": "67d05779514aef7975507dc28152ba8a4641603a4354434fe7635a1291845846",
     "packages/execution/engine/src/unit_run/mod.rs": "b0301cbcf51f52515225ceeb426148705822a5243c148b74e22559965c283bd4",
     "packages/execution/engine/tests/accounts.rs": "64de846e42e43c21da93c3cb1b289306f52c14bb600ed9aafd8658245b3b082c",
     "packages/execution/engine/tests/assignment.rs": "560c4dec811079f19bfeec80b19a1e4c1c690fa0e3065c4e8bc5bd76e058e9b1",
@@ -601,6 +606,7 @@
     "packages/execution/engine/tests/run_result.rs": "98880a45e8766c03eaef29a505852edb0048528caecc2ee9d9197416911d895b",
     "packages/execution/engine/tests/settlement.rs": "5258862993a9b333f20c9cf50be4f0d2c896bd06a3921b85bf5dc9afc453585a",
     "packages/execution/engine/tests/transport.rs": "df814ba577505861a1e3251497398fe9466d8d15068382a68f7384f59c02c2ae",
+    "packages/execution/engine/tests/transport_round.rs": "5573560e1b48323150b2a58f23ec637fc19b826082c31795c4a8b3b1244d3bb0",
     "packages/execution/rust/src/accounts.rs": "f67e2338d580b0b02a94099a9ddf035ec26a7b5c0daeafc65e34a7e0260ac907",
     "packages/execution/rust/src/admission/mod.rs": "c475d6371e6d712aa786c583b1b31dba7f6d94864b3f34cade13e852b21acbd8",
     "packages/execution/rust/src/agents.rs": "dffa2143d373326f72cfa5e2b2b8abc534a700e0a5fc2a563d626a699ed3c912",
@@ -755,7 +761,7 @@
     "packages/holder-lock/rust/src/hot_record.rs": "eabfeb63df4eb278ce92282d41f2f1f6027a3ddc8fee145c867c19b4962a8e99",
     "packages/holder-lock/rust/src/lib.rs": "e4c6721070e4e72fec13dc05fcba9e68f54c47775dd7c278ea3d7e1d80d84743",
     "packages/holder-lock/rust/src/origin.rs": "bb1b83fd875746b6907894a3aeaaee2e5013c45661b7a199bb425882bd9c2317",
-    "packages/holder-lock/rust/src/port.rs": "980b91ecbc5d3f9850623ca80e584eb85d2d04c073807d7b17a4bc59a78ff80f",
+    "packages/holder-lock/rust/src/port.rs": "bbedbe4d4cc472cf8a5147e9693c511ba98cf8efc9be7261aac9d805a87b9b1b",
     "packages/holder-lock/rust/src/predecessor.rs": "04735a46e5476bd41697f2b3f3584f5a844af98dd0cf90965727e5a4578f547d",
     "packages/holder-lock/rust/src/route.rs": "b84a7d4279223174b2102c7ea67999e2191d4f02cf26562db32e6748afaa9c60",
     "packages/holder-lock/rust/src/route/hold.rs": "4317dd6f3ea2ee183ec26d78fcd6e6ca21563d16e0beb964c45c2f3d688fd382",
@@ -767,6 +773,7 @@
     "packages/holder-lock/rust/tests/borrow_git.rs": "f073459db20415fb10aad535ee84e41d13e6b6e94cdf01b1ba437a9b29bcf5bf",
     "packages/holder-lock/rust/tests/borrow_io.rs": "73c1bf13cd2ba16d31d9c91ccb4cc3c8dda7d9e699acf5713eea4fc3e0b26f9f",
     "packages/holder-lock/rust/tests/common/mod.rs": "33bb3a00037e8a57732ad4d5963529a75c50701e3ad8d54fd6f9f185b1693c87",
+    "packages/holder-lock/rust/tests/handle_file.rs": "a57198bbff6e086ff5d1e87d36c2034ae6932003f8ae2519bb2acc137fd1dc66",
     "packages/holder-lock/rust/tests/multiprocess.rs": "560966d064bc2a119b6524eb7f20a04239fdc3d91f57ff8647cfdf726a6fa80c",
     "packages/holder-lock/rust/tests/predecessor_record_shape.rs": "944dd0998588b05ea589e07340b946705e4da1db2f79c56c9545221edb6ac2ef",
     "packages/holder-lock/rust/tests/scope_rank.rs": "ae88fb69b51774c515338db7c856306d97394df657bb3143a19b5db4425670d1",
@@ -2955,6 +2962,20 @@
     {
       "path": "packages/execution/engine/tests/settlement.rs",
       "line": 927,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/execution/engine/tests/transport_round.rs",
+      "line": 245,
+      "spawn": "Command::new",
+      "binary": "git",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/execution/engine/tests/transport_round.rs",
+      "line": 272,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
