@@ -42,12 +42,19 @@ through `legacy_exec::payload_command` (`apps/fgos/src/wiring/doctor/bridge.rs:1
 - `src/native/execution-door.mjs` (P14, new, tier 0): `runUnitInHost(request, {caseAdmission, onUnitRunCreated,
   onCaseAdmitted})` and `launchSessionInHost(request)` spawn the host asynchronously (never `spawnSync`), host resolved
   through `src/util/host-bin-path.mjs`, protocol check `host-version-mismatch`, framed peer server over the child's
-  stdout/stdin answering from the given port object, error rethrown with its `errorClass`; `executionOp(op, payload)`
+  stdout/stdin answering from the given port object, error rethrown with its `errorClass` and, by the result's error
+  type tag (phase 18 schema, P14), as an instance of `CaseAdmissionRefusedError` or `RunnerConfigError`, else a plain
+  `Error` with `errorClass`. Both classes move into this file (tier 0; `RunnerConfigError` from
+  `src/runner/dispatch/runner-config-error.mjs:33`, `CaseAdmissionRefusedError extends RunnerConfigError` from
+  `src/runner/execution/case-admission-port.mjs:107`) and the two old modules re-export them, so one class identity
+  exists for in-process and rethrown errors; `executionOp(op, payload)`
   for the short ops; `serveAdmissionPeer(port, input, output)` shared with `admission-peer.mjs`. On child exit
   without `settle` it settles nothing and returns `{ unsettled: { reservationId } }` (P16). Unit-tested here with one
-  wiring test; callers switch in phase 20.
+  wiring test (it includes a refused admission rethrown so `instanceof CaseAdmissionRefusedError` holds); callers
+  switch in phase 20.
 - `apps/fgos/src/wiring/attempt_step.rs` + `attempt_step.rs` in the supervisor: the step runner calls the host route
-  with the engine's steps; Node `attempt-step.mjs` and `steps/*` lose their caller (deleted in phase 20).
+  with the engine's steps; Node `attempt-step.mjs` and `steps/*` lose their supervisor caller (deleted in phase 20, except
+  `steps/cleanup-trust.mjs`, which Node dispatch imports until phase 21 deletes it).
 - Doors, same change: the row "no Node from the native packaging verbs" gains `apps/fgos/src/wiring/run.rs` as an
   allowed path with its reason (starts the admission peer through `legacy_exec`), since that row's patterns include
   `\blegacy_exec::`.

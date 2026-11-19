@@ -16,7 +16,7 @@ crate; 7-18 in the engine); if each added its own `pub mod` line and dependencie
   the worktree-door plan, `a987e4f0f`, root `Cargo.toml:35`); no dependent crate yet.
 - Engine `src/lib.rs`: crate doc (what the engine owns, what it does not: pure rules stay in `fgos-execution`, the
   attempt process stays in `fgos-run-supervisor`), `pub mod confinement { pub mod policy; pub mod request; pub mod driver; pub mod cleanup; }`,
-  `accounts`, `credentials`, `transport`, `run_result`, `assignment`, `contract`, `settlement`, `steps`, `planning`,
+  `accounts`, `credentials`, `transport`, `transport_round` (phase 11b), `run_result`, `assignment`, `contract`, `settlement`, `steps`, `planning`,
   `assignment_runner`, `unit_run`; each a directory with a `mod.rs` holding only a module doc and, where phase 00 found
   cross-module types, the shared type declarations (the confinement request type, the account lease handle).
 - `fgos-execution` `src/lib.rs`: `pub mod` lines and `mod.rs` stubs for `unit`, `run_request`, `patterns` (phase 6),

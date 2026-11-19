@@ -53,7 +53,8 @@ facts from `lanes.rs`, never a second copy.
 
 1. Read 1045 P6 as landed (envelope fields, lane config reads). Commit the recorder; record vectors.
 2. Red tests `packages/run-supervisor/rust/tests/controller_*.rs`; feature split; port; green.
-3. Report the Node modules now twinned (deleted in phase 20) and their tests' future owner.
+3. Report the Node modules now twinned (deleted in phase 21, except `cancel-opt-in.mjs`, deleted in phase 20: Node
+   dispatch imports the others until then, phase 00 §1) and their tests' future owner.
 
 ## Validation
 
