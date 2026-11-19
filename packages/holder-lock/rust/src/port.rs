@@ -235,6 +235,12 @@ impl Handle {
     /// (`&[&File]` of a supervisor start): the lock outlives this handle only while a duplicate is open. The
     /// child must mark the descriptor close-on-exec before anything else, as the supervisor route does: a copy
     /// that stays inheritable reads as a borrower, and the release of this handle ends it.
+    ///
+    /// After handing a duplicate to a child, the parent drops its handle (the supervisor route does so through
+    /// `AttemptLocks::release_attempt`). Neither a drop nor [`release`] unlocks the description; both only close
+    /// this copy. An explicit unlock would end the child's lock too (flock state is per open file description),
+    /// so this crate never issues one on a holder's description. While the child's copy stays open, the close
+    /// waits out the kill wait and settles as `Stuck`.
     pub fn try_clone_file(&self) -> io::Result<File> {
         self.file().try_clone()
     }
