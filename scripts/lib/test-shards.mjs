@@ -14,7 +14,8 @@ function assertTotal(total) {
 
 // Weight of each file: its recorded one, else the mean of the recorded ones among `files`, else 1.
 function weigh(files, weights) {
-  const known = files.map((f) => weights[f]).filter((w) => typeof w === 'number' && w > 0);
+  // Summed in path order: a float sum depends on its order, and the shards must not depend on the input order.
+  const known = [...files].sort().map((f) => weights[f]).filter((w) => typeof w === 'number' && w > 0);
   const mean = known.length > 0 ? known.reduce((a, b) => a + b, 0) / known.length : 1;
   return new Map(files.map((f) => [f, typeof weights[f] === 'number' && weights[f] > 0 ? weights[f] : mean]));
 }
