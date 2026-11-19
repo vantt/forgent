@@ -7,7 +7,7 @@ rust-version.workspace = true
 [dependencies]
 fgos-yaml-doc = { path = "../../yaml-doc/rust" }
 fgos-git = { path = "../../git/rust" }
-fgos-write-scope = { path = "../../git/write-scope" }
+fgos-write-scope = { path = "../../write-scope" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
 # Library only: the host provider belongs to the composition root.
 fgos-identity = { path = "../../identity/rust", default-features = false }

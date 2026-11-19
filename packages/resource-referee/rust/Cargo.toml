@@ -1,0 +1,11 @@
+[package]
+name = "fgos-resource-referee"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+fgos-graph = { path = "../../graph/rust" }
+fgos-write-scope = { path = "../../write-scope" }
+serde = { workspace = true }
+serde_json = { workspace = true }

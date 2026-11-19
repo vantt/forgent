@@ -8,7 +8,8 @@ rust-version.workspace = true
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-fgos-write-scope = { path = "../write-scope" }
+fgos-write-scope = { path = "../../write-scope" }
+fgos-graph = { path = "../../graph/rust" }
 napi = { version = "=2.16.17", default-features = false, features = ["napi8", "serde-json", "dyn-symbols", "compat-mode"] }
 napi-derive = "=2.16.13"
 serde.workspace = true

@@ -62,7 +62,7 @@ rules:
       - "herdr-dashboard/**/Cargo.lock"
       - "packages/*/rust/**"
       - "packages/*/node-addon/**"
-      - "packages/*/write-scope/**"
+      - "packages/write-scope/**"
       - "src/identity/**"
       - "src/holder-lock/**"
       - "src/git/**"

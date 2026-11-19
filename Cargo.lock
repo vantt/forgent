@@ -383,6 +383,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-graph"
+version = "0.2.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "fgos-holder-lock"
 version = "0.2.0"
 dependencies = [
@@ -455,6 +463,7 @@ dependencies = [
  "fgos-durable-file",
  "fgos-event-store",
  "fgos-git",
+ "fgos-graph",
  "fgos-holder-lock",
  "fgos-identity",
  "fgos-process",
@@ -507,6 +516,16 @@ dependencies = [
  "fgos-identity",
  "fgos-observe",
  "fgos-process",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "fgos-resource-referee"
+version = "0.2.0"
+dependencies = [
+ "fgos-graph",
+ "fgos-write-scope",
  "serde",
  "serde_json",
 ]
