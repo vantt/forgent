@@ -98,8 +98,11 @@ caller, never a heuristic of the package.
 - **Cycle.** Among the shortest cycles through the component's smallest id (the root), the one whose id
   sequence, starting at the root, is lexicographically smallest. It is computed in linear time: a
   breadth-first search over the reversed ordering edges gives every node its distance back to the root; then
-  a greedy walk from the root takes, at each step, the smallest successor id whose distance back to the root
-  is one less than the current node's, until the root is reached. `cycle_through(id)` uses the same rule with
+  a greedy walk from the root first takes the smallest successor id among the successors whose distance
+  back to the root is the minimum over all of the root's successors (the root's own distance is 0, so it
+  cannot be chosen by the next rule), then, at each later step, the smallest successor id whose distance
+  back to the root is one less than the current node's, until the root is reached. Only nodes of the
+  component take part. `cycle_through(id)` uses the same rule with
   the chosen id as the root. A self-edge is a cycle of that one node.
 - **Layers without exclusions.** A node's layer is 0 when it waits for nothing, otherwise one more than the
   greatest layer among the nodes it waits for.
