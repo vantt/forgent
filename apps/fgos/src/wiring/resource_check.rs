@@ -6,6 +6,7 @@
 //! Every value taken from an input file is printed through [`escape_text`], so a hostile file cannot reach a
 //! terminal raw, and an error never quotes file content.
 use crate::routing::Call;
+#[cfg(unix)]
 use fgos_durable_file::{open_beneath, BeneathError, BeneathRefusal};
 use fgos_host_runtime::{
     CategorisedRefusal, ContractRef, EventSink, HostInvocation, InvocationControl, OperationId,
@@ -47,6 +48,7 @@ const DEFAULT_POLICY_SOURCE: &str = "shipped-default";
 /// Longest value printed from an input file, in bytes: the entry limit of the contract.
 const MAX_PRINTED_BYTES: usize = fgos_resource_referee::MAX_ENTRY_BYTES;
 /// Byte cap of one input document (the contract's `maxInputBytes`).
+#[cfg(unix)]
 const MAX_INPUT_BYTES: usize = fgos_graph::MAX_INPUT_BYTES;
 
 /// The claim spaces of the referee contract; any other space is refused by name.
@@ -141,6 +143,7 @@ fn refuse(code: &str, detail: impl AsRef<str>) -> Refused {
 }
 
 /// One capped read of `name` beneath `root`: the bytes and their revision.
+#[cfg(unix)]
 fn read_beneath(root: &Path, name: &Path, label: &str) -> Result<(Vec<u8>, String), Refused> {
     let shown = escape_text(&name.to_string_lossy());
     let opened = match open_beneath(root, name) {
@@ -154,6 +157,17 @@ fn read_beneath(root: &Path, name: &Path, label: &str) -> Result<(Vec<u8>, Strin
     }
 }
 
+/// No no-follow open exists here, so the symlink and escape rules cannot be enforced: refuse by name.
+#[cfg(not(unix))]
+fn read_beneath(_root: &Path, name: &Path, label: &str) -> Result<(Vec<u8>, String), Refused> {
+    let shown = escape_text(&name.to_string_lossy());
+    Err(refuse(
+        "input-unsupported-platform",
+        format!("{label}: {shown}: no no-follow open on this platform"),
+    ))
+}
+
+#[cfg(unix)]
 fn beneath_refusal(error: &BeneathError, label: &str, shown: &str) -> Refused {
     let (code, why) = match error {
         BeneathError::Refused(BeneathRefusal::Symlink) => {
