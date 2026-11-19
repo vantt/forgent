@@ -1,0 +1,113 @@
+{
+  "contract": "assignment-runner-lanes.v1",
+  "cases": [
+    {
+      "lanes": null,
+      "depth": 0,
+      "lanesField": null
+    },
+    {
+      "lanes": null,
+      "depth": 1,
+      "lanesField": null
+    },
+    {
+      "lanes": null,
+      "depth": 2,
+      "lanesField": null
+    },
+    {
+      "lanes": null,
+      "depth": 0,
+      "lanesField": null
+    },
+    {
+      "lanes": null,
+      "depth": 1,
+      "lanesField": null
+    },
+    {
+      "lanes": null,
+      "depth": 2,
+      "lanesField": null
+    },
+    {
+      "lanes": {
+        "ceiling": 4,
+        "laneWaitSec": 30
+      },
+      "depth": 0,
+      "lanesField": {
+        "ceiling": 4,
+        "waitMs": 30000
+      }
+    },
+    {
+      "lanes": {
+        "ceiling": 4,
+        "laneWaitSec": 30
+      },
+      "depth": 1,
+      "lanesField": null
+    },
+    {
+      "lanes": {
+        "ceiling": 4,
+        "laneWaitSec": 30
+      },
+      "depth": 2,
+      "lanesField": null
+    },
+    {
+      "lanes": {
+        "ceiling": null,
+        "laneWaitSec": 0
+      },
+      "depth": 0,
+      "lanesField": {
+        "ceiling": null,
+        "waitMs": 0
+      }
+    },
+    {
+      "lanes": {
+        "ceiling": null,
+        "laneWaitSec": 0
+      },
+      "depth": 1,
+      "lanesField": null
+    },
+    {
+      "lanes": {
+        "ceiling": null,
+        "laneWaitSec": 0
+      },
+      "depth": 2,
+      "lanesField": null
+    },
+    {
+      "lanes": {
+        "laneWaitSec": 5
+      },
+      "depth": 0,
+      "lanesField": {
+        "ceiling": null,
+        "waitMs": 5000
+      }
+    },
+    {
+      "lanes": {
+        "laneWaitSec": 5
+      },
+      "depth": 1,
+      "lanesField": null
+    },
+    {
+      "lanes": {
+        "laneWaitSec": 5
+      },
+      "depth": 2,
+      "lanesField": null
+    }
+  ]
+}

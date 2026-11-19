@@ -1,0 +1,411 @@
+{
+  "contract": "assignment-runner-legality.v1",
+  "cases": [
+    {
+      "name": "assignment must be an object",
+      "assignment": null,
+      "options": {},
+      "unitJson": {
+        "worktree": "$ROOT/linked",
+        "unit": {
+          "id": "unit-run-1"
+        },
+        "bindings": {
+          "producer/1": [
+            {
+              "assignmentId": "unit-run-1/producer/1",
+              "binding": {
+                "bindingInput": {
+                  "configDigest": "sha256:405336c7ec05446658dd47649864dc7c4cf220d98732218da30efdbbad744d1c"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "phase": null,
+          "message": "executeAssignment requires an assignment object"
+        }
+      }
+    },
+    {
+      "name": "human-only dispatch refused",
+      "assignment": {
+        "assignmentId": "a",
+        "operation": "op",
+        "role": "producer",
+        "dispatch": "human-only",
+        "provenance": {
+          "kind": "inline"
+        }
+      },
+      "options": {},
+      "unitJson": {
+        "worktree": "$ROOT/linked",
+        "unit": {
+          "id": "unit-run-1"
+        },
+        "bindings": {
+          "producer/1": [
+            {
+              "assignmentId": "unit-run-1/producer/1",
+              "binding": {
+                "bindingInput": {
+                  "configDigest": "sha256:405336c7ec05446658dd47649864dc7c4cf220d98732218da30efdbbad744d1c"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "phase": null,
+          "message": "cannot execute human-only operation \"op\" via cli-spawn"
+        }
+      }
+    },
+    {
+      "name": "declared assignment without a legal-operation list",
+      "assignment": {
+        "assignmentId": "a",
+        "stage": "s",
+        "operation": "op",
+        "domain": "d",
+        "role": "producer",
+        "provenance": {
+          "kind": "declared"
+        }
+      },
+      "options": {},
+      "unitJson": {
+        "worktree": "$ROOT/linked",
+        "unit": {
+          "id": "unit-run-1"
+        },
+        "bindings": {
+          "producer/1": [
+            {
+              "assignmentId": "unit-run-1/producer/1",
+              "binding": {
+                "bindingInput": {
+                  "configDigest": "sha256:405336c7ec05446658dd47649864dc7c4cf220d98732218da30efdbbad744d1c"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "phase": null,
+          "message": "declared assignment \"a\" carries no legal-operation list for stage \"s\" -- refused"
+        }
+      }
+    },
+    {
+      "name": "declared operation not in the step",
+      "assignment": {
+        "assignmentId": "a",
+        "stage": "s",
+        "operation": "op",
+        "domain": "d",
+        "role": "producer",
+        "provenance": {
+          "kind": "declared",
+          "declared": {
+            "legalOperations": [
+              "other",
+              {
+                "id": "second"
+              }
+            ]
+          }
+        }
+      },
+      "options": {},
+      "unitJson": {
+        "worktree": "$ROOT/linked",
+        "unit": {
+          "id": "unit-run-1"
+        },
+        "bindings": {
+          "producer/1": [
+            {
+              "assignmentId": "unit-run-1/producer/1",
+              "binding": {
+                "bindingInput": {
+                  "configDigest": "sha256:405336c7ec05446658dd47649864dc7c4cf220d98732218da30efdbbad744d1c"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "phase": null,
+          "message": "unknown operation \"op\" for stage \"s\" in domain \"d\" (declared operations: [other, second])"
+        }
+      }
+    },
+    {
+      "name": "human-only operation of the step",
+      "assignment": {
+        "assignmentId": "a",
+        "stage": "s",
+        "operation": "op",
+        "domain": "d",
+        "role": "producer",
+        "provenance": {
+          "kind": "declared"
+        }
+      },
+      "options": {
+        "operations": [
+          {
+            "id": "op",
+            "dispatch": "human-only"
+          }
+        ]
+      },
+      "unitJson": {
+        "worktree": "$ROOT/linked",
+        "unit": {
+          "id": "unit-run-1"
+        },
+        "bindings": {
+          "producer/1": [
+            {
+              "assignmentId": "unit-run-1/producer/1",
+              "binding": {
+                "bindingInput": {
+                  "configDigest": "sha256:405336c7ec05446658dd47649864dc7c4cf220d98732218da30efdbbad744d1c"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "phase": null,
+          "message": "cannot execute human-only operation \"op\" via cli-spawn"
+        }
+      }
+    },
+    {
+      "name": "read-only mode refuses a mutating assignment",
+      "assignment": {
+        "assignmentId": "a",
+        "operation": "op",
+        "role": "producer",
+        "mutation": "mutating",
+        "provenance": {
+          "kind": "declared"
+        }
+      },
+      "options": {
+        "isReadOnlyMode": true
+      },
+      "unitJson": {
+        "worktree": "$ROOT/linked",
+        "unit": {
+          "id": "unit-run-1"
+        },
+        "bindings": {
+          "producer/1": [
+            {
+              "assignmentId": "unit-run-1/producer/1",
+              "binding": {
+                "bindingInput": {
+                  "configDigest": "sha256:405336c7ec05446658dd47649864dc7c4cf220d98732218da30efdbbad744d1c"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "phase": null,
+          "message": "cannot execute mutating operation \"op\" (role: \"producer\") in mission-lite mode — mission-lite is strictly read-only"
+        }
+      }
+    },
+    {
+      "name": "mutating inline needs the explicit assertion",
+      "assignment": {
+        "assignmentId": "a",
+        "operation": "op",
+        "role": "producer",
+        "mutation": "mutating",
+        "provenance": {
+          "kind": "inline"
+        }
+      },
+      "options": {},
+      "unitJson": {
+        "worktree": "$ROOT/linked",
+        "unit": {
+          "id": "unit-run-1"
+        },
+        "bindings": {
+          "producer/1": [
+            {
+              "assignmentId": "unit-run-1/producer/1",
+              "binding": {
+                "bindingInput": {
+                  "configDigest": "sha256:405336c7ec05446658dd47649864dc7c4cf220d98732218da30efdbbad744d1c"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "phase": null,
+          "message": "executeAssignment: inline mutating assignment \"a\" refused -- mutation requires the caller to assert isReadOnlyMode: false explicitly (an omitted flag is read-only)"
+        }
+      }
+    },
+    {
+      "name": "mutating inline claiming the retired stamp",
+      "assignment": {
+        "assignmentId": "a",
+        "operation": "op",
+        "role": "producer",
+        "mutation": "mutating",
+        "provenance": {
+          "kind": "inline",
+          "inline": {
+            "contract": {
+              "constraints": [
+                "protocol-operation:d@1#o"
+              ]
+            }
+          }
+        }
+      },
+      "options": {
+        "isReadOnlyMode": false
+      },
+      "unitJson": {
+        "worktree": "$ROOT/linked",
+        "unit": {
+          "id": "unit-run-1"
+        },
+        "bindings": {
+          "producer/1": [
+            {
+              "assignmentId": "unit-run-1/producer/1",
+              "binding": {
+                "bindingInput": {
+                  "configDigest": "sha256:405336c7ec05446658dd47649864dc7c4cf220d98732218da30efdbbad744d1c"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "phase": null,
+          "message": "executeAssignment: mutating inline assignment \"a\" claims protocol-operation stamp for definition \"d\", but CoordinationProtocol engine has been retired"
+        }
+      }
+    },
+    {
+      "name": "mutating inline with no unit-run gate",
+      "assignment": {
+        "assignmentId": "a",
+        "operation": "op",
+        "role": "producer",
+        "mutation": "mutating",
+        "provenance": {
+          "kind": "inline"
+        }
+      },
+      "options": {
+        "isReadOnlyMode": false
+      },
+      "unitJson": {
+        "worktree": "$ROOT/linked",
+        "unit": {
+          "id": "unit-run-1"
+        },
+        "bindings": {
+          "producer/1": [
+            {
+              "assignmentId": "unit-run-1/producer/1",
+              "binding": {
+                "bindingInput": {
+                  "configDigest": "sha256:405336c7ec05446658dd47649864dc7c4cf220d98732218da30efdbbad744d1c"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "phase": null,
+          "message": "executeAssignment: mutating inline assignment \"a\" carries no single, well-formed engine-reserved protocol-operation stamp and no verified unit-run gate -- refused"
+        }
+      }
+    },
+    {
+      "name": "unit-run with no unit.json refused",
+      "assignment": {
+        "assignmentId": "unit-run-1/producer/1",
+        "role": "producer",
+        "round": 1,
+        "mutation": "mutating",
+        "provenance": {
+          "kind": "unit-run",
+          "seat": "producer",
+          "unitRunId": "unit-run-1"
+        },
+        "binding": {
+          "executor": "a",
+          "tier": "standard",
+          "posture": "workspace-write"
+        }
+      },
+      "options": {
+        "isReadOnlyMode": false,
+        "cwd": "$ROOT/linked"
+      },
+      "unitJson": null,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "phase": null,
+          "message": "executeAssignment: mutating unit-run assignment \"unit-run-1/producer/1\" refers to missing unit.json at \"$ROOT/main/.fgos/assignments/unit-run-1/unit.json\" -- refused"
+        }
+      }
+    }
+  ]
+}
