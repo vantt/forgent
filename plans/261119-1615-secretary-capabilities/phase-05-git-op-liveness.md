@@ -26,6 +26,12 @@ added in d1d4ec7ee (follow it).
    `tests/land_crash_matrix.rs`: (a) live child mid-op -> `resource-busy`; (b) after SIGKILL -> `resource-recovery-required`;
    (c) the op lock is released after the outcome is appended.
 
+6. Same busy theme (supervisor, from lead:OPC): `prepare_land` takes the merge slot at land.rs ~461 with
+   `.map_err(failure)` and publish takes main-checkout at ~851 the same way, so a busy slot surfaces as
+   `lock-acquire-unavailable: Timeout` instead of Busy. Use `acquire_merge_slot`'s existing Held|Timeout -> busy mapping
+   (~786) for prepare_land (one door), and the same for main-checkout (`main-checkout-busy`); tests in
+   `packages/git/rust/tests/land.rs`.
+
 ## Validation
 `cargo test -p fgos-git` (whole crate incl. land_crash_matrix), `cargo test -p fgos-holder-lock`, clippy -D warnings,
 msvc + darwin check (zig env, board 15:52), `node scripts/run-tests.mjs test/holder-lock test/architecture.test.mjs`;

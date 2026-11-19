@@ -38,6 +38,8 @@ footprint:
   - test/holder-lock/registry-contract.test.mjs
   - packages/git/rust/src/wal.rs
   - packages/git/rust/src/refs.rs
+  - packages/git/rust/src/land.rs
+  - packages/git/rust/tests/land.rs
   - packages/git/rust/tests/pending_op_liveness.rs
   - packages/git/rust/tests/scoped_commit_sync.rs
   - packages/holder-lock/rust/src/status.rs
@@ -51,6 +53,8 @@ source:
   - test/holder-lock/registry-contract.test.mjs
   - packages/git/rust/src/wal.rs
   - packages/git/rust/src/refs.rs
+  - packages/git/rust/src/land.rs
+  - packages/git/rust/tests/land.rs
   - packages/git/rust/tests/pending_op_liveness.rs
   - packages/git/rust/tests/scoped_commit_sync.rs
   - packages/holder-lock/rust/src/status.rs
@@ -104,10 +108,10 @@ A general backlog tool beyond add-rows; supervisor skill/route
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Session write refuses a stale base](phase-01-stale-base.md) | - | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/src/route.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/rust/examples/internal_harness.rs, packages/run-supervisor/contracts/head-request.v1.json, apps/fgos/src/wiring/session_write_publish.rs, apps/fgos/tests/session_write_publish.rs, apps/fgos/tests/questions_head.rs, bin/fgos.mjs, src/cli/command-registry.mjs, src/session-host/head-request-client.mjs, test/cli/session-verb.test.mjs, core/skills/fgos-secretary/SKILL.md, .agents/skills/fgos-secretary/SKILL.md, plugins/fgOS/skills/fgos-secretary/SKILL.md, docs/platform/session-host/spec.md | 1 | done |
-| 2 | [Role bound at head start](phase-02-role-binding.md) | - | packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_role_binding.rs, src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, docs/platform/session-host/spec.md | 2 | running |
-| 3 | [Shaper persona, persona-not-found, head TMPDIR](phase-03-shaper-tmpdir.md) | 2 | core/agents/shaper.yaml, .claude/agents/shaper.md, src/session-host/head-start.mjs, src/session-host/head-grants.mjs, test/session-host/head-start.test.mjs, test/session-host/head-request.test.mjs | 4 | ready |
+| 2 | [Role bound at head start](phase-02-role-binding.md) | - | packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_role_binding.rs, src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, docs/platform/session-host/spec.md | 2 | done |
+| 3 | [Shaper persona, persona-not-found, head TMPDIR](phase-03-shaper-tmpdir.md) | 2 | core/agents/shaper.yaml, .claude/agents/shaper.md, src/session-host/head-start.mjs, src/session-host/head-grants.mjs, test/session-host/head-start.test.mjs, test/session-host/head-request.test.mjs | 4 | done |
 | 4 | [Session write add-rows](phase-04-add-rows.md) | 1 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, apps/fgos/src/wiring/session_write_publish.rs, apps/fgos/tests/session_write_publish.rs, bin/fgos.mjs, src/cli/command-registry.mjs, src/session-host/head-request-client.mjs, test/cli/session-verb.test.mjs, core/skills/fgos-secretary/SKILL.md, .agents/skills/fgos-secretary/SKILL.md, plugins/fgOS/skills/fgos-secretary/SKILL.md, docs/platform/session-host/spec.md | 4 | draft |
-| 5 | [A live writer's pending Git op answers resource-busy](phase-05-git-op-liveness.md) | - | packages/holder-lock/contracts/lock-registry.v1.json, docs/platform/holder-lock/spec.md, test/holder-lock/registry-contract.test.mjs, packages/git/rust/src/wal.rs, packages/git/rust/src/refs.rs, packages/git/rust/tests/pending_op_liveness.rs, packages/git/rust/tests/scoped_commit_sync.rs, packages/holder-lock/rust/src/status.rs, packages/holder-lock/rust/src/scope.rs, docs/platform/git/spec.md | 1 | running |
+| 5 | [A live writer's pending Git op answers resource-busy](phase-05-git-op-liveness.md) | - | packages/holder-lock/contracts/lock-registry.v1.json, docs/platform/holder-lock/spec.md, test/holder-lock/registry-contract.test.mjs, packages/git/rust/src/wal.rs, packages/git/rust/src/refs.rs, packages/git/rust/src/land.rs, packages/git/rust/tests/land.rs, packages/git/rust/tests/pending_op_liveness.rs, packages/git/rust/tests/scoped_commit_sync.rs, packages/holder-lock/rust/src/status.rs, packages/holder-lock/rust/src/scope.rs, docs/platform/git/spec.md | 1 | running |
 | 6 | [Session write waits on a live writer](phase-06-busy-retry.md) | 1, 5 | apps/fgos/src/wiring/session_write_publish.rs, apps/fgos/tests/session_write_publish.rs, core/skills/fgos-secretary/SKILL.md, .agents/skills/fgos-secretary/SKILL.md, plugins/fgOS/skills/fgos-secretary/SKILL.md, docs/platform/session-host/spec.md | 5 | ready |
 | 7 | [Live grant audit from Miu's sandbox](phase-07-grant-audit.md) | 1, 2, 3, 4, 5, 6, 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/fgos-secretary/SKILL.md, plugins/fgOS/skills/fgos-secretary/SKILL.md, docs/platform/agent-confinement/spec.md, src/session-host/head-grants.mjs | 6 | ready |
 | 8 | [A rotation successor's role-gated verbs wait for the role](phase-08-rotation-role-wait.md) | 1, 2 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, src/session-host/head-request-client.mjs, test/session-host/head-request.test.mjs, docs/platform/session-host/spec.md | 3 | ready |
