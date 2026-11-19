@@ -1,0 +1,86 @@
+{
+  "subject": "Verification command",
+  "command": "npm test",
+  "cases": [
+    {
+      "verified": {
+        "status": 0,
+        "how": "exited 0",
+        "tail": "",
+        "durationMs": 1,
+        "outputDigest": "sha256:00",
+        "verdict": "pass"
+      },
+      "outcome": "pass",
+      "answer": {
+        "pass": true
+      }
+    },
+    {
+      "verified": {
+        "status": 1,
+        "how": "exited 1",
+        "tail": "line one\nline two",
+        "durationMs": 1,
+        "outputDigest": "sha256:00",
+        "verdict": "findings"
+      },
+      "outcome": "findings",
+      "answer": {
+        "pass": false,
+        "findings": [
+          "Verification command exited 1: npm test\nline one\nline two"
+        ]
+      }
+    },
+    {
+      "verified": {
+        "status": 2,
+        "how": "exited 2",
+        "tail": "",
+        "durationMs": 1,
+        "outputDigest": "sha256:00",
+        "verdict": "findings"
+      },
+      "outcome": "findings",
+      "answer": {
+        "pass": false,
+        "findings": [
+          "Verification command exited 2: npm test"
+        ]
+      }
+    },
+    {
+      "verified": {
+        "status": null,
+        "how": "timed out after 5ms",
+        "tail": "partial",
+        "durationMs": 1,
+        "outputDigest": "sha256:00",
+        "infrastructure": "timeout"
+      },
+      "outcome": "execution-failure",
+      "answer": {
+        "pass": false,
+        "infrastructure": "timeout",
+        "error": "Verification command timed out after 5ms: npm test\npartial"
+      }
+    },
+    {
+      "verified": {
+        "status": null,
+        "how": "could not run",
+        "tail": "",
+        "durationMs": 1,
+        "outputDigest": "sha256:00",
+        "infrastructure": "not-run"
+      },
+      "outcome": "execution-failure",
+      "answer": {
+        "pass": false,
+        "infrastructure": "not-run",
+        "error": "Verification command could not run: npm test"
+      }
+    }
+  ]
+}

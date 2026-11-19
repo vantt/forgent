@@ -1,0 +1,51 @@
+{
+  "contract": { "id": "admission-peer", "version": 1 },
+  "description": "The channel a Unit run asks the case admission port over: prefixed JSON lines on a (reader, writer) pair. The run is the client; the peer (the Workflow's port, in Node) answers. Implemented by packages/execution/engine/src/unit_run/peer.rs.",
+  "framing": {
+    "prefix": "\u001eFGOS-ADMISSION-PEER ",
+    "line": "prefix, one JSON message, newline",
+    "strayOutput": "A line without the prefix is never read as a message.",
+    "protocol": 1,
+    "deadline": "Each request has a deadline; a peer that closes the channel or stays silent fails the request and the run fails closed (nothing is committed).",
+    "transport": "The process's own stdin and stdout (the run-unit internal op), or a spawned peer's stdout and stdin (standalone fgos run). Pipes only; never an inherited fd above 2."
+  },
+  "request": { "protocol": "number", "id": "number, unique per request", "op": "one of operations or event", "payload": "object" },
+  "response": {
+    "ok": { "protocol": "number", "id": "the request's id", "result": "the operation's answer" },
+    "error": { "protocol": "number", "id": "the request's id", "error": { "code": "string", "message": "string" } },
+    "versionMismatch": "A frame whose protocol is not 1 refuses the call with code host-version-mismatch."
+  },
+  "operations": {
+    "resolveBinding": { "payload": { "worktree": "string", "caseId": "string|null" }, "result": { "answer": "string", "record": "object?", "condition": "string?" } },
+    "admit": { "payload": "the proposal: unitRunId, caseRef, activity, writes, worktree, readOnly, pattern, seatLaunches, blind, handoffRefs, rigor, reason", "result": { "admitted": "true with reservationId, caseId, seatLaunchCeiling", "refused": "{ code, condition, violations? }" } },
+    "recheckEffect": { "payload": { "reservationId": "string", "caseId": "string", "paths": "string[]" }, "result": { "ok": "true", "refused": "{ code, condition }" } },
+    "settle": { "payload": { "reservationId": "string", "settle": "the unit-run-result document" }, "result": "null" },
+    "activityUnitOf": { "payload": { "mainRoot": "string", "caseId": "string", "activity": "string" }, "result": "{ pattern, params } or null" },
+    "confinedWriteRefusal": { "payload": { "mainRoot": "string", "caseId": "string|null" }, "result": "the reason (string) or null" }
+  },
+  "events": {
+    "op": "event",
+    "payload": { "event": "unitRunCreated | caseAdmitted", "data": "object" },
+    "ack": { "acknowledged": true },
+    "unitRunCreated": { "data": { "unitRunId": "string" }, "parent": "marks the activity started" },
+    "caseAdmitted": { "data": { "caseId": "string", "reservationId": "string" }, "parent": "records recordScheduled" }
+  },
+  "vectors": [
+    { "name": "resolveBinding unbound", "op": "resolveBinding", "payload": { "worktree": "/w", "caseId": null }, "result": { "answer": "unbound" } },
+    { "name": "resolveBinding bound", "op": "resolveBinding", "payload": { "worktree": "/w", "caseId": "case-1" }, "result": { "answer": "worktree-already-bound", "record": { "caseId": "case-1" } } },
+    { "name": "admit admitted", "op": "admit", "payload": { "unitRunId": "unit-run-1", "caseRef": { "caseId": "case-1", "activity": "build" }, "writes": ["src/**"] }, "result": { "admitted": true, "reservationId": "res-1", "caseId": "case-1", "seatLaunchCeiling": 6 } },
+    { "name": "admit admitted without ceiling", "op": "admit", "payload": { "unitRunId": "unit-run-2", "caseRef": { "caseId": "case-1", "activity": "build" }, "writes": [] }, "result": { "admitted": true, "reservationId": "res-2", "caseId": "case-1", "seatLaunchCeiling": null } },
+    { "name": "admit refused", "op": "admit", "payload": { "unitRunId": "unit-run-3", "caseRef": { "caseId": "case-1", "activity": "build" }, "writes": ["src/**"] }, "result": { "refused": { "code": "case-admission-busy", "condition": "case case-1 is being advanced by another process; ask again", "violations": [{ "code": "busy" }] } } },
+    { "name": "recheckEffect ok", "op": "recheckEffect", "payload": { "reservationId": "res-1", "caseId": "case-1", "paths": ["src/a.rs"] }, "result": { "ok": true } },
+    { "name": "recheckEffect refused", "op": "recheckEffect", "payload": { "reservationId": "res-1", "caseId": "case-1", "paths": ["src/a.rs"] }, "result": { "refused": { "code": "reservation-not-live", "condition": "reservation res-1 of case case-1 is not live" } } },
+    { "name": "settle", "op": "settle", "payload": { "reservationId": "res-1", "settle": { "contract": { "id": "unit-run-result", "version": 1 }, "caseId": "case-1", "outcome": "pass" } }, "result": null },
+    { "name": "activityUnitOf found", "op": "activityUnitOf", "payload": { "mainRoot": "/repo", "caseId": "case-1", "activity": "build" }, "result": { "pattern": "solo", "params": {} } },
+    { "name": "activityUnitOf none", "op": "activityUnitOf", "payload": { "mainRoot": "/repo", "caseId": "case-1", "activity": "none" }, "result": null },
+    { "name": "confinedWriteRefusal reason", "op": "confinedWriteRefusal", "payload": { "mainRoot": "/repo", "caseId": null }, "result": "it cannot see the real bindings directory" },
+    { "name": "confinedWriteRefusal none", "op": "confinedWriteRefusal", "payload": { "mainRoot": "/repo", "caseId": "case-1" }, "result": null }
+  ],
+  "eventVectors": [
+    { "name": "unitRunCreated", "event": "unitRunCreated", "data": { "unitRunId": "unit-run-1" } },
+    { "name": "caseAdmitted", "event": "caseAdmitted", "data": { "caseId": "case-1", "reservationId": "res-1" } }
+  ]
+}

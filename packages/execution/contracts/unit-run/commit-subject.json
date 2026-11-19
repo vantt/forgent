@@ -1,0 +1,118 @@
+{
+  "subjects": [
+    {
+      "name": "conventional summary kept",
+      "summary": "feat(core): add the thing\nmore text",
+      "unitId": "u1",
+      "objective": "objective",
+      "subject": "feat(core): add the thing"
+    },
+    {
+      "name": "plain summary filed under chore",
+      "summary": "Add the thing",
+      "unitId": "u1",
+      "objective": "",
+      "subject": "chore(u1): Add the thing"
+    },
+    {
+      "name": "heading skipped",
+      "summary": "# Goal\nFix the parser",
+      "unitId": "u1",
+      "objective": "",
+      "subject": "chore(u1): Fix the parser"
+    },
+    {
+      "name": "only a heading",
+      "summary": "## Heading only",
+      "unitId": "u2",
+      "objective": "",
+      "subject": "chore(u2): Heading only"
+    },
+    {
+      "name": "objective when no summary",
+      "unitId": "u3",
+      "objective": "Port the module",
+      "subject": "chore(u3): Port the module"
+    },
+    {
+      "name": "empty both",
+      "summary": "",
+      "unitId": "u4",
+      "objective": "",
+      "subject": "chore(u4): producer changes"
+    },
+    {
+      "name": "ellipsis dropped",
+      "summary": "Fix the thing... and more … again",
+      "unitId": "u1",
+      "objective": "",
+      "subject": "chore(u1): Fix the thing and more again"
+    },
+    {
+      "name": "own prefix stripped",
+      "summary": "u5: do work",
+      "unitId": "u5",
+      "objective": "",
+      "subject": "chore(u5): do work"
+    },
+    {
+      "name": "breaking conventional",
+      "summary": "fix(api)!: drop the old route",
+      "unitId": "u1",
+      "objective": "",
+      "subject": "fix(api)!: drop the old route"
+    },
+    {
+      "name": "not conventional without space",
+      "summary": "fix:nospace here",
+      "unitId": "u1",
+      "objective": "",
+      "subject": "chore(u1): fix:nospace here"
+    },
+    {
+      "name": "long cut at sentence end",
+      "summary": "feat(core): xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx. xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx and then xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx more",
+      "unitId": "u1",
+      "objective": "",
+      "subject": "feat(core): xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+      "name": "long cut at word boundary",
+      "summary": "Add xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "unitId": "u1",
+      "objective": "",
+      "subject": "chore(u1): Add xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+      "name": "long hard cut",
+      "summary": "feat(core): yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+      "unitId": "u1",
+      "objective": "",
+      "subject": "feat(core): yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+    },
+    {
+      "name": "long ends in punctuation trimmed",
+      "summary": "fix: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx, tail",
+      "unitId": "u1",
+      "objective": "",
+      "subject": "fix: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+      "name": "crlf lines",
+      "summary": "\r\n# T\r\n  spaced   words \r\n",
+      "unitId": "u1",
+      "objective": "",
+      "subject": "chore(u1): spaced words"
+    }
+  ],
+  "syncSubjects": [
+    {
+      "ref": "main",
+      "subject": "chore(sync): merge main"
+    },
+    {
+      "ref": "origin/branch-branch-branch-branch-branch-branch-branch-branch-branch-branch-branch-branch-branch-branch-branch-branch-branch-branch-branch-branch-",
+      "subject": "chore(sync): merge"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "contract": { "id": "run-unit", "version": 1 },
+  "description": "The run-unit request and result across the internal op. Implemented by packages/execution/engine/src/unit_run/run_unit_contract.rs.",
+  "request": {
+    "contract": { "id": "run-unit-request", "version": 1 },
+    "options": ["acceptedReports", "accountPin", "activityUnit", "branchBase", "caseRef", "collaboration", "cwd", "declared", "forceSharedCwd", "overrides", "pattern", "personaScope", "pinInputs", "providerCapacityRuntimeDir", "raiseAuthorized", "reason", "repoRoot", "request", "resumeUnitRunId", "runnerConfig", "session", "stanceOptions", "unitData", "unitPath", "verify", "workflowId", "worktree"],
+    "notOptions": "caseAdmission is the admission peer (contracts/admission-peer); onCaseAdmitted and onUnitRunCreated are its two acknowledged events."
+  },
+  "result": {
+    "ok": { "contract": { "id": "run-unit-result", "version": 1 }, "ok": true, "result": "unitRunId, outcome, results[] (role, commit, runResult)" },
+    "error": { "contract": { "id": "run-unit-result", "version": 1 }, "ok": false, "error": { "tag": "CaseAdmissionRefusedError | RunnerConfigError | Error", "errorClass": "string, e.g. custody-predecessor-unknown", "message": "string", "code": "string?", "phase": "string?", "refusal": "{ code, condition, violations? } for CaseAdmissionRefusedError" } }
+  },
+  "vectors": [
+    { "name": "admission refused", "error": { "tag": "CaseAdmissionRefusedError", "errorClass": "case-admission-refused", "message": "case admission refused case-admission-busy: busy", "code": "case-admission-busy", "refusal": { "code": "case-admission-busy", "condition": "busy" } } },
+    { "name": "runner config", "error": { "tag": "RunnerConfigError", "errorClass": "runner-config", "message": "nested-write-from-confined-worker: refused", "code": "nested-write-from-confined-worker", "phase": "pre-admission" } },
+    { "name": "custody predecessor unknown", "error": { "tag": "Error", "errorClass": "custody-predecessor-unknown", "message": "the worktree's custody predecessor is unknown" } },
+    { "name": "port missing", "error": { "tag": "Error", "errorClass": "case-admission-port-missing", "message": "a writing or case run needs an admission port", "code": "case-admission-port-missing" } }
+  ]
+}
