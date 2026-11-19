@@ -62,6 +62,7 @@ pub mod session_write_publish;
 pub mod supervision;
 pub mod terminal_tabs;
 pub mod uninstall;
+pub mod unit_run_host;
 pub mod wire_agents;
 pub mod worktree;
 
