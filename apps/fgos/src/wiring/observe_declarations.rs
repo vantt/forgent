@@ -10,6 +10,12 @@ const QUESTIONS_DECLARATION: EmbeddedDeclaration = EmbeddedDeclaration {
     json: fgos_questions::record::OBSERVE_KINDS,
 };
 
+/// The kinds the supervision crate declares: the watcher tick and supervisor wake spans and the discussion status.
+const SUPERVISION_DECLARATION: EmbeddedDeclaration = EmbeddedDeclaration {
+    label: "fgos-supervision",
+    json: include_str!("../../../../packages/supervision/rust/observe-kinds.json"),
+};
+
 /// Every declaration a crate embeds with `include_str!`. Each owner adds its own entry next to its kinds.
 pub fn embedded_declarations() -> Vec<EmbeddedDeclaration> {
     vec![
@@ -19,6 +25,7 @@ pub fn embedded_declarations() -> Vec<EmbeddedDeclaration> {
         fgos_run_result::RUN_DECLARATION,
         super::observe_sources::SOURCES_DECLARATION,
         QUESTIONS_DECLARATION,
+        SUPERVISION_DECLARATION,
     ]
 }
 
@@ -48,5 +55,8 @@ mod tests {
         assert!(registry.has_subject_kind("work"));
         assert!(registry.has_subject_kind("question"));
         assert!(registry.kind("fgos.question.answered").is_some());
+        assert!(registry.kind("fgos.watcher.tick").is_some());
+        assert!(registry.kind("fgos.supervisor.wake").is_some());
+        assert!(registry.kind("fgos.discussion.status").is_some());
     }
 }

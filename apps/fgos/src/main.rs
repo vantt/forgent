@@ -170,7 +170,27 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::worktree::CREATE_DESCRIPTOR,
     wiring::worktree::REMOVE_DESCRIPTOR,
     wiring::worktree::RESYNC_DESCRIPTOR,
+    wiring::supervision::TICK_DESCRIPTOR,
+    wiring::supervision::SUPERVISOR_READ_DESCRIPTOR,
+    wiring::supervision::SUPERVISOR_WRITE_DESCRIPTOR,
+    wiring::supervision::LAND_DESCRIPTOR,
+    wiring::supervision::SLOTS_DESCRIPTOR,
 ];
+
+/// The operation catalog the host links: the `fgos-host-runtime` entries and the supervision verbs' own.
+fn operation_catalog() -> fgos_host_runtime::OperationCatalog {
+    static LINKED: std::sync::OnceLock<Vec<fgos_host_runtime::OperationDescriptor>> =
+        std::sync::OnceLock::new();
+    LINKED
+        .get_or_init(|| {
+            CATALOG
+                .iter()
+                .cloned()
+                .chain(wiring::supervision::catalog_entries())
+                .collect()
+        })
+        .as_slice()
+}
 
 /// The legacy payload root of the running release, for the verbs that read what it ships (its skills, its scripts).
 fn active_payload_root() -> Result<std::path::PathBuf, String> {
@@ -305,6 +325,16 @@ fn main() {
     // before the composition root: the hook protocol needs exact stdout
     // bytes, exit 0 on every path, and no snapshot or async runtime on its
     // hot path.
+    // A confined caller reaches the verbs of the head request contract only through its supervisor's request
+    // socket, whatever route their selector has (PS-20). `session start|rotate|write` and `questions` keep the
+    // doors they have.
+    #[cfg(unix)]
+    if wiring::supervision::is_confined() {
+        if let Some(confined) = routing::confined_head_call(cli_args) {
+            std::process::exit(wiring::supervision::send_confined(confined));
+        }
+    }
+
     let call = Call::new(cli_args);
     let lane = routing::decide(route, &call);
     if let Lane::HookProtocol(kind) = lane {
@@ -318,7 +348,11 @@ fn main() {
     }
 
     // Composition root: build snapshot and InvocationService.
-    let snapshot = build_snapshot(CATALOG, COMPOSITION_PROVIDERS, "fgos-composition-root-v1");
+    let snapshot = build_snapshot(
+        operation_catalog(),
+        COMPOSITION_PROVIDERS,
+        "fgos-composition-root-v1",
+    );
     let service = InvocationService::new(snapshot);
     service.register_provider(Arc::new(fgos_distribution::BuildShowProvider::new()));
     service.register_provider(Arc::new(fgos_work_state::GateBypassShowProvider::new()));
@@ -413,6 +447,17 @@ fn main() {
     ] {
         service.register_provider(Arc::new(
             wiring::worktree::WorktreeProvider::for_descriptor(descriptor),
+        ));
+    }
+    for descriptor in [
+        wiring::supervision::TICK_DESCRIPTOR,
+        wiring::supervision::SUPERVISOR_READ_DESCRIPTOR,
+        wiring::supervision::SUPERVISOR_WRITE_DESCRIPTOR,
+        wiring::supervision::LAND_DESCRIPTOR,
+        wiring::supervision::SLOTS_DESCRIPTOR,
+    ] {
+        service.register_provider(Arc::new(
+            wiring::supervision::SupervisionProvider::for_descriptor(descriptor),
         ));
     }
     service.register_provider(Arc::new(wiring::lock_status::LockStatusProvider::new()));

@@ -194,6 +194,18 @@ pub fn project_cli_invocation(
             ContractRef::from_static("agents.list.request", "1.0.0"),
             Box::new(crate::wiring::agents::project_agents_request(args)),
         ),
+        crate::wiring::supervision::TICK_OPERATION_ID
+        | crate::wiring::supervision::SUPERVISOR_READ_OPERATION_ID
+        | crate::wiring::supervision::SUPERVISOR_WRITE_OPERATION_ID
+        | crate::wiring::supervision::LAND_OPERATION_ID
+        | crate::wiring::supervision::SLOTS_OPERATION_ID => (
+            ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),
+            Box::new(crate::wiring::supervision::project_request(
+                operation_id_str,
+                args,
+                root?,
+            )?),
+        ),
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
@@ -261,6 +273,14 @@ pub fn native_operation_id(
     }
     if route_operation == crate::wiring::questions::READ_OPERATION_ID {
         let request = project_questions_request(args, std::path::PathBuf::new(), None)?;
+        return Ok(request.operation_id().to_string());
+    }
+    if route_operation == crate::wiring::supervision::SUPERVISOR_READ_OPERATION_ID {
+        let request = crate::wiring::supervision::project_request(
+            route_operation,
+            args,
+            std::path::PathBuf::new(),
+        )?;
         return Ok(request.operation_id().to_string());
     }
     Ok(route_operation.to_string())

@@ -93,6 +93,8 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("agents", wiring::agents::AVAILABLE_SUBCOMMANDS),
     ("worktree", wiring::worktree::AVAILABLE_SUBCOMMANDS),
     ("questions", wiring::questions::AVAILABLE_SUBCOMMANDS),
+    ("watcher", wiring::supervision::WATCHER_SUBCOMMANDS),
+    ("supervisor", wiring::supervision::SUPERVISOR_SUBCOMMANDS),
 ];
 
 /// The sub-command a verb runs when the call names none, by selector.
@@ -477,6 +479,154 @@ fn node_unknown_flag_text(
     format!(
         "unknown flag \"--{key}\" for \"fgos {verb}\"{hint}. {valid} See \"fgos {verb} --help\"."
     )
+}
+
+/// A confined call of a verb the head request contract names (`packages/run-supervisor/contracts/head-request.v1.json`):
+/// the contract's verb and the args built from the call's flags.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ConfinedCall {
+    pub verb: &'static str,
+    pub args: serde_json::Value,
+}
+
+/// The call as the head request contract reads it, or why the call cannot be one. `None`: the call is not of a
+/// verb the contract names, so it takes the route its selector has. This is the one confined rule of the host
+/// (PS-20): a confined caller reaches `land`, `run`, `worktree create`, `request result`, `session stop` and
+/// `supervisor handled|done` only through its supervisor's request socket. The marker and the socket are the
+/// caller's to check; this reads the words only.
+///
+/// Flags a confined caller must not choose (`land --footprint`, `--target`, `--squash`) are refused here with the
+/// contract's own `bad-args`, since the contract has no key for them.
+pub fn confined_head_call(cli_args: &[OsString]) -> Option<Result<ConfinedCall, String>> {
+    use serde_json::{json, Map, Value};
+    let selector = cli_args.first()?.to_string_lossy().into_owned();
+    let call = Call::new(cli_args);
+    let verb: &'static str = match (selector.as_str(), call.sub_word()) {
+        ("land", _) => "land",
+        ("run", _) => "run",
+        ("worktree", Some("create")) => "worktree create",
+        ("request", Some("result")) => "request result",
+        ("session", Some("stop")) => "session stop",
+        ("supervisor", Some("handled")) => "supervisor handled",
+        ("supervisor", Some("done")) => "supervisor done",
+        _ => return None,
+    };
+    let built = (|| -> Result<Value, String> {
+        let mut args = Map::new();
+        let text = |args: &mut Map<String, Value>, key: &str, flag: &str| -> Result<(), String> {
+            if let Some(value) = call.value(flag)? {
+                args.insert(key.to_owned(), json!(value));
+            }
+            Ok(())
+        };
+        // The words after the verb (after the sub-command when it has one), before a bare `--`.
+        let words: Vec<String> =
+            if call.sub_word().is_some() && selector != "land" && selector != "run" {
+                call.arguments()
+            } else {
+                call.flags().positional.clone()
+            };
+        let list = |flag: &str| -> Result<Option<Vec<String>>, String> {
+            let found = match call.flags().flag(flag) {
+                None => return Ok(None),
+                Some(FlagValue::One(FlagScalar::Str(t))) => vec![t.clone()],
+                Some(FlagValue::Many(items)) => items
+                    .iter()
+                    .filter_map(|i| match i {
+                        FlagScalar::Str(t) => Some(t.clone()),
+                        FlagScalar::Bool => None,
+                    })
+                    .collect(),
+                Some(_) => return Err(format!("--{flag} requires a value")),
+            };
+            Ok(Some(
+                found
+                    .iter()
+                    .flat_map(|t| t.split(','))
+                    .filter(|w| !w.is_empty())
+                    .map(str::to_owned)
+                    .collect(),
+            ))
+        };
+        match verb {
+            "land" => {
+                if let Some(flag) = ["footprint", "target", "squash"]
+                    .iter()
+                    .find(|f| call.flags().flag(f).is_some())
+                {
+                    return Err(format!(
+                        "bad-args: --{flag} is the host's to set, not a confined caller's"
+                    ));
+                }
+                let mut args = Map::new();
+                if let Some(branch) = words.first().cloned().or(call.value("branch")?) {
+                    args.insert("branch".to_owned(), json!(branch));
+                }
+                if let Some(paths) = list("paths")? {
+                    args.insert("paths".to_owned(), json!(paths));
+                }
+                if let Some(tests) = list("test")? {
+                    args.insert("tests".to_owned(), json!(tests));
+                }
+                if let Some(message) = call.value("message")? {
+                    args.insert("message".to_owned(), json!(message));
+                }
+                return Ok(Value::Object(args));
+            }
+            "run" => {
+                let [prompt] = words.as_slice() else {
+                    return Err("bad-args: run takes one prompt".to_owned());
+                };
+                args.insert("prompt".to_owned(), json!(prompt));
+                text(&mut args, "provider", "provider")?;
+                text(&mut args, "capability", "capability")?;
+                text(&mut args, "worktree", "worktree")?;
+                if let Some(writes) = list("writes")? {
+                    args.insert("writes".to_owned(), json!(writes));
+                }
+            }
+            "worktree create" => {
+                let [path] = words.as_slice() else {
+                    return Err("bad-args: worktree create takes one path".to_owned());
+                };
+                args.insert("path".to_owned(), json!(path));
+                text(&mut args, "branch", "branch")?;
+                text(&mut args, "base", "base")?;
+            }
+            "request result" => {
+                match words.as_slice() {
+                    [] => {}
+                    [id] => {
+                        args.insert("id".to_owned(), json!(id));
+                    }
+                    _ => return Err("bad-args: request result takes at most one id".to_owned()),
+                }
+                if let Some(wait) = call.value("wait")? {
+                    let seconds: f64 = wait
+                        .parse()
+                        .map_err(|_| format!("bad-args: --wait needs a number, got {wait}"))?;
+                    args.insert("wait".to_owned(), json!(seconds));
+                }
+            }
+            "session stop" => {
+                let [persona] = words.as_slice() else {
+                    return Err("bad-args: session stop takes one persona".to_owned());
+                };
+                args.insert("persona".to_owned(), json!(persona));
+                text(&mut args, "name", "name")?;
+                text(&mut args, "reason", "reason")?;
+            }
+            "supervisor handled" => {
+                let [event] = words.as_slice() else {
+                    return Err("bad-args: supervisor handled takes one event id".to_owned());
+                };
+                args.insert("event".to_owned(), json!(event));
+            }
+            _ => {}
+        }
+        Ok(Value::Object(args))
+    })();
+    Some(built.map(|args| ConfinedCall { verb, args }))
 }
 
 #[cfg(test)]
@@ -929,5 +1079,87 @@ mod tests {
         // The sub-command is taken out wherever it stands among the flags.
         let read = call("probe", &["--limit", "3", "list", "--json"]);
         assert_eq!(read.without_sub(), ["--limit", "3", "--json"]);
+    }
+}
+
+#[cfg(test)]
+mod confined_tests {
+    use super::*;
+    use serde_json::json;
+
+    fn confined(args: &[&str]) -> Option<Result<ConfinedCall, String>> {
+        let os: Vec<OsString> = args.iter().map(OsString::from).collect();
+        confined_head_call(&os)
+    }
+
+    fn built(args: &[&str]) -> ConfinedCall {
+        confined(args)
+            .expect("a contract verb")
+            .expect("a valid call")
+    }
+
+    #[test]
+    fn a_land_call_builds_the_contract_args_from_its_flags() {
+        assert_eq!(
+            built(&["land", "feature", "--test", "a.test,b.test", "--json"]),
+            ConfinedCall {
+                verb: "land",
+                args: json!({"branch": "feature", "tests": ["a.test", "b.test"]})
+            }
+        );
+        assert_eq!(
+            built(&[
+                "land",
+                "--paths",
+                "docs/a.md,docs/b.md",
+                "--message",
+                "docs: x"
+            ])
+            .args,
+            json!({"paths": ["docs/a.md", "docs/b.md"], "message": "docs: x"})
+        );
+    }
+
+    #[test]
+    fn a_confined_caller_cannot_choose_the_footprint_a_land_is_held_to() {
+        let refused = confined(&["land", "b", "--footprint", "src/**"])
+            .unwrap()
+            .unwrap_err();
+        assert!(refused.starts_with("bad-args"), "{refused}");
+    }
+
+    #[test]
+    fn the_other_contract_verbs_map_their_words_and_flags() {
+        assert_eq!(
+            built(&["supervisor", "handled", "ab12"]).args,
+            json!({"event": "ab12"})
+        );
+        assert_eq!(built(&["supervisor", "done"]).verb, "supervisor done");
+        assert_eq!(
+            built(&["session", "stop", "lead", "--name", "p-x", "--reason", "done"]).args,
+            json!({"persona": "lead", "name": "p-x", "reason": "done"})
+        );
+        assert_eq!(
+            built(&["request", "result", "t1", "--wait", "30"]).args,
+            json!({"id": "t1", "wait": 30.0})
+        );
+        assert_eq!(built(&["request", "result"]).args, json!({}));
+        assert_eq!(
+            built(&["worktree", "create", "../w", "--branch", "b"]).args,
+            json!({"path": "../w", "branch": "b"})
+        );
+        assert_eq!(
+            built(&["run", "do it", "--writes", "src/a,src/b"]).args,
+            json!({"prompt": "do it", "writes": ["src/a", "src/b"]})
+        );
+    }
+
+    #[test]
+    fn a_verb_the_contract_does_not_name_takes_its_own_route() {
+        assert!(confined(&["worktree", "remove", "../w"]).is_none());
+        assert!(confined(&["session", "start", "lead"]).is_none());
+        assert!(confined(&["supervisor", "queue"]).is_none());
+        assert!(confined(&["questions", "ask"]).is_none());
+        assert!(confined(&["slots"]).is_none());
     }
 }

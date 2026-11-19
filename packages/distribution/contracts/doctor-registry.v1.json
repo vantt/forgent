@@ -26,6 +26,9 @@
       "mailbox-sync-timer",
       "account-probe-timer",
       "watcher-timer",
+      "supervisor-events-unhandled",
+      "supervision-pace",
+      "land-gates-configured",
       "config-parse",
       "config-schema",
       "config-legacy-shadowed",
@@ -455,6 +458,22 @@
       "id": "watcher-timer",
       "description": "project supervision: when watcher.enabled is true, an OS timer runs fgos watcher tick every watcher.activeIntervalSec and keeps a head it starts alive after the timer's run ends; off by default; a platform without a timer scheduler only warns",
       "owner": "rust:packaging"
+    },
+    {
+      "id": "supervisor-events-unhandled",
+      "description": "project supervision: how many events the watcher raised are still unhandled; a pointer to fgos supervisor queue that warns and never fails",
+      "owner": "rust:supervision",
+      "pointer": true
+    },
+    {
+      "id": "supervision-pace",
+      "description": "project supervision: runs the read-only pace definitions watcher-overdue and supervisor-idle-burn and warns with their rows, since a stopped watcher cannot report itself",
+      "owner": "rust:supervision"
+    },
+    {
+      "id": "land-gates-configured",
+      "description": "project supervision: when watcher.enabled is true, land.gates is not empty (every fgos land refuses land-gate-missing otherwise)",
+      "owner": "rust:supervision"
     },
     {
       "id": "workflow-capabilities-configured",

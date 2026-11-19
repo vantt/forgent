@@ -722,3 +722,81 @@ fn with_no_target_and_no_remote_head_a_main_checkout_on_a_side_branch_refuses_ta
     assert_eq!(f.remote_tip(), remote_before);
     assert_eq!(git(&f.main, &["rev-parse", "refs/heads/side"]), side_before);
 }
+
+const PLAN_PATH: &str = "plans/260101-0000-demo/plan.md";
+
+fn plan_text(footprint: &[&str]) -> String {
+    let lines: String = footprint.iter().map(|f| format!("  - {f}\n")).collect();
+    format!("---\ncontract: plan-v1\ntitle: demo\nstatus: running\npriority: P2\nfootprint:\n{lines}created: 2026-01-01\n---\n\n# Demo\n")
+}
+
+/// Commit a plan file on trunk and push it, so the trunk tip holds the plan as a lead found it.
+fn commit_plan(f: &Fixture, footprint: &[&str]) {
+    fs::create_dir_all(f.main.join("plans/260101-0000-demo")).unwrap();
+    fs::write(f.main.join(PLAN_PATH), plan_text(footprint)).unwrap();
+    git(&f.main, &["add", "."]);
+    git(&f.main, &["commit", "-qm", "plan"]);
+    git(&f.main, &["push", "-q", "origin", "trunk"]);
+}
+
+fn lead_paths(names: &[&str]) -> LandCommand {
+    LandCommand {
+        footprint: Some(vec!["plans/260101-0000-demo/**".into()]),
+        ..paths(names)
+    }
+}
+
+#[test]
+fn a_lead_paths_land_that_changes_the_footprint_of_its_plan_file_refuses_and_commits_nothing() {
+    let f = Fixture::new();
+    commit_plan(&f, &["src/**"]);
+    let tip = f.remote_tip();
+    // The edit lands in the working file after any earlier look at it: only these bytes would be committed.
+    fs::write(f.main.join(PLAN_PATH), plan_text(&["src/**", "docs/**"])).unwrap();
+    let refusal = f
+        .land(&lead_paths(&[PLAN_PATH]), &config(vec![gate("true")]))
+        .unwrap_err();
+    assert_eq!(refusal.code, "footprint-change-refused", "{refusal}");
+    assert_eq!(f.remote_tip(), tip);
+    assert_eq!(f.local_tip(), tip);
+}
+
+#[test]
+fn a_lead_paths_land_that_changes_the_footprint_through_a_directory_path_refuses() {
+    let f = Fixture::new();
+    commit_plan(&f, &["src/**"]);
+    fs::write(f.main.join(PLAN_PATH), plan_text(&[])).unwrap();
+    let refusal = f
+        .land(
+            &lead_paths(&["plans/260101-0000-demo"]),
+            &config(vec![gate("true")]),
+        )
+        .unwrap_err();
+    assert_eq!(refusal.code, "footprint-change-refused", "{refusal}");
+}
+
+#[test]
+fn a_lead_paths_land_of_its_plan_file_with_the_footprint_kept_lands() {
+    let f = Fixture::new();
+    commit_plan(&f, &["src/**", "docs/**"]);
+    // The list is reordered and the body edited; the footprint is the same set.
+    let mut text = plan_text(&["docs/**", "src/**"]);
+    text.push_str("\nA note.\n");
+    fs::write(f.main.join(PLAN_PATH), text).unwrap();
+    let out = f
+        .land(&lead_paths(&[PLAN_PATH]), &config(vec![gate("true")]))
+        .unwrap();
+    assert_eq!(out.landed_paths, vec![PLAN_PATH.to_string()]);
+    assert_eq!(out.main_sha, f.remote_tip());
+}
+
+#[test]
+fn a_paths_land_without_a_footprint_does_not_look_at_plan_files() {
+    let f = Fixture::new();
+    commit_plan(&f, &["src/**"]);
+    fs::write(f.main.join(PLAN_PATH), plan_text(&["docs/**"])).unwrap();
+    let out = f
+        .land(&paths(&[PLAN_PATH]), &config(vec![gate("true")]))
+        .unwrap();
+    assert_eq!(out.main_sha, f.remote_tip());
+}

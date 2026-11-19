@@ -58,6 +58,7 @@ pub mod session_rotation_hook;
 #[path = "session_rotation_hook_unsupported.rs"]
 pub mod session_rotation_hook;
 pub mod session_write_publish;
+pub mod supervision;
 pub mod terminal_tabs;
 pub mod uninstall;
 pub mod wire_agents;
