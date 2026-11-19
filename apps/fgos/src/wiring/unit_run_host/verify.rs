@@ -80,7 +80,7 @@ fn borrowed(command: &str, cwd: &Path, timeout: Duration, custody: &Handle) -> R
             passed: false,
             status: None,
             timed_out: false,
-            output: format!("{other:?}"),
+            output: other.to_string(),
         },
     }
 }

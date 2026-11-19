@@ -192,8 +192,9 @@ pub trait UnitRunHost {
     /// Why the receipt a passing attempt left differs from what the provider record granted, or `None`.
     fn audit_lease_receipt(&self, receipt: Option<&Value>, assignment_id: &str) -> Option<String>;
     fn drop_assignment_record(&self, assignment_id: &str);
-    /// The records of an admission ledger's generations, oldest first.
-    fn admission_generations(&self, dir: &Path) -> Vec<Value>;
+    /// The records of an admission ledger's generations, oldest first; a missing ledger has none, any other
+    /// failure to read it is the run's error.
+    fn admission_generations(&self, dir: &Path) -> Result<Vec<Value>, RunUnitError>;
     /// The digest of the report a result names (`reportDigestOf`).
     fn report_digest(&self, result: &Value, main_root: &Path) -> Value;
     /// The verify command run under the unit's custody.

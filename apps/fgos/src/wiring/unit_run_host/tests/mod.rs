@@ -241,6 +241,13 @@ fn a_unit_source_is_data_as_given_or_a_file_read_as_json_then_yaml() {
     let missing = records::read_unit_source(&json!({ "unitPath": scratch.0.join("absent.yaml") }))
         .unwrap_err();
     assert_eq!(missing.code.as_deref(), Some("ENOENT"));
+    assert_eq!(
+        missing.message,
+        format!(
+            "ENOENT: no such file or directory, open '{}'",
+            scratch.0.join("absent.yaml").display()
+        )
+    );
     let broken = scratch.0.join("broken.yaml");
     std::fs::write(&broken, "a: 1\na: 2\n").unwrap();
     let refused = records::read_unit_source(&json!({ "unitPath": broken })).unwrap_err();
@@ -307,13 +314,27 @@ fn the_current_attempt_and_the_summary_of_a_node_settled_unit_run_read_back_byte
     let node_summary = std::fs::read(unit.join("unit-summary.json")).unwrap();
 
     let generations =
-        records::admission_generations(&unit.join("producer/1/admission/generations"));
+        records::admission_generations(&unit.join("producer/1/admission/generations")).unwrap();
     assert_eq!(generations.len(), 1);
     let attempt = records::current_attempt(&scratch.0, &format!("{id}/producer/1")).unwrap();
     assert_eq!(attempt.dir, unit.join("producer/1/runs/01"));
     assert_eq!(attempt.run_id, generations[0]["runId"].as_str().unwrap());
     assert!(records::current_attempt(&scratch.0, &format!("{id}/producer/2")).is_none());
-    assert!(records::admission_generations(&scratch.0.join("none")).is_empty());
+    assert!(records::admission_generations(&scratch.0.join("none"))
+        .unwrap()
+        .is_empty());
+    // Anything but a missing ledger is the run's error, as Node's fs raises it.
+    let not_a_dir = scratch.0.join("plain-file");
+    std::fs::write(&not_a_dir, "").unwrap();
+    let error = records::admission_generations(&not_a_dir).unwrap_err();
+    assert_eq!(error.code.as_deref(), Some("ENOTDIR"));
+    assert_eq!(
+        error.message,
+        format!(
+            "ENOTDIR: not a directory, scandir '{}'",
+            not_a_dir.display()
+        )
+    );
 
     let record = read_json(&unit.join("unit.json"));
     assert!(records::is_seat_record(&record));

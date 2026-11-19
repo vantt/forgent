@@ -47,9 +47,12 @@ pub fn read_unit_source(options: &Value) -> Result<Value, RunUnitError> {
         std::fs::read_to_string(unit_path)
     };
     let content = read.map_err(|e| {
-        let mut error = RunUnitError::other("error", format!("{unit_path}: {e}"));
-        error.code = io_code(&e).map(str::to_string);
-        error
+        if from_stdin {
+            node_fs_error(&e, "read", None)
+        } else {
+            let file = std::path::absolute(unit_path).unwrap_or_else(|_| unit_path.into());
+            node_fs_error(&e, "open", Some(&file))
+        }
     })?;
     if let Ok(value) = serde_json::from_str::<Value>(&content) {
         return Ok(value);
@@ -108,14 +111,28 @@ pub fn expand_generated(writes: &Value, generated: &Value) -> Value {
 }
 
 /// The `code` Node's file read error carries (`ENOENT`, `EACCES`, ...), when the kind names one.
-fn io_code(error: &std::io::Error) -> Option<&'static str> {
+/// A file system failure as Node's `fs` raises it: `code`, and the message `<CODE>: <description>, <syscall>
+/// '<path>'` (no path for a read of a descriptor). A failure Node names no code for keeps its own text.
+fn node_fs_error(error: &std::io::Error, syscall: &str, path: Option<&Path>) -> RunUnitError {
     use std::io::ErrorKind;
-    Some(match error.kind() {
-        ErrorKind::NotFound => "ENOENT",
-        ErrorKind::PermissionDenied => "EACCES",
-        ErrorKind::IsADirectory => "EISDIR",
-        _ => return None,
-    })
+    const EPERM: i32 = 1;
+    let named = match error.kind() {
+        ErrorKind::NotFound => Some(("ENOENT", "no such file or directory")),
+        ErrorKind::PermissionDenied if error.raw_os_error() == Some(EPERM) => {
+            Some(("EPERM", "operation not permitted"))
+        }
+        ErrorKind::PermissionDenied => Some(("EACCES", "permission denied")),
+        ErrorKind::IsADirectory => Some(("EISDIR", "illegal operation on a directory")),
+        ErrorKind::NotADirectory => Some(("ENOTDIR", "not a directory")),
+        _ => None,
+    };
+    let Some((code, description)) = named else {
+        return RunUnitError::other("error", error.to_string());
+    };
+    let target = path.map_or_else(String::new, |p| format!(" '{}'", p.display()));
+    let mut out = RunUnitError::other("error", format!("{code}: {description}, {syscall}{target}"));
+    out.code = Some(code.into());
+    out
 }
 
 fn truthy(value: &Value) -> bool {
@@ -186,11 +203,11 @@ pub fn acquire_unit_control(
 // ---- the admission ledger and the adopt door ----------------------------------------------------------------
 
 /// `listGenerations(dir).map(g => g.record)` (`src/run-supervisor/run-lock.mjs:118`): the records of an admission
-/// ledger, oldest first; a missing or unreadable ledger has none.
-pub fn admission_generations(dir: &Path) -> Vec<Value> {
+/// ledger, oldest first; a missing ledger has none, and any other failure to read it is the caller's error.
+pub fn admission_generations(dir: &Path) -> Result<Vec<Value>, RunUnitError> {
     list_generations(dir)
         .map(|list| list.into_iter().map(|g| g.record).collect())
-        .unwrap_or_default()
+        .map_err(|e| node_fs_error(&e, "scandir", Some(dir)))
 }
 
 /// `currentAttemptOf` (`src/runner/execution/unit-state.mjs:17`): the newest attempt directory the admission
@@ -198,7 +215,9 @@ pub fn admission_generations(dir: &Path) -> Vec<Value> {
 /// never made.
 pub fn current_attempt(assignments_dir: &Path, assignment_id: &str) -> Option<AttemptRef> {
     let assignment = assignments_dir.join(assignment_id);
-    let generations = admission_generations(&assignment.join("admission").join("generations"));
+    // `currentAttemptOf` is asked where a failure only means "no attempt to carry on from".
+    let generations =
+        admission_generations(&assignment.join("admission").join("generations")).ok()?;
     let current = generations.last()?;
     let dir = assignment
         .join("runs")

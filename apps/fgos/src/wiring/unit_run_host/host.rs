@@ -143,6 +143,8 @@ pub fn hold_cancel_on_signal(options: &Value) -> Result<CancelHold, RunUnitError
         {
             held.1 = Some(Box::new(cancel::install_cancel_on_signal(wait_ms)));
         }
+        // No crate installs a console Ctrl-C/Ctrl-Break handler yet (the run supervisor's gate only sends
+        // CTRL_BREAK): on Windows a cancel waits for the route's Windows decision.
         #[cfg(not(unix))]
         let _ = wait_ms;
     }
@@ -497,7 +499,7 @@ impl<A: CaseAdmission + Sync> UnitRunHost for HostUnitRun<A> {
     fn drop_assignment_record(&self, assignment_id: &str) {
         accounts::drop_assignment_record(assignment_id, self.runtime_dir.as_deref());
     }
-    fn admission_generations(&self, dir: &Path) -> Vec<Value> {
+    fn admission_generations(&self, dir: &Path) -> Result<Vec<Value>, RunUnitError> {
         records::admission_generations(dir)
     }
     fn report_digest(&self, result: &Value, main_root: &Path) -> Value {

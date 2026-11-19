@@ -1516,8 +1516,8 @@ mod run_loop {
             None
         }
         fn drop_assignment_record(&self, _: &str) {}
-        fn admission_generations(&self, _: &Path) -> Vec<Value> {
-            Vec::new()
+        fn admission_generations(&self, _: &Path) -> Result<Vec<Value>, RunUnitError> {
+            Ok(Vec::new())
         }
         fn report_digest(&self, _: &Value, _: &Path) -> Value {
             Value::Null
@@ -2322,8 +2322,8 @@ mod run_unit_runs {
             None
         }
         fn drop_assignment_record(&self, _: &str) {}
-        fn admission_generations(&self, _: &Path) -> Vec<Value> {
-            Vec::new()
+        fn admission_generations(&self, _: &Path) -> Result<Vec<Value>, RunUnitError> {
+            Ok(Vec::new())
         }
         fn report_digest(&self, _: &Value, _: &Path) -> Value {
             Value::Null

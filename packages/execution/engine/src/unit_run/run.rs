@@ -1666,7 +1666,7 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
                 .join(assignment_id)
                 .join("admission")
                 .join("generations"),
-        );
+        )?;
         let retry = attempt.get("dispatchRetryId");
         let admitted = retry.is_some() && generations.iter().any(|g| g.get("retryId") == retry);
         let continuing = attempt.get("outcome").is_none() && admitted && !abandoned();
