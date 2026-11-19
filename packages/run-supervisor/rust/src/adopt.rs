@@ -121,7 +121,8 @@ impl Verdict {
         }
     }
 
-    fn line(&self, dir: &Path) -> Value {
+    /// The verdict's answer line for the attempt directory `dir`.
+    pub fn line(&self, dir: &Path) -> Value {
         let mut line = json!({"v": 1, "protocol": 1, "attemptDir": dir, "state": self.state});
         for (key, value) in [
             ("outcome", &self.outcome),
