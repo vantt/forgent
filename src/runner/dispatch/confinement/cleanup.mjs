@@ -237,6 +237,49 @@ function recordedWriteBack(record) {
   } catch { return undefined; }
 }
 
+// The fields that name one login store in a write-back target (`credentialWriteBackTarget`).
+const STORE_FIELDS = ['provider', 'accountId', 'kind', 'home', 'layout', 'runtimeDir', 'store'];
+
+// Whether the attempt that owns `runDir` still runs: its supervisor, as its binding records it, is not proven dead
+// by the process door. An attempt with no binding yet has no owner to judge and does not count.
+function attemptSupervisorLive(runDir) {
+  try {
+    const supervisor = JSON.parse(fs.readFileSync(path.join(runDir, 'supervisor-binding.json'), 'utf8'))?.supervisor;
+    if (!Number.isInteger(supervisor?.pid) || supervisor.pid <= 0) return false;
+    return resolveHolderLiveness(supervisor) !== 'dead';
+  } catch { return false; }
+}
+
+/**
+ * The private homes of attempts still running whose recorded write-back target is the login store `target` names
+ * (`credentialWriteBackTarget`). Found only through the host record beside each home and the finalization descriptor
+ * it names, never from anything inside a home; a home whose attempt's supervisor is dead is left to its finalize
+ * step. Read-only; never a value of a login.
+ */
+export function listLiveSeatHomes(target, { tempRoots = [resolveConfinementTempRoot()] } = {}) {
+  const found = [];
+  if (!target || typeof target !== 'object') return found;
+  for (const root of tempRoots) {
+    let dispatches = [];
+    try { dispatches = fs.readdirSync(root, { withFileTypes: true }); } catch { continue; }
+    for (const entry of dispatches) {
+      if (!entry.isDirectory()) continue;
+      let subs = [];
+      try { subs = fs.readdirSync(path.join(root, entry.name), { withFileTypes: true }); } catch { continue; }
+      for (const sub of subs) {
+        if (!sub.isDirectory()) continue;
+        const home = path.join(root, entry.name, sub.name);
+        const record = readAttemptHomeRecord(home);
+        if (!record) continue;
+        const writeBack = recordedWriteBack(record)?.writeBack;
+        if (!writeBack || STORE_FIELDS.some((field) => (writeBack[field] ?? null) !== (target[field] ?? null))) continue;
+        if (attemptSupervisorLive(record.runDir)) found.push(home);
+      }
+    }
+  }
+  return found;
+}
+
 /**
  * Count one failed removal of a home whose renewed login could not be staged, in its host record (written from
  * `fields` when the home has none yet). An attempt close after the last counted one is not counted again, so a

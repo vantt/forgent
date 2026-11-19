@@ -41,7 +41,7 @@ pub fn canonical_root(root: &Path) -> PathBuf {
     fs::canonicalize(root).unwrap_or_else(|_| resolve(root))
 }
 
-fn subdirs(dir: &Path) -> Vec<PathBuf> {
+pub(super) fn subdirs(dir: &Path) -> Vec<PathBuf> {
     let Ok(read) = fs::read_dir(dir) else {
         return Vec::new();
     };
@@ -93,7 +93,7 @@ pub fn list_kept_credential_homes(temp_root: &Path) -> Vec<KeptHome> {
 }
 
 /// `{writeBack}` of a recorded home's entry in its finalization descriptor; the outer `None` when that cannot say.
-fn recorded_write_back(record: &Value) -> Option<Option<Value>> {
+pub(super) fn recorded_write_back(record: &Value) -> Option<Option<Value>> {
     let text = |key: &str| record.get(key).and_then(Value::as_str);
     let file = Path::new(text("runDir")?)
         .join("protected")
