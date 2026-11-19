@@ -15,6 +15,7 @@ import { spawnSync } from 'node:child_process';
 import { replaceDurably } from '../native/door.mjs';
 import { createSessionHost } from './client.mjs';
 import { grantOf } from './head-grants.mjs';
+import { planOfHead } from './head-plan.mjs';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
@@ -175,7 +176,7 @@ export function assertHeadArgs({ persona, name, projectRoot, gen = null, forQues
  *
  * `gen` is the generation of the lineage (absent: the first unused one); `forQuestion` is the id of an owner question the
  * new head continues (one more opening line); `beside` is the live key of the session whose
- * tab the new one opens next to. `ports` as for `startHeadSession` (`pin`, `handoff`, `opening`, `runnerConfig`, `bind`,
+ * tab the new one opens next to. `ports` as for `startHeadSession` (`planOfHead(projectRoot, persona, name) -> { dir }`, `pin`, `handoff`, `opening`, `runnerConfig`, `bind`,
  * `launch`). Returns `{ role, gen, key, placement, runDir, cli, persona }`; a refusal throws `HeadStartError`.
  */
 export async function placeHead({ persona, name, projectRoot, beside = null, gen = null, forQuestion = null } = {}, ports = {}) {
@@ -184,7 +185,11 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
   const generation = gen ?? nextHeadGeneration(projectRoot, persona, name);
   const key = headKeyOf(persona, name, generation);
   let grant;
-  try { grant = grantOf(role, persona); } catch (err) { throw new HeadStartError('grant-invalid', err.message); }
+  try {
+    // A lead writes only its plan directory, resolved here (a start and a rotation take the same path) because the grant table reads no files.
+    const planDir = persona === 'lead' ? (await (ports.planOfHead ?? planOfHead)(projectRoot, persona, name)).dir : null;
+    grant = grantOf(role, persona, { planDir });
+  } catch (err) { throw new HeadStartError('grant-invalid', err.message); }
   const pinned = await (ports.pin ?? defaultPin)({ persona, projectRoot });
   const handoff = await (ports.handoff ?? defaultHandoff)({ persona, name, projectRoot });
   const text = await (ports.opening ?? defaultOpening)({ persona, name, projectRoot, pinned, handoff, forQuestion });
