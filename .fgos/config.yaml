@@ -332,3 +332,17 @@ land:
         - packages/**
         - bin/**
         - scripts/**
+  # @fgos:doc The command that regenerates derived files after a landing, with the files it rewrites; null runs none.
+  # @fgos:why [74bda49f-655f-46ea-b76a-7a230bb878a6] restore land.regenerate for code paths only (when globs, 0414ccf9b); heads have cargo on PATH (timer re-rendered)
+  regenerate:
+    run: node scripts/export-command-selectors.mjs && node scripts/git-one-door-scan.mjs --root . --write-census
+    files:
+      - packages/git/contracts/mutation-census.v1.json
+      - packages/host-runtime/contracts/command-routes.json
+      - packages/host-runtime/contracts/command-manifest.json
+    when:
+      - src/**
+      - apps/**
+      - packages/**
+      - bin/**
+      - scripts/**
