@@ -13,7 +13,7 @@ Round 0 (2026-11-19 16:2x). Scout done; nothing settled. Starting picture: Miu a
 hands. Miu is always on, does little herself, but must be able to coordinate anything (delegate, queue) and have a fast
 route for small urgent chores. The supervisor is woken, not always on, and covers the large cyclic coordination.
 Round 1: the owner asked why the supervisor can do anything; it is the interim unconfined session, not the designed head (§3 row 9). Open next: which reach is the target (§3 row 9), then the urgent-chore route (§3 row 1).
-Round 2: owner gave a provisional picture of the supervisor (§3 row 10): observe, wake, open, ask, help every session; never do a session's work unless it is stuck. Row 9 deferred by the owner. Round 3: owner described Miu (§3 row 11): cognitive-load reducer at the owner's side, large authority over priority and order, life-and-death over sessions used rarely; the supervisor carries on what Miu arranged. Round 4: channel agreed as C (§3 row 12); SP-D1, SP-D2 minted. Next: the urgent-chore route (§3 row 1) in the light of SP-D1 (Miu rarely orders directly).
+Round 2: owner gave a provisional picture of the supervisor (§3 row 10): observe, wake, open, ask, help every session; never do a session's work unless it is stuck. Row 9 deferred by the owner. Round 3: owner described Miu (§3 row 11): cognitive-load reducer at the owner's side, large authority over priority and order, life-and-death over sessions used rarely; the supervisor carries on what Miu arranged. Round 4: channel agreed as C (§3 row 12); SP-D1, SP-D2 minted. Round 5: urgent-chore route agreed as C (§3 row 1, budget open). Owner asked where work management lives and whether to reorganise the files (§3 row 13, asked).
 
 ## 2. Mục tiêu & đề bài
 
@@ -33,7 +33,7 @@ the door it goes through and how it is proven from the sandbox. Code and plans a
 
 | # | Point | State |
 |---|---|---|
-| 1 | Urgent-chore fast route for Miu: what it is, its limits, how its result reaches main | open |
+| 1 | Urgent-chore fast route for Miu: what it is, its limits, how its result reaches main | agreed round 5 (option C): by default urgent chores go through the supervisor (Miu writes the chore to a file, `supervisor wake`, the supervisor starts a `fgos run`); Miu runs `fgos run` herself only when truly needed (the supervisor cannot come up or is stuck, or the owner is waiting and the chore only reads or checks); each such run is written to a file for the supervisor; writes only in a worktree, reaching main through the merge queue like any branch; Miu's grant gains `run`. Open: the budget ceiling per Miu run. Mint after it holds one more round |
 | 2 | Miu delegating/queuing work to the supervisor: a door to enqueue and wake (today Miu can only start sessions or message peers) | open |
 | 3 | Miu stopping sessions she started (no `session stop` in her grant) | settled SP-D1: needs `session stop` in her grant |
 | 4 | Miu reading the portfolio the supervisor reads (`supervisor plans`, `slots`, queue) for status | open |
@@ -44,6 +44,7 @@ the door it goes through and how it is proven from the sandbox. Code and plans a
 | 10 | Supervisor reach, owner's provisional picture (round 2, "anh cũng chưa rõ trong đầu"): high-level executive, authority without hands-on. It observes and wakes every session, opens new ones, asks an existing one, even helps it; it never does a session's work unless that session is stuck. Door map today: observe = `fgos identity list --project` (who, role, liveness only; no door reads what a session is doing or whether it is stuck beyond watcher events `head-gone`, `plan-no-progress`, `supervisor-stuck`); wake = no fgos door (mailbox reaches a session only during a turn; idle sessions are woken by herdr `pane send-text` or SendMessage, neither in the supervisor grant); open = `session start` (held); ask/help = mailbox or SendMessage (secretary grant only, not the supervisor); take over a stuck one = `session stop` + successor start or `session rotate` (held). Provisional; reversal trigger: the owner's own list of what `forgent-1d` does that must not be lost | provisional |
 | 11 | Miu's role, owner's provisional picture (round 3): always runs alongside the owner; reduces the owner's cognitive load: makes clear what is the priority, gives context and explains the problem so the owner chooses and decides. Large authority over priority and plan order, and life-and-death over sessions, but rarely gives direct orders unless truly needed. The supervisor usually carries on what Miu arranged. They work very closely, as the owner's right and left hands, both cross-domain. Implication found: the supervisor head has no channel back to Miu today (no mailbox, no peers), and Miu has no door to wake the supervisor (`supervisor wake` is not in her grant; only plan/discussion events wake it) | provisional |
 | 12 | Miu-supervisor channel: how what Miu arranges reaches the supervisor at once, and how the supervisor reports back | agreed round 4 (option C): every decision is written to portfolio files, which stay the truth; messages only wake and point ("read file X"); Miu gains `supervisor wake`; the supervisor gains a back channel to Miu for results, stuck work and decisions only. Mint after it holds one more round |
+| 13 | Where the work-management model lives, and whether its files are reorganised (owner question round 5). Evidence: D-ADR0079 (portfolio files in the repo are the truth; Work is a replaceable UX layer); L1 (log vs state); council recommendation in `plans/261117-1430-portfolio-driving-draft/reports/council-final-recommendation.md` (D1 two authored sources, D3 add-only records, D6 generated board, D11 run state through Event Store and holder-lock), draft parked by the owner 2026-11-17 because it touches Work. Today: `docs/backlog.md` is one 356 KB table of 277 rows with about 18 distinct Status shapes (free text after `done`); 134 plan dirs carry about 17 status spellings (complete, completed, done, landed ...) although plan-v1 has an enum; every backlog write replaces the whole file, which is what the caps lane's write races and add-rows phase work around. Shaper leaning: authored state stays in files, what happens (events, claims, questions, run facts) stays in the Event Store; reorganise the files (one backlog row per file with uniform frontmatter and a generated index; plan status held to the plan-v1 enum by a check). Scope: the portfolio-driving topic, not this one | open (asked round 5) |
 | 8 | Proof: each power named with its door and a sandbox proof (ties to supervisor-review T2 head-start preflight, `p-2wb2lfgky3`, and caps phase 6 grant audit) | open |
 
 ## 4. Quyết định đã chốt
@@ -83,6 +84,11 @@ the door it goes through and how it is proven from the sandbox. Code and plans a
 - 2026-11-19 17:1x — Asked the channel question (A files only, B direct two-way messages, C files are the truth and
   messages only wake and point). Owner: "C". §3 row 12 agreed; SP-D1 and SP-D2 minted from round 3 (held unrevised).
   Local ids follow the SM-D*/SR-D* precedent.
+
+- 2026-11-19 17:2x — Owner chose C for the urgent-chore route (§3 row 1), budget not answered. Owner then asked: "Vậy
+  mô hình quản lý đầu việc sẽ ghi ở đâu? Event Store hay file như hiện tại, cấu trúc cách tổ chức file có nên tổ chức
+  lại cho hiệu quả hơn." Scouted D-ADR0079, the portfolio-driving draft and its council report, backlog and plan status
+  counts. Opened §3 row 13.
 
 ## 6. Thiết kế đã chốt {#design}
 
