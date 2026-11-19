@@ -12,7 +12,7 @@ pub mod attestation;
 pub mod bwrap;
 pub mod contract;
 mod error;
-mod js;
+pub(crate) mod js;
 pub mod ports;
 pub mod registry;
 

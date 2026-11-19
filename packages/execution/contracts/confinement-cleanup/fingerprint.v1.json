@@ -1,0 +1,79 @@
+{
+  "contract": "confinement-probe-fingerprint-vectors.v1",
+  "proofProfile": "local-bwrap-v1",
+  "platform": {
+    "payload": "linux:6.1.0:x64:bubblewrap 0.8.0",
+    "digest": "a6132972e039e955e767c2093aa2c67d13818daa25b075df975f62990bd43edc"
+  },
+  "fingerprints": [
+    {
+      "name": "default",
+      "input": {},
+      "out": {
+        "contract": "confinement-probe-fingerprint.v1",
+        "policyDigest": "90db161c39c3b8b3b791b3594beb7f09d33232fe8272f2ca9275826d37445778",
+        "driverVersion": "local-bwrap-v1",
+        "backendConfigDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "proofProfile": "local-bwrap-v1",
+        "machinePrivate": "b447459c62edf18641075046cf2037bfc8b1d6660f19836b8abb8a5575a5ef6b"
+      },
+      "platformDigestIsHex": true
+    },
+    {
+      "name": "blind",
+      "input": {
+        "blind": true
+      },
+      "out": {
+        "contract": "confinement-probe-fingerprint.v1",
+        "policyDigest": "90db161c39c3b8b3b791b3594beb7f09d33232fe8272f2ca9275826d37445778",
+        "driverVersion": "local-bwrap-v1",
+        "backendConfigDigest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "proofProfile": "local-bwrap-v1",
+        "machinePrivate": "b447459c62edf18641075046cf2037bfc8b1d6660f19836b8abb8a5575a5ef6b",
+        "blind": true
+      },
+      "platformDigestIsHex": true
+    },
+    {
+      "name": "policy-and-config",
+      "input": {
+        "policy": "workspace-write",
+        "backendConfig": {
+          "tempRoot": "/srv/t"
+        },
+        "driverVersion": "local-bwrap-v9"
+      },
+      "out": {
+        "contract": "confinement-probe-fingerprint.v1",
+        "policyDigest": "f8e82631b3a8995daf08b3381ac43c35c61047fc3c91df102904cfb207749a8e",
+        "driverVersion": "local-bwrap-v9",
+        "backendConfigDigest": "5dccdc8d247a641f6b83efca8d3ed31fae9a55698ae78ba1d064f0dc417ded8e",
+        "proofProfile": "local-bwrap-v1",
+        "machinePrivate": "b447459c62edf18641075046cf2037bfc8b1d6660f19836b8abb8a5575a5ef6b"
+      },
+      "platformDigestIsHex": true
+    }
+  ],
+  "falsifiers": {
+    "private": [
+      "accounts",
+      "token"
+    ],
+    "runtime-dir": [
+      "systemd",
+      "bus",
+      "sshAgent",
+      "otherAttempt"
+    ],
+    "session-sockets": [
+      "sessionSocket"
+    ],
+    "herdr": [
+      "herdr"
+    ],
+    "login-stores": [
+      "loginStore"
+    ]
+  }
+}
