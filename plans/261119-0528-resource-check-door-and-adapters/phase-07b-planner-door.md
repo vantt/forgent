@@ -15,7 +15,7 @@ verdict. It waits for phase 8b: it must read tables through the reader that keep
 
 ## Files it may write
 
-`apps/fgos/Cargo.toml` (edges to `supervision`, `write-scope`, `graph` and `resource-referee`, workspace crates only) and `Cargo.lock` (regenerated once for those edges), `apps/fgos/src/**` (one small hunk in `main.rs`, the adapter in its own module), `packages/host-runtime/contracts/*`, `src/cli/command-registry.mjs` (the descriptions of the Work verbs whose meaning changes, and the new verb), the generated verb tables, and the verb-table test files above. The mutation census is not touched.
+`apps/fgos/Cargo.toml` (edges to `supervision`, `write-scope`, `graph` and `resource-referee`, workspace crates only) and `Cargo.lock` (regenerated once for those edges), `apps/fgos/src/**` (one small hunk in `main.rs`, the adapter in its own module), `packages/host-runtime/contracts/*`, the operation row in `packages/host-runtime/rust/src/catalog.rs` (added by the lead: admission refuses a verb with no catalog row), `src/cli/command-registry.mjs` (the descriptions of the Work verbs whose meaning changes, and the new verb), the generated verb tables, and the verb-table test files above. The mutation census is not touched.
 
 ## Steps
 
