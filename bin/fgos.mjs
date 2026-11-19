@@ -3356,11 +3356,21 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // A confined head's one way to change a granted file: its supervisor writes it outside the sandbox.
         const target = requireField(positional[1], 'session write requires a path: fgos session write <path> < new-content');
         if (process.stdin.isTTY) throw new StoreError('validation', 'session write reads the new content from stdin: fgos session write <path> < new-content');
-        const { requestHeadWrite } = await import('../src/session-host/head-request-client.mjs');
+        const { requestHeadWrite, blobOid } = await import('../src/session-host/head-request-client.mjs');
+        // The content the edit is based on: the blob id the caller names, else that of the copy it reads on disk now.
+        // The supervisor refuses write-base-stale when the file moved on since; no readable copy sends no base and the
+        // supervisor compares against what the file held when the request arrived.
+        let base = optionalField(flags.base, 'session write --base requires a git blob id (omit --base to use the file as it is on disk)');
+        if (base === undefined) {
+          const { resolveGitRoots: gitRootsOf } = await import('../src/runner/execution/run.mjs');
+          let root = process.cwd();
+          try { root = gitRootsOf(root).worktreeRoot; } catch { /* no git here: the path is read from the cwd */ }
+          try { base = blobOid(fs.readFileSync(path.resolve(root, target))); } catch { base = undefined; }
+        }
         const chunks = [];
         for await (const chunk of process.stdin) chunks.push(chunk);
         try {
-          return await requestHeadWrite({ path: target, content: Buffer.concat(chunks).toString('utf8') });
+          return await requestHeadWrite({ path: target, content: Buffer.concat(chunks).toString('utf8'), base });
         } catch (err) {
           throw new StoreError(HEAD_ARGUMENT_CODES.has(err.code) ? 'validation' : 'precondition', `${err.code ?? 'head-refused'}: ${err.message}`);
         }

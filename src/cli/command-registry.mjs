@@ -2488,11 +2488,12 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos session stop shaper --name <slug> --reason "answer received"'],
       },
       write: {
-        description: 'From inside a confined head: replace a granted file with the content on stdin. The head\'s supervisor checks the path (project-relative, named exactly by the grant, a regular file with no symbolic link on the way) and writes it atomically outside the sandbox, where the file is read-only. Answers {path, bytes}.',
+        description: 'From inside a confined head: replace a granted file with the content on stdin. The head\'s supervisor checks the path (project-relative, named exactly by the grant, a regular file with no symbolic link on the way) and writes it atomically outside the sandbox, where the file is read-only. Refused write-base-stale, writing nothing, when the file changed since the copy the writer read (re-read it and redo the edit). Answers {path, bytes}.',
         parameters: {
           type: 'object',
           properties: {
             path: { type: 'string', description: 'Positional: the project-relative path of the granted file, e.g. docs/backlog.md.' },
+            base: { type: 'string', description: 'The git blob id of the file content the edit was based on (git hash-object <path> of the copy read). Default: the blob id of the file as it is on disk when the command starts.' },
           },
           positional: ['path'],
           required: ['path'],
