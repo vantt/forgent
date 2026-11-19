@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b628c67bdd4b596ff2f89982087bf2c6481ab7705153bb639e484662a398f0c0",
+  "payloadDigest": "6d5e2119ad1905dff449c741ef0da9e30de8f11576def2326d7d9990eee472f1",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -950,7 +950,7 @@
     "packages/supervision/rust/src/land.rs": "52296e3b8250da6e1c83bdcdd35c6ea3451d238b02ac9813ceb9b1d55cedaac9",
     "packages/supervision/rust/src/lib.rs": "8070f2ae2159030a71567ae0ce2da103178415a0703b3de3b9b0f8d76b4cdf15",
     "packages/supervision/rust/src/notify.rs": "2a8ce19013396e3a31c915a903c4762889cc3f902137279e6378c3deb84e8edd",
-    "packages/supervision/rust/src/portfolio.rs": "ef5b142f6734e6b8fecd82052ce3239f451416c411cb090b40c1d6665796e65f",
+    "packages/supervision/rust/src/portfolio.rs": "f066d6130903796940ea0940c1de0b14d80350bfcb63f6dfabb14453c9526587",
     "packages/supervision/rust/src/queue.rs": "23d7cf84d1bd3dd53e29d76741970b57910b28ef27951e6969a7d2ce91cabacb",
     "packages/supervision/rust/src/supervisor.rs": "202847050dc1dbc9650d177752574ba64aae2e14dd62028b8a2246e2d0e90689",
     "packages/supervision/rust/src/wake.rs": "26ac6509e736002256d401aa2292ef168ccf339c80726e4c940d3f79a7dce493",
@@ -958,9 +958,9 @@
     "packages/supervision/rust/tests/definitions.rs": "8140a980c0f45a55dedf14efebcfc69f3fb7f87897f51a8bb4e3ce0bf58416cb",
     "packages/supervision/rust/tests/discussion_source.rs": "f083e37ab0509dd978b17e1982323b8e1d2aa3000c02bb44d418e228fa140848",
     "packages/supervision/rust/tests/land.rs": "675a2154f52aff21815f0fa0b16219d11000f48cd5ff61930bb534aea834665a",
-    "packages/supervision/rust/tests/portfolio.rs": "84b83ffc4a69b2d79d48be467d2523fb63f447f4819586d6443651638cd3f449",
+    "packages/supervision/rust/tests/portfolio.rs": "55b779e72ad9328e52fd36ed6969929dfc6cf2135e498bd128b428d8d80f5e62",
     "packages/supervision/rust/tests/queue.rs": "64318ef31e520f9123cf018d0d66ab43ab67e75f8850f99a7d4112333a5bd60e",
-    "packages/supervision/rust/tests/wake.rs": "deb057958a4b707146d212454ec1bff5cef6cca42e4ebeea015cc371d1e73ece",
+    "packages/supervision/rust/tests/wake.rs": "79d315b5d8ca977755cd2665c5aef7b258007c18b861a55aa14252351c4b1c48",
     "packages/supervision/rust/tests/watcher.rs": "4487b09077652472c7b3e1771d7d4a6accd3a2a74e5bbd0369c758cc89c3eaae",
     "packages/terminal-control/rust/src/core.rs": "0fa67399b5c1e59ac6accc448f58675cae90255659685254b48f428631ab66eb",
     "packages/terminal-control/rust/src/driver/herdr.rs": "8c3df4209429b90138bea12af929cf7456d7f3c7bbbda193dcc585ad7fa9a8eb",
