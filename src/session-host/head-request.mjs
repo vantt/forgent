@@ -22,6 +22,10 @@ import { stopHeadSession } from './head-stop.mjs';
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
 import { judge, observe, selfRecord } from '../native/process-identity.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
+import { assignmentDir } from '../runner/dispatch/assignment-layout.mjs';
+import { canonicalizeWriteEntry, matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
+import { readStoredUnitSummary } from '../runner/execution/unit-summary.mjs';
+import { unitRunFacts } from '../runner/execution/unit-run-record.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
 import { markSuccessorAnswered, requestRotation, rotationHolds } from '../session-rotation/rotate.mjs';
 
@@ -112,16 +116,42 @@ const RUNNER_TIMEOUT_MS = 2 * 60 * 60 * 1000;
 const STOP_WAIT_MS = 15_000;
 const STOP_GRACE_MS = 1_000;
 
+/** A value that becomes one argv token of a host verb must not read as an option: refused `bad-args` when it starts with `-`. */
+const noDash = (key, value) => {
+  if (typeof value === 'string' && value.startsWith('-')) throw badArgs(`${key} must not start with "-"`);
+};
 const isStringArray = (v) => Array.isArray(v) && v.every((x) => typeof x === 'string' && x !== '');
 const roleErr = (message) => Object.assign(new Error(message), { code: 'role-mismatch' });
 const personaOf = (envelope) => envelope.session.persona ?? null;
 
 /** A plain project-relative path: no empty, `.` or `..` segment, not absolute. */
+const plainEntry = (p) => typeof p === 'string' && p !== '' && !path.isAbsolute(p) && !p.includes('\\') && !p.includes(',') && !p.split('/').some((seg) => seg === '..');
 const plainRelative = (p) => typeof p === 'string' && p !== '' && !path.isAbsolute(p) && !p.includes('\\') && !p.includes(',') && !p.split('/').some((seg) => seg === '' || seg === '.' || seg === '..');
 const inGrant = (p, writes) => plainRelative(p) && writes.some((w) => p === w || p.startsWith(`${w.replace(/\/+$/, '')}/`));
-const globRegExp = (glob) => new RegExp(`^${glob.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*\*/g, '\u0000').replace(/\*/g, '[^/]*').replace(/\u0000/g, '.*')}$`);
-/** Whether a footprint entry (a path, a directory or a glob) covers the path. */
-const covered = (p, footprint) => plainRelative(p) && footprint.some((e) => p === e || p.startsWith(`${e.replace(/\/+$/, '')}/`) || (e.includes('*') && globRegExp(e).test(p)));
+const hasGlob = (segment) => segment.includes('*');
+
+/**
+ * Whether the footprint entry `f` contains every path the requested write entry `e` can name. A literal `e` is asked of the
+ * repo's write-scope matcher itself. A glob `e` is contained when `f` is a plain path above its first glob, when `f` is a
+ * plain prefix followed by one trailing `**`, or when `f` is the same entry; a glob that only looks alike (`src/*` against
+ * `src/**`) never covers it.
+ */
+function entryWithin(e, f) {
+  const es = canonicalizeWriteEntry(e).split('/');
+  const fs_ = canonicalizeWriteEntry(f).split('/');
+  if (!es.some(hasGlob)) return matchesWriteScope(es.join('/'), [f]);
+  if (es.join('/') === fs_.join('/')) return true;
+  const firstGlob = fs_.findIndex(hasGlob);
+  const prefix = firstGlob === -1 ? fs_ : fs_.slice(0, firstGlob);
+  const openEnded = firstGlob === -1 || (firstGlob === fs_.length - 1 && fs_[firstGlob] === '**');
+  return openEnded && prefix.length <= es.length && prefix.every((seg, k) => seg === es[k]);
+}
+
+/** Whether the footprint covers a requested write entry (a path, a directory or a glob). */
+const covered = (p, footprint) => {
+  if (!plainEntry(p)) return false;
+  try { return footprint.some((f) => entryWithin(p, f)); } catch { return false; }
+};
 
 const planOfCaller = (envelope, projectRoot, ports) => (ports.planOf ?? ((root, persona, name) => planOfHead(root, persona, name, ports.plan ?? {})))(projectRoot, personaOf(envelope), envelope.session.name);
 
@@ -197,6 +227,10 @@ function startTicket({ id, verb, argv, envelope, projectRoot, ports }) {
     writeTicket(file, { ...ticket, state: 'failed', code: 'spawn-failed', endedAt: new Date().toISOString() });
     throw Object.assign(new Error(`the runner of ticket ${id} did not start: ${started?.error ?? 'no pid'}`), { code: 'spawn-failed' });
   }
+  // The runner's identity is on the ticket before the reply, so a runner that dies at once still reads `failed`/`runner-gone`.
+  const identity = (ports.observe ?? observe)(started.pid);
+  const current = readTicketFile(file);
+  if (identity && current?.state === 'running' && !current.runner) writeTicket(file, { ...current, runner: identity });
   return { ticket: id, state: 'running' };
 }
 
@@ -206,6 +240,10 @@ async function landVerb({ args, envelope, projectRoot, id, ports }) {
   if ((branch === undefined) === (paths === undefined)) throw badArgs('exactly one of branch and paths');
   if (tests !== undefined && !isStringArray(tests)) throw badArgs('tests must be an array of strings');
   if (message !== undefined && (typeof message !== 'string' || message === '')) throw badArgs('message must be a non-empty string');
+  noDash('branch', branch);
+  noDash('message', message);
+  for (const t of tests ?? []) noDash('tests', t);
+  for (const p of Array.isArray(paths) ? paths : []) noDash('paths', p);
   const argv = ['land', '--json'];
   const writes = envelope.session.writes ?? [];
   const lead = personaOf(envelope) === 'lead';
@@ -213,8 +251,8 @@ async function landVerb({ args, envelope, projectRoot, id, ports }) {
     if (typeof branch !== 'string' || !REF_PATTERN.test(branch)) throw badArgs('branch must be a branch name');
     if (!lead) throw Object.assign(new Error('only a lead lands a branch'), { code: 'land-branch-lead-only' });
     const plan = await planOfCaller(envelope, projectRoot, ports);
-    argv.push('--branch', branch);
-    if (plan.footprint.length > 0) argv.push('--footprint', plan.footprint.join(','));
+    if (plan.footprint.length === 0) throw Object.assign(new Error(`plan ${plan.dir} has no footprint, so a branch has nothing to be held to`), { code: 'write-outside-footprint' });
+    argv.push('--branch', branch, '--footprint', plan.footprint.join(','));
   } else {
     if (!isStringArray(paths) || paths.length === 0) throw badArgs('paths must be a non-empty array of strings');
     if (message === undefined) throw badArgs('message is required with paths');
@@ -224,7 +262,7 @@ async function landVerb({ args, envelope, projectRoot, id, ports }) {
     if (lead) await refuseFootprintChange({ paths, envelope, projectRoot, ports });
     argv.push('--paths', paths.join(','), '--message', message);
   }
-  if (tests?.length) argv.push('--tests', tests.join(','));
+  for (const t of tests ?? []) argv.push('--test', t);
   return startTicket({ id, verb: HEAD_LAND_VERB, argv, envelope, projectRoot, ports });
 }
 
@@ -240,15 +278,16 @@ async function refuseFootprintChange({ paths, envelope, projectRoot, ports }) {
 }
 
 async function runVerb({ args, envelope, projectRoot, id, ports }) {
-  exactKeys(args, ['prompt', 'unit', 'provider', 'capability', 'writes', 'worktree']);
+  exactKeys(args, ['prompt', 'provider', 'capability', 'writes', 'worktree']);
   if (personaOf(envelope) !== 'lead') throw roleErr('only a lead runs');
-  if ((args.prompt === undefined) === (args.unit === undefined)) throw badArgs('exactly one of prompt and unit');
-  for (const key of ['prompt', 'unit', 'provider', 'capability', 'worktree']) {
+  if (args.prompt === undefined) throw badArgs('prompt is required');
+  for (const key of ['prompt', 'provider', 'capability', 'worktree']) {
     if (args[key] !== undefined && (typeof args[key] !== 'string' || args[key] === '')) throw badArgs(`${key} must be a non-empty string`);
+    noDash(key, args[key]);
   }
   if (args.writes !== undefined && !isStringArray(args.writes)) throw badArgs('writes must be an array of strings');
-  const argv = ['run', '--json'];
-  if (args.prompt !== undefined) argv.push(args.prompt); else argv.push('--unit', args.unit);
+  for (const p of args.writes ?? []) noDash('writes', p);
+  const argv = ['run', '--json', args.prompt];
   if (args.writes?.length) {
     const plan = await planOfCaller(envelope, projectRoot, ports);
     for (const p of args.writes) {
@@ -295,6 +334,23 @@ export function runTicket(file, ports = {}) {
   return done;
 }
 
+/** The outcome of a run, read from its assignment record through the Unit-run readers: whether it exists, is settled, and its summary outcome. */
+function assignmentOf(projectRoot, unitRunId) {
+  const fgosDir = fgosDirFromRoot(projectRoot);
+  const facts = unitRunFacts(fgosDir, unitRunId);
+  const view = { dir: `.fgos/assignments/${unitRunId}`, present: facts.exists, settled: facts.settled };
+  if (!facts.exists) return view;
+  try {
+    const text = readStoredUnitSummary(assignmentDir(fgosDir, unitRunId));
+    const summary = text === null ? null : JSON.parse(text);
+    if (summary !== null) {
+      view.outcome = summary.outcome ?? null;
+      if (summary.settledAt) view.settledAt = summary.settledAt;
+    }
+  } catch { /* an unreadable summary leaves the outcome out: only positive evidence is shown */ }
+  return view;
+}
+
 /** What `request result` shows of a ticket; a running one whose runner is judged dead reads failed, `runner-gone`. */
 function viewOf(ticket, projectRoot, { withResult, judgeRunner }) {
   let { state, code } = ticket;
@@ -305,7 +361,7 @@ function viewOf(ticket, projectRoot, { withResult, judgeRunner }) {
   if (code) view.code = code;
   if (ticket.unitRunId) {
     view.unitRunId = ticket.unitRunId;
-    view.assignment = { dir: `.fgos/assignments/${ticket.unitRunId}`, present: fs.existsSync(path.join(fgosDirFromRoot(projectRoot), 'assignments', ticket.unitRunId)) };
+    view.assignment = assignmentOf(projectRoot, ticket.unitRunId);
   }
   if (withResult && ticket.result !== undefined) view.result = ticket.result;
   return view;
@@ -357,14 +413,12 @@ function worktreeCreate({ args, envelope, projectRoot, ports }) {
   }
 }
 
-/** The asker of an answered owner question holds `role`: the host's `questions --answered --json` names it. */
+/** The asker of an answered owner question holds `role`: the host's `questions --answered --json` rows carry `asker.roles`. A host failure surfaces with its own code. */
 function askerAnswered({ envelope, projectRoot, role, ports }) {
   if (ports.askerAnswered) return ports.askerAnswered(role);
-  try {
-    const rows = hostCall({ envelope, projectRoot, argv: ['questions', '--answered', '--json'] }, ports);
-    const list = Array.isArray(rows) ? rows : (rows.questions ?? []);
-    return Array.isArray(list) && list.some((q) => (q?.asker?.role ?? q?.askerRole) === role);
-  } catch { return false; }
+  const rows = hostCall({ envelope, projectRoot, argv: ['questions', '--answered', '--json'] }, ports);
+  const list = Array.isArray(rows) ? rows : (rows.questions ?? []);
+  return Array.isArray(list) && list.some((q) => Array.isArray(q?.asker?.roles) && q.asker.roles.includes(role));
 }
 
 async function stopVerb({ args, envelope, projectRoot, ports }) {
@@ -465,8 +519,8 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
         if (data?.done === true) {
           // The caller ends its own session after this route has printed its line (the stop waits for this process to exit).
           const { persona, name } = envelope.session;
-          (ports.spawnStop ?? spawnStopSelf)({ persona, name, projectRoot });
-          data = { ...data, stopping: true };
+          const started = (ports.spawnStop ?? spawnStopSelf)({ persona, name, projectRoot });
+          if (started?.pid) data = { ...data, stopping: true };
         }
         break;
       default:

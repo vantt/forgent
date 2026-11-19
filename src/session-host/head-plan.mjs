@@ -8,7 +8,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { readFrontmatter } from '../util/yaml.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 const VOCABULARY = JSON.parse(fs.readFileSync(new URL('../../packages/supervision/contracts/plan-vocabulary.v1.json', import.meta.url), 'utf8'));
 const PROJECT_PREFIX = VOCABULARY.headName.projectPrefix;
@@ -26,8 +28,23 @@ export class HeadPlanError extends Error {
   }
 }
 
-/** The project handle of a checkout: its folder name as a head-name segment, before the prefix cut. */
-export const projectHandleOf = (projectRoot) => path.basename(projectRoot).toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
+/**
+ * The project handle Identity reports (`fgos identity project`): `handle` of the tracked `.fgos/project.json`, read from this
+ * checkout or, in a linked worktree that lacks it, from the main checkout. Throws `plan-not-found` when no handle is minted.
+ */
+export function projectHandleOf(projectRoot) {
+  const candidates = [path.join(fgosDirFromRoot(projectRoot), 'project.json')];
+  try {
+    const common = execFileSync('git', ['-C', projectRoot, 'rev-parse', '--path-format=absolute', '--git-common-dir'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    candidates.push(path.join(fgosDirFromRoot(path.dirname(common)), 'project.json'));
+  } catch { /* not a git checkout: only the first candidate */ }
+  for (const file of candidates) {
+    let record;
+    try { record = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { continue; }
+    if (typeof record?.handle === 'string' && record.handle !== '') return record.handle;
+  }
+  throw new HeadPlanError('plan-not-found', 'this project has no minted handle (.fgos/project.json), so no head name can be resolved to a plan');
+}
 
 const cut = (text, max) => [...text].slice(0, max).join('');
 

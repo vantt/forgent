@@ -102,27 +102,26 @@
       "args": {
         "branch": "string, optional: a branch to land; a lead only (land-branch-lead-only for any other persona)",
         "paths": "array of strings, optional: exact main-checkout paths to commit; every one must lie inside an entry of envelope.session.writes (path-outside-grant)",
-        "tests": "array of strings, optional: test paths for a gate that uses {tests}",
+        "tests": "array of strings, optional: test paths for a gate that uses {tests}; sent to the host as one --test <path> per path",
         "message": "string, optional: the commit message; required with paths"
       },
-      "does": "answers at once with a ticket (the request id): the route child writes the ticket file and starts a detached runner that runs the host verb `fgos land --json` to its end and rewrites the ticket; `request result` reads it. Exactly one of branch and paths; any other key is bad-args. A lead's branch land passes the footprint of its plan, read from plan.md at the trunk tip, as --footprint; a lead's paths land that would change that footprint in the plan's own plan.md is refused footprint-change-refused",
+      "does": "answers at once with a ticket (the request id): the route child writes the ticket file and starts a detached runner that runs the host verb `fgos land --json` to its end and rewrites the ticket; `request result` reads it. Exactly one of branch and paths; any other key is bad-args, and so is any string that becomes one argv token (branch, message, paths, tests) and starts with '-'. A lead's branch land passes the footprint of its plan, read from plan.md at the trunk tip, as --footprint, and is refused write-outside-footprint when the plan has none; a lead's paths land that would change that footprint in the plan's own plan.md is refused footprint-change-refused",
       "data": {
         "ticket": "the request id",
         "state": "running"
       },
       "identity": "held",
-      "rule": "refusals (verb-failed detail): bad-args, land-branch-lead-only, path-outside-grant, footprint-change-refused, ticket-used, plan-not-found, plan-ambiguous"
+      "rule": "refusals (verb-failed detail): bad-args, land-branch-lead-only, path-outside-grant, write-outside-footprint, footprint-change-refused, ticket-used, plan-not-found, plan-ambiguous"
     },
     "run": {
       "args": {
-        "prompt": "string, one of prompt and unit",
-        "unit": "string, one of prompt and unit: a unit file",
-        "provider": "string, optional",
-        "capability": "string, optional",
-        "writes": "array of strings, optional: each must be covered by the lead's plan footprint (write-outside-footprint)",
-        "worktree": "string, optional: a linked worktree"
+        "prompt": "string, required; must not start with '-'",
+        "provider": "string, optional; must not start with '-'",
+        "capability": "string, optional; must not start with '-'",
+        "writes": "array of strings, optional: each must be contained in the lead's plan footprint by the repo's write-scope semantics (write-outside-footprint); `src/**` is not contained in `src/*`",
+        "worktree": "string, optional: a linked worktree; must not start with '-'"
       },
-      "does": "lead only. Answers at once with a ticket as land does; the detached runner runs `fgos run --json` without FGOS_DISPATCH_DEPTH (a lead's phase run is a top-level seat and takes a lane) and the ticket keeps only the unitRunId, whose outcome stays in .fgos/assignments/<unitRunId>/",
+      "does": "lead only. A `unit` key is bad-args (a unit file declares its own writes, which the footprint could not bound). Answers at once with a ticket as land does; the detached runner runs `fgos run --json` without FGOS_DISPATCH_DEPTH (a lead's phase run is a top-level seat and takes a lane) and the ticket keeps only the unitRunId, whose outcome stays in .fgos/assignments/<unitRunId>/",
       "data": {
         "ticket": "the request id",
         "state": "running"
@@ -157,10 +156,10 @@
         "name": "string, required",
         "reason": "string, optional, at most 200 characters"
       },
-      "does": "stopHeadSession (src/session-host/head-stop.mjs): closes the pane of the live head through Session Host and writes retiredAt into the lineage's placement.json, which the head-state source reads as retired. Refused role-mismatch unless the persona-name is a lead or planner lineage of this project, the asker of an answered question, or the caller's own role",
+      "does": "stopHeadSession (src/session-host/head-stop.mjs): ends the live head the way a rotation ends the old head (writes retiredAt into the lineage's placement.json first, asks the head's own supervisor to stop it, waits for its attempt to close, then retires the pane through Session Host; a head that does not end is stop-not-ended and keeps its record), and retiredAt is what the head-state source reads as retired. Refused role-mismatch unless the persona-name is a lead or planner lineage of this project, the asker of an answered question, or the caller's own role",
       "data": "{stopped: true} or {stopped: false, reason: not-live}",
       "identity": "held",
-      "rule": "refusals (verb-failed detail): role-mismatch, retire-refused, bad-persona, bad-name"
+      "rule": "refusals (verb-failed detail): role-mismatch, stop-not-ended, retire-refused, bad-persona, bad-name"
     },
     "supervisor handled": {
       "args": {
@@ -209,7 +208,7 @@
     "busy": "another request is running, or another large request (over maxReplyBytes) is being read or run",
     "session-not-registered": "session answered only: Identity does not list this attempt's own session as live; when Identity could not answer the detail is its refusal code only",
     "session-bind-failed": "session bind session only: Identity refused to bind the session; detail is its code",
-    "bad-args": "the args of a verb break its contract shape: for session write not exactly {path, content}, both strings; for any other verb a missing, unknown or mistyped key",
+    "bad-args": "the args of a verb break its contract shape: for session write not exactly {path, content}, both strings; for any other verb a missing, unknown or mistyped key, or a string that becomes a host argv token and starts with '-'",
     "path-invalid": "session write only: the path is empty, absolute, or has an empty, `.` or `..` segment",
     "path-not-granted": "session write only: no entry of envelope.session.writes names the path exactly",
     "path-symlink": "session write only: the file or a directory on the way to it is a symbolic link",

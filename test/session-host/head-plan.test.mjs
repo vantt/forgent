@@ -64,3 +64,17 @@ test('the project handle is cut to the name prefix limit like the portfolio writ
   const root = repoWith(t, { '261118-1045-p': ['running', ['a']] });
   assert.equal((await planOfHead(root, 'lead', 'forgentp-261118-1045', { handle: 'forgentproject' })).dir, '261118-1045-p');
 });
+
+test('without an injected handle the Identity project handle of project.json names the heads, not the folder name', async (t) => {
+  const root = repoWith(t, { '261118-1045-p': ['running', ['a']] });
+  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.fgos', 'project.json'), JSON.stringify({ v: 1, projectId: '0123456789abcdef0123456789abcdef', handle: 'forgent', createdAt: '2026-10-24T00:00:00.000Z' }));
+  assert.equal((await planOfHead(root, 'lead', 'forgent-261118-1045')).dir, '261118-1045-p');
+  assert.equal(isPlanHeadName(root, 'lead', 'forgent-x'), true);
+  assert.equal(isPlanHeadName(root, 'lead', `${path.basename(root)}-x`), false);
+});
+
+test('a project with no minted handle resolves no head name', async (t) => {
+  const root = repoWith(t, { '261118-1045-p': ['running', ['a']] });
+  await assert.rejects(planOfHead(root, 'lead', 'forgent-261118-1045'), (err) => err instanceof HeadPlanError && err.code === 'plan-not-found' && /no minted handle/.test(err.message));
+});
