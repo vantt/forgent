@@ -74,6 +74,9 @@ pub struct PaneAsk<'a> {
     pub confinement_request: &'a Value,
     pub seat: &'a SeatInput<'a>,
     pub agent_args: &'a [String],
+    /// The effective execution contract the caller's `after_confinement` returned: the brief names its result
+    /// claim.
+    pub effective_contract: Option<&'a Value>,
 }
 
 /// What the caller decided for this seat (see a worker attempt and a head session).
@@ -97,6 +100,10 @@ pub struct SeatInput<'a> {
     pub repo_root: &'a Path,
     pub context_refs: Option<&'a Value>,
     pub dispatch_batch_key: Option<&'a str>,
+    /// How many seats launch together as one group: their panes share the tab in equal parts.
+    pub dispatch_batch_size: Option<u32>,
+    /// The work a terminal attempt's pane is labelled with (`work_label_of` the assignment).
+    pub work_label: Option<&'a Value>,
     pub launch_env: Option<&'a Map<String, Value>>,
     pub blind: bool,
     pub mutating: bool,
@@ -339,7 +346,6 @@ pub fn prepare_attempt_seat(
     // A terminal attempt gets what only its controller can give before the supervisor exists.
     let pane = if attempt.terminal {
         let ask_args = attempt_args.clone();
-        let _ = &effective_contract;
         Some(ports.prepare_pane(
             attempt,
             &PaneAsk {
@@ -348,6 +354,7 @@ pub fn prepare_attempt_seat(
                 confinement_request: &request,
                 seat,
                 agent_args: &ask_args,
+                effective_contract: effective_contract.as_ref(),
             },
         )?)
     } else {

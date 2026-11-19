@@ -114,6 +114,8 @@ pub struct ExecuteOptions<'a> {
     pub force_shared_cwd: bool,
     pub pin_inputs: Vec<String>,
     pub dispatch_batch_key: Option<String>,
+    /// Seats launched together as one group (more than one): their panes share the tab in equal parts.
+    pub dispatch_batch_size: Option<u32>,
     pub retry_id: Option<String>,
     pub predecessor_run_id: Option<String>,
     pub destination: Option<String>,
@@ -1083,6 +1085,7 @@ fn run_admitted(
         .case_context
         .as_ref()
         .map(|(a, b)| (a.as_str(), b.as_str()));
+    let work_label = crate::transport::terminal_slot::work_label_of(assignment);
     let seat = SeatInput {
         cfg,
         root,
@@ -1109,6 +1112,8 @@ fn run_admitted(
             None
         },
         dispatch_batch_key,
+        dispatch_batch_size: opts.dispatch_batch_size,
+        work_label: Some(&work_label),
         launch_env: None,
         blind: opts.blind,
         mutating: mutating && !opts.force_shared_cwd,
