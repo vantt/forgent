@@ -1,0 +1,40 @@
+{
+  "v": 1,
+  "source": "src/run-supervisor/runtime-dir.mjs",
+  "resolve": [
+    {
+      "env": {
+        "XDG_RUNTIME_DIR": "/run/user/1000"
+      },
+      "uid": 1000,
+      "dir": "/run/user/1000/fgos"
+    },
+    {
+      "env": {
+        "XDG_RUNTIME_DIR": "relative/run"
+      },
+      "uid": 1000,
+      "dir": "/tmp/fgos-1000"
+    },
+    {
+      "env": {},
+      "uid": 501,
+      "dir": "/tmp/fgos-501"
+    },
+    {
+      "env": {
+        "XDG_RUNTIME_DIR": ""
+      },
+      "uid": 0,
+      "dir": "/tmp/fgos-0"
+    }
+  ],
+  "ensureTooLong": {
+    "env": {
+      "XDG_RUNTIME_DIR": "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "uid": 1000,
+    "code": "runtime-dir-too-long",
+    "message": "/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/fgos leaves no room for a socket name within 100 bytes"
+  }
+}

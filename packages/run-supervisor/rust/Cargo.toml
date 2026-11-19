@@ -8,20 +8,151 @@ rust-version.workspace = true
 fgos-durable-file = { path = "../../durable-file/rust" }
 fgos-canonical-json = { path = "../../canonical-json/rust" }
 fgos-process = { path = "../../process/rust" }
-# The one ISO-8601 UTC clock, and the session directory a head session registers its role in; the library
-# without its host provider.
-fgos-identity = { path = "../../identity/rust", default-features = false, features = ["directory"] }
+# The one random door the lease token draws from, and (with `supervise`) the ISO-8601 UTC clock and session
+# directory a head session registers its role in; the library without its host provider.
+fgos-identity = { path = "../../identity/rust", default-features = false }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
-fgos-agent-protocol = { path = "../../agent-protocol/rust" }
-fgos-terminal-control = { path = "../../terminal-control/rust" }
-fgos-session-host = { path = "../../session-host/rust" }
+fgos-agent-protocol = { path = "../../agent-protocol/rust", optional = true }
+fgos-terminal-control = { path = "../../terminal-control/rust", optional = true }
+fgos-session-host = { path = "../../session-host/rust", optional = true }
+# The effective `dispatch` config the controller reads (gate kill grace, cancel wait, lane settings).
+fgos-config = { path = "../../config/rust", optional = true }
 # The bounded parse of a head request frame (a visitor that counts values while it reads).
 serde = { workspace = true }
 serde_json = { workspace = true }
 sha2 = { workspace = true }
+
+[features]
+# `lease` is the run control ledger alone (what the addon reads); `supervise` is every other module, the
+# supervisor routes and the rest of the controller, and is on by default.
+default = ["supervise"]
+lease = []
+supervise = ["lease", "fgos-identity/directory", "dep:fgos-agent-protocol", "dep:fgos-terminal-control", "dep:fgos-session-host", "dep:fgos-config"]
 
 [target.'cfg(unix)'.dependencies]
 libc = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { workspace = true, features = ["Win32_Foundation", "Win32_Storage_FileSystem", "Win32_System_Console", "Win32_System_Pipes", "Win32_System_SystemInformation", "Win32_System_Threading"] }
+
+# These drive the supervisor and controller routes, which only the `supervise` feature builds.
+
+[[test]]
+name = "adopt_concurrency"
+required-features = ["supervise"]
+
+[[test]]
+name = "adopt_matrix"
+required-features = ["supervise"]
+
+[[test]]
+name = "adopt_scan_perf"
+required-features = ["supervise"]
+
+[[test]]
+name = "controller_cancel"
+required-features = ["supervise"]
+
+[[test]]
+name = "controller_config"
+required-features = ["supervise"]
+
+[[test]]
+name = "controller_cwd_lock"
+required-features = ["supervise"]
+
+[[test]]
+name = "controller_launch"
+required-features = ["supervise"]
+
+[[test]]
+name = "controller_runtime_dir"
+required-features = ["supervise"]
+
+[[test]]
+name = "controller_sweep"
+required-features = ["supervise"]
+
+[[test]]
+name = "controller_trust_store"
+required-features = ["supervise"]
+
+[[test]]
+name = "envelope_digest_vectors"
+required-features = ["supervise"]
+
+[[test]]
+name = "gate_ceiling"
+required-features = ["supervise"]
+
+[[test]]
+name = "gate_go"
+required-features = ["supervise"]
+
+[[test]]
+name = "gate_orphan"
+required-features = ["supervise"]
+
+[[test]]
+name = "gate_pid1"
+required-features = ["supervise"]
+
+[[test]]
+name = "gate_portable"
+required-features = ["supervise"]
+
+[[test]]
+name = "gate_terminal_socket"
+required-features = ["supervise"]
+
+[[test]]
+name = "head_request"
+required-features = ["supervise"]
+
+[[test]]
+name = "lanes"
+required-features = ["supervise"]
+
+[[test]]
+name = "release_slot_step"
+required-features = ["supervise"]
+
+[[test]]
+name = "steps_portable"
+required-features = ["supervise"]
+
+[[test]]
+name = "steps_runner"
+required-features = ["supervise"]
+
+[[test]]
+name = "supervise_crash"
+required-features = ["supervise"]
+
+[[test]]
+name = "supervise_guard"
+required-features = ["supervise"]
+
+[[test]]
+name = "supervise_lifecycle"
+required-features = ["supervise"]
+
+[[test]]
+name = "supervise_portable"
+required-features = ["supervise"]
+
+[[test]]
+name = "supervise_terminal_fake_herdr"
+required-features = ["supervise"]
+
+[[test]]
+name = "unix_lease_record"
+required-features = ["supervise"]
+
+[[example]]
+name = "gate_harness"
+required-features = ["supervise"]
+
+[[example]]
+name = "internal_harness"
+required-features = ["supervise"]

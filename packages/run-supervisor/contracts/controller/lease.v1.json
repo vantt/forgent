@@ -1,0 +1,221 @@
+{
+  "note": "recorded from src/run-supervisor/run-lock.mjs; tokens normalised to <t1>..<t3>; a holder with dead:true is the one the recorder judges dead",
+  "holders": {
+    "A": {
+      "id": "a",
+      "host": "other-host",
+      "pid": 11,
+      "startTime": "5"
+    },
+    "B": {
+      "id": "b",
+      "host": "other-host",
+      "pid": 12,
+      "startTime": "6"
+    },
+    "D": {
+      "id": "dead",
+      "host": "other-host",
+      "pid": 13,
+      "startTime": "7",
+      "dead": true
+    }
+  },
+  "steps": [
+    {
+      "name": "acquire-first",
+      "out": {
+        "status": "acquired",
+        "controlEpoch": 1,
+        "controlToken": "<t1>"
+      }
+    },
+    {
+      "name": "acquire-while-held",
+      "out": {
+        "status": "held",
+        "controlEpoch": 1,
+        "holder": {
+          "id": "a",
+          "host": "other-host",
+          "pid": 11,
+          "startTime": "5"
+        }
+      }
+    },
+    {
+      "name": "acquire-stale-fence",
+      "out": {
+        "status": "stale",
+        "controlEpoch": 1
+      }
+    },
+    {
+      "name": "acquire-fresh-heartbeat",
+      "out": {
+        "status": "held",
+        "controlEpoch": 1,
+        "holder": {
+          "id": "a",
+          "host": "other-host",
+          "pid": 11,
+          "startTime": "5"
+        }
+      }
+    },
+    {
+      "name": "inspect-held",
+      "out": {
+        "held": true,
+        "controlEpoch": 1,
+        "holder": {
+          "id": "a",
+          "host": "other-host",
+          "pid": 11,
+          "startTime": "5"
+        }
+      }
+    },
+    {
+      "name": "is-current",
+      "out": true
+    },
+    {
+      "name": "release-unknown-generation",
+      "out": {
+        "status": "unknown-generation"
+      }
+    },
+    {
+      "name": "release-token-mismatch",
+      "out": {
+        "status": "token-mismatch"
+      }
+    },
+    {
+      "name": "release",
+      "out": {
+        "status": "released"
+      }
+    },
+    {
+      "name": "release-again",
+      "out": {
+        "status": "already-released"
+      }
+    },
+    {
+      "name": "inspect-released",
+      "out": {
+        "held": false,
+        "controlEpoch": 1
+      }
+    },
+    {
+      "name": "acquire-after-release",
+      "out": {
+        "status": "acquired",
+        "controlEpoch": 2,
+        "controlToken": "<t2>"
+      }
+    },
+    {
+      "name": "inspect-dead-holder",
+      "out": {
+        "held": false,
+        "controlEpoch": 2
+      }
+    },
+    {
+      "name": "acquire-reclaim-dead",
+      "out": {
+        "status": "acquired",
+        "controlEpoch": 3,
+        "controlToken": "<t3>"
+      }
+    },
+    {
+      "name": "settle-superseded",
+      "out": {
+        "status": "superseded",
+        "controlEpoch": 3
+      }
+    },
+    {
+      "name": "settle",
+      "out": {
+        "status": "settled",
+        "controlEpoch": 4
+      }
+    },
+    {
+      "name": "settle-again",
+      "out": {
+        "status": "superseded",
+        "controlEpoch": 4
+      }
+    },
+    {
+      "name": "inspect-settled",
+      "out": {
+        "held": false,
+        "settled": true,
+        "controlEpoch": 4
+      }
+    },
+    {
+      "name": "acquire-after-settled",
+      "out": {
+        "status": "settled",
+        "controlEpoch": 4
+      }
+    }
+  ],
+  "files": {
+    "control/generations/0000000001.json": {
+      "controlToken": "<t1>",
+      "holder": {
+        "id": "a",
+        "host": "other-host",
+        "pid": 11,
+        "startTime": "5"
+      },
+      "purpose": "unit",
+      "acquiredAt": 1000
+    },
+    "control/generations/0000000002.json": {
+      "controlToken": "<t2>",
+      "holder": {
+        "id": "dead",
+        "host": "other-host",
+        "pid": 13,
+        "startTime": "7",
+        "dead": true
+      },
+      "purpose": "unit",
+      "acquiredAt": 4000
+    },
+    "control/generations/0000000003.json": {
+      "controlToken": "<t3>",
+      "holder": {
+        "id": "b",
+        "host": "other-host",
+        "pid": 12,
+        "startTime": "6"
+      },
+      "purpose": "unit",
+      "acquiredAt": 5000
+    },
+    "control/generations/0000000004.json": {
+      "controlToken": "<t3>",
+      "purpose": "settled",
+      "settledEpoch": 3,
+      "acquiredAt": 6000
+    },
+    "control/releases/0000000001.json.release": {
+      "controlEpoch": 1,
+      "controlToken": "<t1>",
+      "releasedAt": 3000
+    }
+  }
+}

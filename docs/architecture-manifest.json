@@ -106,6 +106,10 @@
           "reason": "reads and hashes the Codex hook file's bytes to trust its entries; it writes no hook"
         },
         {
+          "path": "packages/run-supervisor/rust/src/controller/trust_store.rs",
+          "reason": "the Rust twin of trust-store.mjs: reads and hashes the Codex hook file's bytes to trust its entries; it writes no hook. The hook table lives in fgos-distribution (tier 9), which the run supervisor (tier 4) cannot depend on"
+        },
+        {
           "path": "scripts/lib/mailbox-behaviour-v7f.mjs",
           "reason": "harness-owned frozen experiment: names the hooks.json of the Codex home it builds for a simulated session; not a project hook file"
         },
@@ -438,6 +442,7 @@
         { "path": "packages/process/rust/src/mapped.rs", "reason": "searches PATH for the program of a descriptor-mapped spawn and polls its child" },
         { "path": "packages/process/rust/src/platform/windows_spawn.rs", "reason": "keeps the PATH search for a name that already has an extension; the extension-less lookup is spawn.rs's resolve_program" },
         { "path": "packages/run-supervisor/rust/src/attempt_step.rs", "reason": "finds node on PATH for the attempt step runner" },
+        { "path": "packages/run-supervisor/rust/src/controller/launch.rs", "reason": "polls the detached supervisor child it started (try_wait) until it publishes its binding or exits; the supervisor outlives the call, so it is not a bounded run" },
         { "path": "packages/run-supervisor/rust/src/gate/windows.rs", "reason": "the supervisor's own gate child, ended through its Job Object" },
         { "path": "packages/run-supervisor/rust/src/steps.rs", "reason": "a supervised step led in its own group with the stepTimeoutMs of its envelope" },
         { "path": "packages/run-supervisor/rust/src/supervise.rs", "reason": "polls a child it started itself (try_wait); not a run-to-completion with a replacement environment" },

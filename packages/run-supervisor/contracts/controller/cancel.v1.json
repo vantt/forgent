@@ -1,0 +1,35 @@
+{
+  "note": "requestCancel on a run dir whose envelope names attempt-1; values of requester/at/requestedBy vary per process and are listed under variable",
+  "recordedFrom": "source-literal",
+  "wrote": true,
+  "again": true,
+  "noEnvelope": false,
+  "keys": [
+    "v",
+    "attemptId",
+    "requestedBy",
+    "by",
+    "requester",
+    "at"
+  ],
+  "fixed": {
+    "v": 1,
+    "attemptId": "attempt-1",
+    "by": "signal:SIGINT"
+  },
+  "keptSecond": true,
+  "variable": [
+    "requestedBy",
+    "requester",
+    "at"
+  ],
+  "registeredRuns": [
+    "/tmp/c"
+  ],
+  "exitCodes": {
+    "SIGINT": 130,
+    "SIGTERM": 143
+  },
+  "cancelledMessage": "cancelled by SIGINT: no new step starts; the attempts in flight are stopped and the unit can be resumed",
+  "assertNotCancelledAfterReset": true
+}

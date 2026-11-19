@@ -375,6 +375,20 @@ pub fn file_users(dev: u64, ino: u64) -> Option<Vec<FileUser>> {
     }
 }
 
+/// Paths some process has bound a unix socket to (Linux: the kernel socket table). `None` where there is no
+/// such table, so nothing can be judged from it. Probing by connecting is no substitute: a listener may take
+/// the first connection for itself.
+pub fn bound_unix_socket_paths() -> Option<std::collections::BTreeSet<String>> {
+    #[cfg(target_os = "linux")]
+    {
+        crate::platform::linux::bound_unix_socket_paths()
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        None
+    }
+}
+
 /// One process's place in the process tree at the moment it was read.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Relation {

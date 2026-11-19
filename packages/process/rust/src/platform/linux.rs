@@ -578,6 +578,20 @@ pub fn locked_fds(dev: u64, ino: u64, pids: Option<&[ProcId]>) -> io::Result<Vec
     Ok(out)
 }
 
+/// Paths some process has bound a unix socket to, from the kernel socket table (`/proc/net/unix`): the
+/// eighth field on, of every line after the header. `None` when the table cannot be read.
+pub fn bound_unix_socket_paths() -> Option<std::collections::BTreeSet<String>> {
+    let text = fs::read_to_string("/proc/net/unix").ok()?;
+    let mut bound = std::collections::BTreeSet::new();
+    for line in text.split('\n').skip(1) {
+        let fields: Vec<&str> = line.split_whitespace().collect();
+        if fields.len() >= 8 {
+            bound.insert(fields[7..].join(" "));
+        }
+    }
+    Some(bound)
+}
+
 /// Visible open-file users. Reuses the same proc enumeration and inode
 /// matching as locked_fds, without requiring a kernel advisory lock record.
 pub fn file_users(dev: u64, ino: u64) -> Option<Vec<facts::FileUser>> {

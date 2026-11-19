@@ -579,6 +579,7 @@ version = "0.2.0"
 dependencies = [
  "fgos-agent-protocol",
  "fgos-canonical-json",
+ "fgos-config",
  "fgos-durable-file",
  "fgos-holder-lock",
  "fgos-identity",
