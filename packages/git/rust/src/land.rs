@@ -2129,6 +2129,7 @@ impl GitDriver {
         acknowledgement: &str,
         filesystem: &F,
         discarded: bool,
+        dead_writer: bool,
     ) -> Result<Option<String>> {
         let candidate =
             Oid::parse(&payload.candidate.candidate, repo.object_format()).map_err(failure)?;
@@ -2145,9 +2146,15 @@ impl GitDriver {
                 writer,
             ))?,
         };
+        // The owner's removal keeps the id older releases journalled; only a dead
+        // writer's release names its recoverer, so two recoverers never collide.
         let removal_id = format!(
             "lr-{}",
-            wal::canonical_digest(&("land-cleanup", id, writer))?
+            if dead_writer {
+                wal::canonical_digest(&("land-cleanup", id, "dead-writer", writer))?
+            } else {
+                wal::canonical_digest(&("land-cleanup", id))?
+            }
         );
         let gone = std::fs::symlink_metadata(&payload.candidate.worktree).is_err();
         if gone && !wal.known_id(&removal_id)? {
@@ -2221,6 +2228,7 @@ impl GitDriver {
                 acknowledgement,
                 filesystem,
                 discarded,
+                true,
             )?
             .into_iter()
             .collect())
@@ -2309,6 +2317,7 @@ impl GitDriver {
             acknowledgement,
             filesystem,
             discarded,
+            false,
         )? {
             return Ok(vec![deferred]);
         }
