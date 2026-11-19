@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "d74e65b1c293f190402aee629355ad1a7d7702fa4f1c5297871e56e6731ec986",
+  "payloadDigest": "cf1e105f65c83f0c3b97eeea4aa589195394e73d2ef245e06f81f38c49b97a03",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -318,7 +318,7 @@
     "packages/config/rust/tests/golden_no_echo.rs": "b161c4b4c784d6558346ac927c25f57e395d10ca4237e53bf36a19a5814ca51f",
     "packages/config/rust/tests/golden_schema.rs": "bfb95ce662b2840b6ec2ee8e0c9edf66040b11cf220f0f7c888b987b18476e61",
     "packages/config/rust/tests/golden_scope.rs": "ebcf9054e332984689d13529f2cbf7c80600cd2272eebaad99cb0cd639084afb",
-    "packages/config/rust/tests/golden_snapshot.rs": "f374ee33fa6284616a219f383e6e29e29e30bc68650dd3672b03e37df64ed6f4",
+    "packages/config/rust/tests/golden_snapshot.rs": "ff5bb00d266bc017a63371297dec17a4d1b96f98ebc8f35c5b74733828712888",
     "packages/config/rust/tests/golden_standard.rs": "81fe1d288f4d0ba3fd347bd93572a8486163fb7da692cd351172db38ebc8096d",
     "packages/config/rust/tests/golden_validate.rs": "d358396d89702f6302bf09d0c5faba6189f090bc03c51bde7f81b5867b0e5a3f",
     "packages/config/rust/tests/inspect_verbs.rs": "a1ba88f0b5056847d4ba2c253c6790dce341c6c1f3b769f4712816e7a1b69ce0",
