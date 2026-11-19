@@ -7,9 +7,12 @@
 
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use fgos_execution::decide::CheckoutFacts;
 use fgos_execution::ports::Machine;
+use fgos_execution_engine::accounts::credential_probe::{probe_credential, DEFAULT_TIMEOUT_MS};
+use fgos_execution_engine::accounts::{AccountLock, ProbeRequest};
 use fgos_execution_engine::accounts::{Accounts, SystemHost};
 use fgos_execution_engine::assignment::builder::{
     render_assignment_prompt, PromptOptions, PromptPort,
@@ -18,6 +21,9 @@ use fgos_execution_engine::assignment::Refusal;
 use fgos_execution_engine::assignment_runner::attempt::{Attempt, GiveBack, MachineGiveBack};
 use fgos_execution_engine::assignment_runner::execute::{ExecuteOptions, ExecutePorts};
 use fgos_execution_engine::assignment_runner::inputs::{CheckoutRoots, GitCheckoutRoots};
+use fgos_execution_engine::assignment_runner::lease::{
+    CredentialProbe, CredentialRenewal, RenewAsk,
+};
 use fgos_execution_engine::assignment_runner::outcome::{AdoptDoor, SupervisorAdoptDoor};
 use fgos_execution_engine::assignment_runner::seat::{CommandAsk, PaneAsk, PaneSeat, SeatPorts};
 use fgos_execution_engine::assignment_runner::RunnerConfigError;
@@ -25,6 +31,7 @@ use fgos_execution_engine::confinement::cleanup::probes::{
     compute_probe_fingerprint, driver_over, run_all_confinement_probes, FingerprintInput,
     PolicyResolver, ProbePorts,
 };
+use fgos_execution_engine::confinement::cleanup::AttemptHomeRecords;
 use fgos_execution_engine::confinement::driver::attestation::{
     ProbeCache, DEFAULT_PROBE_CACHE_TTL_MS,
 };
@@ -38,8 +45,11 @@ use fgos_execution_engine::confinement::request::{
 use fgos_execution_engine::contract::templates::{
     resolve_and_render_operation_prompt, ResolveOptions as TemplateAsk, Roots,
 };
-use fgos_execution_engine::credentials::BundledSqlite;
+use fgos_execution_engine::credentials::{
+    refresh_ahead, AccountsProbe, BundledSqlite, RefreshOptions, RefreshRequest,
+};
 use fgos_execution_engine::settlement::{GitDoor, SettlementGit};
+use fgos_execution_engine::transport::worker_session::Env;
 use fgos_execution_engine::transport_round::executor_command::{
     resolve_executor_command, CommandRequest,
 };
@@ -50,6 +60,7 @@ use serde_json::{json, Map, Value};
 
 use super::dispatch_plan::{compile_assignment_plan, PlanAsk};
 use super::settlement::TargetAccountLocks;
+use super::terminal::{HerdrRoute, PaneMachine};
 use crate::wiring::dispatch_decide::HostWorkspace;
 use crate::wiring::seat_binding::HostMachine;
 
@@ -144,6 +155,55 @@ fn accounts_of<'h>(dir: Option<&Path>, host: &'h SystemHost) -> Option<Accounts<
         Some(dir) => Some(Accounts::new(dir, fgos_holder_lock::lock_root(), host)),
         None => Accounts::from_environment(host).ok(),
     }
+}
+
+/// `renewCredential` of `createCredentialRenewal()` (`src/runner/dispatch/provider-credential-renewal.mjs:1496`):
+/// refresh-ahead of one login store, in a copy fgOS holds, under the account lock of the store's runtime directory,
+/// with the account module's credential probe, the bundled SQLite engine and the window widened to the seat's
+/// timeout. A seat still running on the store may hold the only good login, so its home is taken first
+/// (`liveSeatHomes: listLiveSeatHomes`).
+pub struct HostRenewal;
+
+impl CredentialRenewal for HostRenewal {
+    fn renew(&self, ask: &RenewAsk<'_>) -> Result<Option<Value>, String> {
+        let source = source_of(ask.credential_source);
+        let home = env_var("HOME");
+        let probe = AccountsProbe {
+            home_dir: home.clone(),
+            inherited: std::env::vars().collect(),
+        };
+        let now = || now_millis() as f64;
+        let live_seats = AttemptHomeRecords::default();
+        let mut options = RefreshOptions::new(&TargetAccountLocks, &probe, &BundledSqlite, &now);
+        options.seat_timeout_ms = Some(ask.seat_timeout_ms as f64);
+        options.live_seat_homes = &live_seats;
+        let outcome = refresh_ahead(
+            &RefreshRequest {
+                provider: ask.provider,
+                account_id: ask.account_id,
+                credential_source: &source,
+                runtime_dir: ask.runtime_dir,
+                home_dir: home.as_deref(),
+            },
+            &options,
+        );
+        Ok(Some(
+            json!({ "status": outcome.status, "reason": outcome.reason }),
+        ))
+    }
+}
+
+/// `probeCredential` of `createCredentialProbe()` (`src/runner/dispatch/provider-credential-probe.mjs:173`): one
+/// real call with the account's login, holding the account lock it is handed.
+fn probe_account_credential(request: &ProbeRequest<'_>, lock: &AccountLock) -> Value {
+    let inherited: BTreeMap<String, String> = std::env::vars().collect();
+    probe_credential(
+        request,
+        lock,
+        DEFAULT_TIMEOUT_MS,
+        env_var("HOME").as_deref(),
+        &inherited,
+    )
 }
 
 /// `verifyRequiredProbe` (`src/runner/dispatch/confinement/authority.mjs:114`) for a bwrap backend: the cached pass
@@ -482,6 +542,14 @@ impl ExecutePorts for HostExecution {
     fn fgos_dir_of_root(&self, root: &Path) -> PathBuf {
         super::machine::fgos_dir(root)
     }
+    /// `createCredentialRenewal()` (`src/runner/execution/run.mjs:1012`).
+    fn renewal(&self) -> Option<&dyn CredentialRenewal> {
+        Some(&HostRenewal)
+    }
+    /// `createCredentialProbe()` (`src/runner/execution/run.mjs:1011`).
+    fn credential_probe(&self) -> Option<CredentialProbe<'_>> {
+        Some(&probe_account_credential)
+    }
     fn clock(&self) -> BuildClock<'_> {
         BuildClock {
             now_ms: &now_millis,
@@ -571,17 +639,28 @@ impl SeatPorts for HostExecution {
         })
     }
 
-    /// A terminal attempt's pane (`prepareTerminalAttempt`, `src/runner/dispatch/herdr-round.mjs:462`) is not
-    /// prepared by the native route yet: such an attempt is refused by name before anything is opened.
+    /// A terminal attempt's pane (`prepareTerminalAttempt`, `src/runner/dispatch/herdr-round.mjs:462`, as
+    /// `src/runner/dispatch/assignment-runner.mjs:1062` calls it) over the herdr route of this machine and the
+    /// project's `terminal.*` layout settings (`terminalRouteConfig(projectRoot)`).
     fn prepare_pane(
         &self,
-        _attempt: &mut Attempt,
-        _ask: &PaneAsk<'_>,
+        attempt: &mut Attempt,
+        ask: &PaneAsk<'_>,
     ) -> Result<PaneSeat, RunnerConfigError> {
-        Err(RunnerConfigError::coded(
-            "a terminal attempt cannot launch from the native route yet: its pane is prepared by the Node launch route",
-            "terminal-attempt-unsupported",
-        ))
+        let env: Env = std::env::vars().collect();
+        let route = Arc::new(HerdrRoute::of_project(ask.seat.root));
+        let state_root = fgos_holder_lock::state_root::state_root().0;
+        super::terminal::prepare_pane(
+            attempt,
+            ask,
+            route,
+            &PaneMachine {
+                env: &env,
+                state_root: &state_root,
+                tmp_dir: std::env::temp_dir(),
+                host: &self.host,
+            },
+        )
     }
 
     fn controller_writer_id(&self) -> Option<String> {

@@ -17,6 +17,7 @@
 //! * [`host`]: the composed `UnitRunHost` of one unit run, dispatching a bound seat through the assignment runner.
 //! * [`accounts`]: pinned accounts, account rotation, the lease receipt audit and the bind over the live lease
 //!   state.
+//! * [`terminal`]: a terminal attempt's pane, prepared over the herdr route of the session its seat lives in.
 //! * [`settlement`]: what the post-receipt steps read through the host (the terminal pane, the renewed login's
 //!   write-back with the bundled SQLite engine and the accounts module's locks).
 
@@ -37,6 +38,7 @@ pub mod machine;
 pub mod persona;
 pub mod records;
 pub mod settlement;
+pub mod terminal;
 pub mod verify;
 
 #[cfg(test)]

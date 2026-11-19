@@ -7,10 +7,11 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use serde_json::{json, Value};
 
-use super::{accounts, checks, handoff, machine, persona, records, settlement, verify};
+use super::{accounts, checks, execution, handoff, machine, persona, records, settlement, verify};
 use fgos_execution_engine::steps::{AttemptHomeFinalizer, HomeState, PaneScreen};
 
 mod run_unit;
+mod terminal;
 
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 
@@ -824,4 +825,50 @@ fn an_attempt_without_private_homes_finalizes_clean() {
         .unwrap();
     assert_eq!(done.state, HomeState::Cleaned);
     assert_eq!(done.homes, 0);
+}
+
+// ---- credential renewal -----------------------------------------------------------------------------------
+
+#[test]
+fn a_leased_login_far_from_expiry_is_left_fresh_by_the_hosts_renewal_and_the_lease_carries_the_write_back(
+) {
+    use fgos_execution_engine::assignment_runner::lease::renew_leased_login;
+    let scratch = Scratch::new("renew");
+    let (home, runtime) = (scratch.0.join("login"), scratch.0.join("runtime"));
+    std::fs::create_dir_all(&home).unwrap();
+    std::fs::create_dir_all(&runtime).unwrap();
+    let month_ahead = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_millis() as u64
+        + 30 * 24 * 3_600_000;
+    std::fs::write(
+        home.join("auth.json"),
+        json!({ "openai-codex": { "type": "oauth", "access": "a", "refresh": "r", "expires": month_ahead } })
+            .to_string(),
+    )
+    .unwrap();
+    let selection = json!({
+        "status": "selected", "provider": "openai-codex", "accountId": "acct",
+        "credentialSource": { "kind": "home-files", "home": home, "files": ["auth.json"] },
+    });
+    let cfg = json!({ "executors": { "pi": { "kind": "agent", "confinement": { "backend": "bwrap" } } } });
+    let leased = renew_leased_login(
+        &selection,
+        Some(&execution::HostRenewal),
+        &cfg,
+        "pi",
+        None,
+        Some("required"),
+        Some(&runtime),
+        Some(60_000),
+    );
+    assert_eq!(
+        leased["refreshAhead"],
+        json!([{ "cli": null, "status": "fresh", "reason": "outside-window" }])
+    );
+    assert_eq!(
+        leased["credentialWriteBack"]["runtimeDir"],
+        json!(runtime.to_string_lossy())
+    );
 }

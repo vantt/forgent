@@ -3,6 +3,10 @@
 //! supervisor binds, runs the launch the envelope names and waits for the settlement, which the test commits under
 //! the run control token the side file carries, as the settle step does. The seat runs confined (bwrap, from the
 //! machine's backend registry), as every unit run seat does.
+//!
+//! Each run happens in a child of this test binary whose HOME is a scratch directory: its state root and its global
+//! config (with its own machine backend registry declaring this machine's bwrap) are the test's, never the person's
+//! `~/.fgos`, and the controller's cancel state is the child's alone.
 #![cfg(target_os = "linux")]
 
 use std::path::{Path, PathBuf};
@@ -12,8 +16,122 @@ use fgos_execution::admission::{Admission, CaseAdmission, Recheck};
 use fgos_run_supervisor::controller::launch::AttemptHost;
 use serde_json::{json, Value};
 
+use fgos_execution_engine::confinement::cleanup::resolve_confinement_temp_root;
+
 use super::super::host::HostUnitRun;
 use super::{git, repo, Scratch};
+
+const CHILD: &str = "FGOS_UNIT_RUN_HOST_TEST_CHILD";
+
+/// Runs `body` in a child of this test binary with a scratch HOME and nothing of this process's environment but
+/// PATH, the locale and the user, and a Git identity of its own; with `bwrap`, the scratch global config registers this machine's bwrap. A machine
+/// without a working bwrap skips a confined run (the repository's rule for bwrap-dependent proofs).
+fn hermetic(name: &str, bwrap: bool, body: fn()) {
+    if std::env::var_os(CHILD).is_some() {
+        return body();
+    }
+    let path = std::env::var("PATH").unwrap_or_default();
+    let scratch = Scratch::new("home");
+    let confinement = Scratch::new("confinement");
+    let home = scratch.0.join("home");
+    std::fs::create_dir_all(home.join(".fgos")).unwrap();
+    // The writer the runner commits a round's write as.
+    std::fs::write(
+        home.join(".gitconfig"),
+        "[user]\n\tname = t\n\temail = t@t\n[commit]\n\tgpgsign = false\n",
+    )
+    .unwrap();
+    if bwrap {
+        use fgos_execution_engine::confinement::driver::bwrap::SmokeProbe;
+        let smoke = SmokeProbe::new().check("bwrap", &path);
+        if !smoke.passed {
+            eprintln!("skipped: no working bwrap here ({})", smoke.message);
+            return;
+        }
+        let executable = fgos_process::spawn::resolve_program("bwrap", &path, "", false)
+            .expect("a working bwrap is on PATH");
+        // The seats' private homes go under a root of this test's own, named by the backend's registry entry; it
+        // goes with `confinement` when the test ends, whatever the outcome.
+        let root = confinement.0.join("homes");
+        std::fs::write(
+            home.join(".fgos/confinement-backends.json"),
+            json!({
+                "contract": "confinement-backend-registry.v1",
+                "confinementBackends": { "bwrap": { "type": "bwrap", "enabled": true, "executable": executable,
+                    "tempRoot": root, "privateHomeRoot": root } },
+            })
+            .to_string(),
+        )
+        .unwrap();
+    }
+    let shared_root = resolve_confinement_temp_root(&std::env::temp_dir());
+    let shared_before = dispatch_dirs(&shared_root);
+    let test = format!(
+        "{}::{name}",
+        module_path!()
+            .split_once("::")
+            .map_or(module_path!(), |(_, rest)| rest)
+    );
+    let mut child = std::process::Command::new(std::env::current_exe().unwrap());
+    child
+        .args(["--exact", &test, "--nocapture", "--test-threads", "1"])
+        .env_clear()
+        .env(CHILD, "1")
+        .env("HOME", &home)
+        .env("PATH", &path)
+        .env("TMPDIR", std::env::temp_dir());
+    for kept in ["USER", "LANG", "LC_ALL"] {
+        if let Ok(value) = std::env::var(kept) {
+            child.env(kept, value);
+        }
+    }
+    let spawned = child
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+    let child_pid = spawned.id();
+    let out = spawned.wait_with_output().unwrap();
+    let (stdout, stderr) = (
+        String::from_utf8_lossy(&out.stdout),
+        String::from_utf8_lossy(&out.stderr),
+    );
+    assert!(
+        out.status.success() && stdout.contains("1 passed"),
+        "{test} in its own HOME:\n{stdout}\n{stderr}"
+    );
+    // No private home of this run landed under the machine's shared confinement root.
+    // The child's run directories lie under its own scratch directories, named with its pid.
+    let ours = format!("-{child_pid}-");
+    for dir in dispatch_dirs(&shared_root).difference(&shared_before) {
+        let record = std::fs::read_to_string(dir.join("attempt-home.json")).unwrap_or_default();
+        assert!(
+            !(record.contains("fgos-unit-run-host-") && record.contains(&ours)),
+            "{} is this run's",
+            dir.display()
+        );
+    }
+    let injected = confinement.0.join("homes");
+    if bwrap {
+        assert!(
+            !dispatch_dirs(&injected).is_empty(),
+            "the seats' homes went to the injected root"
+        );
+    }
+    drop(confinement);
+    assert!(!injected.exists(), "the injected root goes with the test");
+}
+
+/// The per-dispatch directories under a confinement root.
+fn dispatch_dirs(root: &Path) -> std::collections::BTreeSet<PathBuf> {
+    std::fs::read_dir(root)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|path| path.is_dir())
+        .collect()
+}
 
 /// The admission port of a standalone run: the worktree is free, the effect still holds, every settle kept.
 #[derive(Default)]
@@ -181,6 +299,14 @@ fn host_of(port: Option<FreePort>, bin: &Path, host: &Path) -> HostUnitRun<FreeP
 
 #[test]
 fn a_read_only_unit_runs_end_to_end_through_the_composed_host() {
+    hermetic(
+        "a_read_only_unit_runs_end_to_end_through_the_composed_host",
+        true,
+        read_only_run,
+    );
+}
+
+fn read_only_run() {
     let scratch = Scratch::new("e2e-ro");
     let (main, tree) = repo(&scratch);
     let (bin, host_bin) = stub_bin(&scratch);
@@ -191,7 +317,7 @@ fn a_read_only_unit_runs_end_to_end_through_the_composed_host() {
         "cwd": tree, "runnerConfig": runner(&bin),
         "session": { "pathEnv": bin, "herdrPresent": false, "postureAtLaunch": true, "headless": true },
     });
-    let result = fgos_execution_engine::unit_run::run::run_unit(&options, &host);
+    let result = host.run_unit(&options);
     let settled = settle.join().unwrap();
     let result = result.unwrap_or_else(|e| panic!("{e:?}"));
     assert_eq!(result["outcome"], "pass", "{result}");
@@ -206,6 +332,14 @@ fn a_read_only_unit_runs_end_to_end_through_the_composed_host() {
 
 #[test]
 fn a_writing_unit_runs_under_its_custody_and_commits_its_declared_write() {
+    hermetic(
+        "a_writing_unit_runs_under_its_custody_and_commits_its_declared_write",
+        true,
+        writing_run,
+    );
+}
+
+fn writing_run() {
     let scratch = Scratch::new("e2e-rw");
     let (main, tree) = repo(&scratch);
     let fence = main.join(".fgos/locks/activation.lock");
@@ -229,7 +363,7 @@ fn a_writing_unit_runs_under_its_custody_and_commits_its_declared_write() {
         "cwd": tree, "runnerConfig": runner(&bin),
         "session": { "pathEnv": bin, "herdrPresent": false, "postureAtLaunch": true, "headless": true },
     });
-    let result = fgos_execution_engine::unit_run::run::run_unit(&options, &host);
+    let result = host.run_unit(&options);
     let _ = settle.join().unwrap();
     let result = result.unwrap_or_else(|e| panic!("{e:?}"));
     assert_eq!(result["outcome"], "pass", "{result}");
@@ -262,4 +396,42 @@ fn a_writing_unit_runs_under_its_custody_and_commits_its_declared_write() {
         .lock()
         .unwrap()
         .is_empty());
+}
+
+#[test]
+fn a_cancelled_controller_starts_no_unit_run() {
+    hermetic(
+        "a_cancelled_controller_starts_no_unit_run",
+        false,
+        cancelled_run,
+    );
+}
+
+/// After the first signal no new run starts: the host's cancel port reads the controller's cancel request, and the
+/// run is refused before it makes a unit directory.
+fn cancelled_run() {
+    use fgos_run_supervisor::controller::cancel::{cancel_flow, CancelFlow};
+    let scratch = Scratch::new("cancel");
+    let (main, tree) = repo(&scratch);
+    let (bin, host_bin) = stub_bin(&scratch);
+    let host = host_of(None, &bin, &host_bin);
+    let mut said = Vec::new();
+    cancel_flow(
+        "SIGINT",
+        CancelFlow {
+            cancel_wait_ms: 0,
+            exit: &mut |_| {},
+            stderr: &mut said,
+        },
+    );
+    let options = json!({
+        "unitData": { "id": "u3", "objective": "look around", "capability": "execute", "writes": [] },
+        "cwd": tree, "runnerConfig": runner(&bin),
+        "session": { "pathEnv": bin, "herdrPresent": false, "postureAtLaunch": true, "headless": true },
+    });
+    let error = host
+        .run_unit(&options)
+        .expect_err("a cancelled controller runs nothing");
+    assert_eq!(error.error_class, "run-cancelled");
+    assert!(!main.join(".fgos/assignments").exists());
 }

@@ -19,6 +19,8 @@ use fgos_execution_engine::unit_run::run_unit_contract::RunUnitError;
 use fgos_execution_engine::unit_run::verify::Verified;
 use fgos_git::{GitDriver, RepoHandle};
 use fgos_holder_lock::Handle;
+use fgos_run_supervisor::controller::cancel;
+use fgos_run_supervisor::controller::config::read_cancel_wait_ms;
 use fgos_run_supervisor::controller::launch::AttemptHost;
 use serde_json::{json, Value};
 
@@ -93,7 +95,74 @@ fn execute_error(error: ExecuteError) -> RunUnitError {
     }
 }
 
+/// The cancel handlers this process holds for the unit runs in it, and how many runs hold them.
+static CANCEL_HOLD: Mutex<(usize, Option<Box<dyn std::any::Any + Send>>)> = Mutex::new((0, None));
+
+/// One unit run's hold on the cancel handlers; the last one dropped removes them.
+pub struct CancelHold(bool);
+
+impl Drop for CancelHold {
+    fn drop(&mut self) {
+        if !self.0 {
+            return;
+        }
+        let mut held = CANCEL_HOLD.lock().unwrap_or_else(|p| p.into_inner());
+        held.0 -= 1;
+        if held.0 == 0 {
+            held.1 = None;
+        }
+    }
+}
+
+/// `holdCancelOnSignal(options)` (`src/runner/execution/run.mjs:259`): a process that asked for it
+/// (`enable_cancel_on_signal`) has Ctrl-C and SIGTERM cancel every attempt it delivered; one handler serves all its
+/// units, installed with the first with the project's `dispatch.cancelWaitMs` and removed with the last.
+pub fn hold_cancel_on_signal(options: &Value) -> Result<CancelHold, RunUnitError> {
+    if !cancel::cancel_on_signal_enabled() {
+        return Ok(CancelHold(false));
+    }
+    let mut held = CANCEL_HOLD.lock().unwrap_or_else(|p| p.into_inner());
+    if held.0 == 0 {
+        let project_root = options
+            .get("repoRoot")
+            .and_then(Value::as_str)
+            .map(PathBuf::from)
+            .or_else(|| {
+                let cwd = options
+                    .get("cwd")
+                    .and_then(Value::as_str)
+                    .map(PathBuf::from)
+                    .or_else(|| std::env::current_dir().ok())?;
+                machine::git_roots(&cwd, false)
+                    .ok()
+                    .map(|r| r.main_checkout_root)
+            });
+        let wait_ms = read_cancel_wait_ms(project_root.as_deref())
+            .map_err(|e| RunUnitError::config(e.to_string(), None, None))?;
+        #[cfg(unix)]
+        {
+            held.1 = Some(Box::new(cancel::install_cancel_on_signal(wait_ms)));
+        }
+        #[cfg(not(unix))]
+        let _ = wait_ms;
+    }
+    held.0 += 1;
+    Ok(CancelHold(true))
+}
+
 impl<A: CaseAdmission + Sync> HostUnitRun<A> {
+    /// `runUnit(options)` (`src/runner/execution/run.mjs:177`): engine `run_unit` over this host, holding the
+    /// cancel handlers for as long as the run lasts.
+    pub fn run_unit(&self, options: &Value) -> Result<Value, RunUnitError> {
+        // A cancelled controller starts nothing: the engine refuses before any handler is held.
+        let _hold = if self.cancelled() {
+            None
+        } else {
+            Some(hold_cancel_on_signal(options)?)
+        };
+        fgos_execution_engine::unit_run::run::run_unit(options, self)
+    }
+
     /// `contextRefsOf` (`src/runner/execution/run.mjs:973`): the unit's resolved inputs and the reports earlier seats
     /// handed this one; a blind seat gets what lies in the run state as copies in its own directory, and an own-seat
     /// input is copied in whether the unit is blind or not.
@@ -175,6 +244,10 @@ impl<A: CaseAdmission + Sync> UnitRunHost for HostUnitRun<A> {
         if let Some(notify) = &self.on_case_admitted {
             notify(case_id, reservation_id);
         }
+    }
+    /// `assertNotCancelled` (`src/run-supervisor/cancel-registry.mjs`): a signal asked this controller to cancel.
+    fn cancelled(&self) -> bool {
+        cancel::assert_not_cancelled().is_err()
     }
 
     fn git_roots(&self, cwd: &Path, allow_no_repository: bool) -> Result<GitRoots, String> {
@@ -395,6 +468,11 @@ impl<A: CaseAdmission + Sync> UnitRunHost for HostUnitRun<A> {
                 .case_context
                 .map(|(case, reservation)| (case.to_string(), reservation.to_string())),
             blind: seat.unit.get("blind") == Some(&Value::Bool(true)),
+            // Seats launched together as one group: their panes share the tab in equal parts.
+            dispatch_batch_size: seat
+                .batch_size
+                .filter(|size| *size > 1)
+                .and_then(|size| u32::try_from(size).ok()),
             ..ExecuteOptions::default()
         };
         let mut stage_session = self.session.clone();
