@@ -103,6 +103,9 @@ impl AccountLockGuard for Held {
     fn account_dir(&self) -> &Path {
         &self.0
     }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 impl AccountLocks for Free {
     fn acquire(

@@ -633,8 +633,16 @@ impl Layout {
     }
 }
 
+/// A staged file is on disk before the staging directory is renamed into `pending/`: it is installed through the
+/// durable-file door (new name only, owner-only), which syncs the file and its directory.
 fn stage_copy_file(from: &Path, to: &Path) -> std::io::Result<()> {
-    create_new(to, &read_agent_file(from, MAX_COPY_FILE_BYTES)?)
+    let bytes = read_agent_file(from, MAX_COPY_FILE_BYTES)?;
+    let (Some(dir), Some(name)) = (to.parent(), to.file_name().and_then(|n| n.to_str())) else {
+        return Err(std::io::Error::other("no staging name"));
+    };
+    fgos_durable_file::install_once_with_mode(dir, name, &bytes, 0o600)
+        .map(|_| ())
+        .map_err(|e| std::io::Error::other(e.to_string()))
 }
 
 /// The file is replaced only when it still holds what the merge was based on; the owner's own CLI does not

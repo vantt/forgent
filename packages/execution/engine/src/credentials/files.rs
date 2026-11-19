@@ -181,20 +181,18 @@ pub fn set_mode(file: &Path, mode: u32) -> io::Result<()> {
     }
 }
 
-/// Make a path durable: a file's bytes, or a directory's entries.
-pub fn sync_path(path: &Path) -> io::Result<()> {
-    if fs::metadata(path)?.is_dir() {
-        fgos_durable_file::sync_directory(path)
-    } else {
-        fs::File::open(path)?.sync_all()
-    }
-}
-
+/// Make a staged tree's entries durable: every staged file was installed through the durable-file door (or is
+/// a snapshot the SQLite adapter left on disk), so what is left are the directories that name them.
 pub fn sync_tree(dir: &Path) -> io::Result<()> {
+    let mut dirs = vec![dir.to_path_buf()];
     for entry in fs::read_dir(dir)? {
-        sync_path(&entry?.path())?;
+        let entry = entry?;
+        if entry.file_type()?.is_dir() {
+            dirs.push(entry.path());
+        }
     }
-    sync_path(dir)
+    let dirs: Vec<&Path> = dirs.iter().map(PathBuf::as_path).collect();
+    fgos_durable_file::sync_directories(&dirs)
 }
 
 pub fn remove_all(path: &Path) {
@@ -319,51 +317,12 @@ pub fn jwt_expiry_ms(token: &Value) -> Option<f64> {
 
 // ----------------------------------------------------------------------------------------------- dates
 
-/// `Date.parse` of the ISO forms a login file carries (`YYYY-MM-DD`, or a date and time with an optional
-/// fraction and a `Z` or `±HH:MM` offset; no offset means UTC); milliseconds, or `None`.
+/// `Date.parse` of the ISO forms a login file carries: an RFC 3339 instant (`Z` or `±HH:MM`), or a calendar
+/// date as UTC midnight; milliseconds, or `None`.
 pub fn parse_date_ms(text: &str) -> Option<f64> {
-    let (date, time) = match text.split_once(['T', ' ']) {
-        Some((d, t)) => (d, Some(t)),
-        None => (text, None),
-    };
-    let mut d = date.splitn(3, '-');
-    let (year, month, day): (i64, i64, i64) = (
-        d.next()?.parse().ok()?,
-        d.next().map_or(Some(1), |m| m.parse().ok())?,
-        d.next().map_or(Some(1), |m| m.parse().ok())?,
-    );
-    if !(1..=12).contains(&month) || !(1..=31).contains(&day) {
-        return None;
-    }
-    let (mut seconds, mut offset_min) = (0f64, 0i64);
-    if let Some(t) = time {
-        let (clock, off) = match t.find(['Z', 'z', '+', '-']) {
-            Some(i) if t[i..].eq_ignore_ascii_case("z") => (&t[..i], 0),
-            Some(i) => {
-                let sign = if t.as_bytes()[i] == b'-' { -1 } else { 1 };
-                let (hh, mm) = t[i + 1..].split_once(':').unwrap_or((&t[i + 1..], "0"));
-                (
-                    &t[..i],
-                    sign * (hh.parse::<i64>().ok()? * 60 + mm.parse::<i64>().ok()?),
-                )
-            }
-            None => (t, 0),
-        };
-        offset_min = off;
-        let mut c = clock.splitn(3, ':');
-        let h: f64 = c.next()?.parse().ok()?;
-        let m: f64 = c.next().map_or(Some(0.0), |m| m.parse().ok())?;
-        let s: f64 = c.next().map_or(Some(0.0), |s| s.parse().ok())?;
-        seconds = h * 3600.0 + m * 60.0 + s;
-    }
-    // Days from civil (proleptic Gregorian).
-    let y = if month <= 2 { year - 1 } else { year };
-    let era = y.div_euclid(400);
-    let yoe = y - era * 400;
-    let doy = (153 * (month + if month > 2 { -3 } else { 9 }) + 2) / 5 + day - 1;
-    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
-    let days = era * 146_097 + doe - 719_468;
-    Some(days as f64 * 86_400_000.0 + seconds * 1000.0 - offset_min as f64 * 60_000.0)
+    fgos_host_runtime::civil_time::parse_rfc3339_millis(text)
+        .or_else(|| fgos_host_runtime::civil_time::parse_date_midnight_millis(text))
+        .map(|ms| ms as f64)
 }
 
 pub fn path_str(path: &Path) -> String {
@@ -376,22 +335,6 @@ pub fn join(parts: &[&Path]) -> PathBuf {
 
 /// `new Date(ms).toISOString()`.
 pub fn iso_from_ms(ms: f64) -> String {
-    let total = ms.floor() as i64;
-    let (days, rem) = (total.div_euclid(86_400_000), total.rem_euclid(86_400_000));
-    let z = days + 719_468;
-    let era = z.div_euclid(146_097);
-    let doe = z.rem_euclid(146_097);
-    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
-    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
-    let mp = (5 * doy + 2) / 153;
-    let day = doy - (153 * mp + 2) / 5 + 1;
-    let month = if mp < 10 { mp + 3 } else { mp - 9 };
-    let year = yoe + era * 400 + i64::from(month <= 2);
-    format!(
-        "{year:04}-{month:02}-{day:02}T{:02}:{:02}:{:02}.{:03}Z",
-        rem / 3_600_000,
-        rem / 60_000 % 60,
-        rem / 1000 % 60,
-        rem % 1000
-    )
+    fgos_host_runtime::civil_time::format_unix_millis_rfc3339(ms.floor() as i64, 0)
+        .unwrap_or_default()
 }

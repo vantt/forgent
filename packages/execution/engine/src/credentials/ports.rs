@@ -9,6 +9,8 @@ use super::CredentialSource;
 pub trait AccountLockGuard {
     /// The account directory the lock guards.
     fn account_dir(&self) -> &Path;
+    /// The concrete lock, so a probe driver from the same accounts module can lend it to the call it runs.
+    fn as_any(&self) -> &dyn std::any::Any;
 }
 
 /// The account lock is held elsewhere and did not free within the wait.
@@ -111,7 +113,8 @@ pub trait SqliteAdapter {
     /// One transaction (`BEGIN IMMEDIATE`): select the oauth rows, let `edit` choose updates (it may fail, which
     /// rolls back), apply them, commit, then checkpoint passively when anything changed.
     fn update_rows(&self, file: &Path, edit: &mut RowEdit<'_>) -> Result<Vec<RowUpdate>, String>;
-    /// A consistent snapshot of the file including its write-ahead log; `false` leaves nothing behind.
+    /// A consistent snapshot of the file including its write-ahead log, synced to disk before it returns `true`
+    /// (a write-back renames the staging that holds it into `pending/` next); `false` leaves nothing behind.
     fn snapshot(&self, source: &Path, destination: &Path) -> bool;
     /// A fresh database at `to` holding only the `auth_credentials` rows of `from`.
     fn isolate_login(&self, from: &Path, to: &Path) -> Result<(), SqliteFailure>;

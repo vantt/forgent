@@ -389,15 +389,8 @@ fn staging_writer_alive(dir: &Path) -> bool {
     let Some(pid) = staging_pid(&base(dir)).filter(|p| *p > 0) else {
         return true;
     };
-    #[cfg(target_os = "linux")]
-    {
-        Path::new(&format!("/proc/{pid}")).exists()
-    }
-    #[cfg(not(target_os = "linux"))]
-    {
-        let _ = pid;
-        true
-    }
+    let record = fgos_process::facts::Record::from_json(&serde_json::json!({ "pid": pid }));
+    fgos_process::facts::judge_here(&record) != fgos_process::facts::Verdict::Dead
 }
 
 fn mtime_ms(path: &Path) -> Option<f64> {
@@ -851,7 +844,7 @@ pub fn write_back_renewed_credential(
             // On disk before the rename, and the rename on disk before the home may go.
             sync_tree(&staging).map_err(|_| "stage-failed".to_owned())?;
             fs::rename(&staging, &final_dir).map_err(|_| "stage-failed".to_owned())?;
-            sync_path(&pending).map_err(|_| "stage-failed".to_owned())
+            fgos_durable_file::sync_directory(&pending).map_err(|_| "stage-failed".to_owned())
         });
     if let Err(message) = staged {
         remove_all(&staging);
