@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "21744c53ef2b0aded71778ec31d9e8fb2cfc62d8eef4fec1ea707df895a31eb6",
+  "payloadDigest": "fcc33c35ba692bd367b059076a7506ae2b10e35c1a148cc89aa62b1adae59b2d",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1123,7 +1123,7 @@
     "scripts/measure-verify-cost.mjs": "97768198548908742f0687b069fbe77dfc35839a88e4906f3813afbdd5918abc",
     "scripts/merge-test-shards.mjs": "bd5868bb24fd51a042ddabca60d8a3d5bca12c33b4837e54fb19fbfe10001c77",
     "scripts/package-release-assets.mjs": "60efb629a7ebfe1143445557c55abfa4b3269286a0498754a28dddb662a70fd0",
-    "scripts/plan-contract-check.mjs": "f4183178b7d9b48cb74b308e270cd332d3092a5a1d879a0e0ef172f18888e60e",
+    "scripts/plan-contract-check.mjs": "9a4abdd3519307af4b13d46d613afe747d4c3d791322029578cab60e82db416b",
     "scripts/prepare-release.mjs": "0bd2e6e7514ba4de781ad480889a8f701729a1d4b9d80d5f5af7b2f1de1160aa",
     "scripts/previous-release-tag.mjs": "d79809904f630061da723099f65817f18367462d1d9d64982426c58eb05d6a0f",
     "scripts/probe-storytelling-material.mjs": "b2991c1c14879193953d901e9122a9e511136a91907949643b7f1af008590df4",
