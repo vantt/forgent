@@ -10,7 +10,7 @@ VERIFIED/INFERENCE marks: [external-research.md](external-research.md) (round 0,
 
 Round 2 (2026-11-19). The owner answered Q1: A, with a preflight for the LLM part that remains (G1 and G2,
 provisional until it holds one more round). The owner also raised a new point: "who is allowed to merge? The current
-model feels like no one merges." It is scouted as M1-M4 in §3. Q2 answered A: merge becomes a deterministic queue with an independent review verdict. Q3 answered (a): code runs each merge, and the supervisor owns the queue and arbitrates it. The owner then asked who resolves a merge failure. A responsibility ladder is drafted as M5. Open: Q4 (confirm the ladder). Window 3 of the live run
+model feels like no one merges." It is scouted as M1-M4 in §3. Q2 answered A: merge becomes a deterministic queue with an independent review verdict. Q3 answered (a): code runs each merge, and the supervisor owns the queue and arbitrates it. The owner then asked who resolves a merge failure. A responsibility ladder is drafted as M5. The owner asked for the full end-of-plan merge cycle, so §6 now holds a draft of it (round 5). Open: Q4 (confirm the ladder and the cycle). Window 3 of the live run
 may be in progress, and this discussion stays read-only.
 
 ## 2. Mục tiêu & đề bài
@@ -80,10 +80,103 @@ compare against.
 - 2026-11-19 round 3, Q3 (does the supervisor run the queue?). Owner: "đồng ý a, nhưng merge fail thì sao, ai chịu
   trách nhiệm giải quyết". Q3 = (a) was recorded as provisional. The M5 ladder was drafted from the refusal codes, and Q4
   was asked.
+- 2026-11-19 round 4. Owner: "vậy hãy mô tả lại rõ chi tiết chu trình khi lead dẫn dắt 1 plan sắp xong, tiến trình để
+  merge như thế nào". §6 was drafted with the cycle (steps 1-10, a sequence diagram and the open points). Q4 now covers
+  the ladder and the cycle.
 
 ## 6. Thiết kế đã chốt {#design}
 
-(not yet)
+**Draft (round 5), not settled.** This assembles the provisional answers Q1 = A + preflight, Q2 = A, Q3 = (a) and the
+M5 ladder (Q4 open). Verb names marked *(new)* are placeholders for the plan to name. Today's verbs are `fgos land`,
+`fgos run` and `fgos request result`.
+
+### Cycle of one phase, from unit done to landed
+
+1. **Unit done.** The lead's `fgos run --writes <footprint paths> --worktree <wt>` finishes on branch `<plan>/pNN`.
+   The lead reads `fgos request result`. A failed or blocked unit is handled by the lead, as today.
+2. **Submit.** The lead submits the branch to the merge queue: `fgos land <branch>` becomes a submission *(changed)*.
+   It returns a ticket at once and records a `merge-submitted` event (branch, head SHA, plan, submitter role, tests the
+   phase names). The lead does not wait: it goes on with phases of the wave that do not depend on this one.
+3. **Queue picks it up** (code: the watcher tick or the door itself, one item at a time per target, in plan-priority
+   order).
+4. **Independent review.** If no verdict exists for this exact head SHA, the queue dispatches a read-only review unit
+   *(new)*. The unit runs on `git diff <trunk>...<branch>`, with the phase file as the spec, through an executor other
+   than the author unit's where one is available. The verdict is bound to the SHA, so a new push needs a new verdict.
+   A reject goes to L1 with its findings.
+5. **Land** (today's `fgos land` door, unchanged inside):
+   - fetch;
+   - prepare a merge candidate (trunk tip + branch) while holding the rank-20 merge slot;
+   - footprint check;
+   - regenerate generated files;
+   - `land.gates` plus the phase's tests;
+   - push the candidate to origin;
+   - fast-forward local main.
+
+   L0 failures (remote moved, generated-file conflict, crash needing recover) heal here without waking anyone.
+6. **Outcome event.** The result is either `merge-landed` (trunk SHA) or `merge-refused` (code and ladder level L1, L2
+   or L3).
+   - A busy lead sees the outcome through its own hooks or `request result`.
+   - An idle or gone lead is resumed by the supervisor, the same way an answered question resumes its asker.
+7. **Lead records it.** On `merge-landed` the lead sets the phase `done` in its phase table, a `--paths` land of its
+   own plan dir (grant-only paths; whether these skip review is open, see below). On `merge-refused` at L1 the lead
+   fixes the branch through another unit (for a conflict, merge the trunk into the branch, never rebase) and submits
+   again, at most N attempts. After that the item rises to L2.
+
+### End of the plan
+
+8. **Last phase landed.** The lead sets the plan `done` (a `--paths` land) and stops starting work. It never stops its
+   own session.
+9. **Close check, code first.** The flip to `done` raises `plan-done`. Before any LLM turn, code checks:
+   - every phase row is `done` or parked with a reason;
+   - no queue item of this plan is pending;
+   - every phase branch is an ancestor of the trunk;
+   - the plan's verify command, if it has one, passes on the trunk tip.
+
+   A failed check raises `plan-close-blocked`, which goes to L2.
+10. **Supervisor close (judgement).** The supervisor:
+    - reads the acceptance criteria against the evidence;
+    - writes one board line and a backlog update (`--paths` and `session write`);
+    - stops the lead (`fgos session stop lead`);
+    - has the plan's worktrees removed and its lanes released (they are kernel locks, freed when the seat ends).
+
+    If the evidence does not meet the acceptance criteria, it reopens a phase or asks the owner (L3).
+
+### Who resolves a failure (M5 ladder)
+
+L0 code → L1 submitter (N attempts) → L2 supervisor (cap exceeded, submitter gone or unable to fix code, cross-plan
+conflict, red trunk freezes the queue, item stuck X ticks) → L3 owner, only through a supervisor question.
+
+```mermaid
+sequenceDiagram
+  participant L as Lead
+  participant Q as Merge queue (code)
+  participant R as Review unit
+  participant D as fgos land door
+  participant S as Supervisor (LLM)
+  L->>Q: submit branch (ticket)
+  Note over L: continues independent phases
+  Q->>R: review diff @SHA (if no verdict)
+  R-->>Q: verdict
+  alt reject
+    Q-->>L: merge-refused L1 (findings)
+  else approve
+    Q->>D: land (merge slot, gates, push, publish)
+    D-->>Q: landed / refused (L0 heals inside)
+    Q-->>L: merge-landed or merge-refused L1
+    Q-->>S: L2 events only (cap, gone, cross-plan, red trunk, stuck)
+  end
+  L->>L: phase done (--paths); last phase → plan done
+  Q->>Q: plan-done close check (code)
+  Q-->>S: plan-done / plan-close-blocked
+  S->>S: acceptance review, board + backlog, stop lead, clean worktrees
+```
+
+Open inside this draft:
+- whether grant-only `--paths` lands (phase table, backlog) skip the review verdict;
+- what session L2 starts to fix a branch whose submitter cannot fix code;
+- the values of N and X;
+- whether the lead may submit a dependent phase stacked on an unlanded one, or must wait;
+- reviewer independence when only one provider is available.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
