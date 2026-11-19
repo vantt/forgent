@@ -41,7 +41,7 @@ pub fn canonical_root(root: &Path) -> PathBuf {
     fs::canonicalize(root).unwrap_or_else(|_| resolve(root))
 }
 
-fn subdirs(dir: &Path) -> Vec<PathBuf> {
+pub(super) fn subdirs(dir: &Path) -> Vec<PathBuf> {
     let Ok(read) = fs::read_dir(dir) else {
         return Vec::new();
     };
@@ -93,7 +93,7 @@ pub fn list_kept_credential_homes(temp_root: &Path) -> Vec<KeptHome> {
 }
 
 /// `{writeBack}` of a recorded home's entry in its finalization descriptor; the outer `None` when that cannot say.
-fn recorded_write_back(record: &Value) -> Option<Option<Value>> {
+pub(super) fn recorded_write_back(record: &Value) -> Option<Option<Value>> {
     let text = |key: &str| record.get(key).and_then(Value::as_str);
     let file = Path::new(text("runDir")?)
         .join("protected")
@@ -321,4 +321,31 @@ fn chmod_700(path: &Path) -> bool {
 /// The temp root of private homes under the system temp directory.
 pub fn default_temp_roots() -> Vec<PathBuf> {
     vec![resolve_confinement_temp_root(&std::env::temp_dir())]
+}
+
+/// The roots kept logins are looked for under: the default temp roots and the `tempRoot` and `privateHomeRoot` of
+/// every backend of the machine `registry`, each canonical and once. Only the login scan reads a registry root;
+/// the orphan reaper and the root-mode check keep to [`default_temp_roots`].
+pub fn credential_scan_roots(registry: Option<&serde_json::Value>) -> Vec<PathBuf> {
+    let mut roots: Vec<PathBuf> = Vec::new();
+    let mut add = |root: &Path| {
+        let root = canonical_root(root);
+        if !roots.contains(&root) {
+            roots.push(root);
+        }
+    };
+    default_temp_roots().iter().for_each(|root| add(root));
+    let instances = registry
+        .and_then(|registry| registry.get("confinementBackends"))
+        .and_then(serde_json::Value::as_object);
+    for instance in instances.into_iter().flat_map(|map| map.values()) {
+        for key in ["tempRoot", "privateHomeRoot"] {
+            if let Some(root) = instance.get(key).and_then(serde_json::Value::as_str) {
+                if !root.trim().is_empty() {
+                    add(Path::new(root));
+                }
+            }
+        }
+    }
+    roots
 }

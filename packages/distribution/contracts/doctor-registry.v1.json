@@ -89,7 +89,16 @@
       "rust-host-target-supported",
       "legacy-node-payload-present",
       "active-release-matches-checkout",
-      "activation-matches-pin"
+      "activation-matches-pin",
+      "confinement-policies-declared",
+      "confinement-backend-registry-readable",
+      "confinement-orphaned-resources-reaped",
+      "credential-copies-retained",
+      "confinement-bwrap-platform",
+      "confinement-probe-freshness",
+      "confinement-blind-read",
+      "confinement-strict-readiness",
+      "confinement-herdr-maturity"
     ],
     "fixes": [
       "lock-dirs",
@@ -116,7 +125,10 @@
       "agy-hook-wired",
       "omp-hook-wired",
       "pi-hook-wired",
-      "bin-discovery-cache"
+      "bin-discovery-cache",
+      "confinement-backend-registry-readable",
+      "confinement-orphaned-resources-reaped",
+      "credential-copies-retained"
     ]
   },
   "layers": {
@@ -659,82 +671,47 @@
     {
       "id": "confinement-policies-declared",
       "description": "confinement policies referenced by capabilities exist in built-ins or runner.confinementPolicies",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/capability-config.mjs",
-        "src/runner/dispatch/confinement/policies.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "confinement-backend-registry-readable",
       "description": "machine backend registry file exists and conforms to confinement-backend-registry.v1 schema",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/confinement/backend-registry.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "confinement-orphaned-resources-reaped",
       "description": "confinement temp roots are owner-only and no dispatch home is left behind by a dead process",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/confinement/backend-registry.mjs",
-        "src/runner/dispatch/confinement/cleanup.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "credential-copies-retained",
       "description": "no login copy (pending, scratch, or a kept private home) that may hold the only valid refresh token is left unapplied",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/provider-capacity.mjs",
-        "src/runner/dispatch/confinement/backend-registry.mjs",
-        "src/runner/dispatch/provider-credential-renewal.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "confinement-bwrap-platform",
       "description": "bwrap backend instance configured in machine registry is enabled and its executable is verified on Linux",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/confinement/backend-registry.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "confinement-probe-freshness",
       "description": "confinement probe freshness status (runs the falsification probe harness against the registered bwrap backend)",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/confinement/backend-registry.mjs",
-        "src/runner/dispatch/confinement/probes/harness.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "confinement-blind-read",
       "description": "a blind unit can be enforced: the registered bwrap backend hides peer run state, homes and processes from a worker",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/confinement/backend-registry.mjs",
-        "src/runner/dispatch/confinement/probes/harness.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "confinement-strict-readiness",
       "description": "strict confinement readiness (all capabilities declared with known policies, bwrap ready)",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/capability-config.mjs",
-        "src/runner/dispatch/confinement/policies.mjs",
-        "src/runner/dispatch/confinement/backend-registry.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "confinement-herdr-maturity",
       "description": "herdr confinement convergence maturity status (partial: pre-adapter checks under Authority, session/home lifecycle adapter-managed)",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/confinement/policies.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "observe-dir-writable",
@@ -909,15 +886,15 @@
     },
     {
       "id": "confinement-backend-registry-readable",
-      "owner": "bridge:S6a"
+      "owner": "rust:execution"
     },
     {
       "id": "confinement-orphaned-resources-reaped",
-      "owner": "bridge:S6a"
+      "owner": "rust:execution"
     },
     {
       "id": "credential-copies-retained",
-      "owner": "bridge:S6a"
+      "owner": "rust:execution"
     },
     {
       "id": "identity-machine-id",

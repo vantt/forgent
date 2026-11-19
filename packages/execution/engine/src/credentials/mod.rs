@@ -19,8 +19,8 @@
 //! holder of the account lock. Nothing here prints, logs or returns a token value; results carry fixed codes.
 //!
 //! The account lock, the credential probe and the SQLite engine are ports ([`ports`]); the accounts module serves the
-//! first two ([`ports::AccountsLocks`], [`ports::AccountsProbe`]), the account directories and the home reading are
-//! its own. The files and directory names are the ones the previous Node release reads, byte for byte.
+//! first two ([`ports::AccountsLocks`], [`ports::AccountsProbe`]) and [`sqlite::BundledSqlite`] the third; the
+//! account directories and the home reading are its own. The files and directory names are the ones the previous Node release reads, byte for byte.
 
 pub mod apply;
 pub mod copy;
@@ -28,6 +28,7 @@ pub mod files;
 pub mod layout;
 pub mod ports;
 pub mod renew;
+pub mod sqlite;
 pub mod store;
 
 use std::path::{Path, PathBuf};
@@ -37,10 +38,11 @@ pub use copy::{copy_credential_files, CopyOptions};
 pub use files::Code;
 pub use layout::{Entry, Layout, CODEX_REFRESH_INTERVAL_MS};
 pub use ports::{
-    AccountLockGuard, AccountLocks, AccountsLocks, AccountsProbe, CredentialProbe, LockBusy,
-    NoLocks, NoSqlite, ProbeRequest, ProbeRun, SqliteAdapter,
+    AccountLockGuard, AccountLocks, AccountsLocks, AccountsProbe, CredentialProbe, LiveSeatHomes,
+    LockBusy, NoLiveSeatHomes, NoLocks, NoSqlite, ProbeRequest, ProbeRun, SqliteAdapter,
 };
 pub use renew::{refresh_ahead, RefreshOptions, RefreshOutcome, RefreshRequest};
+pub use sqlite::BundledSqlite;
 pub use store::{
     credential_write_back_target, inspect_pending_copies_over_limit,
     inspect_retained_credential_copies, sweep_interrupted_stagings, write_back_renewed_credential,

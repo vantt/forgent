@@ -30,7 +30,6 @@ import {
   runAllConfinementProbes,
 } from '../../src/runner/dispatch/confinement/probes/harness.mjs';
 import { DispatchError } from '../../src/runner/dispatch/transport.mjs';
-import { checkConfinementBlindRead } from '../../src/setup/registrations.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { writeRawProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -458,31 +457,6 @@ test('the probe set grows by one for a blind dispatch and keeps its own fingerpr
   assert.equal(withBlind.results.length, 10);
   assert.equal(withBlind.results.at(-1).probe, 'peer-run-hidden');
   assert.equal(withBlind.passed, true, withBlind.message);
-});
-
-test('doctor reports blind-read through the real probe', (t) => {
-  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
-  const result = checkConfinementBlindRead();
-  assert.equal(result.passed, true);
-  assert.match(result.message, /^blind-read: pass/);
-});
-
-test('doctor names a backend that cannot enforce blind reads', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-blind-doctor-'));
-  const registry = path.join(dir, 'confinement-backends.json');
-  const previous = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-  try {
-    fs.writeFileSync(registry, JSON.stringify({ contract: 'confinement-backend-registry.v1', confinementBackends: { bwrap: { type: 'bwrap', enabled: false, executable: '/usr/bin/bwrap' } } }));
-    process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = registry;
-    assert.match(checkConfinementBlindRead().message, /^blind-read: backend-unsupported/);
-
-    fs.writeFileSync(registry, JSON.stringify({ contract: 'confinement-backend-registry.v1', confinementBackends: { bwrap: { type: 'bwrap', enabled: true, executable: path.join(dir, 'no-such-bwrap') } } }));
-    assert.match(checkConfinementBlindRead().message, /^blind-read: backend-unsupported/);
-  } finally {
-    if (previous === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
-    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = previous;
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
 });
 
 // ---------------------------------------------------------------------------

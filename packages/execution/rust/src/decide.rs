@@ -13,37 +13,23 @@
 //! Ports: the tools are probed through [`ToolProbe`], Seat Binding through [`SeatBinder`], and the repository and
 //! config facts the config root rule reads through [`Workspace`]. The crate stays pure.
 
-use crate::bind::{bind, effective_rigor, BindRequest, BindSession};
+use crate::bind::{bind, bypass_outside_head_refusal, BindRequest, BindSession};
+use crate::dispatch_policy::effective_dispatch_policy;
+use crate::executor_config::resolve_executor_config;
 use crate::executor_model::{
     has_own_prefer_pool, lookup_executor, mechanism, registered_capability_of,
-    resolve_executor_governance, resolve_executor_provider, with_default_executor, Governance,
-    Mechanism, ModelError,
+    with_default_executor, Mechanism, ModelError,
 };
-use crate::js::{text as js_text, truthy};
+use crate::js::text as js_text;
 use crate::ports::Machine;
 use crate::runner_config::{load_runner_config, DoorRead, RunnerConfigError};
 use crate::tools::{tool_providers, ToolProbe, ToolStatus};
-use fgos_seat_binding::Tier;
 use serde_json::{json, Map, Value};
 
 /// The usage refusal when no selector is given.
 pub const USAGE: &str = "usage: fgos dispatch decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --assignment <assignmentId> [--has-live-task-access] | decide --needs-soul [--has-live-task-access]";
 
-/// The refusal of a dispatch that needs the default executor where none is set.
-const EXECUTOR_MISSING_MESSAGE: &str = "no runner.executor: none set and no assistant CLI found on PATH; set one with fgos config set runner.executor ... --reason ...";
-
-/// The CLI commands that stay within the Claude ecosystem for cross-provider governance.
-const CLAUDE_CLI_COMMANDS: &[&str] = &["claude"];
-
 // ---- reading the JSON ----------------------------------------------------------------------------------
-
-fn present<'a>(value: &'a Value, key: &str) -> Option<&'a Value> {
-    value.get(key).filter(|found| !found.is_null())
-}
-
-fn str_of<'a>(value: &'a Value, key: &str) -> Option<&'a str> {
-    value.get(key).and_then(Value::as_str)
-}
 
 // ---- the request and the answer --------------------------------------------------------------------------
 
@@ -207,7 +193,8 @@ pub trait SeatBinder {
 }
 
 /// The Work seat through the crate's own [`crate::bind::bind`], from the config alone (no lease state is read,
-/// as `bindWorkSeat` reads none): the adapter the host gives `decide`.
+/// as `bindWorkSeat` reads none), a bypass invocation refused as for every worker seat: the adapter the host
+/// gives `decide`.
 pub struct CrateBinder<'a> {
     pub machine: &'a dyn Machine,
     /// Epoch milliseconds.
@@ -243,6 +230,10 @@ impl SeatBinder for CrateBinder<'_> {
             self.now,
         )
         .map_err(BindFailure::Failed)?;
+        let bound = match bypass_outside_head_refusal(&bound, runner) {
+            Some(refused) => json!({ "refused": refused }),
+            None => bound,
+        };
         if let Some(refused) = bound.get("refused") {
             let text = |key: &str| {
                 refused
@@ -313,13 +304,17 @@ pub struct LoadedRunner {
     pub origins: Vec<RunnerOrigin>,
 }
 
-/// The repository and config facts `decide` reads.
-pub trait Workspace {
+/// The checkout facts a directory has, answered by the host's Git door; the rules that read them never read Git.
+pub trait CheckoutFacts {
     /// The worktree root of `dir` (a linked worktree's own root); the refusal text when `dir` is not inside a
     /// repository with a commit.
     fn repo_root(&self, dir: &str) -> Result<String, String>;
     /// The main checkout of `dir`, never a linked worktree's own root; `None` outside a repository.
     fn main_checkout_root(&self, dir: &str) -> Option<String>;
+}
+
+/// The repository and config facts `decide` reads: the checkout facts, plus the process's own checkout and config.
+pub trait Workspace: CheckoutFacts {
     /// The main checkout of the process's own working directory.
     fn process_main_checkout_root(&self) -> Option<String>;
     /// Whether `root` has a project config file (a YAML file or a legacy JSON one).
@@ -530,55 +525,6 @@ fn purpose_seat(
 
 // ---- resolving an out-of-process dispatch ----------------------------------------------------------------
 
-/// The hostname of a URL as the WHATWG URL parser reads it, for the schemes an API base URL uses; `None` when it
-/// does not parse as such a URL.
-fn url_hostname(url: &str) -> Option<String> {
-    let url = url.trim_matches(|c: char| c <= ' ');
-    let colon = url.find(':')?;
-    let scheme = &url[..colon];
-    let mut chars = scheme.chars();
-    if !chars.next()?.is_ascii_alphabetic()
-        || !chars.all(|c| c.is_ascii_alphanumeric() || matches!(c, '+' | '-' | '.'))
-    {
-        return None;
-    }
-    let scheme = scheme.to_ascii_lowercase();
-    let rest = &url[colon + 1..];
-    let special = matches!(scheme.as_str(), "http" | "https" | "ws" | "wss" | "ftp");
-    let authority_start = if special {
-        rest.trim_start_matches(['/', '\\'])
-    } else if let Some(stripped) = rest.strip_prefix("//") {
-        stripped
-    } else {
-        return Some(String::new());
-    };
-    let end = authority_start
-        .find(|c: char| matches!(c, '/' | '?' | '#') || (special && c == '\\'))
-        .unwrap_or(authority_start.len());
-    let authority = &authority_start[..end];
-    let host_port = authority.rsplit_once('@').map_or(authority, |(_, h)| h);
-    let host = if host_port.starts_with('[') {
-        host_port
-            .find(']')
-            .map_or(host_port, |at| &host_port[..=at])
-    } else {
-        host_port.rsplit_once(':').map_or(host_port, |(h, _)| h)
-    };
-    if special && host.is_empty() {
-        return None;
-    }
-    Some(if special {
-        host.to_ascii_lowercase()
-    } else {
-        host.to_string()
-    })
-}
-
-fn is_anthropic_api_host(url: &str) -> bool {
-    url_hostname(url)
-        .is_some_and(|host| host == "api.anthropic.com" || host.ends_with(".api.anthropic.com"))
-}
-
 /// Whether an out-of-process dispatch of `executor_id` can be resolved to a command to run: the checks
 /// `resolveExecutorConfig` makes before a launch, with the text of the refusal it gives (`None` text for a refusal
 /// that carries none). A content class is never declared by `decide`, so an executor that declares `carries` is
@@ -589,328 +535,29 @@ fn dispatch_refusal(
     agent_type: Option<&Value>,
     invocation_id: Option<&str>,
 ) -> Option<String> {
-    let entry = lookup_executor(runner, Some(executor_id)).executor;
-    if let Some(carries) = entry.and_then(|e| e.get("carries")) {
-        return Some(format!(
-            "executor \"{executor_id}\" declares \"carries: {}\" but this dispatch did not declare what content it carries — pass an explicit content class before dispatch.",
-            js_text(Some(carries))
-        ));
-    }
-    let invocations = entry
-        .and_then(|e| e.get("invocations"))
-        .and_then(Value::as_array);
-    let cli = invocations.and_then(|list| {
-        list.iter().find(|inv| {
-            str_of(inv, "via") == Some("cli")
-                && invocation_id.is_none_or(|id| str_of(inv, "id") == Some(id))
-        })
-    });
-    if let (Some(list), None) = (invocations, cli) {
-        return Some(match invocation_id {
-            Some(id) => format!(
-                "executor \"{executor_id}\" has no \"invocations\" entry with \"id\": \"{id}\" dispatchable via \"cli\" (has: {}).",
-                list.iter()
-                    .map(|inv| format!(
-                        "{}:{}",
-                        present(inv, "id").map_or_else(|| "(no id)".into(), |v| js_text(Some(v))),
-                        js_text(inv.get("via"))
-                    ))
-                    .collect::<Vec<_>>()
-                    .join(", ")
-            ),
-            None => format!(
-                "executor \"{executor_id}\" declares \"invocations\" but none is dispatchable via \"cli\" (has: {}) — resolveExecutorConfig only ever spawns a cli invocation; this executor cannot be dispatched this way.",
-                list.iter().map(|inv| js_text(inv.get("via"))).collect::<Vec<_>>().join("/")
-            ),
-        });
-    }
-    let default = present(runner, "executor");
-    let effective_agent_type = entry
-        .and_then(|e| present(e, "agentType"))
-        .or(agent_type.filter(|v| !v.is_null()));
-    let entry_has_command =
-        entry.is_some_and(|e| truthy(e.get("adapter")) || truthy(e.get("command")));
-    let via_agent_type =
-        cli.is_none() && !entry_has_command && truthy(effective_agent_type) && default.is_some();
-    let default_cli = match (entry, default) {
-        (None, Some(default)) => default
-            .get("invocations")
-            .and_then(Value::as_array)
-            .and_then(|list| list.iter().find(|inv| str_of(inv, "via") == Some("cli"))),
-        _ => None,
-    };
-    // The command, args and env of what would run: the cli invocation, the entry itself, the default executor's
-    // cli invocation, the default executor run with `--agent <type>`, else the default executor.
-    let (command, args_ok, env): (Option<&Value>, Result<bool, String>, Option<&Value>) =
-        if let Some(cli) = cli {
-            (
-                cli.get("command"),
-                Ok(cli.get("args").is_some_and(Value::is_array)),
-                cli.get("env"),
-            )
-        } else if let Some(entry) = entry.filter(|_| entry_has_command) {
-            (
-                entry.get("command"),
-                Ok(entry.get("args").is_some_and(Value::is_array)),
-                entry.get("env"),
-            )
-        } else if let Some(inv) = default_cli {
-            let env = present(inv, "env").or_else(|| default.and_then(|d| d.get("env")));
-            (
-                inv.get("command"),
-                Ok(inv.get("args").is_some_and(Value::is_array)),
-                env,
-            )
-        } else if via_agent_type {
-            let default = default.expect("an agent type resolves only over the default executor");
-            let args = match default.get("args") {
-                Some(Value::Array(_)) => Ok(true),
-                None | Some(Value::Null) => Err(format!(
-                    "Cannot read properties of {} (reading 'length')",
-                    js_text(default.get("args"))
-                )),
-                Some(_) => Ok(true),
-            };
-            (default.get("command"), args, None)
-        } else if let Some(default) = default {
-            (
-                default.get("command"),
-                Ok(default.get("args").is_some_and(Value::is_array)),
-                default.get("env"),
-            )
-        } else {
-            return Some(EXECUTOR_MISSING_MESSAGE.into());
-        };
-    match args_ok {
-        Err(type_error) => return Some(type_error),
-        Ok(args_ok) => {
-            if !command.is_some_and(Value::is_string) || !args_ok {
-                return Some("runner config \"executor\" must have a string \"command\" and an \"args\" array.".into());
-            }
-        }
-    }
-    let command = command.and_then(Value::as_str).unwrap_or_default();
-    let env = env.or_else(|| cli.and_then(|c| c.get("env")));
-    let env_target = env.and_then(|block| {
-        ["ANTHROPIC_BASE_URL", "OPENAI_BASE_URL", "BASE_URL"]
-            .iter()
-            .map(|key| block.get(*key))
-            .find(|value| truthy(*value))
-            .flatten()
-    });
-    let url_override = env_target
-        .and_then(Value::as_str)
-        .filter(|target| !target.trim().is_empty() && !is_anthropic_api_host(target));
-    let entry = entry?;
-    let cross_provider = url_override.is_some()
-        || !CLAUDE_CLI_COMMANDS.contains(&command)
-        || entry
-            .get("providerModel")
-            .is_some_and(|m| m.as_str() != Some("claude"));
-    if !via_agent_type && cross_provider && entry.get("allowCrossProvider") != Some(&json!(true)) {
-        return Some(format!(
-            "executor \"{executor_id}\" resolves to cross-provider egress target \"{}\" — prompt content would leave the Claude ecosystem. Set executors.{executor_id}.allowCrossProvider: true to permit this.",
-            url_override.unwrap_or(command)
-        ));
-    }
-    None
+    resolve_executor_config(
+        runner,
+        Some(executor_id),
+        None,
+        agent_type.and_then(Value::as_str),
+        invocation_id,
+    )
+    .err()
+    .map(|refusal| refusal.message)
 }
 
 // ---- the executor of an assignment record ----------------------------------------------------------------
 
-const RIGORS: [&str; 4] = ["low", "standard", "high", "critical"];
-const REASONING_EFFORTS: [&str; 4] = ["low", "medium", "high", "max"];
-const REPEAT_MODES: [&str; 2] = ["pre-delivery", "post-delivery"];
-const SEAT_ROLES: [&str; 5] = ["producer", "synthesizer", "reviewer", "red-team", "judge"];
-
-/// The capability an operation runs under when its policy declares none: the work product's primary capability,
-/// else the domain's `review` row when the catalog has it, else `review`.
-fn derived_capability(record: &Value, policy: &Value, runner: &Value) -> Option<String> {
-    if let Some(declared) = policy.get("capability") {
-        return declared.as_str().map(str::to_string);
-    }
-    let result_kind = match record.get("result") {
-        Some(result) if !result.is_null() => result.get("kind"),
-        _ => record.get("resultKind"),
-    };
-    if result_kind.and_then(Value::as_str) == Some("work-product") {
-        return record
-            .get("primaryCapability")
-            .filter(|p| truthy(Some(p)))
-            .and_then(Value::as_str)
-            .map(str::to_string);
-    }
-    let domain = record
-        .get("domain")
-        .filter(|d| truthy(Some(d)))
-        .map(|d| js_text(Some(d)));
-    let section = runner.get("capabilities").and_then(Value::as_object);
-    match domain.map(|d| format!("{d}:review")) {
-        Some(row)
-            if section
-                .and_then(|s| s.get(&row))
-                .is_some_and(|e| e.is_object() || e.is_array()) =>
-        {
-            Some(row)
-        }
-        _ => Some("review".into()),
-    }
-}
-
-/// The executor the effective dispatch policy of an assignment record runs on, with the refusals the policy gives
-/// before it: the record's policy shape, its rigor, effort and tier demands, then Seat Binding's bind of the seat
-/// with the record's executor (else the default executor) as a hard pin, then governance and the repeat mode.
+/// The executor the effective dispatch policy of an assignment record runs on: the policy's own answer
+/// ([`crate::dispatch_policy`]), with every refusal it gives before it.
 fn assignment_executor(
     runner: &Value,
     record: &Value,
     binder: &dyn SeatBinder,
 ) -> Result<String, DecideFailure> {
-    let refuse = |message: String| DecideFailure::Refused(ModelError::runner(message));
-    let empty = json!({});
-    let policy = match record.get("policy") {
-        None => &empty,
-        Some(policy) if policy.is_object() => policy,
-        Some(_) => {
-            return Err(refuse(
-                "assignment.policy must be an object when provided".into(),
-            ))
-        }
-    };
-    if policy.get("minTier").is_some() {
-        return Err(refuse("assignment policy field \"minTier\" was removed; normalize persisted assignments at the load boundary or use \"rigor\"/\"tier\"".into()));
-    }
-    let from_yaml = truthy(policy.get("_fromYaml"));
-    if from_yaml && policy.get("tier").is_some() {
-        return Err(refuse("workflow YAML cannot set explicit tier; declare the tier in the project config (capability, role, persona or seat), or set it at actor/assignment/CLI scope".into()));
-    }
-    if truthy(policy.get("model")) && !truthy(record.get("_allowLiteralModel")) && from_yaml {
-        return Err(refuse("workflow YAML cannot pin literal model names; declare the cell in modelPolicies or name a persona".into()));
-    }
-    let mut demand: Option<&str> = None;
-    for (value, label) in [
-        (policy.get("rigor"), "operation"),
-        (record.get("rigor"), "assignment"),
-    ] {
-        let Some(value) = value else { continue };
-        let Some(rigor) = RIGORS.iter().copied().find(|r| value.as_str() == Some(r)) else {
-            return Err(refuse(format!(
-                "invalid {label} rigor \"{}\". Valid rigors: [{}]",
-                js_text(Some(value)),
-                RIGORS.join(", ")
-            )));
-        };
-        let rank = |r: &str| RIGORS.iter().position(|x| *x == r);
-        if demand.is_none_or(|best| rank(rigor) > rank(best)) {
-            demand = Some(rigor);
-        }
-    }
-    let capability = match present(policy, "capability").or_else(|| present(record, "capability")) {
-        None => derived_capability(record, policy, runner),
-        Some(value) => value.as_str().map(str::to_string),
-    };
-    let rigor = effective_rigor(
-        &json!({ "rigor": demand, "capability": capability }),
-        runner,
-    )
-    .map_err(DecideFailure::Refused)?
-    .unwrap_or("standard");
-    let effort = policy.get("reasoningEffort");
-    if let Some(effort) =
-        effort.filter(|e| !REASONING_EFFORTS.iter().any(|r| e.as_str() == Some(r)))
-    {
-        return Err(refuse(format!(
-            "invalid reasoningEffort \"{}\". Valid values: [{}]",
-            js_text(Some(effort)),
-            REASONING_EFFORTS.join(", ")
-        )));
-    }
-    // `??`: an empty preferExecutor is a name (no pin, and no default executor either).
-    let named = present(policy, "preferExecutor").map(|e| e.as_str().unwrap_or_default());
-    let default = present(runner, "executor").and_then(|default| {
-        let executors = runner.get("executors").and_then(Value::as_object);
-        [str_of(default, "command"), Some("claude")]
-            .into_iter()
-            .flatten()
-            .find(|id| !id.is_empty() && executors.is_none_or(|all| truthy(all.get(*id))))
-    });
-    let pinned = named.or(default).filter(|p| !p.is_empty());
-    let tier = policy.get("tier");
-    if let Some(tier) = tier.filter(|t| t.as_str().and_then(Tier::parse).is_none()) {
-        return Err(refuse(format!(
-            "invalid explicit tier \"{}\". Valid tiers: [{}]",
-            js_text(Some(tier)),
-            Tier::ALL.map(Tier::name).join(", ")
-        )));
-    }
-    let mut overrides = Map::new();
-    if let Some(pinned) = pinned {
-        overrides.insert("executor".into(), json!(pinned));
-    }
-    if let Some(tier) = tier {
-        overrides.insert("tier".into(), tier.clone());
-    }
-    if let Some(effort) = effort {
-        overrides.insert("reasoningEffort".into(), effort.clone());
-    }
-    let operation = record.get("operation").filter(|o| !o.is_null());
-    let mut unit = json!({
-        "id": operation.cloned().unwrap_or_else(|| json!("work-seat")),
-        "capability": capability.unwrap_or_default(),
-        "rigor": rigor,
-    });
-    if let Some(pinned) = pinned {
-        unit["prefer"] = json!([pinned]);
-    }
-    let role = record
-        .get("role")
-        .and_then(Value::as_str)
-        .filter(|r| SEAT_ROLES.contains(r))
-        .unwrap_or("producer");
-    let ask = WorkSeatAsk {
-        unit,
-        role: role.into(),
-        read_only: record.get("mutation").and_then(Value::as_str) == Some("read-only"),
-        overrides: if overrides.is_empty() {
-            Vec::new()
-        } else {
-            vec![Value::Object(overrides)]
-        },
-    };
-    let seat = match binder.bind_work_seat(runner, &ask) {
-        Ok(seat) => seat,
-        Err(BindFailure::Refused { code, detail }) => {
-            return Err(DecideFailure::SeatRefused {
-                message: format!("{code}: {detail}"),
-                code,
-            })
-        }
-        Err(BindFailure::Failed(error)) => return Err(DecideFailure::Refused(error)),
-    };
-    if let Some(pinned) = pinned.filter(|p| *p != seat.executor) {
-        return Err(DecideFailure::SeatRefused {
-            code: "pin-unsatisfiable".into(),
-            message: format!(
-                "pin-unsatisfiable: preferExecutor \"{pinned}\" is not registered or cannot serve this seat; Seat Binding chose \"{}\"",
-                seat.executor
-            ),
-        });
-    }
-    let governance = Governance::default();
-    let provider = resolve_executor_provider(runner, &seat.executor, &governance)
-        .map_err(DecideFailure::Refused)?;
-    // An undeclared repeat mode is null, which is refused when the policy states it null.
-    if let Some(mode) = policy.get("repeatMode") {
-        if !REPEAT_MODES.iter().any(|r| mode.as_str() == Some(r)) {
-            return Err(refuse(format!(
-                "invalid repeatMode \"{}\". Valid repeatModes: [{}]",
-                js_text(Some(mode)),
-                REPEAT_MODES.join(", ")
-            )));
-        }
-    }
-    resolve_executor_governance(&seat.executor, &provider.family, &governance)
-        .map_err(DecideFailure::Refused)?;
-    Ok(seat.executor)
+    let params = json!({ "assignment": record, "runnerConfig": runner });
+    let policy = effective_dispatch_policy(&params, binder)?;
+    Ok(js_text(policy.get("executorId")))
 }
 
 // ---- deciding --------------------------------------------------------------------------------------------
@@ -1212,28 +859,5 @@ pub fn run_door_hint(
             js_text(entry.get("kind"))
         ),
         None => hint,
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::url_hostname;
-
-    #[test]
-    fn a_base_url_is_judged_by_its_hostname_not_by_its_text() {
-        assert_eq!(
-            url_hostname("https://API.Anthropic.com/v1").as_deref(),
-            Some("api.anthropic.com")
-        );
-        assert_eq!(
-            url_hostname("https://evil.example.com/api.anthropic.com").as_deref(),
-            Some("evil.example.com")
-        );
-        assert_eq!(
-            url_hostname("https://user@x.api.anthropic.com:443?q").as_deref(),
-            Some("x.api.anthropic.com")
-        );
-        assert_eq!(url_hostname("api.anthropic.com"), None);
-        assert_eq!(url_hostname("https://"), None);
     }
 }

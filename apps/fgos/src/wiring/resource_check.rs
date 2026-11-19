@@ -47,9 +47,6 @@ const DEFAULT_POLICY_SOURCE: &str = "shipped-default";
 
 /// Longest value printed from an input file, in bytes: the entry limit of the contract.
 const MAX_PRINTED_BYTES: usize = fgos_resource_referee::MAX_ENTRY_BYTES;
-/// Byte cap of one input document (the contract's `maxInputBytes`).
-#[cfg(unix)]
-const MAX_INPUT_BYTES: usize = fgos_graph::MAX_INPUT_BYTES;
 
 /// The claim spaces of the referee contract; any other space is refused by name.
 const SPACES: [&str; 3] = ["path", "ref", "port"];
@@ -151,7 +148,7 @@ fn read_beneath(root: &Path, name: &Path, label: &str) -> Result<(Vec<u8>, Strin
         Ok(None) => return Err(refuse("input-missing", format!("{label}: {shown}"))),
         Err(error) => return Err(beneath_refusal(&error, label, &shown)),
     };
-    match opened.read(MAX_INPUT_BYTES) {
+    match opened.read(fgos_graph::MAX_INPUT_BYTES) {
         Ok(read) => Ok((read.bytes, read.revision)),
         Err(error) => Err(beneath_refusal(&error, label, &shown)),
     }
@@ -990,7 +987,8 @@ impl OperationProvider for ResourceCheckProvider {
     }
 }
 
-#[cfg(test)]
+/// The tests read real files beneath a root, which needs the no-follow open and symlinks: unix only.
+#[cfg(all(test, unix))]
 mod tests {
     use super::*;
     use std::os::unix::fs::symlink;
@@ -1264,7 +1262,7 @@ mod tests {
             .status()
             .unwrap()
             .success());
-        s.put("big.json", &" ".repeat(MAX_INPUT_BYTES + 1));
+        s.put("big.json", &" ".repeat(fgos_graph::MAX_INPUT_BYTES + 1));
         for (file, code) in [
             ("link.json", "input-symlink"),
             ("fifo.json", "input-not-regular"),

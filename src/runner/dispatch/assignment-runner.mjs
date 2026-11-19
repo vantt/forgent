@@ -98,7 +98,7 @@ import { prepareTerminalAttempt, followPaneScreen, withoutPaneEnv, PANE_IDLE_TIM
 import { resolveHerdrBin, workLabelOf, herdrEndpointEnv } from './terminal-slot.mjs';
 import { retainFailedPaneMsOf } from '../../terminal-control/config.mjs';
 import { controlDeliveryOf, finalizeAttemptHome, prepareConfinementForLaunch } from './confinement/authority.mjs';
-import { CREDENTIAL_HOME_KEPT } from './confinement/cleanup.mjs';
+import { CREDENTIAL_HOME_KEPT, listLiveSeatHomes } from './confinement/cleanup.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import { DEFAULT_SEAT_TIMEOUT_MS } from './confinement/resources.mjs';
 import { resolvePosture } from './confinement/policies.mjs';
@@ -804,6 +804,8 @@ export async function renewLeasedLogin(selection, { cfg, opts, executorId, pinne
         accountId: selection.accountId,
         credentialSource,
         runtimeDir: credentialRuntimeDir,
+        // A seat still running on this account may hold the only good login (it renewed in its home).
+        liveSeatHomes: (target) => listLiveSeatHomes(target),
       });
       // Anything but "nothing was due" is visible, so a renewal that keeps failing is not mistaken for success.
       const quiet = renewal?.status === 'fresh' || (renewal?.status === 'skipped' && renewal?.reason === 'unsupported-layout');

@@ -18,6 +18,8 @@ pub mod bind;
 pub mod case_paths;
 pub mod checks;
 pub mod decide;
+pub mod dispatch_policy;
+pub mod executor_config;
 pub mod executor_model;
 pub mod explain;
 pub mod handoff;

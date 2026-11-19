@@ -41,11 +41,9 @@ fn of(outcome: std::io::Result<Outcome>) -> Ran {
             stdout: String::from_utf8_lossy(&stdout).into_owned(),
             stderr: format!("timed out: {}", String::from_utf8_lossy(&stderr)),
         },
-        Err(err) => Ran {
-            status: None,
-            stdout: String::new(),
-            stderr: err.to_string(),
-        },
+        // A run that never started reported nothing: each probe words that itself ("file not created", "worker
+        // reported nothing"), as the Node probes do, never with the spawn error.
+        Err(_) => Ran::default(),
     }
 }
 

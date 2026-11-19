@@ -6,7 +6,9 @@
 // The vectors are written, never hand-edited: rerun this recorder to change one.
 //
 // Usage: node test/golden-recorders/credentials.recorder.mjs [--out <dir>]
-// Output: <out>/{expiry,apply,write-back}.v1.json (default packages/execution/contracts/credentials).
+// Output: <out>/{expiry,apply,write-back,omp}.v1.json (default packages/execution/contracts/credentials).
+// omp.v1.json is recorded with `node:sqlite` loaded: a store is described as its schema and rows, built the same way
+// by the replay, and a store after a write is read back as SQL literals (`quote()`), so a value's type counts too.
 
 import fs from 'node:fs';
 import os from 'node:os';
@@ -231,6 +233,103 @@ const write = (name, about, body) => {
   run('unknown-layout-target', { provider: 'p', accountId: 'a', home: '/h', runtimeDir: '/rt', layout: 'nope' });
 
   write('write-back', 'credentialWriteBackTarget choice, and writeBackRenewedCredential: its status, the copy staged beside the source (same file names, same bytes) and how the retained-copy listing reads it', { targets, cases, edge });
+}
+
+// ---------------------------------------------------------------------------------------------------- omp
+// The omp login store through a real SQLite engine. A store is `{schema, rows}` (rows inserted column by column),
+// `{raw}` (the file holds these bytes) or absent.
+{
+  const { DatabaseSync } = await import('node:sqlite');
+  const OMP_SCHEMA = 'CREATE TABLE auth_credentials (id INTEGER PRIMARY KEY AUTOINCREMENT, provider TEXT NOT NULL, credential_type TEXT NOT NULL, data TEXT NOT NULL, disabled_cause TEXT DEFAULT NULL, identity_key TEXT DEFAULT NULL, created_at INTEGER NOT NULL DEFAULT 0, updated_at INTEGER NOT NULL DEFAULT 0)';
+  const NO_UPDATED_AT_SCHEMA = 'CREATE TABLE auth_credentials (id INTEGER PRIMARY KEY, provider TEXT NOT NULL, credential_type TEXT NOT NULL, data TEXT NOT NULL, disabled_cause TEXT DEFAULT NULL)';
+  const login = (expires, refresh, extra = {}) => JSON.stringify({ type: 'oauth', access: 'access', refresh, expires, ...extra });
+  const row = (id, provider, data, { type = 'oauth', disabled = null, updatedAt = 1_780_000_000 } = {}) => ({ id, provider, credential_type: type, data, disabled_cause: disabled, updated_at: updatedAt });
+  const store = (rows, schema = OMP_SCHEMA) => ({ schema, rows: schema === OMP_SCHEMA ? rows : rows.map(({ updated_at: _u, ...rest }) => rest) });
+  const layStore = (dir, described) => {
+    if (described === null) return;
+    const file = path.join(dir, 'agent.db');
+    if ('raw' in described) { fs.writeFileSync(file, described.raw); return; }
+    const db = new DatabaseSync(file);
+    try {
+      db.exec(described.schema);
+      for (const r of described.rows) {
+        const names = Object.keys(r);
+        db.prepare(`INSERT INTO auth_credentials (${names.join(', ')}) VALUES (${names.map(() => '?').join(', ')})`).run(...names.map((n) => r[n]));
+      }
+    } finally { db.close(); }
+  };
+  const literalRows = (dir) => {
+    const db = new DatabaseSync(path.join(dir, 'agent.db'), { readOnly: true });
+    try {
+      const names = db.prepare('PRAGMA table_info(auth_credentials)').all().map((c) => c.name);
+      return db.prepare(`SELECT ${names.map((n) => `quote("${n}")`).join(', ')} FROM auth_credentials ORDER BY rowid`).all().map((r) => Object.values(r));
+    } finally { db.close(); }
+  };
+
+  const expiry = [];
+  const read = (id, described) => {
+    const dir = scratchDir();
+    try {
+      layStore(dir, described);
+      expiry.push({ id, store: described, expected: JSON.parse(JSON.stringify(renewal.readCredentialExpiry('omp-agent-db', dir))) });
+    } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+  };
+  read('renewable-rows-only', store([
+    row(1, 'openai-codex', login(NOW + HOUR, 'r1')),
+    row(2, 'anthropic', login(Math.floor((NOW + 2 * HOUR) / 1000), 'r2')),
+    row(3, 'openai-codex', login(NOW + HOUR, 'r3'), { disabled: 'revoked' }),
+    row(4, 'xai', JSON.stringify({ key: 'k' }), { type: 'api_key' }),
+    row(5, 'xai', 'not json'),
+    row(6, 'xai', JSON.stringify({ refresh: 'r6' })),
+  ]));
+  read('no-renewable-row', store([row(1, 'xai', JSON.stringify({ key: 'k' }), { type: 'api_key' })]));
+  read('no-auth-table', { schema: 'CREATE TABLE settings (k TEXT)', rows: [] });
+  read('corrupt-file', { raw: 'not a database, not even close to one' });
+  read('empty-file', { raw: '' });
+  read('missing-store', null);
+
+  const apply = [];
+  const applyCase = (id, provider, source, copy, { requireFuture = true } = {}) => {
+    const sourceDir = scratchDir();
+    const copyDir = scratchDir();
+    try {
+      layStore(sourceDir, source);
+      layStore(copyDir, copy);
+      const result = renewal.applyRenewedCredential({ layoutName: 'omp-agent-db', sourceHome: sourceDir, copyHome: copyDir, provider, requireFuture, now: NOW });
+      const sourceAfter = source && !('raw' in source) ? literalRows(sourceDir) : null;
+      apply.push({ id, provider: provider ?? null, requireFuture, now: NOW, source, copy, expected: { result: JSON.parse(JSON.stringify(result)), sourceAfter } });
+    } finally { fs.rmSync(sourceDir, { recursive: true, force: true }); fs.rmSync(copyDir, { recursive: true, force: true }); }
+  };
+  const other = row(2, 'anthropic', login(NOW + HOUR, 'a-old'));
+  applyCase('newer-row-replaces-data-and-updated-at', 'openai-codex',
+    store([row(1, 'openai-codex', login(NOW + HOUR, 'old')), other]),
+    store([row(1, 'openai-codex', login(NOW + 5 * HOUR, 'new'), { updatedAt: 1_780_300_000 }), row(2, 'anthropic', login(NOW + 9 * HOUR, 'a-new'))]));
+  applyCase('every-newer-row-without-a-provider', undefined,
+    store([row(1, 'openai-codex', login(NOW + HOUR, 'old')), other]),
+    store([row(1, 'openai-codex', login(NOW + 5 * HOUR, 'new')), row(2, 'anthropic', login(NOW + 9 * HOUR, 'a-new'))]));
+  applyCase('same-refresh-unchanged', 'openai-codex',
+    store([row(1, 'openai-codex', login(NOW + HOUR, 'same'))]),
+    store([row(1, 'openai-codex', login(NOW + 5 * HOUR, 'same'))]));
+  applyCase('store-without-updated-at-changes-data-only', 'openai-codex',
+    store([row(1, 'openai-codex', login(NOW + HOUR, 'old'))], NO_UPDATED_AT_SCHEMA),
+    store([row(1, 'openai-codex', login(NOW + 5 * HOUR, 'new'))], NO_UPDATED_AT_SCHEMA));
+  applyCase('provider-not-in-source-defers', 'xai',
+    store([row(1, 'openai-codex', login(NOW + HOUR, 'old'))]),
+    store([row(1, 'openai-codex', login(NOW + 5 * HOUR, 'new'))]));
+  applyCase('copy-row-not-in-source-unchanged', undefined,
+    store([row(1, 'openai-codex', login(NOW + HOUR, 'old'))]),
+    store([row(7, 'openai-codex', login(NOW + 5 * HOUR, 'new'))]));
+  applyCase('copy-without-auth-table-defers', 'openai-codex',
+    store([row(1, 'openai-codex', login(NOW + HOUR, 'old'))]),
+    { schema: 'CREATE TABLE settings (k TEXT)', rows: [] });
+  applyCase('copy-corrupt-defers', 'openai-codex',
+    store([row(1, 'openai-codex', login(NOW + HOUR, 'old'))]),
+    { raw: 'not a database, not even close to one' });
+  applyCase('source-corrupt-defers', 'openai-codex',
+    { raw: 'not a database, not even close to one' },
+    store([row(1, 'openai-codex', login(NOW + 5 * HOUR, 'new'))]));
+
+  write('omp', 'the omp login store through node:sqlite: readCredentialExpiry, and applyRenewedCredential with the source rows after it as SQL literals', { expiry, apply });
 }
 
 console.log(`credentials vectors written to ${outDir}`);

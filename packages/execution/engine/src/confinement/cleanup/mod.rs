@@ -15,6 +15,7 @@ mod agent_file;
 mod error;
 mod homes;
 mod host;
+mod live_seats;
 mod marker;
 mod orphans;
 pub mod probes;
@@ -26,6 +27,7 @@ pub use agent_file::{open_agent_file, read_agent_file, refuse_symlink};
 pub use error::CleanupError;
 pub use homes::CleanupHomes;
 pub use host::{CleanupHost, SystemHost};
+pub use live_seats::AttemptHomeRecords;
 pub use marker::{
     ensure_private_dir, read_attempt_ownership_marker, read_ownership_marker,
     remove_empty_dispatch_parent, resolve_confinement_temp_root, write_ownership_marker,
@@ -33,9 +35,9 @@ pub use marker::{
     OWNERSHIP_CONTRACT, OWNERSHIP_CREATOR, OWNERSHIP_MARKER_FILE,
 };
 pub use orphans::{
-    canonical_root, default_temp_roots, judge_confinement_orphans, list_kept_credential_homes,
-    remove_confinement_orphans, settle_held_credential_homes, CredentialWriteBack, KeptHome,
-    Orphans, Removed, Settled, WriteBackOutcome,
+    canonical_root, credential_scan_roots, default_temp_roots, judge_confinement_orphans,
+    list_kept_credential_homes, remove_confinement_orphans, settle_held_credential_homes,
+    CredentialWriteBack, KeptHome, Orphans, Removed, Settled, WriteBackOutcome,
 };
 pub use record::{
     count_credential_keep, read_attempt_home_record, remove_attempt_home,
@@ -46,3 +48,4 @@ pub use remove::{
     cleanup_confinement_resource, describe_attempt_home, keep_session_transcript,
     remove_confinement_dir, Cleaned, HomeEntry, Transcript,
 };
+pub use resolve::current_uid;

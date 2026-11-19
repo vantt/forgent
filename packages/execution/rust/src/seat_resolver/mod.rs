@@ -4,13 +4,15 @@
 //! composition. A seat is `{ seat, role, posture }`: its id in one unit run, what it does for the pattern, and
 //! how it may run. Records stay `serde_json::Value`: their shape is open and the order of keys is part of them.
 
-mod capability;
+pub(crate) mod capability;
 mod legacy;
 mod resolve;
 mod seat_ledger;
 pub(crate) mod value;
 
-pub use capability::{capability_verify_of, min_checkers_of, own_min_checkers_of, rigor_rank};
+pub use capability::{
+    capability_verify_of, min_checkers_of, own_min_checkers_of, rigor_of, rigor_rank, RIGORS,
+};
 pub use legacy::{
     collaboration_of_record, is_seat_record, is_verdict_result, is_verify_result, legacy_family_of,
     legacy_seats_of, seat_key_of, seats_of_record,

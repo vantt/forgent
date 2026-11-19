@@ -1,11 +1,12 @@
 //! The seams credential renewal reaches the machine through. The account lock and the credential probe belong
-//! to the accounts module, which serves them here ([`AccountsLocks`], [`AccountsProbe`]); SQLite is an adapter.
+//! to the accounts module, which serves them here ([`AccountsLocks`], [`AccountsProbe`]); SQLite is an adapter
+//! ([`super::sqlite::BundledSqlite`]).
 //! Each is a replaceable driver behind a port.
 
 use std::collections::BTreeMap;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-use serde_json::json;
+use serde_json::{json, Value};
 
 use super::files::path_str;
 use super::CredentialSource;
@@ -153,6 +154,23 @@ impl CredentialProbe for AccountsProbe {
         ProbeRun::Ran {
             ok: judged["ok"] == true,
         }
+    }
+}
+
+/// The private homes of seats still running on one login store. A seat renews inside its home with the store's
+/// single-use refresh token, so until its home is finalized only that home holds a good pair. The homes are found
+/// through the host's own records, never by looking inside a home.
+pub trait LiveSeatHomes {
+    /// `target` is the store's write-back target ([`super::credential_write_back_target`]).
+    fn homes(&self, target: &Value) -> Vec<PathBuf>;
+}
+
+/// No seat runs on any store.
+pub struct NoLiveSeatHomes;
+
+impl LiveSeatHomes for NoLiveSeatHomes {
+    fn homes(&self, _: &Value) -> Vec<PathBuf> {
+        Vec::new()
     }
 }
 

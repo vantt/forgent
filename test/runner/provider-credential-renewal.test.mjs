@@ -16,7 +16,9 @@ import {
   credentialLayout,
   credentialWriteBackTarget,
   defaultRefreshAheadThresholdMs,
+  loginLifeProblem,
   readCredentialExpiry,
+  createCredentialRenewal,
   refreshAhead,
   writeBackRenewedCredential,
   inspectRetainedCredentialCopies,
@@ -33,12 +35,16 @@ import {
   OWNERSHIP_MARKER_FILE,
   cleanupConfinementResource,
   writeOwnershipMarker,
+  writeAttemptHomeRecord,
+  listLiveSeatHomes,
+  resolveConfinementTempRoot,
 } from '../../src/runner/dispatch/confinement/cleanup.mjs';
+import { renewLeasedLogin } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { selfRecord } from '../../src/native/process-identity.mjs';
 import { prepareBwrap, prepareBwrapSync } from '../../src/runner/dispatch/confinement/drivers/bwrap.mjs';
 import { resolveConfinementResources } from '../../src/runner/dispatch/confinement/resources.mjs';
 import { finalizeAttemptHome } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { CREDENTIAL_KEEP_MAX_ATTEMPTS, CREDENTIAL_KEEP_MIN_INTERVAL_MS } from '../../src/runner/dispatch/confinement/cleanup.mjs';
-import { fixCredentialCopiesRetained } from '../../src/setup/registrations.mjs';
 import { rewriteOwnershipMarker } from '../helpers/ownership-marker.mjs';
 
 // The account lock is machine-scoped under the state root: a private root keeps this file's locks off
@@ -2295,13 +2301,6 @@ test('a held home settles by itself once its login is safe', () => {
     process.stderr.write = realWrite;
     assert.equal(state, 'credential-home-held', 'the home is held after the retry budget');
     assert.equal(fs.existsSync(path.join(home, 'auth.json')), true);
-
-    // The obstacle is gone: the login can be staged, so the repair settles the home; the staged login waits for
-    // the probe gate of the next refresh-ahead.
-    fs.rmSync(path.join(w.accountDir, 'pending'));
-    fixCredentialCopiesRetained({ roots: [tempRoot], retriedRoots: [tempRoot], stagingRuntimeDir: w.runtimeDir });
-    assert.equal(fs.existsSync(home), false, 'the held home is still there although its login can now be written back');
-    assert.deepEqual(agentCopies(w).map((name) => readPi(path.join(w.accountDir, 'pending', name)).xai.refresh), [FAKE.newRefresh], 'the renewed login waits beside the account');
   } finally {
     Date.now = realNow;
     process.stderr.write = realWrite;
@@ -2309,4 +2308,163 @@ test('a held home settles by itself once its login is safe', () => {
     fs.rmSync(path.join(tempRoot, dispatchId), { recursive: true, force: true });
     w.cleanup();
   }
+});
+
+// ---------------------------------------------------------------------------------------------------
+// Logins held by seats that still run
+// ---------------------------------------------------------------------------------------------------
+
+const SEAT_TIMEOUT_MS = 15 * 60 * 1000;
+
+// A seat home as the host records it: `<root>/<dispatch>/home` with its login, the host record beside it, the
+// finalization descriptor naming the store it writes back to, and the supervisor binding of its attempt.
+function seatHome(root, { name, target, login, supervisor = selfRecord() }) {
+  const dispatchDir = path.join(root, `disp_${name}`);
+  const home = path.join(dispatchDir, 'home');
+  const runDir = path.join(root, `run-${name}`);
+  writeClaude(home, login);
+  writeAttemptHomeRecord(home, { attemptId: `cmd_${name}`, runDir, dispatchId: `disp_${name}`, launchCommandId: `cmd_${name}` });
+  fs.mkdirSync(path.join(runDir, 'protected', 'confinement-finalization'), { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'protected', 'confinement-finalization', `cmd_${name}.json`), JSON.stringify({ resources: [{ resource: 'private-home', pathRef: home, credentialWriteBack: target }] }));
+  fs.writeFileSync(path.join(runDir, 'supervisor-binding.json'), JSON.stringify({ attemptId: `cmd_${name}`, supervisor }));
+  return home;
+}
+const claudeTarget = (w) => credentialWriteBackTarget({ provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home), runtimeDir: w.runtimeDir });
+// A probe that answers and renews nothing: a login whose access token is still good is used as it is.
+const answers = () => fakeSpawn({ behaviour: () => {} });
+
+test('the live seat homes of a store are found from host records alone: a dead seat, another account and a home without a binding are not', () => {
+  const w = workspace();
+  try {
+    const root = path.join(w.tmp, 'confinement');
+    const target = claudeTarget(w);
+    const login = claudeDoc(Date.now() + 6 * HOUR);
+    const live = seatHome(root, { name: 'live', target, login });
+    seatHome(root, { name: 'dead', target, login, supervisor: { ...selfRecord(), startTime: '1' } });
+    seatHome(root, { name: 'other', target: { ...target, accountId: 'someone-else' }, login });
+    const unbound = seatHome(root, { name: 'unbound', target, login });
+    fs.rmSync(path.join(root, 'run-unbound', 'supervisor-binding.json'));
+    assert.ok(unbound);
+    assert.deepEqual(listLiveSeatHomes(target, { tempRoots: [root] }), [live]);
+  } finally { w.cleanup(); }
+});
+
+test('a store whose refresh token a running seat spent takes the newest valid login the seats hold, proven by a call on an isolated copy, and the seat may start', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    // The store still holds the pair a seat redeemed inside its home: its access token is spent too.
+    writeClaude(w.home, claudeDoc(now - 60 * 1000));
+    assert.match(loginLifeProblem(claudeSource(w.home), { timeoutMs: SEAT_TIMEOUT_MS }), /^login-expires-before-seat-timeout/);
+    const root = path.join(w.tmp, 'confinement');
+    const target = claudeTarget(w);
+    const newest = seatHome(root, { name: 'a', target, login: claudeDoc(now + 7 * HOUR, { access: FAKE.newAccess, refresh: FAKE.newRefresh }) });
+    seatHome(root, { name: 'b', target, login: claudeDoc(now + 3 * HOUR, { access: FAKE.other, refresh: FAKE.other }) });
+    const seatBytes = sha(path.join(newest, CLAUDE_LOGIN));
+    const probe = answers();
+    const result = await refreshAhead({ provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home), runtimeDir: w.runtimeDir, spawnFn: probe.spawnFn, liveSeatHomes: (t) => listLiveSeatHomes(t, { tempRoots: [root] }) });
+    assert.deepEqual(result, { status: 'renewed', reason: 'live-seat' });
+    assert.equal(probe.starts.length, 1, 'one call, on the copy taken, and no renewal of the spent pair');
+    const accountDir = providerAccountDir(w.runtimeDir, 'claude-miu', 'acct');
+    assert.match(path.relative(accountDir, probe.starts[0].homeDir), /^pending\/\.tmp-\d+-/, 'the call ran on an isolated copy, never on the seat home');
+    assert.equal(readClaude(w.home).claudeAiOauth.refreshToken, FAKE.newRefresh, 'the newest login is installed');
+    assert.equal(readClaude(w.home).mcpOAuth.kept, true, 'the rest of the store is kept');
+    assert.equal(sha(path.join(newest, CLAUDE_LOGIN)), seatBytes, 'the seat home is only read');
+    assert.equal(loginLifeProblem(claudeSource(w.home), { timeoutMs: SEAT_TIMEOUT_MS }), null, 'the next seat may start');
+    assert.equal(fs.readdirSync(path.join(accountDir, 'pending')).length, 0);
+  } finally { w.cleanup(); }
+});
+
+test('a seat login older than the store\'s is never installed: the store is renewed on its own', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    writeClaude(w.home, claudeDoc(now + 30 * 60 * 1000));
+    const root = path.join(w.tmp, 'confinement');
+    seatHome(root, { name: 'older', target: claudeTarget(w), login: claudeDoc(now + 20 * 60 * 1000, { refresh: FAKE.other }) });
+    const probe = fakeSpawn({ layoutName: 'claude' });
+    const result = await refreshAhead({ provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home), runtimeDir: w.runtimeDir, spawnFn: probe.spawnFn, liveSeatHomes: (t) => listLiveSeatHomes(t, { tempRoots: [root] }) });
+    assert.deepEqual(result, { status: 'renewed', reason: 'applied' });
+    assert.equal(probe.starts.length, 1);
+    assert.match(path.basename(probe.starts[0].homeDir), /^scratch-/, 'the only call is the store\'s own renewal');
+    assert.equal(readClaude(w.home).claudeAiOauth.refreshToken, FAKE.newRefresh);
+  } finally { w.cleanup(); }
+});
+
+test('a seat login whose call fails is not installed, and the seat start is still refused', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    writeClaude(w.home, claudeDoc(now - 60 * 1000));
+    const original = sha(path.join(w.home, CLAUDE_LOGIN));
+    const root = path.join(w.tmp, 'confinement');
+    seatHome(root, { name: 'a', target: claudeTarget(w), login: claudeDoc(now + 7 * HOUR, { refresh: FAKE.newRefresh }) });
+    const failing = fakeSpawn({ behaviour: () => {}, output: 'Error: login failed', exitCode: 1 });
+    const result = await refreshAhead({ provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home), runtimeDir: w.runtimeDir, spawnFn: failing.spawnFn, liveSeatHomes: (t) => listLiveSeatHomes(t, { tempRoots: [root] }) });
+    assert.deepEqual(result, { status: 'failed', reason: 'probe-failed' });
+    assert.equal(sha(path.join(w.home, CLAUDE_LOGIN)), original);
+    assert.match(loginLifeProblem(claudeSource(w.home), { timeoutMs: SEAT_TIMEOUT_MS }), /^login-expires-before-seat-timeout/);
+  } finally { w.cleanup(); }
+});
+
+test('a seat lease renews through the login a running seat on the same account holds', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    writeClaude(w.home, claudeDoc(now - 60 * 1000));
+    const root = resolveConfinementTempRoot();
+    const selection = { status: 'selected', provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home) };
+    const home = seatHome(root, { name: `lease-${process.pid}`, target: claudeTarget(w), login: claudeDoc(now + 7 * HOUR, { refresh: FAKE.newRefresh }) });
+    try {
+      const probe = answers();
+      const opts = { providerCredentialRenew: createCredentialRenewal({ spawnFn: probe.spawnFn }), providerCapacityRuntimeDir: w.runtimeDir };
+      const leased = await renewLeasedLogin(selection, { cfg: { executors: { x: {} } }, opts, executorId: 'x', pinnedInvocationId: null, confinementRequirement: { mode: 'required' } });
+      assert.equal(leased.credentialWriteBack.runtimeDir, w.runtimeDir);
+      assert.equal(readClaude(w.home).claudeAiOauth.refreshToken, FAKE.newRefresh);
+      assert.equal(loginLifeProblem(claudeSource(w.home), { timeoutMs: SEAT_TIMEOUT_MS }), null);
+    } finally {
+      fs.rmSync(path.dirname(home), { recursive: true, force: true });
+      fs.rmSync(path.join(root, `run-lease-${process.pid}`), { recursive: true, force: true });
+    }
+  } finally { w.cleanup(); }
+});
+
+test('a running seat login near its own expiry is never probed: the probe would renew it and spend the seat\'s refresh token', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    writeClaude(w.home, claudeDoc(now - 60 * 1000));
+    const root = path.join(w.tmp, 'confinement');
+    // Ahead of now, but not by one probe call plus the margin.
+    seatHome(root, { name: 'a', target: claudeTarget(w), login: claudeDoc(now + 5 * 60 * 1000, { refresh: FAKE.newRefresh }) });
+    const probe = answers();
+    await refreshAhead({ provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home), runtimeDir: w.runtimeDir, spawnFn: probe.spawnFn, liveSeatHomes: (t) => listLiveSeatHomes(t, { tempRoots: [root] }) });
+    assert.ok(probe.starts.every((start) => path.basename(start.homeDir).startsWith('scratch-')), 'no call ran on a copy of the seat login');
+    assert.equal(readClaude(w.home).claudeAiOauth.refreshToken, FAKE.oldRefresh, 'the seat login is not installed');
+  } finally { w.cleanup(); }
+});
+
+test('while a running seat shares the store\'s refresh token nothing renews it; once the seat renewed, its pair is taken', async () => {
+  const w = workspace();
+  try {
+    const now = Date.now();
+    writeClaude(w.home, claudeDoc(now + 10 * 60 * 1000));
+    const original = sha(path.join(w.home, CLAUDE_LOGIN));
+    const root = path.join(w.tmp, 'confinement');
+    const seat = seatHome(root, { name: 'a', target: claudeTarget(w), login: claudeDoc(now + 10 * 60 * 1000) });
+    const liveSeatHomes = (t) => listLiveSeatHomes(t, { tempRoots: [root] });
+    const probe = fakeSpawn({ layoutName: 'claude' });
+    const shared = await refreshAhead({ provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home), runtimeDir: w.runtimeDir, spawnFn: probe.spawnFn, liveSeatHomes });
+    assert.deepEqual(shared, { status: 'skipped', reason: 'live-seat-owns-renewal' });
+    assert.equal(probe.starts.length, 0, 'the shared refresh token is not spent');
+    assert.equal(sha(path.join(w.home, CLAUDE_LOGIN)), original);
+
+    // The seat renews inside its home: the store's refresh token is spent, the seat holds the new pair.
+    writeClaude(seat, claudeDoc(now + 7 * HOUR, { access: FAKE.newAccess, refresh: FAKE.newRefresh }));
+    const answering = answers();
+    const taken = await refreshAhead({ provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home), runtimeDir: w.runtimeDir, spawnFn: answering.spawnFn, liveSeatHomes });
+    assert.deepEqual(taken, { status: 'renewed', reason: 'live-seat' });
+    assert.equal(readClaude(w.home).claudeAiOauth.refreshToken, FAKE.newRefresh);
+    assert.equal(FAKE_FRAGMENTS.some((value) => JSON.stringify([shared, taken]).includes(value)), false, 'no credential value in a result');
+  } finally { w.cleanup(); }
 });

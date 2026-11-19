@@ -11,6 +11,7 @@ import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { bindHeadSeat, headKeyOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, openingText, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
 import { grantOf } from '../../src/session-host/head-grants.mjs';
+import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { headOf } from '../../src/runner/dispatch/session-attempt.mjs';
 
 seedFileLocalBwrapRegistry();
@@ -102,7 +103,7 @@ test('a secretary launches with the paths and the verb its grant names; the line
   assert.deepEqual(request.grant.writes, ['plans', 'docs/backlog.md', 'docs/discussions']);
   assert.deepEqual(request.grant.verbs, ['session start', 'session write', 'session bind session', 'session rotate', 'session answered', 'session restore role', 'questions list', 'questions ask', 'questions ack', 'questions cancel', 'questions answer', 'land', 'request result']);
   assert.equal(request.grant.mailbox, true, 'the secretary sends and receives mail');
-  assert.deepEqual(request.env, { FGOS_HEAD_ROLE: headRoleOf('secretary', 'miu'), FGOS_HEAD_PERSONA: 'secretary', FGOS_HEAD_NAME: 'miu', FGOS_HEAD_GEN: '2' });
+  assert.deepEqual(request.env, { TMPDIR: '/tmp', FGOS_HEAD_ROLE: headRoleOf('secretary', 'miu'), FGOS_HEAD_PERSONA: 'secretary', FGOS_HEAD_NAME: 'miu', FGOS_HEAD_GEN: '2' });
   // The supervisor records this head in the session's Identity entry from the envelope's session fields.
   assert.deepEqual(headOf(request.env), { persona: 'secretary', name: 'miu', gen: 2 });
   assert.deepEqual(headOf({ FGOS_HEAD_PERSONA: 'secretary', FGOS_HEAD_NAME: 'miu' }), {}, 'no generation, no head fields');
@@ -116,7 +117,7 @@ test('the grant table: the persona matches a table key exactly, an unnamed perso
   assert.deepEqual(grantOf('head:secretary-miu').verbs, ['session start', 'session write', 'session bind session', 'session rotate', 'session answered', 'session restore role', 'questions list', 'questions ask', 'questions ack', 'questions cancel', 'questions answer', 'land', 'request result']);
   assert.equal(grantOf('head:secretary-miu').peers, true, 'only the secretary reaches the peer sessions of its machine');
   const base = ['session bind session', 'session rotate', 'session answered', 'session restore role', 'questions list', 'questions ask', 'questions ack', 'questions cancel'];
-  assert.deepEqual(grantOf('head:shaper-x'), { writes: ['docs/discussions'], verbs: [...base, 'land', 'request result'], mailbox: false, peers: false }, 'a shaper writes its discussions and lands them but starts nothing, answers nothing, has no mailbox and reaches no peer session');
+  assert.deepEqual(grantOf('head:shaper-x'), { writes: ['docs/discussions'], verbs: [...base, 'land', 'request result'], mailbox: true, peers: false }, 'a shaper writes its discussions, parks questions and lands them (a path land is limited to its writes) but starts nothing, answers nothing and reaches no peer session; it has a mailbox');
   assert.deepEqual(grantOf('head:planner-x'), { writes: ['plans', 'docs/discussions'], verbs: [...base, 'land', 'request result'], mailbox: false, peers: false });
   assert.deepEqual(grantOf('head:supervisor-x'), { writes: ['plans', 'docs/backlog.md'], verbs: ['session start', 'session stop', 'session write', ...base, 'land', 'request result', 'supervisor queue', 'supervisor plans', 'slots', 'supervisor handled', 'supervisor done'], mailbox: false, peers: false });
   assert.ok(!grantOf('head:supervisor-x').verbs.includes('run'), 'a supervisor never runs a unit');
@@ -211,6 +212,22 @@ test('a launch that is refused leaves no placement record behind', async () => {
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 
+test('a head whose supervisor could not bind its role is refused with the supervisor\'s own code, not a generic start refusal', async () => {
+  const projectRoot = scratch();
+  const { ports } = fakes({ launchFails: 'the supervisor did not bind head:planner-probe (exited, exit 0)' });
+  const refusedRun = path.join(fgosDirFromRoot(projectRoot), 'assignments', headKeyOf('planner', 'probe', 1), 'runs', '01');
+  fs.mkdirSync(refusedRun, { recursive: true });
+  fs.writeFileSync(path.join(refusedRun, 'start-refused.json'), JSON.stringify({ v: 1, code: 'head-role-held', why: 'head:planner-probe was not bound: role-held: held by the live session x' }));
+  await assert.rejects(startHeadSession({ persona: 'planner', name: 'probe', projectRoot, gen: 1 }, ports), (err) => err.code === 'head-role-held' && /held by the live session x/.test(err.message));
+  fs.writeFileSync(path.join(refusedRun, 'start-refused.json'), JSON.stringify({ v: 1, code: 'terminal-gate-silent', why: 'no hello' }));
+  await assert.rejects(startHeadSession({ persona: 'planner', name: 'probe', projectRoot, gen: 1 }, ports), { code: 'start-refused' });
+  // The note of an earlier run is not the failed launch's: only the newest run is read.
+  fs.writeFileSync(path.join(refusedRun, 'start-refused.json'), JSON.stringify({ v: 1, code: 'head-role-held', why: 'stale' }));
+  fs.mkdirSync(path.join(path.dirname(refusedRun), '02'), { recursive: true });
+  await assert.rejects(startHeadSession({ persona: 'planner', name: 'probe', projectRoot, gen: 1 }, ports), { code: 'start-refused' });
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
 test('placeHead launches a head and leaves the holder check and the placement record to its caller', async () => {
   const projectRoot = scratch();
   const { calls, ports } = fakes({ live: true });
@@ -221,5 +238,26 @@ test('placeHead launches a head and leaves the holder check and the placement re
   assert.equal(calls.front.length, 0, 'a live holder is not fronted: the successor starts beside it');
   assert.equal(readHeadPlacement(lineageDirOf(projectRoot, 'planner', 'probe')), null, 'the caller records where the head lives');
   await assert.rejects(placeHead({ persona: 'Bad', name: 'x', projectRoot }, ports), { code: 'bad-persona' });
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+// The private /tmp itself is proven at the lowest layer by the head sandbox argv (`--tmpfs /tmp`, test/helpers/head-sandbox-argv.mjs).
+test('a head launch exports TMPDIR=/tmp, the sandbox private tmpfs, and makes no scratch directory', async () => {
+  const projectRoot = scratch();
+  const { calls, ports } = fakes();
+  await startHeadSession({ persona: 'shaper', name: 'probe', projectRoot }, ports);
+  assert.equal(calls.launch[0].env.TMPDIR, '/tmp');
+  assert.ok(!fs.existsSync(path.join(fgosDirFromRoot(projectRoot), 'assignments', calls.launch[0].key)), 'nothing is created under the attempt before the launch');
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('a persona with no definition is refused persona-not-found and the known personas are listed', async () => {
+  const projectRoot = scratch();
+  const { ports } = fakes();
+  delete ports.pin;
+  await assert.rejects(
+    () => placeHead({ persona: 'no-such-persona', name: 'probe', projectRoot }, ports),
+    (err) => err instanceof HeadStartError && err.code === 'persona-not-found' && /secretary/.test(err.message) && /shaper/.test(err.message) && err.known.includes('shaper'),
+  );
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });

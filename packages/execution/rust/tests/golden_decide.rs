@@ -6,8 +6,8 @@ mod common;
 
 use common::{VectorMachine, VectorProbe};
 use fgos_execution::decide::{
-    config_root_for, decide_over, guard_cwd_repo_root, run_door_hint, CrateBinder, DecideAnswer,
-    DecideFailure, DecideRequest, LoadedRunner, Workspace,
+    config_root_for, decide_over, guard_cwd_repo_root, run_door_hint, CheckoutFacts, CrateBinder,
+    DecideAnswer, DecideFailure, DecideRequest, LoadedRunner, Workspace,
 };
 use fgos_execution::executor_model::ModelError;
 use fgos_execution::hook::{
@@ -22,7 +22,7 @@ struct Layout {
     process_in: &'static str,
 }
 
-impl Workspace for Layout {
+impl CheckoutFacts for Layout {
     fn repo_root(&self, dir: &str) -> Result<String, String> {
         match dir {
             "<main>" => Ok("<main>".into()),
@@ -33,6 +33,9 @@ impl Workspace for Layout {
     fn main_checkout_root(&self, dir: &str) -> Option<String> {
         self.repo_root(dir).ok().map(|_| "<main>".into())
     }
+}
+
+impl Workspace for Layout {
     fn process_main_checkout_root(&self) -> Option<String> {
         self.main_checkout_root(self.process_in)
     }
@@ -260,4 +263,59 @@ fn every_decide_and_hook_vector_has_the_answer_the_contract_records() {
         wrong.join("\n")
     );
     assert_eq!(replayed, vectors.len());
+}
+
+/// The Work seat `decide` binds refuses a bypass invocation for a worker seat with the reason and text Node's
+/// `bindWorkSeat` gives (the planning recorder's `workSeat` vectors, recorded from Node). No decide vector pins an
+/// executor to a bypass invocation, so this is the owning proof of the refusal; the engine's facade only wires it.
+#[test]
+fn a_work_seat_pinned_to_a_bypass_invocation_is_refused_as_node_bind_work_seat_refuses_it() {
+    use fgos_execution::decide::{BindFailure, SeatBinder, WorkSeatAsk};
+    let path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../contracts/planning/bind-facade.json"
+    );
+    let vectors: Value =
+        serde_json::from_str(&std::fs::read_to_string(path).expect("the vector file is committed"))
+            .expect("the vector file parses");
+    let machine = VectorMachine::of(
+        &json!({ "machine": { "pathCommands": vectors["pathCommands"] } }),
+        false,
+    );
+    let binder = CrateBinder {
+        machine: &machine,
+        now: vectors["now"].as_u64().expect("a recording instant"),
+    };
+    let cases: Vec<&Value> = vectors["workSeat"]
+        .as_array()
+        .expect("work seat cases")
+        .iter()
+        .filter(|case| case["result"]["error"]["code"] == json!("bypass-invocation-not-allowed"))
+        .collect();
+    assert!(!cases.is_empty(), "the recorder states a bypass refusal");
+    for case in cases {
+        let args = &case["args"];
+        let ask = WorkSeatAsk {
+            unit: args["unit"].clone(),
+            role: args["role"].as_str().unwrap_or("producer").into(),
+            read_only: args["readOnly"] == json!(true),
+            overrides: args["overrides"].as_array().cloned().unwrap_or_default(),
+        };
+        let want = &case["result"]["error"];
+        match binder.bind_work_seat(&args["runnerConfig"], &ask) {
+            Err(BindFailure::Refused { code, detail }) => {
+                assert_eq!(json!(code), want["code"], "{}", case["name"]);
+                assert_eq!(
+                    json!(format!("{code}: {detail}")),
+                    want["message"],
+                    "{}",
+                    case["name"]
+                );
+            }
+            other => panic!(
+                "{}: expected the bypass refusal, got {other:?}",
+                case["name"]
+            ),
+        }
+    }
 }
