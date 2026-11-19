@@ -804,15 +804,6 @@ pub fn read_settled_result(run_dir: &Path, run_id: &str) -> Option<InterpretedRu
     sound.then_some(read)
 }
 
-/// The outcome of a classification: the Run Result crate owns the rules; this is the one place the engine asks.
-pub fn derive_outcome_of(classification: &Value) -> Outcome {
-    derive_outcome(classification)
-}
-
-/// The evidence a run left independent of its own claim, used to downgrade a settlement that spoofs a pass.
-#[derive(Debug, Clone, Copy, Default)]
-pub struct EvidenceFloor<'a>(pub Option<&'a Value>);
-
 struct Floor {
     status: Option<String>,
     confidence: Option<String>,

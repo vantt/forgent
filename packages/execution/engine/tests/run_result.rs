@@ -247,8 +247,7 @@ fn run_outcome_reads_every_record_under_every_evidence_floor_as_node_did() {
 #[test]
 fn deriving_an_outcome_from_a_classification_matches_the_recorded_rows() {
     for row in vector("readers.json")["deriveOutcomes"].as_array().unwrap() {
-        let got =
-            fgos_execution_engine::run_result::reader::derive_outcome_of(&row["classification"]);
+        let got = fgos_run_result::derive_outcome(&row["classification"]);
         assert_eq!(
             json!({"category": got.category, "reason": got.reason}),
             row["outcome"],
