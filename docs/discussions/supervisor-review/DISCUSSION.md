@@ -8,10 +8,10 @@ VERIFIED/INFERENCE marks: [external-research.md](external-research.md) (round 0,
 
 ## 1. Trạng thái hiện tại
 
-Round 1 (2026-11-19). The internal design and the external sources are both scouted. Findings are drafted in §3
-(S = strength, D = difference, G = gap, F = inconsistency found in the tree). Nothing is settled yet. Open question to
-the owner: Q1, on whether admission and starting moves out of the LLM into the deterministic watcher (§3 G1). Window 3
-of the live run may be in progress, and this discussion stays read-only.
+Round 2 (2026-11-19). The owner answered Q1: A, with a preflight for the LLM part that remains (G1 and G2,
+provisional until it holds one more round). The owner also raised a new point: "who is allowed to merge? The current
+model feels like no one merges." It is scouted as M1-M4 in §3. Open: Q2 (the merge model). Window 3 of the live run
+may be in progress, and this discussion stays read-only.
 
 ## 2. Mục tiêu & đề bài
 
@@ -41,8 +41,8 @@ source). I = inference (my reasoning).
 | S4 | Batched owner questions in five-part form through one front session (the secretary). The front door is common (agent-teams lead, Gas Town Mayor). The research found no published system that batches human questions across agents, so this looks ahead of common practice. | clear (the "ahead" part is I) | V: front door [ER]; I: batching uncommon |
 | S5 | Per-persona confinement of every head, including the supervisor. Agent teams inherits the lead's permission mode downward, with no per-teammate mode. fgOS is stricter. | clear | V: agent-teams [ER]; `src/session-host/head-grants.mjs:56-62` |
 | D1 | The decisions sit in the LLM. Kubernetes and Erlang/OTP put reconcile and restart decisions in deterministic code, and Gas Town keeps its daemon and Boot triage partly deterministic under LLM roles. In fgOS the watcher "decides, starts and stops nothing", and every admit, start, restart and close is an LLM turn. | clear (the fact). Its cost is Q1 | V: spec:38; [ER] §4 |
-| G1 | Admission is mechanical: `ready`, all `blockedBy` done, `leadsLive < maxLeads`, `lanes.free > 0`, and no live role holding the head name. Both live windows failed on that ritual, not on judgement. Window 1 failed on reading the queue and plans; window 2 failed on the start-ritual commands and an admissible plan that was already held. Moving admit-and-start (and maybe restart of a gone lead, under a cap) into the watcher or the wake door would leave the LLM only judgement: park or ask, a stuck lead, close review. | **open: Q1** | V: `fgos-supervisor/SKILL.md:25-36`; `reports/integration.md` windows 1-2. I: the move removes the failure class |
-| G2 | No session-start preflight. Nothing proves, before the supervisor's first turn, that it can run its ritual under its grant (read the queue, plans and slots, start a session). The harness post does this with `init.sh` and a smoke check on every start. Window 2 already planned "a sandbox reproduction of the start ritual … as the owning proof". | open (direction agreed in the tree, not built) | V: integration.md window 2; [ER] harness |
+| G1 | (owner Q1 = A, provisional) Admission is mechanical: `ready`, all `blockedBy` done, `leadsLive < maxLeads`, `lanes.free > 0`, and no live role holding the head name. Both live windows failed on that ritual, not on judgement. Window 1 failed on reading the queue and plans; window 2 failed on the start-ritual commands and an admissible plan that was already held. Moving admit-and-start (and maybe restart of a gone lead, under a cap) into the watcher or the wake door would leave the LLM only judgement: park or ask, a stuck lead, close review. | owner: A + G2 preflight (round 2) | V: `fgos-supervisor/SKILL.md:25-36`; `reports/integration.md` windows 1-2. I: the move removes the failure class |
+| G2 | No session-start preflight. Nothing proves, before the supervisor's first turn, that it can run its ritual under its grant (read the queue, plans and slots, start a session). The harness post does this with `init.sh` and a smoke check on every start. Window 2 already planned "a sandbox reproduction of the start ritual … as the owning proof". | owner: yes, for the LLM part that remains (round 2) | V: integration.md window 2; [ER] harness |
 | G3 | No restart intensity cap. A gone lead is restarted with no "N restarts in T, then park and ask" limit. Wake has `backoff` for failed starts, but lead restarts have nothing like it. OTP supervisors have intensity limits (I, not read). Multi-agent token cost is about 15x chat (V). | open | V: `fgos-supervisor/SKILL.md:40-44` (no cap); phase-12 wake backoff; anthropic multi-agent-research-system [ER] |
 | G4 | "Done" is the lead's say-so at plan level. Every phase lands through `land.gates`, so per-phase proof exists. Nothing checks plan-level acceptance before close, though agent-teams and the harness post both report early "done" claims. | open (size unclear) | V: `fgos-lead/SKILL.md:37-38`; [ER] §2 |
 | G5 | "Held" is a convention. A plan run outside a head stays admissible unless hand-set `running` (window 2). The admit, mark `running`, start-lead order leaves a gap if the session crashes between the steps. | open | V: integration.md window 2; `fgos-supervisor/SKILL.md:33-34` |
@@ -51,6 +51,10 @@ source). I = inference (my reasoning).
 | F1 | `fgos-lead/SKILL.md:51` says "rebase onto the trunk tip" for `land-conflict-aborted`, but PS-3 says land merges and never rebases, and Git has no rebase port. | inconsistency | V |
 | F2 | `core/agents/supervisor.yaml:3-4` still describes "runs one ready plan to done" (the old per-plan role), not the project-wide queue drain. | inconsistency | V |
 | F3 | The spec header still says "Spec only. No crate, verb … exists yet", and the plan frontmatter is `draft` while phases 1-18 are done. | inconsistency | V: spec:8; plan.md:5 |
+| M1 | On paper the merge authority is the lead. `fgos land <branch>` is lead-only (`land-branch-lead-only`), and every other head lands `--paths` inside its grant writes. The supervisor never merges code. | clear | V: spec §4, PS-14; `src/session-host/head-grants.mjs:49-62` |
+| M2 | A branch that belongs to no plan has nobody who may merge it: a shaper worktree branch (this discussion, commit 726b68d39), a fix branch, an ad-hoc `fgos run` result. No lead exists for it, and every other persona has `--paths` only. | **open: Q2** | V: grants table; this branch |
+| M3 | The lead approves itself. It reviews its own unit's diff with a `code-reviewer` subagent and lands. Independent review lives only in lane convention (the Git reviewer lead:OPC as "Merge gate" in phase 7a), not in the model. Gas Town gives merging to a dedicated role (Refinery). | **open: Q2** | V: `fgos-lead/SKILL.md:31-35`; phase-07a:6-7; gastown [ER] |
+| M4 | The model's merge path has never run live. Every merge on main since 11-18 is a hand-run lane `land <branch>` (land-branch.sh). The script's removal (step 6) waits until every running lead lands with `fgos land`. Nobody arbitrates a refused land across plans (conflict, red gate, `land-recovery-required`): the lead parks or asks the owner. | clear | V: `git log origin/main --since=2026-11-18`; integration.md:49; `fgos-lead/SKILL.md:47-53` |
 | F4 | `event-store-end-trigger` faults are logged for verbs that succeed, which misled the window-1 diagnosis. | finding already in the tree | V: integration.md correction |
 
 Not covered by the research (limits, [ER]): Temporal, OpenHands, Devin, AutoGen/Magentic-One, CrewAI, LangGraph
@@ -66,6 +70,9 @@ compare against.
 
 - 2026-11-19 round 0: scouted the internal design (spec, plan, reports, skills) and external sources
   (external-research.md). No owner input yet.
+- 2026-11-19 round 1, Q1 (admit and start out of the LLM?). Owner: "A, kèm preflight cho phần LLM còn lại. Với ai được
+  phép merge. Cảm giác mô hình hiện tại không ai merge." Recorded as provisional on G1 and G2. The merge point was
+  scouted as M1-M4, and Q2 was asked.
 
 ## 6. Thiết kế đã chốt {#design}
 
