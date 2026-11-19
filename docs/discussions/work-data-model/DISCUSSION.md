@@ -5,7 +5,7 @@ discussion: open
 ## 1. Trạng thái hiện tại
 
 2026-11-19: discussion opened from backlog row `p-mc25x5pfi6` (owner approval via Miu). Starting point scouted
-(§2, §3). Nothing settled yet. Round 9: plans keep their directory name as id. Open: mandatory backlog `source:` for new discussions/plans (round 6), the ~273 open Work items (round 2), discussions location. Round 8: separator `id-slug` recommended. Round 7: discussions get a minted id (round 5 objection withdrawn); plan id open. Round 6: linking mechanism backlog ← discussion ← plan proposed under §3. Round 5: owner agreed proposal point 1; naming/placement answered under §3. Round 4: whole proposal written under §3, waiting for the owner's reaction. Round 2: owner agreed #2 and #3; merged #4/#5; shaper reported that Work keeps a full item store (1215 items) plus gates, outcomes, learnings, docs/topics and decisions in the Event Store, side by side with the backlog. Round 1 done: owner reframed #1 (content of a row, not its storage); shaper proposed a short row + link and a 5-value backlog status list, explained #3–#5. Waiting for the owner's reaction. Plan 261119-1615 phase 4 (add-rows) is on hold
+(§2, §3). Nothing settled yet. Round 10: discussions move to `plans/discussions/` proposed. Round 9: plans keep their directory name as id. Open: mandatory backlog `source:` for new discussions/plans (round 6), the ~273 open Work items (round 2), discussions location. Round 8: separator `id-slug` recommended. Round 7: discussions get a minted id (round 5 objection withdrawn); plan id open. Round 6: linking mechanism backlog ← discussion ← plan proposed under §3. Round 5: owner agreed proposal point 1; naming/placement answered under §3. Round 4: whole proposal written under §3, waiting for the owner's reaction. Round 2: owner agreed #2 and #3; merged #4/#5; shaper reported that Work keeps a full item store (1215 items) plus gates, outcomes, learnings, docs/topics and decisions in the Event Store, side by side with the backlog. Round 1 done: owner reframed #1 (content of a row, not its storage); shaper proposed a short row + link and a 5-value backlog status list, explained #3–#5. Waiting for the owner's reaction. Plan 261119-1615 phase 4 (add-rows) is on hold
 until the backlog shape is decided here.
 
 ## 2. Mục tiêu & đề bài
@@ -66,6 +66,13 @@ Round 7 (owner: why not give discussions an id, for easier linking). Shaper revi
 
 Round 8 (owner: `id_slug` or `id-slug`, since both id and slug use `-`). Shaper's answer, not settled: `id-slug`. Every convention template already joins with `-` and has the same shape (plan `{YYMMDD-HHMM}-{slug}`, report `{type}-{YYMMDD-HHMM}-{slug}` in `packages/convention/contracts/convention.rules.v1.json`); repo rule is kebab-case file names. The split is unambiguous because the id has a fixed length (`<prefix>-<10 base32>`, identity spec line 103), e.g. `^(p-[a-z2-7]{10})-(.+)$`; names come from `fgos convention path`, and readers take the id from frontmatter, never by splitting the name. `_` would be the only underscore in portfolio names. Plan id: **owner round 9: plans keep their id as today** (directory name `YYMMDD-HHMM-slug`; `blockedBy` and the supervision reader unchanged).
 
+Round 10 (owner: why not move discussions into plans). Shaper agrees, not settled:
+- Layout: `plans/backlog.md` (generated), `plans/backlog/<p-id>-<slug>.md`, `plans/discussions/<ds-id>-<slug>/DISCUSSION.md`, `plans/<YYMMDD-HHMM>-<slug>/plan.md`, plus `reports/ journals/ handoffs/`. Every portfolio record under one root; `docs/` keeps evergreen docs only.
+- Timing: same migration as the id rename, because every discussion directory is renamed to `<ds-id>-<slug>` anyway.
+- Cost found: 221 references to `docs/discussions` outside it; about 20 code/contract files hard-code the path (`packages/convention/contracts/convention.rules.v1.json` + golden, `packages/supervision/rust/src/discussion_source.rs`, `packages/questions/rust/src/refcheck.rs`, `src/session-host/head-grants.mjs`, `src/runner/agent-roster.mjs`, `src/state/frontier.mjs`, `src/state/work.mjs`, `src/setup/skill-wrappers.mjs`, `src/report/context-render.mjs`, `bin/fgos.mjs`, tests). That is the tùm lum to gather (RUL11): after the move, code takes the path only from `fgos convention path`, never a literal.
+- Old text references (plans, reports, docs): rewritten mechanically from an old→new map in the migration commit.
+- Other projects using fgOS keep `docs/discussions/` today: the migration ships as a step they run on upgrade (a verb, not doctor), and readers never look in two places afterwards.
+
 ## 4. Quyết định đã chốt
 
 | D-ID | Decision | Date | Source |
@@ -84,6 +91,7 @@ Round 8 (owner: `id_slug` or `id-slug`, since both id and slug use `-`). Shaper'
 - 2026-11-19 19:2x — owner round 7: why not give discussions an id for easier linking. Shaper checked the identity mint decision and agreed, revising round 5 (§3 round 7 block).
 - 2026-11-19 19:3x — owner round 8: `id_slug` or `id-slug`? Shaper recommended `id-slug` (§3 round 8 block).
 - 2026-11-19 19:4x — owner round 9: plans keep their id as today.
+- 2026-11-19 19:5x — owner round 10: why not move discussions into plans. Shaper scouted path references and agreed (§3 round 10 block).
 
 ## 6. Thiết kế đã chốt {#design}
 
