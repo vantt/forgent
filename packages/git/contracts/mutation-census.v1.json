@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "076b75d35dc52807c8ce8ab9131f92138b428402fdf42ac0b5e6705ae9858a26",
+  "payloadDigest": "410bc2ff1ce9412d8fb5dae5d70034cf83201ae75d38ddf2b0659af3d700c089",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1120,7 +1120,7 @@
     "scripts/lib/test-file-cpu.mjs": "f54eb34a6f6f01607c123fbeb04d1a8be61805c7fe687f7887a0adac2068e4a7",
     "scripts/lib/test-file-watchdog.mjs": "90fe256c808c268d8039136a225b4517a9cc1290a530fa503158f6ba2bcb7211",
     "scripts/lib/test-git-config-guard.mjs": "e9bc333d889985d94b847fd80fbfed7e6dcfa1e9b2ffffc97a14e7be326153d1",
-    "scripts/lib/test-shards.mjs": "2f790d59bb7323d20bf20b57f07bfa4e1c3da73238325cad9e8496d10e7061b5",
+    "scripts/lib/test-shards.mjs": "040e5c6eb57759c52db91e3afe74cad04693a12a4d7da8ac66139f357f711976",
     "scripts/list-doc-anchors.mjs": "fe4d901d266dc9d93e8a405051b618210f17808cc10f29663d48ad55a13e253f",
     "scripts/main-checkout-delete-guard-hook.mjs": "1441b87ef8661132314d89ec1d534a6049cfcf2bc088ca789e5a50fd68ec02be",
     "scripts/measure-p08-performance.mjs": "2ab686e2e3f880f584a2f9278a6bbb27a49d71effcdb65215f1cbd3865099e3e",
