@@ -230,10 +230,12 @@ pub fn settled_report_stands(
 
 /// The sha256 hex of some bytes (what a copy must still have).
 pub fn sha256_hex(bytes: &[u8]) -> String {
-    Sha256::digest(bytes)
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect()
+    hex(&Sha256::digest(bytes))
+}
+
+/// Lowercase hex of some bytes, two digits each.
+pub fn hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|b| format!("{b:02x}")).collect()
 }
 
 /// The neutral name (without extension) of the nth anonymized input: seat-A ... seat-Z, seat-AA, ...

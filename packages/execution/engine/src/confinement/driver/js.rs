@@ -1,5 +1,5 @@
 //! The few JavaScript behaviours the vectors pin: how a missing or odd value prints inside a message, which
-//! values are truthy, how `path.resolve` and `isInsideRoot` read a path. Paths are strings because they are
+//! values are truthy, how `path.resolve`, `path.relative` and `isInsideRoot` read a path. Paths are strings because they are
 //! compared as text, as the Node driver compared them.
 
 use serde_json::Value;
@@ -73,6 +73,21 @@ pub fn resolve_path(base: &Path, p: &Path) -> PathBuf {
         }
     }
     out
+}
+
+/// `path.relative(from, to)` for two absolute, normalised paths: `..` up to the common ancestor, then down, joined
+/// with the host's separator as Node's `path` joins them; empty when the two are the same.
+pub fn relative(from: &Path, to: &Path) -> String {
+    let from: Vec<Component> = from.components().collect();
+    let to: Vec<Component> = to.components().collect();
+    let common = from.iter().zip(&to).take_while(|(a, b)| a == b).count();
+    let ups = (common..from.len()).map(|_| "..".to_string());
+    let downs = to[common..]
+        .iter()
+        .map(|part| part.as_os_str().to_string_lossy().into_owned());
+    ups.chain(downs)
+        .collect::<Vec<_>>()
+        .join(std::path::MAIN_SEPARATOR_STR)
 }
 
 /// `path.resolve(base, p)` as text.

@@ -4,8 +4,8 @@
 
 use super::{js, DriverError, ErrorKind};
 use fgos_durable_file::replace_durably_with_mode;
+use fgos_execution::handoff::sha256_hex;
 use serde_json::{json, Map, Value};
-use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -283,9 +283,7 @@ pub fn redacted_reference(attestation: &Value) -> Result<Value, DriverError> {
             digested.insert(key.to_string(), value.clone());
         }
     }
-    let digest = hex(&Sha256::digest(
-        Value::Object(digested).to_string().as_bytes(),
-    ));
+    let digest = sha256_hex(Value::Object(digested).to_string().as_bytes());
     let dispatch_id = js::display(attestation.get("dispatchId"));
     let phase = js::display(attestation.get("phase"));
     let mismatches: Vec<Value> = attestation
@@ -314,10 +312,6 @@ pub fn redacted_reference(attestation: &Value) -> Result<Value, DriverError> {
     }))
 }
 
-pub(super) fn hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|b| format!("{b:02x}")).collect()
-}
-
 /// `new Date(ms).toISOString()`.
 fn iso(ms: i64) -> String {
     fgos_host_runtime::civil_time::format_unix_millis_rfc3339(ms, 0)
@@ -340,7 +334,7 @@ impl ProbeCache {
     }
 
     fn digest(fingerprint: &Value) -> String {
-        hex(&Sha256::digest(fingerprint.to_string().as_bytes()))
+        sha256_hex(fingerprint.to_string().as_bytes())
     }
 
     /// Records a passed probe; a probe that did not pass is not cached (`None`). Persisting to the store is best-effort.

@@ -1,0 +1,3754 @@
+{
+  "constants": {
+    "repeatModeValues": [
+      "pre-delivery",
+      "post-delivery"
+    ],
+    "policyPatchFields": [
+      "rigor",
+      "tier",
+      "visibility",
+      "repeatMode",
+      "capability",
+      "distinctProviderFrom"
+    ],
+    "policyVersion": "1",
+    "stampPrefix": "protocol-operation:",
+    "writerIdRe": "^[A-Za-z0-9._-]+$",
+    "maxWriterIdLength": 200,
+    "modelPolicyTiers": [
+      "nano",
+      "mini",
+      "standard",
+      "advanced",
+      "flagship",
+      "frontier"
+    ]
+  },
+  "noArguments": {
+    "error": {
+      "name": "RunnerConfigError",
+      "code": null,
+      "message": "execution-contract: contract must be a non-null object"
+    }
+  },
+  "validate": [
+    {
+      "name": "good",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "good-with-optional",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2,
+          "tokens": 5
+        },
+        "supports": "op",
+        "contractTemplate": "tpl",
+        "capabilities": [
+          "x"
+        ],
+        "policy": {
+          "tier": "standard"
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "mutating-stamped",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "x",
+          "protocol-operation:flow@1#op"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "mutating",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "mutating-unstamped",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "mutating",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.mutation \"mutating\" is rejected -- only an inline contract carrying the engine-reserved protocol-operation stamp in its constraints (session-engine.mjs's own mediated dispatchDeclaredOperation door) may declare \"mutating\"; every other caller stays read-only-only (ADR-006 §6)"
+        }
+      }
+    },
+    {
+      "name": "mutation-other",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "sometimes",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.mutation must be \"read-only\" or \"mutating\" (missing, or any other value, is rejected)"
+        }
+      }
+    },
+    {
+      "name": "mutation-missing",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.mutation must be \"read-only\" or \"mutating\" (missing, or any other value, is rejected)"
+        }
+      }
+    },
+    {
+      "name": "not-object",
+      "contract": 5,
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract must be a non-null object"
+        }
+      }
+    },
+    {
+      "name": "array",
+      "contract": [],
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract must be a non-null object"
+        }
+      }
+    },
+    {
+      "name": "null",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "unknown-field",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "extra": 1
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract has unknown field \"extra\""
+        }
+      }
+    },
+    {
+      "name": "forbidden-session-field",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "sessionId": "s"
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract carries a forbidden session/coordination field \"sessionId\" -- no session reference in this slice (ADR-006 §6)"
+        }
+      }
+    },
+    {
+      "name": "forbidden-coordination-id",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "coordinationId": "s",
+        "extra": 1
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract carries a forbidden session/coordination field \"coordinationId\" -- no session reference in this slice (ADR-006 §6)"
+        }
+      }
+    },
+    {
+      "name": "forbidden-thread",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "threadId": "s"
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract carries a forbidden session/coordination field \"threadId\" -- no session reference in this slice (ADR-006 §6)"
+        }
+      }
+    },
+    {
+      "name": "forbidden-ref",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "coordinationRef": "s"
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract carries a forbidden session/coordination field \"coordinationRef\" -- no session reference in this slice (ADR-006 §6)"
+        }
+      }
+    },
+    {
+      "name": "objective-blank",
+      "contract": {
+        "objective": "   ",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.objective must be a non-empty string"
+        }
+      }
+    },
+    {
+      "name": "objective-number",
+      "contract": {
+        "objective": 4,
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.objective must be a non-empty string"
+        }
+      }
+    },
+    {
+      "name": "context-refs-not-array",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": "a",
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.contextRefs must be an array of strings (bounded context references)"
+        }
+      }
+    },
+    {
+      "name": "context-refs-non-string",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a",
+          1
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.contextRefs must be an array of strings (bounded context references)"
+        }
+      }
+    },
+    {
+      "name": "constraints-missing",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.constraints must be an array of strings (constraints/authority)"
+        }
+      }
+    },
+    {
+      "name": "expected-outputs-empty",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.expectedOutputs must be a non-empty array of strings"
+        }
+      }
+    },
+    {
+      "name": "expected-outputs-non-string",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          1
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.expectedOutputs must be a non-empty array of strings"
+        }
+      }
+    },
+    {
+      "name": "evidence-missing",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.evidence must be an object with a \"required\" field"
+        }
+      }
+    },
+    {
+      "name": "evidence-array",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": [],
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.evidence must be an object with a \"required\" field"
+        }
+      }
+    },
+    {
+      "name": "evidence-unknown-field",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported",
+          "extra": 1
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.evidence has unknown field \"extra\""
+        }
+      }
+    },
+    {
+      "name": "evidence-bad-value",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "maybe"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.evidence.required must be \"reported\" or \"verified\""
+        }
+      }
+    },
+    {
+      "name": "evidence-verified",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "verified"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "role-blank",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.role must be a non-empty string (role hint)"
+        }
+      }
+    },
+    {
+      "name": "supports-blank",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "supports": " "
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.supports must be a non-empty string when provided (an operation id it claims to support -- legality against the Work's declared Stage is checked by the domain harness seam, ADR-007 §3, not here)"
+        }
+      }
+    },
+    {
+      "name": "supports-number",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "supports": 3
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.supports must be a non-empty string when provided (an operation id it claims to support -- legality against the Work's declared Stage is checked by the domain harness seam, ADR-007 §3, not here)"
+        }
+      }
+    },
+    {
+      "name": "template-blank",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "contractTemplate": ""
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.contractTemplate must be a non-empty string when provided"
+        }
+      }
+    },
+    {
+      "name": "capabilities-bad",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "capabilities": "x"
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.capabilities must be an array of strings when provided (capability hints)"
+        }
+      }
+    },
+    {
+      "name": "capabilities-non-string",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "capabilities": [
+          1
+        ]
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.capabilities must be an array of strings when provided (capability hints)"
+        }
+      }
+    },
+    {
+      "name": "policy-string",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "policy": "x"
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.policy must be an object when provided"
+        }
+      }
+    },
+    {
+      "name": "policy-unknown-field",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "policy": {
+          "tier": "standard",
+          "model": "m"
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.policy has unknown field \"model\""
+        }
+      }
+    },
+    {
+      "name": "policy-bad-tier",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "policy": {
+          "tier": "premium"
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.policy.tier must be one of nano, mini, standard, advanced, flagship, frontier"
+        }
+      }
+    },
+    {
+      "name": "policy-no-tier",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "policy": {}
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.policy.tier must be one of nano, mini, standard, advanced, flagship, frontier"
+        }
+      }
+    },
+    {
+      "name": "budget-missing",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer"
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.budget must be an object"
+        }
+      }
+    },
+    {
+      "name": "budget-unknown-field",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2,
+          "extra": 1
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.budget has unknown field \"extra\""
+        }
+      }
+    },
+    {
+      "name": "budget-timeout-zero",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 0,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.budget.timeoutMs must be a positive integer (milliseconds) -- the only enforced time budget"
+        }
+      }
+    },
+    {
+      "name": "budget-timeout-fraction",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1.5,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.budget.timeoutMs must be a positive integer (milliseconds) -- the only enforced time budget"
+        }
+      }
+    },
+    {
+      "name": "budget-timeout-whole-float",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 2000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "budget-max-runs-negative",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": -1
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.budget.maxRuns must be a positive integer -- the only enforced run-count budget"
+        }
+      }
+    },
+    {
+      "name": "budget-max-runs-string",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": "2"
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.budget.maxRuns must be a positive integer -- the only enforced run-count budget"
+        }
+      }
+    },
+    {
+      "name": "budget-tokens-negative",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2,
+          "tokens": -1
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.budget.tokens must be a non-negative finite number when provided (telemetry only, never enforced as a limit)"
+        }
+      }
+    },
+    {
+      "name": "budget-tokens-string",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2,
+          "tokens": "5"
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.budget.tokens must be a non-negative finite number when provided (telemetry only, never enforced as a limit)"
+        }
+      }
+    },
+    {
+      "name": "budget-tokens-zero",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2,
+          "tokens": 0
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "caller-missing",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "caller-array",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": [],
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller must be a non-null object"
+        }
+      }
+    },
+    {
+      "name": "caller-forbidden",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "sessionId": "s"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller carries a forbidden session/coordination field \"sessionId\" -- no session reference in this slice (ADR-006 §6)"
+        }
+      }
+    },
+    {
+      "name": "caller-unknown",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "extra": 1
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller has unknown field \"extra\""
+        }
+      }
+    },
+    {
+      "name": "caller-writer-missing",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {},
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.writerId must be a non-empty string"
+        }
+      }
+    },
+    {
+      "name": "caller-writer-blank",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": " "
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.writerId must be a non-empty string"
+        }
+      }
+    },
+    {
+      "name": "caller-writer-bad-chars",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "a b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.writerId must match /^[A-Za-z0-9._-]+$/ and be at most 200 characters (format-only floor, not an identity check)"
+        }
+      }
+    },
+    {
+      "name": "caller-writer-newline",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "abc\n"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.writerId must match /^[A-Za-z0-9._-]+$/ and be at most 200 characters (format-only floor, not an identity check)"
+        }
+      }
+    },
+    {
+      "name": "caller-writer-non-ascii",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "é"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.writerId must match /^[A-Za-z0-9._-]+$/ and be at most 200 characters (format-only floor, not an identity check)"
+        }
+      }
+    },
+    {
+      "name": "caller-writer-200",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "caller-writer-201",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.writerId must match /^[A-Za-z0-9._-]+$/ and be at most 200 characters (format-only floor, not an identity check)"
+        }
+      }
+    },
+    {
+      "name": "caller-parent-blank",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "parentAssignmentId": " "
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.parentAssignmentId must be a non-empty string when provided"
+        }
+      }
+    },
+    {
+      "name": "caller-parent-ok",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "parentAssignmentId": "p1"
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "caller-coordination-not-object",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": 1
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination must be an object when provided"
+        }
+      }
+    },
+    {
+      "name": "caller-coordination-unknown",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "x": 1
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination has unknown field \"x\""
+        }
+      }
+    },
+    {
+      "name": "fan-out-ok",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "fanOutPayload": {
+            "actorId": "a",
+            "objective": "o",
+            "taskKey": "t",
+            "expectedOutputs": [
+              "e"
+            ],
+            "constraints": [],
+            "capabilities": [
+              "c"
+            ],
+            "fromAssignmentId": "f",
+            "intent": "i"
+          }
+        }
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "fan-out-not-object",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "fanOutPayload": []
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.fanOutPayload must be an object when provided"
+        }
+      }
+    },
+    {
+      "name": "fan-out-actorId-blank",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "fanOutPayload": {
+            "actorId": "",
+            "objective": "o",
+            "taskKey": "t",
+            "expectedOutputs": [
+              "e"
+            ],
+            "constraints": []
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.fanOutPayload.actorId must be a non-empty string"
+        }
+      }
+    },
+    {
+      "name": "fan-out-objective-blank",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "fanOutPayload": {
+            "actorId": "a",
+            "objective": "",
+            "taskKey": "t",
+            "expectedOutputs": [
+              "e"
+            ],
+            "constraints": []
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.fanOutPayload.objective must be a non-empty string"
+        }
+      }
+    },
+    {
+      "name": "fan-out-taskKey-blank",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "fanOutPayload": {
+            "actorId": "a",
+            "objective": "o",
+            "taskKey": "",
+            "expectedOutputs": [
+              "e"
+            ],
+            "constraints": []
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.fanOutPayload.taskKey must be a non-empty string"
+        }
+      }
+    },
+    {
+      "name": "fan-out-outputs-empty",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "fanOutPayload": {
+            "actorId": "a",
+            "objective": "o",
+            "taskKey": "t",
+            "expectedOutputs": [],
+            "constraints": []
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.fanOutPayload.expectedOutputs must be a non-empty array of strings"
+        }
+      }
+    },
+    {
+      "name": "fan-out-constraints-bad",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "fanOutPayload": {
+            "actorId": "a",
+            "objective": "o",
+            "taskKey": "t",
+            "expectedOutputs": [
+              "e"
+            ],
+            "constraints": [
+              1
+            ]
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.fanOutPayload.constraints must be an array of strings"
+        }
+      }
+    },
+    {
+      "name": "fan-out-capabilities-bad",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "fanOutPayload": {
+            "actorId": "a",
+            "objective": "o",
+            "taskKey": "t",
+            "expectedOutputs": [
+              "e"
+            ],
+            "constraints": [],
+            "capabilities": "x"
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.fanOutPayload.capabilities must be an array of strings when provided"
+        }
+      }
+    },
+    {
+      "name": "fan-out-from-blank",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "fanOutPayload": {
+            "actorId": "a",
+            "objective": "o",
+            "taskKey": "t",
+            "expectedOutputs": [
+              "e"
+            ],
+            "constraints": [],
+            "fromAssignmentId": " "
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.fanOutPayload.fromAssignmentId must be a non-empty string when provided"
+        }
+      }
+    },
+    {
+      "name": "fan-out-intent-blank",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "fanOutPayload": {
+            "actorId": "a",
+            "objective": "o",
+            "taskKey": "t",
+            "expectedOutputs": [
+              "e"
+            ],
+            "constraints": [],
+            "intent": ""
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.fanOutPayload.intent must be a non-empty string when provided"
+        }
+      }
+    },
+    {
+      "name": "invocation-ok",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "fan-out",
+            "normalizedSteps": [
+              {
+                "type": "x",
+                "objective": "o",
+                "omittedFields": [
+                  "a"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "invocation-not-object",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": "x"
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.actionInvocation must be an object when provided"
+        }
+      }
+    },
+    {
+      "name": "invocation-unknown",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "fan-out",
+            "normalizedSteps": [
+              {
+                "type": "x",
+                "objective": "o",
+                "omittedFields": [
+                  "a"
+                ]
+              }
+            ],
+            "extra": 1
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.actionInvocation has unknown field \"extra\""
+        }
+      }
+    },
+    {
+      "name": "invocation-key-not-sha",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "abc",
+            "kind": "fan-out",
+            "normalizedSteps": [
+              {
+                "type": "x",
+                "objective": "o",
+                "omittedFields": [
+                  "a"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.actionInvocation.actionKey must be a sha256 action key"
+        }
+      }
+    },
+    {
+      "name": "invocation-key-missing",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "kind": "fan-out",
+            "normalizedSteps": [
+              {
+                "type": "x",
+                "objective": "o",
+                "omittedFields": [
+                  "a"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.actionInvocation.actionKey must be a sha256 action key"
+        }
+      }
+    },
+    {
+      "name": "invocation-kind-bad",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "nope",
+            "normalizedSteps": [
+              {
+                "type": "x",
+                "objective": "o",
+                "omittedFields": [
+                  "a"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.actionInvocation.kind is not a supported coordination action kind"
+        }
+      }
+    },
+    {
+      "name": "invocation-steps-empty",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "fan-out",
+            "normalizedSteps": []
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.actionInvocation.normalizedSteps must be a non-empty array"
+        }
+      }
+    },
+    {
+      "name": "invocation-steps-not-array",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "fan-out",
+            "normalizedSteps": {}
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.actionInvocation.normalizedSteps must be a non-empty array"
+        }
+      }
+    },
+    {
+      "name": "invocation-step-not-object",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "fan-out",
+            "normalizedSteps": [
+              "x"
+            ]
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.actionInvocation.normalizedSteps entries must be objects"
+        }
+      }
+    },
+    {
+      "name": "invocation-step-unknown",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "fan-out",
+            "normalizedSteps": [
+              {
+                "bogus": 1
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.actionInvocation.normalizedSteps[] has unknown field \"bogus\""
+        }
+      }
+    },
+    {
+      "name": "invocation-step-omitted-bad",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "fan-out",
+            "normalizedSteps": [
+              {
+                "omittedFields": "x"
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: caller.coordination.actionInvocation.normalizedSteps[].omittedFields must be an array of strings when provided"
+        }
+      }
+    },
+    {
+      "name": "invocation-kind-dispatch-operation",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "dispatch-operation",
+            "normalizedSteps": [
+              {
+                "type": "x",
+                "objective": "o",
+                "omittedFields": [
+                  "a"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "invocation-kind-authorize-and-dispatch",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "authorize-and-dispatch",
+            "normalizedSteps": [
+              {
+                "type": "x",
+                "objective": "o",
+                "omittedFields": [
+                  "a"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "invocation-kind-record-disposition",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "record-disposition",
+            "normalizedSteps": [
+              {
+                "type": "x",
+                "objective": "o",
+                "omittedFields": [
+                  "a"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "invocation-kind-record-human-turn",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "record-human-turn",
+            "normalizedSteps": [
+              {
+                "type": "x",
+                "objective": "o",
+                "omittedFields": [
+                  "a"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "invocation-kind-link-contribution",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "link-contribution",
+            "normalizedSteps": [
+              {
+                "type": "x",
+                "objective": "o",
+                "omittedFields": [
+                  "a"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "invocation-kind-fan-out",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "fan-out",
+            "normalizedSteps": [
+              {
+                "type": "x",
+                "objective": "o",
+                "omittedFields": [
+                  "a"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "invocation-all-step-fields",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": "writer-1.a_b",
+        "coordination": {
+          "actionInvocation": {
+            "actionKey": "sha256:abc",
+            "kind": "fan-out",
+            "normalizedSteps": [
+              {
+                "type": 1,
+                "as": 1,
+                "operationId": 1,
+                "targetActorId": 1,
+                "nodeId": 1,
+                "objective": 1,
+                "expectedOutputs": 1,
+                "contextRefs": 1,
+                "constraints": 1,
+                "capabilities": 1,
+                "fromAssignmentId": 1,
+                "intent": 1,
+                "round": 1,
+                "taskKey": 1,
+                "mutation": 1,
+                "authorizationId": 1,
+                "invocationKey": 1,
+                "reason": 1,
+                "grantedContextRefs": 1,
+                "targetArtifactRef": 1,
+                "targetRef": 1,
+                "disposition": 1,
+                "rationale": 1,
+                "evidenceRefs": 1,
+                "turnId": 1,
+                "turnOrdinal": 1,
+                "channel": 1,
+                "artifactRef": 1,
+                "externalRef": 1,
+                "attributedTo": 1,
+                "respondsToRefs": 1,
+                "contributionId": 1,
+                "contributionType": 1,
+                "assignmentId": 1,
+                "roundKey": 1,
+                "anchors": 1,
+                "respondsTo": 1,
+                "branches": 1,
+                "omittedFields": []
+              }
+            ]
+          }
+        }
+      },
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "name": "first-failure-wins-contract-before-caller",
+      "contract": {
+        "objective": "",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        }
+      },
+      "caller": {
+        "writerId": ""
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.objective must be a non-empty string"
+        }
+      }
+    },
+    {
+      "name": "unknown-before-objective",
+      "contract": {
+        "objective": "",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "zzz": 1
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract has unknown field \"zzz\""
+        }
+      }
+    },
+    {
+      "name": "forbidden-before-unknown",
+      "contract": {
+        "objective": "do the thing",
+        "contextRefs": [
+          "a.md"
+        ],
+        "constraints": [
+          "be careful"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "budget": {
+          "timeoutMs": 1000,
+          "maxRuns": 2
+        },
+        "zzz": 1,
+        "sessionId": "s"
+      },
+      "caller": {
+        "writerId": "writer-1.a_b"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract carries a forbidden session/coordination field \"sessionId\" -- no session reference in this slice (ADR-006 §6)"
+        }
+      }
+    }
+  ],
+  "normalizeSavedPolicyTier": [
+    {
+      "policy": {
+        "tier": "standard"
+      },
+      "allowAdditionalFields": false,
+      "result": {
+        "ok": {
+          "tier": "standard"
+        }
+      }
+    },
+    {
+      "policy": {
+        "minTier": "advanced"
+      },
+      "allowAdditionalFields": false,
+      "result": {
+        "ok": {
+          "tier": "advanced"
+        }
+      }
+    },
+    {
+      "policy": {
+        "minTier": "advanced",
+        "tier": "standard"
+      },
+      "allowAdditionalFields": false,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: saved policy cannot declare both \"minTier\" and \"tier\""
+        }
+      }
+    },
+    {
+      "policy": {
+        "minTier": "premium"
+      },
+      "allowAdditionalFields": false,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: saved policy.minTier must be one of nano, mini, standard, advanced, flagship, frontier"
+        }
+      }
+    },
+    {
+      "policy": {
+        "minTier": "advanced",
+        "rigor": "high"
+      },
+      "allowAdditionalFields": false,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: saved contract.policy may contain only \"minTier\""
+        }
+      }
+    },
+    {
+      "policy": {
+        "minTier": "advanced",
+        "rigor": "high"
+      },
+      "allowAdditionalFields": true,
+      "result": {
+        "ok": {
+          "rigor": "high",
+          "tier": "advanced"
+        }
+      }
+    },
+    {
+      "policy": {
+        "minTier": "advanced",
+        "tier": "standard",
+        "rigor": "high"
+      },
+      "allowAdditionalFields": true,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: saved policy cannot declare both \"minTier\" and \"tier\""
+        }
+      }
+    },
+    {
+      "policy": null,
+      "allowAdditionalFields": false,
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "policy": [],
+      "allowAdditionalFields": false,
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "policy": "x",
+      "allowAdditionalFields": false,
+      "result": {
+        "ok": "x"
+      }
+    },
+    {
+      "policy": {},
+      "allowAdditionalFields": false,
+      "result": {
+        "ok": {}
+      }
+    },
+    {
+      "policy": {
+        "minTier": "nano"
+      },
+      "allowAdditionalFields": true,
+      "result": {
+        "ok": {
+          "tier": "nano"
+        }
+      }
+    },
+    {
+      "policy": {
+        "minTier": 7
+      },
+      "allowAdditionalFields": true,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: saved policy.minTier must be one of nano, mini, standard, advanced, flagship, frontier"
+        }
+      }
+    }
+  ],
+  "stamps": [
+    {
+      "constraints": {
+        "absent": true
+      },
+      "carries": false,
+      "extracted": null
+    },
+    {
+      "constraints": null,
+      "carries": false,
+      "extracted": null
+    },
+    {
+      "constraints": "x",
+      "carries": false,
+      "extracted": null
+    },
+    {
+      "constraints": [],
+      "carries": false,
+      "extracted": null
+    },
+    {
+      "constraints": [
+        "a"
+      ],
+      "carries": false,
+      "extracted": null
+    },
+    {
+      "constraints": [
+        "protocol-operation:flow@1#op"
+      ],
+      "carries": true,
+      "extracted": {
+        "definitionId": "flow",
+        "definitionVersion": "1",
+        "operationId": "op"
+      }
+    },
+    {
+      "constraints": [
+        "a",
+        "protocol-operation:flow@1#op"
+      ],
+      "carries": true,
+      "extracted": {
+        "definitionId": "flow",
+        "definitionVersion": "1",
+        "operationId": "op"
+      }
+    },
+    {
+      "constraints": [
+        "protocol-operation:flow@1#op",
+        "protocol-operation:flow@1#op"
+      ],
+      "carries": true,
+      "extracted": null
+    },
+    {
+      "constraints": [
+        "protocol-operation:flow@1#op",
+        "protocol-operation:y@2#o2"
+      ],
+      "carries": true,
+      "extracted": null
+    },
+    {
+      "constraints": [
+        "protocol-operation:"
+      ],
+      "carries": true,
+      "extracted": null
+    },
+    {
+      "constraints": [
+        "protocol-operation:noat"
+      ],
+      "carries": true,
+      "extracted": null
+    },
+    {
+      "constraints": [
+        "protocol-operation:a@b"
+      ],
+      "carries": true,
+      "extracted": null
+    },
+    {
+      "constraints": [
+        "protocol-operation:a@b#"
+      ],
+      "carries": true,
+      "extracted": null
+    },
+    {
+      "constraints": [
+        "protocol-operation:a@b#c"
+      ],
+      "carries": true,
+      "extracted": {
+        "definitionId": "a",
+        "definitionVersion": "b",
+        "operationId": "c"
+      }
+    },
+    {
+      "constraints": [
+        "protocol-operation:@b#c"
+      ],
+      "carries": true,
+      "extracted": null
+    },
+    {
+      "constraints": [
+        "protocol-operation:a@#c"
+      ],
+      "carries": true,
+      "extracted": null
+    },
+    {
+      "constraints": [
+        "protocol-operation:a@b@c#d#e"
+      ],
+      "carries": true,
+      "extracted": {
+        "definitionId": "a",
+        "definitionVersion": "b@c",
+        "operationId": "d#e"
+      }
+    },
+    {
+      "constraints": [
+        "protocol-operation:a@b#c\nmore"
+      ],
+      "carries": true,
+      "extracted": null
+    },
+    {
+      "constraints": [
+        1,
+        "protocol-operation:flow@1#op"
+      ],
+      "carries": true,
+      "extracted": {
+        "definitionId": "flow",
+        "definitionVersion": "1",
+        "operationId": "op"
+      }
+    },
+    {
+      "constraints": [
+        "x protocol-operation:a@b#c"
+      ],
+      "carries": false,
+      "extracted": null
+    }
+  ]
+}

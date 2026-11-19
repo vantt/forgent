@@ -10,6 +10,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use fgos_execution::handoff::{hex, sha256_hex};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 
@@ -153,7 +154,7 @@ fn copy_fingerprint(layout: Layout, dir: &Path, sqlite: &dyn SqliteAdapter) -> O
                 })
                 .collect();
             parts.sort();
-            Some(hex(&Sha256::digest(parts.join("\u{1}").as_bytes())))
+            Some(sha256_hex(parts.join("\u{1}").as_bytes()))
         }
         Err(_) => raw_fingerprint(layout, dir),
     }
