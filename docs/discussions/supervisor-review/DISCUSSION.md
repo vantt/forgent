@@ -10,7 +10,7 @@ VERIFIED/INFERENCE marks: [external-research.md](external-research.md) (round 0,
 
 Round 2 (2026-11-19). The owner answered Q1: A, with a preflight for the LLM part that remains (G1 and G2,
 provisional until it holds one more round). The owner also raised a new point: "who is allowed to merge? The current
-model feels like no one merges." It is scouted as M1-M4 in §3. Q2 answered A: merge becomes a deterministic queue with an independent review verdict. The owner then asked whether the supervisor runs that queue. Open: Q3 (who runs the queue and who arbitrates it). Window 3 of the live run
+model feels like no one merges." It is scouted as M1-M4 in §3. Q2 answered A: merge becomes a deterministic queue with an independent review verdict. Q3 answered (a): code runs each merge, and the supervisor owns the queue and arbitrates it. The owner then asked who resolves a merge failure. A responsibility ladder is drafted as M5. Open: Q4 (confirm the ladder). Window 3 of the live run
 may be in progress, and this discussion stays read-only.
 
 ## 2. Mục tiêu & đề bài
@@ -55,6 +55,7 @@ source). I = inference (my reasoning).
 | M2 | A branch that belongs to no plan has nobody who may merge it: a shaper worktree branch (this discussion, commit 726b68d39), a fix branch, an ad-hoc `fgos run` result. No lead exists for it, and every other persona has `--paths` only. | owner Q2 = A (queue, round 3); runner open: Q3 | V: grants table; this branch |
 | M3 | The lead approves itself. It reviews its own unit's diff with a `code-reviewer` subagent and lands. Independent review lives only in lane convention (the Git reviewer lead:OPC as "Merge gate" in phase 7a), not in the model. Gas Town gives merging to a dedicated role (Refinery). | owner Q2 = A (independent review verdict, round 3) | V: `fgos-lead/SKILL.md:31-35`; phase-07a:6-7; gastown [ER] |
 | M4 | The model's merge path has never run live. Every merge on main since 11-18 is a hand-run lane `land <branch>` (land-branch.sh). The script's removal (step 6) waits until every running lead lands with `fgos land`. Nobody arbitrates a refused land across plans (conflict, red gate, `land-recovery-required`): the lead parks or asks the owner. | clear | V: `git log origin/main --since=2026-11-18`; integration.md:49; `fgos-lead/SKILL.md:47-53` |
+| M5 | Responsibility ladder for a failed merge (draft). The refusal codes are the ones `packages/supervision/rust/src` emits today.<br>**L0 code heals itself:** `land-target-changed`, `land-retries-exhausted` and `land-remote-diverged` (re-fetch and retry), regeneration of a generated-file conflict, and `land-recovery-required` / `land-remote-outcome-unknown` (run `fgos git recover`, then retry once).<br>**L1 submitter fixes its own branch:** `land-conflict-aborted` (merge the trunk into the branch, never rebase), `land-gate-failed`, a rejected review verdict, `land-outside-footprint` / `footprint-change-refused`, `land-regenerate-failed`. Capped at N attempts.<br>**L2 supervisor (queue owner):** the cap is exceeded; the submitter is gone, or is a persona that cannot fix code (shaper, secretary); two branches conflict across plans; the trunk itself fails the gate (not the author's fault: freeze the queue and open a fix item); an item has sat unhandled for X ticks.<br>**L3 owner, only through a supervisor question:** project config (`land-gate-missing`, `land-target-unknown`), widening a footprint, a recover that fails, a trunk that stays red. | **open: Q4** | V: refusal codes (grep of `packages/supervision/rust/src`); `fgos-lead/SKILL.md:45-53` (today every refusal goes to the lead or the owner, with no L0 and no L2). I: the ladder |
 | F4 | `event-store-end-trigger` faults are logged for verbs that succeed, which misled the window-1 diagnosis. | finding already in the tree | V: integration.md correction |
 
 Not covered by the research (limits, [ER]): Temporal, OpenHands, Devin, AutoGen/Magentic-One, CrewAI, LangGraph
@@ -76,6 +77,9 @@ compare against.
 - 2026-11-19 round 2, Q2 (who may merge?). Owner: "đồng ý A, nhưng sẽ do supervisor thực hiện việc merge queue?"
   Q2 = A was recorded as provisional. Q3 was asked: the code runs each merge, and the supervisor owns the queue and
   arbitrates it.
+- 2026-11-19 round 3, Q3 (does the supervisor run the queue?). Owner: "đồng ý a, nhưng merge fail thì sao, ai chịu
+  trách nhiệm giải quyết". Q3 = (a) was recorded as provisional. The M5 ladder was drafted from the refusal codes, and Q4
+  was asked.
 
 ## 6. Thiết kế đã chốt {#design}
 
