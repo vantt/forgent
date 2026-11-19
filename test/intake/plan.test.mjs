@@ -700,6 +700,24 @@ test('resolvePlan gates to awaiting-human when tentative children declare overla
   assert.equal(children.length, 0);
 });
 
+test('resolvePlan gates when one tentative child\'s footprint contains another\'s (a directory and a file in it); the gate stays advisory and writes no children', () => {
+  const storeDir = tmpStoreDir();
+  addWork(storeDir, sampleWork());
+
+  const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', {
+    verdict: 'decompose',
+    reason: 'Two surfaces, one inside the other',
+    children: [
+      { title: 'Build parser', verify: 'npm test -- parser', action: 'x', footprint: ['src/state/'] },
+      { title: 'Build renderer', verify: 'npm test -- renderer', action: 'x', footprint: ['src/state/frontier.mjs'] },
+    ],
+  });
+  assert.equal(result.outcome, 'need-human');
+  const view = listWork(storeDir);
+  assert.match(view.gates['item-x'].ask, /src\/state\//);
+  assert.equal(Object.values(view.work).filter((item) => item.parent === 'item-x').length, 0);
+});
+
 test('resolvePlan honors a declared deps edge between tentative children as the sequence resolution for a shared footprint', () => {
   const storeDir = tmpStoreDir();
   addWork(storeDir, sampleWork());

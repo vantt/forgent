@@ -9,7 +9,8 @@ map (component / how risky / what would prove it), the files likely
 touched, and the order they need to happen in. Before fixing that order,
 run `fgos graph --json` and read its `criticalPath` and `topUnblock`
 fields — let those inform which piece goes first instead of ordering by
-judgment alone. Cite the CONTEXT.md decision each choice honors. A medium
+judgment alone. To check that the planned pieces' footprints do not collide,
+run `fgos resource-check --units <file.json>` (or `--plan <dir>`); `fgos graph` reads Work, not a draft. Cite the CONTEXT.md decision each choice honors. A medium
 or high risk in the map needs a proof point at `fgos-coding-validating`,
 not a guess here.
 

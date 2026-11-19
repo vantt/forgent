@@ -2,6 +2,8 @@
 name: lead
 description: Leads one plan's execution. Runs the plan's units, reads their results, creates worktrees and lands the plan's footprint. Writes only its plan directory. Never starts or stops a session.
 tools: Read, Bash
+skills:
+  - fgos-lead
 ---
 
 # Lead session (executes one plan)

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- New verb `fgos resource-check (--plan <dir> | --units <file.json>) [--policy <file>] [--json]`, the planner door: it answers which phases or units can run in parallel (colliding pairs and shared paths, layers, critical path, independent groups, dependency cycles, and a verdict accept / accept-with-advice / reject; exits non-zero on reject). Read-only. Planning skills and the plan contract now tell the planner to run it before fixing the phase table.
+- Work footprint checks (`fgos conflicts`, `fgos schedule`, the decompose gate) now see one footprint containing another and globs against literals or other globs; on the repo's own plan footprints the conflicting pairs went from 1194 to 1660 (none lost).
+- The decompose gate stays advisory (it parks `need-human` and never writes children) and now also parks children whose footprints contain one another.
+- `fgos merge` no longer auto-merges items whose footprints contain one another or whose glob meets a literal or another glob; it never merges more than before.
+- The fan-out verifier (`scripts/verify-fanout-overlap.mjs`) can now report `FAIL` for a history whose only proof pair had footprints that contain one another, and names an error when a pair scan is truncated.
+- Supervisor admission follows the shared overlap rule, with these differences: two globs in one directory, `src/a*` against `src/ab/x` and `src/a*/x` against `src/b/x` now overlap; an empty footprint list is refused as `footprint-empty`; an entry that is empty, `.`, `..`, absolute, has a backslash or is like `ab**` is refused as `footprint-entry-invalid`; a running plan with an uncomparable footprint no longer holds other plans back; the phase table reader keeps every `*` and refuses a malformed table by name. Admission is not wired to a running door yet (only `supervisor::plans` and `wake` read it).
+- The plan-check script keeps globs in phase tables, reads a table strictly, and its same-wave footprint check skips done and withdrawn phases and plans.
+- Known limit: a very dense units file (about 400 units on one shared path, tens of thousands of edges) is refused by name (`graph-refused: limit-exceeded: maxInputBytes`, exit 4) and never accepted.
+
 - New verb `fgos questions [list]|show|ask|answer|ack|cancel` over the owner-question store (Linux): one door for every question that waits for the owner, each in the five-part decision form. `fgos questions --open` is removed; the bare verb that `head-start` already printed now works. `fgos identity mint question` mints question ids.
 - Head socket verbs `questions ask|ack|cancel` for every head and `questions answer` for the secretary only.
 - A receipt hook (Claude `UserPromptSubmit`/`Stop`, Codex `Stop`) tells a session its question was answered.

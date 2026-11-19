@@ -17,6 +17,8 @@ decision_boundary:
     - Any change outside the plan's footprint or its plan directory
     - A failing result the plan does not cover
     - Starting or stopping a session (never do this; ask the supervisor)
+skills:
+  - fgos-lead
 rigor: standard
 tool-scope:
   - Read

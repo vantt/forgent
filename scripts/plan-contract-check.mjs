@@ -12,8 +12,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { readFrontmatter } from '../src/util/yaml.mjs';
+import { nativeDoor } from '../src/native/door.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
 import { PLAN_SECTIONS, hasSection } from '../src/portfolio/plan-sections.mjs';
+
+// The YAML door and the write-scope package both answer through the native addon; a checkout stages its own.
+ensureAddonForScript();
 
 export const CONTRACT_MARKER = 'plan-v1';
 // The plan vocabulary has one source, shared with the Rust portfolio reader and the head-name resolver.
@@ -28,48 +33,87 @@ const PRIORITIES = VOCABULARY.priorities;
 const TABLE_COLUMNS = VOCABULARY.tableColumns;
 
 const strings = (v) => Array.isArray(v) && v.every((s) => typeof s === 'string' && s.trim() !== '');
-const norm = (p) => p.replace(/\\/g, '/').replace(/\*.*$/, '').replace(/\/+$/, '');
 
-/** Whether two footprint lists share a path: equal, or one inside the other; a glob counts as its fixed prefix. */
-export function overlaps(a, b) {
-  return a.some((x) => b.some((y) => {
-    const nx = norm(x), ny = norm(y);
-    return nx === '' || ny === '' || nx === ny || nx.startsWith(`${ny}/`) || ny.startsWith(`${nx}/`);
-  }));
+/**
+ * The pairs among `items` ({id, footprint}) whose footprints may touch the same path, by the `write-scope`
+ * package's rule (a directory contains its files, a glob meets what it matches). An unreadable entry is left out of
+ * the comparison (readable entries of the same item still count); a truncated scan, or a claim the package dropped as too large or too long, throws, never a partial answer.
+ * @returns {Array<{ a: string, b: string, shared: string[] }>}
+ */
+function collisions(items) {
+  const found = nativeDoor().writeScope('collidingPairs', { items: items.map(({ id, footprint }) => ({ id, scopes: footprint })) });
+  if (found.truncated) throw new Error(`footprint overlap scan stopped at its ${found.truncated.reason} (${found.truncated.limit}): the overlaps are not complete`);
+  // An entry the package dropped (`scope-too-large`, `entry-too-long`, or any code this reader does not know) is a
+  // claim that was never compared, so the answer is not complete. Only an unreadable entry (`entry-invalid`, and the
+  // `scope-empty` of an item holding nothing else) is left out: `unreadableEntries` reports it by name.
+  const dropped = found.problems.find((problem) => !['entry-invalid', 'scope-empty'].includes(problem.code));
+  if (dropped) throw new Error(`footprint overlap scan dropped a claim (${dropped.code}${dropped.entry === undefined ? '' : `: ${dropped.entry.slice(0, 40)}`}): the overlaps are not complete`);
+  return found.pairs;
 }
 
-const cells = (line) => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map((c) => c.trim());
-const plain = (c) => c.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1').replace(/[`*]/g, '').trim();
-const idList = (c) => plain(c).split(/[,;]/).map((s) => s.trim()).filter((s) => s && !/^(-|none|—|n\/a)$/i.test(s));
-const pathList = (c) => c.split(/,|<br\s*\/?>/i).map((s) => plain(s)).filter(Boolean);
+/** The entries of `footprint` that are not a repo-relative path or glob. */
+const unreadableEntries = (footprint) => footprint.filter((entry) => {
+  try { nativeDoor().writeScope('canonicalize', { raw: entry }); return false; } catch { return true; }
+});
 
-/** The first markdown table of `body` whose header names a footprint column, as `{ header, rows }`, else null. */
+const cells = (line) => line.trim().replace(/^\|/, '').replace(/\|$/, '').split(/(?<!\\)\|/).map((c) => c.trim());
+const links = (c) => c.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1');
+const plain = (c) => links(c).replace(/[`*]/g, '').trim();
+const idList = (c) => plain(c).split(/[,;]/).map((s) => s.trim()).filter((s) => s && !/^(-|none|—|n\/a)$/i.test(s));
+// One footprint entry: only backticks around the whole entry, or a link whose text is the whole entry, are unwrapped.
+// Every other character stays (a `*` is a glob), and nothing inside a code span is touched.
+function unwrapEntry(entry) {
+  let s = entry.trim();
+  for (;;) {
+    const code = /^`([^`]*)`$/.exec(s);
+    if (code) return code[1].trim();
+    const link = /^\[([^\[\]]*)\]\(([^)]*)\)$/.exec(s);
+    if (!link) return s;
+    s = link[1].trim();
+  }
+}
+const pathList = (c) => c.split(/,|<br\s*\/?>/i).map(unwrapEntry).filter(Boolean);
+
+/**
+ * The phase table of `body`: the one markdown table whose header names a footprint column, as `{ header, rows }`.
+ * `null` when no table has one; `{ ambiguous: n }` when several do. Mirrors the supervisor's reader
+ * (packages/supervision/rust/src/portfolio.rs, `read_phase_table`).
+ */
 export function findPhaseTable(body) {
   const lines = body.split(/\r?\n/);
+  const found = [];
   for (let i = 0; i < lines.length; i++) {
     if (!lines[i].trimStart().startsWith('|')) continue;
     let j = i;
     while (j < lines.length && lines[j].trimStart().startsWith('|')) j++;
     const block = lines.slice(i, j);
     const header = cells(block[0]).map((h) => h.toLowerCase().replace(/[^a-z]/g, ''));
-    if (header.includes('footprint')) {
-      const rows = block.slice(2).map((l) => cells(l));
-      return { header, rows };
-    }
+    if (header.includes('footprint')) found.push({ header, rows: block.slice(2).map((l) => cells(l)) });
     i = j;
   }
-  return null;
+  if (found.length > 1) return { ambiguous: found.length };
+  return found[0] ?? null;
 }
 
-function checkPhaseTable(body, errors) {
+const WAVE = /^\+?[0-9]+$/;
+const HISTORICAL = new Set(['done', 'withdrawn']);
+
+/**
+ * Checks the phase table, as the supervisor's reader refuses it: a table that exists is read strictly whatever the
+ * plan's status (a column missing, no rows, several tables with a footprint column, a wave that is not an integer
+ * from 1, a duplicate id); a missing table is an error only for a plan that is `ready` or `running`.
+ */
+function checkPhaseTable(body, errors, status) {
   const table = findPhaseTable(body);
-  if (!table) { errors.push('no phase table with a footprint column'); return; }
+  const strict = status === 'ready' || status === 'running';
+  if (!table) { if (strict) errors.push('no phase table with a footprint column'); return; }
+  if (table.ambiguous) { errors.push(`${table.ambiguous} tables have a footprint column: a plan has one phase table`); return; }
   const missing = TABLE_COLUMNS.filter((c) => !table.header.includes(c));
   if (missing.length) { errors.push(`phase table lacks columns: ${missing.join(', ')}`); return; }
   const at = (name) => table.header.indexOf(name);
   const phases = table.rows.map((r) => ({
     id: plain(r[at('id')] ?? ''), deps: idList(r[at('dependson')] ?? ''), footprint: pathList(r[at('footprint')] ?? ''),
-    wave: Number(plain(r[at('wave')] ?? '')), status: plain(r[at('status')] ?? '').toLowerCase(),
+    wave: plain(r[at('wave')] ?? ''), status: plain(r[at('status')] ?? '').toLowerCase(),
   }));
   if (!phases.length) { errors.push('phase table has no rows'); return; }
   const byId = new Map();
@@ -77,20 +121,31 @@ function checkPhaseTable(body, errors) {
     if (!p.id) errors.push('phase row without an id');
     else if (byId.has(p.id)) errors.push(`phase id ${p.id} appears twice`);
     else byId.set(p.id, p);
-    if (!Number.isInteger(p.wave) || p.wave < 1) errors.push(`phase ${p.id}: wave must be an integer from 1`);
+    const wave = WAVE.test(p.wave) ? Number(p.wave) : NaN;
+    p.wave = Number.isSafeInteger(wave) && wave >= 1 && wave <= 0xffffffff ? wave : NaN;
+    if (Number.isNaN(p.wave)) errors.push(`phase ${p.id}: wave must be an integer from 1`);
     if (!p.footprint.length) errors.push(`phase ${p.id}: footprint is empty`);
     if (!STATUSES.includes(p.status)) errors.push(`phase ${p.id}: status "${p.status}" is not one of ${STATUSES.join(', ')}`);
+    if (status === 'ready') {
+      for (const entry of unreadableEntries(p.footprint)) errors.push(`phase ${p.id}: footprint entry ${JSON.stringify(entry)} is not a repo-relative path or glob`);
+    }
   }
   for (const p of phases) for (const d of p.deps) {
     const dep = byId.get(d);
     if (!dep) errors.push(`phase ${p.id}: depends on unknown phase ${d}`);
     else if (dep.wave >= p.wave) errors.push(`phase ${p.id} (wave ${p.wave}) depends on ${d} (wave ${dep.wave}): a phase runs in a later wave than its dependencies`);
   }
-  for (let i = 0; i < phases.length; i++) for (let j = i + 1; j < phases.length; j++) {
-    const a = phases[i], b = phases[j];
-    if (a.wave === b.wave && overlaps(a.footprint, b.footprint)) {
-      errors.push(`phases ${a.id} and ${b.id} share wave ${a.wave} but their footprints overlap`);
-    }
+  // Same-wave overlap is a rule about phases that can still run together: a finished or withdrawn phase, and
+  // every phase of a finished or withdrawn plan, is history that no lane can change.
+  if (HISTORICAL.has(status)) return;
+  const live = phases.filter((p) => !HISTORICAL.has(p.status));
+  const waves = new Set(live.map((p) => p.wave).filter(Number.isInteger));
+  for (const wave of waves) {
+    const same = live.filter((p) => p.wave === wave && p.footprint.length);
+    // Ids may repeat in a malformed table (already an error); the scan keys on position.
+    let pairs;
+    try { pairs = collisions(same.map((p, n) => ({ id: String(n), footprint: p.footprint }))); } catch (e) { errors.push(e.message); continue; }
+    for (const { a, b } of pairs) errors.push(`phases ${same[Number(a)].id} and ${same[Number(b)].id} share wave ${wave} but their footprints overlap`);
   }
 }
 
@@ -130,8 +185,11 @@ export function checkPlanDir(dir, { plansRoot = path.dirname(path.resolve(dir)) 
     if (!Array.isArray(meta.footprint) || meta.footprint.length === 0) errors.push(`footprint is required when status is ${meta.status}`);
     if (meta.base === undefined) errors.push(`base is required when status is ${meta.status}`);
   }
+  if (meta.status === 'ready' && strings(meta.footprint ?? [])) {
+    for (const entry of unreadableEntries(meta.footprint ?? [])) errors.push(`footprint entry ${JSON.stringify(entry)} is not a repo-relative path or glob`);
+  }
   for (const [name] of PLAN_SECTIONS) if (!hasSection(body, name)) errors.push(`missing section: ${name}`);
-  checkPhaseTable(body, errors);
+  checkPhaseTable(body, errors, meta.status);
   return { dir, legacy: false, meta, errors };
 }
 
@@ -145,14 +203,11 @@ export function checkAll(root) {
   return { results, overlaps: activeOverlaps(results) };
 }
 
-/** Pairs of ready or running contract plans whose footprints overlap. */
+/** Pairs of ready or running contract plans whose footprints overlap (a truncated scan throws). */
 export function activeOverlaps(results) {
   const active = results.filter((r) => !r.legacy && ['ready', 'running'].includes(r.meta.status) && strings(r.meta.footprint ?? []) && r.meta.footprint?.length);
-  const out = [];
-  for (let i = 0; i < active.length; i++) for (let j = i + 1; j < active.length; j++) {
-    if (overlaps(active[i].meta.footprint, active[j].meta.footprint)) out.push([path.basename(active[i].dir), path.basename(active[j].dir)]);
-  }
-  return out;
+  return collisions(active.map((r, n) => ({ id: String(n), footprint: r.meta.footprint })))
+    .map(({ a, b }) => [path.basename(active[Number(a)].dir), path.basename(active[Number(b)].dir)]);
 }
 
 function parseArgs(argv) {

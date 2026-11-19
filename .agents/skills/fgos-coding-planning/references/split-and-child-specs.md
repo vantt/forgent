@@ -8,7 +8,8 @@ independently workable ones first. When more than one candidate piece
 could go first, run `fgos graph --what-if <id> --json` per candidate and
 compare the resulting `topUnblock`/`criticalPath` fields to see which
 pick actually unblocks the most follow-on work, instead of guessing from
-judgment alone. If the shape calls for a split, **write each piece's spec
+judgment alone. For whether the pieces' footprints let them run in parallel,
+use `fgos resource-check --units <file.json>` (the planner door, not `fgos graph`). If the shape calls for a split, **write each piece's spec
 into `plan.md` and create nothing** — no work item exists until
 `fgos-coding-validating` materializes them at the single gate. This step
 used to call `fgos add --parent` here; it no longer does, and adding one

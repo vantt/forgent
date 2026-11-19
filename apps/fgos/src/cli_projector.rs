@@ -157,6 +157,10 @@ pub fn project_cli_invocation(
                 args,
             )),
         ),
+        crate::wiring::resource_check::OPERATION_ID => (
+            ContractRef::from_static("resource-check.run.request", "1.0.0"),
+            Box::new(crate::wiring::resource_check::project_resource_check_request(args)),
+        ),
         crate::wiring::worktree::CREATE_OPERATION_ID
         | crate::wiring::worktree::REMOVE_OPERATION_ID
         | crate::wiring::worktree::RESYNC_OPERATION_ID => (

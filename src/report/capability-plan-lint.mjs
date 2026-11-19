@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { parseYaml } from '../util/yaml.mjs';
+import { nativeDoor } from '../native/door.mjs';
 import { validateUnit } from '../runner/execution/unit.mjs';
 import { unservedToolAbilityOf } from '../runner/dispatch/tool-providers.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
@@ -87,49 +88,12 @@ export function resolvePhaseFile(dirPath, phase) {
   return path.join(dirPath, matching[0]);
 }
 
-export function globToRegex(glob) {
-  const escaped = glob
-    .replace(/[.+^${}()|[\]\\]/g, '\\$&')
-    .replace(/\*\*/g, '§DOUBLE§')
-    .replace(/\*/g, '[^/]*')
-    .replace(/§DOUBLE§/g, '.*');
-  return new RegExp(`^${escaped}$`);
-}
-
-export function pathsOverlap(a, b) {
-  if (a === b) return true;
-  const normA = a.replace(/\/+$/, '');
-  const normB = b.replace(/\/+$/, '');
-  if (normA === normB) return true;
-  if (normB.startsWith(normA + '/') || normA.startsWith(normB + '/')) return true;
-
-  const hasGlobA = a.includes('*');
-  const hasGlobB = b.includes('*');
-
-  if (hasGlobA || hasGlobB) {
-    if (globToRegex(a).test(b) || globToRegex(b).test(a)) return true;
-
-    const hasDoubleA = a.includes('**');
-    const hasDoubleB = b.includes('**');
-    const prefixA = hasDoubleA ? a.split('**')[0].replace(/\/+$/, '') : null;
-    const prefixB = hasDoubleB ? b.split('**')[0].replace(/\/+$/, '') : null;
-
-    if (hasDoubleA && hasDoubleB) {
-      if (!prefixA || !prefixB || prefixA === prefixB || prefixA.startsWith(prefixB + '/') || prefixB.startsWith(prefixA + '/')) {
-        return true;
-      }
-    } else if (hasDoubleA) {
-      if (!prefixA || normB === prefixA || normB.startsWith(prefixA + '/')) {
-        return true;
-      }
-    } else if (hasDoubleB) {
-      if (!prefixB || normA === prefixB || normA.startsWith(prefixB + '/')) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
+/**
+ * Whether two write entries may touch the same path: the `write-scope` package's rule (a directory contains its
+ * files, a glob meets what it matches), asked through the native door. An entry the package cannot read throws; unit
+ * writes are canonical by the time they get here (validateUnit).
+ */
+const writesOverlap = (a, b) => nativeDoor().writeScope('overlaps', { a: [a], b: [b] });
 
 function extractUnitBlocks(content) {
   const lines = String(content ?? '').split(/\r?\n/);
@@ -444,7 +408,7 @@ export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
         let collisionFound = false;
         for (const wA of uA.writes ?? []) {
           for (const wB of uB.writes ?? []) {
-            if (pathsOverlap(wA, wB)) {
+            if (writesOverlap(wA, wB)) {
               pushFinding({
                 line: uB.line,
                 unit: uB.id,

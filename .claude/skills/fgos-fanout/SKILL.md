@@ -5,7 +5,7 @@ description: >-
   Run N already-decomposed children of one item concurrently instead of one
   at a time. Given a parent id and a candidate set (children of that
   parent, or a milestone's targets), waves the candidates through
-  computeSchedule, asks the engine for worker-slot room, then fires a
+  computeSchedule, reads the lane pool for its report, then fires a
   batch of up to 5 Agents each running /fgOS:pick end to end, reads live
   state back (never an Agent's own narration), self-recovers from recoverable
   worktree-isolation races, and auto-approves each leaf that reaches

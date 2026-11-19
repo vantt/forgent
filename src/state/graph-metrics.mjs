@@ -9,13 +9,16 @@
 // picker (P7) or planner (P8) later reads. It is a Domain functional core —
 // it imports only same-layer Domain helpers (dep-graph, frontier), never an
 // Infra/Entry module, and it takes an already-folded `view` (it never folds
-// the log itself; the store facade hands it the view).
+// the log itself; the store facade hands it the view). The footprint-overlap rule
+// and the graph facts (layers/waves, cycles, components, critical path) are the
+// `write-scope` and `graph` packages' answers, asked through graph-adapter.mjs
+// (native addon): this module keeps the Work-status metrics and the export names.
 
 import { buildUnifiedEdges } from './dep-graph.mjs';
 import { FRONTIER_ORDER_VERSION, frontier, isResolvedStatus } from './frontier.mjs';
 import { viewRevision } from './replay.mjs';
 import { effectiveStep, getDomain } from './domain-registry.mjs';
-import { normalizePath } from '../util/normalize-path.mjs';
+import { collidingFootprints, packWaves, workComponents, workCriticalPath, workCycles } from './graph-adapter.mjs';
 
 /**
  * Connected components of the UNDIRECTED unified graph (blocks + parent-child
@@ -37,45 +40,7 @@ import { normalizePath } from '../util/normalize-path.mjs';
  * @returns {{ componentCount: number, components: Array<{ size: number, items: string[] }> }}
  */
 export function connectedComponents(view) {
-  const work = view?.work ?? {};
-  const ids = Object.keys(work); // declaration (insertion) order — the FIFO basis
-  const orderIndex = new Map(ids.map((id, i) => [id, i]));
-  const known = new Set(ids);
-
-  const adjacency = new Map(ids.map((id) => [id, new Set()]));
-  for (const { from, to } of buildUnifiedEdges(work)) {
-    if (!known.has(from) || !known.has(to)) continue; // dangling endpoint — never a phantom node
-    adjacency.get(from).add(to);
-    adjacency.get(to).add(from);
-  }
-
-  const seen = new Set();
-  const components = [];
-  // Iterating `ids` in declaration order means each component is discovered
-  // from its lowest-declaration-index member, so the components array is
-  // itself in a stable declaration order — no post-sort of components needed.
-  for (const id of ids) {
-    if (seen.has(id)) continue;
-    const members = [];
-    const queue = [id];
-    seen.add(id);
-    while (queue.length > 0) {
-      const current = queue.shift();
-      members.push(current);
-      for (const neighbour of adjacency.get(current)) {
-        if (!seen.has(neighbour)) {
-          seen.add(neighbour);
-          queue.push(neighbour);
-        }
-      }
-    }
-    // BFS visitation order depends on Set insertion order; re-sort members by
-    // declaration index so the emitted shape is fully deterministic.
-    members.sort((a, b) => orderIndex.get(a) - orderIndex.get(b));
-    components.push({ size: members.length, items: members });
-  }
-
-  return { componentCount: components.length, components };
+  return workComponents(view?.work ?? {});
 }
 
 // Build an id -> [things it waits on] map over the UNIFIED typed-edge graph
@@ -126,55 +91,6 @@ function transitiveDownstream(id, rev, notDone) {
   return out;
 }
 
-// Shared longest-`deps`-chain search underlying both criticalPath (over the
-// whole graph) and goalScopedCriticalPath (over a D5 scope). `candidateIds`
-// is the declaration-order list of ids eligible to be the deepest item; the
-// depthOf recursion itself is never separately scoped — every dep of a
-// scoped candidate is already inside the scope by construction (D5's own
-// deps-ancestor closure), so recursion naturally never leaves it. The graph
-// is acyclic (guaranteed at the write door by S1/S2a), so the memoized
-// recursion always terminates; a `guard` set is a pure defensive backstop,
-// never a cycle report.
-function longestChain(deps, candidateIds) {
-  const depthMemo = new Map();
-  const deepestDep = new Map();
-
-  const depthOf = (id, guard = new Set()) => {
-    if (depthMemo.has(id)) return depthMemo.get(id);
-    if (guard.has(id)) return 0; // defensive only — the deps graph is acyclic
-    guard.add(id);
-    let best = 0;
-    let chosen = null;
-    for (const dep of deps.get(id) ?? []) {
-      const d = depthOf(dep, guard);
-      if (d > best) {
-        best = d;
-        chosen = dep; // first strict max wins -> declaration-order tie-break
-      }
-    }
-    guard.delete(id);
-    depthMemo.set(id, best + 1);
-    deepestDep.set(id, chosen);
-    return best + 1;
-  };
-
-  let top = null;
-  let topDepth = 0;
-  for (const id of candidateIds) {
-    const d = depthOf(id);
-    if (d > topDepth) {
-      topDepth = d;
-      top = id;
-    }
-  }
-
-  const path = [];
-  for (let cursor = top; cursor != null; cursor = deepestDep.get(cursor)) {
-    path.push(cursor);
-  }
-  return { depth: topDepth, path };
-}
-
 /**
  * The CRITICAL PATH through the UNIFIED (`deps` + `parent`) DAG — the longest
  * chain of things one item waits on, whose length is the minimum number of
@@ -190,9 +106,7 @@ function longestChain(deps, candidateIds) {
  * empty view yields `{ depth: 0, path: [] }`.
  */
 export function criticalPath(view) {
-  const work = view?.work ?? {};
-  const deps = knownUnifiedDeps(work);
-  return longestChain(deps, Object.keys(work));
+  return workCriticalPath(view?.work ?? {});
 }
 
 // Ids reachable from `startId` via the transitive closure of `targets` (D5's
@@ -277,8 +191,9 @@ export function goalScopedCriticalPath(view, focusId) {
   const work = view?.work ?? {};
   const scope = goalScopedSet(view, focusId);
   if (scope.size === 0) return { depth: 0, path: [] };
-  const deps = knownUnifiedDeps(work);
-  return longestChain(deps, Object.keys(work).filter((id) => scope.has(id)));
+  // The scope is closed under what its members wait for (goalScopedSet), so the sub-graph's critical path is the
+  // scoped candidates' longest chain.
+  return workCriticalPath(work, scope);
 }
 
 /**
@@ -590,36 +505,17 @@ const FOOTPRINT_CONFLICT_SUGGESTIONS = Object.freeze(['sequence', 'hoist', 're-s
  * below supplies the frontier for the parallel-dispatch case; merge-
  * readiness ranking (`src/state/graph-harness.mjs`) supplies the
  * proposed-and-dep-clear set for the merge-ordering case. Every pair whose
- * declared `footprint`s share at least one path is flagged with the shared
- * paths and the resolution OPTIONS (sequence / hoist / re-slice) — the
+ * declared `footprint`s may touch the same path (the `write-scope` package's
+ * rule: a directory contains its files, a glob meets what it matches) is
+ * flagged with the shared paths and the resolution OPTIONS (sequence / hoist / re-slice) — the
  * detector suggests, it never re-slices. Deterministic: pairs follow the
  * candidate list's own order (i < j), shared paths keep the first item's
- * order. An item with no footprint never conflicts.
+ * order. An item with no footprint never conflicts; an item with an entry that
+ * cannot be read conflicts with every other candidate. A truncated scan throws
+ * (graph-adapter.mjs).
  */
 export function footprintOverlapAmong(candidates) {
-  const conflicts = [];
-  for (let i = 0; i < candidates.length; i += 1) {
-    const footprintA = Array.isArray(candidates[i].footprint) ? candidates[i].footprint : [];
-    if (footprintA.length === 0) continue;
-    for (let j = i + 1; j < candidates.length; j += 1) {
-      // tsk-2jn: normalized through normalizePath (util/normalize-path.mjs) for the
-      // MEMBERSHIP check only -- the same choke-point buildOwnFileSet
-      // (merge.mjs) and frozenJudgeHits (frozen-judge.mjs) already normalize
-      // through, so a stray "./" or a "\" from a different session/OS never
-      // dodges detection. `shared` still reports footprint A's own
-      // as-declared spelling (never the normalized form) -- this is a
-      // detector, not a rewriter, and the raw string is what a person
-      // resolving the conflict actually typed into `footprint`.
-      const footprintB = new Set(
-        (Array.isArray(candidates[j].footprint) ? candidates[j].footprint : []).map(normalizePath),
-      );
-      const shared = footprintA.filter((path) => footprintB.has(normalizePath(path)));
-      if (shared.length > 0) {
-        conflicts.push({ a: candidates[i].id, b: candidates[j].id, shared, suggestions: [...FOOTPRINT_CONFLICT_SUGGESTIONS] });
-      }
-    }
-  }
-  return conflicts;
+  return collidingFootprints(candidates).map((pair) => ({ ...pair, suggestions: [...FOOTPRINT_CONFLICT_SUGGESTIONS] }));
 }
 
 /**
@@ -641,67 +537,23 @@ export function footprintOverlap(view) {
  * version blind to a real deadlock: a parent anchored by an open child
  * whose own `deps`/`mergeAfter` points back at the parent — a permanent
  * stall `findUnifiedCycle` in dep-graph.mjs already catches, this
- * function did not): Tarjan's strongly-connected-components algorithm
- * over `knownUnifiedDeps`'s adjacency (`deps` + `parent` + `mergeAfter`,
+ * function did not): the `graph` package's strongly connected components
+ * over the unified edges (`deps` + `parent` + `mergeAfter`,
  * the SAME unified graph `connectedComponents`/`criticalPath` above
  * already walk), regardless of `status` — a cycle is a graph-integrity
  * defect no matter which items in it happen to be done/blocked/todo right
  * now. A self-edge (an item depending on, parented by, or merge-ordered
  * after itself) is reported as its own one-element cycle. An edge with
- * either endpoint not a known work item is dropped by `knownUnifiedDeps`
+ * either endpoint not a known work item is dropped by the adapter
  * itself (dangling-reference detection is a different concern, not this
  * function's). Returns an array of cycles, each an array of the ids
- * forming that cycle — empty when the graph is acyclic. Unlike
+ * forming that cycle (ascending by byte order) — empty when the graph is acyclic. Unlike
  * `findUnifiedCycle` (which stops at the FIRST cycle found), this returns
  * EVERY cycle — `computedSchedule` (store.mjs) needs the full set, not
  * just proof that one exists. PURE: reads only `view.work`.
  */
 export function detectCycles(view) {
-  const work = view?.work ?? {};
-  const adjacency = knownUnifiedDeps(work);
-  let index = 0;
-  const stack = [];
-  const indices = new Map();
-  const lowlink = new Map();
-  const onStack = new Set();
-  const cycles = [];
-
-  function strongconnect(id) {
-    indices.set(id, index);
-    lowlink.set(id, index);
-    index += 1;
-    stack.push(id);
-    onStack.add(id);
-
-    for (const target of adjacency.get(id) ?? []) {
-      if (target === id) {
-        cycles.push([id]);
-        continue;
-      }
-      if (!indices.has(target)) {
-        strongconnect(target);
-        lowlink.set(id, Math.min(lowlink.get(id), lowlink.get(target)));
-      } else if (onStack.has(target)) {
-        lowlink.set(id, Math.min(lowlink.get(id), indices.get(target)));
-      }
-    }
-
-    if (lowlink.get(id) === indices.get(id)) {
-      const scc = [];
-      let w;
-      do {
-        w = stack.pop();
-        onStack.delete(w);
-        scc.push(w);
-      } while (w !== id);
-      if (scc.length > 1) cycles.push(scc);
-    }
-  }
-
-  for (const id of adjacency.keys()) {
-    if (!indices.has(id)) strongconnect(id);
-  }
-  return cycles;
+  return workCycles(view?.work ?? {});
 }
 
 /**
@@ -747,33 +599,5 @@ export function detectCycles(view) {
 export function computeSchedule(view, candidateIds) {
   const scope = candidateIds ? new Set(candidateIds) : null;
   const candidates = scope ? frontier(view).filter((item) => scope.has(item.id)) : frontier(view);
-  const conflicts = footprintOverlapAmong(candidates);
-  const conflictsOf = new Map();
-  for (const { a, b } of conflicts) {
-    if (!conflictsOf.has(a)) conflictsOf.set(a, new Set());
-    if (!conflictsOf.has(b)) conflictsOf.set(b, new Set());
-    conflictsOf.get(a).add(b);
-    conflictsOf.get(b).add(a);
-  }
-
-  const waves = [];
-  let remaining = candidates;
-  while (remaining.length > 0) {
-    const wave = [];
-    const waveIds = new Set();
-    const deferred = [];
-    for (const item of remaining) {
-      const itemConflicts = conflictsOf.get(item.id);
-      const conflictsWithWave = itemConflicts ? [...itemConflicts].some((id) => waveIds.has(id)) : false;
-      if (conflictsWithWave) {
-        deferred.push(item);
-      } else {
-        wave.push(item.id);
-        waveIds.add(item.id);
-      }
-    }
-    waves.push(wave);
-    remaining = deferred;
-  }
-  return { waves };
+  return { waves: packWaves(candidates, footprintOverlapAmong(candidates)) };
 }

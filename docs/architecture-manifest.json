@@ -265,6 +265,43 @@
       "reason": "one reader of a process start time per platform: the fgos-process drivers; every other crate asks them"
     },
     {
+      "job": "the footprint and write-scope overlap rule",
+      "kind": "door",
+      "patterns": [
+        "export function pathsOverlap\\b",
+        "\\bfootprintOverlapAmong\\b",
+        "\\bfn overlaps\\(",
+        "\\b(?:writeScopesOverlap|literalsOverlap|globsMeet)\\b",
+        "\\bfgos_write_scope::(?:scopes_)?overlaps\\b"
+      ],
+      "allowed": [
+        "packages/write-scope/src/lib.rs",
+        {
+          "path": "packages/git/rust/src/land.rs",
+          "reason": "asks the package which landed paths fall inside a footprint"
+        },
+        "src/state/graph-metrics.mjs",
+        "src/state/graph-harness.mjs",
+        "src/state/store.mjs",
+        "src/intake/plan.mjs",
+        {
+          "path": "scripts/verify-fanout-overlap.mjs",
+          "reason": "importer of the Work adapter surface: the verifier excludes children whose footprints conflict"
+        },
+        "src/workflow/case-admission.mjs",
+        "src/workflow/propose-classify.mjs",
+        "src/workflow/propose-validate.mjs"
+      ],
+      "debt": [
+        {
+          "path": "src/runner/dispatch/write-scope.mjs",
+          "reason": "the JS port of the write-scope rule that dispatch keeps for now (plan decision 6), pinned to the Rust rule by test/git/write-scope-parity.test.mjs; globsMeet and writeScopesOverlap are its overlap functions"
+        }
+      ],
+      "retiredBy": "dispatch moves onto the write-scope package",
+      "reason": "whether two footprints or write scopes may touch the same path is the write-scope package's rule (packages/write-scope); a second definition cannot disagree about a pair"
+    },
+    {
       "job": "read and clear a hot mutex record",
       "kind": "door",
       "patterns": ["export function (?:readHotRecord|reclaimDeadHolder|unlinkRecordIfUnchanged)\\b", "\\.reclaim\\.lock", "\\bhotRecord(?:Read|UnlinkIfUnchanged|Reclaim)\\b", "\\.hot\\b"],
@@ -1694,6 +1731,7 @@
     "src/state/dep-graph.mjs": "domain",
     "src/state/graph-harness.mjs": "domain",
     "src/state/graph-metrics.mjs": "domain",
+    "src/state/graph-adapter.mjs": "domain",
     "src/state/awaiting-context.mjs": "domain",
     "src/state/cleanup-harness.mjs": "infra",
     "src/state/cleanup-pool.mjs": "infra",

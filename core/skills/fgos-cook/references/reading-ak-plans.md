@@ -20,7 +20,9 @@ read-only check of capability annotations; it never gives you the slices.
    Put the resulting paths in the slice's `writes`; `fgos workflow propose` then adds
    the tests that exercise the code the slice changes and shows them as expansions.
    A test the worker had to edit outside its writes stays uncommitted in the case
-   worktree and no later dispatch can land it, so check that list.
+   worktree and no later dispatch can land it, so check that list. To see whether
+   phase footprints collide (globs and containment included), run
+   `fgos resource-check --plan <plan dir>`; it is the planner door, not `fgos graph`.
 5. **Verification in a plan is a list of commands.** For each slice pick one narrow
    pass/fail command as its `--verify`; keep the full suite for the end.
 6. **The plan states no rigor.** The slice table sets it from the write paths. Raise a

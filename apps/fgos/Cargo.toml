@@ -29,6 +29,10 @@ fgos-durable-file = { path = "../../packages/durable-file/rust" }
 fgos-questions = { path = "../../packages/questions/rust" }
 # The paths land a head's `session write` is published through.
 fgos-supervision = { path = "../../packages/supervision/rust" }
+# The planner door `fgos resource-check`: the path-collision rule, the graph facts and the judge over them.
+fgos-write-scope = { path = "../../packages/write-scope" }
+fgos-graph = { path = "../../packages/graph/rust" }
+fgos-resource-referee = { path = "../../packages/resource-referee/rust" }
 # The YAML door: the skill guard reads a skill file's frontmatter version through it.
 fgos-yaml-doc = { path = "../../packages/yaml-doc/rust" }
 tokio = { workspace = true }

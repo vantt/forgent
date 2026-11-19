@@ -5605,6 +5605,37 @@
       "deprecated": null
     },
     {
+      "name": "resource-check",
+      "invoke": "fgos resource-check (--plan <dir> | --units <file.json>) [--policy <file>] [--json]",
+      "description": "Planner door: can these phases or units run in parallel? Call it before fixing the phase table of a plan, and again when a footprint or a dependency changes. It reads the plan's phase table (--plan <dir>) or a units file (--units, shape in packages/resource-referee/contracts/resource-referee.v1.json) and answers with the colliding pairs and the paths they share, the layers (waves), the critical path, the independent groups, any dependency cycle with its path, and a verdict (accept, accept-with-advice, reject) with its findings. Exits non-zero on reject. Path collisions are lexical (case folding and symlinks are outside the rule) and readOnly is asserted by the caller, not verified; both caveats and the policy identity (path and sha256) travel with the verdict. The default policy is the floor plus declared layers valid; --policy <file> replaces the default, never the floor, and a missing or unreadable policy file is refused, never replaced by the default. Input files are read without following symlinks, capped at 4 MiB, and every value printed from them is escaped. Read-only: it writes nothing.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "description": "Plan directory: its plan.md phase table is read (every footprint glob kept); a trailing slash is ignored and a symlinked directory is refused."
+          },
+          "units": {
+            "type": "string",
+            "description": "Units file ({ \"v\": 1, \"units\": [{ id, claims, readOnly, dependsOn, layer }] }); a bare file name in the current directory works."
+          },
+          "policy": {
+            "type": "string",
+            "description": "Policy file ({ \"rules\": [...] }) replacing the shipped default; the floor still runs."
+          }
+        },
+        "required": []
+      },
+      "examples": [
+        "fgos resource-check --plan plans/261119-0528-resource-check-door-and-adapters --json",
+        "fgos resource-check --units units.json --policy policy.json"
+      ],
+      "touchesState": false,
+      "externalEffect": false,
+      "paginated": false,
+      "deprecated": null
+    },
+    {
       "name": "git",
       "invoke": "fgos git <status|recover>",
       "description": "Open Git incidents of this repository. `status` reads every one (journal, pending and retained operations, worktree findings, native locks, a merge in progress) and changes nothing; `recover` settles interrupted Land, ScopedCommit and remote-transfer operations under their own locks and never deletes worktrees, locks or refs (`fgos init` runs the same recovery).",

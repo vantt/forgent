@@ -1,7 +1,7 @@
 # Wave dispatch mechanics
 
 The exact step-by-step behind `fgos-fanout`'s Workflow section in
-SKILL.md, including the slot-poll loop, batch trimming, and the
+SKILL.md, including the lane-pool read, and the
 consolidated dispatch sequence. This runs once per iteration; each
 iteration starts back at Step 1, until `openCandidates` is empty.
 
@@ -56,13 +56,13 @@ Run the fanout entry (a `node` entry point, not an `fgos` verb):
 node src/runner/fanout-batch.mjs "<batch-comma-separated>" --has-live-task-access
 ```
 
-This single call checks worker-slot capacity, trims the batch if needed, re-confirms each candidate's mechanism, and runs each out-of-process candidate through `pick`, its worker run, and `return`. The output always carries the keys `fired`, `mechanismChanged`, `unavailable` and `deferred`, plus `slotsFull: true` when no slot was free.
+This single call re-confirms each candidate's mechanism and runs each out-of-process candidate through `pick`, its worker run, and `return`. The output always carries the keys `fired`, `mechanismChanged`, `unavailable` and `deferred`, and, for a seat past the lane pool, a `lane-pool-full` result after it waited `workerSlots.laneWaitSec`.
 
-- If `slotsFull: true`: the lane is full — wait ~60s and retry. After 10 consecutive refusals (~10 min), STOP and hand back to the caller.
+- `lane-pool-full`: that seat waited up to `workerSlots.laneWaitSec` for a free lane and got none. Report it for its own id and move on; after repeated refusals across waves, STOP and hand back to the caller.
 - `fired`: one entry per out-of-process candidate that was picked, run and returned (or blocked); read each item's real state in Step 5, never the entry alone.
 - `mechanismChanged`: candidates whose mechanism resolved to `in-process`. Add to `firing` for native Agent dispatch in Step 4.
 - `unavailable`: candidates with no registered executor. Report back as needing a person and add to `dispatchUnavailable`.
-- `deferred`: candidates deferred due to slot trimming. Retain in `ready` for the next batch.
+- `deferred`: candidates the call did not fire. Retain in `ready` for the next batch.
 
 ### Handling orphaned claims (background process failure)
 

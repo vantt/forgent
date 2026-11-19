@@ -136,6 +136,21 @@ then hand back to `fgos-coding-exploring` directly, in this same session,
 with `item.workflowStep` staying `planning` throughout (there is no `planning ->
 exploring` edge). Full mechanics: `references/verify-sync-and-gap.md`.
 
+## No claimed item: the plan path
+
+A planner started on `discussion-settled` has no claimed item and no `docs/history/<feature>/CONTEXT.md`. Skip the
+item steps (bootstrap, `Mode:` lane, split specs, verify sync) and:
+
+1. Read the settled discussion (`docs/discussions/<dir>/`) or the shaping report its marker names.
+2. Write `plans/<dir>/plan.md` and its phase files per `../../../core/skills/_shared/plan-contract.md`; take `<dir>`
+   from `fgos convention path --kind plan`.
+3. Run `node scripts/plan-contract-check.mjs --plan plans/<dir>` and fix every error.
+4. Land the plan directory with `fgos land --paths plans/<dir> --message "..."`, with `status: draft`, then set
+   `status: ready` last with a second `fgos land --paths` of `plan.md` alone. The `ready` flip is what wakes the
+   supervisor, so it comes after the files are on `main`.
+
+The item path above stays as is whenever an item is claimed.
+
 ## No gate here
 
 **This skill has no gate.** It ends at a written `plan.md` and hands
