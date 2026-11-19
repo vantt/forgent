@@ -313,13 +313,17 @@ pub struct LoadedRunner {
     pub origins: Vec<RunnerOrigin>,
 }
 
-/// The repository and config facts `decide` reads.
-pub trait Workspace {
+/// The checkout facts a directory has, answered by the host's Git door; the rules that read them never read Git.
+pub trait CheckoutFacts {
     /// The worktree root of `dir` (a linked worktree's own root); the refusal text when `dir` is not inside a
     /// repository with a commit.
     fn repo_root(&self, dir: &str) -> Result<String, String>;
     /// The main checkout of `dir`, never a linked worktree's own root; `None` outside a repository.
     fn main_checkout_root(&self, dir: &str) -> Option<String>;
+}
+
+/// The repository and config facts `decide` reads: the checkout facts, plus the process's own checkout and config.
+pub trait Workspace: CheckoutFacts {
     /// The main checkout of the process's own working directory.
     fn process_main_checkout_root(&self) -> Option<String>;
     /// Whether `root` has a project config file (a YAML file or a legacy JSON one).

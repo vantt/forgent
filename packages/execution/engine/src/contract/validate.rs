@@ -235,13 +235,8 @@ pub fn extract_protocol_operation_stamp(
     })
 }
 
-/// The checkout facts a directory has. Each is answered by the Git door of the host; this module never reads Git.
-pub trait CheckoutFacts {
-    /// The main checkout `cwd` is inside, never a linked worktree's own root; `None` outside a repository.
-    fn main_checkout_root(&self, cwd: &str) -> Option<String>;
-    /// The worktree root of `cwd`; the refusal text when `cwd` is not inside a repository with a commit.
-    fn repo_root(&self, cwd: &str) -> Result<String, String>;
-}
+/// The checkout facts a directory has: `fgos-execution`'s port, the one `decide` reads through its `Workspace`.
+pub use fgos_execution::decide::CheckoutFacts;
 
 /// Whether a directory is safe for a mutating dispatch.
 #[derive(Debug, Clone, PartialEq, Eq)]

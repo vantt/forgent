@@ -560,11 +560,7 @@ fn a_home_with_no_write_back_target_is_removed_after_the_credentials_port_says_n
 // ---- fingerprint ---------------------------------------------------------------------------------------------------
 
 fn sha256_hex(text: &str) -> String {
-    use sha2::{Digest, Sha256};
-    Sha256::digest(text.as_bytes())
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect()
+    fgos_execution::handoff::sha256_hex(text.as_bytes())
 }
 
 #[test]

@@ -13,7 +13,7 @@
 
 use std::cmp::Ordering;
 use std::fs;
-use std::path::{Component, Path, PathBuf};
+use std::path::{Path, PathBuf};
 
 use fgos_execution::handoff::sha256_hex;
 use fgos_execution::runner_config::fgos_dir_from_root;
@@ -21,7 +21,7 @@ use serde_json::{json, Map, Value};
 
 use super::validate::PROTOCOL_OPERATION_STAMP_PREFIX;
 use crate::assignment::js_space;
-use crate::confinement::driver::js::{at, display, truthy};
+use crate::confinement::driver::js::{at, display, relative, truthy};
 
 /// Directory of the shipped core templates, under the package root.
 pub const CORE_PROMPT_TEMPLATES_DIR: [&str; 2] = ["core", "prompt-templates"];
@@ -142,21 +142,6 @@ pub(super) fn is_sha256_digest(value: &str) -> bool {
 
 fn lexical(path: &Path) -> PathBuf {
     crate::confinement::driver::js::resolve_path(Path::new(""), path)
-}
-
-/// `path.relative(from, to)` for two absolute, normalised paths; empty when they are the same.
-fn relative(from: &Path, to: &Path) -> String {
-    let from: Vec<Component> = from.components().collect();
-    let to: Vec<Component> = to.components().collect();
-    let common = from.iter().zip(&to).take_while(|(a, b)| a == b).count();
-    let mut parts: Vec<String> = Vec::new();
-    for _ in common..from.len() {
-        parts.push("..".to_string());
-    }
-    for part in &to[common..] {
-        parts.push(part.as_os_str().to_string_lossy().into_owned());
-    }
-    parts.join(std::path::MAIN_SEPARATOR_STR)
 }
 
 fn real_or_resolved(path: &Path) -> PathBuf {

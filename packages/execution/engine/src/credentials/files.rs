@@ -229,11 +229,7 @@ pub fn sub_dirs(dir: &Path) -> Vec<String> {
 /// Four random bytes from the kernel generator as lowercase hex (the name suffix of a copy or staging). No
 /// fallback: when the system source fails the caller gets the error and moves or creates nothing.
 pub fn random_hex() -> io::Result<String> {
-    fgos_identity::text::random_bytes::<4>().map(|bytes| hex(&bytes))
-}
-
-pub fn hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|b| format!("{b:02x}")).collect()
+    fgos_identity::text::random_bytes::<4>().map(|bytes| fgos_execution::handoff::hex(&bytes))
 }
 
 // ----------------------------------------------------------------------------------------------- base64url
