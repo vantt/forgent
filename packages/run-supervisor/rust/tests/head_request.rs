@@ -586,6 +586,31 @@ fn a_refused_request_logs_its_detail_and_the_routes_message_on_one_line() {
 }
 
 #[test]
+fn a_successors_read_allowance_names_only_the_routes_read_verbs() {
+    let contract: Value =
+        serde_json::from_str(include_str!("../../contracts/head-request.v1.json")).unwrap();
+    let verbs = contract["verbs"].as_object().unwrap();
+    let reads: Vec<&str> = verbs
+        .iter()
+        .filter(|(_, v)| v["read"] == json!(true))
+        .map(|(k, _)| k.as_str())
+        .collect();
+    assert!(!reads.is_empty(), "the contract marks no read verb");
+    for verb in &reads {
+        assert!(
+            verb.starts_with("questions "),
+            "read verb {verb} is not a question store verb"
+        );
+    }
+    for verb in fgos_run_supervisor::head_request::SUCCESSOR_READ_VERBS {
+        assert!(
+            reads.contains(verb),
+            "SUCCESSOR_READ_VERBS names {verb}, which the contract does not mark as a read"
+        );
+    }
+}
+
+#[test]
 fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
     let contract: Value =
         serde_json::from_str(include_str!("../../contracts/head-request.v1.json")).unwrap();

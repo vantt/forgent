@@ -1,6 +1,6 @@
 {
   "contract": { "id": "run-supervisor-head-request", "version": 1 },
-  "description": "The request socket of one head session. A confined head cannot reach herdr, so it asks its own run supervisor, over one AF_UNIX socket the sandbox gets read-only, to perform a granted verb outside. The supervisor only transports and enforces: Identity decides who holds the role, `grantOf` (src/session-host/head-grants.mjs) is the only reader of the grant table and its answer reaches the supervisor in the digest-protected envelope (`session.verbs`, `session.writes`), and every verb but `session bind session` and `session write` is the Node payload behind `fgos internal head-request` (internal-route.run-supervisor.v1.json).",
+  "description": "The request socket of one head session. A confined head cannot reach herdr, so it asks its own run supervisor, over one AF_UNIX socket the sandbox gets read-only, to perform a granted verb outside. The supervisor only transports and enforces: Identity decides who holds the role, `grantOf` (src/session-host/head-grants.mjs) is the only reader of the grant table and its answer reaches the supervisor in the digest-protected envelope (`session.verbs`, `session.writes`), and a verb entry with `read: true` only reads (it changes no store and no file) and is the one list `SUCCESSOR_READ_VERBS` (head_request.rs) is checked against, and every verb but `session bind session` and `session write` is the Node payload behind `fgos internal head-request` (internal-route.run-supervisor.v1.json).",
   "framing": {
     "frame": "as gate-go.v1.json: 4-byte unsigned big-endian length N, then N bytes of UTF-8 JSON (one object)",
     "maxRequestBytes": 4194304,
@@ -44,6 +44,7 @@
       "rule": "same role step as session answered (this attempt's own session is registered and live, session-not-registered otherwise); a refused registration is role-take-failed with Identity's code in detail. The executor reaches this socket as the same user (peer uid)"
     },
     "questions list": {
+      "read": true,
       "args": { "which": "string, optional: open (default), answered or all" },
       "does": "a read, not a ticket verb: the route child runs the host verb `fgos questions [--answered|--all] --json` (envelope hostBin) and returns its JSON, because the confined caller cannot open the event store it is read from. Answers within the 60 s verb bound. Granted to every head with the other `questions *` verbs; the confined `fgos questions` prints this reply's data",
       "data": "the host verb's JSON data (the question rows)",

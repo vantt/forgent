@@ -73,6 +73,8 @@ pub const WRITE_VERB: &str = "session write";
 
 /// The role-gated verbs that only read, which a rotation successor may use before the role moves to it (its first turn
 /// reads the question store). Every verb outside this list keeps waiting for the role (`role-pending-rotation`).
+/// Mirrors the grant lists in `src/session-host/head-grants.mjs` (`QUESTION_VERBS`); each entry must be a verb the
+/// contract marks `"read": true`.
 /// `questions show` is not a socket verb (reads of one question go straight to the store), so only the list is here.
 pub const SUCCESSOR_READ_VERBS: &[&str] = &["questions list"];
 
