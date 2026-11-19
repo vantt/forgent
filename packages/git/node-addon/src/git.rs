@@ -7,7 +7,7 @@ mod scoped_commit;
 mod sync;
 mod write_scope;
 #[allow(unused_imports)] // N-API registration is used by Node, not Rust unit tests.
-pub use write_scope::write_scope;
+pub use write_scope::{write_scope, CONTRACT_VERSION as WRITE_SCOPE_CONTRACT_VERSION};
 mod handover;
 mod inspect;
 pub use handover::{close_git_loan, mint_git_loan, take_git_handover};

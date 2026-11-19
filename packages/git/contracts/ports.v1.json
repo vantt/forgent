@@ -114,6 +114,11 @@
     "prepareGitDriverDirectories",
     "writeScope"
   ],
+  "namespaces": {
+    "graph": [
+      "analyze"
+    ]
+  },
   "publicationExtensions": {
     "writeCommit": "explicit author and committer dates",
     "walkCommits": "caller stop set, ordered parents, tree, bounded opaque continuation",

@@ -29,10 +29,16 @@ function ownRelease(bin) {
   } catch { return null; }
 }
 /** Whether `versions()` of an addon names every namespace this payload calls, each at the version it needs: `config` 4 is
- * the first with `eventStore`, `eventStoreConfig` and `globalDir` (3 added `snapshot`, `init` and `standardValue`), so an addon from before them fails by name instead of at its first call; `holderLock` 2 and `sessionIdentity` 2 add `killWaitMs` and `sharedDirectory`, `holderLock` 3 the hot record read and clear; `agentProtocol` 1 is the first with `classifyDirect`; `yaml` 2 is the first with `emit`; `runResult` 2 is the first with `parseUsage`; `checkout` 1 is the first with the Work checkout lifecycle. */
-export const combinedAbiMatches = (v, napiVersion) => v.napi === napiVersion && typeof v.git === 'string' && typeof v.eventStore === 'string'
-  && typeof v.process === 'number' && typeof v.durableFile === 'string' && typeof v.canonicalJson === 'number' && v.holderLock >= 3
-  && v.sessionIdentity >= 2 && v.checkout >= 1 && v.yaml >= 2 && v.config >= 4 && v.runResult >= 2 && typeof v.agentProtocol === 'number';
+ * the first with `eventStore`, `eventStoreConfig` and `globalDir` (3 added `snapshot`, `init` and `standardValue`), so an addon from before them fails by name instead of at its first call; `holderLock` 2 and `sessionIdentity` 2 add `killWaitMs` and `sharedDirectory`, `holderLock` 3 the hot record read and clear; `agentProtocol` 1 is the first with `classifyDirect`; `yaml` 2 is the first with `emit`; `runResult` 2 is the first with `parseUsage`; `checkout` 1 is the first with the Work checkout lifecycle; `graph` 1 is the first with `graph.analyze`; `writeScope` 1 is the first with `overlaps` and `collidingPairs`. */
+const abiClauses = [
+  ['git', (x) => typeof x === 'string'], ['eventStore', (x) => typeof x === 'string'], ['process', (x) => typeof x === 'number'],
+  ['durableFile', (x) => typeof x === 'string'], ['canonicalJson', (x) => typeof x === 'number'], ['holderLock', (x) => x >= 3],
+  ['sessionIdentity', (x) => x >= 2], ['checkout', (x) => x >= 1], ['yaml', (x) => x >= 2], ['config', (x) => x >= 4],
+  ['runResult', (x) => x >= 2], ['agentProtocol', (x) => typeof x === 'number'], ['graph', (x) => x >= 1], ['writeScope', (x) => x >= 1],
+];
+/** The first field of `versions()` this payload cannot use (`napi` for a Node-API line other than `napiVersion`), or `null` when the addon matches. */
+export const abiShortfall = (v, napiVersion) => (v.napi === napiVersion ? abiClauses.find(([name, ok]) => !ok(v[name]))?.[0] ?? null : 'napi');
+export const combinedAbiMatches = (v, napiVersion) => abiShortfall(v, napiVersion) === null;
 /** Load the addon named by `descriptor`, else this payload's own release: FGOS_HOST_BIN, then the cwd's activation.
  * `hostBin: null` skips the host lookups. A second, different file in one process is refused by name. */
 export function loadNativeAddon({ hostBin, descriptor } = {}) {
@@ -63,7 +69,8 @@ export function loadNativeAddon({ hostBin, descriptor } = {}) {
       helperExes.set(addon, resolved);
     }
     const v = addon.versions(); // Enforce the process marker before exposing any crate.
-    if (!combinedAbiMatches(v, entry.napiVersion)) throw unavailable('combined addon ABI mismatch');
+    const short = abiShortfall(v, entry.napiVersion);
+    if (short !== null) throw unavailable(`combined addon ABI mismatch: ${short} is missing or too old`);
     loaded = { file, addon };
     return addon;
   } catch (err) {

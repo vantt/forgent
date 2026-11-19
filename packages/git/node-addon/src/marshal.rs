@@ -109,6 +109,15 @@ mod tests {
     }
 
     #[test]
+    fn graph_and_write_scope_name_their_own_panic_without_its_message() {
+        for id in ["graph-internal-error", "write-scope-internal-error"] {
+            let failure = guarded_as::<()>(id, || panic!("SECRET-VALUE")).unwrap_err();
+            assert_eq!(failure.id, id);
+            assert!(!format!("{failure:?}").contains("SECRET"));
+        }
+    }
+
+    #[test]
     fn a_failure_serialises_to_its_set_fields_only() {
         let text = serde_json::to_string(&Failure {
             id: "syntax-error".into(),

@@ -22,7 +22,7 @@ const options = { descriptor };
 const addon = loadNativeAddon(options);
 
 test('one combined load reports both crate versions and Node-API line', () => {
-  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, process: 1, durableFile: '0.2.0', canonicalJson: 1, holderLock: 3, sessionIdentity: 2, yaml: 2, config: 4, runResult: 2, agentProtocol: 1, checkout: 1, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
+  assert.deepEqual(addon.versions(), { addon: '0.2.0', git: '0.2.0', eventStore: '0.2.0', napi: 8, process: 1, durableFile: '0.2.0', canonicalJson: 1, holderLock: 3, sessionIdentity: 2, yaml: 2, config: 4, runResult: 2, agentProtocol: 1, checkout: 1, graph: 1, writeScope: 1, contracts: { gitPort: 1, receipt: 1, walRecord: 1, eventStore: 4 } });
   assert.equal(loadNativeAddon(options), addon);
 });
 test('ports.v1.json names only operations the loaded addon answers, and each port refuses an unlisted name by name', { skip: process.platform === 'win32' }, () => {
@@ -62,6 +62,8 @@ test('ports.v1.json names only operations the loaded addon answers, and each por
       assert.throws(() => port.call('noSuchOperation', args, []), unknownMethod, `${name} refuses an unlisted name`);
     }
     for (const name of contract.functions) assert.equal(typeof addon[name], 'function', name);
+    for (const [namespace, names] of Object.entries(contract.namespaces)) for (const name of names) assert.equal(typeof addon[namespace][name], 'function', `${namespace}.${name}`);
+    assert.equal(JSON.parse((() => { try { addon.graph.analyze('not json'); } catch (error) { return error.message; } })()).id, 'input-not-object', 'graph.analyze refuses a malformed input by code');
   } finally {
     publication?.close();
     fs.rmSync(temp, { recursive: true, force: true });

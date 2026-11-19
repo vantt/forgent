@@ -1,15 +1,26 @@
 //! Mechanical JSON binding of the foundation leaf; no second matcher.
+use crate::marshal::guarded_as;
 use crate::{check, error};
 use napi::Result;
 use napi_derive::napi;
 use serde_json::{json, Value};
+/// The contract version `versions()` reports for this namespace: 1 is the first with `overlaps` and `collidingPairs`.
+pub const CONTRACT_VERSION: u32 = 1;
+
 #[allow(dead_code)] // exported through N-API
 #[napi]
 pub fn write_scope(method: String, args: Value) -> Result<Value> {
     check()?;
+    // A panic is the named `write-scope-internal-error`; every ordinary refusal keeps its own message.
+    guarded_as("write-scope-internal-error", || {
+        Ok(dispatch(&method, &args))
+    })?
+}
+
+fn dispatch(method: &str, args: &Value) -> Result<Value> {
     let strings =
         |key: &str| serde_json::from_value::<Vec<String>>(args[key].clone()).map_err(error);
-    match method.as_str() {
+    match method {
         "canonicalize" => Ok(json!(fgos_write_scope::canonicalize(
             args["raw"]
                 .as_str()

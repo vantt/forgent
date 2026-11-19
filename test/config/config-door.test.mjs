@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { combinedAbiMatches, fromDoorJson, nativeDoor } from '../../src/native/door.mjs';
+import { abiShortfall, combinedAbiMatches, fromDoorJson, nativeDoor } from '../../src/native/door.mjs';
 import { initFixtureRepo } from '../helpers/git-fixture.mjs';
 
 // The door resolves the main checkout through a Git driver that keeps its directories under the state root.
@@ -39,6 +39,13 @@ test('the addon marker names the config namespace at the version this payload ca
   assert.equal(combinedAbiMatches({ ...v, runResult: 1 }, v.napi), false, 'an addon before parseUsage');
   assert.equal(combinedAbiMatches({ ...v, config: 3 }, v.napi), false, 'an addon before eventStore and globalDir');
   assert.equal(combinedAbiMatches({ ...v, config: undefined }, v.napi), false, 'an addon with no config namespace');
+  for (const field of ['graph', 'writeScope']) {
+    assert.equal(combinedAbiMatches({ ...v, [field]: undefined }, v.napi), false, `an addon with no ${field} field`);
+    assert.equal(abiShortfall({ ...v, [field]: undefined }, v.napi), field, `the refusal names ${field}`);
+    assert.equal(abiShortfall({ ...v, [field]: 0 }, v.napi), field, `an addon below ${field} 1 is refused by name`);
+  }
+  assert.equal(abiShortfall(v, v.napi), null);
+  assert.equal(abiShortfall({ ...v, config: 3, graph: undefined }, v.napi), 'config', 'the first low field is the one named');
 });
 
 test('accounts reads the pools beside a broken project and global file, as objects with no prototype', () => {
