@@ -8,6 +8,10 @@
 //!   catalog, the committed runner config, the attempt sweep).
 //! * [`records`]: the unit source and the records of a unit run directory (unit control, the admission ledger, the
 //!   adopt probe, the derived unit summary).
+//! * [`checks`]: the unit, its plan, its collaboration, its declared operation and an override's run timeout.
+//! * [`persona`]: the persona lookup across its layers and the pin a run keeps of it.
+//! * [`handoff`]: the inputs a unit's seats read and the digest of the report an attempt left.
+//! * [`verify`]: the verify command under the run's custody.
 //! * [`accounts`]: pinned accounts, account rotation, the lease receipt audit and the bind over the live lease
 //!   state.
 //! * [`settlement`]: what the post-receipt steps read through the host (the terminal pane, the renewed login's
@@ -21,9 +25,13 @@
 #![allow(clippy::result_large_err)]
 
 pub mod accounts;
+pub mod checks;
+pub mod handoff;
 pub mod machine;
+pub mod persona;
 pub mod records;
 pub mod settlement;
+pub mod verify;
 
 #[cfg(test)]
 mod tests;

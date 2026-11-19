@@ -7,7 +7,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 use serde_json::{json, Value};
 
-use super::{accounts, machine, records, settlement};
+use super::{accounts, checks, handoff, machine, persona, records, settlement, verify};
 use fgos_execution_engine::steps::{AttemptHomeFinalizer, HomeState, PaneScreen};
 
 static SERIAL: AtomicU64 = AtomicU64::new(0);
@@ -490,6 +490,312 @@ fn door_choices_refuse_what_the_calling_door_has_no_authority_for_before_a_run_e
                 .starts_with("cannot pin the account for seat"),
         "{pinned:?}"
     );
+}
+
+// ---- checks -----------------------------------------------------------------------------------------------
+
+fn plain_unit() -> Value {
+    json!({ "id": "u1", "objective": "look", "capability": "execute" })
+}
+
+#[test]
+fn a_unit_is_validated_and_a_unit_missing_its_capability_is_refused_by_name() {
+    let unit = checks::validate_unit(&plain_unit()).unwrap();
+    assert_eq!(unit["id"], "u1");
+    assert_eq!(unit["writes"], json!([]));
+    let refused = checks::validate_unit(&json!({ "id": "u1", "objective": "look" })).unwrap_err();
+    assert_eq!(refused.tag.as_str(), "RunnerConfigError");
+    assert!(
+        refused
+            .message
+            .starts_with("unit.capability must be a non-empty string"),
+        "{}",
+        refused.message
+    );
+    let timeout = checks::validate_unit(
+        &json!({ "id": "u1", "objective": "o", "capability": "c", "timeoutMs": 5 }),
+    )
+    .unwrap_err();
+    assert!(
+        timeout.message.contains("unit.timeoutMs must be at least"),
+        "{}",
+        timeout.message
+    );
+}
+
+#[test]
+fn an_override_run_timeout_is_held_to_the_floor_and_ceiling() {
+    assert!(checks::assert_run_timeout(&json!(600_000)).is_ok());
+    let low = checks::assert_run_timeout(&json!(5)).unwrap_err();
+    assert!(
+        low.message
+            .starts_with("override timeoutMs must be at least"),
+        "{}",
+        low.message
+    );
+    let float = checks::assert_run_timeout(&json!(1.5)).unwrap_err();
+    assert!(
+        float
+            .message
+            .contains("must be a whole number of milliseconds"),
+        "{}",
+        float.message
+    );
+}
+
+#[test]
+fn a_unit_files_plan_names_a_plan_directory_that_exists() {
+    let scratch = Scratch::new("plan");
+    std::fs::create_dir_all(scratch.0.join("plans/261119-0000-demo")).unwrap();
+    assert!(checks::existing_plan_ref(None, &scratch.0).is_ok());
+    assert!(checks::existing_plan_ref(
+        Some(&json!({ "dir": "plans/261119-0000-demo" })),
+        &scratch.0
+    )
+    .is_ok());
+    let name =
+        checks::existing_plan_ref(Some(&json!({ "dir": "plans/demo" })), &scratch.0).unwrap_err();
+    assert!(
+        name.message
+            .starts_with("plan \"plans/demo\" is not a plan directory name: invalid-plan-dir"),
+        "{}",
+        name.message
+    );
+    let missing = checks::existing_plan_ref(
+        Some(&json!({ "dir": "plans/261119-0001-gone" })),
+        &scratch.0,
+    )
+    .unwrap_err();
+    assert!(
+        missing
+            .message
+            .contains("is not an existing plan directory"),
+        "{}",
+        missing.message
+    );
+}
+
+#[test]
+fn the_collaboration_of_a_plain_unit_is_one_solo_producer_and_an_unknown_pattern_is_refused() {
+    let scratch = Scratch::new("collab");
+    let runner = stub_runner(&scratch.0);
+    let shipped = machine::shipped_catalog();
+    let ask = |selectors: Value| json!({ "unit": validate(&plain_unit()), "selectors": selectors, "inCase": false, "runnerConfig": runner, "origins": false });
+    let solo = checks::resolve_collaboration(&ask(json!({})), &shipped, None).unwrap();
+    assert_eq!(solo["pin"]["effective"]["loop"], "solo", "{solo}");
+    assert_eq!(solo["seats"][0]["seat"], "producer", "{solo}");
+    assert_eq!(solo["pin"]["pattern"]["layer"], "shipped", "{solo}");
+    let refused = checks::resolve_collaboration(
+        &ask(json!({ "callerString": "no-such-pattern" })),
+        &shipped,
+        None,
+    )
+    .unwrap_err();
+    assert_eq!(refused.phase.as_deref(), Some("pre-admission"));
+    assert!(refused.code.is_some(), "{refused:?}");
+}
+
+fn validate(raw: &Value) -> Value {
+    checks::validate_unit(raw).unwrap()
+}
+
+#[test]
+fn a_declared_operation_stamps_its_fields_and_an_undeclared_one_is_refused() {
+    let declared = json!({ "domain": "coding", "stage": "build", "operation": "op",
+        "operations": [{ "id": "op", "taskSpec": "build.md", "mutation": "read-only" }] });
+    let fields = checks::declared_operation_fields(&declared, None).unwrap();
+    assert_eq!(fields["operation"], "op");
+    assert_eq!(fields["dispatch"], "assignment");
+    assert!(fields["mutation"].is_string(), "{fields}");
+    let mut other = declared.clone();
+    other["operation"] = json!("missing");
+    let refused = checks::declared_operation_fields(&other, None).unwrap_err();
+    assert!(
+        refused.message.starts_with("unknown operation \"missing\""),
+        "{}",
+        refused.message
+    );
+    let scratch = Scratch::new("taskspec");
+    let absent = checks::declared_operation_fields(&declared, Some(&scratch.0)).unwrap_err();
+    assert!(
+        absent.message.contains("taskSpec file does not exist"),
+        "{}",
+        absent.message
+    );
+}
+
+// ---- persona ----------------------------------------------------------------------------------------------
+
+#[test]
+fn a_persona_is_pinned_from_the_first_layer_that_defines_it() {
+    let scratch = Scratch::new("persona");
+    let (project, install) = (scratch.0.join("project"), scratch.0.join("install"));
+    std::fs::create_dir_all(project.join("fgos/agents")).unwrap();
+    std::fs::create_dir_all(install.join("core/agents")).unwrap();
+    let text = "name: helper\ndescription: helps\n";
+    std::fs::write(project.join("fgos/agents/helper.yaml"), text).unwrap();
+    std::fs::write(
+        install.join("core/agents/helper.yaml"),
+        "name: helper\ndescription: core\n",
+    )
+    .unwrap();
+    std::fs::write(
+        install.join("core/agents/shipped.yaml"),
+        "name: shipped\ndescription: s\n",
+    )
+    .unwrap();
+    let pin = persona::persona_pin("helper", &project, &install, None)
+        .unwrap()
+        .unwrap();
+    assert_eq!(pin["identity"], "workspace:fgos/agents/helper");
+    assert_eq!(pin["text"], text);
+    assert_eq!(
+        pin["digest"],
+        fgos_execution::handoff::sha256_hex(text.as_bytes())
+    );
+    let core = persona::persona_pin("shipped", &project, &install, None)
+        .unwrap()
+        .unwrap();
+    assert_eq!(core["identity"], "core:core/agents/shipped");
+    assert!(persona::persona_pin("nobody", &project, &install, None)
+        .unwrap()
+        .is_none());
+    std::fs::write(project.join("fgos/agents/vague.yaml"), "name: vague\n").unwrap();
+    let vague = persona::persona_pin("vague", &project, &install, None).unwrap_err();
+    assert!(
+        vague
+            .message
+            .ends_with("must declare a non-empty description"),
+        "{}",
+        vague.message
+    );
+    let unknown = persona::check_agent_definition("nobody", &project, &install).unwrap_err();
+    assert!(
+        unknown.starts_with("persona \"nobody\" not found; searched fgos/agents ("),
+        "{unknown}"
+    );
+    assert!(persona::check_agent_definition("helper", &project, &install).is_ok());
+    let bad = persona::persona_pin("Bad Name", &project, &install, None).unwrap_err();
+    assert!(
+        bad.message
+            .starts_with("persona name \"Bad Name\" must match"),
+        "{}",
+        bad.message
+    );
+}
+
+// ---- hand-offs ----------------------------------------------------------------------------------------------
+
+/// A main checkout whose unit run `unit-run-1` settled one producer round that left `notes/report.md`.
+fn settled_run(scratch: &Scratch) -> PathBuf {
+    let main = scratch.0.join("main");
+    let run = main.join(".fgos/assignments/unit-run-1/producer/1/runs/01");
+    std::fs::create_dir_all(&run).unwrap();
+    std::fs::create_dir_all(main.join("notes")).unwrap();
+    std::fs::write(main.join("notes/report.md"), "found it\n").unwrap();
+    std::fs::write(
+        run.join("result.json"),
+        r#"{"runResult":true,"evidence":{"artifacts":["notes/report.md"]}}"#,
+    )
+    .unwrap();
+    main
+}
+
+#[test]
+fn inputs_resolve_to_the_report_a_seat_left_and_a_blind_unit_gets_digested_copies() {
+    let scratch = Scratch::new("inputs");
+    let main = settled_run(&scratch);
+    let report = main.join("notes/report.md");
+    let inputs = json!([
+        "unit-run:unit-run-1/producer",
+        "docs/a.md",
+        "unit-run:unit-run-1/{seat}"
+    ]);
+    let plain = handoff::resolve_inputs(&inputs, &main, &json!({ "accept": [] })).unwrap();
+    assert_eq!(
+        plain["refs"],
+        json!([report.to_string_lossy(), "docs/a.md"])
+    );
+    assert_eq!(plain["inputMap"], json!([]));
+
+    let blind = handoff::resolve_inputs(
+        &inputs,
+        &main,
+        &json!({ "accept": [], "blind": true, "anonymize": true }),
+    )
+    .unwrap();
+    assert_eq!(blind["refs"], json!(["docs/a.md"]));
+    assert_eq!(blind["inputMap"][0]["name"], "seat-A.md");
+    assert_eq!(
+        blind["inputMap"][0]["sha256"],
+        fgos_execution::handoff::sha256_hex(b"found it\n")
+    );
+
+    let own = handoff::resolve_inputs(&inputs, &main, &json!({ "seat": "producer" })).unwrap();
+    assert_eq!(own["inputMap"][0]["name"], "own-previous.md");
+
+    let missing =
+        handoff::resolve_inputs(&json!(["unit-run:unit-run-9/producer"]), &main, &json!({}))
+            .unwrap_err();
+    assert_eq!(missing.fields["reason"], "no-such-run");
+    assert!(
+        missing
+            .message
+            .starts_with("handoff-ref-unresolved: unit-run:unit-run-9/producer"),
+        "{}",
+        missing.message
+    );
+}
+
+#[test]
+fn the_report_digest_of_an_attempt_names_its_bytes_or_is_null() {
+    let scratch = Scratch::new("digest");
+    let main = settled_run(&scratch);
+    let record = json!({ "seat": "producer", "round": 1, "runResult": { "evidence": { "artifacts": ["notes/report.md"] } } });
+    let digest = handoff::report_digest(&record, &main);
+    assert_eq!(digest["bytes"], 9);
+    assert_eq!(
+        digest["sha256"],
+        fgos_execution::handoff::sha256_hex(b"found it\n")
+    );
+    assert_eq!(
+        handoff::report_digest(&json!({ "seat": "producer", "round": 1 }), &main),
+        Value::Null
+    );
+}
+
+// ---- verify -------------------------------------------------------------------------------------------------
+
+#[test]
+fn a_verify_command_passes_or_finds_and_runs_under_the_custody_it_is_given() {
+    use fgos_execution_engine::unit_run::verify::Verdict;
+    let scratch = Scratch::new("verify");
+    assert_eq!(
+        verify::verify("exit 0", &scratch.0, Some(10_000), None).verdict,
+        Verdict::Pass
+    );
+    let found = verify::verify("echo nope; exit 3", &scratch.0, Some(10_000), None);
+    assert_eq!(found.verdict, Verdict::Findings);
+    assert!(found.tail.contains("nope"));
+    #[cfg(unix)]
+    {
+        use fgos_holder_lock::{acquire, Acquire, Mode, Resource, Wait, DEFAULT_KILL_WAIT_MS};
+        let resource = Resource::new("attempt", scratch.0.join("attempt.lock"));
+        let Acquire::Acquired(custody) =
+            acquire(&resource, Mode::Ex, Wait::Try, DEFAULT_KILL_WAIT_MS)
+        else {
+            panic!("a fresh lock is free")
+        };
+        let held = verify::verify(
+            "echo held; exit 0",
+            &scratch.0,
+            Some(10_000),
+            Some(&custody),
+        );
+        assert_eq!(held.verdict, Verdict::Pass, "{held:?}");
+        let failed = verify::verify("exit 4", &scratch.0, Some(10_000), Some(&custody));
+        assert_eq!(failed.verdict, Verdict::Findings, "{failed:?}");
+    }
 }
 
 // ---- settlement -------------------------------------------------------------------------------------------

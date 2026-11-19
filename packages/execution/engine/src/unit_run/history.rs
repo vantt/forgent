@@ -129,7 +129,7 @@ fn sorted_dir(dir: &Path) -> std::io::Result<Vec<std::fs::DirEntry>> {
 /// The fallback number and the attempt a round selected so far.
 type Selected = Option<(u64, Option<SettledAttempt>)>;
 
-fn read_seat_directory(unit_dir: &Path, seat_id: &str) -> std::io::Result<Vec<SeatRound>> {
+pub fn read_seat_directory(unit_dir: &Path, seat_id: &str) -> std::io::Result<Vec<SeatRound>> {
     let seat_dir = unit_dir.join(seat_id);
     let unit_run_id = unit_dir
         .file_name()
