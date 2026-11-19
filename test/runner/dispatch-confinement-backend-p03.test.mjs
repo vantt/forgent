@@ -73,7 +73,6 @@ import {
   computePlatformDigest,
 } from '../../src/runner/dispatch/confinement/probes/harness.mjs';
 
-import { checkConfinementProbeFreshness } from '../../src/setup/registrations.mjs';
 import { assessAndPrepare, buildConfinementAttestation } from '../../src/runner/dispatch/confinement/authority.mjs';
 import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
 import { requirementOf } from '../../src/runner/dispatch/session-attempt.mjs';
@@ -1092,19 +1091,6 @@ test('R7: runAllConfinementProbes runs all 9 probes and succeeds on Linux', () =
   assert.equal(result.results.length, 9);
   for (const r of result.results) {
     assert.equal(r.passed, true, `probe "${r.probe}" failed: ${r.detail}`);
-  }
-});
-
-// =========================================================================
-// R8: Doctor check uses the same probe harness
-// =========================================================================
-
-test('R8: checkConfinementProbeFreshness in doctor passes on Linux with working bwrap', () => {
-  if (!HAS_WORKING_BWRAP) return;
-  const check = checkConfinementProbeFreshness();
-  assert.equal(check.passed, true);
-  if (os.platform() === 'linux') {
-    assert.match(check.message, /all 9 local-bwrap-v1 probes passed/);
   }
 });
 

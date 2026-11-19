@@ -5,6 +5,7 @@
 
 pub mod bridge;
 pub mod config;
+pub mod confinement;
 pub mod event_store;
 pub mod execution;
 pub mod git;
@@ -217,6 +218,7 @@ pub struct Rows {
 /// Every group the host judges in process. A phase that ports a group of rows adds its line here.
 const GROUPS: &[&Rows] = &[
     &config::GROUP,
+    &confinement::GROUP,
     &git::GROUP,
     &event_store::GROUP,
     &execution::GROUP,
@@ -555,11 +557,11 @@ mod tests {
         assert_eq!(registry.rows.len(), 116);
         assert_eq!(
             (count("S5"), count("S6a"), count("S6b"), count("S7")),
-            (0, 32, 6, 7)
+            (0, 23, 6, 7)
         );
-        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 71);
+        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 80);
         assert_eq!(registry.fixes.len(), 30);
-        assert_eq!(registry.fix_ids(OwnerKind::Bridge).len(), 5);
+        assert_eq!(registry.fix_ids(OwnerKind::Bridge).len(), 2);
     }
 
     #[test]

@@ -23,6 +23,8 @@ fgos-terminal-control = { path = "../../packages/terminal-control/rust" }
 fgos-session-host = { path = "../../packages/session-host/rust" }
 fgos-seat-binding = { path = "../../packages/seat-binding/rust" }
 fgos-execution = { path = "../../packages/execution/rust" }
+# The confinement doctor rows judge over the engine's confinement and credentials modules.
+fgos-execution-engine = { path = "../../packages/execution/engine" }
 fgos-mailbox = { path = "../../packages/mailbox/rust/store" }
 fgos-mailbox-core = { path = "../../packages/mailbox/rust/core" }
 fgos-durable-file = { path = "../../packages/durable-file/rust" }

@@ -23,11 +23,7 @@ import {
 } from "../../src/runner/dispatch/confinement/policies.mjs";
 import { establishConfinement } from "../../src/runner/dispatch/herdr-round.mjs";
 import { evaluateBypassPairing } from "../../src/runner/dispatch/confinement/bypass-pairing.mjs";
-import { checkConfinementHerdrMaturity } from "../../src/setup/registrations.mjs";
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
-import { initFixtureRepo } from '../helpers/git-fixture.mjs';
-import { readStandardValue } from '../../src/config/facade.mjs';
 
 function mkTemp(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -496,82 +492,3 @@ test("R6: herdr-spawn attestation marks host-ipc out-of-scope and controls unver
 
 // ─── Doctor Check: confinement-herdr-maturity ──────────────────────────────────
 
-test("Doctor check: confinement-herdr-maturity reports partial maturity for herdr executors", () => {
-  const tmpDir = mkTemp("p05-doctor-");
-  initFixtureRepo(tmpDir);
-  writeProjectConfig(tmpDir, {
-      runner: {
-        executors: {
-          "herdr-agent": {
-            kind: "agent",
-            invocations: [{ id: 'herdr-agent-cli', via: 'cli', adapter: "herdr-spawn", command: "claude", args: [], interactiveMode: { exitCommand: "/exit", kind: "claude" } }],
-            confinement: {
-              privateHome: true,
-              isolatedSession: true,
-              ownWorktree: true,
-            },
-          },
-        },
-      },
-    });
-
-  const res = checkConfinementHerdrMaturity(tmpDir);
-  assert.equal(res.passed, true);
-  assert.equal(res.maturity, "partial");
-  assert.match(res.message, /partial/);
-
-  fs.rmSync(tmpDir, { recursive: true, force: true });
-});
-
-test("Doctor check: confinement-herdr-maturity fails if bypass is missing full controls", () => {
-  const tmpDir = mkTemp("p05-doctor-bypass-bad-");
-  initFixtureRepo(tmpDir);
-  writeProjectConfig(tmpDir, {
-      runner: {
-        executors: {
-          "herdr-agent": {
-            kind: "agent",
-            invocations: [{ id: 'herdr-agent-cli', via: 'cli', adapter: "herdr-spawn", command: "claude", args: [], permissionMode: "bypass", interactiveMode: { exitCommand: "/exit", kind: "claude" } }],
-            confinement: {
-              ownWorktree: true, // missing privateHome & isolatedSession
-            },
-          },
-        },
-      },
-    });
-
-  const res = checkConfinementHerdrMaturity(tmpDir);
-  assert.equal(res.passed, false);
-  assert.equal(res.maturity, "invalid");
-  assert.match(res.message, /bypass without full confinement/);
-
-  fs.rmSync(tmpDir, { recursive: true, force: true });
-});
-
-test("Doctor check: confinement-herdr-maturity reports not-applicable when no herdr executors", () => {
-  const tmpDir = mkTemp("p05-doctor-none-");
-  initFixtureRepo(tmpDir);
-  // The standard ships executors that open a herdr pane; a project that dispatches nothing through herdr
-  // keeps only each one's headless invocations (the check reads every invocation, not the first).
-  const standardExecutors = readStandardValue("runner.executors").value;
-  const headlessFirst = Object.fromEntries(Object.entries(standardExecutors).map(([id, executor]) => [id, {
-    invocations: executor.invocations.filter((i) => i.adapter !== "herdr-spawn"),
-  }]));
-  writeProjectConfig(tmpDir, {
-      runner: {
-        executors: {
-          ...headlessFirst,
-          "cli-agent": {
-            kind: "agent",
-            invocations: [{ id: 'cli-agent-cli', via: 'cli', adapter: "cli-spawn", command: "node", args: [] }]
-          },
-        },
-      },
-    });
-
-  const res = checkConfinementHerdrMaturity(tmpDir);
-  assert.equal(res.passed, true);
-  assert.equal(res.maturity, "not-applicable");
-
-  fs.rmSync(tmpDir, { recursive: true, force: true });
-});

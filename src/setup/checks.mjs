@@ -18,6 +18,5 @@ export {
   resolveMainCheckout,
   integrationScriptPath,
   mainCheckoutHookWired,
-  checkConfinementHerdrMaturity,
   checkRunnerPatternsConfig,
 } from './registrations.mjs';

@@ -322,3 +322,30 @@ fn chmod_700(path: &Path) -> bool {
 pub fn default_temp_roots() -> Vec<PathBuf> {
     vec![resolve_confinement_temp_root(&std::env::temp_dir())]
 }
+
+/// The roots kept logins are looked for under: the default temp roots and the `tempRoot` and `privateHomeRoot` of
+/// every backend of the machine `registry`, each canonical and once. Only the login scan reads a registry root;
+/// the orphan reaper and the root-mode check keep to [`default_temp_roots`].
+pub fn credential_scan_roots(registry: Option<&serde_json::Value>) -> Vec<PathBuf> {
+    let mut roots: Vec<PathBuf> = Vec::new();
+    let mut add = |root: &Path| {
+        let root = canonical_root(root);
+        if !roots.contains(&root) {
+            roots.push(root);
+        }
+    };
+    default_temp_roots().iter().for_each(|root| add(root));
+    let instances = registry
+        .and_then(|registry| registry.get("confinementBackends"))
+        .and_then(serde_json::Value::as_object);
+    for instance in instances.into_iter().flat_map(|map| map.values()) {
+        for key in ["tempRoot", "privateHomeRoot"] {
+            if let Some(root) = instance.get(key).and_then(serde_json::Value::as_str) {
+                if !root.trim().is_empty() {
+                    add(Path::new(root));
+                }
+            }
+        }
+    }
+    roots
+}
