@@ -1,0 +1,2561 @@
+[
+  {
+    "name": "clean-pass",
+    "input": {
+      "runId": "run_a_01",
+      "assignmentId": "asgn_a",
+      "workId": "w-1",
+      "controlEpoch": 1,
+      "controlToken": "tok",
+      "executorId": "claude",
+      "adapter": "herdr-spawn",
+      "confinement": "bwrap",
+      "role": "producer",
+      "executorRedirected": false,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "planContentHash": "h1",
+      "inputDigests": [
+        {
+          "path": "a",
+          "sha256": "x"
+        }
+      ],
+      "claimSha256": "c1",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "stdout.log",
+        "stderrLog": "stderr.log",
+        "settledAt": "2026-11-19T00:00:00.000Z"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "ok",
+        "evidenceRefs": [
+          "a.md"
+        ]
+      },
+      "confidenceLevel": "reported",
+      "usage": {
+        "inputTokens": 1
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_a_01",
+      "assignmentId": "asgn_a",
+      "workId": "w-1",
+      "controlEpoch": 1,
+      "controlToken": "tok",
+      "executorId": "claude",
+      "adapter": "herdr-spawn",
+      "confinement": "bwrap",
+      "role": "producer",
+      "executorRedirected": false,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "planContentHash": "h1",
+      "inputDigests": [
+        {
+          "path": "a",
+          "sha256": "x"
+        }
+      ],
+      "claimSha256": "c1",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "pass"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "ok",
+          "reason": "completed-pass"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "stdout.log",
+        "stderrLog": "stderr.log",
+        "settledAt": "2026-11-19T00:00:00.000Z"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "ok",
+        "evidenceRefs": [
+          "a.md"
+        ]
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": {
+        "inputTokens": 1
+      },
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": [],
+        "findingRefs": [
+          "a.md"
+        ]
+      }
+    },
+    "status": "done",
+    "confidence": "reported",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "ok",
+        "executed": "completed",
+        "verdict": "pass",
+        "refused": false,
+        "evidence": "reported",
+        "satisfied": true,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "done",
+      "confidence": "reported"
+    }
+  },
+  {
+    "name": "verified-with-changes",
+    "input": {
+      "runId": "run_b_01",
+      "unitRunId": "unit-1",
+      "round": 2,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "edited"
+      },
+      "evidence": {
+        "changedFiles": [
+          "src/a.mjs"
+        ],
+        "gitBefore": "aaa",
+        "gitAfter": "bbb",
+        "attribution": [
+          {
+            "path": "src/a.mjs",
+            "level": "proven"
+          }
+        ]
+      },
+      "operation": "edit"
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_b_01",
+      "assignmentId": null,
+      "unitRunId": "unit-1",
+      "round": 2,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "pass"
+        },
+        "confidence": {
+          "level": "verified",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout",
+            "workspace-git-diff"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "ok",
+          "reason": "completed-pass"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "edited"
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "changedFiles": [
+          "src/a.mjs"
+        ],
+        "gitBefore": "aaa",
+        "gitAfter": "bbb",
+        "attribution": [
+          {
+            "path": "src/a.mjs",
+            "level": "proven"
+          }
+        ],
+        "gitBeforeSource": "pre-launch",
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "done",
+    "confidence": "verified",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "ok",
+        "executed": "completed",
+        "verdict": "pass",
+        "refused": false,
+        "evidence": "verified",
+        "satisfied": true,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "done",
+      "confidence": "verified"
+    }
+  },
+  {
+    "name": "read-only-done",
+    "input": {
+      "runId": "run_c_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "looked"
+      },
+      "isReadOnlyOperation": true,
+      "evidence": {
+        "changedFiles": [
+          "x"
+        ]
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_c_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "pass"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout",
+            "workspace-git-diff"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "ok",
+          "reason": "completed-pass"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "looked"
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "changedFiles": [
+          "x"
+        ],
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "done",
+    "confidence": "reported",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "ok",
+        "executed": "completed",
+        "verdict": "pass",
+        "refused": false,
+        "evidence": "reported",
+        "satisfied": true,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "done",
+      "confidence": "reported"
+    }
+  },
+  {
+    "name": "claim-blocked",
+    "input": {
+      "runId": "run_d_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_d_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "blocked"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "blocked",
+          "reason": "verdict-blocked"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "blocked",
+    "confidence": "reported",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "blocked",
+        "executed": "completed",
+        "verdict": "blocked",
+        "refused": false,
+        "evidence": "reported",
+        "satisfied": false,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "blocked",
+      "confidence": "reported"
+    }
+  },
+  {
+    "name": "claim-failed-non-assessment",
+    "input": {
+      "runId": "run_d2_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_d2_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "ok",
+          "reason": "completed-pass"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "done",
+    "confidence": "reported",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "ok",
+        "executed": "completed",
+        "verdict": "not-applicable",
+        "refused": false,
+        "evidence": "reported",
+        "satisfied": true,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "done",
+      "confidence": "reported"
+    }
+  },
+  {
+    "name": "reviewer-findings",
+    "input": {
+      "runId": "run_e_01",
+      "role": "reviewer",
+      "policy": {
+        "role": "reviewer",
+        "persona": "code-reviewer",
+        "executorId": "codex-cli",
+        "provenance": {
+          "persona": {
+            "value": "code-reviewer",
+            "source": {
+              "scope": "default",
+              "id": "reviewer"
+            }
+          }
+        }
+      },
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "failed",
+        "summary": "f",
+        "error": "e",
+        "evidenceRefs": [
+          "r.md"
+        ],
+        "assessment": {
+          "verdict": "findings",
+          "severityFloor": "high"
+        }
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_e_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": "reviewer",
+      "policy": {
+        "role": "reviewer",
+        "persona": "code-reviewer",
+        "executorId": "codex-cli",
+        "provenance": {
+          "persona": {
+            "value": "code-reviewer",
+            "source": {
+              "scope": "default",
+              "id": "reviewer"
+            }
+          }
+        }
+      },
+      "promptEnvelope": {
+        "persona": {
+          "ref": "code-reviewer",
+          "delivery": "section",
+          "applied": true,
+          "source": {
+            "scope": "default",
+            "id": "reviewer"
+          }
+        }
+      },
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "findings",
+          "severityFloor": "high"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "verdict",
+          "reason": "reviewer-findings"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "failed",
+        "summary": "f",
+        "error": "e",
+        "evidenceRefs": [
+          "r.md"
+        ],
+        "assessment": {
+          "verdict": "findings",
+          "severityFloor": "high"
+        }
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": [],
+        "findingRefs": [
+          "r.md"
+        ]
+      }
+    },
+    "status": "failed",
+    "confidence": "reported",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "verdict",
+        "executed": "completed",
+        "verdict": "findings",
+        "refused": false,
+        "evidence": "reported",
+        "satisfied": false,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "failed",
+      "confidence": "reported"
+    }
+  },
+  {
+    "name": "reviewer-claim-without-assessment",
+    "input": {
+      "runId": "run_e2_01",
+      "role": "red-team",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "f"
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_e2_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": "red-team",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "pass"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "ok",
+          "reason": "completed-pass"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "f"
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "done",
+    "confidence": "reported",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "ok",
+        "executed": "completed",
+        "verdict": "pass",
+        "refused": false,
+        "evidence": "reported",
+        "satisfied": true,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "done",
+      "confidence": "reported"
+    }
+  },
+  {
+    "name": "recheck-operation-no-claim",
+    "input": {
+      "runId": "run_e3_01",
+      "operation": "recheck-x",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_e3_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "inconclusive"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "verdict",
+          "reason": "verdict-inconclusive"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "failed",
+    "confidence": "reported",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "verdict",
+        "executed": "completed",
+        "verdict": "inconclusive",
+        "refused": false,
+        "evidence": "reported",
+        "satisfied": false,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "failed",
+      "confidence": "reported"
+    }
+  },
+  {
+    "name": "invalid-claim",
+    "input": {
+      "runId": "run_f_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "claimInvalid": true
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_f_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "inconclusive"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "invalid-agent-result-claim",
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "refuse",
+          "code": "invalid-agent-result-claim"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "policy",
+          "reason": "policy-policy-refused"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "runnerNote": {
+        "summary": "agent-result.json was present but failed schema validation"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "failed",
+    "confidence": "failed",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "policy",
+        "executed": "completed",
+        "verdict": "inconclusive",
+        "refused": true,
+        "evidence": "failed",
+        "satisfied": false,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "failed",
+      "confidence": "failed"
+    }
+  },
+  {
+    "name": "nonzero-exit",
+    "input": {
+      "runId": "run_g_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": 2,
+        "stdoutLog": "o.log"
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_g_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "failed",
+          "exitCode": 2
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "captured-stdout",
+            "failed-exit"
+          ]
+        },
+        "failure": {
+          "family": "provider",
+          "code": "nonzero-process-exit"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "nonzero-process-exit"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "infra",
+          "reason": "infra-exec-failed"
+        }
+      },
+      "runtime": {
+        "exitCode": 2,
+        "stdoutLog": "o.log"
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "failed",
+    "confidence": "failed",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "infra",
+        "executed": "failed",
+        "verdict": "not-applicable",
+        "refused": false,
+        "evidence": "failed",
+        "satisfied": false,
+        "infraFailure": true,
+        "failure": {
+          "family": "provider",
+          "code": "nonzero-process-exit"
+        }
+      },
+      "status": "failed",
+      "confidence": "failed"
+    }
+  },
+  {
+    "name": "timeout",
+    "input": {
+      "runId": "run_h_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": null,
+        "isTimeout": true,
+        "stdoutLog": "o.log"
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_h_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "failed",
+          "exitCode": null
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "captured-stdout",
+            "timeout",
+            "failed-exit"
+          ]
+        },
+        "failure": {
+          "family": "resource",
+          "code": "execution-timeout"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "execution-timeout"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "infra",
+          "reason": "infra-exec-failed"
+        }
+      },
+      "runtime": {
+        "exitCode": null,
+        "stdoutLog": "o.log"
+      },
+      "runnerNote": {
+        "summary": "Execution timed out"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "failed",
+    "confidence": "failed",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "infra",
+        "executed": "failed",
+        "verdict": "not-applicable",
+        "refused": false,
+        "evidence": "failed",
+        "satisfied": false,
+        "infraFailure": true,
+        "failure": {
+          "family": "resource",
+          "code": "execution-timeout"
+        }
+      },
+      "status": "failed",
+      "confidence": "failed"
+    }
+  },
+  {
+    "name": "exit-124",
+    "input": {
+      "runId": "run_h2_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": 124
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_h2_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "failed",
+          "exitCode": 124
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "failed-exit"
+          ]
+        },
+        "failure": {
+          "family": "resource",
+          "code": "execution-timeout"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "execution-timeout"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "infra",
+          "reason": "infra-exec-failed"
+        }
+      },
+      "runtime": {
+        "exitCode": 124
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "failed",
+    "confidence": "failed",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "infra",
+        "executed": "failed",
+        "verdict": "not-applicable",
+        "refused": false,
+        "evidence": "failed",
+        "satisfied": false,
+        "infraFailure": true,
+        "failure": {
+          "family": "resource",
+          "code": "execution-timeout"
+        }
+      },
+      "status": "failed",
+      "confidence": "failed"
+    }
+  },
+  {
+    "name": "oom-killed",
+    "input": {
+      "runId": "run_h3_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": 137
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_h3_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "failed",
+          "exitCode": 137
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "failed-exit"
+          ]
+        },
+        "failure": {
+          "family": "resource",
+          "code": "oom-killed"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "oom-killed"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "infra",
+          "reason": "infra-exec-failed"
+        }
+      },
+      "runtime": {
+        "exitCode": 137
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "failed",
+    "confidence": "failed",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "infra",
+        "executed": "failed",
+        "verdict": "not-applicable",
+        "refused": false,
+        "evidence": "failed",
+        "satisfied": false,
+        "infraFailure": true,
+        "failure": {
+          "family": "resource",
+          "code": "oom-killed"
+        }
+      },
+      "status": "failed",
+      "confidence": "failed"
+    }
+  },
+  {
+    "name": "cancelled",
+    "input": {
+      "runId": "run_i_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": null,
+        "isCancelled": true
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_i_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "cancelled",
+          "exitCode": null
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "cancelled"
+          ]
+        },
+        "failure": {
+          "family": "policy",
+          "code": "cancelled"
+        },
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "policy",
+          "reason": "policy-cancelled"
+        }
+      },
+      "runtime": {
+        "exitCode": null
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "failed",
+    "confidence": "failed",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "policy",
+        "executed": "cancelled",
+        "verdict": "not-applicable",
+        "refused": true,
+        "evidence": "failed",
+        "satisfied": false,
+        "infraFailure": false,
+        "failure": {
+          "family": "policy",
+          "code": "cancelled"
+        }
+      },
+      "status": "failed",
+      "confidence": "failed"
+    }
+  },
+  {
+    "name": "execution-error",
+    "input": {
+      "runId": "run_j_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "executionError": {
+          "code": "spawn-enoent",
+          "message": "no such binary"
+        }
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_j_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "failed",
+          "exitCode": null
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "failed-exit"
+          ]
+        },
+        "failure": {
+          "family": "provider",
+          "code": "spawn-enoent",
+          "message": "no such binary"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "spawn-enoent"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "infra",
+          "reason": "infra-exec-failed"
+        }
+      },
+      "runtime": {
+        "exitCode": null
+      },
+      "runnerNote": {
+        "summary": "no such binary"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "failed",
+    "confidence": "failed",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "infra",
+        "executed": "failed",
+        "verdict": "not-applicable",
+        "refused": false,
+        "evidence": "failed",
+        "satisfied": false,
+        "infraFailure": true,
+        "failure": {
+          "family": "provider",
+          "code": "spawn-enoent",
+          "message": "no such binary"
+        }
+      },
+      "status": "failed",
+      "confidence": "failed"
+    }
+  },
+  {
+    "name": "execution-error-no-code",
+    "input": {
+      "runId": "run_j2_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "executionError": {
+          "message": "boom"
+        }
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_j2_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "failed",
+          "exitCode": null
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "failed-exit"
+          ]
+        },
+        "failure": {
+          "family": "provider",
+          "code": "provider-spawn-error",
+          "message": "boom"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "provider-spawn-error"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "infra",
+          "reason": "infra-exec-failed"
+        }
+      },
+      "runtime": {
+        "exitCode": null
+      },
+      "runnerNote": {
+        "summary": "boom"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "failed",
+    "confidence": "failed",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "infra",
+        "executed": "failed",
+        "verdict": "not-applicable",
+        "refused": false,
+        "evidence": "failed",
+        "satisfied": false,
+        "infraFailure": true,
+        "failure": {
+          "family": "provider",
+          "code": "provider-spawn-error",
+          "message": "boom"
+        }
+      },
+      "status": "failed",
+      "confidence": "failed"
+    }
+  },
+  {
+    "name": "completion-unknown",
+    "input": {
+      "runId": "run_k_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {}
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_k_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completion-unknown",
+          "exitCode": null
+        },
+        "assessment": {
+          "verdict": "inconclusive"
+        },
+        "confidence": {
+          "level": "no-evidence",
+          "basis": [
+            "missing-agent-result"
+          ]
+        },
+        "failure": {
+          "family": "unknown",
+          "code": "lost-supervisor"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "completion-unknown"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "infra",
+          "reason": "infra-exec-completion-unknown"
+        }
+      },
+      "runtime": {
+        "exitCode": null
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "no-evidence",
+    "confidence": "no-evidence",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "infra",
+        "executed": "completion-unknown",
+        "verdict": "inconclusive",
+        "refused": false,
+        "evidence": "no-evidence",
+        "satisfied": false,
+        "infraFailure": true,
+        "failure": {
+          "family": "unknown",
+          "code": "lost-supervisor"
+        }
+      },
+      "status": "no-evidence",
+      "confidence": "no-evidence"
+    }
+  },
+  {
+    "name": "completion-unknown-null-exit-with-log",
+    "input": {
+      "runId": "run_k2_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "stdoutLog": "o.log"
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_k2_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completion-unknown",
+          "exitCode": null
+        },
+        "assessment": {
+          "verdict": "inconclusive"
+        },
+        "confidence": {
+          "level": "no-evidence",
+          "basis": [
+            "captured-stdout",
+            "missing-agent-result"
+          ]
+        },
+        "failure": {
+          "family": "unknown",
+          "code": "lost-supervisor"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "completion-unknown"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "infra",
+          "reason": "infra-exec-completion-unknown"
+        }
+      },
+      "runtime": {
+        "exitCode": null,
+        "stdoutLog": "o.log"
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "no-evidence",
+    "confidence": "no-evidence",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "infra",
+        "executed": "completion-unknown",
+        "verdict": "inconclusive",
+        "refused": false,
+        "evidence": "no-evidence",
+        "satisfied": false,
+        "infraFailure": true,
+        "failure": {
+          "family": "unknown",
+          "code": "lost-supervisor"
+        }
+      },
+      "status": "no-evidence",
+      "confidence": "no-evidence"
+    }
+  },
+  {
+    "name": "replayed",
+    "input": {
+      "runId": "run_l_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "deliveryMode": "replayed",
+      "sourceRunId": "run_src",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "s"
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_l_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "pass"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "replayed",
+          "sourceRunId": "run_src"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "ok",
+          "reason": "completed-pass"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "s"
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "done",
+    "confidence": "reported",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "ok",
+        "executed": "completed",
+        "verdict": "pass",
+        "refused": false,
+        "evidence": "reported",
+        "satisfied": true,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "done",
+      "confidence": "reported"
+    }
+  },
+  {
+    "name": "recovered-with-sourceRunId-ignored",
+    "input": {
+      "runId": "run_l2_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "deliveryMode": "recovered",
+      "sourceRunId": "run_src",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_l2_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "inconclusive"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "recovered"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "verdict",
+          "reason": "verdict-inconclusive"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "failed",
+    "confidence": "reported",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "verdict",
+        "executed": "completed",
+        "verdict": "inconclusive",
+        "refused": false,
+        "evidence": "reported",
+        "satisfied": false,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "failed",
+      "confidence": "reported"
+    }
+  },
+  {
+    "name": "overrides",
+    "input": {
+      "runId": "run_m_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "execStatusOverride": "failed",
+      "failureOverride": {
+        "family": "provider",
+        "code": "provider-limit",
+        "cause": "quota"
+      },
+      "policyOverride": {
+        "disposition": "needs-input",
+        "code": "provider-limit"
+      },
+      "assessmentOverride": {
+        "verdict": "inconclusive"
+      },
+      "confidenceLevel": "failed",
+      "runtime": {
+        "exitCode": 1,
+        "stdoutLog": "o.log"
+      },
+      "runnerNote": "limit hit"
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_m_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "failed",
+          "exitCode": 1
+        },
+        "assessment": {
+          "verdict": "inconclusive"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "captured-stdout",
+            "failed-exit"
+          ]
+        },
+        "failure": {
+          "family": "provider",
+          "code": "provider-limit",
+          "cause": "quota"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "provider-limit"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "provider",
+          "reason": "provider-quota"
+        }
+      },
+      "runtime": {
+        "exitCode": 1,
+        "stdoutLog": "o.log"
+      },
+      "runnerNote": {
+        "summary": "limit hit"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "failed",
+    "confidence": "failed",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "provider",
+        "executed": "failed",
+        "verdict": "inconclusive",
+        "refused": false,
+        "evidence": "failed",
+        "satisfied": false,
+        "infraFailure": true,
+        "failure": {
+          "family": "provider",
+          "code": "provider-limit",
+          "cause": "quota"
+        }
+      },
+      "status": "failed",
+      "confidence": "failed"
+    }
+  },
+  {
+    "name": "runner-note-object-and-warnings",
+    "input": {
+      "runId": "run_n_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "s"
+      },
+      "runnerNote": {
+        "summary": "custom",
+        "extra": 1
+      },
+      "warnings": [
+        {
+          "code": "w",
+          "level": "correlated",
+          "basis": [
+            "b"
+          ],
+          "paths": [
+            "p"
+          ]
+        }
+      ],
+      "reportDeclaration": {
+        "path": "r.md"
+      },
+      "settleReports": [
+        "r.md"
+      ]
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_n_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [
+        "r.md"
+      ],
+      "reportDeclaration": {
+        "path": "r.md"
+      },
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "pass"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "ok",
+          "reason": "completed-pass"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "s"
+      },
+      "runnerNote": {
+        "summary": "custom",
+        "extra": 1
+      },
+      "usage": null,
+      "warnings": [
+        {
+          "code": "w",
+          "level": "correlated",
+          "basis": [
+            "b"
+          ],
+          "paths": [
+            "p"
+          ]
+        }
+      ],
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "done",
+    "confidence": "reported",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "ok",
+        "executed": "completed",
+        "verdict": "pass",
+        "refused": false,
+        "evidence": "reported",
+        "satisfied": true,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "done",
+      "confidence": "reported"
+    }
+  },
+  {
+    "name": "evidence-passthrough",
+    "input": {
+      "runId": "run_o_01",
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "x",
+          "y"
+        ]
+      },
+      "evidence": {
+        "extra": 1,
+        "gitBeforeSource": "resume",
+        "tests": [
+          "t"
+        ],
+        "artifacts": [
+          "a"
+        ],
+        "mutatedDirtyBeforeFiles": [
+          "m"
+        ],
+        "findingRefs": [
+          "own"
+        ]
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_o_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "pass"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "ok",
+          "reason": "completed-pass"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "x",
+          "y"
+        ]
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "extra": 1,
+        "gitBeforeSource": "resume",
+        "tests": [
+          "t"
+        ],
+        "artifacts": [
+          "a"
+        ],
+        "mutatedDirtyBeforeFiles": [
+          "m"
+        ],
+        "findingRefs": [
+          "own"
+        ],
+        "gitBefore": null,
+        "gitAfter": null,
+        "changedFiles": []
+      }
+    },
+    "status": "done",
+    "confidence": "reported",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "ok",
+        "executed": "completed",
+        "verdict": "pass",
+        "refused": false,
+        "evidence": "reported",
+        "satisfied": true,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "done",
+      "confidence": "reported"
+    }
+  },
+  {
+    "name": "minimal",
+    "input": {
+      "runId": "run_p_01",
+      "settledAt": "2026-11-19T00:00:00.000Z"
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_p_01",
+      "assignmentId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completion-unknown",
+          "exitCode": null
+        },
+        "assessment": {
+          "verdict": "inconclusive"
+        },
+        "confidence": {
+          "level": "no-evidence",
+          "basis": [
+            "missing-agent-result"
+          ]
+        },
+        "failure": {
+          "family": "unknown",
+          "code": "lost-supervisor"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "completion-unknown"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "infra",
+          "reason": "infra-exec-completion-unknown"
+        }
+      },
+      "runtime": {
+        "exitCode": null
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "no-evidence",
+    "confidence": "no-evidence",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "infra",
+        "executed": "completion-unknown",
+        "verdict": "inconclusive",
+        "refused": false,
+        "evidence": "no-evidence",
+        "satisfied": false,
+        "infraFailure": true,
+        "failure": {
+          "family": "unknown",
+          "code": "lost-supervisor"
+        }
+      },
+      "status": "no-evidence",
+      "confidence": "no-evidence"
+    }
+  },
+  {
+    "name": "explicit-nulls",
+    "input": {
+      "runId": "run_q_01",
+      "assignmentId": null,
+      "workId": null,
+      "executorId": null,
+      "adapter": null,
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "usage": null,
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      }
+    },
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 3
+      },
+      "runId": "run_q_01",
+      "assignmentId": null,
+      "workId": null,
+      "adapter": "cli-spawn",
+      "confinement": null,
+      "role": null,
+      "settledAt": "2026-11-19T00:00:00.000Z",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "inconclusive"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "verdict",
+          "reason": "verdict-inconclusive"
+        }
+      },
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": "o.log"
+      },
+      "runnerNote": {
+        "summary": "Settled"
+      },
+      "usage": null,
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "status": "failed",
+    "confidence": "reported",
+    "nodeRead": {
+      "valid": true,
+      "outcome": {
+        "category": "verdict",
+        "executed": "completed",
+        "verdict": "inconclusive",
+        "refused": false,
+        "evidence": "reported",
+        "satisfied": false,
+        "infraFailure": false,
+        "failure": null
+      },
+      "status": "failed",
+      "confidence": "reported"
+    }
+  }
+]

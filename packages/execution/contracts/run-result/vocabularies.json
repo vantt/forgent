@@ -1,0 +1,105 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "executionStatuses": [
+    "completed",
+    "failed",
+    "cancelled",
+    "completion-unknown"
+  ],
+  "assessmentVerdicts": [
+    "pass",
+    "findings",
+    "blocked",
+    "inconclusive",
+    "not-applicable"
+  ],
+  "confidenceLevels": [
+    "verified",
+    "reported",
+    "inferred",
+    "no-evidence",
+    "failed"
+  ],
+  "failureFamilies": [
+    "provider",
+    "resource",
+    "contract",
+    "policy",
+    "external-interference",
+    "unknown"
+  ],
+  "policyDispositions": [
+    "allow",
+    "refuse",
+    "needs-input",
+    "not-applicable"
+  ],
+  "deliveryModes": [
+    "fresh",
+    "resumed",
+    "replayed",
+    "recovered",
+    "legacy-derived"
+  ],
+  "provenanceValues": [
+    "native-v2",
+    "native-v3",
+    "legacy-derived",
+    "contract-corrupt"
+  ],
+  "recognizedLegacyStatuses": [
+    "done",
+    "failed",
+    "blocked",
+    "no-evidence"
+  ],
+  "leaseConflictFailureCode": "provider-capacity-lease-conflict",
+  "corruptClassification": {
+    "execution": {
+      "status": "completion-unknown",
+      "exitCode": null
+    },
+    "assessment": {
+      "verdict": "inconclusive"
+    },
+    "confidence": {
+      "level": "failed",
+      "basis": [
+        "contract-corrupt"
+      ]
+    },
+    "failure": {
+      "family": "contract",
+      "code": "contract-corrupt"
+    },
+    "policy": {
+      "disposition": "refuse",
+      "code": "corrupt-result"
+    },
+    "delivery": {
+      "mode": "legacy-derived"
+    },
+    "provenance": "contract-corrupt"
+  },
+  "attributionLevels": [
+    "proven",
+    "correlated",
+    "excluded",
+    "unattributed"
+  ],
+  "claimContract": {
+    "id": "agent-result-claim",
+    "version": 2
+  },
+  "claimStatuses": [
+    "done",
+    "blocked",
+    "failed",
+    "no-evidence"
+  ],
+  "frictionsMax": 5,
+  "frictionFieldMax": 80
+}
