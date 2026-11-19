@@ -22,7 +22,7 @@
   },
   "frames": {
     "REQUEST": { "direction": "client -> supervisor", "fields": { "type": "REQUEST", "id": "string, 1 to 64 characters of letters, digits, '.', '_' and '-'", "verb": "string, one of verbs", "args": "object" }, "rule": "one connection carries one request" },
-    "REPLY": { "direction": "supervisor -> client", "fields": { "type": "REPLY", "id": "the request's id, null when no valid id was read", "result": { "enum": ["done", "refused"] }, "data": "object, present when done: the verb's own result", "code": "refusal code, present when refused", "detail": "string, optional", "message": "string, optional: present only on a verb-failed refusal, the route child's own text (the reason behind its code, for example the persona names a persona-not-found lists), control characters replaced and cut to 300 characters" } }
+    "REPLY": { "direction": "supervisor -> client", "fields": { "type": "REPLY", "id": "the request's id, null when no valid id was read", "result": { "enum": ["done", "refused"] }, "data": "object, present when done: the verb's own result", "code": "refusal code, present when refused", "detail": "string, optional", "message": "string, optional: present only on a verb-failed refusal, the route child's own text (the reason behind its code, for example the persona names a persona-not-found lists), control characters replaced and cut to 300 characters; it may contain local paths of the same user's machine, so a client shows it only to that user" } }
   },
   "verbs": {
     "session start": {
@@ -232,7 +232,7 @@
     "peer-uid": "the connection is not from the supervisor's own user",
     "bad-frame": "oversize, not one JSON object, no REQUEST type, an id outside the rule, a verb that is not a string or args that is not an object",
     "role-not-held": "Identity does not give this attempt's session the envelope's role; when Identity could not answer the detail is its refusal code only (its text goes to supervisor.log, never to the client)",
-    "role-pending-rotation": "a role-gated verb from a rotation successor (same persona and name as the live holder, a higher generation) whose role its live predecessor still holds, the move of `session answered` or `session restore role` not done yet; detail names the predecessor. Retryable: the client waits with backoff for at most 60 s, then reports the code. Any other caller without the role stays role-not-held",
+    "role-pending-rotation": "a role-gated verb from a rotation successor (same persona and name as the live holder, a higher generation) whose role its live predecessor still holds, the move of `session answered` or `session restore role` not done yet; detail names the predecessor. Retryable: every client (the JS `requestHead` and the Rust `head_client::request_head`) waits with doubling backoff (0.5 s up to 4 s) for at most 60 s, then reports the code; the rotation stop hook passes no wait. Any other caller without the role stays role-not-held",
     "verb-not-granted": "the verb is not in envelope.session.verbs",
     "busy": "another request is running, or another large request (over maxReplyBytes) is being read or run",
     "session-not-registered": "session answered only: Identity does not list this attempt's own session as live; when Identity could not answer the detail is its refusal code only",
