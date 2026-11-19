@@ -307,7 +307,7 @@ impl GitDriver {
         }
         Ok(())
     }
-    fn worktree_handle(&self, repo: &RepoHandle, path: &Path) -> Result<WorktreeHandle> {
+    pub(crate) fn worktree_handle(&self, repo: &RepoHandle, path: &Path) -> Result<WorktreeHandle> {
         let target = match self.resolve_repo(path, repo.trusted_main_root())? {
             ResolveRepo::Repository(r) => r,
             _ => return Err(recovery("worktree-registration-missing")),

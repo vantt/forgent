@@ -543,7 +543,7 @@ impl GitDriver {
             &candidate_operation,
         )?;
         let candidate_path = worktree.path.clone();
-        (|| {
+        let prepared = (|| -> Result<()> {
             let candidate_repo =
                 match self.resolve_repo(&worktree.path, repo.trusted_main_root())? {
                     ResolveRepo::Repository(r) => self.checkout_repository(&r)?,
@@ -727,20 +727,59 @@ impl GitDriver {
             wal.append(&chain, Phase::Prepared)?;
             drop(admin);
             session.candidate = Some(view);
-            Ok(session)
-        })()
-        .map_err(|mut error: OperationError| {
-            let mut diagnostics = format!(
-                "Land candidate retained at {} (worktree operation {})\n",
-                candidate_path.display(),
-                candidate_operation
-            )
-            .into_bytes();
-            diagnostics.extend_from_slice(&error.stderr);
-            error.stderr = diagnostics;
-            error.stderr.truncate(64 * 1024);
-            error
-        })
+            Ok(())
+        })();
+        match prepared {
+            Ok(()) => Ok(session),
+            Err(mut error) => {
+                // The candidate is the door's own scratch: a failed prepare removes it, ignored
+                // bytes included, while the merge slot is still held. A refusal here keeps the
+                // checkout and says so next to the primary error, which stays first.
+                let note = match self.remove_failed_candidate(repo, &session, &candidate_path, id) {
+                    Ok(()) => format!("Land candidate removed from {}\n", candidate_path.display()),
+                    Err(e) => format!(
+                        "Land candidate retained at {} (worktree operation {}): {}\n",
+                        candidate_path.display(),
+                        candidate_operation,
+                        e.cause
+                    ),
+                };
+                let mut diagnostics = note.into_bytes();
+                diagnostics.extend_from_slice(&error.stderr);
+                error.stderr = diagnostics;
+                error.stderr.truncate(64 * 1024);
+                Err(error)
+            }
+        }
+    }
+    fn remove_failed_candidate(
+        &self,
+        repo: &RepoHandle,
+        session: &LandSession,
+        path: &std::path::Path,
+        id: &str,
+    ) -> Result<()> {
+        let handle = self.worktree_handle(repo, path)?;
+        let proof = WorktreeDelivery {
+            expected_tip: handle.tip.clone(),
+            delivered_to: handle.tip.clone(),
+            evidence_digest: wal::canonical_digest(&(id, "land-prepare-failed"))?,
+        };
+        let removal_id = format!(
+            "lr-{}",
+            wal::canonical_digest(&("land-prepare-failed", id))?
+        );
+        self.remove_land_candidate(
+            repo,
+            held(&session.slot)?,
+            path,
+            &proof,
+            "land-prepare-cleanup",
+            &removal_id,
+            None,
+            IgnoredBytes::Discard,
+        )
+        .map(|_| ())
     }
     /// Hold `destination`'s merge slot, waiting at most `wait_ms`; a slot still held then (a live
     /// Land session or another holder) refuses `merge-slot-busy` (Busy, retryable).
@@ -2164,7 +2203,7 @@ impl GitDriver {
             writer,
             &removal_id,
             if discarded { Some(id) } else { None },
-            IgnoredBytes::Preserve,
+            IgnoredBytes::Discard,
         ) {
             return Ok(vec![format!("land-cleanup-deferred: {}", e.cause)]);
         }

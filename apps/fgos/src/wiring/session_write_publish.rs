@@ -267,5 +267,5 @@ fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, 
     };
     land(&command, &config, &ports)
         .map(|landed| landed.main_sha)
-        .map_err(|why| refusal(&why.code, why.detail))
+        .map_err(|why| refusal(&why.code, why.detail_with_note()))
 }

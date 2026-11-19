@@ -963,6 +963,35 @@ fn retained_listing_skips_chains_that_hold_nothing() {
 }
 
 #[test]
+fn a_prepare_that_fails_after_the_candidate_exists_removes_it_and_names_the_refusal() {
+    let f = Fixture::new();
+    fs::write(f.main.join("a"), "target disagrees\n").unwrap();
+    git(&f.main, &["commit", "-qam", "target disagreement"]);
+    let mut request = f.request.clone();
+    request.target = git(&f.main, &["rev-parse", "HEAD"]);
+    request.files = vec![];
+    let error = f
+        .driver
+        .prepare_land(
+            &f.repo,
+            vec![],
+            &request,
+            "fixture",
+            "undeclared",
+            &wal::OsFileSystem,
+            0,
+        )
+        .err()
+        .unwrap();
+    assert_eq!(error.cause, "land-conflict-aborted");
+    let left = fs::read_dir(f.main.join(".fgos/runtime/git-candidates"))
+        .map(|d| d.count())
+        .unwrap_or(0);
+    assert_eq!(left, 0, "the failed candidate is removed");
+    assert_eq!(git(&f.main, &["worktree", "list"]).lines().count(), 1);
+}
+
+#[test]
 fn declared_resolution_bytes_are_frozen_before_consumer_verification() {
     let f = Fixture::new();
     fs::write(f.main.join("a"), "target disagrees\n").unwrap();
