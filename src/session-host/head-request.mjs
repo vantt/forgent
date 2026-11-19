@@ -259,8 +259,14 @@ async function landVerb({ args, envelope, projectRoot, id, ports }) {
     for (const p of paths) {
       if (!inGrant(p, writes)) throw Object.assign(new Error(`${JSON.stringify(p)} lies outside the paths this role may write`), { code: 'path-outside-grant' });
     }
-    if (lead) await refuseFootprintChange({ paths, envelope, projectRoot, ports });
+    let footprint = [];
+    if (lead) {
+      await refuseFootprintChange({ paths, envelope, projectRoot, ports });
+      footprint = (await planOfCaller(envelope, projectRoot, ports)).footprint;
+    }
     argv.push('--paths', paths.join(','), '--message', message);
+    // The land compares the plan files of its own commit with the trunk tip's footprint-wise; the bound has to reach it.
+    if (footprint.length > 0) argv.push('--footprint', footprint.join(','));
   }
   for (const t of tests ?? []) argv.push('--test', t);
   return startTicket({ id, verb: HEAD_LAND_VERB, argv, envelope, projectRoot, ports });
@@ -367,7 +373,12 @@ function viewOf(ticket, projectRoot, { withResult, judgeRunner }) {
   return view;
 }
 
-async function requestResult({ args, envelope, projectRoot, ports }) {
+/** The tickets of `role` under `projectRoot`: one ticket by `id` (waiting up to `wait` seconds while it runs), or the recent list. */
+export async function requestResult({ projectRoot, role, id, wait }, ports = {}) {
+  return readTickets({ args: { ...(id !== undefined ? { id } : {}), ...(wait !== undefined ? { wait } : {}) }, envelope: { session: { role } }, projectRoot, ports });
+}
+
+async function readTickets({ args, envelope, projectRoot, ports }) {
   exactKeys(args, ['id', 'wait']);
   if (args.wait !== undefined && !(typeof args.wait === 'number' && Number.isFinite(args.wait) && args.wait >= 0)) throw badArgs('wait must be a number of seconds');
   if (args.id !== undefined && typeof args.id !== 'string') throw badArgs('id must be a string');
@@ -506,7 +517,7 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
         data = await runVerb({ args, envelope, projectRoot, id: request.id, ports });
         break;
       case HEAD_REQUEST_RESULT_VERB:
-        data = await requestResult({ args, envelope, projectRoot, ports });
+        data = await readTickets({ args, envelope, projectRoot, ports });
         break;
       case HEAD_WORKTREE_CREATE_VERB:
         data = worktreeCreate({ args, envelope, projectRoot, ports });

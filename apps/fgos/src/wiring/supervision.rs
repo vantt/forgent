@@ -825,7 +825,13 @@ impl watcher::Definitions for QueryDefinitions {
         if defs.is_empty() {
             return Ok(Vec::new());
         }
-        rows_of(&self.answer(defs, since)?)
+        let answer = self.answer(defs, since)?;
+        // The pace definition has no `row` template: each group it answers is one row of liveness, not an event.
+        if defs == [PACE_DEFINITION] {
+            pace_rows_of(&answer)
+        } else {
+            rows_of(&answer)
+        }
     }
 }
 
@@ -885,6 +891,15 @@ pub fn unhandled_count(root: &Path) -> Result<Option<usize>, String> {
 /// reason and next command from the definition's `row` template; subject from `origin.host` else `subject.id`;
 /// instant from `min:ts`, else `max:end`, else `max:ts`.
 pub fn rows_of(answer: &Value) -> Result<Vec<watcher::Row>, String> {
+    rows_from(answer, false)
+}
+
+/// The groups a pace query answers, one row each, named by the definition: the watcher only counts them.
+fn pace_rows_of(answer: &Value) -> Result<Vec<watcher::Row>, String> {
+    rows_from(answer, true)
+}
+
+fn rows_from(answer: &Value, pace: bool) -> Result<Vec<watcher::Row>, String> {
     let definitions = answer["definitions"]
         .as_array()
         .ok_or_else(|| "the answer holds no definitions".to_owned())?;
@@ -905,7 +920,7 @@ pub fn rows_of(answer: &Value) -> Result<Vec<watcher::Row>, String> {
             });
             continue;
         }
-        if !template.is_object() {
+        if !pace && !template.is_object() {
             continue;
         }
         for row in def["rows"].as_array().into_iter().flatten() {
@@ -915,7 +930,9 @@ pub fn rows_of(answer: &Value) -> Result<Vec<watcher::Row>, String> {
             let group = &row["group"];
             let aggs = &row["aggs"];
             rows.push(watcher::Row {
-                kind: text(&template["kind"]).unwrap_or_default(),
+                kind: text(&template["kind"])
+                    .or_else(|| pace.then(|| text(&def["name"])).flatten())
+                    .unwrap_or_default(),
                 reason: text(&template["reason"]).unwrap_or_default(),
                 next_command: text(&template["nextCommand"]).unwrap_or_default(),
                 subject: text(&group["origin.host"]).or_else(|| text(&group["subject.id"])),

@@ -268,6 +268,25 @@ fn a_tick_raises_a_detected_row_once_and_a_second_full_tick_finds_it_a_duplicate
 }
 
 #[test]
+fn an_active_project_runs_a_full_tick_inside_the_idle_interval() {
+    // Long idle interval: only the pace definition's answer can make the second tick a full one. The pace
+    // definition here counts the first tick's own span, so it answers one group without a `row` template.
+    let config = WATCHER_CONFIG.replace("idleIntervalSec: 1", "idleIntervalSec: 3600");
+    let scene = Scene::new("active", &config);
+    fs::write(
+        scene
+            .project()
+            .join("core/watcher/pace/watcher-active.query.json"),
+        r#"{"name":"watcher-active","requires":["fgos.watcher.tick"],"query":{"kind":["fgos.watcher.tick"],"agg":["count"]}}"#,
+    )
+    .unwrap();
+    first_tick(&scene);
+    let second = scene.data(&["watcher", "tick", "--json"]);
+    assert_eq!(second["mode"], "active", "{second}");
+    assert_eq!(second["duplicate"], 1, "{second}");
+}
+
+#[test]
 fn a_row_routed_to_notify_runs_the_mailbox_verb_and_is_counted_as_a_notify_or_an_error() {
     let config = WATCHER_CONFIG.replace(
         "  defaultAction: none\n",

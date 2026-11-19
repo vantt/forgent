@@ -225,39 +225,6 @@ pub fn catch_up(command: &LandCommand, ports: &LandPorts<'_>) -> Result<(), Land
     lander.sync_target(&target, &held)
 }
 
-/// The `plan.md` files a named path stands for: itself, or those under it when it is a directory.
-fn plan_files_of(root: &Path, path: &str, found: &mut Vec<String>) {
-    const MAX_DEPTH: usize = 8;
-    fn walk(root: &Path, rel: &str, depth: usize, found: &mut Vec<String>) {
-        let full = root.join(rel);
-        if full.is_dir() && depth < MAX_DEPTH {
-            if let Ok(entries) = std::fs::read_dir(&full) {
-                for entry in entries.flatten() {
-                    let name = entry.file_name().to_string_lossy().into_owned();
-                    if name != ".git" {
-                        walk(
-                            root,
-                            &format!("{}/{name}", rel.trim_end_matches('/')),
-                            depth + 1,
-                            found,
-                        );
-                    }
-                }
-            }
-        } else if rel.rsplit('/').next() == Some("plan.md") {
-            found.push(rel.to_owned());
-        }
-    }
-    let rel = path.trim_end_matches('/');
-    let named_a_plan_file = rel.rsplit('/').next() == Some("plan.md");
-    if named_a_plan_file && !root.join(rel).is_dir() {
-        // A plan file that was deleted still counts: removing it drops its footprint.
-        found.push(rel.to_owned());
-    } else {
-        walk(root, rel, 0, found);
-    }
-}
-
 /// The sorted `footprint` of the plan file `file` with these bytes; an absent file has none.
 fn footprint_in(file: &str, bytes: &Option<Vec<u8>>) -> Result<Vec<String>, String> {
     let Some(bytes) = bytes else {
@@ -529,56 +496,48 @@ impl Lander<'_> {
         Ok(None)
     }
 
-    /// A lead's paths land commits the working bytes of the named paths, so the check reads those bytes (under the
-    /// merge slot the caller holds) and compares the `footprint` of every `plan.md` among them with the one in the
-    /// trunk tip's copy. A request route that read the working file earlier cannot see an edit made after it.
-    fn require_footprint_unchanged(
-        &self,
-        root: &Path,
-        paths: &[String],
-        target: &str,
-    ) -> Result<(), LandRefusal> {
-        let tip = self
-            .resolve(&format!("refs/heads/{target}"))?
-            .ok_or_else(|| {
-                refuse(
-                    "land-target-unknown",
-                    format!("refs/heads/{target} is absent"),
-                )
-            })?;
-        let mut files = Vec::new();
-        for path in paths {
-            plan_files_of(root, path, &mut files);
-        }
-        for file in files {
-            let working = match std::fs::read(root.join(&file)) {
-                Ok(bytes) => Some(bytes),
-                Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
-                Err(e) => {
-                    return Err(refuse(
-                        "footprint-change-refused",
-                        format!("{file} cannot be read: {e}"),
-                    ))
-                }
+    /// The check of a lead's paths land runs on the committed tree: for every `plans/<name>/plan.md` among the
+    /// commit's changed paths (added, modified or deleted; a glob in `--paths` is already expanded there) it
+    /// compares the `footprint` in the commit with the one at the trunk tip the commit was made on. A deletion,
+    /// a difference or a read failure refuses; the caller pushes nothing.
+    fn require_footprint_unchanged(&self, tip: &Oid, commit: &Oid) -> Result<(), LandRefusal> {
+        let is_plan = |path: &str| {
+            let mut parts = path.split('/');
+            matches!(
+                (parts.next(), parts.next(), parts.next(), parts.next()),
+                (Some("plans"), Some(name), Some("plan.md"), None) if !name.is_empty()
+            )
+        };
+        let refused = |why: String| refuse("footprint-change-refused", why);
+        for file in self
+            .changed_paths(tip, commit)?
+            .into_iter()
+            .filter(|path| is_plan(path))
+        {
+            let read = |id: &Oid| {
+                self.blob_at(id.as_str(), &file)
+                    .map_err(|e| refused(format!("{file} cannot be read: {}", e.detail)))
             };
-            let trunk = self.blob_at(tip.as_str(), &file)?;
-            if working == trunk {
+            let (trunk, committed) = (read(tip)?, read(commit)?);
+            if trunk == committed {
                 continue;
             }
-            let (before, after) = (footprint_in(&file, &trunk), footprint_in(&file, &working));
-            match (before, after) {
-                (Ok(before), Ok(after)) if before == after => {}
-                (_, Err(why)) => {
-                    return Err(refuse(
-                        "footprint-change-refused",
-                        format!("{file}: the footprint to commit cannot be read: {why}"),
-                    ))
-                }
+            if committed.is_none() {
+                return Err(refused(format!(
+                    "{file} is deleted, dropping its footprint"
+                )));
+            }
+            let after = footprint_in(&file, &committed).map_err(|why| {
+                refused(format!(
+                    "{file}: the committed footprint cannot be read: {why}"
+                ))
+            })?;
+            match footprint_in(&file, &trunk) {
+                Ok(before) if before == after => {}
                 _ => {
-                    return Err(refuse(
-                        "footprint-change-refused",
-                        format!("{file} changes the footprint of its own plan"),
-                    ))
+                    return Err(refused(format!(
+                        "{file} changes the footprint of its own plan"
+                    )))
                 }
             }
         }
@@ -1052,9 +1011,9 @@ impl Lander<'_> {
         let held = || slot.lend().map_err(from_git);
         self.sync_target(&target, &held)?;
         self.check_tests(p.repo.trusted_main_root(), &command.tests)?;
-        if command.footprint.is_some() {
-            self.require_footprint_unchanged(p.repo.trusted_main_root(), paths, &target)?;
-        }
+        let tip = self
+            .resolve(&dest)?
+            .ok_or_else(|| refuse("land-target-unknown", format!("{dest} is absent")))?;
         let mut baseline = p
             .git
             .preflight_commit(p.repo, held()?, None)
@@ -1105,6 +1064,20 @@ impl Lander<'_> {
                     result.status
                 ),
             ));
+        }
+        if command.footprint.is_some() {
+            if let Err(refusal) = self.require_footprint_unchanged(&tip, &commit) {
+                return Err(refuse(
+                    &refusal.code,
+                    format!(
+                        "{}; local commit {} on {dest} was not pushed: inspect it, then reset local {target} to the \
+                         remote tip (`git reset --keep {remote}/{target}`) and land again",
+                        refusal.detail,
+                        commit.as_str(),
+                        remote = p.remote.name,
+                    ),
+                ));
+            }
         }
         // With the slot held no Land of this target can move the remote; a rejection is an
         // outside push, and the local commit stays for a human to inspect.

@@ -273,7 +273,7 @@ test('a land answers a ticket at once, the runner finishes it and request result
   assert.equal(spawned[0].ticketFile, ticketFile('t1'));
   const written = JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8'));
   assert.deepEqual([written.state, written.verb, written.runner], ['running', 'land', null]);
-  assert.deepEqual(written.argv, ['land', '--json', '--paths', 'plans/p/a.md', '--message', 'docs(p): a', '--test', 'test/a.test.mjs']);
+  assert.deepEqual(written.argv, ['land', '--json', '--paths', 'plans/p/a.md', '--message', 'docs(p): a', '--footprint', 'src/a/**,docs/x.md', '--test', 'test/a.test.mjs']);
   assert.equal((await ask('request result', { id: 't1' }, 'r1')).line.data.state, 'running');
   runTicket(ticketFile('t1'), { selfRecord: () => ({ pid: 1, startTime: 1 }), exec: () => ({ status: 0, stdout: 'noise\n{"result":"done","data":{"mainSha":"abc"}}\n' }) });
   const done = (await ask('request result', { id: 't1' }, 'r2')).line.data;
@@ -307,7 +307,7 @@ test('a ticket id that was used already refuses ticket-used and leaves the first
 test('a land with several tests emits one --test flag per path', async (t) => {
   const { ask, ticketFile } = headCase(t);
   await ask('land', { paths: ['plans/p/a.md'], message: 'm', tests: ['test/a.test.mjs', 'test/b.test.mjs'] });
-  assert.deepEqual(JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8')).argv, ['land', '--json', '--paths', 'plans/p/a.md', '--message', 'm', '--test', 'test/a.test.mjs', '--test', 'test/b.test.mjs']);
+  assert.deepEqual(JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8')).argv, ['land', '--json', '--paths', 'plans/p/a.md', '--message', 'm', '--footprint', 'src/a/**,docs/x.md', '--test', 'test/a.test.mjs', '--test', 'test/b.test.mjs']);
 });
 
 test('the process identity of the started runner is on the ticket before the reply, so a runner that died at once reads failed', async (t) => {
@@ -416,6 +416,12 @@ test('a lead paths land that keeps the footprint of its plan is accepted', async
   const lead = headCase(t);
   const same = '---\nfootprint:\n  - src/a/**\n  - docs/x.md\n---\n';
   assert.equal((await lead.ask('land', { paths: ['plans/p/plan.md'], message: 'm' }, 't5', { readWorking: () => same })).exit, 0);
+});
+
+test('a lead paths land passes its plan footprint as --footprint', async (t) => {
+  const lead = headCase(t);
+  assert.equal((await lead.ask('land', { paths: ['plans/p/plan.md'], message: 'm' }, 't7', { readWorking: () => null })).exit, 0);
+  assert.deepEqual(JSON.parse(fs.readFileSync(lead.ticketFile('t7'), 'utf8')).argv, ['land', '--json', '--paths', 'plans/p/plan.md', '--message', 'm', '--footprint', 'src/a/**,docs/x.md']);
 });
 
 test('a lead branch land passes its plan footprint as --footprint', async (t) => {

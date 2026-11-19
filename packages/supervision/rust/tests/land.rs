@@ -751,14 +751,17 @@ fn a_lead_paths_land_that_changes_the_footprint_of_its_plan_file_refuses_and_com
     let f = Fixture::new();
     commit_plan(&f, &["src/**"]);
     let tip = f.remote_tip();
-    // The edit lands in the working file after any earlier look at it: only these bytes would be committed.
+    // The bytes in the commit differ from the trunk tip's: the check reads the committed tree.
     fs::write(f.main.join(PLAN_PATH), plan_text(&["src/**", "docs/**"])).unwrap();
     let refusal = f
         .land(&lead_paths(&[PLAN_PATH]), &config(vec![gate("true")]))
         .unwrap_err();
     assert_eq!(refusal.code, "footprint-change-refused", "{refusal}");
     assert_eq!(f.remote_tip(), tip);
-    assert_eq!(f.local_tip(), tip);
+    // The local commit stays for inspection; the refusal names it and the reset.
+    assert_ne!(f.local_tip(), tip);
+    assert!(refusal.detail.contains(&f.local_tip()), "{refusal}");
+    assert!(refusal.detail.contains("git reset --keep"), "{refusal}");
 }
 
 #[test]
@@ -773,6 +776,48 @@ fn a_lead_paths_land_that_changes_the_footprint_through_a_directory_path_refuses
         )
         .unwrap_err();
     assert_eq!(refusal.code, "footprint-change-refused", "{refusal}");
+}
+
+#[test]
+fn a_lead_paths_land_that_changes_the_footprint_through_a_glob_path_refuses_and_pushes_nothing() {
+    let f = Fixture::new();
+    commit_plan(&f, &["src/**"]);
+    let tip = f.remote_tip();
+    fs::write(f.main.join(PLAN_PATH), plan_text(&["src/**", "docs/**"])).unwrap();
+    let refusal = f
+        .land(
+            &lead_paths(&["plans/260101-0000-demo/**"]),
+            &config(vec![gate("true")]),
+        )
+        .unwrap_err();
+    assert_eq!(refusal.code, "footprint-change-refused", "{refusal}");
+    assert_eq!(f.remote_tip(), tip);
+}
+
+#[test]
+fn a_lead_paths_land_that_deletes_its_plan_file_refuses_and_pushes_nothing() {
+    let f = Fixture::new();
+    commit_plan(&f, &["src/**"]);
+    let tip = f.remote_tip();
+    fs::remove_file(f.main.join(PLAN_PATH)).unwrap();
+    let refusal = f
+        .land(&lead_paths(&[PLAN_PATH]), &config(vec![gate("true")]))
+        .unwrap_err();
+    assert_eq!(refusal.code, "footprint-change-refused", "{refusal}");
+    assert_eq!(f.remote_tip(), tip);
+}
+
+#[test]
+fn a_lead_paths_land_whose_committed_plan_file_cannot_be_read_refuses_and_pushes_nothing() {
+    let f = Fixture::new();
+    commit_plan(&f, &["src/**"]);
+    let tip = f.remote_tip();
+    fs::write(f.main.join(PLAN_PATH), "not a plan\n").unwrap();
+    let refusal = f
+        .land(&lead_paths(&[PLAN_PATH]), &config(vec![gate("true")]))
+        .unwrap_err();
+    assert_eq!(refusal.code, "footprint-change-refused", "{refusal}");
+    assert_eq!(f.remote_tip(), tip);
 }
 
 #[test]

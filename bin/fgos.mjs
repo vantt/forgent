@@ -3413,22 +3413,17 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (!role) throw new StoreError('precondition', 'no-head-role: request result reads the tickets of a head role; FGOS_HEAD_ROLE names none here');
       const wait = flags.wait === undefined ? undefined : Number(flags.wait);
       if (wait !== undefined && !(Number.isFinite(wait) && wait >= 0)) throw new StoreError('validation', 'request result --wait takes a number of seconds');
-      const { runHeadRequest } = await import('../src/session-host/head-request.mjs');
+      const { requestResult } = await import('../src/session-host/head-request.mjs');
       const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
-      const fsMod = await import('node:fs');
-      const osMod = await import('node:os');
-      const pathMod = await import('node:path');
-      const root = resolveGitRoots(process.cwd()).worktreeRoot;
-      // runHeadRequest reads its caller from an envelope file; build the one this role would have.
-      const runDir = fsMod.mkdtempSync(pathMod.join(osMod.tmpdir(), 'fgos-request-result-'));
       try {
-        fsMod.writeFileSync(pathMod.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: root, session: { role } }));
-        const args = { ...(positional[1] !== undefined ? { id: positional[1] } : {}), ...(wait !== undefined ? { wait } : {}) };
-        const { line } = await runHeadRequest({ runDir, request: { verb: 'request result', args } });
-        if (line.result !== 'done') throw new StoreError(HEAD_ARGUMENT_CODES.has(line.code) ? 'validation' : 'precondition', `${line.code}: ${line.message}`);
-        return line.data;
-      } finally {
-        fsMod.rmSync(runDir, { recursive: true, force: true });
+        return await requestResult({
+          projectRoot: resolveGitRoots(process.cwd()).worktreeRoot,
+          role,
+          id: positional[1],
+          wait,
+        });
+      } catch (err) {
+        throw new StoreError(HEAD_ARGUMENT_CODES.has(err?.code) ? 'validation' : 'precondition', `${err?.code ?? 'internal'}: ${String(err?.message ?? err).slice(0, 500)}`);
       }
     }
 

@@ -12,6 +12,16 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+/// The host as a child of a test: a confined caller's variables never reach it, so the outcome does not depend on
+/// the environment the suite was started from.
+fn host_command() -> Command {
+    let mut command = Command::new(fgos_bin());
+    command
+        .env_remove("FGOS_CONFINED")
+        .env_remove("FGOS_HEAD_REQUEST_SOCKET");
+    command
+}
+
 fn fgos_bin() -> PathBuf {
     if let Ok(bin) = std::env::var("CARGO_BIN_EXE_fgos") {
         return PathBuf::from(bin);
@@ -106,7 +116,7 @@ fn ensure_dev_manifest() -> PathBuf {
 #[test]
 fn test_unlisted_selector_fails_closed_with_exit_4() {
     for args in [vec!["not-a-real-selector"], vec!["nosuch", "--help"]] {
-        let output = Command::new(fgos_bin())
+        let output = host_command()
             .args(&args)
             .output()
             .expect("failed to execute fgos");
@@ -135,7 +145,7 @@ fn an_unknown_flag_on_a_native_verb_writes_one_record_in_the_callers_store_and_n
         fs::create_dir_all(dir.join(".git")).unwrap();
         fs::create_dir_all(dir.join(".fgos")).unwrap();
     }
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .current_dir(&project)
         .env("HOME", &base)
         .args(["config", "show", "--bogus", "--dir"])
@@ -169,11 +179,11 @@ fn an_unknown_flag_on_a_native_verb_writes_one_record_in_the_callers_store_and_n
 
 #[test]
 fn version_flag_prints_one_line_with_the_version_the_verb_reports() {
-    let flag = Command::new(fgos_bin())
+    let flag = host_command()
         .arg("--version")
         .output()
         .expect("failed to execute fgos");
-    let verb = Command::new(fgos_bin())
+    let verb = host_command()
         .arg("version")
         .output()
         .expect("failed to execute fgos");
@@ -193,9 +203,7 @@ fn version_flag_prints_one_line_with_the_version_the_verb_reports() {
 
 #[test]
 fn no_arguments_print_get_started_and_exit_0() {
-    let output = Command::new(fgos_bin())
-        .output()
-        .expect("failed to execute fgos");
+    let output = host_command().output().expect("failed to execute fgos");
 
     assert_eq!(output.status.code(), Some(0));
     let stdout = String::from_utf8_lossy(&output.stdout);
@@ -219,7 +227,7 @@ fn a_retired_verb_answers_unknown_verb_for_a_call_and_for_its_help() {
         vec!["setup", "--pretty"],
         vec!["setup", "--help"],
     ] {
-        let output = Command::new(fgos_bin())
+        let output = host_command()
             .args(&args)
             .output()
             .expect("failed to execute fgos");
@@ -236,7 +244,7 @@ fn a_retired_verb_answers_unknown_verb_for_a_call_and_for_its_help() {
 
 #[test]
 fn a_near_miss_verb_is_refused_with_a_suggestion() {
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("doctr")
         .output()
         .expect("failed to execute fgos");
@@ -249,7 +257,7 @@ fn a_near_miss_verb_is_refused_with_a_suggestion() {
 
 #[test]
 fn a_verb_with_no_near_miss_gets_no_suggestion() {
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("not-a-real-selector")
         .output()
         .expect("failed to execute fgos");
@@ -260,7 +268,7 @@ fn a_verb_with_no_near_miss_gets_no_suggestion() {
 
 #[test]
 fn test_recursion_trap_fails_closed() {
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("add")
         .env("FGOS_RUST_HOST_RECURSION_GUARD", "1")
         .output()
@@ -334,7 +342,7 @@ fn test_every_help_form_starts_no_node() {
         &["workflow", "--help"],
     ];
     for args in forms {
-        let output = Command::new(fgos_bin())
+        let output = host_command()
             .args(*args)
             .env("PATH", &path)
             .env_remove("FGOS_ACTIVE_RELEASE_PATH")
@@ -369,7 +377,7 @@ fn test_one_node_child_process_spy() {
     // Create a temporary directory containing a spy `node` wrapper script.
     let (temp_dir, spy_log, modified_path) = node_spy_dir("fgos_test_spy");
 
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .args(["workflow", "list"])
         .env("PATH", modified_path)
         .env("FGOS_ACTIVE_RELEASE_PATH", &root)
@@ -399,7 +407,7 @@ fn test_one_node_child_process_spy() {
 
 #[test]
 fn test_native_version_succeeds_with_envelope() {
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("version")
         .output()
         .expect("failed to execute fgos");
@@ -475,7 +483,7 @@ fn test_native_version_zero_node_child_process_spy() {
     let original_path = std::env::var("PATH").unwrap_or_default();
     let modified_path = format!("{}:{}", temp_dir.display(), original_path);
 
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("version")
         .env("PATH", modified_path)
         .env("FGOS_ACTIVE_RELEASE_PATH", &root)
@@ -514,7 +522,7 @@ fn test_native_gate_bypass_succeeds_with_envelope() {
     )
     .unwrap();
 
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("gate-bypass")
         .current_dir(&temp_dir)
         .output()
@@ -576,7 +584,7 @@ fn test_native_gate_bypass_zero_node_child_process_spy() {
     let original_path = std::env::var("PATH").unwrap_or_default();
     let modified_path = format!("{}:{}", spy_dir.display(), original_path);
 
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("gate-bypass")
         .current_dir(&temp_dir)
         .env("PATH", modified_path)
@@ -612,7 +620,7 @@ fn gateway_status_and_stop_of_a_fresh_project_start_no_node_and_answer_not_runni
     let home = spy_dir.join("home");
     fs::create_dir_all(&home).unwrap();
     let run = |sub: &str| {
-        Command::new(fgos_bin())
+        host_command()
             .args(["gateway", sub])
             .current_dir(&project)
             .env("PATH", &path)
@@ -660,7 +668,7 @@ fn test_legacy_exec_invocation_record_sink() {
         std::env::temp_dir().join(format!("fgos_test_rec_{}.jsonl", std::process::id()));
     let _ = fs::remove_file(&record_file);
 
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .args(["workflow", "list"])
         .env("FGOS_ACTIVE_RELEASE_PATH", &root)
         .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
@@ -696,7 +704,7 @@ fn test_legacy_exec_invocation_record_sink() {
 /// unknown-verb check rather than letting the token after it pick a route.
 #[test]
 fn test_leading_unlisted_option_does_not_bypass_selector_validation() {
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .args(["--made-up", "version"])
         .output()
         .expect("failed to execute fgos");
@@ -752,7 +760,7 @@ fn test_absolute_manifest_entry_is_rejected() {
     )
     .unwrap();
 
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("add")
         .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
         .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
@@ -800,7 +808,7 @@ fn test_manifest_without_components_legacy_node_is_rejected() {
     )
     .unwrap();
 
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("add")
         .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
         .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
@@ -858,7 +866,7 @@ fn test_host_manifest_v1_invariants_are_rejected() {
         )
         .unwrap();
 
-        let output = Command::new(fgos_bin())
+        let output = host_command()
             .arg("add")
             .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
             .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
@@ -891,7 +899,7 @@ fn test_host_rejects_partial_manifest_missing_required_v1_fields() {
     )
     .unwrap();
 
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("add")
         .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
         .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
@@ -908,7 +916,7 @@ fn test_host_rejects_partial_manifest_missing_required_v1_fields() {
 }
 
 fn run_host_list(release_root: &Path, manifest_path: &Path) -> std::process::Output {
-    Command::new(fgos_bin())
+    host_command()
         .arg("list")
         .arg("--json")
         .env("FGOS_ACTIVE_RELEASE_PATH", release_root)
@@ -1072,7 +1080,7 @@ fn test_host_rejects_full_manifest_with_legacy_node_digest_only_mismatch() {
     )
     .unwrap();
 
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("list")
         .arg("--json")
         .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
@@ -1126,7 +1134,7 @@ fn test_host_rejects_full_manifest_with_mismatched_artifact_digest() {
     )
     .unwrap();
 
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("list")
         .arg("--json")
         .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
@@ -1207,7 +1215,7 @@ fn test_host_rejects_full_manifest_with_path_traversal_before_launch() {
 
     let invocation_record_path = temp_dir.join("invocations.jsonl");
 
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("list")
         .arg("--json")
         .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
@@ -1284,7 +1292,7 @@ fn test_host_rejects_manifest_with_in_root_directory_symlink() {
 
     let invocation_record_path = temp_dir.join("invocations.jsonl");
 
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("list")
         .arg("--json")
         .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
@@ -1366,7 +1374,7 @@ fn test_host_rejects_manifest_with_unlisted_payload_symlink() {
 
     let invocation_record_path = temp_dir.join("invocations.jsonl");
 
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("list")
         .arg("--json")
         .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
@@ -1443,7 +1451,7 @@ fn native_discussions_reports_owner_voters_and_root_wide_summary_diagnostics() {
         )
         .unwrap();
     }
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .args([
             "metrics",
             "discussions",
@@ -1495,7 +1503,7 @@ fn identity_state_root() -> std::path::PathBuf {
 }
 
 fn identity_command(args: &[&str]) -> Command {
-    let mut cmd = Command::new(fgos_bin());
+    let mut cmd = host_command();
     cmd.arg("identity").args(args);
     cmd.env("FGOS_STATE_ROOT", identity_state_root());
     // An empty home, so the machine's real global config never decides a case.
@@ -2381,7 +2389,7 @@ fn run_with_open_stdin(
     limit: std::time::Duration,
 ) -> Option<std::process::ExitStatus> {
     use std::process::Stdio;
-    let mut child = Command::new(fgos_bin())
+    let mut child = host_command()
         .args(args)
         .current_dir(cwd)
         .stdin(Stdio::piped())
@@ -2442,7 +2450,7 @@ fn test_native_verb_with_stdin_payload_still_reads_it() {
     let _ = fs::remove_dir_all(&temp_dir);
     fs::create_dir_all(&temp_dir).unwrap();
 
-    let mut child = Command::new(fgos_bin())
+    let mut child = host_command()
         .args(["metrics", "ping", "--dir"])
         .arg(&temp_dir)
         .current_dir(&temp_dir)
@@ -2471,7 +2479,7 @@ fn test_native_verb_with_stdin_payload_still_reads_it() {
 fn metrics_with_stdin(root: &Path, args: &[&str], stdin: &str) -> serde_json::Value {
     use std::io::Write;
     use std::process::Stdio;
-    let mut child = Command::new(fgos_bin())
+    let mut child = host_command()
         .arg("metrics")
         .args(args)
         .arg("--dir")
@@ -2553,7 +2561,7 @@ fn host_pins_the_state_root_for_the_node_payload() {
         std::env::var("PATH").unwrap_or_default()
     );
     let run = |pinned: Option<&str>| {
-        let mut cmd = Command::new(fgos_bin());
+        let mut cmd = host_command();
         cmd.args(["workflow", "list"])
             .env("PATH", &path)
             .env("FGOS_ACTIVE_RELEASE_PATH", repo_root())
@@ -2590,7 +2598,7 @@ fn config_sandbox(name: &str) -> PathBuf {
 }
 
 fn config_run(sandbox: &std::path::Path, args: &[&str], confined: bool) -> std::process::Output {
-    let mut cmd = Command::new(fgos_bin());
+    let mut cmd = host_command();
     cmd.arg("config")
         .args(args)
         .arg("--dir")
@@ -2902,7 +2910,7 @@ fn a_native_verb_under_home_with_no_project_is_refused_instead_of_using_the_glob
     fs::create_dir_all(home.join(".fgos")).unwrap();
     fs::create_dir_all(&checkout).unwrap();
     let run = |args: &[&str]| {
-        Command::new(fgos_bin())
+        host_command()
             .args(args)
             .current_dir(&checkout)
             .env("HOME", &home)
@@ -2957,7 +2965,7 @@ fn events_status_runs_in_the_host_and_starts_no_node() {
             .success());
     }
     let run = |args: &[&str]| {
-        let mut command = Command::new(fgos_bin());
+        let mut command = host_command();
         command.args(args).current_dir(&repo);
         command.env("PATH", &path);
         command.env("FGOS_STATE_ROOT", &state);
@@ -3044,7 +3052,7 @@ fn lock_status_runs_the_doors_through_the_binary_and_starts_no_node() {
         fs::canonicalize(&root).unwrap()
     };
     let run = |dir: &Path, extra: &[(&str, &str)], args: &[&str]| {
-        let mut command = Command::new(fgos_bin());
+        let mut command = host_command();
         command
             .current_dir(dir)
             .args(args)
@@ -3182,7 +3190,7 @@ fn lock_fence_refuses_without_yes_then_ends_the_holder_and_starts_no_node() {
     }
     assert!(ready.exists(), "the holder child never took the lock");
     let fence = |extra: &[&str]| {
-        Command::new(fgos_bin())
+        host_command()
             .current_dir(&project)
             .env("HOME", &base)
             .env("PATH", &path)
@@ -3294,7 +3302,7 @@ fn doctor_in(
     let manifest_path = ensure_dev_manifest();
     let home = fresh_dir("fgos_doctor_home");
     let state = fresh_dir("fgos_doctor_state");
-    let mut command = Command::new(fgos_bin());
+    let mut command = host_command();
     command
         .arg("doctor")
         .args(args)
@@ -3620,7 +3628,7 @@ fn an_interrupt_of_the_host_ends_the_bridge_child_and_everything_it_started() {
     let project = fresh_dir("fgos_doctor_sigintproj");
     let record = dump.join("invocation-record.jsonl");
     let manifest_path = ensure_dev_manifest();
-    let mut host = Command::new(fgos_bin())
+    let mut host = host_command()
         .args(["doctor", "--json"])
         .current_dir(&project)
         .env("PATH", &path)
@@ -3683,7 +3691,7 @@ fn an_interrupt_of_the_host_ends_the_bridge_child_and_everything_it_started() {
 fn a_malformed_doctor_call_is_refused_before_anything_runs() {
     let project = fresh_dir("fgos_doctor_refused");
     for args in [vec!["--bogus"], vec!["--fix=1"], vec!["--strict=1"]] {
-        let output = Command::new(fgos_bin())
+        let output = host_command()
             .arg("doctor")
             .args(&args)
             .current_dir(&project)
@@ -3731,7 +3739,7 @@ fn wire_agents_runs_in_the_host_without_node_and_a_failing_step_exits_1() {
     .unwrap();
     fs::set_permissions(&claude, fs::Permissions::from_mode(0o755)).unwrap();
     let run = |args: &[&str]| {
-        Command::new(fgos_bin())
+        host_command()
             .arg("wire-agents")
             .args(args)
             .current_dir(&project)
@@ -3785,7 +3793,7 @@ fn uninstall_plans_and_applies_with_no_node_on_the_machine_and_exits_zero() {
     let state = fresh_dir("fgos_uninstall_state");
     let path = path_without_node();
     let run = |args: &[&str]| {
-        Command::new(fgos_bin())
+        host_command()
             .arg("uninstall")
             .args(args)
             .current_dir(&project)
@@ -3872,7 +3880,7 @@ fn uninstall_from_a_linked_worktree_acts_on_the_main_checkout() {
         "// the person's own\n",
     )
     .unwrap();
-    let output = Command::new(fgos_bin())
+    let output = host_command()
         .arg("uninstall")
         .current_dir(&linked)
         .env("PATH", path_without_node())
@@ -3948,7 +3956,7 @@ impl InitWorld {
     }
 
     fn command(&self, path: &str) -> Command {
-        let mut command = Command::new(fgos_bin());
+        let mut command = host_command();
         command
             .arg("init")
             .current_dir(&self.project)
@@ -4327,7 +4335,7 @@ fn init_without_a_home_is_a_missing_precondition_and_writes_nothing() {
 fn seat_binding_route(args: &[&str], stdin: &str) -> (Option<i32>, serde_json::Value) {
     use std::io::Write;
     use std::process::Stdio;
-    let mut child = Command::new(fgos_bin())
+    let mut child = host_command()
         .args(["internal", "seat-binding"])
         .args(args)
         .stdin(Stdio::piped())
@@ -4448,7 +4456,7 @@ impl ExecutionWorld {
     }
 
     fn command(&self, args: &[&str]) -> Command {
-        let mut command = Command::new(fgos_bin());
+        let mut command = host_command();
         command
             .args(args)
             .current_dir(&self.project)
@@ -4869,7 +4877,7 @@ impl WorktreeWorld {
     }
 
     fn run(&self, cwd: &Path, args: &[&str]) -> std::process::Output {
-        Command::new(fgos_bin())
+        host_command()
             .args(args)
             .current_dir(cwd)
             .env("PATH", &self.path)
