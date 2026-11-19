@@ -101,7 +101,7 @@ impl EventSink for Queue {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Span {
     pub name: &'static str,
-    pub attrs: Vec<(&'static str, &'static str)>,
+    pub attrs: Vec<(&'static str, String)>,
     pub measures: Vec<(&'static str, u64)>,
 }
 pub trait Telemetry {
@@ -184,6 +184,8 @@ pub struct TickReport {
     pub notifies: u64,
     pub errors: u64,
     pub unmeasured: u64,
+    /// Why rows were dropped or ports failed, named: a row missing its subject or instant says which.
+    pub problems: Vec<String>,
 }
 
 /// Event id: the first 16 hex characters of sha256 of `kind|subject|ts`.
@@ -204,6 +206,7 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
         notifies: 0,
         errors: 0,
         unmeasured: 0,
+        problems: Vec::new(),
     };
     let _guard = match ports.lock.try_take() {
         Ok(Some(guard)) => guard,
@@ -294,7 +297,16 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
             continue;
         }
         let (Some(subject), Some(ts)) = (row.subject.clone(), row.ts.clone()) else {
+            let missing = match (row.subject.is_none(), row.ts.is_none()) {
+                (true, true) => "subject and ts",
+                (true, false) => "subject",
+                _ => "ts",
+            };
             r.errors += 1;
+            r.problems.push(format!(
+                "definition {} answered a row with no {missing}; the row was dropped",
+                row.kind
+            ));
             continue;
         };
         if row.kind == STUCK_KIND {
@@ -406,8 +418,9 @@ fn emit(ports: &Ports, r: &TickReport, (ready, running): (u64, u64)) {
     ports.telemetry.emit(&Span {
         name: "fgos.watcher.tick",
         attrs: vec![
-            ("fgos.watcher.mode", r.mode.as_str()),
-            ("fgos.watcher.outcome", r.outcome.as_str()),
+            ("fgos.watcher.mode", r.mode.as_str().to_owned()),
+            ("fgos.watcher.outcome", r.outcome.as_str().to_owned()),
+            ("fgos.watcher.problem", r.problems.join("; ")),
         ],
         measures: vec![
             ("fgos.watcher.interval", r.interval.max(0) as u64),

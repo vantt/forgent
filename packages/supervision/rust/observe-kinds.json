@@ -4,6 +4,7 @@
   "attrs": {
     "fgos.watcher.mode": { "type": "string", "values": ["active", "idle"] },
     "fgos.watcher.outcome": { "type": "string", "values": ["noop", "woke-supervisor", "notified", "error", "skipped-busy"] },
+    "fgos.watcher.problem": { "type": "string" },
     "fgos.supervisor.trigger": { "type": "string" },
     "fgos.supervisor.outcome": {
       "type": "string",
@@ -27,7 +28,7 @@
   "kinds": {
     "fgos.watcher.tick": {
       "subjects": ["session"],
-      "attrs": ["fgos.watcher.mode", "fgos.watcher.outcome"],
+      "attrs": ["fgos.watcher.mode", "fgos.watcher.outcome", "fgos.watcher.problem"],
       "measures": [
         "fgos.watcher.interval", "fgos.plans.ready", "fgos.plans.running", "fgos.watcher.raised",
         "fgos.watcher.duplicate", "fgos.watcher.wakes", "fgos.watcher.notifies", "fgos.watcher.errors",

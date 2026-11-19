@@ -1,0 +1,16 @@
+{
+  "now": "2026-11-18T12:00:00Z",
+  "group": {
+    "fgos.question.asker.role": "x",
+    "fgos.question.asker.session": "x",
+    "fgos.question.asker.handle": "x",
+    "fgos.question.asker.persona": "x",
+    "fgos.question.asker.pane": "x",
+    "fgos.question.asker.machine": "x",
+    "fgos.question.origin_ref": "plan:p1",
+    "fgos.question.answered_at": "2026-11-18T11:00:00.000Z",
+    "subject.id": "q-1"
+  },
+  "since": "2026-11-18T10:30:00Z",
+  "ts": "2026-11-18T11:00:00Z"
+}

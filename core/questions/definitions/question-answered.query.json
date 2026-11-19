@@ -22,7 +22,7 @@
       "fgos.question.asker.pane",
       "fgos.question.asker.machine"
     ],
-    "agg": ["count"]
+    "agg": ["count", "max:ts"]
   },
   "row": {
     "kind": "question-answered",
