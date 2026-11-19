@@ -251,7 +251,7 @@ function headCase(t, { persona = 'lead', name = 'proj-p', writes = ['plans/p'] }
   const project = scratch(t);
   fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, hostBin: '/the/fgos', unitRunId: 'head-x-1', session: { role: `head:${persona}-${name}`, persona, name, verbs: [], writes, requestSocketPath: '/run/s.sock' } }));
   const spawned = [];
-  const ports = { planOf: async () => PLAN, spawnRunner: (call) => { spawned.push(call); return { pid: 4242 }; }, readWorking: () => null };
+  const ports = { planOf: async () => PLAN, spawnRunner: (call) => { spawned.push(call); return { pid: 4242 }; }, observe: () => null, readWorking: () => null };
   const ask = (verb, args, id = 't1', extra = {}) => runHeadRequest({ runDir, request: { id, verb, args } }, { ...ports, ...extra });
   const ticketFile = (id) => path.join(fgosDirFromRoot(project), 'runtime', 'head-tickets', `${persona}-${name}`, `${id}.json`);
   return { runDir, project, spawned, ask, ticketFile, ports };
@@ -273,7 +273,7 @@ test('a land answers a ticket at once, the runner finishes it and request result
   assert.equal(spawned[0].ticketFile, ticketFile('t1'));
   const written = JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8'));
   assert.deepEqual([written.state, written.verb, written.runner], ['running', 'land', null]);
-  assert.deepEqual(written.argv, ['land', '--json', '--paths', 'plans/p/a.md', '--message', 'docs(p): a', '--tests', 'test/a.test.mjs']);
+  assert.deepEqual(written.argv, ['land', '--json', '--paths', 'plans/p/a.md', '--message', 'docs(p): a', '--test', 'test/a.test.mjs']);
   assert.equal((await ask('request result', { id: 't1' }, 'r1')).line.data.state, 'running');
   runTicket(ticketFile('t1'), { selfRecord: () => ({ pid: 1, startTime: 1 }), exec: () => ({ status: 0, stdout: 'noise\n{"result":"done","data":{"mainSha":"abc"}}\n' }) });
   const done = (await ask('request result', { id: 't1' }, 'r2')).line.data;
@@ -302,6 +302,21 @@ test('a ticket id that was used already refuses ticket-used and leaves the first
   const before = fs.readFileSync(ticketFile('t1'), 'utf8');
   assert.equal((await ask('land', { paths: ['plans/p/b.md'], message: 'm' })).line.code, 'ticket-used');
   assert.equal(fs.readFileSync(ticketFile('t1'), 'utf8'), before);
+});
+
+test('a land with several tests emits one --test flag per path', async (t) => {
+  const { ask, ticketFile } = headCase(t);
+  await ask('land', { paths: ['plans/p/a.md'], message: 'm', tests: ['test/a.test.mjs', 'test/b.test.mjs'] });
+  assert.deepEqual(JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8')).argv, ['land', '--json', '--paths', 'plans/p/a.md', '--message', 'm', '--test', 'test/a.test.mjs', '--test', 'test/b.test.mjs']);
+});
+
+test('the process identity of the started runner is on the ticket before the reply, so a runner that died at once reads failed', async (t) => {
+  const { ask, ticketFile } = headCase(t);
+  const started = await ask('run', { prompt: 'x' }, 't1', { observe: (pid) => ({ pid, startTime: 7 }) });
+  assert.equal(started.line.data.state, 'running');
+  assert.deepEqual(JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8')).runner, { pid: 4242, startTime: 7 });
+  const gone = (await ask('request result', { id: 't1' }, 'r1', { judge: () => 'dead' })).line.data;
+  assert.deepEqual([gone.state, gone.code], ['failed', 'runner-gone']);
 });
 
 test('the runner record is judged: dead is failed with runner-gone, unknown stays running', async (t) => {
@@ -333,13 +348,25 @@ test('request result waits for a running ticket to end, at most the seconds aske
   assert.equal((await ask('request result', { id: 't1', wait: 'soon' }, 'r2')).line.code, 'bad-args');
 });
 
+test('request result of a run ticket reads the settled outcome from its assignment record', async (t) => {
+  const { ask, ticketFile, project } = headCase(t);
+  await ask('run', { prompt: 'x' });
+  runTicket(ticketFile('t1'), { selfRecord: () => ({ pid: 1, startTime: 1 }), exec: () => ({ status: 0, stdout: '{"data":{"results":[{"unitRunId":"unit-run-5-abc"}]}}\n' }) });
+  const unitDir = path.join(fgosDirFromRoot(project), 'assignments', 'unit-run-5-abc');
+  fs.mkdirSync(unitDir, { recursive: true });
+  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify({ execution: { status: 'settled' } }));
+  fs.writeFileSync(path.join(unitDir, 'unit-summary.json'), JSON.stringify({ outcome: 'pass', settledAt: '2026-11-19T01:00:00Z' }));
+  const view = (await ask('request result', { id: 't1' }, 'r1')).line.data;
+  assert.deepEqual(view.assignment, { dir: '.fgos/assignments/unit-run-5-abc', present: true, settled: true, outcome: 'pass', settledAt: '2026-11-19T01:00:00Z' });
+});
+
 test('a run ticket starts fgos run without the dispatch depth marker, with the prompt as its own argument', async (t) => {
   const { ask, ticketFile } = headCase(t);
   process.env.FGOS_DISPATCH_DEPTH = '2';
   t.after(() => { delete process.env.FGOS_DISPATCH_DEPTH; });
-  await ask('run', { prompt: '--not-a-flag', writes: ['src/a/b.mjs'], provider: 'codex', worktree: '../wt' });
+  await ask('run', { prompt: 'do the work', writes: ['src/a/b.mjs'], provider: 'codex', worktree: '../wt' });
   const ticket = JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8'));
-  assert.deepEqual(ticket.argv, ['run', '--json', '--not-a-flag', '--writes', 'src/a/b.mjs', '--provider', 'codex', '--worktree', '../wt']);
+  assert.deepEqual(ticket.argv, ['run', '--json', 'do the work', '--writes', 'src/a/b.mjs', '--provider', 'codex', '--worktree', '../wt']);
   let seen;
   runTicket(ticketFile('t1'), { selfRecord: () => ({ pid: 1, startTime: 1 }), exec: (bin, argv, options) => { seen = { bin, argv, env: options.env }; return { status: 0, stdout: '{}' }; } });
   assert.equal(seen.bin, '/the/fgos');
@@ -347,25 +374,76 @@ test('a run ticket starts fgos run without the dispatch depth marker, with the p
   assert.equal(Object.hasOwn(seen.env, 'FGOS_DISPATCH_DEPTH'), false);
 });
 
-test('the bindings refuse a path outside the grant, a branch from a non-lead, a write outside the footprint and a footprint change, once each', async (t) => {
+// One refusal per behaviour: each case names the verb, its args, the code and what makes the request refuse.
+const REFUSALS = [
+  ['a land path outside the grant', 'land', { paths: ['src/x.mjs'], message: 'm' }, 'path-outside-grant'],
+  ['a land path that climbs out of the grant', 'land', { paths: ['plans/p/../../x'], message: 'm' }, 'path-outside-grant'],
+  ['a run write outside the footprint', 'run', { prompt: 'x', writes: ['src/other/b.mjs'] }, 'write-outside-footprint'],
+  ['a run write glob wider than the footprint glob', 'run', { prompt: 'x', writes: ['src/a/**/*.mjs', 'src/**'] }, 'write-outside-footprint'],
+  ['a run with a unit file', 'run', { unit: 'plans/p/u.json' }, 'bad-args'],
+  ['a land of both a branch and paths', 'land', { branch: 'b', paths: ['plans/p/a'], message: 'm' }, 'bad-args'],
+  ['a land with an unknown key', 'land', { paths: ['plans/p/a'], message: 'm', extra: 1 }, 'bad-args'],
+  ['a run prompt that starts with a dash', 'run', { prompt: '--not-a-flag' }, 'bad-args'],
+  ['a run provider that starts with a dash', 'run', { prompt: 'x', provider: '--writes' }, 'bad-args'],
+  ['a run capability that starts with a dash', 'run', { prompt: 'x', capability: '-x' }, 'bad-args'],
+  ['a run worktree that starts with a dash', 'run', { prompt: 'x', worktree: '--writes' }, 'bad-args'],
+  ['a run write that starts with a dash', 'run', { prompt: 'x', writes: ['-x'] }, 'bad-args'],
+  ['a land message that starts with a dash', 'land', { paths: ['plans/p/a.md'], message: '--branch' }, 'bad-args'],
+  ['a land test path that starts with a dash', 'land', { paths: ['plans/p/a.md'], message: 'm', tests: ['--x'] }, 'bad-args'],
+  ['a land branch that starts with a dash', 'land', { branch: '--footprint' }, 'bad-args'],
+];
+for (const [what, verb, args, code] of REFUSALS) {
+  test(`the route refuses ${what} with ${code}`, async (t) => {
+    const { ask, spawned } = headCase(t);
+    assert.equal((await ask(verb, args)).line.code, code);
+    assert.equal(spawned.length, 0);
+  });
+}
+
+test('a run write inside a footprint directory or its glob is accepted', async (t) => {
+  const { ask } = headCase(t);
+  assert.equal((await ask('run', { prompt: 'x', writes: ['src/a/deep/f.mjs', 'src/a/*.mjs', 'docs/x.md'] })).exit, 0);
+});
+
+test('a lead paths land that changes the footprint of its own plan is refused footprint-change-refused', async (t) => {
   const lead = headCase(t);
-  assert.equal((await lead.ask('land', { paths: ['src/x.mjs'], message: 'm' })).line.code, 'path-outside-grant');
-  assert.equal((await lead.ask('land', { paths: ['plans/p/../../x'], message: 'm' }, 't2')).line.code, 'path-outside-grant');
-  assert.equal((await lead.ask('run', { prompt: 'x', writes: ['src/other/b.mjs'] }, 't3')).line.code, 'write-outside-footprint');
   const edited = '---\nfootprint:\n  - src/a/**\n  - src/new/**\n---\n';
-  const changing = await lead.ask('land', { paths: ['plans/p/plan.md'], message: 'm' }, 't4', { readWorking: () => edited });
-  assert.equal(changing.line.code, 'footprint-change-refused');
+  assert.equal((await lead.ask('land', { paths: ['plans/p/plan.md'], message: 'm' }, 't4', { readWorking: () => edited })).line.code, 'footprint-change-refused');
+});
+
+test('a lead paths land that keeps the footprint of its plan is accepted', async (t) => {
+  const lead = headCase(t);
   const same = '---\nfootprint:\n  - src/a/**\n  - docs/x.md\n---\n';
   assert.equal((await lead.ask('land', { paths: ['plans/p/plan.md'], message: 'm' }, 't5', { readWorking: () => same })).exit, 0);
-  const branch = await lead.ask('land', { branch: 'task/p-1' }, 't6');
-  assert.equal(branch.exit, 0);
+});
+
+test('a lead branch land passes its plan footprint as --footprint', async (t) => {
+  const lead = headCase(t);
+  assert.equal((await lead.ask('land', { branch: 'task/p-1' }, 't6')).exit, 0);
   assert.deepEqual(JSON.parse(fs.readFileSync(lead.ticketFile('t6'), 'utf8')).argv, ['land', '--json', '--branch', 'task/p-1', '--footprint', 'src/a/**,docs/x.md']);
+});
+
+test('a lead branch land whose plan has no footprint is refused write-outside-footprint and never omits the bound', async (t) => {
+  const lead = headCase(t);
+  const refused = await lead.ask('land', { branch: 'task/p-1' }, 't1', { planOf: async () => ({ dir: 'p', footprint: [] }) });
+  assert.equal(refused.line.code, 'write-outside-footprint');
+  assert.match(refused.line.message, /no footprint/);
+  assert.equal(lead.spawned.length, 0);
+});
+
+test('a branch land from a planner is refused land-branch-lead-only', async (t) => {
   const planner = headCase(t, { persona: 'planner', name: 'proj-p', writes: ['docs/discussions'] });
   assert.equal((await planner.ask('land', { branch: 'task/p-1' })).line.code, 'land-branch-lead-only');
-  assert.equal((await planner.ask('land', { paths: ['docs/discussions/a.md'], message: 'm' }, 't2')).exit, 0);
-  assert.equal((await planner.ask('run', { prompt: 'x' }, 't3')).line.code, 'role-mismatch');
-  assert.equal((await lead.ask('land', { branch: 'b', paths: ['plans/p/a'], message: 'm' }, 't7')).line.code, 'bad-args');
-  assert.equal((await lead.ask('land', { paths: ['plans/p/a'], message: 'm', extra: 1 }, 't8')).line.code, 'bad-args');
+});
+
+test('a paths land from a planner inside its grant is accepted', async (t) => {
+  const planner = headCase(t, { persona: 'planner', name: 'proj-p', writes: ['docs/discussions'] });
+  assert.equal((await planner.ask('land', { paths: ['docs/discussions/a.md'], message: 'm' })).exit, 0);
+});
+
+test('a run from a planner is refused role-mismatch', async (t) => {
+  const planner = headCase(t, { persona: 'planner', name: 'proj-p', writes: ['docs/discussions'] });
+  assert.equal((await planner.ask('run', { prompt: 'x' })).line.code, 'role-mismatch');
 });
 
 test('worktree create without a branch is refused, with one it runs the host verb', async (t) => {
@@ -384,7 +462,7 @@ test('worktree create without a branch is refused, with one it runs the host ver
 test('supervisor done on an empty queue answers stopping and starts the stop of the caller own role', async (t) => {
   const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
   const stops = [];
-  const base = { spawnStop: (call) => stops.push(call) };
+  const base = { spawnStop: (call) => { stops.push(call); return { pid: 99 }; } };
   const busy = await ask('supervisor done', {}, 'd1', { ...base, hostCall: () => ({ status: 1, stdout: '{"code":"events-unhandled","message":"2 left"}\n' }) });
   assert.equal(busy.line.code, 'events-unhandled');
   assert.equal(stops.length, 0);
@@ -396,6 +474,13 @@ test('supervisor done on an empty queue answers stopping and starts the stop of 
   assert.deepEqual(handled.line.data.argv, ['supervisor', 'handled', 'ev-1', '--json']);
 });
 
+test('supervisor done reports stopping only when the detached stop process started', async (t) => {
+  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
+  const hostCall = () => ({ status: 0, stdout: '{"data":{"done":true}}\n' });
+  const failed = await ask('supervisor done', {}, 'd1', { hostCall, spawnStop: () => ({ pid: null, error: 'EAGAIN' }) });
+  assert.deepEqual(failed.line.data, { done: true });
+});
+
 test('the detached stop of the own session waits for the route to exit, then stops the role', async () => {
   const order = [];
   let alive = 2;
@@ -403,24 +488,61 @@ test('the detached stop of the own session waits for the route to exit, then sto
     observe: () => ({ pid: 77, startTime: 1 }),
     alive: () => { order.push('alive?'); alive -= 1; return alive > 0; },
     sleep: async () => { order.push('sleep'); },
-    stop: { identity: () => ({ live: false }), host: {} },
+    stop: { identity: () => { order.push('stop'); return { live: false }; }, host: {} },
   });
   assert.deepEqual(order.slice(0, 3), ['alive?', 'sleep', 'alive?']);
+  assert.equal(order.at(-1), 'stop');
+  assert.equal(order.filter((x) => x === 'alive?').length, 2);
 });
 
-test('session stop is allowed for a lead of this project, the own role and an asker of an answered question, and refused for any other', async (t) => {
-  const { ask, project } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
-  const lineage = lineageDirOf(project, 'lead', 'proj-p');
-  writeHeadPlacement(lineage, { role: 'head:lead-proj-p', gen: 1, placement: { host: 'terminal', key: 'k1' }, runDir: '/r', persona: 'lead', startedAt: '2026-11-19T00:00:00Z' });
-  const stop = { identity: () => ({ live: true }), host: { retireAsync: async () => ({ result: 'retired' }) } };
-  const ports = { stop, plan: { handle: 'proj' }, askerAnswered: () => false };
-  const stopped = await ask('session stop', { persona: 'lead', name: 'proj-p', reason: 'plan done' }, 's1', ports);
-  assert.deepEqual(stopped.line.data, { stopped: true });
+/** A supervisor head, a stoppable `lead-proj-p` lineage with a placement, and the stop ports that end it. */
+function stopCase(t) {
+  const c = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
+  writeHeadPlacement(lineageDirOf(c.project, 'lead', 'proj-p'), { role: 'head:lead-proj-p', gen: 1, placement: { host: 'terminal', key: 'k1' }, runDir: '/r', persona: 'lead', startedAt: '2026-11-19T00:00:00Z' });
+  const stop = { identity: () => ({ live: true }), host: { retireAsync: async () => ({ result: 'retired' }) }, end: () => true, closed: () => true, sleep: async () => {} };
+  return { ...c, ports: { stop, plan: { handle: 'proj' }, askerAnswered: () => false } };
+}
+
+test('session stop of a lead of this project stops it', async (t) => {
+  const { ask, ports } = stopCase(t);
+  assert.deepEqual((await ask('session stop', { persona: 'lead', name: 'proj-p', reason: 'plan done' }, 's1', ports)).line.data, { stopped: true });
+});
+
+test('session stop of a persona-name that is no plan head of this project is refused role-mismatch', async (t) => {
+  const { ask, ports } = stopCase(t);
   assert.equal((await ask('session stop', { persona: 'secretary', name: 'miu' }, 's2', ports)).line.code, 'role-mismatch');
   assert.equal((await ask('session stop', { persona: 'lead', name: 'other-p' }, 's3', ports)).line.code, 'role-mismatch');
-  assert.equal((await ask('session stop', { persona: 'secretary', name: 'miu' }, 's4', { ...ports, askerAnswered: (role) => role === 'head:secretary-miu' })).line.data.stopped, false);
+});
+
+test('session stop of the asker of an answered question is allowed', async (t) => {
+  const { ask, ports } = stopCase(t);
+  const answered = await ask('session stop', { persona: 'secretary', name: 'miu' }, 's4', { ...ports, askerAnswered: (role) => role === 'head:secretary-miu' });
+  assert.equal(answered.line.data.stopped, false);
+});
+
+test('session stop of the caller own role is allowed', async (t) => {
+  const { ask, ports } = stopCase(t);
   assert.equal((await ask('session stop', { persona: 'supervisor', name: 'proj' }, 's5', ports)).line.data.stopped, false);
+});
+
+test('session stop with a persona that is not a name is bad-persona', async (t) => {
+  const { ask, ports } = stopCase(t);
   assert.equal((await ask('session stop', { persona: '../x', name: 'p' }, 's6', ports)).line.code, 'bad-persona');
+});
+
+test('the asker of an answered question is found in the asker roles of the host rows, and a host failure surfaces with its code', async (t) => {
+  const { ask, ports } = stopCase(t);
+  const { askerAnswered: _unused, ...withoutPort } = ports;
+  const rows = { status: 0, stdout: JSON.stringify({ data: { questions: [{ id: 'q1', asker: { handle: 'claude-1@m', roles: ['head:secretary-miu'] } }] } }) };
+  const calls = [];
+  const hostCall = (call) => { calls.push(call.argv); return rows; };
+  const found = await ask('session stop', { persona: 'secretary', name: 'miu' }, 's7', { ...withoutPort, hostCall });
+  assert.equal(found.exit, 0);
+  assert.deepEqual(calls[0], ['questions', '--answered', '--json']);
+  const nobody = await ask('session stop', { persona: 'secretary', name: 'zed' }, 's8', { ...withoutPort, hostCall });
+  assert.equal(nobody.line.code, 'role-mismatch');
+  const failing = await ask('session stop', { persona: 'secretary', name: 'miu' }, 's9', { ...withoutPort, hostCall: () => ({ status: 1, stdout: '{"code":"store-unreadable","message":"x"}\n' }) });
+  assert.equal(failing.line.code, 'store-unreadable');
 });
 
 test('session start passes forQuestion down to the opening, and the opening carries one line naming the question', async (t) => {
