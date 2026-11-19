@@ -74,7 +74,7 @@ pub trait Clock {
     fn now(&self) -> i64;
 }
 
-/// The `fgos.supervisor.wake` span: `trigger` and `outcome` attrs on the `ref` subject.
+/// The `fgos.supervisor.wake` span: `trigger` and `outcome` attrs on the trigger's `event` subject (a queue event or row id).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WakeSpan {
     pub name: &'static str,
@@ -117,7 +117,8 @@ pub enum WakeOutcome {
     IdentityUnknown,
     RoleHeldOtherProject,
     ProjectIdMissing,
-    /// The host's code.
+    /// The refusal code of the port that failed: the host's start, or the queue or wake log that
+    /// blocked a start. The outcome vocabulary has no value for a failed queue read or close.
     StartFailed(String),
     Backoff,
 }
@@ -180,8 +181,8 @@ fn decide(ports: &Ports, s: &Settings) -> WakeOutcome {
     {
         let ids: Vec<String> = unhandled.iter().map(|e| e.id.clone()).collect();
         // A failed close only means the next tick looks again.
-        if ports.queue.mark_handled(&ids, "watcher").is_err() {
-            return WakeOutcome::StartFailed("store-unavailable".to_owned());
+        if let Err(e) = ports.queue.mark_handled(&ids, "watcher") {
+            return WakeOutcome::StartFailed(e.code.to_owned());
         }
         return WakeOutcome::NothingAdmissible;
     }

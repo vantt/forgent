@@ -16,6 +16,9 @@ const HANDLE: &str = "forgent";
 struct Fake {
     project: Option<ProjectInfo>,
     holder: RefCell<Option<Holder>>,
+    holder_roles: RefCell<Vec<String>>,
+    plans_unreadable: bool,
+    mark_error: Cell<Option<&'static str>>,
     events: RefCell<Vec<RaisedEvent>>,
     handled: RefCell<Vec<(String, String)>>,
     plans: Vec<Plan>,
@@ -89,7 +92,8 @@ impl Project for Fake {
     }
 }
 impl Identity for Fake {
-    fn holder(&self, _: &str) -> Holder {
+    fn holder(&self, role: &str) -> Holder {
+        self.holder_roles.borrow_mut().push(role.into());
         self.holder.borrow().clone().unwrap()
     }
 }
@@ -103,6 +107,9 @@ impl StartSession for Fake {
 }
 impl Portfolio for Fake {
     fn plans(&self) -> Result<Vec<Plan>, String> {
+        if self.plans_unreadable {
+            return Err("plans-unreadable".into());
+        }
         Ok(self.plans.clone())
     }
     fn done_dirs(&self) -> Result<Vec<String>, String> {
@@ -114,6 +121,12 @@ impl Drain for Fake {
         Ok(self.events.borrow().clone())
     }
     fn mark_handled(&self, ids: &[String], by: &str) -> Result<usize, QueueError> {
+        if let Some(code) = self.mark_error.get() {
+            return Err(QueueError {
+                code,
+                detail: String::new(),
+            });
+        }
         self.events.borrow_mut().retain(|e| !ids.contains(&e.id));
         for id in ids {
             self.handled.borrow_mut().push((id.clone(), by.into()));
@@ -167,6 +180,31 @@ fn capacity_events_with_nothing_admissible_are_handled_by_the_watcher() {
 }
 
 #[test]
+fn an_unreadable_portfolio_is_never_read_as_nothing_admissible() {
+    let mut f = Fake::new().with_event("lane-freed");
+    f.plans_unreadable = true;
+    assert_eq!(f.wake(), WakeOutcome::Started);
+    assert_eq!(f.events.borrow().len(), 1);
+    assert!(f.handled.borrow().is_empty());
+}
+
+#[test]
+fn capacity_events_mixed_with_other_events_start_and_are_not_marked_handled() {
+    let f = Fake::new().with_event("lane-freed").with_event("plan-done");
+    assert_eq!(f.wake(), WakeOutcome::Started);
+    assert_eq!(f.events.borrow().len(), 2);
+    assert!(f.handled.borrow().is_empty());
+}
+
+#[test]
+fn a_failed_close_keeps_the_ports_refusal_code() {
+    let f = Fake::new().with_event("lane-freed");
+    f.mark_error.set(Some("event-unknown"));
+    assert_eq!(f.wake(), WakeOutcome::StartFailed("event-unknown".into()));
+    assert!(f.started.borrow().is_empty());
+}
+
+#[test]
 fn a_live_holder_of_this_project_is_never_started() {
     let f = Fake::new().with_event("plan-done");
     *f.holder.borrow_mut() = Some(Holder::Live {
@@ -208,6 +246,10 @@ fn not_live_starts_once_and_a_second_wake_in_the_grace_is_starting() {
     assert_eq!(
         *f.started.borrow(),
         vec![("supervisor".to_owned(), supervisor_name(HANDLE))]
+    );
+    assert_eq!(
+        *f.holder_roles.borrow(),
+        vec![format!("head:supervisor-{}", supervisor_name(HANDLE))]
     );
     f.now.set(f.now.get() + 60);
     assert_eq!(f.wake(), WakeOutcome::Starting);
