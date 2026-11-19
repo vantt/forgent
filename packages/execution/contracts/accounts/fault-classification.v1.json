@@ -1,0 +1,938 @@
+{
+  "contract": "accounts-fault-classification.v1",
+  "recordedBy": "test/golden-recorders/accounts.recorder.mjs",
+  "windowTexts": [
+    {
+      "text": "Resets in 2h",
+      "ms": 7200000
+    },
+    {
+      "text": "resets in 24m1s",
+      "ms": 1441000
+    },
+    {
+      "text": "reset in 1h 30m",
+      "ms": 5400000
+    },
+    {
+      "text": "Resets in 45s",
+      "ms": 45000
+    },
+    {
+      "text": "resets in 0s",
+      "ms": null
+    },
+    {
+      "text": "resets in 5 minutes",
+      "ms": null
+    },
+    {
+      "text": "resets  in  3h",
+      "ms": 10800000
+    },
+    {
+      "text": "will reset in 90m now",
+      "ms": 5400000
+    },
+    {
+      "text": "no window here",
+      "ms": null
+    },
+    {
+      "text": "resets in",
+      "ms": null
+    },
+    {
+      "text": "resets in 12",
+      "ms": null
+    },
+    {
+      "text": "RESETS IN 1H",
+      "ms": 3600000
+    },
+    {
+      "text": "quota resets in 1h30m, try later",
+      "ms": 5400000
+    },
+    {
+      "text": 12,
+      "ms": null
+    }
+  ],
+  "clockTimes": [
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "text": "try again at 6:02 PM.",
+      "ms": 1795111320000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "text": "Try again at 12:00 AM",
+      "ms": 1795132800000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "text": "try again at 12:30 pm",
+      "ms": 1795091400000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "text": "try again at 9:05am",
+      "ms": 1795079100000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "text": "try again at 7:00 PM",
+      "ms": 1795114800000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "text": "try again at 6:2 PM",
+      "ms": null
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "text": "nothing",
+      "ms": null
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795131000000,
+      "text": "try again at 6:02 PM.",
+      "ms": 1795197720000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795131000000,
+      "text": "Try again at 12:00 AM",
+      "ms": 1795132800000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795131000000,
+      "text": "try again at 12:30 pm",
+      "ms": 1795177800000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795131000000,
+      "text": "try again at 9:05am",
+      "ms": 1795165500000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795131000000,
+      "text": "try again at 7:00 PM",
+      "ms": 1795201200000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795131000000,
+      "text": "try again at 6:2 PM",
+      "ms": null
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795131000000,
+      "text": "nothing",
+      "ms": null
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1782907200000,
+      "text": "try again at 6:02 PM.",
+      "ms": 1782928920000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1782907200000,
+      "text": "Try again at 12:00 AM",
+      "ms": 1782950400000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1782907200000,
+      "text": "try again at 12:30 pm",
+      "ms": 1782909000000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1782907200000,
+      "text": "try again at 9:05am",
+      "ms": 1782983100000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1782907200000,
+      "text": "try again at 7:00 PM",
+      "ms": 1782932400000
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1782907200000,
+      "text": "try again at 6:2 PM",
+      "ms": null
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1782907200000,
+      "text": "nothing",
+      "ms": null
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "text": "try again at 6:02 PM.",
+      "ms": 1795086120000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "text": "Try again at 12:00 AM",
+      "ms": 1795107600000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "text": "try again at 12:30 pm",
+      "ms": 1795066200000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "text": "try again at 9:05am",
+      "ms": 1795140300000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "text": "try again at 7:00 PM",
+      "ms": 1795089600000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "text": "try again at 6:2 PM",
+      "ms": null
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "text": "nothing",
+      "ms": null
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795131000000,
+      "text": "try again at 6:02 PM.",
+      "ms": 1795172520000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795131000000,
+      "text": "Try again at 12:00 AM",
+      "ms": 1795194000000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795131000000,
+      "text": "try again at 12:30 pm",
+      "ms": 1795152600000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795131000000,
+      "text": "try again at 9:05am",
+      "ms": 1795140300000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795131000000,
+      "text": "try again at 7:00 PM",
+      "ms": 1795176000000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795131000000,
+      "text": "try again at 6:2 PM",
+      "ms": null
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795131000000,
+      "text": "nothing",
+      "ms": null
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1782907200000,
+      "text": "try again at 6:02 PM.",
+      "ms": 1782990120000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1782907200000,
+      "text": "Try again at 12:00 AM",
+      "ms": 1782925200000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1782907200000,
+      "text": "try again at 12:30 pm",
+      "ms": 1782970200000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1782907200000,
+      "text": "try again at 9:05am",
+      "ms": 1782957900000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1782907200000,
+      "text": "try again at 7:00 PM",
+      "ms": 1782993600000
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1782907200000,
+      "text": "try again at 6:2 PM",
+      "ms": null
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1782907200000,
+      "text": "nothing",
+      "ms": null
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795064400000,
+      "text": "try again at 6:02 PM.",
+      "ms": 1795129320000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795064400000,
+      "text": "Try again at 12:00 AM",
+      "ms": 1795150800000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795064400000,
+      "text": "try again at 12:30 pm",
+      "ms": 1795109400000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795064400000,
+      "text": "try again at 9:05am",
+      "ms": 1795097100000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795064400000,
+      "text": "try again at 7:00 PM",
+      "ms": 1795132800000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795064400000,
+      "text": "try again at 6:2 PM",
+      "ms": null
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795064400000,
+      "text": "nothing",
+      "ms": null
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795131000000,
+      "text": "try again at 6:02 PM.",
+      "ms": 1795215720000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795131000000,
+      "text": "Try again at 12:00 AM",
+      "ms": 1795150800000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795131000000,
+      "text": "try again at 12:30 pm",
+      "ms": 1795195800000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795131000000,
+      "text": "try again at 9:05am",
+      "ms": 1795183500000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795131000000,
+      "text": "try again at 7:00 PM",
+      "ms": 1795132800000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795131000000,
+      "text": "try again at 6:2 PM",
+      "ms": null
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -300,
+      "now": 1795131000000,
+      "text": "nothing",
+      "ms": null
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -240,
+      "now": 1782907200000,
+      "text": "try again at 6:02 PM.",
+      "ms": 1782943320000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -240,
+      "now": 1782907200000,
+      "text": "Try again at 12:00 AM",
+      "ms": 1782964800000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -240,
+      "now": 1782907200000,
+      "text": "try again at 12:30 pm",
+      "ms": 1782923400000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -240,
+      "now": 1782907200000,
+      "text": "try again at 9:05am",
+      "ms": 1782911100000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -240,
+      "now": 1782907200000,
+      "text": "try again at 7:00 PM",
+      "ms": 1782946800000
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -240,
+      "now": 1782907200000,
+      "text": "try again at 6:2 PM",
+      "ms": null
+    },
+    {
+      "tz": "America/New_York",
+      "utcOffsetMin": -240,
+      "now": 1782907200000,
+      "text": "nothing",
+      "ms": null
+    }
+  ],
+  "describeSignal": [
+    {
+      "signal": {
+        "status": 429,
+        "statusWord": "RESOURCE_EXHAUSTED",
+        "requestedWaitMs": 30500,
+        "resetHint": "resets in 1h"
+      },
+      "text": "HTTP 429, RESOURCE_EXHAUSTED, wait 31s, resets in 1h"
+    },
+    {
+      "signal": {
+        "status": 503
+      },
+      "text": "HTTP 503"
+    },
+    {
+      "signal": {
+        "resetHint": "x"
+      },
+      "text": "x"
+    },
+    {
+      "signal": {},
+      "text": null
+    },
+    {
+      "signal": null,
+      "text": null
+    },
+    {
+      "signal": "text",
+      "text": null
+    }
+  ],
+  "classify": [
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "provider-limit",
+        "stopCause": "quota",
+        "providerSignal": {
+          "requestedWaitMs": 30000
+        }
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "quota-limit",
+        "quarantineKind": "temporary",
+        "until": "2026-11-19T05:00:30.000Z",
+        "resetKnown": true
+      }
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "provider-limit",
+        "stopCause": "quota",
+        "providerSignal": {
+          "requestedWaitMs": 30000
+        }
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "quota-limit",
+        "quarantineKind": "temporary",
+        "until": "2026-11-19T05:00:30.000Z",
+        "resetKnown": true
+      }
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "paused-limit",
+        "providerSignal": {
+          "resetHint": "resets in 2h"
+        }
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "quota-limit",
+        "quarantineKind": "temporary",
+        "until": "2026-11-19T07:00:00.000Z",
+        "resetKnown": true
+      }
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "paused-limit",
+        "providerSignal": {
+          "resetHint": "resets in 2h"
+        }
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "quota-limit",
+        "quarantineKind": "temporary",
+        "until": "2026-11-19T07:00:00.000Z",
+        "resetKnown": true
+      }
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "provider-limit",
+        "providerSignal": {
+          "resetHint": "try again at 6:02 PM."
+        }
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "quota-limit",
+        "quarantineKind": "temporary",
+        "until": "2026-11-19T18:02:00.000Z",
+        "resetKnown": true
+      }
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "provider-limit",
+        "providerSignal": {
+          "resetHint": "try again at 6:02 PM."
+        }
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "quota-limit",
+        "quarantineKind": "temporary",
+        "until": "2026-11-19T11:02:00.000Z",
+        "resetKnown": true
+      }
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "provider-limit",
+        "providerSignal": {
+          "requestedWaitMs": 99999999999
+        }
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "quota-limit",
+        "quarantineKind": "temporary",
+        "until": "2026-11-20T05:00:00.000Z",
+        "resetKnown": true
+      }
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "provider-limit",
+        "providerSignal": {
+          "requestedWaitMs": 99999999999
+        }
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "quota-limit",
+        "quarantineKind": "temporary",
+        "until": "2026-11-20T05:00:00.000Z",
+        "resetKnown": true
+      }
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "provider-limit",
+        "providerSignal": null
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "quota-limit",
+        "quarantineKind": "temporary",
+        "until": "2026-11-19T06:00:00.000Z",
+        "resetKnown": false
+      }
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "provider-limit",
+        "providerSignal": null
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "quota-limit",
+        "quarantineKind": "temporary",
+        "until": "2026-11-19T06:00:00.000Z",
+        "resetKnown": false
+      }
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "provider-limit",
+        "stopCause": "credential"
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "auth-token",
+        "quarantineKind": "manual-clear"
+      }
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "provider-limit",
+        "stopCause": "credential"
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "auth-token",
+        "quarantineKind": "manual-clear"
+      }
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "provider-limit",
+        "stopCause": "provider"
+      },
+      "fault": {
+        "action": "evidence-only",
+        "reasonCode": "provider-error"
+      }
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "provider-limit",
+        "stopCause": "provider"
+      },
+      "fault": {
+        "action": "evidence-only",
+        "reasonCode": "provider-error"
+      }
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "structuredAgent": {
+          "stopReason": "paused-limit"
+        },
+        "stopCause": "quota"
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "quota-limit",
+        "quarantineKind": "temporary",
+        "until": "2026-11-19T06:00:00.000Z",
+        "resetKnown": false
+      }
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "structuredAgent": {
+          "stopReason": "paused-limit"
+        },
+        "stopCause": "quota"
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "quota-limit",
+        "quarantineKind": "temporary",
+        "until": "2026-11-19T06:00:00.000Z",
+        "resetKnown": false
+      }
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "structuredAgent": {
+          "stopReason": "provider-limit"
+        },
+        "stopCause": "credential"
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "auth-token",
+        "quarantineKind": "manual-clear"
+      }
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "structuredAgent": {
+          "stopReason": "provider-limit"
+        },
+        "stopCause": "credential"
+      },
+      "fault": {
+        "action": "quarantine",
+        "reasonCode": "auth-token",
+        "quarantineKind": "manual-clear"
+      }
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "completed"
+      },
+      "fault": {
+        "action": "evidence-only",
+        "reasonCode": "unknown-or-low-confidence"
+      }
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "input": {
+        "provider": "openai",
+        "adapterOutcome": "completed"
+      },
+      "fault": {
+        "action": "evidence-only",
+        "reasonCode": "unknown-or-low-confidence"
+      }
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "input": {
+        "provider": "",
+        "adapterOutcome": "provider-limit"
+      },
+      "fault": {
+        "action": "evidence-only",
+        "reasonCode": "provider-unknown"
+      }
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "input": {
+        "provider": "",
+        "adapterOutcome": "provider-limit"
+      },
+      "fault": {
+        "action": "evidence-only",
+        "reasonCode": "provider-unknown"
+      }
+    },
+    {
+      "tz": "UTC",
+      "utcOffsetMin": 0,
+      "now": 1795064400000,
+      "input": {
+        "provider": null,
+        "adapterOutcome": "provider-limit"
+      },
+      "fault": {
+        "action": "evidence-only",
+        "reasonCode": "provider-unknown"
+      }
+    },
+    {
+      "tz": "Asia/Ho_Chi_Minh",
+      "utcOffsetMin": 420,
+      "now": 1795064400000,
+      "input": {
+        "provider": null,
+        "adapterOutcome": "provider-limit"
+      },
+      "fault": {
+        "action": "evidence-only",
+        "reasonCode": "provider-unknown"
+      }
+    }
+  ]
+}
