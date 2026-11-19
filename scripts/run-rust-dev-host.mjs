@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { nativeAddonLibraryName } from './build-rust-distribution.mjs';
 import { devHostEnv, devHostManifest } from './lib/dev-host-manifest.mjs';
 import { gitAddonDirectory } from './lib/git-addon-stage.mjs';
-import { processesInside } from '../src/runner/dispatch/stop-processes-inside.mjs';
+import { processesInside } from '../src/native/stop-processes-inside.mjs';
 import { scan } from '../src/native/process-identity.mjs';
 import { refuseSymlink } from '../src/util/refuse-symlink.mjs';
 

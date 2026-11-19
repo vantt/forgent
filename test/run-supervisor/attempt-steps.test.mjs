@@ -16,7 +16,7 @@ import { copyCredentialFiles, credentialWriteBackTarget } from '../../src/runner
 import { providerAccountDir, providerCapacityStatePaths } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { providerStopOf, terminalStopMessage } from '../../src/run-supervisor/steps/settle-attempt.mjs';
 import { runAttemptStep, verifyPayload } from '../../src/run-supervisor/attempt-step.mjs';
-import { releasePayloadRoot } from '../../src/run-supervisor/payload-root.mjs';
+import { releasePayloadRoot } from '../../src/util/payload-root.mjs';
 
 const REPO = path.resolve(import.meta.dirname, '../..');
 const ENTRY = path.join(REPO, 'src/run-supervisor/attempt-step.mjs');

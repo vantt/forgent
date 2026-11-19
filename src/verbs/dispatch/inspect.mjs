@@ -7,7 +7,7 @@ import { createTerminalControl, scanTerminalAllocations } from '../../terminal-c
 import { resolveHerdrBin } from '../../runner/dispatch/terminal-slot.mjs';
 import { resolveMainCheckoutRoot } from '../../runner/paths.mjs';
 import { invokeHost } from '../../util/host-bin.mjs';
-import { OWN_PAYLOAD_ROOT } from '../../run-supervisor/payload-root.mjs';
+import { OWN_PAYLOAD_ROOT } from '../../util/payload-root.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fgosDirFromRoot } from '../../util/fgos-file-registry.mjs';

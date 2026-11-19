@@ -1,7 +1,7 @@
 // Canonical operation -> dispatch capability derivation.
 // Leaf module shared by coordination binding and assignment policy resolution.
 
-import { hasCapabilityEntry } from './execution/capability-config.mjs';
+import { hasCapabilityEntry } from './capability-config.mjs';
 
 /**
  * Derive an operation's canonical dispatch capability.

@@ -114,7 +114,7 @@ test('the launcher scans for processes inside a run directory that does not exis
   const env = { ...process.env };
   for (const name of Object.keys(env)) if (name.startsWith('FGOS_')) delete env[name];
   const launcher = fileURLToPath(new URL('../../scripts/run-rust-dev-host.mjs', import.meta.url));
-  const stop = fileURLToPath(new URL('../../src/runner/dispatch/stop-processes-inside.mjs', import.meta.url));
+  const stop = fileURLToPath(new URL('../../src/native/stop-processes-inside.mjs', import.meta.url));
   const script = `import { stageLauncherDoor } from ${JSON.stringify(launcher)};
     import { processesInside } from ${JSON.stringify(stop)};
     import fs from 'node:fs';

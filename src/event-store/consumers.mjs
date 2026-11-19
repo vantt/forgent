@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
+import { OWN_PAYLOAD_ROOT } from '../util/payload-root.mjs';
 
 function invalid(detail) {
   return Object.assign(new Error(`event-store-consumer-registry: ${detail}`), { code: 'event-store-consumer-registry' });

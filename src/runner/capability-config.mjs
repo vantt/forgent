@@ -1,4 +1,4 @@
-// src/runner/execution/capability-config.mjs — the one door to the capability catalog (`runner.capabilities`).
+// src/runner/capability-config.mjs — the one door to the capability catalog (`runner.capabilities`).
 // Architecture guard: pure. The only module that reads runner.capabilities; it answers per field and never
 // returns an entry object.
 //
@@ -9,7 +9,7 @@
 //           first colon; a name with no colon has no prefix entry, and the bare verb of `code:review` is never a key).
 // An "entry" is an own key whose value is a non-null object (an array counts, as the doctor rows treat it).
 
-import { RIGOR_VALUES } from '../rigor.mjs';
+import { RIGOR_VALUES } from './rigor.mjs';
 
 const isEntry = (value) => value !== null && typeof value === 'object';
 const isPlainObject = (value) => isEntry(value) && !Array.isArray(value);

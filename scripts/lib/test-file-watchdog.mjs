@@ -25,7 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { worktreeRegistrationsUnder } from './git-dir-layout.mjs';
 import { pruneMissingCheckouts } from './git-ports.mjs';
 import { judge, observe, scan, signalByIdentity } from '../../src/native/process-identity.mjs';
-import { stopProcessesInside } from '../../src/runner/dispatch/stop-processes-inside.mjs';
+import { stopProcessesInside } from '../../src/native/stop-processes-inside.mjs';
 
 // ps prints whole seconds from a clock sampled per process, so a child may
 // read a little older than its parent; the ceiling applies when the parent is

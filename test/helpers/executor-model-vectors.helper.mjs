@@ -13,7 +13,7 @@ import { withDefaultExecutor, validateRunnerConfigShape } from '../../src/runner
 import { familyOf, renderedEffortLevels } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { lookupExecutor } from '../../src/runner/dispatch/resolve.mjs';
 import { resolveExecutorGovernance, resolveExecutorProvider } from '../../src/runner/dispatch/executor-governance.mjs';
-import { capabilityConfinementOf } from '../../src/runner/execution/capability-config.mjs';
+import { capabilityConfinementOf } from '../../src/runner/capability-config.mjs';
 import { credentialStoreOf, providerAccountInventory, readAccountStateOverlay } from '../../src/runner/dispatch/provider-capacity.mjs';
 import { legacyStateKey, readLlmAccounts } from '../../src/runner/dispatch/llm-accounts.mjs';
 import { decideExecutorDispatchMechanism } from '../../src/runner/dispatch/mechanism.mjs';

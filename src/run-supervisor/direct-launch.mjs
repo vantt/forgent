@@ -21,7 +21,7 @@ import { adoptRun, resolveRouteHostBin, RunSupervisorError } from './client.mjs'
 import { readGateKillGraceMs } from './gate-kill-grace.mjs';
 import { readConfig } from '../config/facade.mjs';
 import { ensureRuntimeSocketDir } from './runtime-dir.mjs';
-import { OWN_PAYLOAD_ROOT, realpathOrNull, releasePayloadRoot } from './payload-root.mjs';
+import { OWN_PAYLOAD_ROOT, realpathOrNull, releasePayloadRoot } from '../util/payload-root.mjs';
 import { RUN_SUPERVISOR_PROTOCOL as PROTOCOL, ATTEMPT_STEP_TIMEOUT_MS, MAX_ATTEMPT_STEPS } from './protocol.mjs';
 
 // The supervisor's start budgets for a terminal seat, summed, plus 15 000 slack for the herdr calls:

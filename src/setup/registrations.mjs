@@ -66,7 +66,7 @@ import { detectRetiredPatternKeys, RESERVED_PATTERN_NAMES, SEAT_BINDING_MARKER_P
 import { isCommandAvailable, resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import {
   capabilityConfinementOf, capabilityNamesOf, catalogOf, hasCapabilityEntry, ownMinCheckersOf,
-} from '../runner/execution/capability-config.mjs';
+} from '../runner/capability-config.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';

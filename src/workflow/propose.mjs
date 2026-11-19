@@ -18,7 +18,7 @@ import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { resolveGitRoots } from '../runner/execution/run.mjs';
-import { capabilityVerifyOf } from '../runner/execution/capability-config.mjs';
+import { capabilityVerifyOf } from '../runner/capability-config.mjs';
 import { slugOf } from '../util/slug.mjs';
 import { RIGOR_ORDER } from './guide-schema.mjs';
 import { guideSha256 } from './case-start.mjs';

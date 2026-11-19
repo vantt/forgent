@@ -2271,7 +2271,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         }
         throw err;
       }
-      const { capabilityDescriptionOf } = await import('../src/runner/execution/capability-config.mjs');
+      const { capabilityDescriptionOf } = await import('../src/runner/capability-config.mjs');
 
       let targetPath = absPath;
       let result;

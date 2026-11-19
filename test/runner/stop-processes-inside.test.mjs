@@ -1,4 +1,4 @@
-// Owning proof of src/runner/dispatch/stop-processes-inside.mjs. The module
+// Owning proof of src/native/stop-processes-inside.mjs. The module
 // had no test of its own (`rg -l "stopProcessesInside|processesInside" test`
 // found nothing); its callers are the confinement cleanup, the worker home
 // teardown and the dev host launcher, whose own tests do not exercise it.
@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
-import { processesInside, stopProcessesInside } from '../../src/runner/dispatch/stop-processes-inside.mjs';
+import { processesInside, stopProcessesInside } from '../../src/native/stop-processes-inside.mjs';
 
 test('processesInside names the identities it finds (a view with its identity tuple), never a bare pid, and never this process or its parent', async () => {
   if (os.platform() !== 'linux') return;

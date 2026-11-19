@@ -17,7 +17,7 @@ import { REPEAT_MODE_VALUES } from './execution-contract.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { deriveOperationCapability } from '../operation-capability.mjs';
 import { SEAT_ROLES, effectiveRigorOf } from '../execution/seat-resolver.mjs';
-import { capabilityRigorOf, hasOwnPreferPool, registeredCapabilityOf } from '../execution/capability-config.mjs';
+import { capabilityRigorOf, hasOwnPreferPool, registeredCapabilityOf } from '../capability-config.mjs';
 import { isReadOnlyAssignment } from './assignment.mjs';
 import { bindWorkSeat, viaSeatRoute } from '../execution/bind.mjs';
 import { plan as routePlan } from '../../seat-binding/client.mjs';

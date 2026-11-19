@@ -13,7 +13,7 @@ import {
 } from "./policies.mjs";
 import { ConfinementPolicyError } from "./workspace-paths.mjs";
 import { credentialStoreOf, credentialStoreProblem, providerCapacityForInvocation } from "../provider-capacity.mjs";
-import { capabilityConfinementOf } from "../../execution/capability-config.mjs";
+import { capabilityConfinementOf } from "../../capability-config.mjs";
 
 /** A refusal that names why a blind dispatch cannot be enforced, before anything launches. */
 function blindRefusal(code, detail) {

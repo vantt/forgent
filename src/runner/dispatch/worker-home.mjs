@@ -39,7 +39,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { readTrust, trustedProjectEntry, TrustStoreError } from '../../run-supervisor/trust-store.mjs';
-import { stopProcessesInside } from './stop-processes-inside.mjs';
+import { stopProcessesInside } from '../../native/stop-processes-inside.mjs';
 
 /** Marker file written into every home this module creates. `removeWorkerHome`
  * refuses to delete a directory that does not carry it, so a teardown bug can

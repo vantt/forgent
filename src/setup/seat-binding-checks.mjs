@@ -2,7 +2,7 @@
 
 import { bind } from '../runner/execution/bind.mjs';
 import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
-import { capabilityNamesOf, hasOwnPreferPool, preferOf } from '../runner/execution/capability-config.mjs';
+import { capabilityNamesOf, hasOwnPreferPool, preferOf } from '../runner/capability-config.mjs';
 import { resolveCollaboration, loopOf } from '../runner/execution/patterns/catalog.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { declaredActivities, readWorkflowCatalog, sourceOf, withUnreadableDefinitions, workflowUnitContract } from './workflow-catalog-reader.mjs';

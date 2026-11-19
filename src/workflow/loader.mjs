@@ -9,7 +9,7 @@ import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { definitionNameOf } from '../convention/definition-names.mjs';
 import { domainCatalog } from '../util/domain-dirs.mjs';
-import { OWN_PAYLOAD_ROOT } from '../run-supervisor/payload-root.mjs';
+import { OWN_PAYLOAD_ROOT } from '../util/payload-root.mjs';
 
 /** The raw definition a workflow file's text holds: JSON for `.json`, the YAML door otherwise. */
 export function parseWorkflowText(content, filePath) {

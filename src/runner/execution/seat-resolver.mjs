@@ -10,7 +10,7 @@
 
 import { assertSeatId } from '../../convention/seat-id.mjs';
 import { RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
-import { capabilityRigorOf, minCheckersOf } from './capability-config.mjs';
+import { capabilityRigorOf, minCheckersOf } from '../capability-config.mjs';
 
 export const SEAT_ROLES = Object.freeze(['producer', 'synthesizer', 'reviewer', 'red-team', 'judge']);
 export const LOOP_NAMES = Object.freeze(['solo', 'reviewed', 'panel', 'debate']);

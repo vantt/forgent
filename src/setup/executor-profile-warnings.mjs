@@ -11,7 +11,7 @@
 
 import { familyOf, extractPolicyShapedFlags } from '../runner/dispatch/provider-adapter.mjs';
 import { forEntriesOf, servedCapabilitiesOf } from '../runner/dispatch/tool-providers.mjs';
-import { hasOwnPreferPool } from '../runner/execution/capability-config.mjs';
+import { hasOwnPreferPool } from '../runner/capability-config.mjs';
 
 // Env var name patterns that look like they are trying to do Provider
 // Capacity Rotator's own job (account pool / credential home selection)

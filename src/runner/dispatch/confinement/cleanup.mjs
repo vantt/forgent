@@ -10,7 +10,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { stopProcessesInside } from '../stop-processes-inside.mjs';
+import { stopProcessesInside } from '../../../native/stop-processes-inside.mjs';
 import { writeFileAtomic, writeBackRenewedCredential } from '../provider-credential-renewal.mjs';
 import { readAgentFileSync } from '../../../native/proof-helpers.mjs';
 import { refuseSymlink } from '../../../util/refuse-symlink.mjs';

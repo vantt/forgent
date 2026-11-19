@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { isCommandAvailable } from '../paths.mjs';
 import { commitAt } from '../../git/inspect.mjs';
-import { registeredCapabilityOf } from '../execution/capability-config.mjs';
+import { registeredCapabilityOf } from '../capability-config.mjs';
 
 /** The raw `for` list of any executor (`[]` when it declares none): the one reader of `for`. */
 export function forEntriesOf(executor) {

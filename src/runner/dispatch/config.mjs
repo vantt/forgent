@@ -11,7 +11,7 @@
 // source file, but that also means it carries the same trust level as code:
 // only apply it from a checkout you already trust.
 import { checkDeclaredSeats, SeatResolutionError } from '../execution/seat-resolver.mjs';
-import { bindingTasteOf, capabilityConfinementOf, capabilityNamesOf, preferSitesOf, registeredCapabilityOf } from '../execution/capability-config.mjs';
+import { bindingTasteOf, capabilityConfinementOf, capabilityNamesOf, preferSitesOf, registeredCapabilityOf } from '../capability-config.mjs';
 import { paramTableOf } from '../execution/loops/index.mjs';
 import { definitionFileName } from '../../convention/definition-names.mjs';
 import { RIGOR_VALUES } from '../rigor.mjs';

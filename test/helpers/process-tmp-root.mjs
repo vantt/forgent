@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { processesInside } from '../../src/runner/dispatch/stop-processes-inside.mjs';
+import { processesInside } from '../../src/native/stop-processes-inside.mjs';
 
 const PRIVATE_ROOT_PREFIX = 'fgos-tp-';
 const SEAL_CHILD_WAIT_MS = 20000;

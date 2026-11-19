@@ -9,7 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { assignmentDir } from '../dispatch/assignment-layout.mjs';
-import { realpathOrNull } from '../../run-supervisor/payload-root.mjs';
+import { realpathOrNull } from '../../util/payload-root.mjs';
 import { custodyHeld } from './custody-door.mjs';
 import { unitControllerHeld } from './unit-control.mjs';
 import { deriveUnitState } from './unit-state.mjs';

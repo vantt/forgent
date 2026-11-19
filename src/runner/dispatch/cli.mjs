@@ -11,7 +11,7 @@ import { StoreError } from '../../util/store-error.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot } from '../paths.mjs';
 import { loadRunnerConfigForDir } from './config.mjs';
 import { commandCli } from './provider-capacity.mjs';
-import { registeredCapabilityOf } from '../execution/capability-config.mjs';
+import { registeredCapabilityOf } from '../capability-config.mjs';
 import { executeAssignment } from './assignment-runner.mjs';
 import { adoptRun } from '../../run-supervisor/client.mjs';
 import { ACCOUNT_PROBE_LEGS, runAccountProbe, runAccountSweep } from './provider-account-probe.mjs';

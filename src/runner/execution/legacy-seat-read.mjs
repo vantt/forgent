@@ -7,7 +7,7 @@
 // resume. Readers do not branch on those names: they ask here which seats the old pattern had and
 // what each one was. This is the only module that knows the retired names.
 
-import { ownMinCheckersOf } from './capability-config.mjs';
+import { ownMinCheckersOf } from '../capability-config.mjs';
 
 const posture = (fields) => Object.freeze({ readOnly: false, writer: false, forceOutOfProcess: false, stance: false, verdict: false, ...fields });
 const seat = (name, role, fields) => Object.freeze({ seat: name, role, posture: posture(fields) });

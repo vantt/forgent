@@ -1,4 +1,4 @@
-import '../../helpers/process-tmp-root.mjs';
+import '../helpers/process-tmp-root.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -7,7 +7,7 @@ import {
   capabilityPersonaOf, capabilityRigorOf, minCheckersOf, ownMinCheckersOf, capabilityVerifyOf,
   capabilityConfinementOf, capabilityDescriptionOf, preferOf,
   hasOwnPreferPool, bindingTasteOf,
-} from '../../../src/runner/execution/capability-config.mjs';
+} from '../../src/runner/capability-config.mjs';
 
 // The shapes of the repo's own runner config: string and list `prefer` (with an invocation pin), aliases,
 // confinement, a prefix entry with minCheckers, persona, verify, serves, and the role and persona taste tables.

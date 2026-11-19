@@ -28,7 +28,7 @@ import { refusalAdvice } from './lib/test-file-watchdog.mjs';
 import { parseShard, partitionFiles, repoRelative, shardLoads } from './lib/test-shards.mjs';
 import { loadNativeAddon, nativeDoor } from '../src/native/door.mjs';
 import { scan, selfRecord } from '../src/native/process-identity.mjs';
-import { processesInside, stopProcessesInside } from '../src/runner/dispatch/stop-processes-inside.mjs';
+import { processesInside, stopProcessesInside } from '../src/native/stop-processes-inside.mjs';
 
 export { REPO_ROOT };
 export const DEFAULT_TEST_ROOT = path.join(REPO_ROOT, 'test');

@@ -27,9 +27,9 @@ test('the manifest is the authority for contracts and lazy rebuilds, and rejects
   const { pathToFileURL } = await import('node:url');
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-es-consumers-'));
   t.after(() => fs.rmSync(temp, { recursive: true, force: true }));
-  for (const dir of ['src/event-store', 'src/run-supervisor', 'packages/event-store/contracts', 'src/example']) fs.mkdirSync(path.join(temp, dir), { recursive: true });
+  for (const dir of ['src/event-store', 'src/util', 'packages/event-store/contracts', 'src/example']) fs.mkdirSync(path.join(temp, dir), { recursive: true });
   fs.copyFileSync(new URL('../../src/event-store/consumers.mjs', import.meta.url), path.join(temp, 'src/event-store/consumers.mjs'));
-  fs.copyFileSync(new URL('../../src/run-supervisor/payload-root.mjs', import.meta.url), path.join(temp, 'src/run-supervisor/payload-root.mjs'));
+  fs.copyFileSync(new URL('../../src/util/payload-root.mjs', import.meta.url), path.join(temp, 'src/util/payload-root.mjs'));
   fs.writeFileSync(path.join(temp, 'src/example/rebuild.mjs'), 'globalThis.consumerLoaded = true; export const rebuild = 42;');
   const file = path.join(temp, 'packages/event-store/contracts/consumers.v1.json');
   const entry = { id: 'example', contractFile: 'packages/event-store/contracts/example.json', cachePath: '.fgos/example-view.json', rebuildModule: 'src/example/rebuild.mjs' };

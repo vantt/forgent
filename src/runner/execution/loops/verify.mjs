@@ -1,5 +1,5 @@
 import { VERIFY_SEAT } from '../seat-resolver.mjs';
-import { capabilityVerifyOf } from '../capability-config.mjs';
+import { capabilityVerifyOf } from '../../capability-config.mjs';
 
 /**
  * Verification command resolution for collaboration loops.

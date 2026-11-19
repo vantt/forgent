@@ -21,7 +21,7 @@ import { runLoop, loopRunsVerify } from './loops/index.mjs';
 import { shippedCatalog } from '../dispatch/shipped-catalog.mjs';
 import { rebindsOnResume, NOT_STARTED_OUTCOME, evaluationsOf, infrastructure, isInfrastructure, outcomeAfterScopeRule } from './outcome.mjs';
 import { verifyCommandOf } from './loops/verify.mjs';
-import { catalogOf } from './capability-config.mjs';
+import { catalogOf } from '../capability-config.mjs';
 import { VERIFY_SEAT } from './seat-resolver.mjs';
 import { answerOfVerify, runVerify } from './custody-door.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';

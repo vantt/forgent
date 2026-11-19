@@ -18,7 +18,7 @@
 import { spawnSync } from 'node:child_process';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { hotLockDepth } from '../holder-lock/hot-guard.mjs';
-import { OWN_PAYLOAD_ROOT, releasePayloadRoot, realpathOrNull } from '../run-supervisor/payload-root.mjs';
+import { OWN_PAYLOAD_ROOT, releasePayloadRoot, realpathOrNull } from '../util/payload-root.mjs';
 
 export const PROTOCOL = 2;
 /** Same bound as the other short host routes (src/util/host-bin.mjs). */

@@ -52,7 +52,6 @@
     "src/report/knowledge-resolver.mjs": 7,
     "src/run-supervisor/": 4,
     "src/run-supervisor/attempt-step.mjs": 5,
-    "src/run-supervisor/payload-root.mjs": 0,
     "src/run-supervisor/steps/": 5,
     "src/runner/": 7,
     "src/runner/agent-definitions.mjs": 5,
@@ -64,7 +63,7 @@
     "src/runner/paths.mjs": 2,
     "src/runner/repo-locks.mjs": 2,
     "src/runner/rigor.mjs": 0,
-    "src/runner/execution/capability-config.mjs": 0,
+    "src/runner/capability-config.mjs": 0,
     "src/runner/worktree.mjs": 2,
     "src/seat-binding/": 5,
     "src/portfolio/": 8,
@@ -965,7 +964,7 @@
       "reason": "every temp name of a Node write-then-rename comes from uniqueTmpTag so two threads or two calls never share one; there is no shared write helper (each module keeps its own, see the Durable file row of docs/platform/component-boundary.md). The patterns catch the hand-built forms (a pid-only suffix, a pid plus clock, the request-file temp); a directory staging or an mkdtemp prefix is another job and does not match"
     },
     {
-      "job": "read runner.capabilities only through src/runner/execution/capability-config.mjs (one function per field) or bind()'s result",
+      "job": "read runner.capabilities only through src/runner/capability-config.mjs (one function per field) or bind()'s result",
       "kind": "door",
       "patterns": [
         "(?<!\\b(?:contract|payload|fanOutPayload|manifestWithoutDigest|manifest|report|entry|provider|self|a)\\??)\\.capabilities\\b\\s*(?:\\?\\?|\\|\\||&&|\\?\\.|\\[|\\)|;|,|===|!==)",
@@ -973,7 +972,7 @@
         "\\{[^{}]*\\bcapabilities\\b[^{}]*\\}\\s*=(?!=)(?!\\s*report\\b)"
       ],
       "allowed": [
-        "src/runner/execution/capability-config.mjs"
+        "src/runner/capability-config.mjs"
       ],
       "reason": "the port is the one Node reader of the capabilities section and hands out answers per field, never an entry; the Rust owner is the fgos-execution crate (executor model, bind and decide read the section through the host's config door), which these JS-shaped patterns do not match, and the seat-binding crate is the authority over binding fields"
     },
@@ -1045,7 +1044,7 @@
       "reason": "the verb, the registry module and the local status file were a second path to the same answer decide gives from a live probe"
     },
     {
-      "job": "the raw capability section is handed out only for the run record and doctor presence: ask a per-field function of src/runner/execution/capability-config.mjs",
+      "job": "the raw capability section is handed out only for the run record and doctor presence: ask a per-field function of src/runner/capability-config.mjs",
       "kind": "door",
       "patterns": [
         "\\bcatalogOf\\("
@@ -1196,7 +1195,7 @@
           "reason": "twin, same vectors as the contract: detectHerdrPresent stays for the Node run start"
         },
         {
-          "path": "src/runner/execution/capability-config.mjs",
+          "path": "src/runner/capability-config.mjs",
           "reason": "twin, same vectors as the contract: capabilityConfinementOf stays for Node launch confinement"
         },
         {
@@ -1639,7 +1638,7 @@
     "src/runner/dispatch.mjs": "infra",
     "src/runner/operation-capability.mjs": "domain",
     "src/runner/rigor.mjs": "kernel",
-    "src/runner/execution/capability-config.mjs": "kernel",
+    "src/runner/capability-config.mjs": "kernel",
     "src/runner/fanout-batch.mjs": "use-case",
     "src/runner/work-compat.mjs": "infra",
     "src/runner/dispatch/adapters.mjs": "infra",
@@ -1856,7 +1855,7 @@
     "src/run-supervisor/client.mjs": "infra",
     "src/run-supervisor/direct-launch.mjs": "infra",
     "src/run-supervisor/gate-kill-grace.mjs": "infra",
-    "src/run-supervisor/payload-root.mjs": "kernel",
+    "src/util/payload-root.mjs": "kernel",
     "src/run-supervisor/protocol.mjs": "infra",
     "src/run-supervisor/runtime-dir.mjs": "infra",
     "src/run-supervisor/step-support.mjs": "infra",
@@ -1878,7 +1877,7 @@
     "src/native/process-identity.mjs": "infra",
     "src/run-supervisor/trust-store.mjs": "infra",
     "src/runner/dispatch/worker-home.mjs": "infra",
-    "src/runner/dispatch/stop-processes-inside.mjs": "infra",
+    "src/native/stop-processes-inside.mjs": "infra",
     "src/runner/dispatch/worker-session.mjs": "infra",
     "src/runner/dispatch/worker-session-boot.mjs": "infra",
     "src/setup/instruction-composition.mjs": "infra",

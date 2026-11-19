@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
-import { OWN_PAYLOAD_ROOT, releasePayloadManifest } from '../run-supervisor/payload-root.mjs';
+import { OWN_PAYLOAD_ROOT, releasePayloadManifest } from '../util/payload-root.mjs';
 import { resolveActiveHostBin } from '../util/host-bin-path.mjs';
 const require = createRequire(import.meta.url);
 const verified = new Map(); // file -> identity key verified in this process
