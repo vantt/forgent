@@ -43,7 +43,7 @@ footprint:
   - .agents/skills
   - .claude/skills
   - CHANGELOG.md
-base: f3c32fb891d0237a4c5392b307a499ce8380a95c
+base: e5ea2c754940704d6bc37bca1815d3340c6ce9bc
 source:
   - plans/261119-0030-resource-referee-graph-write-scope-stack
 created: 2026-11-19
