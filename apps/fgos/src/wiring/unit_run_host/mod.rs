@@ -12,6 +12,9 @@
 //! * [`persona`]: the persona lookup across its layers and the pin a run keeps of it.
 //! * [`handoff`]: the inputs a unit's seats read and the digest of the report an attempt left.
 //! * [`verify`]: the verify command under the run's custody.
+//! * [`dispatch_plan`]: the dispatch plan of an assignment the runner executes.
+//! * [`execution`]: the assignment runner's machine (`ExecutePorts`, `SeatPorts`), the bwrap probe, the prompt seams.
+//! * [`host`]: the composed `UnitRunHost` of one unit run, dispatching a bound seat through the assignment runner.
 //! * [`accounts`]: pinned accounts, account rotation, the lease receipt audit and the bind over the live lease
 //!   state.
 //! * [`settlement`]: what the post-receipt steps read through the host (the terminal pane, the renewed login's
@@ -26,7 +29,10 @@
 
 pub mod accounts;
 pub mod checks;
+pub mod dispatch_plan;
+pub mod execution;
 pub mod handoff;
+pub mod host;
 pub mod machine;
 pub mod persona;
 pub mod records;

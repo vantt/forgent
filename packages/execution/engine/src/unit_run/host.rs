@@ -72,6 +72,8 @@ pub struct SeatDispatch<'a> {
     pub session: &'a Value,
     pub custody: Option<&'a Handle>,
     pub carries_operation: bool,
+    /// The operation fields a unit carrying a declared operation stamps on its writer seat (`ctx.declaredOp`).
+    pub declared_op: Option<&'a Value>,
     pub write_scope: &'a [Value],
     pub batch_size: Option<usize>,
 }

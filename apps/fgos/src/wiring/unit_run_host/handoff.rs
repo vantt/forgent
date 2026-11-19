@@ -270,3 +270,73 @@ pub fn report_digest(result: &Value, main_root: &Path) -> Value {
         Err(_) => Value::Null,
     }
 }
+
+/// `reportRefsOf(records, { mainRoot })` (`src/runner/execution/handoff-refs.mjs:78`): the reports of in-run seat
+/// results, in input order, each listed once.
+pub fn report_refs_of(records: &[Value], main_root: &Path) -> Result<Vec<String>, RunUnitError> {
+    let mut refs: Vec<String> = Vec::new();
+    for record in records {
+        let path = report_ref_of(record, main_root, &Accept::Nothing).map_err(refusal)?;
+        let text = path.to_string_lossy().into_owned();
+        if !refs.contains(&text) {
+            refs.push(text);
+        }
+    }
+    Ok(refs)
+}
+
+/// `copyHandoffsInto(dir, entries)` (`src/runner/execution/handoff-refs.mjs:265`): copies of hand-off files
+/// (`{ name, source, sha256? }`) as `<dir>/inputs/<name>`, paths in entry order. A source whose bytes changed from
+/// `sha256` is refused; a copy already in place with those bytes is kept, so a resume reads the same files.
+pub fn copy_handoffs_into(dir: &Path, entries: &[Value]) -> Result<Vec<String>, RunUnitError> {
+    let target = dir.join("inputs");
+    let mut copies = Vec::new();
+    for entry in entries {
+        let text = |key: &str| entry.get(key).and_then(Value::as_str).unwrap_or_default();
+        let (name, source) = (text("name"), PathBuf::from(text("source")));
+        let sha256 = entry.get("sha256").and_then(Value::as_str);
+        let dest = target.join(name);
+        let failed =
+            |e: std::io::Error| refusal(HandoffRefError::new(name, format!("copy-failed: {e}")));
+        std::fs::create_dir_all(&target).map_err(failed)?;
+        let in_place = sha256.is_some() && sha256_of_file(&dest).ok().as_deref() == sha256;
+        if !in_place {
+            let bytes = std::fs::read(&source).map_err(failed)?;
+            if sha256.is_some_and(|want| fgos_execution::handoff::sha256_hex(&bytes) != want) {
+                return Err(refusal(HandoffRefError::new(
+                    name,
+                    "report-changed-after-settle",
+                )));
+            }
+            std::fs::write(&dest, bytes).map_err(failed)?;
+        }
+        copies.push(dest.to_string_lossy().into_owned());
+    }
+    Ok(copies)
+}
+
+/// `refIsHiddenFromBlind(ref, mainRoot)`: whether `reference` lies inside a root `hostRead: blind` hides.
+pub fn hidden_from_blind(reference: &str, main_root: &Path) -> bool {
+    if has_scheme(reference) {
+        return false;
+    }
+    let absolute = main_root.join(reference);
+    let real = std::fs::canonicalize(&absolute).unwrap_or(absolute);
+    let temp = resolve_confinement_temp_root(&std::env::temp_dir());
+    resolve_blind_hidden_roots(
+        &fgos_dir(main_root).to_string_lossy(),
+        &temp.to_string_lossy(),
+    )
+    .unwrap_or_default()
+    .iter()
+    .any(|root| is_inside_root(&real.to_string_lossy(), root))
+}
+
+/// `plainInputName` over this module's `.fgos`, for a copy the run names.
+pub fn plain_name(index: usize, source: &Path, main_root: &Path) -> String {
+    format!(
+        "{}{}",
+        plain_input_name(index, source, &fgos_dir(main_root)),
+        extension_of(source)
+    )
+}

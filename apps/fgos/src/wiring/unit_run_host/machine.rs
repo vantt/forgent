@@ -180,6 +180,12 @@ fn runner_refusal(refusal: &Value) -> RunUnitError {
 /// door (project over global over the standard, the detected executor filled in, nothing written), checked and its
 /// confinement normalised by `fgos-execution`'s one composition. A refusal keeps the door's code.
 pub fn load_runner_config(main_root: &Path) -> Result<Value, RunUnitError> {
+    load_runner_config_with_origins(main_root).map(|(config, _)| config)
+}
+
+/// [`load_runner_config`] with the origins of its values (`runnerOriginsOf`, `src/runner/dispatch/config.mjs:82`),
+/// which name the config layer a collaboration's pattern came from.
+pub fn load_runner_config_with_origins(main_root: &Path) -> Result<(Value, Value), RunUnitError> {
     let root = main_root.to_string_lossy();
     let loaded = HostWorkspace {
         process_cwd: main_root.to_path_buf(),
@@ -191,11 +197,12 @@ pub fn load_runner_config(main_root: &Path) -> Result<Value, RunUnitError> {
         }
         other => RunUnitError::config(other.message(), None, None),
     })?;
+    let origins: Vec<Value> = loaded.origins.iter().map(|o| o.to_json()).collect();
     let door = DoorRead::Read {
         runner: loaded.runner,
-        origins: loaded.origins.iter().map(|o| o.to_json()).collect(),
+        origins: origins.clone(),
     };
     check_runner(&root, door)
-        .map(|checked| checked.config)
+        .map(|checked| (checked.config, Value::Array(origins)))
         .map_err(|refused| runner_refusal(&refused.to_json()))
 }

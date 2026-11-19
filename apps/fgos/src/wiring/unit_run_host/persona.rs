@@ -268,3 +268,132 @@ pub fn check_agent_definition(name: &str, project: &Path, install: &Path) -> Res
         Err(error) => Err(error.message),
     }
 }
+
+/// The text of a rendered field: a scalar as `String()` trims it, anything else nothing (`scalarText`).
+fn scalar_text(value: Option<&Value>) -> String {
+    match value {
+        Some(Value::String(s)) => s.trim().to_string(),
+        Some(Value::Number(n)) => n.to_string(),
+        Some(Value::Bool(b)) => b.to_string(),
+        _ => String::new(),
+    }
+}
+
+/// The scalar items of a list, as text, empty ones left out (`textList`).
+fn text_list(value: Option<&Value>) -> Vec<String> {
+    value
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .map(|v| scalar_text(Some(v)))
+        .filter(|t| !t.is_empty())
+        .collect()
+}
+
+/// `personaFailureLine` (`src/runner/agent-definitions.mjs:276`): the one visible line for a persona that was found
+/// but cannot be rendered, the lookup's reason without its name and path prefix.
+fn failure_line(persona: &str, message: &str) -> String {
+    let reason = message
+        .strip_prefix(&format!("persona \"{persona}\" ("))
+        .and_then(|rest| rest.split_once(") ").map(|(_, r)| r))
+        .unwrap_or(message);
+    match reason.strip_prefix("cannot be parsed: ") {
+        Some(parsed) => format!("Persona \"{persona}\" could not be parsed: {parsed}"),
+        None => format!("Persona \"{persona}\" cannot be rendered: {reason}"),
+    }
+}
+
+/// `renderPersonaSection(personaRef, { pinnedText, projectRoot, installRoot })`
+/// (`src/runner/agent-definitions.mjs:295`): the persona section of a prompt, as lines. Pinned text wins over any
+/// file; a persona no layer defines renders as the bare section; a definition that cannot be read renders one
+/// visible failure line.
+pub fn persona_section(
+    persona: &str,
+    pinned_text: Option<&str>,
+    project: &Path,
+    install: &Path,
+) -> Vec<String> {
+    let mut failure: Option<String> = None;
+    let mut content: Option<Value> = None;
+    let text = match pinned_text {
+        Some(text) => Some(text.to_string()),
+        None => match resolve_agent_definition(persona, project, install, None) {
+            Ok(Lookup::Found(found)) => found["text"].as_str().map(str::to_string),
+            Ok(Lookup::NotFound(_)) => None,
+            Err(error) => {
+                failure = Some(failure_line(persona, &error.message));
+                None
+            }
+        },
+    };
+    if let Some(text) = text {
+        let read =
+            fgos_execution::agents::read_definition(text.as_bytes(), &format!("{persona}.yaml"));
+        match &read.error {
+            Some(error) => failure = Some(failure_line(persona, error)),
+            None => {
+                let data = read.data.unwrap_or_default();
+                match fgos_execution::agents::non_text_values(&data)
+                    .into_iter()
+                    .next()
+                {
+                    Some(problem) => {
+                        failure = Some(format!(
+                            "Persona \"{persona}\" cannot be rendered: {problem}"
+                        ))
+                    }
+                    None => {
+                        content = Some(Value::Object(
+                            data.iter().map(|(k, v)| (k.clone(), v.to_json())).collect(),
+                        ))
+                    }
+                }
+            }
+        }
+    }
+    let mut lines: Vec<String> = vec![
+        String::new(),
+        "# Persona".into(),
+        format!("You are acting under the resolved persona \"{persona}\". Let this persona"),
+        "shape tone, emphasis, and judgment calls for this assignment, without".into(),
+        "overriding the Role, Objective, or Constraints stated elsewhere in this prompt.".into(),
+    ];
+    if let Some(failure) = failure {
+        lines.push(failure);
+    }
+    let Some(data) = content else {
+        return lines;
+    };
+    let section = |key: &str| data.get(key).filter(|v| v.is_object());
+    let description = scalar_text(data.get("description"));
+    if !description.is_empty() {
+        lines.push(format!("Description: {description}"));
+    }
+    for (key, label) in [
+        ("voice", "Voice"),
+        ("style", "Style"),
+        ("archetype", "Archetype"),
+    ] {
+        let value = scalar_text(section("persona").and_then(|p| p.get(key)));
+        if !value.is_empty() {
+            lines.push(format!("{label}: {value}"));
+        }
+    }
+    let skills = text_list(data.get("skills"));
+    if !skills.is_empty() {
+        lines.push(format!("Skills to load: {}", skills.join(", ")));
+    }
+    lines.push(String::new());
+    lines.push("## Decision Boundaries".into());
+    for (key, label) in [
+        ("can_decide", "Can decide:"),
+        ("must_escalate", "Must escalate:"),
+    ] {
+        let items = text_list(section("decision_boundary").and_then(|b| b.get(key)));
+        if !items.is_empty() {
+            lines.push(label.into());
+            lines.extend(items.iter().map(|item| format!("- {item}")));
+        }
+    }
+    lines
+}

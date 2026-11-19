@@ -1814,6 +1814,7 @@ impl<'h, 'c, H: UnitRunHost> Ctx<'h, 'c, H> {
             custody: if role.read_only { None } else { self.custody },
             carries_operation: self.declared_op.is_some()
                 && role.seat.pointer("/posture/writer") == Some(&json!(true)),
+            declared_op: self.declared_op.clone(),
             write_scope: effective_write_scope(&self.record),
         })
     }
@@ -2270,6 +2271,7 @@ struct DispatchInput<'c> {
     committed: Value,
     custody: Option<&'c Handle>,
     carries_operation: bool,
+    declared_op: Option<Value>,
     write_scope: Vec<Value>,
 }
 
@@ -2494,6 +2496,7 @@ fn run_attempt<H: UnitRunHost + Sync>(
         session: &role.session,
         custody: input.custody,
         carries_operation: input.carries_operation,
+        declared_op: input.declared_op.as_ref(),
         write_scope: &input.write_scope,
         batch_size: role.batch.filter(|b| *b > 1),
     })?;

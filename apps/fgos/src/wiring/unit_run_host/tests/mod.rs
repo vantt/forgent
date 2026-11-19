@@ -10,6 +10,8 @@ use serde_json::{json, Value};
 use super::{accounts, checks, handoff, machine, persona, records, settlement, verify};
 use fgos_execution_engine::steps::{AttemptHomeFinalizer, HomeState, PaneScreen};
 
+mod run_unit;
+
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 
 const CORPUS: &str = concat!(
