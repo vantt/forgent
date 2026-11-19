@@ -5,6 +5,7 @@
 use std::collections::BTreeMap;
 use std::fs;
 use std::io;
+use std::path::Path;
 
 use serde::Serialize;
 use serde_json::Value;
@@ -219,15 +220,17 @@ fn unavailable_io(fgos_dir: &str, err: &io::Error) -> ConfinementResourceError {
     )
 }
 
-/// Opens the lock file in place (created when missing, never replaced) and closes it, refusing a link at the path.
+/// Opens the lock file in place (created when missing, never replaced) and closes it. The open never follows a link
+/// at the path, so a link planted after the component check cannot make it create a file elsewhere.
 fn touch_lock_file(lock: &str) -> io::Result<()> {
-    fs::OpenOptions::new()
-        .read(true)
-        .write(true)
-        .create(true)
-        .truncate(false)
-        .open(lock)
-        .map(drop)
+    let mut options = fs::OpenOptions::new();
+    options.read(true).write(true).create(true).truncate(false);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.custom_flags(libc::O_NOFOLLOW).mode(0o644);
+    }
+    options.open(lock).map(drop)
 }
 
 /// What a mailbox-record grant binds, created when missing so the bind can be made: the lock file of the holder-lock
@@ -246,8 +249,15 @@ fn mailbox_record_paths(fgos_dir: &str, lock_path: &str) -> Resolved<[(&'static 
         unredirected_path(fgos_dir, &lock_rel, label).map_err(|e| to_unavailable(e, fgos_dir))?;
     unredirected_path(fgos_dir, dir_rel, label).map_err(|e| to_unavailable(e, fgos_dir))?;
     ensure_real_dir(&real_root, &dirname(&lock_rel), 0o755, label)?;
-    // A link at the lock path was refused above; the open creates the file only when nothing is there.
-    touch_lock_file(&lock).map_err(|err| unavailable_io(fgos_dir, &err))?;
+    touch_lock_file(&lock).map_err(|err| {
+        #[cfg(unix)]
+        if err.raw_os_error() == Some(libc::ELOOP) {
+            return ConfinementResourceError::invalid(format!(
+                "{label}: {lock} is a symbolic link; a grant names real paths only."
+            ));
+        }
+        unavailable_io(fgos_dir, &err)
+    })?;
     let meta = fs::symlink_metadata(&lock).map_err(|err| unavailable_io(fgos_dir, &err))?;
     if meta.file_type().is_symlink() {
         return Err(ConfinementResourceError::invalid(format!(
@@ -278,40 +288,27 @@ fn to_unavailable(err: ConfinementResourceError, fgos_dir: &str) -> ConfinementR
 }
 
 /// The git directory of the checkout rooted at `workspace_root` (a linked worktree's own git directory, not the
-/// shared one), or `None` when `workspace_root` is not itself a checkout root. A `.git` directory is the git
-/// directory; a `.git` file names it (`gitdir: <path>`, relative to the checkout).
+/// shared one), or `None` when `workspace_root` is not itself a checkout root. The Git port's disk-only topology
+/// check answers it: a linked worktree's `.git` file is only a hint, trusted when the main checkout's registration
+/// names it back, so a forged `.git` file can never point the grant at a directory of its choosing.
 pub fn resolve_workspace_git_metadata(workspace_root: &str) -> Resolved<Option<String>> {
-    let dot_git = join(workspace_root, ".git");
-    let Some(meta) = lstat_if_present(&dot_git).map_err(|e| git_unreadable(workspace_root, &e))?
-    else {
+    if !exists(&join(workspace_root, ".git")) {
+        return Ok(None);
+    }
+    let unreadable = |cause: &str| {
+        ConfinementResourceError::invalid(format!(
+            "git metadata of workspace \"{workspace_root}\" is unreadable: {cause}"
+        ))
+    };
+    let repo = fgos_git::GitDriver::topology_at(Path::new(workspace_root))
+        .map_err(|err| unreadable(&err.cause))?;
+    let Some(repo) = repo.filter(|repo| repo.work_tree().is_some()) else {
         return Ok(None);
     };
-    let git_dir = if meta.is_dir() {
-        dot_git
-    } else {
-        let text = fs::read_to_string(&dot_git).map_err(|e| git_unreadable(workspace_root, &e))?;
-        let Some(named) = text
-            .lines()
-            .find_map(|line| line.strip_prefix("gitdir:"))
-            .map(str::trim)
-        else {
-            return Ok(None);
-        };
-        if named.starts_with('/') {
-            named.to_string()
-        } else {
-            join(workspace_root, named)
-        }
-    };
-    real_or_null(&git_dir).map(Some).ok_or_else(|| {
-        ConfinementResourceError::invalid(format!("git metadata of workspace \"{workspace_root}\" is unreadable: {git_dir} does not exist."))
-    })
-}
-
-fn git_unreadable(workspace_root: &str, err: &io::Error) -> ConfinementResourceError {
-    ConfinementResourceError::invalid(format!(
-        "git metadata of workspace \"{workspace_root}\" is unreadable: {err}"
-    ))
+    let git_dir = repo.git_dir().to_string_lossy().into_owned();
+    real_or_null(&git_dir)
+        .map(Some)
+        .ok_or_else(|| unreadable(&format!("{git_dir} does not exist.")))
 }
 
 /// The directory that belongs to this dispatch alone under the hidden roots: its assignment round directory

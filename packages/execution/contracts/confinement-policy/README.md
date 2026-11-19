@@ -7,8 +7,9 @@ Regenerate only when those originals change on purpose: `node test/golden-record
 - `policy.v1.json`: vocabulary constants (built-in policies, control axes, grant access levels, every
   `MACHINE_PRIVATE_ROOTS` and `BLIND_HIDDEN_ROOTS` template) and the cases of each pure rule: network filter, policy
   shape, workspace paths, capability shape, invocation override, legacy normalisation, policy lookup, posture,
-  posture invocation, bypass pairing (all 16 flag combinations) and `controlDelivery` (every launch kind,
-  requirement and backend combination).
+  bypass pairing (all 16 flag combinations) and `controlDelivery` (every launch kind, requirement and backend
+  combination). Whether a posture can apply on this machine (`resolvePostureInvocation`) is the executor model's
+  fact `posture` in `packages/execution/contracts/executor-model.v1.json`, not recorded again here.
 - `resources.v1.json`: file-system cases. A `fixture` lists `dirs`, `files`, `symlinks` and `modes` under `$ROOT`
   (a reader's own temp directory); `$UID` stands for the reader's uid. Covers each machine-private root (home
   private store, runtime directory, session socket directory, both herdr config directories, the herdr socket

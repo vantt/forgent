@@ -24,10 +24,7 @@ pub use bypass::{control_delivery, evaluate_bypass_pairing, BypassPairing, Contr
 pub use error::{ConfinementPolicyError, ConfinementResourceError};
 pub use legacy::{normalize_legacy_confinement, resolve_confinement_policy};
 pub use paths::is_inside_root;
-pub use posture::{
-    can_apply_posture, resolve_posture, resolve_posture_invocation, Candidate, PostureContext,
-    PostureInvocation, ResolvedPosture,
-};
+pub use posture::{resolve_posture, ResolvedPosture};
 pub use resolver::{
     resolve_confinement_resources, resolve_workspace_git_metadata, Grant, ResolveContext,
     ResolveInput, ResolvedResource,

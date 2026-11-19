@@ -242,37 +242,8 @@ const postureCases = [
   ['custom policies do not shadow the built-ins', { posture: 'workspace-write' }, { runnerConfig: { confinementPolicies: { 'workspace-write': { contract: 'x' } } } }],
 ];
 
-// resolvePostureInvocation: the registry is read from a file and the program from a bin directory of
-// executables, so a case names them; the reader supplies both through its own host.
-const backendInstance = (extra = {}) => ({ type: 'bwrap', enabled: true, ...extra });
-const cliInvocation = (extra = {}) => ({ id: 'main', via: 'cli', ...extra });
-const postureInvocationCases = [
-  ['no candidate', null, {}],
-  ['candidate without executor', {}, {}],
-  ['executor not configured', { executor: 'x' }, { executors: {} }],
-  ['native agent runs in process', { executor: 'x', invocation: 'inv' }, { executors: { x: { agentType: 'lead' } } }],
-  ['native agent without a named invocation', { executor: 'x' }, { executors: { x: { agentType: 'lead' } } }],
-  ['agent with a command is not native', { executor: 'x' }, { executors: { x: { agentType: 'lead', command: 'c' } } }],
-  ['named invocation with the backend', { executor: 'x', invocation: 'main' }, { executors: { x: { invocations: [cliInvocation({ confinement: { backend: 'b1' } })] } }, registry: { b1: backendInstance() }, available: ['bwrap'] }],
-  ['named invocation inherits the executor backend', { executor: 'x', invocation: 'main' }, { executors: { x: { confinement: { backend: 'b1' }, invocations: [cliInvocation()] } }, registry: { b1: backendInstance() }, available: ['bwrap'] }],
-  ['named invocation that does not exist', { executor: 'x', invocation: 'gone' }, { executors: { x: { confinement: { backend: 'b1' }, invocations: [cliInvocation()] } }, registry: { b1: backendInstance() }, available: ['bwrap'] }],
-  ['no invocation named: first cli invocation with a backend', { executor: 'x' }, { executors: { x: { invocations: [{ id: 'a', via: 'mcp' }, cliInvocation({ id: 'b', confinement: { backend: 'b1' } })] } }, registry: { b1: backendInstance() }, available: ['bwrap'] }],
-  ['herdr-spawn invocation skipped without herdr', { executor: 'x' }, { executors: { x: { invocations: [cliInvocation({ id: 'h', adapter: 'herdr-spawn', confinement: { backend: 'b1' } }), cliInvocation({ id: 'c', confinement: { backend: 'b1' } })] } }, registry: { b1: backendInstance() }, available: ['bwrap'] }],
-  ['herdr-spawn invocation taken with herdr', { executor: 'x' }, { herdrPresent: true, executors: { x: { invocations: [cliInvocation({ id: 'h', adapter: 'herdr-spawn', confinement: { backend: 'b1' } }), cliInvocation({ id: 'c', confinement: { backend: 'b1' } })] } }, registry: { b1: backendInstance() }, available: ['bwrap'] }],
-  ['invocation without an id that is not the first cli one', { executor: 'x' }, { executors: { x: { invocations: [cliInvocation({ id: 'a' }), { via: 'cli', confinement: { backend: 'b1' } }] } }, registry: { b1: backendInstance() }, available: ['bwrap'] }],
-  ['invocation without an id that is the first cli one', { executor: 'x' }, { executors: { x: { invocations: [{ via: 'cli', confinement: { backend: 'b1' } }] } }, registry: { b1: backendInstance() }, available: ['bwrap'] }],
-  ['executor level backend only', { executor: 'x' }, { executors: { x: { confinement: { backend: 'b1' } } }, registry: { b1: backendInstance() }, available: ['bwrap'] }],
-  ['no backend declared', { executor: 'x', invocation: 'main' }, { executors: { x: { invocations: [cliInvocation()] } }, registry: { b1: backendInstance() }, available: ['bwrap'] }],
-  ['backend not in the registry', { executor: 'x', invocation: 'main' }, { executors: { x: { confinement: { backend: 'zz' }, invocations: [cliInvocation()] } }, registry: { b1: backendInstance() }, available: ['bwrap'] }],
-  ['backend disabled', { executor: 'x', invocation: 'main' }, { executors: { x: { confinement: { backend: 'b1' }, invocations: [cliInvocation()] } }, registry: { b1: backendInstance({ enabled: false }) }, available: ['bwrap'] }],
-  ['backend of another type', { executor: 'x', invocation: 'main' }, { executors: { x: { confinement: { backend: 'b1' }, invocations: [cliInvocation()] } }, registry: { b1: backendInstance({ type: 'docker' }) }, available: ['bwrap'] }],
-  ['executable missing', { executor: 'x', invocation: 'main' }, { executors: { x: { confinement: { backend: 'b1' }, invocations: [cliInvocation()] } }, registry: { b1: backendInstance() }, available: [] }],
-  ['named executable available', { executor: 'x', invocation: 'main' }, { executors: { x: { confinement: { backend: 'b1' }, invocations: [cliInvocation()] } }, registry: { b1: backendInstance({ executable: 'sandbox-run' }) }, available: ['sandbox-run'] }],
-  ['named executable missing while bwrap exists', { executor: 'x', invocation: 'main' }, { executors: { x: { confinement: { backend: 'b1' }, invocations: [cliInvocation()] } }, registry: { b1: backendInstance({ executable: 'sandbox-run' }) }, available: ['bwrap'] }],
-  ['registry unreadable', { executor: 'x', invocation: 'main' }, { executors: { x: { confinement: { backend: 'b1' }, invocations: [cliInvocation()] } }, registry: 'unreadable', available: ['bwrap'] }],
-  ['executors from the runner config', { executor: 'x', invocation: 'main' }, { runnerConfig: { executors: { x: { confinement: { backend: 'b1' }, invocations: [cliInvocation()] } } }, registry: { b1: backendInstance() }, available: ['bwrap'] }],
-  ['executors from runner.executors', { executor: 'x', invocation: 'main' }, { runnerConfig: { runner: { executors: { x: { confinement: { backend: 'b1' }, invocations: [cliInvocation()] } } } }, registry: { b1: backendInstance() }, available: ['bwrap'] }],
-];
+// resolvePostureInvocation is owned by the executor model (packages/execution/contracts/executor-model.v1.json,
+// fact "posture"); it is not recorded again here.
 
 const bypassCases = [];
 for (const isBypass of [false, true]) for (const hasOwnWorktree of [false, true]) for (const hasPrivateHome of [false, true]) for (const hasIsolatedSession of [false, true]) {
@@ -338,36 +309,9 @@ function policyVectors() {
     legacyNormalization: stamp(legacyInputs.map(([name, input]) => ({ name, input })), ({ input }) => observe(() => policies.normalizeLegacyConfinement(clone(input), 'confinement'))),
     resolvePolicy: stamp(resolveCases.map(([name, id, custom]) => ({ name, id, custom })), ({ id, custom }) => observe(() => policies.resolveConfinementPolicy(id, custom === null ? undefined : custom))),
     posture: stamp(postureCases.map(([name, binding, ctx]) => ({ name, binding, ctx })), ({ binding, ctx }) => observe(() => policies.resolvePosture(binding, clone(ctx)))),
-    postureInvocation: postureInvocationCases.map(([name, candidate, ctx]) => recordPostureInvocation(name, candidate, ctx)),
     bypassPairing: bypassCases.map((c) => ({ ...c, ...observe(() => bypass.evaluateBypassPairing(c.input)) })),
     controlDelivery: deliveryCases.map((c) => ({ ...c, ...observe(() => bypass.controlDelivery(c.input)) })),
   };
-}
-
-function recordPostureInvocation(name, candidate, ctx) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cp-posture-'));
-  try {
-    const bin = path.join(dir, 'bin');
-    fs.mkdirSync(bin);
-    for (const program of ctx.available ?? []) {
-      fs.writeFileSync(path.join(bin, program), '#!/bin/sh\n', { mode: 0o755 });
-    }
-    const registryPath = path.join(dir, 'registry.json');
-    if (ctx.registry === 'unreadable') fs.writeFileSync(registryPath, '{ not json');
-    else fs.writeFileSync(registryPath, JSON.stringify({ contract: 'confinement-backend-registry.v1', confinementBackends: ctx.registry ?? {} }));
-    const real = {
-      runnerConfig: ctx.runnerConfig,
-      executors: ctx.executors,
-      herdrPresent: ctx.herdrPresent,
-      registryPath,
-      envPath: bin,
-    };
-    const answer = observe(() => policies.resolvePostureInvocation(clone(candidate), 'workspace-write', real));
-    const canApply = policies.canApplyPosture(clone(candidate), 'workspace-write', real);
-    return { name, candidate, ctx, ...answer, canApply };
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
 }
 
 // ---------------------------------------------------------------- resource vectors

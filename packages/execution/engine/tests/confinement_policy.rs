@@ -253,65 +253,6 @@ fn posture_maps_to_one_policy_and_anything_but_workspace_write_is_read_only() {
 }
 
 #[test]
-fn posture_invocation_is_decided_from_the_declared_backend_the_registry_and_the_program() {
-    let file = vectors("policy.v1.json");
-    let mut report = Report::default();
-    for case in cases(&file, "postureInvocation") {
-        let ctx = &case["ctx"];
-        let empty = json!({});
-        let executors = [
-            ctx.get("executors"),
-            ctx["runnerConfig"].get("executors"),
-            ctx["runnerConfig"]["runner"].get("executors"),
-        ]
-        .into_iter()
-        .flatten()
-        .next()
-        .unwrap_or(&empty);
-        let registry = ctx
-            .get("registry")
-            .filter(|r| r.as_str() != Some("unreadable"))
-            .cloned()
-            .unwrap_or_else(|| json!({}));
-        let backends = (ctx["registry"].as_str() != Some("unreadable")).then_some(&registry);
-        let available: Vec<String> = ctx
-            .get("available")
-            .and_then(Value::as_array)
-            .map(|a| a.iter().map(|s| s.as_str().unwrap().to_string()).collect())
-            .unwrap_or_default();
-        let probe = |command: &str| available.iter().any(|a| a == command);
-        let context = PostureContext {
-            executors: Some(executors),
-            herdr_present: ctx["herdrPresent"].as_bool() == Some(true),
-            backends,
-            command_available: &probe,
-        };
-        let candidate = case["candidate"].as_object().map(|c| Candidate {
-            executor: c
-                .get("executor")
-                .and_then(Value::as_str)
-                .map(str::to_string),
-            invocation: c
-                .get("invocation")
-                .and_then(Value::as_str)
-                .map(str::to_string),
-        });
-        let got = resolve_posture_invocation(candidate.as_ref(), &context);
-        report.expect(
-            case,
-            json!({ "ok": { "ok": got.ok, "invocation": got.invocation } }),
-            &answer(case),
-        );
-        report.expect(
-            case,
-            json!(can_apply_posture(candidate.as_ref(), &context)),
-            &case["canApply"],
-        );
-    }
-    report.finish("posture invocation");
-}
-
-#[test]
 fn bypass_mode_names_every_missing_confinement_control_in_a_fixed_order() {
     let file = vectors("policy.v1.json");
     let mut report = Report::default();
@@ -709,7 +650,14 @@ fn workspace_git_metadata_is_the_checkouts_own_git_directory_or_nothing() {
         match case["layout"].as_str().unwrap() {
             "checkout" => make_dirs(&fixture.at("repo/.git"), 0o755),
             "linked-worktree" => {
+                // Git's own registration: the admin directory names the checkout back and the shared directory.
                 make_dirs(&fixture.at("main/.git/worktrees/repo"), 0o755);
+                fs::write(
+                    fixture.at("main/.git/worktrees/repo/gitdir"),
+                    format!("{}/repo/.git\n", fixture.root),
+                )
+                .unwrap();
+                fs::write(fixture.at("main/.git/worktrees/repo/commondir"), "../..\n").unwrap();
                 fs::write(
                     fixture.at("repo/.git"),
                     format!("gitdir: {}/main/.git/worktrees/repo\n", fixture.root),
@@ -727,6 +675,20 @@ fn workspace_git_metadata_is_the_checkouts_own_git_directory_or_nothing() {
             case["name"]
         );
     }
+}
+
+#[test]
+fn workspace_git_metadata_refuses_a_git_file_the_main_checkout_does_not_register() {
+    // Node asks the Git port, which trusts a `.git` file only when the main checkout's registration names it back;
+    // a forged one must refuse rather than point the grant at the directory it names.
+    let fixture = Fixture::new(&json!({ "dirs": ["repo", "elsewhere"] }));
+    fs::write(
+        fixture.at("repo/.git"),
+        format!("gitdir: {}/elsewhere\n", fixture.root),
+    )
+    .unwrap();
+    let err = resolve_workspace_git_metadata(&format!("{}/repo", fixture.root)).unwrap_err();
+    assert_eq!(err.code, "confinement-grant-invalid", "{}", err.message);
 }
 
 // ------------------------------------------------------------------ resources: the resolver
