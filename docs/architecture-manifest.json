@@ -134,6 +134,10 @@
           "reason": "writes a worker's own settings.json in the worker's home (bypass acceptance), not a project hook file"
         },
         {
+          "path": "packages/execution/engine/src/transport/worker_home.rs",
+          "reason": "writes a worker's own settings.json in the worker's home (bypass acceptance), not a project hook file"
+        },
+        {
           "path": "core/skills/instruction-audit/scripts/instruction-audit.mjs",
           "reason": "a standalone skill script that audits instruction files, Claude Code's settings among them; it reads only"
         }

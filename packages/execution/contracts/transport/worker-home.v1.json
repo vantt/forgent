@@ -1,0 +1,252 @@
+{
+  "note": "recorded from src/runner/dispatch/worker-home.mjs; the source home holds a credential and a claude.json whose /repo trust is the case",
+  "bypassAcceptance": {
+    "skipDangerousModePermissionPrompt": true
+  },
+  "creations": [
+    {
+      "permissionMode": "ask",
+      "trusted": true,
+      "extra": {},
+      "out": {
+        "ok": {
+          "provisioned": [
+            ".zshrc",
+            ".claude/.credentials.json",
+            ".claude.json (onboarding + workspace trust)"
+          ],
+          "tree": {
+            ".claude.json": {
+              "mode": "664",
+              "content": "{\n  \"hasCompletedOnboarding\": true,\n  \"theme\": \"dark\",\n  \"installMethod\": \"native\",\n  \"projects\": {\n    \"/repo/wt\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+            },
+            ".claude/.credentials.json": {
+              "mode": "600",
+              "content": "{\"token\":\"t\"}"
+            },
+            ".fgos-worker-home": {
+              "mode": "664",
+              "content": "run-1\n"
+            },
+            ".zshrc": {
+              "mode": "664",
+              "content": "# provisioned by fgOS: present so zsh does not run its first-run wizard\n"
+            }
+          },
+          "name": "worker-run-1-<rand>"
+        }
+      },
+      "leftover": 1
+    },
+    {
+      "permissionMode": "bypass",
+      "trusted": true,
+      "extra": {},
+      "out": {
+        "ok": {
+          "provisioned": [
+            ".zshrc",
+            ".claude/.credentials.json",
+            ".claude.json (onboarding + workspace trust)",
+            ".claude/settings.json (bypass acceptance)"
+          ],
+          "tree": {
+            ".claude.json": {
+              "mode": "664",
+              "content": "{\n  \"hasCompletedOnboarding\": true,\n  \"theme\": \"dark\",\n  \"installMethod\": \"native\",\n  \"projects\": {\n    \"/repo/wt\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+            },
+            ".claude/.credentials.json": {
+              "mode": "600",
+              "content": "{\"token\":\"t\"}"
+            },
+            ".claude/settings.json": {
+              "mode": "664",
+              "content": "{\n  \"skipDangerousModePermissionPrompt\": true\n}\n"
+            },
+            ".fgos-worker-home": {
+              "mode": "664",
+              "content": "run-1\n"
+            },
+            ".zshrc": {
+              "mode": "664",
+              "content": "# provisioned by fgOS: present so zsh does not run its first-run wizard\n"
+            }
+          },
+          "name": "worker-run-1-<rand>"
+        }
+      },
+      "leftover": 1
+    },
+    {
+      "permissionMode": "ask",
+      "trusted": false,
+      "extra": {},
+      "out": {
+        "error": {
+          "name": "WorkerHomeError",
+          "code": "untrusted-root"
+        }
+      },
+      "leftover": 0
+    },
+    {
+      "permissionMode": "ask",
+      "trusted": null,
+      "extra": {},
+      "out": {
+        "error": {
+          "name": "WorkerHomeError",
+          "code": "untrusted-root"
+        }
+      },
+      "leftover": 0
+    },
+    {
+      "trusted": true,
+      "extra": {},
+      "out": {
+        "ok": {
+          "provisioned": [
+            ".zshrc",
+            ".claude/.credentials.json",
+            ".claude.json (onboarding + workspace trust)"
+          ],
+          "tree": {
+            ".claude.json": {
+              "mode": "664",
+              "content": "{\n  \"hasCompletedOnboarding\": true,\n  \"theme\": \"dark\",\n  \"installMethod\": \"native\",\n  \"projects\": {\n    \"/repo/wt\": {\n      \"allowedTools\": [],\n      \"hasTrustDialogAccepted\": true,\n      \"mcpServers\": {},\n      \"enabledMcpjsonServers\": [],\n      \"disabledMcpjsonServers\": [],\n      \"history\": []\n    }\n  }\n}\n"
+            },
+            ".claude/.credentials.json": {
+              "mode": "600",
+              "content": "{\"token\":\"t\"}"
+            },
+            ".fgos-worker-home": {
+              "mode": "664",
+              "content": "run-1\n"
+            },
+            ".zshrc": {
+              "mode": "664",
+              "content": "# provisioned by fgOS: present so zsh does not run its first-run wizard\n"
+            }
+          },
+          "name": "worker-run-1-<rand>"
+        }
+      },
+      "leftover": 1
+    },
+    {
+      "permissionMode": "nope",
+      "trusted": true,
+      "extra": {},
+      "out": {
+        "error": {
+          "name": "WorkerHomeError",
+          "code": "invalid-arg"
+        }
+      },
+      "leftover": 0
+    },
+    {
+      "permissionMode": "ask",
+      "trusted": true,
+      "extra": {
+        "runId": ""
+      },
+      "out": {
+        "error": {
+          "name": "WorkerHomeError",
+          "code": "invalid-arg"
+        }
+      },
+      "leftover": 0
+    },
+    {
+      "permissionMode": "ask",
+      "trusted": true,
+      "extra": {
+        "workspacePath": "rel"
+      },
+      "out": {
+        "error": {
+          "name": "WorkerHomeError",
+          "code": "invalid-arg"
+        }
+      },
+      "leftover": 0
+    }
+  ],
+  "noCredential": {
+    "out": {
+      "error": {
+        "name": "WorkerHomeError",
+        "code": "missing-credential"
+      }
+    },
+    "leftover": 0
+  },
+  "teardown": [
+    {
+      "step": "redact-plain",
+      "out": {
+        "error": {
+          "name": "WorkerHomeError",
+          "code": "not-a-worker-home"
+        }
+      }
+    },
+    {
+      "step": "remove-plain",
+      "out": {
+        "error": {
+          "name": "WorkerHomeError",
+          "code": "not-a-worker-home"
+        }
+      },
+      "stillThere": true
+    },
+    {
+      "step": "redact",
+      "out": {
+        "ok": true
+      },
+      "credential": false
+    },
+    {
+      "step": "redact-again",
+      "out": {
+        "ok": false
+      }
+    },
+    {
+      "step": "remove",
+      "out": {
+        "ok": true
+      },
+      "stillThere": false
+    },
+    {
+      "step": "remove-again",
+      "out": {
+        "ok": false
+      }
+    },
+    {
+      "step": "remove-empty",
+      "out": {
+        "error": {
+          "name": "WorkerHomeError",
+          "code": "invalid-arg"
+        }
+      }
+    },
+    {
+      "step": "redact-empty",
+      "out": {
+        "error": {
+          "name": "WorkerHomeError",
+          "code": "invalid-arg"
+        }
+      }
+    }
+  ]
+}

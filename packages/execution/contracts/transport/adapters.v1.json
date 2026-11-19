@@ -1,0 +1,180 @@
+{
+  "note": "recorded from src/runner/dispatch/adapters.mjs",
+  "defaultAdapter": "cli-spawn",
+  "names": [
+    "cli-spawn",
+    "herdr-spawn"
+  ],
+  "registry": {
+    "cli-spawn": {
+      "locus": "local-process",
+      "preparedInvocationContract": "exact-v1",
+      "receiptContract": "confinement-adapter-receipt.v1"
+    },
+    "herdr-spawn": {
+      "locus": "herdr-pane",
+      "preparedInvocationContract": "exact-v1",
+      "receiptContract": "herdr-adapter-receipt.v1"
+    }
+  },
+  "metadata": [
+    {
+      "name": "cli-spawn",
+      "out": {
+        "locus": "local-process",
+        "preparedInvocationContract": "exact-v1",
+        "receiptContract": "confinement-adapter-receipt.v1"
+      }
+    },
+    {
+      "name": "herdr-spawn",
+      "out": {
+        "locus": "herdr-pane",
+        "preparedInvocationContract": "exact-v1",
+        "receiptContract": "herdr-adapter-receipt.v1"
+      }
+    },
+    {
+      "name": "other",
+      "out": null
+    }
+  ],
+  "maxDispatchDepth": 3,
+  "depthEnv": "FGOS_DISPATCH_DEPTH",
+  "caseEnv": {
+    "id": "FGOS_CASE_ID",
+    "reservation": "FGOS_CASE_RESERVATION",
+    "out": {
+      "FGOS_CASE_ID": "case-1",
+      "FGOS_CASE_RESERVATION": "res-1"
+    }
+  },
+  "depth": [
+    {
+      "raw": null,
+      "out": 0
+    },
+    {
+      "raw": "0",
+      "out": 0
+    },
+    {
+      "raw": "2",
+      "out": 2
+    },
+    {
+      "raw": "3",
+      "out": 3
+    },
+    {
+      "raw": "-1",
+      "out": 0
+    },
+    {
+      "raw": "x",
+      "out": 0
+    },
+    {
+      "raw": "1.5",
+      "out": 1.5
+    },
+    {
+      "raw": " ",
+      "out": 0
+    },
+    {
+      "raw": "Infinity",
+      "out": 0
+    }
+  ],
+  "executorEnv": [
+    {
+      "raw": {
+        "A": "x",
+        "B": "${HOME}/y",
+        "C": "${MISSING}z",
+        "D": 5,
+        "E": "${HOME}${PATH}"
+      },
+      "base": {
+        "HOME": "/h",
+        "PATH": "/bin",
+        "FGOS_CASE_ID": "c",
+        "CLAUDE_CODE_X": "1",
+        "ANTHROPIC_API_KEY": "k",
+        "HERDR_SOCKET_PATH": "/s",
+        "LANG": "C",
+        "TERM": "xterm",
+        "NOT_LISTED_ANYWHERE": "v"
+      },
+      "out": {
+        "A": "x",
+        "B": "/h/y",
+        "C": "z",
+        "E": "/h/bin"
+      }
+    },
+    {
+      "raw": null,
+      "base": {
+        "HOME": "/h",
+        "PATH": "/bin",
+        "FGOS_CASE_ID": "c",
+        "CLAUDE_CODE_X": "1",
+        "ANTHROPIC_API_KEY": "k",
+        "HERDR_SOCKET_PATH": "/s",
+        "LANG": "C",
+        "TERM": "xterm",
+        "NOT_LISTED_ANYWHERE": "v"
+      },
+      "out": {}
+    },
+    {
+      "raw": "str",
+      "base": {
+        "HOME": "/h",
+        "PATH": "/bin",
+        "FGOS_CASE_ID": "c",
+        "CLAUDE_CODE_X": "1",
+        "ANTHROPIC_API_KEY": "k",
+        "HERDR_SOCKET_PATH": "/s",
+        "LANG": "C",
+        "TERM": "xterm",
+        "NOT_LISTED_ANYWHERE": "v"
+      },
+      "out": {}
+    },
+    {
+      "raw": {},
+      "base": {
+        "HOME": "/h",
+        "PATH": "/bin",
+        "FGOS_CASE_ID": "c",
+        "CLAUDE_CODE_X": "1",
+        "ANTHROPIC_API_KEY": "k",
+        "HERDR_SOCKET_PATH": "/s",
+        "LANG": "C",
+        "TERM": "xterm",
+        "NOT_LISTED_ANYWHERE": "v"
+      },
+      "out": {}
+    }
+  ],
+  "workerEnvBase": {
+    "HOME": "/h",
+    "PATH": "/bin",
+    "FGOS_CASE_ID": "c",
+    "CLAUDE_CODE_X": "1",
+    "ANTHROPIC_API_KEY": "k",
+    "HERDR_SOCKET_PATH": "/s",
+    "LANG": "C",
+    "TERM": "xterm",
+    "NOT_LISTED_ANYWHERE": "v"
+  },
+  "workerEnvWithoutRoot": {
+    "HOME": "/h",
+    "PATH": "/bin",
+    "LANG": "C",
+    "TERM": "xterm"
+  }
+}

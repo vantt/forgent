@@ -1,0 +1,286 @@
+{
+  "note": "recorded from src/runner/dispatch/terminal-slot.mjs",
+  "herdrBin": [
+    {
+      "opt": "my-herdr",
+      "env": {
+        "FGOS_HERDR_BIN": "e"
+      },
+      "out": "my-herdr"
+    },
+    {
+      "opt": "  ",
+      "env": {
+        "FGOS_HERDR_BIN": " e2 "
+      },
+      "out": "e2"
+    },
+    {
+      "env": {},
+      "out": "herdr"
+    },
+    {
+      "env": {
+        "FGOS_HERDR_BIN": "  "
+      },
+      "out": "herdr"
+    },
+    {
+      "opt": " x ",
+      "env": {},
+      "out": "x"
+    }
+  ],
+  "endpointEnv": [
+    {
+      "env": {
+        "HERDR_SESSION": "s",
+        "HERDR_SOCKET_PATH": "/p",
+        "HOME": "/h",
+        "HERDR_X": 5,
+        "FGOS_HERDR_BIN": "b"
+      },
+      "out": {
+        "HERDR_SESSION": "s",
+        "HERDR_SOCKET_PATH": "/p"
+      }
+    },
+    {
+      "env": {},
+      "out": {}
+    }
+  ],
+  "portKey": [
+    {
+      "args": [
+        "abc"
+      ],
+      "out": "abc"
+    },
+    {
+      "args": [
+        "a b/c"
+      ],
+      "out": "a-b-c"
+    },
+    {
+      "args": [
+        "--x"
+      ],
+      "out": "x"
+    },
+    {
+      "args": [
+        ".hidden"
+      ],
+      "out": "hidden"
+    },
+    {
+      "args": [
+        ""
+      ],
+      "out": "run"
+    },
+    {
+      "args": [
+        null,
+        "fb"
+      ],
+      "out": "fb"
+    },
+    {
+      "args": [
+        "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "out": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+      "args": [
+        "é-ü"
+      ],
+      "out": "run"
+    },
+    {
+      "args": [
+        "___a"
+      ],
+      "out": "a"
+    }
+  ],
+  "driverCode": [
+    {
+      "refusal": {
+        "reason": "herdr agent_blocked: nope"
+      },
+      "out": "agent_blocked"
+    },
+    {
+      "refusal": {
+        "detail": "herdr pane_missing: x"
+      },
+      "out": "pane_missing"
+    },
+    {
+      "refusal": {
+        "reason": "other"
+      },
+      "out": null
+    },
+    {
+      "refusal": {},
+      "out": null
+    },
+    {
+      "refusal": null,
+      "out": null
+    },
+    {
+      "refusal": {
+        "reason": "herdr Bad: x"
+      },
+      "out": null
+    }
+  ],
+  "refusal": [
+    {
+      "refusal": {
+        "result": "unsupported",
+        "detail": "no",
+        "capability": "cap"
+      },
+      "what": "launch",
+      "out": {
+        "code": "terminal_unsupported",
+        "message": "launch: no",
+        "capability": "cap"
+      }
+    },
+    {
+      "refusal": {
+        "result": "refused",
+        "reason": "herdr agent_blocked: x"
+      },
+      "what": "launch",
+      "out": {
+        "code": "agent_blocked",
+        "message": "launch: herdr agent_blocked: x",
+        "capability": null
+      }
+    },
+    {
+      "refusal": {
+        "result": "refused",
+        "detail": "plain"
+      },
+      "what": "send",
+      "out": {
+        "code": "terminal_unknown",
+        "message": "send: plain",
+        "capability": null
+      }
+    },
+    {
+      "refusal": {
+        "result": "refused"
+      },
+      "what": "send",
+      "out": {
+        "code": "terminal_unknown",
+        "message": "send: refused",
+        "capability": null
+      }
+    }
+  ],
+  "workLabel": [
+    {
+      "assignment": {
+        "workId": "w1",
+        "title": "T"
+      },
+      "out": {
+        "id": "w1",
+        "title": "T"
+      }
+    },
+    {
+      "assignment": {
+        "workId": "w1"
+      },
+      "out": {
+        "id": "w1"
+      }
+    },
+    {
+      "assignment": {
+        "unitRunId": "unit-run-1-0123abcd",
+        "objective": "do it"
+      },
+      "out": {
+        "id": "run-0123",
+        "title": "do it"
+      }
+    },
+    {
+      "assignment": {
+        "provenance": {
+          "unitRunId": "x-ffffffff"
+        }
+      },
+      "out": {
+        "id": "run-ffff"
+      }
+    },
+    {
+      "assignment": {
+        "unitRunId": "nohex"
+      },
+      "out": {}
+    },
+    {
+      "assignment": {},
+      "out": {}
+    },
+    {
+      "assignment": null,
+      "out": {}
+    }
+  ],
+  "display": [
+    {
+      "args": {
+        "id": 7,
+        "title": "T",
+        "agent": "/usr/bin/claude",
+        "model": "m",
+        "role": "producer"
+      },
+      "out": {
+        "id": "7",
+        "title": "T",
+        "role": "producer",
+        "agent": "claude",
+        "model": "m"
+      }
+    },
+    {
+      "args": {
+        "id": "i"
+      },
+      "out": {
+        "id": "i"
+      }
+    },
+    {
+      "args": {},
+      "out": {}
+    },
+    {
+      "args": {
+        "agent": "codex"
+      },
+      "out": {
+        "agent": "codex"
+      }
+    }
+  ]
+}
