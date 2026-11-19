@@ -154,129 +154,114 @@ fn every_legality_refusal_reads_as_node_stated_it() {
     }
 }
 
-fn mutating_unit_run(root: &Path) -> (Value, PathBuf, PathBuf) {
+/// The checkout facts Node's Git gave for a case's cwd, as its vector recorded them.
+struct RecordedCheckout {
+    repo_root: Option<String>,
+    main_checkout_root: Option<String>,
+}
+impl CheckoutFacts for RecordedCheckout {
+    fn repo_root(&self, _: &str) -> Result<String, String> {
+        self.repo_root
+            .clone()
+            .ok_or_else(|| "not a git checkout".into())
+    }
+    fn main_checkout_root(&self, _: &str) -> Option<String> {
+        self.main_checkout_root.clone()
+    }
+}
+
+#[test]
+fn every_git_half_refusal_of_a_mutating_unit_run_reads_as_node_stated_it() {
+    let doc = vectors("legality.v1.json");
+    let root = scratch("legality-git");
+    for dir in [
+        "git/main/.fgos/assignments/unit-run-1",
+        "git/linked",
+        "git/outside",
+    ] {
+        std::fs::create_dir_all(root.join(dir)).unwrap();
+    }
+    let cases = doc["gitCases"].as_array().unwrap();
+    assert!(!cases.is_empty());
+    for case in cases {
+        let name = case["name"].as_str().unwrap();
+        let assignment = rooted(&case["assignment"], &root);
+        let options = rooted(&case["options"], &root);
+        let facts = rooted(&case["checkout"], &root);
+        std::fs::write(
+            root.join("git/main/.fgos/assignments/unit-run-1/unit.json"),
+            rooted(&case["unitJson"], &root).to_string(),
+        )
+        .unwrap();
+        let checkout = RecordedCheckout {
+            repo_root: facts["repoRoot"].as_str().map(str::to_string),
+            main_checkout_root: facts["mainCheckoutRoot"].as_str().map(str::to_string),
+        };
+        let repo_root = PathBuf::from(options["repoRoot"].as_str().unwrap());
+        let result = check(
+            &assignment,
+            &LegalityOptions {
+                is_read_only_mode: options["isReadOnlyMode"].as_bool(),
+                cwd: options["cwd"].as_str(),
+                repo_root: Some(&repo_root),
+                committed_runner_config: options.get("committedRunnerConfig"),
+                session: BindSession::default(),
+                ..Default::default()
+            },
+            &checkout,
+            &json!({}),
+        );
+        let got = match result {
+            Ok(()) => json!({ "ok": null }),
+            Err(error) => {
+                let mut error = error.to_json();
+                error["message"] = unrooted(&error["message"], &root);
+                json!({ "error": error })
+            }
+        };
+        assert_eq!(got, case["result"], "{name}");
+    }
+}
+
+/// The one posture Git cannot be made to give a recorder: a checkout whose main root is known but whose toplevel
+/// is not. Node's message for it is read from `resolveMutatingCwdPosture`'s caller.
+#[test]
+fn a_mutating_unit_run_whose_toplevel_cannot_be_resolved_fails_closed() {
+    let root = scratch("posture");
     let main = root.join("main");
     let linked = root.join("linked");
     std::fs::create_dir_all(main.join(".fgos/assignments/unit-run-1")).unwrap();
     std::fs::create_dir_all(&linked).unwrap();
+    std::fs::write(
+        main.join(".fgos/assignments/unit-run-1/unit.json"),
+        json!({ "worktree": linked }).to_string(),
+    )
+    .unwrap();
     let assignment = json!({
         "assignmentId": "unit-run-1/producer/1", "role": "producer", "round": 1, "mutation": "mutating",
         "provenance": { "kind": "unit-run", "seat": "producer", "unitRunId": "unit-run-1" },
         "binding": { "executor": "a", "tier": "standard", "posture": "workspace-write" },
     });
-    (assignment, main, linked)
-}
-
-fn write_unit(main: &Path, unit: &Value) {
-    std::fs::write(
-        main.join(".fgos/assignments/unit-run-1/unit.json"),
-        unit.to_string(),
-    )
-    .unwrap();
-}
-
-fn gate(
-    assignment: &Value,
-    main: &Path,
-    cwd: &Path,
-    checkout: &dyn CheckoutFacts,
-    config: Option<&Value>,
-) -> Result<(), RunnerConfigError> {
-    check(
-        assignment,
+    let unresolved = RecordedCheckout {
+        repo_root: None,
+        main_checkout_root: Some(main.to_string_lossy().into()),
+    };
+    let error = check(
+        &assignment,
         &LegalityOptions {
             is_read_only_mode: Some(false),
-            cwd: Some(&cwd.to_string_lossy()),
-            repo_root: Some(main),
-            committed_runner_config: config,
-            session: BindSession::default(),
+            cwd: Some(&linked.to_string_lossy()),
+            repo_root: Some(&main),
             ..Default::default()
         },
-        checkout,
+        &unresolved,
         &json!({}),
     )
-}
-
-#[test]
-fn a_mutating_unit_run_refuses_the_main_checkout_and_an_unresolvable_root() {
-    let root = scratch("posture");
-    let (assignment, main, linked) = mutating_unit_run(&root);
-    write_unit(&main, &json!({ "worktree": linked }));
-    let in_main = FakeCheckout {
-        main: main.to_string_lossy().into(),
-        root: Some(main.to_string_lossy().into()),
-    };
-    let error = gate(&assignment, &main, &main, &in_main, None).unwrap_err();
-    assert!(
-        error.message.contains("resolves to the main checkout")
-            && error.message.contains("never the main checkout"),
-        "{error}"
-    );
-    let outside = gate(&assignment, &main, &linked, &NoCheckout, None).unwrap_err();
-    assert!(outside.message.contains("does not resolve inside any git checkout (fail closed on an unresolvable root, never fail open)"), "{outside}");
-    let unresolved = FakeCheckout {
-        main: main.to_string_lossy().into(),
-        root: None,
-    };
-    let error = gate(&assignment, &main, &linked, &unresolved, None).unwrap_err();
+    .unwrap_err();
     assert!(
         error
             .message
             .contains("toplevel could not be resolved; fail closed, never fail open"),
-        "{error}"
-    );
-}
-
-#[test]
-fn a_mutating_unit_run_must_run_in_the_worktree_its_unit_names_and_carry_a_binding() {
-    let root = scratch("worktree");
-    let (assignment, main, linked) = mutating_unit_run(&root);
-    let checkout = FakeCheckout {
-        main: main.to_string_lossy().into(),
-        root: Some(linked.to_string_lossy().into()),
-    };
-    write_unit(&main, &json!({ "worktree": main }));
-    let error = gate(&assignment, &main, &linked, &checkout, None).unwrap_err();
-    assert!(
-        error.message.contains("worktree mismatch") && error.message.ends_with("-- refused"),
-        "{error}"
-    );
-    write_unit(&main, &json!({ "worktree": linked }));
-    let mut unbound = assignment.clone();
-    unbound.as_object_mut().unwrap().remove("binding");
-    let error = gate(&unbound, &main, &linked, &checkout, None).unwrap_err();
-    assert!(
-        error.message.ends_with("carries no binding -- refused"),
-        "{error}"
-    );
-}
-
-#[test]
-fn a_replay_refuses_a_missing_snapshot_and_a_config_that_changed_since_the_bind() {
-    let root = scratch("replay");
-    let (assignment, main, linked) = mutating_unit_run(&root);
-    let checkout = FakeCheckout {
-        main: main.to_string_lossy().into(),
-        root: Some(linked.to_string_lossy().into()),
-    };
-    write_unit(&main, &json!({ "worktree": linked, "bindings": {} }));
-    let error = gate(&assignment, &main, &linked, &checkout, None).unwrap_err();
-    assert_eq!(
-        error.code.as_deref(),
-        Some("binding-replay-snapshot-missing"),
-        "{error}"
-    );
-
-    let bound = json!({ "capabilities": { "code:implement": { "tier": "standard" } } });
-    write_unit(
-        &main,
-        &json!({ "worktree": linked, "bindings": { "producer/1": [{ "assignmentId": "unit-run-1/producer/1", "binding": { "bindingInput": { "configDigest": seat_config_digest(&bound) } } }] } }),
-    );
-    let changed = json!({ "capabilities": { "code:implement": { "tier": "high" } } });
-    let error = gate(&assignment, &main, &linked, &checkout, Some(&changed)).unwrap_err();
-    assert_eq!(
-        error.code.as_deref(),
-        Some("binding-replay-config-mismatch"),
         "{error}"
     );
 }
@@ -998,7 +983,7 @@ impl ExecutePorts for RefusalPorts {
     fn load_runner_config(&self, _: &Path) -> Result<Value, RunnerConfigError> {
         Ok(json!({ "executors": { "stub": { "kind": "agent", "command": "stub" } } }))
     }
-    fn compile_dispatch_plan(
+    fn decided_dispatch_plan(
         &self,
         _: &Value,
         _: &Value,
@@ -1296,7 +1281,7 @@ mod end_to_end {
                 json!({ "executors": { "stub": { "kind": "agent", "command": "stub" } }, "timeoutMs": 30000 }),
             )
         }
-        fn compile_dispatch_plan(
+        fn decided_dispatch_plan(
             &self,
             _: &Value,
             _: &Value,

@@ -23,26 +23,20 @@ fs.mkdirSync(outDir, { recursive: true });
 const write = (name, body) => fs.writeFileSync(path.join(outDir, name), `${JSON.stringify(body, null, 2)}\n`);
 
 // The native door first (loading it from inside the config import cycle fails on a missing export). A checkout does
-// not ship the addon, so the recorder loads the one of the activated release, as the transport-round recorder does.
-const door = await import('../../src/native/door.mjs');
-{
-  // A linked worktree's `.git` file names its git dir (`<main>/.git/worktrees/<name>`), so the main checkout is read
-  // from the file system, never by asking Git.
-  const gitFile = path.join(repo, '.git');
-  const mainRoot = fs.statSync(gitFile).isFile()
-    ? path.resolve(fs.readFileSync(gitFile, 'utf8').replace(/^gitdir:\s*/, '').trim(), '..', '..', '..')
-    : repo;
-  const activation = JSON.parse(fs.readFileSync(path.join(mainRoot, '.fgos', 'installation', 'activation.json'), 'utf8'));
-  const manifest = JSON.parse(fs.readFileSync(path.join(activation.releasePath, 'manifest.json'), 'utf8'));
-  door.loadNativeAddon({ descriptor: { manifest, releaseRoot: activation.releasePath } });
-  // The seat config digest is the host's own answer (the replay digest), so the recorder asks the activated host.
-  process.env.FGOS_HOST_BIN ||= path.join(activation.releasePath, 'bin', 'fgos');
-}
+// not ship the addon: the recorder stages this checkout's, as the execution-contract recorder does. It loads the addon
+// Git Inspect answers the git half's checkout facts through, and points FGOS_HOST_BIN at this checkout's host, which
+// gives the seat config digest (the replay digest).
+await import('../../src/native/door.mjs');
+const { ensureGitAddon } = await import('../helpers/git-addon.mjs');
+ensureGitAddon();
 
 const runner = await import(path.join(repo, 'src', 'runner', 'dispatch', 'assignment-runner.mjs'));
 const cli = await import(path.join(repo, 'src', 'runner', 'dispatch', 'cli.mjs'));
 const direct = await import(path.join(repo, 'src', 'run-supervisor', 'direct-launch.mjs'));
 const seatClient = await import(path.join(repo, 'src', 'seat-binding', 'client.mjs'));
+const paths = await import(path.join(repo, 'src', 'runner', 'paths.mjs'));
+const { initFixtureRepo } = await import('../helpers/git-fixture.mjs');
+const { sandboxGit } = await import('../../scripts/lib/sandbox-git.mjs');
 
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-assignment-runner-rec-'));
 const plain = (v) => JSON.parse(JSON.stringify(v ?? null));
@@ -55,9 +49,6 @@ const attempt = async (fn) => {
 
 // SECTION: legality. `executeAssignment` judges legality before it reads any config or writes any file, so a
 // refusal here is the legality gate alone.
-// The git half of the mutating gate (the checkout posture and the binding replay behind it) asks Git Inspect, whose
-// addon a checkout does not ship, so the recorder cannot run it: the Rust tests cover those refusals through a fake
-// checkout, with the messages read from the Node source.
 const main = path.join(scratch, 'main');
 fs.mkdirSync(main);
 const linked = path.join(scratch, 'linked');
@@ -90,7 +81,44 @@ await legality('mutating inline needs the explicit assertion', { assignmentId: '
 await legality('mutating inline claiming the retired stamp', { assignmentId: 'a', operation: 'op', role: 'producer', mutation: 'mutating', provenance: { kind: 'inline', inline: { contract: { constraints: ['protocol-operation:d@1#o'] } } } }, { isReadOnlyMode: false });
 await legality('mutating inline with no unit-run gate', { assignmentId: 'a', operation: 'op', role: 'producer', mutation: 'mutating', provenance: { kind: 'inline' } }, { isReadOnlyMode: false });
 await legality('unit-run with no unit.json refused', base, { isReadOnlyMode: false, cwd: linked }, { noUnit: true });
-write('legality.v1.json', { contract: 'assignment-runner-legality.v1', cases: legalityCases });
+
+// The git half: a real repository and a linked worktree of it. Each case also records the checkout facts Node's Git
+// gave for its cwd (`repoRoot`, or null where it threw; `mainCheckoutRoot`), which the Rust replay feeds its
+// checkout port, so the Rust gate is judged on the same facts Node was.
+const gitRoot = path.join(scratch, 'git');
+fs.mkdirSync(gitRoot);
+const gitMain = path.join(gitRoot, 'main');
+fs.mkdirSync(gitMain);
+initFixtureRepo(gitMain);
+const gitLinked = path.join(gitRoot, 'linked');
+sandboxGit(gitRoot)(['-C', gitMain, 'worktree', 'add', '-q', '-b', 'linked-branch', gitLinked], { stdio: 'pipe' });
+const gitOutside = path.join(gitRoot, 'outside');
+fs.mkdirSync(gitOutside);
+const gitRuns = path.join(gitMain, '.fgos', 'assignments', unitRunId);
+fs.mkdirSync(gitRuns, { recursive: true });
+const checkoutFacts = (cwd) => {
+  let repoRoot = null;
+  try { repoRoot = paths.resolveRepoRoot(cwd); } catch { repoRoot = null; }
+  return { repoRoot, mainCheckoutRoot: paths.resolveMainCheckoutRoot(cwd) };
+};
+const boundConfig = { capabilities: { 'code:implement': { tier: 'standard' } } };
+const boundUnit = (worktree, bindings) => ({ worktree, unit: { id: unitRunId }, bindings });
+const recordedBinding = { 'producer/1': [{ assignmentId: `${unitRunId}/producer/1`, binding: { bindingInput: { configDigest: seatClient.digest({ runner: boundConfig }) } } }] };
+const { binding: _carried, ...unbound } = base;
+const gitCases = [];
+async function gitLegality(name, assignment, cwd, unit, committedRunnerConfig) {
+  fs.writeFileSync(path.join(gitRuns, 'unit.json'), JSON.stringify(unit));
+  const opts = { isReadOnlyMode: false, cwd, repoRoot: gitMain, ...(committedRunnerConfig ? { committedRunnerConfig } : {}) };
+  const result = await attempt(() => runner.executeAssignment(assignment, opts));
+  gitCases.push({ name, assignment: scrubAll(assignment), options: scrubAll(opts), unitJson: scrubAll(unit), checkout: scrubAll(checkoutFacts(cwd)), result });
+}
+await gitLegality('a mutating unit run in the main checkout is refused', base, gitMain, boundUnit(gitLinked, recordedBinding));
+await gitLegality('a mutating unit run outside any checkout is refused', base, gitOutside, boundUnit(gitLinked, recordedBinding));
+await gitLegality('a mutating unit run in another worktree than its unit names is refused', base, gitLinked, boundUnit(gitMain, recordedBinding));
+await gitLegality('a mutating unit run that carries no binding is refused', unbound, gitLinked, boundUnit(gitLinked, recordedBinding));
+await gitLegality('a binding with no recorded input to replay is refused', base, gitLinked, boundUnit(gitLinked, {}));
+await gitLegality('a seat config changed since the bind is refused', base, gitLinked, boundUnit(gitLinked, recordedBinding), { capabilities: { 'code:implement': { tier: 'high' } } });
+write('legality.v1.json', { contract: 'assignment-runner-legality.v1', cases: legalityCases, gitCases });
 
 // SECTION: replay digest. Unchanged in bytes: the digest a binding records of the config slice it was bound under.
 const digestInputs = [

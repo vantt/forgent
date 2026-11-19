@@ -5,10 +5,10 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
+use fgos_execution::handoff::sha256_hex;
 use fgos_git::{GitDriver, InspectCursor, ResolveRepo};
 use fgos_run_supervisor::controller::proof::publish_immutable_proof;
 use serde_json::{json, Map, Value};
-use sha2::{Digest, Sha256};
 
 use crate::contract::effective::compute_sha256_digest;
 use crate::transport::visibility_session::iso_now;
@@ -63,13 +63,6 @@ impl CheckoutRoots for GitCheckoutRoots {
         }
         roots
     }
-}
-
-fn sha256_hex(bytes: &[u8]) -> String {
-    Sha256::digest(bytes)
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect()
 }
 
 /// Hash each pinned input before the worker starts. An input is read only when its real path lies inside the main

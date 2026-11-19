@@ -17,6 +17,7 @@ use std::path::{Path, PathBuf};
 use fgos_execution::bind::BindSession;
 use fgos_execution::decide::CheckoutFacts;
 use fgos_execution::dispatch_policy::launch_pin_of;
+use fgos_execution::handoff::sha256_hex;
 use fgos_execution::ports::Machine;
 use fgos_run_supervisor::controller::error::DispatchError;
 use fgos_run_supervisor::controller::launch::{
@@ -27,7 +28,6 @@ use fgos_run_supervisor::controller::lease::{
     AcquireOutcome,
 };
 use serde_json::{json, Map, Value};
-use sha2::{Digest, Sha256};
 
 use super::attempt::{
     close_attempt, open_attempt, publish_attempt_intent, Control, GiveBack, OpenAttempt,
@@ -146,7 +146,7 @@ pub trait ExecutePorts: SeatPorts {
     fn load_runner_config(&self, root: &Path) -> Result<Value, RunnerConfigError>;
     /// The dispatch plan the decision door compiled for this assignment; carries the policy and enforces that the
     /// decided executor agrees with it.
-    fn compile_dispatch_plan(
+    fn decided_dispatch_plan(
         &self,
         cfg: &Value,
         assignment: &Value,
@@ -205,13 +205,6 @@ fn text(value: &Value, key: &str) -> Option<String> {
 
 fn absolute(path: &Path) -> PathBuf {
     std::path::absolute(path).unwrap_or_else(|_| path.to_path_buf())
-}
-
-fn sha256_hex(text: &str) -> String {
-    Sha256::digest(text.as_bytes())
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect()
 }
 
 fn json_text(value: &Value) -> String {
@@ -435,7 +428,7 @@ pub fn execute_assignment(
 
     // Decide first: the compiled plan carries the dispatch policy and enforces that the decided executor agrees with
     // it. Dispatch is never handed a Work item.
-    let compiled_plan = ports.compile_dispatch_plan(&cfg, &effective_assignment, opts)?;
+    let compiled_plan = ports.decided_dispatch_plan(&cfg, &effective_assignment, opts)?;
     let mechanism = compiled_plan.get("mechanism").and_then(Value::as_str);
     if mechanism.is_none() || mechanism == Some("unavailable") {
         let reason = text(&compiled_plan, "blockedReason")
@@ -572,7 +565,10 @@ pub fn execute_assignment(
     // Input identity, recorded runner-side before the worker runs: the sha256 of every file the Work layer pinned.
     // Cross-pass consumption recomputes it, so a verdict computed against older bytes is never consumed.
     let input_digests = digest_pinned_inputs(&opts.pin_inputs, &root, ports.roots());
-    let dispatch_plan_digest = format!("sha256:{}", sha256_hex(&json_text(&compiled_plan)));
+    let dispatch_plan_digest = format!(
+        "sha256:{}",
+        sha256_hex(json_text(&compiled_plan).as_bytes())
+    );
     let declared_unit_run_id = text(&effective_assignment, "unitRunId").or_else(|| {
         effective_assignment
             .pointer("/provenance/unitRunId")
@@ -584,9 +580,10 @@ pub fn execute_assignment(
 
     // Atomic admission. `retry_id` is opt-in: a caller that omits it gets the next available attempt; one that
     // supplies it opts into the idempotent-tuple and predecessor fencing.
-    let default_payload_digest = sha256_hex(&json_text(
-        &json!({ "assignment": effective_assignment, "compiledPlan": compiled_plan }),
-    ));
+    let default_payload_digest = sha256_hex(
+        json_text(&json!({ "assignment": effective_assignment, "compiledPlan": compiled_plan }))
+            .as_bytes(),
+    );
     let destination = opts.destination.clone().unwrap_or_else(|| cwd_text.clone());
     let payload_digest = opts
         .payload_digest

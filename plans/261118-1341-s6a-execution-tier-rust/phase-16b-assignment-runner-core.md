@@ -24,7 +24,31 @@ attempt: plan, lease, prompt, confinement request, envelope, handover, settle.
 - Golden vectors under `packages/execution/contracts/assignment-runner/` recorded by
   `test/golden-recorders/assignment-runner.recorder.mjs`.
 
-- Open item (OPC 2026-11-19): `Handle::hand_over` is unix-only; decide here whether on Windows the controller stays the lock holder for the child's lifetime or a Windows-specific handover is built, and prove it. Any write-then-exec of a script in a multi-threaded host opens with O_CLOEXEC and closes before exec (ETXTBSY seen in the phase-8 smoke tests).
+- Attempt lock on Windows (decided 2026-11-19, review of 16b): no Windows handover is built and the controller does
+  not hold the attempt lock for the child's lifetime. It releases its attempt copy right after the supervisor is
+  spawned (`launch.rs` `start_and_bind`, `cfg(not(unix))`), and the Windows supervisor takes `attempt.lock` itself
+  once it read the envelope, waiting up to `LOCK_WAIT_MS` (10 s) for the controller's release
+  (`packages/run-supervisor/rust/src/supervise/windows.rs`, module doc and `Locks::complete`). This is what Node does
+  (`assignment-runner.mjs` `startAndBind`: `if (process.platform === 'win32') attempt.locks.releaseAttempt()`;
+  `direct-launch.mjs` `startSupervisor` hands over no descriptor on win32). Holding it for the child's lifetime would
+  make the supervisor's own take wait out its 10 s and refuse. Proof: msvc `cargo check` of the `cfg(not(unix))`
+  path; a runtime proof waits for a Windows runner (no Windows machine on the lane).
+- Write-then-exec: the runner writes no script it executes. Tests that do write their stub agent/supervisor with
+  `std::fs::write` (opened `O_CLOEXEC`, closed on return) and take `SCRIPT_EXEC` around the write and the exec, so a
+  fork in a sibling test cannot hold the write descriptor at exec (ETXTBSY seen in the phase-8 smoke tests).
+- Open (review 2026-11-19, blocking a mutating launch): the cwd lease does not reach the supervisor. Unix: the
+  supervisor needs the lease as descriptor 4 (`supervise/unix.rs` `Locks::complete`), Node passes a shared copy
+  (`spawnWithLocks([attempt, cwdLease])`, the controller keeps its own through commit); `start_and_bind` passes only
+  descriptor 3, and `fgos-holder-lock` has no door that lends a held exclusive description to a child while the
+  holder keeps it (`hand_over` moves). Windows: Node names the lease holder (`cwdLeaseOwner` = the helper's
+  `domainEndpoint()`); `seat.rs` passes `cwd_lease_owner: None`, so the supervisor tries to take a lease the
+  controller still holds. Fix needs a `fgos-holder-lock` door (lend a copy to a child on unix; a holder endpoint on
+  Windows) and an end-to-end mutating test.
+- Ports the host implements (named for phases 18/19): `ExecutePorts` + `SeatPorts` (the composite, no impl yet),
+  `TerminalPrep` and `CredentialRenewal` (no impl yet); `CheckoutFacts` (`apps/fgos/src/wiring/dispatch_decide.rs`
+  `HostWorkspace`), `Machine` (`apps/fgos/src/wiring/seat_binding.rs` `HostMachine`), `SettlementGit`
+  (`settlement::ports::GitDoor`), `CheckoutRoots` (`inputs::GitCheckoutRoots`), `AdoptDoor`
+  (`outcome::SupervisorAdoptDoor`), `GiveBack` (`attempt::MachineGiveBack`) exist.
 
 ## Steps
 
