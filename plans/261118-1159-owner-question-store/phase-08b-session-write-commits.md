@@ -10,7 +10,7 @@ A write through `session write` is published by the existing **paths land** use 
 `land_paths` at :909). This is the door of plan 261118-1045 PS-6 and its phase 7a Git ports. It already:
 - takes the target's merge slot, fetches, and fast-forwards the main checkout to the remote tip through
   `GitDriver::catch_up_main_checkout` (`packages/git/rust/src/land.rs:1067`; refusals
-  `main-checkout-catch-up-refused: <reason>`, `land-remote-diverged`);
+  `main-checkout-catch-up-refused: <reason>`, `land-remote-diverged` (fetch refused or tracking ref absent) and `land-target-ahead` (local ahead of the remote));
 - commits only the named paths through `scoped_commit` (`packages/git/rust/src/scoped_commit.rs:1337`), keeping any
   other dirty path out of the commit;
 - pushes the checked-out branch without force (`land-paths-push-rejected` when the remote moved);
