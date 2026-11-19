@@ -12,7 +12,7 @@ fgOS platform (core personas, domain-free). Related: `docs/discussions/secretary
 Round 0 (2026-11-19 16:2x). Scout done; nothing settled. Starting picture: Miu and the supervisor are the owner's two
 hands. Miu is always on, does little herself, but must be able to coordinate anything (delegate, queue) and have a fast
 route for small urgent chores. The supervisor is woken, not always on, and covers the large cyclic coordination.
-First open question: what the urgent-chore fast route is (§3 row 1).
+Round 1: the owner asked why the supervisor can do anything; it is the interim unconfined session, not the designed head (§3 row 9). Open next: which reach is the target (§3 row 9), then the urgent-chore route (§3 row 1).
 
 ## 2. Mục tiêu & đề bài
 
@@ -39,6 +39,7 @@ the door it goes through and how it is proven from the sandbox. Code and plans a
 | 5 | Mismatches between persona text and grant: Miu's skill says "never lands work" but her grant has `land`; persona says "hands a ready plan to a supervisor" while the skill says the watcher does | open |
 | 6 | Supervisor reach beyond plans: owning backlog rows, mailbox/peers, waking on Miu's request | open |
 | 7 | Who wins when Miu and the supervisor touch the same thing (a session, a plan, a backlog row) | open |
+| 9 | Two supervisors exist today: the interim hand-started one (`forgent-1d`, Claude opus, unconfined, role `lead:SUPERVISOR`, brief `.fgos/runtime/tmp/supervisor-brief-portfolio.md`) does anything a person can; the designed head (`head:supervisor-<handle>`, confined, grant table, woken by the watcher) does only its grant verbs and has not yet carried a plan ready to done. Which one is the target reach for "the supervisor" | open |
 | 8 | Proof: each power named with its door and a sandbox proof (ties to supervisor-review T2 head-start preflight, `p-2wb2lfgky3`, and caps phase 6 grant audit) | open |
 
 ## 4. Quyết định đã chốt
@@ -52,6 +53,14 @@ the door it goes through and how it is proven from the sandbox. Code and plans a
   secretary|supervisor|lead.yaml, core/skills/fgos-secretary|fgos-supervisor, `src/session-host/head-grants.mjs`,
   `docs/platform/supervision/spec.md` §1/§7, supervisor-review §1-§2 and hand-off, plan 261118-1045 integration report
   windows 1-5, caps plan `plan.md` (origin/lead/secretary-caps aa2490723), secretary-miu hand-off and SM-D1..SM-D6.
+
+- 2026-11-19 16:4x — Owner: "hiện supervisor đang cấu thành ra sao mà việc gì nó làm cũng được." Answered from
+  scout: the supervisor the owner works with is the interim hand-started session `forgent-1d` (pid 1020432, `claude
+  --dangerously-skip-permissions --model opus`, no bwrap, Identity role `lead:SUPERVISOR`), driven by a by-hand brief
+  (read plans, herdr tabs, worktrees, briefs, restart leads, may lead a plan itself). Its reach is full Bash as the
+  owner. The designed supervisor head is confined (bwrap, `FGOS_CONFINED=1`), reaches only its `head-grants.mjs` verbs
+  through the request socket, and is started by `fgos supervisor wake`. Miu, by contrast, already runs as a confined
+  head (pid 36166 bwrap, sonnet). Opened §3 row 9.
 
 ## 6. Thiết kế đã chốt {#design}
 
