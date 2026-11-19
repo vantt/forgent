@@ -179,14 +179,6 @@ async function defaultPin({ persona, projectRoot }) {
   }
 }
 
-/**
- * A head's private scratch directory: under the attempt's outbox, the one directory of the run the sandbox keeps
- * writable. Made before the launch so the head's `TMPDIR` names a directory that exists the moment it starts.
- */
-export function headTmpDirOf(projectRoot, key) {
-  return path.join(fgosDirFromRoot(projectRoot), 'assignments', key, 'runs', '01', 'outbox', 'tmp');
-}
-
 async function defaultHandoff({ persona, name, projectRoot }) {
   const { readLatestHandoff } = await import('../session-rotation/handoff-store.mjs');
   return readLatestHandoff({ fgosDir: fgosDirFromRoot(projectRoot), persona, name });
@@ -230,11 +222,10 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
   const runnerConfig = await (ports.runnerConfig ?? defaultRunnerConfig)(projectRoot);
   const binding = await (ports.bind ?? bindHeadSeat)({ persona, key, runnerConfig });
 
-  const tmpDir = (ports.tmpDir ?? headTmpDirOf)(projectRoot, key);
-  fs.mkdirSync(tmpDir, { recursive: true, mode: 0o700 });
   const request = {
     binding, runnerConfig, key, role, grant, opening: text, ceilingMs: HEAD_HARD_CEILING_MS,
-    env: { TMPDIR: tmpDir, FGOS_HEAD_ROLE: role, FGOS_HEAD_PERSONA: persona, FGOS_HEAD_NAME: name, FGOS_HEAD_GEN: String(generation) },
+    // The sandbox gives every launch a private writable tmpfs at /tmp (bwrap driver `--tmpfs /tmp`), so /tmp is the head's own scratch, not the shared one.
+    env: { TMPDIR: '/tmp', FGOS_HEAD_ROLE: role, FGOS_HEAD_PERSONA: persona, FGOS_HEAD_NAME: name, FGOS_HEAD_GEN: String(generation) },
     projectRoot, beside, display: { id: name, title: persona },
   };
   let launched;
