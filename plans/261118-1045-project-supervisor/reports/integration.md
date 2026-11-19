@@ -47,3 +47,16 @@ PENDING (owner/supervisor window). Needs: build, stage and activate the combined
   reconciliation is still kept is an owner question, not this plan's.
 - Backlog id `p-j2et24xb6o` was minted and not used.
 - Step 6 (delete land-branch.sh) is pending until every running lead lands with `fgos land` (supervisor decision A).
+
+## Full gate (2026-11-19, main f624664a6)
+Every "Full run: PENDING (full gate)" above is answered here.
+- `cargo test --workspace --no-fail-fast`: 3468 pass, 0 fail. `cargo clippy --workspace --all-targets -D warnings`,
+  `cargo fmt --all --check`, `cargo check --workspace` for x86_64-pc-windows-msvc and aarch64-apple-darwin: pass.
+- `node scripts/run-tests.mjs` (whole suite): 8474 tests; 52 failures in 12 files, all errno -122 (EDQUOT) or EIO on
+  the shared `/tmp` tmpfs (per-user quota, `usrquota`). 10 files passed alone at once; the last two
+  (`test/distribution/native-addon.test.mjs`, `test/scripts/mailbox-live-confined.test.mjs`) passed alone (25/0) after
+  a 4.6 GB scratch copy in this session's own scratchpad was removed. No ERROR (leak/clone) lines.
+- The first full run (184f9c8c1) found one real regression from phase 17: with the pool armed, seat deadlines grew by
+  the whole lane wait (`test/runner/spawn-worker.test.mjs`). Fixed in main 2dbabb340 (the run supervisor gives back the
+  unused wait on `softAt`); follow-up for the hard ceiling of a seat with no soft budget: backlog `p-sksopwqyto`.
+- Still pending: step 5 (live run, acceptance 8) in the supervisor's window; step 6 (script removal).
