@@ -388,8 +388,8 @@ struct ServedSupervisor {
 }
 
 impl ServedSupervisor {
-    /// Serves a supervisor head that holds the verbs a supervisor and every head are granted, on `socket`.
-    fn start(scene: &Scene, socket: &Path) -> Self {
+    /// Serves a supervisor head holding `verbs`, on `socket`.
+    fn start(scene: &Scene, socket: &Path, verbs: &[&str]) -> Self {
         use fgos_run_supervisor::head_request::HeadRequests;
         use fgos_run_supervisor::route::WritePublisher;
         use std::os::unix::fs::PermissionsExt;
@@ -421,7 +421,7 @@ impl ServedSupervisor {
             "session": {
                 "role": "head:supervisor-bob",
                 "persona": "supervisor",
-                "verbs": ["questions list", "supervisor queue", "supervisor plans", "slots", "supervisor handled"],
+                "verbs": verbs,
                 "requestSocketPath": socket,
             },
             "steps": [{ "stepId": "finalize-home", "env": {
@@ -476,7 +476,7 @@ fn a_confined_supervisor_reads_its_queue_plans_and_lanes_and_marks_several_event
 ) {
     let scene = Scene::new("confined-reads");
     let socket = scene.root.join("req.sock");
-    let mut served = ServedSupervisor::start(&scene, &socket);
+    let mut served = ServedSupervisor::start(&scene, &socket, SUPERVISOR_VERBS);
     let confined = |args: &[&str]| {
         scene.fgos_with(
             args,
@@ -567,65 +567,103 @@ fn head_sandbox(scene: &Scene, socket: &Path) -> Result<(String, Vec<String>, Pa
     ))
 }
 
-/// The start ritual of a head and the supervisor's reads, run inside the sandbox a head gets (read-only root, private
-/// /tmp, private home that is not the machine's, no state root pinned) against a real request server: each must be
-/// answered by the host through the socket, never refused for the sandbox's read-only or empty state.
-#[test]
-fn a_head_sandbox_answers_the_start_ritual_and_the_supervisor_reads_through_the_request_socket() {
-    let scene = Scene::new("head-sandbox");
+/// The verbs of a supervisor head that reads through its socket.
+const SUPERVISOR_VERBS: &[&str] = &[
+    "questions list",
+    "supervisor queue",
+    "supervisor plans",
+    "slots",
+    "supervisor handled",
+];
+
+/// Serves a head granted `verbs` and runs each call inside the sandbox a head gets (read-only root, private /tmp,
+/// private home that is not the machine's, no state root pinned). `None`: this machine cannot run the sandbox; the
+/// reason is named, and it fails instead of skipping when `CI` is set, so CI never passes without the proof.
+fn run_in_head_sandbox(tag: &str, verbs: &[&str], calls: &[&[&str]]) -> Option<Vec<Output>> {
+    let scene = Scene::new(tag);
     let runtime_dir = scene.root.join("rt");
     let socket = runtime_dir.join("fgos/req.sock");
     fs::create_dir_all(socket.parent().unwrap()).unwrap();
     let (command, sandbox_args, home) = match head_sandbox(&scene, &socket) {
         Ok(built) => built,
         Err(reason) => {
-            eprintln!("skip: a_head_sandbox_answers_the_start_ritual: {reason}");
-            return;
+            assert!(
+                std::env::var_os("CI").is_none(),
+                "the head sandbox proof cannot run in CI: {reason}"
+            );
+            eprintln!("skip: {tag}: {reason}");
+            return None;
         }
     };
-    let mut served = ServedSupervisor::start(&scene, &socket);
-
-    let in_sandbox = |args: &[&str]| {
-        Command::new(&command)
-            .args(&sandbox_args)
-            .arg(fgos_bin())
-            .args(args)
-            .current_dir(scene.project())
-            .env_clear()
-            .env("HOME", &home)
-            .env("PATH", std::env::var_os("PATH").unwrap_or_default())
-            .env("FGOS_HEAD_REQUEST_SOCKET", &socket)
-            .output()
-            .unwrap()
-    };
-    let calls: [(&[&str], Option<&str>); 6] = [
-        (&["questions"], None),
-        (&["questions", "--json"], None),
-        (&["supervisor", "queue", "--json"], None),
-        (&["supervisor", "plans", "--json"], None),
-        (&["slots", "--json"], None),
-        // No event carries this id: the host's own refusal is the answer, so the verb reached it.
-        (
-            &["supervisor", "handled", "no-such-event", "--json"],
-            Some("event-unknown"),
-        ),
-    ];
-    let answers: Vec<(Vec<&str>, Output)> = calls
+    let mut served = ServedSupervisor::start(&scene, &socket, verbs);
+    let outputs = calls
         .iter()
-        .map(|(args, _)| (args.to_vec(), in_sandbox(args)))
+        .map(|args| {
+            Command::new(&command)
+                .args(&sandbox_args)
+                .arg(fgos_bin())
+                .args(*args)
+                .current_dir(scene.project())
+                .env_clear()
+                .env("HOME", &home)
+                .env("PATH", std::env::var_os("PATH").unwrap_or_default())
+                .env("FGOS_HEAD_REQUEST_SOCKET", &socket)
+                .output()
+                .unwrap()
+        })
         .collect();
     served.finish();
+    Some(outputs)
+}
 
-    for ((args, out), (_, refusal)) in answers.iter().zip(calls.iter()) {
+/// The start ritual of a head and the supervisor's reads, run inside the head sandbox against a real request server:
+/// each must be answered by the host through the socket, never refused for the sandbox's read-only or empty state.
+#[test]
+fn a_head_sandbox_answers_the_start_ritual_and_the_supervisor_reads_through_the_request_socket() {
+    let calls: [&[&str]; 6] = [
+        &["questions"],
+        &["questions", "--json"],
+        &["supervisor", "queue", "--json"],
+        &["supervisor", "plans", "--json"],
+        &["slots", "--json"],
+        // No event carries this id: the host's own refusal is the answer, so the verb reached it.
+        &["supervisor", "handled", "no-such-event", "--json"],
+    ];
+    let Some(outputs) = run_in_head_sandbox("head-sandbox", SUPERVISOR_VERBS, &calls) else {
+        return;
+    };
+    for (args, out) in calls.iter().zip(&outputs) {
         let label = format!("fgos {}: {out:?}", args.join(" "));
         let reply: Value =
             serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}: {label}"));
-        match refusal {
-            None => assert!(out.status.success(), "{label}"),
-            Some(code) => {
-                assert!(!out.status.success(), "{label}");
-                assert_eq!(reply["code"], *code, "{label}");
-            }
+        if args[0] == "supervisor" && args[1] == "handled" {
+            assert!(!out.status.success(), "{label}");
+            assert_eq!(reply["code"], "event-unknown", "{label}");
+        } else {
+            assert!(out.status.success(), "{label}");
         }
     }
+}
+
+/// The negative control of the proof above: a head whose grant lacks `questions list` is refused at the socket, so the
+/// proof's answers come from the grant and the host, not from the sandbox letting everything through.
+#[test]
+fn a_head_sandbox_refuses_questions_when_the_grant_lacks_questions_list() {
+    let verbs: Vec<&str> = SUPERVISOR_VERBS
+        .iter()
+        .copied()
+        .filter(|v| *v != "questions list")
+        .collect();
+    let Some(outputs) = run_in_head_sandbox(
+        "head-sandbox-ungranted",
+        &verbs,
+        &[&["questions", "--json"]],
+    ) else {
+        return;
+    };
+    let out = &outputs[0];
+    assert!(!out.status.success(), "{out:?}");
+    let reply: Value =
+        serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}: {out:?}"));
+    assert_eq!(reply["code"], "verb-not-granted", "{out:?}");
 }
