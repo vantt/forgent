@@ -18,7 +18,7 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 use std::ffi::OsString;
 use std::future::Future;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::pin::Pin;
 
 pub const OPERATION_ID: &str = "resource-check.run";
@@ -187,10 +187,41 @@ fn split_file(path: &str, label: &str) -> Result<(PathBuf, PathBuf), Refused> {
         ));
     };
     let parent = match path.parent() {
-        Some(parent) if !parent.as_os_str().is_empty() => parent.to_path_buf(),
+        Some(parent) if !parent.as_os_str().is_empty() => plain_root(parent, label)?,
         _ => PathBuf::from("."),
     };
     Ok((parent, PathBuf::from(leaf)))
+}
+
+/// The root of a read in one spelling: `.` segments and repeated or trailing separators are dropped before the
+/// root is opened, so no spelling of a symlinked root reaches the OS (which follows a link met mid-path or before
+/// a `.`). A `..` after a name is refused: it would resolve through a link the open never sees.
+fn plain_root(raw: &Path, label: &str) -> Result<PathBuf, Refused> {
+    let mut out = PathBuf::new();
+    let mut named = false;
+    for part in raw.components() {
+        match part {
+            Component::CurDir => {}
+            Component::ParentDir if named => {
+                return Err(refuse(
+                    "input-path-invalid",
+                    format!(
+                        "{label} {}: a '..' after a name is not accepted",
+                        escape_text(&raw.to_string_lossy())
+                    ),
+                ));
+            }
+            Component::Normal(_) => {
+                named = true;
+                out.push(part);
+            }
+            other => out.push(other),
+        }
+    }
+    if out.as_os_str().is_empty() {
+        out.push(".");
+    }
+    Ok(out)
 }
 
 fn parse_json(bytes: &[u8], label: &str) -> Result<Value, Refused> {
@@ -558,26 +589,72 @@ fn collide(units: &[Unit]) -> Collisions {
     out
 }
 
-/// The graph document of the units: depends-on edges, and the collisions as exclusion pairs.
-fn graph_input(units: &[Unit], collisions: &Collisions) -> Value {
-    let edges: Vec<Value> = units
+/// The graph document of the units: depends-on edges, and the collisions as exclusion pairs. Every id is replaced
+/// by its position in the returned table: the graph package holds one document to its input byte cap, and this
+/// document is generated (one exclusion per collision pair), so the cap would otherwise count the length of the
+/// caller's ids instead of the size of the input. The package's node, edge and exclusion limits stay in force;
+/// `restore_ids` puts the caller's ids back into the answer.
+fn graph_input(units: &[Unit], collisions: &Collisions) -> (Value, Vec<String>) {
+    let mut table = IdTable::default();
+    let nodes: Vec<Value> = units
         .iter()
-        .flat_map(|u| {
-            u.depends_on
-                .iter()
-                .map(move |dep| json!({"from": u.id, "to": dep, "kind": "depends-on"}))
-        })
+        .map(|u| json!({"id": table.key(&u.id)}))
         .collect();
+    let mut edges: Vec<Value> = Vec::new();
+    for u in units {
+        for dep in &u.depends_on {
+            let (from, to) = (table.key(&u.id), table.key(dep));
+            edges.push(json!({"from": from, "to": to, "kind": "depends-on"}));
+        }
+    }
     let exclusions: Vec<Value> = collisions
         .pairs
         .iter()
-        .map(|p| json!({"a": units[p.a].id, "b": units[p.b].id}))
+        .map(|p| json!({"a": table.key(&units[p.a].id), "b": table.key(&units[p.b].id)}))
         .collect();
-    json!({
-        "nodes": units.iter().map(|u| json!({"id": u.id})).collect::<Vec<_>>(),
-        "edges": edges,
-        "exclusions": exclusions,
-    })
+    (
+        json!({"nodes": nodes, "edges": edges, "exclusions": exclusions}),
+        table.ids,
+    )
+}
+
+#[derive(Default)]
+struct IdTable {
+    ids: Vec<String>,
+    at: HashMap<String, usize>,
+}
+
+impl IdTable {
+    fn key(&mut self, id: &str) -> String {
+        if let Some(n) = self.at.get(id) {
+            return n.to_string();
+        }
+        self.ids.push(id.to_owned());
+        self.at.insert(id.to_owned(), self.ids.len() - 1);
+        (self.ids.len() - 1).to_string()
+    }
+}
+
+/// Every string of the graph answer that is a table position becomes the id it stands for.
+fn restore_ids(value: Value, table: &[String]) -> Value {
+    match value {
+        Value::String(s) => match s.parse::<usize>().ok().filter(|n| n.to_string() == s) {
+            Some(n) if n < table.len() => Value::String(table[n].clone()),
+            _ => Value::String(s),
+        },
+        Value::Array(items) => Value::Array(
+            items
+                .into_iter()
+                .map(|item| restore_ids(item, table))
+                .collect(),
+        ),
+        Value::Object(map) => Value::Object(
+            map.into_iter()
+                .map(|(k, item)| (k, restore_ids(item, table)))
+                .collect(),
+        ),
+        other => other,
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -600,12 +677,14 @@ fn load(request: &ResourceCheckRequest) -> Result<Loaded, Refused> {
         (Some(_), Some(_)) => Err(refuse("usage", "give --plan or --units, not both")),
         (None, None) => Err(refuse("usage", "give --plan <dir> or --units <file.json>")),
         (Some(dir), None) => {
-            let trimmed = dir.trim_end_matches('/');
-            if trimmed.is_empty() {
+            if dir.trim_end_matches('/').is_empty() {
                 return Err(refuse("input-path-invalid", "--plan names no directory"));
             }
-            let root = request.cwd.join(trimmed);
-            let name = match Path::new(trimmed).file_name() {
+            let plain = plain_root(Path::new(dir), "--plan")?;
+            let trimmed = plain.to_string_lossy().into_owned();
+            let trimmed = trimmed.as_str();
+            let root = request.cwd.join(&plain);
+            let name = match plain.file_name() {
                 Some(name) => name.to_string_lossy().into_owned(),
                 None => request
                     .cwd
@@ -676,9 +755,13 @@ fn check(request: &ResourceCheckRequest) -> Result<(Value, i32), Refused> {
     }
 
     let collisions = collide(units);
-    let analysis = fgos_graph::analyze_value(&graph_input(units, &collisions))
+    let (document, table) = graph_input(units, &collisions);
+    let analysis = fgos_graph::analyze_value(&document)
         .map_err(|why| refuse("graph-refused", escape_text(&why.to_string())))?;
-    let graph = serde_json::to_value(&analysis).expect("an analysis is plain data");
+    let graph = restore_ids(
+        serde_json::to_value(&analysis).expect("an analysis is plain data"),
+        &table,
+    );
 
     let exclusions: Vec<Value> = collisions
         .pairs
@@ -1083,7 +1166,15 @@ mod tests {
             &plan_text("ready", &["| a | one | - | src/a | 1 | draft |"]),
         );
         symlink(s.0.join("real"), s.0.join("link")).unwrap();
-        for given in ["link", "link/"] {
+        for given in [
+            "link",
+            "link/",
+            "link/.",
+            "link/./",
+            "link//.//",
+            "./link/.",
+            "link/./.",
+        ] {
             let mut request = s.request();
             request.plan = Some(given.into());
             assert!(
@@ -1091,6 +1182,61 @@ mod tests {
                 "{given}"
             );
         }
+        let mut request = s.request();
+        request.plan = Some("link/..".into());
+        assert!(run(&request).unwrap_err().contains("input-path-invalid"));
+    }
+
+    #[test]
+    fn a_symlinked_parent_of_units_and_policy_is_refused_in_every_spelling() {
+        let s = Scratch::new("parentlink");
+        s.put("real/f.json", r#"{"v":1,"units":[]}"#);
+        symlink(s.0.join("real"), s.0.join("link")).unwrap();
+        for given in ["link/f.json", "link/./f.json", "./link//f.json"] {
+            let mut request = s.request();
+            request.units = Some(given.into());
+            assert!(
+                run(&request).unwrap_err().contains("input-symlink"),
+                "units {given}"
+            );
+            let mut request = s.request();
+            request.units = Some("real/f.json".into());
+            request.policy = Some(given.into());
+            assert!(
+                run(&request).unwrap_err().contains("input-symlink"),
+                "policy {given}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_dense_valid_units_file_is_not_refused_for_the_size_of_its_generated_graph() {
+        let s = Scratch::new("dense");
+        let units: Vec<String> = (0..400)
+            .map(|i| {
+                let deps = if i == 0 {
+                    String::new()
+                } else {
+                    format!(r#","dependsOn":["unit-with-a-long-identifier-{}"]"#, i - 1)
+                };
+                format!(
+                    r#"{{"id":"unit-with-a-long-identifier-{i}","claims":[{{"space":"path","ref":"src/shared"}}]{deps}}}"#
+                )
+            })
+            .collect();
+        s.put(
+            "dense.json",
+            &format!(r#"{{"v":1,"units":[{}]}}"#, units.join(",")),
+        );
+        let mut request = s.request();
+        request.units = Some("dense.json".into());
+        let result = run(&request);
+        let message = result.as_ref().err().cloned().unwrap_or_default();
+        assert!(!message.contains("graph-refused"), "{message}");
+        let (data, _) = result.unwrap();
+        assert!(data["graph"]["layers"]
+            .to_string()
+            .contains("unit-with-a-long-identifier-399"));
     }
 
     #[test]
