@@ -4,9 +4,10 @@
 //! - [`bind_facade`]: one seat, one answer, over `fgos-execution::bind` in process (`unit_run` and
 //!   `assignment_runner` call it); the ask, the walk, the bypass fence, the Work seat, explain, preflight and the
 //!   dry bind.
-//! - [`policy`]: the effective dispatch policy of an assignment, each field with where it came from.
-//! - [`resolve`]: the capability a dispatch is for and the executor block a name resolves to, with its
-//!   cross-provider governance gate.
+//! - [`policy`]: the effective dispatch policy of an assignment, each field with where it came from
+//!   (`fgos-execution::dispatch_policy`, bound through this facade).
+//! - [`resolve`]: the capability a dispatch is for, and the executor block a name resolves to with its
+//!   cross-provider governance gate (`fgos-execution::executor_config`, the one `decide` judges by).
 //! - [`recovery`]: the pure recovery-recommendation planner over an already-read snapshot.
 //! - [`admission`]: the atomic admission of one Run attempt and its run directory.
 //! - [`reconciliation`]: plan and apply of one narrow guard or projection repair, bound to the facts it was made

@@ -7,6 +7,7 @@
 //! [`AccountStateSource`], so the facade holds no process, file or clock of its own; the instant is passed in.
 
 use fgos_execution::bind::{self, AccountPin, BindRequest, BindSession, Preflight};
+use fgos_execution::decide::{BindFailure, BoundSeat, SeatBinder, WorkSeatAsk};
 use fgos_execution::executor_model::ModelError;
 use fgos_execution::explain::explain_seat as crate_explain_seat;
 use fgos_execution::loops::{Command, LoopInput, LoopRun, Step};
@@ -216,6 +217,16 @@ pub fn bind(
     head_launch: bool,
     now: u64,
 ) -> Result<Value, BindError> {
+    Ok(bind_model(ask, ctx, walk, head_launch, now)?)
+}
+
+fn bind_model(
+    ask: &Value,
+    ctx: &BindContext<'_>,
+    walk: &Walk,
+    head_launch: bool,
+    now: u64,
+) -> Result<Value, ModelError> {
     let account_state = overlay_of(ctx, now);
     let request = BindRequest {
         ask,
@@ -236,6 +247,73 @@ pub fn bind(
     })
 }
 
+/// The Work seat through this facade (the bypass fence and the host version included), as the dispatch policy
+/// asks it: one headless producer seat, its posture judged at launch, bound from the config alone.
+pub struct FacadeBinder<'a> {
+    pub machine: &'a dyn Machine,
+    /// Epoch milliseconds.
+    pub now: u64,
+}
+
+impl SeatBinder for FacadeBinder<'_> {
+    fn bind_work_seat(&self, runner: &Value, ask: &WorkSeatAsk) -> Result<BoundSeat, BindFailure> {
+        let mut unit = ask.unit.clone();
+        if let Some(map) = unit.as_object_mut() {
+            map.insert("writes".into(), json!([]));
+        }
+        let request = json!({
+            "unit": unit, "seat": "producer", "role": ask.role, "readOnly": ask.read_only,
+            "overrides": ask.overrides, "raiseAuthorized": false,
+        });
+        let ctx = BindContext {
+            runner_config: runner,
+            session: BindSession {
+                headless: true,
+                has_native_agent: false,
+                posture_at_launch: true,
+            },
+            machine: self.machine,
+            accounts: None,
+        };
+        let bound =
+            bind_model(&request, &ctx, &json!({}), false, self.now).map_err(BindFailure::Failed)?;
+        if let Some(refused) = bound.get("refused") {
+            let text = |key: &str| {
+                refused
+                    .get(key)
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+                    .to_string()
+            };
+            let fix = text("fix");
+            return Err(BindFailure::Refused {
+                code: text("reason"),
+                detail: if fix.is_empty() {
+                    text("detail")
+                } else {
+                    format!("{}; {fix}", text("detail"))
+                },
+            });
+        }
+        Ok(BoundSeat {
+            executor: text_at(&bound, "executor"),
+            invocation: bound
+                .get("invocation")
+                .and_then(Value::as_str)
+                .map(str::to_string),
+            binding: bound,
+        })
+    }
+}
+
+fn text_at(value: &Value, key: &str) -> String {
+    value
+        .get(key)
+        .and_then(Value::as_str)
+        .unwrap_or_default()
+        .to_string()
+}
+
 /// The seat a Work operation or a raw dispatch runs: one headless producer seat by the same call a unit run
 /// makes, its posture judged at launch (so the ask names no writes); a stated executor, tier or effort is one
 /// override, and a refusal is an error, named. `unit` is `{ id, capability, rigor }`.
@@ -248,45 +326,20 @@ pub fn bind_work_seat(
     machine: &dyn Machine,
     now: u64,
 ) -> Result<Value, BindError> {
-    let mut unit = unit.clone();
-    if let Some(map) = unit.as_object_mut() {
-        map.insert("writes".into(), json!([]));
-    }
-    let ask = json!({
-        "unit": unit, "seat": "producer", "role": role, "readOnly": read_only,
-        "overrides": overrides, "raiseAuthorized": false,
-    });
-    let ctx = BindContext {
-        runner_config,
-        session: BindSession {
-            headless: true,
-            has_native_agent: false,
-            posture_at_launch: true,
-        },
-        machine,
-        accounts: None,
+    let ask = WorkSeatAsk {
+        unit: unit.clone(),
+        role: role.into(),
+        read_only,
+        overrides,
     };
-    let bound = bind(&ask, &ctx, &json!({}), false, now)?;
-    if let Some(refused) = bound.get("refused") {
-        let reason = refused
-            .get("reason")
-            .and_then(Value::as_str)
-            .unwrap_or_default();
-        let detail = refused
-            .get("detail")
-            .and_then(Value::as_str)
-            .unwrap_or_default();
-        let fix = refused
-            .get("fix")
-            .and_then(Value::as_str)
-            .filter(|f| !f.is_empty());
-        let message = match fix {
-            Some(fix) => format!("{reason}: {detail}; {fix}"),
-            None => format!("{reason}: {detail}"),
-        };
-        return Err(BindError::runner_config(message, Some(reason.to_string())));
+    match (FacadeBinder { machine, now }).bind_work_seat(runner_config, &ask) {
+        Ok(seat) => Ok(seat.binding),
+        Err(BindFailure::Refused { code, detail }) => Err(BindError::runner_config(
+            format!("{code}: {detail}"),
+            Some(code),
+        )),
+        Err(BindFailure::Failed(error)) => Err(error.into()),
     }
-    Ok(bound)
 }
 
 /// Why a seat lands where it does, read-only (nothing leased, spawned or written): the binding, the crate's

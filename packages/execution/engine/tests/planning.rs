@@ -85,8 +85,8 @@ fn recovery_error(e: &fgos_execution_engine::planning::recovery::RecoveryPlanner
     e.to_json()
 }
 
-fn refusal(e: &fgos_execution_engine::assignment::Refusal) -> Value {
-    json!({ "name": "RunnerConfigError", "code": e.code, "message": e.message })
+fn model_error(e: &fgos_execution::executor_model::ModelError) -> Value {
+    json!({ "name": e.name, "code": e.code, "message": e.message })
 }
 
 #[test]
@@ -159,7 +159,8 @@ fn recovery_apply_check_refuses_a_stale_or_expired_plan() {
             expected_expires_at: i["expectedExpiresAt"].as_str().unwrap(),
             action_key: i["actionKey"].as_str().unwrap(),
             now: &i["now"],
-        });
+        })
+        .expect("a vector's snapshot is hashable");
         same_bytes(name, &got, &case["result"]["ok"]);
     }
 }
@@ -169,7 +170,9 @@ fn recovery_snapshot_hash_ignores_property_order() {
     let v = vector("recovery.json");
     for case in list(&v, "hash") {
         assert_eq!(
-            Value::String(compute_snapshot_hash(&case["snapshot"])),
+            Value::String(
+                compute_snapshot_hash(&case["snapshot"]).expect("a vector's snapshot is hashable")
+            ),
             case["hash"],
             "{}",
             case["snapshot"]
@@ -226,7 +229,7 @@ fn executor_resolution_gates_egress_and_picks_the_invocation() {
                 case["resolvedAgentType"].as_str(),
                 case["invocationId"].as_str(),
             ),
-            refusal,
+            model_error,
             &case["result"],
         );
     }

@@ -39,6 +39,15 @@ impl RecoveryPlannerError {
         }
     }
 
+    /// A hashed value holding a number outside finite binary64, which has no canonical form.
+    fn not_canonical(error: fgos_canonical_json::NonFiniteNumber) -> Self {
+        RecoveryPlannerError {
+            name: "RecoveryPlannerError",
+            code: Some("non-finite-number"),
+            message: format!("a recovery snapshot or action is not hashable: {error}"),
+        }
+    }
+
     /// `{ name, code, message }`, as the vectors state a thrown error.
     pub fn to_json(&self) -> Value {
         json!({ "name": self.name, "code": self.code, "message": self.message })
@@ -101,12 +110,9 @@ impl Verdict {
 
 /// Deterministic digest over the caller-supplied snapshot: the same facts give the same hash whatever their
 /// property insertion order.
-pub fn compute_snapshot_hash(snapshot: &Value) -> String {
-    sha256_hex(
-        canonical_json(snapshot)
-            .expect("a snapshot holds finite numbers")
-            .as_bytes(),
-    )
+pub fn compute_snapshot_hash(snapshot: &Value) -> Result<String, RecoveryPlannerError> {
+    let canonical = canonical_json(snapshot).map_err(RecoveryPlannerError::not_canonical)?;
+    Ok(sha256_hex(canonical.as_bytes()))
 }
 
 fn attempt_state(snapshot: &Value) -> Option<&str> {
@@ -254,18 +260,15 @@ pub fn compute_action_key(
     control_epoch: &Value,
     action: &Value,
     expires_at: &str,
-) -> String {
+) -> Result<String, RecoveryPlannerError> {
     let bound = json!({
         "snapshotHash": snapshot_hash,
         "controlEpoch": control_epoch,
         "action": action,
         "expiresAt": expires_at,
     });
-    sha256_hex(
-        canonical_json(&bound)
-            .expect("an action key holds finite numbers")
-            .as_bytes(),
-    )
+    let canonical = canonical_json(&bound).map_err(RecoveryPlannerError::not_canonical)?;
+    Ok(sha256_hex(canonical.as_bytes()))
 }
 
 fn epoch_of(snapshot: &Value) -> Value {
@@ -303,9 +306,9 @@ pub fn plan(
                     code: None,
                     message: "Invalid time value".into(),
                 })?;
-            let snapshot_hash = compute_snapshot_hash(snapshot);
+            let snapshot_hash = compute_snapshot_hash(snapshot)?;
             let epoch = epoch_of(snapshot);
-            let action_key = compute_action_key(&snapshot_hash, &epoch, &action, &expires_at);
+            let action_key = compute_action_key(&snapshot_hash, &epoch, &action, &expires_at)?;
             return Ok(json!({
                 "kind": "recommendation",
                 "snapshotHash": snapshot_hash,
@@ -343,56 +346,59 @@ fn instant_millis(now: &Value) -> Option<f64> {
 }
 
 /// The write door's own re-check, pure: whether an apply may proceed against a freshly re-read snapshot.
-/// `{ outcome: 'ok' }` or `{ outcome, reason }` for plan-stale, plan-expired, needs-input and park.
-pub fn check_apply(request: &ApplyRequest<'_>) -> Value {
+/// `{ outcome: 'ok' }` or `{ outcome, reason }` for plan-stale, plan-expired, needs-input and park; a snapshot or
+/// action that cannot be hashed is an error.
+pub fn check_apply(request: &ApplyRequest<'_>) -> Result<Value, RecoveryPlannerError> {
     let refuse = |outcome: &str, reason: String| json!({ "outcome": outcome, "reason": reason });
     let expected_key = compute_action_key(
         request.expected_snapshot,
         request.expected_control_epoch,
         request.action,
         request.expected_expires_at,
-    );
+    )?;
     if request.action_key != expected_key {
-        return refuse(
+        return Ok(refuse(
             "plan-stale",
             "actionKey does not match the action/snapshot/epoch/expiresAt it was issued for -- refusing a mismatched replay".into(),
-        );
+        ));
     }
-    if compute_snapshot_hash(request.snapshot) != request.expected_snapshot {
-        return refuse(
+    if compute_snapshot_hash(request.snapshot)? != request.expected_snapshot {
+        return Ok(refuse(
             "plan-stale",
             "the run's observed state (visibility/outbox) has changed since this recommendation was issued -- snapshot hash mismatch".into(),
-        );
+        ));
     }
     let current_epoch = epoch_of(request.snapshot);
     if &current_epoch != request.expected_control_epoch {
-        return refuse(
+        return Ok(refuse(
             "plan-stale",
             format!(
                 "the run's control epoch has advanced since this recommendation was issued (expected {}, now {})",
                 js_text(Some(request.expected_control_epoch)),
                 js_text(Some(&current_epoch))
             ),
-        );
+        ));
     }
     let expires = parse_rfc3339_millis(request.expected_expires_at).map(|ms| ms as f64);
     match (instant_millis(request.now), expires) {
         (Some(now), Some(expires)) if now <= expires => {}
         _ => {
-            return refuse(
+            return Ok(refuse(
                 "plan-expired",
                 format!(
                     "this recommendation expired at {}",
                     request.expected_expires_at
                 ),
-            )
+            ))
         }
     }
-    match is_action_legal(request.snapshot, request.evidence, request.action) {
-        Verdict::Park { reason } => refuse("park", reason),
-        Verdict::NeedsInput { reason } => refuse("needs-input", reason),
-        Verdict::Ok { .. } => json!({ "outcome": "ok" }),
-    }
+    Ok(
+        match is_action_legal(request.snapshot, request.evidence, request.action) {
+            Verdict::Park { reason } => refuse("park", reason),
+            Verdict::NeedsInput { reason } => refuse("needs-input", reason),
+            Verdict::Ok { .. } => json!({ "outcome": "ok" }),
+        },
+    )
 }
 
 /// Evidence derived from an already-read snapshot: the attempt's own files, and the outbox entries by name. A

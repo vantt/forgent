@@ -448,20 +448,7 @@ pub fn admit_run_attempt(
 
     remove_abandoned_staging(runs_dir, &attempt_str, &record);
 
-    let uuid = {
-        let mut bytes = fgos_identity::text::random_bytes::<16>().map_err(AdmissionError::io)?;
-        bytes[6] = (bytes[6] & 0x0f) | 0x40;
-        bytes[8] = (bytes[8] & 0x3f) | 0x80;
-        let hex: String = bytes.iter().map(|b| format!("{b:02x}")).collect();
-        format!(
-            "{}-{}-{}-{}-{}",
-            &hex[0..8],
-            &hex[8..12],
-            &hex[12..16],
-            &hex[16..20],
-            &hex[20..32]
-        )
-    };
+    let uuid = fgos_identity::text::uuid_v4().map_err(AdmissionError::io)?;
     let staging_name = format!(".staging-{attempt_str}-{}-{uuid}", std::process::id());
     let staging_dir = runs_dir.join(&staging_name);
     fs::create_dir_all(&staging_dir).map_err(AdmissionError::io)?;

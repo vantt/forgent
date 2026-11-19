@@ -93,17 +93,31 @@ fn result_file(run_dir: &Path) -> PathBuf {
     run_dir.join("result.json")
 }
 
-fn canonical(value: &Value) -> String {
-    canonical_json(value).expect("a plan holds finite numbers")
+/// The canonical form a plan is hashed and compared in; a number outside finite binary64 has none.
+fn canonical(value: &Value) -> Result<String, ReconcileError> {
+    canonical_json(value).map_err(|error| ReconcileError {
+        name: "Error",
+        message: format!("a reconcile plan value is not hashable: {error}"),
+    })
 }
 
-fn digest(value: &Value) -> String {
-    format!("sha256:{}", sha256_hex(canonical(value).as_bytes()))
+fn digest(value: &Value) -> Result<String, ReconcileError> {
+    Ok(format!(
+        "sha256:{}",
+        sha256_hex(canonical(value)?.as_bytes())
+    ))
 }
 
-fn action_key(snapshot: &Value, action: &Value, expires_at: &str) -> String {
+fn action_key(
+    snapshot: &Value,
+    action: &Value,
+    expires_at: &str,
+) -> Result<String, ReconcileError> {
     let bound = json!({ "snapshot": snapshot, "action": action, "expiresAt": expires_at });
-    format!("reconcile_{}", sha256_hex(canonical(&bound).as_bytes()))
+    Ok(format!(
+        "reconcile_{}",
+        sha256_hex(canonical(&bound)?.as_bytes())
+    ))
 }
 
 fn expires(now: &str, ttl_ms: i64) -> Result<String, ReconcileError> {
@@ -245,7 +259,7 @@ fn plan_collect_result(
     };
     let expires_at = expires(now, ttl_ms)?;
     let snapshot = json!({
-        "digest": digest(&json!({ "raw": raw })),
+        "digest": digest(&json!({ "raw": raw }))?,
         "runId": run_id,
         "ownerAuthority": { "kind": hint.get("kind"), "id": hint.get("id") },
         "controlEpoch": real_control_epoch(&run_dir),
@@ -255,7 +269,7 @@ fn plan_collect_result(
         json!({ "kind": "collect-result", "runId": run_id, "path": run_dir.join("run.json") });
     Ok(json!({
         "outcome": "planned",
-        "actionKey": action_key(&snapshot, &action, &expires_at),
+        "actionKey": action_key(&snapshot, &action, &expires_at)?,
         "snapshot": snapshot,
         "proposedAction": action,
         "preconditions": ["result-valid", "owner-authority-standalone", "not-superseded"],
@@ -311,7 +325,7 @@ fn plan_repair_projection(
     }
     let expires_at = expires(now, ttl_ms)?;
     let snapshot = json!({
-        "digest": digest(&json!({ "raw": raw })),
+        "digest": digest(&json!({ "raw": raw }))?,
         "runId": run_id,
         "currentStatus": current_status,
         "controlEpoch": real_control_epoch(&run_dir),
@@ -321,7 +335,7 @@ fn plan_repair_projection(
         json!({ "kind": "repair-projection", "runId": run_id, "path": run_dir.join("run.json") });
     Ok(json!({
         "outcome": "planned",
-        "actionKey": action_key(&snapshot, &action, &expires_at),
+        "actionKey": action_key(&snapshot, &action, &expires_at)?,
         "snapshot": snapshot,
         "proposedAction": action,
         "preconditions": ["terminal-result-valid", "status-stale", "projection-epoch-matches"],
@@ -492,13 +506,13 @@ fn apply_rewrite(
     .max(0);
     let fresh = rewrite.plan(view, root, run_id, now, ttl_ms)?;
     let planned = fresh.get("outcome").and_then(Value::as_str) == Some("planned");
-    let same = |key: &str| {
-        fresh
-            .get(key)
-            .zip(plan.get(key))
-            .is_some_and(|(a, b)| canonical(a) == canonical(b))
+    let same = |key: &str| -> Result<bool, ReconcileError> {
+        Ok(match fresh.get(key).zip(plan.get(key)) {
+            Some((a, b)) => canonical(a)? == canonical(b)?,
+            None => false,
+        })
     };
-    if !(planned && same("proposedAction") && same("snapshot")) {
+    if !(planned && same("proposedAction")? && same("snapshot")?) {
         let kind = if fresh.get("outcome").and_then(Value::as_str) == Some("blocked") {
             "blocked"
         } else {
@@ -517,7 +531,7 @@ fn apply_rewrite(
             .pointer("/snapshot/expiresAt")
             .and_then(Value::as_str)
             .unwrap_or_default(),
-    );
+    )?;
     if key != expected {
         return stale("reconcile action key does not bind the canonical snapshot and target");
     }
@@ -532,7 +546,7 @@ fn apply_rewrite(
     let Some(raw) = read_result(&run_dir)? else {
         return stale("the result was removed since planning");
     };
-    if digest(&json!({ "raw": raw }))
+    if digest(&json!({ "raw": raw }))?
         != plan
             .pointer("/snapshot/digest")
             .and_then(Value::as_str)
@@ -611,7 +625,7 @@ pub fn apply_reconciliation(
             "apply requires a reconcile plan for a supported action",
         );
     };
-    if plan.get("proposedAction").map(canonical) != Some(canonical(&target)) {
+    if plan.get("proposedAction").map(canonical).transpose()? != Some(canonical(&target)?) {
         return stale("reconcile action target is not the canonical guard target");
     }
     // clear-cwd-lock never plans a mutation (a kernel lock has no dead holder's file to clear), so applying one only
