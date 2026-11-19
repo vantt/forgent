@@ -5,7 +5,7 @@ discussion: open
 ## 1. Trạng thái hiện tại
 
 2026-11-19: discussion opened from backlog row `p-mc25x5pfi6` (owner approval via Miu). Starting point scouted
-(§2, §3). Nothing settled yet. Round 6: linking mechanism backlog ← discussion ← plan proposed under §3. Round 5: owner agreed proposal point 1; naming/placement answered under §3. Round 4: whole proposal written under §3, waiting for the owner's reaction. Round 2: owner agreed #2 and #3; merged #4/#5; shaper reported that Work keeps a full item store (1215 items) plus gates, outcomes, learnings, docs/topics and decisions in the Event Store, side by side with the backlog. Round 1 done: owner reframed #1 (content of a row, not its storage); shaper proposed a short row + link and a 5-value backlog status list, explained #3–#5. Waiting for the owner's reaction. Plan 261119-1615 phase 4 (add-rows) is on hold
+(§2, §3). Nothing settled yet. Round 7: discussions get a minted id (round 5 objection withdrawn); plan id open. Round 6: linking mechanism backlog ← discussion ← plan proposed under §3. Round 5: owner agreed proposal point 1; naming/placement answered under §3. Round 4: whole proposal written under §3, waiting for the owner's reaction. Round 2: owner agreed #2 and #3; merged #4/#5; shaper reported that Work keeps a full item store (1215 items) plus gates, outcomes, learnings, docs/topics and decisions in the Event Store, side by side with the backlog. Round 1 done: owner reframed #1 (content of a row, not its storage); shaper proposed a short row + link and a 5-value backlog status list, explained #3–#5. Waiting for the owner's reaction. Plan 261119-1615 phase 4 (add-rows) is on hold
 until the backlog shape is decided here.
 
 ## 2. Mục tiêu & đề bài
@@ -59,6 +59,11 @@ Round 6 (owner: discussion must link to backlog; there should be a mechanism lin
   - Check: every `source:` id/path exists; an `in-flight` item has at least one discussion or plan citing it; a new discussion or plan cites at least one backlog item (no work without a why); legacy files are warned, not failed.
 - Why one direction: a link written on both sides drifts; the downstream file is written last and knows its upstream, so it owns the link (same as plan `blockedBy`).
 
+Round 7 (owner: why not give discussions an id, for easier linking). Shaper revises round 5, not settled:
+- Round 5's objection ("a discussion mint kind is a new mechanism") was wrong: the owner chose on 2026-10-22 that Identity mints every kind of artifact id through one door (`docs/platform/identity/spec.md` lines 103, 111, 270). A random kind is a prefix and a length in the crate, no network, no counter. Adding `discussion` extends the door; it is not a second one.
+- Proposal: discussions get a minted random id (prefix e.g. `ds-`, final prefix by the identity crate rules), directory `<id>-<slug>/`, id in frontmatter. `source:` then holds ids only (`p-…`, `ds-…`), never paths, so moving a directory never breaks a link; this also makes "move discussions next to plans" a cheap, separate choice.
+- Plans: their directory name `YYMMDD-HHMM-slug` is already unique and is what `blockedBy` and the supervision reader use; whether plans also get a minted id for uniformity is asked of the owner (round 7).
+
 ## 4. Quyết định đã chốt
 
 | D-ID | Decision | Date | Source |
@@ -74,6 +79,7 @@ Round 6 (owner: discussion must link to backlog; there should be a mechanism lin
 - 2026-11-19 18:2x — owner round 4: asks for a careful, complete restatement of our proposal. Shaper wrote the whole proposal under §3.
 - 2026-11-19 18:4x — owner round 5: agrees point 1 (three kinds, one-direction links); asks backlog vs backlogs, discussion vs discussions, id-slug for both, whether items stay one file each, and `plans/backlog.md`. Shaper answered under §3 (round 5 block).
 - 2026-11-19 19:0x — owner round 6: does the discussion not relate to the backlog? there should be a mechanism linking backlog, discussion and plan. Shaper scouted current links (prose only) and answered under §3 (round 6 block).
+- 2026-11-19 19:2x — owner round 7: why not give discussions an id for easier linking. Shaper checked the identity mint decision and agreed, revising round 5 (§3 round 7 block).
 
 ## 6. Thiết kế đã chốt {#design}
 
