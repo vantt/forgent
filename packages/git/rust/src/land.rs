@@ -2113,6 +2113,119 @@ impl GitDriver {
 }
 
 impl GitDriver {
+    /// Removes a finished Land's candidate worktree under the recorded delivery
+    /// proof and the caller's writer. Replays after the removal chain completed
+    /// and a worktree that is already gone are not errors. `Some` is the
+    /// deferral text when the removal itself could not finish.
+    #[allow(clippy::too_many_arguments)]
+    fn release_land_worktree<F: wal::FileSystem>(
+        &self,
+        repo: &RepoHandle,
+        wal: &Wal<&F>,
+        slot: &LockScope<'_>,
+        payload: &wal::LandIntent,
+        writer: &str,
+        id: &str,
+        acknowledgement: &str,
+        filesystem: &F,
+        discarded: bool,
+    ) -> Result<Option<String>> {
+        let candidate =
+            Oid::parse(&payload.candidate.candidate, repo.object_format()).map_err(failure)?;
+        // The removal Intent retains this authorization digest and caller writer
+        // even after the Land chain itself has been compacted.
+        let proof = WorktreeDelivery {
+            expected_tip: candidate.clone(),
+            delivered_to: candidate,
+            evidence_digest: wal::canonical_digest(&(
+                wal.repository_identity(),
+                id,
+                "consumer-acknowledged",
+                acknowledgement,
+                writer,
+            ))?,
+        };
+        let removal_id = format!(
+            "lr-{}",
+            wal::canonical_digest(&("land-cleanup", id, writer))?
+        );
+        let gone = std::fs::symlink_metadata(&payload.candidate.worktree).is_err();
+        if gone && !wal.known_id(&removal_id)? {
+            return Ok(None);
+        }
+        if let Err(e) = self.remove_land_candidate(
+            repo,
+            held(slot)?,
+            &payload.candidate.worktree,
+            &proof,
+            writer,
+            &removal_id,
+            if discarded { Some(id) } else { None },
+            IgnoredBytes::Discard,
+        ) {
+            return Ok(Some(format!("land-cleanup-deferred: {}", e.cause)));
+        }
+        filesystem
+            .checkpoint("land-cleanup-candidate")
+            .map_err(failure)?;
+        Ok(None)
+    }
+
+    /// Recovery of a finished Land whose writer session is proven dead: frees
+    /// only its candidate worktree. The pins and the journal stay for the
+    /// checkout's own recovery and the later acknowledgement. `writer_is_dead`
+    /// is the caller's positive proof that the chain's writer is gone (unknown
+    /// is false); a chain still pending is refused, and the ordinary writer
+    /// check of [`Self::acknowledge_land`] is untouched.
+    pub fn release_dead_writer_land<F: wal::FileSystem>(
+        &self,
+        repo: &RepoHandle,
+        recoverer: &str,
+        id: &str,
+        acknowledgement: &str,
+        writer_is_dead: &dyn Fn(&str) -> bool,
+        filesystem: &F,
+    ) -> Result<Vec<String>> {
+        if acknowledgement.is_empty() {
+            return Err(failure("land-consumer-acknowledgement-required"));
+        }
+        let operation_repo = self.checkout_repository(repo)?;
+        let repo = &operation_repo;
+        if repo.work_tree.as_deref() != Some(repo.trusted_main_root()) {
+            return Err(failure("land-main-handle-required"));
+        }
+        let wal = Wal::open_with(repo, filesystem)?;
+        let chain = wal.inspect(id)?;
+        let OperationKind::Land(payload) = &chain.intent().kind else {
+            return Err(failure("not-land-operation"));
+        };
+        if chain.outcome().is_none() || !writer_is_dead(&chain.intent().writer_identity) {
+            return Err(failure("land-authority-mismatch"));
+        }
+        let discarded = matches!(
+            chain.outcome(),
+            Some(Outcome::AbandonedBeforeAttempt | Outcome::Loss { .. })
+        );
+        let mut slot = LockScope::seeded(vec![]).map_err(failure)?;
+        let p = merge_slot_params(repo, &payload.request.destination);
+        slot.acquire("merge-slot", &p, Wait::Ms(0))
+            .map_err(failure)?;
+        Ok(self
+            .release_land_worktree(
+                repo,
+                &wal,
+                &slot,
+                payload,
+                recoverer,
+                id,
+                acknowledgement,
+                filesystem,
+                discarded,
+            )?
+            .into_iter()
+            .collect())
+    }
+
     /// Cleanup is part of explicit recovery, after the consumer has durably
     /// settled its unique (repoIdentity, operationId, settlementKind) identity.
     /// The opaque acknowledgement is a consumer assertion, never Git settlement.
@@ -2165,51 +2278,45 @@ impl GitDriver {
             chain.outcome(),
             Some(Outcome::AbandonedBeforeAttempt | Outcome::Loss { .. })
         );
-        match chain.outcome() {
+        let reconciled = match chain.outcome() {
             Some(Outcome::Land { checkout, .. })
-                if ["reconciled", "notApplicable"].contains(&checkout.as_str()) => {}
-            _ if discarded => (),
+                if ["reconciled", "notApplicable"].contains(&checkout.as_str()) =>
+            {
+                true
+            }
+            _ if discarded => true,
+            // A finished land whose main-checkout catch-up still lags: checkout
+            // recovery works from the pinned oids, never from the candidate
+            // worktree, so the worktree goes now; pins and journal stay.
+            Some(Outcome::Land { .. }) => false,
             _ => {
                 return Ok(vec![
                     "land-cleanup-deferred: checkout reconciliation pending".into(),
                 ])
             }
-        }
+        };
         let mut slot = LockScope::seeded(vec![]).map_err(failure)?;
         let p = merge_slot_params(repo, &payload.request.destination);
         slot.acquire("merge-slot", &p, Wait::Ms(0))
             .map_err(failure)?;
-        // The removal Intent retains this authorization digest and caller writer
-        // even after the Land chain itself has been compacted.
-        let proof = WorktreeDelivery {
-            expected_tip: Oid::parse(&payload.candidate.candidate, repo.object_format())
-                .map_err(failure)?,
-            delivered_to: Oid::parse(&payload.candidate.candidate, repo.object_format())
-                .map_err(failure)?,
-            evidence_digest: wal::canonical_digest(&(
-                wal.repository_identity(),
-                id,
-                "consumer-acknowledged",
-                acknowledgement,
-                writer,
-            ))?,
-        };
-        let removal_id = format!("lr-{}", wal::canonical_digest(&("land-cleanup", id))?);
-        if let Err(e) = self.remove_land_candidate(
+        if let Some(deferred) = self.release_land_worktree(
             repo,
-            held(&slot)?,
-            &payload.candidate.worktree,
-            &proof,
+            &wal,
+            &slot,
+            payload,
             writer,
-            &removal_id,
-            if discarded { Some(id) } else { None },
-            IgnoredBytes::Discard,
-        ) {
-            return Ok(vec![format!("land-cleanup-deferred: {}", e.cause)]);
+            id,
+            acknowledgement,
+            filesystem,
+            discarded,
+        )? {
+            return Ok(vec![deferred]);
         }
-        filesystem
-            .checkpoint("land-cleanup-candidate")
-            .map_err(failure)?;
+        if !reconciled {
+            return Ok(vec![
+                "land-cleanup-deferred: checkout reconciliation pending".into(),
+            ]);
+        }
         let scope = crate::refs::acquire_worktree_admin(
             repo,
             held(&slot)?,

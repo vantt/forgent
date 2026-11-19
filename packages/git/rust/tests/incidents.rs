@@ -19,8 +19,15 @@ fn status(f: &Fixture) -> Value {
 }
 
 fn recover(f: &Fixture) -> Value {
-    serde_json::to_value(recover_git_operations(&f.temp.join("state"), &f.main, &writer).unwrap())
-        .unwrap()
+    recover_proving(f, &|_| false)
+}
+
+/// Recovery where `dead` is the proof that a writer session is gone.
+fn recover_proving(f: &Fixture, dead: &dyn Fn(&str) -> bool) -> Value {
+    serde_json::to_value(
+        recover_git_operations(&f.temp.join("state"), &f.main, &writer, dead).unwrap(),
+    )
+    .unwrap()
 }
 
 fn interrupt_land(f: &Fixture, id: &str) {
@@ -107,8 +114,10 @@ fn outside_a_repository_status_says_so_and_recovery_finds_nothing_and_points_now
     fs::create_dir_all(&outside).unwrap();
     let state = outside.join("state");
     let status = serde_json::to_value(read_git_status(&state, &outside)).unwrap();
-    let recovered =
-        serde_json::to_value(recover_git_operations(&state, &outside, &writer).unwrap()).unwrap();
+    let recovered = serde_json::to_value(
+        recover_git_operations(&state, &outside, &writer, &|_| false).unwrap(),
+    )
+    .unwrap();
     fs::remove_dir_all(&outside).unwrap();
     assert_eq!(status, json!({"repository": {"notARepository": true}}));
     assert_eq!(
@@ -232,6 +241,139 @@ fn recovery_releases_the_callers_retained_land_and_only_names_another_writers() 
         "{recovered}"
     );
     assert_eq!(retained_ids(&f), ["other-retained"]);
+}
+
+/// A finished Land of `writer` under `id`, its candidate worktree still held.
+fn finished_land_as(f: &Fixture, id: &str, writer: &str) -> PathBuf {
+    let worktree = interrupt_land_as(f, id, writer);
+    f.driver.recover_land(&f.repo, vec![], writer, id).unwrap();
+    worktree
+}
+
+fn pin_present(f: &Fixture, id: &str) -> bool {
+    !git(
+        &f.main,
+        &["for-each-ref", &format!("refs/fgos/git-operations/{id}/")],
+    )
+    .is_empty()
+}
+
+#[test]
+fn recovery_frees_only_the_worktree_of_a_finished_land_whose_writer_is_proven_dead() {
+    let f = Fixture::new();
+    let worktree = finished_land_as(&f, "dead-writer", "gone-session");
+    let recovered = recover_proving(&f, &|w| w == "gone-session");
+    assert_eq!(recovered["freed"], json!(["dead-writer"]), "{recovered}");
+    assert!(!worktree.exists(), "the dead writer's worktree is removed");
+    assert!(pin_present(&f, "dead-writer"), "pins and journal stay");
+    let again = recover_proving(&f, &|w| w == "gone-session");
+    assert_eq!(again["freed"], json!([]), "{again}");
+    assert_eq!(again["kept"], json!([]), "{again}");
+}
+
+#[test]
+fn recovery_keeps_the_finished_land_of_a_writer_not_proven_dead() {
+    let f = Fixture::new();
+    let worktree = finished_land_as(&f, "live-writer", "live-session");
+    let recovered = recover_proving(&f, &|_| false);
+    assert_eq!(recovered["freed"], json!([]), "{recovered}");
+    assert_eq!(
+        recovered["kept"],
+        json!([{"operationId": "live-writer", "cause": "land-authority-mismatch", "writer": "live-session"}])
+    );
+    assert!(worktree.exists());
+}
+
+#[test]
+fn recovery_never_touches_the_candidate_of_an_attempted_land_even_when_its_writer_is_dead() {
+    let f = Fixture::new();
+    let mut x = f
+        .driver
+        .prepare_land(
+            &f.repo,
+            vec![],
+            &f.request,
+            "gone-session",
+            "attempted",
+            &wal::OsFileSystem,
+            0,
+        )
+        .unwrap();
+    let worktree = x.candidate().unwrap().worktree.clone();
+    let e = evidence(&x);
+    assert!(f
+        .driver
+        .publish_land(&f.repo, &mut x, &e, &StopAt("land-before-read-tree"), 0)
+        .is_err());
+    drop(x);
+    let recovered = recover_proving(&f, &|_| true);
+    assert_eq!(recovered["freed"], json!([]), "{recovered}");
+    assert_eq!(recovered["recovered"], json!([]), "{recovered}");
+    assert!(worktree.exists());
+    assert!(pin_present(&f, "attempted"));
+}
+
+struct StopAt(&'static str);
+impl wal::FileSystem for StopAt {
+    fn checkpoint(&self, step: &'static str) -> std::io::Result<()> {
+        if step == self.0 {
+            Err(std::io::Error::other("interrupted at production boundary"))
+        } else {
+            Ok(())
+        }
+    }
+}
+
+#[test]
+fn a_finished_land_whose_checkout_still_reconciles_loses_its_worktree_and_keeps_its_pins() {
+    let f = Fixture::new();
+    let mut x = f
+        .driver
+        .prepare_land(
+            &f.repo,
+            vec![],
+            &f.request,
+            WRITER,
+            "lagging",
+            &wal::OsFileSystem,
+            0,
+        )
+        .unwrap();
+    let worktree = x.candidate().unwrap().worktree.clone();
+    let e = evidence(&x);
+    assert!(f
+        .driver
+        .publish_land(&f.repo, &mut x, &e, &StopAt("land-before-read-tree"), 0)
+        .is_err());
+    drop(x);
+    git(&f.main, &["commit", "--allow-empty", "-qm", "user work"]);
+    let receipt = f
+        .driver
+        .recover_land(&f.repo, vec![], WRITER, "lagging")
+        .unwrap();
+    assert!(matches!(receipt.checkout, Checkout::Pending));
+
+    let recovered = recover(&f);
+    assert!(!worktree.exists(), "{recovered}");
+    assert!(pin_present(&f, "lagging"), "pins wait for the checkout");
+    let cause = recovered["kept"][0]["cause"].as_str().unwrap();
+    assert!(
+        cause.contains("checkout reconciliation pending"),
+        "{recovered}"
+    );
+    // A replay finds the worktree already gone and its removal chain complete.
+    let again = recover(&f);
+    assert!(
+        again["kept"][0]["cause"]
+            .as_str()
+            .unwrap()
+            .contains("checkout reconciliation pending"),
+        "{again}"
+    );
+    assert!(f
+        .driver
+        .recover_land(&f.repo, vec![], WRITER, "lagging")
+        .is_ok());
 }
 
 #[test]

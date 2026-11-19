@@ -90,9 +90,12 @@ impl wal::FileSystem for StopAt {
 }
 fn recover(f: &Fixture) -> serde_json::Value {
     serde_json::to_value(
-        fgos_git::incidents::recover_git_operations(&f.temp.join("state"), &f.main, &|_| {
-            "fixture".to_owned()
-        })
+        fgos_git::incidents::recover_git_operations(
+            &f.temp.join("state"),
+            &f.main,
+            &|_| "fixture".to_owned(),
+            &|_| false,
+        )
         .unwrap(),
     )
     .unwrap()

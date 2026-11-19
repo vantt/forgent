@@ -1886,3 +1886,20 @@ fn a_new_cli_session_on_the_same_head_takes_the_roles_and_pane_of_the_one_before
     );
     let _ = fs::remove_dir_all(root);
 }
+
+#[test]
+fn a_session_is_proven_dead_only_when_registered_with_a_dead_head() {
+    let root = state_root();
+    let alive = judge(&[]);
+    directory::register(&root, entry("dead", Some(10), &[]), false, &alive).unwrap();
+    directory::register(&root, entry("live", Some(20), &[]), false, &alive).unwrap();
+    directory::register(&root, entry("none", None, &[]), false, &alive).unwrap();
+    let after_death = judge(&[10]);
+    let dead = |name: &str| {
+        directory::session_proven_dead(&root, &format!("fg-abc234/{name}"), &after_death)
+    };
+    assert!(dead("dead"));
+    assert!(!dead("live"), "a live head is not proof");
+    assert!(!dead("none"), "no liveness record is unknown, not dead");
+    assert!(!dead("absent"), "a session the directory lacks is unknown");
+}

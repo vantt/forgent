@@ -334,11 +334,13 @@ impl Steps for Live {
     }
 
     fn recover_git(&self, root: &Path) -> Result<Option<Value>, String> {
-        let recovered =
-            fgos_git::incidents::recover_git_operations(&self.state_root, root, &|_| {
-                super::git_incidents::own_writer()
-            })
-            .map_err(|error| error.cause().to_owned())?;
+        let recovered = fgos_git::incidents::recover_git_operations(
+            &self.state_root,
+            root,
+            &|_| super::git_incidents::own_writer(),
+            &super::git_incidents::writer_is_dead(&self.state_root),
+        )
+        .map_err(|error| error.cause().to_owned())?;
         Ok(
             (!recovered.recovered.is_empty() || !recovered.kept.is_empty()).then(|| {
                 json!({

@@ -150,6 +150,19 @@ pub(crate) fn own_writer() -> String {
     fgos_identity::resolve_current().id.to_string()
 }
 
+/// The positive proof recovery needs to free another writer's finished Land: Identity holds the writer's session
+/// and its agent head and CLI process are judged gone. Anything else, including a session Identity no longer
+/// holds, is not proof.
+pub(crate) fn writer_is_dead(state_root: &std::path::Path) -> impl Fn(&str) -> bool + '_ {
+    move |writer| {
+        fgos_identity::directory::session_proven_dead(
+            state_root,
+            writer,
+            &fgos_process::facts::judge_here,
+        )
+    }
+}
+
 /// What a request answers: the data of the envelope, the caller's refusal, or a failure of the verb itself.
 enum Answer {
     Data(serde_json::Value),
@@ -175,8 +188,13 @@ fn answer(request: &GitRequest) -> Result<Answer, ProviderError> {
     let data = match request.operation {
         GitOperation::Status => serde_json::to_value(read_git_status(&state_root, &root)),
         GitOperation::Recover => {
-            let recovered = recover_git_operations(&state_root, &root, &|_| own_writer())
-                .map_err(|error| ProviderError::ProviderFailed(error.cause().to_owned()))?;
+            let recovered = recover_git_operations(
+                &state_root,
+                &root,
+                &|_| own_writer(),
+                &writer_is_dead(&state_root),
+            )
+            .map_err(|error| ProviderError::ProviderFailed(error.cause().to_owned()))?;
             serde_json::to_value(recovered)
         }
     };
