@@ -328,6 +328,40 @@ test('the runner record is judged: dead is failed with runner-gone, unknown stay
   assert.equal((await ask('request result', { id: 't1' }, 'r2', { judge: () => 'unknown' })).line.data.state, 'running');
 });
 
+const SELF = () => ({ pid: 1, startTime: 1 });
+
+test('a failed host run leaves its argv and the host refusal code and message in the ticket, and request result returns them', async (t) => {
+  const { ask, ticketFile } = headCase(t);
+  await ask('run', { prompt: 'do it', writes: ['src/a/b.mjs'], worktree: '../wt' });
+  runTicket(ticketFile('t1'), { selfRecord: SELF, exec: () => ({ status: 4, stdout: '{"result":"error","code":"writes-need-worktree","message":"--writes needs a linked worktree"}\n', stderr: '' }) });
+  const failed = (await ask('request result', { id: 't1' }, 'r1')).line.data;
+  assert.deepEqual([failed.state, failed.exit, failed.code, failed.message], ['failed', 4, 'writes-need-worktree', '--writes needs a linked worktree']);
+  assert.deepEqual(failed.argv, ['run', '--json', 'do it', '--writes', 'src/a/b.mjs', '--worktree', '../wt']);
+  assert.equal(JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8')).code, 'writes-need-worktree');
+});
+
+test('a host refusal printed only on stderr as `fgos: <message> [<code>]` is parsed into the ticket code and message', async (t) => {
+  const { ask, ticketFile } = headCase(t);
+  await ask('run', { prompt: 'x' });
+  runTicket(ticketFile('t1'), { selfRecord: SELF, exec: () => ({ status: 4, stdout: '', stderr: 'warming up\nfgos: unknown provider "zz" [provider-unknown]\n' }) });
+  const failed = (await ask('request result', { id: 't1' }, 'r1')).line.data;
+  assert.deepEqual([failed.code, failed.message, failed.exit], ['provider-unknown', 'unknown provider "zz"', 4]);
+  assert.match(failed.stderrTail, /provider-unknown/);
+});
+
+test('a failed ticket bounds the stored message and stderr tail, and an unreadable failure keeps exit-N', async (t) => {
+  const { ask, ticketFile } = headCase(t);
+  await ask('run', { prompt: 'x' });
+  const lines = Array.from({ length: 200 }, (_, i) => `line ${i} ${'y'.repeat(50)}`).join('\n');
+  runTicket(ticketFile('t1'), { selfRecord: SELF, exec: () => ({ status: 7, stdout: JSON.stringify({ message: 'm'.repeat(5000) }), stderr: lines }) });
+  const failed = (await ask('request result', { id: 't1' }, 'r1')).line.data;
+  assert.equal(failed.code, 'exit-7');
+  assert.equal(failed.message.length, 1024);
+  assert.ok(failed.stderrTail.length <= 1024);
+  assert.ok(failed.stderrTail.split('\n').length <= 12);
+  assert.ok(failed.stderrTail.endsWith('y'.repeat(50)));
+});
+
 /** Gives a ticket the runner record its detached runner writes first. */
 function runTicketStart(file) {
   const ticket = JSON.parse(fs.readFileSync(file, 'utf8'));
