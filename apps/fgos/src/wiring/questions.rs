@@ -729,11 +729,14 @@ fn process_caller() -> IdentityCaller {
 #[cfg(unix)]
 pub const HEAD_SOCKET_ENV: &str = "FGOS_HEAD_REQUEST_SOCKET";
 /// How many times a write is retried when the head's supervisor answers `busy`, and how long it waits between tries.
+#[cfg(unix)]
 pub const BUSY_RETRIES: u32 = 3;
+#[cfg(unix)]
 pub const BUSY_PAUSE: std::time::Duration = std::time::Duration::from_secs(1);
 
 /// The head-request verb and arguments of a write sub-command: `ask` carries the parsed input and its flags, the
 /// others their own fields. The caller is never an argument; the supervisor's envelope names it.
+#[cfg(unix)]
 fn head_call(request: &QuestionsRequest) -> Result<(&'static str, Value), CategorisedRefusal> {
     Ok(match &request.verb {
         Verb::Ask {
@@ -776,6 +779,7 @@ fn head_call(request: &QuestionsRequest) -> Result<(&'static str, Value), Catego
 }
 
 /// The text a head write prints, the same words the local call prints.
+#[cfg(unix)]
 fn head_text(verb: &Verb, data: &Value) -> String {
     let id = data["id"].as_str().unwrap_or("");
     match verb {

@@ -9,8 +9,8 @@
 //! them has no effect. The answer is one line on stdout, `{ result: "done", data }` or `{ result: "error", code,
 //! message }`, with exit status 0 or 70.
 //!
-//! `answer` is the secretary's alone: the route refuses it for any other head with `answer-not-owner`, whatever the
-//! grant said, and records it with source `secretary`.
+//! `answer` is recorded with source `secretary`; the question use case alone decides who may use that source and
+//! refuses any other head with `answer-not-owner`.
 
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -32,7 +32,6 @@ pub const EXIT_USAGE: i32 = 2;
 
 const ENVELOPE_FILE: &str = "envelope.json";
 const MAX_STDIN: u64 = 4 * 1024 * 1024;
-const SECRETARY_PREFIX: &str = "head:secretary-";
 
 /// The head's identity as its supervisor's envelope states it.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -123,11 +122,7 @@ fn required_id(args: &Value) -> Result<String, Refusal> {
 }
 
 /// The call a request names, with only the fields its verb defines; any other key is dropped.
-fn verb_of(
-    envelope: &HeadEnvelope,
-    verb: &str,
-    args: &Value,
-) -> Result<(Verb, Option<Vec<u8>>), Refusal> {
+fn verb_of(verb: &str, args: &Value) -> Result<(Verb, Option<Vec<u8>>), Refusal> {
     if !args.is_object() {
         return Err(Refusal::new("bad-args", "args must be an object"));
     }
@@ -164,23 +159,15 @@ fn verb_of(
             },
             None,
         )),
-        "questions answer" => {
-            if !envelope.role.starts_with(SECRETARY_PREFIX) {
-                return Err(Refusal::new(
-                    "answer-not-owner",
-                    "only the secretary head answers a question through its socket",
-                ));
-            }
-            Ok((
-                Verb::Answer {
-                    id: required_id(args)?,
-                    option: text_arg(args, "option"),
-                    text: text_arg(args, "text"),
-                    source: Some("secretary".to_owned()),
-                },
-                None,
-            ))
-        }
+        "questions answer" => Ok((
+            Verb::Answer {
+                id: required_id(args)?,
+                option: text_arg(args, "option"),
+                text: text_arg(args, "text"),
+                source: Some("secretary".to_owned()),
+            },
+            None,
+        )),
         other => Err(Refusal::new(
             "unknown-verb",
             format!("unknown verb {other:?}"),
@@ -197,7 +184,7 @@ pub fn serve(
 ) -> (i32, Value) {
     let verb = request["verb"].as_str().unwrap_or("");
     let args = request.get("args").cloned().unwrap_or(Value::Null);
-    let (verb, stdin) = match verb_of(envelope, verb, &args) {
+    let (verb, stdin) = match verb_of(verb, &args) {
         Ok(parsed) => parsed,
         Err(r) => return error(&r.code, r.detail),
     };

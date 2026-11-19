@@ -12,7 +12,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { HeadRequestError, MAX_FRAME_BYTES, MAX_REQUEST_BYTES, requestHead, requestHeadStart, requestHeadWrite } from '../../src/session-host/head-request-client.mjs';
 import { rotateHead, runHeadRequest, startHead } from '../../src/session-host/head-request.mjs';
-import { grantOf, HEAD_REQUEST_SOCKET_ENV, QUESTION_VERBS } from '../../src/session-host/head-grants.mjs';
+import { HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
 
 const scratch = (t) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-head-req-'));
@@ -183,16 +183,6 @@ test('the payload entry runs session rotate and session answered for the envelop
   assert.equal(otherRestore.line.code, 'role-mismatch');
   const stray = await runHeadRequest({ runDir, request: { verb: 'session answered', args: { persona: 'planner', name: 'x', sessionId: 's1', rotationId: '0123456789abcdef', message: 'm', key: 'head-planner-x-9' } } }, ports);
   assert.equal(stray.line.code, 'bad-args');
-});
-
-test('every head may ask, ack and cancel its own questions and only the secretary may answer, all from the one shared list', () => {
-  assert.deepEqual(QUESTION_VERBS, ['questions ask', 'questions ack', 'questions cancel']);
-  for (const role of ['head:secretary-miu', 'head:shaper-x']) {
-    for (const verb of QUESTION_VERBS) assert.ok(grantOf(role).verbs.includes(verb), `${role} holds ${verb}`);
-  }
-  assert.ok(grantOf('head:secretary-miu').verbs.includes('questions answer'));
-  assert.ok(!grantOf('head:shaper-x').verbs.includes('questions answer'), 'the shaper never answers');
-  assert.deepEqual(grantOf('head:planner-x').verbs, [], 'a persona the table does not name still holds nothing');
 });
 
 test('the payload entry hands each questions verb to the host route with the envelope\'s own run directory and returns its answer or its refusal code', async (t) => {

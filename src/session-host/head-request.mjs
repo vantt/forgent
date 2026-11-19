@@ -136,7 +136,7 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
       case HEAD_QUESTIONS_ACK_VERB:
       case HEAD_QUESTIONS_CANCEL_VERB:
       case HEAD_QUESTIONS_ANSWER_VERB: {
-        const hostBin = envelope.hostBin ?? process.env.FGOS_HOST_BIN;
+        const { hostBin } = envelope;
         if (typeof hostBin !== 'string' || hostBin === '') throw Object.assign(new Error('the envelope names no host binary'), { code: 'envelope-invalid' });
         const call = { hostBin, runDir, cwd: projectRoot, request: { verb: request.verb, args } };
         data = ports.questions ? await ports.questions(call) : callHeadQuestions(call);

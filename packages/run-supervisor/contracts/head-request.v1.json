@@ -44,39 +44,39 @@
       "rule": "same role step as session answered (this attempt's own session is registered and live, session-not-registered otherwise); a refused registration is role-take-failed with Identity's code in detail. The executor reaches this socket as the same user (peer uid)"
     },
     "questions ask": {
-    "args": {
-      "input": "object, required: the five-part question (docs/platform/questions/spec.md)",
-      "ref": "string, optional: what the question is about (plan:<dir>[#phase-<nn>], ...); the checkout it is checked in is the envelope's cwd",
-      "supersedes": "string, optional: the id of this head's own earlier question to cancel when the new one is written",
-      "migrated": "boolean, optional, default false"
+      "args": {
+        "input": "object, required: the five-part question (docs/platform/questions/spec.md)",
+        "ref": "string, optional: what the question is about (plan:<dir>[#phase-<nn>], ...); the checkout it is checked in is the envelope's cwd",
+        "supersedes": "string, optional: the id of this head's own earlier question to cancel when the new one is written",
+        "migrated": "boolean, optional, default false"
+      },
+      "does": "the host route `fgos internal head-questions --run-dir <attemptDir>` (apps/fgos/src/wiring/head_questions.rs), reached through the Node payload: it reads envelope.json itself and runs the fgos-questions use case with the asker taken from the envelope (the role from envelope.session.role, the session, handle, roles and machine from Identity as the holder of that role, the persona from the envelope, the project from envelope.cwd). No argument names a caller; a `role`, `asker` or `by` key in args is dropped",
+      "data": "{id}",
+      "identity": "held",
+      "rule": "the same role step as session rotate (role-not-held otherwise); the use case's refusals come back as verb-failed with its code in detail (for example ref-invalid, parts-incomplete, question-unclear, asker-unresolved)"
     },
-    "does": "the host route `fgos internal head-questions --run-dir <attemptDir>` (apps/fgos/src/wiring/head_questions.rs), reached through the Node payload: it reads envelope.json itself and runs the fgos-questions use case with the asker taken from the envelope (the role from envelope.session.role, the session, handle, roles and machine from Identity as the holder of that role, the persona from the envelope, the project from envelope.cwd). No argument names a caller; a `role`, `asker` or `by` key in args is dropped",
-    "data": "{id}",
-    "identity": "held",
-    "rule": "the same role step as session rotate (role-not-held otherwise); the use case's refusals come back as verb-failed with its code in detail (for example ref-invalid, parts-incomplete, question-unclear, asker-unresolved)"
-  },
-  "questions ack": {
-    "args": { "id": "string, required" },
-    "does": "as questions ask: records that the asker received the answer; only the asker or a holder of the asker's head role may close a question",
-    "data": "{id, state: acked}",
-    "identity": "held",
-    "rule": "refusals: question-unknown, not-asker, question-not-open (carried as verb-failed detail)"
-  },
-  "questions cancel": {
-    "args": { "id": "string, required", "reason": "string, required by the use case" },
-    "does": "as questions ask: cancels the head's own open question",
-    "data": "{id, state: cancelled}",
-    "identity": "held",
-    "rule": "same refusals as questions ack"
-  },
-  "questions answer": {
-    "args": { "id": "string, required", "option": "string, optional: the label of one of the question's options", "text": "string, optional; one of option and text is required" },
-    "does": "as questions ask, with source `secretary`: records the owner's answer (by: owner) that the secretary head carries. Granted to the secretary only; the route refuses it for any other head with answer-not-owner whatever the grant said",
-    "data": "{id, state: answered}",
-    "identity": "held",
-    "rule": "refusals: answer-not-owner, question-already-answered, question-not-open, question-unknown (carried as verb-failed detail)"
-  },
-  "session bind session": {
+    "questions ack": {
+      "args": { "id": "string, required" },
+      "does": "as questions ask: records that the asker received the answer; only the asker or a holder of the asker's head role may close a question",
+      "data": "{id, state: acked}",
+      "identity": "held",
+      "rule": "refusals: question-unknown, not-asker, question-not-open (carried as verb-failed detail)"
+    },
+    "questions cancel": {
+      "args": { "id": "string, required", "reason": "string, required by the use case" },
+      "does": "as questions ask: cancels the head's own open question",
+      "data": "{id, state: cancelled}",
+      "identity": "held",
+      "rule": "same refusals as questions ack"
+    },
+    "questions answer": {
+      "args": { "id": "string, required", "option": "string, optional: the label of one of the question's options", "text": "string, optional; one of option and text is required" },
+      "does": "as questions ask, with source `secretary`: records the owner's answer (by: owner) that the secretary head carries. Granted to the secretary only; the route refuses it for any other head with answer-not-owner whatever the grant said",
+      "data": "{id, state: answered}",
+      "identity": "held",
+      "rule": "refusals: answer-not-owner, question-already-answered, question-not-open, question-unknown (carried as verb-failed detail)"
+    },
+    "session bind session": {
       "args": { "source": "string, required: the CLI's own session variable the agent names itself by (CLAUDE_CODE_SESSION_ID, CODEX_THREAD_ID, PI_SESSION_ID), never FGOS_SESSION_ID", "value": "string, required: the agent's session id under that variable", "mailbox": "object {fgosDir, name}, optional, both strings: the mailbox name the agent's hooks bound in the project of fgosDir, recorded as the bound entry's Identity `mailbox` group; no other key is accepted" },
       "does": "answered by the supervisor itself, no route child: Identity's bind_agent_session registers the agent session on the attempt's gate and moves every role the attempt holds to it (take), with the `terminal` and `head` identifier groups, so the head resolves as its CLI session and a role alias reaches the mailbox key its hooks bind. The bound entry also records its `cliSession` group (the variable and id; for CLAUDE_CODE_SESSION_ID also the name, name source, messaging socket, pid and start time the CLI keeps in `<config dir>/sessions/<agent pid>.json` outside the sandbox, read only when that file names the agent's pid, the bound id and the agent's start time; the agent is the gate's direct child above the connecting process) and the `mailbox` group of the args. A bind of the session already bound refreshes these groups. The connecting process (SO_PEERCRED pid, as the supervisor's PID namespace names it) must be the gate or run under it; Identity refuses an attempt with no live entry on the gate and an agent id that is a live session on another head. Afterwards the role checks of this socket ask for the session the attempt is (the bound one when there is one) and a role move registers on it",
       "data": "{id, handle} of the bound session",

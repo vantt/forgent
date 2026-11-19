@@ -107,6 +107,7 @@ impl Scene {
         let envelope = json!({
             "v": 3,
             "cwd": self.project(),
+            "hostBin": fgos_bin(),
             "session": { "role": role, "persona": persona },
         });
         fs::write(run_dir.join("envelope.json"), envelope.to_string()).unwrap();
@@ -114,9 +115,14 @@ impl Scene {
     }
 
     fn fgos(&self, args: &[&str], stdin: &[u8]) -> Output {
+        self.fgos_with(args, stdin, &[])
+    }
+
+    fn fgos_with(&self, args: &[&str], stdin: &[u8], env: &[(&str, &Path)]) -> Output {
         let mut child = Command::new(fgos_bin())
             .current_dir(self.project())
             .env_clear()
+            .envs(env.iter().copied())
             .env("HOME", self.root.join("home"))
             .env("PATH", std::env::var_os("PATH").unwrap_or_default())
             .env("FGOS_STATE_ROOT", self.root.join("state"))
@@ -265,5 +271,108 @@ fn a_role_no_session_holds_has_no_asker_and_an_unknown_verb_or_missing_envelope_
     assert_eq!(
         (exit, line["code"].as_str()),
         (70, Some("envelope-invalid"))
+    );
+}
+
+/// Serves the request frames of `head-request.v1.json` on a socket: one connection per reply, the replies in order.
+/// Returns the requests it saw once every reply was sent.
+fn stub_socket(socket: &Path, replies: Vec<Value>) -> std::thread::JoinHandle<Vec<Value>> {
+    use std::io::Read;
+    let listener = std::os::unix::net::UnixListener::bind(socket).unwrap();
+    std::thread::spawn(move || {
+        let mut seen = Vec::new();
+        for reply in replies {
+            let (mut conn, _) = listener.accept().unwrap();
+            let mut len = [0u8; 4];
+            conn.read_exact(&mut len).unwrap();
+            let mut body = vec![0u8; u32::from_be_bytes(len) as usize];
+            conn.read_exact(&mut body).unwrap();
+            let request: Value = serde_json::from_slice(&body).unwrap();
+            let mut reply = reply;
+            reply["type"] = json!("REPLY");
+            reply["id"] = request["id"].clone();
+            seen.push(request);
+            let out = reply.to_string();
+            conn.write_all(&(out.len() as u32).to_be_bytes()).unwrap();
+            conn.write_all(out.as_bytes()).unwrap();
+        }
+        seen
+    })
+}
+
+#[test]
+fn a_confined_ask_retries_a_busy_reply_over_its_request_socket_and_a_route_refusal_keeps_its_exit_category(
+) {
+    let scene = Scene::new("socket");
+    let socket = scene.root.join("req.sock");
+    let server = stub_socket(
+        &socket,
+        vec![
+            json!({ "result": "refused", "code": "busy" }),
+            json!({ "result": "done", "data": { "id": "q-stub" } }),
+            json!({ "result": "refused", "code": "verb-failed", "detail": "answer-not-owner" }),
+        ],
+    );
+    let env = [("FGOS_HEAD_REQUEST_SOCKET", socket.as_path())];
+    let ask = scene.fgos_with(
+        &["questions", "ask", "--ref", "plan:p", "--input", "-"],
+        QUESTION.as_bytes(),
+        &env,
+    );
+    assert!(ask.status.success(), "{ask:?}");
+    assert!(String::from_utf8_lossy(&ask.stdout).contains("q-stub"));
+    let refused = scene.fgos_with(
+        &["questions", "answer", "q-stub", "--option", "A"],
+        b"",
+        &env,
+    );
+    assert_eq!(refused.status.code(), Some(2), "{refused:?}");
+    let seen = server.join().unwrap();
+    assert_eq!(seen.len(), 3);
+    assert_eq!(seen[0]["verb"], json!("questions ask"));
+    assert_eq!(seen[0]["args"], seen[1]["args"]);
+    assert_eq!(seen[2]["verb"], json!("questions answer"));
+}
+
+#[test]
+fn the_payload_entry_runs_a_head_ask_through_the_real_host_route_and_records_the_envelope_role_as_the_asker(
+) {
+    let scene = Scene::new("payload");
+    let shaper = scene.head("head:shaper-bob", "shaper");
+    let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let body = json!({
+        "v": 1,
+        "verb": "questions ask",
+        "args": { "input": serde_json::from_str::<Value>(QUESTION).unwrap(), "ref": "plan:p" },
+    })
+    .to_string();
+    let mut child = Command::new("node")
+        .arg(repo.join("src/session-host/head-request.mjs"))
+        .args(["--run-dir", shaper.to_str().unwrap()])
+        .current_dir(scene.project())
+        .env_clear()
+        .env("HOME", scene.root.join("home"))
+        .env("PATH", std::env::var_os("PATH").unwrap_or_default())
+        .env("FGOS_STATE_ROOT", scene.root.join("state"))
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(body.as_bytes())
+        .unwrap();
+    let out = child.wait_with_output().unwrap();
+    let text = String::from_utf8_lossy(&out.stdout).into_owned();
+    let line: Value = serde_json::from_str(text.lines().last().unwrap_or_default())
+        .unwrap_or_else(|e| panic!("{e}: {out:?}"));
+    assert_eq!(line["result"], json!("done"), "{line}");
+    let id = line["data"]["id"].as_str().unwrap().to_owned();
+    assert_eq!(
+        scene.show(&id)["asked"]["asker"]["roles"],
+        json!(["head:shaper-bob"])
     );
 }
