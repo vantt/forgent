@@ -31,15 +31,14 @@ properties:
     type: [object, "null"]
     additionalProperties: false
     required: [run, files]
+    $comment: "justification: read from the trusted main checkout, the landing trust boundary; the entry decides what runs on this machine, and its files belong with its command, so the whole entry comes from one file"
     x-fgos-scope: both
+    x-fgos-sensitivity: command
     properties:
       run:
-        $comment: "justification: read from the trusted main checkout, the landing trust boundary; the entry decides what runs on this machine"
         description: Shell command that regenerates the files.
         type: string
         pattern: "\\S"
-        x-fgos-scope: both
-        x-fgos-sensitivity: command
       files:
         description: Repo-relative files the command rewrites.
         type: array
