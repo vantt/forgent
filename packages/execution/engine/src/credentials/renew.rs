@@ -22,6 +22,8 @@ use super::{
 };
 
 const LOCK_MARGIN_MS: u64 = 30_000;
+/// Access-token life a renewed login needs beyond the seat's timeout and one renewal call.
+const SEAT_RENEWAL_MARGIN_MS: f64 = 10.0 * 60_000.0;
 /// Access-token life a running seat's login must still have beyond one probe call before it is taken: the call then
 /// uses that token as it is and never renews the copy, which would spend the seat's single-use refresh token.
 const LIVE_SEAT_LIFE_MARGIN_MS: f64 = 10.0 * 60_000.0;
@@ -40,6 +42,9 @@ pub struct RefreshOptions<'a> {
     pub probe_timeout_ms: u64,
     /// The refresh-ahead window; the default is `default_refresh_ahead_threshold_ms(probe_timeout_ms)`.
     pub threshold_ms: Option<f64>,
+    /// How long the seat this login is copied into may run; the window then also covers that timeout plus one call
+    /// and a margin, so a login that cannot outlive the seat is renewed before the seat's life check.
+    pub seat_timeout_ms: Option<f64>,
     pub cooldown_ms: f64,
     /// How long to wait for the account lock; the default is the probe timeout plus a margin.
     pub lock_wait_ms: Option<u64>,
@@ -61,6 +66,7 @@ impl<'a> RefreshOptions<'a> {
             sqlite,
             probe_timeout_ms: DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS,
             threshold_ms: None,
+            seat_timeout_ms: None,
             cooldown_ms: DEFAULT_RENEWAL_COOLDOWN_MS,
             lock_wait_ms: None,
             live_seat_homes: &NoLiveSeatHomes,
@@ -93,7 +99,8 @@ pub struct RefreshRequest<'a> {
 }
 
 /// Renew the login of `credential_source` once, in an fgOS-held scratch copy, when it is closer to expiry than the
-/// window; apply the renewed entry to the real store.
+/// window (the threshold, widened to the seat's timeout plus one call and a margin when a seat timeout is given);
+/// apply the renewed entry to the real store.
 pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>) -> RefreshOutcome {
     let source = request.credential_source;
     let (Some(layout), Some(home)) = (
@@ -115,6 +122,12 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
     let threshold = options
         .threshold_ms
         .unwrap_or_else(|| default_refresh_ahead_threshold_ms(options.probe_timeout_ms as f64));
+    let threshold = match options.seat_timeout_ms.filter(|t| t.is_finite()) {
+        Some(seat) => {
+            threshold.max(seat + options.probe_timeout_ms as f64 + SEAT_RENEWAL_MARGIN_MS)
+        }
+        None => threshold,
+    };
     let lock_wait = options
         .lock_wait_ms
         .unwrap_or(options.probe_timeout_ms + LOCK_MARGIN_MS);

@@ -1063,6 +1063,7 @@ fn run_admitted(
             pinned_invocation_id,
             confinement_requirement.get("mode").and_then(Value::as_str),
             opts.provider_capacity_runtime_dir.as_deref(),
+            Some(timeout_ms),
         )
     });
     let workspace_write = posture_binding

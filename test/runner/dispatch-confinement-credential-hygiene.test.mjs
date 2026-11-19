@@ -120,24 +120,26 @@ test('a claude login copy with less access-token life than the seat timeout is r
   try {
     const login = (expiresAt) => fs.writeFileSync(path.join(f.accountHome, '.credentials.json'), JSON.stringify({ claudeAiOauth: { accessToken: 'placeholder', refreshToken: 'placeholder', expiresAt } }), { mode: 0o600 });
     const source = { kind: 'home-files', home: f.accountHome, files: ['.credentials.json'] };
-    const requestFor = (dispatchId, timeoutMs) => ({
+    const requestFor = (dispatchId, timeoutMs, refreshAhead) => ({
       dispatchId,
       executorId: 'claude-bwrap',
       invocation: { command: 'claude', args: [], env: {}, credentialStore: { use: 'claude', homeEnv: 'CLAUDE_CONFIG_DIR', files: ['.credentials.json'] } },
-      providerCapacity: { provider: 'claude', accountId: 'a', credentialSource: source },
+      providerCapacity: { provider: 'claude', accountId: 'a', credentialSource: source, ...(refreshAhead ? { refreshAhead } : {}) },
       context: { cwd: os.tmpdir(), runDir: os.tmpdir(), timeoutMs },
     });
     const backend = { id: 'bwrap', type: 'bwrap', config: {} };
 
     login(Date.now() + 10 * 60 * 1000);
     const short = planFor(f.tempRoot, 'disp_claude_short');
-    await assert.rejects(prepareBwrap(short, requestFor('disp_claude_short', 35 * 60 * 1000), backend), /login-expires-before-seat-timeout/);
+    // The refusal names what refresh-ahead did for this store on the lease.
+    const failed = [{ cli: null, status: 'failed', reason: 'probe-failed' }];
+    await assert.rejects(prepareBwrap(short, requestFor('disp_claude_short', 35 * 60 * 1000, failed), backend), /login-expires-before-seat-timeout: .*; refresh-ahead: failed probe-failed$/);
     assert.equal(fs.existsSync(path.join(short.resources[0].hostTarget, '.credentials.json')), false, 'no login copy was made');
 
     // No timeout in the request: the seat runs for the default timeout, which the guard judges against.
     login(DEFAULT_SEAT_TIMEOUT_MS / 2 + Date.now());
     const unset = planFor(f.tempRoot, 'disp_claude_unset');
-    await assert.rejects(prepareBwrap(unset, requestFor('disp_claude_unset', undefined), backend), /login-expires-before-seat-timeout/);
+    await assert.rejects(prepareBwrap(unset, requestFor('disp_claude_unset', undefined), backend), /login-expires-before-seat-timeout: .*; refresh-ahead: not-run$/);
 
     login(Date.now() + 3 * 60 * 60 * 1000);
     const long = planFor(f.tempRoot, 'disp_claude_long');

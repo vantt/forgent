@@ -615,18 +615,21 @@ export function credentialLayout(source) {
  * seat (`seatMustNotRefresh`: the copy carries the source's refresh token) needs more access-token life than the
  * seat's timeout; otherwise the CLI would refresh in the home and spend the source's token. Judged on the source
  * the copy is made from; unreadable is the copy step's business, not a refusal here. The caller passes the seat's
- * timeout (the default one when the request names none). A seat allowed to run longer than the source's remaining
- * life is refused even though refresh-ahead renews only inside its own window (60 min or the probe timeout plus a
- * margin): a long timeout can be refused until the source renews. Names and numbers only, never a token.
+ * timeout (the default one when the request names none). Refresh-ahead widens its window by the seat's timeout, so
+ * a login that cannot outlive the seat is renewed before this check; a refusal here means that renewal did not
+ * happen, and `refreshAhead` (its `{status, reason}`) is appended so the reason is named. Names and numbers only,
+ * never a token.
  */
-export function loginLifeProblem(credentialSource, { timeoutMs, now = Date.now() } = {}) {
+export function loginLifeProblem(credentialSource, { timeoutMs, refreshAhead: renewal, now = Date.now() } = {}) {
   const layout = LAYOUTS[credentialLayout(credentialSource)];
   const home = expandCredentialHome(credentialSource?.home);
   if (!layout?.seatMustNotRefresh || !home || !Number.isFinite(timeoutMs)) return null;
   const read = layout.read(home);
   if (!read.ok) return null;
   const leftMs = Math.min(...read.entries.map((entry) => entry.expiresMs)) - now;
-  return leftMs < timeoutMs ? `login-expires-before-seat-timeout: the login has ${Math.max(0, Math.round(leftMs / 60000))} min of access-token life left and the seat may run ${Math.round(timeoutMs / 60000)} min, so the seat would refresh it inside its home` : null;
+  if (leftMs >= timeoutMs) return null;
+  const status = renewal?.status ? `; refresh-ahead: ${renewal.status}${renewal.reason ? ` ${renewal.reason}` : ''}` : '';
+  return `login-expires-before-seat-timeout: the login has ${Math.max(0, Math.round(leftMs / 60000))} min of access-token life left and the seat may run ${Math.round(timeoutMs / 60000)} min, so the seat would refresh it inside its home${status}`;
 }
 
 /**
@@ -1326,9 +1329,13 @@ function liveSeatSharesRefresh({ layout, homes, key, refresh, loadSqlite }) {
 // Refresh-ahead
 // ---------------------------------------------------------------------------------------------------
 
+// Access-token life a renewed login needs beyond the seat's timeout and one renewal call.
+const SEAT_RENEWAL_MARGIN_MS = 10 * 60 * 1000;
+
 /**
  * Renew the login of `credentialSource` once, in an fgOS-held scratch copy, when it is closer to expiry
- * than `thresholdMs`; apply the renewed entry to the real store. Never throws and never returns a value
+ * than the window: `thresholdMs`, widened for a seat that may run `seatTimeoutMs` to that timeout plus one call
+ * and a margin, so a login that cannot outlive the seat is renewed before the seat's life check; apply the renewed entry to the real store. Never throws and never returns a value
  * of a credential: `{status: 'fresh'|'renewed'|'failed'|'cooldown'|'skipped', reason}`. `liveSeatHomes(target)`
  * names the private homes of seats still running on this store; the newest valid login one of them renewed is
  * taken first (takeLiveSeatLogin), so a store whose refresh token a running seat already spent is not renewed with it;
@@ -1341,6 +1348,7 @@ export async function refreshAhead({
   runtimeDir,
   probeTimeoutMs = DEFAULT_CREDENTIAL_PROBE_TIMEOUT_MS,
   thresholdMs = defaultRefreshAheadThresholdMs(probeTimeoutMs),
+  seatTimeoutMs,
   cooldownMs = DEFAULT_RENEWAL_COOLDOWN_MS,
   lockWaitMs = probeTimeoutMs + LOCK_MARGIN_MS,
   spawnFn,
@@ -1360,7 +1368,8 @@ export async function refreshAhead({
 
     // Only the dispatched provider's entry counts, both for the window and for "was it renewed".
     const entryOf = (read) => selectProviderEntry(read.entries, provider);
-    const inWindow = (entry) => entry.dueMs - now() < thresholdMs;
+    const windowMs = Number.isFinite(seatTimeoutMs) ? Math.max(thresholdMs, seatTimeoutMs + probeTimeoutMs + SEAT_RENEWAL_MARGIN_MS) : thresholdMs;
+    const inWindow = (entry) => entry.dueMs - now() < windowMs;
     const before = layout.read(home, { loadSqlite });
     if (!before.ok) return { status: 'skipped', reason: before.code };
     const beforeEntry = entryOf(before);
@@ -1485,8 +1494,8 @@ async function renewInScratch({ layout, layoutName, provider, credentialSource, 
  * home is built and write-back when one is removed; without it neither runs.
  */
 export function createCredentialRenewal(options = {}) {
-  return function renewCredential({ provider, accountId, credentialSource, runtimeDir, liveSeatHomes }) {
-    return refreshAhead({ ...options, ...(liveSeatHomes ? { liveSeatHomes } : {}), provider, accountId, credentialSource, runtimeDir });
+  return function renewCredential({ provider, accountId, credentialSource, runtimeDir, liveSeatHomes, seatTimeoutMs }) {
+    return refreshAhead({ ...options, ...(liveSeatHomes ? { liveSeatHomes } : {}), provider, accountId, credentialSource, runtimeDir, seatTimeoutMs });
   };
 }
 

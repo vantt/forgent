@@ -132,13 +132,25 @@ pub fn read_credential_expiry(
         .collect())
 }
 
+/// The suffix a seat's life-check refusal carries to name what refresh-ahead did for the store:
+/// `; refresh-ahead: <status>[ <reason>]`. Fixed words only, never a credential.
+pub fn refresh_ahead_note(status: &str, reason: Option<&str>) -> String {
+    match reason.filter(|r| !r.is_empty()) {
+        Some(reason) => format!("; refresh-ahead: {status} {reason}"),
+        None => format!("; refresh-ahead: {status}"),
+    }
+}
+
 /// Why a seat may not start on a copy of this login, or `None`. A login whose layout must never refresh inside a
 /// seat needs more access-token life than the seat's timeout; otherwise the CLI would refresh in the home and spend
-/// the source's token. Unreadable is the copy step's business, not a refusal here. Names and numbers only.
+/// the source's token. Unreadable is the copy step's business, not a refusal here. Refresh-ahead widens its window by
+/// the seat's timeout, so a refusal here means that renewal did not happen: `refresh_ahead`, its outcome, is appended
+/// so the reason is named. Names and numbers only.
 pub fn login_life_problem(
     source: &CredentialSource,
     home_dir: Option<&str>,
     timeout_ms: Option<f64>,
+    refresh_ahead: Option<&RefreshOutcome>,
     now: f64,
     sqlite: &dyn SqliteAdapter,
 ) -> Option<String> {
@@ -156,8 +168,11 @@ pub fn login_life_problem(
         .fold(f64::INFINITY, f64::min)
         - now;
     (left < timeout).then(|| {
+        let status = refresh_ahead
+            .map(|r| refresh_ahead_note(r.status, Some(&r.reason)))
+            .unwrap_or_default();
         format!(
-            "login-expires-before-seat-timeout: the login has {} min of access-token life left and the seat may run {} min, so the seat would refresh it inside its home",
+            "login-expires-before-seat-timeout: the login has {} min of access-token life left and the seat may run {} min, so the seat would refresh it inside its home{status}",
             (left / 60_000.0).round().max(0.0),
             (timeout / 60_000.0).round()
         )

@@ -334,6 +334,9 @@ pub struct RenewAsk<'a> {
     pub account_id: &'a str,
     pub credential_source: &'a Value,
     pub runtime_dir: &'a Path,
+    /// How long the seat the login is copied into may run: the renewal window covers it, so a login that cannot
+    /// outlive the seat is renewed before the seat's life check.
+    pub seat_timeout_ms: u64,
 }
 
 /// The caller's opt-in to renewing a login ahead of its expiry: one renewal in a copy fgOS holds, applied to the
@@ -355,7 +358,11 @@ fn is_confined(entry: Option<&Value>) -> bool {
 /// The lease as the launch carries it. Opted in with a renewal, a login close to expiry is renewed once; the lease
 /// then carries the write-back opt-in, so a home whose login a pane renewed anyway is offered back to the source.
 /// Only a confined launch copies a login, and which invocation is confined is settled later, so any executor that
-/// can be confined (by posture, executor config or a confined invocation) counts. Renewal never blocks the dispatch.
+/// can be confined (by posture, executor config or a confined invocation) counts. The renewal is given the seat's
+/// timeout (`timeout_ms`, the default one when none is named), and each store's outcome (`refreshAhead`: cli, status
+/// and reason, never a credential) rides on the lease, so a life-check refusal names it. Renewal never blocks the
+/// dispatch.
+#[allow(clippy::too_many_arguments)]
 pub fn renew_leased_login(
     selection: &Value,
     renewal: Option<&dyn CredentialRenewal>,
@@ -364,6 +371,7 @@ pub fn renew_leased_login(
     pinned_invocation_id: Option<&str>,
     confinement_mode: Option<&str>,
     runtime_dir: Option<&Path>,
+    timeout_ms: Option<u64>,
 ) -> Value {
     let launch_executor = cfg
         .pointer(&format!("/executors/{executor_id}"))
@@ -405,13 +413,29 @@ pub fn renew_leased_login(
         .get("accountId")
         .and_then(Value::as_str)
         .unwrap_or_default();
+    let seat_timeout_ms = timeout_ms
+        .filter(|t| *t > 0)
+        .unwrap_or(crate::confinement::policy::DEFAULT_SEAT_TIMEOUT_MS);
+    let mut outcomes = Vec::new();
     for source in sources {
         let outcome = renewal.renew(&RenewAsk {
             provider,
             account_id,
             credential_source: source,
             runtime_dir: &credential_runtime_dir,
+            seat_timeout_ms,
         });
+        let cli = source.get("cli").cloned().unwrap_or(Value::Null);
+        match &outcome {
+            Ok(Some(renewed)) => outcomes.push(json!({
+                "cli": cli,
+                "status": renewed.get("status").cloned().unwrap_or(Value::Null),
+                "reason": renewed.get("reason").cloned().unwrap_or(Value::Null),
+            })),
+            Ok(None) => {}
+            Err(_) => outcomes
+                .push(json!({ "cli": cli, "status": "failed", "reason": "unexpected-error" })),
+        }
         // Anything but "nothing was due" is visible, so a renewal that keeps failing is not mistaken for success; a
         // renewal that throws lets the launch go on with the login as it is.
         if let Ok(Some(renewed)) = outcome {
@@ -435,5 +459,6 @@ pub fn renew_leased_login(
     }
     let mut out = selection.clone();
     out["credentialWriteBack"] = json!({ "runtimeDir": credential_runtime_dir });
+    out["refreshAhead"] = Value::Array(outcomes);
     out
 }
