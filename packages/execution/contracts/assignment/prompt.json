@@ -1,0 +1,2013 @@
+{
+  "prompts": [
+    {
+      "name": "declared-plain",
+      "assignment": {
+        "assignmentId": "asgn_tsk_1_implement_item_001",
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "stage": "implementation",
+        "operation": "implement-item",
+        "role": "implementer",
+        "dispatch": "unit",
+        "taskSpec": "implement-item",
+        "skills": [],
+        "objective": "do it",
+        "contextRefs": [
+          "a.md"
+        ],
+        "expectedOutputs": [
+          "out"
+        ],
+        "expectedFiles": [
+          "src/a.mjs"
+        ],
+        "policy": {
+          "model": "m",
+          "tier": "advanced",
+          "_fromYaml": true
+        },
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "createdBy": "tester",
+        "provenance": {
+          "kind": "declared",
+          "contractPolicyVersion": "1",
+          "normalizerVersion": "1",
+          "validators": [
+            "workflow-step-legality"
+          ],
+          "declared": {
+            "domain": "coding",
+            "workflow": "feature",
+            "stage": "implementation",
+            "operation": "implement-item",
+            "taskSpec": "implement-item",
+            "legalOperations": [
+              "validate-plan",
+              "implement-item",
+              "review-item",
+              "no-spec"
+            ]
+          }
+        },
+        "mutation": "mutating",
+        "evidence": {
+          "required": "verified"
+        },
+        "resultKind": "work-product"
+      },
+      "options": {},
+      "result": {
+        "ok": "Assignment: asgn_tsk_1_implement_item_001\nWork: tsk-1\nStage operation: implementation.implement-item\nRole: implementer\nTask-spec: domains/coding/task-specs/implement-item.md\nObjective: do it\nContext refs:\n- a.md\nExpected outputs:\n- out"
+      }
+    },
+    {
+      "name": "declared-with-run-dir",
+      "assignment": {
+        "assignmentId": "asgn_tsk_1_implement_item_001",
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "stage": "implementation",
+        "operation": "implement-item",
+        "role": "implementer",
+        "dispatch": "unit",
+        "taskSpec": "implement-item",
+        "skills": [],
+        "objective": "do it",
+        "contextRefs": [
+          "a.md"
+        ],
+        "expectedOutputs": [
+          "out"
+        ],
+        "expectedFiles": [
+          "src/a.mjs"
+        ],
+        "policy": {
+          "model": "m",
+          "tier": "advanced",
+          "_fromYaml": true
+        },
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "createdBy": "tester",
+        "provenance": {
+          "kind": "declared",
+          "contractPolicyVersion": "1",
+          "normalizerVersion": "1",
+          "validators": [
+            "workflow-step-legality"
+          ],
+          "declared": {
+            "domain": "coding",
+            "workflow": "feature",
+            "stage": "implementation",
+            "operation": "implement-item",
+            "taskSpec": "implement-item",
+            "legalOperations": [
+              "validate-plan",
+              "implement-item",
+              "review-item",
+              "no-spec"
+            ]
+          }
+        },
+        "mutation": "mutating",
+        "evidence": {
+          "required": "verified"
+        },
+        "resultKind": "work-product"
+      },
+      "options": {
+        "runDir": "/runs/r1"
+      },
+      "result": {
+        "ok": "Assignment: asgn_tsk_1_implement_item_001\nWork: tsk-1\nStage operation: implementation.implement-item\nRole: implementer\nTask-spec: domains/coding/task-specs/implement-item.md\nObjective: do it\nContext refs:\n- a.md\nExpected outputs:\n- out\nResult artifact:\n- Write structured JSON to /runs/r1/worker-output/outbox/result-1.json\n  \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a required non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidenceRefs\" must be an array of non-empty strings if provided\n  \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n  \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n  Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- Optional human-readable report: /runs/r1/worker-output/outbox/report-1.md\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver."
+      }
+    },
+    {
+      "name": "reviewer-read-only-run-dir",
+      "assignment": {
+        "assignmentId": "asgn_tsk_1_review_item_001",
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "stage": "review",
+        "operation": "review-item",
+        "role": "reviewer",
+        "dispatch": "assignment",
+        "taskSpec": "review-item.md",
+        "skills": [],
+        "objective": "Execute review.review-item operation",
+        "contextRefs": [],
+        "expectedOutputs": [
+          "result-1.json (verdict: APPROVED | REJECT, evidenceRefs: [candidate diff ref, verify result ref])",
+          "report-1.md (reviewer findings and evaluation)"
+        ],
+        "expectedFiles": [],
+        "reason": "second-look",
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "provenance": {
+          "kind": "declared",
+          "contractPolicyVersion": "1",
+          "normalizerVersion": "1",
+          "validators": [
+            "workflow-step-legality"
+          ],
+          "declared": {
+            "domain": "coding",
+            "workflow": "feature",
+            "stage": "review",
+            "operation": "review-item",
+            "taskSpec": "review-item.md",
+            "legalOperations": [
+              "validate-plan",
+              "implement-item",
+              "review-item",
+              "no-spec"
+            ]
+          }
+        },
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "resultKind": "review-verdict"
+      },
+      "options": {
+        "runDir": "/runs/r1",
+        "effectiveContract": {
+          "contract": {
+            "id": "effective-execution-contract",
+            "version": 1
+          },
+          "mutation": "read-only",
+          "resultClaim": {
+            "path": "/runs/r1/outbox/result-1.json"
+          },
+          "limits": {
+            "executorTimeoutMs": 5400000
+          },
+          "workspace": {
+            "writeScope": []
+          },
+          "enforcementPosture": "enforced"
+        }
+      },
+      "result": {
+        "ok": "Assignment: asgn_tsk_1_review_item_001\nWork: tsk-1\nStage operation: review.review-item\nRole: reviewer\nTask-spec: domains/coding/task-specs/review-item.md\nObjective: Execute review.review-item operation\nContext refs:\n- (none)\nExpected outputs:\n- result-1.json (verdict: APPROVED | REJECT, evidenceRefs: [candidate diff ref, verify result ref])\n- report-1.md (reviewer findings and evaluation)\nResult artifact:\n- This operation is read-only: change nothing in the workspace. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only.\n- Write structured JSON to /runs/r1/outbox/result-1.json\n  \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a required non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidenceRefs\" must be an array of non-empty strings if provided\n  \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n  \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n  Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n  \"assessment.verdict\" is required for this assessment role and must be one of: pass | findings | blocked | inconclusive | not-applicable\n- Also write a human-readable report to /runs/r1/outbox/report-1.md -- REQUIRED for this read-only operation: write one sentence stating what was answered or done; a \"done\" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-contract.v1\n- Mutation: read-only\n- Claim path: /runs/r1/outbox/result-1.json\n- Timeout: 5400000ms\n- Write scope: none in the workspace (read-only); your result files are still required\n- Permission enforcement: enforced"
+      }
+    },
+    {
+      "name": "inline-with-contract",
+      "assignment": {
+        "assignmentId": "asgn_tsk_9_op_001",
+        "workId": "tsk-9",
+        "role": "researcher",
+        "dispatch": "assignment",
+        "objective": "investigate x",
+        "contextRefs": [
+          "a.md"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "expectedFiles": [],
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "createdBy": "me",
+        "provenance": {
+          "kind": "inline",
+          "contractPolicyVersion": "1",
+          "normalizerVersion": "1",
+          "validators": [
+            "execution-contract-schema"
+          ],
+          "inline": {
+            "contract": {
+              "objective": "investigate x",
+              "contextRefs": [
+                "a.md"
+              ],
+              "constraints": [
+                "no network"
+              ],
+              "expectedOutputs": [
+                "report"
+              ],
+              "mutation": "read-only",
+              "evidence": {
+                "required": "reported"
+              },
+              "role": "researcher",
+              "capabilities": [
+                "read"
+              ],
+              "budget": {
+                "timeoutMs": 120000,
+                "maxRuns": 1
+              }
+            },
+            "caller": {
+              "writerId": "wr.1"
+            }
+          }
+        },
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        }
+      },
+      "options": {
+        "runDir": "/runs/r1",
+        "effectiveContract": {
+          "contract": {
+            "id": "effective-execution-contract",
+            "version": 1
+          },
+          "mutation": "mutating",
+          "resultClaim": {
+            "path": "/runs/r1/outbox/result-1.json"
+          },
+          "limits": {
+            "executorTimeoutMs": 5400000
+          },
+          "workspace": {
+            "writeScope": [
+              "/wt"
+            ]
+          },
+          "enforcementPosture": "enforced"
+        }
+      },
+      "result": {
+        "ok": "Assignment: asgn_tsk_9_op_001\nWork: tsk-9\nRole: researcher\nObjective: investigate x\nContext refs:\n- a.md\nExpected outputs:\n- report\nResult artifact:\n- This operation is read-only: change nothing in the workspace. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only.\n- Write structured JSON to /runs/r1/outbox/result-1.json\n  \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a required non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidenceRefs\" must be an array of non-empty strings if provided\n  \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n  \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n  Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- Also write a human-readable report to /runs/r1/outbox/report-1.md -- REQUIRED for this read-only operation: write one sentence stating what was answered or done; a \"done\" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-contract.v1\n- Mutation: mutating\n- Claim path: /runs/r1/outbox/result-1.json\n- Timeout: 5400000ms\n- Write scope: /wt\n- Permission enforcement: enforced"
+      }
+    },
+    {
+      "name": "declared-with-task-spec-root",
+      "assignment": {
+        "assignmentId": "asgn_tsk_1_implement_item_001",
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "stage": "implementation",
+        "operation": "implement-item",
+        "role": "implementer",
+        "dispatch": "unit",
+        "taskSpec": "implement-item",
+        "skills": [],
+        "objective": "do it",
+        "contextRefs": [
+          "a.md"
+        ],
+        "expectedOutputs": [
+          "out"
+        ],
+        "expectedFiles": [
+          "src/a.mjs"
+        ],
+        "policy": {
+          "model": "m",
+          "tier": "advanced",
+          "_fromYaml": true
+        },
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "createdBy": "tester",
+        "provenance": {
+          "kind": "declared",
+          "contractPolicyVersion": "1",
+          "normalizerVersion": "1",
+          "validators": [
+            "workflow-step-legality"
+          ],
+          "declared": {
+            "domain": "coding",
+            "workflow": "feature",
+            "stage": "implementation",
+            "operation": "implement-item",
+            "taskSpec": "implement-item",
+            "legalOperations": [
+              "validate-plan",
+              "implement-item",
+              "review-item",
+              "no-spec"
+            ]
+          }
+        },
+        "mutation": "mutating",
+        "evidence": {
+          "required": "verified"
+        },
+        "resultKind": "work-product"
+      },
+      "options": {
+        "cwd": "/proj"
+      },
+      "result": {
+        "ok": "Assignment: asgn_tsk_1_implement_item_001\nWork: tsk-1\nStage operation: implementation.implement-item\nRole: implementer\nTask-spec: /proj/domains/coding/task-specs/implement-item.md\nObjective: do it\nContext refs:\n- a.md\nExpected outputs:\n- out"
+      }
+    },
+    {
+      "name": "unit-writer-carrying-operation-plain",
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-a",
+        "role": "implementer",
+        "posture": {
+          "verdict": false
+        },
+        "round": 1,
+        "workId": "w-1",
+        "title": "T",
+        "domain": "coding",
+        "workflow": "feature",
+        "stage": "implementation",
+        "operation": "implement-item",
+        "dispatch": "assignment",
+        "taskSpec": "implement-item",
+        "skills": [
+          "s"
+        ],
+        "evidence": {
+          "required": "verified"
+        },
+        "resultKind": "work-product",
+        "objective": "obj",
+        "mutation": "mutating",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "code-reviewer",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-a",
+          "role": "producer",
+          "posture": {
+            "verdict": false
+          },
+          "round": 1,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "code-reviewer",
+            "model": "m"
+          },
+          "declared": {
+            "domain": "coding",
+            "stage": "implementation",
+            "operation": "implement-item",
+            "taskSpec": "implement-item",
+            "legalOperations": [
+              "implement-item"
+            ]
+          }
+        },
+        "expectedOutputs": [
+          "x"
+        ],
+        "contextRefs": [
+          "c.md"
+        ],
+        "writes": [
+          "src/**"
+        ],
+        "syncConflicts": [
+          "a.mjs"
+        ],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "code-reviewer",
+          "rigor": "high",
+          "personaPin": {
+            "name": "code-reviewer",
+            "text": "pinned"
+          }
+        }
+      },
+      "options": {},
+      "result": {
+        "ok": "Assignment: asgn_u_001\nWork: w-1\nStage operation: implementation.implement-item\nRole: implementer\nTask-spec: domains/coding/task-specs/implement-item.md\nObjective: obj\nContext refs:\n- c.md\nExpected outputs:\n- x\nWrite scope:\n- Write only files inside this scope (repo-relative):\n  - src/**\n- Do not run `git add` or `git commit`, even if the task above asks you to: the runner commits after the round passes, and only the files inside the scope.\n- The first line of \"summary\" is the commit subject, in conventional form: `type(scope): ...`.\n- Need to write a file outside the scope? Do not write it: list it in \"needsWrites\": [<path>, ...] in your result claim and say why in \"summary\".\n- Your result files (the claim and its report, named below) are the exception: they sit outside the workspace, writing them is required, and they never go in \"needsWrites\"."
+      }
+    },
+    {
+      "name": "unit-writer-carrying-operation-run-dir-contract",
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-a",
+        "role": "implementer",
+        "posture": {
+          "verdict": false
+        },
+        "round": 1,
+        "workId": "w-1",
+        "title": "T",
+        "domain": "coding",
+        "workflow": "feature",
+        "stage": "implementation",
+        "operation": "implement-item",
+        "dispatch": "assignment",
+        "taskSpec": "implement-item",
+        "skills": [
+          "s"
+        ],
+        "evidence": {
+          "required": "verified"
+        },
+        "resultKind": "work-product",
+        "objective": "obj",
+        "mutation": "mutating",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "code-reviewer",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-a",
+          "role": "producer",
+          "posture": {
+            "verdict": false
+          },
+          "round": 1,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "code-reviewer",
+            "model": "m"
+          },
+          "declared": {
+            "domain": "coding",
+            "stage": "implementation",
+            "operation": "implement-item",
+            "taskSpec": "implement-item",
+            "legalOperations": [
+              "implement-item"
+            ]
+          }
+        },
+        "expectedOutputs": [
+          "x"
+        ],
+        "contextRefs": [
+          "c.md"
+        ],
+        "writes": [
+          "src/**"
+        ],
+        "syncConflicts": [
+          "a.mjs"
+        ],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "code-reviewer",
+          "rigor": "high",
+          "personaPin": {
+            "name": "code-reviewer",
+            "text": "pinned"
+          }
+        }
+      },
+      "options": {
+        "runDir": "/runs/u1",
+        "effectiveContract": {
+          "contract": {
+            "id": "effective-execution-contract",
+            "version": 1
+          },
+          "mutation": "mutating",
+          "resultClaim": {
+            "path": "/runs/r1/outbox/result-1.json"
+          },
+          "limits": {
+            "executorTimeoutMs": 5400000
+          },
+          "workspace": {
+            "writeScope": [
+              "/wt"
+            ]
+          },
+          "enforcementPosture": "enforced"
+        }
+      },
+      "result": {
+        "ok": "Assignment: asgn_u_001\nWork: w-1\nStage operation: implementation.implement-item\nRole: implementer\nTask-spec: domains/coding/task-specs/implement-item.md\nObjective: obj\nContext refs:\n- c.md\nExpected outputs:\n- x\nWrite scope:\n- Write only files inside this scope (repo-relative):\n  - src/**\n- Do not run `git add` or `git commit`, even if the task above asks you to: the runner commits after the round passes, and only the files inside the scope.\n- The first line of \"summary\" is the commit subject, in conventional form: `type(scope): ...`.\n- Need to write a file outside the scope? Do not write it: list it in \"needsWrites\": [<path>, ...] in your result claim and say why in \"summary\".\n- Your result files (the claim and its report, named below) are the exception: they sit outside the workspace, writing them is required, and they never go in \"needsWrites\".\nResult artifact:\n- Write structured JSON to /runs/r1/outbox/result-1.json\n  \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a required non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidenceRefs\" must be an array of non-empty strings if provided\n  \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n  \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n  Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- Optional human-readable report: /runs/r1/outbox/report-1.md\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-contract.v1\n- Mutation: mutating\n- Claim path: /runs/r1/outbox/result-1.json\n- Timeout: 5400000ms\n- Write scope: src/** (the workspace mount /wt is wider; write only inside the scope)\n- Permission enforcement: enforced"
+      }
+    },
+    {
+      "name": "unit-writer-carrying-operation-no-writes-contract",
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-a",
+        "role": "implementer",
+        "posture": {
+          "verdict": false
+        },
+        "round": 1,
+        "workId": "w-1",
+        "title": "T",
+        "domain": "coding",
+        "workflow": "feature",
+        "stage": "implementation",
+        "operation": "implement-item",
+        "dispatch": "assignment",
+        "taskSpec": "implement-item",
+        "skills": [
+          "s"
+        ],
+        "evidence": {
+          "required": "verified"
+        },
+        "resultKind": "work-product",
+        "objective": "obj",
+        "mutation": "mutating",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "code-reviewer",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-a",
+          "role": "producer",
+          "posture": {
+            "verdict": false
+          },
+          "round": 1,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "code-reviewer",
+            "model": "m"
+          },
+          "declared": {
+            "domain": "coding",
+            "stage": "implementation",
+            "operation": "implement-item",
+            "taskSpec": "implement-item",
+            "legalOperations": [
+              "implement-item"
+            ]
+          }
+        },
+        "expectedOutputs": [
+          "x"
+        ],
+        "contextRefs": [
+          "c.md"
+        ],
+        "writes": [
+          "src/**"
+        ],
+        "syncConflicts": [
+          "a.mjs"
+        ],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "code-reviewer",
+          "rigor": "high",
+          "personaPin": {
+            "name": "code-reviewer",
+            "text": "pinned"
+          }
+        }
+      },
+      "options": {
+        "runDir": "/runs/u1",
+        "effectiveContract": {
+          "contract": {
+            "id": "effective-execution-contract",
+            "version": 1
+          },
+          "mutation": "mutating",
+          "resultClaim": {
+            "path": "/runs/r1/outbox/result-1.json"
+          },
+          "limits": {
+            "executorTimeoutMs": 5400000
+          },
+          "workspace": {
+            "writeScope": []
+          },
+          "enforcementPosture": "enforced"
+        }
+      },
+      "result": {
+        "ok": "Assignment: asgn_u_001\nWork: w-1\nStage operation: implementation.implement-item\nRole: implementer\nTask-spec: domains/coding/task-specs/implement-item.md\nObjective: obj\nContext refs:\n- c.md\nExpected outputs:\n- x\nWrite scope:\n- Write only files inside this scope (repo-relative):\n  - src/**\n- Do not run `git add` or `git commit`, even if the task above asks you to: the runner commits after the round passes, and only the files inside the scope.\n- The first line of \"summary\" is the commit subject, in conventional form: `type(scope): ...`.\n- Need to write a file outside the scope? Do not write it: list it in \"needsWrites\": [<path>, ...] in your result claim and say why in \"summary\".\n- Your result files (the claim and its report, named below) are the exception: they sit outside the workspace, writing them is required, and they never go in \"needsWrites\".\nResult artifact:\n- Write structured JSON to /runs/r1/outbox/result-1.json\n  \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a required non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidenceRefs\" must be an array of non-empty strings if provided\n  \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n  \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n  Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- Optional human-readable report: /runs/r1/outbox/report-1.md\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-contract.v1\n- Mutation: mutating\n- Claim path: /runs/r1/outbox/result-1.json\n- Timeout: 5400000ms\n- Write scope: none in the workspace (read-only); your result files are still required\n- Permission enforcement: enforced"
+      }
+    },
+    {
+      "name": "unit-reviewer-plain-plain",
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-b",
+        "role": "reviewer",
+        "posture": {
+          "verdict": true
+        },
+        "round": 2,
+        "objective": "review it",
+        "mutation": "read-only",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "code-reviewer",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-b",
+          "role": "reviewer",
+          "posture": {
+            "verdict": true
+          },
+          "round": 2,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "code-reviewer",
+            "model": "m"
+          }
+        },
+        "expectedOutputs": [],
+        "contextRefs": [],
+        "writes": [],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "code-reviewer",
+          "personaPin": {
+            "name": "code-reviewer",
+            "text": "pinned"
+          }
+        }
+      },
+      "options": {},
+      "result": {
+        "ok": "Assignment: asgn_u_001\nWork: (none)\nRole: reviewer\nObjective: review it\nContext refs:\n- (none)\nExpected outputs:\n- (none)"
+      }
+    },
+    {
+      "name": "unit-reviewer-plain-run-dir-contract",
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-b",
+        "role": "reviewer",
+        "posture": {
+          "verdict": true
+        },
+        "round": 2,
+        "objective": "review it",
+        "mutation": "read-only",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "code-reviewer",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-b",
+          "role": "reviewer",
+          "posture": {
+            "verdict": true
+          },
+          "round": 2,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "code-reviewer",
+            "model": "m"
+          }
+        },
+        "expectedOutputs": [],
+        "contextRefs": [],
+        "writes": [],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "code-reviewer",
+          "personaPin": {
+            "name": "code-reviewer",
+            "text": "pinned"
+          }
+        }
+      },
+      "options": {
+        "runDir": "/runs/u1",
+        "effectiveContract": {
+          "contract": {
+            "id": "effective-execution-contract",
+            "version": 1
+          },
+          "mutation": "mutating",
+          "resultClaim": {
+            "path": "/runs/r1/outbox/result-1.json"
+          },
+          "limits": {
+            "executorTimeoutMs": 5400000
+          },
+          "workspace": {
+            "writeScope": [
+              "/wt"
+            ]
+          },
+          "enforcementPosture": "enforced"
+        }
+      },
+      "result": {
+        "ok": "Assignment: asgn_u_001\nWork: (none)\nRole: reviewer\nObjective: review it\nContext refs:\n- (none)\nExpected outputs:\n- (none)\nResult artifact:\n- This operation is read-only: change nothing in the workspace. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only.\n- Write structured JSON to /runs/r1/outbox/result-1.json\n  \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a required non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidenceRefs\" must be an array of non-empty strings if provided\n  \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n  \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n  Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n  \"assessment.verdict\" is required for this assessment role and must be one of: pass | findings | blocked | inconclusive | not-applicable\n- Also write a human-readable report to /runs/r1/outbox/report-1.md -- REQUIRED for this read-only operation: write one sentence stating what was answered or done; a \"done\" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-contract.v1\n- Mutation: mutating\n- Claim path: /runs/r1/outbox/result-1.json\n- Timeout: 5400000ms\n- Write scope: /wt\n- Permission enforcement: enforced"
+      }
+    },
+    {
+      "name": "unit-reviewer-plain-no-writes-contract",
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-b",
+        "role": "reviewer",
+        "posture": {
+          "verdict": true
+        },
+        "round": 2,
+        "objective": "review it",
+        "mutation": "read-only",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "code-reviewer",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-b",
+          "role": "reviewer",
+          "posture": {
+            "verdict": true
+          },
+          "round": 2,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "code-reviewer",
+            "model": "m"
+          }
+        },
+        "expectedOutputs": [],
+        "contextRefs": [],
+        "writes": [],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "code-reviewer",
+          "personaPin": {
+            "name": "code-reviewer",
+            "text": "pinned"
+          }
+        }
+      },
+      "options": {
+        "runDir": "/runs/u1",
+        "effectiveContract": {
+          "contract": {
+            "id": "effective-execution-contract",
+            "version": 1
+          },
+          "mutation": "mutating",
+          "resultClaim": {
+            "path": "/runs/r1/outbox/result-1.json"
+          },
+          "limits": {
+            "executorTimeoutMs": 5400000
+          },
+          "workspace": {
+            "writeScope": []
+          },
+          "enforcementPosture": "enforced"
+        }
+      },
+      "result": {
+        "ok": "Assignment: asgn_u_001\nWork: (none)\nRole: reviewer\nObjective: review it\nContext refs:\n- (none)\nExpected outputs:\n- (none)\nResult artifact:\n- This operation is read-only: change nothing in the workspace. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only.\n- Write structured JSON to /runs/r1/outbox/result-1.json\n  \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a required non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidenceRefs\" must be an array of non-empty strings if provided\n  \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n  \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n  Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n  \"assessment.verdict\" is required for this assessment role and must be one of: pass | findings | blocked | inconclusive | not-applicable\n- Also write a human-readable report to /runs/r1/outbox/report-1.md -- REQUIRED for this read-only operation: write one sentence stating what was answered or done; a \"done\" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-contract.v1\n- Mutation: mutating\n- Claim path: /runs/r1/outbox/result-1.json\n- Timeout: 5400000ms\n- Write scope: none in the workspace (read-only); your result files are still required\n- Permission enforcement: enforced"
+      }
+    },
+    {
+      "name": "unit-override-persona-pin-plain",
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-b",
+        "role": "reviewer",
+        "posture": {},
+        "round": 1,
+        "objective": "o",
+        "mutation": "read-only",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "p2",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-b",
+          "role": "reviewer",
+          "posture": {},
+          "round": 1,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "p2",
+            "model": "m"
+          }
+        },
+        "expectedOutputs": [],
+        "contextRefs": [],
+        "writes": [],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "p2",
+          "personaPin": {
+            "name": "p2",
+            "text": "q"
+          }
+        }
+      },
+      "options": {},
+      "result": {
+        "ok": "Assignment: asgn_u_001\nWork: (none)\nRole: reviewer\nObjective: o\nContext refs:\n- (none)\nExpected outputs:\n- (none)"
+      }
+    },
+    {
+      "name": "unit-override-persona-pin-run-dir-contract",
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-b",
+        "role": "reviewer",
+        "posture": {},
+        "round": 1,
+        "objective": "o",
+        "mutation": "read-only",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "p2",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-b",
+          "role": "reviewer",
+          "posture": {},
+          "round": 1,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "p2",
+            "model": "m"
+          }
+        },
+        "expectedOutputs": [],
+        "contextRefs": [],
+        "writes": [],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "p2",
+          "personaPin": {
+            "name": "p2",
+            "text": "q"
+          }
+        }
+      },
+      "options": {
+        "runDir": "/runs/u1",
+        "effectiveContract": {
+          "contract": {
+            "id": "effective-execution-contract",
+            "version": 1
+          },
+          "mutation": "mutating",
+          "resultClaim": {
+            "path": "/runs/r1/outbox/result-1.json"
+          },
+          "limits": {
+            "executorTimeoutMs": 5400000
+          },
+          "workspace": {
+            "writeScope": [
+              "/wt"
+            ]
+          },
+          "enforcementPosture": "enforced"
+        }
+      },
+      "result": {
+        "ok": "Assignment: asgn_u_001\nWork: (none)\nRole: reviewer\nObjective: o\nContext refs:\n- (none)\nExpected outputs:\n- (none)\nResult artifact:\n- This operation is read-only: change nothing in the workspace. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only.\n- Write structured JSON to /runs/r1/outbox/result-1.json\n  \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a required non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidenceRefs\" must be an array of non-empty strings if provided\n  \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n  \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n  Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- Also write a human-readable report to /runs/r1/outbox/report-1.md -- REQUIRED for this read-only operation: write one sentence stating what was answered or done; a \"done\" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-contract.v1\n- Mutation: mutating\n- Claim path: /runs/r1/outbox/result-1.json\n- Timeout: 5400000ms\n- Write scope: /wt\n- Permission enforcement: enforced"
+      }
+    },
+    {
+      "name": "unit-override-persona-pin-no-writes-contract",
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-b",
+        "role": "reviewer",
+        "posture": {},
+        "round": 1,
+        "objective": "o",
+        "mutation": "read-only",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "p2",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-b",
+          "role": "reviewer",
+          "posture": {},
+          "round": 1,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "p2",
+            "model": "m"
+          }
+        },
+        "expectedOutputs": [],
+        "contextRefs": [],
+        "writes": [],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "p2",
+          "personaPin": {
+            "name": "p2",
+            "text": "q"
+          }
+        }
+      },
+      "options": {
+        "runDir": "/runs/u1",
+        "effectiveContract": {
+          "contract": {
+            "id": "effective-execution-contract",
+            "version": 1
+          },
+          "mutation": "mutating",
+          "resultClaim": {
+            "path": "/runs/r1/outbox/result-1.json"
+          },
+          "limits": {
+            "executorTimeoutMs": 5400000
+          },
+          "workspace": {
+            "writeScope": []
+          },
+          "enforcementPosture": "enforced"
+        }
+      },
+      "result": {
+        "ok": "Assignment: asgn_u_001\nWork: (none)\nRole: reviewer\nObjective: o\nContext refs:\n- (none)\nExpected outputs:\n- (none)\nResult artifact:\n- This operation is read-only: change nothing in the workspace. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only.\n- Write structured JSON to /runs/r1/outbox/result-1.json\n  \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a required non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidenceRefs\" must be an array of non-empty strings if provided\n  \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n  \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n  Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- Also write a human-readable report to /runs/r1/outbox/report-1.md -- REQUIRED for this read-only operation: write one sentence stating what was answered or done; a \"done\" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-contract.v1\n- Mutation: mutating\n- Claim path: /runs/r1/outbox/result-1.json\n- Timeout: 5400000ms\n- Write scope: none in the workspace (read-only); your result files are still required\n- Permission enforcement: enforced"
+      }
+    },
+    {
+      "name": "unit-persona-pin-mismatch-plain",
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-c",
+        "role": "reviewer",
+        "posture": {},
+        "round": 1,
+        "objective": "o",
+        "mutation": "read-only",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "other",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-c",
+          "role": "reviewer",
+          "posture": {},
+          "round": 1,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "other",
+            "model": "m"
+          }
+        },
+        "expectedOutputs": [],
+        "contextRefs": [],
+        "writes": [],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "other"
+        }
+      },
+      "options": {},
+      "result": {
+        "ok": "Assignment: asgn_u_001\nWork: (none)\nRole: reviewer\nObjective: o\nContext refs:\n- (none)\nExpected outputs:\n- (none)"
+      }
+    },
+    {
+      "name": "unit-persona-pin-mismatch-run-dir-contract",
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-c",
+        "role": "reviewer",
+        "posture": {},
+        "round": 1,
+        "objective": "o",
+        "mutation": "read-only",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "other",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-c",
+          "role": "reviewer",
+          "posture": {},
+          "round": 1,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "other",
+            "model": "m"
+          }
+        },
+        "expectedOutputs": [],
+        "contextRefs": [],
+        "writes": [],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "other"
+        }
+      },
+      "options": {
+        "runDir": "/runs/u1",
+        "effectiveContract": {
+          "contract": {
+            "id": "effective-execution-contract",
+            "version": 1
+          },
+          "mutation": "mutating",
+          "resultClaim": {
+            "path": "/runs/r1/outbox/result-1.json"
+          },
+          "limits": {
+            "executorTimeoutMs": 5400000
+          },
+          "workspace": {
+            "writeScope": [
+              "/wt"
+            ]
+          },
+          "enforcementPosture": "enforced"
+        }
+      },
+      "result": {
+        "ok": "Assignment: asgn_u_001\nWork: (none)\nRole: reviewer\nObjective: o\nContext refs:\n- (none)\nExpected outputs:\n- (none)\nResult artifact:\n- This operation is read-only: change nothing in the workspace. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only.\n- Write structured JSON to /runs/r1/outbox/result-1.json\n  \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a required non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidenceRefs\" must be an array of non-empty strings if provided\n  \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n  \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n  Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- Also write a human-readable report to /runs/r1/outbox/report-1.md -- REQUIRED for this read-only operation: write one sentence stating what was answered or done; a \"done\" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-contract.v1\n- Mutation: mutating\n- Claim path: /runs/r1/outbox/result-1.json\n- Timeout: 5400000ms\n- Write scope: /wt\n- Permission enforcement: enforced"
+      }
+    },
+    {
+      "name": "unit-persona-pin-mismatch-no-writes-contract",
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-c",
+        "role": "reviewer",
+        "posture": {},
+        "round": 1,
+        "objective": "o",
+        "mutation": "read-only",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "other",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-c",
+          "role": "reviewer",
+          "posture": {},
+          "round": 1,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "other",
+            "model": "m"
+          }
+        },
+        "expectedOutputs": [],
+        "contextRefs": [],
+        "writes": [],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "other"
+        }
+      },
+      "options": {
+        "runDir": "/runs/u1",
+        "effectiveContract": {
+          "contract": {
+            "id": "effective-execution-contract",
+            "version": 1
+          },
+          "mutation": "mutating",
+          "resultClaim": {
+            "path": "/runs/r1/outbox/result-1.json"
+          },
+          "limits": {
+            "executorTimeoutMs": 5400000
+          },
+          "workspace": {
+            "writeScope": []
+          },
+          "enforcementPosture": "enforced"
+        }
+      },
+      "result": {
+        "ok": "Assignment: asgn_u_001\nWork: (none)\nRole: reviewer\nObjective: o\nContext refs:\n- (none)\nExpected outputs:\n- (none)\nResult artifact:\n- This operation is read-only: change nothing in the workspace. Your result files are the exception: they sit outside the workspace and writing them is required, not a breach of read-only.\n- Write structured JSON to /runs/r1/outbox/result-1.json\n  \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a required non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidenceRefs\" must be an array of non-empty strings if provided\n  \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n  \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n  Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- Also write a human-readable report to /runs/r1/outbox/report-1.md -- REQUIRED for this read-only operation: write one sentence stating what was answered or done; a \"done\" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-contract.v1\n- Mutation: mutating\n- Claim path: /runs/r1/outbox/result-1.json\n- Timeout: 5400000ms\n- Write scope: none in the workspace (read-only); your result files are still required\n- Permission enforcement: enforced"
+      }
+    }
+  ],
+  "readOnly": [
+    {
+      "assignment": {
+        "assignmentId": "asgn_tsk_1_review_item_001",
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "stage": "review",
+        "operation": "review-item",
+        "role": "reviewer",
+        "dispatch": "assignment",
+        "taskSpec": "review-item.md",
+        "skills": [],
+        "objective": "Execute review.review-item operation",
+        "contextRefs": [],
+        "expectedOutputs": [
+          "result-1.json (verdict: APPROVED | REJECT, evidenceRefs: [candidate diff ref, verify result ref])",
+          "report-1.md (reviewer findings and evaluation)"
+        ],
+        "expectedFiles": [],
+        "reason": "second-look",
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "provenance": {
+          "kind": "declared",
+          "contractPolicyVersion": "1",
+          "normalizerVersion": "1",
+          "validators": [
+            "workflow-step-legality"
+          ],
+          "declared": {
+            "domain": "coding",
+            "workflow": "feature",
+            "stage": "review",
+            "operation": "review-item",
+            "taskSpec": "review-item.md",
+            "legalOperations": [
+              "validate-plan",
+              "implement-item",
+              "review-item",
+              "no-spec"
+            ]
+          }
+        },
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "resultKind": "review-verdict"
+      },
+      "readOnly": true
+    },
+    {
+      "assignment": {
+        "assignmentId": "asgn_tsk_9_op_001",
+        "workId": "tsk-9",
+        "role": "researcher",
+        "dispatch": "assignment",
+        "objective": "investigate x",
+        "contextRefs": [
+          "a.md"
+        ],
+        "expectedOutputs": [
+          "report"
+        ],
+        "expectedFiles": [],
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "createdBy": "me",
+        "provenance": {
+          "kind": "inline",
+          "contractPolicyVersion": "1",
+          "normalizerVersion": "1",
+          "validators": [
+            "execution-contract-schema"
+          ],
+          "inline": {
+            "contract": {
+              "objective": "investigate x",
+              "contextRefs": [
+                "a.md"
+              ],
+              "constraints": [
+                "no network"
+              ],
+              "expectedOutputs": [
+                "report"
+              ],
+              "mutation": "read-only",
+              "evidence": {
+                "required": "reported"
+              },
+              "role": "researcher",
+              "capabilities": [
+                "read"
+              ],
+              "budget": {
+                "timeoutMs": 120000,
+                "maxRuns": 1
+              }
+            },
+            "caller": {
+              "writerId": "wr.1"
+            }
+          }
+        },
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        }
+      },
+      "readOnly": true
+    },
+    {
+      "assignment": {
+        "assignmentId": "asgn_tsk_1_implement_item_001",
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "stage": "implementation",
+        "operation": "implement-item",
+        "role": "implementer",
+        "dispatch": "unit",
+        "taskSpec": "implement-item",
+        "skills": [],
+        "objective": "do it",
+        "contextRefs": [
+          "a.md"
+        ],
+        "expectedOutputs": [
+          "out"
+        ],
+        "expectedFiles": [
+          "src/a.mjs"
+        ],
+        "policy": {
+          "model": "m",
+          "tier": "advanced",
+          "_fromYaml": true
+        },
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "createdBy": "tester",
+        "provenance": {
+          "kind": "declared",
+          "contractPolicyVersion": "1",
+          "normalizerVersion": "1",
+          "validators": [
+            "workflow-step-legality"
+          ],
+          "declared": {
+            "domain": "coding",
+            "workflow": "feature",
+            "stage": "implementation",
+            "operation": "implement-item",
+            "taskSpec": "implement-item",
+            "legalOperations": [
+              "validate-plan",
+              "implement-item",
+              "review-item",
+              "no-spec"
+            ]
+          }
+        },
+        "mutation": "mutating",
+        "evidence": {
+          "required": "verified"
+        },
+        "resultKind": "work-product"
+      },
+      "readOnly": false
+    },
+    {
+      "assignment": null,
+      "readOnly": false
+    },
+    {
+      "assignment": "text",
+      "readOnly": false
+    },
+    {
+      "assignment": {},
+      "readOnly": false
+    },
+    {
+      "assignment": {
+        "mutation": "read-only"
+      },
+      "readOnly": true
+    },
+    {
+      "assignment": {
+        "mutation": "mutating"
+      },
+      "readOnly": false
+    }
+  ],
+  "unitRun": [
+    {
+      "name": "writer-carrying-operation",
+      "ctx": {
+        "unitRecord": {
+          "declared": {
+            "workId": "w-1",
+            "title": "T"
+          },
+          "sync": {
+            "status": "conflicted",
+            "conflicts": [
+              "a.mjs"
+            ]
+          },
+          "personaPin": {
+            "name": "code-reviewer",
+            "text": "pinned"
+          },
+          "overrides": [
+            {
+              "scope": {
+                "seat": "seat-b"
+              },
+              "persona": "p2",
+              "personaPin": {
+                "name": "p2",
+                "text": "q"
+              }
+            }
+          ]
+        },
+        "declaredOp": {
+          "role": "implementer",
+          "domain": "coding",
+          "workflow": "feature",
+          "stage": "implementation",
+          "operation": "implement-item",
+          "dispatch": "assignment",
+          "taskSpec": "implement-item",
+          "skills": [
+            "s"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "resultKind": "work-product",
+          "declared": {
+            "domain": "coding",
+            "stage": "implementation",
+            "operation": "implement-item",
+            "taskSpec": "implement-item",
+            "legalOperations": [
+              "implement-item"
+            ]
+          }
+        },
+        "unit": {
+          "expectedOutputs": [
+            "x"
+          ],
+          "rigor": "high"
+        },
+        "unitRunId": "unit-run-1"
+      },
+      "role": {
+        "seat": {
+          "seat": "seat-a",
+          "role": "producer",
+          "posture": {
+            "verdict": false
+          }
+        },
+        "round": 1,
+        "readOnly": false
+      },
+      "extra": {
+        "bound": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "code-reviewer",
+          "model": "m"
+        },
+        "assignmentId": "asgn_u_001",
+        "carriesOperation": true,
+        "writes": [
+          "src/**"
+        ],
+        "contextRefs": [
+          "c.md"
+        ],
+        "objective": "obj"
+      },
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-a",
+        "role": "implementer",
+        "posture": {
+          "verdict": false
+        },
+        "round": 1,
+        "workId": "w-1",
+        "title": "T",
+        "domain": "coding",
+        "workflow": "feature",
+        "stage": "implementation",
+        "operation": "implement-item",
+        "dispatch": "assignment",
+        "taskSpec": "implement-item",
+        "skills": [
+          "s"
+        ],
+        "evidence": {
+          "required": "verified"
+        },
+        "resultKind": "work-product",
+        "objective": "obj",
+        "mutation": "mutating",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "code-reviewer",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-a",
+          "role": "producer",
+          "posture": {
+            "verdict": false
+          },
+          "round": 1,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "code-reviewer",
+            "model": "m"
+          },
+          "declared": {
+            "domain": "coding",
+            "stage": "implementation",
+            "operation": "implement-item",
+            "taskSpec": "implement-item",
+            "legalOperations": [
+              "implement-item"
+            ]
+          }
+        },
+        "expectedOutputs": [
+          "x"
+        ],
+        "contextRefs": [
+          "c.md"
+        ],
+        "writes": [
+          "src/**"
+        ],
+        "syncConflicts": [
+          "a.mjs"
+        ],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "code-reviewer",
+          "rigor": "high",
+          "personaPin": {
+            "name": "code-reviewer",
+            "text": "pinned"
+          }
+        }
+      },
+      "readOnly": false
+    },
+    {
+      "name": "reviewer-plain",
+      "ctx": {
+        "unitRecord": {
+          "declared": {
+            "workId": "w-1",
+            "title": "T"
+          },
+          "sync": {
+            "status": "conflicted",
+            "conflicts": [
+              "a.mjs"
+            ]
+          },
+          "personaPin": {
+            "name": "code-reviewer",
+            "text": "pinned"
+          },
+          "overrides": [
+            {
+              "scope": {
+                "seat": "seat-b"
+              },
+              "persona": "p2",
+              "personaPin": {
+                "name": "p2",
+                "text": "q"
+              }
+            }
+          ]
+        },
+        "declaredOp": {
+          "role": "implementer",
+          "domain": "coding",
+          "workflow": "feature",
+          "stage": "implementation",
+          "operation": "implement-item",
+          "dispatch": "assignment",
+          "taskSpec": "implement-item",
+          "skills": [
+            "s"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "resultKind": "work-product",
+          "declared": {
+            "domain": "coding",
+            "stage": "implementation",
+            "operation": "implement-item",
+            "taskSpec": "implement-item",
+            "legalOperations": [
+              "implement-item"
+            ]
+          }
+        },
+        "unit": {},
+        "unitRunId": "unit-run-1"
+      },
+      "role": {
+        "seat": {
+          "seat": "seat-b",
+          "role": "reviewer",
+          "posture": {
+            "verdict": true
+          }
+        },
+        "round": 2,
+        "readOnly": true
+      },
+      "extra": {
+        "bound": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "code-reviewer",
+          "model": "m"
+        },
+        "assignmentId": "asgn_u_001",
+        "carriesOperation": false,
+        "writes": [],
+        "contextRefs": [],
+        "objective": "review it"
+      },
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-b",
+        "role": "reviewer",
+        "posture": {
+          "verdict": true
+        },
+        "round": 2,
+        "objective": "review it",
+        "mutation": "read-only",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "code-reviewer",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-b",
+          "role": "reviewer",
+          "posture": {
+            "verdict": true
+          },
+          "round": 2,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "code-reviewer",
+            "model": "m"
+          }
+        },
+        "expectedOutputs": [],
+        "contextRefs": [],
+        "writes": [],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "code-reviewer",
+          "personaPin": {
+            "name": "code-reviewer",
+            "text": "pinned"
+          }
+        }
+      },
+      "readOnly": true
+    },
+    {
+      "name": "override-persona-pin",
+      "ctx": {
+        "unitRecord": {
+          "declared": {
+            "workId": "w-1",
+            "title": "T"
+          },
+          "sync": {
+            "status": "conflicted",
+            "conflicts": [
+              "a.mjs"
+            ]
+          },
+          "personaPin": {
+            "name": "code-reviewer",
+            "text": "pinned"
+          },
+          "overrides": [
+            {
+              "scope": {
+                "seat": "seat-b"
+              },
+              "persona": "p2",
+              "personaPin": {
+                "name": "p2",
+                "text": "q"
+              }
+            }
+          ]
+        },
+        "declaredOp": {
+          "role": "implementer",
+          "domain": "coding",
+          "workflow": "feature",
+          "stage": "implementation",
+          "operation": "implement-item",
+          "dispatch": "assignment",
+          "taskSpec": "implement-item",
+          "skills": [
+            "s"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "resultKind": "work-product",
+          "declared": {
+            "domain": "coding",
+            "stage": "implementation",
+            "operation": "implement-item",
+            "taskSpec": "implement-item",
+            "legalOperations": [
+              "implement-item"
+            ]
+          }
+        },
+        "unit": {},
+        "unitRunId": "unit-run-1"
+      },
+      "role": {
+        "seat": {
+          "seat": "seat-b",
+          "role": "reviewer",
+          "posture": {}
+        },
+        "round": 1,
+        "readOnly": true
+      },
+      "extra": {
+        "bound": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "p2",
+          "model": "m"
+        },
+        "assignmentId": "asgn_u_001",
+        "carriesOperation": false,
+        "writes": [],
+        "contextRefs": [],
+        "objective": "o"
+      },
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-b",
+        "role": "reviewer",
+        "posture": {},
+        "round": 1,
+        "objective": "o",
+        "mutation": "read-only",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "p2",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-b",
+          "role": "reviewer",
+          "posture": {},
+          "round": 1,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "p2",
+            "model": "m"
+          }
+        },
+        "expectedOutputs": [],
+        "contextRefs": [],
+        "writes": [],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "p2",
+          "personaPin": {
+            "name": "p2",
+            "text": "q"
+          }
+        }
+      },
+      "readOnly": true
+    },
+    {
+      "name": "persona-pin-mismatch",
+      "ctx": {
+        "unitRecord": {
+          "declared": {
+            "workId": "w-1",
+            "title": "T"
+          },
+          "sync": {
+            "status": "conflicted",
+            "conflicts": [
+              "a.mjs"
+            ]
+          },
+          "personaPin": {
+            "name": "code-reviewer",
+            "text": "pinned"
+          },
+          "overrides": [
+            {
+              "scope": {
+                "seat": "seat-b"
+              },
+              "persona": "p2",
+              "personaPin": {
+                "name": "p2",
+                "text": "q"
+              }
+            }
+          ]
+        },
+        "declaredOp": {
+          "role": "implementer",
+          "domain": "coding",
+          "workflow": "feature",
+          "stage": "implementation",
+          "operation": "implement-item",
+          "dispatch": "assignment",
+          "taskSpec": "implement-item",
+          "skills": [
+            "s"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "resultKind": "work-product",
+          "declared": {
+            "domain": "coding",
+            "stage": "implementation",
+            "operation": "implement-item",
+            "taskSpec": "implement-item",
+            "legalOperations": [
+              "implement-item"
+            ]
+          }
+        },
+        "unit": {},
+        "unitRunId": "unit-run-1"
+      },
+      "role": {
+        "seat": {
+          "seat": "seat-c",
+          "role": "reviewer",
+          "posture": {}
+        },
+        "round": 1,
+        "readOnly": true
+      },
+      "extra": {
+        "bound": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "other",
+          "model": "m"
+        },
+        "assignmentId": "asgn_u_001",
+        "carriesOperation": false,
+        "writes": [],
+        "contextRefs": [],
+        "objective": "o"
+      },
+      "assignment": {
+        "assignmentId": "asgn_u_001",
+        "unitRunId": "unit-run-1",
+        "seat": "seat-c",
+        "role": "reviewer",
+        "posture": {},
+        "round": 1,
+        "objective": "o",
+        "mutation": "read-only",
+        "binding": {
+          "tier": "standard",
+          "executor": "codex-cli",
+          "invocation": "cli",
+          "persona": "other",
+          "model": "m"
+        },
+        "provenance": {
+          "kind": "unit-run",
+          "unitRunId": "unit-run-1",
+          "seat": "seat-c",
+          "role": "reviewer",
+          "posture": {},
+          "round": 1,
+          "binding": {
+            "tier": "standard",
+            "executor": "codex-cli",
+            "invocation": "cli",
+            "persona": "other",
+            "model": "m"
+          }
+        },
+        "expectedOutputs": [],
+        "contextRefs": [],
+        "writes": [],
+        "policy": {
+          "tier": "standard",
+          "preferExecutor": "codex-cli",
+          "preferInvocation": "cli",
+          "preferPersona": "other"
+        }
+      },
+      "readOnly": true
+    }
+  ]
+}

@@ -1,0 +1,1831 @@
+{
+  "ids": [
+    {
+      "label": "first",
+      "input": {
+        "workId": "tsk-abc",
+        "operation": "validate-plan",
+        "existingIds": []
+      },
+      "existingDirs": [],
+      "id": "asgn_tsk_abc_validate_plan_001"
+    },
+    {
+      "label": "second-after-dirs",
+      "input": {
+        "workId": "tsk-abc",
+        "operation": "validate-plan",
+        "existingIds": []
+      },
+      "existingDirs": [
+        "asgn_tsk_abc_validate_plan_001",
+        "asgn_tsk_abc_validate_plan_002"
+      ],
+      "id": "asgn_tsk_abc_validate_plan_001"
+    },
+    {
+      "label": "sanitized-and-gap",
+      "input": {
+        "workId": "Tsk.ABC",
+        "operation": "Validate Plan",
+        "existingIds": []
+      },
+      "existingDirs": [
+        "asgn_tsk_abc_validate_plan_009"
+      ],
+      "id": "asgn_tsk_abc_validate_plan_003"
+    },
+    {
+      "label": "writer-fallback",
+      "input": {
+        "caller": {
+          "writerId": "wr.1"
+        },
+        "operation": "x",
+        "existingIds": []
+      },
+      "existingDirs": [],
+      "id": "asgn_wr_1_x_001"
+    },
+    {
+      "label": "nowork",
+      "input": {
+        "operation": "x",
+        "existingIds": []
+      },
+      "existingDirs": [],
+      "id": "asgn_nowork_x_001"
+    },
+    {
+      "label": "stage-as-op",
+      "input": {
+        "workId": "w",
+        "stage": "planning",
+        "existingIds": []
+      },
+      "existingDirs": [],
+      "id": "asgn_w_planning_001"
+    },
+    {
+      "label": "op-literal",
+      "input": {
+        "workId": "w",
+        "existingIds": []
+      },
+      "existingDirs": [],
+      "id": "asgn_w_op_001"
+    },
+    {
+      "label": "existing-ids",
+      "input": {
+        "workId": "w",
+        "operation": "o",
+        "existingIds": [
+          "asgn_w_o_041",
+          "asgn_w_o_x"
+        ]
+      },
+      "existingDirs": [],
+      "id": "asgn_w_o_042"
+    },
+    {
+      "label": "parse-int-prefix",
+      "input": {
+        "workId": "w",
+        "operation": "o",
+        "existingIds": [
+          "asgn_w_o_7abc"
+        ]
+      },
+      "existingDirs": [],
+      "id": "asgn_w_o_008"
+    }
+  ],
+  "declared": [
+    {
+      "name": "validate-plan-defaults",
+      "input": {
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "stage": "planning",
+        "operation": "validate-plan"
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "ok": {
+          "assignmentId": "asgn_tsk_1_validate_plan_001",
+          "workId": "tsk-1",
+          "domain": "coding",
+          "workflow": "feature",
+          "stage": "planning",
+          "operation": "validate-plan",
+          "role": "reviewer",
+          "dispatch": "assignment",
+          "taskSpec": "validate-plan",
+          "skills": [
+            "s1"
+          ],
+          "objective": "Execute planning.validate-plan operation",
+          "contractTemplate": "validate-plan-v1",
+          "contextRefs": [],
+          "expectedOutputs": [
+            "result-1.json (verdict: READY | NOT READY | READY WITH CONSTRAINTS)",
+            "report-1.md (reviewer findings and evaluation)"
+          ],
+          "expectedFiles": [],
+          "createdAt": "2026-11-19T00:00:00.000Z",
+          "provenance": {
+            "kind": "declared",
+            "contractPolicyVersion": "1",
+            "normalizerVersion": "1",
+            "validators": [
+              "workflow-step-legality"
+            ],
+            "declared": {
+              "domain": "coding",
+              "workflow": "feature",
+              "stage": "planning",
+              "operation": "validate-plan",
+              "taskSpec": "validate-plan",
+              "legalOperations": [
+                "validate-plan",
+                "implement-item",
+                "review-item",
+                "no-spec"
+              ]
+            }
+          },
+          "mutation": "read-only",
+          "evidence": {
+            "required": "reported"
+          },
+          "resultKind": "gate-verdict",
+          "onAdvance": "derive-plan-verdict-from-plan-md"
+        }
+      }
+    },
+    {
+      "name": "implement-with-policy",
+      "input": {
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "stage": "implementation",
+        "operation": "implement-item",
+        "objective": "do it",
+        "contextRefs": [
+          "a.md"
+        ],
+        "expectedOutputs": [
+          "out"
+        ],
+        "expectedFiles": [
+          "src/a.mjs",
+          "",
+          "  ",
+          7
+        ],
+        "policy": {
+          "tier": "advanced"
+        },
+        "createdBy": "tester"
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "ok": {
+          "assignmentId": "asgn_tsk_1_implement_item_001",
+          "workId": "tsk-1",
+          "domain": "coding",
+          "workflow": "feature",
+          "stage": "implementation",
+          "operation": "implement-item",
+          "role": "implementer",
+          "dispatch": "unit",
+          "taskSpec": "implement-item",
+          "skills": [],
+          "objective": "do it",
+          "contextRefs": [
+            "a.md"
+          ],
+          "expectedOutputs": [
+            "out"
+          ],
+          "expectedFiles": [
+            "src/a.mjs"
+          ],
+          "policy": {
+            "model": "m",
+            "tier": "advanced",
+            "_fromYaml": true
+          },
+          "createdAt": "2026-11-19T00:00:00.000Z",
+          "createdBy": "tester",
+          "provenance": {
+            "kind": "declared",
+            "contractPolicyVersion": "1",
+            "normalizerVersion": "1",
+            "validators": [
+              "workflow-step-legality"
+            ],
+            "declared": {
+              "domain": "coding",
+              "workflow": "feature",
+              "stage": "implementation",
+              "operation": "implement-item",
+              "taskSpec": "implement-item",
+              "legalOperations": [
+                "validate-plan",
+                "implement-item",
+                "review-item",
+                "no-spec"
+              ]
+            }
+          },
+          "mutation": "mutating",
+          "evidence": {
+            "required": "verified"
+          },
+          "resultKind": "work-product"
+        }
+      }
+    },
+    {
+      "name": "yaml-model-policy",
+      "input": {
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "stage": "implementation",
+        "operation": "implement-item",
+        "policy": {
+          "rigor": "high"
+        }
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "ok": {
+          "assignmentId": "asgn_tsk_1_implement_item_001",
+          "workId": "tsk-1",
+          "domain": "coding",
+          "workflow": "feature",
+          "stage": "implementation",
+          "operation": "implement-item",
+          "role": "implementer",
+          "dispatch": "unit",
+          "taskSpec": "implement-item",
+          "skills": [],
+          "objective": "Execute implementation.implement-item operation",
+          "contextRefs": [],
+          "expectedOutputs": [],
+          "expectedFiles": [],
+          "policy": {
+            "model": "m",
+            "tier": "standard",
+            "rigor": "high",
+            "_fromYaml": true
+          },
+          "createdAt": "2026-11-19T00:00:00.000Z",
+          "provenance": {
+            "kind": "declared",
+            "contractPolicyVersion": "1",
+            "normalizerVersion": "1",
+            "validators": [
+              "workflow-step-legality"
+            ],
+            "declared": {
+              "domain": "coding",
+              "workflow": "feature",
+              "stage": "implementation",
+              "operation": "implement-item",
+              "taskSpec": "implement-item",
+              "legalOperations": [
+                "validate-plan",
+                "implement-item",
+                "review-item",
+                "no-spec"
+              ]
+            }
+          },
+          "mutation": "mutating",
+          "evidence": {
+            "required": "verified"
+          },
+          "resultKind": "work-product"
+        }
+      }
+    },
+    {
+      "name": "review-item-defaults",
+      "input": {
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "stage": "review",
+        "operation": "review-item",
+        "role": "reviewer"
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "ok": {
+          "assignmentId": "asgn_tsk_1_review_item_001",
+          "workId": "tsk-1",
+          "domain": "coding",
+          "workflow": "feature",
+          "stage": "review",
+          "operation": "review-item",
+          "role": "reviewer",
+          "dispatch": "assignment",
+          "taskSpec": "review-item.md",
+          "skills": [],
+          "objective": "Execute review.review-item operation",
+          "contextRefs": [],
+          "expectedOutputs": [
+            "result-1.json (verdict: APPROVED | REJECT, evidenceRefs: [candidate diff ref, verify result ref])",
+            "report-1.md (reviewer findings and evaluation)"
+          ],
+          "expectedFiles": [],
+          "reason": "second-look",
+          "createdAt": "2026-11-19T00:00:00.000Z",
+          "provenance": {
+            "kind": "declared",
+            "contractPolicyVersion": "1",
+            "normalizerVersion": "1",
+            "validators": [
+              "workflow-step-legality"
+            ],
+            "declared": {
+              "domain": "coding",
+              "workflow": "feature",
+              "stage": "review",
+              "operation": "review-item",
+              "taskSpec": "review-item.md",
+              "legalOperations": [
+                "validate-plan",
+                "implement-item",
+                "review-item",
+                "no-spec"
+              ]
+            }
+          },
+          "mutation": "read-only",
+          "evidence": {
+            "required": "reported"
+          },
+          "resultKind": "review-verdict"
+        }
+      }
+    },
+    {
+      "name": "no-workflow-no-work",
+      "input": {
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "domain": " coding ",
+        "stage": "review",
+        "operation": "review-item"
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "ok": {
+          "assignmentId": "asgn_nowork_review_item_001",
+          "workId": null,
+          "domain": "coding",
+          "stage": "review",
+          "operation": "review-item",
+          "role": "implementer",
+          "dispatch": "assignment",
+          "taskSpec": "review-item.md",
+          "skills": [],
+          "objective": "Execute review.review-item operation",
+          "contextRefs": [],
+          "expectedOutputs": [
+            "result-1.json (verdict: APPROVED | REJECT, evidenceRefs: [candidate diff ref, verify result ref])",
+            "report-1.md (reviewer findings and evaluation)"
+          ],
+          "expectedFiles": [],
+          "reason": "second-look",
+          "createdAt": "2026-11-19T00:00:00.000Z",
+          "provenance": {
+            "kind": "declared",
+            "contractPolicyVersion": "1",
+            "normalizerVersion": "1",
+            "validators": [
+              "workflow-step-legality"
+            ],
+            "declared": {
+              "domain": "coding",
+              "stage": "review",
+              "operation": "review-item",
+              "taskSpec": "review-item.md",
+              "legalOperations": [
+                "validate-plan",
+                "implement-item",
+                "review-item",
+                "no-spec"
+              ]
+            }
+          },
+          "mutation": "mutating",
+          "evidence": {
+            "required": "reported"
+          },
+          "resultKind": "review-verdict"
+        }
+      }
+    },
+    {
+      "name": "role-and-template-override",
+      "input": {
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "stage": "planning",
+        "operation": "validate-plan",
+        "role": "advisor",
+        "contractTemplate": "custom-v2"
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "ok": {
+          "assignmentId": "asgn_tsk_1_validate_plan_001",
+          "workId": "tsk-1",
+          "domain": "coding",
+          "workflow": "feature",
+          "stage": "planning",
+          "operation": "validate-plan",
+          "role": "advisor",
+          "dispatch": "assignment",
+          "taskSpec": "validate-plan",
+          "skills": [
+            "s1"
+          ],
+          "objective": "Execute planning.validate-plan operation",
+          "contractTemplate": "custom-v2",
+          "contextRefs": [],
+          "expectedOutputs": [
+            "result-1.json (verdict: READY | NOT READY | READY WITH CONSTRAINTS)",
+            "report-1.md (reviewer findings and evaluation)"
+          ],
+          "expectedFiles": [],
+          "createdAt": "2026-11-19T00:00:00.000Z",
+          "provenance": {
+            "kind": "declared",
+            "contractPolicyVersion": "1",
+            "normalizerVersion": "1",
+            "validators": [
+              "workflow-step-legality"
+            ],
+            "declared": {
+              "domain": "coding",
+              "workflow": "feature",
+              "stage": "planning",
+              "operation": "validate-plan",
+              "taskSpec": "validate-plan",
+              "legalOperations": [
+                "validate-plan",
+                "implement-item",
+                "review-item",
+                "no-spec"
+              ]
+            }
+          },
+          "mutation": "read-only",
+          "evidence": {
+            "required": "reported"
+          },
+          "resultKind": "gate-verdict",
+          "onAdvance": "derive-plan-verdict-from-plan-md"
+        }
+      }
+    },
+    {
+      "name": "unknown-operation",
+      "input": {
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "stage": "planning",
+        "operation": "nope"
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "unknown operation \"nope\" for stage \"planning\" in domain \"coding\" (declared operations: [validate-plan, implement-item, review-item, no-spec])"
+        }
+      }
+    },
+    {
+      "name": "no-taskspec",
+      "input": {
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "stage": "planning",
+        "operation": "no-spec"
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "operation \"no-spec\" in stage \"planning\" declares no taskSpec"
+        }
+      }
+    },
+    {
+      "name": "missing-stage",
+      "input": {
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "operation": "validate-plan"
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "buildAssignment requires a non-empty stage name"
+        }
+      }
+    },
+    {
+      "name": "missing-operation",
+      "input": {
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "stage": "planning"
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "buildAssignment requires a non-empty operation id"
+        }
+      }
+    },
+    {
+      "name": "missing-domain",
+      "input": {
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "stage": "p",
+        "operation": "validate-plan"
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "buildAssignment requires a non-empty \"domain\" (the caller resolves it from the Work item)"
+        }
+      }
+    },
+    {
+      "name": "missing-operations",
+      "input": {
+        "domain": "coding",
+        "stage": "p",
+        "operation": "validate-plan"
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "buildAssignment requires \"operations\": the legal operations of the step, resolved from its Workflow by the caller"
+        }
+      }
+    },
+    {
+      "name": "work-item-input",
+      "input": {
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "stage": "planning",
+        "operation": "validate-plan",
+        "work": {
+          "id": "x"
+        }
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "buildAssignment() takes no Work item (work): pass its demand as generic inputs (assignment rigor/domain, a work hint, capability hints, agent type)"
+        }
+      }
+    },
+    {
+      "name": "work-item-input-workitem",
+      "input": {
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "stage": "planning",
+        "operation": "validate-plan",
+        "workItem": {}
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z",
+        "allowSyntheticCompatibilityOperation": true
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "buildAssignment() takes no Work item (workItem): pass its demand as generic inputs (assignment rigor/domain, a work hint, capability hints, agent type)"
+        }
+      }
+    },
+    {
+      "name": "taskspec-present",
+      "input": {
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "stage": "planning",
+        "operation": "validate-plan"
+      },
+      "taskSpecs": [
+        "validate-plan"
+      ],
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z"
+      },
+      "result": {
+        "ok": {
+          "assignmentId": "asgn_tsk_1_validate_plan_001",
+          "workId": "tsk-1",
+          "domain": "coding",
+          "workflow": "feature",
+          "stage": "planning",
+          "operation": "validate-plan",
+          "role": "reviewer",
+          "dispatch": "assignment",
+          "taskSpec": "validate-plan",
+          "skills": [
+            "s1"
+          ],
+          "objective": "Execute planning.validate-plan operation",
+          "contractTemplate": "validate-plan-v1",
+          "contextRefs": [],
+          "expectedOutputs": [
+            "result-1.json (verdict: READY | NOT READY | READY WITH CONSTRAINTS)",
+            "report-1.md (reviewer findings and evaluation)"
+          ],
+          "expectedFiles": [],
+          "createdAt": "2026-11-19T00:00:00.000Z",
+          "provenance": {
+            "kind": "declared",
+            "contractPolicyVersion": "1",
+            "normalizerVersion": "1",
+            "validators": [
+              "workflow-step-legality",
+              "task-spec-existence"
+            ],
+            "declared": {
+              "domain": "coding",
+              "workflow": "feature",
+              "stage": "planning",
+              "operation": "validate-plan",
+              "taskSpec": "validate-plan",
+              "legalOperations": [
+                "validate-plan",
+                "implement-item",
+                "review-item",
+                "no-spec"
+              ]
+            }
+          },
+          "mutation": "read-only",
+          "evidence": {
+            "required": "reported"
+          },
+          "resultKind": "gate-verdict",
+          "onAdvance": "derive-plan-verdict-from-plan-md"
+        }
+      }
+    },
+    {
+      "name": "taskspec-absent",
+      "input": {
+        "workId": "tsk-1",
+        "domain": "coding",
+        "workflow": "feature",
+        "operations": [
+          {
+            "id": "validate-plan",
+            "taskSpec": "validate-plan",
+            "role": "reviewer",
+            "skills": [
+              "s1"
+            ],
+            "task": {
+              "contractTemplate": "validate-plan-v1"
+            }
+          },
+          {
+            "id": "implement-item",
+            "taskSpec": "implement-item",
+            "dispatch": "unit",
+            "policy": {
+              "model": "m",
+              "tier": "standard"
+            }
+          },
+          {
+            "id": "review-item",
+            "taskSpec": "review-item.md",
+            "reason": "second-look"
+          },
+          {
+            "id": "no-spec"
+          }
+        ],
+        "stage": "implementation",
+        "operation": "implement-item"
+      },
+      "taskSpecs": [
+        "validate-plan"
+      ],
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "operation \"implement-item\" in stage \"implementation\": taskSpec file does not exist: <repo>/domains/coding/task-specs/implement-item.md — refuse runtime dispatch for missing taskSpec"
+        }
+      },
+      "rootToken": "<repo>"
+    }
+  ],
+  "inline": [
+    {
+      "name": "read-only",
+      "input": {
+        "provenance": {
+          "kind": "inline",
+          "contract": {
+            "objective": "investigate x",
+            "contextRefs": [
+              "a.md"
+            ],
+            "constraints": [
+              "no network"
+            ],
+            "expectedOutputs": [
+              "report"
+            ],
+            "mutation": "read-only",
+            "evidence": {
+              "required": "reported"
+            },
+            "role": "researcher",
+            "capabilities": [
+              "read"
+            ],
+            "budget": {
+              "timeoutMs": 120000,
+              "maxRuns": 1
+            }
+          },
+          "caller": {
+            "writerId": "wr.1"
+          }
+        },
+        "workId": "tsk-9",
+        "createdBy": "me"
+      },
+      "validator": {
+        "ok": null
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z"
+      },
+      "result": {
+        "ok": {
+          "assignmentId": "asgn_tsk_9_op_001",
+          "workId": "tsk-9",
+          "role": "researcher",
+          "dispatch": "assignment",
+          "objective": "investigate x",
+          "contextRefs": [
+            "a.md"
+          ],
+          "expectedOutputs": [
+            "report"
+          ],
+          "expectedFiles": [],
+          "createdAt": "2026-11-19T00:00:00.000Z",
+          "createdBy": "me",
+          "provenance": {
+            "kind": "inline",
+            "contractPolicyVersion": "1",
+            "normalizerVersion": "1",
+            "validators": [
+              "execution-contract-schema"
+            ],
+            "inline": {
+              "contract": {
+                "objective": "investigate x",
+                "contextRefs": [
+                  "a.md"
+                ],
+                "constraints": [
+                  "no network"
+                ],
+                "expectedOutputs": [
+                  "report"
+                ],
+                "mutation": "read-only",
+                "evidence": {
+                  "required": "reported"
+                },
+                "role": "researcher",
+                "capabilities": [
+                  "read"
+                ],
+                "budget": {
+                  "timeoutMs": 120000,
+                  "maxRuns": 1
+                }
+              },
+              "caller": {
+                "writerId": "wr.1"
+              }
+            }
+          },
+          "mutation": "read-only",
+          "evidence": {
+            "required": "reported"
+          }
+        }
+      }
+    },
+    {
+      "name": "no-work-uses-writer",
+      "input": {
+        "provenance": {
+          "kind": "inline",
+          "contract": {
+            "objective": "investigate x",
+            "contextRefs": [
+              "a.md"
+            ],
+            "constraints": [
+              "no network"
+            ],
+            "expectedOutputs": [
+              "report"
+            ],
+            "mutation": "read-only",
+            "evidence": {
+              "required": "reported"
+            },
+            "role": "researcher",
+            "capabilities": [
+              "read"
+            ],
+            "budget": {
+              "timeoutMs": 120000,
+              "maxRuns": 1
+            }
+          },
+          "caller": {
+            "writerId": "Writer.7",
+            "parentAssignmentId": "asgn_p_001"
+          }
+        }
+      },
+      "validator": {
+        "ok": null
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z"
+      },
+      "result": {
+        "ok": {
+          "assignmentId": "asgn_writer_7_op_001",
+          "workId": null,
+          "role": "researcher",
+          "dispatch": "assignment",
+          "objective": "investigate x",
+          "contextRefs": [
+            "a.md"
+          ],
+          "expectedOutputs": [
+            "report"
+          ],
+          "expectedFiles": [],
+          "createdAt": "2026-11-19T00:00:00.000Z",
+          "provenance": {
+            "kind": "inline",
+            "contractPolicyVersion": "1",
+            "normalizerVersion": "1",
+            "validators": [
+              "execution-contract-schema"
+            ],
+            "inline": {
+              "contract": {
+                "objective": "investigate x",
+                "contextRefs": [
+                  "a.md"
+                ],
+                "constraints": [
+                  "no network"
+                ],
+                "expectedOutputs": [
+                  "report"
+                ],
+                "mutation": "read-only",
+                "evidence": {
+                  "required": "reported"
+                },
+                "role": "researcher",
+                "capabilities": [
+                  "read"
+                ],
+                "budget": {
+                  "timeoutMs": 120000,
+                  "maxRuns": 1
+                }
+              },
+              "caller": {
+                "writerId": "Writer.7",
+                "parentAssignmentId": "asgn_p_001"
+              }
+            }
+          },
+          "mutation": "read-only",
+          "evidence": {
+            "required": "reported"
+          }
+        }
+      }
+    },
+    {
+      "name": "with-policy-tier",
+      "input": {
+        "provenance": {
+          "kind": "inline",
+          "contract": {
+            "objective": "investigate x",
+            "contextRefs": [
+              "a.md"
+            ],
+            "constraints": [
+              "no network"
+            ],
+            "expectedOutputs": [
+              "report"
+            ],
+            "mutation": "read-only",
+            "evidence": {
+              "required": "reported"
+            },
+            "role": "researcher",
+            "capabilities": [
+              "read"
+            ],
+            "budget": {
+              "timeoutMs": 120000,
+              "maxRuns": 1
+            },
+            "policy": {
+              "tier": "standard"
+            },
+            "supports": "x",
+            "contractTemplate": "t"
+          },
+          "caller": {
+            "writerId": "w"
+          }
+        }
+      },
+      "validator": {
+        "ok": null
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z"
+      },
+      "result": {
+        "ok": {
+          "assignmentId": "asgn_w_op_001",
+          "workId": null,
+          "role": "researcher",
+          "dispatch": "assignment",
+          "objective": "investigate x",
+          "contractTemplate": "t",
+          "contextRefs": [
+            "a.md"
+          ],
+          "expectedOutputs": [
+            "report"
+          ],
+          "expectedFiles": [],
+          "createdAt": "2026-11-19T00:00:00.000Z",
+          "policy": {
+            "tier": "standard"
+          },
+          "provenance": {
+            "kind": "inline",
+            "contractPolicyVersion": "1",
+            "normalizerVersion": "1",
+            "validators": [
+              "execution-contract-schema"
+            ],
+            "inline": {
+              "contract": {
+                "objective": "investigate x",
+                "contextRefs": [
+                  "a.md"
+                ],
+                "constraints": [
+                  "no network"
+                ],
+                "expectedOutputs": [
+                  "report"
+                ],
+                "mutation": "read-only",
+                "evidence": {
+                  "required": "reported"
+                },
+                "role": "researcher",
+                "capabilities": [
+                  "read"
+                ],
+                "budget": {
+                  "timeoutMs": 120000,
+                  "maxRuns": 1
+                },
+                "supports": "x",
+                "contractTemplate": "t",
+                "policy": {
+                  "tier": "standard"
+                }
+              },
+              "caller": {
+                "writerId": "w"
+              }
+            }
+          },
+          "mutation": "read-only",
+          "evidence": {
+            "required": "reported"
+          }
+        }
+      }
+    },
+    {
+      "name": "with-coordination",
+      "input": {
+        "provenance": {
+          "kind": "inline",
+          "contract": {
+            "objective": "investigate x",
+            "contextRefs": [
+              "a.md"
+            ],
+            "constraints": [
+              "no network"
+            ],
+            "expectedOutputs": [
+              "report"
+            ],
+            "mutation": "read-only",
+            "evidence": {
+              "required": "reported"
+            },
+            "role": "researcher",
+            "capabilities": [
+              "read"
+            ],
+            "budget": {
+              "timeoutMs": 120000,
+              "maxRuns": 1
+            }
+          },
+          "caller": {
+            "writerId": "w",
+            "coordination": {
+              "fanOutPayload": {
+                "actorId": "a1",
+                "objective": "o",
+                "taskKey": "k1",
+                "expectedOutputs": [
+                  "o"
+                ],
+                "constraints": [
+                  "c"
+                ],
+                "capabilities": [
+                  "k"
+                ]
+              },
+              "actionInvocation": {
+                "actionKey": "sha256:ab",
+                "kind": "fan-out",
+                "normalizedSteps": [
+                  {
+                    "type": "s1",
+                    "omittedFields": [
+                      "a"
+                    ]
+                  },
+                  {
+                    "type": "s2"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "validator": {
+        "ok": null
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z"
+      },
+      "result": {
+        "ok": {
+          "assignmentId": "asgn_w_op_001",
+          "workId": null,
+          "role": "researcher",
+          "dispatch": "assignment",
+          "objective": "investigate x",
+          "contextRefs": [
+            "a.md"
+          ],
+          "expectedOutputs": [
+            "report"
+          ],
+          "expectedFiles": [],
+          "createdAt": "2026-11-19T00:00:00.000Z",
+          "provenance": {
+            "kind": "inline",
+            "contractPolicyVersion": "1",
+            "normalizerVersion": "1",
+            "validators": [
+              "execution-contract-schema"
+            ],
+            "inline": {
+              "contract": {
+                "objective": "investigate x",
+                "contextRefs": [
+                  "a.md"
+                ],
+                "constraints": [
+                  "no network"
+                ],
+                "expectedOutputs": [
+                  "report"
+                ],
+                "mutation": "read-only",
+                "evidence": {
+                  "required": "reported"
+                },
+                "role": "researcher",
+                "capabilities": [
+                  "read"
+                ],
+                "budget": {
+                  "timeoutMs": 120000,
+                  "maxRuns": 1
+                }
+              },
+              "caller": {
+                "writerId": "w",
+                "coordination": {
+                  "fanOutPayload": {
+                    "actorId": "a1",
+                    "objective": "o",
+                    "taskKey": "k1",
+                    "expectedOutputs": [
+                      "o"
+                    ],
+                    "constraints": [
+                      "c"
+                    ],
+                    "capabilities": [
+                      "k"
+                    ]
+                  },
+                  "actionInvocation": {
+                    "actionKey": "sha256:ab",
+                    "kind": "fan-out",
+                    "normalizedSteps": [
+                      {
+                        "type": "s1",
+                        "omittedFields": [
+                          "a"
+                        ]
+                      },
+                      {
+                        "type": "s2"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "mutation": "read-only",
+          "evidence": {
+            "required": "reported"
+          }
+        }
+      }
+    },
+    {
+      "name": "declared-field-rides-along",
+      "input": {
+        "provenance": {
+          "kind": "inline",
+          "contract": {
+            "objective": "investigate x",
+            "contextRefs": [
+              "a.md"
+            ],
+            "constraints": [
+              "no network"
+            ],
+            "expectedOutputs": [
+              "report"
+            ],
+            "mutation": "read-only",
+            "evidence": {
+              "required": "reported"
+            },
+            "role": "researcher",
+            "capabilities": [
+              "read"
+            ],
+            "budget": {
+              "timeoutMs": 120000,
+              "maxRuns": 1
+            }
+          },
+          "caller": {
+            "writerId": "w"
+          }
+        },
+        "stage": "planning"
+      },
+      "validator": {
+        "ok": null
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "buildAssignment: inline provenance cannot be combined with declared-shape field(s): stage"
+        }
+      }
+    },
+    {
+      "name": "mutating-unstamped",
+      "input": {
+        "provenance": {
+          "kind": "inline",
+          "contract": {
+            "objective": "investigate x",
+            "contextRefs": [
+              "a.md"
+            ],
+            "constraints": [
+              "no network"
+            ],
+            "expectedOutputs": [
+              "report"
+            ],
+            "mutation": "mutating",
+            "evidence": {
+              "required": "verified"
+            },
+            "role": "researcher",
+            "capabilities": [
+              "read"
+            ],
+            "budget": {
+              "timeoutMs": 120000,
+              "maxRuns": 1
+            }
+          },
+          "caller": {
+            "writerId": "w"
+          }
+        }
+      },
+      "validator": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.mutation \"mutating\" is rejected -- only an inline contract carrying the engine-reserved protocol-operation stamp in its constraints (session-engine.mjs's own mediated dispatchDeclaredOperation door) may declare \"mutating\"; every other caller stays read-only-only (ADR-006 §6)"
+        }
+      },
+      "options": {
+        "createdAt": "2026-11-19T00:00:00.000Z"
+      },
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.mutation \"mutating\" is rejected -- only an inline contract carrying the engine-reserved protocol-operation stamp in its constraints (session-engine.mjs's own mediated dispatchDeclaredOperation door) may declare \"mutating\"; every other caller stays read-only-only (ADR-006 §6)"
+        }
+      }
+    }
+  ],
+  "claim": [
+    {
+      "step": "refused-build",
+      "dirCreated": false,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "execution-contract: contract.mutation \"mutating\" is rejected -- only an inline contract carrying the engine-reserved protocol-operation stamp in its constraints (session-engine.mjs's own mediated dispatchDeclaredOperation door) may declare \"mutating\"; every other caller stays read-only-only (ADR-006 §6)"
+        }
+      }
+    },
+    {
+      "step": "two-claims",
+      "ids": [
+        "asgn_tsk_9_op_001",
+        "asgn_tsk_9_op_002"
+      ],
+      "dirs": [
+        "asgn_tsk_9_op_001",
+        "asgn_tsk_9_op_002"
+      ]
+    }
+  ]
+}

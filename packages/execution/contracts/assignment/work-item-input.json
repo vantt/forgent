@@ -1,0 +1,90 @@
+{
+  "keys": [
+    "work",
+    "workItem"
+  ],
+  "cases": [
+    {
+      "params": {},
+      "where": "x()",
+      "keys": null,
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "params": {
+        "work": 1
+      },
+      "where": "a()",
+      "keys": null,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "a() takes no Work item (work): pass its demand as generic inputs (assignment rigor/domain, a work hint, capability hints, agent type)"
+        }
+      }
+    },
+    {
+      "params": {
+        "workItem": 1,
+        "work": 2
+      },
+      "where": "b()",
+      "keys": null,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "b() takes no Work item (work, workItem): pass its demand as generic inputs (assignment rigor/domain, a work hint, capability hints, agent type)"
+        }
+      }
+    },
+    {
+      "params": {
+        "workExecutorId": "e"
+      },
+      "where": "c()",
+      "keys": null,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "c() takes no Work item (workExecutorId): pass its demand as generic inputs (assignment rigor/domain, a work hint, capability hints, agent type)"
+        }
+      }
+    },
+    {
+      "params": {
+        "workExecutorId": "e"
+      },
+      "where": "c()",
+      "keys": [
+        "work",
+        "workItem"
+      ],
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "params": null,
+      "where": "d()",
+      "keys": null,
+      "result": {
+        "ok": null
+      }
+    },
+    {
+      "params": {
+        "stage": "s"
+      },
+      "where": "e()",
+      "keys": null,
+      "result": {
+        "ok": null
+      }
+    }
+  ]
+}
