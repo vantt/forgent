@@ -18,6 +18,100 @@ use std::io::BufReader;
 use std::path::Path;
 use std::time::{Duration, SystemTime};
 
+/// The contract a Run Result is written under, and the closed vocabularies of its classification. Every writer and
+/// reader of a Run Result names them from here.
+pub const RUN_RESULT_CONTRACT_ID: &str = "assignment-run-result";
+/// The one version the writer produces; readers also accept [`RUN_RESULT_CONTRACT_VERSION_V2`].
+pub const RUN_RESULT_CONTRACT_VERSION: u64 = 3;
+pub const RUN_RESULT_CONTRACT_VERSION_V2: u64 = 2;
+pub const EXECUTION_STATUSES: [&str; 4] =
+    ["completed", "failed", "cancelled", "completion-unknown"];
+pub const ASSESSMENT_VERDICTS: [&str; 5] = [
+    "pass",
+    "findings",
+    "blocked",
+    "inconclusive",
+    "not-applicable",
+];
+pub const CONFIDENCE_LEVELS: [&str; 5] =
+    ["verified", "reported", "inferred", "no-evidence", "failed"];
+pub const FAILURE_FAMILIES: [&str; 6] = [
+    "provider",
+    "resource",
+    "contract",
+    "policy",
+    "external-interference",
+    "unknown",
+];
+pub const POLICY_DISPOSITIONS: [&str; 4] = ["allow", "refuse", "needs-input", "not-applicable"];
+pub const DELIVERY_MODES: [&str; 5] = [
+    "fresh",
+    "resumed",
+    "replayed",
+    "recovered",
+    "legacy-derived",
+];
+pub const PROVENANCE_VALUES: [&str; 4] = [
+    "native-v2",
+    "native-v3",
+    "legacy-derived",
+    "contract-corrupt",
+];
+/// The `status` values a version-1 record (no contract) may carry.
+pub const RECOGNIZED_LEGACY_STATUSES: [&str; 4] = ["done", "failed", "blocked", "no-evidence"];
+
+/// The classification a version-1 record reads as, from its legacy status and confidence.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LegacyClassification {
+    pub execution_status: &'static str,
+    pub verdict: &'static str,
+    /// The failure `(family, code)`, when the record names a failure.
+    pub failure: Option<(&'static str, &'static str)>,
+    /// The exit code the execution reads as when the record carries none.
+    pub default_exit_code: Option<i64>,
+}
+
+/// The one mapping of a version-1 record onto a classification. `status` is the record's status (absent reads as
+/// `no-evidence`), `confidence` the confidence text it is matched on, `is_timeout` whether its runtime timed out,
+/// and `claim_verdict` the verdict its agent claim names.
+pub fn legacy_classification(
+    status: &str,
+    confidence: Option<&str>,
+    is_timeout: bool,
+    claim_verdict: Option<&str>,
+) -> LegacyClassification {
+    let class = |execution_status, verdict, failure, default_exit_code| LegacyClassification {
+        execution_status,
+        verdict,
+        failure,
+        default_exit_code,
+    };
+    if status == "no-evidence" || confidence == Some("no-evidence") {
+        class(
+            "completion-unknown",
+            "inconclusive",
+            Some(("unknown", "no-evidence")),
+            None,
+        )
+    } else if status == "failed" && (confidence == Some("failed") || is_timeout) {
+        class(
+            "failed",
+            "not-applicable",
+            Some(("unknown", "legacy-failure")),
+            Some(1),
+        )
+    } else if status == "failed" && claim_verdict == Some("findings") {
+        // A reviewer finding preserved in a legacy result.
+        class("completed", "findings", None, Some(0))
+    } else if status == "blocked" {
+        class("completed", "blocked", None, Some(0))
+    } else if status == "done" {
+        class("completed", "pass", None, Some(0))
+    } else {
+        class("completed", "not-applicable", None, Some(0))
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Outcome {
     pub category: String,
@@ -103,18 +197,6 @@ pub fn recorded_category_agrees(recorded: &str, derived: &str) -> bool {
 }
 
 fn is_classification_valid(c: &serde_json::Map<String, Value>) -> bool {
-    const EXECUTION_STATUSES: &[&str] = &["completed", "failed", "cancelled", "completion-unknown"];
-    const ASSESSMENT_VERDICTS: &[&str] = &[
-        "pass",
-        "findings",
-        "inconclusive",
-        "blocked",
-        "not-applicable",
-    ];
-    const CONFIDENCE_LEVELS: &[&str] =
-        &["verified", "reported", "inferred", "no-evidence", "failed"];
-    const POLICY_DISPOSITIONS: &[&str] = &["allow", "refuse", "needs-input", "not-applicable"];
-
     if let Some(e) = c.get("execution").and_then(|v| v.as_object()) {
         if let Some(s) = e.get("status").and_then(|v| v.as_str()) {
             if !EXECUTION_STATUSES.contains(&s) {
@@ -180,11 +262,13 @@ pub fn derive_legacy_outcome(record: &Value) -> Outcome {
             category: "corrupt".to_string(),
             reason: reason.to_string(),
         };
-        if contract.get("id").and_then(Value::as_str) != Some("assignment-run-result") {
+        if contract.get("id").and_then(Value::as_str) != Some(RUN_RESULT_CONTRACT_ID) {
             return corrupt("unsupported-contract");
         }
         let version = contract.get("version").and_then(Value::as_u64);
-        if version != Some(2) && version != Some(3) {
+        if version != Some(RUN_RESULT_CONTRACT_VERSION_V2)
+            && version != Some(RUN_RESULT_CONTRACT_VERSION)
+        {
             return corrupt("unsupported-contract-version");
         }
         let Some(c) = raw.get("classification").and_then(Value::as_object) else {
@@ -194,7 +278,7 @@ pub fn derive_legacy_outcome(record: &Value) -> Outcome {
             return corrupt("corrupt-classification");
         }
         let derived = derive_outcome(&Value::Object(c.clone()));
-        if version == Some(2) {
+        if version == Some(RUN_RESULT_CONTRACT_VERSION_V2) {
             return derived;
         }
         // A version-3 outcome is a checked cache: kept as recorded when the classification derives its category;
@@ -227,7 +311,6 @@ pub fn derive_legacy_outcome(record: &Value) -> Outcome {
     }
 
     // Check recognized legacy statuses
-    const RECOGNIZED_LEGACY_STATUSES: &[&str] = &["done", "failed", "no-evidence", "blocked"];
     if let Some(st) = raw.get("status").and_then(|s| s.as_str()) {
         if !RECOGNIZED_LEGACY_STATUSES.contains(&st) {
             return Outcome {
@@ -257,27 +340,15 @@ pub fn derive_legacy_outcome(record: &Value) -> Outcome {
         .and_then(|b| b.as_bool())
         .unwrap_or(false);
 
-    let has_findings = raw
+    let claim_verdict = raw
         .get("agentClaim")
         .and_then(|c| c.get("assessment"))
         .and_then(|a| a.get("verdict"))
-        .and_then(|v| v.as_str())
-        == Some("findings");
+        .and_then(|v| v.as_str());
 
-    let (exec_status, assess_verdict, failure_family) =
-        if legacy_status == "no-evidence" || legacy_conf == "no-evidence" {
-            ("completion-unknown", "inconclusive", Some("unknown"))
-        } else if legacy_status == "failed" && (legacy_conf == "failed" || is_timeout) {
-            ("failed", "not-applicable", Some("unknown"))
-        } else if legacy_status == "failed" && has_findings {
-            ("completed", "findings", None)
-        } else if legacy_status == "blocked" {
-            ("completed", "blocked", None)
-        } else if legacy_status == "done" {
-            ("completed", "pass", None)
-        } else {
-            ("completed", "not-applicable", None)
-        };
+    let legacy = legacy_classification(legacy_status, Some(legacy_conf), is_timeout, claim_verdict);
+    let (exec_status, assess_verdict) = (legacy.execution_status, legacy.verdict);
+    let failure_family = legacy.failure.map(|(family, _)| family);
 
     let mut map = serde_json::Map::new();
     let mut exec_map = serde_json::Map::new();

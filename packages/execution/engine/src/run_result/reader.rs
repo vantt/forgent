@@ -11,7 +11,7 @@ use super::vocabulary::{
     POLICY_DISPOSITIONS, PROVENANCE_VALUES, RECOGNIZED_LEGACY_STATUSES, RUN_RESULT_CONTRACT_ID,
     RUN_RESULT_CONTRACT_VERSION, RUN_RESULT_CONTRACT_VERSION_V2,
 };
-use fgos_run_result::{derive_outcome, recorded_category_agrees, Outcome};
+use fgos_run_result::{derive_outcome, legacy_classification, recorded_category_agrees, Outcome};
 use serde_json::{json, Map, Value};
 use std::path::Path;
 
@@ -655,31 +655,14 @@ fn interpret_legacy_v1(raw: &Map<String, Value>) -> InterpretedRunResult {
     let claim_verdict =
         str_of(raw_get("agentClaim").and_then(|c| path(c, &["assessment", "verdict"])));
 
-    let (exec_status, verdict, failure): (&str, &str, Value);
-    if status_text == "no-evidence" || confidence_text == Some("no-evidence") {
-        (exec_status, verdict) = ("completion-unknown", "inconclusive");
-        failure = json!({"family": "unknown", "code": "no-evidence"});
-    } else if status_text == "failed" && (confidence_text == Some("failed") || is_timeout) {
-        (exec_status, verdict) = ("failed", "not-applicable");
-        failure = json!({"family": "unknown", "code": "legacy-failure"});
-        exit_code.get_or_insert_with(|| json!(1));
-    } else if status_text == "failed" && claim_verdict == Some("findings") {
-        // A reviewer finding preserved in a legacy result.
-        (exec_status, verdict) = ("completed", "findings");
-        failure = Value::Null;
-        exit_code.get_or_insert_with(|| json!(0));
-    } else if status_text == "blocked" {
-        (exec_status, verdict) = ("completed", "blocked");
-        failure = Value::Null;
-        exit_code.get_or_insert_with(|| json!(0));
-    } else if status_text == "done" {
-        (exec_status, verdict) = ("completed", "pass");
-        failure = Value::Null;
-        exit_code.get_or_insert_with(|| json!(0));
-    } else {
-        (exec_status, verdict) = ("completed", "not-applicable");
-        failure = Value::Null;
-        exit_code.get_or_insert_with(|| json!(0));
+    let legacy = legacy_classification(status_text, confidence_text, is_timeout, claim_verdict);
+    let (exec_status, verdict) = (legacy.execution_status, legacy.verdict);
+    let failure = legacy.failure.map_or(
+        Value::Null,
+        |(family, code)| json!({"family": family, "code": code}),
+    );
+    if let Some(code) = legacy.default_exit_code {
+        exit_code.get_or_insert_with(|| json!(code));
     }
 
     let mut execution = Map::new();
