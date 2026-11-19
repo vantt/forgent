@@ -70,7 +70,9 @@ at 60 s, so a long verb must not run inside the request.
      grant `writes` refuse `path-outside-grant`; `branch` from any persona but `lead` refuses `land-branch-lead-only`;
      a lead's branch land passes its plan footprint (`planOfHead`) as `--footprint`; a lead's `paths` land that changes
      the `footprint` of its plan's frontmatter against the trunk tip refuses `footprint-change-refused`.
-   - `run` args `{prompt | unit, provider?, capability?, writes?, worktree?}`, lead only; `writes` not covered by the
+   - `run` args `{prompt, provider?, capability?, writes?, worktree?}`, lead only (no `unit`: a Unit file the sandbox
+     wrote names its own writes and cannot be bound; review 2026-11-19); any argv value starting with `-` refuses
+     `bad-args`; `writes` not covered by the
      lead's plan footprint refuse `write-outside-footprint`. The runner starts `fgos run` without
      `FGOS_DISPATCH_DEPTH` (a lead's phase run is a top-level seat and takes a lane, PS-12).
    - Unknown keys refuse `bad-args`; the host argv is built from these fields, never a free string.

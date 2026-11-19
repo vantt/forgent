@@ -41,11 +41,15 @@ never hand-edited).
    - `lead`: writes = its plan dir (step 2); verbs `run`, `land`, `worktree create`, `request result`.
      No `session start`.
    Only a lead's `land` may name a branch; the route enforces it (phase 10).
-2. Lead writes: `grantOf(role, persona, { projectRoot })` for persona `lead` calls `planOfHead` and returns
-   `['plans/<dir>']`. Refusals (`HeadGrantError`) are the resolver's: `plan-not-found`, `plan-ambiguous`. The footprint
-   is not a write grant (PS-24); it bounds `run` and `land` in the route (phase 10).
-3. Pass `projectRoot` from `placeHead` (`head-start.mjs:172`) to `grantOf`, so a start and a rotation resolve the same
-   grant. The shape of `grantOf` without `projectRoot` is unchanged for every other persona.
+2. Lead writes: `grantOf(role, persona, { planDir })` for persona `lead` returns `writes: ['plans/<planDir>']`; a
+   lead without `planDir` refuses `HeadGrantError('plan-not-found')`. `head-grants.mjs` stays a kernel module (no fs,
+   no Git): it never imports `head-plan.mjs` (posture `infra`, `docs/architecture-manifest.json`; the import guard
+   refuses kernel -> infra). The footprint is not a write grant (PS-24); it bounds `run` and `land` in the route
+   (phase 10).
+3. `placeHead` (`head-start.mjs:177`) resolves the plan for a `lead` with `planOfHead(projectRoot, persona, name)`
+   (`src/session-host/head-plan.mjs`, phase 10; refusals `plan-not-found`, `plan-ambiguous` surface as
+   `grant-invalid`) and passes `{ planDir }` to `grantOf`, so a start and a rotation resolve the same grant through the
+   one reader. The shape of `grantOf` without the option is unchanged for every other persona.
 4. `core/agents/supervisor.yaml` and `lead.yaml` in the secretary's shape: `decision_boundary`, `rigor`, `tool-scope`
    (`Read`, `Bash`), no `skills` field (phase 18 adds it with the skills, so no persona names a missing skill).
    Supervisor never implements, reviews, lands code or chats with the owner; lead never starts or stops a session. Add
