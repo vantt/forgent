@@ -419,3 +419,221 @@ fn every_error_vector_of_the_run_unit_contract_survives_the_round_trip() {
     let options = contract["request"]["options"].as_array().unwrap();
     assert_eq!(options.len(), fgos_execution_engine::unit_run::run_unit_contract::REQUEST_OPTIONS.len());
 }
+
+// ---- the Git-backed commit and sync, over a real repository and a linked worktree ----------------------------
+
+#[cfg(target_os = "linux")]
+mod git_backed {
+    use std::fs;
+    use std::path::{Path, PathBuf};
+    use std::process::Command;
+    use std::sync::atomic::{AtomicU64, Ordering};
+
+    use fgos_execution_engine::unit_run::git_port::*;
+    use fgos_git::{GitDriver, RepoHandle, ResolveRepo};
+    use fgos_holder_lock::{acquire, Acquire, Handle, Mode, Resource, Wait};
+    use serde_json::{json, Value};
+
+    static SERIAL: AtomicU64 = AtomicU64::new(0);
+
+    fn git(root: &Path, args: &[&str]) -> String {
+        let out = Command::new("git").arg("-C").arg(root).args(args).output().unwrap();
+        assert!(out.status.success(), "{args:?}: {}", String::from_utf8_lossy(&out.stderr));
+        String::from_utf8(out.stdout).unwrap().trim().into()
+    }
+
+    struct Fixture {
+        temp: PathBuf,
+        main: PathBuf,
+        tree: PathBuf,
+        driver: GitDriver,
+        repo: RepoHandle,
+        lease: Option<Handle>,
+    }
+
+    impl Fixture {
+        fn new() -> Self {
+            use std::os::unix::fs::{MetadataExt, PermissionsExt};
+            let temp = std::env::temp_dir().join(format!("fgos-p18-{}-{}", std::process::id(), SERIAL.fetch_add(1, Ordering::Relaxed)));
+            fs::create_dir(&temp).unwrap();
+            fs::set_permissions(&temp, fs::Permissions::from_mode(0o700)).unwrap();
+            let main = temp.join("repo");
+            fs::create_dir(&main).unwrap();
+            git(&main, &["init", "-q", "--initial-branch=trunk"]);
+            git(&main, &["config", "user.name", "Fixture"]);
+            git(&main, &["config", "user.email", "fixture@example.invalid"]);
+            fs::write(main.join("a"), "base\n").unwrap();
+            git(&main, &["add", "."]);
+            git(&main, &["commit", "-qm", "base"]);
+            let tree = temp.join("producer");
+            git(&main, &["worktree", "add", "-qb", "producer", tree.to_str().unwrap()]);
+            let fence = main.join(".fgos/locks/activation.lock");
+            fs::create_dir_all(&fence).unwrap();
+            fs::write(fence.join("TOMBSTONE"), r#"{"lock":"activation","by":"fgos git","at":"fixture"}"#).unwrap();
+            let m = fs::metadata(&tree).unwrap();
+            let birth = m.created().unwrap().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
+            let key = format!("dispatch-cwd--{}-{}-{}.lock", m.dev(), m.ino(), birth);
+            let lease = match acquire(&Resource::new("dispatch-cwd", main.join(".fgos/locks").join(key)), Mode::Ex, Wait::Ms(100), 5000) {
+                Acquire::Acquired(h) => h,
+                other => panic!("{other:?}"),
+            };
+            let driver = GitDriver::new(&temp).unwrap();
+            let repo = match driver.resolve_repo(&tree, &main).unwrap() {
+                ResolveRepo::Repository(r) => r,
+                _ => panic!("not a repository"),
+            };
+            Self { temp, main, tree, driver, repo, lease: Some(lease) }
+        }
+
+        fn unit(&self) -> UnitGit<'_> {
+            UnitGit { driver: &self.driver, repo: &self.repo, custody: self.lease.as_ref(), writer: "fixture" }
+        }
+    }
+
+    impl Drop for Fixture {
+        fn drop(&mut self) {
+            drop(self.lease.take());
+            let _ = fs::remove_dir_all(&self.temp);
+        }
+    }
+
+    fn scope(paths: &[&str]) -> Vec<String> {
+        paths.iter().map(|p| (*p).to_owned()).collect()
+    }
+
+    fn args<'a>(scope: &'a [String], baseline: Option<&'a fgos_git::CommitBaseline>, id: &'a str) -> CommitArgs<'a> {
+        CommitArgs {
+            unit_id: "u1",
+            summary: Some("feat(x): add the thing\n\ndetails"),
+            objective: None,
+            scope,
+            baseline,
+            changed_files: Some(&[]),
+            exclude_paths: &[],
+            needs_writes: None,
+            operation_id: id,
+            resume: None,
+        }
+    }
+
+    fn clear(f: &Fixture, scope: &[String]) -> fgos_git::CommitBaseline {
+        match f.unit().preflight(scope, None).unwrap() {
+            Preflight::Clear { baseline, .. } => baseline,
+            Preflight::Foreign { .. } => panic!("foreign"),
+        }
+    }
+
+    #[test]
+    fn a_round_commits_only_the_declared_writes_and_leaves_the_rest() {
+        let f = Fixture::new();
+        let scope = scope(&["src/**"]);
+        let baseline = clear(&f, &scope);
+        fs::create_dir(f.tree.join("src")).unwrap();
+        fs::write(f.tree.join("src/new.txt"), "in\n").unwrap();
+        fs::write(f.tree.join("stray.txt"), "out\n").unwrap();
+        let mut prepared = Vec::new();
+        let out = f.unit().commit_unit_work(&args(&scope, Some(&baseline), "op-commit-1"), &mut |p| prepared.push(p.clone()));
+        assert_eq!(out["status"], "committed", "{out}");
+        assert_eq!(out["subject"], "feat(x): add the thing");
+        assert_eq!(out["files"], json!(["src/new.txt"]));
+        assert_eq!(prepared.len(), 1, "the operation is recorded before it runs");
+        assert_eq!(prepared[0].expected_paths, vec!["src/new.txt".to_string()]);
+        assert!(f.tree.join("stray.txt").exists(), "a file outside the scope is left as it was");
+        assert_eq!(git(&f.tree, &["log", "-1", "--format=%s"]), "feat(x): add the thing");
+        assert!(f.unit().commit_on_branch(out["sha"].as_str().unwrap()).unwrap());
+    }
+
+    #[test]
+    fn a_round_that_changed_nothing_in_scope_is_no_changes() {
+        let f = Fixture::new();
+        let scope = scope(&["src/**"]);
+        let baseline = clear(&f, &scope);
+        let out = f.unit().commit_unit_work(&args(&scope, Some(&baseline), "op-commit-2"), &mut |_| {});
+        assert_eq!(out["status"], "no-changes", "{out}");
+    }
+
+    #[test]
+    fn a_commit_without_its_baseline_is_refused_by_name() {
+        let f = Fixture::new();
+        let scope = scope(&["src/**"]);
+        let out = f.unit().commit_unit_work(&args(&scope, None, "op-commit-3"), &mut |_| {});
+        assert_eq!(out["status"], "failed");
+        assert_eq!(out["reason"], "baseline-required");
+    }
+
+    #[test]
+    fn staged_changes_the_run_did_not_make_refuse_the_preflight_and_the_commit() {
+        let f = Fixture::new();
+        fs::write(f.tree.join("other.txt"), "x\n").unwrap();
+        git(&f.tree, &["add", "other.txt"]);
+        let scope = scope(&["src/**"]);
+        match f.unit().preflight(&scope, None).unwrap() {
+            Preflight::Foreign { staged, merge_head } => {
+                assert_eq!(staged, vec!["other.txt".to_string()]);
+                assert!(merge_head.is_none());
+            }
+            Preflight::Clear { .. } => panic!("the foreign index must be named"),
+        }
+    }
+
+    #[test]
+    fn the_sync_merge_of_a_moved_base_commits_and_a_current_base_is_up_to_date() {
+        let f = Fixture::new();
+        let main_head = f.unit().resolve_sync_base("trunk").unwrap().unwrap();
+        let first = f.unit().start_sync_merge("trunk", &main_head, "op-sync-1");
+        assert_eq!(first["status"], "up-to-date", "{first}");
+
+        fs::write(f.main.join("b"), "more\n").unwrap();
+        git(&f.main, &["add", "b"]);
+        git(&f.main, &["commit", "-qm", "more"]);
+        let moved = f.unit().resolve_sync_base("trunk").unwrap().unwrap();
+        assert_ne!(moved, main_head);
+        let merged = f.unit().start_sync_merge("trunk", &moved, "op-sync-2");
+        assert_eq!(merged["status"], "merged", "{merged}");
+        assert_eq!(merged["commit"]["subject"], "chore(sync): merge trunk");
+        assert!(f.tree.join("b").exists());
+        assert!(f.unit().commit_on_branch(&moved).unwrap());
+    }
+
+    #[test]
+    fn a_conflicting_sync_merge_stays_open_for_the_worker_and_finishes_when_resolved() {
+        let f = Fixture::new();
+        fs::write(f.tree.join("a"), "from the branch\n").unwrap();
+        git(&f.tree, &["commit", "-qam", "branch edit"]);
+        fs::write(f.main.join("a"), "from trunk\n").unwrap();
+        git(&f.main, &["commit", "-qam", "trunk edit"]);
+        let moved = f.unit().resolve_sync_base("trunk").unwrap().unwrap();
+        let started = f.unit().start_sync_merge("trunk", &moved, "op-sync-3");
+        assert_eq!(started["status"], "conflicted", "{started}");
+        assert_eq!(started["conflicts"], json!(["a"]));
+        let state = f.unit().sync_merge_state("op-sync-3").unwrap();
+        assert_eq!(state["state"], "in-progress");
+
+        fs::write(f.tree.join("a"), "resolved\n").unwrap();
+        git(&f.tree, &["add", "a"]);
+        let finished = f.unit().finish_sync_merge(&started);
+        assert_eq!(finished["status"], "committed", "{finished}");
+        assert_eq!(finished["subject"], "chore(sync): merge trunk");
+        assert!(f.unit().commit_on_branch(&moved).unwrap());
+    }
+
+    #[test]
+    fn a_merge_that_never_started_is_not_in_progress() {
+        let f = Fixture::new();
+        let err: Value = match f.unit().sync_merge_state("never-started") {
+            Ok(v) => v,
+            Err(e) => json!({ "state": "error", "cause": e.cause }),
+        };
+        assert_ne!(err["state"], "in-progress", "{err}");
+    }
+}
+
+#[test]
+fn a_worktree_that_does_not_exist_has_no_key_and_no_custody_holder() {
+    use fgos_execution_engine::unit_run::custody::{custody_held, worktree_key};
+    let here = std::env::temp_dir();
+    assert!(worktree_key(&here).is_some());
+    let gone = here.join("fgos-p18-no-such-worktree");
+    assert!(worktree_key(&gone).is_none());
+    assert!(!custody_held(&here.join("fgos-p18-no-fgos-dir"), &gone));
+}

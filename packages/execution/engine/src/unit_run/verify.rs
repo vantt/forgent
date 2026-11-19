@@ -71,13 +71,22 @@ pub fn classify(ran: &Ran, timeout_ms: Option<u64>, duration_ms: u64) -> Verifie
     }
 }
 
+#[cfg(windows)]
+fn run_shell(command: &str, env: &[(String, String)], cwd: &std::path::Path, timeout: Duration) -> std::io::Result<Outcome> {
+    run_bounded("cmd", ["/C", command], env, Some(cwd), None, timeout)
+}
+
+#[cfg(not(windows))]
+fn run_shell(command: &str, env: &[(String, String)], cwd: &std::path::Path, timeout: Duration) -> std::io::Result<Outcome> {
+    run_bounded("sh", ["-c", command], env, Some(cwd), None, timeout)
+}
+
 /// Run `command` in `cwd` through the platform shell, bounded by `timeout`, and classify it. Never fails: a
 /// command that cannot start is `not-run`.
 pub fn run_verify(command: &str, cwd: &std::path::Path, timeout: Duration) -> Verified {
     let started = Instant::now();
-    let (shell, flag) = if cfg!(windows) { ("cmd", "/C") } else { ("sh", "-c") };
     let env: Vec<(String, String)> = std::env::vars().collect();
-    let ran = match run_bounded(shell, [flag, command], &env, Some(cwd), None, timeout) {
+    let ran = match run_shell(command, &env, cwd, timeout) {
         Ok(Outcome::Exited(out)) => Ran {
             passed: out.status.success(),
             status: out.status.code(),

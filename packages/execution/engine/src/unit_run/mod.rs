@@ -9,6 +9,8 @@
 //! * [`sync`]: what a unit's `syncBase` record says (pure: scope, brief, summary, a sync-only pass).
 //! * [`verify`]: the verify command's verdict and what a loop's `verify` hook is told.
 //! * [`partial_writes`]: did a seat of a writing unit change the worktree before it stopped.
+//! * [`custody`]: a worktree's custody, over the run supervisor's lease.
+//! * [`git_port`]: the scoped commit and the sync merge, through the `fgos-git` port.
 //! * [`consent`]: the admission consent checked again just before a writing round commits.
 //! * [`peer`]: the framed admission peer channel and its `CaseAdmission` adapter.
 //! * [`run_unit_contract`]: the `run-unit` request and result and the error type tags.
@@ -18,6 +20,8 @@
 
 pub mod commit_subject;
 pub mod consent;
+pub mod custody;
+pub mod git_port;
 pub mod partial_writes;
 pub mod peer;
 pub mod run_unit_contract;
