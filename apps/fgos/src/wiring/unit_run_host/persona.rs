@@ -3,11 +3,13 @@
 //! (`src/runner/agent-definitions.mjs:253,337`). The shape check is `fgos-execution`'s, the one `fgos agents list`
 //! judges every file by; the agent-file name rule is Convention's.
 //!
-//! Lookup order: the workspace `fgos/agents`, the workflow's own folder (`agent.<name>.yaml`), the workflow's
-//! owning domain under the running payload, then `core/agents` (the project's own when it carries that folder, the
-//! payload's otherwise). The first layer that holds the name wins; an unknown name names every directory searched.
+//! Lookup order: the workspace tier, the workflow's own folder (`agent.<name>.yaml`), the workflow's owning domain
+//! under the running payload, then the core tier (the project's own when it carries that folder, the payload's
+//! otherwise). The tier folders are read by the agents listing's one reader. The first layer that holds the name wins; an unknown name names every directory searched.
 
 use std::path::{Path, PathBuf};
+
+use crate::wiring::agents::tiers_of;
 
 use fgos_execution_engine::unit_run::run_unit_contract::RunUnitError;
 use serde_json::{json, Value};
@@ -24,6 +26,15 @@ fn valid_name(name: &str) -> bool {
         && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
 }
 
+/// Where one layer's definition of the name lies.
+enum Source {
+    /// A file the agents listing's tier reader read beneath its tier folder.
+    Read(fgos_execution::agents::Content),
+    /// The workflow's own folder, read here (no tier reader knows a workflow's folder).
+    Workflow(PathBuf),
+    None,
+}
+
 /// One layer a lookup reads.
 struct Layer {
     layer: &'static str,
@@ -31,19 +42,44 @@ struct Layer {
     dir: PathBuf,
     rel_dir: String,
     file_name: String,
+    source: Source,
+    /// The `.yml` file beside it that is never read, named in a not-found answer.
+    ignored_yml: bool,
 }
 
 /// `lookupTiers` (`src/runner/agent-definitions.mjs:211`): the layers one lookup reads, in order, for the workflow
-/// it is made for (`{ workflowDir, owningDomain }`, the run's `personaScope`).
+/// it is made for (`{ workflowDir, owningDomain }`, the run's `personaScope`). The tier folders and their files are
+/// the agents listing's ([`tiers_of`]), the one reader of the tier directories.
 fn layers(name: &str, project: &Path, install: &Path, workflow: Option<&Value>) -> Vec<Layer> {
+    let (tiers, _) = tiers_of(project, install);
     let plain = format!("{name}.yaml");
-    let mut out = vec![Layer {
-        layer: "workspace",
-        label: "fgos/agents".into(),
-        dir: project.join("fgos").join("agents"),
-        rel_dir: "fgos/agents".into(),
-        file_name: plain.clone(),
-    }];
+    let tier = |id: &str| tiers.iter().find(|t| t.tier == id);
+    let from_tier = |id: &str, rel_dir: &str| -> (Source, bool) {
+        let Some(t) = tier(id) else {
+            return (Source::None, false);
+        };
+        let rel = format!("{rel_dir}/{plain}");
+        let found = t
+            .files
+            .iter()
+            .find(|f| f.rel == rel)
+            .map(|f| Source::Read(f.content.clone()));
+        let yml = t.ignored.contains(&format!("{rel_dir}/{name}.yml"));
+        (found.unwrap_or(Source::None), yml)
+    };
+    let mut out = Vec::new();
+    if let Some(t) = tier("workspace") {
+        let (source, ignored_yml) = from_tier("workspace", &t.label);
+        out.push(Layer {
+            layer: "workspace",
+            label: t.label.clone(),
+            dir: project.join(&t.label),
+            rel_dir: t.label.clone(),
+            file_name: plain.clone(),
+            source,
+            ignored_yml,
+        });
+    }
     let text = |key: &str| {
         workflow
             .and_then(|w| w.get(key))
@@ -62,38 +98,55 @@ fn layers(name: &str, project: &Path, install: &Path, workflow: Option<&Value>) 
             || format!("agent.{name}.yaml"),
             |r| format!("{}{name}{}", r.prefix, r.suffix),
         );
+        let file = dir.join(&file_name);
+        let ignored_yml = dir.join(format!("{name}.yml")).exists();
         out.push(Layer {
             layer: "workflow",
             label: "the workflow folder".into(),
+            source: if std::fs::metadata(&file).is_ok_and(|m| m.is_file()) {
+                Source::Workflow(file)
+            } else {
+                Source::None
+            },
             dir,
             rel_dir,
             file_name,
+            ignored_yml,
         });
     }
     if let Some(domain) = text("owningDomain") {
-        let dir = install.join("domains").join(domain);
-        if std::fs::symlink_metadata(&dir).is_ok_and(|m| m.is_dir()) {
+        let rel_dir = format!("domains/{domain}/agents");
+        if std::fs::symlink_metadata(install.join("domains").join(domain)).is_ok_and(|m| m.is_dir())
+        {
+            let (source, ignored_yml) = from_tier("domain", &rel_dir);
             out.push(Layer {
                 layer: "domain",
-                label: format!("domains/{domain}/agents"),
-                dir: dir.join("agents"),
-                rel_dir: format!("domains/{domain}/agents"),
+                label: rel_dir.clone(),
+                dir: install.join(&rel_dir),
+                rel_dir,
                 file_name: plain.clone(),
+                source,
+                ignored_yml,
             });
         }
     }
-    let core_root = if project.join("core").join("agents").exists() {
-        project
-    } else {
-        install
-    };
-    out.push(Layer {
-        layer: "core",
-        label: "core/agents".into(),
-        dir: core_root.join("core").join("agents"),
-        rel_dir: "core/agents".into(),
-        file_name: plain,
-    });
+    if let Some(t) = tier("core") {
+        let root = if project.join(&t.label).exists() {
+            project
+        } else {
+            install
+        };
+        let (source, ignored_yml) = from_tier("core", &t.label);
+        out.push(Layer {
+            layer: "core",
+            label: t.label.clone(),
+            dir: root.join(&t.label),
+            rel_dir: t.label.clone(),
+            file_name: plain,
+            source,
+            ignored_yml,
+        });
+    }
     out
 }
 
@@ -124,24 +177,25 @@ pub fn resolve_agent_definition(
     }
     let layers = layers(name, project, install, workflow);
     for layer in &layers {
-        let file = layer.dir.join(&layer.file_name);
-        let Ok(meta) = std::fs::metadata(&file) else {
-            continue;
-        };
-        if !meta.is_file() {
-            continue;
-        }
         let rel = format!("{}/{}", layer.rel_dir, layer.file_name);
-        if meta.len() > AGENT_FILE_MAX_BYTES {
+        let unreadable = |why: String| {
+            RunUnitError::other("error", format!("persona \"{name}\" ({rel}): {why}"))
+        };
+        let bytes = match &layer.source {
+            Source::None => continue,
+            Source::Read(fgos_execution::agents::Content::Bytes(bytes)) => bytes.clone(),
+            Source::Read(fgos_execution::agents::Content::Unreadable) => {
+                return Err(unreadable("cannot be read".into()))
+            }
+            Source::Workflow(file) => std::fs::read(file).map_err(|e| unreadable(e.to_string()))?,
+        };
+        if bytes.len() as u64 > AGENT_FILE_MAX_BYTES {
             return Err(RunUnitError::config(
                 format!("persona \"{name}\" ({rel}) is larger than {AGENT_FILE_MAX_BYTES} bytes"),
                 None,
                 None,
             ));
         }
-        let bytes = std::fs::read(&file).map_err(|e| {
-            RunUnitError::other("error", format!("persona \"{name}\" ({rel}): {e}"))
-        })?;
         let read = fgos_execution::agents::read_definition(&bytes, &rel);
         if let Some(problem) = fgos_execution::agents::shape_problem(name, &read) {
             return Err(RunUnitError::config(
@@ -170,7 +224,7 @@ pub fn resolve_agent_definition(
         .collect();
     let hint = layers
         .iter()
-        .find(|l| l.dir.join(format!("{name}.yml")).exists())
+        .find(|l| l.ignored_yml)
         .map(|l| {
             format!(
                 "; {}/{name}.yml exists but only .yaml files are read",
