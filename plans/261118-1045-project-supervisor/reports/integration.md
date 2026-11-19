@@ -39,3 +39,11 @@ PENDING (owner/supervisor window). Needs: build, stage and activate the combined
 
 ## Open questions
 - `node scripts/check-backlog-reconciliation.mjs` already fails on this tree before this phase (186 problems on `HEAD`, 188 now: the three new proposed rows have no section in RECONCILIATION.md, and `p-t55xjys4u5` left the proposed set). Who reconciles?
+
+## Open points (lead, 2026-11-19)
+- `node scripts/check-backlog-reconciliation.mjs` was already failing on main before this phase (186 problems: proposed
+  rows with no section in docs/history/backlog-execution-reconciliation/RECONCILIATION.md). This phase's three new
+  rows (`p-nqftk5hypy`, `p-rk25cfw4ct`, `p-fllz2aajji`) add three of the same kind. Not in `npm test`; whether that
+  reconciliation is still kept is an owner question, not this plan's.
+- Backlog id `p-j2et24xb6o` was minted and not used.
+- Step 6 (delete land-branch.sh) is pending until every running lead lands with `fgos land` (supervisor decision A).
