@@ -86,7 +86,9 @@ impl std::fmt::Display for PeerError {
                 "{HOST_VERSION_MISMATCH}: the peer speaks protocol {}, this side {PROTOCOL}",
                 got.map_or("none".to_string(), |g| g.to_string())
             ),
-            Self::Remote { code, message } => write!(f, "admission peer refused the call ({code}): {message}"),
+            Self::Remote { code, message } => {
+                write!(f, "admission peer refused the call ({code}): {message}")
+            }
             Self::Malformed(m) => write!(f, "admission peer sent a malformed answer: {m}"),
         }
     }
@@ -148,19 +150,34 @@ impl PeerChannel {
                 }
             }
         });
-        Self { inner: Mutex::new(Inner { writer: Box::new(writer), inbox, next_id: 1 }), deadline }
+        Self {
+            inner: Mutex::new(Inner {
+                writer: Box::new(writer),
+                inbox,
+                next_id: 1,
+            }),
+            deadline,
+        }
     }
 
     /// The process's own stdin and stdout.
     pub fn over_stdio(deadline: Duration) -> Self {
-        Self::with_deadline(std::io::BufReader::new(std::io::stdin()), std::io::stdout(), deadline)
+        Self::with_deadline(
+            std::io::BufReader::new(std::io::stdin()),
+            std::io::stdout(),
+            deadline,
+        )
     }
 
     /// A spawned peer's stdout and stdin; `None` when either pipe was not captured.
     pub fn over_child(child: &mut Child, deadline: Duration) -> Option<Self> {
         let out = child.stdout.take()?;
         let input = child.stdin.take()?;
-        Some(Self::with_deadline(std::io::BufReader::new(out), input, deadline))
+        Some(Self::with_deadline(
+            std::io::BufReader::new(out),
+            input,
+            deadline,
+        ))
     }
 
     /// One request and its answer's `result`.
@@ -168,7 +185,8 @@ impl PeerChannel {
         let mut inner = self.inner.lock().unwrap_or_else(|e| e.into_inner());
         let id = inner.next_id;
         inner.next_id += 1;
-        let frame = frame_line(&json!({ "protocol": PROTOCOL, "id": id, "op": op, "payload": payload }));
+        let frame =
+            frame_line(&json!({ "protocol": PROTOCOL, "id": id, "op": op, "payload": payload }));
         inner
             .writer
             .write_all(frame.as_bytes())
@@ -179,8 +197,12 @@ impl PeerChannel {
             let left = until.saturating_duration_since(Instant::now());
             let message = match inner.inbox.recv_timeout(left) {
                 Ok(m) => m,
-                Err(RecvTimeoutError::Timeout) => return Err(PeerError::Deadline { op: op.into() }),
-                Err(RecvTimeoutError::Disconnected) => return Err(PeerError::Closed { op: op.into() }),
+                Err(RecvTimeoutError::Timeout) => {
+                    return Err(PeerError::Deadline { op: op.into() })
+                }
+                Err(RecvTimeoutError::Disconnected) => {
+                    return Err(PeerError::Closed { op: op.into() })
+                }
             };
             let protocol = message.get("protocol").and_then(Value::as_u64);
             if protocol != Some(PROTOCOL) {
@@ -191,13 +213,21 @@ impl PeerChannel {
                 continue;
             }
             if let Some(error) = message.get("error") {
-                let text = |k: &str| error.get(k).and_then(Value::as_str).unwrap_or("").to_string();
-                return Err(PeerError::Remote { code: text("code"), message: text("message") });
+                let text = |k: &str| {
+                    error
+                        .get(k)
+                        .and_then(Value::as_str)
+                        .unwrap_or("")
+                        .to_string()
+                };
+                return Err(PeerError::Remote {
+                    code: text("code"),
+                    message: text("message"),
+                });
             }
-            return message
-                .get("result")
-                .cloned()
-                .ok_or_else(|| PeerError::Malformed(format!("{op}: the answer has neither result nor error")));
+            return message.get("result").cloned().ok_or_else(|| {
+                PeerError::Malformed(format!("{op}: the answer has neither result nor error"))
+            });
         }
     }
 
@@ -207,7 +237,9 @@ impl PeerChannel {
         if ack.get("acknowledged") == Some(&Value::Bool(true)) {
             Ok(())
         } else {
-            Err(PeerError::Malformed(format!("event {name} was not acknowledged")))
+            Err(PeerError::Malformed(format!(
+                "event {name} was not acknowledged"
+            )))
         }
     }
 
@@ -218,7 +250,10 @@ impl PeerChannel {
 
     /// The case admitted the run (the parent records `recordScheduled`).
     pub fn case_admitted(&self, case_id: &str, reservation_id: &str) -> Result<(), PeerError> {
-        self.event(EVENT_CASE_ADMITTED, json!({ "caseId": case_id, "reservationId": reservation_id }))
+        self.event(
+            EVENT_CASE_ADMITTED,
+            json!({ "caseId": case_id, "reservationId": reservation_id }),
+        )
     }
 }
 
@@ -269,7 +304,9 @@ impl CaseAdmission for PeerAdmission {
             return Ok(Admission::Refused(refusal_of(refused, OP_ADMIT)?));
         }
         if answer.get("admitted") != Some(&Value::Bool(true)) {
-            return Err(PeerError::Malformed("admit: neither admitted nor refused".into()));
+            return Err(PeerError::Malformed(
+                "admit: neither admitted nor refused".into(),
+            ));
         }
         Ok(Admission::Admitted {
             reservation_id: string_field(&answer, "reservationId", OP_ADMIT)?,
@@ -278,29 +315,47 @@ impl CaseAdmission for PeerAdmission {
         })
     }
 
-    fn recheck_effect(&self, reservation_id: &str, case_id: &str, paths: &[String]) -> Result<Recheck, PeerError> {
+    fn recheck_effect(
+        &self,
+        reservation_id: &str,
+        case_id: &str,
+        paths: &[String],
+    ) -> Result<Recheck, PeerError> {
         let answer = self.channel.request(
             OP_RECHECK_EFFECT,
             json!({ "reservationId": reservation_id, "caseId": case_id, "paths": paths }),
         )?;
         if let Some(refused) = answer.get("refused") {
             let r = refusal_of(refused, OP_RECHECK_EFFECT)?;
-            return Ok(Recheck::Refused { code: r.code, condition: r.condition });
+            return Ok(Recheck::Refused {
+                code: r.code,
+                condition: r.condition,
+            });
         }
         if answer.get("ok") == Some(&Value::Bool(true)) {
             Ok(Recheck::Ok)
         } else {
-            Err(PeerError::Malformed("recheckEffect: neither ok nor refused".into()))
+            Err(PeerError::Malformed(
+                "recheckEffect: neither ok nor refused".into(),
+            ))
         }
     }
 
     fn settle(&self, reservation_id: &str, settle: &Value) -> Result<(), PeerError> {
         self.channel
-            .request(OP_SETTLE, json!({ "reservationId": reservation_id, "settle": settle }))
+            .request(
+                OP_SETTLE,
+                json!({ "reservationId": reservation_id, "settle": settle }),
+            )
             .map(|_| ())
     }
 
-    fn activity_unit_of(&self, main_root: &str, case_id: &str, activity: &str) -> Result<Option<Value>, PeerError> {
+    fn activity_unit_of(
+        &self,
+        main_root: &str,
+        case_id: &str,
+        activity: &str,
+    ) -> Result<Option<Value>, PeerError> {
         let answer = self.channel.request(
             OP_ACTIVITY_UNIT_OF,
             json!({ "mainRoot": main_root, "caseId": case_id, "activity": activity }),
@@ -308,14 +363,21 @@ impl CaseAdmission for PeerAdmission {
         Ok(if answer.is_null() { None } else { Some(answer) })
     }
 
-    fn confined_write_refusal(&self, main_root: &str, case_id: Option<&str>) -> Result<Option<String>, PeerError> {
-        let answer = self
-            .channel
-            .request(OP_CONFINED_WRITE_REFUSAL, json!({ "mainRoot": main_root, "caseId": case_id }))?;
+    fn confined_write_refusal(
+        &self,
+        main_root: &str,
+        case_id: Option<&str>,
+    ) -> Result<Option<String>, PeerError> {
+        let answer = self.channel.request(
+            OP_CONFINED_WRITE_REFUSAL,
+            json!({ "mainRoot": main_root, "caseId": case_id }),
+        )?;
         match answer {
             Value::Null => Ok(None),
             Value::String(reason) => Ok(Some(reason)),
-            _ => Err(PeerError::Malformed("confinedWriteRefusal: neither null nor a reason".into())),
+            _ => Err(PeerError::Malformed(
+                "confinedWriteRefusal: neither null nor a reason".into(),
+            )),
         }
     }
 }

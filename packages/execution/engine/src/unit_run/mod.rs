@@ -14,16 +14,32 @@
 //! * [`consent`]: the admission consent checked again just before a writing round commits.
 //! * [`peer`]: the framed admission peer channel and its `CaseAdmission` adapter.
 //! * [`run_unit_contract`]: the `run-unit` request and result and the error type tags.
+//! * [`start`]: admission of a new unit run, or the resume of one, refused by name before any seat binds.
+//! * [`run`]: the run loop, `run_unit`, over the pure loops and the host's assignment runner.
+//! * [`provider_limit`]: what a seat does after a provider limit or a lost brief.
+//! * [`history`]: the settled seat rounds read back from a unit run directory.
+//! * [`record`]: the `unit.json` bytes, through the durable-file door.
+//! * [`host`]: what the run asks of the machine around it.
 //!
 //! Golden vectors: `packages/execution/contracts/unit-run/`; the peer's contract:
 //! `packages/execution/contracts/admission-peer/admission-peer.v1.json`.
+
+// A refusal is the `run-unit` error document a caller reads (tag, class, code, message, phase, refusal), returned
+// whole across every port; boxing it would only move the same fields behind a pointer at each call.
+#![allow(clippy::result_large_err)]
 
 pub mod commit_subject;
 pub mod consent;
 pub mod custody;
 pub mod git_port;
+pub mod history;
+pub mod host;
 pub mod partial_writes;
 pub mod peer;
+pub mod provider_limit;
+pub mod record;
+pub mod run;
 pub mod run_unit_contract;
+pub mod start;
 pub mod sync;
 pub mod verify;

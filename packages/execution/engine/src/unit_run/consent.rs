@@ -22,7 +22,9 @@ pub fn recheck_write_consent<P: CaseAdmission>(
     admission: Option<&HeldAdmission<'_, P>>,
     changed_files: &[String],
 ) -> Result<Option<ConsentRefusal>, P::Error> {
-    let Some(held) = admission else { return Ok(None) };
+    let Some(held) = admission else {
+        return Ok(None);
+    };
     Ok(
         match held
             .port

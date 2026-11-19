@@ -66,7 +66,9 @@ pub fn sync_summary(sync: Option<&Value>) -> Option<Value> {
     let object = sync.as_object()?;
     let kept: Map<String, Value> = object
         .iter()
-        .filter(|(k, _)| !["started", "mergeStaged", "nativeHead", "nextOperationId"].contains(&k.as_str()))
+        .filter(|(k, _)| {
+            !["started", "mergeStaged", "nativeHead", "nextOperationId"].contains(&k.as_str())
+        })
         .map(|(k, v)| (k.clone(), v.clone()))
         .collect();
     Some(Value::Object(kept))
@@ -74,7 +76,9 @@ pub fn sync_summary(sync: Option<&Value>) -> Option<Value> {
 
 /// A sync-only unit that needed no worker: its one result is the runner's merge commit (or none).
 pub fn sync_only_pass(sync: &Value) -> Value {
-    let warnings = sync.get("warnings").filter(|w| w.as_array().is_some_and(|a| !a.is_empty()));
+    let warnings = sync
+        .get("warnings")
+        .filter(|w| w.as_array().is_some_and(|a| !a.is_empty()));
     let mut commit = match sync.pointer("/commit/sha").and_then(Value::as_str) {
         Some(sha) => json!({
             "status": "committed",
@@ -94,7 +98,10 @@ pub fn sync_only_pass(sync: &Value) -> Value {
 /// Whether a record with no pending merge still owes a sync-only pass: its merge is done, the unit only syncs,
 /// and no producer was ever bound.
 pub fn owes_sync_only_pass(unit_record: &Value) -> bool {
-    let done = matches!(status_of(unit_record.get("sync")), Some("merged" | "up-to-date"));
+    let done = matches!(
+        status_of(unit_record.get("sync")),
+        Some("merged" | "up-to-date")
+    );
     done && unit_record.pointer("/unit/syncOnly") == Some(&Value::Bool(true))
         && unit_record.pointer("/bindings/producer~11").is_none()
 }

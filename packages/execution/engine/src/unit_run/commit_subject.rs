@@ -133,7 +133,11 @@ pub fn subject_from(summary: Option<&str>, unit_id: &str, objective: Option<&str
     }
     let own = format!("{unit_id}: ");
     let text = line.strip_prefix(&own).map_or(line.as_str(), str::trim);
-    let text = if text.is_empty() { "producer changes" } else { text };
+    let text = if text.is_empty() {
+        "producer changes"
+    } else {
+        text
+    };
     fit_subject(&format!("chore({unit_id}): {text}"))
 }
 

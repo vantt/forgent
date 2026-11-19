@@ -34,7 +34,9 @@ fn token(fingerprint: &PathFingerprint) -> Option<String> {
 }
 
 /// The snapshot a Git capture stands for; the run store (`.fgos`) is never part of it.
-pub fn worktree_snapshot(captured: &WritesSnapshot) -> Result<WorktreeSnapshot, std::string::FromUtf8Error> {
+pub fn worktree_snapshot(
+    captured: &WritesSnapshot,
+) -> Result<WorktreeSnapshot, std::string::FromUtf8Error> {
     let mut files = BTreeMap::new();
     for entry in &captured.files {
         let path = String::from_utf8(entry.path.clone())?;
@@ -43,7 +45,10 @@ pub fn worktree_snapshot(captured: &WritesSnapshot) -> Result<WorktreeSnapshot, 
         }
         files.insert(path, token(&entry.fingerprint));
     }
-    Ok(WorktreeSnapshot { head: captured.head.as_ref().map(|h| h.as_str().to_string()), files })
+    Ok(WorktreeSnapshot {
+        head: captured.head.as_ref().map(|h| h.as_str().to_string()),
+        files,
+    })
 }
 
 /// A path dirty in only one snapshot changed even when its content reads the same (a file put back, or one that
@@ -60,5 +65,8 @@ pub fn writes_since(before: &WorktreeSnapshot, now: &WorktreeSnapshot) -> Writes
         })
         .cloned()
         .collect();
-    WritesSince { paths, head_moved: before.head != now.head }
+    WritesSince {
+        paths,
+        head_moved: before.head != now.head,
+    }
 }

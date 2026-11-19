@@ -67,17 +67,33 @@ pub fn classify(ran: &Ran, timeout_ms: Option<u64>, duration_ms: u64) -> Verifie
         how,
         tail,
         duration_ms,
-        output_digest: format!("sha256:{}", digest.iter().map(|b| format!("{b:02x}")).collect::<String>()),
+        output_digest: format!(
+            "sha256:{}",
+            digest
+                .iter()
+                .map(|b| format!("{b:02x}"))
+                .collect::<String>()
+        ),
     }
 }
 
 #[cfg(windows)]
-fn run_shell(command: &str, env: &[(String, String)], cwd: &std::path::Path, timeout: Duration) -> std::io::Result<Outcome> {
+fn run_shell(
+    command: &str,
+    env: &[(String, String)],
+    cwd: &std::path::Path,
+    timeout: Duration,
+) -> std::io::Result<Outcome> {
     run_bounded("cmd", ["/C", command], env, Some(cwd), None, timeout)
 }
 
 #[cfg(not(windows))]
-fn run_shell(command: &str, env: &[(String, String)], cwd: &std::path::Path, timeout: Duration) -> std::io::Result<Outcome> {
+fn run_shell(
+    command: &str,
+    env: &[(String, String)],
+    cwd: &std::path::Path,
+    timeout: Duration,
+) -> std::io::Result<Outcome> {
     run_bounded("sh", ["-c", command], env, Some(cwd), None, timeout)
 }
 
@@ -101,11 +117,24 @@ pub fn run_verify(command: &str, cwd: &std::path::Path, timeout: Duration) -> Ve
             passed: false,
             status: None,
             timed_out: true,
-            output: format!("{}{}", String::from_utf8_lossy(&stdout), String::from_utf8_lossy(&stderr)),
+            output: format!(
+                "{}{}",
+                String::from_utf8_lossy(&stdout),
+                String::from_utf8_lossy(&stderr)
+            ),
         },
-        Err(error) => Ran { passed: false, status: None, timed_out: false, output: error.to_string() },
+        Err(error) => Ran {
+            passed: false,
+            status: None,
+            timed_out: false,
+            output: error.to_string(),
+        },
     };
-    classify(&ran, u64::try_from(timeout.as_millis()).ok(), u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX))
+    classify(
+        &ran,
+        u64::try_from(timeout.as_millis()).ok(),
+        u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX),
+    )
 }
 
 /// The Execution outcome of a verify answer: a verdict is its own outcome, an infrastructure failure is
@@ -124,10 +153,16 @@ pub fn answer_of_verify(verified: &Verified, subject: &str, command: &str) -> Va
     if verified.verdict == Verdict::Pass {
         return json!({ "pass": true });
     }
-    let tail = if verified.tail.is_empty() { String::new() } else { format!("\n{}", verified.tail) };
+    let tail = if verified.tail.is_empty() {
+        String::new()
+    } else {
+        format!("\n{}", verified.tail)
+    };
     let text = format!("{subject} {}: {command}{tail}", verified.how);
     match &verified.verdict {
-        Verdict::Infrastructure(kind) => json!({ "pass": false, "infrastructure": kind, "error": text }),
+        Verdict::Infrastructure(kind) => {
+            json!({ "pass": false, "infrastructure": kind, "error": text })
+        }
         _ => json!({ "pass": false, "findings": [text] }),
     }
 }

@@ -18,12 +18,20 @@ use fgos_execution_engine::unit_run::partial_writes::{writes_since, WorktreeSnap
 use fgos_execution_engine::unit_run::peer::*;
 use fgos_execution_engine::unit_run::run_unit_contract::{ErrorTag, RunUnitError};
 use fgos_execution_engine::unit_run::sync::*;
-use fgos_execution_engine::unit_run::verify::{answer_of_verify, classify, outcome_of_verify, run_verify, Ran, Verdict, Verified};
+use fgos_execution_engine::unit_run::verify::{
+    answer_of_verify, classify, outcome_of_verify, run_verify, Ran, Verdict, Verified,
+};
 use serde_json::{json, Value};
 
 fn load(dir: &str, name: &str) -> Value {
-    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../contracts").join(dir).join(name);
-    serde_json::from_str(&std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("{}: {e}", path.display()))).unwrap()
+    let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../contracts")
+        .join(dir)
+        .join(name);
+    serde_json::from_str(
+        &std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("{}: {e}", path.display())),
+    )
+    .unwrap()
 }
 
 fn vectors(name: &str) -> Value {
@@ -36,11 +44,18 @@ fn vectors(name: &str) -> Value {
 fn commit_subjects_match_what_node_made() {
     let v = vectors("commit-subject.json");
     for case in v["subjects"].as_array().unwrap() {
-        let got = subject_from(case["summary"].as_str(), case["unitId"].as_str().unwrap(), case["objective"].as_str());
+        let got = subject_from(
+            case["summary"].as_str(),
+            case["unitId"].as_str().unwrap(),
+            case["objective"].as_str(),
+        );
         assert_eq!(got, case["subject"].as_str().unwrap(), "{}", case["name"]);
     }
     for case in v["syncSubjects"].as_array().unwrap() {
-        assert_eq!(sync_subject(case["ref"].as_str().unwrap()), case["subject"].as_str().unwrap());
+        assert_eq!(
+            sync_subject(case["ref"].as_str().unwrap()),
+            case["subject"].as_str().unwrap()
+        );
     }
 }
 
@@ -48,13 +63,22 @@ fn commit_subjects_match_what_node_made() {
 fn sync_decisions_match_what_node_made() {
     let v = vectors("sync.json");
     for case in v["effectiveWriteScope"].as_array().unwrap() {
-        assert_eq!(json!(effective_write_scope(&case["unitRecord"])), case["scope"]);
+        assert_eq!(
+            json!(effective_write_scope(&case["unitRecord"])),
+            case["scope"]
+        );
     }
     for case in v["syncBrief"].as_array().unwrap() {
-        assert_eq!(sync_brief(Some(&case["sync"]).filter(|s| !s.is_null())), case["brief"].as_str().unwrap());
+        assert_eq!(
+            sync_brief(Some(&case["sync"]).filter(|s| !s.is_null())),
+            case["brief"].as_str().unwrap()
+        );
     }
     for case in v["syncSummary"].as_array().unwrap() {
-        assert_eq!(sync_summary(Some(&case["sync"]).filter(|s| !s.is_null())).unwrap_or(Value::Null), case["summary"]);
+        assert_eq!(
+            sync_summary(Some(&case["sync"]).filter(|s| !s.is_null())).unwrap_or(Value::Null),
+            case["summary"]
+        );
     }
     for case in v["syncOnlyPass"].as_array().unwrap() {
         assert_eq!(sync_only_pass(&case["sync"]), case["result"]);
@@ -87,8 +111,18 @@ fn verify_answers_match_what_node_made() {
     let v = vectors("verify.json");
     for case in v["cases"].as_array().unwrap() {
         let verified = verified_of(&case["verified"]);
-        assert_eq!(outcome_of_verify(&verified), case["outcome"].as_str().unwrap());
-        assert_eq!(answer_of_verify(&verified, v["subject"].as_str().unwrap(), v["command"].as_str().unwrap()), case["answer"]);
+        assert_eq!(
+            outcome_of_verify(&verified),
+            case["outcome"].as_str().unwrap()
+        );
+        assert_eq!(
+            answer_of_verify(
+                &verified,
+                v["subject"].as_str().unwrap(),
+                v["command"].as_str().unwrap()
+            ),
+            case["answer"]
+        );
     }
 }
 
@@ -101,7 +135,10 @@ fn a_verify_run_proves_a_verdict_only_when_the_check_ran_to_an_end() {
     assert_eq!(pass.verdict, Verdict::Pass);
     assert!(pass.output_digest.starts_with("sha256:"));
     let findings = run_verify("echo found; exit 3", &dir, Duration::from_secs(20));
-    assert_eq!((findings.verdict.clone(), findings.status), (Verdict::Findings, Some(3)));
+    assert_eq!(
+        (findings.verdict.clone(), findings.status),
+        (Verdict::Findings, Some(3))
+    );
     assert_eq!(findings.tail, "found");
     let timeout = run_verify("sleep 30", &dir, Duration::from_millis(200));
     assert_eq!(timeout.verdict, Verdict::Infrastructure("timeout"));
@@ -112,7 +149,16 @@ fn a_verify_run_proves_a_verdict_only_when_the_check_ran_to_an_end() {
 #[test]
 fn a_verify_tail_keeps_the_last_twenty_lines() {
     let output: String = (1..=30).map(|i| format!("l{i}\n")).collect();
-    let verified = classify(&Ran { passed: false, status: Some(1), timed_out: false, output }, Some(5), 1);
+    let verified = classify(
+        &Ran {
+            passed: false,
+            status: Some(1),
+            timed_out: false,
+            output,
+        },
+        Some(5),
+        1,
+    );
     assert_eq!(verified.tail.lines().count(), 20);
     assert!(verified.tail.starts_with("l11") && verified.tail.ends_with("l30"));
 }
@@ -120,7 +166,10 @@ fn a_verify_tail_keeps_the_last_twenty_lines() {
 fn snapshot(head: &str, files: &[(&str, Option<&str>)]) -> WorktreeSnapshot {
     WorktreeSnapshot {
         head: Some(head.into()),
-        files: files.iter().map(|(p, t)| ((*p).to_string(), t.map(str::to_string))).collect(),
+        files: files
+            .iter()
+            .map(|(p, t)| ((*p).to_string(), t.map(str::to_string)))
+            .collect(),
     }
 }
 
@@ -129,7 +178,10 @@ fn writes_since_names_changed_paths_and_a_moved_head() {
     let before = snapshot("h1", &[("a", Some("1")), ("b", Some("2")), ("c", None)]);
     let same = writes_since(&before, &before);
     assert!(same.paths.is_empty() && !same.head_moved);
-    let now = snapshot("h2", &[("a", Some("1")), ("b", Some("3")), ("d", Some("4"))]);
+    let now = snapshot(
+        "h2",
+        &[("a", Some("1")), ("b", Some("3")), ("d", Some("4"))],
+    );
     let since = writes_since(&before, &now);
     // b changed content; c is dirty in one snapshot only; d is new.
     assert_eq!(since.paths, ["b", "c", "d"]);
@@ -193,7 +245,10 @@ impl Peer {
     fn request(&mut self) -> Value {
         loop {
             let mut line = String::new();
-            assert!(self.requests.read_line(&mut line).unwrap() > 0, "the client closed before asking");
+            assert!(
+                self.requests.read_line(&mut line).unwrap() > 0,
+                "the client closed before asking"
+            );
             if let Some(message) = parse_line(&line) {
                 return message;
             }
@@ -210,11 +265,19 @@ impl Peer {
     }
 }
 
-fn with_peer(deadline: Duration, script: impl FnOnce(Peer) + Send + 'static) -> (PeerAdmission, thread::JoinHandle<()>) {
+fn with_peer(
+    deadline: Duration,
+    script: impl FnOnce(Peer) + Send + 'static,
+) -> (PeerAdmission, thread::JoinHandle<()>) {
     let (client_in, peer_out) = pipe();
     let (peer_in, client_out) = pipe();
     let channel = PeerChannel::with_deadline(BufReader::new(client_in), client_out, deadline);
-    let handle = thread::spawn(move || script(Peer { requests: BufReader::new(peer_in), out: peer_out }));
+    let handle = thread::spawn(move || {
+        script(Peer {
+            requests: BufReader::new(peer_in),
+            out: peer_out,
+        })
+    });
     (PeerAdmission::new(channel), handle)
 }
 
@@ -238,9 +301,18 @@ fn every_vector_of_the_contract_round_trips_through_the_adapter() {
         let payload = &v["payload"];
         let text = |key: &str| payload[key].as_str().unwrap_or("").to_string();
         match v["op"].as_str().unwrap() {
-            OP_RESOLVE_BINDING => assert_eq!(port.resolve_binding(payload).unwrap(), v["result"], "{}", v["name"]),
+            OP_RESOLVE_BINDING => assert_eq!(
+                port.resolve_binding(payload).unwrap(),
+                v["result"],
+                "{}",
+                v["name"]
+            ),
             OP_ADMIT => match port.admit(payload).unwrap() {
-                Admission::Admitted { reservation_id, case_id, seat_launch_ceiling } => {
+                Admission::Admitted {
+                    reservation_id,
+                    case_id,
+                    seat_launch_ceiling,
+                } => {
                     assert_eq!(json!(reservation_id), v["result"]["reservationId"]);
                     assert_eq!(json!(case_id), v["result"]["caseId"]);
                     assert_eq!(json!(seat_launch_ceiling), v["result"]["seatLaunchCeiling"]);
@@ -248,22 +320,48 @@ fn every_vector_of_the_contract_round_trips_through_the_adapter() {
                 Admission::Refused(r) => {
                     assert_eq!(json!(r.code), v["result"]["refused"]["code"]);
                     assert_eq!(json!(r.condition), v["result"]["refused"]["condition"]);
-                    assert_eq!(r.violations.map(Value::Array), v["result"]["refused"].get("violations").cloned());
+                    assert_eq!(
+                        r.violations.map(Value::Array),
+                        v["result"]["refused"].get("violations").cloned()
+                    );
                 }
             },
             OP_RECHECK_EFFECT => {
-                let paths: Vec<String> = payload["paths"].as_array().unwrap().iter().map(|p| p.as_str().unwrap().into()).collect();
-                let got = port.recheck_effect(&text("reservationId"), &text("caseId"), &paths).unwrap();
-                assert_eq!(matches!(got, fgos_execution::admission::Recheck::Ok), v["result"]["ok"] == true, "{}", v["name"]);
+                let paths: Vec<String> = payload["paths"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|p| p.as_str().unwrap().into())
+                    .collect();
+                let got = port
+                    .recheck_effect(&text("reservationId"), &text("caseId"), &paths)
+                    .unwrap();
+                assert_eq!(
+                    matches!(got, fgos_execution::admission::Recheck::Ok),
+                    v["result"]["ok"] == true,
+                    "{}",
+                    v["name"]
+                );
             }
-            OP_SETTLE => port.settle(&text("reservationId"), &payload["settle"]).unwrap(),
+            OP_SETTLE => port
+                .settle(&text("reservationId"), &payload["settle"])
+                .unwrap(),
             OP_ACTIVITY_UNIT_OF => {
-                let got = port.activity_unit_of(&text("mainRoot"), &text("caseId"), &text("activity")).unwrap();
+                let got = port
+                    .activity_unit_of(&text("mainRoot"), &text("caseId"), &text("activity"))
+                    .unwrap();
                 assert_eq!(got.unwrap_or(Value::Null), v["result"], "{}", v["name"]);
             }
             OP_CONFINED_WRITE_REFUSAL => {
-                let got = port.confined_write_refusal(&text("mainRoot"), payload["caseId"].as_str()).unwrap();
-                assert_eq!(got.map_or(Value::Null, Value::String), v["result"], "{}", v["name"]);
+                let got = port
+                    .confined_write_refusal(&text("mainRoot"), payload["caseId"].as_str())
+                    .unwrap();
+                assert_eq!(
+                    got.map_or(Value::Null, Value::String),
+                    v["result"],
+                    "{}",
+                    v["name"]
+                );
             }
             other => panic!("unknown op {other}"),
         }
@@ -284,7 +382,10 @@ fn both_events_are_acknowledged_by_the_peer() {
     });
     port.channel().unit_run_created("unit-run-1").unwrap();
     port.channel().case_admitted("case-1", "res-1").unwrap();
-    assert!(matches!(port.channel().unit_run_created("unit-run-2"), Err(PeerError::Malformed(_))));
+    assert!(matches!(
+        port.channel().unit_run_created("unit-run-2"),
+        Err(PeerError::Malformed(_))
+    ));
     peer.join().unwrap();
 }
 
@@ -293,11 +394,17 @@ fn a_stray_unprefixed_line_is_never_read_as_a_message() {
     let (port, peer) = with_peer(LONG, |mut p| {
         let request = p.request();
         // Stray output that looks like an answer, then the real one.
-        p.raw(&format!("{}\n", json!({ "protocol": 1, "id": request["id"], "result": { "answer": "stray" } })));
+        p.raw(&format!(
+            "{}\n",
+            json!({ "protocol": 1, "id": request["id"], "result": { "answer": "stray" } })
+        ));
         p.raw("warning: something printed to stdout\n");
         p.answer(&request, json!({ "answer": "unbound" }));
     });
-    assert_eq!(port.resolve_binding(&json!({ "worktree": "/w" })).unwrap()["answer"], "unbound");
+    assert_eq!(
+        port.resolve_binding(&json!({ "worktree": "/w" })).unwrap()["answer"],
+        "unbound"
+    );
     peer.join().unwrap();
 }
 
@@ -316,7 +423,11 @@ fn a_peer_that_dies_mid_run_fails_the_call_closed() {
 fn nothing_commits_when_the_recheck_is_refused_or_unanswered() {
     let committed = std::cell::Cell::new(0);
     let commit_unless_refused = |port: &PeerAdmission| -> Result<Option<String>, PeerError> {
-        let held = HeldAdmission { port, case_id: "case-1", reservation_id: "res-1" };
+        let held = HeldAdmission {
+            port,
+            case_id: "case-1",
+            reservation_id: "res-1",
+        };
         match recheck_write_consent(Some(&held), &["src/a.rs".to_string()])? {
             Some(refusal) => Ok(Some(refusal.reason)),
             None => {
@@ -328,9 +439,15 @@ fn nothing_commits_when_the_recheck_is_refused_or_unanswered() {
     // Refused: the peer says the reservation is no longer live.
     let (port, peer) = with_peer(LONG, |mut p| {
         let request = p.request();
-        p.answer(&request, json!({ "refused": { "code": "reservation-not-live", "condition": "gone" } }));
+        p.answer(
+            &request,
+            json!({ "refused": { "code": "reservation-not-live", "condition": "gone" } }),
+        );
     });
-    assert_eq!(commit_unless_refused(&port).unwrap().as_deref(), Some("reservation-not-live"));
+    assert_eq!(
+        commit_unless_refused(&port).unwrap().as_deref(),
+        Some("reservation-not-live")
+    );
     peer.join().unwrap();
     // Unanswered: the peer dies.
     let (port, peer) = with_peer(LONG, |mut p| {
@@ -338,7 +455,11 @@ fn nothing_commits_when_the_recheck_is_refused_or_unanswered() {
     });
     assert!(commit_unless_refused(&port).is_err());
     peer.join().unwrap();
-    assert_eq!(committed.get(), 0, "a commit ran after consent was refused or could not be checked");
+    assert_eq!(
+        committed.get(),
+        0,
+        "a commit ran after consent was refused or could not be checked"
+    );
     // Held: the commit runs.
     let (port, peer) = with_peer(LONG, |mut p| {
         let request = p.request();
@@ -349,7 +470,10 @@ fn nothing_commits_when_the_recheck_is_refused_or_unanswered() {
     peer.join().unwrap();
     assert_eq!(committed.get(), 1);
     // No admission: nothing to ask.
-    assert_eq!(recheck_write_consent::<PeerAdmission>(None, &[]).unwrap(), None);
+    assert_eq!(
+        recheck_write_consent::<PeerAdmission>(None, &[]).unwrap(),
+        None
+    );
 }
 
 #[test]
@@ -361,10 +485,16 @@ fn a_slow_peer_hits_the_deadline_and_its_late_answer_is_not_the_next_answer() {
         let next = p.request();
         p.answer(&next, json!({ "answer": "unbound" }));
     });
-    assert!(matches!(port.resolve_binding(&json!({ "worktree": "/w" })), Err(PeerError::Deadline { .. })));
+    assert!(matches!(
+        port.resolve_binding(&json!({ "worktree": "/w" })),
+        Err(PeerError::Deadline { .. })
+    ));
     thread::sleep(Duration::from_millis(500));
     // The late answer of the first request is skipped by its id.
-    assert_eq!(port.resolve_binding(&json!({ "worktree": "/w" })).unwrap()["answer"], "unbound");
+    assert_eq!(
+        port.resolve_binding(&json!({ "worktree": "/w" })).unwrap()["answer"],
+        "unbound"
+    );
     peer.join().unwrap();
 }
 
@@ -387,7 +517,13 @@ fn an_error_answer_of_the_peer_is_a_remote_error_not_a_refusal() {
         p.send(&json!({ "protocol": PROTOCOL, "id": request["id"], "error": { "code": "ledger-unreadable", "message": "the ledger cannot be read" } }));
     });
     let error = port.admit(&json!({})).unwrap_err();
-    assert_eq!(error, PeerError::Remote { code: "ledger-unreadable".into(), message: "the ledger cannot be read".into() });
+    assert_eq!(
+        error,
+        PeerError::Remote {
+            code: "ledger-unreadable".into(),
+            message: "the ledger cannot be read".into()
+        }
+    );
     peer.join().unwrap();
 }
 
@@ -401,7 +537,10 @@ fn both_sides_writing_at_once_never_deadlock() {
         let request = p.request();
         p.answer(&request, json!({ "answer": "unbound" }));
     });
-    assert_eq!(port.resolve_binding(&json!({ "worktree": "/w" })).unwrap()["answer"], "unbound");
+    assert_eq!(
+        port.resolve_binding(&json!({ "worktree": "/w" })).unwrap()["answer"],
+        "unbound"
+    );
     peer.join().unwrap();
 }
 
@@ -413,11 +552,17 @@ fn every_error_vector_of_the_run_unit_contract_survives_the_round_trip() {
     for v in contract["vectors"].as_array().unwrap() {
         let wire = json!({ "contract": { "id": "run-unit-result", "version": 1 }, "ok": false, "error": v["error"] });
         let error = RunUnitError::from_json(&wire).unwrap_or_else(|| panic!("{}", v["name"]));
-        assert_eq!(ErrorTag::parse(v["error"]["tag"].as_str().unwrap()), Some(error.tag));
+        assert_eq!(
+            ErrorTag::parse(v["error"]["tag"].as_str().unwrap()),
+            Some(error.tag)
+        );
         assert_eq!(error.to_json(), wire, "{}", v["name"]);
     }
     let options = contract["request"]["options"].as_array().unwrap();
-    assert_eq!(options.len(), fgos_execution_engine::unit_run::run_unit_contract::REQUEST_OPTIONS.len());
+    assert_eq!(
+        options.len(),
+        fgos_execution_engine::unit_run::run_unit_contract::REQUEST_OPTIONS.len()
+    );
 }
 
 // ---- the Git-backed commit and sync, over a real repository and a linked worktree ----------------------------
@@ -437,8 +582,17 @@ mod git_backed {
     static SERIAL: AtomicU64 = AtomicU64::new(0);
 
     fn git(root: &Path, args: &[&str]) -> String {
-        let out = Command::new("git").arg("-C").arg(root).args(args).output().unwrap();
-        assert!(out.status.success(), "{args:?}: {}", String::from_utf8_lossy(&out.stderr));
+        let out = Command::new("git")
+            .arg("-C")
+            .arg(root)
+            .args(args)
+            .output()
+            .unwrap();
+        assert!(
+            out.status.success(),
+            "{args:?}: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
         String::from_utf8(out.stdout).unwrap().trim().into()
     }
 
@@ -454,7 +608,11 @@ mod git_backed {
     impl Fixture {
         fn new() -> Self {
             use std::os::unix::fs::{MetadataExt, PermissionsExt};
-            let temp = std::env::temp_dir().join(format!("fgos-p18-{}-{}", std::process::id(), SERIAL.fetch_add(1, Ordering::Relaxed)));
+            let temp = std::env::temp_dir().join(format!(
+                "fgos-p18-{}-{}",
+                std::process::id(),
+                SERIAL.fetch_add(1, Ordering::Relaxed)
+            ));
             fs::create_dir(&temp).unwrap();
             fs::set_permissions(&temp, fs::Permissions::from_mode(0o700)).unwrap();
             let main = temp.join("repo");
@@ -466,14 +624,31 @@ mod git_backed {
             git(&main, &["add", "."]);
             git(&main, &["commit", "-qm", "base"]);
             let tree = temp.join("producer");
-            git(&main, &["worktree", "add", "-qb", "producer", tree.to_str().unwrap()]);
+            git(
+                &main,
+                &["worktree", "add", "-qb", "producer", tree.to_str().unwrap()],
+            );
             let fence = main.join(".fgos/locks/activation.lock");
             fs::create_dir_all(&fence).unwrap();
-            fs::write(fence.join("TOMBSTONE"), r#"{"lock":"activation","by":"fgos git","at":"fixture"}"#).unwrap();
+            fs::write(
+                fence.join("TOMBSTONE"),
+                r#"{"lock":"activation","by":"fgos git","at":"fixture"}"#,
+            )
+            .unwrap();
             let m = fs::metadata(&tree).unwrap();
-            let birth = m.created().unwrap().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos();
+            let birth = m
+                .created()
+                .unwrap()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos();
             let key = format!("dispatch-cwd--{}-{}-{}.lock", m.dev(), m.ino(), birth);
-            let lease = match acquire(&Resource::new("dispatch-cwd", main.join(".fgos/locks").join(key)), Mode::Ex, Wait::Ms(100), 5000) {
+            let lease = match acquire(
+                &Resource::new("dispatch-cwd", main.join(".fgos/locks").join(key)),
+                Mode::Ex,
+                Wait::Ms(100),
+                5000,
+            ) {
                 Acquire::Acquired(h) => h,
                 other => panic!("{other:?}"),
             };
@@ -482,11 +657,23 @@ mod git_backed {
                 ResolveRepo::Repository(r) => r,
                 _ => panic!("not a repository"),
             };
-            Self { temp, main, tree, driver, repo, lease: Some(lease) }
+            Self {
+                temp,
+                main,
+                tree,
+                driver,
+                repo,
+                lease: Some(lease),
+            }
         }
 
         fn unit(&self) -> UnitGit<'_> {
-            UnitGit { driver: &self.driver, repo: &self.repo, custody: self.lease.as_ref(), writer: "fixture" }
+            UnitGit {
+                driver: &self.driver,
+                repo: &self.repo,
+                custody: self.lease.as_ref(),
+                writer: "fixture",
+            }
         }
     }
 
@@ -501,7 +688,11 @@ mod git_backed {
         paths.iter().map(|p| (*p).to_owned()).collect()
     }
 
-    fn args<'a>(scope: &'a [String], baseline: Option<&'a fgos_git::CommitBaseline>, id: &'a str) -> CommitArgs<'a> {
+    fn args<'a>(
+        scope: &'a [String],
+        baseline: Option<&'a fgos_git::CommitBaseline>,
+        id: &'a str,
+    ) -> CommitArgs<'a> {
         CommitArgs {
             unit_id: "u1",
             summary: Some("feat(x): add the thing\n\ndetails"),
@@ -532,15 +723,32 @@ mod git_backed {
         fs::write(f.tree.join("src/new.txt"), "in\n").unwrap();
         fs::write(f.tree.join("stray.txt"), "out\n").unwrap();
         let mut prepared = Vec::new();
-        let out = f.unit().commit_unit_work(&args(&scope, Some(&baseline), "op-commit-1"), &mut |p| prepared.push(p.clone()));
+        let out = f
+            .unit()
+            .commit_unit_work(&args(&scope, Some(&baseline), "op-commit-1"), &mut |p| {
+                prepared.push(p.clone())
+            });
         assert_eq!(out["status"], "committed", "{out}");
         assert_eq!(out["subject"], "feat(x): add the thing");
         assert_eq!(out["files"], json!(["src/new.txt"]));
-        assert_eq!(prepared.len(), 1, "the operation is recorded before it runs");
+        assert_eq!(
+            prepared.len(),
+            1,
+            "the operation is recorded before it runs"
+        );
         assert_eq!(prepared[0].expected_paths, vec!["src/new.txt".to_string()]);
-        assert!(f.tree.join("stray.txt").exists(), "a file outside the scope is left as it was");
-        assert_eq!(git(&f.tree, &["log", "-1", "--format=%s"]), "feat(x): add the thing");
-        assert!(f.unit().commit_on_branch(out["sha"].as_str().unwrap()).unwrap());
+        assert!(
+            f.tree.join("stray.txt").exists(),
+            "a file outside the scope is left as it was"
+        );
+        assert_eq!(
+            git(&f.tree, &["log", "-1", "--format=%s"]),
+            "feat(x): add the thing"
+        );
+        assert!(f
+            .unit()
+            .commit_on_branch(out["sha"].as_str().unwrap())
+            .unwrap());
     }
 
     #[test]
@@ -548,7 +756,9 @@ mod git_backed {
         let f = Fixture::new();
         let scope = scope(&["src/**"]);
         let baseline = clear(&f, &scope);
-        let out = f.unit().commit_unit_work(&args(&scope, Some(&baseline), "op-commit-2"), &mut |_| {});
+        let out = f
+            .unit()
+            .commit_unit_work(&args(&scope, Some(&baseline), "op-commit-2"), &mut |_| {});
         assert_eq!(out["status"], "no-changes", "{out}");
     }
 
@@ -556,7 +766,9 @@ mod git_backed {
     fn a_commit_without_its_baseline_is_refused_by_name() {
         let f = Fixture::new();
         let scope = scope(&["src/**"]);
-        let out = f.unit().commit_unit_work(&args(&scope, None, "op-commit-3"), &mut |_| {});
+        let out = f
+            .unit()
+            .commit_unit_work(&args(&scope, None, "op-commit-3"), &mut |_| {});
         assert_eq!(out["status"], "failed");
         assert_eq!(out["reason"], "baseline-required");
     }
@@ -636,4 +848,972 @@ fn a_worktree_that_does_not_exist_has_no_key_and_no_custody_holder() {
     let gone = here.join("fgos-p18-no-such-worktree");
     assert!(worktree_key(&gone).is_none());
     assert!(!custody_held(&here.join("fgos-p18-no-fgos-dir"), &gone));
+}
+
+// ---- the run loop: the decisions recorded from run.mjs, unit-run-start.mjs and unit-run-history.mjs -----------
+
+mod run_loop_vectors {
+    use std::path::Path;
+
+    use fgos_execution::admission::{Admission, CaseAdmission, Recheck};
+    use fgos_execution_engine::accounts::rotation::Rotation;
+    use fgos_execution_engine::unit_run::history::{outcome_of_run_result, read_unit_run_history};
+    use fgos_execution_engine::unit_run::provider_limit::{answer_provider_limit, LimitAsk};
+    use fgos_execution_engine::unit_run::record::{
+        publish_unit_record, read_unit_record, record_bytes,
+    };
+    use fgos_execution_engine::unit_run::run::{
+        failed_unit_facts, infrastructure_reason_of, refused_seats_of, scope_rule,
+    };
+    use fgos_execution_engine::unit_run::run_unit_contract::{ErrorTag, RunUnitError};
+    use fgos_execution_engine::unit_run::start::*;
+    use serde_json::{json, Value};
+
+    fn v() -> Value {
+        super::vectors("run-loop.json")
+    }
+
+    fn corpus() -> std::path::PathBuf {
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../contracts/corpus")
+    }
+
+    /// A value the recorder wrote as `"<absent>"` is a missing option.
+    fn given(value: &Value) -> Option<&Value> {
+        (value != "<absent>").then_some(value)
+    }
+
+    /// What a check returned or threw, in the recorder's shape.
+    fn answer_of(result: Result<Value, RunUnitError>) -> Value {
+        match result {
+            Ok(value) => json!({ "ok": true, "value": value }),
+            Err(e) => {
+                let mut error = json!({ "name": e.tag.as_str(), "code": e.code, "phase": e.phase, "message": e.message });
+                if let Some(refusal) = e.refusal {
+                    error["refusal"] = refusal;
+                }
+                json!({ "ok": false, "error": error })
+            }
+        }
+    }
+
+    #[test]
+    fn answers_to_a_provider_limit_match_what_node_made() {
+        for case in v()["providerLimit"].as_array().unwrap() {
+            let attempts = case["attempts"].as_array().unwrap();
+            let rotation = case.get("rotation").map(|r| Rotation {
+                pool: r["pool"].as_str().unwrap().into(),
+                total: r["total"].as_u64().unwrap() as usize,
+                healthy: r["healthy"].as_u64().unwrap() as usize,
+            });
+            let got = answer_provider_limit(&LimitAsk {
+                result: &case["result"],
+                bound: &case["bound"],
+                attempts,
+                attempt_no: case["attemptNo"].as_u64().unwrap() as usize,
+                brief_not_delivered: case["briefNotDelivered"] == json!(true),
+                rotation: rotation.as_ref(),
+                changed: case.get("changed"),
+            });
+            assert_eq!(got, case["answer"], "{}", case["name"]);
+        }
+    }
+
+    #[test]
+    fn the_runner_config_snapshot_and_its_hash_match_what_node_made() {
+        for case in v()["snapshot"].as_array().unwrap() {
+            assert_eq!(
+                snapshot_runner_config(&case["cfg"]),
+                case["snapshot"],
+                "{}",
+                case["cfg"]
+            );
+        }
+    }
+
+    #[test]
+    fn the_outcome_of_a_settled_run_result_matches_what_node_made() {
+        for case in v()["outcomeOfRunResult"].as_array().unwrap() {
+            assert_eq!(
+                outcome_of_run_result(&case["runResult"]),
+                case["outcome"].as_str().unwrap(),
+                "{}",
+                case["runResult"]
+            );
+        }
+    }
+
+    #[test]
+    fn the_end_of_a_run_is_judged_as_node_judged_it() {
+        let v = v();
+        for case in v["scopeRule"].as_array().unwrap() {
+            let r = scope_rule(
+                &case["unitRecord"],
+                case["outcome"].as_str().unwrap(),
+                case["results"].as_array().unwrap(),
+                Ok(vec![]),
+            );
+            let got = json!({ "outcome": r.outcome, "error": r.error, "outOfScope": r.out_of_scope, "outOfScopeOnBranch": r.out_of_scope_on_branch });
+            assert_eq!(got, case["ruled"], "{case}");
+        }
+        for case in v["infrastructureReason"].as_array().unwrap() {
+            let got = infrastructure_reason_of(
+                case["started"]["value"] == json!(true),
+                case["ruled"].get("error").is_some(),
+                case["attempts"].as_array().unwrap(),
+            );
+            assert_eq!(got, case["reason"].as_str().unwrap(), "{case}");
+        }
+        for case in v["refusedSeats"].as_array().unwrap() {
+            assert_eq!(
+                json!(refused_seats_of(case["attempts"].as_array().unwrap())),
+                case["seats"]
+            );
+        }
+        for case in v["failedUnitFacts"].as_array().unwrap() {
+            let scope = RunScope {
+                unit_record: Some(case["scope"]["unitRecord"].clone()).filter(|r| !r.is_null()),
+                ceiling_hit: case["scope"]["ceilingHit"] == json!(true),
+                ..RunScope::default()
+            };
+            let held = HeldCase {
+                case_id: "c".into(),
+                reservation_id: "r".into(),
+                unit_run_id: "u".into(),
+                started: case["admission"]["started"] == json!(true),
+                settled: false,
+            };
+            assert_eq!(failed_unit_facts(&scope, &held), case["facts"], "{case}");
+        }
+    }
+
+    struct Binding(Value);
+
+    impl CaseAdmission for Binding {
+        type Error = std::io::Error;
+        fn resolve_binding(&self, _: &Value) -> Result<Value, Self::Error> {
+            Ok(self.0.clone())
+        }
+        fn admit(&self, _: &Value) -> Result<Admission, Self::Error> {
+            unreachable!()
+        }
+        fn recheck_effect(&self, _: &str, _: &str, _: &[String]) -> Result<Recheck, Self::Error> {
+            unreachable!()
+        }
+        fn settle(&self, _: &str, _: &Value) -> Result<(), Self::Error> {
+            unreachable!()
+        }
+        fn activity_unit_of(
+            &self,
+            _: &str,
+            _: &str,
+            _: &str,
+        ) -> Result<Option<Value>, Self::Error> {
+            unreachable!()
+        }
+        fn confined_write_refusal(
+            &self,
+            _: &str,
+            _: Option<&str>,
+        ) -> Result<Option<String>, Self::Error> {
+            unreachable!()
+        }
+    }
+
+    #[test]
+    fn the_option_checks_of_a_fresh_run_and_a_resume_refuse_as_node_refused() {
+        let v = v();
+        let s = &v["start"];
+        for case in s["branchBases"].as_array().unwrap() {
+            let got = checked_branch_base(given(&case["value"])).map(|b| b.unwrap_or(Value::Null));
+            assert_eq!(answer_of(got), case["answer"], "{}", case["value"]);
+        }
+        for case in s["pinInputs"].as_array().unwrap() {
+            assert_eq!(
+                answer_of(checked_pin_inputs(given(&case["value"])).map(Value::from)),
+                case["answer"],
+                "{}",
+                case["value"]
+            );
+        }
+        for case in s["acceptedReports"].as_array().unwrap() {
+            assert_eq!(
+                answer_of(checked_accepted_reports(given(&case["value"])).map(Value::from)),
+                case["answer"],
+                "{}",
+                case["value"]
+            );
+        }
+        for case in s["seatSchemas"].as_array().unwrap() {
+            let record = match given(&case["schema"]) {
+                Some(schema) => json!({ "seatSchema": schema }),
+                None => json!({}),
+            };
+            let got =
+                assert_record_not_from_newer_release("unit-run-1", &record).map(|()| Value::Null);
+            assert_eq!(answer_of(got), case["answer"], "{}", case["schema"]);
+        }
+        let pins = &s["collaborationPins"];
+        let shipped = json!({ "solo": {}, "reviewed": {}, "panel": {}, "debate": {} });
+        for case in pins["cases"].as_array().unwrap() {
+            let registered = [
+                Some(&shipped),
+                pins.pointer("/snapshot/runner/patterns"),
+                pins.pointer("/live/runner/patterns"),
+            ];
+            let got = assert_collaboration_pin_usable(
+                "unit-run-1",
+                given(&case["collaboration"]),
+                &registered,
+            )
+            .map(|()| Value::Null);
+            assert_eq!(answer_of(got), case["answer"], "{}", case["collaboration"]);
+        }
+        for case in s["requireFreeWorktree"].as_array().unwrap() {
+            let got = require_free_worktree(&Binding(case["binding"].clone()), Path::new("/w"))
+                .map(|()| Value::Null);
+            let answer = answer_of(got);
+            assert_eq!(answer, case["answer"], "{}", case["binding"]);
+            if answer["ok"] == json!(false) {
+                assert_eq!(
+                    answer["error"]["name"],
+                    ErrorTag::CaseAdmissionRefusedError.as_str()
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn corpus_unit_records_read_back_and_publish_as_the_same_bytes_and_their_history_matches_node()
+    {
+        let temp = std::env::temp_dir().join(format!("fgos-p18-corpus-{}", std::process::id()));
+        for case in v()["corpusHistory"].as_array().unwrap() {
+            let sample = case["sample"].as_str().unwrap();
+            let dir = corpus().join(sample);
+            let file = dir.join("unit.json");
+            let record = read_unit_record(sample, &file).unwrap();
+            let bytes = std::fs::read(&file).unwrap();
+            assert_eq!(
+                record_bytes(&record),
+                bytes,
+                "{sample}: a record read back is written as the same bytes"
+            );
+            let out = temp.join(sample);
+            publish_unit_record(&out, &record).unwrap();
+            assert_eq!(
+                std::fs::read(out.join("unit.json")).unwrap(),
+                bytes,
+                "{sample}: published through the durable door"
+            );
+            let history: Vec<Value> = read_unit_run_history(&dir)
+                .unwrap()
+                .into_iter()
+                .map(|h| json!({ "seat": h["seat"], "round": h["round"], "outcome": h["outcome"] }))
+                .collect();
+            assert_eq!(json!(history), case["history"], "{sample}");
+            // The record judges as the 6c reader judges it: one seat, the settled producer round.
+            assert_eq!(record["seatSchema"], json!(KNOWN_SEAT_SCHEMA));
+        }
+        let _ = std::fs::remove_dir_all(&temp);
+        assert!(
+            matches!(read_unit_record("x", &corpus().join("README.md")), Err(e) if e.code.as_deref() == Some("unit-record-unreadable"))
+        );
+    }
+}
+
+// ---- the run loop end to end, over a real repository and a fake machine around it ------------------------------
+
+#[cfg(target_os = "linux")]
+mod run_loop {
+    use std::cell::RefCell;
+    use std::fs;
+    use std::path::{Path, PathBuf};
+    use std::process::Command;
+    use std::sync::atomic::{AtomicU64, Ordering};
+    use std::time::Duration;
+
+    use fgos_execution::admission::{Admission, CaseAdmission, Recheck, Refusal};
+    use fgos_execution_engine::accounts::rotation::Rotation;
+    use fgos_execution_engine::unit_run::host::*;
+    use fgos_execution_engine::unit_run::run::run_unit;
+    use fgos_execution_engine::unit_run::run_unit_contract::{ErrorTag, RunUnitError};
+    use fgos_execution_engine::unit_run::verify::{Verdict, Verified};
+    use fgos_git::{GitDriver, RepoHandle, ResolveRepo};
+    use fgos_holder_lock::Handle;
+    use serde_json::{json, Value};
+
+    static SERIAL: AtomicU64 = AtomicU64::new(0);
+
+    fn git(root: &Path, args: &[&str]) -> String {
+        let out = Command::new("git")
+            .arg("-C")
+            .arg(root)
+            .args(args)
+            .output()
+            .unwrap();
+        assert!(
+            out.status.success(),
+            "{args:?}: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        String::from_utf8(out.stdout).unwrap().trim().into()
+    }
+
+    /// A main checkout with a linked worktree the unit writes in.
+    struct Repo {
+        temp: PathBuf,
+        main: PathBuf,
+        tree: PathBuf,
+    }
+
+    impl Repo {
+        fn new() -> Self {
+            use std::os::unix::fs::PermissionsExt;
+            let temp = std::env::temp_dir().join(format!(
+                "fgos-p18-run-{}-{}",
+                std::process::id(),
+                SERIAL.fetch_add(1, Ordering::Relaxed)
+            ));
+            fs::create_dir(&temp).unwrap();
+            fs::set_permissions(&temp, fs::Permissions::from_mode(0o700)).unwrap();
+            let main = temp.join("repo");
+            fs::create_dir(&main).unwrap();
+            git(&main, &["init", "-q", "--initial-branch=trunk"]);
+            git(&main, &["config", "user.name", "Fixture"]);
+            git(&main, &["config", "user.email", "fixture@example.invalid"]);
+            fs::write(main.join("a"), "base\n").unwrap();
+            fs::write(main.join(".gitignore"), ".fgos/\n").unwrap();
+            git(&main, &["add", "."]);
+            git(&main, &["commit", "-qm", "base"]);
+            let tree = temp.join("producer");
+            git(
+                &main,
+                &["worktree", "add", "-qb", "producer", tree.to_str().unwrap()],
+            );
+            let fence = main.join(".fgos/locks/activation.lock");
+            fs::create_dir_all(&fence).unwrap();
+            fs::write(
+                fence.join("TOMBSTONE"),
+                r#"{"lock":"activation","by":"fgos git","at":"fixture"}"#,
+            )
+            .unwrap();
+            Self { temp, main, tree }
+        }
+
+        fn head_subject(&self) -> String {
+            git(&self.tree, &["log", "-1", "--format=%s"])
+        }
+    }
+
+    impl Drop for Repo {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.temp);
+        }
+    }
+
+    /// A port answered in process: binding, admission and recheck as given; every settle kept.
+    struct Port {
+        binding: Value,
+        admit: Admission,
+        recheck: Recheck,
+        settles: RefCell<Vec<Value>>,
+    }
+
+    impl Port {
+        fn free() -> Self {
+            Port {
+                binding: json!({ "answer": "unbound" }),
+                admit: Admission::Refused(refusal("unused")),
+                recheck: Recheck::Ok,
+                settles: RefCell::default(),
+            }
+        }
+    }
+
+    fn refusal(code: &str) -> Refusal {
+        Refusal {
+            code: code.into(),
+            condition: format!("{code} says no"),
+            violations: None,
+        }
+    }
+
+    impl CaseAdmission for Port {
+        type Error = std::io::Error;
+        fn resolve_binding(&self, _: &Value) -> Result<Value, Self::Error> {
+            Ok(self.binding.clone())
+        }
+        fn admit(&self, _: &Value) -> Result<Admission, Self::Error> {
+            Ok(self.admit.clone())
+        }
+        fn recheck_effect(&self, _: &str, _: &str, _: &[String]) -> Result<Recheck, Self::Error> {
+            Ok(self.recheck.clone())
+        }
+        fn settle(&self, _: &str, settle: &Value) -> Result<(), Self::Error> {
+            self.settles.borrow_mut().push(settle.clone());
+            Ok(())
+        }
+        fn activity_unit_of(
+            &self,
+            _: &str,
+            _: &str,
+            _: &str,
+        ) -> Result<Option<Value>, Self::Error> {
+            Ok(None)
+        }
+        fn confined_write_refusal(
+            &self,
+            _: &str,
+            _: Option<&str>,
+        ) -> Result<Option<String>, Self::Error> {
+            Ok(None)
+        }
+    }
+
+    struct NoControl;
+    impl UnitControl for NoControl {
+        fn release(&mut self) -> Result<(), String> {
+            Ok(())
+        }
+    }
+
+    type Agent = dyn Fn(&SeatDispatch<'_>) -> Value;
+
+    /// The machine around the run: a repository, a port, an effective loop and the agent each seat stands for.
+    struct Host<'a, A: CaseAdmission> {
+        repo: &'a Repo,
+        port: Option<A>,
+        effective: Value,
+        cfg: Value,
+        agent: Box<Agent>,
+        dispatched: RefCell<Vec<String>>,
+        created: RefCell<Vec<String>>,
+    }
+
+    fn passed(changed: &[&str]) -> Value {
+        json!({
+            "runId": "run-1",
+            "classification": { "outcome": { "category": "ok", "reason": "completed" } },
+            "agentClaim": { "summary": "feat(x): add b" },
+            "evidence": { "changedFiles": changed },
+        })
+    }
+
+    impl<'a, A: CaseAdmission> Host<'a, A> {
+        fn new(repo: &'a Repo, port: Option<A>, effective: Value, agent: Box<Agent>) -> Self {
+            let cfg = json!({
+                "capabilities": { "code:implement": { "verify": "true", "rigor": "standard", "minCheckers": [] }, "code:review": {} },
+                "loops": { "reviewed": { "checkersByRigor": { "standard": ["reviewer"], "high": ["reviewer", "red-team"] } } },
+                "llmAccounts": { "secret": "never recorded" },
+            });
+            Host {
+                repo,
+                port,
+                effective,
+                cfg,
+                agent,
+                dispatched: RefCell::default(),
+                created: RefCell::default(),
+            }
+        }
+
+        fn options(&self, unit: Value) -> Value {
+            json!({ "unitData": unit, "cwd": self.repo.tree, "repoRoot": self.repo.main })
+        }
+    }
+
+    impl<A: CaseAdmission> UnitRunHost for Host<'_, A> {
+        type Admission = A;
+        fn admission(&self) -> Option<&A> {
+            self.port.as_ref()
+        }
+        fn on_unit_run_created(&self, id: &str) {
+            self.created.borrow_mut().push(id.into());
+        }
+        fn on_case_admitted(&self, _: &str, _: &str) {}
+        fn git_roots(&self, _: &Path, _: bool) -> Result<GitRoots, String> {
+            Ok(GitRoots {
+                worktree_root: self.repo.tree.clone(),
+                main_checkout_root: self.repo.main.clone(),
+                is_linked_worktree: true,
+                not_a_repository: false,
+            })
+        }
+        fn fgos_dir(&self, main: &Path) -> PathBuf {
+            main.join(".fgos")
+        }
+        fn sweep_attempts(&self, _: &Path) {}
+        fn load_runner_config(&self, _: &Path) -> Result<Value, RunUnitError> {
+            Ok(self.cfg.clone())
+        }
+        fn herdr_present(&self) -> bool {
+            false
+        }
+        fn git_writer(&self) -> String {
+            "fixture".into()
+        }
+        fn created_by(&self) -> String {
+            "tester".into()
+        }
+        fn shipped_catalog(&self) -> Value {
+            json!({})
+        }
+        fn git(&self, worktree: &Path, main: &Path) -> Result<(GitDriver, RepoHandle), String> {
+            let driver = GitDriver::new(&self.repo.temp).map_err(|e| e.cause)?;
+            match driver.resolve_repo(worktree, main).map_err(|e| e.cause)? {
+                ResolveRepo::Repository(repo) => Ok((driver, repo)),
+                _ => Err("not a repository".into()),
+            }
+        }
+        fn read_unit_source(&self, options: &Value) -> Result<Value, RunUnitError> {
+            Ok(options["unitData"].clone())
+        }
+        fn check_unit_file(&self, _: &Value) -> Result<(), RunUnitError> {
+            Ok(())
+        }
+        fn validate_unit(&self, raw: &Value) -> Result<Value, RunUnitError> {
+            Ok(raw.clone())
+        }
+        fn existing_plan_ref(&self, _: Option<&Value>, _: &Path) -> Result<(), RunUnitError> {
+            Ok(())
+        }
+        fn resolve_collaboration(&self, _: &Value) -> Result<Value, RunUnitError> {
+            let name = self.effective["loop"].clone();
+            Ok(
+                json!({ "pin": { "pattern": { "name": name, "layer": "shipped" }, "effective": self.effective }, "seats": [], "launchBound": 3, "entry": { "loop": name } }),
+            )
+        }
+        fn declared_operation_fields(
+            &self,
+            _: &Value,
+            _: Option<&Path>,
+        ) -> Result<Value, RunUnitError> {
+            Ok(json!({}))
+        }
+        fn is_main_checkout(&self, worktree: &Path) -> bool {
+            worktree == self.repo.main
+        }
+        fn assert_run_timeout(&self, _: &Value) -> Result<(), RunUnitError> {
+            Ok(())
+        }
+        fn door_choices(
+            &self,
+            _: &Value,
+            runner: &Value,
+            _: &Value,
+            _: &Value,
+        ) -> Result<(), RunUnitError> {
+            assert!(
+                runner.get("llmAccounts").is_some(),
+                "the inventory is read live for the bind"
+            );
+            Ok(())
+        }
+        fn persona_pin(
+            &self,
+            _: &str,
+            _: &Path,
+            _: Option<&Value>,
+        ) -> Result<Option<Value>, RunUnitError> {
+            Ok(None)
+        }
+        fn resolve_inputs(&self, _: &Value, _: &Path, _: &Value) -> Result<Value, RunUnitError> {
+            Ok(json!({ "refs": [], "inputMap": [] }))
+        }
+        fn expand_generated(&self, writes: &Value, _: &Value) -> Value {
+            writes.clone()
+        }
+        fn acquire_unit_control(
+            &self,
+            _: &Path,
+            _: &str,
+        ) -> Result<Box<dyn UnitControl>, ControlHeld> {
+            Ok(Box::new(NoControl))
+        }
+        fn is_seat_record(&self, _: &Value) -> bool {
+            true
+        }
+        fn collaboration_of_record(&self, _: &Value) -> Result<(Value, Value), RunUnitError> {
+            unreachable!("every record here carries its pin")
+        }
+        fn adopt_state(&self, _: &Path) -> String {
+            "closed".into()
+        }
+        fn current_attempt(&self, _: &Path, _: &str) -> Option<AttemptRef> {
+            None
+        }
+        fn pinned_accounts_usable(
+            &self,
+            _: &[Value],
+            _: &Value,
+            _: &str,
+        ) -> Result<(), RunUnitError> {
+            Ok(())
+        }
+        fn bind(
+            &self,
+            ask: &Value,
+            _: &Value,
+            _: &Value,
+            _: &Value,
+            _: &Value,
+        ) -> Result<Value, RunUnitError> {
+            Ok(
+                json!({ "executor": format!("exec-{}", ask["seat"].as_str().unwrap()), "invocation": "cli", "transport": "process" }),
+            )
+        }
+        fn runner_config_for_binding(&self, runner: &Value, _: &Value) -> Value {
+            runner.clone()
+        }
+        fn dispatch_seat(&self, seat: &SeatDispatch<'_>) -> Result<Value, RunUnitError> {
+            self.dispatched
+                .borrow_mut()
+                .push(seat.assignment_id.to_string());
+            Ok((self.agent)(seat))
+        }
+        fn account_rotation(&self, _: &Value, _: &str) -> Option<Rotation> {
+            None
+        }
+        fn audit_lease_receipt(&self, _: Option<&Value>, _: &str) -> Option<String> {
+            None
+        }
+        fn drop_assignment_record(&self, _: &str) {}
+        fn admission_generations(&self, _: &Path) -> Vec<Value> {
+            Vec::new()
+        }
+        fn report_digest(&self, _: &Value, _: &Path) -> Value {
+            Value::Null
+        }
+        fn verify(
+            &self,
+            command: &str,
+            _: &Path,
+            _: Option<u64>,
+            custody: Option<&Handle>,
+        ) -> Verified {
+            assert!(
+                custody.is_some(),
+                "a writing unit's verify runs under its custody"
+            );
+            Verified {
+                verdict: Verdict::Pass,
+                status: Some(0),
+                how: format!("{command} exited 0"),
+                tail: String::new(),
+                duration_ms: 1,
+                output_digest: "sha256:00".into(),
+            }
+        }
+        fn publish_unit_summary(&self, _: &Path) -> Result<(), String> {
+            Ok(())
+        }
+    }
+
+    fn record_of(repo: &Repo, result: &Value) -> Value {
+        let id = result["unitRunId"].as_str().unwrap();
+        serde_json::from_slice(
+            &fs::read(
+                repo.main
+                    .join(".fgos/assignments")
+                    .join(id)
+                    .join("unit.json"),
+            )
+            .unwrap(),
+        )
+        .unwrap()
+    }
+
+    fn reading_unit() -> Value {
+        json!({ "id": "u1", "objective": "look around", "capability": "code:review", "writes": [], "inputs": [] })
+    }
+
+    fn writing_unit() -> Value {
+        json!({ "id": "u1", "objective": "add b", "capability": "code:implement", "writes": ["b.txt"], "inputs": [] })
+    }
+
+    /// The agent of a writing seat: the producer writes `b.txt` (and a stray file outside the scope), checkers read.
+    fn producer_writes(seat: &SeatDispatch<'_>) -> Value {
+        if seat.read_only {
+            return passed(&[]);
+        }
+        let tree = PathBuf::from(seat.unit_record["worktree"].as_str().unwrap());
+        fs::write(tree.join("b.txt"), "b\n").unwrap();
+        fs::write(tree.join("stray.txt"), "s\n").unwrap();
+        passed(&["b.txt", "stray.txt"])
+    }
+
+    #[test]
+    fn a_solo_read_only_run_passes_and_settles_its_record() {
+        let repo = Repo::new();
+        let host: Host<'_, Port> = Host::new(
+            &repo,
+            None,
+            json!({ "loop": "solo", "params": {} }),
+            Box::new(|_| passed(&[])),
+        );
+        let result = run_unit(&host.options(reading_unit()), &host).unwrap();
+        assert_eq!(result["outcome"], "pass", "{result:#}");
+        assert_eq!(result["results"][0]["seat"], "producer");
+        assert_eq!(result["started"], json!({ "value": true, "reason": null }));
+        assert_eq!(result["settled"], json!({ "unit": true, "case": null }));
+        assert_eq!(
+            *host.created.borrow(),
+            vec![result["unitRunId"].as_str().unwrap().to_string()]
+        );
+        let record = record_of(&repo, &result);
+        assert_eq!(record["execution"], json!({ "status": "settled" }));
+        assert_eq!(record["settlement"]["outcome"], "pass");
+        assert!(
+            record["configSnapshot"]["runner"]
+                .get("llmAccounts")
+                .is_none(),
+            "the account inventory is never recorded"
+        );
+        let attempt = &record["bindings"]["producer/1"][0];
+        assert_eq!(attempt["outcome"], "pass");
+        assert!(attempt["dispatchRetryId"]
+            .as_str()
+            .unwrap()
+            .starts_with(&format!(
+                "{}/producer/1~",
+                result["unitRunId"].as_str().unwrap()
+            )));
+        assert!(
+            attempt.get("nativeBaseline").is_none(),
+            "a read-only seat takes no baseline"
+        );
+        // The record is written as Node writes it: pretty JSON and a newline.
+        let bytes = fs::read(
+            repo.main
+                .join(".fgos/assignments")
+                .join(result["unitRunId"].as_str().unwrap())
+                .join("unit.json"),
+        )
+        .unwrap();
+        assert_eq!(
+            bytes,
+            fgos_execution_engine::unit_run::record::record_bytes(&record)
+        );
+    }
+
+    #[test]
+    fn a_reviewed_run_with_writes_commits_only_the_declared_writes() {
+        let repo = Repo::new();
+        let effective = json!({ "loop": "reviewed", "params": { "maxRounds": 3 } });
+        let host = Host::new(
+            &repo,
+            Some(Port::free()),
+            effective,
+            Box::new(producer_writes),
+        );
+        let result = run_unit(&host.options(writing_unit()), &host).unwrap();
+        assert_eq!(
+            result["outcome"], "findings",
+            "a stray write outside the scope is never a pass: {result:#}"
+        );
+        let producer = &result["results"][0];
+        assert_eq!(producer["commit"]["status"], "committed", "{producer:#}");
+        assert_eq!(producer["commit"]["files"], json!(["b.txt"]));
+        assert_eq!(result["outOfScope"], json!(["stray.txt"]));
+        assert_eq!(repo.head_subject(), "feat(x): add b");
+        assert_eq!(
+            git(&repo.tree, &["status", "--porcelain"]),
+            "?? stray.txt",
+            "the stray file is reported, never committed"
+        );
+        assert_eq!(
+            *host.dispatched.borrow(),
+            vec![
+                format!("{}/producer/1", result["unitRunId"].as_str().unwrap()),
+                format!("{}/reviewer/1", result["unitRunId"].as_str().unwrap()),
+            ]
+        );
+        let record = record_of(&repo, &result);
+        assert_eq!(
+            record["bindings"]["producer/1"][0]["commitOperation"]["state"],
+            "settled"
+        );
+        assert!(record["bindings"]["producer/1"][0]["nativeBaseline"]["head"].is_string());
+        assert_eq!(record["settlement"]["verify"]["ran"], json!(true));
+        assert_eq!(record["gitWriter"], "fixture");
+        assert_eq!(
+            host.port.as_ref().unwrap().settles.borrow().len(),
+            0,
+            "a standalone run holds no reservation"
+        );
+    }
+
+    #[test]
+    fn a_refused_admission_is_a_case_admission_refused_error_and_no_unit_run_exists() {
+        let repo = Repo::new();
+        let port = Port {
+            admit: Admission::Refused(refusal("case-admission-busy")),
+            ..Port::free()
+        };
+        let host = Host::new(
+            &repo,
+            Some(port),
+            json!({ "loop": "solo", "params": {} }),
+            Box::new(|_| unreachable!("no seat runs")),
+        );
+        let mut options = host.options(reading_unit());
+        options["caseRef"] = json!({ "caseId": "case-1", "activity": "build" });
+        let error = run_unit(&options, &host).unwrap_err();
+        assert_eq!(error.tag, ErrorTag::CaseAdmissionRefusedError);
+        assert_eq!(error.code.as_deref(), Some("case-admission-busy"));
+        assert_eq!(
+            error.refusal,
+            Some(
+                json!({ "code": "case-admission-busy", "condition": "case-admission-busy says no" })
+            )
+        );
+        assert_eq!(
+            RunUnitError::from_json(&error.to_json()).unwrap(),
+            error,
+            "the tag crosses the run-unit result"
+        );
+        assert!(host.created.borrow().is_empty());
+        assert!(!repo.main.join(".fgos/assignments").exists());
+    }
+
+    #[test]
+    fn a_standalone_writing_run_needs_the_port_and_a_free_worktree() {
+        let repo = Repo::new();
+        let host: Host<'_, Port> = Host::new(
+            &repo,
+            None,
+            json!({ "loop": "solo", "params": {} }),
+            Box::new(|_| unreachable!()),
+        );
+        let error = run_unit(&host.options(writing_unit()), &host).unwrap_err();
+        assert_eq!(
+            (error.tag, error.code.as_deref()),
+            (
+                ErrorTag::RunnerConfigError,
+                Some("case-admission-port-missing")
+            )
+        );
+        let bound = Port {
+            binding: json!({ "answer": "bound", "record": { "caseId": "case-9" } }),
+            ..Port::free()
+        };
+        let host = Host::new(
+            &repo,
+            Some(bound),
+            json!({ "loop": "solo", "params": {} }),
+            Box::new(|_| unreachable!()),
+        );
+        let error = run_unit(&host.options(writing_unit()), &host).unwrap_err();
+        assert_eq!(error.tag, ErrorTag::CaseAdmissionRefusedError);
+        assert!(
+            error
+                .message
+                .ends_with("is not free for a run that names no case: bound (case case-9)"),
+            "{}",
+            error.message
+        );
+    }
+
+    #[test]
+    fn a_refused_recheck_commits_nothing_and_settles_the_reservation() {
+        let repo = Repo::new();
+        let before = git(&repo.tree, &["rev-parse", "HEAD"]);
+        let port = Port {
+            admit: Admission::Admitted {
+                reservation_id: "res-1".into(),
+                case_id: "case-1".into(),
+                seat_launch_ceiling: Some(4),
+            },
+            recheck: Recheck::Refused {
+                code: "consent-withdrawn".into(),
+                condition: "the case moved on".into(),
+            },
+            ..Port::free()
+        };
+        let host = Host::new(
+            &repo,
+            Some(port),
+            json!({ "loop": "solo", "params": {} }),
+            Box::new(producer_writes),
+        );
+        let mut options = host.options(writing_unit());
+        options["caseRef"] = json!({ "caseId": "case-1", "activity": "build" });
+        let result = run_unit(&options, &host).unwrap();
+        assert_eq!(result["outcome"], "policy-refusal", "{result:#}");
+        assert_eq!(
+            result["results"][0]["refused"],
+            json!({ "reason": "consent-withdrawn", "detail": "the case moved on" })
+        );
+        assert_eq!(
+            git(&repo.tree, &["rev-parse", "HEAD"]),
+            before,
+            "nothing was committed"
+        );
+        let settles = host.port.as_ref().unwrap().settles.borrow();
+        assert_eq!(settles.len(), 1, "the reservation is settled once");
+        assert_eq!(settles[0]["outcome"], "policy-refusal");
+        assert_eq!(
+            settles[0]["launches"],
+            json!({ "ceiling": 4, "used": 1, "ceilingHit": false })
+        );
+        assert_eq!(result["settled"]["case"], json!(true));
+        assert_eq!(
+            record_of(&repo, &result)["workflow"],
+            json!({ "caseId": "case-1", "activity": "build", "reservationId": "res-1" })
+        );
+    }
+
+    #[test]
+    fn a_peer_that_dies_mid_run_fails_the_run_closed_and_nothing_is_committed() {
+        let repo = Repo::new();
+        let before = git(&repo.tree, &["rev-parse", "HEAD"]);
+        let (port, peer) = super::with_peer(Duration::from_secs(20), |mut p| {
+            // A stray unprefixed line on the channel is never read as a message.
+            p.raw("npm notice: not a frame\n");
+            let admit = p.request();
+            assert_eq!(admit["op"], "admit");
+            assert_eq!(admit["payload"]["writes"], json!(["b.txt"]));
+            p.answer(
+                &admit,
+                json!({ "admitted": true, "reservationId": "res-1", "caseId": "case-1" }),
+            );
+            let recheck = p.request();
+            assert_eq!(recheck["op"], "recheckEffect");
+            assert_eq!(recheck["payload"]["paths"], json!(["b.txt", "stray.txt"]));
+            // Dies here: the recheck is never answered.
+        });
+        let host = Host::new(
+            &repo,
+            Some(port),
+            json!({ "loop": "solo", "params": {} }),
+            Box::new(producer_writes),
+        );
+        let mut options = host.options(writing_unit());
+        options["caseRef"] = json!({ "caseId": "case-1", "activity": "build" });
+        let error = run_unit(&options, &host).unwrap_err();
+        assert_eq!(
+            (error.tag, error.error_class.as_str()),
+            (ErrorTag::Error, "case-admission-port-failed"),
+            "{error:?}"
+        );
+        assert_eq!(
+            git(&repo.tree, &["rev-parse", "HEAD"]),
+            before,
+            "nothing was committed"
+        );
+        let unit_run = host.created.borrow()[0].clone();
+        let record: Value = serde_json::from_slice(
+            &fs::read(
+                repo.main
+                    .join(".fgos/assignments")
+                    .join(&unit_run)
+                    .join("unit.json"),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(record["settlement"]["outcome"], "execution-failure");
+        assert_eq!(record["settlement"]["infrastructureReason"], "run-error");
+        assert!(record["bindings"]["producer/1"][0].get("commit").is_none());
+        peer.join().unwrap();
+    }
 }

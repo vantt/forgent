@@ -13,10 +13,33 @@ pub const CONTRACT_VERSION: u64 = 1;
 /// operation step, claim dispatch, fanout and `fgos run`). The three callbacks and the port are not options of this
 /// list: the port is the admission peer, `onCaseAdmitted` and `onUnitRunCreated` are its two acknowledged events.
 pub const REQUEST_OPTIONS: [&str; 27] = [
-    "acceptedReports", "accountPin", "activityUnit", "branchBase", "caseRef", "collaboration", "cwd", "declared",
-    "forceSharedCwd", "overrides", "pattern", "personaScope", "pinInputs", "providerCapacityRuntimeDir",
-    "raiseAuthorized", "reason", "repoRoot", "request", "resumeUnitRunId", "runnerConfig", "session",
-    "stanceOptions", "unitData", "unitPath", "verify", "workflowId", "worktree",
+    "acceptedReports",
+    "accountPin",
+    "activityUnit",
+    "branchBase",
+    "caseRef",
+    "collaboration",
+    "cwd",
+    "declared",
+    "forceSharedCwd",
+    "overrides",
+    "pattern",
+    "personaScope",
+    "pinInputs",
+    "providerCapacityRuntimeDir",
+    "raiseAuthorized",
+    "reason",
+    "repoRoot",
+    "request",
+    "resumeUnitRunId",
+    "runnerConfig",
+    "session",
+    "stanceOptions",
+    "unitData",
+    "unitPath",
+    "verify",
+    "workflowId",
+    "worktree",
 ];
 
 /// The Node error class a caller branches on.
@@ -38,9 +61,13 @@ impl ErrorTag {
     }
 
     pub fn parse(text: &str) -> Option<Self> {
-        [Self::CaseAdmissionRefusedError, Self::RunnerConfigError, Self::Error]
-            .into_iter()
-            .find(|t| t.as_str() == text)
+        [
+            Self::CaseAdmissionRefusedError,
+            Self::RunnerConfigError,
+            Self::Error,
+        ]
+        .into_iter()
+        .find(|t| t.as_str() == text)
     }
 }
 
@@ -57,6 +84,51 @@ pub struct RunUnitError {
 }
 
 impl RunUnitError {
+    /// A `RunnerConfigError` with its `code` and `phase` when it has them.
+    pub fn config(message: impl Into<String>, code: Option<&str>, phase: Option<&str>) -> Self {
+        Self {
+            tag: ErrorTag::RunnerConfigError,
+            error_class: "runner-config".into(),
+            code: code.map(str::to_string),
+            message: message.into(),
+            phase: phase.map(str::to_string),
+            refusal: None,
+        }
+    }
+
+    /// The `CaseAdmissionRefusedError` a port's refusal becomes; the refusal rides along.
+    pub fn admission_refused(refusal: &fgos_execution::admission::Refusal) -> Self {
+        let mut answer = Map::new();
+        answer.insert("code".into(), json!(refusal.code));
+        answer.insert("condition".into(), json!(refusal.condition));
+        if let Some(violations) = &refusal.violations {
+            answer.insert("violations".into(), json!(violations));
+        }
+        Self {
+            tag: ErrorTag::CaseAdmissionRefusedError,
+            error_class: "case-admission-refused".into(),
+            code: Some(refusal.code.clone()),
+            message: format!(
+                "case admission refused {}: {}",
+                refusal.code, refusal.condition
+            ),
+            phase: None,
+            refusal: Some(Value::Object(answer)),
+        }
+    }
+
+    /// Any other error: its class (a stable code such as `custody-predecessor-unknown`) and its message.
+    pub fn other(error_class: &str, message: impl Into<String>) -> Self {
+        Self {
+            tag: ErrorTag::Error,
+            error_class: error_class.into(),
+            code: None,
+            message: message.into(),
+            phase: None,
+            refusal: None,
+        }
+    }
+
     pub fn to_json(&self) -> Value {
         let mut error = Map::new();
         error.insert("tag".into(), json!(self.tag.as_str()));
@@ -99,8 +171,13 @@ pub fn ok_result(result: Value) -> Value {
 
 /// The request of a run: only the options of [`REQUEST_OPTIONS`] cross; an unknown one is refused by name.
 pub fn request(options: &Map<String, Value>) -> Result<Value, String> {
-    if let Some(unknown) = options.keys().find(|k| !REQUEST_OPTIONS.contains(&k.as_str())) {
+    if let Some(unknown) = options
+        .keys()
+        .find(|k| !REQUEST_OPTIONS.contains(&k.as_str()))
+    {
         return Err(format!("run-unit: unknown option \"{unknown}\""));
     }
-    Ok(json!({ "contract": contract(REQUEST_CONTRACT_ID), "options": Value::Object(options.clone()) }))
+    Ok(
+        json!({ "contract": contract(REQUEST_CONTRACT_ID), "options": Value::Object(options.clone()) }),
+    )
 }

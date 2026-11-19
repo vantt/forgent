@@ -4,7 +4,10 @@
 //! the port's answers into the record shapes Node's `commit-unit-work.mjs` wrote, so `unit.json`, the run ledger
 //! and the result a caller reads stay byte-compatible.
 
-use fgos_git::{wal, CommitBaseline, CommitRequest, GitDriver, Oid, OperationError, RepoHandle, ResultCode, SyncResult};
+use fgos_git::{
+    wal, CommitBaseline, CommitRequest, GitDriver, Oid, OperationError, RepoHandle, ResultCode,
+    SyncResult,
+};
 use fgos_holder_lock::{BorrowedHandle, Handle};
 use serde_json::{json, Map, Value};
 
@@ -31,7 +34,11 @@ fn strings(value: &Value, key: &str) -> Vec<String> {
     value
         .get(key)
         .and_then(Value::as_array)
-        .map(|a| a.iter().filter_map(|v| v.as_str().map(str::to_owned)).collect())
+        .map(|a| {
+            a.iter()
+                .filter_map(|v| v.as_str().map(str::to_owned))
+                .collect()
+        })
         .unwrap_or_default()
 }
 
@@ -52,16 +59,34 @@ pub fn partition_paths(paths: &[String], scope: &[String]) -> (Vec<String>, Vec<
 
 /// What a port refusal becomes: the record fields Node's `refusal` gave, with the git cause kept as `nativeCause`.
 pub fn refusal(error: &OperationError) -> Map<String, Value> {
-    let cause = if error.cause.is_empty() { "git-error" } else { error.cause.as_str() };
+    let cause = if error.cause.is_empty() {
+        "git-error"
+    } else {
+        error.cause.as_str()
+    };
     let reason = if cause == "foreign-merge-head" {
         "merge-in-progress"
-    } else if ["untrusted-worktree", "trusted-main-gitfile", "not-a-repository"].iter().any(|c| cause.contains(c)) {
+    } else if [
+        "untrusted-worktree",
+        "trusted-main-gitfile",
+        "not-a-repository",
+    ]
+    .iter()
+    .any(|c| cause.contains(c))
+    {
         "untrusted-worktree"
     } else if cause == "unscopable-conflict-path" {
         cause
     } else if cause == "sync-index-changed" {
         "staged-set-mismatch"
-    } else if ["foreign-staged-index", "staged-set-mismatch", "merge-refused", "hook-refused"].contains(&cause) {
+    } else if [
+        "foreign-staged-index",
+        "staged-set-mismatch",
+        "merge-refused",
+        "hook-refused",
+    ]
+    .contains(&cause)
+    {
         cause
     } else if cause.starts_with("conflict-markers") {
         "conflict-markers"
@@ -75,7 +100,14 @@ pub fn refusal(error: &OperationError) -> Map<String, Value> {
     let stderr = String::from_utf8_lossy(&error.stderr).into_owned();
     out.insert("status".into(), json!("failed"));
     out.insert("reason".into(), json!(reason));
-    out.insert("error".into(), json!(if stderr.is_empty() { cause } else { stderr.as_str() }));
+    out.insert(
+        "error".into(),
+        json!(if stderr.is_empty() {
+            cause
+        } else {
+            stderr.as_str()
+        }),
+    );
     if !stderr.is_empty() {
         out.insert("stderr".into(), json!(stderr));
         out.insert("stderrBytes".into(), json!(error.stderr));
@@ -120,9 +152,15 @@ pub struct CommitArgs<'a> {
 
 /// The outcome of the unit worktree's preflight.
 pub enum Preflight {
-    Clear { baseline: CommitBaseline, pre_existing_in_scope: Vec<String> },
+    Clear {
+        baseline: CommitBaseline,
+        pre_existing_in_scope: Vec<String>,
+    },
     /// The index or a merge is not this run's: the caller refuses the run by name.
-    Foreign { staged: Vec<String>, merge_head: Option<String> },
+    Foreign {
+        staged: Vec<String>,
+        merge_head: Option<String>,
+    },
 }
 
 /// The unit run's door to Git over one worktree, under the custody the caller holds.
@@ -137,19 +175,21 @@ impl<'a> UnitGit<'a> {
     fn held(&self) -> Result<Vec<BorrowedHandle<'a>>, OperationError> {
         match self.custody {
             None => Ok(Vec::new()),
-            Some(handle) => BorrowedHandle::new(handle)
-                .map(|b| vec![b])
-                .map_err(|e| OperationError {
-                    code: ResultCode::Refused,
-                    cause: format!("custody-unavailable: {e}"),
-                    retryable: false,
-                    operation_id: None,
-                    receipt: None,
-                    exit_code: None,
-                    signal: None,
-                    stderr: vec![],
-                    detail: None,
-                }),
+            Some(handle) => {
+                BorrowedHandle::new(handle)
+                    .map(|b| vec![b])
+                    .map_err(|e| OperationError {
+                        code: ResultCode::Refused,
+                        cause: format!("custody-unavailable: {e}"),
+                        retryable: false,
+                        operation_id: None,
+                        receipt: None,
+                        exit_code: None,
+                        signal: None,
+                        stderr: vec![],
+                        detail: None,
+                    })
+            }
         }
     }
 
@@ -157,8 +197,15 @@ impl<'a> UnitGit<'a> {
     pub fn state(&self) -> Result<WorktreeState, OperationError> {
         let value = self.driver.checkout_state(self.repo, self.held()?)?;
         Ok(WorktreeState {
-            head: value.get("head").and_then(Value::as_str).unwrap_or_default().to_owned(),
-            merge_head: value.get("mergeHead").and_then(Value::as_str).map(str::to_owned),
+            head: value
+                .get("head")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned(),
+            merge_head: value
+                .get("mergeHead")
+                .and_then(Value::as_str)
+                .map(str::to_owned),
             unmerged: strings(&value, "unmerged"),
             staged: strings(&value, "staged"),
             changed: strings(&value, "changed"),
@@ -179,17 +226,32 @@ impl<'a> UnitGit<'a> {
 
     /// Capture the native baseline before a producer launches. `sync_operation` is the open merge of this run
     /// (its conflicted paths and staged paths are its own, not foreign).
-    pub fn preflight(&self, scope: &[String], sync_operation: Option<&str>) -> Result<Preflight, OperationError> {
+    pub fn preflight(
+        &self,
+        scope: &[String],
+        sync_operation: Option<&str>,
+    ) -> Result<Preflight, OperationError> {
         let sync = sync_operation.map(|id| (self.writer, id));
         match self.driver.preflight_commit(self.repo, self.held()?, sync) {
             Ok(baseline) => {
-                let dirty: Vec<String> = baseline.dirty.iter().map(|(p, _)| p.clone()).filter(|p| outside_store(p)).collect();
+                let dirty: Vec<String> = baseline
+                    .dirty
+                    .iter()
+                    .map(|(p, _)| p.clone())
+                    .filter(|p| outside_store(p))
+                    .collect();
                 let (pre_existing_in_scope, _) = partition_paths(&dirty, scope);
-                Ok(Preflight::Clear { baseline, pre_existing_in_scope })
+                Ok(Preflight::Clear {
+                    baseline,
+                    pre_existing_in_scope,
+                })
             }
             Err(e) if e.cause == "foreign-staged-index" || e.cause == "foreign-merge-head" => {
                 let state = self.state()?;
-                Ok(Preflight::Foreign { staged: state.staged, merge_head: state.merge_head })
+                Ok(Preflight::Foreign {
+                    staged: state.staged,
+                    merge_head: state.merge_head,
+                })
             }
             Err(e) => Err(e),
         }
@@ -211,7 +273,10 @@ impl<'a> UnitGit<'a> {
         on_prepared: &mut dyn FnMut(&PreparedCommit),
     ) -> Value {
         let mut base = json!({ "outOfScope": [], "preExistingInScope": args.exclude_paths });
-        if let (Some(needs), Some(object)) = (args.needs_writes.filter(|v| v.is_array()), base.as_object_mut()) {
+        if let (Some(needs), Some(object)) = (
+            args.needs_writes.filter(|v| v.is_array()),
+            base.as_object_mut(),
+        ) {
             object.insert("needsWrites".into(), needs.clone());
         }
         match self.commit_inner(args, &mut base, on_prepared) {
@@ -233,31 +298,60 @@ impl<'a> UnitGit<'a> {
         let fs = wal::OsFileSystem;
         let mut recovered: Option<fgos_git::CommitResult> = None;
         if let Some(resume) = args.resume {
-            let outcome = self.driver.recover_scoped_commit(self.repo, self.held()?, self.writer, &resume.operation_id, &fs)?;
+            let outcome = self.driver.recover_scoped_commit(
+                self.repo,
+                self.held()?,
+                self.writer,
+                &resume.operation_id,
+                &fs,
+            )?;
             match outcome {
                 wal::Outcome::Commit { .. } => {
                     let baseline = args.baseline.ok_or_else(missing_baseline)?;
                     recovered = Some(self.driver.scoped_commit(
-                        self.repo, self.held()?, baseline, &resume.request, self.writer, &resume.operation_id, &fs,
+                        self.repo,
+                        self.held()?,
+                        baseline,
+                        &resume.request,
+                        self.writer,
+                        &resume.operation_id,
+                        &fs,
                     )?);
                 }
                 wal::Outcome::AbandonedBeforeAttempt => {}
-                wal::Outcome::CommitRejected { ref cause } if COMMIT_REFUSED_FOR_GOOD.contains(&cause.as_str()) => {}
+                wal::Outcome::CommitRejected { ref cause }
+                    if COMMIT_REFUSED_FOR_GOOD.contains(&cause.as_str()) => {}
                 other => {
                     let what = match &other {
                         wal::Outcome::CommitRejected { cause } => cause.clone(),
                         _ => "unresolved".to_owned(),
                     };
-                    return Ok(Self::failed(base, "git-error", format!("native commit recovery: {what}")));
+                    return Ok(Self::failed(
+                        base,
+                        "git-error",
+                        format!("native commit recovery: {what}"),
+                    ));
                 }
             }
         }
-        let current = if recovered.is_some() { WorktreeState::default() } else { self.state()? };
+        let current = if recovered.is_some() {
+            WorktreeState::default()
+        } else {
+            self.state()?
+        };
         if let Some(merge_head) = &current.merge_head {
-            return Ok(Self::failed(base, "merge-in-progress", format!("the worktree has a merge in progress (MERGE_HEAD {merge_head})")));
+            return Ok(Self::failed(
+                base,
+                "merge-in-progress",
+                format!("the worktree has a merge in progress (MERGE_HEAD {merge_head})"),
+            ));
         }
         if !current.staged.is_empty() {
-            let mut out = Self::failed(base, "foreign-staged-index", foreign_index_detail(&current.staged));
+            let mut out = Self::failed(
+                base,
+                "foreign-staged-index",
+                foreign_index_detail(&current.staged),
+            );
             out["stagedPaths"] = json!(current.staged);
             return Ok(out);
         }
@@ -265,7 +359,8 @@ impl<'a> UnitGit<'a> {
             return Ok(Self::failed(
                 base,
                 "baseline-required",
-                "the native baseline captured before producer launch is required; start a new run".into(),
+                "the native baseline captured before producer launch is required; start a new run"
+                    .into(),
             ));
         };
         let (in_scope, out_of_scope) = match (recovered.is_some(), args.resume) {
@@ -281,12 +376,22 @@ impl<'a> UnitGit<'a> {
             }
         };
         let reported = args.changed_files.unwrap_or(&[]);
-        base["outOfScope"] = json!(out_of_scope.iter().filter(|p| reported.contains(p)).collect::<Vec<_>>());
+        base["outOfScope"] = json!(out_of_scope
+            .iter()
+            .filter(|p| reported.contains(p))
+            .collect::<Vec<_>>());
         let (subject, request, operation_id) = match (&recovered, args.resume) {
-            (Some(_), Some(resume)) => (resume.request.message.clone(), resume.request.clone(), resume.operation_id.clone()),
+            (Some(_), Some(resume)) => (
+                resume.request.message.clone(),
+                resume.request.clone(),
+                resume.operation_id.clone(),
+            ),
             _ => {
                 let subject = subject_from(args.summary, args.unit_id, args.objective);
-                let request = CommitRequest { writes: args.scope.to_vec(), message: subject.clone() };
+                let request = CommitRequest {
+                    writes: args.scope.to_vec(),
+                    message: subject.clone(),
+                };
                 (subject, request, args.operation_id.to_owned())
             }
         };
@@ -304,7 +409,15 @@ impl<'a> UnitGit<'a> {
         }
         let result = match recovered {
             Some(r) => r,
-            None => self.driver.scoped_commit(self.repo, self.held()?, baseline, &request, self.writer, &operation_id, &fs)?,
+            None => self.driver.scoped_commit(
+                self.repo,
+                self.held()?,
+                baseline,
+                &request,
+                self.writer,
+                &operation_id,
+                &fs,
+            )?,
         };
         let mut extra = Map::new();
         if !result.warnings.is_empty() {
@@ -322,7 +435,11 @@ impl<'a> UnitGit<'a> {
             ResultCode::Committed | ResultCode::CommittedButContractViolation => {}
             // Any other answer is not a commit this run may count: it fails closed.
             other => {
-                return Ok(Self::failed(base, "git-error", format!("scoped commit answered {other:?}")));
+                return Ok(Self::failed(
+                    base,
+                    "git-error",
+                    format!("scoped commit answered {other:?}"),
+                ));
             }
         }
         let sha = result.oid.as_ref().map(|o| o.as_str().to_owned());
@@ -338,10 +455,26 @@ impl<'a> UnitGit<'a> {
             failed.insert("reason".into(), json!("committed-set-mismatch"));
             failed.insert(
                 "error".into(),
-                json!(format!("commit {} is on the branch but violates the scoped commit contract", sha.unwrap_or_default())),
+                json!(format!(
+                    "commit {} is on the branch but violates the scoped commit contract",
+                    sha.unwrap_or_default()
+                )),
             );
-            failed.insert("unexpected".into(), json!(result.files.iter().filter(|p| !in_scope.contains(p)).collect::<Vec<_>>()));
-            failed.insert("missing".into(), json!(in_scope.iter().filter(|p| !result.files.contains(p)).collect::<Vec<_>>()));
+            failed.insert(
+                "unexpected".into(),
+                json!(result
+                    .files
+                    .iter()
+                    .filter(|p| !in_scope.contains(p))
+                    .collect::<Vec<_>>()),
+            );
+            failed.insert(
+                "missing".into(),
+                json!(in_scope
+                    .iter()
+                    .filter(|p| !result.files.contains(p))
+                    .collect::<Vec<_>>()),
+            );
             return Ok(Value::Object(failed));
         }
         let mut committed = Map::new();
@@ -352,14 +485,75 @@ impl<'a> UnitGit<'a> {
 
     /// Whether `sha` is an ancestor of the worktree's head.
     pub fn commit_on_branch(&self, sha: &str) -> Result<bool, OperationError> {
-        let Some(head) = self.driver.resolve_commit_ref(self.repo, "HEAD")? else { return Ok(false) };
+        let Some(head) = self.driver.resolve_commit_ref(self.repo, "HEAD")? else {
+            return Ok(false);
+        };
         let ancestor = parse_oid(sha, self.repo)?;
         self.driver.ancestry(self.repo, &ancestor, &head)
     }
 
+    /// What the worktree looks like now (HEAD and a token of every changed path), for the partial-writes check.
+    pub fn worktree_snapshot(&self) -> Result<super::partial_writes::WorktreeSnapshot, String> {
+        let captured = self
+            .driver
+            .snapshot_writes(self.repo, &[], 9_007_199_254_740_991)
+            .map_err(|e| e.cause)?;
+        super::partial_writes::worktree_snapshot(&captured).map_err(|e| e.to_string())
+    }
+
+    /// The paths `branch` carries outside `scope` since `base_sha`: every commit on it counts. Sorted; an error when
+    /// the branch cannot be compared with its base.
+    pub fn paths_outside_scope(
+        &self,
+        branch: &str,
+        base_sha: &str,
+        scope: &[String],
+    ) -> Result<Vec<String>, String> {
+        let tip = self
+            .driver
+            .resolve_commit_ref(self.repo, branch)
+            .map_err(|e| e.cause)?
+            .ok_or_else(|| "cannot resolve writing branch".to_string())?;
+        let base = parse_oid(base_sha, self.repo).map_err(|e| e.cause)?;
+        let mut outside: Vec<String> = Vec::new();
+        let mut cursor = None;
+        loop {
+            let page = self
+                .driver
+                .diff(
+                    self.repo,
+                    fgos_git::DiffSides::Objects(&base, &tip),
+                    &fgos_git::DiffScope {
+                        prefix: None,
+                        renames: false,
+                    },
+                    cursor,
+                    4096,
+                )
+                .map_err(|e| e.cause)?;
+            for entry in &page.entries {
+                let file = String::from_utf8_lossy(&entry.path).into_owned();
+                if !fgos_write_scope::matches(file.as_bytes(), scope).unwrap_or(false)
+                    && !outside.contains(&file)
+                {
+                    outside.push(file);
+                }
+            }
+            match page.next_cursor {
+                Some(next) => cursor = Some(next),
+                None => break,
+            }
+        }
+        outside.sort();
+        Ok(outside)
+    }
+
     /// The commit a ref names, or `None`.
     pub fn resolve_sync_base(&self, name: &str) -> Result<Option<String>, OperationError> {
-        Ok(self.driver.resolve_commit_ref(self.repo, name)?.map(|o| o.as_str().to_owned()))
+        Ok(self
+            .driver
+            .resolve_commit_ref(self.repo, name)?
+            .map(|o| o.as_str().to_owned()))
     }
 
     /// Start the merge of `sha` (named `name`) into the worktree's branch. Returns the sync record: `merged`,
@@ -367,7 +561,14 @@ impl<'a> UnitGit<'a> {
     pub fn start_sync_merge(&self, name: &str, sha: &str, operation_id: &str) -> Value {
         let attempt = (|| {
             let target = parse_oid(sha, self.repo)?;
-            self.driver.start_sync(self.repo, self.held()?, &target, &sync_subject(name), self.writer, operation_id)
+            self.driver.start_sync(
+                self.repo,
+                self.held()?,
+                &target,
+                &sync_subject(name),
+                self.writer,
+                operation_id,
+            )
         })();
         match attempt {
             Ok(result) => translate_sync(&result, name),
@@ -390,16 +591,21 @@ impl<'a> UnitGit<'a> {
     }
 
     fn abort_own_rejected_merge(&self, operation_id: &str) -> Result<(), OperationError> {
-        let own = self.driver.inspect_sync(self.repo, self.held()?, self.writer, operation_id)?;
+        let own = self
+            .driver
+            .inspect_sync(self.repo, self.held()?, self.writer, operation_id)?;
         if own.state == "rejected-open" && own.resolver_grant.is_empty() {
-            self.driver.abort_sync(self.repo, self.held()?, self.writer, operation_id)?;
+            self.driver
+                .abort_sync(self.repo, self.held()?, self.writer, operation_id)?;
         }
         Ok(())
     }
 
     /// Where the merge this run started stands now.
     pub fn sync_merge_state(&self, operation_id: &str) -> Result<Value, OperationError> {
-        let r = self.driver.inspect_sync(self.repo, self.held()?, self.writer, operation_id)?;
+        let r = self
+            .driver
+            .inspect_sync(self.repo, self.held()?, self.writer, operation_id)?;
         let current = self.state()?;
         let state = match r.state.as_str() {
             "rejected-open" => "in-progress",
@@ -419,12 +625,18 @@ impl<'a> UnitGit<'a> {
     /// Conclude the merge the worker finished: the merge commit, or a refusal by name.
     pub fn finish_sync_merge(&self, sync: &Value) -> Value {
         let name = sync.get("ref").and_then(Value::as_str).unwrap_or_default();
-        let id = sync.get("operationId").and_then(Value::as_str).unwrap_or_default();
+        let id = sync
+            .get("operationId")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
         let next = sync.get("nextOperationId").and_then(Value::as_str);
         let attempt = (|| {
             let held = self.held()?;
             match next {
-                Some(next_id) => self.driver.retry_sync_commit(self.repo, held, self.writer, id, next_id),
+                Some(next_id) => {
+                    self.driver
+                        .retry_sync_commit(self.repo, held, self.writer, id, next_id)
+                }
                 None => self.driver.continue_sync(self.repo, held, self.writer, id),
             }
         })();
@@ -464,7 +676,15 @@ impl<'a> UnitGit<'a> {
                     );
                 }
                 if result.get("reason") == Some(&json!("conflict-markers")) {
-                    let paths: Vec<String> = result.get("paths").and_then(Value::as_array).map(|a| a.iter().filter_map(|v| v.as_str().map(str::to_owned)).collect()).unwrap_or_default();
+                    let paths: Vec<String> = result
+                        .get("paths")
+                        .and_then(Value::as_array)
+                        .map(|a| {
+                            a.iter()
+                                .filter_map(|v| v.as_str().map(str::to_owned))
+                                .collect()
+                        })
+                        .unwrap_or_default();
                     result.insert(
                         "error".into(),
                         json!(format!(
@@ -544,10 +764,16 @@ pub fn translate_sync(result: &SyncResult, name: &str) -> Value {
         "up-to-date" => with(json!({ "status": "up-to-date" })),
         "done" => {
             let commit = match &result.commit {
-                Some(c) => json!({ "sha": c.oid.as_ref().map(|o| o.as_str()), "subject": sync_subject(name), "files": c.files }),
+                Some(c) => {
+                    json!({ "sha": c.oid.as_ref().map(|o| o.as_str()), "subject": sync_subject(name), "files": c.files })
+                }
                 None => json!({ "by": "outside" }),
             };
-            if result.commit.as_ref().is_some_and(|c| c.status == ResultCode::CommittedButContractViolation) {
+            if result
+                .commit
+                .as_ref()
+                .is_some_and(|c| c.status == ResultCode::CommittedButContractViolation)
+            {
                 let sha = commit["sha"].as_str().unwrap_or_default().to_owned();
                 return with(json!({
                     "status": "failed",
