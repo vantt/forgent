@@ -364,7 +364,7 @@
         "export function (?:scanAssignmentLayout|listOpenAttemptDirs)\\b",
         "export const runsRoot\\b",
         "['\"`]workflow-runs['\"`]\\)",
-        "\\bfn (?:workflow_run_dirs|assignment_run_dirs|open_attempt_dirs)\\b"
+        "\\bfn (?:workflow_run_dirs|assignment_run_dirs|open_attempt_dirs|scan_assignment_layout|list_assignment_runs|assignment_runs|walk_assignments|scan_assignment_runs)\\b"
       ],
       "allowed": [
         {
@@ -384,11 +384,20 @@
           "reason": "the Rust port of case-run-paths.mjs on the same vectors; the execution crate's one spelling of the case runs root, which hand-off naming asks instead of repeating it"
         },
         {
-          "path": "apps/fgos/src/wiring/run_dirs.rs",
-          "reason": "the host lists run directories for the lock report; both sides read test/rust-host/fixtures/run-dirs-vectors.json"
+          "path": "packages/execution/engine/src/assignment/layout.rs",
+          "reason": "the Rust owner of the assignment layout walk (port of assignment-layout.mjs on packages/execution/contracts/assignment/layout.json and corpus.json); every engine reader of the assignment tree asks it"
         }
       ],
-      "debt": [],
+      "debt": [
+        {
+          "path": "apps/fgos/src/wiring/run_dirs.rs",
+          "reason": "twin: the host lists run directories for the lock report with its own walk; both sides read test/rust-host/fixtures/run-dirs-vectors.json until the host asks the engine's assignment layout"
+        },
+        {
+          "path": "packages/run-result/rust/src/lib.rs",
+          "reason": "twin: the run-result doctor scan walks the assignment tree with its own symlink and depth barriers (walk_assignments, scan_assignment_runs); fgos-run-result sits below the engine and cannot ask assignment/layout.rs until the walk moves to a crate both can use"
+        }
+      ],
       "retiredBy": "the runner's layouts move to Rust",
       "reason": "the lock report needs the run directories the runner lays out, one layer above the lock crate; until the layouts move the host lists them with a twin of each Node lister, pinned by one fixture"
     },
