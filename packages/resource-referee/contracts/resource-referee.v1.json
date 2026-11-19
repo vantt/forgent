@@ -1,0 +1,187 @@
+{
+  "contract": { "id": "resource-referee", "version": 1 },
+  "description": "Applies a ruleset given as data to facts about a set of units and returns findings plus a verdict. Never acts. Holds no default policy: the default belongs to the door. Numbers come from reports/facts.md of plans/261119-0030-resource-referee-graph-write-scope-stack.",
+  "limits": {
+    "maxNodes": 20000,
+    "maxClaimsPerNode": 512,
+    "maxEntryBytes": 1024,
+    "maxIdBytes": 256,
+    "maxRules": 200,
+    "maxInputBytes": 4194304,
+    "perItem": "A node with more claims than maxClaimsPerNode, or a claim `ref` longer than maxEntryBytes, gives the item-level finding `claims-over-limit`; the rest of the set is still evaluated and the surplus is not compared.",
+    "setLevel": "More nodes than maxNodes, more rules than maxRules, or a file larger than maxInputBytes is refused by name before anything is evaluated. maxInputBytes is the byte cap of each file the door reads (a plan table, a units file, a policy file)."
+  },
+  "claimSpaces": [
+    { "space": "path", "comparison": "write-scope", "meaning": "a repo-relative path or glob, compared by the write-scope may-overlap rule" },
+    { "space": "ref", "comparison": "equality", "meaning": "a git ref name, compared as an exact string" },
+    { "space": "port", "comparison": "equality", "meaning": "a network port as a decimal string, compared as an exact string" }
+  ],
+  "claimSpaceRules": [
+    "A claim is { space, ref }. `space` must be listed above; an unknown space is refused by name (`claim-space-unknown`), so a misspelt space can never pass as 'no collision'.",
+    "Two claims collide only inside one space. The caller computes the collisions (the door uses write-scope for `path` and exact equality for the other spaces) and passes them as `exclusions`; the referee compares nothing itself.",
+    "An empty `claims` list means 'unknown', never 'disjoint'. A node must declare claims or `readOnly: true`."
+  ],
+  "unitsFile": {
+    "description": "The shape of the planner door's `--units <file.json>`. A neutral shape, not the `Unit` file schema: a real Unit treats empty `writes` as read-only because dispatch enforces it (src/runner/execution/unit.mjs:125), which is why this shape names read-only explicitly.",
+    "fields": {
+      "v": "1 (required)",
+      "units": "list of unit objects (required)"
+    },
+    "unit": {
+      "id": "string, non-empty, at most maxIdBytes, unique (required)",
+      "claims": "list of { space, ref } (optional)",
+      "readOnly": "boolean (optional, default false); asserted by the caller and not verified",
+      "dependsOn": "list of unit ids (optional, default empty)",
+      "layer": "integer from 1 (optional): the layer the author declared for the unit"
+    },
+    "rules": [
+      "Unknown fields at any level are refused by name (`unknown-field`).",
+      "The door reads that one file; there is no second description of it.",
+      "A unit with `readOnly: true` takes no part in any collision and must have no claims; both together is the blocking finding `read-only-with-claims`.",
+      "`layer` is optional per unit; the layer checks apply only when at least one unit declares one (section `catalog`)."
+    ]
+  },
+  "facts": {
+    "description": "What the evaluator is given. Built by the caller (the door) from the units, the graph output and the colliding pairs.",
+    "fields": {
+      "nodes": "list of { id, claims?, readOnly?, dependsOn?, layer? } (the unit shape above, ids unique)",
+      "graph": "the output of the graph package for these nodes, verbatim (cycles, dangling, layers, deferrals, criticalPath, groups)",
+      "exclusions": "list of { a, b, shared } colliding pairs, `shared` being the entries of `a` that caused the collision",
+      "problems": "list of { item, code: \"entry-invalid\", entry, why } for path claims that do not canonicalize, as reported by write-scope. The caller does not pass scope-empty, entry-too-long or scope-too-large: the referee derives footprint-empty and claims-over-limit from the nodes itself, so each fact has one source",
+      "truncated": "null, or { reason, limit, source } when a fact was cut short (write-scope pairs-cap or comparison-cap)"
+    }
+  },
+  "ruleset": {
+    "description": "A policy as data. A policy replaces the default's non-floor rules; the floor always runs.",
+    "fields": {
+      "rules": "list of { check, class?, params? } (required, may be empty)"
+    },
+    "rules": [
+      "The floor is not part of a ruleset: naming a floor check with any parameter, or with a class, is refused by name (`floor-check-not-configurable`).",
+      "A check named twice is refused (`rule-duplicate`); an unknown check (`check-unknown`) or unknown parameter (`param-unknown`) or a parameter of the wrong type or range (`param-invalid`) is refused.",
+      "`class` is `blocking` or `advisory`; omitted, the catalog default applies.",
+      "More than maxRules rules is refused (`limit-exceeded`).",
+      "An empty ruleset means 'the floor only'.",
+      "The package holds no default ruleset; the door ships one as data."
+    ],
+    "identity": "The verdict echoes the policy identity the caller passes: { source, sha256 } as opaque strings. The package never reads the policy file or computes the hash."
+  },
+  "catalog": [
+    {
+      "check": "no-cycles",
+      "floor": true,
+      "class": "blocking",
+      "params": {},
+      "reads": "graph.cycles",
+      "codes": [ "cycle" ]
+    },
+    {
+      "check": "no-dangling-edges",
+      "floor": true,
+      "class": "blocking",
+      "params": {},
+      "reads": "graph.dangling",
+      "codes": [ "dangling-edge" ]
+    },
+    {
+      "check": "claims-declared",
+      "floor": true,
+      "class": "blocking",
+      "params": {},
+      "reads": "nodes, problems",
+      "codes": [ "claims-missing", "footprint-empty", "footprint-entry-invalid", "claims-over-limit", "read-only-with-claims" ]
+    },
+    {
+      "check": "facts-not-truncated",
+      "floor": true,
+      "class": "blocking",
+      "params": {},
+      "reads": "truncated",
+      "codes": [ "facts-truncated" ]
+    },
+    {
+      "check": "no-exclusion-in-one-layer",
+      "floor": true,
+      "class": "blocking",
+      "params": {},
+      "reads": "exclusions, nodes[].layer",
+      "codes": [ "exclusion-in-one-layer" ],
+      "note": "Applies to declared layers only; vacuous when no node declares one."
+    },
+    {
+      "check": "declared-layers-valid",
+      "floor": false,
+      "defaultClass": "blocking",
+      "params": {},
+      "reads": "nodes[].layer, nodes[].dependsOn",
+      "codes": [ "layer-order-violation", "layer-missing" ],
+      "note": "Every node is declared in a layer strictly later than each node it depends on. If any node declares a layer, every node must (`layer-missing`); if none does, the check has nothing to judge and passes, and the verdict says how many of the units declared one."
+    },
+    {
+      "check": "max-layer-width",
+      "floor": false,
+      "defaultClass": "advisory",
+      "params": { "max": "integer from 1 (required)" },
+      "reads": "nodes[].layer",
+      "codes": [ "layer-width-exceeded" ],
+      "note": "Optional, no default. Counts non-read-only nodes per declared layer."
+    }
+  ],
+  "findingClasses": [ "blocking", "advisory" ],
+  "findings": [
+    { "code": "cycle", "class": "blocking", "nodes": "members of the component", "evidence": "the canonical cycle with edge kinds" },
+    { "code": "dangling-edge", "class": "blocking", "nodes": "the node that names the missing id", "evidence": "the missing ids and the edge or exclusion index" },
+    { "code": "claims-missing", "class": "blocking", "nodes": "the node", "evidence": "neither `claims` nor `readOnly: true` is given" },
+    { "code": "footprint-empty", "class": "blocking", "nodes": "the node", "evidence": "`claims` is an empty list and the node is not read-only: unknown, never disjoint" },
+    { "code": "footprint-entry-invalid", "class": "blocking", "nodes": "the node", "evidence": "the entry as written and why it does not canonicalize" },
+    { "code": "claims-over-limit", "class": "blocking", "nodes": "the node", "evidence": "which per-item limit and its value" },
+    { "code": "read-only-with-claims", "class": "blocking", "nodes": "the node", "evidence": "the claims listed beside `readOnly: true`" },
+    { "code": "facts-truncated", "class": "blocking", "nodes": [], "evidence": "reason, limit and source of the truncation" },
+    { "code": "exclusion-in-one-layer", "class": "blocking", "nodes": "the pair", "evidence": "the shared entries and the layer" },
+    { "code": "layer-order-violation", "class": "per rule", "nodes": "the node and the dependency", "evidence": "both declared layers" },
+    { "code": "layer-missing", "class": "per rule", "nodes": "the node", "evidence": "other units declare layers; this one does not" },
+    { "code": "layer-width-exceeded", "class": "per rule", "nodes": "the nodes of the layer", "evidence": "the layer, its width and the maximum" }
+  ],
+  "findingFields": "Every finding is { code, class, check, nodes, evidence }. `code` is stable across releases; a code is never reused for another meaning and a retired code is never reissued.",
+  "verdicts": [ "accept", "accept-with-advice", "reject" ],
+  "verdictDerivation": [
+    "reject: at least one blocking finding.",
+    "accept-with-advice: no blocking finding and at least one advisory finding.",
+    "accept: no finding.",
+    "The verdict derives only from finding classes. A `facts-truncated` finding is blocking whatever the ruleset says, so a truncated fact set never yields accept or accept-with-advice."
+  ],
+  "verdictFields": {
+    "verdict": "one of verdicts",
+    "findings": "list of findings ordered by check order in the catalog, then by node input position",
+    "policy": "the identity the caller passed, echoed verbatim, or null when the caller passed none",
+    "counts": "{ nodes, readOnlyNodes, declaredLayers }",
+    "readOnlyNodes": "ids of the nodes that asserted readOnly, listed because the assertion is the caller's and is not verified",
+    "caveats": "the caveats below, always all of them"
+  },
+  "caveats": [
+    { "id": "lexical", "text": "Path collisions are lexical: case folding, Unicode normalisation and symlinks are outside the rule. 'Disjoint' means disjoint as spelled." },
+    { "id": "read-only-asserted", "text": "readOnly is asserted by the caller and is not verified; a read-only unit is not checked for collisions." }
+  ],
+  "refusals": [
+    "input-not-object",
+    "unknown-field",
+    "claim-space-unknown",
+    "claim-malformed",
+    "node-malformed",
+    "duplicate-node-id",
+    "id-too-long",
+    "check-unknown",
+    "param-unknown",
+    "param-invalid",
+    "rule-duplicate",
+    "floor-check-not-configurable",
+    "limit-exceeded"
+  ],
+  "refusalRules": "A refusal happens before anything is evaluated and returns no findings. It names the code, the field or limit and the index of the first offending item, and quotes no more than maxEntryBytes of input text. The door escapes every value it prints.",
+  "emptyFacts": "Zero nodes evaluate to accept with counts.nodes = 0. A plan with zero phases is a blocking finding in the door, never accept (plan decision 31).",
+  "boundaries": [
+    "The package reads no file and computes no hash; the door passes the policy identity.",
+    "The package holds no default ruleset and no claim comparison; the door supplies both.",
+    "The package never acts: it returns a verdict and the caller decides what to do with it."
+  ]
+}

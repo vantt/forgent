@@ -1,0 +1,100 @@
+{
+  "contract": { "id": "graph", "version": 1 },
+  "description": "Deterministic facts about a directed graph with typed edges and exclusion pairs. No domain meaning and no policy. Every number below comes from reports/facts.md of plans/261119-0030-resource-referee-graph-write-scope-stack.",
+  "direction": "An ordering edge {from, to} means: `from` cannot start before `to` is done, so `to` sits in an earlier layer than `from`.",
+  "limits": {
+    "maxNodes": 20000,
+    "maxEdges": 200000,
+    "maxExclusions": 100000,
+    "maxIdBytes": 256,
+    "maxInputBytes": 4194304,
+    "perItem": "An id longer than maxIdBytes is refused by name: a node that cannot be named has no answer to give. The graph reports no item-level findings.",
+    "setLevel": "Input beyond maxNodes, maxEdges, maxExclusions or maxInputBytes is refused by name; no partial answer is ever returned. Cycle reporting is linear and needs no cap."
+  },
+  "edgeKinds": [
+    { "kind": "depends-on", "orders": true, "groups": true, "meaning": "from waits for to" },
+    { "kind": "parent-child", "orders": true, "groups": true, "meaning": "from (the parent) waits for to (the child)" },
+    { "kind": "waits-for", "orders": true, "groups": true, "meaning": "from waits for to without owning it" },
+    { "kind": "related", "orders": false, "groups": true, "meaning": "from and to belong together; neither waits" }
+  ],
+  "edgeKindRules": [
+    "An unknown kind is refused by name: a misspelt kind can never pass as 'no ordering'.",
+    "`orders` decides whether the kind takes part in cycles, layers and the critical path.",
+    "`groups` decides whether the kind joins its two ends into one independent group.",
+    "The three ordering kinds behave identically; they differ only so that a cycle report names which relation closes the loop."
+  ],
+  "input": {
+    "fields": {
+      "nodes": "list of { id } (required; ids are non-empty strings, unique)",
+      "edges": "list of { from, to, kind } (optional, default empty)",
+      "exclusions": "list of { a, b } (optional, default empty): the pair may not share a layer",
+      "priority": "list of node ids (optional): earlier ids are placed first when an exclusion forces a choice; ids not listed follow in input order"
+    },
+    "rules": [
+      "Unknown fields at any level are refused by name.",
+      "Node order, and edge order per `from`, are part of the input: the output is a pure function of the input including order.",
+      "Duplicate edges and duplicate exclusion pairs change nothing and appear once in outputs.",
+      "An ordering edge from a node to itself is a cycle of one node."
+    ]
+  },
+  "refusals": [
+    "input-not-object",
+    "unknown-field",
+    "nodes-missing",
+    "node-malformed",
+    "id-empty",
+    "id-not-string",
+    "id-too-long",
+    "duplicate-node-id",
+    "edge-malformed",
+    "unknown-edge-kind",
+    "exclusion-malformed",
+    "exclusion-self-pair",
+    "priority-duplicate",
+    "priority-unknown-id",
+    "limit-exceeded"
+  ],
+  "refusalRules": "A refusal carries its code, the name of the limit or field, and the index of the first offending item. It never quotes more than the id-length limit of any input text.",
+  "output": {
+    "fields": {
+      "cycles": "list, one entry per non-trivial strongly connected component (size above one, or a self-edge), ordered by the component's smallest id",
+      "dangling": "list of references to ids that are not nodes, never materialised as nodes",
+      "layers": "list of { index, nodes } or null when a cycle exists",
+      "deferrals": "list explaining each node placed later than its earliest possible layer, or null when layers is null",
+      "criticalPath": "{ depth, path } or null when a cycle exists",
+      "groups": "{ groupCount, groups: [ { size, nodes } ] }"
+    },
+    "cycleEntry": {
+      "members": "ids of the component, ascending by byte order",
+      "edges": "the component's induced ordering edges as { from, to, kind }, ordered by from then to then kind",
+      "cycle": "ids of one canonical shortest cycle through the smallest member, starting at it; the cycle follows edge direction and closes from its last id back to the first",
+      "cycleKinds": "the edge kind of each step, same length as cycle (the last entry is the closing edge)"
+    },
+    "danglingEntry": "{ source: 'edge' | 'exclusion', index, from?, to?, a?, b?, missing: list of the absent ids }",
+    "deferralEntry": "{ node, earliest, placedAt, reasons: [ { layer, partner } ] }: in each layer from `earliest` up to but excluding `placedAt`, `partner` is the first node already placed in that layer that is excluded with `node`",
+    "criticalPathEntry": "{ depth: number of nodes on the path, path: ids from the deepest node down through the dependency it waits on longest }; an empty graph gives { depth: 0, path: [] }"
+  },
+  "queries": {
+    "cycle_through": {
+      "input": "the graph input plus one node id",
+      "output": "the shortest cycle through that id, in the shape of cycleEntry.cycle and cycleKinds, or null when the id is on no cycle",
+      "refusals": [ "cycle-through-unknown-id" ],
+      "cost": "linear in the size of the component"
+    }
+  },
+  "tieBreaks": [
+    "Smallest id means smallest by UTF-8 byte order.",
+    "Cycle: breadth-first search from the root over the component's ordering edges, neighbours visited in ascending id order; the closing step is taken from the in-neighbour of the root found at the smallest distance, ties by the smaller id. The path found is the lexicographically smallest of the shortest ones.",
+    "Layers: a node's earliest layer is 0 when it waits for nothing, else one more than the greatest layer of the nodes it waits for. Under exclusions, layers are filled one at a time: the nodes whose dependencies are all placed in earlier layers are offered in priority order and each is placed unless an already placed node of that layer is excluded with it.",
+    "Priority: the `priority` list, then input order for ids not listed. No two nodes tie because every node has one input position.",
+    "Critical path: the first strict maximum wins, over nodes in input order and, for one node, over its dependencies in edge input order.",
+    "Groups: ordered by the input position of their first member; members in input order; groups are connected through edges whose kind has `groups: true` and through exclusion pairs.",
+    "Components in `cycles` are ordered by smallest id; `members` and `edges` have the orders given above."
+  ],
+  "refusalsVersusResults": [
+    "Refused (malformed input, nothing computed): anything under `refusals`.",
+    "Result (a fact about well-formed input): cycles, dangling references, layers, deferrals, the critical path, groups.",
+    "When a cycle exists, `layers`, `deferrals` and `criticalPath` are null: they are not defined on a graph that cannot be ordered. The cycles are the answer."
+  ],
+  "differsFromWorkVerb": "The package `graph` is a library of facts about a graph. The Work verb `fgos graph` (src/cli/command-registry.mjs:1103, packages/host-runtime/contracts/command-routes.json:622) reads Work state and prints its metrics. Neither calls the other; the Work adapter of the door plan maps Work items to this input."
+}

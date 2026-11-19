@@ -1,0 +1,10 @@
+ERROR 261118-1117-external-ui-integration-multica: source must be a list of paths or backlog ids
+ERROR 261118-1117-external-ui-integration-multica: missing section: outcome
+ERROR 261118-1117-external-ui-integration-multica: missing section: acceptance criteria
+ERROR 261118-1117-external-ui-integration-multica: missing section: non-goals
+ERROR 261118-1117-external-ui-integration-multica: missing section: phases
+ERROR 261118-1117-external-ui-integration-multica: missing section: owner questions
+ERROR 261118-1117-external-ui-integration-multica: missing section: risks and rollback
+ERROR 261118-1117-external-ui-integration-multica: no phase table with a footprint column
+plans 128: under contract 15 (failing 1), legacy 113 (5 with frontmatter that is not valid YAML; would migrate to unreadable 5, draft 15, done 69, unmapped 16, running 6, ready 2)
+WARN legacy plans are not checked; add `contract: plan-v1` when a plan is next planned
