@@ -41,8 +41,8 @@ use fgos_execution_engine::credentials::store::{OverLimit, ResolveStore, SweepOp
 use fgos_execution_engine::credentials::{
     credential_write_back_target, inspect_pending_copies_over_limit,
     inspect_retained_credential_copies, sweep_interrupted_stagings, write_back_renewed_credential,
-    AccountInventory, AccountsLocks, CredentialSource, InventoryAccount, Layout, NoLocks, NoSqlite,
-    RetainedCopy, StoreJudgement, MAX_PENDING_COPIES, STAGING_MIN_AGE_MS,
+    AccountInventory, AccountsLocks, BundledSqlite, CredentialSource, InventoryAccount, Layout,
+    NoLocks, RetainedCopy, StoreJudgement, MAX_PENDING_COPIES, STAGING_MIN_AGE_MS,
 };
 use fgos_host_runtime::civil_time::parse_rfc3339_millis;
 use serde_json::{json, Map, Value};
@@ -861,7 +861,7 @@ struct StageLogin<'a> {
 
 impl CredentialWriteBack for StageLogin<'_> {
     fn write_back(&self, home: &Path, target: Option<&Value>) -> WriteBackOutcome {
-        write_back_renewed_credential(home, target, self.now, &NoSqlite, self.locks)
+        write_back_renewed_credential(home, target, self.now, &BundledSqlite, self.locks)
     }
 }
 
@@ -979,7 +979,7 @@ fn fix_copies_in(fix: &CopiesFix<'_>) -> (bool, String) {
         now,
         min_age_ms: STAGING_MIN_AGE_MS,
         locks: fix.locks,
-        sqlite: &NoSqlite,
+        sqlite: &BundledSqlite,
     });
     let retried: BTreeSet<PathBuf> = fix
         .retried_roots
