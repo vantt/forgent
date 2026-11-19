@@ -285,7 +285,7 @@
     "test/runner/execution/bind-committed-config.test.mjs": 2.4,
     "test/runner/execution/bind-tier-composition.test.mjs": 0.1,
     "test/runner/execution/bind.test.mjs": 2,
-    "test/runner/execution/capability-config.test.mjs": 0.1,
+    "test/runner/capability-config.test.mjs": 0.1,
     "test/runner/execution/case-run-paths.test.mjs": 0.1,
     "test/runner/execution/commit-unit-work.test.mjs": 12.2,
     "test/runner/execution/config-snapshot-hash.test.mjs": 0.2,
