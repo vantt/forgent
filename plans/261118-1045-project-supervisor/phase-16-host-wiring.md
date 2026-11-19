@@ -32,10 +32,13 @@ session-verb plan (PS-16). A finding that changes a decision stops the phase wit
 `apps/fgos/Cargo.toml`, `Cargo.lock`, `apps/fgos/src/main.rs`, `apps/fgos/src/routing.rs`, `apps/fgos/src/wiring/mod.rs`, `apps/fgos/src/wiring/supervision.rs`, `apps/fgos/src/wiring/observe_declarations.rs`, `apps/fgos/src/wiring/metrics_sources.rs`, `apps/fgos/src/wiring/doctor/supervision.rs`, `apps/fgos/src/wiring/doctor/mod.rs`, `apps/fgos/tests/supervision_verbs.rs`, `packages/distribution/contracts/doctor-registry.v1.json`, `src/cli/command-registry.mjs`, `packages/host-runtime/contracts/command-manifest.json`, `packages/host-runtime/contracts/command-routes.json`, `packages/host-runtime/contracts/command-route-annotations.json`, `apps/fgos/src/cli_projector.rs`, `apps/fgos-gateway/src/gateway.rs`, `apps/fgos-gateway/web/src/api/types.ts`, `docs/platform/herdr-web-dashboard/contracts/fgos-gateway-api-v1.yaml`, `bin/fgos.mjs`, `test/cli/**`.
 
 ## Steps
+Run as two ordered seats in one worktree (2026-11-19): seat A = steps 1-4, 3b, 7-9 (Rust host, crate land, doctor
+registry); seat B = steps 5, 6, 10 (Node verbs, registry and generated contracts, gateway, `test/cli/**`).
 1. `apps/fgos/Cargo.toml`: depend on `fgos-supervision`; `cargo update -p fgos-supervision` is the only `Cargo.lock` change (no hand merge).
 2. `wiring/supervision.rs`: one provider per verb family. It resolves the project root, reads config values (`watcher.*`, `supervisor.maxLeads`, `land.*`, `workerSlots.ceiling`) through the config door, builds the crate's ports (Event Store queue, Git Land/Remote/inspect, Identity resolve and project read, the head-start door for session start, the mailbox notifier, the definitions runner with each `watcher.definitions` entry and the pace file resolved like the attention view) and calls the crate. No logic of its own. `land` takes `--footprint` only from the request route (a lead's plan, phase 10) and `--test <path>...`; `slots` calls the lane view and answers `{lanes:{ceiling,live,free,seats}}`.
 3. `routing.rs` `NATIVE_SUBCOMMANDS` and `main.rs` provider table and registration: add `watcher` (`tick`), `supervisor` (`wake`, `plans`, `queue`, `handled`, `done`); `land` and `slots` are plain native verbs.
-3b. Footprint at commit time: `fgos land --paths` from a lead (the route passes `--footprint`) re-reads its plan's
+3b. Footprint at commit time (in the crate, `packages/supervision/rust/src/land.rs` + `tests/land.rs`, added to this
+   footprint 2026-11-19): `fgos land --paths` from a lead (the route passes `--footprint`) re-reads its plan's
    `footprint` from the bytes it is about to commit and refuses `footprint-change-refused` when they differ from the
    trunk tip's; the route's earlier check (phase 10) cannot see a sandbox edit made after the request (review of
    phase 10, 2026-11-19).
