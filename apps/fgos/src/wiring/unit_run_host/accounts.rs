@@ -222,3 +222,185 @@ pub fn drop_assignment_record(assignment_id: &str, runtime_dir: Option<&Path>) {
 pub fn runner_config_for_binding(runner: &Value, bound: &Value) -> Value {
     fgos_execution_engine::accounts::pin::runner_config_for_binding(runner, bound)
 }
+
+/// The modes a caller may pin an account in (`ACCOUNT_PIN_MODES`, `src/runner/execution/unit-run-start.mjs:207`).
+const ACCOUNT_PIN_MODES: [&str; 2] = ["strict", "where-served"];
+
+fn pre_admission(message: String, code: Option<&str>) -> RunUnitError {
+    RunUnitError::config(message, code, Some("pre-admission"))
+}
+
+/// `assertDoorChoicesBeforeRun` (`src/runner/execution/unit-run-start.mjs:216`): refuse, before a unit run exists, a
+/// machine on which no agent CLI can start, an unknown `accountPin` mode, a dependence or a raised tier the calling
+/// door has no authority for, and a pinned account no seat takes (unless `accountPin` is `where-served`), that a
+/// seat refuses, or that is quarantined now. The seats are bound dry, exactly as the run will bind them.
+pub fn door_choices(
+    unit: &Value,
+    runner: &Value,
+    options: &Value,
+    collaboration: &Value,
+) -> Result<(), RunUnitError> {
+    let session = options.get("session").filter(|s| s.is_object());
+    let (bind_session, machine) = session_and_machine(session.unwrap_or(&Value::Null));
+    let now = now_ms();
+    let preflight = preflight_of(
+        &PreflightRequest {
+            runner_config: runner,
+            session: bind_session,
+            pin: None,
+            accounts: None,
+        },
+        &machine,
+        now,
+    );
+    if let Some(missing) = preflight.agent_cli_missing {
+        return Err(pre_admission(
+            format!("{}: {}; {}", missing.reason, missing.detail, missing.fix),
+            Some(missing.reason),
+        ));
+    }
+    if let Some(mode) = options.get("accountPin").filter(|m| !m.is_null()) {
+        if !mode
+            .as_str()
+            .is_some_and(|m| ACCOUNT_PIN_MODES.contains(&m))
+        {
+            return Err(pre_admission(
+                format!(
+                    "accountPin must be one of {}, got {mode}",
+                    ACCOUNT_PIN_MODES.join(", ")
+                ),
+                None,
+            ));
+        }
+    }
+    let raise_authorized = options.get("raiseAuthorized") == Some(&Value::Bool(true));
+    let overrides: Vec<Value> = options
+        .get("overrides")
+        .and_then(Value::as_array)
+        .cloned()
+        .unwrap_or_default();
+    let objects: Vec<&Value> = overrides.iter().filter(|o| o.is_object()).collect();
+    if !raise_authorized
+        && objects
+            .iter()
+            .any(|o| o.get("acceptDependence") == Some(&Value::Bool(true)))
+    {
+        return Err(pre_admission(
+            "dependence-acceptance-unauthorized: accepting a dependence between seats needs an authorized door; no door of this release is authorized, so every seat keeps the independence its pattern asks for".into(),
+            Some("dependence-acceptance-unauthorized"),
+        ));
+    }
+    let names = |key: &str| objects.iter().any(|o| o.get(key).is_some());
+    let pins_account = names("account");
+    if !pins_account && !names("tier") && !names("persona") {
+        return Ok(());
+    }
+    // The dry bind runs headless in this machine's herdr unless the caller's session says otherwise.
+    let mut dry_session = serde_json::Map::new();
+    dry_session.insert("headless".into(), json!(true));
+    dry_session.insert(
+        "herdrPresent".into(),
+        json!(super::machine::herdr_present()),
+    );
+    if let Some(stated) = session.and_then(Value::as_object) {
+        dry_session.extend(stated.clone());
+    }
+    let (dry_bind_session, dry_machine) = session_and_machine(&Value::Object(dry_session));
+    let effective = collaboration
+        .pointer("/pin/effective")
+        .or_else(|| collaboration.get("effective"))
+        .filter(|e| !e.is_null())
+        .unwrap_or(collaboration);
+    let workflow_id = options.get("workflowId").and_then(Value::as_str);
+    let simulated = fgos_execution_engine::planning::bind_facade::simulate_unit_bindings(
+        unit,
+        runner,
+        effective,
+        &fgos_execution_engine::planning::bind_facade::DryBindOptions {
+            session: Some(dry_bind_session),
+            overrides,
+            raise_authorized,
+            workflow_id,
+        },
+        &dry_machine,
+        now,
+    )
+    .map_err(|e| bind_refusal(&e.name, e.code.as_deref(), &e.message))?;
+    let seats: Vec<Value> = simulated
+        .get("seats")
+        .and_then(Value::as_array)
+        .cloned()
+        .unwrap_or_default();
+    let refused_for = |prefix: &str| {
+        seats.iter().find(|s| {
+            s.pointer("/refused/reason")
+                .and_then(Value::as_str)
+                .is_some_and(|r| r.starts_with(prefix))
+        })
+    };
+    let text = |v: &Value, pointer: &str| {
+        v.pointer(pointer)
+            .and_then(Value::as_str)
+            .unwrap_or("undefined")
+            .to_string()
+    };
+    if let Some(seat) = seats.iter().find(|s| {
+        s.pointer("/refused/reason").and_then(Value::as_str) == Some("tier-escalation-unauthorized")
+    }) {
+        return Err(pre_admission(
+            format!(
+                "tier-escalation-unauthorized: {}",
+                text(seat, "/refused/detail")
+            ),
+            Some("tier-escalation-unauthorized"),
+        ));
+    }
+    if !pins_account {
+        return Ok(());
+    }
+    if let Some(seat) = refused_for("account-pin") {
+        return Err(RunUnitError::config(
+            format!(
+                "cannot pin the account for seat \"{}\": {}",
+                text(seat, "/seat"),
+                text(seat, "/refused/detail")
+            ),
+            None,
+            None,
+        ));
+    }
+    if !seats
+        .iter()
+        .any(|s| s.get("account").is_some_and(|a| !a.is_null()))
+    {
+        if options.get("accountPin").and_then(Value::as_str) == Some("where-served") {
+            return Ok(());
+        }
+        let why: Vec<String> = seats
+            .iter()
+            .filter(|s| s.get("accountSkipped").is_some_and(|a| !a.is_null()))
+            .map(|s| {
+                format!(
+                    "seat \"{}\": {}",
+                    text(s, "/seat"),
+                    text(s, "/accountSkipped/detail")
+                )
+            })
+            .collect();
+        let tail = if why.is_empty() {
+            ": no seat its override names binds here".to_string()
+        } else {
+            format!(" ({})", why.join("; "))
+        };
+        return Err(RunUnitError::config(
+            format!("the pinned account applies to no seat of this unit{tail}"),
+            None,
+            None,
+        ));
+    }
+    let runtime_dir = options
+        .get("providerCapacityRuntimeDir")
+        .and_then(Value::as_str)
+        .map(Path::new);
+    pinned_accounts_usable(&seats, runner, "cannot start the unit run", runtime_dir)
+}

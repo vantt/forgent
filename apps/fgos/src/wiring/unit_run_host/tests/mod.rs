@@ -434,6 +434,64 @@ fn account_reads_over_an_empty_store_find_nothing_to_rotate_or_audit() {
     );
 }
 
+#[test]
+fn door_choices_refuse_what_the_calling_door_has_no_authority_for_before_a_run_exists() {
+    let scratch = Scratch::new("doors");
+    let runner = stub_runner(&scratch.0);
+    let unit = json!({ "id": "u1", "capability": "execute", "writes": [] });
+    let collaboration = json!({ "pin": { "effective": { "loop": "solo", "params": {} } } });
+    let session = json!({ "pathEnv": scratch.0, "herdrPresent": false, "postureAtLaunch": true });
+    let ask = |extra: Value| {
+        let mut options = json!({ "session": session });
+        options
+            .as_object_mut()
+            .unwrap()
+            .extend(extra.as_object().unwrap().clone());
+        accounts::door_choices(&unit, &runner, &options, &collaboration)
+    };
+    assert!(ask(json!({})).is_ok());
+
+    let missing = accounts::door_choices(
+        &unit,
+        &runner,
+        &json!({ "session": { "pathEnv": scratch.0.join("empty") } }),
+        &collaboration,
+    )
+    .unwrap_err();
+    assert_eq!(missing.phase.as_deref(), Some("pre-admission"));
+    let code = missing.code.clone().unwrap();
+    assert!(
+        missing.message.starts_with(&format!("{code}: ")),
+        "{missing:?}"
+    );
+
+    let mode = ask(json!({ "accountPin": "always" })).unwrap_err();
+    assert_eq!(
+        mode.message,
+        "accountPin must be one of strict, where-served, got \"always\""
+    );
+    let dependence = ask(json!({ "overrides": [{ "acceptDependence": true }] })).unwrap_err();
+    assert_eq!(
+        dependence.code.as_deref(),
+        Some("dependence-acceptance-unauthorized")
+    );
+    assert!(
+        ask(json!({ "overrides": [{ "acceptDependence": true }], "raiseAuthorized": true }))
+            .is_ok()
+    );
+
+    let pinned = ask(json!({ "overrides": [{ "account": "stub/nobody" }] })).unwrap_err();
+    assert!(
+        pinned
+            .message
+            .starts_with("the pinned account applies to no seat of this unit")
+            || pinned
+                .message
+                .starts_with("cannot pin the account for seat"),
+        "{pinned:?}"
+    );
+}
+
 // ---- settlement -------------------------------------------------------------------------------------------
 
 #[test]
