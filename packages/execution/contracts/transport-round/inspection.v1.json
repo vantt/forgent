@@ -1,0 +1,2362 @@
+{
+  "note": "recorded from src/runner/dispatch/runtime-inspection.mjs; every case reads the same fixture tree (`files`, relative to the project root, `<root>` stands for it in the output) at observedAt",
+  "files": {
+    ".fgos/assignments/a1/assignment.json": "{\"assignmentId\":\"a1\"}\n",
+    ".fgos/assignments/a1/runs/01/run.json": "{\"runId\":\"r1\",\"assignmentId\":\"a1\",\"status\":\"bound\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/a1/runs/01/supervisor-binding.json": "{\"bound\":true}\n",
+    ".fgos/assignments/a1/runs/01/visibility.json": "{\"status\":\"working\"}\n",
+    ".fgos/assignments/a1/runs/01/workspace-evidence.json": "{\"dirt\":\"clean\"}\n",
+    ".fgos/assignments/a1/admission/generations/0000000001.json": "{\"runId\":\"r1\",\"attempt\":1}\n",
+    ".fgos/assignments/a2/assignment.json": "{\"assignmentId\":\"a2\"}\n",
+    ".fgos/assignments/a2/runs/01/run.json": "{\"runId\":\"r2\",\"assignmentId\":\"a2\",\"status\":\"settled\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000,\"coordinationId\":\"s1\"}\n",
+    ".fgos/assignments/a2/runs/01/result.json": "{\"runId\":\"r2\",\"status\":\"done\",\"confidence\":\"high\",\"summary\":\"ok\"}\n",
+    ".fgos/assignments/a2/admission/generations/0000000001.json": "{\"runId\":\"r2\",\"attempt\":1}\n",
+    ".fgos/coordination/sessions/s1/session.json": "{\"assignmentRefs\":[\"a2\"]}\n",
+    ".fgos/assignments/a3/assignment.json": "{\"assignmentId\":\"a3\"}\n",
+    ".fgos/assignments/a3/runs/01/run.json": "{\"runId\":\"r3\",\"assignmentId\":\"a3\",\"status\":\"running\",\"cwd\":\"/vec/ws-b\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000,\"launchedAt\":\"2026-11-19T09:00:01.000Z\"}\n",
+    ".fgos/assignments/a3/runs/01/result.json": "{ not json",
+    ".fgos/assignments/a3/admission/generations/0000000001.json": "{\"runId\":\"r3\",\"attempt\":1}\n",
+    ".fgos/assignments/a4/assignment.json": "{\"assignmentId\":\"a4\"}\n",
+    ".fgos/assignments/a4/runs/01/run.json": "[]",
+    ".fgos/assignments/a4/admission/generations/0000000001.json": "{\"runId\":\"r4\",\"attempt\":1}\n",
+    ".fgos/assignments/a5/assignment.json": "{\"assignmentId\":\"a5\"}\n",
+    ".fgos/assignments/a5/runs/01/run.json": "{\"runId\":\"dup\",\"assignmentId\":\"a5\",\"status\":\"bound\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/a5/admission/generations/0000000001.json": "{\"runId\":\"dup\",\"attempt\":1}\n",
+    ".fgos/assignments/a6/assignment.json": "{\"assignmentId\":\"a6\"}\n",
+    ".fgos/assignments/a6/runs/01/run.json": "{\"runId\":\"dup\",\"assignmentId\":\"a6\",\"status\":\"bound\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/a6/admission/generations/0000000001.json": "{\"runId\":\"dup\",\"attempt\":1}\n",
+    ".fgos/assignments/a7/assignment.json": "{\"assignmentId\":\"a7\"}\n",
+    ".fgos/assignments/a7/runs/01/run.json": "{\"runId\":\"r7a\",\"assignmentId\":\"a7\",\"status\":\"admitted\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/a7/runs/02/run.json": "{\"runId\":\"r7b\",\"assignmentId\":\"a7\",\"status\":\"delivered\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000,\"delivery\":\"delivered\"}\n",
+    ".fgos/assignments/a7/runs/03/run.json": "{\"runId\":\"r7x\",\"assignmentId\":\"a7\",\"status\":\"admitted\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/a7/admission/generations/0000000001.json": "{\"runId\":\"r7old\",\"attempt\":1,\"retryId\":\"rt1\"}\n",
+    ".fgos/assignments/a7/admission/generations/0000000002.json": "{\"runId\":\"r7a\",\"attempt\":1}\n",
+    ".fgos/assignments/a7/admission/generations/0000000003.json": "{\"runId\":\"r7b\",\"attempt\":1}\n",
+    ".fgos/assignments/a7/admission/markers/rt1.aborted.json": "{\"aborted\":true}\n",
+    ".fgos/assignments/a8/runs/01/run.json": "{\"runId\":\"r8\",\"assignmentId\":\"a8\",\"status\":\"bound\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/a9/assignment.json": "{\"assignmentId\":\"a9\"}\n"
+  },
+  "observedAt": "2026-11-19T10:00:00.000Z",
+  "selectors": [
+    {
+      "options": {
+        "run": "r1"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "run",
+            "id": "r1",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a1",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a1/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "run-record",
+              "source": "run-repository",
+              "level": "correlated",
+              "value": {
+                "status": "bound",
+                "phase": "bound"
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-19T10:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "r1"
+            },
+            "phase": "bound",
+            "resourceState": "ambiguous",
+            "delivery": "unknown",
+            "inspectionStatus": "partial",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "stale",
+              "result": "missing",
+              "ownership": "complete",
+              "workspace": "complete"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "bound",
+                  "phase": "bound"
+                }
+              }
+            ]
+          },
+          "runResult": null,
+          "recoveryAuthority": {
+            "kind": "standalone-run",
+            "id": "r1",
+            "observeCommand": "fgos dispatch recover r1"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "a1"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "r1"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "run": "r2"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "resolved",
+          "subject": {
+            "kind": "run",
+            "id": "r2",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a2",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a2/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "run-record",
+              "source": "run-repository",
+              "level": "correlated",
+              "value": {
+                "status": "settled",
+                "phase": "settled"
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-19T10:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "r2"
+            },
+            "phase": "settled",
+            "resourceState": "unobserved",
+            "delivery": "unknown",
+            "inspectionStatus": "resolved",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "missing",
+              "result": "complete",
+              "ownership": "complete",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "settled",
+                  "phase": "settled"
+                }
+              }
+            ]
+          },
+          "runResult": {
+            "contract": {
+              "id": "assignment-run-result",
+              "version": 2
+            },
+            "runId": "r2",
+            "assignmentId": null,
+            "settleReports": [],
+            "classification": {
+              "execution": {
+                "status": "completed",
+                "exitCode": 0
+              },
+              "assessment": {
+                "verdict": "pass"
+              },
+              "confidence": {
+                "level": "high",
+                "basis": [
+                  "v1-status"
+                ]
+              },
+              "failure": null,
+              "policy": {
+                "disposition": "not-applicable",
+                "code": null
+              },
+              "delivery": {
+                "mode": "legacy-derived"
+              },
+              "provenance": "legacy-derived"
+            },
+            "status": "done",
+            "confidence": "high",
+            "runtime": {},
+            "evidence": {
+              "sourceVersion": "v1",
+              "bytesRewritten": false
+            }
+          },
+          "recoveryAuthority": {
+            "kind": "coordination-session",
+            "id": "s1",
+            "observeCommand": "fgos coordination recover s1"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "a2"
+            ],
+            "coordinationIds": [
+              "s1"
+            ],
+            "runIds": [
+              "r2"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "run": "r3"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "run",
+            "id": "r3",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a3",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a3/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "run-record",
+              "source": "run-repository",
+              "level": "correlated",
+              "value": {
+                "status": "running",
+                "phase": "launched"
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-19T10:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "r3"
+            },
+            "phase": "launched",
+            "resourceState": "unobserved",
+            "delivery": "running",
+            "inspectionStatus": "partial",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "missing",
+              "result": "corrupt",
+              "ownership": "complete",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "running",
+                  "phase": "launched"
+                }
+              }
+            ]
+          },
+          "runResult": {
+            "contract": {
+              "id": "assignment-run-result",
+              "version": 3
+            },
+            "runId": null,
+            "assignmentId": null,
+            "classification": {
+              "execution": {
+                "status": "completion-unknown",
+                "exitCode": null
+              },
+              "assessment": {
+                "verdict": "inconclusive"
+              },
+              "confidence": {
+                "level": "failed",
+                "basis": [
+                  "invalid-json"
+                ]
+              },
+              "failure": {
+                "family": "contract",
+                "code": "invalid-run-result-structure"
+              },
+              "policy": {
+                "disposition": "refuse",
+                "code": "corrupt-result"
+              },
+              "delivery": {
+                "mode": "legacy-derived"
+              },
+              "provenance": "contract-corrupt"
+            },
+            "status": "no-evidence",
+            "confidence": "failed",
+            "contractCorrupt": true,
+            "resultCorrupt": true,
+            "corrupt": true,
+            "corruptionReasons": [
+              "Input is not an object"
+            ],
+            "runtime": {},
+            "evidence": {}
+          },
+          "recoveryAuthority": {
+            "kind": "standalone-run",
+            "id": "r3",
+            "observeCommand": "fgos dispatch recover r3"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "a3"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "r3"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "run": "dup"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "ambiguous",
+          "subject": {
+            "kind": "run",
+            "id": "dup",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a5",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a5/runs/01"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a6",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a6/runs/01"
+              }
+            ]
+          },
+          "observations": [],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "manual-required",
+            "reason": "More than one Run repository owns this run id."
+          },
+          "links": {
+            "assignmentIds": [
+              "a5",
+              "a6"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "dup"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "run": "nope"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "not-found",
+          "subject": {
+            "kind": "run",
+            "id": "nope",
+            "locations": []
+          },
+          "observations": [],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No matching Run was found in registered Assignment or ad-hoc Run repositories."
+          },
+          "links": {
+            "assignmentIds": [],
+            "coordinationIds": [],
+            "runIds": []
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "run": "r4"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "not-found",
+          "subject": {
+            "kind": "run",
+            "id": "r4",
+            "locations": []
+          },
+          "observations": [],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No matching Run was found in registered Assignment or ad-hoc Run repositories."
+          },
+          "links": {
+            "assignmentIds": [],
+            "coordinationIds": [],
+            "runIds": []
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "run": "r8"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "run",
+            "id": "r8",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a8",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a8/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "run-record",
+              "source": "run-repository",
+              "level": "correlated",
+              "value": {
+                "status": "bound",
+                "phase": "bound"
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-19T10:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "r8"
+            },
+            "phase": "bound",
+            "resourceState": "unobserved",
+            "delivery": "unknown",
+            "inspectionStatus": "partial",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "missing",
+              "result": "missing",
+              "ownership": "missing",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "bound",
+                  "phase": "bound"
+                }
+              }
+            ]
+          },
+          "runResult": null,
+          "reconciliation": {
+            "state": "manual-required",
+            "reason": "Run ownership is incomplete or disagrees with repository admission facts."
+          },
+          "links": {
+            "assignmentIds": [
+              "a8"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "r8"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "run": "r7b"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "run",
+            "id": "r7b",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a7",
+                "attempt": "02",
+                "path": "<root>/.fgos/assignments/a7/runs/02"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "run-record",
+              "source": "run-repository",
+              "level": "correlated",
+              "value": {
+                "status": "delivered",
+                "phase": "delivered"
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-19T10:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "r7b"
+            },
+            "phase": "delivered",
+            "resourceState": "unobserved",
+            "delivery": "delivered",
+            "inspectionStatus": "partial",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "missing",
+              "result": "missing",
+              "ownership": "missing",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "delivered",
+                  "phase": "delivered"
+                }
+              }
+            ]
+          },
+          "runResult": null,
+          "reconciliation": {
+            "state": "manual-required",
+            "reason": "Run ownership is incomplete or disagrees with repository admission facts."
+          },
+          "links": {
+            "assignmentIds": [
+              "a7"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "r7b"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "assignment": "a1"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "assignment",
+            "id": "a1",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a1",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a1/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "assignment-history",
+              "source": "admission-generation-ledger",
+              "level": "correlated",
+              "value": {
+                "delivery": "started",
+                "currentRunIds": [
+                  "r1"
+                ],
+                "runIds": [
+                  "r1"
+                ],
+                "missingMaterializations": [],
+                "malformedMaterializations": [],
+                "unadmittedMaterializations": [],
+                "duplicateCurrentMaterializations": []
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-19T10:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "r1"
+            },
+            "phase": "bound",
+            "resourceState": "ambiguous",
+            "delivery": "unknown",
+            "inspectionStatus": "partial",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "stale",
+              "result": "missing",
+              "ownership": "complete",
+              "workspace": "complete"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "bound",
+                  "phase": "bound"
+                }
+              }
+            ]
+          },
+          "runResult": null,
+          "recoveryAuthority": {
+            "kind": "standalone-run",
+            "id": "r1",
+            "observeCommand": "fgos dispatch recover r1"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "a1"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "r1"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "assignment": "a2"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "resolved",
+          "subject": {
+            "kind": "assignment",
+            "id": "a2",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a2",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a2/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "assignment-history",
+              "source": "admission-generation-ledger",
+              "level": "correlated",
+              "value": {
+                "delivery": "started",
+                "currentRunIds": [
+                  "r2"
+                ],
+                "runIds": [
+                  "r2"
+                ],
+                "missingMaterializations": [],
+                "malformedMaterializations": [],
+                "unadmittedMaterializations": [],
+                "duplicateCurrentMaterializations": []
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-19T10:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "r2"
+            },
+            "phase": "settled",
+            "resourceState": "unobserved",
+            "delivery": "unknown",
+            "inspectionStatus": "resolved",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "missing",
+              "result": "complete",
+              "ownership": "complete",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "settled",
+                  "phase": "settled"
+                }
+              }
+            ]
+          },
+          "runResult": {
+            "contract": {
+              "id": "assignment-run-result",
+              "version": 2
+            },
+            "runId": "r2",
+            "assignmentId": null,
+            "settleReports": [],
+            "classification": {
+              "execution": {
+                "status": "completed",
+                "exitCode": 0
+              },
+              "assessment": {
+                "verdict": "pass"
+              },
+              "confidence": {
+                "level": "high",
+                "basis": [
+                  "v1-status"
+                ]
+              },
+              "failure": null,
+              "policy": {
+                "disposition": "not-applicable",
+                "code": null
+              },
+              "delivery": {
+                "mode": "legacy-derived"
+              },
+              "provenance": "legacy-derived"
+            },
+            "status": "done",
+            "confidence": "high",
+            "runtime": {},
+            "evidence": {
+              "sourceVersion": "v1",
+              "bytesRewritten": false
+            }
+          },
+          "recoveryAuthority": {
+            "kind": "coordination-session",
+            "id": "s1",
+            "observeCommand": "fgos coordination recover s1"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "a2"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "r2"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "assignment": "a3"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "assignment",
+            "id": "a3",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a3",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a3/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "assignment-history",
+              "source": "admission-generation-ledger",
+              "level": "correlated",
+              "value": {
+                "delivery": "started",
+                "currentRunIds": [
+                  "r3"
+                ],
+                "runIds": [
+                  "r3"
+                ],
+                "missingMaterializations": [],
+                "malformedMaterializations": [],
+                "unadmittedMaterializations": [],
+                "duplicateCurrentMaterializations": []
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-19T10:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "r3"
+            },
+            "phase": "launched",
+            "resourceState": "unobserved",
+            "delivery": "running",
+            "inspectionStatus": "partial",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "missing",
+              "result": "corrupt",
+              "ownership": "complete",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "running",
+                  "phase": "launched"
+                }
+              }
+            ]
+          },
+          "runResult": {
+            "contract": {
+              "id": "assignment-run-result",
+              "version": 3
+            },
+            "runId": null,
+            "assignmentId": null,
+            "classification": {
+              "execution": {
+                "status": "completion-unknown",
+                "exitCode": null
+              },
+              "assessment": {
+                "verdict": "inconclusive"
+              },
+              "confidence": {
+                "level": "failed",
+                "basis": [
+                  "invalid-json"
+                ]
+              },
+              "failure": {
+                "family": "contract",
+                "code": "invalid-run-result-structure"
+              },
+              "policy": {
+                "disposition": "refuse",
+                "code": "corrupt-result"
+              },
+              "delivery": {
+                "mode": "legacy-derived"
+              },
+              "provenance": "contract-corrupt"
+            },
+            "status": "no-evidence",
+            "confidence": "failed",
+            "contractCorrupt": true,
+            "resultCorrupt": true,
+            "corrupt": true,
+            "corruptionReasons": [
+              "Input is not an object"
+            ],
+            "runtime": {},
+            "evidence": {}
+          },
+          "recoveryAuthority": {
+            "kind": "standalone-run",
+            "id": "r3",
+            "observeCommand": "fgos dispatch recover r3"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "a3"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "r3"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "assignment": "a4"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "assignment",
+            "id": "a4",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a4",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a4/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "assignment-history",
+              "source": "admission-generation-ledger",
+              "level": "partial",
+              "value": {
+                "delivery": "started",
+                "currentRunIds": [
+                  "r4"
+                ],
+                "runIds": [
+                  "r4"
+                ],
+                "missingMaterializations": [
+                  "r4"
+                ],
+                "malformedMaterializations": [
+                  {
+                    "kind": "assignment-run",
+                    "assignmentId": "a4",
+                    "attempt": "01",
+                    "path": "<root>/.fgos/assignments/a4/runs/01"
+                  }
+                ],
+                "unadmittedMaterializations": [],
+                "duplicateCurrentMaterializations": []
+              }
+            }
+          ],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "manual-required",
+            "reason": "Admission ledger and Run materialization are incomplete or corrupt."
+          },
+          "links": {
+            "assignmentIds": [
+              "a4"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "r4"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "assignment": "a5"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "assignment",
+            "id": "a5",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a5",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a5/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "assignment-history",
+              "source": "admission-generation-ledger",
+              "level": "correlated",
+              "value": {
+                "delivery": "started",
+                "currentRunIds": [
+                  "dup"
+                ],
+                "runIds": [
+                  "dup"
+                ],
+                "missingMaterializations": [],
+                "malformedMaterializations": [],
+                "unadmittedMaterializations": [],
+                "duplicateCurrentMaterializations": []
+              }
+            }
+          ],
+          "runObservation": {
+            "contract": {
+              "id": "run-observation",
+              "version": 1
+            },
+            "observedAt": "2026-11-19T10:00:00.000Z",
+            "subject": {
+              "kind": "run",
+              "runId": "dup"
+            },
+            "phase": "bound",
+            "resourceState": "unobserved",
+            "delivery": "unknown",
+            "inspectionStatus": "partial",
+            "evidenceCompleteness": {
+              "identity": "complete",
+              "lifecycle": "complete",
+              "resource": "missing",
+              "result": "missing",
+              "ownership": "complete",
+              "workspace": "unsupported"
+            },
+            "recoveryAuthority": null,
+            "observations": [
+              {
+                "kind": "run-record",
+                "source": "run-repository",
+                "level": "correlated",
+                "value": {
+                  "status": "bound",
+                  "phase": "bound"
+                }
+              }
+            ]
+          },
+          "runResult": null,
+          "recoveryAuthority": {
+            "kind": "standalone-run",
+            "id": "dup",
+            "observeCommand": "fgos dispatch recover dup"
+          },
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "a5"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "dup"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "assignment": "a7"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "assignment",
+            "id": "a7",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a7",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a7/runs/01"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a7",
+                "attempt": "02",
+                "path": "<root>/.fgos/assignments/a7/runs/02"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a7",
+                "attempt": "03",
+                "path": "<root>/.fgos/assignments/a7/runs/03"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "assignment-history",
+              "source": "admission-generation-ledger",
+              "level": "partial",
+              "value": {
+                "delivery": "started",
+                "currentRunIds": [
+                  "r7a",
+                  "r7b"
+                ],
+                "runIds": [
+                  "r7a",
+                  "r7b"
+                ],
+                "missingMaterializations": [],
+                "malformedMaterializations": [],
+                "unadmittedMaterializations": [
+                  {
+                    "kind": "assignment-run",
+                    "assignmentId": "a7",
+                    "attempt": "03",
+                    "path": "<root>/.fgos/assignments/a7/runs/03"
+                  }
+                ],
+                "duplicateCurrentMaterializations": []
+              }
+            }
+          ],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "manual-required",
+            "reason": "Admission ledger and Run materialization are incomplete or corrupt."
+          },
+          "links": {
+            "assignmentIds": [
+              "a7"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "r7a",
+              "r7b"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "assignment": "a8"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "not-found",
+          "subject": {
+            "kind": "assignment",
+            "id": "a8",
+            "locations": []
+          },
+          "observations": [],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No matching Assignment was found."
+          },
+          "links": {
+            "assignmentIds": [],
+            "coordinationIds": [],
+            "runIds": []
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "assignment": "a9"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "resolved",
+          "subject": {
+            "kind": "assignment",
+            "id": "a9",
+            "locations": []
+          },
+          "observations": [
+            {
+              "kind": "assignment-history",
+              "source": "admission-generation-ledger",
+              "level": "correlated",
+              "value": {
+                "delivery": "not-started",
+                "currentRunIds": [],
+                "runIds": [],
+                "missingMaterializations": [],
+                "malformedMaterializations": [],
+                "unadmittedMaterializations": [],
+                "duplicateCurrentMaterializations": []
+              }
+            }
+          ],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No stale local guard was observed."
+          },
+          "links": {
+            "assignmentIds": [
+              "a9"
+            ],
+            "coordinationIds": [],
+            "runIds": []
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "assignment": "nope"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "not-found",
+          "subject": {
+            "kind": "assignment",
+            "id": "nope",
+            "locations": []
+          },
+          "observations": [],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No matching Assignment was found."
+          },
+          "links": {
+            "assignmentIds": [],
+            "coordinationIds": [],
+            "runIds": []
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "assignment": "../x"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "not-found",
+          "subject": {
+            "kind": "assignment",
+            "id": "../x",
+            "locations": []
+          },
+          "observations": [],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "assignmentId must not escape the assignments directory."
+          },
+          "links": {
+            "assignmentIds": [],
+            "coordinationIds": [],
+            "runIds": []
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "cwd": "/vec/ws-a"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "cwd",
+            "id": "/vec/ws-a",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a1",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a1/runs/01"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a2",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a2/runs/01"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a5",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a5/runs/01"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a6",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a6/runs/01"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a7",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a7/runs/01"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a7",
+                "attempt": "02",
+                "path": "<root>/.fgos/assignments/a7/runs/02"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a7",
+                "attempt": "03",
+                "path": "<root>/.fgos/assignments/a7/runs/03"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a8",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a8/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "cwd-aggregate",
+              "source": "workspace-evidence",
+              "level": "partial",
+              "value": {
+                "git": {
+                  "path": "/vec/ws-a",
+                  "root": "/vec/ws-a",
+                  "commonDir": null,
+                  "key": "/vec/ws-a"
+                },
+                "lock": null,
+                "activeRunIds": [
+                  "r1",
+                  "dup",
+                  "dup",
+                  "r7a",
+                  "r7b",
+                  "r7x",
+                  "r8"
+                ],
+                "historicalRunIds": [
+                  "r2"
+                ],
+                "historicalRunResults": [
+                  {
+                    "runId": "r2",
+                    "result": {
+                      "contract": {
+                        "id": "assignment-run-result",
+                        "version": 2
+                      },
+                      "runId": "r2",
+                      "assignmentId": null,
+                      "settleReports": [],
+                      "classification": {
+                        "execution": {
+                          "status": "completed",
+                          "exitCode": 0
+                        },
+                        "assessment": {
+                          "verdict": "pass"
+                        },
+                        "confidence": {
+                          "level": "high",
+                          "basis": [
+                            "v1-status"
+                          ]
+                        },
+                        "failure": null,
+                        "policy": {
+                          "disposition": "not-applicable",
+                          "code": null
+                        },
+                        "delivery": {
+                          "mode": "legacy-derived"
+                        },
+                        "provenance": "legacy-derived"
+                      },
+                      "status": "done",
+                      "confidence": "high",
+                      "runtime": {},
+                      "evidence": {
+                        "sourceVersion": "v1",
+                        "bytesRewritten": false
+                      }
+                    }
+                  }
+                ],
+                "workspace": {
+                  "dirt": "unknown"
+                },
+                "guardConflicts": []
+              }
+            }
+          ],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "manual-required",
+            "reason": "Workspace guard/projection evidence or Run materialization is incomplete or corrupt."
+          },
+          "links": {
+            "assignmentIds": [
+              "a1",
+              "a2",
+              "a5",
+              "a6",
+              "a7",
+              "a8"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "r1",
+              "r2",
+              "dup",
+              "dup",
+              "r7a",
+              "r7b",
+              "r7x",
+              "r8"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "cwd": "/vec/ws-b"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "cwd",
+            "id": "/vec/ws-b",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a3",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a3/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "cwd-aggregate",
+              "source": "workspace-evidence",
+              "level": "partial",
+              "value": {
+                "git": {
+                  "path": "/vec/ws-b",
+                  "root": "/vec/ws-b",
+                  "commonDir": null,
+                  "key": "/vec/ws-b"
+                },
+                "lock": null,
+                "activeRunIds": [],
+                "historicalRunIds": [
+                  "r3"
+                ],
+                "historicalRunResults": [
+                  {
+                    "runId": "r3",
+                    "result": {
+                      "contract": {
+                        "id": "assignment-run-result",
+                        "version": 3
+                      },
+                      "runId": null,
+                      "assignmentId": null,
+                      "classification": {
+                        "execution": {
+                          "status": "completion-unknown",
+                          "exitCode": null
+                        },
+                        "assessment": {
+                          "verdict": "inconclusive"
+                        },
+                        "confidence": {
+                          "level": "failed",
+                          "basis": [
+                            "invalid-json"
+                          ]
+                        },
+                        "failure": {
+                          "family": "contract",
+                          "code": "invalid-run-result-structure"
+                        },
+                        "policy": {
+                          "disposition": "refuse",
+                          "code": "corrupt-result"
+                        },
+                        "delivery": {
+                          "mode": "legacy-derived"
+                        },
+                        "provenance": "contract-corrupt"
+                      },
+                      "status": "no-evidence",
+                      "confidence": "failed",
+                      "contractCorrupt": true,
+                      "resultCorrupt": true,
+                      "corrupt": true,
+                      "corruptionReasons": [
+                        "Input is not an object"
+                      ],
+                      "runtime": {},
+                      "evidence": {}
+                    }
+                  }
+                ],
+                "workspace": {
+                  "dirt": "unknown"
+                },
+                "guardConflicts": []
+              }
+            }
+          ],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "manual-required",
+            "reason": "Workspace guard/projection evidence or Run materialization is incomplete or corrupt."
+          },
+          "links": {
+            "assignmentIds": [
+              "a3"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "r3"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "options": {
+        "cwd": "/vec/ws-none"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "not-found",
+          "subject": {
+            "kind": "cwd",
+            "id": "/vec/ws-none",
+            "locations": []
+          },
+          "observations": [
+            {
+              "kind": "cwd-aggregate",
+              "source": "workspace-evidence",
+              "level": "partial",
+              "value": {
+                "git": {
+                  "path": "/vec/ws-none",
+                  "root": "/vec/ws-none",
+                  "commonDir": null,
+                  "key": "/vec/ws-none"
+                },
+                "lock": null,
+                "activeRunIds": [],
+                "historicalRunIds": [],
+                "historicalRunResults": [],
+                "workspace": {
+                  "dirt": "unknown"
+                },
+                "guardConflicts": []
+              }
+            }
+          ],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "not-needed",
+            "reason": "No Runs are bound to this canonical workspace identity."
+          },
+          "links": {
+            "assignmentIds": [],
+            "coordinationIds": [],
+            "runIds": []
+          }
+        }
+      }
+    },
+    {
+      "options": {},
+      "out": {
+        "error": {
+          "message": "dispatch inspect requires exactly one selector: --run, --assignment, --cwd, or --attention --since <time>"
+        }
+      }
+    },
+    {
+      "options": {
+        "run": "r1",
+        "assignment": "a1"
+      },
+      "out": {
+        "error": {
+          "message": "dispatch inspect requires exactly one selector: --run, --assignment, --cwd, or --attention --since <time>"
+        }
+      }
+    },
+    {
+      "options": {
+        "run": " "
+      },
+      "out": {
+        "error": {
+          "message": "dispatch inspect requires exactly one selector: --run, --assignment, --cwd, or --attention --since <time>"
+        }
+      }
+    },
+    {
+      "options": {
+        "run": "r1",
+        "since": "2026-01-01"
+      },
+      "out": {
+        "error": {
+          "message": "dispatch inspect --since belongs to --attention"
+        }
+      }
+    },
+    {
+      "options": {
+        "attention": true
+      },
+      "out": {
+        "error": {
+          "message": "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>"
+        }
+      }
+    },
+    {
+      "options": {
+        "attention": true,
+        "since": "2026-02-30"
+      },
+      "out": {
+        "error": {
+          "message": "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>"
+        }
+      }
+    }
+  ],
+  "cwdEvidence": [
+    {
+      "cwd": "/vec/ws-a",
+      "files": {
+        ".fgos/dispatch.lock": "{\"holder\":\"x\"}\n",
+        ".fgos/workspace-evidence.json": "{\"dirt\":\"clean\"}\n",
+        ".fgos/dispatch/projection-conflicts.json": "[]\n"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "cwd",
+            "id": "/vec/ws-a",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a1",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a1/runs/01"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a2",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a2/runs/01"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a5",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a5/runs/01"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a6",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a6/runs/01"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a7",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a7/runs/01"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a7",
+                "attempt": "02",
+                "path": "<root>/.fgos/assignments/a7/runs/02"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a7",
+                "attempt": "03",
+                "path": "<root>/.fgos/assignments/a7/runs/03"
+              },
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a8",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a8/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "cwd-aggregate",
+              "source": "workspace-evidence",
+              "level": "partial",
+              "value": {
+                "git": {
+                  "path": "/vec/ws-a",
+                  "root": "/vec/ws-a",
+                  "commonDir": null,
+                  "key": "/vec/ws-a"
+                },
+                "lock": {
+                  "holder": "x"
+                },
+                "activeRunIds": [
+                  "r1",
+                  "dup",
+                  "dup",
+                  "r7a",
+                  "r7b",
+                  "r7x",
+                  "r8"
+                ],
+                "historicalRunIds": [
+                  "r2"
+                ],
+                "historicalRunResults": [
+                  {
+                    "runId": "r2",
+                    "result": {
+                      "contract": {
+                        "id": "assignment-run-result",
+                        "version": 2
+                      },
+                      "runId": "r2",
+                      "assignmentId": null,
+                      "settleReports": [],
+                      "classification": {
+                        "execution": {
+                          "status": "completed",
+                          "exitCode": 0
+                        },
+                        "assessment": {
+                          "verdict": "pass"
+                        },
+                        "confidence": {
+                          "level": "high",
+                          "basis": [
+                            "v1-status"
+                          ]
+                        },
+                        "failure": null,
+                        "policy": {
+                          "disposition": "not-applicable",
+                          "code": null
+                        },
+                        "delivery": {
+                          "mode": "legacy-derived"
+                        },
+                        "provenance": "legacy-derived"
+                      },
+                      "status": "done",
+                      "confidence": "high",
+                      "runtime": {},
+                      "evidence": {
+                        "sourceVersion": "v1",
+                        "bytesRewritten": false
+                      }
+                    }
+                  }
+                ],
+                "workspace": {
+                  "dirt": "clean"
+                },
+                "guardConflicts": []
+              }
+            }
+          ],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "manual-required",
+            "reason": "Workspace guard/projection evidence or Run materialization is incomplete or corrupt."
+          },
+          "links": {
+            "assignmentIds": [
+              "a1",
+              "a2",
+              "a5",
+              "a6",
+              "a7",
+              "a8"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "r1",
+              "r2",
+              "dup",
+              "dup",
+              "r7a",
+              "r7b",
+              "r7x",
+              "r8"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "cwd": "/vec/ws-b",
+      "files": {
+        ".fgos/dispatch.lock": "{\"holder\":\"x\"}\n",
+        ".fgos/workspace-evidence.json": "{\"dirt\":\"clean\"}\n",
+        ".fgos/dispatch/projection-conflicts.json": "[]\n"
+      },
+      "out": {
+        "ok": {
+          "inspectionStatus": "partial",
+          "subject": {
+            "kind": "cwd",
+            "id": "/vec/ws-b",
+            "locations": [
+              {
+                "kind": "assignment-run",
+                "assignmentId": "a3",
+                "attempt": "01",
+                "path": "<root>/.fgos/assignments/a3/runs/01"
+              }
+            ]
+          },
+          "observations": [
+            {
+              "kind": "cwd-aggregate",
+              "source": "workspace-evidence",
+              "level": "partial",
+              "value": {
+                "git": {
+                  "path": "/vec/ws-b",
+                  "root": "/vec/ws-b",
+                  "commonDir": null,
+                  "key": "/vec/ws-b"
+                },
+                "lock": {
+                  "holder": "x"
+                },
+                "activeRunIds": [],
+                "historicalRunIds": [
+                  "r3"
+                ],
+                "historicalRunResults": [
+                  {
+                    "runId": "r3",
+                    "result": {
+                      "contract": {
+                        "id": "assignment-run-result",
+                        "version": 3
+                      },
+                      "runId": null,
+                      "assignmentId": null,
+                      "classification": {
+                        "execution": {
+                          "status": "completion-unknown",
+                          "exitCode": null
+                        },
+                        "assessment": {
+                          "verdict": "inconclusive"
+                        },
+                        "confidence": {
+                          "level": "failed",
+                          "basis": [
+                            "invalid-json"
+                          ]
+                        },
+                        "failure": {
+                          "family": "contract",
+                          "code": "invalid-run-result-structure"
+                        },
+                        "policy": {
+                          "disposition": "refuse",
+                          "code": "corrupt-result"
+                        },
+                        "delivery": {
+                          "mode": "legacy-derived"
+                        },
+                        "provenance": "contract-corrupt"
+                      },
+                      "status": "no-evidence",
+                      "confidence": "failed",
+                      "contractCorrupt": true,
+                      "resultCorrupt": true,
+                      "corrupt": true,
+                      "corruptionReasons": [
+                        "Input is not an object"
+                      ],
+                      "runtime": {},
+                      "evidence": {}
+                    }
+                  }
+                ],
+                "workspace": {
+                  "dirt": "clean"
+                },
+                "guardConflicts": []
+              }
+            }
+          ],
+          "runObservation": null,
+          "runResult": null,
+          "reconciliation": {
+            "state": "manual-required",
+            "reason": "Workspace guard/projection evidence or Run materialization is incomplete or corrupt."
+          },
+          "links": {
+            "assignmentIds": [
+              "a3"
+            ],
+            "coordinationIds": [],
+            "runIds": [
+              "r3"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "cwdConflict": {
+    "cwd": "/vec/ws-b",
+    "files": {
+      ".fgos/dispatch.lock": "{\"holder\":\"x\"}\n",
+      ".fgos/workspace-evidence.json": "{\"dirt\":\"clean\"}\n",
+      ".fgos/dispatch/projection-conflicts.json": "[{\"a\":1}]\n"
+    },
+    "out": {
+      "ok": {
+        "inspectionStatus": "conflicting",
+        "subject": {
+          "kind": "cwd",
+          "id": "/vec/ws-b",
+          "locations": [
+            {
+              "kind": "assignment-run",
+              "assignmentId": "a3",
+              "attempt": "01",
+              "path": "<root>/.fgos/assignments/a3/runs/01"
+            }
+          ]
+        },
+        "observations": [
+          {
+            "kind": "cwd-aggregate",
+            "source": "workspace-evidence",
+            "level": "partial",
+            "value": {
+              "git": {
+                "path": "/vec/ws-b",
+                "root": "/vec/ws-b",
+                "commonDir": null,
+                "key": "/vec/ws-b"
+              },
+              "lock": {
+                "holder": "x"
+              },
+              "activeRunIds": [],
+              "historicalRunIds": [
+                "r3"
+              ],
+              "historicalRunResults": [
+                {
+                  "runId": "r3",
+                  "result": {
+                    "contract": {
+                      "id": "assignment-run-result",
+                      "version": 3
+                    },
+                    "runId": null,
+                    "assignmentId": null,
+                    "classification": {
+                      "execution": {
+                        "status": "completion-unknown",
+                        "exitCode": null
+                      },
+                      "assessment": {
+                        "verdict": "inconclusive"
+                      },
+                      "confidence": {
+                        "level": "failed",
+                        "basis": [
+                          "invalid-json"
+                        ]
+                      },
+                      "failure": {
+                        "family": "contract",
+                        "code": "invalid-run-result-structure"
+                      },
+                      "policy": {
+                        "disposition": "refuse",
+                        "code": "corrupt-result"
+                      },
+                      "delivery": {
+                        "mode": "legacy-derived"
+                      },
+                      "provenance": "contract-corrupt"
+                    },
+                    "status": "no-evidence",
+                    "confidence": "failed",
+                    "contractCorrupt": true,
+                    "resultCorrupt": true,
+                    "corrupt": true,
+                    "corruptionReasons": [
+                      "Input is not an object"
+                    ],
+                    "runtime": {},
+                    "evidence": {}
+                  }
+                }
+              ],
+              "workspace": {
+                "dirt": "clean"
+              },
+              "guardConflicts": [
+                {
+                  "a": 1
+                }
+              ]
+            }
+          }
+        ],
+        "runObservation": null,
+        "runResult": null,
+        "reconciliation": {
+          "state": "manual-required",
+          "reason": "Workspace guard/projection or concurrency facts conflict."
+        },
+        "links": {
+          "assignmentIds": [
+            "a3"
+          ],
+          "coordinationIds": [],
+          "runIds": [
+            "r3"
+          ]
+        }
+      }
+    }
+  },
+  "sinceCases": [
+    {
+      "since": "2026-11-19",
+      "out": {
+        "ok": {
+          "ms": 1795046400000
+        }
+      }
+    },
+    {
+      "since": "2026-11-19T10:00:00Z",
+      "out": {
+        "ok": {
+          "ms": 1795082400000
+        }
+      }
+    },
+    {
+      "since": "2026-11-19T10:00:00.5+07:00",
+      "out": {
+        "ok": {
+          "ms": 1795057200500
+        }
+      }
+    },
+    {
+      "since": "2026-11-19T10:00:00-05:30",
+      "out": {
+        "ok": {
+          "ms": 1795102200000
+        }
+      }
+    },
+    {
+      "since": "2026-02-30",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>"
+        }
+      }
+    },
+    {
+      "since": "2026-11-19T10:00:00",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>"
+        }
+      }
+    },
+    {
+      "since": "2026-11-19T25:00:00Z",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>"
+        }
+      }
+    },
+    {
+      "since": "2026-11-19T10:00:00+24:00",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>"
+        }
+      }
+    },
+    {
+      "since": "999-01-01",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>"
+        }
+      }
+    },
+    {
+      "since": "",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>"
+        }
+      }
+    },
+    {
+      "since": "tomorrow",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>"
+        }
+      }
+    },
+    {
+      "since": "2026-11-19T10:00Z",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>"
+        }
+      }
+    },
+    {
+      "since": "0999-12-31",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>"
+        }
+      }
+    },
+    {
+      "since": "2026-13-01",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>"
+        }
+      }
+    },
+    {
+      "since": "2024-02-29",
+      "out": {
+        "ok": {
+          "ms": 1709164800000
+        }
+      }
+    },
+    {
+      "since": "2026-11-19t10:00:00z",
+      "out": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "errorClass": null,
+          "reason": null,
+          "message": "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>"
+        }
+      }
+    }
+  ]
+}

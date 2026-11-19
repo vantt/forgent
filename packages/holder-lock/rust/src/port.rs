@@ -231,6 +231,14 @@ impl Handle {
         self.file.as_ref().expect("live handle owns its file")
     }
 
+    /// A second descriptor of the same open file description, for a caller that hands the lock to a child
+    /// (`&[&File]` of a supervisor start): the lock outlives this handle only while a duplicate is open. The
+    /// child must mark the descriptor close-on-exec before anything else, as the supervisor route does: a copy
+    /// that stays inheritable reads as a borrower, and the release of this handle ends it.
+    pub fn try_clone_file(&self) -> io::Result<File> {
+        self.file().try_clone()
+    }
+
     fn settle_release(&mut self) -> Release {
         let Some(file) = self.file.take() else {
             return Release::Released { killed: 0 };
