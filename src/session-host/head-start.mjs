@@ -169,8 +169,14 @@ export function nextHeadGeneration(projectRoot, persona, name) {
 }
 
 async function defaultPin({ persona, projectRoot }) {
-  const { pinPersona } = await import('../runner/agent-definitions.mjs');
-  return pinPersona(persona, { projectRoot });
+  const { pinPersona, AgentNotFoundError, scanAgentTiers } = await import('../runner/agent-definitions.mjs');
+  try {
+    return pinPersona(persona, { projectRoot });
+  } catch (err) {
+    if (!(err instanceof AgentNotFoundError)) throw err;
+    const known = [...new Set(scanAgentTiers({ projectRoot }).flatMap((tier) => tier.entries.map((entry) => entry.name)))].sort();
+    throw new HeadStartError('persona-not-found', `no persona named "${persona}"; known personas: ${known.join(', ') || '(none)'}`, { cause: err, known });
+  }
 }
 
 async function defaultHandoff({ persona, name, projectRoot }) {
@@ -218,7 +224,8 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
 
   const request = {
     binding, runnerConfig, key, role, grant, opening: text, ceilingMs: HEAD_HARD_CEILING_MS,
-    env: { FGOS_HEAD_ROLE: role, FGOS_HEAD_PERSONA: persona, FGOS_HEAD_NAME: name, FGOS_HEAD_GEN: String(generation) },
+    // The sandbox gives every launch a private writable tmpfs at /tmp (bwrap driver `--tmpfs /tmp`), so /tmp is the head's own scratch, not the shared one.
+    env: { TMPDIR: '/tmp', FGOS_HEAD_ROLE: role, FGOS_HEAD_PERSONA: persona, FGOS_HEAD_NAME: name, FGOS_HEAD_GEN: String(generation) },
     projectRoot, beside, display: { id: name, title: persona },
   };
   let launched;

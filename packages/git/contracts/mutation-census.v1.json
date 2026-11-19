@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "35aff1c35bb95fbb0ff2dbb95005457f7d022b573f8eda31fa322f7b446361f1",
+  "payloadDigest": "eabe15f569cc3940f7b446808555180b786fe7c65bd7d0827d7d5d780ce8585d",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1552,11 +1552,11 @@
     "src/runner/write-queue.mjs": "a816a82d6c4499cca921f2b105eaaafe646f1413ff202ce3f132c4b84ed7a2b3",
     "src/seat-binding/client.mjs": "2927a6ac2263bbcbb15ccdcc11d6986b2e7f0da9608c9612f8a190ff614386f1",
     "src/session-host/client.mjs": "e49192345fa315a153ace4c3de0422351b0989bf20b663ae0a77b398767cd0eb",
-    "src/session-host/head-grants.mjs": "bf4202309157eabd09df549300cb710e529ae7f53767c4b267c06b14efccc497",
+    "src/session-host/head-grants.mjs": "6bf939aafb8dfe9835d1fa80f248ba79543036a71aa8dc20aadf10b1869405f7",
     "src/session-host/head-plan.mjs": "9e7f591a9bf2ebb52061e61526d3b11e81b8ceb30e6c7c9a6c8bdaae4a0713b1",
     "src/session-host/head-request-client.mjs": "2c45341b14fd7f9e5cb9f935914d54927d5207e530b1d23de95dee71d4090894",
     "src/session-host/head-request.mjs": "bea76843c1a99b72749a496ca36a439c547ec08a2dd5e0f5bf43b47569428eee",
-    "src/session-host/head-start.mjs": "e1fcaf0ca6d0767cd5829505805c9aa7d66f257d3cd37255ca1995a2a2d0136e",
+    "src/session-host/head-start.mjs": "0aca7dc8f2172cbaf16039dd7f223b8ed989707ee7f126765d0ffb142e399f06",
     "src/session-host/head-stop.mjs": "4284bc2638e3ac4a71d151763c981d220a017c4f948cefc829115be5a6221ad3",
     "src/session-rotation/handoff-store.mjs": "3d1385774aa7c09573a6e298f82e7bf75d55beb436d9caa7c266cc1735c46128",
     "src/session-rotation/rotate.mjs": "933fb64dc09eaf6ac214ed305ef11236b7750455b1b2f9879da017d6ec124f64",
