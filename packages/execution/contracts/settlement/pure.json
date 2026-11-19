@@ -1,0 +1,461 @@
+{
+  "substantiveReport": [
+    {
+      "text": "",
+      "out": false
+    },
+    {
+      "text": "   ",
+      "out": false
+    },
+    {
+      "text": "TODO",
+      "out": false
+    },
+    {
+      "text": "tbd.",
+      "out": false
+    },
+    {
+      "text": "N/A",
+      "out": false
+    },
+    {
+      "text": "n/a - nothing",
+      "out": false
+    },
+    {
+      "text": "None",
+      "out": false
+    },
+    {
+      "text": "OK",
+      "out": true
+    },
+    {
+      "text": "YES",
+      "out": true
+    },
+    {
+      "text": "done",
+      "out": false
+    },
+    {
+      "text": "# Summary",
+      "out": false
+    },
+    {
+      "text": "# Report\n\nStatus: PASSED",
+      "out": false
+    },
+    {
+      "text": "The loop terminates because the counter only grows.",
+      "out": true
+    },
+    {
+      "text": "todo: write this up properly today",
+      "out": true
+    },
+    {
+      "text": "none of the files matched the pattern we looked for",
+      "out": true
+    },
+    {
+      "text": "null",
+      "out": false
+    },
+    {
+      "text": "undefined behaviour in the parser",
+      "out": true
+    },
+    {
+      "text": "###",
+      "out": false
+    },
+    {
+      "text": "--",
+      "out": false
+    },
+    {
+      "text": "findings: 3 high, 2 low",
+      "out": true
+    }
+  ],
+  "providerStop": [
+    {
+      "receipt": {
+        "reason": "terminal:blocked:usage-limit",
+        "providerSignal": {
+          "status": 429
+        }
+      },
+      "claimed": false,
+      "out": {
+        "adapterOutcome": "provider-limit",
+        "cause": "quota",
+        "signal": {
+          "status": 429
+        }
+      }
+    },
+    {
+      "receipt": {
+        "reason": "terminal:blocked:usage-limit",
+        "providerSignal": {
+          "status": 429
+        }
+      },
+      "claimed": true,
+      "out": null
+    },
+    {
+      "receipt": {
+        "reason": "terminal:blocked:login"
+      },
+      "claimed": false,
+      "out": {
+        "adapterOutcome": "provider-limit",
+        "cause": "credential",
+        "signal": null
+      }
+    },
+    {
+      "receipt": {
+        "reason": "terminal:blocked:login"
+      },
+      "claimed": true,
+      "out": null
+    },
+    {
+      "receipt": {
+        "reason": "direct:blocked:provider-error",
+        "providerSignal": {
+          "statusWord": "overloaded"
+        }
+      },
+      "claimed": false,
+      "out": {
+        "adapterOutcome": "provider-limit",
+        "cause": "provider",
+        "signal": {
+          "statusWord": "overloaded"
+        }
+      }
+    },
+    {
+      "receipt": {
+        "reason": "direct:blocked:provider-error",
+        "providerSignal": {
+          "statusWord": "overloaded"
+        }
+      },
+      "claimed": true,
+      "out": null
+    },
+    {
+      "receipt": {
+        "reason": "terminal:blocked:trust-dialog"
+      },
+      "claimed": false,
+      "out": {
+        "adapterOutcome": "blocked",
+        "cause": null,
+        "signal": null
+      }
+    },
+    {
+      "receipt": {
+        "reason": "terminal:blocked:trust-dialog"
+      },
+      "claimed": true,
+      "out": null
+    },
+    {
+      "receipt": {
+        "reason": "terminal:needs-human"
+      },
+      "claimed": false,
+      "out": {
+        "adapterOutcome": "blocked",
+        "cause": null,
+        "signal": null
+      }
+    },
+    {
+      "receipt": {
+        "reason": "terminal:needs-human"
+      },
+      "claimed": true,
+      "out": null
+    },
+    {
+      "receipt": {
+        "reason": "terminal:needs-setup"
+      },
+      "claimed": false,
+      "out": {
+        "adapterOutcome": "blocked",
+        "cause": null,
+        "signal": null
+      }
+    },
+    {
+      "receipt": {
+        "reason": "terminal:needs-setup"
+      },
+      "claimed": true,
+      "out": null
+    },
+    {
+      "receipt": {
+        "reason": "direct:blocked:"
+      },
+      "claimed": false,
+      "out": null
+    },
+    {
+      "receipt": {
+        "reason": "direct:blocked:"
+      },
+      "claimed": true,
+      "out": null
+    },
+    {
+      "receipt": {
+        "reason": "finished"
+      },
+      "claimed": false,
+      "out": null
+    },
+    {
+      "receipt": {
+        "reason": "finished"
+      },
+      "claimed": true,
+      "out": null
+    },
+    {
+      "receipt": {},
+      "claimed": false,
+      "out": null
+    },
+    {
+      "receipt": {},
+      "claimed": true,
+      "out": null
+    }
+  ],
+  "terminalStopMessage": [
+    {
+      "receipt": {
+        "reason": "terminal:blocked:usage-limit"
+      },
+      "screen": "line one\nline two\n",
+      "out": "the agent was stopped: terminal:blocked:usage-limit. Its screen ended with: line one / line two. The account's quota or credits are used up: wait for the reset or add credits; the seat walk falls back to another account or candidate."
+    },
+    {
+      "receipt": {
+        "reason": "terminal:blocked:login"
+      },
+      "screen": "",
+      "out": "the agent was stopped: terminal:blocked:login. Next: log the agent in again on this account (in the agent's own home), then run again."
+    },
+    {
+      "receipt": {
+        "reason": "terminal:blocked:trust-dialog"
+      },
+      "screen": "a\n\nb\nc\nd\ne\nf\ng\nh\n",
+      "out": "the agent was stopped: terminal:blocked:trust-dialog. Its screen ended with: c / d / e / f / g / h. Next: grant trust for this project in the agent's own home, then run again."
+    },
+    {
+      "receipt": {
+        "reason": "terminal:blocked:something-new"
+      },
+      "screen": "x",
+      "out": "the agent was stopped: terminal:blocked:something-new. Its screen ended with: x. Next: answer the prompt in the pane, then run again."
+    },
+    {
+      "receipt": {
+        "reason": "terminal:needs-setup"
+      },
+      "screen": "  spaced  \n",
+      "out": "the agent was stopped: terminal:needs-setup. Its screen ended with: spaced. Next: finish the CLI's first-run setup once by hand on the same profile (for omp, `omp --profile=<profile>`), then run again."
+    },
+    {
+      "receipt": {
+        "reason": "terminal:needs-human"
+      },
+      "screen": "prompt?",
+      "out": "the agent was stopped: terminal:needs-human. Its screen ended with: prompt?. Next: answer the prompt in the pane, then run again."
+    },
+    {
+      "receipt": {
+        "reason": "terminal:cancelled-for-other"
+      },
+      "screen": "x",
+      "out": "the agent was stopped: terminal:cancelled-for-other. Its screen ended with: x."
+    }
+  ],
+  "workerArtifacts": [
+    {
+      "name": "outbox-highest-round",
+      "files": [
+        "worker-output/outbox/result-2.json",
+        "worker-output/outbox/result-11.json",
+        "worker-output/outbox/result-9.json"
+      ],
+      "result": "worker-output/outbox/result-11.json",
+      "report": "agent-report.md",
+      "claim": "worker-output/outbox/result-11.json"
+    },
+    {
+      "name": "leading-zero-ignored",
+      "files": [
+        "worker-output/outbox/result-01.json",
+        "worker-output/outbox/result-0.json"
+      ],
+      "result": "worker-output/outbox/result-0.json",
+      "report": "agent-report.md",
+      "claim": "worker-output/outbox/result-0.json"
+    },
+    {
+      "name": "flat-outbox-only",
+      "files": [
+        "outbox/result-3.json"
+      ],
+      "result": "outbox/result-3.json",
+      "report": "agent-report.md",
+      "claim": "outbox/result-3.json"
+    },
+    {
+      "name": "worker-output-before-outbox",
+      "files": [
+        "worker-output/result-1.json",
+        "outbox/result-5.json"
+      ],
+      "result": "worker-output/result-1.json",
+      "report": "agent-report.md",
+      "claim": "worker-output/result-1.json"
+    },
+    {
+      "name": "legacy-name-in-outbox",
+      "files": [
+        "worker-output/outbox/agent-result.json"
+      ],
+      "result": "worker-output/outbox/agent-result.json",
+      "report": "agent-report.md",
+      "claim": "worker-output/outbox/agent-result.json"
+    },
+    {
+      "name": "legacy-flat",
+      "files": [
+        "agent-result.json"
+      ],
+      "result": "agent-result.json",
+      "report": "agent-report.md",
+      "claim": "agent-result.json"
+    },
+    {
+      "name": "nothing",
+      "files": [],
+      "result": "agent-result.json",
+      "report": "agent-report.md",
+      "claim": null
+    },
+    {
+      "name": "round-beats-legacy",
+      "files": [
+        "worker-output/outbox/agent-result.json",
+        "worker-output/outbox/result-1.json"
+      ],
+      "result": "worker-output/outbox/result-1.json",
+      "report": "agent-report.md",
+      "claim": "worker-output/outbox/result-1.json"
+    }
+  ],
+  "changedFiles": [
+    {
+      "before": [],
+      "after": [],
+      "out": {
+        "changedFiles": [],
+        "changedFileReasons": {}
+      }
+    },
+    {
+      "before": [
+        "a.txt"
+      ],
+      "after": [
+        "a.txt",
+        "b.txt"
+      ],
+      "out": {
+        "changedFiles": [
+          "b.txt"
+        ],
+        "changedFileReasons": {
+          "b.txt": "new-dirty-after-run"
+        }
+      }
+    },
+    {
+      "before": [
+        "a.txt"
+      ],
+      "after": [],
+      "out": {
+        "changedFiles": [],
+        "changedFileReasons": {}
+      }
+    },
+    {
+      "before": [],
+      "after": [
+        "z",
+        "a",
+        "m"
+      ],
+      "out": {
+        "changedFiles": [
+          "a",
+          "m",
+          "z"
+        ],
+        "changedFileReasons": {
+          "z": "new-dirty-after-run",
+          "a": "new-dirty-after-run",
+          "m": "new-dirty-after-run"
+        }
+      }
+    }
+  ],
+  "mutatedDirtyBefore": {
+    "files": {
+      "kept.txt": "one",
+      "changed.txt": "two"
+    },
+    "snapshots": {
+      "kept.txt": {
+        "exists": true,
+        "sha256": "7692c3ad3540bb803c020b3aee66cd8887123234ea0c6e7143c0add73ff431ed"
+      },
+      "changed.txt": {
+        "exists": true,
+        "sha256": "9d6f965ac832e40a5df6c06afe983e3b449c07b843ff51ce76204de05c690d11"
+      },
+      "gone.txt": {
+        "exists": true,
+        "sha256": "2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881"
+      },
+      "never.txt": {
+        "exists": false,
+        "sha256": null
+      }
+    },
+    "out": [
+      "changed.txt",
+      "gone.txt"
+    ]
+  }
+}
