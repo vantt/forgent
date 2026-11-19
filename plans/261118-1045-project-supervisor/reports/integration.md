@@ -91,3 +91,19 @@ Paused; no lead started.
   `event-store-end-trigger`, logged even when the verb succeeds), not the supervisor's. The confined-reads fix
   (675ea511c) stands on the code audit (`supervisor queue`, `plans`, `slots` need masked paths), not on those faults.
   The fault being logged for successful verbs is itself a finding.
+
+## Live run, windows 3-5 (2026-11-19 13:36-14:26)
+- Window 3 (release 45aa379b): the supervisor half ran end to end with no human command: tick -> wake -> socket reads ->
+  plan `running` via `land --paths` -> lead head started -> events handled -> `supervisor done` -> session ended. The
+  lead's first `worktree create` was refused (likely `worktree-admin-name-in-use`, a common last path segment) and it
+  investigated host source; stopped. Fixed: lead skill worktree rule, refusal details logged, path checks (a0ea47319).
+- Window 4 (release 58f1af36): `lead-ended` woke the supervisor, which restarted the gone lead on its own (gone-lead
+  path proven). Stopped because `leadLive` saw only head leads (a second lead for a non-head-led plan was about to
+  start) and because a failed run ticket kept only `exit-4`. Fixed: plan `lead:` field read through Identity
+  (f624a355f), tickets keep argv and the host's reason (1f481e8e2).
+- Window 5 (release 212f9187): precheck clean (other lanes' running plans `leadLive: true`); the watcher woke the
+  supervisor twice on its own (the second after a manual stop, no command); both heads spent their turn on leftovers
+  (a pre-fix ticket, an old worktree, git history) instead of restarting the named gone lead; stopped.
+- Open: the head executor (agy, Gemini 3.8 Flash) drifts into investigation in every window except the first
+  supervisor; owner decision pending on a stronger executor for heads. Leftovers that lure heads are to be cleared
+  before window 6. Acceptance 8 (a plan from `ready` to `done` with nobody typing) is not yet proven.
