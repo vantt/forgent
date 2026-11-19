@@ -69,11 +69,16 @@ fn borrowed(command: &str, cwd: &Path, timeout: Duration, custody: &Handle) -> R
                 output,
             }
         }
-        Err(BorrowError::Deadline { .. }) => Ran {
+        // What the command wrote before the deadline ended it is kept, as Node's `runCommand` keeps it.
+        Err(BorrowError::Deadline { stdout, stderr, .. }) => Ran {
             passed: false,
             status: None,
             timed_out: true,
-            output: String::new(),
+            output: format!(
+                "{}{}",
+                String::from_utf8_lossy(&stdout),
+                String::from_utf8_lossy(&stderr)
+            ),
         },
         // A custody that cannot be proven alone again after the run is an authority failure: it proved nothing.
         Err(other) => Ran {

@@ -316,10 +316,16 @@ fn the_current_attempt_and_the_summary_of_a_node_settled_unit_run_read_back_byte
     let generations =
         records::admission_generations(&unit.join("producer/1/admission/generations")).unwrap();
     assert_eq!(generations.len(), 1);
-    let attempt = records::current_attempt(&scratch.0, &format!("{id}/producer/1")).unwrap();
+    let attempt = records::current_attempt(&scratch.0, &format!("{id}/producer/1"))
+        .unwrap()
+        .unwrap();
     assert_eq!(attempt.dir, unit.join("producer/1/runs/01"));
     assert_eq!(attempt.run_id, generations[0]["runId"].as_str().unwrap());
-    assert!(records::current_attempt(&scratch.0, &format!("{id}/producer/2")).is_none());
+    assert!(
+        records::current_attempt(&scratch.0, &format!("{id}/producer/2"))
+            .unwrap()
+            .is_none()
+    );
     assert!(records::admission_generations(&scratch.0.join("none"))
         .unwrap()
         .is_empty());
@@ -335,6 +341,12 @@ fn the_current_attempt_and_the_summary_of_a_node_settled_unit_run_read_back_byte
             not_a_dir.display()
         )
     );
+    // The current attempt reads the same ledger and fails with it, as `currentAttemptOf` throws.
+    let blocked = scratch.0.join("blocked");
+    std::fs::create_dir_all(blocked.join("admission")).unwrap();
+    std::fs::write(blocked.join("admission/generations"), "").unwrap();
+    let error = records::current_attempt(&scratch.0, "blocked").unwrap_err();
+    assert_eq!(error.code.as_deref(), Some("ENOTDIR"));
 
     let record = read_json(&unit.join("unit.json"));
     assert!(records::is_seat_record(&record));
@@ -819,6 +831,14 @@ fn a_verify_command_passes_or_finds_and_runs_under_the_custody_it_is_given() {
         assert_eq!(held.verdict, Verdict::Pass, "{held:?}");
         let failed = verify::verify("exit 4", &scratch.0, Some(10_000), Some(&custody));
         assert_eq!(failed.verdict, Verdict::Findings, "{failed:?}");
+        // A verify the deadline ends keeps what it wrote before, as Node's `runCommand` does.
+        let slow = verify::verify(
+            "echo partial; sleep 30",
+            &scratch.0,
+            Some(300),
+            Some(&custody),
+        );
+        assert!(slow.tail.contains("partial"), "{slow:?}");
     }
 }
 

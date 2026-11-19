@@ -368,7 +368,11 @@ impl<A: CaseAdmission + Sync> UnitRunHost for HostUnitRun<A> {
     fn adopt_state(&self, run_dir: &Path) -> String {
         records::adopt_state(run_dir)
     }
-    fn current_attempt(&self, assignments_dir: &Path, assignment_id: &str) -> Option<AttemptRef> {
+    fn current_attempt(
+        &self,
+        assignments_dir: &Path,
+        assignment_id: &str,
+    ) -> Result<Option<AttemptRef>, RunUnitError> {
         records::current_attempt(assignments_dir, assignment_id)
     }
     fn pinned_accounts_usable(

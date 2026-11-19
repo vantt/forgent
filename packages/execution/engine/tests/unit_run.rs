@@ -1468,8 +1468,8 @@ mod run_loop {
         fn adopt_state(&self, _: &Path) -> String {
             "closed".into()
         }
-        fn current_attempt(&self, _: &Path, _: &str) -> Option<AttemptRef> {
-            None
+        fn current_attempt(&self, _: &Path, _: &str) -> Result<Option<AttemptRef>, RunUnitError> {
+            Ok(None)
         }
         fn pinned_accounts_usable(
             &self,
@@ -2287,8 +2287,8 @@ mod run_unit_runs {
         fn adopt_state(&self, _: &Path) -> String {
             "closed".into()
         }
-        fn current_attempt(&self, _: &Path, _: &str) -> Option<AttemptRef> {
-            None
+        fn current_attempt(&self, _: &Path, _: &str) -> Result<Option<AttemptRef>, RunUnitError> {
+            Ok(None)
         }
         fn pinned_accounts_usable(
             &self,

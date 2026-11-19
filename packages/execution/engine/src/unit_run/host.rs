@@ -165,7 +165,11 @@ pub trait UnitRunHost {
     fn collaboration_of_record(&self, record: &Value) -> Result<(Value, Value), RunUnitError>;
     /// The state the adopt door judges a run directory in (`closed`, `legacy-run`, ...), read-only.
     fn adopt_state(&self, run_dir: &Path) -> String;
-    fn current_attempt(&self, assignments_dir: &Path, assignment_id: &str) -> Option<AttemptRef>;
+    fn current_attempt(
+        &self,
+        assignments_dir: &Path,
+        assignment_id: &str,
+    ) -> Result<Option<AttemptRef>, RunUnitError>;
     /// `assertPinnedAccountsUsable`.
     fn pinned_accounts_usable(
         &self,

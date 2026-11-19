@@ -212,24 +212,28 @@ pub fn admission_generations(dir: &Path) -> Result<Vec<Value>, RunUnitError> {
 
 /// `currentAttemptOf` (`src/runner/execution/unit-state.mjs:17`): the newest attempt directory the admission
 /// ledger committed for `assignment_id`, with its run id; `None` while nothing was admitted or the directory was
-/// never made.
-pub fn current_attempt(assignments_dir: &Path, assignment_id: &str) -> Option<AttemptRef> {
+/// never made. A ledger that cannot be read is the caller's error, as Node's `listGenerations` throws it.
+pub fn current_attempt(
+    assignments_dir: &Path,
+    assignment_id: &str,
+) -> Result<Option<AttemptRef>, RunUnitError> {
     let assignment = assignments_dir.join(assignment_id);
-    // `currentAttemptOf` is asked where a failure only means "no attempt to carry on from".
-    let generations =
-        admission_generations(&assignment.join("admission").join("generations")).ok()?;
-    let current = generations.last()?;
-    let dir = assignment
-        .join("runs")
-        .join(fgos_execution::unit_record::attempt_dir_name(current)?);
-    dir.exists().then(|| AttemptRef {
+    let generations = admission_generations(&assignment.join("admission").join("generations"))?;
+    let Some(current) = generations.last() else {
+        return Ok(None);
+    };
+    let Some(name) = fgos_execution::unit_record::attempt_dir_name(current) else {
+        return Ok(None);
+    };
+    let dir = assignment.join("runs").join(name);
+    Ok(dir.exists().then(|| AttemptRef {
         dir,
         run_id: current
             .get("runId")
             .and_then(Value::as_str)
             .unwrap_or_default()
             .to_string(),
-    })
+    }))
 }
 
 /// `adoptRun(runDir, { probeOnly: true }).state` (`src/run-supervisor/client.mjs:67`): the adopt door's judgement
