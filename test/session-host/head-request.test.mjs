@@ -251,7 +251,7 @@ function headCase(t, { persona = 'lead', name = 'proj-p', writes = ['plans/p'] }
   const project = scratch(t);
   fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, hostBin: '/the/fgos', unitRunId: 'head-x-1', session: { role: `head:${persona}-${name}`, persona, name, verbs: [], writes, requestSocketPath: '/run/s.sock' } }));
   const spawned = [];
-  const ports = { planOf: async () => PLAN, spawnRunner: (call) => { spawned.push(call); return { pid: 4242 }; }, observe: () => null, readWorking: () => null };
+  const ports = { planOf: async () => PLAN, spawnRunner: (call) => { spawned.push(call); return { pid: 4242 }; }, observe: () => null };
   const ask = (verb, args, id = 't1', extra = {}) => runHeadRequest({ runDir, request: { id, verb, args } }, { ...ports, ...extra });
   const ticketFile = (id) => path.join(fgosDirFromRoot(project), 'runtime', 'head-tickets', `${persona}-${name}`, `${id}.json`);
   return { runDir, project, spawned, ask, ticketFile, ports };
@@ -406,21 +406,25 @@ test('a run write inside a footprint directory or its glob is accepted', async (
   assert.equal((await ask('run', { prompt: 'x', writes: ['src/a/deep/f.mjs', 'src/a/*.mjs', 'docs/x.md'] })).exit, 0);
 });
 
-test('a lead paths land that changes the footprint of its own plan is refused footprint-change-refused', async (t) => {
+test('a lead paths land whose plan has no footprint is refused write-outside-footprint and never omits the bound', async (t) => {
   const lead = headCase(t);
-  const edited = '---\nfootprint:\n  - src/a/**\n  - src/new/**\n---\n';
-  assert.equal((await lead.ask('land', { paths: ['plans/p/plan.md'], message: 'm' }, 't4', { readWorking: () => edited })).line.code, 'footprint-change-refused');
+  const refused = await lead.ask('land', { paths: ['plans/p/a.md'], message: 'm' }, 't4', { planOf: async () => ({ dir: 'p', footprint: [] }) });
+  assert.equal(refused.line.code, 'write-outside-footprint');
+  assert.equal(lead.spawned.length, 0);
 });
 
-test('a lead paths land that keeps the footprint of its plan is accepted', async (t) => {
-  const lead = headCase(t);
-  const same = '---\nfootprint:\n  - src/a/**\n  - docs/x.md\n---\n';
-  assert.equal((await lead.ask('land', { paths: ['plans/p/plan.md'], message: 'm' }, 't5', { readWorking: () => same })).exit, 0);
+test('request result refuses a role that is not a head role before it becomes a path', async (t) => {
+  const bad = headCase(t);
+  const envelopeFile = path.join(bad.runDir, 'envelope.json');
+  const envelope = JSON.parse(fs.readFileSync(envelopeFile, 'utf8'));
+  envelope.session.role = 'head:../../x';
+  fs.writeFileSync(envelopeFile, JSON.stringify(envelope));
+  assert.equal((await bad.ask('request result', {}, 'r9')).line.code, 'bad-role');
 });
 
 test('a lead paths land passes its plan footprint as --footprint', async (t) => {
   const lead = headCase(t);
-  assert.equal((await lead.ask('land', { paths: ['plans/p/plan.md'], message: 'm' }, 't7', { readWorking: () => null })).exit, 0);
+  assert.equal((await lead.ask('land', { paths: ['plans/p/plan.md'], message: 'm' }, 't7')).exit, 0);
   assert.deepEqual(JSON.parse(fs.readFileSync(lead.ticketFile('t7'), 'utf8')).argv, ['land', '--json', '--paths', 'plans/p/plan.md', '--message', 'm', '--footprint', 'src/a/**,docs/x.md']);
 });
 

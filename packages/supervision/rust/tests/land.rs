@@ -727,7 +727,7 @@ const PLAN_PATH: &str = "plans/260101-0000-demo/plan.md";
 
 fn plan_text(footprint: &[&str]) -> String {
     let lines: String = footprint.iter().map(|f| format!("  - {f}\n")).collect();
-    format!("---\ncontract: plan-v1\ntitle: demo\nstatus: running\npriority: P2\nfootprint:\n{lines}created: 2026-01-01\n---\n\n# Demo\n")
+    format!("---\ncontract: plan-v1\ntitle: demo\nstatus: running\npriority: P2\nfootprint:\n{lines}created: 2026-01-01\n---\n\n# Demo\n\n## Phases\n\n| Phase | Title | Depends on | Footprint | Wave | Status |\n|---|---|---|---|---|---|\n| 01 | one | - | src/** | 1 | pending |\n")
 }
 
 /// Commit a plan file on trunk and push it, so the trunk tip holds the plan as a lead found it.
@@ -757,6 +757,12 @@ fn a_lead_paths_land_that_changes_the_footprint_of_its_plan_file_refuses_and_com
         .land(&lead_paths(&[PLAN_PATH]), &config(vec![gate("true")]))
         .unwrap_err();
     assert_eq!(refusal.code, "footprint-change-refused", "{refusal}");
+    assert!(
+        refusal
+            .detail
+            .contains("changes the footprint of its own plan"),
+        "{refusal}"
+    );
     assert_eq!(f.remote_tip(), tip);
     // The local commit stays for inspection; the refusal names it and the reset.
     assert_ne!(f.local_tip(), tip);
@@ -776,6 +782,12 @@ fn a_lead_paths_land_that_changes_the_footprint_through_a_directory_path_refuses
         )
         .unwrap_err();
     assert_eq!(refusal.code, "footprint-change-refused", "{refusal}");
+    assert!(
+        refusal
+            .detail
+            .contains("changes the footprint of its own plan"),
+        "{refusal}"
+    );
 }
 
 #[test]
@@ -791,6 +803,12 @@ fn a_lead_paths_land_that_changes_the_footprint_through_a_glob_path_refuses_and_
         )
         .unwrap_err();
     assert_eq!(refusal.code, "footprint-change-refused", "{refusal}");
+    assert!(
+        refusal
+            .detail
+            .contains("changes the footprint of its own plan"),
+        "{refusal}"
+    );
     assert_eq!(f.remote_tip(), tip);
 }
 
@@ -804,6 +822,7 @@ fn a_lead_paths_land_that_deletes_its_plan_file_refuses_and_pushes_nothing() {
         .land(&lead_paths(&[PLAN_PATH]), &config(vec![gate("true")]))
         .unwrap_err();
     assert_eq!(refusal.code, "footprint-change-refused", "{refusal}");
+    assert!(refusal.detail.contains("is deleted"), "{refusal}");
     assert_eq!(f.remote_tip(), tip);
 }
 
@@ -817,6 +836,12 @@ fn a_lead_paths_land_whose_committed_plan_file_cannot_be_read_refuses_and_pushes
         .land(&lead_paths(&[PLAN_PATH]), &config(vec![gate("true")]))
         .unwrap_err();
     assert_eq!(refusal.code, "footprint-change-refused", "{refusal}");
+    assert!(
+        refusal
+            .detail
+            .contains("committed footprint cannot be read"),
+        "{refusal}"
+    );
     assert_eq!(f.remote_tip(), tip);
 }
 

@@ -142,9 +142,12 @@ export interface ListReadyData extends Page {
 
 // GET /sessions/{sessionId}/slots (fgos-gateway-api-v1.yaml:505-521).
 export interface SessionSlotsData {
-  execution?: {
-    occupied: number
-    items: Array<{ id: string; sessionId: string; claimRole: string }>
+  lanes: {
+    // null when the pool is unarmed and has no ceiling
+    ceiling: number | null
+    live: number
+    free: number | null
+    seats: Array<{ k: string; held: boolean }>
   }
 }
 

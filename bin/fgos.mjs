@@ -103,7 +103,7 @@ import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, re
 import { COMMAND_REGISTRY, declared, isNativeInvocation } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault } from '../src/observe/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
-import { readConfig } from '../src/config/facade.mjs';
+import { CONFINED_MARKER_ENV, readConfig } from '../src/config/facade.mjs';
 import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
@@ -259,7 +259,7 @@ function requireField(value, message) {
 }
 
 // Codes of a malformed head or rotation argument: refused as validation, never as a failed start.
-const HEAD_ARGUMENT_CODES = new Set(['bad-persona', 'bad-name', 'bad-project-root', 'bad-generation', 'bad-args', 'bad-reason', 'bad-stop-facts', 'path-invalid', 'request-too-large']);
+const HEAD_ARGUMENT_CODES = new Set(['bad-persona', 'bad-name', 'bad-project-root', 'bad-generation', 'bad-args', 'bad-role', 'bad-reason', 'bad-stop-facts', 'path-invalid', 'request-too-large']);
 
 // The sub-verb of `verb`, checked against the registry's `subcommands`: the one list of what the verb accepts.
 function requireSubVerb(verb, positional) {
@@ -3371,7 +3371,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
       if (sub === 'stop') {
         // Unconfined callers stop a head directly; a confined head's call is answered by the host through its socket,
-        // where the request route decides who may stop which head.
+        // where the request route decides who may stop which head. A confined call that got here has no socket.
+        if (process.env[CONFINED_MARKER_ENV] === '1') throw new StoreError('precondition', 'no-request-socket: a confined session stops a head only through its request socket, and this one has none');
         const { stopHeadSession } = await import('../src/session-host/head-stop.mjs');
         const { assertHeadArgs } = await import('../src/session-host/head-start.mjs');
         const reason = optionalField(flags.reason, 'session stop --reason requires a non-empty value (omit --reason entirely to skip it)');

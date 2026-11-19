@@ -225,15 +225,54 @@ pub fn catch_up(command: &LandCommand, ports: &LandPorts<'_>) -> Result<(), Land
     lander.sync_target(&target, &held)
 }
 
-/// The sorted `footprint` of the plan file `file` with these bytes; an absent file has none.
+/// The sorted `footprint` in the frontmatter of the plan file `file` with these bytes; an absent file has none.
+/// Only the frontmatter list is read: the rest of the plan contract is not this check's business.
 fn footprint_in(file: &str, bytes: &Option<Vec<u8>>) -> Result<Vec<String>, String> {
     let Some(bytes) = bytes else {
         return Ok(Vec::new());
     };
     let text = std::str::from_utf8(bytes).map_err(|e| e.to_string())?;
-    let dir = file.rsplit('/').nth(1).unwrap_or(file);
-    let plan = crate::portfolio::read_plan(dir, text).map_err(|e| e.code().to_owned())?;
-    let mut footprint = plan.footprint;
+    let text = text.strip_prefix('\u{FEFF}').unwrap_or(text);
+    let mut lines = text.lines();
+    if lines.next().map(str::trim_end) != Some("---") {
+        return Err("no frontmatter block".into());
+    }
+    let mut front = Vec::new();
+    let mut closed = false;
+    for line in lines {
+        if line.trim_end() == "---" {
+            closed = true;
+            break;
+        }
+        front.push(line);
+    }
+    if !closed {
+        return Err("the frontmatter block is not closed".into());
+    }
+    let doc = fgos_yaml_doc::parse(
+        front.join("\n").as_bytes(),
+        fgos_yaml_doc::Profile::Tool,
+        file,
+    )
+    .map_err(|e| format!("{e:?}"))?;
+    let fgos_yaml_doc::Value::Map(entries) = doc.value() else {
+        return Err("the frontmatter is not a mapping".into());
+    };
+    let mut footprint = match entries
+        .iter()
+        .find(|(k, _)| k == "footprint")
+        .map(|(_, v)| v)
+    {
+        Some(fgos_yaml_doc::Value::Seq(items)) => items
+            .iter()
+            .map(|v| match v {
+                fgos_yaml_doc::Value::Str(s) => Ok(s.clone()),
+                _ => Err("footprint holds an entry that is not a string".to_owned()),
+            })
+            .collect::<Result<Vec<_>, _>>()?,
+        None | Some(fgos_yaml_doc::Value::Null) => Vec::new(),
+        Some(_) => return Err("footprint is not a list".into()),
+    };
     footprint.sort();
     Ok(footprint)
 }

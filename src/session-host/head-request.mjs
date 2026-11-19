@@ -17,7 +17,7 @@ import { CONFINED_MARKER_ENV } from '../config/facade.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
 import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_START_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_SUPERVISOR_HANDLED_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
 import { assertHeadArgs, headRoleOf, startHeadSession } from './head-start.mjs';
-import { footprintOfPlanText, HeadPlanError, isPlanHeadName, planOfHead } from './head-plan.mjs';
+import { HeadPlanError, isPlanHeadName, planOfHead } from './head-plan.mjs';
 import { stopHeadSession } from './head-stop.mjs';
 import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
 import { judge, observe, selfRecord } from '../native/process-identity.mjs';
@@ -183,7 +183,11 @@ function hostCall({ envelope, projectRoot, argv }, ports) {
 
 // -- tickets
 
-const ticketDirOf = (projectRoot, role) => path.join(fgosDirFromRoot(projectRoot), 'runtime', 'head-tickets', role.replace(/^head:/, ''));
+const HEAD_ROLE_PATTERN = /^head:[a-z][a-z0-9-]*$/;
+const ticketDirOf = (projectRoot, role) => {
+  if (typeof role !== 'string' || !HEAD_ROLE_PATTERN.test(role)) throw Object.assign(new Error(`${JSON.stringify(role)} is not a head role`), { code: 'bad-role' });
+  return path.join(fgosDirFromRoot(projectRoot), 'runtime', 'head-tickets', role.replace(/^head:/, ''));
+};
 
 function writeTicket(file, ticket, { exclusive = false } = {}) {
   const dir = path.dirname(file);
@@ -259,28 +263,16 @@ async function landVerb({ args, envelope, projectRoot, id, ports }) {
     for (const p of paths) {
       if (!inGrant(p, writes)) throw Object.assign(new Error(`${JSON.stringify(p)} lies outside the paths this role may write`), { code: 'path-outside-grant' });
     }
-    let footprint = [];
-    if (lead) {
-      await refuseFootprintChange({ paths, envelope, projectRoot, ports });
-      footprint = (await planOfCaller(envelope, projectRoot, ports)).footprint;
-    }
     argv.push('--paths', paths.join(','), '--message', message);
-    // The land compares the plan files of its own commit with the trunk tip's footprint-wise; the bound has to reach it.
-    if (footprint.length > 0) argv.push('--footprint', footprint.join(','));
+    if (lead) {
+      // The land compares the plan files of its own commit with the trunk tip's footprint; the bound has to reach it.
+      const plan = await planOfCaller(envelope, projectRoot, ports);
+      if (plan.footprint.length === 0) throw Object.assign(new Error(`plan ${plan.dir} has no footprint, so a land has nothing to be held to`), { code: 'write-outside-footprint' });
+      argv.push('--footprint', plan.footprint.join(','));
+    }
   }
   for (const t of tests ?? []) argv.push('--test', t);
   return startTicket({ id, verb: HEAD_LAND_VERB, argv, envelope, projectRoot, ports });
-}
-
-/** A lead's paths land may not change the footprint of its own plan: the working plan.md against the trunk tip's. */
-async function refuseFootprintChange({ paths, envelope, projectRoot, ports }) {
-  const plan = await planOfCaller(envelope, projectRoot, ports);
-  const planFile = `plans/${plan.dir}/plan.md`;
-  if (!paths.some((p) => p === planFile || planFile.startsWith(`${p.replace(/\/+$/, '')}/`))) return;
-  const working = (ports.readWorking ?? ((file) => { try { return fs.readFileSync(path.join(projectRoot, file), 'utf8'); } catch (err) { if (err.code === 'ENOENT') return null; throw err; } }))(planFile);
-  if (working !== null && JSON.stringify(footprintOfPlanText(working, plan.dir)) !== JSON.stringify(plan.footprint)) {
-    throw Object.assign(new Error(`${planFile} changes the footprint of its own plan`), { code: 'footprint-change-refused' });
-  }
 }
 
 async function runVerb({ args, envelope, projectRoot, id, ports }) {

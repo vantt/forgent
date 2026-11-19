@@ -40,13 +40,15 @@ test('a session call without a persona or --name, or with a malformed one, is re
   }
 });
 
-test('session stop of a head that is not live answers stopped false, and request result reads the tickets of FGOS_HEAD_ROLE', () => {
-  const cwd = project();
-  const stopped = run(cwd, ['session', 'stop', 'secretary', '--name', 'miu', '--json'], unconfined);
+test('session stop of a head that is not live answers stopped false', () => {
+  const stopped = run(project(), ['session', 'stop', 'secretary', '--name', 'miu', '--json'], unconfined);
   assert.equal(stopped.status, 0, stopped.stderr);
   assert.match(stopped.stdout, /"stopped":\s*false/);
   assert.match(stopped.stdout, /not-live/);
+});
 
+test('request result reads the tickets of FGOS_HEAD_ROLE and refuses a missing role or an unknown ticket', () => {
+  const cwd = project();
   const noRole = run(cwd, ['request', 'result'], { ...unconfined, FGOS_HEAD_ROLE: '' });
   assert.equal(noRole.status, EXIT_PRECONDITION, noRole.stderr);
   assert.match(noRole.stderr, /no-head-role/);
@@ -62,7 +64,7 @@ test('session stop of a head that is not live answers stopped false, and request
 
 test('a confined caller without a request socket is refused as precondition by every subcommand, starting or writing nothing', () => {
   const cwd = project();
-  for (const args of [['start', 'secretary', '--name', 'miu'], ['rotate', 'secretary', '--name', 'miu'], ['write', 'docs/backlog.md']]) {
+  for (const args of [['start', 'secretary', '--name', 'miu'], ['rotate', 'secretary', '--name', 'miu'], ['stop', 'secretary', '--name', 'miu'], ['write', 'docs/backlog.md']]) {
     const sub = args[0];
     const result = run(cwd, ['session', ...args], { FGOS_CONFINED: '1', FGOS_HEAD_REQUEST_SOCKET: '' });
     assert.equal(result.status, EXIT_PRECONDITION, `${sub}: ${result.stderr}`);
