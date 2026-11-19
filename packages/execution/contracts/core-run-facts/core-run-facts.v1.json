@@ -1,0 +1,668 @@
+{
+ "version": "core-run-facts.v1",
+ "about": "Golden vectors of the Unit-run judgements over facts the caller reads. unitRunFacts: { recordText (unit.json text, null when the file is absent), controlHeld, worktreeExists, unsafeId?, expect } where expect is the facts object. judgeUnitRun: { unitRunId, caseId, unless, standing, expect }, standing being what the caller read of assignments/<id>: unsafe, unsafe-link, missing, link, or a directory with its record text, controller, custody and derived unit state. custody: { holders, expect }. Recorded by test/golden-recorders/core-runner-config.recorder.mjs.",
+ "unitRunFacts": [
+  {
+   "name": "a settled record with a worktree and a case reads as settled and resumable",
+   "recordText": "{\"execution\":{\"status\":\"settled\"},\"worktree\":\"$ROOT/worktree\",\"writeScope\":[\"src/a.mjs\"],\"workflow\":{\"caseId\":\"case-1\"}}",
+   "controlHeld": false,
+   "worktreeExists": true,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": true,
+    "controllerHeld": false,
+    "worktree": "$ROOT/worktree",
+    "writeScope": [
+     "src/a.mjs"
+    ],
+    "resumable": true,
+    "caseId": "case-1"
+   }
+  },
+  {
+   "name": "a settled record with a worktree and a case reads as settled and resumable (controller held)",
+   "recordText": "{\"execution\":{\"status\":\"settled\"},\"worktree\":\"$ROOT/worktree\",\"writeScope\":[\"src/a.mjs\"],\"workflow\":{\"caseId\":\"case-1\"}}",
+   "controlHeld": true,
+   "worktreeExists": true,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": true,
+    "controllerHeld": true,
+    "worktree": "$ROOT/worktree",
+    "writeScope": [
+     "src/a.mjs"
+    ],
+    "resumable": true,
+    "caseId": "case-1"
+   }
+  },
+  {
+   "name": "a record whose worktree is gone is not resumable",
+   "recordText": "{\"execution\":{\"status\":\"running\"},\"worktree\":\"$ROOT/gone\",\"unit\":{\"writes\":[\"docs/\"]}}",
+   "controlHeld": false,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": false,
+    "worktree": "$ROOT/gone",
+    "writeScope": [
+     "docs/"
+    ],
+    "resumable": false,
+    "caseId": null
+   }
+  },
+  {
+   "name": "a record whose worktree is gone is not resumable (controller held)",
+   "recordText": "{\"execution\":{\"status\":\"running\"},\"worktree\":\"$ROOT/gone\",\"unit\":{\"writes\":[\"docs/\"]}}",
+   "controlHeld": true,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": true,
+    "worktree": "$ROOT/gone",
+    "writeScope": [
+     "docs/"
+    ],
+    "resumable": false,
+    "caseId": null
+   }
+  },
+  {
+   "name": "writeScope wins over the unit writes, an empty list stays",
+   "recordText": "{\"writeScope\":[],\"unit\":{\"writes\":[\"x\"]}}",
+   "controlHeld": false,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": false,
+    "worktree": null,
+    "writeScope": [],
+    "resumable": false,
+    "caseId": null
+   }
+  },
+  {
+   "name": "writeScope wins over the unit writes, an empty list stays (controller held)",
+   "recordText": "{\"writeScope\":[],\"unit\":{\"writes\":[\"x\"]}}",
+   "controlHeld": true,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": true,
+    "worktree": null,
+    "writeScope": [],
+    "resumable": false,
+    "caseId": null
+   }
+  },
+  {
+   "name": "a record with no scope reads null; a non-string worktree reads null",
+   "recordText": "{\"worktree\":5,\"workflow\":{\"caseId\":null}}",
+   "controlHeld": false,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": false,
+    "worktree": null,
+    "writeScope": null,
+    "resumable": false,
+    "caseId": null
+   }
+  },
+  {
+   "name": "a record with no scope reads null; a non-string worktree reads null (controller held)",
+   "recordText": "{\"worktree\":5,\"workflow\":{\"caseId\":null}}",
+   "controlHeld": true,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": true,
+    "worktree": null,
+    "writeScope": null,
+    "resumable": false,
+    "caseId": null
+   }
+  },
+  {
+   "name": "an unreadable record reads as not settled and not resumable but existing",
+   "recordText": "{not json",
+   "controlHeld": false,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": false,
+    "worktree": null,
+    "writeScope": null,
+    "resumable": false,
+    "caseId": null
+   }
+  },
+  {
+   "name": "an unreadable record reads as not settled and not resumable but existing (controller held)",
+   "recordText": "{not json",
+   "controlHeld": true,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": true,
+    "worktree": null,
+    "writeScope": null,
+    "resumable": false,
+    "caseId": null
+   }
+  },
+  {
+   "name": "a record that is JSON but not an object reads as no facts",
+   "recordText": "[1,2]",
+   "controlHeld": false,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": false,
+    "worktree": null,
+    "writeScope": null,
+    "resumable": false,
+    "caseId": null
+   }
+  },
+  {
+   "name": "a record that is JSON but not an object reads as no facts (controller held)",
+   "recordText": "[1,2]",
+   "controlHeld": true,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": true,
+    "worktree": null,
+    "writeScope": null,
+    "resumable": false,
+    "caseId": null
+   }
+  },
+  {
+   "name": "a record with a byte order mark does not parse",
+   "recordText": "﻿{\"execution\":{\"status\":\"settled\"}}",
+   "controlHeld": false,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": false,
+    "worktree": null,
+    "writeScope": null,
+    "resumable": false,
+    "caseId": null
+   }
+  },
+  {
+   "name": "a record with a byte order mark does not parse (controller held)",
+   "recordText": "﻿{\"execution\":{\"status\":\"settled\"}}",
+   "controlHeld": true,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": true,
+    "worktree": null,
+    "writeScope": null,
+    "resumable": false,
+    "caseId": null
+   }
+  },
+  {
+   "name": "a record with a non-string case id passes it through",
+   "recordText": "{\"workflow\":{\"caseId\":7}}",
+   "controlHeld": false,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": false,
+    "worktree": null,
+    "writeScope": null,
+    "resumable": false,
+    "caseId": 7
+   }
+  },
+  {
+   "name": "a record with a non-string case id passes it through (controller held)",
+   "recordText": "{\"workflow\":{\"caseId\":7}}",
+   "controlHeld": true,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": true,
+    "settled": false,
+    "controllerHeld": true,
+    "worktree": null,
+    "writeScope": null,
+    "resumable": false,
+    "caseId": 7
+   }
+  },
+  {
+   "name": "a run id that names no directory exists nowhere",
+   "recordText": null,
+   "controlHeld": false,
+   "worktreeExists": false,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": false,
+    "settled": false,
+    "controllerHeld": false,
+    "worktree": null,
+    "writeScope": null,
+    "resumable": false,
+    "caseId": null
+   }
+  },
+  {
+   "name": "an unsafe run id exists nowhere",
+   "recordText": null,
+   "controlHeld": true,
+   "worktreeExists": false,
+   "unsafeId": true,
+   "expect": {
+    "contract": {
+     "id": "unit-run-record",
+     "version": 1
+    },
+    "exists": false,
+    "settled": false,
+    "controllerHeld": false,
+    "worktree": null,
+    "writeScope": null,
+    "resumable": false,
+    "caseId": null
+   }
+  }
+ ],
+ "judgeUnitRun": [
+  {
+   "name": "an id that is not a plain path is unsafe",
+   "unitRunId": "../x",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "unsafe"
+   },
+   "expect": {
+    "keep": "unsafe-path",
+    "blocks": true
+   }
+  },
+  {
+   "name": "a plain id that is a link is a link",
+   "unitRunId": "a-link",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "unsafe-link"
+   },
+   "expect": {
+    "keep": "link",
+    "blocks": true
+   }
+  },
+  {
+   "name": "a run with no directory is gone",
+   "unitRunId": "run-none",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "missing"
+   },
+   "expect": {
+    "gone": true
+   }
+  },
+  {
+   "name": "a run directory that is a link is kept as a link",
+   "unitRunId": "run-link",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "link"
+   },
+   "expect": {
+    "keep": "link",
+    "blocks": true
+   }
+  },
+  {
+   "name": "a directory without a unit record keeps the run and blocks",
+   "unitRunId": "j-norecord",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "directory",
+    "expected": "$ROOT/main/.fgos/assignments/j-norecord",
+    "unitJsonIsFile": false,
+    "recordText": null,
+    "controllerHeld": false,
+    "custodyHeld": false,
+    "unitState": "completed"
+   },
+   "expect": {
+    "keep": "unit-record-missing",
+    "blocks": true
+   }
+  },
+  {
+   "name": "a run another case names stays alone",
+   "unitRunId": "j-other",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "directory",
+    "expected": "$ROOT/main/.fgos/assignments/j-other",
+    "unitJsonIsFile": true,
+    "recordText": "{\"workflow\":{\"caseId\":\"case-2\"}}",
+    "controllerHeld": true,
+    "custodyHeld": true,
+    "unitState": "running"
+   },
+   "expect": {
+    "keep": "names-other-case",
+    "blocks": false
+   }
+  },
+  {
+   "name": "an unreadable record names no case, so it stays alone",
+   "unitRunId": "j-bad",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "directory",
+    "expected": "$ROOT/main/.fgos/assignments/j-bad",
+    "unitJsonIsFile": true,
+    "recordText": "{bad",
+    "controllerHeld": false,
+    "custodyHeld": false,
+    "unitState": "completed"
+   },
+   "expect": {
+    "keep": "names-other-case",
+    "blocks": false
+   }
+  },
+  {
+   "name": "a run another case names in unless stays alone",
+   "unitRunId": "j-unless",
+   "caseId": "case-1",
+   "unless": [
+    "j-unless"
+   ],
+   "standing": {
+    "kind": "directory",
+    "expected": "$ROOT/main/.fgos/assignments/j-unless",
+    "unitJsonIsFile": true,
+    "recordText": "{\"workflow\":{\"caseId\":\"case-1\"}}",
+    "controllerHeld": true,
+    "custodyHeld": false,
+    "unitState": "running"
+   },
+   "expect": {
+    "keep": "named-by-other-case",
+    "blocks": false
+   }
+  },
+  {
+   "name": "a held controller keeps the run and blocks",
+   "unitRunId": "j-held",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "directory",
+    "expected": "$ROOT/main/.fgos/assignments/j-held",
+    "unitJsonIsFile": true,
+    "recordText": "{\"workflow\":{\"caseId\":\"case-1\"}}",
+    "controllerHeld": true,
+    "custodyHeld": true,
+    "unitState": "running"
+   },
+   "expect": {
+    "keep": "controller-held",
+    "blocks": true
+   }
+  },
+  {
+   "name": "a held custody keeps the run and blocks",
+   "unitRunId": "j-custody",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "directory",
+    "expected": "$ROOT/main/.fgos/assignments/j-custody",
+    "unitJsonIsFile": true,
+    "recordText": "{\"workflow\":{\"caseId\":\"case-1\"},\"worktree\":\"$ROOT/worktree\"}",
+    "controllerHeld": false,
+    "custodyHeld": true,
+    "unitState": "completed"
+   },
+   "expect": {
+    "keep": "custody-held",
+    "blocks": true
+   }
+  },
+  {
+   "name": "a custody read of a record with no worktree string does not count",
+   "unitRunId": "j-nocustody",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "directory",
+    "expected": "$ROOT/main/.fgos/assignments/j-nocustody",
+    "unitJsonIsFile": true,
+    "recordText": "{\"workflow\":{\"caseId\":\"case-1\"}}",
+    "controllerHeld": false,
+    "custodyHeld": true,
+    "unitState": "completed"
+   },
+   "expect": {
+    "dir": "$ROOT/main/.fgos/assignments/j-nocustody"
+   }
+  },
+  {
+   "name": "an unsettled run keeps and blocks",
+   "unitRunId": "j-unsettled",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "directory",
+    "expected": "$ROOT/main/.fgos/assignments/j-unsettled",
+    "unitJsonIsFile": true,
+    "recordText": "{\"workflow\":{\"caseId\":\"case-1\"}}",
+    "controllerHeld": false,
+    "custodyHeld": false,
+    "unitState": "awaiting-resume"
+   },
+   "expect": {
+    "keep": "unsettled",
+    "blocks": true
+   }
+  },
+  {
+   "name": "a run that is still running keeps and blocks",
+   "unitRunId": "j-running",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "directory",
+    "expected": "$ROOT/main/.fgos/assignments/j-running",
+    "unitJsonIsFile": true,
+    "recordText": "{\"workflow\":{\"caseId\":\"case-1\"}}",
+    "controllerHeld": false,
+    "custodyHeld": false,
+    "unitState": "running"
+   },
+   "expect": {
+    "keep": "unsettled",
+    "blocks": true
+   }
+  },
+  {
+   "name": "a completed run of this case is removable",
+   "unitRunId": "j-done",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "directory",
+    "expected": "$ROOT/main/.fgos/assignments/j-done",
+    "unitJsonIsFile": true,
+    "recordText": "{\"workflow\":{\"caseId\":\"case-1\"}}",
+    "controllerHeld": false,
+    "custodyHeld": false,
+    "unitState": "completed"
+   },
+   "expect": {
+    "dir": "$ROOT/main/.fgos/assignments/j-done"
+   }
+  },
+  {
+   "name": "a failed run of this case is removable",
+   "unitRunId": "j-failed",
+   "caseId": "case-1",
+   "unless": [],
+   "standing": {
+    "kind": "directory",
+    "expected": "$ROOT/main/.fgos/assignments/j-failed",
+    "unitJsonIsFile": true,
+    "recordText": "{\"workflow\":{\"caseId\":\"case-1\"}}",
+    "controllerHeld": false,
+    "custodyHeld": false,
+    "unitState": "failed"
+   },
+   "expect": {
+    "dir": "$ROOT/main/.fgos/assignments/j-failed"
+   }
+  }
+ ],
+ "custodyHeld": [
+  {
+   "name": "a worktree that does not exist is held by nobody",
+   "holders": {
+    "kind": "none"
+   },
+   "expect": false
+  },
+  {
+   "name": "a lock file never created is held by nobody",
+   "holders": {
+    "kind": "none"
+   },
+   "expect": false
+  },
+  {
+   "name": "a listed holder holds custody",
+   "holders": {
+    "kind": "listed",
+    "pids": [
+     4242
+    ]
+   },
+   "expect": true
+  },
+  {
+   "name": "an empty holder list is no custody",
+   "holders": {
+    "kind": "listed",
+    "pids": []
+   },
+   "expect": false
+  },
+  {
+   "name": "a platform that cannot list reads free as no custody",
+   "holders": {
+    "kind": "unlisted",
+    "free": true
+   },
+   "expect": false
+  },
+  {
+   "name": "a platform that cannot list reads anything but free as held",
+   "holders": {
+    "kind": "unlisted",
+    "free": false
+   },
+   "expect": true
+  }
+ ]
+}

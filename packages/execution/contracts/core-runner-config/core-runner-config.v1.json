@@ -1,0 +1,1323 @@
+{
+ "version": "core-runner-config.v1",
+ "about": "Golden vectors of loadRunnerConfigForDir over the documents the config door reads. A load vector is { name, root, door: { runner, origins }, expect } and a refusal vector is { name, root, door: { refused: { code, message, refusals }, checkFindings }, expect }; expect is { ok: { config, origins } } or { error: { name, category, code?, phase?, message, path?, paths?, detail? } }. $ROOT is the directory the project lives under; the attributed file path is the project root joined onto .fgos. Recorded by test/golden-recorders/core-runner-config.recorder.mjs; the Rust loader is the owner now.",
+ "vectors": [
+  {
+   "name": "an empty runner section loads as an empty config",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {},
+    "origins": []
+   },
+   "expect": {
+    "ok": {
+     "config": {},
+     "origins": []
+    }
+   }
+  },
+  {
+   "name": "a runner section with a default executor loads unchanged and carries its origins",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "executor": {
+      "command": "claude",
+      "args": []
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.executor.command",
+      "layer": "project",
+      "role": "value",
+      "file": "project:config.yaml",
+      "line": 2,
+      "column": 3,
+      "described": false
+     }
+    ]
+   },
+   "expect": {
+    "ok": {
+     "config": {
+      "executor": {
+       "command": "claude",
+       "args": []
+      }
+     },
+     "origins": [
+      {
+       "path": "runner.executor.command",
+       "layer": "project",
+       "role": "value",
+       "file": "project:config.yaml",
+       "line": 2,
+       "column": 3,
+       "described": false
+      }
+     ]
+    }
+   }
+  },
+  {
+   "name": "legacy confinement flags on the default executor become a policy and keep the backend",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "executor": {
+      "command": "claude",
+      "args": [],
+      "confinement": {
+       "privateHome": true,
+       "ownWorktree": true,
+       "backend": "bwrap"
+      }
+     }
+    },
+    "origins": []
+   },
+   "expect": {
+    "ok": {
+     "config": {
+      "executor": {
+       "command": "claude",
+       "args": [],
+       "confinement": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+         "hostWrite": "allow",
+         "hostRead": "allow",
+         "networkEgress": "allow",
+         "process": "host",
+         "home": "private",
+         "session": "shared",
+         "workspace": "own"
+        },
+        "grants": [
+         {
+          "resource": "private-home",
+          "access": "read-write",
+          "scope": "dispatch"
+         }
+        ],
+        "backend": "bwrap"
+       }
+      }
+     },
+     "origins": []
+    }
+   }
+  },
+  {
+   "name": "legacy short-form flags on a named executor become a policy",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "executors": {
+      "claude": {
+       "invocations": [
+        {
+         "via": "cli",
+         "command": "claude"
+        }
+       ],
+       "confinement": {
+        "home": "private",
+        "session": "isolated",
+        "workspace": "own"
+       }
+      }
+     }
+    },
+    "origins": []
+   },
+   "expect": {
+    "ok": {
+     "config": {
+      "executors": {
+       "claude": {
+        "invocations": [
+         {
+          "via": "cli",
+          "command": "claude"
+         }
+        ],
+        "confinement": {
+         "contract": "confinement-policy.v1",
+         "controls": {
+          "hostWrite": "allow",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "private",
+          "session": "isolated",
+          "workspace": "own"
+         },
+         "grants": [
+          {
+           "resource": "private-home",
+           "access": "read-write",
+           "scope": "dispatch"
+          }
+         ]
+        }
+       }
+      }
+     },
+     "origins": []
+    }
+   }
+  },
+  {
+   "name": "a controls-only confinement is filled with the policy defaults, grants from a private home",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "executors": {
+      "claude": {
+       "invocations": [
+        {
+         "via": "cli",
+         "command": "claude"
+        }
+       ],
+       "confinement": {
+        "controls": {
+         "home": "private",
+         "hostWrite": "deny"
+        },
+        "networkFilter": null
+       }
+      }
+     }
+    },
+    "origins": []
+   },
+   "expect": {
+    "ok": {
+     "config": {
+      "executors": {
+       "claude": {
+        "invocations": [
+         {
+          "via": "cli",
+          "command": "claude"
+         }
+        ],
+        "confinement": {
+         "contract": "confinement-policy.v1",
+         "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "private",
+          "session": "shared",
+          "workspace": "shared"
+         },
+         "grants": [
+          {
+           "resource": "private-home",
+           "access": "read-write",
+           "scope": "dispatch"
+          }
+         ],
+         "networkFilter": null
+        }
+       }
+      }
+     },
+     "origins": []
+    }
+   }
+  },
+  {
+   "name": "a controls-only confinement keeps its own grants and backend",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "executors": {
+      "claude": {
+       "invocations": [
+        {
+         "via": "cli",
+         "command": "claude"
+        }
+       ],
+       "confinement": {
+        "controls": {
+         "session": "isolated"
+        },
+        "grants": [
+         {
+          "resource": "x",
+          "access": "read",
+          "scope": "dispatch"
+         }
+        ],
+        "backend": "bwrap"
+       }
+      }
+     }
+    },
+    "origins": []
+   },
+   "expect": {
+    "ok": {
+     "config": {
+      "executors": {
+       "claude": {
+        "invocations": [
+         {
+          "via": "cli",
+          "command": "claude"
+         }
+        ],
+        "confinement": {
+         "contract": "confinement-policy.v1",
+         "controls": {
+          "hostWrite": "allow",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "isolated",
+          "workspace": "shared"
+         },
+         "grants": [
+          {
+           "resource": "x",
+           "access": "read",
+           "scope": "dispatch"
+          }
+         ],
+         "backend": "bwrap"
+        }
+       }
+      }
+     },
+     "origins": []
+    }
+   }
+  },
+  {
+   "name": "a policy already in the v1 shape stays as it is",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "executors": {
+      "claude": {
+       "invocations": [
+        {
+         "via": "cli",
+         "command": "claude"
+        }
+       ],
+       "confinement": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+         "hostWrite": "deny"
+        },
+        "grants": [],
+        "backend": "bwrap"
+       }
+      }
+     }
+    },
+    "origins": []
+   },
+   "expect": {
+    "ok": {
+     "config": {
+      "executors": {
+       "claude": {
+        "invocations": [
+         {
+          "via": "cli",
+          "command": "claude"
+         }
+        ],
+        "confinement": {
+         "contract": "confinement-policy.v1",
+         "controls": {
+          "hostWrite": "deny"
+         },
+         "grants": [],
+         "backend": "bwrap"
+        }
+       }
+      }
+     },
+     "origins": []
+    }
+   }
+  },
+  {
+   "name": "a confinement with no flags and no controls is left alone",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "executors": {
+      "claude": {
+       "invocations": [
+        {
+         "via": "cli",
+         "command": "claude"
+        }
+       ],
+       "confinement": {
+        "backend": "bwrap"
+       }
+      }
+     }
+    },
+    "origins": []
+   },
+   "expect": {
+    "ok": {
+     "config": {
+      "executors": {
+       "claude": {
+        "invocations": [
+         {
+          "via": "cli",
+          "command": "claude"
+         }
+        ],
+        "confinement": {
+         "backend": "bwrap"
+        }
+       }
+      }
+     },
+     "origins": []
+    }
+   }
+  },
+  {
+   "name": "a global runner.rigorToTier names the global file with line and column",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "executor": {
+      "command": "claude",
+      "args": []
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.rigorToTier.medium",
+      "layer": "global",
+      "role": "value",
+      "file": "global:config.yaml",
+      "line": 7,
+      "column": 5,
+      "described": false
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "message": "~/.fgos/config.yaml:7:5 runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key."
+    }
+   }
+  },
+  {
+   "name": "a global runner.rigorToTier with no position names only the file",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "executor": {
+      "command": "claude",
+      "args": []
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.rigorToTier",
+      "layer": "global",
+      "file": "global:config.json",
+      "role": "value"
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "message": "~/.fgos/config.json runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key."
+    }
+   }
+  },
+  {
+   "name": "a global runner.rigorToTier with no file names config.json",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "executor": {
+      "command": "claude",
+      "args": []
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.rigorToTier",
+      "layer": "global",
+      "role": "value"
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "message": "~/.fgos/config.json runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key."
+    }
+   }
+  },
+  {
+   "name": "a project runner.rigorToTier is the shape check's refusal, with no position",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "executor": {
+      "command": "claude",
+      "args": []
+     },
+     "rigorToTier": {
+      "medium": "a"
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.rigorToTier",
+      "layer": "project",
+      "role": "value",
+      "file": "project:config.yaml",
+      "line": 4,
+      "column": 3,
+      "described": false
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "message": "runner config ($ROOT/project/.fgos runner) declares retired \"rigorToTier\": rigor no longer chooses a tier; delete the key and declare \"tier\" per capability, role, persona or seat."
+    }
+   }
+  },
+  {
+   "name": "a retired runner key is refused unattributed",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "readOnlyExecutorRedirects": {}
+    },
+    "origins": []
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "message": "runner config ($ROOT/project/.fgos runner) declares retired \"readOnlyExecutorRedirects\": read-only posture is enforced by OS confinement; delete the key."
+    }
+   }
+  },
+  {
+   "name": "a retired pattern key is attributed to the project file and line",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "patterns": {
+      "reviewed": {
+       "maxRounds": 3
+      }
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.patterns.reviewed.maxRounds",
+      "layer": "project",
+      "role": "value",
+      "file": "project:config.yaml",
+      "line": 12,
+      "column": 3,
+      "described": false
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "runner config ($ROOT/project/.fgos/config.yaml:12 patterns.reviewed.maxRounds) runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.",
+     "paths": [
+      "runner.patterns.reviewed.maxRounds"
+     ],
+     "detail": "runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead."
+    }
+   }
+  },
+  {
+   "name": "a retired pattern key from the global file is attributed to the home directory",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "patterns": {
+      "defaultRule": "x"
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.patterns.defaultRule",
+      "layer": "global",
+      "role": "value",
+      "file": "global:config.yaml",
+      "line": 3,
+      "column": 3,
+      "described": false
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "runner config (~/.fgos/config.yaml:3 patterns.defaultRule) runner config ($ROOT/project/.fgos runner patterns): runner.patterns.defaultRule was retired; delete the key.",
+     "paths": [
+      "runner.patterns.defaultRule"
+     ],
+     "detail": "runner config ($ROOT/project/.fgos runner patterns): runner.patterns.defaultRule was retired; delete the key."
+    }
+   }
+  },
+  {
+   "name": "a retired pattern key with an origin only on its parent falls to the nearest ancestor",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "patterns": {
+      "reviewed": {
+       "checkersByRigor": {
+        "low": 1
+       }
+      }
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.patterns.reviewed",
+      "layer": "project",
+      "role": "value",
+      "file": "project:config.yaml",
+      "line": 9,
+      "column": 3,
+      "described": false
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "runner config ($ROOT/project/.fgos/config.yaml:9 patterns.reviewed.checkersByRigor) runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.checkersByRigor was retired; use runner.loops.reviewed.checkersByRigor instead.",
+     "paths": [
+      "runner.patterns.reviewed.checkersByRigor"
+     ],
+     "detail": "runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.checkersByRigor was retired; use runner.loops.reviewed.checkersByRigor instead."
+    }
+   }
+  },
+  {
+   "name": "a retired pattern key with no origin keeps the plain message",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "patterns": {
+      "reviewed": {
+       "maxRounds": 3
+      }
+     }
+    },
+    "origins": []
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.",
+     "paths": [
+      "runner.patterns.reviewed.maxRounds"
+     ],
+     "detail": "runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead."
+    }
+   }
+  },
+  {
+   "name": "two retired pattern keys from two files list each location, the common parent in the subpath",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "patterns": {
+      "reviewed": {
+       "maxRounds": 3,
+       "checkersByRigor": {
+        "low": 1
+       }
+      }
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.patterns.reviewed.maxRounds",
+      "layer": "project",
+      "role": "value",
+      "file": "project:config.yaml",
+      "line": 12,
+      "column": 3,
+      "described": false
+     },
+     {
+      "path": "runner.patterns.reviewed.checkersByRigor",
+      "layer": "project",
+      "role": "value",
+      "file": "project:config.yaml",
+      "line": 14,
+      "column": 5,
+      "described": false
+     },
+     {
+      "path": "runner.patterns.reviewed.maxRounds",
+      "layer": "global",
+      "role": "value",
+      "file": "global:config.yaml",
+      "line": 3,
+      "column": 3,
+      "described": false
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "runner config ($ROOT/project/.fgos/config.yaml:12, ~/.fgos/config.yaml:3, $ROOT/project/.fgos/config.yaml:14 patterns.reviewed) runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.\nrunner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.checkersByRigor was retired; use runner.loops.reviewed.checkersByRigor instead.",
+     "paths": [
+      "runner.patterns.reviewed.maxRounds",
+      "runner.patterns.reviewed.checkersByRigor"
+     ],
+     "detail": "runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.\nrunner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.checkersByRigor was retired; use runner.loops.reviewed.checkersByRigor instead."
+    }
+   }
+  },
+  {
+   "name": "two refusal paths that share one origin location list it once",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "patterns": {
+      "reviewed": {
+       "maxRounds": 3,
+       "checkersByRigor": {
+        "low": 1
+       }
+      }
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.patterns.reviewed",
+      "layer": "project",
+      "role": "value",
+      "file": "project:config.yaml",
+      "line": 12,
+      "column": 3,
+      "described": false
+     },
+     {
+      "path": "runner.patterns.reviewed.maxRounds",
+      "layer": "project",
+      "role": "value",
+      "file": "project:config.yaml",
+      "line": 12,
+      "column": 3,
+      "described": false
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "runner config ($ROOT/project/.fgos/config.yaml:12 patterns.reviewed) runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.\nrunner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.checkersByRigor was retired; use runner.loops.reviewed.checkersByRigor instead.",
+     "paths": [
+      "runner.patterns.reviewed.maxRounds",
+      "runner.patterns.reviewed.checkersByRigor"
+     ],
+     "detail": "runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.\nrunner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.checkersByRigor was retired; use runner.loops.reviewed.checkersByRigor instead."
+    }
+   }
+  },
+  {
+   "name": "a shipped-layer origin shows as the standard",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "patterns": {
+      "reviewed": {
+       "maxRounds": 3
+      }
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.patterns.reviewed.maxRounds",
+      "layer": "standard",
+      "role": "value",
+      "file": "standard:runner.yaml",
+      "line": 5,
+      "column": 3,
+      "described": false
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "runner config (<standard>:5 patterns.reviewed.maxRounds) runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.",
+     "paths": [
+      "runner.patterns.reviewed.maxRounds"
+     ],
+     "detail": "runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead."
+    }
+   }
+  },
+  {
+   "name": "an origin of another layer shows its own file",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "patterns": {
+      "reviewed": {
+       "maxRounds": 3
+      }
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.patterns.reviewed.maxRounds",
+      "layer": "accounts",
+      "role": "value",
+      "file": "machine.yaml",
+      "line": 5,
+      "column": 3,
+      "described": false
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "runner config (machine.yaml:5 patterns.reviewed.maxRounds) runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.",
+     "paths": [
+      "runner.patterns.reviewed.maxRounds"
+     ],
+     "detail": "runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead."
+    }
+   }
+  },
+  {
+   "name": "an origin with no line shows the bare file",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "patterns": {
+      "reviewed": {
+       "maxRounds": 3
+      }
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.patterns.reviewed.maxRounds",
+      "layer": "project",
+      "file": "project:config.yaml",
+      "role": "value"
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "runner config ($ROOT/project/.fgos/config.yaml patterns.reviewed.maxRounds) runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.",
+     "paths": [
+      "runner.patterns.reviewed.maxRounds"
+     ],
+     "detail": "runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead."
+    }
+   }
+  },
+  {
+   "name": "an origin with no layer is told by its file prefix",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "patterns": {
+      "reviewed": {
+       "maxRounds": 3
+      }
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.patterns.reviewed.maxRounds",
+      "file": "global:other.yaml",
+      "line": 2,
+      "column": 1
+     },
+     {
+      "path": "runner.patterns.reviewed.maxRounds",
+      "file": "project:sub/c.yaml",
+      "line": 8,
+      "column": 1
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "runner config (~/.fgos/other.yaml:2, $ROOT/project/.fgos/sub/c.yaml:8 patterns.reviewed.maxRounds) runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.",
+     "paths": [
+      "runner.patterns.reviewed.maxRounds"
+     ],
+     "detail": "runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead."
+    }
+   }
+  },
+  {
+   "name": "a descendant origin under the failing container is used when the key itself has none",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "patterns": {
+      "reviewed": {
+       "maxRounds": 3
+      }
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.patterns.reviewed.maxRounds.x",
+      "layer": "project",
+      "role": "value",
+      "file": "project:config.yaml",
+      "line": 40,
+      "column": 3,
+      "described": false
+     },
+     {
+      "path": "runner.patterns.reviewed.maxRounds[0]",
+      "layer": "project",
+      "role": "value",
+      "file": "project:config.yaml",
+      "line": 41,
+      "column": 3,
+      "described": false
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "runner config ($ROOT/project/.fgos/config.yaml:40, $ROOT/project/.fgos/config.yaml:41 patterns.reviewed.maxRounds) runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.",
+     "paths": [
+      "runner.patterns.reviewed.maxRounds"
+     ],
+     "detail": "runner config ($ROOT/project/.fgos runner patterns): runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead."
+    }
+   }
+  },
+  {
+   "name": "a loop bound the loop does not read is attributed to the missing key's parent",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "loops": {
+      "reviewed": {
+       "bounds": {
+        "bogus": 1
+       }
+      }
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.loops.reviewed.bounds",
+      "layer": "project",
+      "role": "value",
+      "file": "project:config.yaml",
+      "line": 30,
+      "column": 5,
+      "described": false
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "message": "runner config ($ROOT/project/.fgos/config.yaml:30 loops.reviewed.bounds.bogus) is not a parameter read by the \"reviewed\" loop.",
+     "path": "runner.loops.reviewed.bounds.bogus",
+     "paths": [
+      "runner.loops.reviewed.bounds.bogus"
+     ],
+     "detail": "is not a parameter read by the \"reviewed\" loop."
+    }
+   }
+  },
+  {
+   "name": "a loop bound with a deep missing key climbs to the nearest existing parent entry",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "loops": {
+      "reviewed": {
+       "bounds": {
+        "bogus": 1
+       }
+      }
+     }
+    },
+    "origins": [
+     {
+      "path": "runner.loops.reviewed.other",
+      "layer": "project",
+      "role": "value",
+      "file": "project:config.yaml",
+      "line": 31,
+      "column": 7,
+      "described": false
+     },
+     {
+      "path": "runner.loops.reviewed.zzz",
+      "layer": "project",
+      "role": "value",
+      "file": "project:config.yaml",
+      "line": 33,
+      "column": 7,
+      "described": false
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "message": "runner config ($ROOT/project/.fgos/config.yaml:31 loops.reviewed.bounds.bogus) is not a parameter read by the \"reviewed\" loop.",
+     "path": "runner.loops.reviewed.bounds.bogus",
+     "paths": [
+      "runner.loops.reviewed.bounds.bogus"
+     ],
+     "detail": "is not a parameter read by the \"reviewed\" loop."
+    }
+   }
+  },
+  {
+   "name": "a provider that still lists accounts is refused unattributed with the retired code",
+   "root": "$ROOT/project",
+   "door": {
+    "runner": {
+     "providers": {
+      "anthropic": {
+       "accounts": {
+        "a": {}
+       }
+      }
+     }
+    },
+    "origins": []
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "runner config ($ROOT/project/.fgos runner): runner.providers.anthropic.accounts was retired; declare the accounts in runner.llmAccounts.<pool>.<account>.credentialStore instead."
+    }
+   }
+  }
+ ],
+ "refusals": [
+  {
+   "name": "a refusal that names no retired key keeps the door message and code",
+   "root": "$ROOT/project",
+   "door": {
+    "refused": {
+     "code": "config-schema",
+     "message": "config-schema project:config.yaml:2:3 runner.executor (type)",
+     "refusals": [
+      {
+       "id": "config-schema",
+       "path": "runner.executor",
+       "file": "project:config.yaml",
+       "line": 2,
+       "column": 3,
+       "keyword": "type"
+      }
+     ]
+    },
+    "checkFindings": []
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-schema",
+     "message": "config-schema project:config.yaml:2:3 runner.executor (type)"
+    }
+   }
+  },
+  {
+   "name": "a refused retired pattern key is told what replaced it, with the position",
+   "root": "$ROOT/project",
+   "door": {
+    "refused": {
+     "code": "config-schema",
+     "message": "config-schema /proj/.fgos/config.yaml:5:7 runner.patterns.reviewed.maxRounds (unknown)",
+     "refusals": [
+      {
+       "id": "config-schema",
+       "path": "runner.patterns.reviewed.maxRounds",
+       "file": "/proj/.fgos/config.yaml",
+       "line": 5,
+       "column": 7,
+       "keyword": "unknown"
+      }
+     ]
+    },
+    "checkFindings": []
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "/proj/.fgos/config.yaml:5:7: runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead."
+    }
+   }
+  },
+  {
+   "name": "a refused retired key of the global file names the home directory",
+   "root": "$ROOT/project",
+   "door": {
+    "refused": {
+     "code": "config-schema",
+     "message": "config-schema global:config.yaml:1:1 runner.patterns.defaultRule (unknown)",
+     "refusals": [
+      {
+       "id": "config-schema",
+       "path": "runner.patterns.defaultRule",
+       "file": "global:config.yaml",
+       "line": 1,
+       "column": 1,
+       "keyword": "unknown"
+      }
+     ]
+    },
+    "checkFindings": []
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "~/.fgos/config.yaml:1:1: runner.patterns.defaultRule was retired; delete the key."
+    }
+   }
+  },
+  {
+   "name": "a refusal with no line has no position",
+   "root": "$ROOT/project",
+   "door": {
+    "refused": {
+     "code": "config-schema",
+     "message": "config-schema global:config.yaml runner.patterns.research-fan-out-gated.x (unknown)",
+     "refusals": [
+      {
+       "id": "config-schema",
+       "path": "runner.patterns.research-fan-out-gated.x",
+       "file": "global:config.yaml",
+       "keyword": "unknown"
+      }
+     ]
+    },
+    "checkFindings": []
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "~/.fgos/config.yaml: runner.patterns.research-fan-out-gated was retired; use runner.patterns.research-fan-out instead."
+    }
+   }
+  },
+  {
+   "name": "a refusal with no file names the placeholder",
+   "root": "$ROOT/project",
+   "door": {
+    "refused": {
+     "code": "config-schema",
+     "message": "config-schema runner.patterns.defaultRule (unknown)",
+     "refusals": [
+      {
+       "id": "config-schema",
+       "path": "runner.patterns.defaultRule",
+       "keyword": "unknown"
+      }
+     ]
+    },
+    "checkFindings": []
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "<file>: runner.patterns.defaultRule was retired; delete the key."
+    }
+   }
+  },
+  {
+   "name": "the same retired key in the same file is told once, in another file again",
+   "root": "$ROOT/project",
+   "door": {
+    "refused": {
+     "code": "config-schema",
+     "message": "c global:config.yaml:1:1 runner.patterns.defaultRule; c global:config.yaml:2:1 runner.patterns.defaultRule.x; c /p/.fgos/config.yaml:3:1 runner.patterns.defaultRule",
+     "refusals": [
+      {
+       "id": "c",
+       "path": "runner.patterns.defaultRule",
+       "file": "global:config.yaml",
+       "line": 1,
+       "column": 1
+      },
+      {
+       "id": "c",
+       "path": "runner.patterns.defaultRule.x",
+       "file": "global:config.yaml",
+       "line": 2,
+       "column": 1
+      },
+      {
+       "id": "c",
+       "path": "runner.patterns.defaultRule",
+       "file": "/p/.fgos/config.yaml",
+       "line": 3,
+       "column": 1
+      }
+     ]
+    },
+    "checkFindings": []
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "~/.fgos/config.yaml:1:1: runner.patterns.defaultRule was retired; delete the key.\n/p/.fgos/config.yaml:3:1: runner.patterns.defaultRule was retired; delete the key."
+    }
+   }
+  },
+  {
+   "name": "a retired key found only by the config check is told, check findings before refusals",
+   "root": "$ROOT/project",
+   "door": {
+    "refused": {
+     "code": "config-schema",
+     "message": "c global:config.yaml:9:2 runner.patterns.defaultRule",
+     "refusals": [
+      {
+       "id": "c",
+       "path": "runner.patterns.defaultRule",
+       "file": "global:config.yaml",
+       "line": 9,
+       "column": 2
+      }
+     ]
+    },
+    "checkFindings": [
+     {
+      "row": "config",
+      "file": "project:config.yaml",
+      "line": 4,
+      "column": 3,
+      "path": "runner.patterns.reviewed.maxRounds"
+     }
+    ]
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-key-retired",
+     "message": "project:config.yaml:4:3: runner.patterns.reviewed.maxRounds was retired; use runner.loops.reviewed.maxRounds instead.\n~/.fgos/config.yaml:9:2: runner.patterns.defaultRule was retired; delete the key."
+    }
+   }
+  },
+  {
+   "name": "a refusal with no path and a non-retired path is skipped",
+   "root": "$ROOT/project",
+   "door": {
+    "refused": {
+     "code": "config-io",
+     "message": "config-io (io); c project:config.yaml:1:1 runner.executor",
+     "refusals": [
+      {
+       "id": "config-io",
+       "keyword": "io"
+      },
+      {
+       "id": "c",
+       "path": "runner.executor",
+       "file": "project:config.yaml",
+       "line": 1,
+       "column": 1
+      }
+     ]
+    },
+    "checkFindings": []
+   },
+   "expect": {
+    "error": {
+     "name": "RunnerConfigError",
+     "category": "validation",
+     "code": "config-io",
+     "message": "config-io (io); c project:config.yaml:1:1 runner.executor"
+    }
+   }
+  }
+ ]
+}
