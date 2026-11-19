@@ -277,35 +277,19 @@ fn is_dead(holder: &Value) -> bool {
     judge_here(&Record::from_json(holder)) == Verdict::Dead
 }
 
-fn random_token() -> String {
-    use std::collections::hash_map::RandomState;
-    use std::hash::{BuildHasher, Hasher};
-    let mut bytes = [0u8; 16];
-    #[cfg(unix)]
-    {
-        use std::io::Read;
-        if let Ok(mut file) = fs::File::open("/dev/urandom") {
-            let _ = file.read_exact(&mut bytes);
-        }
-    }
-    if bytes.iter().all(|b| *b == 0) {
-        for chunk in bytes.chunks_mut(8) {
-            let mut hasher = RandomState::new().build_hasher();
-            hasher.write_u128(now_ms() as u128);
-            chunk.copy_from_slice(&hasher.finish().to_le_bytes()[..chunk.len()]);
-        }
-    }
+fn random_token() -> io::Result<String> {
+    let mut bytes = fgos_identity::text::random_bytes::<16>()?;
     bytes[6] = (bytes[6] & 0x0f) | 0x40;
     bytes[8] = (bytes[8] & 0x3f) | 0x80;
     let hex: String = bytes.iter().map(|b| format!("{b:02x}")).collect();
-    format!(
+    Ok(format!(
         "{}-{}-{}-{}-{}",
         &hex[0..8],
         &hex[8..12],
         &hex[12..16],
         &hex[16..20],
         &hex[20..32]
-    )
+    ))
 }
 
 /// Acquire per-Run control: a monotonic `controlEpoch` plus a unique `controlToken` fencing successive controller
@@ -359,8 +343,18 @@ pub fn acquire_run_control(run_dir: &Path, options: &AcquireOptions) -> io::Resu
                 }
             }
         }
+        // No token means no generation: the error is returned below and the placeholder outcome never read.
+        let token = match random_token() {
+            Ok(token) => token,
+            Err(err) => {
+                failure = Some(err);
+                return Decision::Stop(AcquireOutcome::Stale {
+                    control_epoch: None,
+                });
+            }
+        };
         Decision::Record(json!({
-            "controlToken": random_token(),
+            "controlToken": token,
             "holder": options.holder,
             "purpose": options.purpose,
             "acquiredAt": now,

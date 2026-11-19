@@ -516,6 +516,7 @@ fn read_store(store_path: &Path) -> Result<Json> {
 /// points; its own permission bits are kept, and one that does not exist yet is created owner-only.
 fn write_store(store_path: &Path, body: &str) -> Result<()> {
     let mut target = store_path.to_path_buf();
+    #[cfg_attr(not(unix), allow(unused_mut))]
     let mut mode = 0o600u32;
     match fs::canonicalize(store_path) {
         Ok(real) => {

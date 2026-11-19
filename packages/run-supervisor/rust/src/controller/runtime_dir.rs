@@ -191,18 +191,18 @@ pub fn remove_orphan_attempt_sockets(
             continue;
         };
         #[cfg(unix)]
-        {
+        let orphan = {
             use std::os::unix::fs::{FileTypeExt, MetadataExt};
-            if !meta.file_type().is_socket()
-                || meta.uid() != uid
-                || bound.contains(file.to_string_lossy().as_ref())
-            {
-                continue;
-            }
-        }
+            meta.file_type().is_socket()
+                && meta.uid() == uid
+                && !bound.contains(file.to_string_lossy().as_ref())
+        };
         #[cfg(not(unix))]
-        {
+        let orphan = {
             let _ = (&meta, &bound);
+            false
+        };
+        if !orphan {
             continue;
         }
         if fs::remove_file(&file).is_ok() {
