@@ -1,0 +1,897 @@
+{
+ "version": "core-loops-outcome.v1",
+ "about": "Outcome vocabulary of Execution: classes, predicates, the scope rule, evaluations and the exit code table, recorded from src/runner/execution/outcome.mjs. A case is { id, fn, args, expected }, expected being { ok } or { error }.",
+ "tables": {
+  "validOutcomes": [
+   "pass",
+   "findings",
+   "execution-failure",
+   "policy-refusal",
+   "provider-limit",
+   "blocked"
+  ],
+  "errorOutcomes": [
+   "execution-failure",
+   "policy-refusal",
+   "provider-limit",
+   "blocked"
+  ],
+  "notStarted": "not-started",
+  "undetermined": "undetermined",
+  "exitCodes": {
+   "policy-refusal": 4,
+   "provider-limit": 10,
+   "execution-failure": 11,
+   "not-started": 11,
+   "partial-writes": 12,
+   "blocked": 13,
+   "findings": 14
+  }
+ },
+ "cases": [
+  {
+   "id": "outcomeClass \"pass\"",
+   "fn": "outcomeClass",
+   "args": [
+    "pass"
+   ],
+   "expected": {
+    "ok": "verdict"
+   }
+  },
+  {
+   "id": "isVerdict \"pass\"",
+   "fn": "isVerdict",
+   "args": [
+    "pass"
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "isInfrastructure \"pass\"",
+   "fn": "isInfrastructure",
+   "args": [
+    "pass"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "rebindsOnResume \"pass\"",
+   "fn": "rebindsOnResume",
+   "args": [
+    "pass"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "exitCodeForOutcome \"pass\"",
+   "fn": "exitCodeForOutcome",
+   "args": [
+    "pass"
+   ],
+   "expected": {
+    "ok": 0
+   }
+  },
+  {
+   "id": "outcomeClass \"findings\"",
+   "fn": "outcomeClass",
+   "args": [
+    "findings"
+   ],
+   "expected": {
+    "ok": "verdict"
+   }
+  },
+  {
+   "id": "isVerdict \"findings\"",
+   "fn": "isVerdict",
+   "args": [
+    "findings"
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "isInfrastructure \"findings\"",
+   "fn": "isInfrastructure",
+   "args": [
+    "findings"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "rebindsOnResume \"findings\"",
+   "fn": "rebindsOnResume",
+   "args": [
+    "findings"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "exitCodeForOutcome \"findings\"",
+   "fn": "exitCodeForOutcome",
+   "args": [
+    "findings"
+   ],
+   "expected": {
+    "ok": 14
+   }
+  },
+  {
+   "id": "outcomeClass \"execution-failure\"",
+   "fn": "outcomeClass",
+   "args": [
+    "execution-failure"
+   ],
+   "expected": {
+    "ok": "infrastructure"
+   }
+  },
+  {
+   "id": "isVerdict \"execution-failure\"",
+   "fn": "isVerdict",
+   "args": [
+    "execution-failure"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isInfrastructure \"execution-failure\"",
+   "fn": "isInfrastructure",
+   "args": [
+    "execution-failure"
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "rebindsOnResume \"execution-failure\"",
+   "fn": "rebindsOnResume",
+   "args": [
+    "execution-failure"
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "exitCodeForOutcome \"execution-failure\"",
+   "fn": "exitCodeForOutcome",
+   "args": [
+    "execution-failure"
+   ],
+   "expected": {
+    "ok": 11
+   }
+  },
+  {
+   "id": "outcomeClass \"policy-refusal\"",
+   "fn": "outcomeClass",
+   "args": [
+    "policy-refusal"
+   ],
+   "expected": {
+    "ok": "policy"
+   }
+  },
+  {
+   "id": "isVerdict \"policy-refusal\"",
+   "fn": "isVerdict",
+   "args": [
+    "policy-refusal"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isInfrastructure \"policy-refusal\"",
+   "fn": "isInfrastructure",
+   "args": [
+    "policy-refusal"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "rebindsOnResume \"policy-refusal\"",
+   "fn": "rebindsOnResume",
+   "args": [
+    "policy-refusal"
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "exitCodeForOutcome \"policy-refusal\"",
+   "fn": "exitCodeForOutcome",
+   "args": [
+    "policy-refusal"
+   ],
+   "expected": {
+    "ok": 4
+   }
+  },
+  {
+   "id": "outcomeClass \"provider-limit\"",
+   "fn": "outcomeClass",
+   "args": [
+    "provider-limit"
+   ],
+   "expected": {
+    "ok": "provider"
+   }
+  },
+  {
+   "id": "isVerdict \"provider-limit\"",
+   "fn": "isVerdict",
+   "args": [
+    "provider-limit"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isInfrastructure \"provider-limit\"",
+   "fn": "isInfrastructure",
+   "args": [
+    "provider-limit"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "rebindsOnResume \"provider-limit\"",
+   "fn": "rebindsOnResume",
+   "args": [
+    "provider-limit"
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "exitCodeForOutcome \"provider-limit\"",
+   "fn": "exitCodeForOutcome",
+   "args": [
+    "provider-limit"
+   ],
+   "expected": {
+    "ok": 10
+   }
+  },
+  {
+   "id": "outcomeClass \"blocked\"",
+   "fn": "outcomeClass",
+   "args": [
+    "blocked"
+   ],
+   "expected": {
+    "ok": "blocked"
+   }
+  },
+  {
+   "id": "isVerdict \"blocked\"",
+   "fn": "isVerdict",
+   "args": [
+    "blocked"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isInfrastructure \"blocked\"",
+   "fn": "isInfrastructure",
+   "args": [
+    "blocked"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "rebindsOnResume \"blocked\"",
+   "fn": "rebindsOnResume",
+   "args": [
+    "blocked"
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "exitCodeForOutcome \"blocked\"",
+   "fn": "exitCodeForOutcome",
+   "args": [
+    "blocked"
+   ],
+   "expected": {
+    "ok": 13
+   }
+  },
+  {
+   "id": "outcomeClass \"not-started\"",
+   "fn": "outcomeClass",
+   "args": [
+    "not-started"
+   ],
+   "expected": {
+    "ok": "infrastructure"
+   }
+  },
+  {
+   "id": "isVerdict \"not-started\"",
+   "fn": "isVerdict",
+   "args": [
+    "not-started"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isInfrastructure \"not-started\"",
+   "fn": "isInfrastructure",
+   "args": [
+    "not-started"
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "rebindsOnResume \"not-started\"",
+   "fn": "rebindsOnResume",
+   "args": [
+    "not-started"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "exitCodeForOutcome \"not-started\"",
+   "fn": "exitCodeForOutcome",
+   "args": [
+    "not-started"
+   ],
+   "expected": {
+    "ok": 11
+   }
+  },
+  {
+   "id": "outcomeClass \"undetermined\"",
+   "fn": "outcomeClass",
+   "args": [
+    "undetermined"
+   ],
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "isVerdict \"undetermined\"",
+   "fn": "isVerdict",
+   "args": [
+    "undetermined"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isInfrastructure \"undetermined\"",
+   "fn": "isInfrastructure",
+   "args": [
+    "undetermined"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "rebindsOnResume \"undetermined\"",
+   "fn": "rebindsOnResume",
+   "args": [
+    "undetermined"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "exitCodeForOutcome \"undetermined\"",
+   "fn": "exitCodeForOutcome",
+   "args": [
+    "undetermined"
+   ],
+   "expected": {
+    "ok": 1
+   }
+  },
+  {
+   "id": "outcomeClass \"unknown\"",
+   "fn": "outcomeClass",
+   "args": [
+    "unknown"
+   ],
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "isVerdict \"unknown\"",
+   "fn": "isVerdict",
+   "args": [
+    "unknown"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isInfrastructure \"unknown\"",
+   "fn": "isInfrastructure",
+   "args": [
+    "unknown"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "rebindsOnResume \"unknown\"",
+   "fn": "rebindsOnResume",
+   "args": [
+    "unknown"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "exitCodeForOutcome \"unknown\"",
+   "fn": "exitCodeForOutcome",
+   "args": [
+    "unknown"
+   ],
+   "expected": {
+    "ok": 1
+   }
+  },
+  {
+   "id": "outcomeClass \"\"",
+   "fn": "outcomeClass",
+   "args": [
+    ""
+   ],
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "isVerdict \"\"",
+   "fn": "isVerdict",
+   "args": [
+    ""
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isInfrastructure \"\"",
+   "fn": "isInfrastructure",
+   "args": [
+    ""
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "rebindsOnResume \"\"",
+   "fn": "rebindsOnResume",
+   "args": [
+    ""
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "exitCodeForOutcome \"\"",
+   "fn": "exitCodeForOutcome",
+   "args": [
+    ""
+   ],
+   "expected": {
+    "ok": 1
+   }
+  },
+  {
+   "id": "outcomeClass \"toString\"",
+   "fn": "outcomeClass",
+   "args": [
+    "toString"
+   ],
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "isVerdict \"toString\"",
+   "fn": "isVerdict",
+   "args": [
+    "toString"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "isInfrastructure \"toString\"",
+   "fn": "isInfrastructure",
+   "args": [
+    "toString"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "rebindsOnResume \"toString\"",
+   "fn": "rebindsOnResume",
+   "args": [
+    "toString"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "exitCodeForOutcome partial-writes",
+   "fn": "exitCodeForOutcome",
+   "args": [
+    "partial-writes"
+   ],
+   "expected": {
+    "ok": 12
+   }
+  },
+  {
+   "id": "infrastructure: infrastructure outcome, nothing else",
+   "fn": "infrastructure",
+   "args": [
+    {
+     "outcome": "execution-failure"
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "infrastructure: not-started is infrastructure",
+   "fn": "infrastructure",
+   "args": [
+    {
+     "outcome": "not-started",
+     "results": []
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "infrastructure: a pass is not infrastructure",
+   "fn": "infrastructure",
+   "args": [
+    {
+     "outcome": "pass"
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "infrastructure: out of scope writes rule infrastructure out",
+   "fn": "infrastructure",
+   "args": [
+    {
+     "outcome": "execution-failure",
+     "outOfScope": [
+      "a.txt"
+     ]
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "infrastructure: a refused seat is never infrastructure",
+   "fn": "infrastructure",
+   "args": [
+    {
+     "outcome": "execution-failure",
+     "results": [
+      {
+       "seat": "producer",
+       "refused": {
+        "reason": "x",
+        "detail": "y"
+       }
+      }
+     ]
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "infrastructure: a verdict seat that reached a verdict rules it out",
+   "fn": "infrastructure",
+   "args": [
+    {
+     "outcome": "execution-failure",
+     "results": [
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "pass",
+       "posture": {
+        "readOnly": false,
+        "writer": false,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": true
+       }
+      }
+     ]
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "infrastructure: a verdict seat that failed does not",
+   "fn": "infrastructure",
+   "args": [
+    {
+     "outcome": "execution-failure",
+     "results": [
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "execution-failure",
+       "posture": {
+        "readOnly": false,
+        "writer": false,
+        "forceOutOfProcess": false,
+        "stance": false,
+        "verdict": true
+       }
+      }
+     ]
+    }
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "infrastructure: a pre-fence checker named by role reached a verdict",
+   "fn": "infrastructure",
+   "args": [
+    {
+     "outcome": "execution-failure",
+     "results": [
+      {
+       "role": "red-team-1",
+       "outcome": "findings"
+      }
+     ]
+    }
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "infrastructure: no result at all",
+   "fn": "infrastructure",
+   "args": [
+    {}
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "outcomeAfterScopeRule pass 0",
+   "fn": "outcomeAfterScopeRule",
+   "args": [
+    "pass",
+    []
+   ],
+   "expected": {
+    "ok": "pass"
+   }
+  },
+  {
+   "id": "outcomeAfterScopeRule pass 1",
+   "fn": "outcomeAfterScopeRule",
+   "args": [
+    "pass",
+    [
+     "x"
+    ]
+   ],
+   "expected": {
+    "ok": "findings"
+   }
+  },
+  {
+   "id": "outcomeAfterScopeRule findings 1",
+   "fn": "outcomeAfterScopeRule",
+   "args": [
+    "findings",
+    [
+     "x"
+    ]
+   ],
+   "expected": {
+    "ok": "findings"
+   }
+  },
+  {
+   "id": "outcomeAfterScopeRule blocked 1",
+   "fn": "outcomeAfterScopeRule",
+   "args": [
+    "blocked",
+    [
+     "x"
+    ]
+   ],
+   "expected": {
+    "ok": "blocked"
+   }
+  },
+  {
+   "id": "evaluationsOf: verify, checker verdict, producer and unfinished evaluators",
+   "fn": "evaluationsOf",
+   "args": [
+    [
+     {
+      "seat": "producer",
+      "round": 1,
+      "outcome": "pass",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "outcome": "findings",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "tester",
+      "round": 2,
+      "outcome": "pass",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "red-team",
+      "round": 2,
+      "outcome": "execution-failure",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": true
+      }
+     },
+     {
+      "seat": "verify",
+      "round": 2,
+      "outcome": "pass"
+     },
+     {
+      "role": "verifier",
+      "round": 3,
+      "outcome": "findings"
+     },
+     {
+      "role": "reviewer",
+      "outcome": "pass"
+     },
+     {
+      "seat": "noise",
+      "outcome": "surprise"
+     }
+    ]
+   ],
+   "expected": {
+    "ok": [
+     {
+      "kind": "verdict",
+      "seat": "reviewer",
+      "round": 1,
+      "passed": false
+     },
+     {
+      "kind": "verify",
+      "seat": "verify",
+      "round": 2,
+      "passed": true
+     },
+     {
+      "kind": "verify",
+      "seat": "verifier",
+      "round": 3,
+      "passed": false
+     },
+     {
+      "kind": "verdict",
+      "seat": "reviewer",
+      "round": 1,
+      "passed": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "evaluationsOf: nothing",
+   "fn": "evaluationsOf",
+   "args": [
+    []
+   ],
+   "expected": {
+    "ok": []
+   }
+  }
+ ]
+}

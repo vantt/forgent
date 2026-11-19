@@ -1,0 +1,7151 @@
+{
+ "version": "core-loops-loops.v1",
+ "about": "Loop rules, recorded from src/runner/execution/loops/*.mjs. `cases` are plain functions ({ id, fn, args, expected }). `runs` play a loop with a table of answers: each role call is answered by results[\"<seat>/<round or 1>\"], the n-th verify call by verify[n]; expected holds the loop result and the calls in order (a verify call is { verify: true }; a call lists the seat id, the objective it was told, and the optional round, preferIndependentOf, independentOf, inputs as { seat, round, outcome } and the size of its batch). `history` cases are patternHistoryOutcome calls.",
+ "paramTables": {
+  "solo": {
+   "seats": {
+    "type": "seats",
+    "scalar": false,
+    "requestable": true
+   }
+  },
+  "reviewed": {
+   "maxRounds": {
+    "type": "integer",
+    "domain": "integer >= 1",
+    "scalar": true,
+    "requestable": true
+   },
+   "minCheckers": {
+    "type": "checker-list",
+    "domain": "list of CHECKER_SEATS names",
+    "scalar": false,
+    "requestable": true
+   },
+   "seats": {
+    "type": "seats",
+    "scalar": false,
+    "requestable": true
+   },
+   "roleTasks": {
+    "type": "role-tasks",
+    "domain": "map seat-or-kind to text",
+    "scalar": false,
+    "requestable": false
+   }
+  },
+  "panel": {
+   "seats": {
+    "type": "seats",
+    "scalar": false,
+    "requestable": true
+   },
+   "roleTasks": {
+    "type": "role-tasks",
+    "domain": "map seat-or-kind to text",
+    "scalar": false,
+    "requestable": false
+   }
+  },
+  "debate": {
+   "seats": {
+    "type": "seats",
+    "scalar": false,
+    "requestable": true
+   },
+   "roleTasks": {
+    "type": "role-tasks",
+    "domain": "map seat-or-kind to text",
+    "scalar": false,
+    "requestable": false
+   },
+   "rebuttal": {
+    "type": "boolean",
+    "scalar": true,
+    "requestable": true
+   }
+  }
+ },
+ "defaultRebuttal": true,
+ "cases": [
+  {
+   "id": "roleUnit: synthesizer",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "s-synthesizer",
+     "kind": "synthesizer",
+     "params": {},
+     "findings": []
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "You are the synthesizer for a panel that answered the task below.\nEach panelist's report is listed under Context refs. Read every one.\nState each panelist's position by its seat name, keep any disagreement visible instead of averaging it away, and end with one recommendation and the evidence for it.\nDo not answer the task from scratch.\n\nThe task the panel answered:\nfix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: thesis",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "s-thesis",
+     "kind": "thesis",
+     "params": {},
+     "findings": []
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "You argue one side of a debate. Do not change any file.\nArgue the position the task below states, or when it states none, the strongest current answer to it, with the best evidence you can find. Name the assumptions your case rests on and say what would make you abandon it.\nAnother agent argues the opposite side at the same time; you cannot see its argument, so do not guess at it.\n\nThe task:\nfix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: antithesis",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "s-antithesis",
+     "kind": "antithesis",
+     "params": {},
+     "findings": []
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "You argue the opposing side of a debate. Do not change any file.\nTake the position the task below states (or, when it states none, the strongest current answer to it), find the load-bearing assumptions it rests on, reverse them, and argue the best plan or answer that follows from the opposite assumptions. Argue the strongest opposing case, never a straw man.\nAnother agent argues the original position at the same time; you cannot see its argument, so argue from the assumptions you reversed.\n\nThe task:\nfix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: thesis-rebuttal",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "s-thesis-rebuttal",
+     "kind": "thesis-rebuttal",
+     "params": {},
+     "findings": []
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "You argued one side of a debate and now answer the other side. Do not change any file.\nThe opposing argument is listed under Context refs. Read it, concede what holds, and answer each point that does not, with evidence. Say whether it changes your position and what would.\n\nThe task that was debated:\nfix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: antithesis-rebuttal",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "s-antithesis-rebuttal",
+     "kind": "antithesis-rebuttal",
+     "params": {},
+     "findings": []
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "You argued the opposing side of a debate and now answer the original position. Do not change any file.\nThe original side's argument is listed under Context refs. Read it, concede what holds, and answer each point that does not, with evidence. Say whether it changes your position and what would.\n\nThe task that was debated:\nfix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: judge",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "s-judge",
+     "kind": "judge",
+     "params": {},
+     "findings": []
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "You are the judge of a debate on the task below. Do not change any file and do not argue a side of your own.\nEvery argument and rebuttal of both sides is listed under Context refs. Read all of them.\nRule: which side holds and why, which claims of each side fail (quote them), the decision that follows, and what evidence or change would reverse it. Name the winning side plainly, or say that neither holds and what is still open. Do not average the sides or restate one without ruling.\n\nThe task that was debated:\nfix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: reviewer",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "s-reviewer",
+     "kind": "reviewer",
+     "params": {},
+     "findings": []
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: red-team",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "s-red-team",
+     "kind": "red-team",
+     "params": {},
+     "findings": []
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "You are the red-team for work another agent just did. Do not change any file.\nTry to break the result: wrong claims, missed cases, regressions, and anything the task forbade. The work is the latest commit in this worktree (git log -1, git show HEAD). The producer's own account of it is listed under Context refs.\nReport concrete failures with evidence, or say plainly that you found none.\n\nThe task that was assigned:\nfix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: producer",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "s-producer",
+     "kind": "producer",
+     "params": {},
+     "findings": []
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: panelist",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "s-panelist",
+     "kind": "panelist",
+     "params": {},
+     "findings": []
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: seat named after a kind",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "reviewer"
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: override by seat id wins over kind",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "a",
+     "kind": "reviewer",
+     "params": {
+      "roleTasks": {
+       "a": "Look at {objective} twice",
+       "reviewer": "no"
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "Look at fix the bug twice",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: override without placeholder appends the objective",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "a",
+     "params": {
+      "roleTasks": {
+       "a": "Be brief."
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "Be brief.\n\nfix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: dollar signs in the objective are text",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "cost $& and $1",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "a",
+     "params": {
+      "roleTasks": {
+       "a": "X {objective} Y {objective}"
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "X cost $& and $1 Y cost $& and $1",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: findings are listed for a producer",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "producer",
+     "kind": "producer",
+     "findings": [
+      "one",
+      "two"
+     ]
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "fix the bug\n\nThe previous round's checks reported these findings. Fix them and change nothing else:\n- one\n- two",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: findings after a task",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "a",
+     "kind": "reviewer",
+     "findings": [
+      "x"
+     ]
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix the bug\n\nThe previous round's checks reported these findings. Fix them and change nothing else:\n- x",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: stance options for a panelist",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ],
+     "stanceOptions": [
+      "yes",
+      "no"
+     ]
+    },
+    {
+     "seat": "m1",
+     "kind": "panelist",
+     "stance": true
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "fix the bug\n\nPassive stance measurement for this question. Declared choices: [\"yes\",\"no\"]; \"other\" is also allowed.\nEnd your report by stating your stance and include \"stance\": {\"choice\": <one declared choice or \"other\">, \"confidence\": <number from 0 to 1>} in your result claim. This optional measurement never changes whether your work passes.",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ],
+     "stanceOptions": [
+      "yes",
+      "no"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: stance without options changes nothing",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "m1",
+     "kind": "panelist",
+     "stance": true
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: findings and stance together",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ],
+     "stanceOptions": [
+      "a"
+     ]
+    },
+    {
+     "seat": "m",
+     "kind": "synthesizer",
+     "stance": true,
+     "findings": [
+      "f"
+     ]
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "You are the synthesizer for a panel that answered the task below.\nEach panelist's report is listed under Context refs. Read every one.\nState each panelist's position by its seat name, keep any disagreement visible instead of averaging it away, and end with one recommendation and the evidence for it.\nDo not answer the task from scratch.\n\nThe task the panel answered:\nfix the bug\n\nThe previous round's checks reported these findings. Fix them and change nothing else:\n- f\n\nPassive stance measurement for this question. Declared choices: [\"a\"]; \"other\" is also allowed.\nEnd your report by stating your stance and include \"stance\": {\"choice\": <one declared choice or \"other\">, \"confidence\": <number from 0 to 1>} in your result claim. This optional measurement never changes whether your work passes.",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ],
+     "stanceOptions": [
+      "a"
+     ]
+    }
+   }
+  },
+  {
+   "id": "roleUnit: a non-text override is ignored",
+   "fn": "roleUnit",
+   "args": [
+    {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    {
+     "seat": "a",
+     "kind": "producer",
+     "params": {
+      "roleTasks": {
+       "a": 5
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": {
+     "id": "u",
+     "objective": "fix the bug",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    }
+   }
+  },
+  {
+   "id": "verifySeatResult: pass",
+   "fn": "verifySeatResult",
+   "args": [
+    {
+     "pass": true
+    },
+    3
+   ],
+   "expected": {
+    "ok": {
+     "seat": "verify",
+     "round": 3,
+     "outcome": "pass",
+     "findings": []
+    }
+   }
+  },
+  {
+   "id": "verifySeatResult: findings",
+   "fn": "verifySeatResult",
+   "args": [
+    {
+     "findings": [
+      "x",
+      "y"
+     ]
+    },
+    3
+   ],
+   "expected": {
+    "ok": {
+     "seat": "verify",
+     "round": 3,
+     "outcome": "findings",
+     "findings": [
+      "x",
+      "y"
+     ]
+    }
+   }
+  },
+  {
+   "id": "verifySeatResult: findings default",
+   "fn": "verifySeatResult",
+   "args": [
+    {},
+    3
+   ],
+   "expected": {
+    "ok": {
+     "seat": "verify",
+     "round": 3,
+     "outcome": "findings",
+     "findings": [
+      "Verification failed"
+     ]
+    }
+   }
+  },
+  {
+   "id": "verifySeatResult: timeout",
+   "fn": "verifySeatResult",
+   "args": [
+    {
+     "infrastructure": "timeout",
+     "error": "slow"
+    },
+    3
+   ],
+   "expected": {
+    "ok": {
+     "seat": "verify",
+     "round": 3,
+     "outcome": "execution-failure",
+     "infrastructure": true,
+     "infrastructureReason": "timeout",
+     "error": "slow"
+    }
+   }
+  },
+  {
+   "id": "verifySeatResult: not run",
+   "fn": "verifySeatResult",
+   "args": [
+    {
+     "infrastructure": "not-run"
+    },
+    3
+   ],
+   "expected": {
+    "ok": {
+     "seat": "verify",
+     "round": 3,
+     "outcome": "execution-failure",
+     "infrastructure": true,
+     "infrastructureReason": "not-run"
+    }
+   }
+  },
+  {
+   "id": "verifySeatResult: undefinedAnswer",
+   "fn": "verifySeatResult",
+   "args": [
+    null,
+    3
+   ],
+   "expected": {
+    "ok": {
+     "seat": "verify",
+     "round": 3,
+     "outcome": "findings",
+     "findings": [
+      "Verification failed"
+     ]
+    }
+   }
+  },
+  {
+   "id": "verifyCommandOf: own verify",
+   "fn": "verifyCommandOf",
+   "args": [
+    {
+     "verify": "make"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "verify": "npm test"
+      },
+      "blank": {
+       "verify": "  "
+      },
+      "num": {
+       "verify": 5
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": "make"
+   }
+  },
+  {
+   "id": "verifyCommandOf: capability verify",
+   "fn": "verifyCommandOf",
+   "args": [
+    {
+     "capability": "code:implement"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "verify": "npm test"
+      },
+      "blank": {
+       "verify": "  "
+      },
+      "num": {
+       "verify": 5
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": "npm test"
+   }
+  },
+  {
+   "id": "verifyCommandOf: blank capability verify",
+   "fn": "verifyCommandOf",
+   "args": [
+    {
+     "capability": "blank"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "verify": "npm test"
+      },
+      "blank": {
+       "verify": "  "
+      },
+      "num": {
+       "verify": 5
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "verifyCommandOf: non-string verify",
+   "fn": "verifyCommandOf",
+   "args": [
+    {
+     "capability": "num"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "verify": "npm test"
+      },
+      "blank": {
+       "verify": "  "
+      },
+      "num": {
+       "verify": 5
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "verifyCommandOf: own non-string wins",
+   "fn": "verifyCommandOf",
+   "args": [
+    {
+     "verify": 7,
+     "capability": "code:implement"
+    },
+    {
+     "capabilities": {
+      "code:implement": {
+       "verify": "npm test"
+      },
+      "blank": {
+       "verify": "  "
+      },
+      "num": {
+       "verify": 5
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "verifyCommandOf: none",
+   "fn": "verifyCommandOf",
+   "args": [
+    {},
+    {
+     "capabilities": {
+      "code:implement": {
+       "verify": "npm test"
+      },
+      "blank": {
+       "verify": "  "
+      },
+      "num": {
+       "verify": 5
+      }
+     }
+    }
+   ],
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "extractFindings {\"findings\":[\"a\"]}",
+   "fn": "extractFindings",
+   "args": [
+    {
+     "findings": [
+      "a"
+     ]
+    }
+   ],
+   "expected": {
+    "ok": [
+     "a"
+    ]
+   }
+  },
+  {
+   "id": "extractFindings {\"findings\":[],\"outcome\":\"findings\",\"seat\":\"reviewer\"}",
+   "fn": "extractFindings",
+   "args": [
+    {
+     "findings": [],
+     "outcome": "findings",
+     "seat": "reviewer"
+    }
+   ],
+   "expected": {
+    "ok": [
+     "Seat reviewer reported findings"
+    ]
+   }
+  },
+  {
+   "id": "extractFindings {\"findings\":\"text\"}",
+   "fn": "extractFindings",
+   "args": [
+    {
+     "findings": "text"
+    }
+   ],
+   "expected": {
+    "ok": [
+     "text"
+    ]
+   }
+  },
+  {
+   "id": "extractFindings {\"finding\":\"single\"}",
+   "fn": "extractFindings",
+   "args": [
+    {
+     "finding": "single"
+    }
+   ],
+   "expected": {
+    "ok": [
+     "single"
+    ]
+   }
+  },
+  {
+   "id": "extractFindings {\"outcome\":\"findings\"}",
+   "fn": "extractFindings",
+   "args": [
+    {
+     "outcome": "findings"
+    }
+   ],
+   "expected": {
+    "ok": [
+     "Seat checker reported findings"
+    ]
+   }
+  },
+  {
+   "id": "extractFindings {\"outcome\":\"pass\"}",
+   "fn": "extractFindings",
+   "args": [
+    {
+     "outcome": "pass"
+    }
+   ],
+   "expected": {
+    "ok": []
+   }
+  },
+  {
+   "id": "extractFindings null",
+   "fn": "extractFindings",
+   "args": [
+    null
+   ],
+   "expected": {
+    "ok": []
+   }
+  },
+  {
+   "id": "loopRunsVerify solo",
+   "fn": "loopRunsVerify",
+   "args": [
+    "solo"
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "paramTableOf solo",
+   "fn": "paramTableOf",
+   "args": [
+    "solo"
+   ],
+   "expected": {
+    "ok": {
+     "seats": {
+      "type": "seats",
+      "scalar": false,
+      "requestable": true
+     }
+    }
+   }
+  },
+  {
+   "id": "loopRunsVerify reviewed",
+   "fn": "loopRunsVerify",
+   "args": [
+    "reviewed"
+   ],
+   "expected": {
+    "ok": true
+   }
+  },
+  {
+   "id": "paramTableOf reviewed",
+   "fn": "paramTableOf",
+   "args": [
+    "reviewed"
+   ],
+   "expected": {
+    "ok": {
+     "maxRounds": {
+      "type": "integer",
+      "domain": "integer >= 1",
+      "scalar": true,
+      "requestable": true
+     },
+     "minCheckers": {
+      "type": "checker-list",
+      "domain": "list of CHECKER_SEATS names",
+      "scalar": false,
+      "requestable": true
+     },
+     "seats": {
+      "type": "seats",
+      "scalar": false,
+      "requestable": true
+     },
+     "roleTasks": {
+      "type": "role-tasks",
+      "domain": "map seat-or-kind to text",
+      "scalar": false,
+      "requestable": false
+     }
+    }
+   }
+  },
+  {
+   "id": "loopRunsVerify panel",
+   "fn": "loopRunsVerify",
+   "args": [
+    "panel"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "paramTableOf panel",
+   "fn": "paramTableOf",
+   "args": [
+    "panel"
+   ],
+   "expected": {
+    "ok": {
+     "seats": {
+      "type": "seats",
+      "scalar": false,
+      "requestable": true
+     },
+     "roleTasks": {
+      "type": "role-tasks",
+      "domain": "map seat-or-kind to text",
+      "scalar": false,
+      "requestable": false
+     }
+    }
+   }
+  },
+  {
+   "id": "loopRunsVerify debate",
+   "fn": "loopRunsVerify",
+   "args": [
+    "debate"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "paramTableOf debate",
+   "fn": "paramTableOf",
+   "args": [
+    "debate"
+   ],
+   "expected": {
+    "ok": {
+     "seats": {
+      "type": "seats",
+      "scalar": false,
+      "requestable": true
+     },
+     "roleTasks": {
+      "type": "role-tasks",
+      "domain": "map seat-or-kind to text",
+      "scalar": false,
+      "requestable": false
+     },
+     "rebuttal": {
+      "type": "boolean",
+      "scalar": true,
+      "requestable": true
+     }
+    }
+   }
+  },
+  {
+   "id": "loopRunsVerify swarm",
+   "fn": "loopRunsVerify",
+   "args": [
+    "swarm"
+   ],
+   "expected": {
+    "ok": false
+   }
+  },
+  {
+   "id": "paramTableOf swarm",
+   "fn": "paramTableOf",
+   "args": [
+    "swarm"
+   ],
+   "expected": {
+    "ok": null
+   }
+  }
+ ],
+ "runs": [
+  {
+   "id": "solo passes without a verify command",
+   "loop": "solo",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "solo",
+    "params": {}
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "outcome": "pass"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "outcome": "pass"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix"
+     }
+    ]
+   }
+  },
+  {
+   "id": "solo fails and goes no further",
+   "loop": "solo",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "solo",
+    "params": {}
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "outcome": "execution-failure"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "execution-failure",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "outcome": "execution-failure"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix"
+     }
+    ]
+   }
+  },
+  {
+   "id": "solo passes then verify passes",
+   "loop": "solo",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "solo",
+    "params": {}
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "outcome": "pass"
+    }
+   },
+   "verify": [
+    {
+     "pass": true
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "pass",
+       "findings": []
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix"
+     },
+     {
+      "verify": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "solo verify finds",
+   "loop": "solo",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "solo",
+    "params": {}
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "outcome": "pass"
+    }
+   },
+   "verify": [
+    {
+     "findings": [
+      "lint"
+     ]
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "findings",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "findings",
+       "findings": [
+        "lint"
+       ]
+      }
+     ],
+     "findings": [
+      "lint"
+     ]
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix"
+     },
+     {
+      "verify": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "solo verify cannot run",
+   "loop": "solo",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "solo",
+    "params": {}
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "outcome": "pass"
+    }
+   },
+   "verify": [
+    {
+     "infrastructure": "timeout",
+     "error": "slow"
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "execution-failure",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "execution-failure",
+       "infrastructure": true,
+       "infrastructureReason": "timeout",
+       "error": "slow"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix"
+     },
+     {
+      "verify": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "solo reuses a passed producer and passed verify",
+   "loop": "solo",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "solo",
+    "params": {}
+   },
+   "history": [
+    {
+     "seat": "producer",
+     "outcome": "pass"
+    },
+    {
+     "seat": "verify",
+     "round": 1,
+     "outcome": "pass",
+     "findings": []
+    }
+   ],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {},
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "pass",
+       "findings": []
+      }
+     ]
+    },
+    "calls": []
+   }
+  },
+  {
+   "id": "solo reuses a passed producer and runs verify",
+   "loop": "solo",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "solo",
+    "params": {}
+   },
+   "history": [
+    {
+     "seat": "producer",
+     "outcome": "pass"
+    }
+   ],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {},
+   "verify": [
+    {
+     "pass": true
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "pass",
+       "findings": []
+      }
+     ]
+    },
+    "calls": [
+     {
+      "verify": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "solo with a declared seat",
+   "loop": "solo",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "solo",
+    "params": {
+     "seats": [
+      {
+       "seat": "maker",
+       "role": "producer"
+      }
+     ]
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "maker/1": {
+     "seat": "maker",
+     "outcome": "blocked"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "blocked",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "maker",
+       "outcome": "blocked"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "maker",
+      "objective": "fix"
+     }
+    ]
+   }
+  },
+  {
+   "id": "solo with a bad seat declaration",
+   "loop": "solo",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "solo",
+    "params": {
+     "seats": [
+      {
+       "seat": "maker",
+       "role": "judge"
+      }
+     ]
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {},
+   "verify": [],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seat-multiplicity",
+     "message": "a solo unit declares exactly one seat, with role \"producer\""
+    },
+    "calls": []
+   }
+  },
+  {
+   "id": "reviewed passes in one round",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "pass"
+    }
+   },
+   "verify": [
+    {
+     "pass": true
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "pass",
+       "findings": []
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed finds, the producer fixes, the second round passes",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "findings",
+     "findings": [
+      "missing test",
+      "typo"
+     ]
+    },
+    "producer/2": {
+     "seat": "producer",
+     "round": 2,
+     "outcome": "pass"
+    },
+    "reviewer/2": {
+     "seat": "reviewer",
+     "round": 2,
+     "outcome": "pass"
+    }
+   },
+   "verify": [
+    {
+     "pass": true
+    },
+    {
+     "pass": true
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 2,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "findings",
+       "findings": [
+        "missing test",
+        "typo"
+       ]
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "pass",
+       "findings": []
+      },
+      {
+       "seat": "producer",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 2,
+       "outcome": "pass",
+       "findings": []
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     },
+     {
+      "seat": "producer",
+      "objective": "fix\n\nThe previous round's checks reported these findings. Fix them and change nothing else:\n- missing test\n- typo",
+      "round": 2
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 2,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 2,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed keeps finding to the last round",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 2
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "findings",
+     "findings": [
+      "a"
+     ]
+    },
+    "producer/2": {
+     "seat": "producer",
+     "round": 2,
+     "outcome": "pass"
+    },
+    "reviewer/2": {
+     "seat": "reviewer",
+     "round": 2,
+     "outcome": "findings",
+     "findings": [
+      "b"
+     ]
+    }
+   },
+   "verify": [
+    {
+     "findings": [
+      "v1"
+     ]
+    },
+    {
+     "findings": [
+      "v2"
+     ]
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "findings",
+     "rounds": 2,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "findings",
+       "findings": [
+        "a"
+       ]
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "findings",
+       "findings": [
+        "v1"
+       ]
+      },
+      {
+       "seat": "producer",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 2,
+       "outcome": "findings",
+       "findings": [
+        "b"
+       ]
+      },
+      {
+       "seat": "verify",
+       "round": 2,
+       "outcome": "findings",
+       "findings": [
+        "v2"
+       ]
+      }
+     ],
+     "findings": [
+      "a",
+      "v1",
+      "b",
+      "v2"
+     ]
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     },
+     {
+      "seat": "producer",
+      "objective": "fix\n\nThe previous round's checks reported these findings. Fix them and change nothing else:\n- a\n- v1",
+      "round": 2
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 2,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 2,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed verify alone finds",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "producer/2": {
+     "seat": "producer",
+     "round": 2,
+     "outcome": "pass"
+    },
+    "reviewer/2": {
+     "seat": "reviewer",
+     "round": 2,
+     "outcome": "pass"
+    }
+   },
+   "verify": [
+    {
+     "findings": [
+      "lint"
+     ]
+    },
+    {
+     "pass": true
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 2,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "findings",
+       "findings": [
+        "lint"
+       ]
+      },
+      {
+       "seat": "producer",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 2,
+       "outcome": "pass",
+       "findings": []
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     },
+     {
+      "seat": "producer",
+      "objective": "fix\n\nThe previous round's checks reported these findings. Fix them and change nothing else:\n- lint",
+      "round": 2
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 2,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 2,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed verify cannot run ends the round in error",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "pass"
+    }
+   },
+   "verify": [
+    {
+     "infrastructure": "not-run"
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "execution-failure",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "execution-failure",
+       "infrastructure": true,
+       "infrastructureReason": "not-run"
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed producer fails",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "provider-limit"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "provider-limit",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "provider-limit"
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed producer that changed nothing still goes to its checks",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "execution-failure",
+     "runResult": {
+      "classification": {
+       "confidence": {
+        "level": "no-evidence"
+       },
+       "assessment": {
+        "verdict": "inconclusive"
+       }
+      }
+     }
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "pass"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "execution-failure",
+       "runResult": {
+        "classification": {
+         "confidence": {
+          "level": "no-evidence"
+         },
+         "assessment": {
+          "verdict": "inconclusive"
+         }
+        }
+       }
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "pass"
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "execution-failure"
+       }
+      ],
+      "batch": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed producer that crashed stops even with a classification",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "execution-failure",
+     "runResult": {
+      "classification": {
+       "confidence": {
+        "level": "no-evidence"
+       },
+       "assessment": {
+        "verdict": "inconclusive"
+       },
+       "failure": {
+        "kind": "crash"
+       }
+      }
+     }
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "execution-failure",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "execution-failure",
+       "runResult": {
+        "classification": {
+         "confidence": {
+          "level": "no-evidence"
+         },
+         "assessment": {
+          "verdict": "inconclusive"
+         },
+         "failure": {
+          "kind": "crash"
+         }
+        }
+       }
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed a checker fails",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "blocked"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "blocked",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "blocked"
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed high rigor needs distinct families and two checkers",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ],
+    "rigor": "high"
+   },
+   "cfg": {
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "red-team/1": {
+     "seat": "red-team",
+     "round": 1,
+     "outcome": "pass"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "red-team",
+       "round": 1,
+       "outcome": "pass"
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer",
+       "red-team"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "red-team",
+      "objective": "You are the red-team for work another agent just did. Do not change any file.\nTry to break the result: wrong claims, missed cases, regressions, and anything the task forbade. The work is the latest commit in this worktree (git log -1, git show HEAD). The producer's own account of it is listed under Context refs.\nReport concrete failures with evidence, or say plainly that you found none.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer",
+       "reviewer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed resumes a fully settled history",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [
+    {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "findings",
+     "findings": [
+      "a"
+     ]
+    },
+    {
+     "seat": "verify",
+     "round": 1,
+     "outcome": "pass",
+     "findings": []
+    }
+   ],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/2": {
+     "seat": "producer",
+     "round": 2,
+     "outcome": "pass"
+    },
+    "reviewer/2": {
+     "seat": "reviewer",
+     "round": 2,
+     "outcome": "pass"
+    }
+   },
+   "verify": [
+    {
+     "pass": true
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 2,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "findings",
+       "findings": [
+        "a"
+       ]
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "pass",
+       "findings": []
+      },
+      {
+       "seat": "producer",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 2,
+       "outcome": "pass",
+       "findings": []
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix\n\nThe previous round's checks reported these findings. Fix them and change nothing else:\n- a",
+      "round": 2
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 2,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 2,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed resumes a round whose checker never reported",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [
+    {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    }
+   ],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "pass"
+    }
+   },
+   "verify": [
+    {
+     "pass": true
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "pass",
+       "findings": []
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed resumes with a failed checker rerun and passed verify reused",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [
+    {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "execution-failure"
+    },
+    {
+     "seat": "verify",
+     "round": 1,
+     "outcome": "pass",
+     "findings": []
+    }
+   ],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "pass"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "execution-failure",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "execution-failure"
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "pass",
+       "findings": []
+      }
+     ],
+     "findings": []
+    },
+    "calls": []
+   }
+  },
+  {
+   "id": "reviewed resume ends on a settled error",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [
+    {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "blocked"
+    }
+   ],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {},
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "blocked",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "blocked"
+      }
+     ],
+     "findings": []
+    },
+    "calls": []
+   }
+  },
+  {
+   "id": "reviewed a seat-launch ceiling stops the second round",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": 1,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "findings",
+     "findings": [
+      "a"
+     ]
+    }
+   },
+   "verify": [
+    {
+     "pass": true
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "findings",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "findings",
+       "findings": [
+        "a"
+       ]
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "pass",
+       "findings": []
+      }
+     ],
+     "findings": [
+      "a"
+     ]
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed a ceiling with room lets the second round run",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": 5,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "findings",
+     "findings": [
+      "a"
+     ]
+    },
+    "producer/2": {
+     "seat": "producer",
+     "round": 2,
+     "outcome": "pass"
+    },
+    "reviewer/2": {
+     "seat": "reviewer",
+     "round": 2,
+     "outcome": "pass"
+    }
+   },
+   "verify": [
+    {
+     "pass": true
+    },
+    {
+     "pass": true
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 2,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "findings",
+       "findings": [
+        "a"
+       ]
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "pass",
+       "findings": []
+      },
+      {
+       "seat": "producer",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 2,
+       "outcome": "pass",
+       "findings": []
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     },
+     {
+      "seat": "producer",
+      "objective": "fix\n\nThe previous round's checks reported these findings. Fix them and change nothing else:\n- a",
+      "round": 2
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 2,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 2,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed declared seats with a tester",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 1,
+     "minCheckers": [
+      "tester"
+     ],
+     "seats": [
+      {
+       "seat": "maker",
+       "role": "producer"
+      },
+      {
+       "seat": "look",
+       "role": "reviewer"
+      },
+      {
+       "seat": "run",
+       "role": "reviewer"
+      }
+     ]
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "maker/1": {
+     "seat": "maker",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "look/1": {
+     "seat": "look",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "run/1": {
+     "seat": "run",
+     "round": 1,
+     "outcome": "findings"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "findings",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "maker",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "look",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "run",
+       "round": 1,
+       "outcome": "findings"
+      }
+     ],
+     "findings": [
+      "Seat run reported findings"
+     ]
+    },
+    "calls": [
+     {
+      "seat": "maker",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "look",
+      "objective": "fix",
+      "round": 1,
+      "independentOf": [
+       "maker"
+      ],
+      "inputs": [
+       {
+        "seat": "maker",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "run",
+      "objective": "fix",
+      "round": 1,
+      "independentOf": [
+       "maker"
+      ],
+      "inputs": [
+       {
+        "seat": "maker",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed without maxRounds is refused",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {}
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {},
+   "verify": [],
+   "expected": {
+    "error": {
+     "class": "Error",
+     "code": "reviewed-max-rounds-missing",
+     "message": "the reviewed loop needs params.maxRounds, an integer >= 1 from runner.loops.reviewed.maxRounds in the effective config, got undefined"
+    },
+    "calls": []
+   }
+  },
+  {
+   "id": "reviewed with a bad maxRounds is refused",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 0
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {},
+   "verify": [],
+   "expected": {
+    "error": {
+     "class": "Error",
+     "code": "reviewed-max-rounds-missing",
+     "message": "the reviewed loop needs params.maxRounds, an integer >= 1 from runner.loops.reviewed.maxRounds in the effective config, got 0"
+    },
+    "calls": []
+   }
+  },
+  {
+   "id": "reviewed with a bad rigor is refused",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ],
+    "rigor": "extreme"
+   },
+   "cfg": {
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {},
+   "verify": [],
+   "expected": {
+    "error": {
+     "class": "RangeError",
+     "code": "",
+     "message": "invalid rigor \"extreme\". Valid rigors: [low, standard, high, critical]"
+    },
+    "calls": []
+   }
+  },
+  {
+   "id": "reviewed gets the default red-team for code work",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": {
+    "standard": [
+     "reviewer"
+    ]
+   },
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "red-team/1": {
+     "seat": "red-team",
+     "round": 1,
+     "outcome": "findings",
+     "findings": [
+      "x"
+     ]
+    },
+    "producer/2": {
+     "seat": "producer",
+     "round": 2,
+     "outcome": "pass"
+    },
+    "reviewer/2": {
+     "seat": "reviewer",
+     "round": 2,
+     "outcome": "pass"
+    },
+    "red-team/2": {
+     "seat": "red-team",
+     "round": 2,
+     "outcome": "pass"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 2,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "red-team",
+       "round": 1,
+       "outcome": "findings",
+       "findings": [
+        "x"
+       ]
+      },
+      {
+       "seat": "producer",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "red-team",
+       "round": 2,
+       "outcome": "pass"
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "red-team",
+      "objective": "You are the red-team for work another agent just did. Do not change any file.\nTry to break the result: wrong claims, missed cases, regressions, and anything the task forbade. The work is the latest commit in this worktree (git log -1, git show HEAD). The producer's own account of it is listed under Context refs.\nReport concrete failures with evidence, or say plainly that you found none.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "producer",
+      "objective": "fix\n\nThe previous round's checks reported these findings. Fix them and change nothing else:\n- x",
+      "round": 2
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 2,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 2,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "red-team",
+      "objective": "You are the red-team for work another agent just did. Do not change any file.\nTry to break the result: wrong claims, missed cases, regressions, and anything the task forbade. The work is the latest commit in this worktree (git log -1, git show HEAD). The producer's own account of it is listed under Context refs.\nReport concrete failures with evidence, or say plainly that you found none.\n\nThe task that was assigned:\nfix",
+      "round": 2,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 2,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "reviewed uses the shipped checker table",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": {
+    "standard": [
+     "reviewer"
+    ]
+   },
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "pass"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "pass"
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "panel members then the synthesizer",
+   "loop": "panel",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ],
+    "stanceOptions": [
+     "a",
+     "b"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "panel",
+    "params": {
+     "seats": [
+      {
+       "seat": "m1",
+       "role": "producer"
+      },
+      {
+       "seat": "m2",
+       "role": "producer"
+      },
+      {
+       "seat": "sum",
+       "role": "synthesizer"
+      }
+     ]
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "m1/1": {
+     "seat": "m1",
+     "outcome": "pass"
+    },
+    "m2/1": {
+     "seat": "m2",
+     "outcome": "pass"
+    },
+    "sum/1": {
+     "seat": "sum",
+     "outcome": "pass"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "results": [
+      {
+       "seat": "m1",
+       "outcome": "pass"
+      },
+      {
+       "seat": "m2",
+       "outcome": "pass"
+      },
+      {
+       "seat": "sum",
+       "outcome": "pass"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "m1",
+      "objective": "fix\n\nPassive stance measurement for this question. Declared choices: [\"a\",\"b\"]; \"other\" is also allowed.\nEnd your report by stating your stance and include \"stance\": {\"choice\": <one declared choice or \"other\">, \"confidence\": <number from 0 to 1>} in your result claim. This optional measurement never changes whether your work passes.",
+      "preferIndependentOf": [
+       "m2"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "m2",
+      "objective": "fix\n\nPassive stance measurement for this question. Declared choices: [\"a\",\"b\"]; \"other\" is also allowed.\nEnd your report by stating your stance and include \"stance\": {\"choice\": <one declared choice or \"other\">, \"confidence\": <number from 0 to 1>} in your result claim. This optional measurement never changes whether your work passes.",
+      "preferIndependentOf": [
+       "m1"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "sum",
+      "objective": "You are the synthesizer for a panel that answered the task below.\nEach panelist's report is listed under Context refs. Read every one.\nState each panelist's position by its seat name, keep any disagreement visible instead of averaging it away, and end with one recommendation and the evidence for it.\nDo not answer the task from scratch.\n\nThe task the panel answered:\nfix",
+      "preferIndependentOf": [
+       "m1",
+       "m2"
+      ],
+      "inputs": [
+       {
+        "seat": "m1",
+        "outcome": "pass"
+       },
+       {
+        "seat": "m2",
+        "outcome": "pass"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "panel a member fails",
+   "loop": "panel",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "panel",
+    "params": {
+     "seats": [
+      {
+       "seat": "m1",
+       "role": "producer"
+      },
+      {
+       "seat": "m2",
+       "role": "producer"
+      },
+      {
+       "seat": "sum",
+       "role": "synthesizer"
+      }
+     ]
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "m1/1": {
+     "seat": "m1",
+     "outcome": "pass"
+    },
+    "m2/1": {
+     "seat": "m2",
+     "outcome": "provider-limit"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "provider-limit",
+     "results": [
+      {
+       "seat": "m1",
+       "outcome": "pass"
+      },
+      {
+       "seat": "m2",
+       "outcome": "provider-limit"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "m1",
+      "objective": "fix",
+      "preferIndependentOf": [
+       "m2"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "m2",
+      "objective": "fix",
+      "preferIndependentOf": [
+       "m1"
+      ],
+      "batch": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "panel reuses passed members",
+   "loop": "panel",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "panel",
+    "params": {
+     "seats": [
+      {
+       "seat": "m1",
+       "role": "producer"
+      },
+      {
+       "seat": "m2",
+       "role": "producer"
+      },
+      {
+       "seat": "sum",
+       "role": "synthesizer"
+      }
+     ]
+    }
+   },
+   "history": [
+    {
+     "seat": "m1",
+     "outcome": "pass"
+    }
+   ],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "m2/1": {
+     "seat": "m2",
+     "outcome": "pass"
+    },
+    "sum/1": {
+     "seat": "sum",
+     "outcome": "findings"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "findings",
+     "results": [
+      {
+       "seat": "m1",
+       "outcome": "pass"
+      },
+      {
+       "seat": "m2",
+       "outcome": "pass"
+      },
+      {
+       "seat": "sum",
+       "outcome": "findings"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "m2",
+      "objective": "fix",
+      "preferIndependentOf": [
+       "m1"
+      ],
+      "batch": 1
+     },
+     {
+      "seat": "sum",
+      "objective": "You are the synthesizer for a panel that answered the task below.\nEach panelist's report is listed under Context refs. Read every one.\nState each panelist's position by its seat name, keep any disagreement visible instead of averaging it away, and end with one recommendation and the evidence for it.\nDo not answer the task from scratch.\n\nThe task the panel answered:\nfix",
+      "preferIndependentOf": [
+       "m1",
+       "m2"
+      ],
+      "inputs": [
+       {
+        "seat": "m1",
+        "outcome": "pass"
+       },
+       {
+        "seat": "m2",
+        "outcome": "pass"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "panel reuses everything",
+   "loop": "panel",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "panel",
+    "params": {
+     "seats": [
+      {
+       "seat": "m1",
+       "role": "producer"
+      },
+      {
+       "seat": "m2",
+       "role": "producer"
+      },
+      {
+       "seat": "sum",
+       "role": "synthesizer"
+      }
+     ]
+    }
+   },
+   "history": [
+    {
+     "seat": "m1",
+     "outcome": "pass"
+    },
+    {
+     "seat": "m2",
+     "outcome": "pass"
+    },
+    {
+     "seat": "sum",
+     "outcome": "pass"
+    }
+   ],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {},
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "results": [
+      {
+       "seat": "m1",
+       "outcome": "pass"
+      },
+      {
+       "seat": "m2",
+       "outcome": "pass"
+      },
+      {
+       "seat": "sum",
+       "outcome": "pass"
+      }
+     ]
+    },
+    "calls": []
+   }
+  },
+  {
+   "id": "panel role task override",
+   "loop": "panel",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "panel",
+    "params": {
+     "seats": [
+      {
+       "seat": "m1",
+       "role": "producer"
+      },
+      {
+       "seat": "m2",
+       "role": "producer"
+      },
+      {
+       "seat": "sum",
+       "role": "synthesizer"
+      }
+     ],
+     "roleTasks": {
+      "sum": "Merge: {objective}"
+     }
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "m1/1": {
+     "seat": "m1",
+     "outcome": "pass"
+    },
+    "m2/1": {
+     "seat": "m2",
+     "outcome": "pass"
+    },
+    "sum/1": {
+     "seat": "sum",
+     "outcome": "pass"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "results": [
+      {
+       "seat": "m1",
+       "outcome": "pass"
+      },
+      {
+       "seat": "m2",
+       "outcome": "pass"
+      },
+      {
+       "seat": "sum",
+       "outcome": "pass"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "m1",
+      "objective": "fix",
+      "preferIndependentOf": [
+       "m2"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "m2",
+      "objective": "fix",
+      "preferIndependentOf": [
+       "m1"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "sum",
+      "objective": "Merge: fix",
+      "preferIndependentOf": [
+       "m1",
+       "m2"
+      ],
+      "inputs": [
+       {
+        "seat": "m1",
+        "outcome": "pass"
+       },
+       {
+        "seat": "m2",
+        "outcome": "pass"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "panel without seats is refused",
+   "loop": "panel",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "panel",
+    "params": {}
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {},
+   "verify": [],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seats-required",
+     "message": "a panel unit must declare its seats: producers as members and one synthesizer"
+    },
+    "calls": []
+   }
+  },
+  {
+   "id": "debate with rebuttal",
+   "loop": "debate",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "debate",
+    "params": {
+     "seats": [
+      {
+       "seat": "pro",
+       "role": "producer"
+      },
+      {
+       "seat": "con",
+       "role": "producer"
+      },
+      {
+       "seat": "judge",
+       "role": "judge"
+      }
+     ]
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "pro/1": {
+     "seat": "pro",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "con/1": {
+     "seat": "con",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "pro/2": {
+     "seat": "pro",
+     "round": 2,
+     "outcome": "pass"
+    },
+    "con/2": {
+     "seat": "con",
+     "round": 2,
+     "outcome": "pass"
+    },
+    "judge/1": {
+     "seat": "judge",
+     "outcome": "pass"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 2,
+     "results": [
+      {
+       "seat": "pro",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "con",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "pro",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "con",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "judge",
+       "outcome": "pass"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "pro",
+      "objective": "You argue one side of a debate. Do not change any file.\nArgue the position the task below states, or when it states none, the strongest current answer to it, with the best evidence you can find. Name the assumptions your case rests on and say what would make you abandon it.\nAnother agent argues the opposite side at the same time; you cannot see its argument, so do not guess at it.\n\nThe task:\nfix",
+      "round": 1,
+      "preferIndependentOf": [
+       "con"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "con",
+      "objective": "You argue the opposing side of a debate. Do not change any file.\nTake the position the task below states (or, when it states none, the strongest current answer to it), find the load-bearing assumptions it rests on, reverse them, and argue the best plan or answer that follows from the opposite assumptions. Argue the strongest opposing case, never a straw man.\nAnother agent argues the original position at the same time; you cannot see its argument, so argue from the assumptions you reversed.\n\nThe task:\nfix",
+      "round": 1,
+      "preferIndependentOf": [
+       "pro"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "pro",
+      "objective": "You argued one side of a debate and now answer the other side. Do not change any file.\nThe opposing argument is listed under Context refs. Read it, concede what holds, and answer each point that does not, with evidence. Say whether it changes your position and what would.\n\nThe task that was debated:\nfix",
+      "round": 2,
+      "preferIndependentOf": [
+       "con"
+      ],
+      "inputs": [
+       {
+        "seat": "con",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "con",
+      "objective": "You argued the opposing side of a debate and now answer the original position. Do not change any file.\nThe original side's argument is listed under Context refs. Read it, concede what holds, and answer each point that does not, with evidence. Say whether it changes your position and what would.\n\nThe task that was debated:\nfix",
+      "round": 2,
+      "preferIndependentOf": [
+       "pro"
+      ],
+      "inputs": [
+       {
+        "seat": "pro",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "judge",
+      "objective": "You are the judge of a debate on the task below. Do not change any file and do not argue a side of your own.\nEvery argument and rebuttal of both sides is listed under Context refs. Read all of them.\nRule: which side holds and why, which claims of each side fail (quote them), the decision that follows, and what evidence or change would reverse it. Name the winning side plainly, or say that neither holds and what is still open. Do not average the sides or restate one without ruling.\n\nThe task that was debated:\nfix",
+      "independentOf": [
+       "pro",
+       "con"
+      ],
+      "inputs": [
+       {
+        "seat": "pro",
+        "round": 1,
+        "outcome": "pass"
+       },
+       {
+        "seat": "con",
+        "round": 1,
+        "outcome": "pass"
+       },
+       {
+        "seat": "pro",
+        "round": 2,
+        "outcome": "pass"
+       },
+       {
+        "seat": "con",
+        "round": 2,
+        "outcome": "pass"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "debate without rebuttal",
+   "loop": "debate",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "debate",
+    "params": {
+     "seats": [
+      {
+       "seat": "pro",
+       "role": "producer"
+      },
+      {
+       "seat": "con",
+       "role": "producer"
+      },
+      {
+       "seat": "judge",
+       "role": "judge"
+      }
+     ],
+     "rebuttal": false
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "pro/1": {
+     "seat": "pro",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "con/1": {
+     "seat": "con",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "judge/1": {
+     "seat": "judge",
+     "outcome": "findings"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "findings",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "pro",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "con",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "judge",
+       "outcome": "findings"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "pro",
+      "objective": "You argue one side of a debate. Do not change any file.\nArgue the position the task below states, or when it states none, the strongest current answer to it, with the best evidence you can find. Name the assumptions your case rests on and say what would make you abandon it.\nAnother agent argues the opposite side at the same time; you cannot see its argument, so do not guess at it.\n\nThe task:\nfix",
+      "round": 1,
+      "preferIndependentOf": [
+       "con"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "con",
+      "objective": "You argue the opposing side of a debate. Do not change any file.\nTake the position the task below states (or, when it states none, the strongest current answer to it), find the load-bearing assumptions it rests on, reverse them, and argue the best plan or answer that follows from the opposite assumptions. Argue the strongest opposing case, never a straw man.\nAnother agent argues the original position at the same time; you cannot see its argument, so argue from the assumptions you reversed.\n\nThe task:\nfix",
+      "round": 1,
+      "preferIndependentOf": [
+       "pro"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "judge",
+      "objective": "You are the judge of a debate on the task below. Do not change any file and do not argue a side of your own.\nEvery argument and rebuttal of both sides is listed under Context refs. Read all of them.\nRule: which side holds and why, which claims of each side fail (quote them), the decision that follows, and what evidence or change would reverse it. Name the winning side plainly, or say that neither holds and what is still open. Do not average the sides or restate one without ruling.\n\nThe task that was debated:\nfix",
+      "independentOf": [
+       "pro",
+       "con"
+      ],
+      "inputs": [
+       {
+        "seat": "pro",
+        "round": 1,
+        "outcome": "pass"
+       },
+       {
+        "seat": "con",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "debate a side fails in round one",
+   "loop": "debate",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "debate",
+    "params": {
+     "seats": [
+      {
+       "seat": "pro",
+       "role": "producer"
+      },
+      {
+       "seat": "con",
+       "role": "producer"
+      },
+      {
+       "seat": "judge",
+       "role": "judge"
+      }
+     ]
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "pro/1": {
+     "seat": "pro",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "con/1": {
+     "seat": "con",
+     "round": 1,
+     "outcome": "blocked"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "blocked",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "pro",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "con",
+       "round": 1,
+       "outcome": "blocked"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "pro",
+      "objective": "You argue one side of a debate. Do not change any file.\nArgue the position the task below states, or when it states none, the strongest current answer to it, with the best evidence you can find. Name the assumptions your case rests on and say what would make you abandon it.\nAnother agent argues the opposite side at the same time; you cannot see its argument, so do not guess at it.\n\nThe task:\nfix",
+      "round": 1,
+      "preferIndependentOf": [
+       "con"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "con",
+      "objective": "You argue the opposing side of a debate. Do not change any file.\nTake the position the task below states (or, when it states none, the strongest current answer to it), find the load-bearing assumptions it rests on, reverse them, and argue the best plan or answer that follows from the opposite assumptions. Argue the strongest opposing case, never a straw man.\nAnother agent argues the original position at the same time; you cannot see its argument, so argue from the assumptions you reversed.\n\nThe task:\nfix",
+      "round": 1,
+      "preferIndependentOf": [
+       "pro"
+      ],
+      "batch": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "debate a side fails in round two",
+   "loop": "debate",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "debate",
+    "params": {
+     "seats": [
+      {
+       "seat": "pro",
+       "role": "producer"
+      },
+      {
+       "seat": "con",
+       "role": "producer"
+      },
+      {
+       "seat": "judge",
+       "role": "judge"
+      }
+     ]
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "pro/1": {
+     "seat": "pro",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "con/1": {
+     "seat": "con",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "pro/2": {
+     "seat": "pro",
+     "round": 2,
+     "outcome": "execution-failure"
+    },
+    "con/2": {
+     "seat": "con",
+     "round": 2,
+     "outcome": "pass"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "execution-failure",
+     "rounds": 2,
+     "results": [
+      {
+       "seat": "pro",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "con",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "pro",
+       "round": 2,
+       "outcome": "execution-failure"
+      },
+      {
+       "seat": "con",
+       "round": 2,
+       "outcome": "pass"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "pro",
+      "objective": "You argue one side of a debate. Do not change any file.\nArgue the position the task below states, or when it states none, the strongest current answer to it, with the best evidence you can find. Name the assumptions your case rests on and say what would make you abandon it.\nAnother agent argues the opposite side at the same time; you cannot see its argument, so do not guess at it.\n\nThe task:\nfix",
+      "round": 1,
+      "preferIndependentOf": [
+       "con"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "con",
+      "objective": "You argue the opposing side of a debate. Do not change any file.\nTake the position the task below states (or, when it states none, the strongest current answer to it), find the load-bearing assumptions it rests on, reverse them, and argue the best plan or answer that follows from the opposite assumptions. Argue the strongest opposing case, never a straw man.\nAnother agent argues the original position at the same time; you cannot see its argument, so argue from the assumptions you reversed.\n\nThe task:\nfix",
+      "round": 1,
+      "preferIndependentOf": [
+       "pro"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "pro",
+      "objective": "You argued one side of a debate and now answer the other side. Do not change any file.\nThe opposing argument is listed under Context refs. Read it, concede what holds, and answer each point that does not, with evidence. Say whether it changes your position and what would.\n\nThe task that was debated:\nfix",
+      "round": 2,
+      "preferIndependentOf": [
+       "con"
+      ],
+      "inputs": [
+       {
+        "seat": "con",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "con",
+      "objective": "You argued the opposing side of a debate and now answer the original position. Do not change any file.\nThe original side's argument is listed under Context refs. Read it, concede what holds, and answer each point that does not, with evidence. Say whether it changes your position and what would.\n\nThe task that was debated:\nfix",
+      "round": 2,
+      "preferIndependentOf": [
+       "pro"
+      ],
+      "inputs": [
+       {
+        "seat": "pro",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "debate reuses round one and the judge",
+   "loop": "debate",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "debate",
+    "params": {
+     "seats": [
+      {
+       "seat": "pro",
+       "role": "producer"
+      },
+      {
+       "seat": "con",
+       "role": "producer"
+      },
+      {
+       "seat": "judge",
+       "role": "judge"
+      }
+     ]
+    }
+   },
+   "history": [
+    {
+     "seat": "pro",
+     "round": 1,
+     "outcome": "pass"
+    },
+    {
+     "seat": "con",
+     "round": 1,
+     "outcome": "pass"
+    },
+    {
+     "seat": "judge",
+     "outcome": "pass"
+    }
+   ],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "pro/2": {
+     "seat": "pro",
+     "round": 2,
+     "outcome": "pass"
+    },
+    "con/2": {
+     "seat": "con",
+     "round": 2,
+     "outcome": "pass"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 2,
+     "results": [
+      {
+       "seat": "pro",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "con",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "pro",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "con",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "judge",
+       "outcome": "pass"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "pro",
+      "objective": "You argued one side of a debate and now answer the other side. Do not change any file.\nThe opposing argument is listed under Context refs. Read it, concede what holds, and answer each point that does not, with evidence. Say whether it changes your position and what would.\n\nThe task that was debated:\nfix",
+      "round": 2,
+      "preferIndependentOf": [
+       "con"
+      ],
+      "inputs": [
+       {
+        "seat": "con",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "con",
+      "objective": "You argued the opposing side of a debate and now answer the original position. Do not change any file.\nThe original side's argument is listed under Context refs. Read it, concede what holds, and answer each point that does not, with evidence. Say whether it changes your position and what would.\n\nThe task that was debated:\nfix",
+      "round": 2,
+      "preferIndependentOf": [
+       "pro"
+      ],
+      "inputs": [
+       {
+        "seat": "pro",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     }
+    ]
+   }
+  },
+  {
+   "id": "debate rebuttal false as null still rebuts",
+   "loop": "debate",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "debate",
+    "params": {
+     "seats": [
+      {
+       "seat": "pro",
+       "role": "producer"
+      },
+      {
+       "seat": "con",
+       "role": "producer"
+      },
+      {
+       "seat": "judge",
+       "role": "judge"
+      }
+     ],
+     "rebuttal": null
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "pro/1": {
+     "seat": "pro",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "con/1": {
+     "seat": "con",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "pro/2": {
+     "seat": "pro",
+     "round": 2,
+     "outcome": "pass"
+    },
+    "con/2": {
+     "seat": "con",
+     "round": 2,
+     "outcome": "pass"
+    },
+    "judge/1": {
+     "seat": "judge",
+     "outcome": "pass"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 2,
+     "results": [
+      {
+       "seat": "pro",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "con",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "pro",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "con",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "judge",
+       "outcome": "pass"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "pro",
+      "objective": "You argue one side of a debate. Do not change any file.\nArgue the position the task below states, or when it states none, the strongest current answer to it, with the best evidence you can find. Name the assumptions your case rests on and say what would make you abandon it.\nAnother agent argues the opposite side at the same time; you cannot see its argument, so do not guess at it.\n\nThe task:\nfix",
+      "round": 1,
+      "preferIndependentOf": [
+       "con"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "con",
+      "objective": "You argue the opposing side of a debate. Do not change any file.\nTake the position the task below states (or, when it states none, the strongest current answer to it), find the load-bearing assumptions it rests on, reverse them, and argue the best plan or answer that follows from the opposite assumptions. Argue the strongest opposing case, never a straw man.\nAnother agent argues the original position at the same time; you cannot see its argument, so argue from the assumptions you reversed.\n\nThe task:\nfix",
+      "round": 1,
+      "preferIndependentOf": [
+       "pro"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "pro",
+      "objective": "You argued one side of a debate and now answer the other side. Do not change any file.\nThe opposing argument is listed under Context refs. Read it, concede what holds, and answer each point that does not, with evidence. Say whether it changes your position and what would.\n\nThe task that was debated:\nfix",
+      "round": 2,
+      "preferIndependentOf": [
+       "con"
+      ],
+      "inputs": [
+       {
+        "seat": "con",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "con",
+      "objective": "You argued the opposing side of a debate and now answer the original position. Do not change any file.\nThe original side's argument is listed under Context refs. Read it, concede what holds, and answer each point that does not, with evidence. Say whether it changes your position and what would.\n\nThe task that was debated:\nfix",
+      "round": 2,
+      "preferIndependentOf": [
+       "pro"
+      ],
+      "inputs": [
+       {
+        "seat": "pro",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "judge",
+      "objective": "You are the judge of a debate on the task below. Do not change any file and do not argue a side of your own.\nEvery argument and rebuttal of both sides is listed under Context refs. Read all of them.\nRule: which side holds and why, which claims of each side fail (quote them), the decision that follows, and what evidence or change would reverse it. Name the winning side plainly, or say that neither holds and what is still open. Do not average the sides or restate one without ruling.\n\nThe task that was debated:\nfix",
+      "independentOf": [
+       "pro",
+       "con"
+      ],
+      "inputs": [
+       {
+        "seat": "pro",
+        "round": 1,
+        "outcome": "pass"
+       },
+       {
+        "seat": "con",
+        "round": 1,
+        "outcome": "pass"
+       },
+       {
+        "seat": "pro",
+        "round": 2,
+        "outcome": "pass"
+       },
+       {
+        "seat": "con",
+        "round": 2,
+        "outcome": "pass"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "debate with one side is refused",
+   "loop": "debate",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "debate",
+    "params": {
+     "seats": [
+      {
+       "seat": "pro",
+       "role": "producer"
+      },
+      {
+       "seat": "judge",
+       "role": "judge"
+      }
+     ]
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {},
+   "verify": [],
+   "expected": {
+    "error": {
+     "class": "SeatResolutionError",
+     "code": "seat-multiplicity",
+     "message": "a debate unit needs 2 seat(s) with role \"producer\", has 1"
+    },
+    "calls": []
+   }
+  },
+  {
+   "id": "an unknown loop is refused",
+   "loop": "swarm",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "swarm",
+    "params": {}
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {},
+   "verify": [],
+   "expected": {
+    "error": {
+     "class": "Error",
+     "code": "",
+     "message": "Unknown collaboration loop: \"swarm\""
+    },
+    "calls": []
+   }
+  },
+  {
+   "id": "an effective loop carries its seats beside its params",
+   "loop": "panel",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {},
+   "effective": {
+    "loop": "panel",
+    "params": {},
+    "seats": [
+     {
+      "seat": "m1",
+      "role": "producer"
+     },
+     {
+      "seat": "m2",
+      "role": "producer"
+     },
+     {
+      "seat": "sum",
+      "role": "synthesizer"
+     }
+    ]
+   },
+   "history": [],
+   "launchRoom": null,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "m1/1": {
+     "seat": "m1",
+     "outcome": "pass"
+    },
+    "m2/1": {
+     "seat": "m2",
+     "outcome": "pass"
+    },
+    "sum/1": {
+     "seat": "sum",
+     "outcome": "pass"
+    }
+   },
+   "verify": [],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "results": [
+      {
+       "seat": "m1",
+       "outcome": "pass"
+      },
+      {
+       "seat": "m2",
+       "outcome": "pass"
+      },
+      {
+       "seat": "sum",
+       "outcome": "pass"
+      }
+     ]
+    },
+    "calls": [
+     {
+      "seat": "m1",
+      "objective": "fix",
+      "preferIndependentOf": [
+       "m2"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "m2",
+      "objective": "fix",
+      "preferIndependentOf": [
+       "m1"
+      ],
+      "batch": 2
+     },
+     {
+      "seat": "sum",
+      "objective": "You are the synthesizer for a panel that answered the task below.\nEach panelist's report is listed under Context refs. Read every one.\nState each panelist's position by its seat name, keep any disagreement visible instead of averaging it away, and end with one recommendation and the evidence for it.\nDo not answer the task from scratch.\n\nThe task the panel answered:\nfix",
+      "preferIndependentOf": [
+       "m1",
+       "m2"
+      ],
+      "inputs": [
+       {
+        "seat": "m1",
+        "outcome": "pass"
+       },
+       {
+        "seat": "m2",
+        "outcome": "pass"
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ],
+ "history": [
+  {
+   "id": "solo: producer only",
+   "args": {
+    "loop": "solo",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "maker",
+      "role": "producer"
+     }
+    ],
+    "history": [
+     {
+      "seat": "maker",
+      "round": 1,
+      "outcome": "pass"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "pass"
+   }
+  },
+  {
+   "id": "solo: nothing settled",
+   "args": {
+    "loop": "solo",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "maker",
+      "role": "producer"
+     }
+    ],
+    "history": []
+   },
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "solo: default seat id",
+   "args": {
+    "loop": "solo",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [],
+    "history": [
+     {
+      "seat": "producer",
+      "outcome": "blocked"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "blocked"
+   }
+  },
+  {
+   "id": "solo verified: verify settled",
+   "args": {
+    "loop": "solo",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {
+     "capabilities": {
+      "code:implement": {
+       "verify": "npm test",
+       "rigor": "standard",
+       "minCheckers": []
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    },
+    "seats": [
+     {
+      "seat": "producer",
+      "role": "producer"
+     }
+    ],
+    "history": [
+     {
+      "seat": "producer",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "verify",
+      "round": 1,
+      "outcome": "findings"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "findings"
+   }
+  },
+  {
+   "id": "solo verified: verify missing",
+   "args": {
+    "loop": "solo",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {
+     "capabilities": {
+      "code:implement": {
+       "verify": "npm test",
+       "rigor": "standard",
+       "minCheckers": []
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    },
+    "seats": [
+     {
+      "seat": "producer",
+      "role": "producer"
+     }
+    ],
+    "history": [
+     {
+      "seat": "producer",
+      "round": 1,
+      "outcome": "pass"
+     }
+    ]
+   },
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "solo verified: producer failed",
+   "args": {
+    "loop": "solo",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {
+     "capabilities": {
+      "code:implement": {
+       "verify": "npm test",
+       "rigor": "standard",
+       "minCheckers": []
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    },
+    "seats": [
+     {
+      "seat": "producer",
+      "role": "producer"
+     }
+    ],
+    "history": [
+     {
+      "seat": "producer",
+      "round": 1,
+      "outcome": "provider-limit"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "provider-limit"
+   }
+  },
+  {
+   "id": "solo verified: producer missing",
+   "args": {
+    "loop": "solo",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {
+     "capabilities": {
+      "code:implement": {
+       "verify": "npm test",
+       "rigor": "standard",
+       "minCheckers": []
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    },
+    "seats": [
+     {
+      "seat": "producer",
+      "role": "producer"
+     }
+    ],
+    "history": []
+   },
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "solo verified: a later-round verify is found by seat",
+   "args": {
+    "loop": "solo",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {
+     "capabilities": {
+      "code:implement": {
+       "verify": "npm test",
+       "rigor": "standard",
+       "minCheckers": []
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    },
+    "seats": [],
+    "history": [
+     {
+      "seat": "producer",
+      "round": 2,
+      "outcome": "pass"
+     },
+     {
+      "seat": "verify",
+      "round": 2,
+      "outcome": "pass"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "pass"
+   }
+  },
+  {
+   "id": "reviewed: first round passes",
+   "args": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 2
+    },
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ],
+    "history": [
+     {
+      "seat": "producer",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "reviewer",
+      "round": 1,
+      "outcome": "pass"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "pass"
+   }
+  },
+  {
+   "id": "reviewed: findings then pass",
+   "args": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 2
+    },
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ],
+    "history": [
+     {
+      "seat": "producer",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "reviewer",
+      "round": 1,
+      "outcome": "findings"
+     },
+     {
+      "seat": "producer",
+      "round": 2,
+      "outcome": "pass"
+     },
+     {
+      "seat": "reviewer",
+      "round": 2,
+      "outcome": "pass"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "pass"
+   }
+  },
+  {
+   "id": "reviewed: findings at the last round",
+   "args": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 2
+    },
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ],
+    "history": [
+     {
+      "seat": "producer",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "reviewer",
+      "round": 1,
+      "outcome": "findings"
+     },
+     {
+      "seat": "producer",
+      "round": 2,
+      "outcome": "pass"
+     },
+     {
+      "seat": "reviewer",
+      "round": 2,
+      "outcome": "findings"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "findings"
+   }
+  },
+  {
+   "id": "reviewed: round two missing",
+   "args": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 2
+    },
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ],
+    "history": [
+     {
+      "seat": "producer",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "reviewer",
+      "round": 1,
+      "outcome": "findings"
+     }
+    ]
+   },
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "reviewed: producer failed",
+   "args": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 2
+    },
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ],
+    "history": [
+     {
+      "seat": "producer",
+      "round": 1,
+      "outcome": "blocked"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "blocked"
+   }
+  },
+  {
+   "id": "reviewed: checker failed",
+   "args": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 2
+    },
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ],
+    "history": [
+     {
+      "seat": "producer",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "reviewer",
+      "round": 1,
+      "outcome": "execution-failure"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "execution-failure"
+   }
+  },
+  {
+   "id": "reviewed: verify holds the verdict",
+   "args": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 2
+    },
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "capability": "code:implement",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {
+     "capabilities": {
+      "code:implement": {
+       "verify": "npm test",
+       "rigor": "standard",
+       "minCheckers": []
+      }
+     },
+     "loops": {
+      "reviewed": {
+       "checkersByRigor": {
+        "standard": [
+         "reviewer"
+        ],
+        "high": [
+         "reviewer",
+         "red-team"
+        ]
+       }
+      }
+     }
+    },
+    "seats": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ],
+    "history": [
+     {
+      "seat": "producer",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "reviewer",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "verify",
+      "round": 1,
+      "outcome": "findings"
+     },
+     {
+      "seat": "producer",
+      "round": 2,
+      "outcome": "pass"
+     },
+     {
+      "seat": "reviewer",
+      "round": 2,
+      "outcome": "pass"
+     },
+     {
+      "seat": "verify",
+      "round": 2,
+      "outcome": "pass"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "pass"
+   }
+  },
+  {
+   "id": "reviewed: no maxRounds is refused",
+   "args": {
+    "loop": "reviewed",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "producer",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": true,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "reviewer",
+      "role": "reviewer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": true
+      }
+     }
+    ],
+    "history": []
+   },
+   "expected": {
+    "error": {
+     "class": "Error",
+     "code": "reviewed-max-rounds-missing",
+     "message": "the reviewed loop needs params.maxRounds, an integer >= 1 from runner.loops.reviewed.maxRounds in the effective config, got undefined"
+    }
+   }
+  },
+  {
+   "id": "debate: ruled",
+   "args": {
+    "loop": "debate",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "pro",
+      "role": "producer"
+     },
+     {
+      "seat": "con",
+      "role": "producer"
+     },
+     {
+      "seat": "judge",
+      "role": "judge"
+     }
+    ],
+    "history": [
+     {
+      "seat": "pro",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "con",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "pro",
+      "round": 2,
+      "outcome": "pass"
+     },
+     {
+      "seat": "con",
+      "round": 2,
+      "outcome": "pass"
+     },
+     {
+      "seat": "judge",
+      "outcome": "findings"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "findings"
+   }
+  },
+  {
+   "id": "debate: not ruled yet",
+   "args": {
+    "loop": "debate",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "pro",
+      "role": "producer"
+     },
+     {
+      "seat": "con",
+      "role": "producer"
+     },
+     {
+      "seat": "judge",
+      "role": "judge"
+     }
+    ],
+    "history": [
+     {
+      "seat": "pro",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "con",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "pro",
+      "round": 2,
+      "outcome": "pass"
+     },
+     {
+      "seat": "con",
+      "round": 2,
+      "outcome": "pass"
+     }
+    ]
+   },
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "debate: a side failed with the round incomplete",
+   "args": {
+    "loop": "debate",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "pro",
+      "role": "producer"
+     },
+     {
+      "seat": "con",
+      "role": "producer"
+     },
+     {
+      "seat": "judge",
+      "role": "judge"
+     }
+    ],
+    "history": [
+     {
+      "seat": "pro",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "con",
+      "round": 1,
+      "outcome": "blocked"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "blocked"
+   }
+  },
+  {
+   "id": "debate: a side failed in a complete history",
+   "args": {
+    "loop": "debate",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "pro",
+      "role": "producer"
+     },
+     {
+      "seat": "con",
+      "role": "producer"
+     },
+     {
+      "seat": "judge",
+      "role": "judge"
+     }
+    ],
+    "history": [
+     {
+      "seat": "pro",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "con",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "pro",
+      "round": 2,
+      "outcome": "provider-limit"
+     },
+     {
+      "seat": "con",
+      "round": 2,
+      "outcome": "pass"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "provider-limit"
+   }
+  },
+  {
+   "id": "debate: no rebuttal",
+   "args": {
+    "loop": "debate",
+    "params": {
+     "rebuttal": false
+    },
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "pro",
+      "role": "producer"
+     },
+     {
+      "seat": "con",
+      "role": "producer"
+     },
+     {
+      "seat": "judge",
+      "role": "judge"
+     }
+    ],
+    "history": [
+     {
+      "seat": "pro",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "con",
+      "round": 1,
+      "outcome": "pass"
+     },
+     {
+      "seat": "judge",
+      "outcome": "pass"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "pass"
+   }
+  },
+  {
+   "id": "panel: synthesized",
+   "args": {
+    "loop": "panel",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "m1",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "m2",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "sum",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ],
+    "history": [
+     {
+      "seat": "m1",
+      "outcome": "pass"
+     },
+     {
+      "seat": "m2",
+      "outcome": "pass"
+     },
+     {
+      "seat": "sum",
+      "outcome": "findings"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "findings"
+   }
+  },
+  {
+   "id": "panel: a member missing",
+   "args": {
+    "loop": "panel",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "m1",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "m2",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "sum",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ],
+    "history": [
+     {
+      "seat": "m1",
+      "outcome": "pass"
+     },
+     {
+      "seat": "sum",
+      "outcome": "pass"
+     }
+    ]
+   },
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "panel: a member failed",
+   "args": {
+    "loop": "panel",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "m1",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "m2",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "sum",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ],
+    "history": [
+     {
+      "seat": "m1",
+      "outcome": "pass"
+     },
+     {
+      "seat": "m2",
+      "outcome": "blocked"
+     }
+    ]
+   },
+   "expected": {
+    "ok": "blocked"
+   }
+  },
+  {
+   "id": "panel: synthesizer missing",
+   "args": {
+    "loop": "panel",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [
+     {
+      "seat": "m1",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "m2",
+      "role": "producer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": true,
+       "verdict": false
+      }
+     },
+     {
+      "seat": "sum",
+      "role": "synthesizer",
+      "posture": {
+       "readOnly": false,
+       "writer": false,
+       "forceOutOfProcess": false,
+       "stance": false,
+       "verdict": false
+      }
+     }
+    ],
+    "history": [
+     {
+      "seat": "m1",
+      "outcome": "pass"
+     },
+     {
+      "seat": "m2",
+      "outcome": "pass"
+     }
+    ]
+   },
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "id": "unknown loop is null",
+   "args": {
+    "loop": "swarm",
+    "params": {},
+    "unit": {
+     "id": "u",
+     "objective": "fix",
+     "writes": [
+      "src"
+     ]
+    },
+    "cfg": {},
+    "seats": [],
+    "history": []
+   },
+   "expected": {
+    "ok": null
+   }
+  }
+ ]
+}
