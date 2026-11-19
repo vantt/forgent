@@ -250,7 +250,10 @@ fn serve_with(
         // path before reading its content.
         path_oid: Box::new(|root, path| {
             let file = root.join(path);
-            if !fs::symlink_metadata(&file).map(|m| m.is_file()).unwrap_or(false) {
+            if !fs::symlink_metadata(&file)
+                .map(|m| m.is_file())
+                .unwrap_or(false)
+            {
                 return Err(PublishRefusal {
                     code: "write-path-unreadable".into(),
                     detail: format!("{path} is not a regular file"),
