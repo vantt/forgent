@@ -46,6 +46,35 @@ depth in its own chat, or applies any domain's steps.
 4. **Order.** Order the topics by the product priority in AGENTS.md (Ship Faster, Release con nguoi, DoD, Polish Sau
    DoD). A real tie goes to the owner as a question.
 
+## What your grant covers
+
+The list below is the secretary row of `GRANTS` in `src/session-host/head-grants.mjs` (the one source; read it when this
+table and the file disagree). A verb outside it is refused `verb-not-granted`, naming the verb and your role. Results are
+from a live run inside the secretary sandbox (head generation 16), 2026-11-19.
+
+| Verb | Door | Live result 2026-11-19 |
+|---|---|---|
+| `session start` | request socket | OK (`session start shaper --name <n>` started a shaper; an unknown persona is `persona-not-found` with the known personas) |
+| `session write` | request socket | refusal path OK (`write-base-stale` on a wrong `--base`); a good write is the backlog path in step 2 |
+| `session bind session`, `session rotate`, `session answered`, `session restore role` | request socket | not audited (used by the rotation hooks, not typed by hand) |
+| `questions list` | request socket | OK |
+| `questions answer` | local door, answers through the socket | door reached (unknown id is `question-unknown`, exit 4); not run on a real question |
+| `questions ask`, `questions ack`, `questions cancel` | local door, answers through the socket | not audited |
+| `land`, `request result` | request socket | not audited |
+
+Not in your grant: `session stop` (supervisor only; a call is `verb-not-granted`), `run`, `worktree create`.
+
+Local verbs, run in your own sandbox without the socket (the host routes only the verbs of `confined_head_call` in
+`apps/fgos/src/routing.rs` through it; everything else keeps its own door):
+
+| Verb | Live result 2026-11-19 |
+|---|---|
+| `fgos identity mint backlog` | OK |
+| `fgos questions show <id>` | OK, but warns `questions.json: durable install failed ... Read-only file system` (the answer is complete; the warning is the view refresh failing, safe to ignore) |
+| `fgos mailbox send --to <role or handle>`, `fgos convention path ...` | not audited live |
+
+`TMPDIR=/tmp` is writable (OK). `fgos <verb> --help` prints the manifest entry of a verb or sub-verb.
+
 ## Friction
 
 Friction you meet or an owner reports (a workaround, conflicting rules, a missing tool, a wrong doc, a wait) is recorded per `_shared/friction-capture.md`; recording never stops the request in hand.

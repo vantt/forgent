@@ -83,6 +83,17 @@ test('a write that was made but not published is a HeadRequestError naming the l
   );
 });
 
+test('a stale write base reaches the caller with the current and the given blob ids in the message', async (t) => {
+  const socketPath = path.join(scratch(t), 'req.sock');
+  const detail = 'docs/backlog.md is now aaaa, the write was based on bbbb; read it again and redo the edit';
+  serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'refused', code: 'write-base-stale', detail }));
+  await listening();
+  await assert.rejects(
+    requestHeadWrite({ path: 'docs/backlog.md', content: 'x', base: 'bbbb' }, { socketPath }),
+    (err) => err.code === 'write-base-stale' && err.detail === detail && err.message.includes('is now aaaa') && err.message.includes('based on bbbb'),
+  );
+});
+
 test('a refused reply is a HeadRequestError carrying the supervisor\'s code, or the use case\'s own code when verb-failed wraps it', async (t) => {
   const socketPath = path.join(scratch(t), 'req.sock');
   serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'refused', code: 'verb-failed', detail: 'bad-persona' }));

@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { bindHeadSeat, headKeyOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, openingText, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
+import { bindHeadSeat, headKeyOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, openingText, personasHeadsFirst, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
 import { grantOf } from '../../src/session-host/head-grants.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { headOf } from '../../src/runner/dispatch/session-attempt.mjs';
@@ -249,6 +249,11 @@ test('a head launch exports TMPDIR=/tmp, the sandbox private tmpfs, and makes no
   assert.equal(calls.launch[0].env.TMPDIR, '/tmp');
   assert.ok(!fs.existsSync(path.join(fgosDirFromRoot(projectRoot), 'assignments', calls.launch[0].key)), 'nothing is created under the attempt before the launch');
   fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('the known personas list the ones that hold a head grant first, so a cut message keeps them', () => {
+  const names = ['aaa-helper', 'zeta-tool', 'shaper', 'lead', 'secretary', 'planner', 'supervisor', 'bbb-other'];
+  assert.deepEqual(personasHeadsFirst(names), ['lead', 'planner', 'secretary', 'shaper', 'supervisor', 'aaa-helper', 'bbb-other', 'zeta-tool']);
 });
 
 test('a persona with no definition is refused persona-not-found and the known personas are listed', async () => {
