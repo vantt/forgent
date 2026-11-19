@@ -142,7 +142,7 @@
         "wait": "number, optional: seconds to wait for a running ticket to end, at most 50"
       },
       "does": "reads this role's own tickets in the role's own ticket folder under .fgos/runtime. With id, that ticket (ticket-unknown for another role's or a missing one); without id, the role's tickets, newest first. A running ticket whose runner record judges dead reads state failed, code runner-gone; an unknown judgement stays running",
-      "data": "{id, verb, state: running|done|failed, exit?, code?, result?, unitRunId?} for one ticket, {tickets: [...]} without id",
+      "data": "{id, verb, state: running|done|failed, argv, exit?, code?, message?, stderrTail?, result?, unitRunId?} for one ticket; argv is the host argv built from the request fields (never secrets); on a failed run code is the host's own refusal code when it gave one (else exit-N), message its refusal text (at most 1 KB) and stderrTail the last stderr lines (bounded), {tickets: [...]} without id",
       "identity": "held",
       "rule": "refusals (verb-failed detail): ticket-unknown, bad-args"
     },
