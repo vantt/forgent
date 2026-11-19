@@ -419,8 +419,8 @@ pub fn prepare_attempt_seat(
     let cwd_lease_file = attempt
         .locks
         .as_ref()
-        .and_then(|locks| locks.cwd_lease.as_ref())
-        .map(|lease| lease.path().to_string_lossy().into_owned())
+        .and_then(|locks| locks.cwd_lease_file())
+        .map(|lease| lease.to_string_lossy().into_owned())
         .filter(|_| seat.mutating);
     let extra_steps: Vec<String> = if attempt.terminal {
         vec!["cleanup-trust".into()]

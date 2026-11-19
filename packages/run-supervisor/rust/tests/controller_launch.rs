@@ -495,6 +495,52 @@ fn a_second_attempt_lock_is_refused_by_name_and_a_mutating_attempt_also_takes_th
 
 #[cfg(unix)]
 #[test]
+fn under_custody_an_attempt_takes_no_second_cwd_lease_and_lends_the_callers_to_the_supervisor() {
+    use fgos_run_supervisor::controller::cwd_lock::acquire_dispatch_cwd_lock;
+    let dir = scratch("custody");
+    let fgos_dir = dir.join(".fgos");
+    let (cwd, other) = (dir.join("work"), dir.join("other"));
+    std::fs::create_dir_all(&cwd).unwrap();
+    std::fs::create_dir_all(&other).unwrap();
+    let assignment = dir.join("assignment");
+    let custody = acquire_dispatch_cwd_lock(&fgos_dir, &cwd).unwrap();
+    let lock = |attempt: &str, custody| {
+        acquire_attempt_locks(AttemptLockRequest {
+            fgos_dir: &fgos_dir,
+            assignment_dir: &assignment,
+            attempt_str: attempt,
+            cwd: &cwd,
+            mutating: true,
+            custody,
+            executor_id: None,
+            capability: None,
+        })
+    };
+    let mut locks = lock("01", Some(&custody)).unwrap();
+    assert!(locks.cwd_lease.is_none() && locks.cwd_lease_is_custody);
+    assert!(
+        locks.custody_copy.is_some(),
+        "descriptor 4 is a copy of the caller's lease"
+    );
+    assert_eq!(locks.cwd_lease_file().as_deref(), Some(custody.path()));
+    // The caller's own handle is neither lent nor released: its custody can still be borrowed.
+    assert!(fgos_holder_lock::validate(&custody).is_ok());
+    locks.release();
+    assert!(locks.custody_copy.is_none());
+    assert_eq!(
+        acquire_dispatch_cwd_lock(&fgos_dir, &cwd).unwrap_err().code,
+        "dispatch-in-flight",
+        "the caller keeps its lease after the attempt lets go"
+    );
+    let elsewhere = acquire_dispatch_cwd_lock(&fgos_dir, &other).unwrap();
+    assert_eq!(
+        lock("02", Some(&elsewhere)).unwrap_err().code,
+        "custody-required"
+    );
+}
+
+#[cfg(unix)]
+#[test]
 fn a_supervisor_that_binds_is_seen_bound_one_that_exits_is_seen_exited_and_a_failed_start_removes_the_secrets(
 ) {
     use std::os::unix::fs::PermissionsExt;

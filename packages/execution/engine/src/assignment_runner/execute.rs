@@ -99,7 +99,7 @@ impl From<AdmissionError> for ExecuteError {
 
 /// What the caller states beside the assignment.
 #[derive(Default)]
-pub struct ExecuteOptions {
+pub struct ExecuteOptions<'a> {
     pub cwd: Option<PathBuf>,
     pub repo_root: Option<PathBuf>,
     pub runner_config: Option<Value>,
@@ -122,7 +122,9 @@ pub struct ExecuteOptions {
     pub force_new_attempt: bool,
     pub refuse_if_settled: bool,
     pub launch_command_id: Option<String>,
-    pub custody: bool,
+    /// The held lease of the cwd the caller keeps across attempts and commit (a unit run's custody): the attempt
+    /// runs under it and takes no lease of its own.
+    pub custody: Option<&'a fgos_holder_lock::Handle>,
     pub provider_capacity_runtime_dir: Option<PathBuf>,
     pub control_ttl_ms: Option<u64>,
     pub committed_runner_config: Option<Value>,
@@ -225,7 +227,7 @@ fn json_text(value: &Value) -> String {
 }
 
 fn legality_options<'a>(
-    opts: &'a ExecuteOptions,
+    opts: &'a ExecuteOptions<'a>,
     cwd: &'a str,
     pinned: Option<&'a str>,
 ) -> LegalityOptions<'a> {
@@ -732,7 +734,7 @@ pub fn execute_assignment(
         cwd: cwd_text.clone(),
         host,
         step_env: ports.step_env(),
-        custody: opts.custody,
+        custody: opts.custody.is_some(),
         lease_runtime_dir: opts.provider_capacity_runtime_dir.clone(),
         session: false,
     });
@@ -817,7 +819,7 @@ fn run_admitted(
             attempt_str,
             cwd: Path::new(&cwd),
             mutating: effective_mutation == "mutating",
-            custody: None,
+            custody: opts.custody,
             executor_id: Some(executor_id),
             capability: compiled_plan.get("capability").and_then(Value::as_str),
         })?;

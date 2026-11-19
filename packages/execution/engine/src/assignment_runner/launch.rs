@@ -69,6 +69,13 @@ pub fn start_and_bind(
             let mut descriptors = vec![lent(attempt_lock)?];
             if let Some(lease) = locks.cwd_lease.as_ref() {
                 descriptors.push(lent(lease)?);
+            } else if let Some(copy) = locks.custody_copy.as_ref() {
+                // Under custody the caller's lease goes over through the copy lent when the locks were taken.
+                descriptors.push(copy.try_clone().map_err(|e| {
+                    launch_failed(format!(
+                        "executeAssignment: the custody lease could not be handed to the supervisor ({e})"
+                    ))
+                })?);
             }
             let handover: Vec<&std::fs::File> = descriptors.iter().collect();
             let started = start_supervisor(envelope, &handover, &attempt.step_env, extra_env)

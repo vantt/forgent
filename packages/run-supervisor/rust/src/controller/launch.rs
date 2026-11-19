@@ -650,9 +650,16 @@ pub fn settlement_ceiling_ms(envelope: &Value, timeout_ms: u64, gate_kill_grace_
 #[derive(Debug)]
 pub struct AttemptLocks {
     pub attempt: Option<Handle>,
+    /// The cwd lease this attempt acquired itself (an attempt that writes outside any custody).
     pub cwd_lease: Option<Handle>,
-    /// The cwd lease came from the caller (custody), which keeps it.
+    /// The caller holds the cwd lease (custody) and keeps it; the attempt never acquires one.
     pub cwd_lease_is_custody: bool,
+    /// Under custody, the copy of the caller's lease that goes to the supervisor as descriptor 4: lent from a
+    /// close-only duplicate of the caller's handle (`Handle::lend`), so the caller's own handle stays its own, as
+    /// Node's `spawnWithLocks([attempt, custody])` hands the custody description over without taking it.
+    pub custody_copy: Option<fs::File>,
+    /// Under custody, the lock file of the caller's lease, which the envelope names.
+    pub custody_path: Option<PathBuf>,
 }
 
 impl AttemptLocks {
@@ -666,7 +673,16 @@ impl AttemptLocks {
         if !self.cwd_lease_is_custody {
             self.cwd_lease = None;
         }
+        self.custody_copy = None;
         self.attempt = None;
+    }
+
+    /// The lock file of the cwd lease the attempt runs under: its own, or the caller's under custody.
+    pub fn cwd_lease_file(&self) -> Option<PathBuf> {
+        self.cwd_lease
+            .as_ref()
+            .map(|lease| lease.path().to_path_buf())
+            .or_else(|| self.custody_path.clone())
     }
 }
 
@@ -678,8 +694,9 @@ pub struct AttemptLockRequest<'a> {
     pub attempt_str: &'a str,
     pub cwd: &'a Path,
     pub mutating: bool,
-    /// A held lease of this cwd the caller already owns (checked by path); the caller keeps it.
-    pub custody: Option<Handle>,
+    /// A held lease of this cwd the caller already owns (checked by path); the caller keeps it, and the attempt
+    /// takes no second one.
+    pub custody: Option<&'a Handle>,
     pub executor_id: Option<&'a str>,
     pub capability: Option<&'a str>,
 }
@@ -744,7 +761,9 @@ pub fn acquire_attempt_locks(request: AttemptLockRequest) -> Result<AttemptLocks
         }
     };
     let custody_given = custody.is_some();
-    let mut cwd_lease = custody;
+    let custody_copy = custody.map(lend_custody).transpose()?.flatten();
+    let custody_path = custody.map(|c| c.path().to_path_buf());
+    let mut cwd_lease = None;
     if mutating && !custody_given {
         let admitted = {
             // The order check (attempt before dispatch-cwd) runs against a scope that holds the attempt lock.
@@ -759,7 +778,25 @@ pub fn acquire_attempt_locks(request: AttemptLockRequest) -> Result<AttemptLocks
         attempt: Some(attempt),
         cwd_lease,
         cwd_lease_is_custody: custody_given,
+        custody_copy,
+        custody_path,
     })
+}
+
+/// The supervisor's copy of the caller's cwd lease: a close-only duplicate of the caller's handle, lent, so the
+/// caller's handle is neither lent nor released (a later borrow of its custody stays possible). Where a lock does
+/// not pass to a child with its handle (Windows) there is no copy: the attempt that writes is refused there first.
+fn lend_custody(custody: &Handle) -> Result<Option<fs::File>, DispatchError> {
+    if !cfg!(unix) {
+        return Ok(None);
+    }
+    let duplicate = BorrowedHandle::new(custody)
+        .map_err(|e| DispatchError::new("lock-handle-invalid", format!("custody: {e:?}")))?;
+    duplicate
+        .as_ref()
+        .lend()
+        .map(Some)
+        .map_err(|e| DispatchError::new("lock-handle-invalid", format!("custody: {e}")))
 }
 
 /// The supervisor started for an envelope.
