@@ -7,7 +7,7 @@ Binding for every phase lead; a phase file may tighten a rule, never loosen it.
 `AGENTS.md`, `docs/reading-map.md`, `docs/platform/runner/spec.md` ("Execution Core and Dispatch"),
 `docs/platform/run-supervisor/spec.md`, `docs/platform/git/spec.md` (Worktree rows), this file, `plan.md` (decisions
 P1-P22), `reports/facts.md` (phase 00 output), then your phase file. Every `file:line` in this plan was read on
-`b5b237534`; phase 00 re-reads them after S5 and the worktree-door plan land. Re-check every line you edit before
+`b5b237534` and re-read on `f031ab0c8` (phase 00 part B, `reports/facts-part-b.md`). Re-check every line you edit before
 editing it. If a fact moved, stop and report to the plan lead with the new `file:line`; do not adapt silently.
 
 ## Start gates
@@ -15,7 +15,9 @@ editing it. If a fact moved, stop and report to the plan lead with the new `file
 - S5 (`261115-2328`) phases 11 and 12 and the worktree-door plan (`261118-1455-s6a-worktree-door`) are on `main`
   (whole plan, `blockedBy`).
 - Plan 1045 phase 6 is on `main` before phases 5, 11, 16b, 19 start (D4). It is a phase-level landing of 1045 that
-  does not wait for 1045 `ready` (1045 P3, P5, P8 landed while that plan was `draft`). Read its board row first.
+  does not wait for 1045 `ready` (1045 P3, P5, P8 landed while that plan was `draft`). Met on `f031ab0c8`: 1045
+  phases 1-18 are `done` (lane pool `47165e3bf`, lane-wait fix `2dbabb340`); only 1045 phase 19 (integration docs, live
+  run) is open. Read its board row first.
 - Your `depends-on` phases are merged on the integration branch (`s6a-execution/integration`, cut from `main` after
   the worktree-door plan landed).
 
@@ -63,7 +65,7 @@ From phase 19's start a board line asks every lane to route a main fix in those 
 
 A phase that deletes or moves a file or symbol edits, in the same change, every `doors` `allowed`/`debt` entry and
 every manifest tier/layer entry in `docs/architecture-manifest.json` that names it (move to the new path, or drop the
-entry); `test/architecture.test.mjs:1870-1871` fails on a stale path. Phase 22 only adds new rows and closes rows
+entry); `test/architecture.test.mjs:1848-1849` fails on a stale path. Phase 22 only adds new rows and closes rows
 whose job is gone. Every phase that deletes or moves a file has `docs/architecture-manifest.json` in its footprint.
 
 ## Layering (checked in review)

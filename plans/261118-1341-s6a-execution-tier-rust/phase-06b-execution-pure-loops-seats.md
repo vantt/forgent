@@ -7,7 +7,7 @@ Wave 3. Depends on: 3. Effort 2d. Library only. Split from the old phase 6.
 Ports the rest of the pure half of `src/runner/execution/**` (P2): `outcome.mjs` (115), `loops/*` as state machines
 (solo, reviewed, panel, debate, verify, role-tasks, history-outcome, index; 811), `seat-resolver.mjs` (380,
 `checkDeclaredSeats`, `assertNoSeatTier`, `assertNoUnitTier`, `seatLaunchesOf`), `legacy-seat-read.mjs` (172),
-`case-run-paths.mjs` (31), `handoff-refs.mjs` (289), the pure parts of `unit-summary.mjs`, `unit-state.mjs`,
+`case-run-paths.mjs` (32), `handoff-refs.mjs` (290), the pure parts of `unit-summary.mjs`, `unit-state.mjs`,
 `seat-ledger.mjs`, `unit-control.mjs`, and `case-admission-port.mjs` (contract part: the `CaseAdmission` trait,
 `unitRunSettle`/`releasedUnitRunSettle` shapes, `CaseAdmissionRefusedError` code). About 2 200 lines. The exact list is
 phase 00 §1.
@@ -20,7 +20,7 @@ phase 00 §1.
 - `CaseAdmission` trait with the six operations the peer protocol carries (P17): `resolveBinding`, `admit`,
   `recheckEffect`, `settle` with their payloads exactly as the Node port documents them
   (`src/runner/execution/case-admission-port.mjs:6-13`), plus `activityUnitOf` and `confinedWriteRefusal` as Workflow
-  answers them today (`src/workflow/case-admission-port.mjs:124,250`, injected at `bin/fgos.mjs:2544`); no adapter here.
+  answers them today (`src/workflow/case-admission-port.mjs:38,124`, injected at `bin/fgos.mjs:2499-2504`; lines on `f031ab0c8`); no adapter here.
 - Legacy seat reads accept every generation in the phase 00 corpus (F13).
 - Golden vectors under `packages/execution/contracts/core-loops/` recorded by
   `test/golden-recorders/core-loops.recorder.mjs` (committed); Rust tests `packages/execution/rust/tests/core_loops.rs`.

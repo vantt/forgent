@@ -4,15 +4,15 @@ Wave 3. Depends on: 3. Effort 1.5d. Library only. New phase (V5, F6).
 
 ## Context
 
-`loadRunnerConfigForDir` (`src/runner/dispatch/config.mjs:315-344`, file 778 lines; `runner-config-error.mjs` 49) does
+`loadRunnerConfigForDir` (`src/runner/dispatch/config.mjs:316-345` on `f031ab0c8`, file 779 lines; `runner-config-error.mjs` 49) does
 more than read the file: retired-key refusal, `refuseGlobalRigorToTier`, `validateRunnerConfigShape` with origin
-attribution, `withRunnerOrigins`, `normalizeConfigConfinement`. `src/config/facade.mjs:80` has none of these, so a
+attribution, `withRunnerOrigins`, `normalizeConfigConfinement`. `src/config/facade.mjs:81` (`readConfig`) has none of these, so a
 switch to the facade drops behaviour (V5, RUL104). S5 ported `validateRunnerConfigShape` to
 `packages/execution/rust/src/runner_check.rs`. Callers needing the checked config after cutover: Workflow
 (`src/workflow/{case-gate,runner,propose,case-start}.mjs`), Work (`bin/fgos-runner.mjs:25`,
-`src/runner/{operation-choice,fanout-batch}.mjs`), `src/session-host/head-start.mjs:126`, `bin/fgos.mjs`, and the engine.
+`src/runner/{operation-choice,fanout-batch}.mjs`), `src/session-host/head-start.mjs:140-141`, `bin/fgos.mjs`, and the engine.
 
-Workflow's dead-reservation sweep (`src/workflow/case-runtime.mjs:73-79`, under the advance hold) reads
+Workflow's dead-reservation sweep (`reservationDead`, `src/workflow/case-runtime.mjs:74-80`, under the advance hold) reads
 `custodyHeld` (`src/runner/execution/custody-door.mjs:41`, a holder-lock holder list on `dispatch-cwd`) and
 `unitRunFacts` (`src/runner/execution/unit-run-record.mjs:31-46`: `unit.json` fields plus `unitControllerHeld`, which is
 `inspectRunControl` of the run control ledger, `src/run-supervisor/run-lock.mjs:309-318`). Both are reads of files,
@@ -31,7 +31,8 @@ the record format (P15).
   `unit.json` with `fgos-durable-file`, the control ledger through `fgos-run-supervisor` feature `lease` (phase 05),
   holders through `fgos-holder-lock` (phase 20 wires them).
 - Golden vectors under `packages/execution/contracts/core-runner-config/` (config documents with origins -> checked
-  config or error code, from the existing config fixtures) and `packages/execution/contracts/core-run-facts/` (record
+  config or error code, from the existing config fixtures; the attributed file path keeps the `<root>/.fgos` join that
+  Node now takes from `fgosDirFromRoot`, `src/util/fgos-file-registry.mjs`, `691255ad0`) and `packages/execution/contracts/core-run-facts/` (record
   and ledger fixtures from the corpus -> facts), recorded by `test/golden-recorders/core-runner-config.recorder.mjs`;
   tests `packages/execution/rust/tests/core_runner_config.rs`.
 
@@ -47,4 +48,4 @@ new modules.
 ## Risk and rollback
 
 Risk: an origin attribution or refusal message differs and a doctor or verb message changes. Vectors include every
-refusal path of `config.mjs:315-344`. Rollback: revert.
+refusal path of `config.mjs:316-345`. Rollback: revert.

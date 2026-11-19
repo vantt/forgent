@@ -12,8 +12,8 @@ crate; 7-18 in the engine); if each added its own `pub mod` line and dependencie
 ## Requirements
 
 - `packages/execution/engine/Cargo.toml`: name `fgos-execution-engine`; every dependency the port map (phase 00 §1)
-  needs, within the layering of the phase-lead rules (incl. `fgos-checkout` from the worktree-door plan); no dependent
-  crate yet.
+  needs, within the layering of the phase-lead rules (incl. `fgos-checkout`, landed at `packages/execution/checkout` by
+  the worktree-door plan, `a987e4f0f`, root `Cargo.toml:35`); no dependent crate yet.
 - Engine `src/lib.rs`: crate doc (what the engine owns, what it does not: pure rules stay in `fgos-execution`, the
   attempt process stays in `fgos-run-supervisor`), `pub mod confinement { pub mod policy; pub mod request; pub mod driver; pub mod cleanup; }`,
   `accounts`, `credentials`, `transport`, `run_result`, `assignment`, `contract`, `settlement`, `steps`, `planning`,
@@ -22,7 +22,10 @@ crate; 7-18 in the engine); if each added its own `pub mod` line and dependencie
 - `fgos-execution` `src/lib.rs`: `pub mod` lines and `mod.rs` stubs for `unit`, `run_request`, `patterns` (phase 6),
   `outcome`, `loops`, `seat_resolver`, `case_paths`, `handoff`, `unit_record`, `admission` (6b), `runner_config`,
   `run_facts` (6c); shared types (`Unit`, `Outcome`) declared in the stubs; `packages/execution/rust/Cargo.toml` gains
-  `fgos-write-scope`.
+  `fgos-write-scope` (now `packages/write-scope`, moved by `3ee940891`; root `Cargo.toml:3`). On `f031ab0c8` the crate
+  already has `accounts`, `agents`, `bind`, `checks` (S5 doctor judgements), `decide`, `executor_model`, `explain`,
+  `hook`, `ports`, `runner_check`, `tools` (`packages/execution/rust/src/lib.rs:14-24`); the new module names do not
+  collide with them.
 - Root `Cargo.toml` member line for the engine.
 - No behaviour, no tests beyond `cargo check`.
 

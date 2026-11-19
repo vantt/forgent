@@ -5,8 +5,8 @@ Wave 4. Depends on: 8. Effort 1.5d. Library only (engine module `confinement::cl
 ## Context
 
 `src/runner/dispatch/confinement/cleanup.mjs` (554: attempt ownership markers, kept credential homes, orphan judgement
-and removal; imports `stop-processes-inside`, which phase 02 moved to `src/native/`) and `probes/harness.mjs` (859:
-falsification probes, peer-run-hidden). 1 413 lines. Doctor rows `confinement-orphaned-resources-reaped` (fix),
+and removal; imports `stop-processes-inside` at `cleanup.mjs:13`, which phase 02 moves to `src/native/`) and `probes/harness.mjs` (860: falsification probes, peer-run-hidden). 1 414 lines on `f031ab0c8` (`harness.mjs` now joins
+`.fgos` through `fgosDirFromRoot`, `691255ad0`; no behaviour change). Doctor rows `confinement-orphaned-resources-reaped` (fix),
 `credential-copies-retained`, `confinement-probe-freshness`, `confinement-blind-read` use it (phase 15).
 
 ## Requirements
