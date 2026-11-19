@@ -12,7 +12,7 @@
     "58": { "kinds": ["mutex"], "note": "event-seal" },
     "60": { "kinds": ["hot-mutex"], "note": "hot state (events + claims)" },
     "70": { "kinds": ["mutex"], "note": "event-append" },
-    "80": { "kinds": ["mutex", "lease"], "note": "leaves: advance, reconcile, recovery, observe, provider account, activation, install, full-suite, repo-config, mailbox, session-rotation" }
+    "80": { "kinds": ["mutex", "lease"], "note": "leaves: advance, reconcile, recovery, observe, provider account, activation, install, full-suite, repo-config, git-operation, mailbox, session-rotation" }
   },
   "locks": [
     {
@@ -253,6 +253,14 @@
       "scope": "repo",
       "rank": 80,
       "v3Path": "<fgosDir>/locks/repo-config.lock",
+      "owner": "git"
+    },
+    {
+      "name": "git-operation",
+      "kind": "mutex",
+      "scope": "repo",
+      "rank": 80,
+      "v3Path": "<common>/fgos/git/locks/op--<operationId>.lock",
       "owner": "git"
     },
     {

@@ -22,6 +22,10 @@ footprint:
   - src/session-host/head-request-client.mjs
   - src/session-host/head-start.mjs
   - src/session-host/head-grants.mjs
+  - packages/identity/rust/src/directory.rs
+  - packages/identity/rust/tests/directory.rs
+  - src/session-rotation/rotate.mjs
+  - test/session-rotation/rotate.test.mjs
   - core/agents/shaper.yaml
   - .claude/agents/shaper.md
   - core/skills/fgos-secretary/SKILL.md
@@ -113,8 +117,9 @@ A general backlog tool beyond add-rows; supervisor skill/route
 | 4 | [Session write add-rows](phase-04-add-rows.md) | 1 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, apps/fgos/src/wiring/session_write_publish.rs, apps/fgos/tests/session_write_publish.rs, bin/fgos.mjs, src/cli/command-registry.mjs, src/session-host/head-request-client.mjs, test/cli/session-verb.test.mjs, core/skills/fgos-secretary/SKILL.md, .agents/skills/fgos-secretary/SKILL.md, plugins/fgOS/skills/fgos-secretary/SKILL.md, docs/platform/session-host/spec.md | 4 | draft |
 | 5 | [A live writer's pending Git op answers resource-busy](phase-05-git-op-liveness.md) | - | packages/holder-lock/contracts/lock-registry.v1.json, docs/platform/holder-lock/spec.md, test/holder-lock/registry-contract.test.mjs, packages/git/rust/src/wal.rs, packages/git/rust/src/refs.rs, packages/git/rust/src/land.rs, packages/git/rust/tests/land.rs, packages/git/rust/tests/pending_op_liveness.rs, packages/git/rust/tests/scoped_commit_sync.rs, packages/holder-lock/rust/src/status.rs, packages/holder-lock/rust/src/scope.rs, docs/platform/git/spec.md | 1 | running |
 | 6 | [Session write waits on a live writer](phase-06-busy-retry.md) | 1, 5 | apps/fgos/src/wiring/session_write_publish.rs, apps/fgos/tests/session_write_publish.rs, core/skills/fgos-secretary/SKILL.md, .agents/skills/fgos-secretary/SKILL.md, plugins/fgOS/skills/fgos-secretary/SKILL.md, docs/platform/session-host/spec.md | 5 | ready |
-| 7 | [Live grant audit from Miu's sandbox](phase-07-grant-audit.md) | 1, 2, 3, 4, 5, 6, 8 | core/skills/fgos-secretary/SKILL.md, .agents/skills/fgos-secretary/SKILL.md, plugins/fgOS/skills/fgos-secretary/SKILL.md, docs/platform/agent-confinement/spec.md, src/session-host/head-grants.mjs | 6 | ready |
+| 7 | [Live grant audit from Miu's sandbox](phase-07-grant-audit.md) | 1, 2, 3, 4, 5, 6, 8, 9 | core/skills/fgos-secretary/SKILL.md, .agents/skills/fgos-secretary/SKILL.md, plugins/fgOS/skills/fgos-secretary/SKILL.md, docs/platform/agent-confinement/spec.md, src/session-host/head-grants.mjs | 6 | ready |
 | 8 | [A rotation successor's role-gated verbs wait for the role](phase-08-rotation-role-wait.md) | 1, 2 | packages/run-supervisor/rust/src/head_request.rs, packages/run-supervisor/rust/tests/head_request.rs, packages/run-supervisor/contracts/head-request.v1.json, src/session-host/head-request-client.mjs, test/session-host/head-request.test.mjs, docs/platform/session-host/spec.md | 3 | ready |
+| 9 | [A role take is never read as two holders](phase-09-identity-take-window.md) | 2 | packages/identity/rust/src/directory.rs, packages/identity/rust/tests/directory.rs, src/session-host/head-start.mjs, src/session-rotation/rotate.mjs, test/session-rotation/rotate.test.mjs | 3 | running |
 
 ## Owner questions
 None. Shaper persona decided by the supervisor inside the frame; Git busy design decided by lead:OPC (reviews phase 5).
@@ -124,6 +129,9 @@ Shared with plan 261118-1341 (lead:S6A) after its narrowing ae99a8984: docs/plat
 to drop it) and test/holder-lock/registry-contract.test.mjs (phase 5 adds the `git-operation` row there, as d1d4ec7ee did
 for `repo-config`; sequenced by the supervisor). CHANGELOG lines and backlog rows go through the supervisor.
 `packages/git/contracts/mutation-census.v1.json` is regenerated at land time on top of main.
+
+Phase 9 and plan 1341 phase 20 both edit src/session-host/head-start.mjs, src/session-rotation/rotate.mjs and
+test/session-rotation/**: sequential, phase 9 lands before S6A starts phase 20 (supervisor, 2026-11-19).
 
 ## Risks and rollback
 Refusing a start on a failed bind could block Miu if Identity is down: the refusal names the cause so the supervisor

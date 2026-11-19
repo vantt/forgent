@@ -231,6 +231,32 @@ impl Handle {
         self.file.as_ref().expect("live handle owns its file")
     }
 
+    /// Moves an exclusive lock to a child: the returned `File` is the holder's own descriptor, to be passed to the
+    /// child's spawn as an inherited descriptor (the `&[&File]` of a supervisor start). The child marks it
+    /// close-on-exec before anything else, as the supervisor route does. The handle keeps nothing, so its drop
+    /// settles at once; dropping the returned `File` after the spawn leaves the child's copy as the last one,
+    /// and if the spawn fails that drop closes the last descriptor and the kernel frees the lock.
+    ///
+    /// Nothing here unlocks the description: flock state is per open file description, so an explicit unlock
+    /// would end the child's lock too. A shared handle is refused (a second shared holder could still be in this
+    /// process), and so is every platform without `flock`, where a lock does not pass to a child with its handle;
+    /// a refused handle is released as by [`release`].
+    pub fn hand_over(mut self) -> io::Result<File> {
+        if self.mode != Mode::Ex {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "only an exclusive holder hands its lock over",
+            ));
+        }
+        if !cfg!(unix) {
+            return Err(io::Error::new(
+                io::ErrorKind::Unsupported,
+                "a lock passes to a child only where flock holds it",
+            ));
+        }
+        Ok(self.file.take().expect("live handle owns its file"))
+    }
+
     fn settle_release(&mut self) -> Release {
         let Some(file) = self.file.take() else {
             return Release::Released { killed: 0 };

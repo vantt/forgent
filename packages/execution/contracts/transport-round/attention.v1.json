@@ -1,0 +1,982 @@
+{
+  "note": "recorded from src/runner/dispatch/attention-view.mjs; mtimes pins the modification time of each result file (the time of a result with no settledAt); viewOf maps a run id to the attempt view its caller injects; definitionsCalls are what the host call was asked",
+  "files": {
+    ".fgos/assignments/a1/assignment.json": "{\"assignmentId\":\"a1\"}\n",
+    ".fgos/assignments/a1/runs/01/run.json": "{\"runId\":\"r1\",\"assignmentId\":\"a1\",\"status\":\"bound\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/a1/runs/01/supervisor-binding.json": "{\"bound\":true}\n",
+    ".fgos/assignments/a1/runs/01/visibility.json": "{\"status\":\"working\"}\n",
+    ".fgos/assignments/a1/runs/01/workspace-evidence.json": "{\"dirt\":\"clean\"}\n",
+    ".fgos/assignments/a1/admission/generations/0000000001.json": "{\"runId\":\"r1\",\"attempt\":1}\n",
+    ".fgos/assignments/a2/assignment.json": "{\"assignmentId\":\"a2\"}\n",
+    ".fgos/assignments/a2/runs/01/run.json": "{\"runId\":\"r2\",\"assignmentId\":\"a2\",\"status\":\"settled\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000,\"coordinationId\":\"s1\"}\n",
+    ".fgos/assignments/a2/runs/01/result.json": "{\"runId\":\"r2\",\"status\":\"done\",\"confidence\":\"high\",\"summary\":\"ok\"}\n",
+    ".fgos/assignments/a2/admission/generations/0000000001.json": "{\"runId\":\"r2\",\"attempt\":1}\n",
+    ".fgos/coordination/sessions/s1/session.json": "{\"assignmentRefs\":[\"a2\"]}\n",
+    ".fgos/assignments/a3/assignment.json": "{\"assignmentId\":\"a3\"}\n",
+    ".fgos/assignments/a3/runs/01/run.json": "{\"runId\":\"r3\",\"assignmentId\":\"a3\",\"status\":\"running\",\"cwd\":\"/vec/ws-b\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000,\"launchedAt\":\"2026-11-19T09:00:01.000Z\"}\n",
+    ".fgos/assignments/a3/runs/01/result.json": "{ not json",
+    ".fgos/assignments/a3/admission/generations/0000000001.json": "{\"runId\":\"r3\",\"attempt\":1}\n",
+    ".fgos/assignments/a4/assignment.json": "{\"assignmentId\":\"a4\"}\n",
+    ".fgos/assignments/a4/runs/01/run.json": "[]",
+    ".fgos/assignments/a4/admission/generations/0000000001.json": "{\"runId\":\"r4\",\"attempt\":1}\n",
+    ".fgos/assignments/a5/assignment.json": "{\"assignmentId\":\"a5\"}\n",
+    ".fgos/assignments/a5/runs/01/run.json": "{\"runId\":\"dup\",\"assignmentId\":\"a5\",\"status\":\"bound\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/a5/admission/generations/0000000001.json": "{\"runId\":\"dup\",\"attempt\":1}\n",
+    ".fgos/assignments/a6/assignment.json": "{\"assignmentId\":\"a6\"}\n",
+    ".fgos/assignments/a6/runs/01/run.json": "{\"runId\":\"dup\",\"assignmentId\":\"a6\",\"status\":\"bound\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/a6/admission/generations/0000000001.json": "{\"runId\":\"dup\",\"attempt\":1}\n",
+    ".fgos/assignments/a7/assignment.json": "{\"assignmentId\":\"a7\"}\n",
+    ".fgos/assignments/a7/runs/01/run.json": "{\"runId\":\"r7a\",\"assignmentId\":\"a7\",\"status\":\"admitted\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/a7/runs/02/run.json": "{\"runId\":\"r7b\",\"assignmentId\":\"a7\",\"status\":\"delivered\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000,\"delivery\":\"delivered\"}\n",
+    ".fgos/assignments/a7/runs/03/run.json": "{\"runId\":\"r7x\",\"assignmentId\":\"a7\",\"status\":\"admitted\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/a7/admission/generations/0000000001.json": "{\"runId\":\"r7old\",\"attempt\":1,\"retryId\":\"rt1\"}\n",
+    ".fgos/assignments/a7/admission/generations/0000000002.json": "{\"runId\":\"r7a\",\"attempt\":1}\n",
+    ".fgos/assignments/a7/admission/generations/0000000003.json": "{\"runId\":\"r7b\",\"attempt\":1}\n",
+    ".fgos/assignments/a7/admission/markers/rt1.aborted.json": "{\"aborted\":true}\n",
+    ".fgos/assignments/a8/runs/01/run.json": "{\"runId\":\"r8\",\"assignmentId\":\"a8\",\"status\":\"bound\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:00:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/a9/assignment.json": "{\"assignmentId\":\"a9\"}\n",
+    ".fgos/assignments/f1/assignment.json": "{\"assignmentId\":\"f1\"}\n",
+    ".fgos/assignments/f1/runs/01/run.json": "{\"runId\":\"rf1\",\"assignmentId\":\"f1\",\"status\":\"settled\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:10:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/f1/runs/01/result.json": "{\"runId\":\"rf1\",\"status\":\"failed\",\"confidence\":\"failed\",\"summary\":\"boom\"}\n",
+    ".fgos/assignments/f1/admission/generations/0000000001.json": "{\"runId\":\"rf1\",\"attempt\":1}\n",
+    ".fgos/assignments/b1/assignment.json": "{\"assignmentId\":\"b1\"}\n",
+    ".fgos/assignments/b1/runs/01/run.json": "{\"runId\":\"rb1\",\"assignmentId\":\"b1\",\"status\":\"settled\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:20:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/b1/runs/01/result.json": "{\"runId\":\"rb1\",\"status\":\"blocked\",\"confidence\":\"high\",\"summary\":\"stuck\"}\n",
+    ".fgos/assignments/b1/runs/01/receipt.json": "{\"reason\":\"terminal:needs-owner\"}\n",
+    ".fgos/assignments/b1/admission/generations/0000000001.json": "{\"runId\":\"rb1\",\"attempt\":1}\n",
+    ".fgos/assignments/b2/assignment.json": "{\"assignmentId\":\"b2\"}\n",
+    ".fgos/assignments/b2/runs/01/run.json": "{\"runId\":\"rb2\",\"assignmentId\":\"b2\",\"status\":\"settled\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:21:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/b2/runs/01/result.json": "{\"runId\":\"rb2\",\"status\":\"blocked\",\"confidence\":\"high\",\"summary\":\"stuck\"}\n",
+    ".fgos/assignments/b2/admission/generations/0000000001.json": "{\"runId\":\"rb2\",\"attempt\":1}\n",
+    ".fgos/assignments/s1-fb1/assignment.json": "{\"assignmentId\":\"s1-fb1\"}\n",
+    ".fgos/assignments/s1-fb1/runs/01/run.json": "{\"runId\":\"rs1\",\"assignmentId\":\"s1-fb1\",\"status\":\"settled\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:30:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/s1-fb1/runs/01/result.json": "{\"runId\":\"rs1\",\"status\":\"failed\",\"confidence\":\"failed\",\"summary\":\"first seat failed\"}\n",
+    ".fgos/assignments/s1-fb1/admission/generations/0000000001.json": "{\"runId\":\"rs1\",\"attempt\":1}\n",
+    ".fgos/assignments/s1/assignment.json": "{\"assignmentId\":\"s1\"}\n",
+    ".fgos/assignments/s1/runs/01/run.json": "{\"runId\":\"rs2\",\"assignmentId\":\"s1\",\"status\":\"settled\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:40:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/s1/runs/01/result.json": "{\"runId\":\"rs2\",\"status\":\"done\",\"confidence\":\"high\",\"summary\":\"passed\"}\n",
+    ".fgos/assignments/s1/admission/generations/0000000001.json": "{\"runId\":\"rs2\",\"attempt\":1}\n",
+    ".fgos/assignments/d1/assignment.json": "{\"assignmentId\":\"d1\"}\n",
+    ".fgos/assignments/d1/runs/01/run.json": "{\"runId\":\"rd1\",\"assignmentId\":\"d1\",\"status\":\"running\",\"cwd\":\"/vec/ws-d\",\"startedAt\":\"2026-11-19T09:50:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/d1/admission/generations/0000000001.json": "{\"runId\":\"rd1\",\"attempt\":1}\n",
+    ".fgos/assignments/d2/assignment.json": "{\"assignmentId\":\"d2\"}\n",
+    ".fgos/assignments/d2/runs/01/run.json": "{\"runId\":\"rd2\",\"assignmentId\":\"d2\",\"status\":\"running\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:51:00.000Z\",\"timeoutMs\":600000}\n",
+    ".fgos/assignments/d2/admission/generations/0000000001.json": "{\"runId\":\"rd2\",\"attempt\":1}\n",
+    ".fgos/assignments/d3/assignment.json": "{\"assignmentId\":\"d3\"}\n",
+    ".fgos/assignments/d3/runs/01/run.json": "{\"runId\":\"rd3\",\"assignmentId\":\"d3\",\"status\":\"running\",\"cwd\":\"/vec/ws-a\",\"startedAt\":\"2026-11-19T09:52:00.000Z\",\"timeoutMs\":600000,\"settlement\":\"abandoned-legacy\"}\n",
+    ".fgos/assignments/d3/admission/generations/0000000001.json": "{\"runId\":\"rd3\",\"attempt\":1}\n"
+  },
+  "mtimes": {
+    ".fgos/assignments/a2/runs/01/result.json": "2026-11-19T09:10:00.000Z",
+    ".fgos/assignments/a3/runs/01/result.json": "2026-11-19T09:11:00.000Z",
+    ".fgos/assignments/b1/runs/01/result.json": "2026-11-19T09:12:00.000Z",
+    ".fgos/assignments/b2/runs/01/result.json": "2026-11-19T09:13:00.000Z",
+    ".fgos/assignments/f1/runs/01/result.json": "2026-11-19T09:14:00.000Z",
+    ".fgos/assignments/s1-fb1/runs/01/result.json": "2026-11-19T09:15:00.000Z",
+    ".fgos/assignments/s1/runs/01/result.json": "2026-11-19T09:16:00.000Z"
+  },
+  "observedAt": "2026-11-19T10:00:00.000Z",
+  "viewOf": {
+    "rd1": {
+      "attemptState": "live",
+      "unitState": "running",
+      "resumeCommand": "fgos run resume rd1"
+    },
+    "rd2": {
+      "attemptState": "superseded"
+    }
+  },
+  "definitions": {
+    "definitions": [
+      {
+        "name": "plan-late",
+        "row": {
+          "kind": "blocked",
+          "reason": "late",
+          "nextCommand": "fgos plan show"
+        },
+        "rows": [
+          {
+            "group": {
+              "subject.id": "plan-1"
+            }
+          },
+          {
+            "group": {
+              "subject.id": "plan-2"
+            },
+            "insufficient": true
+          },
+          {
+            "group": {}
+          }
+        ]
+      },
+      {
+        "name": "head-quiet",
+        "unmeasured": "no metric",
+        "row": {
+          "kind": "needs-human",
+          "reason": "quiet",
+          "nextCommand": "x"
+        },
+        "rows": []
+      },
+      {
+        "name": "broken",
+        "error": "host said no"
+      },
+      {
+        "name": "rowless",
+        "rows": [
+          {
+            "group": {
+              "subject.id": "z"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "definitionsCalls": [
+    {
+      "since": "2026-11-19T00:00:00.000Z",
+      "now": "2026-11-19T10:00:00.000Z"
+    },
+    {
+      "since": "2026-11-19T09:35:00.000Z",
+      "now": "2026-11-19T10:00:00.000Z"
+    },
+    {
+      "since": "2026-11-20T00:00:00.000Z",
+      "now": "2026-11-19T10:00:00.000Z"
+    },
+    {
+      "since": "2026-11-19T09:00:00.000Z",
+      "now": "2026-11-19T10:00:00.000Z"
+    }
+  ],
+  "cases": [
+    {
+      "since": "2026-11-19",
+      "withDefinitions": {
+        "contract": {
+          "id": "attention-view",
+          "version": 2
+        },
+        "since": "2026-11-19",
+        "observedAt": "2026-11-19T10:00:00.000Z",
+        "rows": [
+          {
+            "runId": "dup",
+            "subject": "dup",
+            "assignmentId": "a5",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run dup",
+            "line": "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup"
+          },
+          {
+            "runId": "dup",
+            "subject": "dup",
+            "assignmentId": "a6",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run dup",
+            "line": "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup"
+          },
+          {
+            "runId": "r1",
+            "subject": "r1",
+            "assignmentId": "a1",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r1",
+            "line": "controller-dead r1 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r1"
+          },
+          {
+            "runId": "r7a",
+            "subject": "r7a",
+            "assignmentId": "a7",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r7a",
+            "line": "controller-dead r7a /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7a"
+          },
+          {
+            "runId": "r7b",
+            "subject": "r7b",
+            "assignmentId": "a7",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r7b",
+            "line": "controller-dead r7b /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7b"
+          },
+          {
+            "runId": "r7x",
+            "subject": "r7x",
+            "assignmentId": "a7",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r7x",
+            "line": "controller-dead r7x /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7x"
+          },
+          {
+            "runId": "r8",
+            "subject": "r8",
+            "assignmentId": "a8",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r8",
+            "line": "controller-dead r8 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r8"
+          },
+          {
+            "runId": "r3",
+            "subject": "r3",
+            "assignmentId": "a3",
+            "worktree": "/vec/ws-b",
+            "kind": "failed",
+            "reason": "the run result is unreadable",
+            "nextCommand": "fgos dispatch inspect --run r3",
+            "line": "failed r3 /vec/ws-b the run result is unreadable -> fgos dispatch inspect --run r3"
+          },
+          {
+            "runId": "rb1",
+            "subject": "rb1",
+            "assignmentId": "b1",
+            "worktree": "/vec/ws-a",
+            "kind": "needs-human",
+            "reason": "the run stopped for a person: terminal:needs-owner",
+            "nextCommand": "fgos dispatch inspect --run rb1",
+            "line": "needs-human rb1 /vec/ws-a the run stopped for a person: terminal:needs-owner -> fgos dispatch inspect --run rb1"
+          },
+          {
+            "runId": "rb2",
+            "subject": "rb2",
+            "assignmentId": "b2",
+            "worktree": "/vec/ws-a",
+            "kind": "blocked",
+            "reason": "blocked (blocked)",
+            "nextCommand": "fgos dispatch inspect --run rb2",
+            "line": "blocked rb2 /vec/ws-a blocked (blocked) -> fgos dispatch inspect --run rb2"
+          },
+          {
+            "runId": "rf1",
+            "subject": "rf1",
+            "assignmentId": "f1",
+            "worktree": "/vec/ws-a",
+            "kind": "failed",
+            "reason": "the run failed (legacy-failure)",
+            "nextCommand": "fgos dispatch inspect --run rf1",
+            "line": "failed rf1 /vec/ws-a the run failed (legacy-failure) -> fgos dispatch inspect --run rf1"
+          },
+          {
+            "runId": "rd1",
+            "subject": "rd1",
+            "assignmentId": "d1",
+            "worktree": "/vec/ws-d",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos run resume rd1",
+            "line": "controller-dead rd1 /vec/ws-d no result and nobody holds the attempt lock: its controller died -> fgos run resume rd1"
+          },
+          {
+            "subject": "plan-1",
+            "assignmentId": null,
+            "worktree": null,
+            "kind": "blocked",
+            "reason": "late",
+            "nextCommand": "fgos plan show",
+            "line": "blocked plan-1 late -> fgos plan show"
+          },
+          {
+            "subject": "plan-late",
+            "assignmentId": null,
+            "worktree": null,
+            "kind": "blocked",
+            "reason": "late",
+            "nextCommand": "fgos plan show",
+            "line": "blocked plan-late late -> fgos plan show"
+          }
+        ],
+        "unmeasured": [
+          {
+            "name": "head-quiet",
+            "reason": "no metric"
+          },
+          {
+            "name": "broken",
+            "reason": "host said no"
+          }
+        ],
+        "idle": {
+          "state": "not-readable",
+          "reason": "the supervisor keeps its idle clock in memory; no readable record, so no idle rows"
+        },
+        "lines": [
+          "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup",
+          "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup",
+          "controller-dead r1 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r1",
+          "controller-dead r7a /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7a",
+          "controller-dead r7b /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7b",
+          "controller-dead r7x /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7x",
+          "controller-dead r8 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r8",
+          "failed r3 /vec/ws-b the run result is unreadable -> fgos dispatch inspect --run r3",
+          "needs-human rb1 /vec/ws-a the run stopped for a person: terminal:needs-owner -> fgos dispatch inspect --run rb1",
+          "blocked rb2 /vec/ws-a blocked (blocked) -> fgos dispatch inspect --run rb2",
+          "failed rf1 /vec/ws-a the run failed (legacy-failure) -> fgos dispatch inspect --run rf1",
+          "controller-dead rd1 /vec/ws-d no result and nobody holds the attempt lock: its controller died -> fgos run resume rd1",
+          "blocked plan-1 late -> fgos plan show",
+          "blocked plan-late late -> fgos plan show"
+        ]
+      },
+      "withoutDefinitions": {
+        "contract": {
+          "id": "attention-view",
+          "version": 2
+        },
+        "since": "2026-11-19",
+        "observedAt": "2026-11-19T10:00:00.000Z",
+        "rows": [
+          {
+            "runId": "dup",
+            "subject": "dup",
+            "assignmentId": "a5",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run dup",
+            "line": "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup"
+          },
+          {
+            "runId": "dup",
+            "subject": "dup",
+            "assignmentId": "a6",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run dup",
+            "line": "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup"
+          },
+          {
+            "runId": "r1",
+            "subject": "r1",
+            "assignmentId": "a1",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r1",
+            "line": "controller-dead r1 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r1"
+          },
+          {
+            "runId": "r7a",
+            "subject": "r7a",
+            "assignmentId": "a7",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r7a",
+            "line": "controller-dead r7a /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7a"
+          },
+          {
+            "runId": "r7b",
+            "subject": "r7b",
+            "assignmentId": "a7",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r7b",
+            "line": "controller-dead r7b /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7b"
+          },
+          {
+            "runId": "r7x",
+            "subject": "r7x",
+            "assignmentId": "a7",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r7x",
+            "line": "controller-dead r7x /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7x"
+          },
+          {
+            "runId": "r8",
+            "subject": "r8",
+            "assignmentId": "a8",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r8",
+            "line": "controller-dead r8 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r8"
+          },
+          {
+            "runId": "r3",
+            "subject": "r3",
+            "assignmentId": "a3",
+            "worktree": "/vec/ws-b",
+            "kind": "failed",
+            "reason": "the run result is unreadable",
+            "nextCommand": "fgos dispatch inspect --run r3",
+            "line": "failed r3 /vec/ws-b the run result is unreadable -> fgos dispatch inspect --run r3"
+          },
+          {
+            "runId": "rb1",
+            "subject": "rb1",
+            "assignmentId": "b1",
+            "worktree": "/vec/ws-a",
+            "kind": "needs-human",
+            "reason": "the run stopped for a person: terminal:needs-owner",
+            "nextCommand": "fgos dispatch inspect --run rb1",
+            "line": "needs-human rb1 /vec/ws-a the run stopped for a person: terminal:needs-owner -> fgos dispatch inspect --run rb1"
+          },
+          {
+            "runId": "rb2",
+            "subject": "rb2",
+            "assignmentId": "b2",
+            "worktree": "/vec/ws-a",
+            "kind": "blocked",
+            "reason": "blocked (blocked)",
+            "nextCommand": "fgos dispatch inspect --run rb2",
+            "line": "blocked rb2 /vec/ws-a blocked (blocked) -> fgos dispatch inspect --run rb2"
+          },
+          {
+            "runId": "rf1",
+            "subject": "rf1",
+            "assignmentId": "f1",
+            "worktree": "/vec/ws-a",
+            "kind": "failed",
+            "reason": "the run failed (legacy-failure)",
+            "nextCommand": "fgos dispatch inspect --run rf1",
+            "line": "failed rf1 /vec/ws-a the run failed (legacy-failure) -> fgos dispatch inspect --run rf1"
+          },
+          {
+            "runId": "rd1",
+            "subject": "rd1",
+            "assignmentId": "d1",
+            "worktree": "/vec/ws-d",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos run resume rd1",
+            "line": "controller-dead rd1 /vec/ws-d no result and nobody holds the attempt lock: its controller died -> fgos run resume rd1"
+          }
+        ],
+        "unmeasured": [],
+        "idle": {
+          "state": "not-readable",
+          "reason": "the supervisor keeps its idle clock in memory; no readable record, so no idle rows"
+        },
+        "lines": [
+          "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup",
+          "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup",
+          "controller-dead r1 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r1",
+          "controller-dead r7a /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7a",
+          "controller-dead r7b /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7b",
+          "controller-dead r7x /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7x",
+          "controller-dead r8 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r8",
+          "failed r3 /vec/ws-b the run result is unreadable -> fgos dispatch inspect --run r3",
+          "needs-human rb1 /vec/ws-a the run stopped for a person: terminal:needs-owner -> fgos dispatch inspect --run rb1",
+          "blocked rb2 /vec/ws-a blocked (blocked) -> fgos dispatch inspect --run rb2",
+          "failed rf1 /vec/ws-a the run failed (legacy-failure) -> fgos dispatch inspect --run rf1",
+          "controller-dead rd1 /vec/ws-d no result and nobody holds the attempt lock: its controller died -> fgos run resume rd1"
+        ]
+      }
+    },
+    {
+      "since": "2026-11-19T09:35:00Z",
+      "withDefinitions": {
+        "contract": {
+          "id": "attention-view",
+          "version": 2
+        },
+        "since": "2026-11-19T09:35:00Z",
+        "observedAt": "2026-11-19T10:00:00.000Z",
+        "rows": [
+          {
+            "runId": "rd1",
+            "subject": "rd1",
+            "assignmentId": "d1",
+            "worktree": "/vec/ws-d",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos run resume rd1",
+            "line": "controller-dead rd1 /vec/ws-d no result and nobody holds the attempt lock: its controller died -> fgos run resume rd1"
+          },
+          {
+            "subject": "plan-1",
+            "assignmentId": null,
+            "worktree": null,
+            "kind": "blocked",
+            "reason": "late",
+            "nextCommand": "fgos plan show",
+            "line": "blocked plan-1 late -> fgos plan show"
+          },
+          {
+            "subject": "plan-late",
+            "assignmentId": null,
+            "worktree": null,
+            "kind": "blocked",
+            "reason": "late",
+            "nextCommand": "fgos plan show",
+            "line": "blocked plan-late late -> fgos plan show"
+          }
+        ],
+        "unmeasured": [
+          {
+            "name": "head-quiet",
+            "reason": "no metric"
+          },
+          {
+            "name": "broken",
+            "reason": "host said no"
+          }
+        ],
+        "idle": {
+          "state": "not-readable",
+          "reason": "the supervisor keeps its idle clock in memory; no readable record, so no idle rows"
+        },
+        "lines": [
+          "controller-dead rd1 /vec/ws-d no result and nobody holds the attempt lock: its controller died -> fgos run resume rd1",
+          "blocked plan-1 late -> fgos plan show",
+          "blocked plan-late late -> fgos plan show"
+        ]
+      },
+      "withoutDefinitions": {
+        "contract": {
+          "id": "attention-view",
+          "version": 2
+        },
+        "since": "2026-11-19T09:35:00Z",
+        "observedAt": "2026-11-19T10:00:00.000Z",
+        "rows": [
+          {
+            "runId": "rd1",
+            "subject": "rd1",
+            "assignmentId": "d1",
+            "worktree": "/vec/ws-d",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos run resume rd1",
+            "line": "controller-dead rd1 /vec/ws-d no result and nobody holds the attempt lock: its controller died -> fgos run resume rd1"
+          }
+        ],
+        "unmeasured": [],
+        "idle": {
+          "state": "not-readable",
+          "reason": "the supervisor keeps its idle clock in memory; no readable record, so no idle rows"
+        },
+        "lines": [
+          "controller-dead rd1 /vec/ws-d no result and nobody holds the attempt lock: its controller died -> fgos run resume rd1"
+        ]
+      }
+    },
+    {
+      "since": "2026-11-20",
+      "withDefinitions": {
+        "contract": {
+          "id": "attention-view",
+          "version": 2
+        },
+        "since": "2026-11-20",
+        "observedAt": "2026-11-19T10:00:00.000Z",
+        "rows": [
+          {
+            "subject": "plan-1",
+            "assignmentId": null,
+            "worktree": null,
+            "kind": "blocked",
+            "reason": "late",
+            "nextCommand": "fgos plan show",
+            "line": "blocked plan-1 late -> fgos plan show"
+          },
+          {
+            "subject": "plan-late",
+            "assignmentId": null,
+            "worktree": null,
+            "kind": "blocked",
+            "reason": "late",
+            "nextCommand": "fgos plan show",
+            "line": "blocked plan-late late -> fgos plan show"
+          }
+        ],
+        "unmeasured": [
+          {
+            "name": "head-quiet",
+            "reason": "no metric"
+          },
+          {
+            "name": "broken",
+            "reason": "host said no"
+          }
+        ],
+        "idle": {
+          "state": "not-readable",
+          "reason": "the supervisor keeps its idle clock in memory; no readable record, so no idle rows"
+        },
+        "lines": [
+          "blocked plan-1 late -> fgos plan show",
+          "blocked plan-late late -> fgos plan show"
+        ]
+      },
+      "withoutDefinitions": {
+        "contract": {
+          "id": "attention-view",
+          "version": 2
+        },
+        "since": "2026-11-20",
+        "observedAt": "2026-11-19T10:00:00.000Z",
+        "rows": [],
+        "unmeasured": [],
+        "idle": {
+          "state": "not-readable",
+          "reason": "the supervisor keeps its idle clock in memory; no readable record, so no idle rows"
+        },
+        "lines": []
+      }
+    },
+    {
+      "since": "2026-11-19T09:00:00+00:00",
+      "withDefinitions": {
+        "contract": {
+          "id": "attention-view",
+          "version": 2
+        },
+        "since": "2026-11-19T09:00:00+00:00",
+        "observedAt": "2026-11-19T10:00:00.000Z",
+        "rows": [
+          {
+            "runId": "dup",
+            "subject": "dup",
+            "assignmentId": "a5",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run dup",
+            "line": "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup"
+          },
+          {
+            "runId": "dup",
+            "subject": "dup",
+            "assignmentId": "a6",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run dup",
+            "line": "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup"
+          },
+          {
+            "runId": "r1",
+            "subject": "r1",
+            "assignmentId": "a1",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r1",
+            "line": "controller-dead r1 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r1"
+          },
+          {
+            "runId": "r7a",
+            "subject": "r7a",
+            "assignmentId": "a7",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r7a",
+            "line": "controller-dead r7a /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7a"
+          },
+          {
+            "runId": "r7b",
+            "subject": "r7b",
+            "assignmentId": "a7",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r7b",
+            "line": "controller-dead r7b /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7b"
+          },
+          {
+            "runId": "r7x",
+            "subject": "r7x",
+            "assignmentId": "a7",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r7x",
+            "line": "controller-dead r7x /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7x"
+          },
+          {
+            "runId": "r8",
+            "subject": "r8",
+            "assignmentId": "a8",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r8",
+            "line": "controller-dead r8 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r8"
+          },
+          {
+            "runId": "r3",
+            "subject": "r3",
+            "assignmentId": "a3",
+            "worktree": "/vec/ws-b",
+            "kind": "failed",
+            "reason": "the run result is unreadable",
+            "nextCommand": "fgos dispatch inspect --run r3",
+            "line": "failed r3 /vec/ws-b the run result is unreadable -> fgos dispatch inspect --run r3"
+          },
+          {
+            "runId": "rb1",
+            "subject": "rb1",
+            "assignmentId": "b1",
+            "worktree": "/vec/ws-a",
+            "kind": "needs-human",
+            "reason": "the run stopped for a person: terminal:needs-owner",
+            "nextCommand": "fgos dispatch inspect --run rb1",
+            "line": "needs-human rb1 /vec/ws-a the run stopped for a person: terminal:needs-owner -> fgos dispatch inspect --run rb1"
+          },
+          {
+            "runId": "rb2",
+            "subject": "rb2",
+            "assignmentId": "b2",
+            "worktree": "/vec/ws-a",
+            "kind": "blocked",
+            "reason": "blocked (blocked)",
+            "nextCommand": "fgos dispatch inspect --run rb2",
+            "line": "blocked rb2 /vec/ws-a blocked (blocked) -> fgos dispatch inspect --run rb2"
+          },
+          {
+            "runId": "rf1",
+            "subject": "rf1",
+            "assignmentId": "f1",
+            "worktree": "/vec/ws-a",
+            "kind": "failed",
+            "reason": "the run failed (legacy-failure)",
+            "nextCommand": "fgos dispatch inspect --run rf1",
+            "line": "failed rf1 /vec/ws-a the run failed (legacy-failure) -> fgos dispatch inspect --run rf1"
+          },
+          {
+            "runId": "rd1",
+            "subject": "rd1",
+            "assignmentId": "d1",
+            "worktree": "/vec/ws-d",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos run resume rd1",
+            "line": "controller-dead rd1 /vec/ws-d no result and nobody holds the attempt lock: its controller died -> fgos run resume rd1"
+          },
+          {
+            "subject": "plan-1",
+            "assignmentId": null,
+            "worktree": null,
+            "kind": "blocked",
+            "reason": "late",
+            "nextCommand": "fgos plan show",
+            "line": "blocked plan-1 late -> fgos plan show"
+          },
+          {
+            "subject": "plan-late",
+            "assignmentId": null,
+            "worktree": null,
+            "kind": "blocked",
+            "reason": "late",
+            "nextCommand": "fgos plan show",
+            "line": "blocked plan-late late -> fgos plan show"
+          }
+        ],
+        "unmeasured": [
+          {
+            "name": "head-quiet",
+            "reason": "no metric"
+          },
+          {
+            "name": "broken",
+            "reason": "host said no"
+          }
+        ],
+        "idle": {
+          "state": "not-readable",
+          "reason": "the supervisor keeps its idle clock in memory; no readable record, so no idle rows"
+        },
+        "lines": [
+          "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup",
+          "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup",
+          "controller-dead r1 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r1",
+          "controller-dead r7a /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7a",
+          "controller-dead r7b /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7b",
+          "controller-dead r7x /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7x",
+          "controller-dead r8 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r8",
+          "failed r3 /vec/ws-b the run result is unreadable -> fgos dispatch inspect --run r3",
+          "needs-human rb1 /vec/ws-a the run stopped for a person: terminal:needs-owner -> fgos dispatch inspect --run rb1",
+          "blocked rb2 /vec/ws-a blocked (blocked) -> fgos dispatch inspect --run rb2",
+          "failed rf1 /vec/ws-a the run failed (legacy-failure) -> fgos dispatch inspect --run rf1",
+          "controller-dead rd1 /vec/ws-d no result and nobody holds the attempt lock: its controller died -> fgos run resume rd1",
+          "blocked plan-1 late -> fgos plan show",
+          "blocked plan-late late -> fgos plan show"
+        ]
+      },
+      "withoutDefinitions": {
+        "contract": {
+          "id": "attention-view",
+          "version": 2
+        },
+        "since": "2026-11-19T09:00:00+00:00",
+        "observedAt": "2026-11-19T10:00:00.000Z",
+        "rows": [
+          {
+            "runId": "dup",
+            "subject": "dup",
+            "assignmentId": "a5",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run dup",
+            "line": "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup"
+          },
+          {
+            "runId": "dup",
+            "subject": "dup",
+            "assignmentId": "a6",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run dup",
+            "line": "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup"
+          },
+          {
+            "runId": "r1",
+            "subject": "r1",
+            "assignmentId": "a1",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r1",
+            "line": "controller-dead r1 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r1"
+          },
+          {
+            "runId": "r7a",
+            "subject": "r7a",
+            "assignmentId": "a7",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r7a",
+            "line": "controller-dead r7a /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7a"
+          },
+          {
+            "runId": "r7b",
+            "subject": "r7b",
+            "assignmentId": "a7",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r7b",
+            "line": "controller-dead r7b /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7b"
+          },
+          {
+            "runId": "r7x",
+            "subject": "r7x",
+            "assignmentId": "a7",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r7x",
+            "line": "controller-dead r7x /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7x"
+          },
+          {
+            "runId": "r8",
+            "subject": "r8",
+            "assignmentId": "a8",
+            "worktree": "/vec/ws-a",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos dispatch inspect --run r8",
+            "line": "controller-dead r8 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r8"
+          },
+          {
+            "runId": "r3",
+            "subject": "r3",
+            "assignmentId": "a3",
+            "worktree": "/vec/ws-b",
+            "kind": "failed",
+            "reason": "the run result is unreadable",
+            "nextCommand": "fgos dispatch inspect --run r3",
+            "line": "failed r3 /vec/ws-b the run result is unreadable -> fgos dispatch inspect --run r3"
+          },
+          {
+            "runId": "rb1",
+            "subject": "rb1",
+            "assignmentId": "b1",
+            "worktree": "/vec/ws-a",
+            "kind": "needs-human",
+            "reason": "the run stopped for a person: terminal:needs-owner",
+            "nextCommand": "fgos dispatch inspect --run rb1",
+            "line": "needs-human rb1 /vec/ws-a the run stopped for a person: terminal:needs-owner -> fgos dispatch inspect --run rb1"
+          },
+          {
+            "runId": "rb2",
+            "subject": "rb2",
+            "assignmentId": "b2",
+            "worktree": "/vec/ws-a",
+            "kind": "blocked",
+            "reason": "blocked (blocked)",
+            "nextCommand": "fgos dispatch inspect --run rb2",
+            "line": "blocked rb2 /vec/ws-a blocked (blocked) -> fgos dispatch inspect --run rb2"
+          },
+          {
+            "runId": "rf1",
+            "subject": "rf1",
+            "assignmentId": "f1",
+            "worktree": "/vec/ws-a",
+            "kind": "failed",
+            "reason": "the run failed (legacy-failure)",
+            "nextCommand": "fgos dispatch inspect --run rf1",
+            "line": "failed rf1 /vec/ws-a the run failed (legacy-failure) -> fgos dispatch inspect --run rf1"
+          },
+          {
+            "runId": "rd1",
+            "subject": "rd1",
+            "assignmentId": "d1",
+            "worktree": "/vec/ws-d",
+            "kind": "controller-dead",
+            "reason": "no result and nobody holds the attempt lock: its controller died",
+            "nextCommand": "fgos run resume rd1",
+            "line": "controller-dead rd1 /vec/ws-d no result and nobody holds the attempt lock: its controller died -> fgos run resume rd1"
+          }
+        ],
+        "unmeasured": [],
+        "idle": {
+          "state": "not-readable",
+          "reason": "the supervisor keeps its idle clock in memory; no readable record, so no idle rows"
+        },
+        "lines": [
+          "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup",
+          "controller-dead dup /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run dup",
+          "controller-dead r1 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r1",
+          "controller-dead r7a /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7a",
+          "controller-dead r7b /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7b",
+          "controller-dead r7x /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r7x",
+          "controller-dead r8 /vec/ws-a no result and nobody holds the attempt lock: its controller died -> fgos dispatch inspect --run r8",
+          "failed r3 /vec/ws-b the run result is unreadable -> fgos dispatch inspect --run r3",
+          "needs-human rb1 /vec/ws-a the run stopped for a person: terminal:needs-owner -> fgos dispatch inspect --run rb1",
+          "blocked rb2 /vec/ws-a blocked (blocked) -> fgos dispatch inspect --run rb2",
+          "failed rf1 /vec/ws-a the run failed (legacy-failure) -> fgos dispatch inspect --run rf1",
+          "controller-dead rd1 /vec/ws-d no result and nobody holds the attempt lock: its controller died -> fgos run resume rd1"
+        ]
+      }
+    }
+  ],
+  "outcomes": {
+    ".fgos/assignments/a2/runs/01/result.json": "pass",
+    ".fgos/assignments/a3/runs/01/result.json": "execution-failure",
+    ".fgos/assignments/f1/runs/01/result.json": "execution-failure",
+    ".fgos/assignments/b1/runs/01/result.json": "blocked",
+    ".fgos/assignments/b2/runs/01/result.json": "blocked",
+    ".fgos/assignments/s1-fb1/runs/01/result.json": "execution-failure",
+    ".fgos/assignments/s1/runs/01/result.json": "pass"
+  }
+}

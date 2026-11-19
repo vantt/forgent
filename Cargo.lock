@@ -245,6 +245,7 @@ dependencies = [
  "fgos-durable-file",
  "fgos-event-store",
  "fgos-execution",
+ "fgos-execution-engine",
  "fgos-git",
  "fgos-graph",
  "fgos-holder-lock",

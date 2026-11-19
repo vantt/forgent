@@ -1360,45 +1360,49 @@ fn lifecycle_attempts_exclude_commit_and_sync() {
             resources.push(format!("worktree:{}", f.temp.join("moved").display()));
         }
         resources.sort();
-        let wal = wal::Wal::open(&f.repo).unwrap();
-        let wal::Begin::Created(chain) = wal
-            .begin(
-                "lifecycle",
-                wal::Intent {
-                    kind,
-                    request_digest: "a".repeat(64),
-                    repo_identity: wal.repository_identity().into(),
-                    resource_set: resources,
-                    authority_binding: "admin".into(),
-                    writer_identity: "fixture".into(),
-                    object_format: f.repo.object_format(),
-                    expected: if action == "create" {
-                        wal::Tip::Absent
-                    } else {
-                        wal::Tip::Oid(baseline.head.clone())
+        // The writer died mid-operation: its Wal (and the per-operation
+        // liveness lock it holds) is gone before anyone else is admitted.
+        {
+            let wal = wal::Wal::open(&f.repo).unwrap();
+            let wal::Begin::Created(chain) = wal
+                .begin(
+                    "lifecycle",
+                    wal::Intent {
+                        kind,
+                        request_digest: "a".repeat(64),
+                        repo_identity: wal.repository_identity().into(),
+                        resource_set: resources,
+                        authority_binding: "admin".into(),
+                        writer_identity: "fixture".into(),
+                        object_format: f.repo.object_format(),
+                        expected: if action == "create" {
+                            wal::Tip::Absent
+                        } else {
+                            wal::Tip::Oid(baseline.head.clone())
+                        },
+                        next: if action == "remove" {
+                            wal::Tip::Absent
+                        } else {
+                            wal::Tip::Oid(baseline.head.clone())
+                        },
                     },
-                    next: if action == "remove" {
-                        wal::Tip::Absent
-                    } else {
-                        wal::Tip::Oid(baseline.head.clone())
-                    },
+                    &Held,
+                )
+                .unwrap()
+            else {
+                panic!()
+            };
+            let chain = wal.append(&chain, wal::Phase::Prepared).unwrap();
+            wal.append(
+                &chain,
+                wal::Phase::TargetAttempt {
+                    prior_target_attempt: None,
+                    expected: chain.intent().expected.clone(),
+                    next: chain.intent().next.clone(),
                 },
-                &Held,
             )
-            .unwrap()
-        else {
-            panic!()
-        };
-        let chain = wal.append(&chain, wal::Phase::Prepared).unwrap();
-        wal.append(
-            &chain,
-            wal::Phase::TargetAttempt {
-                prior_target_attempt: None,
-                expected: chain.intent().expected.clone(),
-                next: chain.intent().next.clone(),
-            },
-        )
-        .unwrap();
+            .unwrap();
+        }
         fs::write(f.tree.join("a"), "producer edit").unwrap();
         let err = f
             .driver
@@ -1429,7 +1433,12 @@ fn lifecycle_attempts_exclude_commit_and_sync() {
             .start_sync(&f.repo, f.held(), &target, "sync", "fixture", "new-sync")
             .unwrap_err();
         assert_eq!(err.code, ResultCode::RecoveryRequired, "{err:?}");
-        assert!(wal.inspect("lifecycle").unwrap().outcome().is_none());
+        assert!(wal::Wal::open(&f.repo)
+            .unwrap()
+            .inspect("lifecycle")
+            .unwrap()
+            .outcome()
+            .is_none());
     }
 }
 

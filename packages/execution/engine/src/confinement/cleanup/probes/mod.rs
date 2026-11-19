@@ -14,6 +14,7 @@ mod basic;
 mod fingerprint;
 mod machine_private;
 mod peer;
+mod ports;
 mod sandbox;
 
 pub use all::{run_all_confinement_probes, ProbePorts, ProbeRun};
@@ -30,6 +31,7 @@ pub use machine_private::{
     machine_private_hidden, MachinePrivateFalsifier, MACHINE_PRIVATE_FALSIFIERS,
 };
 pub use peer::peer_run_hidden;
+pub use ports::{driver_over, NoLogin, PolicyResolver};
 
 use serde_json::{json, Value};
 

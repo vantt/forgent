@@ -67,6 +67,8 @@ through `legacy_exec::payload_command` (`apps/fgos/src/wiring/doctor/bridge.rs:1
   admission through the native door" (F4); one case per internal op; `test/cli/run-verb.test.mjs` behaviours moved to
   their Rust owners and the file deleted or cut to its one wiring proof.
 
+- Carried in from landed phases (2026-11-19): supply the real BundledSqlite engine and phase-9 account locks to phase 14's `ConfinementHomes` finalizer; build the `PaneScreen` adapter (settlement pane read, host terminal); the Windows lock-handover decision from 16b. Pre-land proof (OPC): the first binary linking fgos-execution-engine is built and linked natively on windows-msvc and macOS (release-assets-check gains a macOS job or uses the platform-probe macOS matrix).
+
 ## Footprint
 
 As the plan table row 19. The row leaves out `bin/fgos.mjs`, `src/cli/command-registry.mjs` and the SECRETARY-CAPS files (plan 261119-1615: `packages/run-supervisor/rust/src/{head_request,route}.rs`, `rust/src/supervise/terminal.rs`, `rust/tests/{head_request,head_role_binding}.rs`, `rust/examples/internal_harness.rs`, `contracts/head-request.v1.json`, `apps/fgos/src/wiring/session_write_publish.rs`, `apps/fgos/tests/{session_write_publish,questions_head}.rs`, `src/session-host/head-start.mjs`, `test/cli/session-verb.test.mjs`, `test/session-host/{head-start,head-request}.test.mjs`) while plan 261119-1615 (lead:SECRETARY-CAPS) owns them. Re-add them (plan footprint and row) when this phase starts after 1615 lands; the `run` arm deletion in `bin/fgos.mjs` and the registry edit happen then.

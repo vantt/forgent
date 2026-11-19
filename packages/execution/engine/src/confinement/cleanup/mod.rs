@@ -35,9 +35,9 @@ pub use marker::{
     OWNERSHIP_CONTRACT, OWNERSHIP_CREATOR, OWNERSHIP_MARKER_FILE,
 };
 pub use orphans::{
-    canonical_root, default_temp_roots, judge_confinement_orphans, list_kept_credential_homes,
-    remove_confinement_orphans, settle_held_credential_homes, CredentialWriteBack, KeptHome,
-    Orphans, Removed, Settled, WriteBackOutcome,
+    canonical_root, credential_scan_roots, default_temp_roots, judge_confinement_orphans,
+    list_kept_credential_homes, remove_confinement_orphans, settle_held_credential_homes,
+    CredentialWriteBack, KeptHome, Orphans, Removed, Settled, WriteBackOutcome,
 };
 pub use record::{
     count_credential_keep, read_attempt_home_record, remove_attempt_home,
@@ -48,3 +48,4 @@ pub use remove::{
     cleanup_confinement_resource, describe_attempt_home, keep_session_transcript,
     remove_confinement_dir, Cleaned, HomeEntry, Transcript,
 };
+pub use resolve::current_uid;

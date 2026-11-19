@@ -267,6 +267,14 @@ test('Git repo-config is a rank 80 leaf', () => {
   assert.deepEqual({ kind: row.kind, rank: row.rank, owner: row.owner }, { kind: 'mutex', rank: 80, owner: 'git' });
 });
 
+test('the Git operation mutex is a per-operation repo leaf at rank 80 owned by git', () => {
+  const row = registry.locks.find((lock) => lock.name === 'git-operation');
+  assert.deepEqual(row, { name: 'git-operation', kind: 'mutex', scope: 'repo', rank: 80,
+    v3Path: '<common>/fgos/git/locks/op--<operationId>.lock', owner: 'git' });
+  assert.deepEqual(validate(row, schema.$defs.lock, schema), []);
+  assert.match(registry.ranks['80'].note, /\bgit-operation\b/);
+});
+
 test('the mailbox mutex is a repo leaf at rank 80 owned by the mailbox', () => {
   const row = registry.locks.find((lock) => lock.name === 'mailbox');
   assert.deepEqual(row, { name: 'mailbox', kind: 'mutex', scope: 'repo', rank: 80,
