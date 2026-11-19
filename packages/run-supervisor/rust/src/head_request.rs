@@ -449,6 +449,12 @@ pub fn identity_holds(
     ) {
         Ok(holder) => Ok(holder.id == own),
         Err(r) if r.reason == "not-found" => Ok(false),
+        // Two live holders still after Identity's own recheck: the refusal says so, so it does not read as
+        // "you do not hold it". The answer stays closed.
+        Err(r) if r.reason == "ambiguous" => Err(HoldError {
+            code: "identity-ambiguous".into(),
+            detail: r.detail,
+        }),
         Err(r) => Err(hold_error(r)),
     }
 }

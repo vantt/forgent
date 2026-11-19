@@ -1614,7 +1614,8 @@ impl Hit<'_> {
 /// The scan is lock-free. Only an `ambiguous` answer is checked again, once, under the `identity-directory` lock
 /// with a bounded wait: a role take stores the new holder and then strips the old one while holding that lock, so a
 /// scan between the two writes sees two holders that the rescan, taken after the take finished, sees as one. Still
-/// `ambiguous` under the lock is real, and so is returned; a lock that stays busy returns the first answer.
+/// `ambiguous` under the lock is real, and so is returned; a lock that stays busy returns the first answer. An
+/// ambiguity among shared (other machines') sessions only is returned without taking the lock.
 pub fn resolve(
     root: &Path,
     query: &str,
@@ -1623,7 +1624,15 @@ pub fn resolve(
     terminal: &dyn TerminalPort,
 ) -> Result<Listed, Refusal> {
     match resolve_scan(root, query, judge, shared, terminal) {
-        Err(first) if first.reason == "ambiguous" => {
+        // Only a local row can be a take caught between its two writes; an ambiguity wholly in the shared view has
+        // no local writer to wait for.
+        Err(first)
+            if first.reason == "ambiguous"
+                && first
+                    .candidates
+                    .iter()
+                    .any(|candidate| candidate.remote.is_none()) =>
+        {
             let mut lock = DirLock::new(root);
             if lock.hold_for(AMBIGUOUS_RESCAN_WAIT_MS).is_err() {
                 return Err(first);
