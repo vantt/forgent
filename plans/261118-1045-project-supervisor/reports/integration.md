@@ -60,3 +60,19 @@ Every "Full run: PENDING (full gate)" above is answered here.
   the whole lane wait (`test/runner/spawn-worker.test.mjs`). Fixed in main 2dbabb340 (the run supervisor gives back the
   unused wait on `softAt`); follow-up for the hard ceiling of a seat with no soft budget: backlog `p-sksopwqyto`.
 - Still pending: step 5 (live run, acceptance 8) in the supervisor's window; step 6 (script removal).
+
+## Live run, first window (2026-11-19 11:44-12:11, release sha256:c9e48aa5, main bcb6a2ad5)
+Blocked; window closed. Pointers: board lines of 11:4x-12:1x; watcher journal `journalctl --user -u fgos-watcher-e9756c48`.
+- Worked: `watcher.enabled` on + `doctor --fix` installed the timer; the full tick at 12:03 raised `plan-became-ready`
+  and `plan-ready-waiting` for the throwaway plan `plans/261119-1142-supervisor-live-run` (landed fa41a7b86 with
+  `fgos land --paths`, which also caught the main checkout up) and woke the supervisor: wake outcome `started`,
+  `head:supervisor-forgent` live (executor agy).
+- Blocker: a confined supervisor cannot read its queue or plans: `fgos supervisor queue|plans` inside the sandbox fail
+  `event-store-io` (only `handled|done` went through the request socket). It admitted nothing and started no lead.
+  Ended with `fgos session stop supervisor --name forgent`; `watcher.enabled` unset (timer removed).
+  Fix: branch `sv/fix-supervisor-reads` (reads through the socket door and grant, audit of every read both skills do).
+- Findings: (1) first wake `persona not found`: the main checkout was 88 commits behind (fixed by the first
+  `fgos land --paths`); (2) 29 historical events raised by the lookback on first enable (marked handled by the lead);
+  (3) `supervisor handled a b c` marked only the first id, and (4) handled head-gone events were re-raised with new ids
+  (both fixed on the fix branch); (5) idle mode delays detection up to 15 min: backlog `p-xpeg4jshiu`; (6) the timer
+  fired every ~120 s: no `AccuracySec`, systemd's 1 min default (fixed on the fix branch).
