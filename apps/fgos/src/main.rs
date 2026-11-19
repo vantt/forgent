@@ -177,21 +177,6 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::supervision::SLOTS_DESCRIPTOR,
 ];
 
-/// The operation catalog the host links: the `fgos-host-runtime` entries and the supervision verbs' own.
-fn operation_catalog() -> fgos_host_runtime::OperationCatalog {
-    static LINKED: std::sync::OnceLock<Vec<fgos_host_runtime::OperationDescriptor>> =
-        std::sync::OnceLock::new();
-    LINKED
-        .get_or_init(|| {
-            CATALOG
-                .iter()
-                .cloned()
-                .chain(wiring::supervision::catalog_entries())
-                .collect()
-        })
-        .as_slice()
-}
-
 /// The legacy payload root of the running release, for the verbs that read what it ships (its skills, its scripts).
 fn active_payload_root() -> Result<std::path::PathBuf, String> {
     legacy_exec::resolve_payload().map(|payload| payload.root)
@@ -348,11 +333,7 @@ fn main() {
     }
 
     // Composition root: build snapshot and InvocationService.
-    let snapshot = build_snapshot(
-        operation_catalog(),
-        COMPOSITION_PROVIDERS,
-        "fgos-composition-root-v1",
-    );
+    let snapshot = build_snapshot(CATALOG, COMPOSITION_PROVIDERS, "fgos-composition-root-v1");
     let service = InvocationService::new(snapshot);
     service.register_provider(Arc::new(fgos_distribution::BuildShowProvider::new()));
     service.register_provider(Arc::new(fgos_work_state::GateBypassShowProvider::new()));

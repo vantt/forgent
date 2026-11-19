@@ -431,6 +431,61 @@ pub const CATALOG: &[OperationDescriptor] = &[
         allowed_host_kinds: &["cli"],
         streaming_mode: StreamingMode::None,
     },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("watcher.tick"),
+        owning_component_id: Cow::Borrowed("supervision"),
+        request_contract: ContractRef::from_static("watcher.tick.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("watcher.tick.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("supervision.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("supervisor.read"),
+        owning_component_id: Cow::Borrowed("supervision"),
+        request_contract: ContractRef::from_static("supervisor.read.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("supervisor.read.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("supervision.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("supervisor.write"),
+        owning_component_id: Cow::Borrowed("supervision"),
+        request_contract: ContractRef::from_static("supervisor.write.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("supervisor.write.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("supervision.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("land.run"),
+        owning_component_id: Cow::Borrowed("supervision"),
+        request_contract: ContractRef::from_static("land.run.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("land.run.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("supervision.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("slots.read"),
+        owning_component_id: Cow::Borrowed("supervision"),
+        request_contract: ContractRef::from_static("slots.read.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("slots.read.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("supervision.read"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
 ];
 
 #[cfg(test)]
@@ -440,8 +495,8 @@ mod tests {
     #[test]
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
-        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run and the init run, the dispatch decide and explain, and the agents list.
-        assert_eq!(CATALOG.len(), 38);
+        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run and the init run, the dispatch decide and explain, the agents list, and the supervision tick, supervisor read and write, land and slots.
+        assert_eq!(CATALOG.len(), 43);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -481,6 +536,15 @@ mod tests {
         assert!(ids.contains(&"agents.list"));
         assert!(ids.contains(&"questions.read"));
         assert!(ids.contains(&"questions.write"));
+        for id in [
+            "watcher.tick",
+            "supervisor.read",
+            "supervisor.write",
+            "land.run",
+            "slots.read",
+        ] {
+            assert!(ids.contains(&id));
+        }
     }
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips

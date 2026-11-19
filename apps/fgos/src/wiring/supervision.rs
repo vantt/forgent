@@ -13,10 +13,9 @@ use fgos_git::{
     GitDriver, Inspect, Oid, PathValue, RefName, RefValue, RemoteGrant, RepoHandle, TrunkFact,
 };
 use fgos_host_runtime::{
-    CategorisedRefusal, ContractRef, EventSink, HostInvocation, InvocationControl,
-    OperationDescriptor, OperationEffect, OperationId, OperationIdempotency, OperationProvider,
-    OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle, ProviderOutcome,
-    StreamingMode, VerbAnswer,
+    CategorisedRefusal, ContractRef, EventSink, HostInvocation, InvocationControl, OperationId,
+    OperationProvider, OperationRequest, ProviderDescriptor, ProviderError, ProviderLifecycle,
+    ProviderOutcome, VerbAnswer,
 };
 use fgos_observe::record::store::RecordDoor;
 use fgos_observe::record::types::{AttrValue, Basis, Origin, Record, SubjectRef, RECORD_VERSION};
@@ -93,54 +92,6 @@ pub const SLOTS_DESCRIPTOR: ProviderDescriptor = descriptor(
     "slots.read.request",
     "slots.read.outcome",
 );
-
-/// The catalog entries of the five operations: the catalog authors a verb's request and outcome contracts and its
-/// authority policy, and the host adds these to the `fgos-host-runtime` entries it links.
-pub fn catalog_entries() -> Vec<OperationDescriptor> {
-    let entry =
-        |id: &'static str, effect: OperationEffect, policy: &'static str| OperationDescriptor {
-            operation_id: OperationId::from_static(id),
-            owning_component_id: Cow::Borrowed("supervision"),
-            request_contract: ContractRef::new(format!("{id}.request"), "1.0.0"),
-            outcome_contract: ContractRef::new(format!("{id}.outcome"), "1.0.0"),
-            effect,
-            idempotency: if effect == OperationEffect::Read {
-                OperationIdempotency::Safe
-            } else {
-                OperationIdempotency::None
-            },
-            authority_policy_id: Cow::Borrowed(policy),
-            allowed_host_kinds: &["cli"],
-            streaming_mode: StreamingMode::None,
-        };
-    vec![
-        entry(
-            TICK_OPERATION_ID,
-            OperationEffect::Write,
-            "supervision.write",
-        ),
-        entry(
-            SUPERVISOR_READ_OPERATION_ID,
-            OperationEffect::Read,
-            "supervision.read",
-        ),
-        entry(
-            SUPERVISOR_WRITE_OPERATION_ID,
-            OperationEffect::Write,
-            "supervision.write",
-        ),
-        entry(
-            LAND_OPERATION_ID,
-            OperationEffect::Write,
-            "supervision.write",
-        ),
-        entry(
-            SLOTS_OPERATION_ID,
-            OperationEffect::Read,
-            "supervision.read",
-        ),
-    ]
-}
 
 /// What the caller asked for. `root` is the project the doors resolved.
 #[derive(Debug, Clone)]

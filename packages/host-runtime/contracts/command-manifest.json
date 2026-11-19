@@ -2875,15 +2875,270 @@
     {
       "name": "slots",
       "invoke": "fgos slots",
-      "description": "Read-only worker-slot ledger: how many work items are running right now (execution-lane occupancy, one running item = one slot), whether the lane has room under the configured ceiling, and the admin lane's fixed reservation. This is the port launchers pre-check before standing a worker up — herdr-dashboard (Rust) and fgos-fanout (a prose skill) reach the engine only through the CLI, per decision 0014. An absent or null workerSlots.ceiling means no ceiling: hasRoom is always true, which is what a project has until a person arms it. Not paginated: a launcher reads the fixed summary fields (hasRoom, occupied, ceiling, free), and execution.items — one row per running item, so it grows with the number of items at doing — is diagnostic detail for a human, never a row set to page through.",
+      "description": "Read-only lane view, served natively by the Rust host: how many plan lanes hold a seat right now, the configured ceiling and how many are free. Answers {lanes: {ceiling, live, free, seats: [{k, held}]}} (one seat per live lead, `held` is the role that holds it). `ceiling` and `free` are null while workerSlots.ceiling is unset, which is what a project has until a person arms it. launchers (herdr-dashboard, fgos-fanout) reach the engine only through the CLI, per decision 0014, and pre-check this before standing a worker up. Not paginated: the seat rows grow with the live leads, never a row set to page through.",
       "parameters": {
         "type": "object",
         "properties": {},
         "required": []
       },
       "examples": [
-        "fgos slots"
+        "fgos slots",
+        "fgos slots --json"
       ],
+      "touchesState": false,
+      "externalEffect": false,
+      "paginated": false,
+      "deprecated": null
+    },
+    {
+      "name": "watcher",
+      "invoke": "fgos watcher tick",
+      "description": "The project watcher (docs/platform/supervision): `tick` runs one pass, served natively by the Rust host under the `watcher` repo lock. It runs the configured watcher definitions, raises one supervision event per fired row (a duplicate of a still-open row is counted, not raised), sends the notify kinds through the mailbox and wakes the supervisor when a trigger is unhandled. An overrunning tick makes the next one `skipped-busy`, never concurrent.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "sub": {
+            "type": "string",
+            "description": "Sub-verb (positional); its own flags are under subcommands.<sub>.parameters.",
+            "enum": [
+              "tick"
+            ]
+          }
+        },
+        "positional": [
+          "sub"
+        ],
+        "required": [
+          "sub"
+        ]
+      },
+      "examples": [
+        "fgos watcher tick"
+      ],
+      "subcommands": {
+        "tick": {
+          "description": "Run one watcher pass and print what it raised, found as duplicates, notified and woke.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "examples": [
+            "fgos watcher tick",
+            "fgos watcher tick --json"
+          ]
+        }
+      },
+      "touchesState": true,
+      "externalEffect": true,
+      "paginated": false,
+      "deprecated": null
+    },
+    {
+      "name": "supervisor",
+      "invoke": "fgos supervisor <wake|plans|queue|handled|done>",
+      "description": "The plan supervisor's verbs, served natively by the Rust host. `wake` starts the supervisor head when an event is unhandled and none is live (answers nothing-unhandled, starting or started); `plans` lists the ready plans of the trunk tip; `queue` lists the unhandled supervision events; `handled` marks events handled; `done` ends the supervisor's run and refuses while an event is unhandled. From inside a confined head `handled` and `done` go through its request socket.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "sub": {
+            "type": "string",
+            "description": "Sub-verb (positional); its own flags are under subcommands.<sub>.parameters.",
+            "enum": [
+              "wake",
+              "plans",
+              "queue",
+              "handled",
+              "done"
+            ]
+          }
+        },
+        "positional": [
+          "sub"
+        ],
+        "required": [
+          "sub"
+        ]
+      },
+      "examples": [
+        "fgos supervisor queue",
+        "fgos supervisor handled <id>",
+        "fgos supervisor done"
+      ],
+      "subcommands": {
+        "wake": {
+          "description": "Start the supervisor head when an event is unhandled and no supervisor is live; records the wake.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "examples": [
+            "fgos supervisor wake"
+          ]
+        },
+        "plans": {
+          "description": "Read-only: the plans of the trunk tip with their status, from each plan.md.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "examples": [
+            "fgos supervisor plans --json"
+          ]
+        },
+        "queue": {
+          "description": "Read-only: the supervision events that are not handled yet.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "examples": [
+            "fgos supervisor queue --json"
+          ]
+        },
+        "handled": {
+          "description": "Mark one or more supervision events handled (positional event ids).",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "event": {
+                "type": "string",
+                "description": "Positional: one or more event ids from `fgos supervisor queue`."
+              }
+            },
+            "positional": [
+              "event"
+            ],
+            "required": [
+              "event"
+            ]
+          },
+          "examples": [
+            "fgos supervisor handled 0a1b2c"
+          ]
+        },
+        "done": {
+          "description": "End the supervisor's run: refuses while an event is unhandled.",
+          "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "examples": [
+            "fgos supervisor done"
+          ]
+        }
+      },
+      "touchesState": true,
+      "externalEffect": true,
+      "paginated": false,
+      "deprecated": null
+    },
+    {
+      "name": "land",
+      "invoke": "fgos land <branch> | fgos land --paths <a,b> --message <text>",
+      "description": "Land work on the target branch, served natively by the Rust host under the merge slot: a branch land fast-forwards or squashes the branch onto the target, a paths land commits exactly the named paths with --message. The configured gates (`land.gates`) run first and a project with none refuses `land-gate-missing`; every --test path must pass. A lead's paths land passes --footprint (from its plan, set by the request route, never by a person) and a changed footprint is refused `footprint-change-refused`. From inside a confined head the call goes through its request socket.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "branch": {
+            "type": "string",
+            "description": "The branch to land (positional, or --branch)."
+          },
+          "paths": {
+            "type": "string",
+            "description": "Land exactly these project-relative paths instead of a branch: a comma list, also repeatable."
+          },
+          "message": {
+            "type": "string",
+            "description": "The commit message; required with --paths."
+          },
+          "test": {
+            "type": "string",
+            "description": "A test path that must pass before the land; repeatable or a comma list."
+          },
+          "footprint": {
+            "type": "string",
+            "description": "The plan footprint a lead is held to (comma list); set by the request route."
+          },
+          "target": {
+            "type": "string",
+            "description": "The branch to land on (default the trunk)."
+          },
+          "squash": {
+            "type": "boolean",
+            "description": "Squash a branch into one commit instead of fast-forwarding."
+          }
+        },
+        "positional": [
+          "branch"
+        ],
+        "required": []
+      },
+      "examples": [
+        "fgos land plan-x",
+        "fgos land --paths docs/backlog.md --message \"docs: backlog\" --test test/x.test.mjs"
+      ],
+      "touchesState": true,
+      "externalEffect": true,
+      "paginated": false,
+      "deprecated": null
+    },
+    {
+      "name": "request",
+      "invoke": "fgos request result [<id>] [--wait <seconds>]",
+      "description": "Read what a long verb asked through the request socket (`land`, `run`) is doing: a confined head asks through its socket, anyone else reads the tickets of the role named by FGOS_HEAD_ROLE.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "sub": {
+            "type": "string",
+            "description": "Sub-verb (positional); its own flags are under subcommands.<sub>.parameters.",
+            "enum": [
+              "result"
+            ]
+          }
+        },
+        "positional": [
+          "sub"
+        ],
+        "required": [
+          "sub"
+        ]
+      },
+      "examples": [
+        "fgos request result",
+        "fgos request result <id> --wait 30"
+      ],
+      "subcommands": {
+        "result": {
+          "description": "Without an id: the caller's recent tickets. With an id: that ticket's state (running, done, failed), its result once done, and with --wait the call blocks until it leaves running or the seconds pass.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Positional: the ticket (request) id."
+              },
+              "wait": {
+                "type": "number",
+                "description": "Seconds to wait for the ticket to leave running (default 0)."
+              }
+            },
+            "positional": [
+              "id"
+            ],
+            "required": []
+          },
+          "examples": [
+            "fgos request result",
+            "fgos request result 0a1b2c --wait 30"
+          ]
+        }
+      },
       "touchesState": false,
       "externalEffect": false,
       "paginated": false,
@@ -4796,8 +5051,8 @@
     },
     {
       "name": "session",
-      "invoke": "fgos session <start|rotate|write>",
-      "description": "Agent head sessions: \"start\" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; \"rotate\" asks for its replacement by a successor that reads a redacted handoff; \"write\" replaces a file of a confined head's grant (the secretary's docs/backlog.md) through its supervisor. From inside a confined head all three go through its request socket.",
+      "invoke": "fgos session <start|rotate|stop|write>",
+      "description": "Agent head sessions: \"start\" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; \"rotate\" asks for its replacement by a successor that reads a redacted handoff; \"stop\" ends a head on purpose; \"write\" replaces a file of a confined head's grant (the secretary's docs/backlog.md) through its supervisor. From inside a confined head all four go through its request socket.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -4807,6 +5062,7 @@
             "enum": [
               "start",
               "rotate",
+              "stop",
               "write"
             ]
           }
@@ -4836,6 +5092,10 @@
               "name": {
                 "type": "string",
                 "description": "The head's name, 1 to 32 characters of a-z, 0-9 and hyphen."
+              },
+              "for-question": {
+                "type": "string",
+                "description": "The owner question this head is started to answer; its id is passed to the head."
               }
             },
             "positional": [
@@ -4848,7 +5108,8 @@
           },
           "examples": [
             "fgos session start secretary --name miu",
-            "fgos session start shaper --name <slug>"
+            "fgos session start shaper --name <slug>",
+            "fgos session start shaper --name <slug> --for-question <id>"
           ]
         },
         "rotate": {
@@ -4875,6 +5136,36 @@
           },
           "examples": [
             "fgos session rotate secretary --name miu"
+          ]
+        },
+        "stop": {
+          "description": "End the live head of a persona-name through its own supervisor and retire its pane; answers {stopped: true}, or {stopped: false, reason: \"not-live\"} when no live session holds the role. From inside a confined head the request route decides who may stop which head.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "persona": {
+                "type": "string",
+                "description": "Positional: the agent persona of the head."
+              },
+              "name": {
+                "type": "string",
+                "description": "The name of the head."
+              },
+              "reason": {
+                "type": "string",
+                "description": "Why it is stopped (at most 200 characters), kept on the lineage."
+              }
+            },
+            "positional": [
+              "persona"
+            ],
+            "required": [
+              "persona",
+              "name"
+            ]
+          },
+          "examples": [
+            "fgos session stop shaper --name <slug> --reason \"answer received\""
           ]
         },
         "write": {

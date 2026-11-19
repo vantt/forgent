@@ -90,7 +90,7 @@ import { invokeDispatchReconcileOperation } from '../src/verbs/dispatch/reconcil
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
 import { branchNameFor, branchExists, detectTrunk, isMainWorktree, admitStoreAccess, currentHead, inspectGit, resolveRefSha, createVerifyCheckout, removeWorktree } from '../src/runner/worktree.mjs';
-import { claimWork, ClaimError, readWorkerSlotCeiling } from '../src/runner/claim-port.mjs';
+import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
 import { isReclaimEligible } from '../src/runner/claim-liveness.mjs';
 import { commitAt, pathExistsAt, readRepoFacts } from '../src/git/inspect.mjs';
 import { HolderLockError } from '../src/holder-lock/index.mjs';
@@ -104,7 +104,6 @@ import { COMMAND_REGISTRY, declared, isNativeInvocation } from '../src/cli/comma
 import { recordInvocationFault } from '../src/observe/invocation-fault-log.mjs';
 import { computeAwaitingContext } from '../src/state/awaiting-context.mjs';
 import { readConfig } from '../src/config/facade.mjs';
-import { countWorkerSlots, hasWorkerSlotRoom } from '../src/state/worker-slots.mjs';
 import { assessCleanupReadiness, blockedItemsNowResolvable } from '../src/state/cleanup-harness.mjs';
 
 // D5: `verify` is a required non-empty field on every work item, but a
@@ -2175,29 +2174,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // pairs of ready items whose declared file footprints overlap, so a
     // parallel dispatch would risk a file conflict. Suggests sequence/hoist/
     // re-slice; never mutates anything.
-    // Read-only worker-slot ledger: how many work items are running and
-    // whether the execution lane has room. This verb IS the port — decision
-    // 0014 makes the CLI the door, and herdr-dashboard (Rust) and fgos-fanout
-    // (a prose skill) have no other way to ask the engine before they stand a
-    // worker up. Pure read: worker-slots.mjs never touches fs, and the
-    // ceiling comes from the same config resolution claimWork's own gate uses.
-    case 'slots': {
-      const slotsView = listWork(dir);
-      const ceiling = readWorkerSlotCeiling(dir);
-      const counts = countWorkerSlots(slotsView);
-      const room = hasWorkerSlotRoom(slotsView, { ceiling });
-      return {
-        execution: {
-          ...counts.execution,
-          ceiling: room.ceiling,
-          free: room.free,
-          hasRoom: room.allowed,
-          reason: room.reason,
-        },
-        admin: counts.admin,
-      };
-    }
-
     // D10: give a driver's closing report a landing place on the item, so a
     // result is read with `fgos show <id>` instead of by watching a terminal
     // pane nobody can afford to guard. Deliberately no new event type and no
@@ -3393,6 +3369,21 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const name = requireField(flags.name, `session ${sub} requires --name <name>`);
       const { startHead, rotateHead } = await import('../src/session-host/head-request.mjs');
       const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
+      if (sub === 'stop') {
+        // Unconfined callers stop a head directly; a confined head's call is answered by the host through its socket,
+        // where the request route decides who may stop which head.
+        const { stopHeadSession } = await import('../src/session-host/head-stop.mjs');
+        const { assertHeadArgs } = await import('../src/session-host/head-start.mjs');
+        const reason = optionalField(flags.reason, 'session stop --reason requires a non-empty value (omit --reason entirely to skip it)');
+        const stopRoot = resolveGitRoots(process.cwd()).worktreeRoot;
+        try {
+          assertHeadArgs({ persona, name, projectRoot: stopRoot });
+          return await stopHeadSession({ persona, name, projectRoot: stopRoot, reason });
+        } catch (err) {
+          throw new StoreError(HEAD_ARGUMENT_CODES.has(err.code) ? 'validation' : 'precondition', `${err.code ?? 'head-refused'}: ${err.message}`);
+        }
+      }
+      const forQuestion = optionalField(flags['for-question'], 'session start --for-question requires a question id');
       // A resolver, not a path: startHead and rotateHead call it only when the caller is not confined.
       const projectRoot = () => resolveGitRoots(process.cwd()).worktreeRoot;
       const refused = (err) => {
@@ -3402,7 +3393,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       let result;
       try {
         if (sub === 'start') {
-          result = await startHead({ persona, name, projectRoot });
+          result = await startHead({ persona, name, forQuestion, projectRoot });
         }
         if (sub === 'rotate') {
           result = await rotateHead({ persona, name, reason: 'manual', projectRoot });
@@ -3412,6 +3403,33 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       if (result?.started === false) throw refused({ code: result.reason, message: `rotation of head:${persona}-${name} was not started` });
       return result;
+    }
+
+    // The reader of the tickets a head's long verbs (`land`, `run`) left. A confined head asks through its socket (the
+    // host sends it there before this payload runs); anyone else reads the tickets of the role named by FGOS_HEAD_ROLE.
+    case 'request': {
+      requireSubVerb('request', positional);
+      const role = process.env.FGOS_HEAD_ROLE;
+      if (!role) throw new StoreError('precondition', 'no-head-role: request result reads the tickets of a head role; FGOS_HEAD_ROLE names none here');
+      const wait = flags.wait === undefined ? undefined : Number(flags.wait);
+      if (wait !== undefined && !(Number.isFinite(wait) && wait >= 0)) throw new StoreError('validation', 'request result --wait takes a number of seconds');
+      const { runHeadRequest } = await import('../src/session-host/head-request.mjs');
+      const { resolveGitRoots } = await import('../src/runner/execution/run.mjs');
+      const fsMod = await import('node:fs');
+      const osMod = await import('node:os');
+      const pathMod = await import('node:path');
+      const root = resolveGitRoots(process.cwd()).worktreeRoot;
+      // runHeadRequest reads its caller from an envelope file; build the one this role would have.
+      const runDir = fsMod.mkdtempSync(pathMod.join(osMod.tmpdir(), 'fgos-request-result-'));
+      try {
+        fsMod.writeFileSync(pathMod.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: root, session: { role } }));
+        const args = { ...(positional[1] !== undefined ? { id: positional[1] } : {}), ...(wait !== undefined ? { wait } : {}) };
+        const { line } = await runHeadRequest({ runDir, request: { verb: 'request result', args } });
+        if (line.result !== 'done') throw new StoreError(HEAD_ARGUMENT_CODES.has(line.code) ? 'validation' : 'precondition', `${line.code}: ${line.message}`);
+        return line.data;
+      } finally {
+        fsMod.rmSync(runDir, { recursive: true, force: true });
+      }
     }
 
     case 'goal': {

@@ -54,7 +54,7 @@ const DELEGATES = {
 };
 
 // Verbs whose shared tail is itself one sub-verb's handler.
-const FALLTHROUGH = { workflow: 'operations', tool: 'query' };
+const FALLTHROUGH = { workflow: 'operations', tool: 'query', request: 'result' };
 
 /** Index just past the `}` matching the `{` at `open`, skipping strings, templates and comments. */
 function matchBrace(src, open) {
@@ -193,8 +193,8 @@ const MULTI = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.nati
 const NATIVE = COMMAND_REGISTRY.filter((entry) => entry.subcommands && entry.native === true);
 
 test('the drift scan covers the verbs that branch on a positional sub-verb', () => {
-  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['dispatch', 'goal', 'merge', 'session', 'workflow']);
-  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'config', 'convention', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'questions', 'worktree']);
+  assert.deepEqual(MULTI.map((e) => e.name).sort(), ['dispatch', 'goal', 'merge', 'request', 'session', 'workflow']);
+  assert.deepEqual(NATIVE.map((e) => e.name).sort(), ['agents', 'config', 'convention', 'events', 'friction', 'gateway', 'git', 'identity', 'lock', 'mailbox', 'metrics', 'questions', 'supervisor', 'watcher', 'worktree']);
 });
 
 // A verb that lists sub-verbs in `native` serves those in the Rust host: the Node handler holds no branch for them
@@ -381,6 +381,10 @@ const NATIVE_SOURCES = {
       return src.slice(start, src.indexOf('fn project_events_request', start));
     },
   },
+  // watcher and supervisor -> apps/fgos/src/wiring/supervision.rs, each with its own sub-verb list; no sub-verb takes a flag
+  // of its own (`supervisor handled` takes its event ids as positionals), so the shared parser reads none.
+  watcher: { subs: RUST('apps/fgos/src/wiring/supervision.rs'), constant: 'WATCHER_SUBCOMMANDS', shared: () => '' },
+  supervisor: { subs: RUST('apps/fgos/src/wiring/supervision.rs'), constant: 'SUPERVISOR_SUBCOMMANDS', shared: () => '' },
   convention: {
     subs: RUST('packages/convention/rust/src/lib.rs'),
     shared: () => {
@@ -391,9 +395,9 @@ const NATIVE_SOURCES = {
   },
 };
 
-function rustSubcommands(src) {
-  const m = /AVAILABLE_SUBCOMMANDS: &\[&str\] = &\[([^\]]*)\]/.exec(src);
-  assert.ok(m, 'AVAILABLE_SUBCOMMANDS not found');
+function rustSubcommands(src, constant = 'AVAILABLE_SUBCOMMANDS') {
+  const m = new RegExp(`${constant}: &\\[&str\\] = &\\[([^\\]]*)\\]`).exec(src);
+  assert.ok(m, `${constant} not found`);
   return [...m[1].matchAll(/"([^"]+)"/g)].map((x) => x[1]);
 }
 
@@ -406,7 +410,7 @@ const schemaFlags = (spec) => Object.keys(spec.parameters.properties).filter((n)
 for (const entry of NATIVE) {
   test(`${entry.name} (native): sub-verbs and their flags match the Rust sources`, () => {
     const source = NATIVE_SOURCES[entry.name];
-    const subs = rustSubcommands(source.subs);
+    const subs = rustSubcommands(source.subs, source.constant);
     assert.deepEqual(Object.keys(entry.subcommands).sort(), [...subs].sort(), `${entry.name}: registry sub-verbs != AVAILABLE_SUBCOMMANDS`);
     const problems = [];
     if (source.shared) {

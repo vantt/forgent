@@ -29,12 +29,35 @@ test('a session call without a persona or --name, or with a malformed one, is re
     [['session', 'bogus', 'secretary', '--name', 'miu'], /sub-verb/],
     [['session', 'end', 'secretary', '--name', 'miu'], /unknown session sub-verb "end"/],
     [['session', 'write'], /requires a path/],
+    [['session', 'stop', 'secretary'], /--name/],
+    [['session', 'stop', 'Bad_Persona', '--name', 'miu'], /bad-persona/],
+    [['session', 'start', 'secretary', '--name', 'miu', '--for-question'], /--for-question/],
   ];
   for (const [args, message] of cases) {
     const result = run(cwd, args, unconfined);
     assert.equal(result.status, EXIT_VALIDATION, `${args.join(' ')}: ${result.stderr}`);
     assert.match(result.stderr, message);
   }
+});
+
+test('session stop of a head that is not live answers stopped false, and request result reads the tickets of FGOS_HEAD_ROLE', () => {
+  const cwd = project();
+  const stopped = run(cwd, ['session', 'stop', 'secretary', '--name', 'miu', '--json'], unconfined);
+  assert.equal(stopped.status, 0, stopped.stderr);
+  assert.match(stopped.stdout, /"stopped":\s*false/);
+  assert.match(stopped.stdout, /not-live/);
+
+  const noRole = run(cwd, ['request', 'result'], { ...unconfined, FGOS_HEAD_ROLE: '' });
+  assert.equal(noRole.status, EXIT_PRECONDITION, noRole.stderr);
+  assert.match(noRole.stderr, /no-head-role/);
+
+  const listed = run(cwd, ['request', 'result', '--json'], { ...unconfined, FGOS_HEAD_ROLE: 'head:lead-demo' });
+  assert.equal(listed.status, 0, listed.stderr);
+  assert.match(listed.stdout, /"tickets":\s*\[\]/);
+
+  const unknown = run(cwd, ['request', 'result', 'nope1', '--json'], { ...unconfined, FGOS_HEAD_ROLE: 'head:lead-demo' });
+  assert.equal(unknown.status, EXIT_PRECONDITION, unknown.stderr);
+  assert.match(unknown.stderr, /ticket-unknown/);
 });
 
 test('a confined caller without a request socket is refused as precondition by every subcommand, starting or writing nothing', () => {

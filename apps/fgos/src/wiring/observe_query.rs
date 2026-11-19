@@ -104,7 +104,8 @@ mod tests {
                 "fgos-observe-transcripts",
                 "fgos-run-result",
                 "fgos-host-sources",
-                "fgos-questions"
+                "fgos-questions",
+                "fgos-supervision"
             ]
         );
     }

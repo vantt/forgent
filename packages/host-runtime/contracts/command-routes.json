@@ -767,6 +767,28 @@
       "attest"
     ]
   },
+  "land": {
+    "selector": "land",
+    "route_kind": "native",
+    "operation_id": "land.run",
+    "owner_path": "apps/fgos",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ],
+    "accepted_flags": [
+      "dir",
+      "json",
+      "help",
+      "branch",
+      "paths",
+      "message",
+      "test",
+      "footprint",
+      "target",
+      "squash"
+    ],
+    "store": "open"
+  },
   "list": {
     "selector": "list",
     "route_kind": "legacy-cli",
@@ -1179,6 +1201,16 @@
     "store": "require",
     "mutates_store": true
   },
+  "request": {
+    "selector": "request",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ],
+    "store": "none"
+  },
   "resolve-park-reason": {
     "selector": "resolve-park-reason",
     "route_kind": "legacy-cli",
@@ -1290,11 +1322,16 @@
   },
   "slots": {
     "selector": "slots",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
+    "route_kind": "native",
+    "operation_id": "slots.read",
+    "owner_path": "apps/fgos",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
+    ],
+    "accepted_flags": [
+      "dir",
+      "json",
+      "help"
     ],
     "store": "none"
   },
@@ -1318,6 +1355,49 @@
     ],
     "store": "require",
     "mutates_store": true
+  },
+  "supervisor": {
+    "selector": "supervisor",
+    "route_kind": "native",
+    "operation_id": "supervisor.read",
+    "owner_path": "apps/fgos",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ],
+    "subcommands": true,
+    "subcommand_flags": {
+      "done": [
+        "dir",
+        "json",
+        "help"
+      ],
+      "handled": [
+        "dir",
+        "json",
+        "help",
+        "event"
+      ],
+      "plans": [
+        "dir",
+        "json",
+        "help"
+      ],
+      "queue": [
+        "dir",
+        "json",
+        "help"
+      ],
+      "wake": [
+        "dir",
+        "json",
+        "help"
+      ]
+    },
+    "store": "open",
+    "mutates_store": [
+      "wake",
+      "handled"
+    ]
   },
   "sync-root": {
     "selector": "sync-root",
@@ -1404,6 +1484,27 @@
       "runtime-json"
     ],
     "store": "none"
+  },
+  "watcher": {
+    "selector": "watcher",
+    "route_kind": "native",
+    "operation_id": "watcher.tick",
+    "owner_path": "apps/fgos",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ],
+    "subcommands": true,
+    "subcommand_flags": {
+      "tick": [
+        "dir",
+        "json",
+        "help"
+      ]
+    },
+    "store": "open",
+    "mutates_store": [
+      "tick"
+    ]
   },
   "wire-agents": {
     "selector": "wire-agents",

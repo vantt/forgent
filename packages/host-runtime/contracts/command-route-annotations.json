@@ -53,6 +53,10 @@
     "operation_id": "init.run",
     "owner_path": "apps/fgos"
   },
+  "land": {
+    "operation_id": "land.run",
+    "owner_path": "apps/fgos"
+  },
   "lock-status": {
     "operation_id": "holder-lock.status",
     "owner_path": "packages/holder-lock/rust"
@@ -81,6 +85,15 @@
     "operation_id": "worktree.resync",
     "owner_path": "packages/execution/checkout"
   },
+  "slots": {
+    "operation_id": "slots.read",
+    "owner_path": "apps/fgos"
+  },
+  "supervisor": {
+    "operation_id": "supervisor.read",
+    "owner_path": "apps/fgos",
+    "subcommands": true
+  },
   "uninstall": {
     "operation_id": "uninstall.run",
     "owner_path": "apps/fgos"
@@ -88,6 +101,11 @@
   "version": {
     "operation_id": "distribution.build.show",
     "owner_path": "packages/distribution/rust"
+  },
+  "watcher": {
+    "operation_id": "watcher.tick",
+    "owner_path": "apps/fgos",
+    "subcommands": true
   },
   "wire-agents": {
     "operation_id": "wire-agents.run",
