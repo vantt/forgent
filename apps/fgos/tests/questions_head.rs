@@ -378,75 +378,105 @@ fn the_payload_entry_runs_a_head_ask_through_the_real_host_route_and_records_the
 }
 
 /// The supervisor's side of a head's socket for real: its request server over the attempt's envelope (Identity
-/// asked unstubbed), a route child that is the real Node payload entry, and the real host for the host verbs. Only
-/// the sandbox is absent; the host binary the envelope names is a one-line forwarder because the route child is
-/// started as `<hostBin> internal head-request`, which the Node payload entry, not the host, serves in a checkout.
+/// asked unstubbed), a route child that is the real Node payload entry, and the real host for the host verbs. The
+/// host binary the envelope names is a one-line forwarder because the route child is started as
+/// `<hostBin> internal head-request`, which the Node payload entry, not the host, serves in a checkout.
+struct ServedSupervisor {
+    stop: std::sync::Arc<std::sync::atomic::AtomicBool>,
+    pump: Option<std::thread::JoinHandle<()>>,
+    host_log: PathBuf,
+}
+
+impl ServedSupervisor {
+    /// Serves a supervisor head that holds the verbs a supervisor and every head are granted, on `socket`.
+    fn start(scene: &Scene, socket: &Path) -> Self {
+        use fgos_run_supervisor::head_request::HeadRequests;
+        use fgos_run_supervisor::route::WritePublisher;
+        use std::os::unix::fs::PermissionsExt;
+        use std::sync::atomic::{AtomicBool, Ordering};
+        use std::sync::Arc;
+
+        let init = scene.fgos(&["identity", "project", "--init", "--json"], b"");
+        assert!(init.status.success(), "identity project --init: {init:?}");
+        let run_dir = scene.head("head:supervisor-bob", "supervisor");
+        let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let forwarder = scene.root.join("host.sh");
+        let host_log = scene.root.join("host-argv.log");
+        fs::write(
+            &forwarder,
+            format!(
+                "#!/bin/sh\necho \"$@\" >> {}\nif [ \"$1\" = internal ] && [ \"$2\" = head-request ]; then\n  shift 2\n  [ \"$1\" = --protocol ] && shift 2\n  exec node {} \"$@\"\nfi\nexec {} \"$@\"\n",
+                host_log.display(),
+                repo.join("src/session-host/head-request.mjs").display(),
+                fgos_bin().display()
+            ),
+        )
+        .unwrap();
+        fs::set_permissions(&forwarder, fs::Permissions::from_mode(0o755)).unwrap();
+        let envelope = json!({
+            "v": 3,
+            "cwd": scene.project(),
+            "hostBin": forwarder,
+            "identity": { "writerId": "att-supervisor" },
+            "session": {
+                "role": "head:supervisor-bob",
+                "persona": "supervisor",
+                "verbs": ["questions list", "supervisor queue", "supervisor plans", "slots", "supervisor handled"],
+                "requestSocketPath": socket,
+            },
+            "steps": [{ "stepId": "finalize-home", "env": {
+                "HOME": scene.root.join("home"),
+                "PATH": std::env::var("PATH").unwrap_or_default(),
+                "FGOS_STATE_ROOT": scene.root.join("state"),
+            }}],
+        });
+        fs::write(run_dir.join("envelope.json"), envelope.to_string()).unwrap();
+        let publisher = WritePublisher {
+            catch_up: Arc::new(|_, _| unreachable!("no session write here")),
+            path_clean: Arc::new(|_, _| unreachable!("no session write here")),
+            publish: Arc::new(|_, _, _, _| unreachable!("no session write here")),
+        };
+        let (path, server) =
+            HeadRequests::from_envelope(&envelope, &run_dir, &scene.root.join("state"), &publisher)
+                .unwrap()
+                .expect("a socket");
+        let listener = std::os::unix::net::UnixListener::bind(&path).unwrap();
+        listener.set_nonblocking(true).unwrap();
+        let stop = Arc::new(AtomicBool::new(false));
+        let flag = stop.clone();
+        let pump = std::thread::spawn(move || {
+            while !flag.load(Ordering::SeqCst) {
+                server.poll(&listener);
+                std::thread::sleep(Duration::from_millis(10));
+            }
+        });
+        Self {
+            stop,
+            pump: Some(pump),
+            host_log,
+        }
+    }
+
+    fn finish(&mut self) {
+        self.stop.store(true, std::sync::atomic::Ordering::SeqCst);
+        if let Some(pump) = self.pump.take() {
+            pump.join().unwrap();
+        }
+    }
+}
+
+impl Drop for ServedSupervisor {
+    fn drop(&mut self) {
+        self.finish();
+    }
+}
+
 #[test]
 fn a_confined_supervisor_reads_its_queue_plans_and_lanes_and_marks_several_events_through_the_real_request_server(
 ) {
-    use fgos_run_supervisor::head_request::HeadRequests;
-    use fgos_run_supervisor::route::WritePublisher;
-    use std::os::unix::fs::PermissionsExt;
-    use std::sync::atomic::{AtomicBool, Ordering};
-    use std::sync::Arc;
-
     let scene = Scene::new("confined-reads");
-    let project = scene.project();
-    let init = scene.fgos(&["identity", "project", "--init", "--json"], b"");
-    assert!(init.status.success(), "identity project --init: {init:?}");
-    let run_dir = scene.head("head:supervisor-bob", "supervisor");
-    let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
-    let forwarder = scene.root.join("host.sh");
-    fs::write(
-        &forwarder,
-        format!(
-            "#!/bin/sh\necho \"$@\" >> {}\nif [ \"$1\" = internal ] && [ \"$2\" = head-request ]; then\n  shift 2\n  [ \"$1\" = --protocol ] && shift 2\n  exec node {} \"$@\"\nfi\nexec {} \"$@\"\n",
-            scene.root.join("host-argv.log").display(),
-            repo.join("src/session-host/head-request.mjs").display(),
-            fgos_bin().display()
-        ),
-    )
-    .unwrap();
-    fs::set_permissions(&forwarder, fs::Permissions::from_mode(0o755)).unwrap();
     let socket = scene.root.join("req.sock");
-    let envelope = json!({
-        "v": 3,
-        "cwd": project,
-        "hostBin": forwarder,
-        "identity": { "writerId": "att-supervisor" },
-        "session": {
-            "role": "head:supervisor-bob",
-            "persona": "supervisor",
-            "verbs": ["supervisor queue", "supervisor plans", "slots", "supervisor handled"],
-            "requestSocketPath": socket,
-        },
-        "steps": [{ "stepId": "finalize-home", "env": {
-            "HOME": scene.root.join("home"),
-            "PATH": std::env::var("PATH").unwrap_or_default(),
-            "FGOS_STATE_ROOT": scene.root.join("state"),
-        }}],
-    });
-    fs::write(run_dir.join("envelope.json"), envelope.to_string()).unwrap();
-    let publisher = WritePublisher {
-        catch_up: Arc::new(|_, _| unreachable!("no session write here")),
-        path_clean: Arc::new(|_, _| unreachable!("no session write here")),
-        publish: Arc::new(|_, _, _, _| unreachable!("no session write here")),
-    };
-    let (path, server) =
-        HeadRequests::from_envelope(&envelope, &run_dir, &scene.root.join("state"), &publisher)
-            .unwrap()
-            .expect("a socket");
-    let listener = std::os::unix::net::UnixListener::bind(&path).unwrap();
-    listener.set_nonblocking(true).unwrap();
-    let stop = Arc::new(AtomicBool::new(false));
-    let flag = stop.clone();
-    let pump = std::thread::spawn(move || {
-        while !flag.load(Ordering::SeqCst) {
-            server.poll(&listener);
-            std::thread::sleep(Duration::from_millis(10));
-        }
-    });
-
+    let mut served = ServedSupervisor::start(&scene, &socket);
     let confined = |args: &[&str]| {
         scene.fgos_with(
             args,
@@ -464,8 +494,7 @@ fn a_confined_supervisor_reads_its_queue_plans_and_lanes_and_marks_several_event
     let slots = confined(&["slots", "--json"]);
     let plans = confined(&["supervisor", "plans", "--json"]);
     let handled = confined(&["supervisor", "handled", "no-such-a", "no-such-b", "--json"]);
-    stop.store(true, Ordering::SeqCst);
-    pump.join().unwrap();
+    served.finish();
 
     assert!(queue.status.success(), "{queue:?}");
     assert_eq!(json_of(&queue)["events"], json!([]), "{queue:?}");
@@ -476,11 +505,127 @@ fn a_confined_supervisor_reads_its_queue_plans_and_lanes_and_marks_several_event
     // Both ids reached the host verb, which names the first one it does not know.
     assert!(!handled.status.success());
     assert_eq!(json_of(&handled)["code"], "event-unknown", "{handled:?}");
-    let host_calls = fs::read_to_string(scene.root.join("host-argv.log")).unwrap();
+    let host_calls = fs::read_to_string(&served.host_log).unwrap();
     assert!(
         host_calls
             .lines()
             .any(|l| l == "supervisor handled no-such-a no-such-b --json"),
         "both ids reach the host verb: {host_calls}"
     );
+}
+
+/// The bwrap command of a confined head, built by the real resolver and driver (`test/helpers/head-sandbox-argv.mjs`),
+/// or the named reason this machine cannot run one.
+fn head_sandbox(scene: &Scene, socket: &Path) -> Result<(String, Vec<String>, PathBuf), String> {
+    let bwrap_runs = Command::new("bwrap")
+        .args(["--ro-bind", "/", "/", "true"])
+        .output()
+        .map(|out| out.status.success())
+        .unwrap_or(false);
+    if !bwrap_runs {
+        return Err("no-bwrap: bwrap is absent or cannot create a sandbox here".to_owned());
+    }
+    let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let runtime_dir = scene.root.join("rt");
+    // The go socket the driver binds back must exist; nothing in this proof dials it.
+    fs::create_dir_all(runtime_dir.join("fgos")).unwrap();
+    fs::write(runtime_dir.join("fgos/go.sock"), "").unwrap();
+    let request = json!({
+        "project": scene.project(),
+        "scratch": scene.root.join("scratch"),
+        "home": scene.root.join("home"),
+        "runtimeDir": runtime_dir,
+        "requestSocket": socket,
+        "gateBin": "/bin/true",
+        // The fixture lives under /tmp, which the sandbox replaces with its own; a real project does not.
+        "bindBack": [scene.project(), fgos_bin()],
+    });
+    let out = Command::new("node")
+        .current_dir(&repo)
+        .arg(repo.join("test/helpers/head-sandbox-argv.mjs"))
+        .arg(request.to_string())
+        .env("FGOS_STATE_ROOT", scene.root.join("state"))
+        .output()
+        .unwrap();
+    assert!(
+        out.status.success(),
+        "head-sandbox-argv: {}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let line = String::from_utf8_lossy(&out.stdout);
+    let built: Value = serde_json::from_str(line.lines().last().unwrap()).unwrap();
+    let args = built["args"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|a| a.as_str().unwrap().to_owned())
+        .collect();
+    Ok((
+        built["command"].as_str().unwrap().to_owned(),
+        args,
+        PathBuf::from(built["home"].as_str().unwrap()),
+    ))
+}
+
+/// The start ritual of a head and the supervisor's reads, run inside the sandbox a head gets (read-only root, private
+/// /tmp, private home that is not the machine's, no state root pinned) against a real request server: each must be
+/// answered by the host through the socket, never refused for the sandbox's read-only or empty state.
+#[test]
+fn a_head_sandbox_answers_the_start_ritual_and_the_supervisor_reads_through_the_request_socket() {
+    let scene = Scene::new("head-sandbox");
+    let runtime_dir = scene.root.join("rt");
+    let socket = runtime_dir.join("fgos/req.sock");
+    fs::create_dir_all(socket.parent().unwrap()).unwrap();
+    let (command, sandbox_args, home) = match head_sandbox(&scene, &socket) {
+        Ok(built) => built,
+        Err(reason) => {
+            eprintln!("skip: a_head_sandbox_answers_the_start_ritual: {reason}");
+            return;
+        }
+    };
+    let mut served = ServedSupervisor::start(&scene, &socket);
+
+    let in_sandbox = |args: &[&str]| {
+        Command::new(&command)
+            .args(&sandbox_args)
+            .arg(fgos_bin())
+            .args(args)
+            .current_dir(scene.project())
+            .env_clear()
+            .env("HOME", &home)
+            .env("PATH", std::env::var_os("PATH").unwrap_or_default())
+            .env("FGOS_HEAD_REQUEST_SOCKET", &socket)
+            .output()
+            .unwrap()
+    };
+    let calls: [(&[&str], Option<&str>); 6] = [
+        (&["questions"], None),
+        (&["questions", "--json"], None),
+        (&["supervisor", "queue", "--json"], None),
+        (&["supervisor", "plans", "--json"], None),
+        (&["slots", "--json"], None),
+        // No event carries this id: the host's own refusal is the answer, so the verb reached it.
+        (
+            &["supervisor", "handled", "no-such-event", "--json"],
+            Some("event-unknown"),
+        ),
+    ];
+    let answers: Vec<(Vec<&str>, Output)> = calls
+        .iter()
+        .map(|(args, _)| (args.to_vec(), in_sandbox(args)))
+        .collect();
+    served.finish();
+
+    for ((args, out), (_, refusal)) in answers.iter().zip(calls.iter()) {
+        let label = format!("fgos {}: {out:?}", args.join(" "));
+        let reply: Value =
+            serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}: {label}"));
+        match refusal {
+            None => assert!(out.status.success(), "{label}"),
+            Some(code) => {
+                assert!(!out.status.success(), "{label}");
+                assert_eq!(reply["code"], *code, "{label}");
+            }
+        }
+    }
 }

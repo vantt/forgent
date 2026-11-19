@@ -43,6 +43,13 @@
       "identity": "registered-then-register",
       "rule": "same role step as session answered (this attempt's own session is registered and live, session-not-registered otherwise); a refused registration is role-take-failed with Identity's code in detail. The executor reaches this socket as the same user (peer uid)"
     },
+    "questions list": {
+      "args": { "which": "string, optional: open (default), answered or all" },
+      "does": "a read, not a ticket verb: the route child runs the host verb `fgos questions [--answered|--all] --json` (envelope hostBin) and returns its JSON, because the confined caller cannot open the event store it is read from. Answers within the 60 s verb bound. Granted to every head with the other `questions *` verbs; the confined `fgos questions` prints this reply's data",
+      "data": "the host verb's JSON data (the question rows)",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): the host verb's own code (for example event-store-no-repository); an unknown `which` is bad-args"
+    },
     "questions ask": {
       "args": {
         "input": "object, required: the five-part question (docs/platform/questions/spec.md)",

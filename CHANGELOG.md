@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- A confined head now lists its open owner questions (`fgos questions`, `--answered`, `--all`, the form its start ritual uses) through its request socket (new verb `questions list`, granted to every head); inside the sandbox it failed `event-store-unavailable` (empty state root, then a read-only git floor probe). A test runs the start ritual and the supervisor reads inside the real head sandbox.
 - Fixed: `fgos land <branch>` now refuses a dirty main checkout only when a dirty path is one the land writes (the commit diff plus the declared footprint), as the main-checkout catch-up already did; machine-local edits such as `.fgos/distribution.json` no longer block it. The refusal is renamed `main-checkout-dirty-overlap` (was `main-checkout-dirty-mid-merge`) and names the path.
 - New verb `fgos watcher tick` and a third OS timer (`watcher-tick`, installed by `fgos doctor --fix` once `watcher.enabled` is on; global-only, active interval 60 s, idle 900 s): one non-LLM pass that runs the watcher definitions in `core/watcher/`, raises supervision events, notifies and wakes the supervisor. Doctor gains `watcher-timer`, `supervisor-events-unhandled`, `supervision-pace` and `land-gates-configured`.
 - New verbs `fgos supervisor wake|plans|queue|handled|done`: the per-project plan supervisor head (`head:supervisor-<project>`) is started when an event is unhandled, lists ready plans, and ends its own session on `done`, which refuses while events are unhandled.

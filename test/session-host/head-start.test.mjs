@@ -100,7 +100,7 @@ test('a secretary launches with the paths and the verb its grant names; the line
   assert.equal(request.key, headKeyOf('secretary', 'miu', 2));
   assert.deepEqual(request.grant, grantOf('head:secretary-miu'));
   assert.deepEqual(request.grant.writes, ['plans', 'docs/backlog.md', 'docs/discussions']);
-  assert.deepEqual(request.grant.verbs, ['session start', 'session write', 'session bind session', 'session rotate', 'session answered', 'session restore role', 'questions ask', 'questions ack', 'questions cancel', 'questions answer', 'land', 'request result']);
+  assert.deepEqual(request.grant.verbs, ['session start', 'session write', 'session bind session', 'session rotate', 'session answered', 'session restore role', 'questions list', 'questions ask', 'questions ack', 'questions cancel', 'questions answer', 'land', 'request result']);
   assert.equal(request.grant.mailbox, true, 'the secretary sends and receives mail');
   assert.deepEqual(request.env, { FGOS_HEAD_ROLE: headRoleOf('secretary', 'miu'), FGOS_HEAD_PERSONA: 'secretary', FGOS_HEAD_NAME: 'miu', FGOS_HEAD_GEN: '2' });
   // The supervisor records this head in the session's Identity entry from the envelope's session fields.
@@ -113,9 +113,9 @@ test('a secretary launches with the paths and the verb its grant names; the line
 });
 
 test('the grant table: the persona matches a table key exactly, an unnamed persona holds nothing, a non-head role is refused', () => {
-  assert.deepEqual(grantOf('head:secretary-miu').verbs, ['session start', 'session write', 'session bind session', 'session rotate', 'session answered', 'session restore role', 'questions ask', 'questions ack', 'questions cancel', 'questions answer', 'land', 'request result']);
+  assert.deepEqual(grantOf('head:secretary-miu').verbs, ['session start', 'session write', 'session bind session', 'session rotate', 'session answered', 'session restore role', 'questions list', 'questions ask', 'questions ack', 'questions cancel', 'questions answer', 'land', 'request result']);
   assert.equal(grantOf('head:secretary-miu').peers, true, 'only the secretary reaches the peer sessions of its machine');
-  const base = ['session bind session', 'session rotate', 'session answered', 'session restore role', 'questions ask', 'questions ack', 'questions cancel'];
+  const base = ['session bind session', 'session rotate', 'session answered', 'session restore role', 'questions list', 'questions ask', 'questions ack', 'questions cancel'];
   assert.deepEqual(grantOf('head:shaper-x'), { writes: ['docs/discussions'], verbs: [...base, 'land', 'request result'], mailbox: false, peers: false }, 'a shaper writes its discussions and lands them but starts nothing, answers nothing, has no mailbox and reaches no peer session');
   assert.deepEqual(grantOf('head:planner-x'), { writes: ['plans', 'docs/discussions'], verbs: [...base, 'land', 'request result'], mailbox: false, peers: false });
   assert.deepEqual(grantOf('head:supervisor-x'), { writes: ['plans', 'docs/backlog.md'], verbs: ['session start', 'session stop', 'session write', ...base, 'land', 'request result', 'supervisor queue', 'supervisor plans', 'slots', 'supervisor handled', 'supervisor done'], mailbox: false, peers: false });

@@ -493,6 +493,15 @@ test('the confined reads supervisor queue, supervisor plans and slots run the ho
   assert.equal((await ask('slots', { x: 1 }, 'q4', echoArgv)).line.code, 'bad-args');
 });
 
+test('the confined questions list runs the host list for the open, answered or all questions and refuses another which', async (t) => {
+  const { ask } = headCase(t, { persona: 'shaper', name: 'x', writes: [] });
+  assert.deepEqual((await ask('questions list', {}, 'l1', echoArgv)).line.data.argv, ['questions', '--json']);
+  assert.deepEqual((await ask('questions list', { which: 'answered' }, 'l2', echoArgv)).line.data.argv, ['questions', '--answered', '--json']);
+  assert.deepEqual((await ask('questions list', { which: 'all' }, 'l3', echoArgv)).line.data.argv, ['questions', '--all', '--json']);
+  assert.equal((await ask('questions list', { which: 'constructor' }, 'l4', echoArgv)).line.code, 'bad-args');
+  assert.equal((await ask('questions list', { x: 1 }, 'l5', echoArgv)).line.code, 'bad-args');
+});
+
 test('a host refusal keeps its code, from the JSON line or from stderr', async (t) => {
   const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
   const json = await ask('supervisor queue', {}, 'q5', { hostCall: () => ({ status: 1, stdout: '{"code":"event-store-no-repository","message":"none"}\n' }) });
