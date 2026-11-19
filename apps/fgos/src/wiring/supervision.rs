@@ -761,10 +761,7 @@ impl watcher::Telemetry for HostTelemetry {
                 kind: "session".to_owned(),
                 id: writer(),
             },
-            span.attrs
-                .iter()
-                .map(|(k, v)| (*k, (*v).to_owned()))
-                .collect(),
+            span.attrs.iter().map(|(k, v)| (*k, v.clone())).collect(),
             span.measures.clone(),
         );
         // The write door counts its own failures; a lost span never changes the tick's outcome.
@@ -1247,7 +1244,7 @@ fn tick_json(r: &watcher::TickReport) -> Value {
     json!({
         "mode": r.mode.as_str(), "outcome": r.outcome.as_str(), "interval": r.interval,
         "raised": r.raised, "duplicate": r.duplicate, "wakes": r.wakes, "notifies": r.notifies,
-        "errors": r.errors, "unmeasured": r.unmeasured,
+        "errors": r.errors, "unmeasured": r.unmeasured, "problems": r.problems,
     })
 }
 

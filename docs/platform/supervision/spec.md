@@ -125,6 +125,7 @@ Personas and grants: shaper gains writes `docs/discussions` and verb `land`; sec
 | Two supervisors | The Identity role is unique per project; a second start for the same role refuses. |
 | Stuck supervisor | A live supervisor leaving events unhandled for `watcher.stuckWakeLimit` ticks raises `supervisor-stuck` (notify); an idle one is then stopped (`session stop`, span outcome `stopped-stuck`) so the next tick wakes a fresh one, while a busy or unknown one (mid-turn, or a request ticket still `running`) is only notified. |
 | Late or foreign commits, lost state | Each full tick fetches the trunk; edge windows reach back `watcher.lookbackSec`; a missing state uses `now - lookbackSec`; stable ids dedupe the overlap (PS-21). |
+| A detection row with no subject or no instant (a definition that carries no `min:ts`, `max:end` or `max:ts` aggregate) | The watcher drops the row, counts it in `errors`, and names the definition and the missing field in the tick result (`problems`) and the tick span (`fgos.watcher.problem`); every shipped definition is proven to yield both. |
 | Footprint escape | `land` refuses `land-outside-footprint`; a lead's `land --paths` that changes its own `footprint` is refused (PS-24). |
 | Empty gate list | `land` refuses `land-gate-missing`. |
 | Windows | No timer scheduler: supervision does not run there and the `watcher-timer` doctor row says so. |

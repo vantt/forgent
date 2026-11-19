@@ -461,6 +461,19 @@ fn malformed_unmeasured_and_missing_definition_rows_are_counted_not_raised() {
     s.definitions.push("absent.json".into());
     let report = run(&w, None, &s);
     assert_eq!((report.raised, report.errors, report.unmeasured), (0, 1, 2));
+    assert_eq!(
+        report.problems,
+        vec!["definition a answered a row with no ts; the row was dropped".to_owned()],
+        "a dropped row is named, with the definition and the missing field"
+    );
+    let spans = w.spans.borrow();
+    let problem = spans
+        .last()
+        .unwrap()
+        .attrs
+        .iter()
+        .find(|(k, _)| *k == "fgos.watcher.problem");
+    assert_eq!(problem.unwrap().1, report.problems.join("; "));
     assert_eq!(w.runs.borrow().last().unwrap().0, vec![DEF.to_owned()]);
 }
 

@@ -22,6 +22,7 @@ const RAISED: [&str; 9] = [
     "supervisor-wake-failed",
     "supervisor-stuck",
 ];
+const QUESTIONS: [&str; 1] = ["question-answered"];
 const PACE: [&str; 3] = ["watcher-active", "watcher-overdue", "supervisor-idle-burn"];
 const SUPERVISION_KINDS: &str = include_str!("../observe-kinds.json");
 
@@ -31,6 +32,10 @@ fn repo() -> PathBuf {
 
 fn definitions_dir() -> PathBuf {
     repo().join("core/watcher/definitions")
+}
+
+fn questions_dir() -> PathBuf {
+    repo().join("core/questions/definitions")
 }
 
 fn pace_dir() -> PathBuf {
@@ -44,6 +49,8 @@ fn fixtures() -> PathBuf {
 fn definition_file(name: &str) -> PathBuf {
     let dir = if PACE.contains(&name) {
         pace_dir()
+    } else if QUESTIONS.contains(&name) {
+        questions_dir()
     } else {
         definitions_dir()
     };
@@ -87,7 +94,11 @@ fn scratch(name: &str) -> PathBuf {
 }
 
 /// The declarations of the upstream kinds, read from the files that own them.
-const UPSTREAM_KINDS: [(&str, &str); 2] = [
+const UPSTREAM_KINDS: [(&str, &str); 3] = [
+    (
+        "questions.json",
+        "packages/questions/rust/observe-kinds.json",
+    ),
     ("heads-and-plans.json", "apps/fgos/observe-kinds.json"),
     ("runs.json", "packages/run-result/rust/observe-kinds.json"),
 ];
@@ -230,7 +241,11 @@ fn group_of(row: &Value) -> Value {
 
 #[test]
 fn every_definition_in_the_two_directories_has_one_fixture_pair_and_none_is_missing() {
-    for (dir, names) in [(definitions_dir(), &RAISED[..]), (pace_dir(), &PACE[..])] {
+    for (dir, names) in [
+        (definitions_dir(), &RAISED[..]),
+        (questions_dir(), &QUESTIONS[..]),
+        (pace_dir(), &PACE[..]),
+    ] {
         let mut found: Vec<String> = std::fs::read_dir(&dir)
             .unwrap()
             .map(|e| e.unwrap().file_name().into_string().unwrap())
@@ -241,7 +256,7 @@ fn every_definition_in_the_two_directories_has_one_fixture_pair_and_none_is_miss
         want.sort_unstable();
         assert_eq!(found, want, "{}", dir.display());
     }
-    for name in RAISED.iter().chain(PACE.iter()) {
+    for name in RAISED.iter().chain(QUESTIONS.iter()).chain(PACE.iter()) {
         for file in ["records.jsonl", "nomatch.jsonl", "expected.json"] {
             assert!(fixtures().join(name).join(file).is_file(), "{name}/{file}");
         }
@@ -250,10 +265,10 @@ fn every_definition_in_the_two_directories_has_one_fixture_pair_and_none_is_miss
 
 #[test]
 fn a_raised_definition_carries_its_row_template_and_a_pace_definition_carries_none() {
-    for name in RAISED {
+    for name in RAISED.iter().chain(QUESTIONS.iter()) {
         let text = std::fs::read_to_string(definition_file(name)).unwrap();
         let file: Value = serde_json::from_str(&text).unwrap();
-        assert_eq!(file["row"]["kind"], name);
+        assert_eq!(file["row"]["kind"], *name);
         assert!(!file["row"]["reason"].as_str().unwrap().is_empty());
         assert!(file["row"]["nextCommand"]
             .as_str()
@@ -274,7 +289,7 @@ fn a_raised_definition_carries_its_row_template_and_a_pace_definition_carries_no
 
 #[test]
 fn each_definition_gives_exactly_one_row_on_its_matching_fixture_and_none_on_the_other() {
-    for name in RAISED.iter().chain(PACE.iter()) {
+    for name in RAISED.iter().chain(QUESTIONS.iter()).chain(PACE.iter()) {
         let want = expected(name);
         let env = TestEnvironment {
             config: config_of(&want),
@@ -291,6 +306,23 @@ fn each_definition_gives_exactly_one_row_on_its_matching_fixture_and_none_on_the
         let found = rows(&got);
         assert_eq!(found.len(), 1, "{name} on its matching fixture: {got}");
         assert_eq!(group_of(&found[0]), want["group"], "{name}");
+        if !PACE.contains(name) {
+            // The watcher drops a row it cannot name or date, so every raised definition's row carries both.
+            let aggs = &found[0]["aggs"];
+            assert!(
+                ["min:ts", "max:end", "max:ts"]
+                    .iter()
+                    .any(|k| aggs.get(*k).and_then(Value::as_str).is_some()),
+                "{name}: the row carries no instant: {}",
+                found[0]
+            );
+            let group = &found[0]["group"];
+            assert!(
+                group["origin.host"].is_string() || group["subject.id"].is_string(),
+                "{name}: the row carries no subject: {}",
+                found[0]
+            );
+        }
         if let Some(ts) = want["ts"].as_str() {
             assert_eq!(row_ts(&found[0]), ts.replace("Z", ".000Z"), "{name}");
         }
