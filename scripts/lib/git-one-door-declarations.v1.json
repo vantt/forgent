@@ -24,7 +24,7 @@
     },
     {
       "path": "packages/supervision/rust/src/land.rs",
-      "siteId": "run:f956953ff77a52d61188c8ea0703843d119b8c4aa1b683e7ca42dfd9626eb2a5",
+      "siteId": "run:cdc7c50ed5243f3814732be4be5d94a22428f659fdd491986300a2a75894d2dd",
       "class": "configured-binary",
       "reason": "a land.gates command line from the trusted main checkout's project config (land.schema.yaml, x-fgos-sensitivity: command), run through the POSIX shell's -c operand in the candidate checkout, like worktreeSetup.commands; the scanner's Rust path classifies a shell only by a literal",
       "retireWhen": "the scanner's Rust path classifies a shell whose script operand is configuration data as configured-binary, or land gates stop running through a shell"
