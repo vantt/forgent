@@ -1903,3 +1903,109 @@ fn a_session_is_proven_dead_only_when_registered_with_a_dead_head() {
     assert!(!dead("none"), "no liveness record is unknown, not dead");
     assert!(!dead("absent"), "a session the directory lacks is unknown");
 }
+
+/// Holds the `identity-directory` lock the way a registration does, until dropped.
+fn hold_directory_lock(root: &Path) -> fgos_holder_lock::LockScope<'static> {
+    let mut scope = fgos_holder_lock::LockScope::seeded(Vec::new()).unwrap();
+    let params = std::collections::BTreeMap::from([(
+        "lockRoot".to_owned(),
+        root.join("locks").to_string_lossy().into_owned(),
+    )]);
+    scope
+        .acquire(
+            "identity-directory",
+            &params,
+            fgos_holder_lock::Wait::Ms(1_000),
+        )
+        .unwrap();
+    scope
+}
+
+#[test]
+fn a_resolve_during_a_role_take_between_its_two_writes_returns_the_one_holder_never_ambiguous() {
+    let root = Arc::new(state_root());
+    let alive = judge(&[]);
+    directory::register(
+        &root,
+        entry("aaaa", Some(10), &["lead:MAIL"]),
+        false,
+        &alive,
+    )
+    .unwrap();
+    directory::register(&root, entry("bbbb", Some(20), &[]), false, &alive).unwrap();
+    // The take's first write is down (bbbb holds the role) and its second (aaaa loses it) is not: both hold it,
+    // and the take holds the lock across the pause.
+    let paused_take = hold_directory_lock(&root);
+    let dir = directory::directory(&root);
+    let file_of = |handle: &str| {
+        fs::read_dir(&dir)
+            .unwrap()
+            .map(|f| f.unwrap().path())
+            .find(|p| fs::read_to_string(p).unwrap().contains(handle))
+            .unwrap()
+    };
+    let b_file = file_of("claude-bbbb@fg");
+    let a_file = file_of("claude-aaaa@fg");
+    let mut b = serde_json::from_slice::<Entry>(fs::read(&b_file).unwrap().trim_ascii()).unwrap();
+    b.roles = vec!["lead:MAIL".into()];
+    fs::write(
+        &b_file,
+        [serde_json::to_vec(&b).unwrap(), b"\n".to_vec()].concat(),
+    )
+    .unwrap();
+    let reader = {
+        let root = Arc::clone(&root);
+        std::thread::spawn(move || {
+            directory::resolve(
+                &root,
+                "lead:MAIL",
+                &judge(&[]),
+                None,
+                &directory::NoTerminal,
+            )
+        })
+    };
+    std::thread::sleep(std::time::Duration::from_millis(400));
+    assert!(
+        !reader.is_finished(),
+        "an ambiguous scan waits for the take instead of answering"
+    );
+    // The take finishes: the old holder is stripped, then the lock is released.
+    let mut a = serde_json::from_slice::<Entry>(fs::read(&a_file).unwrap().trim_ascii()).unwrap();
+    a.roles.clear();
+    fs::write(
+        &a_file,
+        [serde_json::to_vec(&a).unwrap(), b"\n".to_vec()].concat(),
+    )
+    .unwrap();
+    drop(paused_take);
+    let holder = reader
+        .join()
+        .unwrap()
+        .expect("exactly one holder, never ambiguous");
+    assert_eq!(holder.id, "fg-abc234/bbbb");
+    let _ = fs::remove_dir_all(&*root);
+}
+
+#[test]
+fn a_resolve_of_one_holder_never_touches_the_directory_lock() {
+    let root = state_root();
+    let alive = judge(&[]);
+    directory::register(
+        &root,
+        entry("aaaa", Some(10), &["lead:MAIL"]),
+        false,
+        &alive,
+    )
+    .unwrap();
+    let _busy = hold_directory_lock(&root);
+    let started = std::time::Instant::now();
+    let holder =
+        directory::resolve(&root, "lead:MAIL", &alive, None, &directory::NoTerminal).unwrap();
+    assert_eq!(holder.id, "fg-abc234/aaaa");
+    assert!(
+        started.elapsed() < std::time::Duration::from_millis(1_000),
+        "a lock-free read does not wait for a held lock"
+    );
+    let _ = fs::remove_dir_all(root);
+}

@@ -724,6 +724,27 @@ fn identity_gives_the_role_only_to_the_attempts_own_session_and_fails_closed_whe
     assert!(!err.detail.is_empty());
 }
 
+#[test]
+fn a_role_two_live_sessions_hold_is_refused_closed_with_the_identity_ambiguous_cause() {
+    let role = "head:planner-x";
+    let root = state_root("ambiguous", true);
+    register(&root, "att-first", &[role]);
+    register(&root, "att-own", &[]);
+    // Give the second session the role without stripping the first: two live holders.
+    let dir = fgos_identity::directory::directory(&root);
+    let file = fs::read_dir(&dir)
+        .unwrap()
+        .map(|f| f.unwrap().path())
+        .find(|p| fs::read_to_string(p).unwrap().contains("att-own"))
+        .expect("the attempt's entry file");
+    let mut entry: Value = serde_json::from_str(fs::read_to_string(&file).unwrap().trim()).unwrap();
+    entry["roles"] = json!([role]);
+    fs::write(&file, format!("{entry}\n")).unwrap();
+    let err = identity_holds(&root, role, "att-own", None).unwrap_err();
+    assert_eq!(err.code, "identity-ambiguous", "{err:?}");
+    assert!(!err.detail.is_empty());
+}
+
 // ---- the envelope a server is built from ---------------------------------------------------------
 
 fn session_envelope(dir: &Path, script: &Path) -> Value {

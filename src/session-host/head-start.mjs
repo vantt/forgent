@@ -80,6 +80,9 @@ export function identityHolder(role, projectRoot) {
     return { live: true, session: record?.id ?? null, record };
   }
   if (/not-found/.test(text)) return { live: false };
+  // Identity already rescans an ambiguous answer under its own lock, so this one is real or a take still in flight:
+  // a caller that can wait treats it as transient by its own code.
+  if (/ambiguous/.test(text)) throw new HeadStartError('identity-ambiguous', `Identity found more than one holder of ${role}: ${text.trim().slice(0, 300)}`);
   throw new HeadStartError('identity-unavailable', `Identity refused the lookup of ${role}: ${text.trim().slice(0, 300)}`);
 }
 

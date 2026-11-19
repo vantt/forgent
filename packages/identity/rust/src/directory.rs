@@ -65,6 +65,9 @@ const LOCK_NAME: &str = "identity-directory";
 /// How long a rewrite waits for that lock; a rewrite holds it for milliseconds, so a longer wait means something
 /// is stuck, and the caller is better told (`directory-busy`) than held.
 const LOCK_WAIT_MS: u64 = 2_000;
+/// How long an `ambiguous` resolve waits for that lock before it rescans: a role take writes the new holder and
+/// then strips the old one under the lock, so a scan that saw both is exact once the lock is free.
+const AMBIGUOUS_RESCAN_WAIT_MS: u64 = 5_000;
 
 /// Judges the recorded head process of an entry.
 pub type Judge<'a> = &'a dyn Fn(&Record) -> Verdict;
@@ -676,6 +679,11 @@ impl<'r> DirLock<'r> {
     /// `directory-busy` when it is not free within [`LOCK_WAIT_MS`] or cannot be
     /// taken at all; the caller may skip the write and retry on its next trigger.
     fn hold(&mut self) -> Result<(), Refusal> {
+        self.hold_for(LOCK_WAIT_MS)
+    }
+
+    /// [`DirLock::hold`] with its own bound on the wait.
+    fn hold_for(&mut self, wait_ms: u64) -> Result<(), Refusal> {
         if self.scope.is_some() {
             return Ok(());
         }
@@ -691,7 +699,7 @@ impl<'r> DirLock<'r> {
             self.root.join("locks").to_string_lossy().into_owned(),
         )]);
         scope
-            .acquire(LOCK_NAME, &params, Wait::Ms(LOCK_WAIT_MS))
+            .acquire(LOCK_NAME, &params, Wait::Ms(wait_ms))
             .map_err(busy)?;
         self.scope = Some(scope);
         Ok(())
@@ -1602,7 +1610,42 @@ impl Hit<'_> {
 /// names). An entry reached only through its CLI session whose process is dead
 /// is not an answer; when only such entries match the call is refused `stale`.
 /// The answer carries `ids`, `matched` and `stale`.
+///
+/// The scan is lock-free. Only an `ambiguous` answer is checked again, once, under the `identity-directory` lock
+/// with a bounded wait: a role take stores the new holder and then strips the old one while holding that lock, so a
+/// scan between the two writes sees two holders that the rescan, taken after the take finished, sees as one. Still
+/// `ambiguous` under the lock is real, and so is returned; a lock that stays busy returns the first answer. An
+/// ambiguity among shared (other machines') sessions only is returned without taking the lock. Never call `resolve`
+/// while this process holds the `identity-directory` lock: the rescan's flock on a second descriptor would wait out
+/// the bound and fall back to the first answer.
 pub fn resolve(
+    root: &Path,
+    query: &str,
+    judge: Judge,
+    shared: Option<&SharedView>,
+    terminal: &dyn TerminalPort,
+) -> Result<Listed, Refusal> {
+    match resolve_scan(root, query, judge, shared, terminal) {
+        // Only a local row can be a take caught between its two writes; an ambiguity wholly in the shared view has
+        // no local writer to wait for.
+        Err(first)
+            if first.reason == "ambiguous"
+                && first
+                    .candidates
+                    .iter()
+                    .any(|candidate| candidate.remote.is_none()) =>
+        {
+            let mut lock = DirLock::new(root);
+            if lock.hold_for(AMBIGUOUS_RESCAN_WAIT_MS).is_err() {
+                return Err(first);
+            }
+            resolve_scan(root, query, judge, shared, terminal)
+        }
+        answer => answer,
+    }
+}
+
+fn resolve_scan(
     root: &Path,
     query: &str,
     judge: Judge,
