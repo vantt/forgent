@@ -16,14 +16,14 @@ pub mod confinement {
     pub mod request;
 }
 pub mod accounts;
-pub mod credentials;
-pub mod transport;
-pub mod transport_round;
-pub mod run_result;
 pub mod assignment;
+pub mod assignment_runner;
 pub mod contract;
+pub mod credentials;
+pub mod planning;
+pub mod run_result;
 pub mod settlement;
 pub mod steps;
-pub mod planning;
-pub mod assignment_runner;
+pub mod transport;
+pub mod transport_round;
 pub mod unit_run;
