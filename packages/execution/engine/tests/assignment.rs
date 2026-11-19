@@ -624,3 +624,59 @@ fn the_assignment_tree_lists_run_directories_and_stops_at_every_barrier() {
         }
     }
 }
+
+fn copy_tree(from: &Path, to: &Path) {
+    fs::create_dir_all(to).unwrap();
+    for entry in fs::read_dir(from).unwrap() {
+        let entry = entry.unwrap();
+        let target = to.join(entry.file_name());
+        if entry.file_type().unwrap().is_dir() {
+            copy_tree(&entry.path(), &target);
+        } else {
+            fs::copy(entry.path(), target).unwrap();
+        }
+    }
+}
+
+/// The records the Node tier really wrote (`packages/execution/contracts/corpus/`), each placed as one assignment, are
+/// listed and found by run id exactly as Node's layout reader did; the synthetic tree above cannot show that the
+/// readers accept the shapes and layouts older Node releases left on disk.
+#[test]
+fn the_node_era_corpus_is_listed_and_found_by_run_id_as_node_did() {
+    let v = vector("corpus.json");
+    let corpus = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../contracts/corpus");
+    let scratch = Scratch::new("corpus");
+    let fgos = scratch.0.join(".fgos");
+    for sample in cases(&v, "samples") {
+        let sample = sample.as_str().unwrap();
+        copy_tree(&corpus.join(sample), &fgos.join("assignments").join(sample));
+    }
+    let rel = |p: &Path| {
+        p.strip_prefix(&fgos)
+            .unwrap()
+            .to_string_lossy()
+            .replace('\\', "/")
+    };
+    let scan = scan_assignment_layout(&fgos);
+    let runs: Vec<Value> = scan
+        .runs
+        .iter()
+        .map(|r| json!({ "assignmentId": r.assignment_id, "attempt": r.attempt, "runDir": rel(&r.run_dir), "hasAssignmentJson": r.has_assignment_json }))
+        .collect();
+    same_bytes("runs", &Value::Array(runs), &v["scan"]["runs"]);
+    same_bytes("skipped", &skipped_json(&scan), &v["scan"]["skipped"]);
+    assert_eq!(
+        scan.run_dirs_seen,
+        v["scan"]["runDirsSeen"].as_u64().unwrap()
+    );
+    assert!(!cases(&v, "findRunDir").is_empty());
+    for case in cases(&v, "findRunDir") {
+        let id = case["runId"].as_str().unwrap();
+        let found = find_run_dir(&fgos, id).unwrap_or_else(|e| panic!("{id}: {e}"));
+        assert_eq!(
+            found.map(|d| Value::String(rel(&d))).unwrap_or(Value::Null),
+            case["dir"],
+            "{id}"
+        );
+    }
+}

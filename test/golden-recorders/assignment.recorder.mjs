@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Assignment golden recorder: replays the Node assignment modules (assignment, assignment-normalizer, brief,
-// tier-cell, work-item-input, assignment-layout) over fixed inputs and writes the results as vectors for the Rust
+// tier-cell, work-item-input, assignment-layout) over fixed inputs and the Node-era corpus, and writes the results as vectors for the Rust
 // `assignment` engine module to replay (packages/execution/engine/tests/assignment.rs).
 // Usage: node test/golden-recorders/assignment.recorder.mjs [--out <dir>]
 // Default out: packages/execution/contracts/assignment.
@@ -251,6 +251,24 @@ write('layout.json', tokenize({
   findRunDir: ['run_a', 'run_b', 'run_zzz', ''].map((runId) => ({ runId, dir: (() => { const r = layout.findRunDir(lay, runId); return r ? rel(r) : null; })() }))
     .concat([{ runId: 'dup', error: dups.error ? { code: dups.error.code, message: dups.error.message.replaceAll(lay, '<fgos>') } : null }]),
 }));
+
+// ---- Node-era corpus -------------------------------------------------------------------------------------------
+// Each sample of packages/execution/contracts/corpus/ is placed as one assignment (its directory name the id), so the
+// layout readers meet records the Node tier really wrote.
+const corpusRoot = path.join(repo, 'packages/execution/contracts/corpus');
+const corpusFgos = path.join(tmp, 'corpus', '.fgos');
+const samples = fs.readdirSync(corpusRoot, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort();
+for (const sample of samples) fs.cpSync(path.join(corpusRoot, sample), path.join(corpusFgos, 'assignments', sample), { recursive: true });
+const corpusScan = layout.scanAssignmentLayout(corpusFgos);
+const crel = (p) => path.relative(corpusFgos, p);
+const corpusRunIds = [...new Set(corpusScan.runs.flatMap(({ runDir }) => ['run.json', 'result.json']
+  .map((name) => { try { return JSON.parse(fs.readFileSync(path.join(runDir, name), 'utf8')).runId; } catch { return undefined; } })
+  .filter((id) => typeof id === 'string')))].sort();
+write('corpus.json', {
+  samples,
+  scan: { runs: corpusScan.runs.map((r) => ({ assignmentId: r.assignmentId, attempt: r.attempt, runDir: crel(r.runDir), hasAssignmentJson: r.hasAssignmentJson })), skipped: plain(corpusScan.skipped), runDirsSeen: corpusScan.runDirsSeen },
+  findRunDir: corpusRunIds.map((runId) => ({ runId, dir: (() => { const r = layout.findRunDir(corpusFgos, runId); return r ? crel(r) : null; })() })),
+});
 
 fs.rmSync(tmp, { recursive: true, force: true });
 console.log(`assignment vectors written to ${path.relative(repo, outDir)}`);

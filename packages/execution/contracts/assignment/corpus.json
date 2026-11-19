@@ -1,0 +1,56 @@
+{
+  "samples": [
+    "adopt-v3-envelope-attempt",
+    "pre-v3-layout-assignment",
+    "v3-open-attempt",
+    "v3-solo-settled"
+  ],
+  "scan": {
+    "runs": [
+      {
+        "assignmentId": "adopt-v3-envelope-attempt",
+        "attempt": "01",
+        "runDir": "assignments/adopt-v3-envelope-attempt/runs/01",
+        "hasAssignmentJson": true
+      },
+      {
+        "assignmentId": "pre-v3-layout-assignment",
+        "attempt": "01",
+        "runDir": "assignments/pre-v3-layout-assignment/runs/01",
+        "hasAssignmentJson": true
+      },
+      {
+        "assignmentId": "v3-open-attempt/producer/1",
+        "attempt": "01",
+        "runDir": "assignments/v3-open-attempt/producer/1/runs/01",
+        "hasAssignmentJson": true
+      },
+      {
+        "assignmentId": "v3-solo-settled/producer/1",
+        "attempt": "01",
+        "runDir": "assignments/v3-solo-settled/producer/1/runs/01",
+        "hasAssignmentJson": true
+      }
+    ],
+    "skipped": {},
+    "runDirsSeen": 4
+  },
+  "findRunDir": [
+    {
+      "runId": "run_asgn_4f660b01_7ec3_48f3_89b5_8219ba811853_op_001_01",
+      "dir": "assignments/adopt-v3-envelope-attempt/runs/01"
+    },
+    {
+      "runId": "run_asgn_8e8e56bb_00a0_4158_ad04_ec29cabf8204_op_001_01",
+      "dir": "assignments/pre-v3-layout-assignment/runs/01"
+    },
+    {
+      "runId": "run_unit-run-1794987012087-5f3337a8/producer/1_01",
+      "dir": "assignments/v3-open-attempt/producer/1/runs/01"
+    },
+    {
+      "runId": "run_unit-run-1795056603528-44eb3ca1/producer/1_01",
+      "dir": "assignments/v3-solo-settled/producer/1/runs/01"
+    }
+  ]
+}
