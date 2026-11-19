@@ -557,6 +557,7 @@
         "src/run-supervisor/runtime-dir.mjs",
         "src/runner/dispatch/confinement/drivers/bwrap.mjs",
         "src/runner/dispatch/confinement/probes/harness.mjs",
+        { "path": "packages/execution/engine/src/confinement/driver/bwrap.rs", "reason": "Rust twin of drivers/bwrap.mjs: mounts /proc in the sandbox and passes the fd-closer script that lists /proc/$$/fd inside it, bwrap arguments and not reads of process facts" },
         { "path": "scripts/ci-setup-bwrap.sh", "reason": "reads the AppArmor user-namespace switch to set up the sandbox on CI" },
         { "path": "scripts/lib/test-file-cpu.mjs", "reason": "reads /proc/self/stat for waited CPU seconds of the test run, a measurement and not a process judgement" },
         { "path": "scripts/lib/mailbox-live-cli.mjs", "reason": "live probe reads /proc/meminfo and scans /proc/*/cmdline for the heavy-gate check, machine measurements and not process judgements" },

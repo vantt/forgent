@@ -1,0 +1,617 @@
+{
+  "note": "recorded from src/runner/dispatch/confinement/backend-registry.mjs; the parse detail of invalid JSON is not pinned",
+  "allowedDriverTypes": [
+    "bwrap",
+    "container",
+    "remote"
+  ],
+  "defaultRegistry": {
+    "contract": "confinement-backend-registry.v1",
+    "confinementBackends": {
+      "bwrap": {
+        "type": "bwrap",
+        "enabled": true,
+        "executable": "/usr/bin/bwrap"
+      }
+    }
+  },
+  "instanceCases": [
+    {
+      "name": "bwrap-full",
+      "id": "a",
+      "config": {
+        "type": "bwrap",
+        "enabled": true,
+        "executable": "/usr/bin/bwrap",
+        "tempRoot": "/srv/t",
+        "privateHomeRoot": "/srv/h"
+      },
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "bwrap-minimal",
+      "id": "a",
+      "config": {
+        "type": "bwrap"
+      },
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "bwrap-unknown-key",
+      "id": "a",
+      "config": {
+        "type": "bwrap",
+        "shell": "x"
+      },
+      "out": {
+        "error": "runner config (confinement backend.a) contains unknown key \"shell\" for type \"bwrap\". Allowed keys: type, enabled, executable, tempRoot, privateHomeRoot."
+      }
+    },
+    {
+      "name": "bwrap-blank-executable",
+      "id": "a",
+      "config": {
+        "type": "bwrap",
+        "executable": "  "
+      },
+      "out": {
+        "error": "runner config (confinement backend.a) \"executable\" must be a non-empty string when present."
+      }
+    },
+    {
+      "name": "bwrap-enabled-not-bool",
+      "id": "a",
+      "config": {
+        "type": "bwrap",
+        "enabled": "yes"
+      },
+      "out": {
+        "error": "runner config (confinement backend.a) \"enabled\" must be a boolean when present."
+      }
+    },
+    {
+      "name": "bwrap-blank-temp-root",
+      "id": "a",
+      "config": {
+        "type": "bwrap",
+        "tempRoot": ""
+      },
+      "out": {
+        "error": "runner config (confinement backend.a) \"tempRoot\" must be a non-empty string when present."
+      }
+    },
+    {
+      "name": "bwrap-numeric-home-root",
+      "id": "a",
+      "config": {
+        "type": "bwrap",
+        "privateHomeRoot": 3
+      },
+      "out": {
+        "error": "runner config (confinement backend.a) \"privateHomeRoot\" must be a non-empty string when present."
+      }
+    },
+    {
+      "name": "container-ok",
+      "id": "c",
+      "config": {
+        "type": "container",
+        "runtime": "podman",
+        "image": "img",
+        "pullPolicy": "never"
+      },
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "container-bad-runtime",
+      "id": "c",
+      "config": {
+        "type": "container",
+        "runtime": "lxc",
+        "image": "img"
+      },
+      "out": {
+        "error": "runner config (confinement backend.c) \"runtime\" must be \"docker\" or \"podman\", got: \"lxc\"."
+      }
+    },
+    {
+      "name": "container-missing-image",
+      "id": "c",
+      "config": {
+        "type": "container",
+        "runtime": "docker"
+      },
+      "out": {
+        "error": "runner config (confinement backend.c) \"image\" must be a non-empty string."
+      }
+    },
+    {
+      "name": "container-bad-pull",
+      "id": "c",
+      "config": {
+        "type": "container",
+        "runtime": "docker",
+        "image": "i",
+        "pullPolicy": "sometimes"
+      },
+      "out": {
+        "error": "runner config (confinement backend.c) \"pullPolicy\" must be one of never/if-missing/always, got: \"sometimes\"."
+      }
+    },
+    {
+      "name": "container-unknown-key",
+      "id": "c",
+      "config": {
+        "type": "container",
+        "runtime": "docker",
+        "image": "i",
+        "mount": 1
+      },
+      "out": {
+        "error": "runner config (confinement backend.c) contains unknown key \"mount\" for type \"container\". Allowed keys: type, enabled, runtime, image, pullPolicy."
+      }
+    },
+    {
+      "name": "remote-ok",
+      "id": "r",
+      "config": {
+        "type": "remote",
+        "endpoint": "https://x",
+        "credentialRef": "ref"
+      },
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "remote-missing-endpoint",
+      "id": "r",
+      "config": {
+        "type": "remote",
+        "credentialRef": "ref"
+      },
+      "out": {
+        "error": "runner config (confinement backend.r) \"endpoint\" must be a non-empty string."
+      }
+    },
+    {
+      "name": "remote-missing-credential",
+      "id": "r",
+      "config": {
+        "type": "remote",
+        "endpoint": "https://x"
+      },
+      "out": {
+        "error": "runner config (confinement backend.r) \"credentialRef\" must be a non-empty string."
+      }
+    },
+    {
+      "name": "remote-unknown-key",
+      "id": "r",
+      "config": {
+        "type": "remote",
+        "endpoint": "e",
+        "credentialRef": "c",
+        "token": "t"
+      },
+      "out": {
+        "error": "runner config (confinement backend.r) contains unknown key \"token\" for type \"remote\". Allowed keys: type, enabled, endpoint, credentialRef."
+      }
+    },
+    {
+      "name": "unknown-type",
+      "id": "u",
+      "config": {
+        "type": "vm"
+      },
+      "out": {
+        "error": "runner config (confinement backend.u) \"type\" must be one of bwrap/container/remote, got: \"vm\"."
+      }
+    },
+    {
+      "name": "not-an-object",
+      "id": "u",
+      "config": [
+        "bwrap"
+      ],
+      "out": {
+        "error": "runner config (confinement backend.u) must be an object."
+      }
+    },
+    {
+      "name": "null-config",
+      "id": "u",
+      "config": null,
+      "out": {
+        "error": "runner config (confinement backend.u) must be an object."
+      }
+    }
+  ],
+  "docCases": [
+    {
+      "name": "valid",
+      "doc": {
+        "contract": "confinement-backend-registry.v1",
+        "confinementBackends": {
+          "bwrap": {
+            "type": "bwrap"
+          }
+        }
+      },
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "empty-backends",
+      "doc": {
+        "contract": "confinement-backend-registry.v1",
+        "confinementBackends": {}
+      },
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "wrong-contract",
+      "doc": {
+        "contract": "x",
+        "confinementBackends": {}
+      },
+      "out": {
+        "error": "runner config (doc) \"contract\" must be \"confinement-backend-registry.v1\", got: \"x\"."
+      }
+    },
+    {
+      "name": "unknown-doc-key",
+      "doc": {
+        "contract": "confinement-backend-registry.v1",
+        "confinementBackends": {},
+        "extra": 1
+      },
+      "out": {
+        "error": "runner config (doc) contains unknown key \"extra\". Allowed keys: contract, confinementBackends."
+      }
+    },
+    {
+      "name": "backends-array",
+      "doc": {
+        "contract": "confinement-backend-registry.v1",
+        "confinementBackends": []
+      },
+      "out": {
+        "error": "runner config (doc) \"confinementBackends\" must be an object mapping instanceId to backend config."
+      }
+    },
+    {
+      "name": "backends-missing",
+      "doc": {
+        "contract": "confinement-backend-registry.v1"
+      },
+      "out": {
+        "error": "runner config (doc) \"confinementBackends\" must be an object mapping instanceId to backend config."
+      }
+    },
+    {
+      "name": "blank-instance-id",
+      "doc": {
+        "contract": "confinement-backend-registry.v1",
+        "confinementBackends": {
+          " ": {
+            "type": "bwrap"
+          }
+        }
+      },
+      "out": {
+        "error": "runner config (doc) backend instance key must be a non-empty string."
+      }
+    },
+    {
+      "name": "bad-instance",
+      "doc": {
+        "contract": "confinement-backend-registry.v1",
+        "confinementBackends": {
+          "b": {
+            "type": "bwrap",
+            "nope": 1
+          }
+        }
+      },
+      "out": {
+        "error": "runner config (doc.confinementBackends.b) contains unknown key \"nope\" for type \"bwrap\". Allowed keys: type, enabled, executable, tempRoot, privateHomeRoot."
+      }
+    },
+    {
+      "name": "array-doc",
+      "doc": [],
+      "out": {
+        "error": "runner config (doc) must be an object."
+      }
+    }
+  ],
+  "overrideCases": [
+    {
+      "name": "none",
+      "cfg": {},
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "null",
+      "cfg": null,
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "top-level",
+      "cfg": {
+        "confinementBackends": {}
+      },
+      "out": {
+        "error": "runner config (project) cannot define or override \"confinementBackends\" — machine backend instance deployment config is managed at the machine level (confinement-backend-registry-forbidden)."
+      }
+    },
+    {
+      "name": "under-runner",
+      "cfg": {
+        "runner": {
+          "confinementBackends": {}
+        }
+      },
+      "out": {
+        "error": "runner config (project) cannot define or override \"confinementBackends\" — machine backend instance deployment config is managed at the machine level (confinement-backend-registry-forbidden)."
+      }
+    },
+    {
+      "name": "unrelated",
+      "cfg": {
+        "runner": {
+          "other": 1
+        }
+      },
+      "out": {
+        "ok": true
+      }
+    }
+  ],
+  "snapDoc": {
+    "contract": "confinement-backend-registry.v1",
+    "confinementBackends": {
+      "on": {
+        "type": "bwrap",
+        "executable": "/opt/bwrap"
+      },
+      "off": {
+        "type": "bwrap",
+        "enabled": false
+      },
+      "imp": {
+        "type": "bwrap",
+        "enabled": true
+      }
+    }
+  },
+  "resolves": [
+    {
+      "id": "on",
+      "out": {
+        "id": "on",
+        "type": "bwrap",
+        "config": {
+          "type": "bwrap",
+          "executable": "/opt/bwrap"
+        }
+      }
+    },
+    {
+      "id": "off",
+      "out": null
+    },
+    {
+      "id": "imp",
+      "out": {
+        "id": "imp",
+        "type": "bwrap",
+        "config": {
+          "type": "bwrap",
+          "enabled": true
+        }
+      }
+    },
+    {
+      "id": "missing",
+      "out": null
+    },
+    {
+      "id": "",
+      "out": null
+    },
+    {
+      "id": " ",
+      "out": null
+    },
+    {
+      "id": 7,
+      "out": null
+    }
+  ],
+  "load": [
+    {
+      "name": "absent",
+      "text": null,
+      "out": {
+        "ok": {
+          "contract": "confinement-backend-registry.v1",
+          "confinementBackends": {}
+        }
+      }
+    },
+    {
+      "name": "valid",
+      "text": "{\"contract\":\"confinement-backend-registry.v1\",\"confinementBackends\":{\"on\":{\"type\":\"bwrap\",\"executable\":\"/opt/bwrap\"},\"off\":{\"type\":\"bwrap\",\"enabled\":false},\"imp\":{\"type\":\"bwrap\",\"enabled\":true}}}",
+      "out": {
+        "ok": {
+          "contract": "confinement-backend-registry.v1",
+          "confinementBackends": {
+            "on": {
+              "type": "bwrap",
+              "executable": "/opt/bwrap"
+            },
+            "off": {
+              "type": "bwrap",
+              "enabled": false
+            },
+            "imp": {
+              "type": "bwrap",
+              "enabled": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "not-json",
+      "text": "{nope",
+      "out": {
+        "error": "machine backend registry at \"<dir>/not-json.json\" is not valid JSON: <parse detail>"
+      }
+    },
+    {
+      "name": "wrong-shape",
+      "text": "{\"contract\":\"confinement-backend-registry.v1\",\"confinementBackends\":{\"a\":{\"type\":\"vm\"}}}",
+      "out": {
+        "error": "runner config (<dir>/wrong-shape.json.confinementBackends.a) \"type\" must be one of bwrap/container/remote, got: \"vm\"."
+      }
+    }
+  ],
+  "ensure": [
+    {
+      "name": "absent",
+      "before": null,
+      "out": {
+        "created": true,
+        "changed": true,
+        "path": "<file>",
+        "message": "bootstrapped machine backend registry at <file> with default bwrap instance"
+      },
+      "after": "{\n  \"contract\": \"confinement-backend-registry.v1\",\n  \"confinementBackends\": {\n    \"bwrap\": {\n      \"type\": \"bwrap\",\n      \"enabled\": true,\n      \"executable\": \"/usr/bin/bwrap\"\n    }\n  }\n}\n"
+    },
+    {
+      "name": "current",
+      "before": "{\n  \"contract\": \"confinement-backend-registry.v1\",\n  \"confinementBackends\": {\n    \"bwrap\": {\n      \"type\": \"bwrap\",\n      \"enabled\": true,\n      \"executable\": \"/usr/bin/bwrap\"\n    }\n  }\n}\n",
+      "out": {
+        "created": false,
+        "changed": false,
+        "path": "<file>",
+        "message": "machine backend registry at <file> is already up to date"
+      },
+      "after": "{\n  \"contract\": \"confinement-backend-registry.v1\",\n  \"confinementBackends\": {\n    \"bwrap\": {\n      \"type\": \"bwrap\",\n      \"enabled\": true,\n      \"executable\": \"/usr/bin/bwrap\"\n    }\n  }\n}\n"
+    },
+    {
+      "name": "empty-backends",
+      "before": "{\"contract\":\"confinement-backend-registry.v1\",\"confinementBackends\":{}}",
+      "out": {
+        "created": false,
+        "changed": true,
+        "path": "<file>",
+        "message": "added missing default backend instances to <file>"
+      },
+      "after": "{\n  \"contract\": \"confinement-backend-registry.v1\",\n  \"confinementBackends\": {\n    \"bwrap\": {\n      \"type\": \"bwrap\",\n      \"enabled\": true,\n      \"executable\": \"/usr/bin/bwrap\"\n    }\n  }\n}\n"
+    },
+    {
+      "name": "custom-only",
+      "before": "{\"contract\":\"confinement-backend-registry.v1\",\"confinementBackends\":{\"mine\":{\"type\":\"bwrap\",\"executable\":\"/x/bwrap\"}}}",
+      "out": {
+        "created": false,
+        "changed": false,
+        "path": "<file>",
+        "message": "machine backend registry at <file> is already up to date"
+      },
+      "after": "{\"contract\":\"confinement-backend-registry.v1\",\"confinementBackends\":{\"mine\":{\"type\":\"bwrap\",\"executable\":\"/x/bwrap\"}}}"
+    },
+    {
+      "name": "old-contract",
+      "before": "{\"contract\":\"old\",\"confinementBackends\":{\"mine\":{\"type\":\"bwrap\"}}}",
+      "out": {
+        "created": false,
+        "changed": true,
+        "path": "<file>",
+        "message": "added missing default backend instances to <file>"
+      },
+      "after": "{\n  \"contract\": \"confinement-backend-registry.v1\",\n  \"confinementBackends\": {\n    \"mine\": {\n      \"type\": \"bwrap\"\n    }\n  }\n}\n"
+    },
+    {
+      "name": "extra-key",
+      "before": "{\"contract\":\"confinement-backend-registry.v1\",\"confinementBackends\":{\"mine\":{\"type\":\"bwrap\"}},\"junk\":1}",
+      "out": {
+        "created": false,
+        "changed": true,
+        "path": "<file>",
+        "message": "added missing default backend instances to <file>"
+      },
+      "after": "{\n  \"contract\": \"confinement-backend-registry.v1\",\n  \"confinementBackends\": {\n    \"mine\": {\n      \"type\": \"bwrap\"\n    }\n  }\n}\n"
+    },
+    {
+      "name": "unparseable",
+      "before": "{nope",
+      "out": {
+        "created": false,
+        "changed": false,
+        "path": "<file>",
+        "message": "skipped -- cannot parse machine backend registry at \"<file>\": <parse detail>"
+      },
+      "after": "{nope"
+    },
+    {
+      "name": "repair-invalid",
+      "before": "{\"contract\":\"confinement-backend-registry.v1\",\"confinementBackends\":{\"bad\":{\"type\":\"vm\"}},\"junk\":1}",
+      "out": {
+        "created": false,
+        "changed": false,
+        "path": "<file>",
+        "message": "skipped -- cannot repair machine backend registry at \"<file>\": runner config (<file>.confinementBackends.bad) \"type\" must be one of bwrap/container/remote, got: \"vm\"."
+      },
+      "after": "{\"contract\":\"confinement-backend-registry.v1\",\"confinementBackends\":{\"bad\":{\"type\":\"vm\"}},\"junk\":1}"
+    }
+  ],
+  "drivers": [
+    {
+      "type": "bwrap",
+      "out": {
+        "ok": "bwrap"
+      }
+    },
+    {
+      "type": "container",
+      "out": {
+        "error": "unknown confinement backend driver type \"container\" (confinement-backend-unknown). Known types: bwrap."
+      }
+    },
+    {
+      "type": "remote",
+      "out": {
+        "error": "unknown confinement backend driver type \"remote\" (confinement-backend-unknown). Known types: bwrap."
+      }
+    },
+    {
+      "type": "vm",
+      "out": {
+        "error": "unknown confinement backend driver type \"vm\" (confinement-backend-unknown). Known types: bwrap."
+      }
+    },
+    {
+      "type": 7,
+      "out": {
+        "error": "unknown confinement backend driver type \"7\" (confinement-backend-unknown). Known types: bwrap."
+      }
+    }
+  ]
+}

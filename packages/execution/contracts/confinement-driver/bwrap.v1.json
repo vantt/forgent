@@ -1,0 +1,3507 @@
+{
+  "note": "recorded from src/runner/dispatch/confinement/drivers/bwrap.mjs with XDG_RUNTIME_DIR=/run/user/1000; assess pins only the mismatches the driver itself makes, not the resolver's",
+  "driver": {
+    "type": "bwrap",
+    "version": "local-bwrap-v1",
+    "confinedMarkerEnv": "FGOS_CONFINED"
+  },
+  "runtimeSocketDirEnv": {
+    "XDG_RUNTIME_DIR": "/run/user/1000"
+  },
+  "configCases": [
+    {
+      "name": "minimal",
+      "config": {
+        "type": "bwrap"
+      },
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "full",
+      "config": {
+        "type": "bwrap",
+        "enabled": false,
+        "executable": "/o/bwrap",
+        "tempRoot": "/t",
+        "privateHomeRoot": "/h"
+      },
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "wrong-type",
+      "config": {
+        "type": "x"
+      },
+      "out": {
+        "error": "cfg \"type\" must be \"bwrap\", got: \"x\"."
+      }
+    },
+    {
+      "name": "unknown-key",
+      "config": {
+        "type": "bwrap",
+        "extra": 1
+      },
+      "out": {
+        "error": "cfg contains unknown config key \"extra\". Allowed keys: type, enabled, executable, tempRoot, privateHomeRoot."
+      }
+    },
+    {
+      "name": "blank-executable",
+      "config": {
+        "type": "bwrap",
+        "executable": " "
+      },
+      "out": {
+        "error": "cfg \"executable\" must be a non-empty string when present."
+      }
+    },
+    {
+      "name": "enabled-string",
+      "config": {
+        "type": "bwrap",
+        "enabled": "y"
+      },
+      "out": {
+        "error": "cfg \"enabled\" must be a boolean when present."
+      }
+    },
+    {
+      "name": "blank-temp-root",
+      "config": {
+        "type": "bwrap",
+        "tempRoot": ""
+      },
+      "out": {
+        "error": "cfg \"tempRoot\" must be a non-empty string when present."
+      }
+    },
+    {
+      "name": "number-home-root",
+      "config": {
+        "type": "bwrap",
+        "privateHomeRoot": 1
+      },
+      "out": {
+        "error": "cfg \"privateHomeRoot\" must be a non-empty string when present."
+      }
+    },
+    {
+      "name": "array",
+      "config": [],
+      "out": {
+        "error": "cfg must be an object."
+      }
+    },
+    {
+      "name": "null",
+      "config": null,
+      "out": {
+        "error": "cfg must be an object."
+      }
+    }
+  ],
+  "assessCases": [
+    {
+      "name": "all-allow",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": []
+      }
+    },
+    {
+      "name": "preferred-mode",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "preferred",
+          "policyId": "p",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-unsupported",
+            "detail": "preferred confinement mode is not supported in local-bwrap-v1; use required or unconfined."
+          }
+        ]
+      }
+    },
+    {
+      "name": "unconfined-no-controls",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "unconfined",
+          "policyId": "p",
+          "policy": {}
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {},
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-unsupported",
+            "detail": "required confinement policy must declare a controls object."
+          }
+        ]
+      }
+    },
+    {
+      "name": "override-blind-only",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": [],
+        "override": {
+          "controls": {
+            "hostRead": "blind"
+          }
+        }
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": []
+      }
+    },
+    {
+      "name": "override-other",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": [],
+        "override": {
+          "controls": {
+            "hostRead": "deny"
+          }
+        }
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-unsupported",
+            "detail": "invocation confinement override is not supported in local-bwrap-v1."
+          }
+        ]
+      }
+    },
+    {
+      "name": "override-extra-key",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": [],
+        "override": {
+          "controls": {
+            "hostRead": "blind"
+          },
+          "grants": []
+        }
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-unsupported",
+            "detail": "invocation confinement override is not supported in local-bwrap-v1."
+          }
+        ]
+      }
+    },
+    {
+      "name": "host-read-deny",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "deny",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "unsatisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-unsupported",
+            "detail": "hostRead: deny is not supported by local-bwrap-v1 (only hostRead: allow and blind are supported)."
+          }
+        ]
+      }
+    },
+    {
+      "name": "host-read-blind-policy",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "blind",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": []
+      }
+    },
+    {
+      "name": "host-write-allow-required",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "unsatisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-unsupported",
+            "detail": "required policy cannot specify hostWrite: allow on bwrap backend; must be deny."
+          }
+        ]
+      }
+    },
+    {
+      "name": "host-write-weird",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "maybe",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "unknown",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": []
+      }
+    },
+    {
+      "name": "network-deny",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "deny",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "unsatisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-unsupported",
+            "detail": "networkEgress: deny is not supported by local-bwrap-v1 (only networkEgress: allow is supported)."
+          }
+        ]
+      }
+    },
+    {
+      "name": "process-isolated",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "isolated",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "unsatisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-unsupported",
+            "detail": "process: isolated is not supported as a verified claim by local-bwrap-v1 (only process: host is supported)."
+          }
+        ]
+      }
+    },
+    {
+      "name": "home-private-session-isolated-workspace-own",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "private",
+              "session": "isolated",
+              "workspace": "own"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "unverified",
+          "control:session": "unverified",
+          "control:workspace": "unverified"
+        },
+        "readiness": {},
+        "mismatches": []
+      }
+    },
+    {
+      "name": "home-session-workspace-unknown",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "odd",
+              "session": "shared",
+              "workspace": "odd"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "unknown",
+          "control:session": "satisfied",
+          "control:workspace": "unknown"
+        },
+        "readiness": {},
+        "mismatches": []
+      }
+    },
+    {
+      "name": "control-missing",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostRead": "unsatisfied",
+          "control:networkEgress": "unsatisfied",
+          "control:process": "unsatisfied",
+          "control:home": "unknown",
+          "control:session": "unverified",
+          "control:workspace": "unknown",
+          "control:hostWrite": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-unsupported",
+            "detail": "required confinement policy is missing control \"hostRead\"."
+          },
+          {
+            "code": "confinement-unsupported",
+            "detail": "required confinement policy is missing control \"networkEgress\"."
+          },
+          {
+            "code": "confinement-unsupported",
+            "detail": "required confinement policy is missing control \"process\"."
+          },
+          {
+            "code": "confinement-unsupported",
+            "detail": "required confinement policy is missing control \"home\"."
+          },
+          {
+            "code": "confinement-unsupported",
+            "detail": "required confinement policy is missing control \"session\"."
+          },
+          {
+            "code": "confinement-unsupported",
+            "detail": "required confinement policy is missing control \"workspace\"."
+          },
+          {
+            "code": "confinement-unsupported",
+            "detail": "hostRead: undefined is not supported by local-bwrap-v1 (only hostRead: allow and blind are supported)."
+          },
+          {
+            "code": "confinement-unsupported",
+            "detail": "networkEgress: undefined is not supported by local-bwrap-v1 (only networkEgress: allow is supported)."
+          },
+          {
+            "code": "confinement-unsupported",
+            "detail": "process: undefined is not supported as a verified claim by local-bwrap-v1 (only process: host is supported)."
+          }
+        ]
+      }
+    },
+    {
+      "name": "control-unknown",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared",
+              "magic": "on"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:magic": "unsatisfied",
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-unsupported",
+            "detail": "control \"magic\" is not supported by local-bwrap-v1."
+          }
+        ]
+      }
+    },
+    {
+      "name": "controls-array",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": [],
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "unknown",
+          "control:hostRead": "unsatisfied",
+          "control:networkEgress": "unsatisfied",
+          "control:process": "unsatisfied",
+          "control:home": "unknown",
+          "control:session": "unverified",
+          "control:workspace": "unknown"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-unsupported",
+            "detail": "required confinement policy must declare a controls object."
+          },
+          {
+            "code": "confinement-unsupported",
+            "detail": "hostRead: undefined is not supported by local-bwrap-v1 (only hostRead: allow and blind are supported)."
+          },
+          {
+            "code": "confinement-unsupported",
+            "detail": "networkEgress: undefined is not supported by local-bwrap-v1 (only networkEgress: allow is supported)."
+          },
+          {
+            "code": "confinement-unsupported",
+            "detail": "process: undefined is not supported as a verified claim by local-bwrap-v1 (only process: host is supported)."
+          }
+        ]
+      }
+    },
+    {
+      "name": "grants-run-output-private-home",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": [
+              {
+                "resource": "run-output"
+              },
+              {
+                "resource": "private-home"
+              },
+              {
+                "resource": "executor-credentials",
+                "optional": true
+              },
+              {
+                "resource": "workspace-paths"
+              }
+            ]
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied",
+          "grant:run-output": "satisfied",
+          "grant:private-home": "satisfied",
+          "grant:executor-credentials": "unverified",
+          "grant:workspace-paths": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": []
+      }
+    },
+    {
+      "name": "grant-workspace-denied-policy",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": [
+              {
+                "resource": "workspace"
+              },
+              {
+                "resource": "workspace-git-metadata"
+              }
+            ]
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied",
+          "grant:workspace": "unsatisfied",
+          "grant:workspace-git-metadata": "unsatisfied"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-grant-invalid",
+            "detail": "resource \"workspace\" is not supported or not permitted under policy \"host-write-denied\"."
+          },
+          {
+            "code": "confinement-grant-invalid",
+            "detail": "resource \"workspace-git-metadata\" is not supported or not permitted under policy \"host-write-denied\"."
+          }
+        ]
+      }
+    },
+    {
+      "name": "grant-workspace-write-policy",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "workspace-write",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": [
+              {
+                "resource": "workspace"
+              },
+              {
+                "resource": "workspace-git-metadata"
+              }
+            ]
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied",
+          "grant:workspace": "satisfied",
+          "grant:workspace-git-metadata": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": []
+      }
+    },
+    {
+      "name": "grant-head-only-worker",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": [
+              {
+                "resource": "mailbox-record"
+              },
+              {
+                "resource": "peer-sessions"
+              }
+            ]
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied",
+          "grant:mailbox-record": "unsatisfied",
+          "grant:peer-sessions": "unsatisfied"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-grant-invalid",
+            "detail": "resource \"mailbox-record\" is not supported or not permitted under policy \"host-write-denied\"."
+          },
+          {
+            "code": "confinement-grant-invalid",
+            "detail": "resource \"peer-sessions\" is not supported or not permitted under policy \"host-write-denied\"."
+          }
+        ]
+      }
+    },
+    {
+      "name": "grant-head-session",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": [
+              {
+                "resource": "mailbox-record"
+              },
+              {
+                "resource": "peer-sessions"
+              }
+            ]
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": [],
+        "assignmentLaunchContext": {
+          "kind": "session"
+        }
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied",
+          "grant:mailbox-record": "satisfied",
+          "grant:peer-sessions": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": []
+      }
+    },
+    {
+      "name": "store-without-private-home",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [],
+          "env": {},
+          "credentialStore": {
+            "use": "codex",
+            "homeEnv": "CODEX_HOME"
+          }
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-grant-invalid",
+            "detail": "the invocation reads login store \"codex\" through a private home, and policy \"host-write-denied\" grants no \"private-home\"."
+          }
+        ]
+      }
+    },
+    {
+      "name": "required-credentials-unresolved",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": [
+              {
+                "resource": "executor-credentials",
+                "optional": false
+              }
+            ]
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": []
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied",
+          "grant:executor-credentials": "unverified"
+        },
+        "readiness": {},
+        "mismatches": [
+          {
+            "code": "confinement-unsupported",
+            "detail": "required executor credentials were requested but no provider credential source was resolved for mounting."
+          }
+        ]
+      }
+    },
+    {
+      "name": "need-unsatisfied",
+      "request": {
+        "dispatchId": "d1",
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": []
+          }
+        },
+        "context": {
+          "cwd": "/srv/ws",
+          "repoRoot": "/srv/ws"
+        },
+        "invocation": {
+          "command": "echo",
+          "args": [
+            "hi"
+          ],
+          "env": {}
+        },
+        "resourceNeeds": [
+          {
+            "resource": "ghost"
+          }
+        ]
+      },
+      "out": {
+        "coverage": {
+          "control:hostWrite": "satisfied",
+          "control:hostRead": "satisfied",
+          "control:networkEgress": "satisfied",
+          "control:process": "satisfied",
+          "control:home": "satisfied",
+          "control:session": "satisfied",
+          "control:workspace": "satisfied"
+        },
+        "readiness": {
+          "ghost": "unsatisfied"
+        },
+        "mismatches": [
+          {
+            "code": "confinement-need-unsatisfied",
+            "detail": "required resource need \"ghost\" could not be resolved."
+          }
+        ]
+      }
+    }
+  ],
+  "prepareCases": [
+    {
+      "name": "direct-plain",
+      "plan": {
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "resources": [
+          {
+            "resource": "workspace",
+            "access": "write",
+            "hostTarget": "/srv/ws",
+            "executionTarget": {
+              "path": "/srv/ws"
+            }
+          },
+          {
+            "resource": "run-output",
+            "access": "read-write",
+            "hostTarget": "/srv/out",
+            "executionTarget": {
+              "path": "/srv/out"
+            }
+          },
+          {
+            "resource": "docs",
+            "access": "read",
+            "hostTarget": "/srv/docs",
+            "executionTarget": {
+              "path": "/docs"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/srv/run"
+        },
+        "launchMode": "direct"
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--bind",
+              "/srv/ws",
+              "/srv/ws",
+              "--bind",
+              "/srv/out",
+              "/srv/out",
+              "--ro-bind",
+              "/srv/docs",
+              "/docs",
+              "--",
+              "bash",
+              "-c",
+              "for f in $(ls /proc/$$/fd 2>/dev/null); do if [ \"$f\" -ge 3 ] 2>/dev/null; then eval \"exec $f>&-\" 2>/dev/null || true; fi; done; exec \"$@\"",
+              "bwrap-launch",
+              "agent",
+              "--go"
+            ],
+            "env": {
+              "A": "1"
+            }
+          },
+          "claims": {
+            "control:hostWrite": "satisfied"
+          },
+          "bwrapPrefix": null,
+          "agentArgv": null,
+          "launchDigest": null,
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "terminal-die-with-parent",
+      "plan": {
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "resources": [
+          {
+            "resource": "workspace",
+            "access": "write",
+            "hostTarget": "/srv/ws",
+            "executionTarget": {
+              "path": "/srv/ws"
+            }
+          },
+          {
+            "resource": "run-output",
+            "access": "read-write",
+            "hostTarget": "/srv/out",
+            "executionTarget": {
+              "path": "/srv/out"
+            }
+          },
+          {
+            "resource": "docs",
+            "access": "read",
+            "hostTarget": "/srv/docs",
+            "executionTarget": {
+              "path": "/docs"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/srv/run"
+        },
+        "launchMode": "terminal"
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--die-with-parent",
+              "--bind",
+              "/srv/ws",
+              "/srv/ws",
+              "--bind",
+              "/srv/out",
+              "/srv/out",
+              "--ro-bind",
+              "/srv/docs",
+              "/docs",
+              "--",
+              "bash",
+              "-c",
+              "for f in $(ls /proc/$$/fd 2>/dev/null); do if [ \"$f\" -ge 3 ] 2>/dev/null; then eval \"exec $f>&-\" 2>/dev/null || true; fi; done; exec \"$@\"",
+              "bwrap-launch",
+              "agent",
+              "--go"
+            ],
+            "env": {
+              "A": "1"
+            }
+          },
+          "claims": {
+            "control:hostWrite": "satisfied"
+          },
+          "bwrapPrefix": null,
+          "agentArgv": null,
+          "launchDigest": null,
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "custom-executable",
+      "plan": {
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "resources": [
+          {
+            "resource": "workspace",
+            "access": "write",
+            "hostTarget": "/srv/ws",
+            "executionTarget": {
+              "path": "/srv/ws"
+            }
+          },
+          {
+            "resource": "run-output",
+            "access": "read-write",
+            "hostTarget": "/srv/out",
+            "executionTarget": {
+              "path": "/srv/out"
+            }
+          },
+          {
+            "resource": "docs",
+            "access": "read",
+            "hostTarget": "/srv/docs",
+            "executionTarget": {
+              "path": "/docs"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/srv/run"
+        },
+        "launchMode": "direct"
+      },
+      "backend": {
+        "config": {
+          "executable": "/opt/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/opt/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--bind",
+              "/srv/ws",
+              "/srv/ws",
+              "--bind",
+              "/srv/out",
+              "/srv/out",
+              "--ro-bind",
+              "/srv/docs",
+              "/docs",
+              "--",
+              "bash",
+              "-c",
+              "for f in $(ls /proc/$$/fd 2>/dev/null); do if [ \"$f\" -ge 3 ] 2>/dev/null; then eval \"exec $f>&-\" 2>/dev/null || true; fi; done; exec \"$@\"",
+              "bwrap-launch",
+              "agent",
+              "--go"
+            ],
+            "env": {
+              "A": "1"
+            }
+          },
+          "claims": {
+            "control:hostWrite": "satisfied"
+          },
+          "bwrapPrefix": null,
+          "agentArgv": null,
+          "launchDigest": null,
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "default-executable",
+      "plan": {
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "resources": [
+          {
+            "resource": "workspace",
+            "access": "write",
+            "hostTarget": "/srv/ws",
+            "executionTarget": {
+              "path": "/srv/ws"
+            }
+          },
+          {
+            "resource": "run-output",
+            "access": "read-write",
+            "hostTarget": "/srv/out",
+            "executionTarget": {
+              "path": "/srv/out"
+            }
+          },
+          {
+            "resource": "docs",
+            "access": "read",
+            "hostTarget": "/srv/docs",
+            "executionTarget": {
+              "path": "/docs"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/srv/run"
+        },
+        "launchMode": "direct"
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--bind",
+              "/srv/ws",
+              "/srv/ws",
+              "--bind",
+              "/srv/out",
+              "/srv/out",
+              "--ro-bind",
+              "/srv/docs",
+              "/docs",
+              "--",
+              "bash",
+              "-c",
+              "for f in $(ls /proc/$$/fd 2>/dev/null); do if [ \"$f\" -ge 3 ] 2>/dev/null; then eval \"exec $f>&-\" 2>/dev/null || true; fi; done; exec \"$@\"",
+              "bwrap-launch",
+              "agent",
+              "--go"
+            ],
+            "env": {
+              "A": "1"
+            }
+          },
+          "claims": {
+            "control:hostWrite": "satisfied"
+          },
+          "bwrapPrefix": null,
+          "agentArgv": null,
+          "launchDigest": null,
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "home-env-wins",
+      "plan": {
+        "coverage": {},
+        "resources": [
+          {
+            "resource": "private-home",
+            "access": "none",
+            "hostTarget": "/srv/home",
+            "executionTarget": {
+              "path": "/home/w"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "CODEX_HOME": "/real"
+          },
+          "credentialStore": {
+            "use": "codex",
+            "homeEnv": "CODEX_HOME"
+          }
+        },
+        "context": {
+          "runDir": "/srv/run"
+        },
+        "launchMode": "direct"
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--ro-bind",
+              "/srv/home",
+              "/home/w",
+              "--",
+              "bash",
+              "-c",
+              "for f in $(ls /proc/$$/fd 2>/dev/null); do if [ \"$f\" -ge 3 ] 2>/dev/null; then eval \"exec $f>&-\" 2>/dev/null || true; fi; done; exec \"$@\"",
+              "bwrap-launch",
+              "agent",
+              "--go"
+            ],
+            "env": {
+              "CODEX_HOME": "/home/w"
+            },
+            "credentialStore": {
+              "use": "codex",
+              "homeEnv": "CODEX_HOME"
+            }
+          },
+          "claims": {},
+          "bwrapPrefix": null,
+          "agentArgv": null,
+          "launchDigest": null,
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "blind-masks-in-order",
+      "plan": {
+        "coverage": {},
+        "resources": [
+          {
+            "resource": "workspace",
+            "access": "write",
+            "hostTarget": "/srv/ws",
+            "executionTarget": {
+              "path": "/srv/ws"
+            }
+          },
+          {
+            "resource": "hidden-root",
+            "access": "none",
+            "hostTarget": "/srv/fgos/assignments",
+            "executionTarget": {
+              "path": "/srv/fgos/assignments"
+            }
+          },
+          {
+            "resource": "own-assignment",
+            "access": "read",
+            "hostTarget": "/srv/fgos/assignments/d1",
+            "executionTarget": {
+              "path": "/srv/fgos/assignments/d1"
+            }
+          },
+          {
+            "resource": "outbox",
+            "access": "write",
+            "hostTarget": "/srv/fgos/assignments/d1/out",
+            "executionTarget": {
+              "path": "/srv/fgos/assignments/d1/out"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/srv/run"
+        },
+        "launchMode": "direct",
+        "requirement": {
+          "policy": {
+            "controls": {
+              "hostRead": "blind"
+            }
+          }
+        }
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--bind",
+              "/srv/ws",
+              "/srv/ws",
+              "--tmpfs",
+              "/srv/fgos/assignments",
+              "--ro-bind",
+              "/srv/fgos/assignments/d1",
+              "/srv/fgos/assignments/d1",
+              "--bind",
+              "/srv/fgos/assignments/d1/out",
+              "/srv/fgos/assignments/d1/out",
+              "--remount-ro",
+              "/srv/fgos/assignments",
+              "--",
+              "bash",
+              "-c",
+              "for f in $(ls /proc/$$/fd 2>/dev/null); do if [ \"$f\" -ge 3 ] 2>/dev/null; then eval \"exec $f>&-\" 2>/dev/null || true; fi; done; exec \"$@\"",
+              "bwrap-launch",
+              "agent",
+              "--go"
+            ],
+            "env": {
+              "A": "1"
+            }
+          },
+          "claims": {},
+          "bwrapPrefix": null,
+          "agentArgv": null,
+          "launchDigest": null,
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "blind-without-own-assignment",
+      "plan": {
+        "coverage": {},
+        "resources": [
+          {
+            "resource": "hidden-root",
+            "access": "none",
+            "hostTarget": "/srv/fgos/assignments",
+            "executionTarget": {
+              "path": "/srv/fgos/assignments"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/srv/run"
+        },
+        "launchMode": "direct",
+        "requirement": {
+          "policy": {
+            "controls": {
+              "hostRead": "blind"
+            }
+          }
+        }
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "error": "hostRead: blind plan has no own-assignment resource to bind back."
+      }
+    },
+    {
+      "name": "head-keeps-host-pid-space",
+      "plan": {
+        "coverage": {},
+        "resources": [
+          {
+            "resource": "mailbox-record",
+            "access": "read-write",
+            "hostTarget": "/srv/fgos/runtime/mailbox/rec",
+            "executionTarget": {
+              "path": "/srv/fgos/runtime/mailbox/rec"
+            }
+          },
+          {
+            "resource": "peer-sessions",
+            "access": "read-write",
+            "hostTarget": "/run/user/1000/fgos/sessions",
+            "executionTarget": {
+              "path": "/run/user/1000/fgos/sessions"
+            },
+            "env": {
+              "CLAUDE_PEER": "/run/user/1000/fgos/sessions"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/srv/run"
+        },
+        "launchMode": "direct"
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--bind",
+              "/srv/fgos/runtime/mailbox/rec",
+              "/srv/fgos/runtime/mailbox/rec",
+              "--bind",
+              "/run/user/1000/fgos/sessions",
+              "/run/user/1000/fgos/sessions",
+              "--",
+              "bash",
+              "-c",
+              "for f in $(ls /proc/$$/fd 2>/dev/null); do if [ \"$f\" -ge 3 ] 2>/dev/null; then eval \"exec $f>&-\" 2>/dev/null || true; fi; done; exec \"$@\"",
+              "bwrap-launch",
+              "agent",
+              "--go"
+            ],
+            "env": {
+              "A": "1",
+              "CLAUDE_PEER": "/run/user/1000/fgos/sessions"
+            }
+          },
+          "claims": {},
+          "bwrapPrefix": null,
+          "agentArgv": null,
+          "launchDigest": null,
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "attempt-binds-gate-and-run-dir",
+      "plan": {
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "resources": [
+          {
+            "resource": "workspace",
+            "access": "write",
+            "hostTarget": "/srv/ws",
+            "executionTarget": {
+              "path": "/srv/ws"
+            }
+          },
+          {
+            "resource": "run-output",
+            "access": "read-write",
+            "hostTarget": "/srv/out",
+            "executionTarget": {
+              "path": "/srv/out"
+            }
+          },
+          {
+            "resource": "docs",
+            "access": "read",
+            "hostTarget": "/srv/docs",
+            "executionTarget": {
+              "path": "/docs"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/tmp/run/r1"
+        },
+        "launchMode": "direct",
+        "attemptId": "a1",
+        "gateCommand": [
+          "/tmp/gate/bin/gate",
+          "--flag"
+        ],
+        "attemptBinds": [
+          "/srv/run/a1/exit.json",
+          "/srv/run/a1/out.txt"
+        ]
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--ro-bind",
+              "/tmp/run/r1",
+              "/tmp/run/r1",
+              "--ro-bind",
+              "/tmp/gate/bin/gate",
+              "/tmp/gate/bin/gate",
+              "--bind",
+              "/srv/ws",
+              "/srv/ws",
+              "--bind",
+              "/srv/out",
+              "/srv/out",
+              "--ro-bind",
+              "/srv/docs",
+              "/docs",
+              "--bind",
+              "/srv/run/a1/exit.json",
+              "/srv/run/a1/exit.json",
+              "--bind",
+              "/srv/run/a1/out.txt",
+              "/srv/run/a1/out.txt",
+              "--"
+            ],
+            "env": {
+              "A": "1"
+            }
+          },
+          "claims": {
+            "control:hostWrite": "satisfied"
+          },
+          "bwrapPrefix": [
+            "--ro-bind",
+            "/",
+            "/",
+            "--dev",
+            "/dev",
+            "--proc",
+            "/proc",
+            "--tmpfs",
+            "/tmp",
+            "--unshare-pid",
+            "--as-pid-1",
+            "--setenv",
+            "FGOS_CONFINED",
+            "1",
+            "--ro-bind",
+            "/tmp/run/r1",
+            "/tmp/run/r1",
+            "--ro-bind",
+            "/tmp/gate/bin/gate",
+            "/tmp/gate/bin/gate",
+            "--bind",
+            "/srv/ws",
+            "/srv/ws",
+            "--bind",
+            "/srv/out",
+            "/srv/out",
+            "--ro-bind",
+            "/srv/docs",
+            "/docs",
+            "--bind",
+            "/srv/run/a1/exit.json",
+            "/srv/run/a1/exit.json",
+            "--bind",
+            "/srv/run/a1/out.txt",
+            "/srv/run/a1/out.txt",
+            "--"
+          ],
+          "agentArgv": [
+            "agent",
+            "--go"
+          ],
+          "launchDigest": "sha256:737fb892edee8b33c93a93a5a9f1ec46983ae337d94e853594b7a85db87933dd",
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "attempt-digest-with-gate",
+      "plan": {
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "resources": [
+          {
+            "resource": "workspace",
+            "access": "write",
+            "hostTarget": "/srv/ws",
+            "executionTarget": {
+              "path": "/srv/ws"
+            }
+          },
+          {
+            "resource": "run-output",
+            "access": "read-write",
+            "hostTarget": "/srv/out",
+            "executionTarget": {
+              "path": "/srv/out"
+            }
+          },
+          {
+            "resource": "docs",
+            "access": "read",
+            "hostTarget": "/srv/docs",
+            "executionTarget": {
+              "path": "/docs"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/tmp/run/r1"
+        },
+        "launchMode": "direct",
+        "attemptId": "a1",
+        "gateCommand": [
+          "/tmp/gate/bin/gate",
+          "--flag"
+        ],
+        "attemptBinds": [
+          "/srv/run/a1/exit.json",
+          "/srv/run/a1/out.txt"
+        ]
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--ro-bind",
+              "/tmp/run/r1",
+              "/tmp/run/r1",
+              "--ro-bind",
+              "/tmp/gate/bin/gate",
+              "/tmp/gate/bin/gate",
+              "--bind",
+              "/srv/ws",
+              "/srv/ws",
+              "--bind",
+              "/srv/out",
+              "/srv/out",
+              "--ro-bind",
+              "/srv/docs",
+              "/docs",
+              "--bind",
+              "/srv/run/a1/exit.json",
+              "/srv/run/a1/exit.json",
+              "--bind",
+              "/srv/run/a1/out.txt",
+              "/srv/run/a1/out.txt",
+              "--"
+            ],
+            "env": {
+              "A": "1"
+            }
+          },
+          "claims": {
+            "control:hostWrite": "satisfied"
+          },
+          "bwrapPrefix": [
+            "--ro-bind",
+            "/",
+            "/",
+            "--dev",
+            "/dev",
+            "--proc",
+            "/proc",
+            "--tmpfs",
+            "/tmp",
+            "--unshare-pid",
+            "--as-pid-1",
+            "--setenv",
+            "FGOS_CONFINED",
+            "1",
+            "--ro-bind",
+            "/tmp/run/r1",
+            "/tmp/run/r1",
+            "--ro-bind",
+            "/tmp/gate/bin/gate",
+            "/tmp/gate/bin/gate",
+            "--bind",
+            "/srv/ws",
+            "/srv/ws",
+            "--bind",
+            "/srv/out",
+            "/srv/out",
+            "--ro-bind",
+            "/srv/docs",
+            "/docs",
+            "--bind",
+            "/srv/run/a1/exit.json",
+            "/srv/run/a1/exit.json",
+            "--bind",
+            "/srv/run/a1/out.txt",
+            "/srv/run/a1/out.txt",
+            "--"
+          ],
+          "agentArgv": [
+            "agent",
+            "--go"
+          ],
+          "launchDigest": "sha256:737fb892edee8b33c93a93a5a9f1ec46983ae337d94e853594b7a85db87933dd",
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "attempt-no-gate-command",
+      "plan": {
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "resources": [
+          {
+            "resource": "workspace",
+            "access": "write",
+            "hostTarget": "/srv/ws",
+            "executionTarget": {
+              "path": "/srv/ws"
+            }
+          },
+          {
+            "resource": "run-output",
+            "access": "read-write",
+            "hostTarget": "/srv/out",
+            "executionTarget": {
+              "path": "/srv/out"
+            }
+          },
+          {
+            "resource": "docs",
+            "access": "read",
+            "hostTarget": "/srv/docs",
+            "executionTarget": {
+              "path": "/docs"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/tmp/run/r1"
+        },
+        "launchMode": "direct",
+        "attemptId": "a1",
+        "attemptBinds": [
+          "/srv/run/a1/exit.json",
+          "/srv/run/a1/out.txt"
+        ]
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--ro-bind",
+              "/tmp/run/r1",
+              "/tmp/run/r1",
+              "--bind",
+              "/srv/ws",
+              "/srv/ws",
+              "--bind",
+              "/srv/out",
+              "/srv/out",
+              "--ro-bind",
+              "/srv/docs",
+              "/docs",
+              "--bind",
+              "/srv/run/a1/exit.json",
+              "/srv/run/a1/exit.json",
+              "--bind",
+              "/srv/run/a1/out.txt",
+              "/srv/run/a1/out.txt",
+              "--"
+            ],
+            "env": {
+              "A": "1"
+            }
+          },
+          "claims": {
+            "control:hostWrite": "satisfied"
+          },
+          "bwrapPrefix": [
+            "--ro-bind",
+            "/",
+            "/",
+            "--dev",
+            "/dev",
+            "--proc",
+            "/proc",
+            "--tmpfs",
+            "/tmp",
+            "--unshare-pid",
+            "--as-pid-1",
+            "--setenv",
+            "FGOS_CONFINED",
+            "1",
+            "--ro-bind",
+            "/tmp/run/r1",
+            "/tmp/run/r1",
+            "--bind",
+            "/srv/ws",
+            "/srv/ws",
+            "--bind",
+            "/srv/out",
+            "/srv/out",
+            "--ro-bind",
+            "/srv/docs",
+            "/docs",
+            "--bind",
+            "/srv/run/a1/exit.json",
+            "/srv/run/a1/exit.json",
+            "--bind",
+            "/srv/run/a1/out.txt",
+            "/srv/run/a1/out.txt",
+            "--"
+          ],
+          "agentArgv": [
+            "agent",
+            "--go"
+          ],
+          "launchDigest": null,
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "attempt-gate-on-path",
+      "plan": {
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "resources": [
+          {
+            "resource": "workspace",
+            "access": "write",
+            "hostTarget": "/srv/ws",
+            "executionTarget": {
+              "path": "/srv/ws"
+            }
+          },
+          {
+            "resource": "run-output",
+            "access": "read-write",
+            "hostTarget": "/srv/out",
+            "executionTarget": {
+              "path": "/srv/out"
+            }
+          },
+          {
+            "resource": "docs",
+            "access": "read",
+            "hostTarget": "/srv/docs",
+            "executionTarget": {
+              "path": "/docs"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/tmp/run/r1"
+        },
+        "launchMode": "direct",
+        "attemptId": "a1",
+        "gateCommand": [
+          "gate"
+        ],
+        "attemptBinds": [
+          "/srv/run/a1/exit.json",
+          "/srv/run/a1/out.txt"
+        ]
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--ro-bind",
+              "/tmp/run/r1",
+              "/tmp/run/r1",
+              "--bind",
+              "/srv/ws",
+              "/srv/ws",
+              "--bind",
+              "/srv/out",
+              "/srv/out",
+              "--ro-bind",
+              "/srv/docs",
+              "/docs",
+              "--bind",
+              "/srv/run/a1/exit.json",
+              "/srv/run/a1/exit.json",
+              "--bind",
+              "/srv/run/a1/out.txt",
+              "/srv/run/a1/out.txt",
+              "--"
+            ],
+            "env": {
+              "A": "1"
+            }
+          },
+          "claims": {
+            "control:hostWrite": "satisfied"
+          },
+          "bwrapPrefix": [
+            "--ro-bind",
+            "/",
+            "/",
+            "--dev",
+            "/dev",
+            "--proc",
+            "/proc",
+            "--tmpfs",
+            "/tmp",
+            "--unshare-pid",
+            "--as-pid-1",
+            "--setenv",
+            "FGOS_CONFINED",
+            "1",
+            "--ro-bind",
+            "/tmp/run/r1",
+            "/tmp/run/r1",
+            "--bind",
+            "/srv/ws",
+            "/srv/ws",
+            "--bind",
+            "/srv/out",
+            "/srv/out",
+            "--ro-bind",
+            "/srv/docs",
+            "/docs",
+            "--bind",
+            "/srv/run/a1/exit.json",
+            "/srv/run/a1/exit.json",
+            "--bind",
+            "/srv/run/a1/out.txt",
+            "/srv/run/a1/out.txt",
+            "--"
+          ],
+          "agentArgv": [
+            "agent",
+            "--go"
+          ],
+          "launchDigest": "sha256:afef56b831ef88f55a6025664700e36b79ddd6a7889fa1fe9d5853dd0d117443",
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "terminal-go-socket",
+      "plan": {
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "resources": [
+          {
+            "resource": "workspace",
+            "access": "write",
+            "hostTarget": "/srv/ws",
+            "executionTarget": {
+              "path": "/srv/ws"
+            }
+          },
+          {
+            "resource": "run-output",
+            "access": "read-write",
+            "hostTarget": "/srv/out",
+            "executionTarget": {
+              "path": "/srv/out"
+            }
+          },
+          {
+            "resource": "docs",
+            "access": "read",
+            "hostTarget": "/srv/docs",
+            "executionTarget": {
+              "path": "/docs"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/tmp/run/r1"
+        },
+        "launchMode": "terminal",
+        "attemptId": "a1",
+        "gateCommand": [
+          "/usr/bin/gate",
+          "--go-socket",
+          "/run/user/1000/fgos/go.sock"
+        ],
+        "attemptBinds": [
+          "/srv/run/a1/exit.json",
+          "/srv/run/a1/out.txt"
+        ]
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--die-with-parent",
+              "--ro-bind",
+              "/tmp/run/r1",
+              "/tmp/run/r1",
+              "--bind",
+              "/srv/ws",
+              "/srv/ws",
+              "--bind",
+              "/srv/out",
+              "/srv/out",
+              "--ro-bind",
+              "/srv/docs",
+              "/docs",
+              "--bind",
+              "/srv/run/a1/exit.json",
+              "/srv/run/a1/exit.json",
+              "--bind",
+              "/srv/run/a1/out.txt",
+              "/srv/run/a1/out.txt",
+              "--ro-bind",
+              "/run/user/1000/fgos/go.sock",
+              "/run/user/1000/fgos/go.sock",
+              "--"
+            ],
+            "env": {
+              "A": "1"
+            }
+          },
+          "claims": {
+            "control:hostWrite": "satisfied"
+          },
+          "bwrapPrefix": [
+            "--ro-bind",
+            "/",
+            "/",
+            "--dev",
+            "/dev",
+            "--proc",
+            "/proc",
+            "--tmpfs",
+            "/tmp",
+            "--unshare-pid",
+            "--as-pid-1",
+            "--setenv",
+            "FGOS_CONFINED",
+            "1",
+            "--die-with-parent",
+            "--ro-bind",
+            "/tmp/run/r1",
+            "/tmp/run/r1",
+            "--bind",
+            "/srv/ws",
+            "/srv/ws",
+            "--bind",
+            "/srv/out",
+            "/srv/out",
+            "--ro-bind",
+            "/srv/docs",
+            "/docs",
+            "--bind",
+            "/srv/run/a1/exit.json",
+            "/srv/run/a1/exit.json",
+            "--bind",
+            "/srv/run/a1/out.txt",
+            "/srv/run/a1/out.txt",
+            "--ro-bind",
+            "/run/user/1000/fgos/go.sock",
+            "/run/user/1000/fgos/go.sock",
+            "--"
+          ],
+          "agentArgv": [
+            "agent",
+            "--go"
+          ],
+          "launchDigest": "sha256:655f20ce6ad0427d701e666f1f1bbb299b7ffc9d162effedb83a9ff3470e7ee8",
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "terminal-go-socket-outside-runtime-dir",
+      "plan": {
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "resources": [
+          {
+            "resource": "workspace",
+            "access": "write",
+            "hostTarget": "/srv/ws",
+            "executionTarget": {
+              "path": "/srv/ws"
+            }
+          },
+          {
+            "resource": "run-output",
+            "access": "read-write",
+            "hostTarget": "/srv/out",
+            "executionTarget": {
+              "path": "/srv/out"
+            }
+          },
+          {
+            "resource": "docs",
+            "access": "read",
+            "hostTarget": "/srv/docs",
+            "executionTarget": {
+              "path": "/docs"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/tmp/run/r1"
+        },
+        "launchMode": "terminal",
+        "attemptId": "a1",
+        "gateCommand": [
+          "/usr/bin/gate",
+          "--go-socket",
+          "/tmp/evil.sock"
+        ],
+        "attemptBinds": [
+          "/srv/run/a1/exit.json",
+          "/srv/run/a1/out.txt"
+        ]
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "error": "the gate's GO socket \"/tmp/evil.sock\" is not in the run supervisor's socket directory \"/run/user/1000/fgos\"; only that is bound back into the sandbox.",
+        "code": "go-socket-outside-runtime-socket-dir"
+      }
+    },
+    {
+      "name": "terminal-request-socket",
+      "plan": {
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "resources": [
+          {
+            "resource": "workspace",
+            "access": "write",
+            "hostTarget": "/srv/ws",
+            "executionTarget": {
+              "path": "/srv/ws"
+            }
+          },
+          {
+            "resource": "run-output",
+            "access": "read-write",
+            "hostTarget": "/srv/out",
+            "executionTarget": {
+              "path": "/srv/out"
+            }
+          },
+          {
+            "resource": "docs",
+            "access": "read",
+            "hostTarget": "/srv/docs",
+            "executionTarget": {
+              "path": "/docs"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/tmp/run/r1"
+        },
+        "launchMode": "terminal",
+        "attemptId": "a1",
+        "gateCommand": [
+          "/usr/bin/gate"
+        ],
+        "attemptBinds": [
+          "/srv/run/a1/exit.json",
+          "/srv/run/a1/out.txt"
+        ],
+        "requestSocket": "/run/user/1000/fgos/req.sock"
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--die-with-parent",
+              "--ro-bind",
+              "/tmp/run/r1",
+              "/tmp/run/r1",
+              "--bind",
+              "/srv/ws",
+              "/srv/ws",
+              "--bind",
+              "/srv/out",
+              "/srv/out",
+              "--ro-bind",
+              "/srv/docs",
+              "/docs",
+              "--bind",
+              "/srv/run/a1/exit.json",
+              "/srv/run/a1/exit.json",
+              "--bind",
+              "/srv/run/a1/out.txt",
+              "/srv/run/a1/out.txt",
+              "--ro-bind",
+              "/run/user/1000/fgos/req.sock",
+              "/run/user/1000/fgos/req.sock",
+              "--"
+            ],
+            "env": {
+              "A": "1"
+            }
+          },
+          "claims": {
+            "control:hostWrite": "satisfied"
+          },
+          "bwrapPrefix": [
+            "--ro-bind",
+            "/",
+            "/",
+            "--dev",
+            "/dev",
+            "--proc",
+            "/proc",
+            "--tmpfs",
+            "/tmp",
+            "--unshare-pid",
+            "--as-pid-1",
+            "--setenv",
+            "FGOS_CONFINED",
+            "1",
+            "--die-with-parent",
+            "--ro-bind",
+            "/tmp/run/r1",
+            "/tmp/run/r1",
+            "--bind",
+            "/srv/ws",
+            "/srv/ws",
+            "--bind",
+            "/srv/out",
+            "/srv/out",
+            "--ro-bind",
+            "/srv/docs",
+            "/docs",
+            "--bind",
+            "/srv/run/a1/exit.json",
+            "/srv/run/a1/exit.json",
+            "--bind",
+            "/srv/run/a1/out.txt",
+            "/srv/run/a1/out.txt",
+            "--ro-bind",
+            "/run/user/1000/fgos/req.sock",
+            "/run/user/1000/fgos/req.sock",
+            "--"
+          ],
+          "agentArgv": [
+            "agent",
+            "--go"
+          ],
+          "launchDigest": "sha256:d91bf2da58d83d1e760ad52bae22a5923da07d6fb943544ed397b6bd60c056dc",
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "terminal-request-socket-outside",
+      "plan": {
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "resources": [
+          {
+            "resource": "workspace",
+            "access": "write",
+            "hostTarget": "/srv/ws",
+            "executionTarget": {
+              "path": "/srv/ws"
+            }
+          },
+          {
+            "resource": "run-output",
+            "access": "read-write",
+            "hostTarget": "/srv/out",
+            "executionTarget": {
+              "path": "/srv/out"
+            }
+          },
+          {
+            "resource": "docs",
+            "access": "read",
+            "hostTarget": "/srv/docs",
+            "executionTarget": {
+              "path": "/docs"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/tmp/run/r1"
+        },
+        "launchMode": "terminal",
+        "attemptId": "a1",
+        "gateCommand": [
+          "/usr/bin/gate"
+        ],
+        "attemptBinds": [
+          "/srv/run/a1/exit.json",
+          "/srv/run/a1/out.txt"
+        ],
+        "requestSocket": "/run/user/1000/other/req.sock"
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "error": "the request socket \"/run/user/1000/other/req.sock\" is not in the run supervisor's socket directory \"/run/user/1000/fgos\"; only that is bound back into the sandbox.",
+        "code": "go-socket-outside-runtime-socket-dir"
+      }
+    },
+    {
+      "name": "resource-env-merged",
+      "plan": {
+        "coverage": {},
+        "resources": [
+          {
+            "resource": "docs",
+            "access": "read",
+            "hostTarget": "/srv/d",
+            "executionTarget": {
+              "path": "/d"
+            },
+            "env": {
+              "DOCS": "/d"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/srv/run"
+        },
+        "launchMode": "direct"
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--ro-bind",
+              "/srv/d",
+              "/d",
+              "--",
+              "bash",
+              "-c",
+              "for f in $(ls /proc/$$/fd 2>/dev/null); do if [ \"$f\" -ge 3 ] 2>/dev/null; then eval \"exec $f>&-\" 2>/dev/null || true; fi; done; exec \"$@\"",
+              "bwrap-launch",
+              "agent",
+              "--go"
+            ],
+            "env": {
+              "A": "1",
+              "DOCS": "/d"
+            }
+          },
+          "claims": {},
+          "bwrapPrefix": null,
+          "agentArgv": null,
+          "launchDigest": null,
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    },
+    {
+      "name": "resource-without-targets-skipped",
+      "plan": {
+        "coverage": {},
+        "resources": [
+          {
+            "resource": "x",
+            "access": "read"
+          },
+          {
+            "resource": "y",
+            "access": "read",
+            "hostTarget": "/srv/y",
+            "executionTarget": {
+              "path": "/y"
+            }
+          }
+        ]
+      },
+      "request": {
+        "dispatchId": "d1",
+        "invocation": {
+          "command": "agent",
+          "args": [
+            "--go"
+          ],
+          "env": {
+            "A": "1"
+          }
+        },
+        "context": {
+          "runDir": "/srv/run"
+        },
+        "launchMode": "direct"
+      },
+      "backend": {
+        "config": {
+          "executable": "/usr/bin/bwrap"
+        }
+      },
+      "out": {
+        "ok": {
+          "invocation": {
+            "command": "/usr/bin/bwrap",
+            "args": [
+              "--ro-bind",
+              "/",
+              "/",
+              "--dev",
+              "/dev",
+              "--proc",
+              "/proc",
+              "--tmpfs",
+              "/tmp",
+              "--unshare-pid",
+              "--as-pid-1",
+              "--setenv",
+              "FGOS_CONFINED",
+              "1",
+              "--ro-bind",
+              "/srv/y",
+              "/y",
+              "--",
+              "bash",
+              "-c",
+              "for f in $(ls /proc/$$/fd 2>/dev/null); do if [ \"$f\" -ge 3 ] 2>/dev/null; then eval \"exec $f>&-\" 2>/dev/null || true; fi; done; exec \"$@\"",
+              "bwrap-launch",
+              "agent",
+              "--go"
+            ],
+            "env": {
+              "A": "1"
+            }
+          },
+          "claims": {},
+          "bwrapPrefix": null,
+          "agentArgv": null,
+          "launchDigest": null,
+          "providerCapacity": null,
+          "credentialWriteBack": null
+        }
+      }
+    }
+  ],
+  "digest": {
+    "bwrapPrefix": [
+      "--ro-bind",
+      "/",
+      "/"
+    ],
+    "gateCommand": [
+      "g"
+    ],
+    "agentArgv": [
+      "a"
+    ],
+    "value": "sha256:656b2739aabb3baed5d7af7406078cbd47b7adbf86236fbf648fc5d11c32b9ec"
+  }
+}
