@@ -10,7 +10,7 @@ VERIFIED/INFERENCE marks: [external-research.md](external-research.md) (round 0,
 
 Round 2 (2026-11-19). The owner answered Q1: A, with a preflight for the LLM part that remains (G1 and G2,
 provisional until it holds one more round). The owner also raised a new point: "who is allowed to merge? The current
-model feels like no one merges." It is scouted as M1-M4 in §3. Open: Q2 (the merge model). Window 3 of the live run
+model feels like no one merges." It is scouted as M1-M4 in §3. Q2 answered A: merge becomes a deterministic queue with an independent review verdict. The owner then asked whether the supervisor runs that queue. Open: Q3 (who runs the queue and who arbitrates it). Window 3 of the live run
 may be in progress, and this discussion stays read-only.
 
 ## 2. Mục tiêu & đề bài
@@ -52,8 +52,8 @@ source). I = inference (my reasoning).
 | F2 | `core/agents/supervisor.yaml:3-4` still describes "runs one ready plan to done" (the old per-plan role), not the project-wide queue drain. | inconsistency | V |
 | F3 | The spec header still says "Spec only. No crate, verb … exists yet", and the plan frontmatter is `draft` while phases 1-18 are done. | inconsistency | V: spec:8; plan.md:5 |
 | M1 | On paper the merge authority is the lead. `fgos land <branch>` is lead-only (`land-branch-lead-only`), and every other head lands `--paths` inside its grant writes. The supervisor never merges code. | clear | V: spec §4, PS-14; `src/session-host/head-grants.mjs:49-62` |
-| M2 | A branch that belongs to no plan has nobody who may merge it: a shaper worktree branch (this discussion, commit 726b68d39), a fix branch, an ad-hoc `fgos run` result. No lead exists for it, and every other persona has `--paths` only. | **open: Q2** | V: grants table; this branch |
-| M3 | The lead approves itself. It reviews its own unit's diff with a `code-reviewer` subagent and lands. Independent review lives only in lane convention (the Git reviewer lead:OPC as "Merge gate" in phase 7a), not in the model. Gas Town gives merging to a dedicated role (Refinery). | **open: Q2** | V: `fgos-lead/SKILL.md:31-35`; phase-07a:6-7; gastown [ER] |
+| M2 | A branch that belongs to no plan has nobody who may merge it: a shaper worktree branch (this discussion, commit 726b68d39), a fix branch, an ad-hoc `fgos run` result. No lead exists for it, and every other persona has `--paths` only. | owner Q2 = A (queue, round 3); runner open: Q3 | V: grants table; this branch |
+| M3 | The lead approves itself. It reviews its own unit's diff with a `code-reviewer` subagent and lands. Independent review lives only in lane convention (the Git reviewer lead:OPC as "Merge gate" in phase 7a), not in the model. Gas Town gives merging to a dedicated role (Refinery). | owner Q2 = A (independent review verdict, round 3) | V: `fgos-lead/SKILL.md:31-35`; phase-07a:6-7; gastown [ER] |
 | M4 | The model's merge path has never run live. Every merge on main since 11-18 is a hand-run lane `land <branch>` (land-branch.sh). The script's removal (step 6) waits until every running lead lands with `fgos land`. Nobody arbitrates a refused land across plans (conflict, red gate, `land-recovery-required`): the lead parks or asks the owner. | clear | V: `git log origin/main --since=2026-11-18`; integration.md:49; `fgos-lead/SKILL.md:47-53` |
 | F4 | `event-store-end-trigger` faults are logged for verbs that succeed, which misled the window-1 diagnosis. | finding already in the tree | V: integration.md correction |
 
@@ -73,6 +73,9 @@ compare against.
 - 2026-11-19 round 1, Q1 (admit and start out of the LLM?). Owner: "A, kèm preflight cho phần LLM còn lại. Với ai được
   phép merge. Cảm giác mô hình hiện tại không ai merge." Recorded as provisional on G1 and G2. The merge point was
   scouted as M1-M4, and Q2 was asked.
+- 2026-11-19 round 2, Q2 (who may merge?). Owner: "đồng ý A, nhưng sẽ do supervisor thực hiện việc merge queue?"
+  Q2 = A was recorded as provisional. Q3 was asked: the code runs each merge, and the supervisor owns the queue and
+  arbitrates it.
 
 ## 6. Thiết kế đã chốt {#design}
 
