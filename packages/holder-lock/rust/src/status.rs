@@ -1394,7 +1394,12 @@ mod tests {
         for entry in scope::registry()["locks"].as_array().unwrap() {
             let scope_name = entry["scope"].as_str().unwrap();
             let template = entry["v3Path"].as_str().unwrap();
-            if !["repo", "machine"].contains(&scope_name) || template.contains("<eventOpenRoot>") {
+            // Rows rooted outside the fgOS dir and lock root (the event store's
+            // open root, a repository's git common dir) are not scannable from it.
+            if !["repo", "machine"].contains(&scope_name)
+                || template.contains("<eventOpenRoot>")
+                || template.contains("<common>")
+            {
                 continue;
             }
             let mut filled = template

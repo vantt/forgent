@@ -28,7 +28,7 @@ pub mod route;
 pub mod scope;
 pub mod semantics;
 pub mod status;
-pub use scope::{LockScope, ScopeError};
+pub use scope::{lock_path, LockScope, ScopeError};
 pub mod state_root;
 pub mod tombstone;
 

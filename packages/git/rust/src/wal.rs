@@ -360,6 +360,26 @@ pub enum OperationKind {
         targets: Vec<(String, Tip, Tip)>,
     },
 }
+impl OperationKind {
+    /// Stable variant name for diagnostics.
+    pub fn name(&self) -> &'static str {
+        match self {
+            Self::Land(_) => "Land",
+            Self::Restore(_) => "Restore",
+            Self::ScopedCommit(_) => "ScopedCommit",
+            Self::Sync(_) => "Sync",
+            Self::PublicationCas => "PublicationCas",
+            Self::WorktreeCreate { .. } => "WorktreeCreate",
+            Self::WorktreeMove { .. } => "WorktreeMove",
+            Self::WorktreeRemove { .. } => "WorktreeRemove",
+            Self::RefUpdate { .. } => "RefUpdate",
+            Self::RefDelete => "RefDelete",
+            Self::ConfigChange(_) => "ConfigChange",
+            Self::RemoteFetch { .. } => "RemoteFetch",
+            Self::RemotePush { .. } => "RemotePush",
+        }
+    }
+}
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct Intent {
@@ -1378,6 +1398,13 @@ pub struct Wal<F = OsFileSystem> {
     ledger: Directory,
     fs: F,
     identity: String,
+    /// Per-operation `git-operation` locks this Wal holds, keyed by operation
+    /// id: taken when `begin` creates a chain, released when an outcome is
+    /// appended for it or when the Wal drops. The kernel frees them if the
+    /// process dies, which is what lets admission tell a live writer from a
+    /// dead one.
+    op_locks:
+        std::sync::Mutex<std::collections::BTreeMap<String, fgos_holder_lock::LockScope<'static>>>,
 }
 #[derive(Debug)]
 pub enum Begin {
@@ -1424,6 +1451,7 @@ impl<F: FileSystem> Wal<F> {
             ledger,
             fs: fsys,
             identity,
+            op_locks: Default::default(),
         })
     }
     /// C5/doctor reader: opens existing descriptors without mkdir or fsync.
@@ -1445,6 +1473,7 @@ impl<F: FileSystem> Wal<F> {
             ledger,
             fs: fsys,
             identity,
+            op_locks: Default::default(),
         })
     }
     /// Seven-day orphan retention is housekeeping, never effect attribution.
@@ -1675,9 +1704,64 @@ impl<F: FileSystem> Wal<F> {
             return Ok(Begin::Compacted(c));
         }
         match installed {
-            Installed::Created => Ok(Begin::Created(Chain { records: vec![r] })),
+            Installed::Created => {
+                self.hold_operation(id);
+                Ok(Begin::Created(Chain { records: vec![r] }))
+            }
             Installed::AlreadyExists => self.existing(id, &intent),
         }
+    }
+    /// Registry path of operation `id`'s `git-operation` lock, from the
+    /// holder-lock door.
+    fn operation_lock_path(&self, id: &str) -> Option<PathBuf> {
+        fgos_holder_lock::lock_path("git-operation", &self.operation_lock_params(id)?).ok()
+    }
+    fn operation_lock_params(
+        &self,
+        id: &str,
+    ) -> Option<std::collections::BTreeMap<String, String>> {
+        // The id becomes a path segment that remove_operation deletes: an id
+        // with '/' or '..' must never reach the template, whatever its source.
+        if !valid_id(id) {
+            return None;
+        }
+        Some(std::collections::BTreeMap::from([
+            ("common".to_owned(), self.common.path().to_str()?.to_owned()),
+            ("operationId".to_owned(), id.to_owned()),
+        ]))
+    }
+    /// Take `git-operation` for a chain this Wal just created, in a scope of
+    /// its own (operations take worktree-admin and main-checkout after
+    /// begin, which a caller's scope would refuse as out of order). Liveness
+    /// is advisory: when the lock cannot be taken the operation proceeds and
+    /// admission falls back to `resource-recovery-required`.
+    fn hold_operation(&self, id: &str) {
+        let Ok(mut scope) = fgos_holder_lock::LockScope::seeded(vec![]) else {
+            return;
+        };
+        let (Some(params), Ok(mut held)) = (self.operation_lock_params(id), self.op_locks.lock())
+        else {
+            return;
+        };
+        if scope
+            .acquire("git-operation", &params, fgos_holder_lock::Wait::Ms(0))
+            .is_ok()
+        {
+            held.insert(id.to_owned(), scope);
+        }
+    }
+    /// Whether another live process holds operation `id`'s `git-operation`
+    /// lock. A free, absent or unprobeable lock answers `false`.
+    pub fn operation_live(&self, id: &str) -> bool {
+        self.operation_lock_path(id).is_some_and(|path| {
+            matches!(
+                fgos_holder_lock::port::probe(&fgos_holder_lock::port::Resource::new(
+                    "git-operation",
+                    path
+                )),
+                Ok(fgos_holder_lock::port::Probe::Held)
+            )
+        })
     }
     /// The established chain of `id`, when it binds the same request.
     fn existing(&self, id: &str, intent: &Intent) -> WalResult<Begin> {
@@ -1828,6 +1912,11 @@ impl<F: FileSystem> Wal<F> {
         )? != Installed::Created
         {
             return Err(WalError::Busy);
+        }
+        if matches!(r.phase, Phase::Outcome(_)) {
+            if let Ok(mut held) = self.op_locks.lock() {
+                held.remove(id);
+            }
         }
         let mut records = chain.records.clone();
         records.push(r);
@@ -2464,6 +2553,14 @@ impl<F: FileSystem> Wal<F> {
         self.fs.checkpoint("removed-records-fsync")?;
         fs::remove_dir(self.root.path().join(id))?;
         self.fs.checkpoint("remove-operation")?;
+        // The lock was released at the outcome; an absent file probes free.
+        if let Some(lock) = self.operation_lock_path(id) {
+            match fs::remove_file(lock) {
+                Ok(()) => {}
+                Err(e) if e.kind() == io::ErrorKind::NotFound => {}
+                Err(e) => return Err(e.into()),
+            }
+        }
         fgos_durable_file::sync_directory(&self.root.path())?;
         Ok(self.fs.checkpoint("removed-operation-parent-fsync")?)
     }
