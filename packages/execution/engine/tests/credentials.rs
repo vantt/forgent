@@ -884,3 +884,231 @@ fn the_accounts_module_serves_the_lock_and_probe_ports_on_the_account_directory_
         .is_some());
     fs::remove_dir_all(root).unwrap();
 }
+
+// ------------------------------------------------------------------------------------------ live seats
+
+fn claude_auth(refresh: &str, expires: f64) -> String {
+    json!({ "claudeAiOauth": { "accessToken": format!("FAKE-ACCESS-{refresh}"), "refreshToken": refresh, "expiresAt": expires }, "mcpOAuth": { "kept": true } }).to_string()
+}
+
+fn source_claude(home: &Path) -> CredentialSource {
+    CredentialSource {
+        kind: "home-files".into(),
+        home: home.to_string_lossy().into_owned(),
+        files: vec![".credentials.json".into()],
+        cli: None,
+    }
+}
+
+/// The seat homes the host records name, as given.
+struct Seats(Vec<PathBuf>);
+impl LiveSeatHomes for Seats {
+    fn homes(&self, _: &Value) -> Vec<PathBuf> {
+        self.0.clone()
+    }
+}
+
+/// A call that renews nothing and answers `ok`: a good access token is used as it is.
+struct Answers {
+    seen: RefCell<Vec<String>>,
+    ok: bool,
+}
+impl CredentialProbe for Answers {
+    fn run(&self, request: &ProbeRequest<'_>, _: &dyn AccountLockGuard) -> ProbeRun {
+        self.seen.borrow_mut().push(
+            request
+                .home
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .into_owned(),
+        );
+        ProbeRun::Ran { ok: self.ok }
+    }
+}
+
+fn seat(dir: &Path, name: &str, login: &str) -> PathBuf {
+    let home = dir.join(name);
+    fs::create_dir_all(&home).unwrap();
+    fs::write(home.join(".credentials.json"), login).unwrap();
+    home
+}
+
+const SEAT_TIMEOUT_MS: f64 = 15.0 * 60_000.0;
+
+#[test]
+fn a_store_whose_refresh_token_a_running_seat_spent_takes_the_newest_valid_seat_login_and_the_seat_may_start(
+) {
+    let (source, runtime, seats) = (
+        scratch("seat-source"),
+        scratch("seat-runtime"),
+        scratch("seats"),
+    );
+    fs::write(
+        source.join(".credentials.json"),
+        claude_auth("spent", NOW - 60_000.0),
+    )
+    .unwrap();
+    let newest = seat(&seats, "a", &claude_auth("seat-newest", NOW + 7.0 * HOUR));
+    seat(&seats, "b", &claude_auth("seat-older", NOW + 3.0 * HOUR));
+    let seat_bytes = fs::read_to_string(newest.join(".credentials.json")).unwrap();
+    let credential_source = source_claude(&source);
+    assert!(login_life_problem(
+        &credential_source,
+        None,
+        Some(SEAT_TIMEOUT_MS),
+        NOW,
+        &NoSqlite
+    )
+    .is_some());
+    let probe = Answers {
+        seen: RefCell::new(vec![]),
+        ok: true,
+    };
+    let now = || NOW;
+    let homes = Seats(vec![newest.clone(), seats.join("b")]);
+    let outcome = refresh_ahead(
+        &RefreshRequest {
+            provider: "claude-miu",
+            account_id: "acct",
+            credential_source: &credential_source,
+            runtime_dir: &runtime,
+            home_dir: None,
+        },
+        &RefreshOptions {
+            live_seat_homes: &homes,
+            ..RefreshOptions::new(&Free, &probe, &NoSqlite, &now)
+        },
+    );
+    assert_eq!(
+        (outcome.status, outcome.reason.as_str()),
+        ("renewed", "live-seat")
+    );
+    assert_eq!(
+        probe.seen.borrow().len(),
+        1,
+        "one call, on the copy taken, and no renewal of the spent pair"
+    );
+    assert!(
+        probe.seen.borrow()[0].starts_with(".tmp-"),
+        "the call ran on an isolated copy, never on the seat home"
+    );
+    let store = fs::read_to_string(source.join(".credentials.json")).unwrap();
+    assert!(
+        store.contains("\"seat-newest\"") && store.contains("\"kept\":true"),
+        "the newest login is installed, the rest kept"
+    );
+    assert_eq!(
+        fs::read_to_string(newest.join(".credentials.json")).unwrap(),
+        seat_bytes,
+        "the seat home is only read"
+    );
+    assert_eq!(
+        login_life_problem(
+            &credential_source,
+            None,
+            Some(SEAT_TIMEOUT_MS),
+            NOW,
+            &NoSqlite
+        ),
+        None
+    );
+    for dir in [source, runtime, seats] {
+        fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+#[test]
+fn a_seat_login_older_than_the_store_or_whose_call_fails_is_never_installed_and_the_seat_is_still_refused(
+) {
+    let now = || NOW;
+    // Older than the store: no call on it; the only call is the store's own renewal.
+    let (source, runtime, seats) = (
+        scratch("older-source"),
+        scratch("older-runtime"),
+        scratch("older-seats"),
+    );
+    let store = claude_auth("store", NOW + 30.0 * 60_000.0);
+    fs::write(source.join(".credentials.json"), &store).unwrap();
+    let homes = Seats(vec![seat(
+        &seats,
+        "a",
+        &claude_auth("seat", NOW + 20.0 * 60_000.0),
+    )]);
+    let probe = Answers {
+        seen: RefCell::new(vec![]),
+        ok: false,
+    };
+    let credential_source = source_claude(&source);
+    let request = RefreshRequest {
+        provider: "claude-miu",
+        account_id: "acct",
+        credential_source: &credential_source,
+        runtime_dir: &runtime,
+        home_dir: None,
+    };
+    let options = RefreshOptions {
+        live_seat_homes: &homes,
+        ..RefreshOptions::new(&Free, &probe, &NoSqlite, &now)
+    };
+    assert_eq!(refresh_ahead(&request, &options).reason, "probe-failed");
+    assert_eq!(probe.seen.borrow().len(), 1);
+    assert!(probe.seen.borrow()[0].starts_with("scratch-"));
+    assert_eq!(
+        fs::read_to_string(source.join(".credentials.json")).unwrap(),
+        store
+    );
+    for dir in [source, runtime, seats] {
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    // A newer seat login whose call fails: nothing installed, and the life check still refuses the seat.
+    let (source, runtime, seats) = (
+        scratch("fail-source"),
+        scratch("fail-runtime"),
+        scratch("fail-seats"),
+    );
+    let store = claude_auth("spent", NOW - 60_000.0);
+    fs::write(source.join(".credentials.json"), &store).unwrap();
+    let homes = Seats(vec![seat(
+        &seats,
+        "a",
+        &claude_auth("seat", NOW + 7.0 * HOUR),
+    )]);
+    let probe = Answers {
+        seen: RefCell::new(vec![]),
+        ok: false,
+    };
+    let credential_source = source_claude(&source);
+    let request = RefreshRequest {
+        provider: "claude-miu",
+        account_id: "acct",
+        credential_source: &credential_source,
+        runtime_dir: &runtime,
+        home_dir: None,
+    };
+    let options = RefreshOptions {
+        live_seat_homes: &homes,
+        ..RefreshOptions::new(&Free, &probe, &NoSqlite, &now)
+    };
+    let outcome = refresh_ahead(&request, &options);
+    assert_eq!(
+        (outcome.status, outcome.reason.as_str()),
+        ("failed", "probe-failed")
+    );
+    assert_eq!(
+        fs::read_to_string(source.join(".credentials.json")).unwrap(),
+        store
+    );
+    assert!(login_life_problem(
+        &credential_source,
+        None,
+        Some(SEAT_TIMEOUT_MS),
+        NOW,
+        &NoSqlite
+    )
+    .is_some_and(|p| p.starts_with("login-expires-before-seat-timeout")));
+    for dir in [source, runtime, seats] {
+        fs::remove_dir_all(dir).unwrap();
+    }
+}
