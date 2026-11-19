@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "18f0100609ace1abda8e5505b685dd76f2d025295b2b9f1c4a08e6a87418fd49",
+  "payloadDigest": "1bb8fc884afbb6e5bbcb88ccdcc305db54380eafe70de66a91cc87fa3bbd10c5",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -914,7 +914,7 @@
     "packages/run-supervisor/rust/src/controller/proof.rs": "5f0c14241226da7aa63f3ae9029c504c1941511b934809908880d0faf89791b6",
     "packages/run-supervisor/rust/src/controller/runtime_dir.rs": "4b98623e29a97fc31c6f6889f4a26bec3be48de994fb614dcfb2d48c09d7413b",
     "packages/run-supervisor/rust/src/controller/sweep.rs": "0c4d8be6041e89191226b04db9a1d62256efc78ab25ca74eda114ec364e45c54",
-    "packages/run-supervisor/rust/src/controller/trust_store.rs": "78f3334194b84c46d657295c71ce4ba59d742e36ea0e0853b1c1f38ac63e3a8e",
+    "packages/run-supervisor/rust/src/controller/trust_store.rs": "387f81da8da453f21d636f5766116cee33470fd48f1adcadfe46b7603d087416",
     "packages/run-supervisor/rust/src/envelope.rs": "f068c9cbf016d098bce8bb4460bfc40a9ba0cd80e418e62939da883fcd8f7b61",
     "packages/run-supervisor/rust/src/gate.rs": "562a8e46577ab3d932689b0a5065676ec4db3b400a40b6c8ecf703e93bbfed14",
     "packages/run-supervisor/rust/src/gate/unix.rs": "91533de6d62c9d7f901ac5207719fa28da898fcbcf8931577fbade440a7c6b5d",
@@ -1552,16 +1552,7 @@
     "src/workflow/units-source.mjs": "e4376a8f38d0a55f2e132aa6a094b552e8117eb46b6a4d8b03b00da32d6bb2b4",
     "scripts/lib/git-one-door-declarations.v1.json": "2c8cc399d89492a708ceb1cc403f30c29a99c6f597e5edc1c35f657751896648"
   },
-  "sites": [
-    {
-      "path": "packages/run-supervisor/rust/src/controller/trust_store.rs",
-      "line": 643,
-      "spawn": "Command::new",
-      "binary": "git",
-      "siteId": "trust_roots:db9370b5c2464150f4a4d9e8d507edaec973c670ebb3c94d93b6ac5b937ec007",
-      "family": "rust"
-    }
-  ],
+  "sites": [],
   "classes": [
     {
       "path": ".agents/skills/distill/scripts/distill.mjs",

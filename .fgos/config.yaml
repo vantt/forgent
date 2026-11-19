@@ -276,7 +276,7 @@ eventStore:
 # @fgos:doc How a finished plan branch lands on the trunk: the gates it must pass and the files it regenerates.
 land:
   # @fgos:doc Gates a landing runs, each a command and optional path globs; a gate with when runs only if a landed path matches one, and without when it always runs. Default: [].
-  # @fgos:why [e5f414aa-bf4e-4ec8-a51e-149fed09b1eb] this repo's land gates (the land-branch.sh checks) run only for code paths, so a docs, backlog or plans write publishes with no gate
+  # @fgos:why [74bda49f-655f-46ea-b76a-7a230bb878a6] fgos land at least as strict as land-branch.sh: add its separate one-door scan and selector checks as gates and its census/selector regeneration (supervisor 2026-11-19, after S6A p05 landed an undeclared site)
   gates:
     - run: node scripts/run-tests.mjs test/architecture.test.mjs test/setup/git-mutation-census.test.mjs test/scripts/doc-health.test.mjs test/scripts/check-decision-citation-drift.test.mjs test/scripts/mailbox-behaviour-v7n.test.mjs test/rust-host/command-routes.test.mjs test/cli/fgos-manifest.test.mjs {tests}
       when:
@@ -291,3 +291,25 @@ land:
         - apps/**/*.rs
         - packages/**/*.rs
         - test/**/*.rs
+    - run: node scripts/git-one-door-scan.mjs --root . | tail -1 | grep -q '^0 undeclared'
+      when:
+        - src/**
+        - apps/**
+        - packages/**
+        - bin/**
+        - scripts/**
+    - run: node scripts/export-command-selectors.mjs --check
+      when:
+        - src/**
+        - apps/**
+        - packages/**
+        - bin/**
+        - scripts/**
+  # @fgos:doc The command that regenerates derived files after a landing, with the files it rewrites; null runs none.
+  # @fgos:why [74bda49f-655f-46ea-b76a-7a230bb878a6] fgos land at least as strict as land-branch.sh: add its separate one-door scan and selector checks as gates and its census/selector regeneration (supervisor 2026-11-19, after S6A p05 landed an undeclared site)
+  regenerate:
+    run: node scripts/export-command-selectors.mjs && node scripts/git-one-door-scan.mjs --root . --write-census
+    files:
+      - packages/git/contracts/mutation-census.v1.json
+      - packages/host-runtime/contracts/command-routes.json
+      - packages/host-runtime/contracts/command-manifest.json

@@ -17,6 +17,8 @@ fgos-terminal-control = { path = "../../terminal-control/rust", optional = true 
 fgos-session-host = { path = "../../session-host/rust", optional = true }
 # The effective `dispatch` config the controller reads (gate kill grace, cancel wait, lane settings).
 fgos-config = { path = "../../config/rust", optional = true }
+# The Git port's disk-only topology read (a workspace's main checkout for trust roots).
+fgos-git = { path = "../../git/rust", optional = true }
 # The bounded parse of a head request frame (a visitor that counts values while it reads).
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -27,7 +29,7 @@ sha2 = { workspace = true }
 # supervisor routes and the rest of the controller, and is on by default.
 default = ["supervise"]
 lease = []
-supervise = ["lease", "fgos-identity/directory", "dep:fgos-agent-protocol", "dep:fgos-terminal-control", "dep:fgos-session-host", "dep:fgos-config"]
+supervise = ["lease", "fgos-identity/directory", "dep:fgos-agent-protocol", "dep:fgos-terminal-control", "dep:fgos-session-host", "dep:fgos-config", "dep:fgos-git"]
 
 [target.'cfg(unix)'.dependencies]
 libc = { workspace = true }
