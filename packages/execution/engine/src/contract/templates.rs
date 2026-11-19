@@ -15,9 +15,9 @@ use std::cmp::Ordering;
 use std::fs;
 use std::path::{Component, Path, PathBuf};
 
+use fgos_execution::handoff::sha256_hex;
 use fgos_execution::runner_config::fgos_dir_from_root;
 use serde_json::{json, Map, Value};
-use sha2::{Digest, Sha256};
 
 use super::validate::PROTOCOL_OPERATION_STAMP_PREFIX;
 use crate::assignment::js_space;
@@ -125,15 +125,11 @@ fn text(path: &Path) -> String {
 
 /// `sha256:<hex>` of the text's UTF-8 bytes.
 pub fn sha256_digest(content: &str) -> String {
-    format!("sha256:{}", hex(&Sha256::digest(content.as_bytes())))
-}
-
-fn hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|b| format!("{b:02x}")).collect()
+    format!("sha256:{}", sha256_hex(content.as_bytes()))
 }
 
 /// `/^sha256:[0-9a-f]{64}$/`.
-fn is_sha256_digest(value: &str) -> bool {
+pub(super) fn is_sha256_digest(value: &str) -> bool {
     value.strip_prefix("sha256:").is_some_and(|hex| {
         hex.len() == 64
             && hex
@@ -402,8 +398,14 @@ fn domain_dirs(package_root: &Path) -> Result<Vec<(String, PathBuf)>, TemplateEr
     let domains = package_root.join("domains");
     let listing = match fs::read_dir(&domains) {
         Ok(listing) => listing,
-        Err(e) if matches!(e.kind(), std::io::ErrorKind::NotFound) => return Ok(Vec::new()),
-        Err(e) if e.raw_os_error() == Some(20) => return Ok(Vec::new()),
+        Err(e)
+            if matches!(
+                e.kind(),
+                std::io::ErrorKind::NotFound | std::io::ErrorKind::NotADirectory
+            ) =>
+        {
+            return Ok(Vec::new())
+        }
         Err(e) => return Err(unreadable(&domains, &e)),
     };
     let mut names = Vec::new();

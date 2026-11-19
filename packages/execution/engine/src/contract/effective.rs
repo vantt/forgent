@@ -19,8 +19,8 @@ use std::path::{Path, PathBuf};
 
 use fgos_canonical_json::canonical_json;
 use serde_json::{json, Map, Value};
-use sha2::{Digest, Sha256};
 
+use super::templates::{is_sha256_digest, sha256_digest};
 use super::validate::{resolve_mutating_cwd_posture, CheckoutFacts, MutatingCwdPosture};
 use crate::assignment::builder::is_read_only_assignment;
 use crate::assignment::{js_space, truthy, Refusal};
@@ -47,15 +47,10 @@ pub fn canonical_json_text(value: &Value) -> String {
 
 /// `sha256:<hex>` of a string as it is, or of the canonical JSON of any other value.
 pub fn compute_sha256_digest(value: &Value) -> String {
-    let text = match value {
-        Value::String(text) => text.clone(),
-        other => canonical_json_text(other),
-    };
-    let hash = Sha256::digest(text.as_bytes());
-    format!(
-        "sha256:{}",
-        hash.iter().map(|b| format!("{b:02x}")).collect::<String>()
-    )
+    match value {
+        Value::String(text) => sha256_digest(text),
+        other => sha256_digest(&canonical_json_text(other)),
+    }
 }
 
 fn is_word(c: char) -> bool {
@@ -412,14 +407,7 @@ fn non_blank(value: Option<&Value>) -> bool {
 }
 
 fn is_sha256_hex(value: Option<&Value>) -> bool {
-    value.and_then(Value::as_str).is_some_and(|s| {
-        s.strip_prefix("sha256:").is_some_and(|hex| {
-            hex.len() == 64
-                && hex
-                    .bytes()
-                    .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
-        })
-    })
+    value.and_then(Value::as_str).is_some_and(is_sha256_digest)
 }
 
 /// Refuses a value that is not a v1 effective execution contract, or that holds a secret.
