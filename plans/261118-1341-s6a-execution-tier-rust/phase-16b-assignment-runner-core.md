@@ -24,6 +24,8 @@ attempt: plan, lease, prompt, confinement request, envelope, handover, settle.
 - Golden vectors under `packages/execution/contracts/assignment-runner/` recorded by
   `test/golden-recorders/assignment-runner.recorder.mjs`.
 
+- Open item (OPC 2026-11-19): `Handle::hand_over` is unix-only; decide here whether on Windows the controller stays the lock holder for the child's lifetime or a Windows-specific handover is built, and prove it. Any write-then-exec of a script in a multi-threaded host opens with O_CLOEXEC and closes before exec (ETXTBSY seen in the phase-8 smoke tests).
+
 ## Steps
 
 Read 1045 P6 as landed. Commit the recorder; record vectors; red `engine/tests/assignment_runner.rs`; port; green;
