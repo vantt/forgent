@@ -13,6 +13,7 @@ Round 0 (2026-11-19 16:2x). Scout done; nothing settled. Starting picture: Miu a
 hands. Miu is always on, does little herself, but must be able to coordinate anything (delegate, queue) and have a fast
 route for small urgent chores. The supervisor is woken, not always on, and covers the large cyclic coordination.
 Round 1: the owner asked why the supervisor can do anything; it is the interim unconfined session, not the designed head (§3 row 9). Open next: which reach is the target (§3 row 9), then the urgent-chore route (§3 row 1).
+Round 2: owner gave a provisional picture of the supervisor (§3 row 10): observe, wake, open, ask, help every session; never do a session's work unless it is stuck. Row 9 deferred by the owner. Next: whether Miu shares that reach.
 
 ## 2. Mục tiêu & đề bài
 
@@ -40,6 +41,7 @@ the door it goes through and how it is proven from the sandbox. Code and plans a
 | 6 | Supervisor reach beyond plans: owning backlog rows, mailbox/peers, waking on Miu's request | open |
 | 7 | Who wins when Miu and the supervisor touch the same thing (a session, a plan, a backlog row) | open |
 | 9 | Two supervisors exist today: the interim hand-started one (`forgent-1d`, Claude opus, unconfined, role `lead:SUPERVISOR`, brief `.fgos/runtime/tmp/supervisor-brief-portfolio.md`) does anything a person can; the designed head (`head:supervisor-<handle>`, confined, grant table, woken by the watcher) does only its grant verbs and has not yet carried a plan ready to done. Which one is the target reach for "the supervisor" | open |
+| 10 | Supervisor reach, owner's provisional picture (round 2, "anh cũng chưa rõ trong đầu"): high-level executive, authority without hands-on. It observes and wakes every session, opens new ones, asks an existing one, even helps it; it never does a session's work unless that session is stuck. Door map today: observe = `fgos identity list --project` (who, role, liveness only; no door reads what a session is doing or whether it is stuck beyond watcher events `head-gone`, `plan-no-progress`, `supervisor-stuck`); wake = no fgos door (mailbox reaches a session only during a turn; idle sessions are woken by herdr `pane send-text` or SendMessage, neither in the supervisor grant); open = `session start` (held); ask/help = mailbox or SendMessage (secretary grant only, not the supervisor); take over a stuck one = `session stop` + successor start or `session rotate` (held). Provisional; reversal trigger: the owner's own list of what `forgent-1d` does that must not be lost | provisional |
 | 8 | Proof: each power named with its door and a sandbox proof (ties to supervisor-review T2 head-start preflight, `p-2wb2lfgky3`, and caps phase 6 grant audit) | open |
 
 ## 4. Quyết định đã chốt
@@ -61,6 +63,11 @@ the door it goes through and how it is proven from the sandbox. Code and plans a
   owner. The designed supervisor head is confined (bwrap, `FGOS_CONFINED=1`), reaches only its `head-grants.mjs` verbs
   through the request socket, and is started by `fgos supervisor wake`. Miu, by contrast, already runs as a confined
   head (pid 36166 bwrap, sonnet). Opened §3 row 9.
+
+- 2026-11-19 16:5x — Owner (row 9 not answered yet: "chưa trả lời được lúc này. thấy nó làm mượt quá, mà có nhận ra
+  gì đâu"): "nó phải có khả năng quan sát và đánh thức được mọi phiên cũng như mở được phiên mới, hỏi phiên cũ, thậm
+  chí giúp phiên cũ gì đó. tuyệt nhiên nó sẽ không làm việc của phiên cũ trừ khi phiên đó kẹt. kiểu điều hành cấp cao,
+  có thẩm quyền nhưng không nhúng tay." Recorded as provisional §3 row 10 with today's door map.
 
 ## 6. Thiết kế đã chốt {#design}
 
