@@ -1662,26 +1662,32 @@ fn a_prepared_attempt_is_handed_over_with_its_lock_and_a_stub_agent_settles_on_t
     std::fs::write(&side, "{}").unwrap();
     let envelope = json!({ "runDir": rig.run_dir.to_string_lossy(), "hostBin": supervisor.to_string_lossy(), "sideFile": side.to_string_lossy() });
 
-    // 3. The handover: a duplicate of the held lock goes over, then the controller closes its own copy.
+    // 3. The handover moves the held lock to the supervisor: the controller keeps no copy, so nothing waits on
+    // the child (a copy left in the controller would settle only after the kill wait).
+    let handing = std::time::Instant::now();
     let handover = locks
         .attempt
-        .as_ref()
+        .take()
         .unwrap()
-        .try_clone_file()
-        .expect("duplicate of the lock file");
+        .hand_over()
+        .expect("the attempt lock hands over");
     let mut started = start_supervisor(&envelope, &[&handover], &Map::new(), &Map::new())
         .expect("supervisor started");
     drop(handover);
+    let handed = handing.elapsed();
+    assert!(
+        handed < std::time::Duration::from_millis(fgos_holder_lock::DEFAULT_KILL_WAIT_MS / 4),
+        "the handover waited on the supervisor: {handed:?}"
+    );
     assert_eq!(
         wait_for_binding(&rig.run_dir, &mut started.child, 10_000),
         Binding::Bound
     );
-    locks.release_attempt();
     let resource = Resource::new("attempt", &lock_path);
     assert_eq!(
         probe(&resource).unwrap(),
         Probe::Held,
-        "the supervisor keeps the lock after the controller closed its copy"
+        "the supervisor holds the lock the controller handed over"
     );
 
     std::fs::write(rig.run_dir.join("controller-released"), "").unwrap();
