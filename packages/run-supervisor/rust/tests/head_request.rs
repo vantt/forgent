@@ -1796,8 +1796,15 @@ fn a_pending_successor_reads_the_question_store_but_its_write_verbs_keep_waiting
         false,
     );
     let read = ask(&served.socket, "questions list");
-    assert_eq!(read["code"], serde_json::Value::Null, "read answered: {read}");
-    assert!(served.dir.join("argv").exists(), "the read ran its route child");
+    assert_eq!(
+        read["code"],
+        serde_json::Value::Null,
+        "read answered: {read}"
+    );
+    assert!(
+        served.dir.join("argv").exists(),
+        "the read ran its route child"
+    );
     let write = ask(&served.socket, "session start");
     assert_eq!(write["code"], "role-pending-rotation");
     assert_eq!(
