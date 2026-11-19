@@ -209,6 +209,7 @@ pub fn land_config_of(config: &Value) -> Result<LandConfig, String> {
                 .ok_or_else(|| "land.regenerate has no run command".to_owned())?
                 .to_owned(),
             files: strings(&value["files"])?,
+            when: strings(&value["when"])?,
         }),
     };
     Ok(LandConfig { gates, regenerate })
