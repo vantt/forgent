@@ -141,31 +141,6 @@ pub fn credential_probe_command(
     None
 }
 
-/// Make a call end on its own even when its runner dies: coreutils `timeout` ends it after the limit (and kills it
-/// five seconds after that). Without `timeout` on PATH the plan runs as it is.
-pub fn with_kill_timeout(plan: ProbePlan, timeout_ms: u64, path_var: &str) -> ProbePlan {
-    // Only coreutils `timeout` takes these arguments; Windows has a `timeout.exe` that does something else.
-    let bin = if cfg!(windows) {
-        None
-    } else {
-        fgos_process::spawn::resolve_program("timeout", path_var, "", false)
-    };
-    let Some(bin) = bin else { return plan };
-    let seconds = (timeout_ms.div_ceil(1000)).max(1);
-    let mut args = vec![
-        "--kill-after=5".to_string(),
-        seconds.to_string(),
-        plan.command.clone(),
-    ];
-    args.extend(plan.args.clone());
-    ProbePlan {
-        command: bin.to_string_lossy().into_owned(),
-        args,
-        cli: plan.cli.clone().or(Some(plan.command)),
-        ..plan
-    }
-}
-
 fn said(signal: &Value) -> String {
     describe_provider_signal(signal).map_or(String::new(), |phrase| format!(" ({phrase})"))
 }
@@ -372,10 +347,9 @@ pub fn probe_credential(
     let account = request.account;
     let sources = account_credential_sources(account);
     let source = credential_source_for_cli(account, request.cli).or(sources.first().copied());
-    let path_var = inherited.get("PATH").cloned().unwrap_or_default();
-    let planned = source
-        .and_then(|source| credential_probe_command(source, false, request.model, home_dir))
-        .map(|p| with_kill_timeout(p, timeout_ms, &path_var));
+    // The call is bounded by its runner's deadline, which ends it and its group: no `timeout` wrapper.
+    let planned =
+        source.and_then(|source| credential_probe_command(source, false, request.model, home_dir));
     let Some(planned) = planned else {
         return json!({ "ok": false, "detail": "no probe exists for this credential layout" });
     };

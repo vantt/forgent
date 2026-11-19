@@ -23,7 +23,7 @@ use fgos_execution_engine::accounts::credential::{
 };
 use fgos_execution_engine::accounts::credential_probe::credential_probe_command;
 #[cfg(unix)]
-use fgos_execution_engine::accounts::credential_probe::{with_kill_timeout, ProbePlan};
+use fgos_execution_engine::accounts::credential_probe::ProbePlan;
 use fgos_execution_engine::accounts::fault::{
     classify_fault, describe_provider_signal, parse_quota_reset_clock_time,
     parse_quota_reset_window_ms, FaultInput,
@@ -810,46 +810,6 @@ fn the_probe_call_is_built_per_credential_layout_as_node_built_it() {
             case["model"]
         );
     }
-}
-
-// Unix only: on Windows `timeout.exe` is another program, so the call is never wrapped there.
-#[cfg(unix)]
-#[test]
-fn the_probe_call_ends_on_its_own_when_coreutils_timeout_exists_and_runs_as_it_is_when_not() {
-    let plan = ProbePlan {
-        command: "codex".into(),
-        args: vec!["exec".into()],
-        env: BTreeMap::new(),
-        home: "/h".into(),
-        cli: None,
-    };
-    let bin = scratch("path-with-timeout");
-    let tool = bin.join("timeout");
-    std::fs::write(&tool, "#!/bin/sh\n").unwrap();
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(&tool, std::fs::Permissions::from_mode(0o755)).unwrap();
-    }
-    let wrapped = with_kill_timeout(plan.clone(), 90_000, &bin.to_string_lossy());
-    assert_eq!(wrapped.command, tool.to_string_lossy());
-    assert_eq!(wrapped.args, vec!["--kill-after=5", "90", "codex", "exec"]);
-    assert_eq!(
-        wrapped.cli.as_deref(),
-        Some("codex"),
-        "the wrapped call is still judged as its own CLI"
-    );
-    assert_eq!(
-        with_kill_timeout(plan.clone(), 500, &bin.to_string_lossy()).args[1],
-        "1",
-        "never under a second"
-    );
-    let empty = scratch("path-without-timeout");
-    assert_eq!(
-        with_kill_timeout(plan.clone(), 90_000, &empty.to_string_lossy()),
-        plan
-    );
-    let _ = (std::fs::remove_dir_all(bin), std::fs::remove_dir_all(empty));
 }
 
 #[cfg(unix)]
