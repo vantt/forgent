@@ -2444,6 +2444,50 @@ test('a running seat login near its own expiry is never probed: the probe would 
   } finally { w.cleanup(); }
 });
 
+test('a login that cannot outlive the seat is renewed before its life check, unless a running seat owns its renewal; a refusal names what refresh-ahead did', async () => {
+  const w = workspace();
+  const root = resolveConfinementTempRoot();
+  const seatName = `seat-window-${process.pid}`;
+  try {
+    const seatMs = 90 * 60 * 1000;
+    // 72 minutes left: outside the plain window, shorter than the seat may run.
+    writeClaude(w.home, claudeDoc(Date.now() + 72 * 60 * 1000));
+    const selection = { status: 'selected', provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home) };
+    const lease = (spawnFn, timeoutMs) => renewLeasedLogin(selection, {
+      cfg: { executors: { x: {} } }, opts: { providerCredentialRenew: createCredentialRenewal({ spawnFn }), providerCapacityRuntimeDir: w.runtimeDir },
+      executorId: 'x', pinnedInvocationId: null, confinementRequirement: { mode: 'required' }, timeoutMs,
+    });
+    const life = (leased) => loginLifeProblem(claudeSource(w.home), { timeoutMs: seatMs, refreshAhead: leased.refreshAhead[0] });
+
+    // Without the seat's timeout the window is the plain one: the login looks fresh, and the refusal says so.
+    const plain = await refreshAhead({ provider: 'claude-miu', accountId: 'acct', credentialSource: claudeSource(w.home), runtimeDir: w.runtimeDir, spawnFn: fakeSpawn({ layoutName: 'claude' }).spawnFn });
+    assert.deepEqual(plain, { status: 'fresh', reason: 'outside-window' });
+    assert.match(loginLifeProblem(claudeSource(w.home), { timeoutMs: seatMs, refreshAhead: plain }), /^login-expires-before-seat-timeout: .*; refresh-ahead: fresh outside-window$/);
+
+    // A running seat sharing the store's refresh token still owns its renewal, however long the new seat.
+    const seat = seatHome(root, { name: seatName, target: claudeTarget(w), login: readClaude(w.home) });
+    const held = fakeSpawn({ layoutName: 'claude' });
+    const owned = await lease(held.spawnFn, seatMs);
+    assert.deepEqual(owned.refreshAhead, [{ cli: null, status: 'skipped', reason: 'live-seat-owns-renewal' }]);
+    assert.equal(held.starts.length, 0, 'the shared refresh token is not spent');
+    assert.match(life(owned), /; refresh-ahead: skipped live-seat-owns-renewal$/);
+    fs.rmSync(path.dirname(seat), { recursive: true, force: true });
+    fs.rmSync(path.join(root, `run-${seatName}`), { recursive: true, force: true });
+
+    // The seat's timeout widens the window: the login is renewed, and the seat is admitted.
+    const renewing = fakeSpawn({ layoutName: 'claude' });
+    const renewed = await lease(renewing.spawnFn, seatMs);
+    assert.deepEqual(renewed.refreshAhead, [{ cli: null, status: 'renewed', reason: 'applied' }]);
+    assert.equal(renewing.starts.length, 1);
+    assert.equal(life(renewed), null);
+    assert.equal(FAKE_FRAGMENTS.some((value) => JSON.stringify([owned, renewed].map((l) => l.refreshAhead)).includes(value)), false, 'no credential value in an outcome');
+  } finally {
+    fs.rmSync(path.join(root, `disp_${seatName}`), { recursive: true, force: true });
+    fs.rmSync(path.join(root, `run-${seatName}`), { recursive: true, force: true });
+    w.cleanup();
+  }
+});
+
 test('while a running seat shares the store\'s refresh token nothing renews it; once the seat renewed, its pair is taken', async () => {
   const w = workspace();
   try {

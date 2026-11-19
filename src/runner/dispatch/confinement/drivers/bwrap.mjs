@@ -83,7 +83,9 @@ function provisionSelectedCredential(privateHomeTarget, request) {
     throw credentialError(`unsupported provider credential source kind "${source.kind}"`);
   }
   files = store.files ?? files;
-  const lifeProblem = loginLifeProblem(source, { timeoutMs: request?.context?.timeoutMs || DEFAULT_SEAT_TIMEOUT_MS });
+  // What refresh-ahead did for this store before the check, so a refusal names it; `not-run` when it was not asked.
+  const renewal = (capacity.refreshAhead ?? []).find((entry) => entry.cli === (source.cli ?? null)) ?? { status: 'not-run' };
+  const lifeProblem = loginLifeProblem(source, { timeoutMs: request?.context?.timeoutMs || DEFAULT_SEAT_TIMEOUT_MS, refreshAhead: renewal });
   if (lifeProblem) throw credentialError(`account "${capacity.accountId}": ${lifeProblem}`);
   if (copyHomeFiles(privateHomeTarget, home, files).length === 0) {
     throw credentialError(`credential-store-empty: account "${capacity.accountId}" has none of [${files.join(', ')}] of store "${store.use}" under ${home}`);

@@ -221,6 +221,7 @@ fn a_seat_may_not_start_on_a_login_that_would_refresh_inside_its_home() {
             &source,
             None,
             case["timeoutMs"].as_f64(),
+            None,
             case["now"].as_f64().unwrap(),
             &NoSqlite,
         );
@@ -957,6 +958,7 @@ fn a_store_whose_refresh_token_a_running_seat_spent_takes_the_newest_valid_seat_
         &credential_source,
         None,
         Some(SEAT_TIMEOUT_MS),
+        None,
         NOW,
         &NoSqlite
     )
@@ -1008,6 +1010,7 @@ fn a_store_whose_refresh_token_a_running_seat_spent_takes_the_newest_valid_seat_
             &credential_source,
             None,
             Some(SEAT_TIMEOUT_MS),
+            None,
             NOW,
             &NoSqlite
         ),
@@ -1104,6 +1107,7 @@ fn a_seat_login_older_than_the_store_or_whose_call_fails_is_never_installed_and_
         &credential_source,
         None,
         Some(SEAT_TIMEOUT_MS),
+        None,
         NOW,
         &NoSqlite
     )
@@ -1226,6 +1230,114 @@ fn while_a_running_seat_shares_the_store_refresh_token_nothing_renews_it_and_its
         !reported.contains("FAKE-ACCESS") && !reported.contains("seat-renewed"),
         "no credential value in a result"
     );
+    for dir in [source, runtime, seats] {
+        fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+/// A probe that renews a claude scratch copy the way the CLI would: a new pair with a later expiry.
+struct RenewsClaude(RefCell<Vec<String>>);
+impl CredentialProbe for RenewsClaude {
+    fn run(&self, request: &ProbeRequest<'_>, _: &dyn AccountLockGuard) -> ProbeRun {
+        self.0.borrow_mut().push(
+            request
+                .home
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .into_owned(),
+        );
+        fs::write(
+            request.home.join(".credentials.json"),
+            claude_auth("renewed", NOW + 8.0 * HOUR),
+        )
+        .unwrap();
+        ProbeRun::Ran { ok: true }
+    }
+}
+
+#[test]
+fn a_login_that_cannot_outlive_the_seat_is_renewed_before_its_life_check_unless_a_running_seat_owns_its_renewal(
+) {
+    const SEAT: f64 = 90.0 * 60_000.0;
+    let (source, runtime, seats) = (
+        scratch("seat-window-source"),
+        scratch("seat-window-runtime"),
+        scratch("seat-window-seats"),
+    );
+    // 72 minutes left: outside the plain window, shorter than the seat may run.
+    let store = claude_auth("short", NOW + 72.0 * 60_000.0);
+    fs::write(source.join(".credentials.json"), &store).unwrap();
+    let credential_source = source_claude(&source);
+    let request = RefreshRequest {
+        provider: "claude-miu",
+        account_id: "acct",
+        credential_source: &credential_source,
+        runtime_dir: &runtime,
+        home_dir: None,
+    };
+    let now = || NOW;
+    let probe = RenewsClaude(RefCell::new(vec![]));
+    let life = |outcome: &RefreshOutcome| {
+        login_life_problem(
+            &credential_source,
+            None,
+            Some(SEAT),
+            Some(outcome),
+            NOW,
+            &NoSqlite,
+        )
+    };
+
+    // Without the seat's timeout the login looks fresh, and the refusal says so.
+    let plain = refresh_ahead(
+        &request,
+        &RefreshOptions::new(&Free, &probe, &NoSqlite, &now),
+    );
+    assert_eq!(
+        (plain.status, plain.reason.as_str()),
+        ("fresh", "outside-window")
+    );
+    assert!(
+        life(&plain).is_some_and(|p| p.starts_with("login-expires-before-seat-timeout")
+            && p.ends_with("; refresh-ahead: fresh outside-window"))
+    );
+
+    // A running seat that shares the store's refresh token still owns its renewal, however long the new seat.
+    let homes = Seats(vec![seat(&seats, "a", &store)]);
+    let shared = refresh_ahead(
+        &request,
+        &RefreshOptions {
+            seat_timeout_ms: Some(SEAT),
+            live_seat_homes: &homes,
+            ..RefreshOptions::new(&Free, &probe, &NoSqlite, &now)
+        },
+    );
+    assert_eq!(
+        (shared.status, shared.reason.as_str()),
+        ("skipped", "live-seat-owns-renewal")
+    );
+    assert!(
+        probe.0.borrow().is_empty(),
+        "the shared refresh token is not spent"
+    );
+    assert!(life(&shared)
+        .is_some_and(|p| p.ends_with("; refresh-ahead: skipped live-seat-owns-renewal")));
+
+    // With the seat's timeout the login is renewed, and the seat is admitted.
+    let renewed = refresh_ahead(
+        &request,
+        &RefreshOptions {
+            seat_timeout_ms: Some(SEAT),
+            ..RefreshOptions::new(&Free, &probe, &NoSqlite, &now)
+        },
+    );
+    assert_eq!(
+        (renewed.status, renewed.reason.as_str()),
+        ("renewed", "applied")
+    );
+    assert_eq!(probe.0.borrow().len(), 1);
+    assert_eq!(life(&renewed), None);
     for dir in [source, runtime, seats] {
         fs::remove_dir_all(dir).unwrap();
     }

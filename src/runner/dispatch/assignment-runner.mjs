@@ -783,9 +783,12 @@ function resumedRunOutcome(runDir, runId) {
  * no pane renews in a throwaway copy and uses up the source's single-use refresh token); the lease then carries
  * the write-back opt-in, so a home whose login a pane renewed anyway is offered back to the source. Only a
  * confined launch copies a login, and which invocation is confined is settled later, so any executor that can
- * be confined (by posture, executor config or a confined invocation) counts. Renewal never blocks the dispatch.
+ * be confined (by posture, executor config or a confined invocation) counts. The window covers the seat's timeout
+ * (`timeoutMs`, the default one when none is named), so a login that cannot outlive the seat is renewed before the
+ * private home's life check; each store's outcome (`refreshAhead`: cli, status and reason, never a credential) rides
+ * on the lease, so a refusal there names it. Renewal never blocks the dispatch.
  */
-export async function renewLeasedLogin(selection, { cfg, opts, executorId, pinnedInvocationId, confinementRequirement }) {
+export async function renewLeasedLogin(selection, { cfg, opts, executorId, pinnedInvocationId, confinementRequirement, timeoutMs }) {
   const launchExecutor = cfg.executors?.[executorId] ?? cfg.executor;
   const isConfined = (entry) => entry?.confinement && typeof entry.confinement === 'object' && Object.keys(entry.confinement).length > 0;
   const mayCopyCredential = confinementRequirement.mode !== 'unconfined'
@@ -797,6 +800,7 @@ export async function renewLeasedLogin(selection, { cfg, opts, executorId, pinne
   const renewSources = selection.credentialSources
     ? launchCandidateClis(cfg, executorId, pinnedInvocationId).map((cli) => credentialSourceForCli(selection, cli)).filter(Boolean)
     : [selection.credentialSource];
+  const refreshAheadOutcomes = [];
   for (const credentialSource of renewSources) {
     try {
       const renewal = await opts.providerCredentialRenew({
@@ -806,16 +810,21 @@ export async function renewLeasedLogin(selection, { cfg, opts, executorId, pinne
         runtimeDir: credentialRuntimeDir,
         // A seat still running on this account may hold the only good login (it renewed in its home).
         liveSeatHomes: (target) => listLiveSeatHomes(target),
+        seatTimeoutMs: timeoutMs || DEFAULT_SEAT_TIMEOUT_MS,
       });
+      if (renewal) refreshAheadOutcomes.push({ cli: credentialSource?.cli ?? null, status: renewal.status, reason: renewal.reason });
       // Anything but "nothing was due" is visible, so a renewal that keeps failing is not mistaken for success.
       const quiet = renewal?.status === 'fresh' || (renewal?.status === 'skipped' && renewal?.reason === 'unsupported-layout');
       if (renewal && !quiet) {
         const store = credentialSource?.cli ? ` (${credentialSource.cli})` : '';
         process.stderr.write(`fgos: credential refresh-ahead for ${selection.provider}/${selection.accountId}${store}: ${renewal.status} (${renewal.reason})\n`);
       }
-    } catch { /* the launch goes on with the login as it is */ }
+    } catch {
+      // The launch goes on with the login as it is.
+      refreshAheadOutcomes.push({ cli: credentialSource?.cli ?? null, status: 'failed', reason: 'unexpected-error' });
+    }
   }
-  return { ...selection, credentialWriteBack: { runtimeDir: credentialRuntimeDir } };
+  return { ...selection, credentialWriteBack: { runtimeDir: credentialRuntimeDir }, refreshAhead: refreshAheadOutcomes };
 }
 
 /** Publish the Evaluator Baseline (dirty files with their hashes, HEAD) before launch; returns its digest. */
