@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { STATUSES, checkAll, checkPlanDir, main } from '../../scripts/plan-contract-check.mjs';
+import { STATUSES, activeOverlaps, checkAll, checkPlanDir, main } from '../../scripts/plan-contract-check.mjs';
 
 const SCRIPT = fileURLToPath(new URL('../../scripts/plan-contract-check.mjs', import.meta.url));
 const SHA = 'a'.repeat(40);
@@ -79,6 +79,14 @@ test('phases of one wave with overlapping footprints are an error', () => {
   const rows = ['| 1 | a | - | `src/a/` | 1 | ready |', '| 2 | b | - | `src/a/file.mjs` | 1 | ready |'];
   const r = root({ p: planText({ rows }) });
   assert.ok(checkPlanDir(path.join(r, 'p')).errors.some((e) => e.includes('share wave 1')));
+  // A done wave is history: a done phase, or any phase of a done plan, is not checked; an active pair still is.
+  const doneRows = ['| 1 | a | - | `src/a/` | 1 | done |', '| 2 | b | - | `src/a/file.mjs` | 1 | ready |', '| 3 | c | - | `src/a/other.mjs` | 1 | ready |'];
+  const shared = checkPlanDir(path.join(root({ p: planText({ rows: doneRows }) }), 'p')).errors.filter((e) => e.includes('share wave'));
+  assert.deepEqual(shared, []);
+  const activeRows = ['| 1 | a | - | `src/a/` | 1 | done |', '| 2 | b | - | `src/a/file.mjs` | 1 | ready |', '| 3 | c | - | `src/a/` | 1 | running |'];
+  assert.ok(checkPlanDir(path.join(root({ p: planText({ rows: activeRows }) }), 'p')).errors.some((e) => e.includes('phases 2 and 3 share wave 1')));
+  const donePlan = root({ p: planText({ fm: { status: 'done' }, rows }) });
+  assert.equal(checkPlanDir(path.join(donePlan, 'p')).errors.filter((e) => e.includes('share wave')).length, 0);
 });
 
 test('a phase must sit in a later wave than its dependency, and the table needs its columns', () => {
@@ -88,6 +96,67 @@ test('a phase must sit in a later wave than its dependency, and the table needs 
   const noWave = planText().replace('| wave ', '');
   const r2 = root({ q: noWave });
   assert.ok(checkPlanDir(path.join(r2, 'q')).errors.some((e) => e.startsWith('phase table lacks columns: wave')));
+});
+
+// The phase-table reader mirrors the supervisor's (packages/supervision/rust/src/portfolio.rs); the overlap rule itself
+// is owned by the write-scope package's tests (packages/write-scope/src/lib.rs). These cases own the script's wiring.
+const errorsOf = (text) => checkPlanDir(path.join(root({ p: text }), 'p')).errors;
+const phaseRows = (...footprints) => footprints.map((f, n) => `| ${n + 1} | t | - | ${f} | 1 | ready |`);
+
+test('two globs in one directory, and a glob and a file there, are a same-wave overlap (the old rule cut at the first star and called them disjoint)', () => {
+  assert.ok(errorsOf(planText({ rows: phaseRows('`apps/t/tests/q_*.rs`', '`apps/t/tests/s_*.rs`') })).some((e) => e.includes('share wave 1')));
+  assert.ok(errorsOf(planText({ rows: phaseRows('`apps/t/tests/q_*.rs`', '`apps/t/tests/q_a.rs`') })).some((e) => e.includes('share wave 1')));
+  assert.deepEqual(errorsOf(planText({ rows: phaseRows('`apps/t/a/*.rs`', '`apps/t/b/q.rs`') })), []);
+});
+
+test('a claim the write-scope package drops as too long or too large fails the overlap check by name, same-wave and cross-plan', () => {
+  const long = `src/${'x'.repeat(1030)}`;
+  assert.ok(errorsOf(planText({ rows: phaseRows(`\`${long}\``, `\`${long}\``) })).some((e) => e.includes('entry-too-long')));
+  const many = Array.from({ length: 513 }, (_, n) => `d${n}/`);
+  assert.ok(errorsOf(planText({ rows: phaseRows(`\`${many.join('`, `')}\``, '`d0/x`') })).some((e) => e.includes('scope-too-large')));
+  const active = (footprint) => ({ dir: 'plans/p', legacy: false, meta: { status: 'ready', footprint } });
+  assert.throws(() => activeOverlaps([active([...many.slice(0, 512), 'hot/']), active(['hot/x'])]), /scope-too-large/);
+  assert.throws(() => activeOverlaps([active([long]), active([long])]), /entry-too-long/);
+});
+
+test('a footprint cell keeps every star and unwraps only whole-entry backticks or links', () => {
+  assert.deepEqual(errorsOf(planText({ rows: phaseRows('`src/**`, [docs/](d)') })), []);
+  // `**src/a/*.mjs**` is not a whole-entry wrapper: its stars stay, so it is an entry that is not a repo path.
+  assert.ok(errorsOf(planText({ rows: phaseRows('**src/a/*.mjs**') })).some((e) => e.includes('"**src/a/*.mjs**"')));
+});
+
+test('a footprint entry that does not canonicalize is refused at ready and not before', () => {
+  for (const bad of ['`../x`', '`/abs`', '`a\\b`', '`ab**`', '`.`']) {
+    assert.ok(errorsOf(planText({ rows: phaseRows(bad) })).some((e) => e.includes('is not a repo-relative path or glob')), bad);
+  }
+  assert.ok(errorsOf(planText({ fm: { footprint: '[../x]' } })).some((e) => e.startsWith('footprint entry "../x"')));
+  const draft = planText({ fm: { status: 'draft' }, rows: ['| 1 | t | - | `../x` | 1 | draft |'] });
+  assert.deepEqual(errorsOf(draft), []);
+});
+
+test('a malformed phase table is refused for every status; a missing table only for ready or running', () => {
+  const draft = (extra) => planText({ fm: { status: 'draft' }, ...extra });
+  assert.ok(errorsOf(draft({ rows: ['| 1 | t | - | `a/` | 1 | draft |', '| 1 | u | - | `b/` | 2 | draft |'] })).includes('phase id 1 appears twice'));
+  for (const wave of ['0', '1.5', 'x', '-1', '']) {
+    assert.ok(errorsOf(draft({ rows: [`| 1 | t | - | \`a/\` | ${wave} | draft |`] })).includes('phase 1: wave must be an integer from 1'), JSON.stringify(wave));
+  }
+  assert.ok(errorsOf(draft({ rows: [] })).includes('phase table has no rows'));
+  const second = '\n| id | footprint |\n|---|---|\n| 1 | a/ |\n';
+  assert.ok(errorsOf(draft({ tail: SECTIONS + second })).some((e) => e.startsWith('2 tables have a footprint column')));
+  const noTable = (status) => planText({ fm: { status }, rows: [] }).replace(/## Phases[\s\S]*$/, '');
+  assert.ok(!errorsOf(noTable('draft')).includes('no phase table with a footprint column'));
+  assert.ok(errorsOf(noTable('ready')).includes('no phase table with a footprint column'));
+  assert.ok(errorsOf(noTable('running')).includes('no phase table with a footprint column'));
+});
+
+test('a list key that is not a list is refused by name', () => {
+  assert.ok(errorsOf(planText({ fm: { blockedBy: 'some-plan' } })).includes('blockedBy must be a list of plan directory names'));
+  assert.ok(errorsOf(planText({ fm: { footprint: 'src/a/' } })).includes('footprint must be a list of repo-relative paths or globs'));
+});
+
+test('a pair scan that stops at its cap is an error, never a clean verdict', () => {
+  const rows = Array.from({ length: 460 }, (_, n) => `| ${n + 1} | t | - | \`src/a/\` | 1 | ready |`);
+  assert.ok(errorsOf(planText({ rows })).some((e) => e.startsWith('footprint overlap scan stopped at its')));
 });
 
 test('--all reports a plan without the marker as legacy and still exits 0', () => {

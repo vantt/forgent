@@ -61,6 +61,10 @@
     "operation_id": "holder-lock.status",
     "owner_path": "packages/holder-lock/rust"
   },
+  "resource-check": {
+    "operation_id": "resource-check.run",
+    "owner_path": "apps/fgos"
+  },
   "lock": {
     "operation_id": "holder-lock.fence",
     "owner_path": "packages/holder-lock/rust",
