@@ -1,8 +1,9 @@
-# Phase 2: Item contract, verification check, index generator and Rust write door
+# Phase 2: Item contract, check and generated index
 
 ## Inputs
-- Phase 1 landed (identity discussion mint kind, convention paths for `plans/backlog/`, `plans/discussions/`, `plans/backlog.md`).
-- Settled discussion `docs/discussions/work-data-model/DISCUSSION.md` §6, §7 `#task-item-check`, D-ADR0082.
+- Phase 1 landed (`ds-` minting and convention paths).
+- Section 7 anchor `#task-item-check` of `docs/discussions/work-data-model/DISCUSSION.md`, decision D-ADR0082.
+- Backlog row `p-rw5iadsp2p`.
 
 ## Files it may write
 - `packages/portfolio/**`
@@ -18,7 +19,7 @@
 2. Implement portfolio contract check:
    - Validates frontmatter fields and allowed enum values.
    - Validates `source:` citations: every referenced `p-` and `ds-` id must exist.
-   - Enforces that an `in-flight` backlog item has at least one active citing discussion or plan.
+   - Enforces that an `in-flight` backlog item has at least one citing discussion or plan.
    - Enforces that any new discussion or plan cites at least one backlog item.
    - Flags drift: item `done` with a citing plan `running`, or item `in-flight` with all citing plans completed/withdrawn.
    - Checks that `plans/backlog.md` matches the freshly generated index (drift fails the check).

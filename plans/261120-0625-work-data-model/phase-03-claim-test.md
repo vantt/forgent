@@ -1,7 +1,8 @@
-# Phase 7: Concurrent plan claim refusal verification test
+# Phase 3: Concurrent claim is refused at landing
 
 ## Inputs
-- Settled discussion `docs/discussions/work-data-model/DISCUSSION.md` §6, §7 `#task-claim-test`, D-ADR0082.
+- Section 7 anchor `#task-claim-test` of `docs/discussions/work-data-model/DISCUSSION.md`, decision D-ADR0082.
+- Backlog row `p-lsjboo4xzg`.
 - `apps/fgos/src/wiring/land.rs` and the landing door.
 
 ## Files it may write

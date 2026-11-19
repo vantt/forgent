@@ -1,9 +1,9 @@
-# Phase 6: Session write creates one item file and replaces plan 1615 phase 4
+# Phase 4: Replace plan 261119-1615 phase 4
 
 ## Inputs
 - Phase 2 landed (item frontmatter schema and validation).
-- Phase 4 landed (portfolio paths under `plans/`).
-- Settled discussion `docs/discussions/work-data-model/DISCUSSION.md` §6, §7 `#task-1615-phase4`, D-ADR0082.
+- Section 7 anchor `#task-1615-phase4` of `docs/discussions/work-data-model/DISCUSSION.md`, decision D-ADR0082.
+- Backlog row `p-xyod5s5h6r`.
 - Plan `261119-1615-secretary-capabilities` phase 4 withdrawn.
 
 ## Files it may write

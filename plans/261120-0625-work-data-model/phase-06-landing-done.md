@@ -1,9 +1,10 @@
-# Phase 5: Landing writes source items done
+# Phase 6: Landing writes item done
 
 ## Inputs
 - Phase 2 landed (item contract and frontmatter schema).
-- Phase 4 landed (backlog items stored as discrete files under `plans/backlog/`).
-- Settled discussion `docs/discussions/work-data-model/DISCUSSION.md` §6, §7 `#task-landing-done`, D-ADR0082.
+- Phase 5 landed (backlog items stored as discrete files under `plans/backlog/`).
+- Section 7 anchor `#task-landing-done` of `docs/discussions/work-data-model/DISCUSSION.md`, decision D-ADR0082.
+- Backlog row `p-pjouokg3jm`.
 
 ## Files it may write
 - `apps/fgos/src/wiring/land.rs`
