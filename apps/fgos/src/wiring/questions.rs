@@ -726,6 +726,7 @@ fn process_caller() -> IdentityCaller {
 }
 
 /// The variable that names a head's request socket inside its sandbox.
+#[cfg(unix)]
 pub const HEAD_SOCKET_ENV: &str = "FGOS_HEAD_REQUEST_SOCKET";
 /// How many times a write is retried when the head's supervisor answers `busy`, and how long it waits between tries.
 pub const BUSY_RETRIES: u32 = 3;

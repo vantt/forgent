@@ -438,6 +438,10 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
     assert_eq!(
         verbs,
         [
+            "questions ack",
+            "questions answer",
+            "questions ask",
+            "questions cancel",
             "session answered",
             "session bind session",
             "session restore role",
