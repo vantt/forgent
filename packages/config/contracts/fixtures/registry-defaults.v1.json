@@ -12,7 +12,7 @@
    "leafTtlDays": 0
   },
   "workerSlots": {
-   "ceiling": null
+   "ceiling": 4
   },
   "invariantChecks": {
    "commands": []

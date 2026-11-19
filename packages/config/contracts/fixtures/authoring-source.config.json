@@ -1083,9 +1083,6 @@
       "node --test test/architecture.test.mjs"
     ]
   },
-  "workerSlots": {
-    "ceiling": null
-  },
   "ironLaw": {
     "level": "ask"
   },

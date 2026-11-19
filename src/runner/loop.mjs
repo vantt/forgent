@@ -90,8 +90,7 @@ import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, claimRoot, steerFrontier } from './root-affinity.mjs';
 import { resolveRoot, hasOpenDescendant, indexChildrenByParent } from '../state/frontier.mjs';
 import { cleanupMergedBranch } from './merge.mjs';
-import { claimWork, ClaimError, readWorkerSlotCeiling } from './claim-port.mjs';
-import { hasWorkerSlotRoom, countWorkerSlots } from '../state/worker-slots.mjs';
+import { claimWork, ClaimError } from './claim-port.mjs';
 import { resolveRepoRoot, resolveInvocationRoot } from './paths.mjs';
 import { FALLBACK_VERIFY, resolveDiscovery, classificationPatchFromVerdict } from '../intake/discovery.mjs';
 import { resolvePlan, resolveContentRoot } from '../intake/plan.mjs';
@@ -1236,19 +1235,11 @@ async function claimAndDispatch(ctx) {
     }
     return await dispatchClaimedItem({ ...ctx, priorVisits, rootId: decision.root, claimId: decision.claimId });
   } catch (err) {
-    // A worker-slot refusal is an ANSWER, not a failure (D6): the launcher
-    // asked, the engine said no, and nothing was stood up. It reaches here
-    // only for the tail of a batch the pre-check above granted whole (D8) —
-    // claimWork's own enforcing gate counts per item, so between "asked, saw
-    // room" and "actually claimed" the last free slot can go to a sibling in
-    // the same wave, or to another launcher entirely. That race is accepted
-    // on purpose (worker-slots.mjs), which makes this landing load-bearing:
-    // without it, `validation` category routing below would turn the very
-    // overshoot D8 designs for into a halted drain-run with a non-zero exit.
-    // `claim-rejected` is the outcome that already means "never dispatched,
-    // left for a later poll" — the refused item keeps its place in the
-    // frontier and the next poll picks it up once a slot frees.
-    if ((err.name === 'ClaimError' || err instanceof ClaimError) && (err.code === 'worker-slot-ceiling' || err.category === 'conflict' || err.code === 'conflict')) {
+    // A refused claim is an ANSWER, not a failure: a sibling in the same wave
+    // (or another launcher) took the item first. `claim-rejected` means
+    // "never dispatched, left for a later poll" — the item keeps its place in
+    // the frontier and the next poll picks it up.
+    if ((err.name === 'ClaimError' || err instanceof ClaimError) && (err.category === 'conflict' || err.code === 'conflict')) {
       log(`fgos-runner: claim for "${item.id}" refused — ${err.message}; left for a later poll`);
       return { outcome: 'claim-rejected', id: item.id, reason: err.code || 'conflict', exitCode: 0 };
     }
@@ -1361,31 +1352,9 @@ async function drainOnce(options) {
       // equivalent (tsk-1w7 D10) — no other registered domain ever declares
       // a stage named 'discovery' at all, so this direct literal comparison
       // can never wrongly match a non-coding item.
-      // This sweep stands a REAL worker process up, so it has to obey the
-      // shared ceiling like every other launcher (D6/D7) — the whole point of
-      // one engine-owned total is that no launcher keeps a private one. It is
-      // the one dispatch path that never claims: the item stays `todo` and
-      // moves to `doing` only inside the worker itself, so `countWorkerSlots`
-      // (which counts `doing`) cannot see this process at all. Left ungated,
-      // a full lane refused the execution wave below and then spawned research
-      // workers anyway, and `fgos slots` under-reported the machine while
-      // every other launcher decided on that undercount.
-      //
-      // Asked per item, not once for the sweep: these run sequentially and
-      // each one occupies the lane only while it runs, so a fresh read is both
-      // cheaper and more accurate than a batch grant. `break`, not `continue`
-      // — the answer will not change within this pass.
       for (const item of Object.values(listWork(dir).work)) {
         const discoverEntry = stepForPhase(getDomain(item.domain, { onUnrecognized: () => {} }), 'discover', item.kind);
         if (discoverEntry === undefined || item.workflowStep !== discoverEntry || item.status !== 'todo') continue;
-        const researchRoom = hasWorkerSlotRoom(listWork(dir), {
-          ceiling: readWorkerSlotCeiling(dir),
-          excludeId: item.id,
-        });
-        if (!researchRoom.allowed) {
-          log(`fgos-runner: no worker-slot room for research on "${item.id}" — ${researchRoom.occupied} of ${researchRoom.ceiling} slot(s) in use; left for a later poll`);
-          break;
-        }
         let wt = null;
         let keepWorktree = false;
         try {
@@ -1621,22 +1590,8 @@ async function drainOnce(options) {
     const ownershipStore = createOwnershipStore();
     const ownerIdentity = options.ownerIdentity ?? RUNNER_OWNER_IDENTITY;
     const parallel = resolveParallel(config);
-    // The shared execution-lane ceiling (docs/history/orchestrator-worker-
-    // slots/plan.md §Shape T4, D6). Read once for the whole drain-run: this
-    // is CONFIGURATION, while the occupancy it is compared against is STATE
-    // — and the state half is already re-read every poll, through `view`
-    // below. `dir` is the `.fgos` directory, so its parent is the project
-    // root the config facade expects — resolved the same way claimWork's own
-    // gate does (claim-port.mjs), rather than from `repoRoot`, which callers
-    // set independently. An absent `workerSlots.ceiling` means no ceiling at
-    // all, so this whole gate stays inert until a project configures one.
-    const ceiling = readWorkerSlotCeiling(dir);
     const dispatched = [];
     let haltExitCode = null;
-    // Set whenever the worker-slot gate refused or trimmed a wave, so the
-    // "nothing dispatched" branch below can tell a full lane from an empty
-    // frontier instead of reporting both as the same silent idle.
-    let roomRefused = false;
 
     while (true) {
       const frontierItems = readyWork(dir);
@@ -1667,37 +1622,8 @@ async function drainOnce(options) {
       const wave = selectWave(steered, view, parallel);
       if (wave.length === 0) break; // nothing dispatchable — drain complete
 
-      // Ask the engine for room BEFORE standing any worker up (D6), then
-      // TRIM the wave to what it granted. The batch is never offered whole:
-      // the enforcing gate inside `claimWork` claims one item at a time and
-      // re-folds the log per call, so it cannot honor a whole-batch grant —
-      // dispatching more than `granted` just sends the tail to a claim that
-      // refuses it. See `hasWorkerSlotRoom` for the supersede of D8's
-      // whole-batch rule. With no ceiling armed, `granted` is the whole wave,
-      // so this slice is a no-op and behavior is identical to before.
-      // `break`, not `continue`: a drain-run is bounded (D15), so re-polling
-      // a full lane would only see it full again; `--watch`'s next cycle is
-      // where waiting belongs.
-      const room = hasWorkerSlotRoom(view, { ceiling, batchSize: wave.length });
-      if (!room.allowed) {
-        // Name the ids actually holding the lane. Without this, a lane wedged
-        // by claims nobody is working (a closed terminal, a crashed session --
-        // `startupReap` skips human/session claims by design) is invisible:
-        // every launcher is refused and the only clue is a count.
-        const holders = countWorkerSlots(view).execution.items.map((i) => i.id);
-        log(`fgos-runner: no worker-slot room — ${room.occupied} of ${room.ceiling} slot(s) in use by ${holders.join(', ')}; ${wave.length} ready item(s) left for a later poll`);
-        roomRefused = true;
-        break;
-      }
-
-      const admitted = wave.slice(0, room.granted);
-      if (admitted.length < wave.length) {
-        log(`fgos-runner: worker-slot ceiling admits ${admitted.length} of ${wave.length} ready item(s) — ${room.occupied} of ${room.ceiling} slot(s) in use; the rest wait for a later poll`);
-        roomRefused = true;
-      }
-
       const ctxBase ={ repoRoot, dir, config, worktreeDir, breaker, queue, log, ownershipStore, ownerIdentity };
-      const settled = await Promise.allSettled(admitted.map((item) => claimAndDispatch({ ...ctxBase, item })));
+      const settled = await Promise.allSettled(wave.map((item) => claimAndDispatch({ ...ctxBase, item })));
 
       processSealCoalescer.flush(); // a wave is a finished unit of work
       let progressed = false;
@@ -1715,15 +1641,6 @@ async function drainOnce(options) {
     }
 
     if (dispatched.length === 0) {
-      // "Nothing to do" and "work is waiting behind a full lane" are opposite
-      // situations that used to print the same line and return the same
-      // envelope. A caller polling `outcome: 'idle'` could not tell a quiet
-      // backlog from a wedged one, and the log flatly contradicted the
-      // refusal message printed moments earlier.
-      if (roomRefused) {
-        log('fgos-runner: nothing dispatched — the worker-slot lane is full; see the refusal above.');
-        return { outcome: 'idle', reason: 'worker-slot-ceiling', reap, parked, dispatched, exitCode: 0 };
-      }
       log('fgos-runner: frontier empty — nothing to do.');
       return { outcome: 'idle', reason: 'frontier-empty', reap, parked, dispatched, exitCode: 0 };
     }

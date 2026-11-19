@@ -146,11 +146,11 @@
     "src/runner/execution/dry-bind.mjs": "S6a",
     "src/runner/execution/patterns/retired-keys.mjs": "S6a",
     "src/seat-binding/client.mjs": "S6a",
+    "src/setup/registrations.mjs": "S7",
     "src/state/drift-status.mjs": "S7",
     "src/state/frontier.mjs": "S7",
     "src/state/replay.mjs": "S7",
     "src/state/store.mjs": "S7",
-    "src/state/worker-slots.mjs": "S7",
     "src/util/domain-compile.mjs": "S7",
     "src/workflow/case-bindings.mjs": "S6b",
     "src/workflow/loader.mjs": "S6b",
@@ -492,10 +492,10 @@
     },
     {
       "id": "worker-slots-ceiling-usable",
-      "description": "workerSlots.ceiling is either a positive integer or explicitly null (a malformed value silently enforces nothing)",
+      "description": "workerSlots.ceiling is a positive integer, the number of worker seats per machine (a null or non-positive value leaves the seat pool without a usable size)",
       "owner": "bridge:S7",
       "judge": [
-        "src/state/worker-slots.mjs"
+        "src/setup/registrations.mjs"
       ]
     },
     {

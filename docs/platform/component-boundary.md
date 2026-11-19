@@ -1062,9 +1062,9 @@ Likely additional or more explicit boundaries:
 3. Claim And Runtime Occupancy Coordination.
 
    Existing code under `src/runner/claim-port.mjs`,
-   `src/state/runtime-coordination.mjs`, `src/state/worker-slots.mjs`, and
-   `src/runner/main-checkout-lock.mjs` (deleted in cd7ed1207) owns effective claim state, worker slot
-   pressure, and main-checkout safety. This is not the same thing as
+   `src/state/runtime-coordination.mjs`, and
+   `src/runner/main-checkout-lock.mjs` (deleted in cd7ed1207) owns effective claim state
+   and main-checkout safety; worker seat pressure is owned by the lane pool in the run supervisor, enforced where a top-level seat starts. This is not the same thing as
    `CoordinationSession`; it is runtime occupancy around Work execution.
 
 4. Work Driver And Automation Engine.

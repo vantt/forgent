@@ -5,7 +5,7 @@
   "file": "authoring-source.config.json",
   "copied-from": ".fgos/config.json at ef4a056d7, reshaped at 9758cb1bf (taste moved to runner.roles; seat and marketing blocks removed; council, business and marketing rows removed with the standard's, coding:implement left with its prefer only)",
   "commit": "ef4a056d7",
-  "sha256": "db683e96f1aaf3821cb28fcb6f8f171fe9208d82952fffd623f5e172486897ec"
+  "sha256": "96f0c2b5a0ba50db3a180102b9880fafa2e24ea8998bd8809919363934fc091f"
  },
  "exclusions": [
   {
@@ -475,8 +475,7 @@
    "watcher"
   ],
   [
-   "workerSlots",
-   "laneWaitSec"
+   "workerSlots"
   ],
   [
    "runner",

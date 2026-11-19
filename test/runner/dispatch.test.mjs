@@ -1848,38 +1848,6 @@ test('dispatch doors refuse a Work item instead of ignoring it', async () => {
 
 // --- fanout-batch and fgos schedule --candidates -------------------------
 
-test('fanoutBatchExecutorCli returns slotsFull when worker slots ceiling is full', async () => {
-  const repo = mkTempGitRepo();
-  const fgosDir = repo.fgosDir;
-  initStore(fgosDir);
-  // Write shared config with ceiling = 1 into .fgos/config.json
-  writeProjectConfig(repo.repoRoot, { workerSlots: { ceiling: 1 } });
-  // Add 1 doing item to consume the slot
-  addWork(fgosDir, { id: 't1', title: 'Running Item', kind: 'task', status: 'doing', domain: 'coding', workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
-
-  const result = await fanoutBatchExecutorCli(['c1', 'c2'], { repoRoot: repo.repoRoot });
-  assert.equal(result.slotsFull, true);
-  assert.deepEqual(result.deferred, ['c1', 'c2']);
-  assert.deepEqual(result.fired, []);
-});
-
-test('fanoutBatchExecutorCli trims candidates to free slots when ceiling is configured', async () => {
-  const repo = mkTempGitRepo();
-  const fgosDir = repo.fgosDir;
-  initStore(fgosDir);
-  writeProjectConfig(repo.repoRoot, { workerSlots: { ceiling: 1 } });
-
-  // Planning-stage items: the standard registers a CLI executor for the executing stage, so only these hand back to the caller's own Task tool.
-  addWork(fgosDir, { id: 'c1', title: 'Cand 1', kind: 'task', status: 'todo', domain: 'coding', workflowStep: 'planning', deps: [], refs: [], risk: 'light', verify: 'npm test' });
-  addWork(fgosDir, { id: 'c2', title: 'Cand 2', kind: 'task', status: 'todo', domain: 'coding', workflowStep: 'planning', deps: [], refs: [], risk: 'light', verify: 'npm test' });
-
-  const result = await fanoutBatchExecutorCli(['c1', 'c2'], { repoRoot: repo.repoRoot, hasLiveTaskAccess: true });
-  assert.equal(result.slotsFull, undefined);
-  assert.deepEqual(result.deferred, ['c2']);
-  assert.equal(result.mechanismChanged.length, 1);
-  assert.equal(result.mechanismChanged[0].id, 'c1');
-});
-
 test('fgos schedule --candidates filters schedule to specified candidates', () => {
   const repo = mkTempGitRepo();
   const fgosDir = repo.fgosDir;

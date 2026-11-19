@@ -12,7 +12,6 @@ import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
 import { initStore, addWork, moveWork, settleClaim, listWork, FsmError, readRawEvents } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 import { holdStateLockInChild } from '../helpers/hold-state-lock-in-child.mjs';
-import { writeProjectConfig } from '../helpers/config-fixture.mjs';
 
 const CLAIM_PORT_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/runner/claim-port.mjs');
 const FGOS_BIN = path.resolve(fileURLToPath(import.meta.url), '../../../bin/fgos.mjs');
@@ -330,54 +329,6 @@ test('a stale-claim reclaim records a durable work.attempt(result:"reclaimed") b
   // and every future settleClaim on it fails with a revision conflict.
   const res = settleClaim(dir, { id: 'item-a', claimId: second.claimId, finalStatus: 'awaiting-approval', role: 'session' });
   assert.equal(res.view.work['item-a'].status, 'awaiting-approval', 'the reclaimed claim must still be settle-able — preClaimRevision must reflect the post-attempt durable state, not a stale pre-attempt snapshot');
-});
-
-// tsk-37t: a repo drifted over its own worker-slot ceiling (occupied >
-// ceiling, e.g. the ceiling was lowered or stale claims piled up) used to
-// refuse EVERY claim, including a stale-claim reclaim that doesn't add net
-// occupancy — the one claim that would actually clear the drift. This
-// exercises the real gate end-to-end via claimWork, not just
-// hasWorkerSlotRoom in isolation.
-
-test('tsk-37t: a stale-claim reclaim succeeds even when the repo is already drifted past its worker-slot ceiling', async () => {
-  const { repoRoot, dir } = setup();
-  writeProjectConfig(repoRoot, { workerSlots: { ceiling: 1 } });
-
-  // item-a is claimed and its worktree goes conclusively quiet.
-  const first = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
-  const staleSeconds = Math.floor((Date.now() - HUMAN_MS - 1000) / 1000);
-  commitAt(first.worktree.path, 'stale.txt', 'stale', staleSeconds);
-
-  // A second, unrelated item is also `doing` -- with ceiling 1, occupied
-  // (excluding item-a) is already 1, at/over ceiling before the reclaim.
-  addWork(dir, { id: 'item-b', title: 'Item B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  acquireClaim(dir, { id: 'item-b', actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
-
-  // Reclaiming item-a must succeed: it was already `doing` (occupying its
-  // slot) before this call, and stays `doing` after -- no net new
-  // occupancy, so the ceiling has nothing real to refuse.
-  const second = await claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot });
-  assert.equal(second.to, 'doing');
-  assert.equal(second.branch, 'fgw/item-a');
-});
-
-test('tsk-37t: a genuinely NEW claim still refuses when the repo is at ceiling, unchanged (the exemption never widens past reclaims)', async () => {
-  const { repoRoot, dir } = setup();
-  writeProjectConfig(repoRoot, { workerSlots: { ceiling: 1 } });
-
-  addWork(dir, { id: 'item-b', title: 'Item B', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
-  acquireClaim(dir, { id: 'item-b', actor: 'session', preClaimStatus: 'todo', claimRole: 'session' });
-
-  // item-a (todo, never claimed) is a genuinely NEW claim -- not a reclaim
-  // of an already-doing item -- so it must still be refused at ceiling 1.
-  await assert.rejects(
-    () => claimWork(dir, { id: 'item-a', actor: 'session', isolate: true, repoRoot }),
-    (err) => {
-      assert.ok(err instanceof ClaimError);
-      assert.equal(err.code, 'worker-slot-ceiling');
-      return true;
-    },
-  );
 });
 
 // tsk-2ec regression: the literal shape of the bug report that started this

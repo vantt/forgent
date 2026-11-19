@@ -143,7 +143,7 @@ test('readGateBypassLevel: reads config.gateBypass.level from the shared config 
 
 test('readGateBypassLevel: falls back to the legacy standalone file when the shared file exists but has no gateBypass key', () => {
   const fgosDir = tmpFgosDir();
-  writeProjectConfig(path.dirname(fgosDir), { workerSlots: { ceiling: 3 } });
+  writeProjectConfig(path.dirname(fgosDir), { cleanup: { ttlDays: 3 } });
   fs.writeFileSync(path.join(fgosDir, 'gate-bypass.json'), JSON.stringify({ level: 'light' }), 'utf8');
   assert.equal(readGateBypassLevel(fgosDir), 'light');
 });

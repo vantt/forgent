@@ -25,7 +25,6 @@ import {
   spawnSync,
   withHome,
 } from './helpers/setup-checks-harness.mjs';
-import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 import { writeGlobalConfig, writeProjectConfig, writeRawGlobalConfig, writeRawProjectConfig, readProjectConfig, statGatewayToken, gatewayTokenPath } from '../helpers/config-fixture.mjs';
 
 // tsk-in1-1 D1: a tool provider is declared directly in
@@ -66,40 +65,48 @@ test('executor-profile-warnings warns, without failing, that a prefer on a tool-
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('worker-slots-ceiling-usable passes on the standard alone (unarmed null), and says so', () => {
+// `workerSlots.ceiling` is a machine setting (global file only), so each case reads it from a throwaway HOME.
+function ceilingCheck(cwd, home) {
+  return withHome(home, () => checkById('worker-slots-ceiling-usable').check(cwd));
+}
+
+test('worker-slots-ceiling-usable passes on the standard alone and names the armed seat count', () => {
   const cwd = mkTemp('doctor-slots-standard-');
-  const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
-  assert.equal(passed, true);
-  assert.match(message, /unarmed/);
-  assert.match(message, new RegExp(`recommended: ${DEFAULT_WORKER_SLOT_CEILING}`));
+  const home = mkTemp('doctor-slots-standard-home-');
+  const { passed, message } = ceilingCheck(cwd, home);
+  assert.equal(passed, true, message);
+  assert.match(message, /workerSlots\.ceiling = 4 worker seat\(s\) per machine/);
   fs.rmSync(cwd, { recursive: true, force: true });
+  fs.rmSync(home, { recursive: true, force: true });
 });
 
-// The whole point of the check: each of these silently enforces NOTHING,
-// because hasWorkerSlotRoom treats anything that is not a positive integer
-// as "no ceiling configured" and allows every claim. A project reading its
-// own config would believe it is capped. The schema already refuses a string,
-// a fraction, a boolean and a list; these two are integers it admits.
-test('worker-slots-ceiling-usable fails on a ceiling that silently enforces nothing', () => {
-  for (const ceiling of [0, -1]) {
-    const cwd = mkTemp('doctor-slots-malformed-');
-    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-    writeProjectConfig(cwd, { workerSlots: { ceiling } });
-    const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
-    assert.equal(passed, false, `malformed ceiling: ${JSON.stringify(ceiling)}`);
-    assert.match(message, /enforces NOTHING/);
-    fs.rmSync(cwd, { recursive: true, force: true });
-  }
-});
-
-test('worker-slots-ceiling-usable passes and names a real armed ceiling', () => {
+test('worker-slots-ceiling-usable passes and names a ceiling the machine file sets', () => {
   const cwd = mkTemp('doctor-slots-armed-');
-  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
-  writeProjectConfig(cwd, { workerSlots: { ceiling: 6 } });
-  const { passed, message } = checkById('worker-slots-ceiling-usable').check(cwd);
-  assert.equal(passed, true);
-  assert.match(message, /workerSlots\.ceiling = 6/);
+  const home = mkTemp('doctor-slots-armed-home-');
+  writeGlobalConfig(home, { workerSlots: { ceiling: 6 } });
+  const { passed, message } = ceilingCheck(cwd, home);
+  assert.equal(passed, true, message);
+  assert.match(message, /workerSlots\.ceiling = 6 worker seat\(s\) per machine/);
   fs.rmSync(cwd, { recursive: true, force: true });
+  fs.rmSync(home, { recursive: true, force: true });
+});
+
+test('worker-slots-ceiling-usable does not pass a ceiling that is not a positive integer', () => {
+  for (const ceiling of [0, -1, null]) {
+    const cwd = mkTemp('doctor-slots-malformed-');
+    const home = mkTemp('doctor-slots-malformed-home-');
+    writeGlobalConfig(home, { workerSlots: { ceiling } });
+    // The config door refuses the value at read time (the schema holds minimum 1), or the check fails it by name.
+    let outcome;
+    try {
+      outcome = ceilingCheck(cwd, home);
+    } catch (err) {
+      outcome = { passed: false, message: err.message };
+    }
+    assert.equal(outcome.passed, false, `ceiling ${JSON.stringify(ceiling)}: ${outcome.message}`);
+    fs.rmSync(cwd, { recursive: true, force: true });
+    fs.rmSync(home, { recursive: true, force: true });
+  }
 });
 
 // A project Workflow of the project's own, naming the capabilities given.

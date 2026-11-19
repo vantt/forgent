@@ -1,9 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from './paths.mjs';
 import { loadRunnerConfigForDir } from './dispatch/config.mjs';
-import { readConfig } from '../config/facade.mjs';
 import { listWork } from '../state/store.mjs';
-import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { compileDispatchPlan } from './dispatch/plan.mjs';
 import { runUnit } from './execution/run.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
@@ -23,13 +21,13 @@ export function resolveBinFgos(root) {
 /**
  * `fanout-batch <id,id,...>` subcommand (fanout-execute-consolidation):
  * Consolidates the out-of-process dispatch chain (pick -> execute -> return)
- * and worker slot-checking/trimming into a single fast, testable call for fgos-fanout.
+ * into a single fast, testable call for fgos-fanout.
  *
  * Boundary Note (R1 / M10):
  * Lives in the Work Driver layer (next to loop.mjs) rather than dispatch core.
  * Dispatch core owns compileDispatchPlan; the worker runs as one Unit through runUnit (the
  * door `fgos run` uses), which commits what the worker left in the item's worktree. Work
- * lifecycle driving (pick, return, worker slot checking) belongs here in the Work Driver layer.
+ * lifecycle driving (pick, return) belongs here in the Work Driver layer.
  *
  * Fault Tolerance Invariant (R1):
  * If `pick` succeeds but the Unit run does not pass (or throws), the item must be returned with
@@ -50,17 +48,8 @@ export async function fanoutBatchExecutorCli(
   const fgosDir = fgosDirFromRoot(root);
   const cfg = loadRunnerConfigForDir(root);
 
-  const ceiling = readConfig({ projectRoot: root, sections: ['workerSlots'] }).value.workerSlots.ceiling;
   const slotsView = listWork(fgosDir);
-  const room = hasWorkerSlotRoom(slotsView, { ceiling, batchSize: candidateIds.length });
-
-  if (!room.allowed) {
-    return { fired: [], mechanismChanged: [], unavailable: [], deferred: [...candidateIds], slotsFull: true };
-  }
-
-  const freeSlots = room.free !== null && room.free !== undefined ? Math.max(0, room.free) : candidateIds.length;
-  const batchToRun = candidateIds.slice(0, freeSlots);
-  const deferred = candidateIds.slice(freeSlots);
+  const batchToRun = candidateIds;
 
   const fired = [];
   const mechanismChanged = [];
@@ -195,7 +184,7 @@ export async function fanoutBatchExecutorCli(
     }
   }
 
-  return { fired, mechanismChanged, unavailable, deferred };
+  return { fired, mechanismChanged, unavailable, deferred: [] };
 }
 
 // CLI entry point: `node src/runner/fanout-batch.mjs "<id>,<id>..." [--has-live-task-access]

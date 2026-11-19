@@ -1,7 +1,7 @@
 // claim-port.mjs — single choke-point for all claim flows (tsk-53f D1).
 //
 // Every claim (CLI take, CLI pick, runner claimItem) goes through this module.
-// Centralizes: the worker-slot ceiling check + acquireClaim in one state
+// Centralizes: the status check + acquireClaim in one state
 // transaction (runtime claim only — tsk-40m retired the durable
 // moveWork(to:'doing') claim-time write entirely; doing is derived purely from
 // the active-claim overlay), optional worktree creation with correct baseRef for leaf items.
@@ -17,18 +17,9 @@ import { visitCount } from './anti-loop.mjs';
 import { LockScope } from '../holder-lock/index.mjs';
 import { createClaimWorktree, branchNameFor, branchExists, currentHead, resolveRefSha } from './worktree.mjs';
 import { lastActivityAt, isReclaimEligible } from './claim-liveness.mjs';
-import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
-import { readConfig } from '../config/facade.mjs';
 import { acquireClaimTx, releaseClaim, readClaims, readClaim, buildEffectiveView, getItemDurableRevision, withMainState } from '../state/runtime-coordination.mjs';
-import fs from 'node:fs';
-import path from 'node:path';
 
 import { DEFAULTS } from '../state/work.mjs';
-
-/** `workerSlots.ceiling` of the project that owns the `.fgos` directory `dir` (null: no ceiling armed), following a linked worktree's `.fgos` symlink to the main checkout that holds the store; a refused config file throws. */
-export function readWorkerSlotCeiling(dir) {
-  return readConfig({ projectRoot: path.dirname(fs.realpathSync(dir)), sections: ['workerSlots'] }).value.workerSlots?.ceiling;
-}
 
 /**
  * Read `releaseTrigger` off the MOST RECENT settle-to-'todo' event for
@@ -61,10 +52,6 @@ function latestTodoReleaseTrigger(events, id) {
 const CLAIM_ERROR_CATEGORY = Object.freeze({
   'not-found': 'validation',
   'deps-not-merged': 'validation',
-  // Same reasoning as 'deps-not-merged': a refused claim is an ordinary,
-  // expected outcome, so the runner must halt this one item gracefully
-  // rather than crash its whole drain-run on an 'unexpected' category.
-  'worker-slot-ceiling': 'validation',
   // The pre-claim durable-status CAS below (tsk-40m D2: preClaimStatus vs
   // expectedStatus) reports the same 'conflict' category moveWork's own CAS
   // always has for "the state changed since you read it" — a real,
@@ -135,14 +122,6 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
 
   const activeClaim = claims[id];
   const effectiveClaimRole = item.claimRole || activeClaim?.claimRole;
-
-  const isPotentialStaleClaimReclaim = isolate
-    && (activeClaim || item.status === 'doing')
-    && (effectiveClaimRole === 'human' || effectiveClaimRole === 'session')
-    && (actor === 'session' || actor === 'human')
-    && isReclaimEligible(repoRoot, id, effectiveClaimRole);
-
-  const ceiling = readWorkerSlotCeiling(dir);
 
   // tsk-40m (docs/platform/proposals/doing-coordination-redesign.md): claim time no
   // longer writes a durable work.move(->doing), so the ORIGINAL claim's
@@ -218,9 +197,8 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
 
   // tsk-40m code-review finding (blocker, TOCTOU): everything above took real
   // wall-clock time with no lock held, long enough for a genuinely DIFFERENT
-  // process to durably move this item or take the last worker slot. So the
-  // fresh read, the status check, the worker-slot ceiling check and the
-  // claim write are one `state` transaction: no other durable write or claim
+  // process to durably move this item. So the fresh read, the status check
+  // and the claim write are one `state` transaction: no other durable write or claim
   // can land between the read and the claim file being written.
   const runtimeClaim = withMainState(dir, (tx) => {
     const freshDurableView = tx.view;
@@ -232,17 +210,6 @@ export async function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoo
       );
     }
     const freshRevision = getItemDurableRevision(freshDurableView, id);
-
-    if (!isPotentialStaleClaimReclaim) {
-      const room = hasWorkerSlotRoom(buildEffectiveView(freshDurableView, readClaims(dir, tx)), { ceiling, excludeId: id });
-      if (!room.allowed) {
-        throw new ClaimError(
-          'worker-slot-ceiling',
-          `claimWork: worker-slot ceiling reached — ${room.occupied} of ${room.ceiling} slots in use; finish or park a running item before claiming "${id}".`,
-          { occupied: room.occupied, ceiling: room.ceiling },
-        );
-      }
-    }
 
     return acquireClaimTx(tx, {
       id,

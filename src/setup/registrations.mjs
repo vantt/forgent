@@ -81,7 +81,6 @@ import { inspectRetainedCredentialCopies, inspectPendingCopiesOverLimit, sweepIn
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { createTerminalControl } from '../terminal-control/client.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath, operatorClaudeStorePath } from '../run-supervisor/trust-store.mjs';
-import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { discoverProjectPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
 import { createSeatBindingClient, PROTOCOL as SEAT_BINDING_PROTOCOL, resolveSeatBindingHost } from '../seat-binding/client.mjs';
@@ -1223,28 +1222,19 @@ registerCheck({
   check: (cwd) => checkWorkflowCapabilitiesConfigured(cwd),
 });
 
-// A present-but-unusable `ceiling` is the misconfiguration that actually
-// bites, and it fails SILENTLY: `hasWorkerSlotRoom` treats anything that is
-// not a positive integer as "no ceiling configured" and allows every claim,
-// so a project that believes it is capped runs uncapped. The schema refuses a
-// string or `8.5`; `0` and `-1` are integers it admits and land there.
-// `null` is the one non-positive value that is not a mistake: the standard's
-// own value, meaning "deliberately unarmed".
+// `workerSlots.ceiling` counts worker seats per machine and is enforced where a
+// top-level seat starts. A value that is not a positive integer (null, 0, -1)
+// would leave the seat pool without a usable size, so it fails here. The schema
+// refuses a string or `8.5`; `0`, `-1` and a null written by hand land here.
 function checkWorkerSlotsCeiling(cwd) {
   const { ceiling } = effectiveSection(cwd, 'workerSlots');
-  if (ceiling === null || ceiling === undefined) {
-    return {
-      passed: true,
-      message: `workerSlots.ceiling is unarmed (null) -- no claim is refused; set a positive integer (recommended: ${DEFAULT_WORKER_SLOT_CEILING}) to enforce a ceiling`,
-    };
-  }
   if (!Number.isInteger(ceiling) || ceiling <= 0) {
     return {
       passed: false,
-      message: `workerSlots.ceiling is ${JSON.stringify(ceiling)}, which enforces NOTHING -- expected a positive integer (recommended: ${DEFAULT_WORKER_SLOT_CEILING}) or null to mean deliberately unarmed`,
+      message: `workerSlots.ceiling is ${JSON.stringify(ceiling)}, which is not a usable seat count -- expected a positive integer (worker seats per machine)`,
     };
   }
-  return { passed: true, message: `workerSlots.ceiling = ${ceiling} running work item(s)` };
+  return { passed: true, message: `workerSlots.ceiling = ${ceiling} worker seat(s) per machine` };
 }
 
 registerCheck({

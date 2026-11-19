@@ -1,12 +1,14 @@
 $schema: https://json-schema.org/draft/2020-12/schema
 $id: urn:fgos:config-schema:workerSlots:v1
-$comment: "owner: work-state"
-description: "The ceiling on work items running at one time."
+$comment: "owner: run-supervisor"
+description: "The size of this machine's worker seat pool."
 type: object
 properties:
   ceiling:
-    description: Most work items that may run at once; a claim past it is refused, and null leaves the ceiling unarmed so no claim is refused.
-    type: [integer, "null"]
+    description: Worker seats on this machine (a lead and a nested dispatch take none).
+    type: integer
+    minimum: 1
+    x-fgos-scope: global-only
   laneWaitSec:
     description: How long a top-level worker seat waits for a free lane before it fails with lane-pool-full. In seconds.
     type: integer
