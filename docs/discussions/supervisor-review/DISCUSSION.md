@@ -4,57 +4,41 @@ discussion: settled
 
 ## Hand-off
 
-**Outcome.** A written review of the supervisor orchestration ([advice.md](advice.md)), and five decisions (SR-D1..SR-D5)
-that set the direction for the follow-up work in §7. Each follow-up becomes its own backlog row (through Miu) and its
-own plan (through a planner). Plan 261118-1045 is not changed: the follow-ups start after it lands.
+**Outcome.** The written review ([advice.md](advice.md)) answers backlog `p-dkiyey4ttl`. Round 1 (rounds 0-7) minted
+SR-D1..SR-D5. Round 2 (rounds 8-18, branch `shape/supervisor-review-2`) found that SR-D1..SR-D3 put mechanics in the
+wrong layer and minted SR-D6..SR-D10. Standing decisions: SR-D4, SR-D5, SR-D6..SR-D10. Superseded: SR-D1 (by SR-D6),
+SR-D2 and SR-D3 (by SR-D7). The foundation questions the review opened (the orchestration skeleton, one frame language,
+a harness that lets agents drive) move to a new discussion, `orchestration-skeleton`, with §3 G12-G16 as its input.
+Each follow-up becomes its own backlog row through Miu. Plan 261118-1045 is not changed.
 
 **Constraints.** Laws L9 and L10 (one door; the old path is removed in the same change), RUL104 ("better, not
 bigger"), new code in Rust, design principle 8 (one proof per behaviour), the AGENTS.md install/setup/doctor gate for
-any new config key.
+any new config key, SR-D9 (a harness never prescribes the procedure).
 
-**Non-goals.** Cross-machine supervision of one project. Windows timers. Confined gates (already backlog `p-nqftk5hypy`).
-The idle-mode detection delay (already backlog `p-xpeg4jshiu`).
+**Non-goals.** Cross-machine supervision of one project. Windows timers. Confined gates (backlog `p-nqftk5hypy`). The
+idle-mode detection delay (backlog `p-xpeg4jshiu`). The design of the skeleton, the frame language and the merge
+mechanics: they belong to `orchestration-skeleton`.
 
-**Acceptance criteria (for the follow-up plans, one per §7 task):**
-1. Admission and lead start are code. The supervisor LLM wakes only for judgement.
-2. Every head's start ritual is proven in a sandbox before its first turn.
-3. Every branch, plan or not, reaches main only through one merge queue, with an independent review verdict bound to
-   the head SHA.
-4. Every refused merge has a named owner on the L0-L3 ladder, and no item sits unowned.
-5. Every plan has an integration phase. New capability stays dormant behind a temporary switch until that phase, which
-   switches it on, removes the switch and removes the old path in the same change.
+**Acceptance criteria (for the follow-ups ready now, §7 T0 and T2):**
+1. F1-F4 and G7 are corrected, each with its owning proof (T0).
+2. Before a head's first turn, a sandbox proof shows the harness lets it run its start ritual and the commands its skill
+   names; a failing proof refuses the start with a named cause (T2). The proof tests the harness, not the agent.
 
-**Open points that block only parts:** the values of N and X; the session L2 starts to fix code for a submitter that
-cannot write code; whether grant-only `--paths` lands skip review; stacked submission of a dependent phase; reviewer
-independence with only one provider. The planner of each task decides these.
+**Open points (for `orchestration-skeleton`):** the skeleton's primitives and their owners (G13); the facets the
+skeleton reads from domain work (G14); one frame language for plans and workflow guides (G16); the integration mechanics
+of the coding domain (review bound to the SHA or to the author diff, the serial merge-slot section, stacked phases,
+reviewer independence with one provider); the values of N and X in SR-D4.
 
 Sources: §3 (V/I marks), [external-research.md](external-research.md).
 
-
 Backlog: `p-dkiyey4ttl` (docs/backlog.md). Plan under review: `plans/261118-1045-project-supervisor`, live run
-`plans/261119-1142-supervisor-live-run`. Area: `docs/platform/supervision/spec.md`. External sources with
-VERIFIED/INFERENCE marks: [external-research.md](external-research.md) (round 0, 2026-11-19).
+`plans/261119-1142-supervisor-live-run`. Area: `docs/platform/supervision/spec.md`.
 
 ## 1. Trạng thái hiện tại
 
-Round 13 (2026-11-19): the owner flagged a direction risk (G12). The supervisor and the plan layer are domain-agnostic;
-domain mechanics (merge, review, toggles, rebase) are injected per domain. G8, G9 and G11 put coding mechanics in shared
-places and are under review; SR-D2/SR-D3 stay reopened. Round 14: Q6 = A (phases run as domain workflow cases). Open: Q7 (G13, where the skeleton is defined). Round 15: lesson G14 (the skeleton owns actors and time, never work states). Round 16-18: G15 (harness weight) and G16 (owner: frame,
-agent, harness; failures are the harness's); Q8 superseded. Open: Q7. The text
-below is the earlier state.
-
-Round 10 (2026-11-19, reopened on `shape/supervisor-review-2`). Round 8 adopted the standard vocabulary (§3 T-VOCAB).
-Round 9: owner chose A for the text switch (G8, provisional, feeds T5). Round 10: owner chose A on Q5 (G9): integration
-has three layers (domain-free supervision with an integrate port, domain doctrine where agents decide, the domain door
-in code); §6 and T3/T5 regenerated. SR-D2/SR-D3 get superseded once G8/G9 hold another round.
-Round 11: issue 2 (queue throughput) is absorbed by G9 (review runs before submit; only path-scoped gates stay serial);
-issue 4 becomes its own backlog row (G10). Next: confirm G8/G9, mint, send the T0-T5 and G10 rows to Miu, settle.
-
-Round 7 (2026-11-19), settled. The owner agreed to Q4: the cycle in §6, the L0-L3 ladder, and per-phase merging under
-three rules. In the owner's words: "a plan always has an integration step, with a temporary off switch that is removed
-only at the last step". SR-D1..SR-D5 are minted in §4 (local ids, following the secretary-miu `SM-D*` precedent). The
-written review is [advice.md](advice.md), and the follow-ups are in §7. This branch (`shape/supervisor-review`) itself
-has no merger yet (M2); Miu is asked to land it.
+Round 19 (2026-11-19), settled. The owner agreed to close this review and continue the foundation questions in a new
+discussion, `orchestration-skeleton`. SR-D6..SR-D10 minted; SR-D1..SR-D3 superseded. Ready now: T0, T2. Waiting on the
+new discussion: T1, T3, T4, T5. New rows: G10 (repeated second doors and implicit decisions), the new discussion.
 
 ## 2. Mục tiêu & đề bài
 
@@ -125,6 +109,12 @@ compare against.
 | SR-D3 | Code runs each merge (the watcher tick or the door, through `fgos land`). The supervisor owns the queue and arbitrates it: cross-plan conflicts, priority, orphan branches, a red trunk. | 2026-11-19 | Q3 = (a) (round 3), held through round 7 |
 | SR-D4 | A refused merge follows the ladder: L0 code heals itself (retry, regenerate, `git recover`); L1 the submitter fixes its own branch, N attempts, merging the trunk in and never rebasing; L2 the supervisor (cap exceeded, submitter gone or unable to fix code, cross-plan conflict, a red trunk freezes the queue, an item stuck X ticks); L3 the owner, only through a supervisor question. A gone lead's restarts are capped the same way. | 2026-11-19 | M5 (round 4), Q4 (round 7); G3 |
 | SR-D5 | Merge per phase. Every plan has an integration phase. New capability stays dormant behind a temporary off switch (or simply not wired) until that phase, which switches it on, removes the switch and removes the old path in the same change (L10). A plan closes only after a code close check (phases done, queue empty, branches in the trunk, plan verify green) and a supervisor acceptance review. A withdrawn or parked plan closes only once its dormant code is finished or removed. | 2026-11-19 | M6 (round 6), Q4 owner restatement (round 7); G4 |
+
+| SR-D6 | Supersedes SR-D1. Code holds the caps as hard guards: `supervisor.maxLeads`, the lane pool, a head name held once. Choosing which plan to admit and starting its lead are the supervisor's. Before a head's first turn, a sandbox proof shows the harness lets it run its ritual (T2). | 2026-11-19 | G15, G16 (rounds 16-18); live-run windows 1-5 |
+| SR-D7 | Supersedes SR-D2 and SR-D3. The supervisor and the plan layer are domain-agnostic. Each phase runs as a workflow case of its plan's domain; the domain pack (`domains/<d>/`) injects its phase frames, its doctrine for the lead and the plan, its refusal-to-ladder map and its doors. For coding this carries: an independent review verdict as evidence bound to the change, `fgos land` gates as the hard guard, merging the trunk into a branch and never rebasing (G11). No merge loop runs in code outside the domain. | 2026-11-19 | Q6 = A (round 14), held through round 18; G9, G11, G12 |
+| SR-D8 | The orchestration skeleton owns actors and time: triggers, timers, start, sleep, wake, handoff, who acts next, ports to surfaces. It never owns the states of the work. Work states, steps and board columns are the domain's own data; the skeleton reads only the facets it needs to schedule (actionable, waiting on what, finished). | 2026-11-19 | G13 (round 14), G14 (round 15), held through round 18 |
+| SR-D9 | Three parts of process. The frame is a wide allowed road with checkpoints, never a forced narrow path. The agent drives inside it and reports friction when the frame is wrong, so the frame improves. The harness lets the agent drive: it runs any process expressed in the frame language, ready-made or shaped by the agent, and makes each step reliable (recorded, resumable, observable, capped, refused with a reason). A flexible frame and a capable agent that still fail point at the harness. | 2026-11-19 | owner rounds 16-18 (G15, G16) |
+| SR-D10 | Refines SR-D5. A plan declares `toggles:` and `retires:`; the close check refuses while a declared toggle marker or retired path remains. Text describing new behaviour lands in the phase that switches it on. The toggle mechanics are domain doctrine (coding first); the shared plan contract keeps only the integration step and the declarations. | 2026-11-19 | G8 (round 9), placed by G12 (round 13) |
 
 ## 5. Q&A log
 
@@ -205,107 +195,53 @@ compare against.
   của khung để định hình quy trình thì harness vẫn chạy được." Recorded as G16 (Q8 superseded); found two frame
   languages (plan contract and workflow guide); Q7 re-asked.
 
+- 2026-11-19 round 19, Q7. Owner: "bài này quyết định chuwyeejn gì mà có thể kết thúc ở dây rồi"; answered with the
+  standing and superseded decisions. Owner: "tức theo em thì nên tiếp tục bàn ở chủ đề mới?"; answered yes (Q7 = B).
+  Owner: "đồng ý". SR-D6..SR-D10 minted, SR-D1..SR-D3 superseded, §6 and §7 regenerated, settled.
+
 ## 6. Thiết kế đã chốt {#design}
 
-**Settled: SR-D1, SR-D4, SR-D5. Provisional (round 9, owner A, awaiting a second round): G8 (switch for text) and G9
-(three layers for integration), which revise SR-D2/SR-D3.** Verb names marked *(new)* are placeholders for the plan to
-name. Today's verbs are `fgos land`, `fgos run` and `fgos request result`.
+**Settled (round 19).** Standing: SR-D4, SR-D5, SR-D6..SR-D10. Superseded: SR-D1, SR-D2, SR-D3. This section states the
+direction; the mechanics are designed in `orchestration-skeleton`.
 
-### Three layers of integration (G9)
+### Layers
 
-| Layer | Holds | Decides | Runs |
-|---|---|---|---|
-| Supervision (domain-free) | plan, phase, "a result to integrate", outcome events, the L0-L3 ladder, unowned-item detection | agents (lead, supervisor) | code keeps the state and raises events |
-| Domain doctrine (`domains/<d>/AGENTS.md` + the domain's skills) | what integration means in the domain: for coding, review → merge → gates; for another domain, e.g. approve → publish | the agent reads it and decides when to submit, whether and by whom to review, how to fix a conflict, the order between plans, when to escalate | — |
-| Domain door (coding: `fgos land`, Git ports) | the merge slot, the candidate, gates, push, publish, L0 self-heal | nothing beyond its refusals | code, because it must be exact |
+| Layer | Owns | Never owns |
+|---|---|---|
+| Skeleton (domain-agnostic, SR-D8) | triggers, timers, start, sleep, wake, handoff, who acts next, ports to surfaces (multica), the caps (SR-D6), the L0-L3 levels (SR-D4) | the states, steps or columns of any domain's work |
+| Frame language (one, SR-D9) | a wide allowed road with checkpoints; plans and workflow guides are both processes written in it | a single forced path |
+| Domain pack (`domains/<d>/`, SR-D7) | its frames, its states and board columns, its doctrine for lead and plan, its refusal-to-ladder map, its doors (coding: review verdict, `fgos land`, no rebase, toggles and retires per SR-D10) | the skeleton's primitives |
+| Agents (supervisor, lead, units) | which step comes next, inside the frame; friction reports when the frame is wrong | the hard guards |
+| Harness | each step reliable: recorded, resumable, observable, capped, refused with a reason; hard guards only where harm is irreversible | the procedure |
 
-Supervision talks to the domain door through one port, "integrate this result" *(new)*. `land.rs` moves out of the
-supervision crate into the coding side behind that port (design principle 3). There is no merge loop in the watcher:
-ordering comes from the agents, and the target's merge slot already keeps one merge at a time.
+### A plan, end to end (direction)
 
-### Cycle of one coding phase, from unit done to landed
-
-1. **Unit done.** The lead's `fgos run --writes <footprint paths> --worktree <wt>` finishes on branch `<plan>/pNN`.
-   The lead reads `fgos request result`. A failed or blocked unit is handled by the lead, as today.
-2. **Independent review (agent decision, per coding doctrine).** The lead has the diff `git diff <trunk>...<branch>`
-   reviewed against the phase file by a reviewer other than the author unit (another executor where one is available).
-   The verdict is bound to the head SHA; a new push needs a new verdict. Review runs in parallel with other phases, before
-   the branch reaches the merge slot.
-3. **Submit.** The lead calls the integrate port with the branch and its verdict. The coding adapter refuses a branch with
-   no verdict for its exact SHA, a diff outside the plan footprint or the submitter's grant, and red gates.
-4. **Land** (the `fgos land` door, unchanged inside): fetch; prepare the candidate (trunk tip + branch) under the rank-20
-   merge slot; footprint check; regenerate generated files; `land.gates` plus the phase's tests; push; fast-forward
-   local main. L0 failures (remote moved, generated-file conflict, crash needing recover) heal here.
-5. **Outcome event.** `integrated` (trunk SHA) or `integration-refused` (code and ladder level). A busy lead sees it in
-   its own result; an idle or gone lead is resumed by the supervisor, as an answered question resumes its asker.
-6. **Lead records it.** On success the lead sets the phase `done` (a `--paths` land of its plan dir). On an L1 refusal
-   it fixes the branch through another unit (for a conflict, merge the trunk into the branch, never rebase) and submits
-   again, at most N attempts; then the item rises to L2.
-   The branch never rebases and does not sync with main on a schedule; it merges main in only on a conflict, a needed
-   newer trunk, or a semantic clash the reviewer found (G11).
-7. **Branches with no plan** (a shaper branch, a fix branch, an ad-hoc `fgos run` result) are raised as events; the
-   supervisor takes them through steps 2-6 itself.
-
-### End of the plan
-
-8. **Integration phase.** It switches on what the plan kept dormant, lands the text that describes the new behaviour in
-   the same phase, removes every declared toggle and every retired path (G8).
-9. **Last phase landed.** The lead sets the plan `done` and stops starting work. It never stops its own session.
-10. **Close check, code first.** The flip to `done` raises `plan-done`. Before any LLM turn, code checks:
-    - every phase row is `done` or parked with a reason;
-    - no integration of this plan is pending;
-    - for coding, every phase branch is an ancestor of the trunk (a domain check through the port);
-    - the plan's verify command, if it has one, passes on the trunk tip;
-    - no marker of a toggle the plan declared in `toggles:` remains, and no path in `retires:` still exists (`rg`).
-
-    A failed check raises `plan-close-blocked`, which goes to L2.
-11. **Supervisor close (judgement).** Reads the acceptance criteria against the evidence; writes one board line and a
-    backlog update; stops the lead (`fgos session stop lead`); has the plan's worktrees removed and lanes released. If
-    the evidence falls short, it reopens a phase or asks the owner (L3).
-
-### Who resolves a failure (SR-D4 ladder, now domain policy)
-
-L0 the domain door → L1 submitter (N attempts) → L2 supervisor (cap exceeded, submitter gone or unable to fix code,
-cross-plan conflict, red trunk freezes integration, item stuck X ticks) → L3 owner, only through a supervisor question.
-The levels are domain-free; which refusal falls on which level is written in the domain doctrine.
+1. A planner writes the plan in the frame language, with its domain, an integration step, and its declared `toggles:` /
+   `retires:` (SR-D5, SR-D10).
+2. The supervisor, woken by the skeleton, admits within the caps and starts a lead (SR-D6).
+3. The lead drives each phase as a case of the domain's frame; the domain injects how the phase integrates (SR-D7).
+4. A refusal climbs L0 (the domain door heals) → L1 (the submitter) → L2 (the supervisor) → L3 (the owner, through a
+   supervisor question) (SR-D4).
+5. The integration step switches the new capability on, lands its text, removes toggles and retired paths; the close
+   check and the supervisor's acceptance review close the plan (SR-D5, SR-D10).
 
 ```mermaid
-sequenceDiagram
-  participant L as Lead (agent)
-  participant R as Review unit
-  participant P as Integrate port (supervision)
-  participant D as Coding door: fgos land
-  participant S as Supervisor (agent)
-  L->>R: review diff @SHA (coding doctrine)
-  R-->>L: verdict
-  L->>P: integrate(branch, verdict)
-  P->>D: land (merge slot, gates, push, publish; L0 heals inside)
-  D-->>P: landed / refused (level)
-  P-->>L: integrated or integration-refused L1
-  P-->>S: L2 events only (cap, gone, cross-plan, red trunk, stuck, orphan branch)
-  L->>L: phase done; integration phase removes toggles and old paths; plan done
-  P->>P: plan-done close check (code)
-  P-->>S: plan-done / plan-close-blocked
-  S->>S: acceptance review, board + backlog, stop lead, clean worktrees
+flowchart TB
+  SK[Skeleton: triggers, timers, start/sleep/wake, handoff, who next, caps, ladder levels, surface ports]
+  FL[One frame language: plans and workflow guides]
+  DP[Domain pack: frames, states, columns, doctrine, refusal map, doors]
+  AG[Agents: supervisor, lead, units drive inside the frame]
+  HA[Harness: reliable steps, hard guards only for irreversible harm]
+  SK --> AG
+  FL --> AG
+  DP --> FL
+  AG --> HA
+  AG -. friction .-> FL
 ```
-
-Open:
-- whether grant-only `--paths` lands skip the review verdict;
-- what session L2 starts to fix a branch whose submitter cannot fix code;
-- the values of N and X;
-- whether the lead may submit a dependent phase stacked on an unlanded one, or must wait;
-- reviewer independence when only one provider is available;
-- the integrate port's contract, and where the coding adapter lives (Git crate or a coding crate).
-- what the verdict binds to: the branch head SHA forces a new review after every clean trunk merge into the branch;
-  binding to the author's own diff (e.g. `git patch-id` of `trunk...branch` minus trunk merges) would keep a verdict
-  across clean trunk merges, but a conflict resolution still needs a new review;
-- throughput: only the merge slot section (fetch, candidate, path-scoped gates, push) stays serial, as today; batching
-  in the GitHub `merge_group` style waits for a measured queue.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Order: T0 can go at any time. T1 and T2 come after plan 261118-1045 lands, since they change what its live run proves.
-T3 and T4 go together or in that order. T5 is independent.
+Ready now: T0, T2, T6. T7 opens the new discussion. T1, T3, T4 and T5 wait for it.
 
 ### T0 Small corrections {#task-small-fixes}
 - Goal: fix F1-F4 and G7.
@@ -316,38 +252,35 @@ T3 and T4 go together or in that order. T5 is independent.
   - G7: enabling the watcher must not wake the supervisor.
 - D-IDs: none (corrections). Verify: `npm test` for the touched skills (render check), plus the owning test for F4 and G7.
 
-### T1 Admission in code {#task-admission-in-code}
-- Goal: the wake door admits, marks `running` and starts leads. The supervisor skill keeps only judgement.
-- §6 excerpt: wake to admission. D-IDs: SR-D1. Sibling: T2.
-- Verify: `cargo test -p fgos-supervision` (one owning test per admission rule); a live window confirms.
+### T1 Admission {#task-admission-in-code}
+- Withdrawn as written (SR-D1 superseded). The caps stay code (SR-D6); where admission lives is a skeleton question (T7).
 
-### T2 Head start preflight {#task-head-preflight}
-- Goal: every head's start ritual and skill commands are proven in a sandbox before its first turn. A failing proof
-  refuses the start with a named cause. This is window 2's planned owning proof, made general.
-- D-IDs: SR-D1. Verify: a sandbox test per persona (supervisor and lead first).
+### T2 Harness preflight for heads {#task-head-preflight}
+- Goal: before a head's first turn, a sandbox proof shows the harness lets it run its start ritual and every command its
+  skill names; a failing proof refuses the start with a named cause. It tests the harness, not the agent (SR-D9).
+  Supervisor and lead first. Window 2's planned owning proof, made general.
+- D-IDs: SR-D6, SR-D9. Verify: one sandbox test per persona.
 
-### T3 Integrate port and independent review {#task-merge-queue}
-- Goal: supervision gets a domain-free "integrate a result" port; `land.rs` moves to the coding side behind it. The
-  coding doctrine and the lead skill carry the review-before-submit rule; the adapter refuses a branch without a verdict
-  bound to its SHA. Branches with no plan reach the supervisor as events. `land-branch.sh` is retired in the same change
-  (L10).
-- §6 layers table and steps 2-7. D-IDs: SR-D2, SR-D3 (as revised by G9 once minted). Sibling: T4.
-- Verify: `cargo test` of the adapter (refusal without a verdict, verdict bound to SHA, footprint); the architecture test
-  proves the supervision crate no longer imports `fgos_git`; a live integration of a shaper branch.
+### T3 Integration mechanics of the coding domain {#task-merge-queue}
+- Waits for T7. Input: SR-D7, G9, G11, the verdict-binding and serial-section open points. `land-branch.sh` retires
+  with it (L10).
 
 ### T4 Failure ladder and caps {#task-failure-ladder}
-- Goal: L0 self-heal (auto `git recover`), the L1 attempt cap N, L2 events (cap, gone, cross-plan, red trunk freezes the
-  queue, stuck X), L3 only through supervisor questions; the same cap for lead restarts.
-- D-IDs: SR-D4. Open: N, X, the L2 fixer session.
-- Verify: one owning test per ladder transition.
+- Waits for T7 for its events and caps; the levels are settled (SR-D4).
 
-### T5 Integration phase, declared toggles and retirements {#task-integration-phase}
-- Goal: `core/skills/_shared/plan-contract.md` requires an integration phase that states what it switches on and what it
-  removes ("none" allowed), and frontmatter `toggles:` / `retires:`; `plan-contract-check` checks both. Text describing
-  new behaviour lands in the integration phase. The close check refuses a plan while a declared toggle marker or a
-  retired path remains.
-- §6 steps 8-10. D-IDs: SR-D5 (with G8 once minted).
-- Verify: `plan-contract-check` tests, plus a close-check test.
+### T5 Integration step and declarations in the plan contract {#task-integration-phase}
+- Waits for T7 (one frame language). Content settled: SR-D5, SR-D10.
+
+### T6 Repeated second doors and implicit decisions {#task-second-doors}
+- Goal: find why a second door keeps appearing and being cleaned up (G10), and how parallel agents avoid conflicting
+  implicit decisions; prevention at planning, detection at land. Its own backlog row; investigation first.
+
+### T7 Discussion `orchestration-skeleton` {#task-orchestration-skeleton}
+- Goal: a shaper discussion on the skeleton's primitives (G13), the facets it reads (G14), one frame language and a
+  harness that lets agents drive (G15, G16), and integration with surfaces (plan `261118-1117-external-ui-integration-multica`,
+  six ports). Recommended: an architecture panel (`fgos-architecture-panel`) and a read of earlier frame discussions
+  (workflow spec, D-ADR0070).
+- Input: SR-D4..SR-D10, §3 G9-G16.
 
 ## Q1 {#Q1}
 
