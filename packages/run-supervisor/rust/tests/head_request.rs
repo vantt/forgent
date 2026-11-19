@@ -101,6 +101,14 @@ impl Default for Publish {
 }
 
 /// The port of a server whose test sends no session write.
+/// A 40-hex stand-in for a blob id: equal content gives an equal id.
+fn stub_oid(content: &str) -> String {
+    use std::hash::{Hash, Hasher};
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    content.hash(&mut hasher);
+    format!("{:040x}", hasher.finish())
+}
+
 fn no_publisher() -> WritePublisher {
     WritePublisher {
         catch_up: Arc::new(|_, _| unreachable!("no session write in this test")),
@@ -237,11 +245,10 @@ fn serve_with(
                 publish.clean.clone()
             }
         }),
-        // The stub's blob id of a file is its content behind a prefix, so a test names the id it read.
+        // The stub's blob id of a file is a hex digest of its content, so a test names the id it read.
         path_oid: Box::new(|root, path| {
-            Ok(format!(
-                "oid:{}",
-                fs::read_to_string(root.join(path)).unwrap_or_default()
+            Ok(stub_oid(
+                &fs::read_to_string(root.join(path)).unwrap_or_default(),
             ))
         }),
         publish_write: Box::new({
@@ -587,6 +594,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "verb-failed",
             "verb-not-granted",
             "verb-timeout",
+            "write-base-stale",
             "write-branch-ahead",
             "write-catch-up-refused",
             "write-failed",
@@ -1262,7 +1270,7 @@ fn head_write_based_on_the_content_the_file_still_has_is_written() {
     let served = write_served("write-base-current", &publish);
     let reply = write_request(
         &served.socket,
-        json!({"path": "docs/backlog.md", "content": "new\n", "base": "oid:old\n"}),
+        json!({"path": "docs/backlog.md", "content": "new\n", "base": stub_oid("old\n")}),
     );
     assert_eq!(reply["data"]["commit"], "c0ffee", "{reply}");
     assert_eq!(
@@ -1277,13 +1285,13 @@ fn head_write_based_on_content_a_newer_commit_replaced_is_refused_and_leaves_the
     let served = write_served("write-base-stale", &publish);
     let reply = write_request(
         &served.socket,
-        json!({"path": "docs/backlog.md", "content": "new\n", "base": "oid:older\n"}),
+        json!({"path": "docs/backlog.md", "content": "new\n", "base": stub_oid("older\n")}),
     );
     assert_eq!(reply["result"], "refused");
     assert_eq!(reply["code"], "write-base-stale", "{reply}");
     let detail = reply["detail"].as_str().unwrap();
     assert!(
-        detail.contains("oid:old\n") && detail.contains("oid:older\n"),
+        detail.contains(&stub_oid("old\n")) && detail.contains(&stub_oid("older\n")),
         "names the current and the given id: {detail}"
     );
     assert_eq!(
@@ -1296,6 +1304,28 @@ fn head_write_based_on_content_a_newer_commit_replaced_is_refused_and_leaves_the
         .unwrap()
         .iter()
         .any(|call| call.starts_with("publish")));
+}
+
+#[test]
+fn head_write_with_a_base_that_is_not_a_blob_id_is_refused_as_a_bad_argument_and_writes_nothing() {
+    let publish = Publish::default();
+    let served = write_served("write-base-malformed", &publish);
+    for base in [
+        "oid:old",
+        "ABCDEF0123456789ABCDEF0123456789ABCDEF01",
+        "abc123",
+        "",
+    ] {
+        let reply = write_request(
+            &served.socket,
+            json!({"path": "docs/backlog.md", "content": "new\n", "base": base}),
+        );
+        assert_eq!(reply["code"], "bad-args", "{base}: {reply}");
+    }
+    assert_eq!(
+        fs::read_to_string(served.dir.join("docs/backlog.md")).unwrap(),
+        "old\n"
+    );
 }
 
 #[test]

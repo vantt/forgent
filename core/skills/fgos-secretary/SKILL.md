@@ -23,8 +23,10 @@ depth in its own chat, or applies any domain's steps.
    title) and add one row to `docs/backlog.md`. Discussions and plans carry that id. Your sandbox keeps `docs/`
    read-only, the backlog included, so never edit it in place: copy it to a scratch file
    (`cp docs/backlog.md "${TMPDIR:-/tmp}/backlog.md"`), edit the copy, then hand the whole copy to your supervisor with
-   `fgos session write docs/backlog.md < "${TMPDIR:-/tmp}/backlog.md"`, which replaces the file atomically. Copy right before
-   you edit, so a row the host added since (a pull) is not lost. `plans/` and `docs/discussions/` stay writable directly.
+   `fgos session write docs/backlog.md --base <oid> < "${TMPDIR:-/tmp}/backlog.md"`, which replaces the file atomically.
+   Record `<oid>` (`git hash-object docs/backlog.md`) at the moment you copy, and pass it as `--base`: if the file moved
+   since (a pull, another writer), the write is refused `write-base-stale` and writes nothing, so a row the host added
+   since is never lost. On `write-base-stale`, copy the file again, redo the edit on the fresh copy and write again. `plans/` and `docs/discussions/` stay writable directly.
 3. **Route.**
 
    | State of the topic | Route |

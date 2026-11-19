@@ -616,7 +616,12 @@ fn plain_relative(path: &str) -> bool {
             .all(|c| matches!(c, std::path::Component::Normal(_)))
 }
 
-/// [`WRITE_VERB`], the checks: `args` is `{path, content}` and optionally `base`, all strings (`bad-args`), the path
+/// A git object id as the two object formats print it: 40 (SHA-1) or 64 (SHA-256) lowercase hex digits.
+fn is_blob_oid(text: &str) -> bool {
+    matches!(text.len(), 40 | 64) && text.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
+}
+
+/// [`WRITE_VERB`], the checks: `args` is `{path, content}` and optionally `base`, all strings and `base` a blob id (`bad-args`), the path
 /// is plain and relative (`path-invalid`) and named exactly by an entry of `writes` (`path-not-granted`). Returns the
 /// path, the content and the base (the git blob id of the content the writer read) when given.
 pub fn granted_write<'a>(
@@ -632,7 +637,16 @@ pub fn granted_write<'a>(
     let object = args.as_object().ok_or_else(bad)?;
     let base = match object.get("base") {
         None => None,
-        Some(value) => Some(value.as_str().filter(|b| !b.is_empty()).ok_or_else(bad)?),
+        Some(value) => {
+            let oid = value.as_str().ok_or_else(bad)?;
+            if !is_blob_oid(oid) {
+                return Err(write_refused(
+                    "bad-args",
+                    "base must be a git blob id: 40 or 64 lowercase hex digits".to_string(),
+                ));
+            }
+            Some(oid)
+        }
     };
     if object.len() != 2 + usize::from(base.is_some()) {
         return Err(bad());
