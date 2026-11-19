@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "bfa3d8f7afcface98f5a5dc0e96cd8a5c245ae553be19d76faa8f751b950dd87",
+  "payloadDigest": "4a36c0b75c3dbc35ceabf7e20bbc9f65472d50f6a8ab2a92eefbcf00dd4998ff",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -163,7 +163,7 @@
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "a35e94cd71509b6fb9de91bf771a0b65a8dbb9e495c5aefefb633b9f3a880643",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
-    "apps/fgos/tests/questions_head.rs": "7ea955ab02865234e4d91f131686649154cad35c751f22002349eb9699790430",
+    "apps/fgos/tests/questions_head.rs": "5164ecb5cd74fa247244993e1e59527e8521e622330027a1184b8ffee38c17fa",
     "apps/fgos/tests/questions_hook.rs": "1c206c5633a8ec75345fdcc4debd1efe30f8aa996aa48e00e3963c426061f5a2",
     "apps/fgos/tests/questions_verb.rs": "b0ccc8a1c82bbf81b7ad84eecfdcf4a2e3c350eb297cf6749645b4ee1a3296dd",
     "apps/fgos/tests/session_write_publish.rs": "49ba0c1edf3ba739b47fdfa1024152a79eaebd46e43249a2d002220a45f2ae69",
@@ -2309,7 +2309,7 @@
     },
     {
       "path": "apps/fgos/tests/questions_head.rs",
-      "line": 589,
+      "line": 602,
       "spawn": "Command::new",
       "binary": "? command",
       "class": "rust-test"
