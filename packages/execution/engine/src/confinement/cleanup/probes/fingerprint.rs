@@ -4,17 +4,10 @@
 use super::sandbox::run;
 use crate::confinement::driver::bwrap::BWRAP_DRIVER_VERSION;
 use crate::confinement::policy::MACHINE_PRIVATE_ROOTS;
+use fgos_execution::handoff;
 use serde_json::{json, Value};
-use sha2::{Digest, Sha256};
 
 pub const PROOF_PROFILE: &str = "local-bwrap-v1";
-
-fn sha256_hex(text: &str) -> String {
-    Sha256::digest(text.as_bytes())
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect()
-}
 
 /// `<platform>:<kernel release>:<arch>:<bwrap version>`, the names Node's `os` module reports.
 pub fn platform_payload(platform: &str, release: &str, arch: &str, bwrap_version: &str) -> String {
@@ -62,7 +55,7 @@ pub fn compute_platform_digest(bwrap_executable: &str) -> String {
     } else {
         "unknown".to_string()
     };
-    sha256_hex(&platform_payload(
+    sha256_text(&platform_payload(
         node_platform(),
         &kernel_release(),
         node_arch(),
@@ -97,15 +90,19 @@ pub fn compute_probe_fingerprint(input: &FingerprintInput) -> Value {
         |value: &Value| serde_json::to_string(value).expect("a JSON value always serialises");
     let mut fingerprint = json!({
         "contract": "confinement-probe-fingerprint.v1",
-        "policyDigest": sha256_hex(&compact(&Value::String(input.policy.clone()))),
+        "policyDigest": sha256_text(&compact(&Value::String(input.policy.clone()))),
         "driverVersion": input.driver_version,
-        "backendConfigDigest": sha256_hex(&compact(&input.backend_config)),
+        "backendConfigDigest": sha256_text(&compact(&input.backend_config)),
         "platformDigest": compute_platform_digest(&input.bwrap_executable),
         "proofProfile": PROOF_PROFILE,
-        "machinePrivate": sha256_hex(&compact(&json!(MACHINE_PRIVATE_ROOTS))),
+        "machinePrivate": sha256_text(&compact(&json!(MACHINE_PRIVATE_ROOTS))),
     });
     if input.blind {
         fingerprint["blind"] = Value::Bool(true);
     }
     fingerprint
+}
+
+fn sha256_text(text: &str) -> String {
+    handoff::sha256_hex(text.as_bytes())
 }

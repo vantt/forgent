@@ -15,6 +15,7 @@ mod agent_file;
 mod error;
 mod homes;
 mod host;
+mod live_seats;
 mod marker;
 mod orphans;
 pub mod probes;
@@ -26,6 +27,7 @@ pub use agent_file::{open_agent_file, read_agent_file, refuse_symlink};
 pub use error::CleanupError;
 pub use homes::CleanupHomes;
 pub use host::{CleanupHost, SystemHost};
+pub use live_seats::AttemptHomeRecords;
 pub use marker::{
     ensure_private_dir, read_attempt_ownership_marker, read_ownership_marker,
     remove_empty_dispatch_parent, resolve_confinement_temp_root, write_ownership_marker,

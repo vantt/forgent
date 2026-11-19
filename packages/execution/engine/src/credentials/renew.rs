@@ -12,7 +12,8 @@ use super::copy::{copy_credential_files, CopyOptions};
 use super::files::*;
 use super::layout::Layout;
 use super::ports::{
-    AccountLockGuard, AccountLocks, CredentialProbe, ProbeRequest, ProbeRun, SqliteAdapter,
+    AccountLockGuard, AccountLocks, CredentialProbe, LiveSeatHomes, NoLiveSeatHomes, ProbeRequest,
+    ProbeRun, SqliteAdapter,
 };
 use super::store::*;
 use super::{
@@ -39,6 +40,8 @@ pub struct RefreshOptions<'a> {
     pub cooldown_ms: f64,
     /// How long to wait for the account lock; the default is the probe timeout plus a margin.
     pub lock_wait_ms: Option<u64>,
+    /// The seats still running on the store; the newest valid login one of them holds is taken first.
+    pub live_seat_homes: &'a dyn LiveSeatHomes,
     pub now: &'a dyn Fn() -> f64,
 }
 
@@ -57,6 +60,7 @@ impl<'a> RefreshOptions<'a> {
             threshold_ms: None,
             cooldown_ms: DEFAULT_RENEWAL_COOLDOWN_MS,
             lock_wait_ms: None,
+            live_seat_homes: &NoLiveSeatHomes,
             now,
         }
     }
@@ -154,6 +158,25 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
     ) else {
         return outcome("skipped", "lock-busy");
     };
+    let homes = super::credential_write_back_target(
+        request.provider,
+        request.account_id,
+        source,
+        request.runtime_dir,
+        request.home_dir,
+    )
+    .map(|target| options.live_seat_homes.homes(&target))
+    .unwrap_or_default();
+    let taken = !homes.is_empty()
+        && take_live_seat_login(
+            &account_dir,
+            layout,
+            request,
+            &home,
+            &homes,
+            lock.as_ref(),
+            options,
+        );
     apply_agent_copies(&account_dir, layout, request, &home, lock.as_ref(), options);
     apply_leftovers(
         &account_dir,
@@ -172,7 +195,11 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
         Err(code) => return outcome("skipped", code),
     };
     if !in_window(entry.due_ms) {
-        return outcome("fresh", "outside-window");
+        return if taken {
+            outcome("renewed", "live-seat")
+        } else {
+            outcome("fresh", "outside-window")
+        };
     }
     if in_cooldown(&account_dir, options.cooldown_ms, now()) {
         return outcome("cooldown", "recent-failure");
@@ -308,6 +335,112 @@ fn renew_in_scratch(
             outcome("failed", reason)
         }
     }
+}
+
+// ------------------------------------------------------------------------------------------ live seats
+
+/// Take the newest valid login a seat that still runs holds for this store, under the account lock the caller holds.
+/// A candidate counts only when it is newer than the store's entry (strictly later expiry, another refresh token),
+/// its access token is still ahead and it names no other account. The newest is proven before it is installed: the
+/// probe runs on an isolated copy of its login, given no tools, and only a call that succeeds, or that renewed the
+/// copy, installs the copy through the store's compare-before-write apply. A call that renewed the copy but cannot be
+/// applied yet leaves it among the pending copies. Never cools the account. Returns whether the store now holds the
+/// seat's login.
+fn take_live_seat_login(
+    account_dir: &Path,
+    layout: Layout,
+    request: &RefreshRequest<'_>,
+    home: &Path,
+    homes: &[PathBuf],
+    lock: &dyn AccountLockGuard,
+    options: &RefreshOptions<'_>,
+) -> bool {
+    let (now, sqlite, provider) = (options.now, options.sqlite, request.provider);
+    let Some(key) = layout.read(home, false, sqlite).ok().and_then(|read| {
+        select_provider_entry(&read.entries, provider)
+            .ok()
+            .map(|e| e.key.clone())
+    }) else {
+        return false;
+    };
+    let entry_in = |dir: &Path| {
+        layout
+            .read(dir, true, sqlite)
+            .ok()
+            .and_then(|read| read.entries.into_iter().find(|e| e.key == key))
+    };
+    let mut best: Option<(&PathBuf, f64)> = None;
+    for dir in homes {
+        let Some(entry) = entry_in(dir) else {
+            continue;
+        };
+        if entry.expires_ms <= now()
+            || judge_copy(layout, provider, home, dir, now(), sqlite) != Verdict::Newer
+            || same_account(layout, provider, home, dir, sqlite) == Some(false)
+        {
+            continue;
+        }
+        if best.is_none_or(|(_, expires)| entry.expires_ms > expires) {
+            best = Some((dir, entry.expires_ms));
+        }
+    }
+    let Some((seat, _)) = best else {
+        return false;
+    };
+    // A staging name under pending/: a runner killed during the call leaves the copy where the sweep finds it.
+    let (Ok(probe_suffix), Ok(kept_suffix)) = (random_hex(), random_hex()) else {
+        return false;
+    };
+    let pending = account_dir.join(PENDING_DIR);
+    let probe_home = pending.join(format!(".tmp-{}-{probe_suffix}", std::process::id()));
+    let taken = (|| {
+        make_dir(&pending, true).ok()?;
+        isolate_login(layout, seat, &probe_home, sqlite).ok()?;
+        let before = entry_in(&probe_home).and_then(|e| e.refresh);
+        let ok = match options.probe.run(
+            &ProbeRequest {
+                source: request.credential_source,
+                home: &probe_home,
+                no_tools: true,
+                timeout_ms: options.probe_timeout_ms,
+            },
+            lock,
+        ) {
+            ProbeRun::Ran { ok } => ok,
+            ProbeRun::NoProbe => return None,
+        };
+        let renewed = entry_in(&probe_home).and_then(|e| e.refresh) != before;
+        if !ok && !renewed {
+            return None;
+        }
+        let applied = apply_renewed_credential(&ApplyRequest {
+            layout_name: layout.name(),
+            source_home: home,
+            copy_home: &probe_home,
+            provider: Some(provider),
+            require_future: true,
+            now: now(),
+            sqlite,
+        })
+        .ok()?;
+        match applied {
+            ApplyOutcome::Applied(_) => Some(()),
+            ApplyOutcome::ApplyDeferred(_) if renewed => {
+                let _ = fs::rename(
+                    &probe_home,
+                    pending.join(pending_name(now(), None, &kept_suffix)),
+                );
+                None
+            }
+            _ => None,
+        }
+    })()
+    .is_some();
+    remove_all(&probe_home);
+    if taken {
+        clear_failure(account_dir);
+    }
+    taken
 }
 
 // ------------------------------------------------------------------------------------------ probe gate

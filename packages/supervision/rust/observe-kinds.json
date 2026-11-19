@@ -7,7 +7,7 @@
     "fgos.supervisor.trigger": { "type": "string" },
     "fgos.supervisor.outcome": {
       "type": "string",
-      "values": ["started", "already-live", "starting", "nothing-unhandled", "nothing-admissible", "identity-unknown", "role-held-other-project", "project-id-missing", "start-failed", "backoff"]
+      "values": ["started", "already-live", "starting", "nothing-unhandled", "nothing-admissible", "identity-unknown", "role-held-other-project", "project-id-missing", "start-failed", "backoff", "stopped-stuck"]
     },
     "fgos.discussion.from": { "type": "string" },
     "fgos.discussion.to": { "type": "string" },

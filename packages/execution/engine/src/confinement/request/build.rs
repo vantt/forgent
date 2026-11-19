@@ -25,7 +25,7 @@ pub fn system_clock_parts() -> (u64, String) {
         .duration_since(std::time::UNIX_EPOCH)
         .map_or(0, |d| d.as_millis() as u64);
     let bytes = fgos_identity::text::random_bytes::<4>().unwrap_or([0; 4]);
-    (millis, bytes.iter().map(|b| format!("{b:02x}")).collect())
+    (millis, fgos_execution::handoff::hex(&bytes))
 }
 
 fn blind_refusal(code: &str, detail: &str) -> RequestError {

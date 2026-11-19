@@ -51,9 +51,22 @@ pub trait Definitions {
     fn exists(&self, path: &str) -> bool;
     fn run(&self, defs: &[String], since: Option<i64>) -> Result<Vec<Row>, String>;
 }
+/// What stopping a stuck supervisor did.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StopOutcome {
+    Stopped,
+    /// Nothing stopped: no live supervisor, or it is busy or unknown.
+    Kept,
+    Refused,
+}
 pub trait Wake {
     fn wake(&self, kind: &str, subject: &str) -> WakeOutcome;
+    /// Stop the project's supervisor only when it is live and idle.
+    fn stop_stuck(&self, subject: &str) -> StopOutcome;
 }
+
+/// The row kind that says a live supervisor's queue is not shrinking.
+pub const STUCK_KIND: &str = "supervisor-stuck";
 /// Ready and running plan counts, over the portfolio reader.
 pub trait Portfolio {
     fn counts(&self) -> Result<(u64, u64), String>;
@@ -274,6 +287,7 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
 
     // A tick wakes at most once, with the oldest event that routed to a wake.
     let mut wake_with: Option<RaisedEvent> = None;
+    let mut stuck_subject: Option<String> = None;
     for row in rows {
         if row.unmeasured {
             r.unmeasured += 1;
@@ -283,6 +297,9 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
             r.errors += 1;
             continue;
         };
+        if row.kind == STUCK_KIND {
+            stuck_subject.get_or_insert_with(|| subject.clone());
+        }
         let event = RaisedEvent {
             id: event_id(&row.kind, &subject, &ts),
             kind: row.kind.clone(),
@@ -305,16 +322,31 @@ pub fn tick(ports: &Ports, settings: &Settings) -> TickReport {
         }
     }
 
-    if let Some(event) = &wake_with {
-        wake(ports, &event.kind, &event.subject, &mut r);
-    } else {
-        match ports.queue.unhandled() {
-            Ok(open) => {
-                if let Some(oldest) = open.first() {
-                    wake(ports, &oldest.kind, &oldest.subject, &mut r);
-                }
+    // The stuck row stays while the queue is not shrinking, so a busy head is asked again next tick.
+    let stopped = match stuck_subject {
+        Some(subject) => match ports.wake.stop_stuck(&subject) {
+            StopOutcome::Stopped => true,
+            StopOutcome::Kept => false,
+            StopOutcome::Refused => {
+                r.errors += 1;
+                false
             }
-            Err(_) => r.errors += 1,
+        },
+        None => false,
+    };
+    // A stopped supervisor is replaced by the next tick's wake, not this one's.
+    if !stopped {
+        if let Some(event) = &wake_with {
+            wake(ports, &event.kind, &event.subject, &mut r);
+        } else {
+            match ports.queue.unhandled() {
+                Ok(open) => {
+                    if let Some(oldest) = open.first() {
+                        wake(ports, &oldest.kind, &oldest.subject, &mut r);
+                    }
+                }
+                Err(_) => r.errors += 1,
+            }
         }
     }
 

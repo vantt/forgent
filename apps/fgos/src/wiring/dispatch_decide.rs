@@ -16,7 +16,8 @@ use fgos_config::snapshot::SnapshotError;
 use fgos_execution::bind::BindSession;
 use fgos_execution::decide::{
     config_root_for, decide_over, guard_cwd_repo_root, load_checked_runner, run_door_hint,
-    CrateBinder, DecideFailure, DecideRequest, LoadedRunner, RunnerOrigin, Workspace,
+    CheckoutFacts, CrateBinder, DecideFailure, DecideRequest, LoadedRunner, RunnerOrigin,
+    Workspace,
 };
 use fgos_execution::executor_model::ModelError;
 use fgos_execution::explain::explain_capability;
@@ -294,7 +295,7 @@ const ORIGIN_KEYS: [&str; 4] = [
     "runner.loops",
 ];
 
-impl Workspace for HostWorkspace {
+impl CheckoutFacts for HostWorkspace {
     fn repo_root(&self, dir: &str) -> Result<String, String> {
         let shown = dir.to_owned();
         let Some(repo) = self.topology(dir) else {
@@ -320,7 +321,9 @@ impl Workspace for HostWorkspace {
         self.topology(dir)
             .map(|repo| real(repo.trusted_main_root()))
     }
+}
 
+impl Workspace for HostWorkspace {
     fn process_main_checkout_root(&self) -> Option<String> {
         self.main_checkout_root(&self.process_cwd.to_string_lossy())
     }
