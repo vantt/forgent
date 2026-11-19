@@ -75,13 +75,12 @@ pub fn is_agent_copy(dir: &Path) -> bool {
     !name.starts_with(SCRATCH_PREFIX) && !is_host_copy_name(&name)
 }
 
-/// `<15 digits>-[<origin>-]<8 hex>`.
-pub fn pending_name(at: f64, origin: Option<&str>) -> String {
+/// `<15 digits>-[<origin>-]<8 hex>`; `suffix` comes from [`random_hex`], drawn before anything is moved.
+pub fn pending_name(at: f64, origin: Option<&str>, suffix: &str) -> String {
     format!(
-        "{:0>15}-{}{}",
+        "{:0>15}-{}{suffix}",
         at as i64,
         origin.map(|o| format!("{o}-")).unwrap_or_default(),
-        random_hex(4)
     )
 }
 
@@ -559,11 +558,11 @@ fn sweep_one_staging(
     account_id: &str,
     options: &SweepOptions<'_>,
 ) -> bool {
-    let claimed = staging.with_file_name(format!(
-        "{SWEEP_PREFIX}{}-{}",
-        std::process::id(),
-        random_hex(4)
-    ));
+    // No random name, no claim: the staging is kept for a later sweep.
+    let Ok(suffix) = random_hex() else {
+        return false;
+    };
+    let claimed = staging.with_file_name(format!("{SWEEP_PREFIX}{}-{suffix}", std::process::id()));
     if fs::rename(staging, &claimed).is_err() {
         return false;
     }
@@ -830,13 +829,17 @@ pub fn write_back_renewed_credential(
         return WriteBackOutcome::status("unchanged");
     }
     let pending = account_dir.join(PENDING_DIR);
-    let staging = pending.join(format!(".tmp-{}-{}", std::process::id(), random_hex(4)));
+    // Both names are drawn before anything is written; without them the private home stays.
+    let (Ok(staging_suffix), Ok(final_suffix)) = (random_hex(), random_hex()) else {
+        return WriteBackOutcome::failed("write-back-failed", true);
+    };
+    let staging = pending.join(format!(".tmp-{}-{staging_suffix}", std::process::id()));
     // Until a copy is safe in pending/, the private home may hold the only good pair.
     if make_dir(&staging, true).is_err() {
         remove_all(&staging);
         return WriteBackOutcome::failed("write-back-failed", true);
     }
-    let final_dir = pending.join(pending_name(now, Some(AGENT_ORIGIN)));
+    let final_dir = pending.join(pending_name(now, Some(AGENT_ORIGIN), &final_suffix));
     let staged = target
         .layout
         .stage(home_dir, &staging, sqlite)

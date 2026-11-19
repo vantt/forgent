@@ -4,10 +4,8 @@
 use std::fs;
 use std::io::{self, Read};
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicU64, Ordering};
 
 use serde_json::{Map, Value};
-use sha2::{Digest, Sha256};
 
 /// A fixed failure code (`missing-file`, `unreadable-json`, ...).
 pub type Code = &'static str;
@@ -228,20 +226,10 @@ pub fn sub_dirs(dir: &Path) -> Vec<String> {
 
 // ----------------------------------------------------------------------------------------------- random
 
-/// `bytes` random bytes as lowercase hex, from the clock, the process, a counter and the address space.
-pub fn random_hex(bytes: usize) -> String {
-    static COUNTER: AtomicU64 = AtomicU64::new(0);
-    let nanos = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map_or(0, |d| d.as_nanos());
-    let marker = 0u8;
-    let mut hasher = Sha256::new();
-    hasher.update(nanos.to_le_bytes());
-    hasher.update(std::process::id().to_le_bytes());
-    hasher.update(COUNTER.fetch_add(1, Ordering::SeqCst).to_le_bytes());
-    hasher.update((&marker as *const u8 as usize).to_le_bytes());
-    hasher.update(format!("{:?}", std::thread::current().id()));
-    hex(&hasher.finalize()[..bytes])
+/// Four random bytes from the kernel generator as lowercase hex (the name suffix of a copy or staging). No
+/// fallback: when the system source fails the caller gets the error and moves or creates nothing.
+pub fn random_hex() -> io::Result<String> {
+    fgos_identity::text::random_bytes::<4>().map(|bytes| hex(&bytes))
 }
 
 pub fn hex(bytes: &[u8]) -> String {

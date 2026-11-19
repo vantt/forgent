@@ -487,7 +487,7 @@ fn a_pending_copy_survives_an_interrupted_staging_and_is_applied_by_the_next_ren
         pi_auth("newer", NOW + 9.0 * HOUR),
     )
     .unwrap();
-    let complete = pending.join(pending_name(NOW, None));
+    let complete = pending.join(pending_name(NOW, None, "0a1b2c3d"));
     fs::create_dir_all(&complete).unwrap();
     fs::write(complete.join("auth.json"), pi_auth("new", NOW + 5.0 * HOUR)).unwrap();
 
@@ -547,7 +547,7 @@ fn a_staging_that_is_empty_or_a_duplicate_of_a_kept_copy_is_removed_and_one_whos
 ) {
     let runtime = scratch("sweep-runtime");
     let pending = runtime.join("account-locks/openai-codex/acct/pending");
-    let kept = pending.join(pending_name(NOW, None));
+    let kept = pending.join(pending_name(NOW, None, "0a1b2c3d"));
     fs::create_dir_all(&kept).unwrap();
     fs::write(kept.join("auth.json"), pi_auth("x", NOW)).unwrap();
     let empty = pending.join(".tmp-4000001-aaaaaaaa");

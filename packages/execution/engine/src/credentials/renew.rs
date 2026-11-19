@@ -197,6 +197,10 @@ fn renew_in_scratch(
     options: &RefreshOptions<'_>,
 ) -> RefreshOutcome {
     let (now, sqlite, source) = (options.now, options.sqlite, request.credential_source);
+    // The name a kept scratch copy moves to is drawn before any token is spent: without it nothing is renewed.
+    let Ok(kept_suffix) = random_hex() else {
+        return outcome("failed", "unexpected-error");
+    };
     let scratch = account_dir.join(format!(
         "{SCRATCH_PREFIX}{}-{}",
         std::process::id(),
@@ -266,7 +270,11 @@ fn renew_in_scratch(
             // pending copies and the next holder of the account lock decides.
             let pending = account_dir.join(PENDING_DIR);
             if make_dir(&pending, true).is_ok()
-                && fs::rename(&scratch, pending.join(pending_name(now(), None))).is_ok()
+                && fs::rename(
+                    &scratch,
+                    pending.join(pending_name(now(), None, &kept_suffix)),
+                )
+                .is_ok()
             {
                 cap_pending_copies(account_dir, layout, sqlite);
             }
@@ -279,7 +287,7 @@ fn renew_in_scratch(
             // or dropped automatically, and reported by `fgos doctor`.
             let torn = account_dir.join(TORN_DIR);
             if make_dir(&torn, true).is_ok() {
-                let _ = fs::rename(&scratch, torn.join(pending_name(now(), None)));
+                let _ = fs::rename(&scratch, torn.join(pending_name(now(), None, &kept_suffix)));
             }
             record_failure(account_dir, "torn-copy", now());
             outcome("failed", "torn-copy-kept")
@@ -339,9 +347,17 @@ fn count_agent_try(dir: &Path) -> u32 {
 }
 
 fn move_to_torn(account_dir: &Path, dir: &Path, at: f64) {
+    // Without a name the copy stays where it is for the next holder; it is never dropped for want of one.
+    let Ok(suffix) = random_hex() else {
+        return;
+    };
     let torn = account_dir.join(TORN_DIR);
     if make_dir(&torn, true).is_err()
-        || fs::rename(dir, torn.join(pending_name(at, Some(AGENT_ORIGIN)))).is_err()
+        || fs::rename(
+            dir,
+            torn.join(pending_name(at, Some(AGENT_ORIGIN), &suffix)),
+        )
+        .is_err()
     {
         drop_copy(dir);
     }
@@ -426,11 +442,13 @@ fn apply_agent_copies(
         }
         // A staging name under pending/: a runner killed after the CLI spent the copy's refresh token leaves the
         // renewed pair where the sweep and doctor find it.
-        let probe_home = account_dir.join(PENDING_DIR).join(format!(
-            ".tmp-{}-{}",
-            std::process::id(),
-            random_hex(4)
-        ));
+        // Both names are drawn before the call: a renewed pair is never left without a place to go.
+        let (Ok(probe_suffix), Ok(deferred_suffix)) = (random_hex(), random_hex()) else {
+            continue;
+        };
+        let probe_home = account_dir
+            .join(PENDING_DIR)
+            .join(format!(".tmp-{}-{probe_suffix}", std::process::id()));
         let mut called = false;
         let gate = gate_one_copy(
             &dir,
@@ -440,6 +458,7 @@ fn apply_agent_copies(
             home,
             lock,
             options,
+            &deferred_suffix,
             &mut called,
         );
         if gate.is_err() && !called && count_agent_try(&dir) >= AGENT_COPY_TRIES {
@@ -460,6 +479,7 @@ fn gate_one_copy(
     home: &Path,
     lock: &dyn AccountLockGuard,
     options: &RefreshOptions<'_>,
+    deferred_suffix: &str,
     called: &mut bool,
 ) -> Result<(), ()> {
     let (now, sqlite, provider) = (options.now, options.sqlite, request.provider);
@@ -541,6 +561,7 @@ fn gate_one_copy(
                 } else {
                     Some(AGENT_ORIGIN)
                 },
+                deferred_suffix,
             )),
         )
         .map_err(|_| ())?;
