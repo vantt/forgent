@@ -15,13 +15,14 @@
 
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use fgos_config::detect::PathDetectors;
 use fgos_git::{
     GitDriver, HeadFact, Ignored, Inspect, RemoteGrant, RepoHandle, ResolveRepo, Submodules,
     Untracked,
 };
+use fgos_run_supervisor::head_request::WRITE_BUSY;
 use fgos_run_supervisor::route::{CatchUpRefusal, PublishRefusal, WritePublisher};
 use fgos_supervision::land::{
     catch_up, land, Gate, LandCommand, LandConfig, LandPorts, Regenerate, ShellRunner,
@@ -32,6 +33,16 @@ use serde_json::Value;
 const REMOTE: &str = "origin";
 /// How long the land waits for the target's merge slot and the main checkout.
 const WAIT_MS: u64 = 30_000;
+/// The land refusals whose class is Busy (retryable): a live writer's operation is pending (`resource-busy`), or the
+/// merge slot or the main checkout is held. `LandRefusal` carries only the code, so the class is read from the code.
+const BUSY_CODES: [&str; 3] = ["resource-busy", "merge-slot-busy", "main-checkout-busy"];
+/// How long one catch-up attempt waits for the merge slot while retrying, and how long the retries run in all: under
+/// the head request's own 60 s verb timeout even when the last attempt starts at the end of the budget.
+const BUSY_ATTEMPT_WAIT_MS: u64 = 5_000;
+const BUSY_BUDGET: Duration = Duration::from_millis(45_000);
+/// Pause before the next attempt: doubles from the first up to the cap.
+const BUSY_BACKOFF_FIRST: Duration = Duration::from_millis(500);
+const BUSY_BACKOFF_CAP: Duration = Duration::from_millis(4_000);
 /// Status entries per page (the Git door's own bound) and pages read at most: a checkout with more changed paths than
 /// this is not a checkout to write into.
 const STATUS_PAGE: usize = 4096;
@@ -244,8 +255,45 @@ fn grant(checkout: &Checkout) -> Result<RemoteGrant, PublishRefusal> {
     })
 }
 
-/// Fast-forwards the main checkout of `root` to its remote tip as `writer`, under the target's merge slot.
+/// Runs `attempt` until it does not refuse Busy, pausing with doubling backoff between tries, for at most `budget`.
+/// A Busy that outlasts the budget comes back as `write-busy` naming the last code; any other result is returned as
+/// it is. `sleep` and `now` are parameters so the schedule is provable without waiting.
+pub fn retry_busy(
+    budget: Duration,
+    mut attempt: impl FnMut() -> Result<(), CatchUpRefusal>,
+    sleep: impl Fn(Duration),
+    now: impl Fn() -> Instant,
+) -> Result<(), CatchUpRefusal> {
+    let start = now();
+    let mut pause = BUSY_BACKOFF_FIRST;
+    loop {
+        let why = match attempt() {
+            Err(CatchUpRefusal::Refused(why)) if BUSY_CODES.contains(&why.code.as_str()) => why,
+            other => return other,
+        };
+        if now().duration_since(start) + pause > budget {
+            return Err(CatchUpRefusal::Refused(refusal(
+                WRITE_BUSY,
+                format!("{}: {}", why.code, why.detail),
+            )));
+        }
+        sleep(pause);
+        pause = (pause * 2).min(BUSY_BACKOFF_CAP);
+    }
+}
+
+/// Fast-forwards the main checkout of `root` to its remote tip as `writer`, under the target's merge slot. A Busy
+/// refusal (a live writer's operation pending, the slot or the checkout held) is retried within [`BUSY_BUDGET`].
 fn catch_up_main(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
+    retry_busy(
+        BUSY_BUDGET,
+        || catch_up_once(root, writer),
+        std::thread::sleep,
+        Instant::now,
+    )
+}
+
+fn catch_up_once(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
     let checkout = open(root).map_err(CatchUpRefusal::Refused)?;
     let target = checked_out_branch(&checkout).map_err(CatchUpRefusal::Refused)?;
     let grant = grant(&checkout).map_err(CatchUpRefusal::Refused)?;
@@ -257,7 +305,7 @@ fn catch_up_main(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
         operation_id: &operation_id,
         runner: &ShellRunner,
         log_dir: &checkout.main.join(".fgos").join("runtime").join("land"),
-        wait_ms: WAIT_MS,
+        wait_ms: BUSY_ATTEMPT_WAIT_MS,
     };
     let command = LandCommand {
         target: Some(target),

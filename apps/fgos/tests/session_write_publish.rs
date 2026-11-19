@@ -388,3 +388,99 @@ fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_fo
     );
     assert_eq!(scene.remote_tip(), tip);
 }
+
+/// A virtual clock: `sleep` advances it, so the retry schedule is proven without waiting.
+struct Clock {
+    origin: std::time::Instant,
+    slept: std::cell::RefCell<Vec<Duration>>,
+}
+
+impl Clock {
+    fn new() -> Self {
+        Self {
+            origin: std::time::Instant::now(),
+            slept: Default::default(),
+        }
+    }
+    fn now(&self) -> std::time::Instant {
+        self.origin + self.slept.borrow().iter().sum::<Duration>()
+    }
+}
+
+fn busy(code: &str) -> fgos_run_supervisor::route::CatchUpRefusal {
+    fgos_run_supervisor::route::CatchUpRefusal::Refused(
+        fgos_run_supervisor::route::PublishRefusal {
+            code: code.to_owned(),
+            detail: "pending fetch".to_owned(),
+        },
+    )
+}
+
+#[test]
+fn a_catch_up_refused_busy_while_a_writer_is_pending_lands_once_the_writer_settles() {
+    let clock = Clock::new();
+    let mut tries = 0;
+    let result = session_write_publish::retry_busy(
+        Duration::from_secs(45),
+        || {
+            tries += 1;
+            match tries {
+                1 => Err(busy("resource-busy")),
+                2 => Err(busy("merge-slot-busy")),
+                _ => Ok(()),
+            }
+        },
+        |d| clock.slept.borrow_mut().push(d),
+        || clock.now(),
+    );
+    assert_eq!(result, Ok(()));
+    assert_eq!(tries, 3);
+    assert_eq!(
+        *clock.slept.borrow(),
+        [Duration::from_millis(500), Duration::from_millis(1000)],
+        "backoff doubles"
+    );
+}
+
+#[test]
+fn a_catch_up_whose_writer_never_settles_is_write_busy_naming_the_last_code_inside_the_budget() {
+    let clock = Clock::new();
+    let budget = Duration::from_secs(45);
+    let result = session_write_publish::retry_busy(
+        budget,
+        || Err(busy("resource-busy")),
+        |d| clock.slept.borrow_mut().push(d),
+        || clock.now(),
+    );
+    let Err(fgos_run_supervisor::route::CatchUpRefusal::Refused(why)) = result else {
+        panic!("not a refusal: {result:?}");
+    };
+    assert_eq!(why.code, "write-busy");
+    assert_eq!(why.detail, "resource-busy: pending fetch");
+    let waited: Duration = clock.slept.borrow().iter().sum();
+    assert!(waited <= budget, "{waited:?}");
+    assert!(
+        clock
+            .slept
+            .borrow()
+            .iter()
+            .all(|d| *d <= Duration::from_secs(4)),
+        "backoff is capped"
+    );
+}
+
+#[test]
+fn a_catch_up_refusal_that_is_not_busy_is_returned_at_once_not_retried() {
+    let mut tries = 0;
+    let result = session_write_publish::retry_busy(
+        Duration::from_secs(45),
+        || {
+            tries += 1;
+            Err(busy("land-recovery-required"))
+        },
+        |_| panic!("no pause"),
+        std::time::Instant::now,
+    );
+    assert_eq!(tries, 1);
+    assert_eq!(result, Err(busy("land-recovery-required")));
+}

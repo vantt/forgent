@@ -28,7 +28,7 @@ depth in its own chat, or applies any domain's steps.
    supervisor with `fgos session write docs/backlog.md --base "$oid" < "${TMPDIR:-/tmp}/backlog.md"`, which replaces the
    file atomically. `--base` is what protects newer rows: if the file moved
    since (a pull, another writer), the write is refused `write-base-stale` and writes nothing, so a row the host added
-   since is never lost. On `write-base-stale`, copy the file again, redo the edit on the fresh copy and write again. `plans/` and `docs/discussions/` stay writable directly.
+   since is never lost. On `write-base-stale`, copy the file again, redo the edit on the fresh copy and write again. On `write-busy` (a live Git operation of the host held the checkout through the host's own retries; nothing was written), wait a little and write again unchanged. `plans/` and `docs/discussions/` stay writable directly.
 3. **Route.**
 
    | State of the topic | Route |
