@@ -48,7 +48,7 @@ anything, so nothing is resurrected. The git spec's RUL84 (written `fa8c7611d` 2
 matcher to become "a thin facade in the same switch"; the switch was never made, so
 `src/runner/dispatch/write-scope.mjs` is still a second implementation pinned by the parity test.
 `docs/platform/git/spec.md:723` still calls it "Thin shared Rust matcher facade, no copied implementation",
-which is not what the file is; **phase 2 owns that spec and should correct the row**.
+which is not what the file is; the label was corrected in the review fix (JS port: a pinned second implementation, not a facade).
 
 Search of `test/` as well as `src`: the cases live in `test/state/graph-metrics.test.mjs` (detectCycles at 657,
 computeSchedule at 734), `test/report/capability-plan-lint.test.mjs:414`, `test/runner/write-scope-globs.test.mjs`,
@@ -122,7 +122,7 @@ over every `plans/*/plan.md`; file sizes with `stat`).
 | Largest phase file | 87072 bytes | `plans/reports/phase-lead-261021-1129-test-governance-p2-ported-areas.md` |
 | Largest file in a plan directory | 1345165 bytes | `261017-1313-fgos-platform-program-board/log.md`; the door never reads it (the board plan tells readers never to read it whole) |
 | Open Work items | 13 (plan fact) | not re-measurable here |
-| Folded Work view | not measured | this worktree has no activation and the Work state is not in a ref this checkout reads; the nearest proxy is 270 table lines in `docs/backlog.md`. The node limit is a refusal by name, so a wrong guess is loud, never silent (decision 7) |
+| Folded Work view | 285 items | `fgos list --json` run read-only in `/home/vantt/projects/forgent` on 2026-11-19; `data.work` holds 285 entries (counted, nothing written). The node limit of 20000 is about 70 times that; it is a refusal by name, so a wrong guess is loud, never silent (decision 7) |
 
 Values fixed in the contracts (`graph.v1.json`, `resource-referee.v1.json`) and the write-scope spec:
 

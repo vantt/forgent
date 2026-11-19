@@ -84,7 +84,7 @@
   },
   "tieBreaks": [
     "Smallest id means smallest by UTF-8 byte order.",
-    "Cycle: breadth-first search from the root over the component's ordering edges, neighbours visited in ascending id order; the closing step is taken from the in-neighbour of the root found at the smallest distance, ties by the smaller id. The path found is the lexicographically smallest of the shortest ones.",
+    "Cycle: among the shortest cycles through the component's smallest id, the one whose id sequence is lexicographically smallest, computed linearly (breadth-first distances back to the root, then a greedy walk choosing the smallest successor that stays on a shortest path). cycle_through(id) uses the same rule rooted at the chosen id.",
     "Layers: a node's earliest layer is 0 when it waits for nothing, else one more than the greatest layer of the nodes it waits for. Under exclusions, layers are filled one at a time: the nodes whose dependencies are all placed in earlier layers are offered in priority order and each is placed unless an already placed node of that layer is excluded with it.",
     "Priority: the `priority` list, then input order for ids not listed. No two nodes tie because every node has one input position.",
     "Critical path: the first strict maximum wins, over nodes in input order and, for one node, over its dependencies in edge input order.",

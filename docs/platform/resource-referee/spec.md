@@ -78,7 +78,7 @@ caller that needs them. `ref` and `port` have no caller in these plans and are t
 owner wants the registry at `path` alone (reports/facts.md, section 6).
 
 **An empty list is not "disjoint".** A unit declares `claims` or `readOnly: true`; a unit with neither, and a
-unit whose `claims` is an empty list while not read-only, is a blocking finding. This closes the loophole in
+unit whose `claims` is an empty list while not read-only, is a blocking finding. A read-only unit may omit `claims` or give `[]`; only a non-empty `claims` beside `readOnly: true` is refused. This closes the loophole in
 `packages/supervision/rust/src/portfolio.rs:200`, where an empty footprint never overlaps anything, which
 would break the soundness contract of write-scope (plan decision 13). `readOnly` is asserted by the caller,
 is not verified, and every verdict lists the read-only units and says so.
@@ -105,8 +105,7 @@ and to keep stable).
 | `declared-layers-valid` | no | blocking | none | every unit is declared in a layer later than all it depends on |
 | `max-layer-width` | no | advisory | `max` (integer from 1, required) | no declared layer holds more than `max` non-read-only units |
 
-**The floor takes no parameters and is always blocking.** A ruleset that names a floor check with any
-parameter, or with a `class`, is refused by name (`floor-check-not-configurable`); a policy therefore cannot
+**The floor takes no parameters and is always blocking.** A ruleset may name a floor check only bare or with params `{}` (a no-op); any parameter key, or a `class`, is refused by name (`floor-check-not-configurable`); a policy therefore cannot
 turn the collision check into a warning. The floor runs whether or not the ruleset names its checks. The
 layer checks judge the layers the author declared, and are vacuous when no unit declares one. The hot-file
 rule needs no check of its own: two phases that list the same file in one layer collide under the footprint
@@ -125,7 +124,7 @@ attribute check (phase size, risk) and alone-in-layer.
 | `footprint-empty` | blocking | `claims-declared` | `claims` is an empty list and the unit is not read-only |
 | `footprint-entry-invalid` | blocking | `claims-declared` | a `path` claim does not canonicalize (a write-scope problem) |
 | `claims-over-limit` | blocking | `claims-declared` | a unit exceeds the claims-per-unit or entry-length limit |
-| `read-only-with-claims` | blocking | `claims-declared` | `readOnly: true` beside a non-empty `claims` |
+| `read-only-with-claims` | blocking | `claims-declared` | `readOnly: true` beside a non-empty `claims` (absent or `[]` claims beside `readOnly: true` is fine) |
 | `facts-truncated` | blocking | `facts-not-truncated` | the `truncated` fact is set |
 | `exclusion-in-one-layer` | blocking | `no-exclusion-in-one-layer` | a colliding pair is declared in one layer |
 | `layer-order-violation` | per rule | `declared-layers-valid` | a unit is not later than a unit it depends on |
@@ -162,7 +161,7 @@ refusal by the door, never a fall back to the default (plan decision 11). The pa
 caller passes `{ source, sha256 }` as opaque strings for the echo.
 
 A ruleset is refused before anything is evaluated when it names an unknown check, an unknown parameter, a
-parameter of the wrong type or range, a check twice, a floor check with any parameter or class, or more than
+parameter of the wrong type or range, a check twice, a floor check with any parameter key or a class (bare or `params: {}` is accepted as a no-op), or more than
 200 rules.
 
 ## 7. Limits and refusals
@@ -171,7 +170,9 @@ parameter of the wrong type or range, a check twice, a floor check with any para
 |---|---|---|
 | Units | 20000 | set-level: refused by name |
 | Rules | 200 | set-level: refused by name |
-| Input bytes, per file the door reads | 4 MiB | set-level: refused by name; measured against `plan.md` at most 128519 bytes |
+| Input bytes, per input document (a file the door reads, or the JSON text a binding receives) | 4 MiB | set-level: refused by name; measured against `plan.md` at most 128519 bytes |
+| Exclusions in `facts.exclusions` | 100000 | set-level: refused by name; equals the emitted-pairs cap of write-scope |
+| Problems in `facts.problems` | 100000 | set-level: refused by name; same bound as exclusions |
 | Claims per unit | 512 | per-item: the finding `claims-over-limit`; the rest is still evaluated |
 | Claim `ref` length | 1024 bytes | per-item: the same finding |
 | Id length | 256 bytes | refused by name (an id is how the unit is named) |
@@ -199,10 +200,12 @@ each gap with its resolution.
 **Expressed.** Plan contract section 4: footprints disjoint in one wave (floor), a wave later than the waves
 of its dependencies (`declared-layers-valid`), one writer per hot file per wave (the same footprint rule).
 Admission guard 3, write scope (`src/workflow/case-admission.mjs:168`): writes disjoint from every live
-reservation, by passing the proposal and the live reservations as units in one layer.
+reservation, by passing the proposal and the live reservations as units. The guard compares the proposal against each live reservation only (`case-admission.mjs:171`) and never the reservations among themselves, so the mapping must not put them in one layer as peers of each other: the door builds exclusions from the proposal-against-reservation pairs alone, and overlaps among live reservations raise no finding.
 
 | Rule | Where | Why the catalog cannot say it | Resolution |
 |---|---|---|---|
+| Phase table has exactly the columns id, title, depends-on, footprint, wave, status (order free) | plan-contract section 4, phase table | a table-shape rule, not a fact about a set of units | Stays in `scripts/plan-contract-check.mjs` table parsing; the door reads units, not tables |
+| Layers stay serial (a lower layer lands before the one above starts) | plan-contract section 4, Waves | an execution ordering rule at run time, not a property of the declared layers | Stays with the supervisor and the workflow; `declared-layers-valid` judges only that a layer is later than its dependencies |
 | Phase fits one short leader | plan-contract section 4, Size | no unit attribute carries a size | Stays judgement; a numeric attribute check is left out of v1 (plan decision 12) |
 | One integration phase in the last wave | plan-contract section 4, Integration | needs a unit role | Stays in the plan-contract skill; not a table attribute |
 | One Workflow case per parallel phase, at most two slices per case | plan-contract section 4, Execution | a workflow rule, not a set-of-units fact | Stays in the workflow guide |

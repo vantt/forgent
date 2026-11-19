@@ -5,10 +5,10 @@ Document type: BA-grade area specification
 Audience: Owner, maintainer, implementation agent
 Purpose: One authority for what a declared path scope means and whether two scopes can touch the same path, for one scope and for a whole set of them
 Design status: Settled by the owner in the discussion of plans/261119-0030-resource-referee-graph-write-scope-stack (decisions 1-6, 17, 19, 22); the numeric limits were measured in phase 1
-Implementation: Partial. The grammar, the matcher and the pairwise literal-prefix test exist as the crate fgos-write-scope under packages/git/write-scope; the move to packages/write-scope and the set-level function are plan phases 2 and 3
+Implementation: Partial. The grammar, the matcher and the pairwise literal-prefix test exist as the crate fgos-write-scope under packages/write-scope (the move from packages/write-scope landed in plan phase 2); the set-level function is plan phase 3
 Canonical: Yes for the scope below, from the day the plan lands
 Owner: Write-scope component (proposed)
-Source: packages/git/write-scope today; packages/write-scope after plan phase 2 (crate fgos-write-scope, name unchanged)
+Source: packages/write-scope (crate fgos-write-scope; moved there from packages/write-scope in plan phase 2, name unchanged)
 Contracts: none of its own file; the numeric limits are in section 8 until plan phase 3 turns them into constants with their one owning test
 Provenance: plans/261119-0030-resource-referee-graph-write-scope-stack/plan.md and reports/facts.md at base 40949614f077844005a986ca1f0f75c0c5e8f508 (2026-11-19)
 Writer type: Agent draft writer
@@ -50,13 +50,13 @@ decides whether a collision is acceptable; that belongs to the caller and, for v
 | Entry | One string a person or tool wrote to name a path or a family of paths | section 3 |
 | Canonical entry | The one spelling of an entry that every comparison uses | section 3 |
 | Scope | A list of entries | section 4 |
-| Item | `{ id, scopes }`: an id the caller chose and one or more scopes (lists of entries) | section 6 |
+| Item | `{ id, scopes }`: an id the caller chose and `scopes`, one flat list of entry strings | section 6 |
 | Collision | An unordered pair of items whose scopes may touch the same path, with the entries of the first item that caused it | section 6 |
 | Problem | An item-level report: one entry that does not canonicalize, one empty scope, one item beyond a per-item limit | section 7 |
 
 ## 3. Grammar
 
-An entry is canonicalized by `canonicalize` (`packages/git/write-scope/src/lib.rs`, mirrored by
+An entry is canonicalized by `canonicalize` (`packages/write-scope/src/lib.rs`, mirrored by
 `canonicalizeWriteEntry` in `src/runner/dispatch/write-scope.mjs`). The rules, all taken from the code
 that runs today:
 
@@ -102,7 +102,7 @@ everything. Two scopes may overlap when any entry of one may overlap any entry o
 | `**` | anything | yes | empty prefix |
 
 This is the rule `fgos_write_scope::overlaps` applies to the prefixes of two entries
-(`packages/git/write-scope/src/lib.rs:149`) and `writeScopesOverlap` applies to two scopes
+(`packages/write-scope/src/lib.rs:149`) and `writeScopesOverlap` applies to two scopes
 (`src/runner/dispatch/write-scope.mjs:186`). It is the meaning dispatch admission already uses
 (`src/workflow/case-admission.mjs:171`). It is chosen because it is the only one of the meanings found in
 the repository (section 5.3) that is both sound and cheap enough to hold on a set.
@@ -151,8 +151,8 @@ supervisor reader (meaning 2, two sites), `footprintOverlapAmong` (1), `pathsOve
 
 The set-level function answers "which pairs of items may touch the same path" in one call.
 
-Input: a list of items `{ id, scopes }`, where `scopes` is a list of entries (an item with several scopes
-passes them concatenated; the pair test is per entry). Items are compared in input order.
+Input: a list of items `{ id, scopes }`, where `scopes` is one flat list of entry strings (no nesting; the pair
+test is per entry). Items are compared in input order.
 
 Output:
 
@@ -183,8 +183,8 @@ collides with nothing" (plan decision 17).
 | An item has no entries at all (an empty or missing footprint) | Reported in `problems`; the item is not compared and is **not** claimed disjoint | `scope-empty` |
 | An entry longer than the entry limit, or an item with more entries than the per-item limit | Reported in `problems` (an item-level finding); the rest of the set is still evaluated; the offending entry or surplus is not compared | `entry-too-long`, `scope-too-large` |
 
-Callers decide what a problem means. The door and the plan check refuse; the supervisor marks that one plan
-not admissible; `resource-referee` turns each into a blocking finding. The Work adapters differ on purpose,
+An invalid entry is reported by item and entry and never dropped. Callers decide what a problem means. The planner door refuses (plan decision 17); the plan check refuses; the supervisor marks that one plan
+not admissible; `resource-referee`, when given such a problem as a fact, emits the blocking finding `footprint-entry-invalid` for it. The Work adapters differ on purpose,
 by a named exception (plan decision 17): an entry that does not canonicalize makes that one item conflict
 with everything, but a missing or empty footprint keeps meaning "no claim" in Work, because Work footprints
 are optional and an item without one has never conflicted. That exception is recorded in the door plan and
@@ -212,7 +212,7 @@ error. The referee takes `truncated` as a fact and emits the blocking `facts-tru
 
 ## 9. Boundaries
 
-**Why the crate leaves `git/`.** `fgos-write-scope` sits under `packages/git/` but three components use it:
+**Why the crate leaves `git/`.** `fgos-write-scope` sat under `packages/git/` until plan phase 2 moved it (landed); three components use it:
 Git (`packages/git/rust/src/land.rs:286`, `scoped_commit.rs`), the Node addon
 (`packages/git/node-addon/src/git/write_scope.rs`) and the supervisor
 (`packages/supervision/rust/src/land.rs:463`, `Cargo.toml:10`). It has had no spec of its own and no row in

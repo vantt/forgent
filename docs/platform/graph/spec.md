@@ -95,10 +95,12 @@ Where several answers are valid, the rule is written here and in the contract an
 caller, never a heuristic of the package.
 
 - **Smallest id** is smallest by UTF-8 byte order.
-- **Cycle.** Breadth-first search from the root (the smallest member) over the component's ordering edges,
-  neighbours in ascending id order. The closing step comes from the in-neighbour of the root found at the
-  smallest distance, ties by the smaller id. The result is the lexicographically smallest of the shortest
-  cycles through the root. A self-edge is a cycle of that one node.
+- **Cycle.** Among the shortest cycles through the component's smallest id (the root), the one whose id
+  sequence, starting at the root, is lexicographically smallest. It is computed in linear time: a
+  breadth-first search over the reversed ordering edges gives every node its distance back to the root; then
+  a greedy walk from the root takes, at each step, the smallest successor id whose distance back to the root
+  is one less than the current node's, until the root is reached. `cycle_through(id)` uses the same rule with
+  the chosen id as the root. A self-edge is a cycle of that one node.
 - **Layers without exclusions.** A node's layer is 0 when it waits for nothing, otherwise one more than the
   greatest layer among the nodes it waits for.
 - **Layers under exclusions.** Layers are filled one at a time. In layer *n*, the nodes whose dependencies
@@ -131,7 +133,7 @@ id that is not an item (`src/state/dep-graph.mjs`), and a refusal there would hi
 | Edges | 200000 | the largest phase `dependsOn` cell today lists a handful of ids |
 | Exclusion pairs | 100000 | equals the emitted-pairs cap of write-scope, the usual producer |
 | Id length | 256 bytes | plan phase ids are at most 3 characters; Work ids are short |
-| Input bytes (JSON text a binding receives) | 4 MiB | 32 times the largest `plan.md` read today (128519 bytes) |
+| Input bytes (the bytes of one input document: the JSON text a binding receives) | 4 MiB | 32 times the largest `plan.md` read today (128519 bytes) |
 
 Input beyond a limit is refused by name and never answered partially. A caller whose graph is refused fails
 with the named error; it does not degrade silently (plan decision 7). The numbers and what they were

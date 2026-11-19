@@ -7,11 +7,10 @@
 // Order: (1) the manifest the caller already names in FGOS_ACTIVE_MANIFEST_PATH, else the activated release's
 // manifest under <repository>/.fgos/installation; (2) only when the addon does not load that way,
 // ensureAddonForScript() from scripts/lib/git-addon-stage.mjs (one cargo build, then reused).
-// It refuses to report anything when a result carries `git-addon-unavailable`: a verdict produced without the
+// It buffers all output and prints nothing when a result carries `git-addon-unavailable`: a verdict produced without the
 // addon says nothing about the plans.
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -56,9 +55,10 @@ if (!loadable()) {
 
 const check = await import(url('scripts/plan-contract-check.mjs'));
 const lines = [];
-const code = check.main(process.argv.slice(2), (line) => { lines.push(line); console.log(line); });
+const code = check.main(process.argv.slice(2), (line) => { lines.push(line); });
 if (lines.some((line) => line.includes('git-addon-unavailable'))) {
-  console.error('run-plan-check: a result carries git-addon-unavailable; the output above is not a verdict');
+  console.error('run-plan-check: a result carries git-addon-unavailable; nothing is printed because it is not a verdict');
   process.exit(3);
 }
+for (const line of lines) console.log(line);
 process.exit(code);
