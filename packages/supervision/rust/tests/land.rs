@@ -434,6 +434,10 @@ fn a_publish_that_fails_after_the_push_is_not_settled_and_names_the_recovery_ver
         .land(&branch("topic"), &config(vec![gate(&dirty)]))
         .unwrap_err();
     assert!(refusal.detail.contains("fgos git recover"), "{refusal:?}");
+    assert!(
+        !refusal.retryable,
+        "a refusal after the push is recovery, not busy"
+    );
     assert!(!pins(&f).is_empty(), "the operation stays for recovery");
 }
 

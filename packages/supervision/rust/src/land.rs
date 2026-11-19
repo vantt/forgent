@@ -950,6 +950,9 @@ impl Lander<'_> {
         mut refusal: LandRefusal,
     ) -> LandRefusal {
         live.take();
+        // After a push or publish was tried the answer is recovery, never busy: a retry would only
+        // meet the pending operation again.
+        refusal.retryable = false;
         if !refusal.detail.contains("fgos git recover") {
             refusal.detail = format!(
                 "{}; the push or publish may have happened: run `fgos git recover`",
