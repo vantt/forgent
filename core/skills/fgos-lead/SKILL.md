@@ -15,6 +15,8 @@ tip, bounds what a unit may write and what a land may bring in. You never change
 stop a session. You have no mailbox and no peers: escalate with `fgos questions ask` or park the phase with a reason
 in its plan file.
 
+A wake is one turn: never end it before your done step (its plan-file update (phase `done` or parked)).
+
 ## Start
 
 0. Taking a plan: in the same `fgos land --paths` commit that sets its `status: running`, write `lead: <your role>` (for

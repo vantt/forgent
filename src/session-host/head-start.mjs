@@ -94,12 +94,12 @@ export function slotKeyOf(record) {
 
 /** The opening a head session is typed: its persona section, the skills line the persona carries, and the start ritual. */
 async function defaultOpening({ persona, name, projectRoot, pinned, handoff, forQuestion = null }) {
-  const { renderPersonaSection } = await import('../runner/agent-definitions.mjs');
-  return openingText({ persona, name, personaLines: renderPersonaSection(persona, { projectRoot, pinnedText: pinned.text }), handoff, forQuestion });
+  const { renderPersonaSection, renderOnWake } = await import('../runner/agent-definitions.mjs');
+  return openingText({ persona, name, personaLines: renderPersonaSection(persona, { projectRoot, pinnedText: pinned.text }), handoff, forQuestion, onWake: renderOnWake(persona, { projectRoot, pinnedText: pinned.text }) });
 }
 
 /** Pure: the opening text from its parts, so a test reads the exact words a head is given. */
-export function openingText({ persona, name, personaLines, handoff = null, forQuestion = null }) {
+export function openingText({ persona, name, personaLines, handoff = null, forQuestion = null, onWake = null }) {
   return [
     ...personaLines,
     '',
@@ -110,8 +110,9 @@ export function openingText({ persona, name, personaLines, handoff = null, forQu
       ? `1. Read the latest handoff of this session first: ${handoff.path}. It describes state as it was; verify it against the repo before acting.`
       : '1. There is no earlier handoff for this session; start from the portfolio.',
     '2. Read the portfolio: `fgos questions` for the owner questions still open, and docs/backlog.md for the work in flight.',
-    '3. Say in one line which pending question you resumed, or that none is pending.',
+    '3. Say in one line which pending question you resumed, or that none is pending, then continue; the ritual is not a finished turn.',
     ...(forQuestion ? ['', `You continue question ${forQuestion}: write its answer back to its origin, then \`fgos questions ack ${forQuestion}\` (or \`cancel\`).`] : []),
+    ...(onWake ? ['', '# On wake', onWake] : []),
   ].join('\n');
 }
 

@@ -283,6 +283,21 @@ function personaFailureLine(personaRef, error) {
 }
 
 /**
+ * The persona's one-line `on_wake` instruction a woken head's opening ends with, or null when it names none.
+ *
+ * @param {string} personaRef
+ * @param {{ pinnedText?: string, projectRoot?: string }} options
+ */
+export function renderOnWake(personaRef, { pinnedText, ...lookup }) {
+  try {
+    const text = typeof pinnedText === 'string' ? pinnedText : resolveAgentDefinition(personaRef, lookup).text;
+    return scalarText(parseYaml(text, { filename: `${personaRef}.yaml` })?.on_wake) || null;
+  } catch {
+    return null; // a persona that cannot be read has no wake line; renderPersonaSection reports the failure itself
+  }
+}
+
+/**
  * The persona section of a prompt, as lines: the one rendering a worker brief and a head session share.
  * Text a caller pinned when it bound the persona wins over any file, so the same definition reaches every
  * attempt and every resume; otherwise the lookup above finds the file, and a persona it does not find
