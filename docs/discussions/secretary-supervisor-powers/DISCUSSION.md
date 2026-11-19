@@ -9,11 +9,13 @@ fgOS platform (core personas, domain-free). Related: `docs/discussions/secretary
 
 ## 1. Trạng thái hiện tại
 
-Round 0 (2026-11-19 16:2x). Scout done; nothing settled. Starting picture: Miu and the supervisor are the owner's two
-hands. Miu is always on, does little herself, but must be able to coordinate anything (delegate, queue) and have a fast
-route for small urgent chores. The supervisor is woken, not always on, and covers the large cyclic coordination.
-Round 1: the owner asked why the supervisor can do anything; it is the interim unconfined session, not the designed head (§3 row 9). Open next: which reach is the target (§3 row 9), then the urgent-chore route (§3 row 1).
-Round 2: owner gave a provisional picture of the supervisor (§3 row 10): observe, wake, open, ask, help every session; never do a session's work unless it is stuck. Row 9 deferred by the owner. Round 3: owner described Miu (§3 row 11): cognitive-load reducer at the owner's side, large authority over priority and order, life-and-death over sessions used rarely; the supervisor carries on what Miu arranged. Round 4: channel agreed as C (§3 row 12); SP-D1, SP-D2 minted. Round 5: urgent-chore route agreed as C (§3 row 1, budget open). Owner asked where work management lives and whether to reorganise the files (§3 row 13). Round 6: split out to its own topic (through Miu). Round 7: observe agreed as two tiers (§3 row 14); SP-D3, SP-D4 minted. Next: the wake/ask/help door (§3 row 15).
+Round 14 (2026-11-19 18:5x). The shape is in place: Miu is the owner's side and sets priority and order (SP-D1), the
+supervisor carries on (SP-D2), they talk through files plus wake-and-point messages (SP-D3), urgent chores go through
+the supervisor with a narrow Miu fallback (SP-D4), observation is a drone plus an on-site visit (SP-D5), coordination
+acts live on the supervision event queue and improvement evidence in Observe with a prune rule (§3 row 17, agreed,
+mint next round). §6 holds the first full synthesis and the proposed grants; §7 the candidate tasks. Open: the
+defaults listed in §3 rows 4-9 and 18-21 (proposed, awaiting the owner's read of §6). Split out: the work-management
+data model (§3 row 13, own topic through Miu).
 
 ## 2. Mục tiêu & đề bài
 
@@ -33,23 +35,27 @@ the door it goes through and how it is proven from the sandbox. Code and plans a
 
 | # | Point | State |
 |---|---|---|
-| 1 | Urgent-chore fast route for Miu: what it is, its limits, how its result reaches main | agreed round 5 (option C): by default urgent chores go through the supervisor (Miu writes the chore to a file, `supervisor wake`, the supervisor starts a `fgos run`); Miu runs `fgos run` herself only when truly needed (the supervisor cannot come up or is stuck, or the owner is waiting and the chore only reads or checks); each such run is written to a file for the supervisor; writes only in a worktree, reaching main through the merge queue like any branch; Miu's grant gains `run`. Settled SP-D4; open: the budget ceiling per Miu run |
-| 2 | Miu delegating/queuing work to the supervisor: a door to enqueue and wake (today Miu can only start sessions or message peers) | open |
-| 3 | Miu stopping sessions she started (no `session stop` in her grant) | settled SP-D1: needs `session stop` in her grant |
-| 4 | Miu reading the portfolio the supervisor reads (`supervisor plans`, `slots`, queue) for status | open |
-| 5 | Mismatches between persona text and grant: Miu's skill says "never lands work" but her grant has `land`; persona says "hands a ready plan to a supervisor" while the skill says the watcher does | open |
-| 6 | Supervisor reach beyond plans: owning backlog rows, mailbox/peers, waking on Miu's request | open |
-| 7 | Who wins when Miu and the supervisor touch the same thing (a session, a plan, a backlog row) | leaning (round 3): Miu sets priority and order, the supervisor carries out what Miu arranged; a direct Miu order overrides. Not yet stated as a rule by the owner |
-| 9 | Two supervisors exist today: the interim hand-started one (`forgent-1d`, Claude opus, unconfined, role `lead:SUPERVISOR`, brief `.fgos/runtime/tmp/supervisor-brief-portfolio.md`) does anything a person can; the designed head (`head:supervisor-<handle>`, confined, grant table, woken by the watcher) does only its grant verbs and has not yet carried a plan ready to done. Which one is the target reach for "the supervisor" | open |
-| 10 | Supervisor reach, owner's provisional picture (round 2, "anh cũng chưa rõ trong đầu"): high-level executive, authority without hands-on. It observes and wakes every session, opens new ones, asks an existing one, even helps it; it never does a session's work unless that session is stuck. Door map today: observe = `fgos identity list --project` (who, role, liveness only; no door reads what a session is doing or whether it is stuck beyond watcher events `head-gone`, `plan-no-progress`, `supervisor-stuck`); wake = no fgos door (mailbox reaches a session only during a turn; idle sessions are woken by herdr `pane send-text` or SendMessage, neither in the supervisor grant); open = `session start` (held); ask/help = mailbox or SendMessage (secretary grant only, not the supervisor); take over a stuck one = `session stop` + successor start or `session rotate` (held). Provisional; reversal trigger: the owner's own list of what `forgent-1d` does that must not be lost | provisional |
-| 11 | Miu's role, owner's provisional picture (round 3): always runs alongside the owner; reduces the owner's cognitive load: makes clear what is the priority, gives context and explains the problem so the owner chooses and decides. Large authority over priority and plan order, and life-and-death over sessions, but rarely gives direct orders unless truly needed. The supervisor usually carries on what Miu arranged. They work very closely, as the owner's right and left hands, both cross-domain. Implication found: the supervisor head has no channel back to Miu today (no mailbox, no peers), and Miu has no door to wake the supervisor (`supervisor wake` is not in her grant; only plan/discussion events wake it) | provisional |
-| 12 | Miu-supervisor channel: how what Miu arranges reaches the supervisor at once, and how the supervisor reports back | settled SP-D3 (option C): every decision is written to portfolio files, which stay the truth; messages only wake and point ("read file X"); Miu gains `supervisor wake`; the supervisor gains a back channel to Miu for results, stuck work and decisions only. Mint after it holds one more round |
-| 13 | Where the work-management model lives, and whether its files are reorganised (owner question round 5). Evidence: D-ADR0079 (portfolio files in the repo are the truth; Work is a replaceable UX layer); L1 (log vs state); council recommendation in `plans/261117-1430-portfolio-driving-draft/reports/council-final-recommendation.md` (D1 two authored sources, D3 add-only records, D6 generated board, D11 run state through Event Store and holder-lock), draft parked by the owner 2026-11-17 because it touches Work. Today: `docs/backlog.md` is one 356 KB table of 277 rows with about 18 distinct Status shapes (free text after `done`); 134 plan dirs carry about 17 status spellings (complete, completed, done, landed ...) although plan-v1 has an enum; every backlog write replaces the whole file, which is what the caps lane's write races and add-rows phase work around. Shaper leaning: authored state stays in files, what happens (events, claims, questions, run facts) stays in the Event Store; reorganise the files (one backlog row per file with uniform frontmatter and a generated index; plan status held to the plan-v1 enum by a check). Scope: the portfolio-driving topic, not this one | split out round 6: the data model (backlog shape, status vocabulary, generated index, plan status check) goes to its own discussion; this discussion keeps only the dependency: the write powers of Miu and the supervisor use a write-one-item door whose shape that topic decides. Shaper leaning recorded above is input to it, not decided here. Caps lane add-rows phase flagged to Miu as at risk of being thrown away |
-| 14 | What "observe" means for the supervisor, and over which sessions. Today: watcher definitions (`core/watcher/definitions/`) see plans, discussions, lanes, `lead-ended` and the supervisor itself; attention definitions (`core/attention/definitions/`) add `head-gone` and `plan-no-progress` (60 min, `dispatch.attention.planNoProgressMinutes`). All are about plan leads only; hand-started sessions, shapers and planners are not watched. Not seen at all: a session alive but idle while holding unfinished work, a busy session drifting off-task (windows 4-5), a session blocked on a refused command. Seeing drift needs reading what the session is doing (pane or transcript), which has no door | agreed round 7: two tiers. Tier 1, the watcher (no LLM) watches mechanical signals for every session registered in Identity for the project (gone; idle too long while holding unfinished work; no commit or result for N minutes; repeated refused commands) and wakes the supervisor. Tier 2, the supervisor (LLM, only once woken) reads the session's recent work through a read-only door (screen or recent transcript), then asks, helps, wakes or replaces it. No periodic patrol without a signal. Owner framing (round 7): "thật ra watcher như tool của supervisor ý": the watcher is the supervisor's own instrument (its eyes while it sleeps), not a separate authority; matches supervision spec §1 (the watcher decides, starts and stops nothing). Owner round 8: "nó là thiết bị drone quan sát bay ra thu thập tín hiệu định kỳ cung cấp cho supervisor. hữu sự thật sự thì supervisor đi đến tận nơi": the watcher is a drone that flies out on a period and collects signals for the supervisor; on real trouble the supervisor goes to the session itself (tier 2). Provisional implication: what the watcher watches (definitions, thresholds, pace) is the supervisor's to tune inside config. Mint after it holds one more round |
-| 15 | Door for wake, ask and help: the agent mailbox (one door, its `Nudge` port already wakes idle Claude and Codex heads) for both Miu and the supervisor; the supervisor's grant gains `mailbox`; Miu's direct SendMessage stops being a second path. Gap: agy heads cannot be woken when idle (mailbox §15.8 deferred), which ties to the pending head-executor decision (integration report windows 3-5) | reopened round 9: owner first said "đồng ý", asked what it meant, then: "tại sao không cho 3 phương tiện. anh chưa cảm nhận mailbox reliable và nó đang bị trễ". Three means exist today: mailbox (recorded, wakes idle Claude/Codex), Claude SendMessage (direct, unrecorded, Claude only), herdr `pane send-text` (typing into the screen; the mailbox spec forbids peer text acting as owner input). Shaper proposal now: three means, one record: every touch is written to the mailbox record; delivery tries mailbox nudge, then SendMessage, then pane typing (supervisor only, for a stuck session). Mailbox reliability and latency go to their own item. Round 10 owner: "chưa thuyết phục vì dùng mailbox sai mục đích, đâu chỉ là một ledger ghi nhận ai nói chuyện với ai, ai làm gì đang như thế nào không ghi nhận à": the mailbox is a messaging tool, not the ledger. Shaper proposal round 10: the three means are tools, chosen by reachability (pane typing still supervisor-only for a stuck session); the ledger of who did what is Observe (record door, registered kinds in `apps/fgos/observe-kinds.json`, which already hold `fgos.head.state`, `fgos.head.role`, `fgos.plan.activity`, `fgos.plan.status`; run attempts as `fgos.run.attempt`), so each coordination act of Miu or the supervisor on another session (observed, woke, asked, helped, replaced, which means) is one Observe record | agreed round 11 ("ồ hay thế"). Found: the watcher's definitions are themselves Observe queries (`core/watcher/definitions/lead-ended.query.json` reads `fgos.head.state`), so the drone reads the same ledger. Limits: the record door is fail-open (a lost record never blocks), so the ledger is evidence, never state, which stays in files (SP-D3); whether a confined head reaches `fgos metrics record` is unproven (not in any grant; to prove from the sandbox) |
-| 16 | Use the coordination and observation signals to improve the system (owner round 11). Existing doors: `fgos metrics query` (by kind, ref, group, aggregate), Observe definitions, friction records and `friction rank`, metrics outcomes/harness, the retro skills. Shaper proposal: no new mechanism; register the coordination kinds and read them through these doors (which persona gets stuck most, wake-to-recovery time, which of the three means reached the session; the last answers the mailbox reliability doubt with data) | open (asked round 11) |
-| 17 | Lifetime of signals (owner round 12): "thực chất tín hiệu điều phối cần tự xóa sau khi không còn giá trị điều phối. tín hiệu quan sát cho cải tiến thì cần xóa đi sau khi đủ bằng chứng." By L1 the two are different physics: a coordination signal answers "where are we now" (State: overwritten, gone when its purpose is met); improvement evidence answers "how did we get here" (Log, kept until it has served). Today Observe is append-only with no retention (friction has `resolve`, an appended settlement, never a delete); its records live per machine in `.fgos/observe/records/` (1.9 MB here, not tracked), so a physical prune is safe, unlike the Event Store refs whose truncation the owner cancelled 2026-11-08. Shaper proposal: coordination signals leave Observe and become runtime State under `.fgos/runtime/` owned by supervision, one record per open act keyed by its target session, deleted when the act closes or the target is gone; improvement evidence stays in Observe and is pruned when the finding it supports is settled, with a maximum age for evidence no finding claimed. Revises row 15. Round 13: owner agreed the split and the evidence rule (prune when the finding it supports is settled, i.e. a friction or decision records the lesson and cites the evidence; at most 30 days for evidence no finding claimed). Owner then asked whether the coordination board needs a new mechanism and whether Observe sits on the Event Store. Facts: Observe is its own store (JSONL shards per writer under `.fgos/observe/`, observe lock), not the Event Store; the supervision event queue is over the Event Store, whose spec keeps claims and leases outside it as runtime state; the Event Store prunes nothing (its history lives in git refs). Options for the board: A reuse the supervision event queue (a coordination act is an event, closing it is `supervisor handled`, the queue shows only open ones; no new mechanism; closed acts vanish from the view but stay in history); B a small runtime State dir under `.fgos/runtime/` (physically deleted on close; a new, small mechanism); C a field on the Identity session record (dies with the session; mixes authorities, rejected). Shaper leaning A | evidence rule agreed; board asked round 13 |
-| 8 | Proof: each power named with its door and a sandbox proof (ties to supervisor-review T2 head-start preflight, `p-2wb2lfgky3`, and caps phase 6 grant audit) | open |
+| 1 | Urgent-chore route for Miu | settled SP-D4; budget per Miu run: default proposed in row 18 |
+| 2 | Miu delegating/queuing work to the supervisor | settled by SP-D3 and row 17: Miu raises an event on the supervision queue (decision in files, event points to it) and calls `supervisor wake` |
+| 3 | Miu stopping sessions | settled SP-D1: `session stop` in her grant |
+| 4 | Miu reading what the supervisor reads (`supervisor plans`, `queue`, `slots`, Identity list) | proposed default: yes, read-only, so Miu answers status and context without asking the supervisor |
+| 5 | Persona text against grants: Miu's skill says "never lands work" while her grant has `land`; her persona says she hands a ready plan to the supervisor while her skill says the watcher does | proposed default: rewrite both personas and skills from the §6 grant table; Miu keeps `land --paths` for portfolio files only; "hands a plan" becomes "raises it on the queue" |
+| 6 | Supervisor reach beyond plans | settled by SP-D5 and row 10: every session of the project, not only plan leads |
+| 7 | Who wins on the same thing | leaning (round 3, unrevised): Miu sets priority and order, the supervisor carries out; a direct Miu order overrides a supervisor choice; the owner overrides both. To mint with the owner's read of §6 |
+| 8 | Proof | proposed default: each power in the §6 table is proven from the sandbox by the head-start preflight (backlog `p-2wb2lfgky3`) plus a live grant audit (caps lane phase 6 pattern); a power with no passing proof is not granted |
+| 9 | Interim supervisor `forgent-1d` (unconfined, hand-briefed) against the designed head | owner deferred round 2 ("thấy nó làm mượt quá, mà có nhận ra gì đâu"). Proposed default: keep it as scaffolding; retire it once the head carries every §6 supervisor power with a passing proof and one plan has gone ready to done with nobody typing (plan 261118-1045 acceptance 8) |
+| 10 | Supervisor reach, owner's picture: observe and wake every session, open new ones, ask and help an existing one, never do a session's work unless it is stuck; authority without hands-on | provisional (round 2), now carried by SP-D5 and rows 15, 17; folded into SP-D2/SP-D5 wording at the next mint |
+| 11 | Miu's role, owner's picture | minted as SP-D1 |
+| 12 | Miu-supervisor channel | settled SP-D3 |
+| 13 | Work-management data model (backlog shape, status vocabulary, generated index, plan status check) | split out round 6 to its own topic through Miu; this discussion keeps only the dependency: the write powers here use a write-one-item door whose shape that topic decides. Miu told that the caps add-rows phase is at risk |
+| 14 | What "observe" means | settled SP-D5 |
+| 15 | Means to wake, ask and help a session | agreed round 9-10 (no objection after the revision): three means chosen by reachability: mailbox, Claude SendMessage, herdr pane typing (pane typing for the supervisor only, and only for a stuck session). The mailbox is a messaging tool, not the ledger (owner round 10). Mailbox reliability and latency: own item through Miu. Gap: agy heads cannot be woken when idle (mailbox spec §15.8 deferred), tied to the pending head-executor decision |
+| 16 | Use signals to improve | agreed in principle round 11; carried by row 17: no new mechanism, register coordination kinds in Observe, read through `fgos metrics query`, friction and retro |
+| 17 | Lifetime of signals | agreed rounds 12-14: coordination signals are State: each coordination act is an event on the supervision event queue, closed by `supervisor handled`, the queue shows only open acts (option A; closed acts leave the view, not the Event Store history). Improvement evidence is Log in Observe (its own store, not the Event Store), pruned when the finding it supports is settled (a friction or decision records the lesson and cites the evidence), at most 30 days for evidence no finding claimed. Observe needs a prune door (none today). Mint next round |
+| 18 | Budget ceiling of a Miu `fgos run` (SP-D4) | proposed default: read-only, tier `standard`, 15 minutes wall clock, one unit; a write run needs `--writes` in a linked worktree and goes through the merge queue |
+| 19 | On-site read door (SP-D5 tier 2): how the supervisor reads a session's recent work | open for the planner: a read-only door over the session's screen (terminal control) or its recent transcript, through one verb with per-CLI adapters; no raw herdr in the grant |
+| 20 | Watcher tuning by the supervisor (owner round 7-8: the watcher is the supervisor's drone) | proposed default: the supervisor may arm or disarm a definition and change its thresholds and pace within config bounds, recorded as a coordination event; adding a new definition kind stays a code change |
+| 21 | Stopping or replacing a session nobody started through `session start` (hand-started sessions like `lead-s6a`) | proposed default: the supervisor observes, asks and helps them like any session, but stops or replaces only heads; a stuck hand-started session goes to Miu, who asks the owner |
 
 ## 4. Quyết định đã chốt
 
@@ -59,6 +65,7 @@ the door it goes through and how it is proven from the sandbox. Code and plans a
 | SP-D2 | The supervisor usually carries on what Miu arranged; the two work very closely as the owner's right and left hands | Owner round 3, held unrevised through round 4 (the channel choice in round 4 builds on it) | 2026-11-19 |
 | SP-D3 | Channel between Miu and the supervisor: every decision is written to portfolio files, which stay the truth; messages only wake and point ("read file X"). Miu gains `supervisor wake`; the supervisor gains a back channel to Miu for results, stuck work and decisions only | Owner round 4 "C", held unrevised through rounds 5-7 | 2026-11-19 |
 | SP-D4 | Urgent chores go through the supervisor by default (Miu writes the chore to a file and wakes the supervisor, which starts a `fgos run`). Miu runs `fgos run` herself only when truly needed: the supervisor cannot come up or is stuck, or the owner is waiting and the chore only reads or checks. Each such run is written to a file for the supervisor; writes happen only in a worktree and reach main through the merge queue. Miu's grant gains `run`. The budget ceiling per Miu run is open | Owner round 5 "Anh chọn C", held unrevised through rounds 6-7; fits SP-D1 (rarely orders directly) | 2026-11-19 |
+| SP-D5 | Observation has two tiers. The watcher is the supervisor's drone: no LLM, on a period, it collects mechanical signals for every session registered in Identity for the project (gone; idle too long while holding unfinished work; no commit or result for N minutes; repeated refused commands) and wakes the supervisor. On real trouble the supervisor goes on site: it reads the session's recent work through a read-only door, then asks, helps, wakes or replaces it. No patrol without a signal; the supervisor never does a session's work unless that session is stuck | Owner rounds 7-8 ("đồng ý"; "thiết bị drone ... hữu sự thật sự thì supervisor đi đến tận nơi"), held unrevised through round 14 | 2026-11-19 |
 
 ## 5. Q&A log
 
@@ -122,10 +129,97 @@ the door it goes through and how it is proven from the sandbox. Code and plans a
 - 2026-11-19 18:4x — Owner: "được. nhưng mà bảng điều phối thì lại phải tạo thêm cơ chế à? observe có base trên event
   store?" Scouted the Observe and Event Store specs; row 17 updated with options A/B/C.
 
+- 2026-11-19 18:5x — Board options asked; owner: "A". SP-D5 minted (observation, held since round 7). Rewrote §3 in place,
+  wrote the first §6 synthesis with the proposed grant table and the §7 draft tasks; proposed defaults for rows 4, 5,
+  7-9, 18-21 for the owner to read at once.
+
 ## 6. Thiết kế đã chốt {#design}
 
-Not yet.
+Draft synthesis, round 14. Rows 4, 5, 7-9, 18-21 are proposed defaults not yet read by the owner.
+
+**Two hands.** Miu (persona `secretary`) sits at the owner's side and is always on. Her job is the owner's cognitive
+load: what is the priority, the context, the problem, so the owner decides. She sets priority and plan order and holds
+life-and-death over sessions, but rarely acts directly (SP-D1). The supervisor (persona `supervisor`) is woken, not
+always on, and carries on what Miu arranged across every session of the project (SP-D2). Both are cross-domain. Who
+wins: the owner, then a direct Miu order, then the supervisor's own choice (row 7).
+
+**Talking.** Decisions are written to portfolio files, which stay the truth. Messages only wake and point (SP-D3).
+Miu hands work to the supervisor by raising an event on the supervision queue and calling `supervisor wake`; the
+supervisor reports back to Miu only results, stuck work and decisions. A session is reached by whichever of three means
+works: mailbox, SendMessage, pane typing (supervisor only, stuck session only) (row 15).
+
+**Seeing.** The watcher is the supervisor's drone (SP-D5): periodic, mechanical, every registered session, raising
+events that wake the supervisor. The supervisor goes on site through a read-only door into the session (row 19) and
+may tune the drone within config (row 20).
+
+**Remembering.** Coordination acts are State on the supervision event queue: open while they have coordination value,
+closed by `supervisor handled`, gone from the view (row 17). Improvement evidence is Log in Observe, read through
+`fgos metrics query`, friction and retro, and pruned once its finding is settled or after 30 days (rows 16-17).
+
+**Urgent chores.** By default through the supervisor (event plus wake, the supervisor starts a `fgos run`); Miu runs one
+herself only when the supervisor cannot come up or is stuck, or the owner waits and the chore only reads (SP-D4), under
+the row 18 ceiling.
+
+**Proposed grants** (changes against `src/session-host/head-grants.mjs` today; each row is granted only with a passing
+sandbox proof, row 8):
+
+| Power | Door | Miu | Supervisor |
+|---|---|---|---|
+| Start a session | `session start` | has | has |
+| Stop a session | `session stop` | add | has (heads only; row 21) |
+| Read the portfolio and queue | `supervisor plans`, `supervisor queue`, `slots`, `identity list` | add (read) | has (`identity list` to prove) |
+| Raise a coordination event | supervision queue raise (verb name for the planner) | add | add |
+| Close a coordination event | `supervisor handled` | no | has |
+| Wake the supervisor | `supervisor wake` | add | n/a |
+| Message a session | mailbox | has | add |
+| Message a Claude session directly | SendMessage (`peers`) | has | add |
+| Type into a stuck session | pane typing through terminal control | no | add (stuck only) |
+| Read a session's recent work | on-site read door (row 19) | no | add |
+| Tune the drone | watcher definition arm/thresholds (row 20) | no | add |
+| Run a unit | `fgos run` | add (SP-D4, row 18) | add (urgent chores) |
+| Record coordination evidence | `fgos metrics record` (coordination kinds) | add | add |
+| Write portfolio files | `land --paths`, `session write` | has (portfolio only) | has |
+| Owner questions | `questions ask/ack/cancel`; `answer` | has; has | has; no |
+
+```mermaid
+flowchart LR
+  O[Owner] <--> M[Miu: priority, order, context]
+  M -- files + event + wake --> Q[(Supervision queue)]
+  W[Watcher drone] -- signals as events --> Q
+  Q --> S[Supervisor]
+  S -- results, stuck, decisions --> M
+  S -- observe, ask, help, wake, replace --> X[Every session]
+  S -. on site read .-> X
+  S -- coordination evidence --> OB[(Observe)]
+  M -- coordination evidence --> OB
+  OB -- definitions --> W
+```
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Not yet.
+Draft, round 14; the planner shapes the final split. Siblings outside this topic: the work-management data model (row
+13), mailbox reliability and latency (row 15), the head-executor decision (row 15 agy gap), caps lane plan
+261119-1615 (its grant audit pattern is reused).
+
+### Grants and personas {#task-grants}
+Goal: the §6 grant table in `head-grants.mjs`, both persona yamls and both skills say the same thing; each added power
+has its sandbox proof. Decisions: SP-D1..SP-D5, rows 4, 5, 8, 18, 21. Verify: head-start preflight per persona passes;
+`npm test` green.
+
+### Coordination events {#task-coordination-events}
+Goal: Miu and the supervisor raise coordination events on the supervision queue and close them with `supervisor
+handled`; Miu's urgent chore and hand-off are such events. Decisions: SP-D3, SP-D4, row 17. Verify: `cargo test -p
+fgos-supervision` owning tests for raise and close.
+
+### Drone over every session {#task-drone}
+Goal: watcher definitions for the SP-D5 tier-1 signals over every Identity session of the project; the supervisor
+may tune them within config (row 20). Decisions: SP-D5, row 20. Verify: one fixture per definition in
+`packages/supervision/rust/tests/definitions.rs` style.
+
+### On-site read door {#task-on-site}
+Goal: one read-only verb that returns a session's recent work (screen or transcript) with per-CLI adapters, granted
+to the supervisor. Decisions: SP-D5, row 19. Verify: adapter tests per CLI plus one sandbox proof.
+
+### Coordination evidence and prune {#task-evidence}
+Goal: registered coordination kinds in Observe and a prune door that removes evidence of a settled finding or older
+than 30 days. Decisions: rows 16, 17. Verify: Observe owning tests for record and prune.
