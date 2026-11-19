@@ -1,0 +1,6588 @@
+{
+  "contract": "confinement-resource-vectors.v1",
+  "note": "Paths are written with $ROOT, the reader's fixture root. A fixture lists dirs, files, symlinks and modes under it; `git` names a real repository the recorder initialised (a plain checkout, or a linked worktree whose .git file points into main/.git/worktrees).",
+  "machinePrivateRoots": [
+    {
+      "name": "nothing exists: no roots",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks"
+      ]
+    },
+    {
+      "name": "home .fgos/private",
+      "fixture": {
+        "dirs": [
+          "home/.fgos/private",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/home/.fgos/private",
+        "$ROOT/sockbase/cc-socks"
+      ]
+    },
+    {
+      "name": "runtime directory",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase",
+          "rt"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": "$ROOT/rt",
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/rt",
+        "$ROOT/sockbase/cc-socks"
+      ]
+    },
+    {
+      "name": "runtime directory that does not exist is skipped",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": "$ROOT/nope",
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks"
+      ]
+    },
+    {
+      "name": "relative runtime directory has no value",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": "rt",
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks"
+      ]
+    },
+    {
+      "name": "session socket directory is created outside the runtime directory",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase",
+          "rt"
+        ],
+        "modes": {
+          "sockbase": 493
+        }
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": "$ROOT/rt",
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/rt",
+        "$ROOT/sockbase/cc-socks"
+      ],
+      "tree": [
+        {
+          "path": "home",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "rt",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase/cc-socks",
+          "kind": "dir",
+          "mode": 448
+        }
+      ]
+    },
+    {
+      "name": "session socket directory under the runtime directory is covered by it",
+      "fixture": {
+        "dirs": [
+          "home",
+          "rt/cc-socks"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/rt",
+        "xdgRuntimeDir": "$ROOT/rt",
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/rt"
+      ]
+    },
+    {
+      "name": "session socket directory created when the base is a real directory",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks"
+      ],
+      "tree": [
+        {
+          "path": "home",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase/cc-socks",
+          "kind": "dir",
+          "mode": 448
+        }
+      ]
+    },
+    {
+      "name": "session socket directory existing is left as it is",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase/cc-socks"
+        ],
+        "modes": {
+          "sockbase/cc-socks": 493
+        }
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks"
+      ],
+      "tree": [
+        {
+          "path": "home",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase/cc-socks",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "socket base missing creates nothing",
+      "fixture": {
+        "dirs": [
+          "home"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [],
+      "tree": [
+        {
+          "path": "home",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "herdr config under home",
+      "fixture": {
+        "dirs": [
+          "home/.config/herdr",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks",
+        "$ROOT/home/.config/herdr"
+      ]
+    },
+    {
+      "name": "herdr config under xdg config home",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase",
+          "xdg/herdr"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": "$ROOT/xdg",
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks",
+        "$ROOT/xdg/herdr"
+      ]
+    },
+    {
+      "name": "herdr socket directory",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase",
+          "herdr-run"
+        ],
+        "files": {
+          "herdr-run/herdr.sock": ""
+        }
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": "$ROOT/herdr-run/herdr.sock",
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks",
+        "$ROOT/herdr-run"
+      ]
+    },
+    {
+      "name": "herdr socket directory that is the home is refused",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": "$ROOT/home/herdr.sock",
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "error": "$HERDR_SOCKET_PATH \"$ROOT/home/herdr.sock\" lies directly in \"$ROOT/home\", which holds \"$ROOT/home\"; masking it would hide far more than herdr's sockets.",
+      "code": "herdr-socket-dir-too-broad"
+    },
+    {
+      "name": "herdr socket directory above the home is refused",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": "$ROOT/herdr.sock",
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "error": "$HERDR_SOCKET_PATH \"$ROOT/herdr.sock\" lies directly in \"$ROOT\", which holds \"$ROOT/home\"; masking it would hide far more than herdr's sockets.",
+      "code": "herdr-socket-dir-too-broad"
+    },
+    {
+      "name": "herdr socket directory that is the config directory is refused",
+      "fixture": {
+        "dirs": [
+          "home/.config",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": "$ROOT/home/.config/herdr.sock",
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "error": "$HERDR_SOCKET_PATH \"$ROOT/home/.config/herdr.sock\" lies directly in \"$ROOT/home/.config\", which holds \"$ROOT/home/.config\"; masking it would hide far more than herdr's sockets.",
+      "code": "herdr-socket-dir-too-broad"
+    },
+    {
+      "name": "herdr socket directory that is the xdg config home is refused",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase",
+          "xdg"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": "$ROOT/xdg",
+        "herdrSocketPath": "$ROOT/xdg/herdr.sock",
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "error": "$HERDR_SOCKET_PATH \"$ROOT/xdg/herdr.sock\" lies directly in \"$ROOT/xdg\", which holds \"$ROOT/xdg\"; masking it would hide far more than herdr's sockets.",
+      "code": "herdr-socket-dir-too-broad"
+    },
+    {
+      "name": "herdr socket directory that is /tmp is refused",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": "/tmp/herdr.sock",
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "error": "$HERDR_SOCKET_PATH \"/tmp/herdr.sock\" lies directly in \"/tmp\", which holds \"$ROOT/home\"; masking it would hide far more than herdr's sockets.",
+      "code": "herdr-socket-dir-too-broad"
+    },
+    {
+      "name": "relative herdr socket path has no value",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": "herdr.sock",
+        "loginStores": [],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks"
+      ]
+    },
+    {
+      "name": "login store",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase",
+          "logins/a",
+          "logins/b"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT/logins/a",
+          "$ROOT/logins/b"
+        ],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks",
+        "$ROOT/logins/a",
+        "$ROOT/logins/b"
+      ]
+    },
+    {
+      "name": "login store that does not exist is skipped",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT/logins/a"
+        ],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks"
+      ]
+    },
+    {
+      "name": "login store is a link: its real path is masked",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase",
+          "real"
+        ],
+        "symlinks": {
+          "logins/a": "$ROOT/real"
+        }
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT/logins/a"
+        ],
+        "confinementRoots": []
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks",
+        "$ROOT/real"
+      ]
+    },
+    {
+      "name": "login store that is the home is refused",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT/home"
+        ],
+        "confinementRoots": []
+      },
+      "error": "the login store \"$ROOT/home\" is the home \"$ROOT/home\" or holds it; masking it would hide the whole home.",
+      "code": "login-store-is-home"
+    },
+    {
+      "name": "login store that holds the home is refused",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT"
+        ],
+        "confinementRoots": []
+      },
+      "error": "the login store \"$ROOT\" is the home \"$ROOT/home\" or holds it; masking it would hide the whole home.",
+      "code": "login-store-is-home"
+    },
+    {
+      "name": "login store that is a file is refused",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ],
+        "files": {
+          "logins/file": "x"
+        }
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT/logins/file"
+        ],
+        "confinementRoots": []
+      },
+      "error": "the login store \"$ROOT/logins/file\" is not a directory.",
+      "code": "login-store-not-a-directory"
+    },
+    {
+      "name": "login store that is relative is refused",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "logins/a"
+        ],
+        "confinementRoots": []
+      },
+      "error": "the login store \"logins/a\" is not an absolute directory.",
+      "code": "login-store-not-a-directory"
+    },
+    {
+      "name": "login store that is not a string is refused",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          3
+        ],
+        "confinementRoots": []
+      },
+      "error": "the login store \"3\" is not an absolute directory.",
+      "code": "login-store-not-a-directory"
+    },
+    {
+      "name": "confinement root",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase",
+          "tmp/fgos-confinement"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/tmp/fgos-confinement"
+        ]
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks",
+        "$ROOT/tmp/fgos-confinement"
+      ]
+    },
+    {
+      "name": "two confinement roots, repeats once",
+      "fixture": {
+        "dirs": [
+          "home",
+          "sockbase",
+          "c1",
+          "c2"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/c1",
+          "$ROOT/c2",
+          "$ROOT/c1"
+        ]
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks",
+        "$ROOT/c1",
+        "$ROOT/c2"
+      ]
+    },
+    {
+      "name": "a root inside another is masked by the outer one",
+      "fixture": {
+        "dirs": [
+          "home/.fgos/private",
+          "logins/a",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT/logins/a"
+        ],
+        "confinementRoots": [
+          "$ROOT/home/.fgos"
+        ]
+      },
+      "ok": [
+        "$ROOT/sockbase/cc-socks",
+        "$ROOT/logins/a",
+        "$ROOT/home/.fgos"
+      ]
+    },
+    {
+      "name": "every root at once",
+      "fixture": {
+        "dirs": [
+          "home/.fgos/private",
+          "home/.config/herdr",
+          "rt",
+          "sockbase",
+          "xdg/herdr",
+          "hs",
+          "login",
+          "cr"
+        ]
+      },
+      "input": {
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": "$ROOT/rt",
+        "xdgConfigHome": "$ROOT/xdg",
+        "herdrSocketPath": "$ROOT/hs/herdr.sock",
+        "loginStores": [
+          "$ROOT/login"
+        ],
+        "confinementRoots": [
+          "$ROOT/cr"
+        ]
+      },
+      "ok": [
+        "$ROOT/home/.fgos/private",
+        "$ROOT/rt",
+        "$ROOT/sockbase/cc-socks",
+        "$ROOT/home/.config/herdr",
+        "$ROOT/xdg/herdr",
+        "$ROOT/hs",
+        "$ROOT/login",
+        "$ROOT/cr"
+      ],
+      "tree": [
+        {
+          "path": "cr",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.config",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.config/herdr",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.fgos/private",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "hs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "login",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "rt",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase/cc-socks",
+          "kind": "dir",
+          "mode": 448
+        },
+        {
+          "path": "xdg",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "xdg/herdr",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    }
+  ],
+  "runtimeDirForMask": [
+    {
+      "name": "xdg runtime dir wins",
+      "fixture": {},
+      "input": {
+        "env": {
+          "XDG_RUNTIME_DIR": "$ROOT/xdg"
+        },
+        "uid": "$UID",
+        "runUserBase": "$ROOT/run"
+      },
+      "ok": "$ROOT/xdg"
+    },
+    {
+      "name": "relative xdg runtime dir is not used",
+      "fixture": {},
+      "input": {
+        "env": {
+          "XDG_RUNTIME_DIR": "rel"
+        },
+        "uid": "$UID",
+        "runUserBase": "$ROOT/run"
+      },
+      "ok": null
+    },
+    {
+      "name": "systemd directory of the user, 0700",
+      "fixture": {
+        "dirs": [
+          "run/$UID"
+        ],
+        "modes": {
+          "run/$UID": 448
+        }
+      },
+      "input": {
+        "env": {},
+        "uid": "$UID",
+        "runUserBase": "$ROOT/run"
+      },
+      "ok": "$ROOT/run/$UID"
+    },
+    {
+      "name": "systemd directory with loose mode is not used",
+      "fixture": {
+        "dirs": [
+          "run/$UID"
+        ],
+        "modes": {
+          "run/$UID": 493
+        }
+      },
+      "input": {
+        "env": {},
+        "uid": "$UID",
+        "runUserBase": "$ROOT/run"
+      },
+      "ok": null
+    },
+    {
+      "name": "systemd directory missing",
+      "fixture": {},
+      "input": {
+        "env": {},
+        "uid": "$UID",
+        "runUserBase": "$ROOT/run"
+      },
+      "ok": null
+    },
+    {
+      "name": "systemd path that is a link is not used",
+      "fixture": {
+        "dirs": [
+          "real"
+        ],
+        "symlinks": {
+          "run/$UID": "$ROOT/real"
+        },
+        "modes": {
+          "real": 448
+        }
+      },
+      "input": {
+        "env": {},
+        "uid": "$UID",
+        "runUserBase": "$ROOT/run"
+      },
+      "ok": null
+    },
+    {
+      "name": "systemd path that is a file is not used",
+      "fixture": {
+        "files": {
+          "run/$UID": ""
+        }
+      },
+      "input": {
+        "env": {},
+        "uid": "$UID",
+        "runUserBase": "$ROOT/run"
+      },
+      "ok": null
+    },
+    {
+      "name": "systemd directory of another uid is not used",
+      "fixture": {
+        "dirs": [
+          "run/$UID"
+        ],
+        "modes": {
+          "run/$UID": 448
+        }
+      },
+      "input": {
+        "env": {},
+        "uid": "$UID+1",
+        "runUserBase": "$ROOT/run"
+      },
+      "ok": null
+    },
+    {
+      "name": "no uid",
+      "fixture": {},
+      "input": {
+        "env": {},
+        "uid": null,
+        "runUserBase": "$ROOT/run"
+      },
+      "ok": null
+    }
+  ],
+  "claudeSocketBase": [
+    {
+      "name": "xdg runtime dir first",
+      "env": {
+        "XDG_RUNTIME_DIR": "/x/rt",
+        "CLAUDE_CODE_TMPDIR": "/x/cc",
+        "TMPDIR": "/x/t"
+      },
+      "ok": "/x/rt"
+    },
+    {
+      "name": "claude code tmp dir",
+      "env": {
+        "CLAUDE_CODE_TMPDIR": "/x/cc",
+        "TMPDIR": "/x/t"
+      },
+      "ok": "/x/cc"
+    },
+    {
+      "name": "TMPDIR",
+      "env": {
+        "TMPDIR": "/x/t",
+        "TMP": "/x/tmp",
+        "TEMP": "/x/temp"
+      },
+      "ok": "/x/t"
+    },
+    {
+      "name": "TMP",
+      "env": {
+        "TMP": "/x/tmp",
+        "TEMP": "/x/temp"
+      },
+      "ok": "/x/tmp"
+    },
+    {
+      "name": "TEMP",
+      "env": {
+        "TEMP": "/x/temp"
+      },
+      "ok": "/x/temp"
+    },
+    {
+      "name": "relative values are skipped",
+      "env": {
+        "XDG_RUNTIME_DIR": "a",
+        "CLAUDE_CODE_TMPDIR": "b",
+        "TMPDIR": "c",
+        "TMP": "d",
+        "TEMP": "e"
+      },
+      "ok": "/tmp"
+    },
+    {
+      "name": "nothing set falls to /tmp",
+      "env": {},
+      "ok": "/tmp"
+    }
+  ],
+  "blindHiddenRoots": [
+    {
+      "name": "no fgosDir",
+      "fixture": {
+        "dirs": []
+      },
+      "input": {
+        "fgosDir": "",
+        "backendConfig": {}
+      },
+      "error": "hostRead: blind requires context.fgosDir to name the run state it hides.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "nothing exists",
+      "fixture": {
+        "dirs": [
+          "fgos"
+        ]
+      },
+      "input": {
+        "fgosDir": "$ROOT/fgos",
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        }
+      },
+      "ok": []
+    },
+    {
+      "name": "every hidden root exists",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments",
+          "fgos/workflow-runs",
+          "fgos/dispatch-runs",
+          "fgos/runtime/mailbox",
+          "homes"
+        ]
+      },
+      "input": {
+        "fgosDir": "$ROOT/fgos",
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        }
+      },
+      "ok": [
+        "$ROOT/fgos/assignments",
+        "$ROOT/fgos/workflow-runs",
+        "$ROOT/fgos/dispatch-runs",
+        "$ROOT/fgos/runtime/mailbox",
+        "$ROOT/homes"
+      ]
+    },
+    {
+      "name": "temp root from backend tempRoot",
+      "fixture": {
+        "dirs": [
+          "fgos",
+          "tmpr"
+        ]
+      },
+      "input": {
+        "fgosDir": "$ROOT/fgos",
+        "backendConfig": {
+          "tempRoot": "$ROOT/tmpr"
+        }
+      },
+      "ok": [
+        "$ROOT/tmpr"
+      ]
+    },
+    {
+      "name": "a hidden root that is a file is not hidden",
+      "fixture": {
+        "dirs": [
+          "fgos"
+        ],
+        "files": {
+          "fgos/assignments": "x"
+        }
+      },
+      "input": {
+        "fgosDir": "$ROOT/fgos",
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/none"
+        }
+      },
+      "ok": []
+    },
+    {
+      "name": "a hidden root that is a link is real-pathed",
+      "fixture": {
+        "dirs": [
+          "elsewhere",
+          "fgos"
+        ],
+        "symlinks": {
+          "fgos/assignments": "$ROOT/elsewhere"
+        }
+      },
+      "input": {
+        "fgosDir": "$ROOT/fgos",
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/none"
+        }
+      },
+      "ok": [
+        "$ROOT/elsewhere"
+      ]
+    }
+  ],
+  "createBlindRoots": [
+    {
+      "name": "creates the mailbox directory 0700",
+      "fixture": {
+        "dirs": [
+          "fgos"
+        ]
+      },
+      "input": {
+        "fgosDir": "$ROOT/fgos"
+      },
+      "ok": null,
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/runtime",
+          "kind": "dir",
+          "mode": 448
+        },
+        {
+          "path": "fgos/runtime/mailbox",
+          "kind": "dir",
+          "mode": 448
+        }
+      ]
+    },
+    {
+      "name": "creates the runtime directory on the way",
+      "fixture": {
+        "dirs": [
+          "fgos"
+        ]
+      },
+      "input": {
+        "fgosDir": "$ROOT/fgos"
+      },
+      "ok": null,
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/runtime",
+          "kind": "dir",
+          "mode": 448
+        },
+        {
+          "path": "fgos/runtime/mailbox",
+          "kind": "dir",
+          "mode": 448
+        }
+      ]
+    },
+    {
+      "name": "no-op when .fgos is missing",
+      "fixture": {
+        "dirs": []
+      },
+      "input": {
+        "fgosDir": "$ROOT/fgos"
+      },
+      "ok": null,
+      "tree": []
+    },
+    {
+      "name": "no-op for a blank directory",
+      "fixture": {
+        "dirs": []
+      },
+      "input": {
+        "fgosDir": "  "
+      },
+      "ok": null,
+      "tree": []
+    },
+    {
+      "name": "leaves an existing directory as it is",
+      "fixture": {
+        "dirs": [
+          "fgos/runtime/mailbox"
+        ],
+        "modes": {
+          "fgos/runtime/mailbox": 493
+        }
+      },
+      "input": {
+        "fgosDir": "$ROOT/fgos"
+      },
+      "ok": null,
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/runtime",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/runtime/mailbox",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "runtime a plain file leaves the root missing",
+      "fixture": {
+        "dirs": [
+          "fgos"
+        ],
+        "files": {
+          "fgos/runtime": "x"
+        }
+      },
+      "input": {
+        "fgosDir": "$ROOT/fgos"
+      },
+      "ok": null,
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/runtime",
+          "kind": "file"
+        }
+      ]
+    }
+  ],
+  "canonicalizeSubpath": [
+    {
+      "name": "inside",
+      "fixture": {
+        "dirs": [
+          "r/a"
+        ]
+      },
+      "input": {
+        "args": [
+          "$ROOT/r/a",
+          "$ROOT/r",
+          "x"
+        ]
+      },
+      "ok": {
+        "hostTarget": "$ROOT/r/a",
+        "declaredRoot": "$ROOT/r"
+      }
+    },
+    {
+      "name": "the root itself",
+      "fixture": {
+        "dirs": [
+          "r"
+        ]
+      },
+      "input": {
+        "args": [
+          "$ROOT/r",
+          "$ROOT/r",
+          "x"
+        ]
+      },
+      "ok": {
+        "hostTarget": "$ROOT/r",
+        "declaredRoot": "$ROOT/r"
+      }
+    },
+    {
+      "name": "not yet existing under an existing ancestor",
+      "fixture": {
+        "dirs": [
+          "r"
+        ]
+      },
+      "input": {
+        "args": [
+          "$ROOT/r/new/deeper",
+          "$ROOT/r",
+          "x"
+        ]
+      },
+      "ok": {
+        "hostTarget": "$ROOT/r/new/deeper",
+        "declaredRoot": "$ROOT/r"
+      }
+    },
+    {
+      "name": "outside",
+      "fixture": {
+        "dirs": [
+          "r",
+          "s"
+        ]
+      },
+      "input": {
+        "args": [
+          "$ROOT/s",
+          "$ROOT/r",
+          "x"
+        ]
+      },
+      "error": "symlink escape or out-of-bounds path detected for resource \"x\": resolved path \"$ROOT/s\" escapes declared root \"$ROOT/r\".",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "sibling with the root as name prefix",
+      "fixture": {
+        "dirs": [
+          "r",
+          "r2"
+        ]
+      },
+      "input": {
+        "args": [
+          "$ROOT/r2",
+          "$ROOT/r",
+          "x"
+        ]
+      },
+      "error": "symlink escape or out-of-bounds path detected for resource \"x\": resolved path \"$ROOT/r2\" escapes declared root \"$ROOT/r\".",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "link escaping the root",
+      "fixture": {
+        "dirs": [
+          "r",
+          "s"
+        ],
+        "symlinks": {
+          "r/l": "$ROOT/s"
+        }
+      },
+      "input": {
+        "args": [
+          "$ROOT/r/l",
+          "$ROOT/r",
+          "x"
+        ]
+      },
+      "error": "symlink escape or out-of-bounds path detected for resource \"x\": resolved path \"$ROOT/s\" escapes declared root \"$ROOT/r\".",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "link staying inside the root",
+      "fixture": {
+        "dirs": [
+          "r/a"
+        ],
+        "symlinks": {
+          "r/l": "$ROOT/r/a"
+        }
+      },
+      "input": {
+        "args": [
+          "$ROOT/r/l",
+          "$ROOT/r",
+          "x"
+        ]
+      },
+      "ok": {
+        "hostTarget": "$ROOT/r/a",
+        "declaredRoot": "$ROOT/r"
+      }
+    },
+    {
+      "name": "root that is a link",
+      "fixture": {
+        "dirs": [
+          "real/a"
+        ],
+        "symlinks": {
+          "rl": "$ROOT/real"
+        }
+      },
+      "input": {
+        "args": [
+          "$ROOT/rl/a",
+          "$ROOT/rl",
+          "x"
+        ]
+      },
+      "ok": {
+        "hostTarget": "$ROOT/real/a",
+        "declaredRoot": "$ROOT/real"
+      }
+    },
+    {
+      "name": "target blank",
+      "fixture": {
+        "dirs": [
+          "r"
+        ]
+      },
+      "input": {
+        "args": [
+          "  ",
+          "$ROOT/r",
+          "x"
+        ]
+      },
+      "error": "resource \"x\" target path must be a non-empty string.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "root blank",
+      "fixture": {
+        "dirs": [
+          "r"
+        ]
+      },
+      "input": {
+        "args": [
+          "$ROOT/r",
+          "",
+          "x"
+        ]
+      },
+      "error": "resource \"x\" declared root must be a non-empty string.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "target not a string",
+      "fixture": {
+        "dirs": [
+          "r"
+        ]
+      },
+      "input": {
+        "args": [
+          null,
+          "$ROOT/r",
+          "x"
+        ]
+      },
+      "error": "resource \"x\" target path must be a non-empty string.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "dot-dot that leaves the root",
+      "fixture": {
+        "dirs": [
+          "r",
+          "s"
+        ]
+      },
+      "input": {
+        "args": [
+          "$ROOT/r/../s",
+          "$ROOT/r",
+          "x"
+        ]
+      },
+      "error": "symlink escape or out-of-bounds path detected for resource \"x\": resolved path \"$ROOT/s\" escapes declared root \"$ROOT/r\".",
+      "code": "confinement-grant-invalid"
+    }
+  ],
+  "isInsideRoot": [
+    {
+      "name": "equal",
+      "target": "/a/b",
+      "root": "/a/b",
+      "ok": true
+    },
+    {
+      "name": "below",
+      "target": "/a/b/c",
+      "root": "/a/b",
+      "ok": true
+    },
+    {
+      "name": "sibling prefix",
+      "target": "/a/bc",
+      "root": "/a/b",
+      "ok": false
+    },
+    {
+      "name": "above",
+      "target": "/a",
+      "root": "/a/b",
+      "ok": false
+    },
+    {
+      "name": "root with trailing slash",
+      "target": "/a/b/c",
+      "root": "/a/b/",
+      "ok": true
+    },
+    {
+      "name": "root slash",
+      "target": "/a",
+      "root": "/",
+      "ok": true
+    }
+  ],
+  "gitMetadata": [
+    {
+      "name": "plain checkout",
+      "layout": "checkout",
+      "ok": "$ROOT/repo/.git"
+    },
+    {
+      "name": "linked worktree",
+      "layout": "linked-worktree",
+      "ok": "$ROOT/main/.git/worktrees/repo"
+    },
+    {
+      "name": "no .git at all",
+      "layout": "none",
+      "ok": null
+    }
+  ],
+  "resolveResources": [
+    {
+      "name": "no dispatch id",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "dispatchId is required.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "no grants: only the machine-private masks",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "home/.fgos/private",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/home/.fgos/private",
+          "hostTarget": "$ROOT/home/.fgos/private",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/home/.fgos/private"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/sockbase/cc-socks",
+          "hostTarget": "$ROOT/sockbase/cc-socks",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/sockbase/cc-socks"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ]
+    },
+    {
+      "name": "run-output for a cli-spawn run",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "run-output",
+          "identity": "run-output:d1",
+          "hostTarget": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/assignments/u/p/1/runs/01"
+          },
+          "delivery": "mount",
+          "collect": "artifact",
+          "access": "write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ]
+    },
+    {
+      "name": "run-output for a herdr-spawn run",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo",
+          "adapter": "herdr-spawn"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "run-output",
+          "identity": "run-output:d1",
+          "hostTarget": "$ROOT/fgos/assignments/u/p/1/runs/01/outbox",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/assignments/u/p/1/runs/01/outbox"
+          },
+          "delivery": "mount",
+          "collect": "artifact",
+          "access": "write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01/outbox",
+          "kind": "dir",
+          "mode": 509
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "run-output for an assignment launch",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo",
+          "assignmentLaunchContext": true
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "run-output",
+          "identity": "run-output:d1",
+          "hostTarget": "$ROOT/fgos/assignments/u/p/1/runs/01/worker-output/outbox",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/assignments/u/p/1/runs/01/worker-output/outbox"
+          },
+          "delivery": "mount",
+          "collect": "artifact",
+          "access": "write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01/worker-output",
+          "kind": "dir",
+          "mode": 509
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01/worker-output/outbox",
+          "kind": "dir",
+          "mode": 509
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "run-output with the worker-output subpath",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch",
+            "subpath": "worker-output"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "run-output",
+          "identity": "run-output:d1",
+          "hostTarget": "$ROOT/fgos/assignments/u/p/1/runs/01/worker-output/outbox",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/assignments/u/p/1/runs/01/worker-output/outbox"
+          },
+          "delivery": "mount",
+          "collect": "artifact",
+          "access": "write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01/worker-output",
+          "kind": "dir",
+          "mode": 509
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01/worker-output/outbox",
+          "kind": "dir",
+          "mode": 509
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "run-output with the worker-output/outbox subpath",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch",
+            "subpath": "worker-output/outbox"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "run-output",
+          "identity": "run-output:d1",
+          "hostTarget": "$ROOT/fgos/assignments/u/p/1/runs/01/worker-output/outbox",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/assignments/u/p/1/runs/01/worker-output/outbox"
+          },
+          "delivery": "mount",
+          "collect": "artifact",
+          "access": "write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01/worker-output",
+          "kind": "dir",
+          "mode": 509
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01/worker-output/outbox",
+          "kind": "dir",
+          "mode": 509
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "run-output without a run directory",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "run-output resource requires context.runDir to be specified.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "run-output without a state directory",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "run-output resource requires context.fgosDir so its containment boundary can be verified.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "run-output outside the state directory",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "elsewhere"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/elsewhere",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "symlink escape or out-of-bounds path detected for resource \"run-output\": resolved path \"$ROOT/elsewhere\" escapes declared root \"$ROOT/fgos\".",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "run-output through a link out of the state directory",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "elsewhere"
+        ],
+        "symlinks": {
+          "fgos/assignments/u/p/1/runs/02": "$ROOT/elsewhere"
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/02",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "symlink escape or out-of-bounds path detected for resource \"run-output\": resolved path \"$ROOT/elsewhere\" escapes declared root \"$ROOT/fgos\".",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "workspace",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "workspace",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "workspace",
+          "identity": "workspace:repo",
+          "hostTarget": "$ROOT/repo",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/repo"
+          },
+          "delivery": "mount",
+          "collect": "workspace-change",
+          "access": "read-write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ]
+    },
+    {
+      "name": "workspace from cwd",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "cwd": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "workspace",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "workspace",
+          "identity": "workspace:repo",
+          "hostTarget": "$ROOT/repo",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/repo"
+          },
+          "delivery": "mount",
+          "collect": "workspace-change",
+          "access": "read-write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ]
+    },
+    {
+      "name": "workspace without a root",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos"
+        },
+        "grants": [
+          {
+            "resource": "workspace",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "workspace resource requires context.repoRoot or context.cwd.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "workspace root that is a link is refused",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "real"
+        ],
+        "symlinks": {
+          "rl": "$ROOT/real"
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/rl"
+        },
+        "grants": [
+          {
+            "resource": "workspace",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "workspace root \"$ROOT/rl\" resolves through a symlink to \"$ROOT/real\"; use its canonical path.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "workspace-paths directory is bound, a file is not",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "repo/plans"
+        ],
+        "files": {
+          "repo/docs/backlog.md": "x"
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              "plans",
+              "docs/backlog.md"
+            ]
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "workspace-paths",
+          "identity": "workspace-paths:plans",
+          "hostTarget": "$ROOT/repo/plans",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/repo/plans"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ]
+    },
+    {
+      "name": "workspace-paths entry missing",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              "plans"
+            ]
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "workspace-paths entry \"plans\" does not exist under $ROOT/repo; create it before the session starts.",
+      "code": "workspace-path-missing"
+    },
+    {
+      "name": "workspace-paths entry is a link",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "repo/real"
+        ],
+        "symlinks": {
+          "repo/plans": "$ROOT/repo/real"
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              "plans"
+            ]
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "workspace-paths entry \"plans\" is a symbolic link; name the real path.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "workspace-paths directory between is a link",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "repo/real/sub"
+        ],
+        "symlinks": {
+          "repo/docs": "$ROOT/repo/real"
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              "docs/sub"
+            ]
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "workspace-paths: \"docs\" under $ROOT/repo is a symbolic link; a grant names real paths only.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "workspace-paths invalid shape",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              "/etc"
+            ]
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "runner config (workspace-paths grant) path \"/etc\" is absolute; a workspace path is relative to the project root.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "workspace-paths without a root",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              "plans"
+            ]
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "workspace-paths requires context.repoRoot or context.cwd.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "mailbox-record creates the lock file and the directory",
+      "fixture": {
+        "dirs": [
+          "fgos",
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "mailbox-record",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "mailbox-record",
+          "identity": "mailbox-record:lock",
+          "hostTarget": "$ROOT/fgos/locks/mailbox.lock",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/locks/mailbox.lock"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "mailbox-record",
+          "identity": "mailbox-record:record",
+          "hostTarget": "$ROOT/fgos/runtime/mailbox",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/runtime/mailbox"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/locks",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/locks/mailbox.lock",
+          "kind": "file"
+        },
+        {
+          "path": "fgos/runtime",
+          "kind": "dir",
+          "mode": 448
+        },
+        {
+          "path": "fgos/runtime/mailbox",
+          "kind": "dir",
+          "mode": 448
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "mailbox-record with the files in place",
+      "fixture": {
+        "dirs": [
+          "fgos/runtime/mailbox",
+          "fgos/locks",
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ],
+        "files": {
+          "fgos/locks/mailbox.lock": ""
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "mailbox-record",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "mailbox-record",
+          "identity": "mailbox-record:lock",
+          "hostTarget": "$ROOT/fgos/locks/mailbox.lock",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/locks/mailbox.lock"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "mailbox-record",
+          "identity": "mailbox-record:record",
+          "hostTarget": "$ROOT/fgos/runtime/mailbox",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/runtime/mailbox"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/locks",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/locks/mailbox.lock",
+          "kind": "file"
+        },
+        {
+          "path": "fgos/runtime",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/runtime/mailbox",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "mailbox-record without a state directory",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "mailbox-record",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "mailbox-record requires context.fgosDir.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "mailbox-record where runtime/mailbox is a link",
+      "fixture": {
+        "dirs": [
+          "fgos",
+          "elsewhere",
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ],
+        "symlinks": {
+          "fgos/runtime": "$ROOT/elsewhere"
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "mailbox-record",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "mailbox-record: \"runtime\" under $ROOT/fgos is a symbolic link; a grant names real paths only.",
+      "code": "confinement-grant-invalid",
+      "tree": [
+        {
+          "path": "elsewhere",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/runtime",
+          "kind": "link"
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "mailbox-record where the lock file is a link",
+      "fixture": {
+        "dirs": [
+          "fgos/locks",
+          "elsewhere",
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ],
+        "symlinks": {
+          "fgos/locks/mailbox.lock": "$ROOT/elsewhere"
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "mailbox-record",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "mailbox-record: \"locks/mailbox.lock\" under $ROOT/fgos is a symbolic link; a grant names real paths only.",
+      "code": "confinement-grant-invalid",
+      "tree": [
+        {
+          "path": "elsewhere",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/locks",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/locks/mailbox.lock",
+          "kind": "link"
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "mailbox-record where the lock directory is a link",
+      "fixture": {
+        "dirs": [
+          "fgos",
+          "elsewhere",
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ],
+        "symlinks": {
+          "fgos/locks": "$ROOT/elsewhere"
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "mailbox-record",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "mailbox-record: \"locks\" under $ROOT/fgos is a symbolic link; a grant names real paths only.",
+      "code": "confinement-grant-invalid",
+      "tree": [
+        {
+          "path": "elsewhere",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/locks",
+          "kind": "link"
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "mailbox-record where the lock file is a directory",
+      "fixture": {
+        "dirs": [
+          "fgos/locks/mailbox.lock",
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "mailbox-record",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "the mailbox record under $ROOT/fgos cannot be prepared: EISDIR: illegal operation on a directory, open '$ROOT/fgos/locks/mailbox.lock'",
+      "code": "mailbox-record-unavailable",
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/locks",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/locks/mailbox.lock",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "mailbox-record where .fgos cannot take the directory",
+      "fixture": {
+        "dirs": [
+          "fgos",
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ],
+        "files": {
+          "fgos/runtime": "x"
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "mailbox-record",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "the mailbox record under $ROOT/fgos cannot be prepared: ENOTDIR: not a directory, lstat '$ROOT/fgos/runtime/mailbox'",
+      "code": "mailbox-record-unavailable",
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/runtime",
+          "kind": "file"
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "git metadata of a directory that is not a checkout root",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "workspace-git-metadata",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ]
+    },
+    {
+      "name": "git metadata without a root",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos"
+        },
+        "grants": [
+          {
+            "resource": "workspace-git-metadata",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "workspace-git-metadata requires context.repoRoot or context.cwd.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "private-home",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "private-home",
+          "identity": "private-home:d1",
+          "hostTarget": "$ROOT/homes/d1/home",
+          "tempRoot": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes/d1/home"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "temporary"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ]
+    },
+    {
+      "name": "private-home from the backend temp root",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "tmpr"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "tempRoot": "$ROOT/tmpr"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "private-home",
+          "identity": "private-home:d1",
+          "hostTarget": "$ROOT/tmpr/d1/home",
+          "tempRoot": "$ROOT/tmpr",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/tmpr/d1/home"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "temporary"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ]
+    },
+    {
+      "name": "private-home with a hostile dispatch id",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "../escape",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "symlink escape or out-of-bounds path detected for resource \"private-home\": resolved path \"$ROOT/escape/home\" escapes declared root \"$ROOT/homes\".",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "executor-credentials at a given path",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "creds"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {
+          "credentialsPath": "$ROOT/creds"
+        },
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "executor-credentials",
+          "identity": "executor-credentials:creds",
+          "hostTarget": "$ROOT/creds",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/creds"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ]
+    },
+    {
+      "name": "executor-credentials at a given directory",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "credsdir"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {
+          "credentialsDir": "$ROOT/credsdir"
+        },
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "executor-credentials",
+          "identity": "executor-credentials:credsdir",
+          "hostTarget": "$ROOT/credsdir",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/credsdir"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ]
+    },
+    {
+      "name": "executor-credentials that do not exist",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {
+          "credentialsPath": "$ROOT/none"
+        },
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ]
+    },
+    {
+      "name": "executor-credentials must be read only",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "executor-credentials",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {
+          "credentialsPath": "$ROOT/none"
+        },
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "executor-credentials resource access must be strictly \"read\", got \"read-write\".",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "peer-sessions binds the socket directory and the registry",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "sockbase",
+          "home/.claude/sessions"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "peer-sessions",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "peer-sessions",
+          "identity": "peer-sessions:sockets",
+          "hostTarget": "$ROOT/sockbase/cc-socks",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/sockbase/cc-socks"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "existing",
+          "env": {
+            "CLAUDE_CODE_TMPDIR": "$ROOT/sockbase"
+          }
+        },
+        {
+          "resource": "peer-sessions",
+          "identity": "peer-sessions:registry",
+          "hostTarget": "$ROOT/home/.claude/sessions",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/home/.claude/sessions"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/sockbase/cc-socks",
+          "hostTarget": "$ROOT/sockbase/cc-socks",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/sockbase/cc-socks"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.claude",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.claude/sessions",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase/cc-socks",
+          "kind": "dir",
+          "mode": 448
+        }
+      ]
+    },
+    {
+      "name": "peer-sessions registry lands in the private home",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "sockbase",
+          "home/.claude/sessions"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "peer-sessions",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "private-home",
+          "identity": "private-home:d1",
+          "hostTarget": "$ROOT/homes/d1/home",
+          "tempRoot": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes/d1/home"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "temporary"
+        },
+        {
+          "resource": "peer-sessions",
+          "identity": "peer-sessions:sockets",
+          "hostTarget": "$ROOT/sockbase/cc-socks",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/sockbase/cc-socks"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "existing",
+          "env": {
+            "CLAUDE_CODE_TMPDIR": "$ROOT/sockbase"
+          }
+        },
+        {
+          "resource": "peer-sessions",
+          "identity": "peer-sessions:registry",
+          "hostTarget": "$ROOT/home/.claude/sessions",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes/d1/home/sessions"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/sockbase/cc-socks",
+          "hostTarget": "$ROOT/sockbase/cc-socks",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/sockbase/cc-socks"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.claude",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.claude/sessions",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase/cc-socks",
+          "kind": "dir",
+          "mode": 448
+        }
+      ]
+    },
+    {
+      "name": "peer-sessions names the runtime directory variable when the base is it",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "rt",
+          "home/.claude/sessions"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "peer-sessions",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/rt",
+        "xdgRuntimeDir": "$ROOT/rt",
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "peer-sessions",
+          "identity": "peer-sessions:sockets",
+          "hostTarget": "$ROOT/rt/cc-socks",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/rt/cc-socks"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "existing",
+          "env": {
+            "XDG_RUNTIME_DIR": "$ROOT/rt"
+          }
+        },
+        {
+          "resource": "peer-sessions",
+          "identity": "peer-sessions:registry",
+          "hostTarget": "$ROOT/home/.claude/sessions",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/home/.claude/sessions"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/rt",
+          "hostTarget": "$ROOT/rt",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/rt"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.claude",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.claude/sessions",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "rt",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "rt/cc-socks",
+          "kind": "dir",
+          "mode": 448
+        }
+      ]
+    },
+    {
+      "name": "peer-sessions without a registry",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "peer-sessions",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "peer-sessions",
+          "identity": "peer-sessions:sockets",
+          "hostTarget": "$ROOT/sockbase/cc-socks",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/sockbase/cc-socks"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "existing",
+          "env": {
+            "CLAUDE_CODE_TMPDIR": "$ROOT/sockbase"
+          }
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/sockbase/cc-socks",
+          "hostTarget": "$ROOT/sockbase/cc-socks",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/sockbase/cc-socks"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase/cc-socks",
+          "kind": "dir",
+          "mode": 448
+        }
+      ]
+    },
+    {
+      "name": "peer-sessions must be read-write",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "peer-sessions",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "peer-sessions access must be strictly \"read-write\", got \"read\".",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "masks marked machine-private and confinement roots",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "home/.fgos/private",
+          "sockbase",
+          "login"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT/login"
+        ],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/home/.fgos/private",
+          "hostTarget": "$ROOT/home/.fgos/private",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/home/.fgos/private"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/sockbase/cc-socks",
+          "hostTarget": "$ROOT/sockbase/cc-socks",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/sockbase/cc-socks"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/login",
+          "hostTarget": "$ROOT/login",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/login"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.fgos/private",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "login",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase/cc-socks",
+          "kind": "dir",
+          "mode": 448
+        }
+      ]
+    },
+    {
+      "name": "launch program inside a masked root is bound back (install directories)",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "login/bin",
+          "login/install",
+          "login/other"
+        ],
+        "files": {
+          "login/bin/agent": ""
+        },
+        "modes": {
+          "login/bin/agent": 493
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo",
+          "launchCommand": "$ROOT/login/bin/agent"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT/login"
+        ],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/login",
+          "hostTarget": "$ROOT/login",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/login"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        },
+        {
+          "resource": "launch-program",
+          "identity": "launch-program:$ROOT/login/bin",
+          "hostTarget": "$ROOT/login/bin",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/login/bin"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read",
+          "allocation": "existing"
+        },
+        {
+          "resource": "launch-program",
+          "identity": "launch-program:$ROOT/login/install",
+          "hostTarget": "$ROOT/login/install",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/login/install"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read",
+          "allocation": "existing"
+        }
+      ]
+    },
+    {
+      "name": "launch program inside a masked root with no install directory is bound alone",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "login"
+        ],
+        "files": {
+          "login/agent": ""
+        },
+        "modes": {
+          "login/agent": 493
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo",
+          "launchCommand": "$ROOT/login/agent"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT/login"
+        ],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/login",
+          "hostTarget": "$ROOT/login",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/login"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        },
+        {
+          "resource": "launch-program",
+          "identity": "launch-program:$ROOT/login/agent",
+          "hostTarget": "$ROOT/login/agent",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/login/agent"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read",
+          "allocation": "existing"
+        }
+      ]
+    },
+    {
+      "name": "launch program found on the launch path",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "login/packages",
+          "tools"
+        ],
+        "files": {
+          "login/agent": ""
+        },
+        "symlinks": {
+          "tools/agent": "$ROOT/login/agent"
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo",
+          "launchCommand": "agent",
+          "launchPath": "$ROOT/tools"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT/login"
+        ],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/login",
+          "hostTarget": "$ROOT/login",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/login"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        },
+        {
+          "resource": "launch-program",
+          "identity": "launch-program:$ROOT/login/agent",
+          "hostTarget": "$ROOT/login/agent",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/login/agent"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read",
+          "allocation": "existing"
+        }
+      ]
+    },
+    {
+      "name": "launch program outside every masked root needs no bind",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "login",
+          "tools"
+        ],
+        "files": {
+          "tools/agent": ""
+        }
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo",
+          "launchCommand": "$ROOT/tools/agent"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT/login"
+        ],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/login",
+          "hostTarget": "$ROOT/login",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/login"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ]
+    },
+    {
+      "name": "launch program that does not exist",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "login"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo",
+          "launchCommand": "$ROOT/login/none"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT/login"
+        ],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/login",
+          "hostTarget": "$ROOT/login",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/login"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ]
+    },
+    {
+      "name": "blind hides the other dispatches and keeps its own",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "fgos/workflow-runs",
+          "fgos/dispatch-runs"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": true,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/fgos/assignments",
+          "hostTarget": "$ROOT/fgos/assignments",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/assignments"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/fgos/workflow-runs",
+          "hostTarget": "$ROOT/fgos/workflow-runs",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/workflow-runs"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/fgos/dispatch-runs",
+          "hostTarget": "$ROOT/fgos/dispatch-runs",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/dispatch-runs"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/fgos/runtime/mailbox",
+          "hostTarget": "$ROOT/fgos/runtime/mailbox",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/runtime/mailbox"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing"
+        },
+        {
+          "resource": "own-assignment",
+          "identity": "own-assignment:1",
+          "hostTarget": "$ROOT/fgos/assignments/u/p/1",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/assignments/u/p/1"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read",
+          "allocation": "existing"
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/dispatch-runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/runtime",
+          "kind": "dir",
+          "mode": 448
+        },
+        {
+          "path": "fgos/runtime/mailbox",
+          "kind": "dir",
+          "mode": 448
+        },
+        {
+          "path": "fgos/workflow-runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "blind hides the mailbox record it creates",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": true,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/fgos/assignments",
+          "hostTarget": "$ROOT/fgos/assignments",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/assignments"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/fgos/runtime/mailbox",
+          "hostTarget": "$ROOT/fgos/runtime/mailbox",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/runtime/mailbox"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing"
+        },
+        {
+          "resource": "own-assignment",
+          "identity": "own-assignment:1",
+          "hostTarget": "$ROOT/fgos/assignments/u/p/1",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/assignments/u/p/1"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read",
+          "allocation": "existing"
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/runtime",
+          "kind": "dir",
+          "mode": 448
+        },
+        {
+          "path": "fgos/runtime/mailbox",
+          "kind": "dir",
+          "mode": 448
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "blind root already masked by a machine-private root is not hidden twice",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "fgos/workflow-runs"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": true,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [
+          "$ROOT/fgos"
+        ],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/fgos",
+          "hostTarget": "$ROOT/fgos",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        },
+        {
+          "resource": "own-assignment",
+          "identity": "own-assignment:1",
+          "hostTarget": "$ROOT/fgos/assignments/u/p/1",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/assignments/u/p/1"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read",
+          "allocation": "existing"
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/runtime",
+          "kind": "dir",
+          "mode": 448
+        },
+        {
+          "path": "fgos/runtime/mailbox",
+          "kind": "dir",
+          "mode": 448
+        },
+        {
+          "path": "fgos/workflow-runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "blind without a run directory",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": true,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "hostRead: blind requires context.runDir.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "blind where the own directory is missing",
+      "fixture": {
+        "dirs": [
+          "fgos",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/run-x",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": true,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "hostRead: blind needs the dispatch's own directory \"$ROOT/fgos/run-x\" to exist before launch.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "blind with a run directory of its own (no assignment)",
+      "fixture": {
+        "dirs": [
+          "fgos/dispatch-runs/r1",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/dispatch-runs/r1",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": true,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/fgos/dispatch-runs",
+          "hostTarget": "$ROOT/fgos/dispatch-runs",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/dispatch-runs"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/fgos/runtime/mailbox",
+          "hostTarget": "$ROOT/fgos/runtime/mailbox",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/runtime/mailbox"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing"
+        },
+        {
+          "resource": "own-assignment",
+          "identity": "own-assignment:r1",
+          "hostTarget": "$ROOT/fgos/dispatch-runs/r1",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/dispatch-runs/r1"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read",
+          "allocation": "existing"
+        }
+      ],
+      "tree": [
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/dispatch-runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/dispatch-runs/r1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/runtime",
+          "kind": "dir",
+          "mode": 448
+        },
+        {
+          "path": "fgos/runtime/mailbox",
+          "kind": "dir",
+          "mode": 448
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        }
+      ]
+    },
+    {
+      "name": "blind without a state directory",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {},
+        "blind": true,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "error": "hostRead: blind requires context.fgosDir to name the run state it hides.",
+      "code": "confinement-grant-invalid"
+    },
+    {
+      "name": "every grant of the workspace-write policy but git metadata",
+      "fixture": {
+        "dirs": [
+          "fgos/assignments/u/p/1/runs/01",
+          "repo",
+          "homes",
+          "creds",
+          "home/.fgos/private",
+          "sockbase"
+        ]
+      },
+      "input": {
+        "dispatchId": "d1",
+        "context": {
+          "runDir": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "fgosDir": "$ROOT/fgos",
+          "repoRoot": "$ROOT/repo"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backendConfig": {
+          "privateHomeRoot": "$ROOT/homes"
+        },
+        "providerSources": {
+          "credentialsPath": "$ROOT/creds"
+        },
+        "blind": false,
+        "homeDir": "$ROOT/home",
+        "claudeSocketBase": "$ROOT/sockbase",
+        "xdgRuntimeDir": null,
+        "xdgConfigHome": null,
+        "herdrSocketPath": null,
+        "loginStores": [],
+        "confinementRoots": [
+          "$ROOT/homes"
+        ]
+      },
+      "ok": [
+        {
+          "resource": "run-output",
+          "identity": "run-output:d1",
+          "hostTarget": "$ROOT/fgos/assignments/u/p/1/runs/01",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/fgos/assignments/u/p/1/runs/01"
+          },
+          "delivery": "mount",
+          "collect": "artifact",
+          "access": "write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "workspace",
+          "identity": "workspace:repo",
+          "hostTarget": "$ROOT/repo",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/repo"
+          },
+          "delivery": "mount",
+          "collect": "workspace-change",
+          "access": "read-write",
+          "allocation": "existing"
+        },
+        {
+          "resource": "private-home",
+          "identity": "private-home:d1",
+          "hostTarget": "$ROOT/homes/d1/home",
+          "tempRoot": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes/d1/home"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read-write",
+          "allocation": "temporary"
+        },
+        {
+          "resource": "executor-credentials",
+          "identity": "executor-credentials:creds",
+          "hostTarget": "$ROOT/creds",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/creds"
+          },
+          "delivery": "mount",
+          "collect": "none",
+          "access": "read",
+          "allocation": "existing"
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/home/.fgos/private",
+          "hostTarget": "$ROOT/home/.fgos/private",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/home/.fgos/private"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/sockbase/cc-socks",
+          "hostTarget": "$ROOT/sockbase/cc-socks",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/sockbase/cc-socks"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true
+        },
+        {
+          "resource": "hidden-root",
+          "identity": "hidden-root:$ROOT/homes",
+          "hostTarget": "$ROOT/homes",
+          "executionTarget": {
+            "location": "host",
+            "path": "$ROOT/homes"
+          },
+          "delivery": "mask",
+          "collect": "none",
+          "access": "hidden",
+          "allocation": "existing",
+          "machinePrivate": true,
+          "confinementRoot": true
+        }
+      ],
+      "tree": [
+        {
+          "path": "creds",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "fgos/assignments/u/p/1/runs/01",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.fgos",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "home/.fgos/private",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "homes",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "repo",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase",
+          "kind": "dir",
+          "mode": 493
+        },
+        {
+          "path": "sockbase/cc-socks",
+          "kind": "dir",
+          "mode": 448
+        }
+      ]
+    }
+  ]
+}

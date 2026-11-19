@@ -395,6 +395,7 @@ dependencies = [
  "fgos-session-host",
  "fgos-terminal-control",
  "fgos-write-scope",
+ "libc",
  "serde",
  "serde_json",
  "sha2",
