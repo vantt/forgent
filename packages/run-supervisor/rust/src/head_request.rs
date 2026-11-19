@@ -16,7 +16,7 @@ use std::os::unix::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use std::sync::{Arc, Mutex, OnceLock};
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use fgos_identity::cli_dirs::{claude_config_dir, read_claude_session};
@@ -112,44 +112,11 @@ type TakesRole = Box<dyn Fn(bool) -> Result<(), HoldError> + Send + Sync>;
 type BindsSession = Box<dyn Fn(&Value, Option<u32>) -> Result<Value, HoldError> + Send + Sync>;
 type ChecksPeer = Box<dyn Fn(Option<u32>) -> Result<(), HoldError> + Send + Sync>;
 type LogLine = Box<dyn Fn(&str) + Send + Sync>;
-type PathCleanFn = dyn Fn(&Path, &str) -> Result<bool, PublishRefusal> + Send + Sync;
-type PublishFn = dyn Fn(&Path, &str, &str, &str) -> Result<String, PublishRefusal> + Send + Sync;
-type PathClean = Box<PathCleanFn>;
+type CatchesUp = Box<dyn Fn(&Path) -> Result<(), CatchUpRefusal> + Send + Sync>;
+type PathClean = Box<dyn Fn(&Path, &str) -> Result<bool, PublishRefusal> + Send + Sync>;
 type PublishesWrite = Box<dyn Fn(&Path, &str) -> Result<String, PublishRefusal> + Send + Sync>;
 
-/// Why the publish port could not answer: the code it names itself (a land refusal keeps its own name) and one line
-/// of detail.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PublishRefusal {
-    pub code: String,
-    pub detail: String,
-}
-
-/// The one port [`WRITE_VERB`] publishes through, filled by the composition root (`apps/fgos`) with the paths land:
-/// `path_clean(root, path)` says whether the path has no uncommitted change in the main checkout, and
-/// `publish(root, path, role, writer)` fast-forwards it, commits only that path, pushes without force and returns the
-/// commit. This crate commits, fetches and pushes nothing itself.
-#[derive(Clone)]
-pub struct WritePublisher {
-    pub path_clean: Arc<PathCleanFn>,
-    pub publish: Arc<PublishFn>,
-}
-
-static WRITE_PUBLISHER: OnceLock<WritePublisher> = OnceLock::new();
-
-/// Installs the publisher every envelope-built server of this process uses; the first call wins. The supervisor
-/// route is entered through `route::main`, which has no parameter for it, so the composition root installs it before
-/// that call.
-pub fn install_write_publisher(publisher: WritePublisher) -> bool {
-    WRITE_PUBLISHER.set(publisher).is_ok()
-}
-
-fn publisher_missing() -> PublishRefusal {
-    PublishRefusal {
-        code: "publisher-not-installed".into(),
-        detail: "this host binary installed no write publisher".into(),
-    }
-}
+pub use crate::route::{CatchUpRefusal, PublishRefusal, WritePublisher};
 
 /// What serving the socket needs, all of it from the envelope except the two ports.
 pub struct Config {
@@ -180,6 +147,9 @@ pub struct Config {
     /// attempt's gate, so the request comes from the agent the supervisor launched and not from another process of the
     /// same user. An error is refused `caller-not-under-gate` with its code as the detail.
     pub caller_under_gate: ChecksPeer,
+    /// [`WRITE_VERB`], first: fast-forward the main checkout of `cwd` to its remote tip. A branch ahead of its remote is
+    /// refused `write-branch-ahead`, any other refusal `write-catch-up-refused`; nothing is written.
+    pub catch_up: CatchesUp,
     /// [`WRITE_VERB`], before the write: does `path` (granted, beneath `cwd`) have no uncommitted change in the main
     /// checkout. An error is refused `write-path-unreadable`.
     pub path_clean: PathClean,
@@ -230,6 +200,7 @@ impl HeadRequests {
         envelope: &Value,
         run_dir: &Path,
         state_root: &Path,
+        publisher: &WritePublisher,
     ) -> Result<Option<(PathBuf, HeadRequests)>, EnvelopeError> {
         let session = &envelope["session"];
         let has_verbs = session["verbs"].as_array().is_some_and(|v| !v.is_empty());
@@ -332,16 +303,18 @@ impl HeadRequests {
                     fgos_identity::directory::caller_under_head(&head, peer).map_err(hold_error)
                 }
             }),
-            path_clean: Box::new(|root, path| match WRITE_PUBLISHER.get() {
-                Some(publisher) => (publisher.path_clean)(root, path),
-                None => Err(publisher_missing()),
+            catch_up: Box::new({
+                let (catch_up, writer_id) = (publisher.catch_up.clone(), writer_id.clone());
+                move |root| catch_up(root, &writer_id)
+            }),
+            path_clean: Box::new({
+                let path_clean = publisher.path_clean.clone();
+                move |root, path| path_clean(root, path)
             }),
             publish_write: Box::new({
-                let (role, writer_id) = (role.clone(), writer_id.clone());
-                move |root, path| match WRITE_PUBLISHER.get() {
-                    Some(publisher) => (publisher.publish)(root, path, &role, &writer_id),
-                    None => Err(publisher_missing()),
-                }
+                let (publish, role, writer_id) =
+                    (publisher.publish.clone(), role.clone(), writer_id.clone());
+                move |root, path| publish(root, path, &role, &writer_id)
             }),
             take_role: Box::new({
                 let gate = gate.clone();
@@ -693,9 +666,10 @@ pub fn install_granted(root: &Path, rel: &str, content: &str) -> Result<usize, W
     Ok(content.len())
 }
 
-/// [`WRITE_VERB`] in full, in contract order: the grant checks, the path has no uncommitted change
-/// (`write-path-dirty`, nothing written), the atomic write, then the publish. A publish refusal is a reply that names
-/// it beside the bytes written, not a refusal of the request.
+/// [`WRITE_VERB`] in full, in contract order: the argument and grant checks, the catch-up of the main checkout to its
+/// remote tip (`write-branch-ahead`, `write-catch-up-refused`), the path has no uncommitted change
+/// (`write-path-dirty`), the atomic write, then the publish; every refusal before the write leaves nothing written. A
+/// publish refusal is a reply that names it beside the bytes written, not a refusal of the request.
 fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
     let refuse_with = |why: WriteRefusal| Outcome::Refused {
         code: why.code,
@@ -705,6 +679,21 @@ fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
         Ok(granted) => granted,
         Err(why) => return refuse_with(why),
     };
+    match (cfg.catch_up)(&cfg.cwd) {
+        Ok(()) => {}
+        Err(CatchUpRefusal::BranchAhead(detail)) => {
+            return Outcome::Refused {
+                code: "write-branch-ahead",
+                detail: Some(detail),
+            }
+        }
+        Err(CatchUpRefusal::Refused(why)) => {
+            return Outcome::Refused {
+                code: "write-catch-up-refused",
+                detail: Some(format!("{}: {}", why.code, why.detail)),
+            }
+        }
+    }
     match (cfg.path_clean)(&cfg.cwd, rel) {
         Ok(true) => {}
         Ok(false) => return refused("write-path-dirty"),

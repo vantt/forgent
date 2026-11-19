@@ -2,6 +2,8 @@
 //! `internal-route.run-supervisor.v1.json`, flag parsing and machine output.
 
 use std::io::Write;
+use std::path::Path;
+use std::sync::Arc;
 
 pub const EXIT_USAGE: i32 = 2;
 pub const EXIT_VERSION_MISMATCH: i32 = 3;
@@ -10,6 +12,40 @@ pub const EXIT_PAYLOAD_MISSING: i32 = 66;
 pub const EXIT_INTERNAL: i32 = 70;
 /// `supervise` refused because the attempt was already handed to a supervisor.
 pub const EXIT_ATTEMPT_BOUND: i32 = 71;
+
+/// Why a port of [`WritePublisher`] could not answer: the code it names itself (a land refusal keeps its own name) and
+/// one line of detail.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PublishRefusal {
+    pub code: String,
+    pub detail: String,
+}
+
+/// Why [`WritePublisher::catch_up`] left the main checkout where it was.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum CatchUpRefusal {
+    /// The checked-out branch has commits its remote lacks (an earlier publish committed but could not push); the
+    /// detail names both tips.
+    BranchAhead(String),
+    /// Any other refusal of the land's catch-up, by its own name.
+    Refused(PublishRefusal),
+}
+
+type CatchUpFn = dyn Fn(&Path, &str) -> Result<(), CatchUpRefusal> + Send + Sync;
+type PathCleanFn = dyn Fn(&Path, &str) -> Result<bool, PublishRefusal> + Send + Sync;
+type PublishFn = dyn Fn(&Path, &str, &str, &str) -> Result<String, PublishRefusal> + Send + Sync;
+
+/// The port a head's `session write` is published through, filled by the composition root (`apps/fgos`) with the
+/// paths land and handed to [`main`] as a parameter. This crate commits, fetches and pushes nothing itself.
+/// - `catch_up(root, writer)`: fast-forward the main checkout of `root` to its remote tip, before anything is written.
+/// - `path_clean(root, path)`: `path` has no uncommitted change in that main checkout.
+/// - `publish(root, path, role, writer)`: commit only `path`, push without force, return the commit.
+#[derive(Clone)]
+pub struct WritePublisher {
+    pub catch_up: Arc<CatchUpFn>,
+    pub path_clean: Arc<PathCleanFn>,
+    pub publish: Arc<PublishFn>,
+}
 
 /// Why argv was refused; `exit_code` says which code the route ends with.
 #[derive(Debug, PartialEq, Eq)]
@@ -144,9 +180,9 @@ fn probe(route: &str, args: &[String]) -> i32 {
     0
 }
 
-/// Dispatch `fgos internal <route> ...` for the routes this crate owns.
-/// `None`: the route is not one of ours.
-pub fn main(route: &str, args: &[String]) -> Option<i32> {
+/// Dispatch `fgos internal <route> ...` for the routes this crate owns; `publisher` is the port a supervised head's
+/// `session write` is published through. `None`: the route is not one of ours.
+pub fn main(route: &str, args: &[String], publisher: &WritePublisher) -> Option<i32> {
     if !matches!(
         route,
         "supervise" | "gate" | "adopt" | "attempt-step" | "head-request"
@@ -157,7 +193,7 @@ pub fn main(route: &str, args: &[String]) -> Option<i32> {
         return Some(probe(route, args));
     }
     Some(match route {
-        "supervise" => crate::supervise::run(args),
+        "supervise" => crate::supervise::run(args, publisher),
         "gate" => crate::gate::run(args),
         "adopt" => crate::adopt::run(args),
         "head-request" => head_request(args),
@@ -213,6 +249,21 @@ mod tests {
 
     #[test]
     fn other_routes_are_not_ours() {
-        assert_eq!(main("lock-fd", &argv(&["--probe"])), None);
+        let unused = PublishRefusal {
+            code: "unused".into(),
+            detail: String::new(),
+        };
+        let publisher = WritePublisher {
+            catch_up: Arc::new({
+                let unused = unused.clone();
+                move |_, _| Err(CatchUpRefusal::Refused(unused.clone()))
+            }),
+            path_clean: Arc::new({
+                let unused = unused.clone();
+                move |_, _| Err(unused.clone())
+            }),
+            publish: Arc::new(move |_, _, _, _| Err(unused.clone())),
+        };
+        assert_eq!(main("lock-fd", &argv(&["--probe"]), &publisher), None);
     }
 }

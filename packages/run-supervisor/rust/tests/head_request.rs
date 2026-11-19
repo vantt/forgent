@@ -21,8 +21,9 @@ use fgos_identity::resolve::{HeadRef, WriterKey, ENV_ORDER};
 use fgos_process::{facts, ProcId};
 use fgos_run_supervisor::go_channel::{read_frame, write_frame, MAX_FRAME_BYTES};
 use fgos_run_supervisor::head_request::{
-    identity_bind, identity_holds, identity_registered, identity_take, Config, HeadRequests,
-    HoldError, PublishRefusal, BIND_VERB, MAX_REQUEST_BYTES, MAX_REQUEST_VALUES, WRITE_VERB,
+    identity_bind, identity_holds, identity_registered, identity_take, CatchUpRefusal, Config,
+    HeadRequests, HoldError, PublishRefusal, WritePublisher, BIND_VERB, MAX_REQUEST_BYTES,
+    MAX_REQUEST_VALUES, WRITE_VERB,
 };
 use serde_json::{json, Value};
 
@@ -74,10 +75,12 @@ struct Identity {
     publish: Publish,
 }
 
-/// The publish port of a session write, stubbed: whether the path is clean, what the publish answers, and the calls it
-/// got in order (`clean <path>`, `publish <path> <role> <writer>`) with the file's content at the moment of each.
+/// The publish port of a session write, stubbed: what the catch-up answers, whether the path is clean, what the
+/// publish answers, and the calls it got in order (`catch up`, `clean <path>`, `publish <path>`) with the file's content
+/// at the moment of each.
 #[derive(Clone)]
 struct Publish {
+    caught_up: Result<(), CatchUpRefusal>,
     clean: Result<bool, PublishRefusal>,
     commit: Result<String, PublishRefusal>,
     calls: Arc<Mutex<Vec<String>>>,
@@ -86,10 +89,20 @@ struct Publish {
 impl Default for Publish {
     fn default() -> Publish {
         Publish {
+            caught_up: Ok(()),
             clean: Ok(true),
             commit: Ok("c0ffee".to_string()),
             calls: Arc::new(Mutex::new(Vec::new())),
         }
+    }
+}
+
+/// The port of a server whose test sends no session write.
+fn no_publisher() -> WritePublisher {
+    WritePublisher {
+        catch_up: Arc::new(|_, _| unreachable!("no session write in this test")),
+        path_clean: Arc::new(|_, _| unreachable!("no session write in this test")),
+        publish: Arc::new(|_, _, _, _| unreachable!("no session write in this test")),
     }
 }
 
@@ -196,6 +209,13 @@ fn serve_with(
                         detail: r.detail,
                     }
                 })
+            }
+        }),
+        catch_up: Box::new({
+            let publish = identity.publish.clone();
+            move |_root| {
+                publish.calls.lock().unwrap().push("catch up".into());
+                publish.caught_up.clone()
             }
         }),
         path_clean: Box::new({
@@ -477,6 +497,8 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "verb-failed",
             "verb-not-granted",
             "verb-timeout",
+            "write-branch-ahead",
+            "write-catch-up-refused",
             "write-failed",
             "write-path-dirty",
             "write-path-unreadable"
@@ -598,7 +620,7 @@ fn an_envelope_that_cannot_serve_a_socket_is_envelope_invalid_and_one_without_a_
     let build = |shape: &dyn Fn(&mut Value)| {
         let mut envelope = session_envelope(&dir, &script);
         shape(&mut envelope);
-        HeadRequests::from_envelope(&envelope, &dir, &root)
+        HeadRequests::from_envelope(&envelope, &dir, &root, &no_publisher())
     };
     let invalid = |result: Result<_, fgos_run_supervisor::head_request::EnvelopeError>,
                    needle: &str| {
@@ -675,7 +697,7 @@ echo '{"v":1,"protocol":1,"result":"done","data":{"ok":true}}'
     let envelope = session_envelope(&dir, &script);
     // The attempt's own session holds the role in the real Identity, so the whole check runs unstubbed.
     register(&root, "att-own", &["head:planner-x"]);
-    let (path, server) = HeadRequests::from_envelope(&envelope, &dir, &root)
+    let (path, server) = HeadRequests::from_envelope(&envelope, &dir, &root, &no_publisher())
         .unwrap()
         .expect("a socket");
     assert_eq!(path, dir.join("req.sock"));
@@ -703,7 +725,7 @@ echo '{"v":1,"protocol":1,"result":"done","data":{"ok":true}}'
 
     // The same server with a state root Identity cannot read refuses closed and names only the code.
     let broken = state_root("env-broken", false);
-    let (path, server) = HeadRequests::from_envelope(&envelope, &dir, &broken)
+    let (path, server) = HeadRequests::from_envelope(&envelope, &dir, &broken, &no_publisher())
         .unwrap()
         .unwrap();
     let _ = fs::remove_file(&path);
@@ -925,6 +947,7 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_r
             identity_bind(&r4, &r4, "att-bind", &g4, args, peer)
         }),
         caller_under_gate: Box::new(|_| unreachable!("no session write in this test")),
+        catch_up: Box::new(|_| unreachable!("no session write in this test")),
         path_clean: Box::new(|_, _| unreachable!("no session write in this test")),
         publish_write: Box::new(|_, _| unreachable!("no session write in this test")),
         log: Box::new(|_| {}),
@@ -1111,7 +1134,8 @@ fn write_served(name: &str, publish: &Publish) -> Served {
 }
 
 #[test]
-fn head_write_checks_the_path_is_clean_before_it_writes_and_publishes_the_new_content_after() {
+fn head_write_catches_up_then_checks_the_path_is_clean_before_it_writes_and_publishes_the_new_content_after(
+) {
     let publish = Publish::default();
     let served = write_served("write-order", &publish);
     let reply = write_request(
@@ -1122,6 +1146,7 @@ fn head_write_checks_the_path_is_clean_before_it_writes_and_publishes_the_new_co
     assert_eq!(
         *publish.calls.lock().unwrap(),
         [
+            "catch up",
             r#"clean docs/backlog.md "old\n""#,
             r#"publish docs/backlog.md "new\n""#
         ]
@@ -1147,9 +1172,46 @@ fn head_write_of_a_path_with_an_uncommitted_change_is_refused_and_writes_and_pub
     );
     assert_eq!(
         publish.calls.lock().unwrap().len(),
-        1,
-        "only the clean check ran"
+        2,
+        "only the catch-up and the clean check ran"
     );
+}
+
+#[test]
+fn head_write_whose_catch_up_is_refused_is_refused_by_name_before_the_clean_check_and_writes_nothing(
+) {
+    for (caught_up, code, detail) in [
+        (
+            CatchUpRefusal::BranchAhead(
+                "local trunk at a has commits the remote tip b lacks".into(),
+            ),
+            "write-branch-ahead",
+            "local trunk at a has commits the remote tip b lacks",
+        ),
+        (
+            CatchUpRefusal::Refused(refusal("main-checkout-catch-up-refused", "dirty")),
+            "write-catch-up-refused",
+            "main-checkout-catch-up-refused: dirty",
+        ),
+    ] {
+        let publish = Publish {
+            caught_up: Err(caught_up),
+            ..Publish::default()
+        };
+        let served = write_served(code, &publish);
+        let reply = write_request(
+            &served.socket,
+            json!({"path": "docs/backlog.md", "content": "new\n"}),
+        );
+        assert_eq!(reply["result"], "refused", "{reply}");
+        assert_eq!(reply["code"], code, "{reply}");
+        assert_eq!(reply["detail"], detail, "{reply}");
+        assert_eq!(
+            fs::read_to_string(served.dir.join("docs/backlog.md")).unwrap(),
+            "old\n"
+        );
+        assert_eq!(*publish.calls.lock().unwrap(), ["catch up"]);
+    }
 }
 
 #[test]

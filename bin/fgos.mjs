@@ -3672,6 +3672,9 @@ async function main() {
       } else if (verb === 'workflow' && positional[0] === 'propose' && !flags.json) {
         const { renderProposalText } = await import('../src/workflow/propose.mjs');
         process.stdout.write(renderProposalText(data));
+      } else if (verb === 'session' && positional[0] === 'write' && !flags.json) {
+        // A published write is its commit; a write that was not published threw before here.
+        process.stdout.write(`committed ${data.commit}\n`);
       } else if (verb === 'dispatch' && sub === 'inspect' && flags.attention === true && !flags.json) {
         // One line per run that needs a person, then one line for the terminal part unless it scanned clean.
         const terminal = data.terminal;

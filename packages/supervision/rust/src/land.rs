@@ -201,6 +201,29 @@ pub fn land(
     }
 }
 
+/// The first step of a paths land on its own: under the target's merge slot, fetch the target and
+/// fast-forward the main checkout (on `command.target`, or the trunk) to the remote tip. Nothing is
+/// committed or pushed. A local branch with commits the remote lacks is `land-target-ahead`; every
+/// other refusal is the paths land's own.
+pub fn catch_up(command: &LandCommand, ports: &LandPorts<'_>) -> Result<(), LandRefusal> {
+    let config = LandConfig::default();
+    let lander = Lander {
+        ports,
+        config: &config,
+    };
+    let target = lander.checked_out_target(command)?;
+    let slot = ports
+        .git
+        .acquire_merge_slot(
+            ports.repo,
+            &ref_name(&format!("refs/heads/{target}"))?,
+            ports.wait_ms,
+        )
+        .map_err(at("merge slot"))?;
+    let held = || slot.lend().map_err(from_git);
+    lander.sync_target(&target, &held)
+}
+
 struct Lander<'a> {
     ports: &'a LandPorts<'a>,
     config: &'a LandConfig,
@@ -286,8 +309,8 @@ impl Lander<'_> {
     }
 
     /// Fetch the target and fast-forward local main to the remote tip. Local main never holds an
-    /// unpushed commit: a local-only tip is `land-remote-diverged`. `held` lends a lock the caller
-    /// already holds (a paths land's merge slot) to every Git door called here.
+    /// unpushed commit: a local tip with commits the remote lacks is `land-target-ahead`. `held`
+    /// lends a lock the caller already holds (a paths land's merge slot) to every Git door called here.
     fn sync_target<'h>(
         &self,
         branch: &str,
@@ -350,9 +373,9 @@ impl Lander<'_> {
             return Ok(());
         }
         Err(refuse(
-            "land-remote-diverged",
+            "land-target-ahead",
             format!(
-                "local {dest} at {} has commits the remote tip {} lacks",
+                "local {dest} at {} has commits the remote tip {} lacks; push or reset them first",
                 local_tip.as_str(),
                 remote_tip.as_str()
             ),
@@ -915,18 +938,8 @@ impl Lander<'_> {
         if paths.is_empty() {
             return Err(refuse("land-paths-empty", "no paths named"));
         }
-        let target = self.target_branch(command)?;
+        let target = self.checked_out_target(command)?;
         let dest = format!("refs/heads/{target}");
-        // A paths land commits the main checkout's checked-out branch, so that branch is the target.
-        match p.git.resolve_head(p.repo).map_err(from_git)? {
-            HeadFact::Attached { target: head, .. } if head.as_str() == dest => {}
-            other => {
-                return Err(refuse(
-                    "land-target-not-checked-out",
-                    format!("the main checkout is on {other:?}, not {dest}"),
-                ))
-            }
-        }
         // The target's merge slot, the one a branch Land holds, serialises this land with every
         // Land of the same target from the sync through the push.
         let slot = p
@@ -1007,6 +1020,21 @@ impl Lander<'_> {
             retries: 0,
             gates_run,
         })
+    }
+
+    /// The target of a paths land: the branch the main checkout has checked out, since that is the
+    /// branch it commits.
+    fn checked_out_target(&self, command: &LandCommand) -> Result<String, LandRefusal> {
+        let p = self.ports;
+        let target = self.target_branch(command)?;
+        let dest = format!("refs/heads/{target}");
+        match p.git.resolve_head(p.repo).map_err(from_git)? {
+            HeadFact::Attached { target: head, .. } if head.as_str() == dest => Ok(target),
+            other => Err(refuse(
+                "land-target-not-checked-out",
+                format!("the main checkout is on {other:?}, not {dest}"),
+            )),
+        }
     }
 
     /// Push the local target branch itself; `false` when the remote rejected it as non-fast-forward.

@@ -4,7 +4,10 @@
 // test/session-rotation/rotate.test.mjs; what session write does, in packages/run-supervisor/rust/tests/head_request.rs.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { initGitCwd, run, tmpCwd } from './helpers/fgos-cli-harness.mjs';
+import { spawn } from 'node:child_process';
+import net from 'node:net';
+import path from 'node:path';
+import { FGOS, initGitCwd, run, tmpCwd } from './helpers/fgos-cli-harness.mjs';
 
 const EXIT_VALIDATION = 4;
 const EXIT_PRECONDITION = 2;
@@ -41,5 +44,38 @@ test('a confined caller without a request socket is refused as precondition by e
     const result = run(cwd, ['session', ...args], { FGOS_CONFINED: '1', FGOS_HEAD_REQUEST_SOCKET: '' });
     assert.equal(result.status, EXIT_PRECONDITION, `${sub}: ${result.stderr}`);
     assert.match(result.stderr, /no-request-socket/);
+  }
+});
+
+test('a published session write prints the commit it landed as one line', async () => {
+  const cwd = project();
+  const socketPath = path.join(cwd, 'req.sock');
+  const server = net.createServer((conn) => {
+    let received = Buffer.alloc(0);
+    conn.on('data', (chunk) => {
+      received = Buffer.concat([received, chunk]);
+      if (received.length < 4 || received.length < 4 + received.readUInt32BE(0)) return;
+      const request = JSON.parse(received.subarray(4, 4 + received.readUInt32BE(0)).toString('utf8'));
+      const body = Buffer.from(JSON.stringify({ type: 'REPLY', id: request.id, result: 'done', data: { path: request.args.path, bytes: 4, commit: 'c0ffee' } }));
+      const head = Buffer.alloc(4);
+      head.writeUInt32BE(body.length);
+      conn.end(Buffer.concat([head, body]));
+    });
+  });
+  await new Promise((resolve) => server.listen(socketPath, resolve));
+  try {
+    const child = spawn(process.execPath, [FGOS, 'session', 'write', 'docs/backlog.md'], {
+      cwd, env: { ...process.env, FGOS_CONFINED: '1', FGOS_HEAD_REQUEST_SOCKET: socketPath },
+    });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (chunk) => { stdout += chunk; });
+    child.stderr.on('data', (chunk) => { stderr += chunk; });
+    child.stdin.end('new\n');
+    const status = await new Promise((resolve) => child.on('close', resolve));
+    assert.equal(status, 0, stderr);
+    assert.equal(stdout, 'committed c0ffee\n');
+  } finally {
+    server.close();
   }
 });

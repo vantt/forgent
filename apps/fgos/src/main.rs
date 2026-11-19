@@ -241,13 +241,10 @@ fn main() {
             .iter()
             .map(|a| a.to_string_lossy().into_owned())
             .collect();
-        // A head's `session write` is published through the paths land; the supervisor route carries the port.
-        #[cfg(unix)]
-        fgos_run_supervisor::head_request::install_write_publisher(
-            wiring::session_write_publish::publisher(),
-        );
+        // A head's `session write` is published through the paths land, handed to the supervisor route as its port.
+        let publisher = wiring::session_write_publish::publisher();
         if let Some(route) = rest.first() {
-            if let Some(code) = fgos_run_supervisor::route::main(route, &rest[1..]) {
+            if let Some(code) = fgos_run_supervisor::route::main(route, &rest[1..], &publisher) {
                 std::process::exit(code);
             }
         }

@@ -30,8 +30,8 @@ use crate::gate::boottime_ns;
 use crate::go_channel::{read_frame, write_frame};
 use crate::publish::publish_once;
 use crate::route::{
-    emit, refuse, report, Flags, EXIT_ATTEMPT_BOUND, EXIT_ENVELOPE_INVALID, EXIT_INTERNAL,
-    EXIT_VERSION_MISMATCH,
+    emit, refuse, report, Flags, WritePublisher, EXIT_ATTEMPT_BOUND, EXIT_ENVELOPE_INVALID,
+    EXIT_INTERNAL, EXIT_VERSION_MISMATCH,
 };
 use fgos_identity::text::iso_utc_now;
 
@@ -483,12 +483,13 @@ impl CaptureTail {
 }
 
 /// Run the supervisor; the return value is the process exit code.
-pub fn run(args: &[String]) -> i32 {
+/// `publisher` is the port a head's `session write` is published through.
+pub fn run(args: &[String], publisher: &WritePublisher) -> i32 {
     let args = match parse_args(args) {
         Ok(args) => args,
         Err(err) => return refuse("supervise", err),
     };
-    match supervise(&args) {
+    match supervise(&args, publisher) {
         Ok(code) => code,
         Err(refusal) => {
             if refusal.code != "attempt-already-bound" {
@@ -540,7 +541,7 @@ pub(crate) fn read_start_refusal(run_dir: &Path, attempt_id: &str) -> Option<Str
         .then(|| note["code"].as_str().unwrap_or("unknown").to_string())
 }
 
-fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
+fn supervise(args: &SuperviseArgs, publisher: &WritePublisher) -> Result<i32, Refusal> {
     // Before any other syscall: nothing this process spawns may inherit a lock.
     let mut locks = os::Locks::early()?;
 
@@ -603,7 +604,7 @@ fn supervise(args: &SuperviseArgs) -> Result<i32, Refusal> {
         Err(crate::lanes::TakeError::Unavailable(why)) => return Err(Refusal::internal(why)),
     };
     if terminal {
-        return supervise_terminal(&envelope, &run_dir, locks, &watch);
+        return supervise_terminal(&envelope, &run_dir, locks, &watch, publisher);
     }
 
     let driver = open_driver(&envelope).map_err(Refusal::internal)?;
@@ -742,8 +743,9 @@ fn supervise_terminal(
     run_dir: &Path,
     locks: os::Locks,
     watch: &Watch,
+    publisher: &WritePublisher,
 ) -> Result<i32, Refusal> {
-    terminal::run(envelope, run_dir, locks, watch)
+    terminal::run(envelope, run_dir, locks, watch, publisher)
 }
 
 #[cfg(not(unix))]
@@ -752,6 +754,7 @@ fn supervise_terminal(
     _run_dir: &Path,
     _locks: os::Locks,
     _watch: &Watch,
+    _publisher: &WritePublisher,
 ) -> Result<i32, Refusal> {
     Err(Refusal {
         exit: EXIT_INTERNAL,

@@ -1,13 +1,16 @@
-//! The publisher a head's `session write` goes through: the existing paths land (`fgos_supervision::land::land` with
-//! `paths: [path]`), composed here for the main checkout of the head's project. Nothing in this file commits, fetches
-//! or pushes; it only builds the land's ports and reads what the land asks of its caller.
+//! The publisher a head's `session write` goes through: the existing paths land (`fgos_supervision::land`), composed
+//! here for the main checkout of the head's project. Nothing in this file commits, fetches or pushes; it only builds
+//! the land's ports and reads what the land asks of its caller.
 //!
+//! - `catch_up` is the land's own first step alone (`fgos_supervision::land::catch_up`): under the target's merge slot
+//!   the main checkout is fast-forwarded to the remote tip before anything is written. A branch with commits its
+//!   remote lacks (an earlier publish committed but could not push) comes back as `BranchAhead`.
 //! - `path_clean` answers whether the path has no uncommitted change in the main checkout (Git's own status read).
-//! - `publish` lands the path: the main checkout is fast-forwarded to the remote tip, only that path is committed with
-//!   the subject `docs(<role>): write <path>` and the head's writer key, and the checked-out branch is pushed without
-//!   force. The gates are the project's `land.gates` that match the path; a land refusal comes back by its own name.
+//! - `publish` lands the path: only that path is committed with the subject `docs(<role>): write <path>` and the
+//!   head's writer key, and the checked-out branch is pushed without force. The gates are the project's `land.gates`
+//!   whose `when` matches the path; a land refusal comes back by its own name.
 //!
-//! The head's supervisor installs it through `fgos_run_supervisor::head_request::install_write_publisher`.
+//! The composition root hands it to the supervisor route as a parameter (`fgos_run_supervisor::route::main`).
 
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -18,9 +21,9 @@ use fgos_git::{
     GitDriver, HeadFact, Ignored, Inspect, RemoteGrant, RepoHandle, ResolveRepo, Submodules,
     Untracked,
 };
-use fgos_run_supervisor::head_request::{PublishRefusal, WritePublisher};
+use fgos_run_supervisor::route::{CatchUpRefusal, PublishRefusal, WritePublisher};
 use fgos_supervision::land::{
-    land, Gate, LandCommand, LandConfig, LandPorts, Regenerate, ShellRunner,
+    catch_up, land, Gate, LandCommand, LandConfig, LandPorts, Regenerate, ShellRunner,
 };
 use serde_json::Value;
 
@@ -33,9 +36,10 @@ const WAIT_MS: u64 = 30_000;
 const STATUS_PAGE: usize = 4096;
 const MAX_STATUS_PAGES: usize = 25;
 
-/// The publisher the composition root installs.
+/// The publisher the composition root hands the supervisor route.
 pub fn publisher() -> WritePublisher {
     WritePublisher {
+        catch_up: std::sync::Arc::new(catch_up_main),
         path_clean: std::sync::Arc::new(path_clean),
         publish: std::sync::Arc::new(publish),
     }
@@ -190,26 +194,9 @@ fn operation_id() -> String {
     )
 }
 
-/// Lands `path` from the main checkout of `root` for the head holding `role`, written as `writer`. Returns the commit.
-fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, PublishRefusal> {
-    let checkout = open(root)?;
-    let config = land_config(&checkout.main)?;
-    let grant = RemoteGrant {
-        name: REMOTE.to_owned(),
-        pinned_url: Inspect::remote_url(&checkout.driver, &checkout.repo, REMOTE)
-            .map_err(|e| refusal("write-remote-unreadable", e.cause))?,
-    };
-    let ports = LandPorts {
-        git: &checkout.driver,
-        repo: &checkout.repo,
-        remote: &grant,
-        writer,
-        operation_id: &operation_id,
-        runner: &ShellRunner,
-        wait_ms: WAIT_MS,
-    };
-    // A paths land commits the branch the main checkout is on, so that branch is the target.
-    let target = match checkout.driver.resolve_head(&checkout.repo) {
+/// The branch the main checkout is on: a paths land commits that branch, so it is the target.
+fn checked_out_branch(checkout: &Checkout) -> Result<String, PublishRefusal> {
+    match checkout.driver.resolve_head(&checkout.repo) {
         Ok(HeadFact::Attached { target, .. }) => target
             .as_str()
             .strip_prefix("refs/heads/")
@@ -221,9 +208,57 @@ fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, 
             "land-target-not-checked-out",
             "the main checkout is not on a branch",
         )
-    })?;
+    })
+}
+
+fn grant(checkout: &Checkout) -> Result<RemoteGrant, PublishRefusal> {
+    Ok(RemoteGrant {
+        name: REMOTE.to_owned(),
+        pinned_url: Inspect::remote_url(&checkout.driver, &checkout.repo, REMOTE)
+            .map_err(|e| refusal("write-remote-unreadable", e.cause))?,
+    })
+}
+
+/// Fast-forwards the main checkout of `root` to its remote tip as `writer`, under the target's merge slot.
+fn catch_up_main(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
+    let checkout = open(root).map_err(CatchUpRefusal::Refused)?;
+    let target = checked_out_branch(&checkout).map_err(CatchUpRefusal::Refused)?;
+    let grant = grant(&checkout).map_err(CatchUpRefusal::Refused)?;
+    let ports = LandPorts {
+        git: &checkout.driver,
+        repo: &checkout.repo,
+        remote: &grant,
+        writer,
+        operation_id: &operation_id,
+        runner: &ShellRunner,
+        wait_ms: WAIT_MS,
+    };
     let command = LandCommand {
         target: Some(target),
+        ..LandCommand::default()
+    };
+    catch_up(&command, &ports).map_err(|why| match why.code.as_str() {
+        "land-target-ahead" => CatchUpRefusal::BranchAhead(why.detail),
+        _ => CatchUpRefusal::Refused(refusal(&why.code, why.detail)),
+    })
+}
+
+/// Lands `path` from the main checkout of `root` for the head holding `role`, written as `writer`. Returns the commit.
+fn publish(root: &Path, path: &str, role: &str, writer: &str) -> Result<String, PublishRefusal> {
+    let checkout = open(root)?;
+    let config = land_config(&checkout.main)?;
+    let grant = grant(&checkout)?;
+    let ports = LandPorts {
+        git: &checkout.driver,
+        repo: &checkout.repo,
+        remote: &grant,
+        writer,
+        operation_id: &operation_id,
+        runner: &ShellRunner,
+        wait_ms: WAIT_MS,
+    };
+    let command = LandCommand {
+        target: Some(checked_out_branch(&checkout)?),
         paths: Some(vec![path.to_owned()]),
         message: format!("docs({role}): write {path}"),
         ..LandCommand::default()

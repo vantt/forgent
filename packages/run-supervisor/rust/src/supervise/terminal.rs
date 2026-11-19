@@ -46,6 +46,7 @@ use super::{
 };
 use crate::go_channel::{peer_uid, read_frame, write_frame};
 use crate::head_request::HeadRequests;
+use crate::route::WritePublisher;
 use crate::route::EXIT_ENVELOPE_INVALID;
 use crate::terminal_slot::Backend;
 
@@ -794,29 +795,28 @@ pub(super) fn run(
     run_dir: &Path,
     mut locks: os::Locks,
     watch: &Watch,
+    publisher: &WritePublisher,
 ) -> Result<i32, Refusal> {
     let plan = Plan::from(envelope)?;
     let mut socket = AttemptSocket::bind(&plan.socket_path).map_err(Refusal::internal)?;
     // A head session's request socket listens from before the pane is launched until the attempt closes.
     let state_root = fgos_holder_lock::state_root::state_root().0;
-    let requests =
-        match HeadRequests::from_envelope(envelope, run_dir, &state_root).map_err(|err| {
-            Refusal {
-                exit: EXIT_ENVELOPE_INVALID,
-                code: err.code,
-                why: err.why,
-            }
+    let requests = match HeadRequests::from_envelope(envelope, run_dir, &state_root, publisher)
+        .map_err(|err| Refusal {
+            exit: EXIT_ENVELOPE_INVALID,
+            code: err.code,
+            why: err.why,
         })? {
-            Some((path, server)) => Some((
-                AttemptSocket::bind_beside(&path, &plan.socket_path).map_err(|why| Refusal {
-                    exit: EXIT_ENVELOPE_INVALID,
-                    code: "envelope-invalid",
-                    why,
-                })?,
-                server,
-            )),
-            None => None,
-        };
+        Some((path, server)) => Some((
+            AttemptSocket::bind_beside(&path, &plan.socket_path).map_err(|why| Refusal {
+                exit: EXIT_ENVELOPE_INVALID,
+                code: "envelope-invalid",
+                why,
+            })?,
+            server,
+        )),
+        None => None,
+    };
     crate::terminal_slot::record_endpoint(run_dir);
     let backend = Backend::from_env(run_dir)
         .with_shell_ready_timeout_ms(crate::terminal_slot::shell_ready_timeout_ms(envelope));

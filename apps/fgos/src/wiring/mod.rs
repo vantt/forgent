@@ -57,7 +57,6 @@ pub mod session_rotation_hook;
 #[cfg(not(unix))]
 #[path = "session_rotation_hook_unsupported.rs"]
 pub mod session_rotation_hook;
-#[cfg(unix)]
 pub mod session_write_publish;
 pub mod terminal_tabs;
 pub mod uninstall;

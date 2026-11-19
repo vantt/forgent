@@ -9,7 +9,7 @@
 mod session_write_publish;
 
 use fgos_run_supervisor::go_channel::read_frame;
-use fgos_run_supervisor::head_request::{install_write_publisher, HeadRequests};
+use fgos_run_supervisor::head_request::HeadRequests;
 use serde_json::{json, Value};
 use std::fs;
 use std::io::Write;
@@ -94,7 +94,7 @@ impl Scene {
             &project,
             &["remote", "add", "origin", remote.to_str().unwrap()],
         );
-        git(&project, &["push", "-q", "origin", "trunk"]);
+        git(&project, &["push", "-q", "-u", "origin", "trunk"]);
         let fence = project.join(".fgos/locks/activation.lock");
         fs::create_dir_all(&fence).unwrap();
         fs::write(
@@ -145,10 +145,14 @@ impl Scene {
                         "requestSocketPath": socket},
             "steps": [{"stepId": "finalize-home", "env": {}}]
         });
-        assert!(install_write_publisher(session_write_publish::publisher()));
-        let (path, server) = HeadRequests::from_envelope(&envelope, &run_dir, &root.join("state"))
-            .unwrap()
-            .expect("a socket");
+        let (path, server) = HeadRequests::from_envelope(
+            &envelope,
+            &run_dir,
+            &root.join("state"),
+            &session_write_publish::publisher(),
+        )
+        .unwrap()
+        .expect("a socket");
         server.set_gate(head);
         let listener = UnixListener::bind(&path).unwrap();
         listener.set_nonblocking(true).unwrap();
@@ -292,8 +296,9 @@ fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_fo
     assert_eq!(scene.remote_tip(), before);
     git(&scene.project, &["checkout", "--", "docs/backlog.md"]);
 
-    // 3. The remote moves outside fgos while the land runs: the push is refused by its own name, the file stays
-    // written and uncommitted, and nothing is forced.
+    // 3. The remote moves outside fgos while the land runs: the push is refused by its own name and nothing is
+    // forced. The commit was already made, so it stays local: the path is committed, the branch is one commit ahead
+    // of its remote, and the next write is refused `write-branch-ahead` before it writes anything.
     let mover = scene.root.join("mover.sh");
     fs::write(
         &mover,
@@ -321,4 +326,26 @@ fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_fo
         scene.remote_tip(),
         "the remote keeps its own tip; nothing was forced"
     );
+    assert_eq!(
+        git(
+            &scene.project,
+            &["status", "--porcelain", "--", "docs/backlog.md"]
+        ),
+        "",
+        "the path is committed locally"
+    );
+    assert_eq!(
+        git(&scene.project, &["rev-list", "--count", "@{u}..HEAD"]),
+        "1",
+        "one local commit the remote lacks"
+    );
+    let tip = scene.remote_tip();
+    let reply = scene.write("docs/backlog.md", "fourth\n");
+    assert_eq!(reply["result"], "refused", "{reply}");
+    assert_eq!(reply["code"], "write-branch-ahead", "{reply}");
+    assert_eq!(
+        fs::read_to_string(scene.project.join("docs/backlog.md")).unwrap(),
+        "third\n"
+    );
+    assert_eq!(scene.remote_tip(), tip);
 }

@@ -3,7 +3,7 @@
 //! are owned by `packages/git/rust/tests/land.rs`; one pass-through proof lives here.
 use fgos_git::{GitDriver, RemoteGrant, RepoHandle, ResolveRepo};
 use fgos_supervision::land::{
-    land, Gate, LandCommand, LandConfig, LandPorts, Regenerate, ShellRunner,
+    catch_up, land, Gate, LandCommand, LandConfig, LandPorts, Regenerate, ShellRunner,
 };
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -175,12 +175,29 @@ impl Fixture {
         git(&self.main, &["rev-parse", "refs/heads/trunk"])
     }
 
+    fn catch_up(&self) -> Result<(), fgos_supervision::land::LandRefusal> {
+        let next = || format!("up-{}", self.ids.fetch_add(1, Ordering::Relaxed));
+        catch_up(&paths(&["a"]), &ports(&self.env, &next, 30_000))
+    }
+
     fn land(
         &self,
         command: &LandCommand,
         config: &LandConfig,
     ) -> Result<fgos_supervision::land::LandOutcome, fgos_supervision::land::LandRefusal> {
         run_land(&self.env, "op", &self.ids, command, config, 30_000)
+    }
+}
+
+fn ports<'a>(env: &'a Env, next: &'a dyn Fn() -> String, wait_ms: u64) -> LandPorts<'a> {
+    LandPorts {
+        git: &env.driver,
+        repo: &env.repo,
+        remote: &env.grant,
+        writer: "fixture",
+        operation_id: next,
+        runner: &ShellRunner,
+        wait_ms,
     }
 }
 
@@ -193,16 +210,7 @@ fn run_land(
     wait_ms: u64,
 ) -> Result<fgos_supervision::land::LandOutcome, fgos_supervision::land::LandRefusal> {
     let next = || format!("{prefix}-{}", ids.fetch_add(1, Ordering::Relaxed));
-    let ports = LandPorts {
-        git: &env.driver,
-        repo: &env.repo,
-        remote: &env.grant,
-        writer: "fixture",
-        operation_id: &next,
-        runner: &ShellRunner,
-        wait_ms,
-    };
-    land(command, config, &ports)
+    land(command, config, &ports(env, &next, wait_ms))
 }
 
 impl Drop for Fixture {
@@ -464,6 +472,31 @@ fn a_paths_land_commits_exactly_the_named_paths_and_runs_only_matching_gates() {
         "still dirty\n"
     );
     assert!(!f.main.join("ran-for-b").exists());
+
+    // A path no gate's `when` matches lands with no gate run, though the gate list is not empty.
+    fs::write(f.main.join("c"), "no gate\n").unwrap();
+    let out = f.land(&paths(&["c"]), &cfg).unwrap();
+    assert!(out.gates_run.is_empty(), "{:?}", out.gates_run);
+    assert_eq!(out.main_sha, f.remote_tip());
+    assert!(!f.main.join("ran-for-b").exists());
+}
+
+#[test]
+fn catch_up_alone_fast_forwards_and_refuses_a_local_branch_with_commits_the_remote_lacks() {
+    let f = Fixture::new();
+    f.move_remote("moved.txt", "from elsewhere\n");
+    f.catch_up().unwrap();
+    assert_eq!(f.local_tip(), f.remote_tip());
+    assert!(f.main.join("moved.txt").exists());
+
+    fs::write(f.main.join("a"), "unpushed\n").unwrap();
+    git(&f.main, &["commit", "-qam", "unpushed"]);
+    f.move_remote("moved-again.txt", "again\n");
+    let (local, remote) = (f.local_tip(), f.remote_tip());
+    let refusal = f.catch_up().unwrap_err();
+    assert_eq!(refusal.code, "land-target-ahead", "{refusal}");
+    assert_eq!(f.local_tip(), local);
+    assert_eq!(f.remote_tip(), remote);
 }
 
 #[test]
