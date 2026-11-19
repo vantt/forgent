@@ -251,7 +251,9 @@ runner:
     # @fgos:doc The tier, executors and account pool one persona prefers. Only a persona may name a pool; a role entry refuses the key by name.
     # @fgos:why [74bda49f-655f-46ea-b76a-7a230bb878a6] owner 2026-11-19 15:24: heads on claude until 1045 closes (planner too, supervisor 2026-11-19)
     planner:
+      # @fgos:doc One tier of the model ladder. Values: nano | mini | standard | advanced | flagship | frontier.
       tier: standard
+      # @fgos:doc Executors a seat may use, in order: one executor id, or a list whose entries are an id or an object naming an executor, one of its invocation ids and whether it may cross provider.
       prefer:
         - executor: claude
           invocation: claude-herdr-bypass-bwrap
@@ -330,13 +332,3 @@ land:
         - packages/**
         - bin/**
         - scripts/**
-  # @fgos:doc The command that regenerates derived files after a landing, with the files it rewrites; null runs none.
-  # @fgos:why [74bda49f-655f-46ea-b76a-7a230bb878a6] restore land.regenerate now that every config reader takes it whole (e2d37914a, release 58f1af36)
-  regenerate:
-    # @fgos:doc Shell command that regenerates the files.
-    run: node scripts/export-command-selectors.mjs && node scripts/git-one-door-scan.mjs --root . --write-census
-    # @fgos:doc Repo-relative files the command rewrites.
-    files:
-      - packages/git/contracts/mutation-census.v1.json
-      - packages/host-runtime/contracts/command-routes.json
-      - packages/host-runtime/contracts/command-manifest.json
