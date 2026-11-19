@@ -5,7 +5,7 @@ discussion: open
 ## 1. Trạng thái hiện tại
 
 2026-11-19: discussion opened from backlog row `p-mc25x5pfi6` (owner approval via Miu). Starting point scouted
-(§2, §3). Nothing settled yet. Round 10: discussions move to `plans/discussions/` proposed. Round 9: plans keep their directory name as id. Open: mandatory backlog `source:` for new discussions/plans (round 6), the ~273 open Work items (round 2), discussions location. Round 8: separator `id-slug` recommended. Round 7: discussions get a minted id (round 5 objection withdrawn); plan id open. Round 6: linking mechanism backlog ← discussion ← plan proposed under §3. Round 5: owner agreed proposal point 1; naming/placement answered under §3. Round 4: whole proposal written under §3, waiting for the owner's reaction. Round 2: owner agreed #2 and #3; merged #4/#5; shaper reported that Work keeps a full item store (1215 items) plus gates, outcomes, learnings, docs/topics and decisions in the Event Store, side by side with the backlog. Round 1 done: owner reframed #1 (content of a row, not its storage); shaper proposed a short row + link and a 5-value backlog status list, explained #3–#5. Waiting for the owner's reaction. Plan 261119-1615 phase 4 (add-rows) is on hold
+(§2, §3). Nothing settled yet. Round 11: mandatory backlog source chosen. Still open: the ~273 open Work items. Round 10: discussions move to `plans/discussions/` proposed. Round 9: plans keep their directory name as id. Open: mandatory backlog `source:` for new discussions/plans (round 6), the ~273 open Work items (round 2), discussions location. Round 8: separator `id-slug` recommended. Round 7: discussions get a minted id (round 5 objection withdrawn); plan id open. Round 6: linking mechanism backlog ← discussion ← plan proposed under §3. Round 5: owner agreed proposal point 1; naming/placement answered under §3. Round 4: whole proposal written under §3, waiting for the owner's reaction. Round 2: owner agreed #2 and #3; merged #4/#5; shaper reported that Work keeps a full item store (1215 items) plus gates, outcomes, learnings, docs/topics and decisions in the Event Store, side by side with the backlog. Round 1 done: owner reframed #1 (content of a row, not its storage); shaper proposed a short row + link and a 5-value backlog status list, explained #3–#5. Waiting for the owner's reaction. Plan 261119-1615 phase 4 (add-rows) is on hold
 until the backlog shape is decided here.
 
 ## 2. Mục tiêu & đề bài
@@ -73,6 +73,8 @@ Round 10 (owner: why not move discussions into plans). Shaper agrees, not settle
 - Old text references (plans, reports, docs): rewritten mechanically from an old→new map in the migration commit.
 - Other projects using fgOS keep `docs/discussions/` today: the migration ships as a step they run on upgrade (a verb, not doctor), and readers never look in two places afterwards.
 
+Round 11: **owner chose (a)**: a new discussion or plan must carry `source:` naming at least one backlog item, the check fails without it; files existing when the check is switched on are warned only.
+
 ## 4. Quyết định đã chốt
 
 | D-ID | Decision | Date | Source |
@@ -92,6 +94,7 @@ Round 10 (owner: why not move discussions into plans). Shaper agrees, not settle
 - 2026-11-19 19:3x — owner round 8: `id_slug` or `id-slug`? Shaper recommended `id-slug` (§3 round 8 block).
 - 2026-11-19 19:4x — owner round 9: plans keep their id as today.
 - 2026-11-19 19:5x — owner round 10: why not move discussions into plans. Shaper scouted path references and agreed (§3 round 10 block).
+- 2026-11-19 20:0x — owner round 11: (a), mandatory backlog `source:` for new discussions and plans.
 
 ## 6. Thiết kế đã chốt {#design}
 
