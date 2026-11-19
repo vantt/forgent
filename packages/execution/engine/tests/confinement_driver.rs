@@ -1020,10 +1020,17 @@ fn a_home_written_with_a_tilde_or_home_variable_expands_to_the_users_home() {
 
 // ---- smoke test --------------------------------------------------------------------------------------------------
 
+/// A script written by one test and executed while another test forks keeps its write descriptor open in the
+/// forked child until that child execs, so the exec fails with "text file busy". The tests that write and run a
+/// script take this lock so only one of them forks at a time.
+#[cfg(unix)]
+static SCRIPT_EXEC: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
 #[cfg(unix)]
 #[test]
 fn the_smoke_test_passes_a_binary_that_runs_and_names_one_that_fails_or_is_missing() {
     use std::os::unix::fs::PermissionsExt;
+    let _exec = SCRIPT_EXEC.lock().unwrap_or_else(|e| e.into_inner());
     let dir = scratch("smoke");
     let write = |name: &str, body: &str| {
         let path = dir.join(name);
@@ -1073,6 +1080,7 @@ fn the_smoke_test_passes_a_binary_that_runs_and_names_one_that_fails_or_is_missi
 #[cfg(unix)]
 #[test]
 fn the_smoke_result_of_the_default_binary_name_is_kept_for_the_life_of_the_probe() {
+    let _exec = SCRIPT_EXEC.lock().unwrap_or_else(|e| e.into_inner());
     let dir = scratch("smoke-cache");
     let probe = SmokeProbe::new();
     let first = probe.check("bwrap", &dir.to_string_lossy());
