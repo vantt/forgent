@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { STATUSES, checkAll, checkPlanDir, main } from '../../scripts/plan-contract-check.mjs';
+import { STATUSES, activeOverlaps, checkAll, checkPlanDir, main } from '../../scripts/plan-contract-check.mjs';
 
 const SCRIPT = fileURLToPath(new URL('../../scripts/plan-contract-check.mjs', import.meta.url));
 const SHA = 'a'.repeat(40);
@@ -99,6 +99,16 @@ test('two globs in one directory, and a glob and a file there, are a same-wave o
   assert.ok(errorsOf(planText({ rows: phaseRows('`apps/t/tests/q_*.rs`', '`apps/t/tests/s_*.rs`') })).some((e) => e.includes('share wave 1')));
   assert.ok(errorsOf(planText({ rows: phaseRows('`apps/t/tests/q_*.rs`', '`apps/t/tests/q_a.rs`') })).some((e) => e.includes('share wave 1')));
   assert.deepEqual(errorsOf(planText({ rows: phaseRows('`apps/t/a/*.rs`', '`apps/t/b/q.rs`') })), []);
+});
+
+test('a claim the write-scope package drops as too long or too large fails the overlap check by name, same-wave and cross-plan', () => {
+  const long = `src/${'x'.repeat(1030)}`;
+  assert.ok(errorsOf(planText({ rows: phaseRows(`\`${long}\``, `\`${long}\``) })).some((e) => e.includes('entry-too-long')));
+  const many = Array.from({ length: 513 }, (_, n) => `d${n}/`);
+  assert.ok(errorsOf(planText({ rows: phaseRows(`\`${many.join('`, `')}\``, '`d0/x`') })).some((e) => e.includes('scope-too-large')));
+  const active = (footprint) => ({ dir: 'plans/p', legacy: false, meta: { status: 'ready', footprint } });
+  assert.throws(() => activeOverlaps([active([...many.slice(0, 512), 'hot/']), active(['hot/x'])]), /scope-too-large/);
+  assert.throws(() => activeOverlaps([active([long]), active([long])]), /entry-too-long/);
 });
 
 test('a footprint cell keeps every star and unwraps only whole-entry backticks or links', () => {

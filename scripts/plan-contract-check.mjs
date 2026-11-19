@@ -37,12 +37,17 @@ const strings = (v) => Array.isArray(v) && v.every((s) => typeof s === 'string' 
 /**
  * The pairs among `items` ({id, footprint}) whose footprints may touch the same path, by the `write-scope`
  * package's rule (a directory contains its files, a glob meets what it matches). An unreadable entry is left out of
- * the comparison (readable entries of the same item still count); a truncated scan throws, never a partial answer.
+ * the comparison (readable entries of the same item still count); a truncated scan, or a claim the package dropped as too large or too long, throws, never a partial answer.
  * @returns {Array<{ a: string, b: string, shared: string[] }>}
  */
 function collisions(items) {
   const found = nativeDoor().writeScope('collidingPairs', { items: items.map(({ id, footprint }) => ({ id, scopes: footprint })) });
   if (found.truncated) throw new Error(`footprint overlap scan stopped at its ${found.truncated.reason} (${found.truncated.limit}): the overlaps are not complete`);
+  // An entry the package dropped (`scope-too-large`, `entry-too-long`, or any code this reader does not know) is a
+  // claim that was never compared, so the answer is not complete. Only an unreadable entry (`entry-invalid`, and the
+  // `scope-empty` of an item holding nothing else) is left out: `unreadableEntries` reports it by name.
+  const dropped = found.problems.find((problem) => !['entry-invalid', 'scope-empty'].includes(problem.code));
+  if (dropped) throw new Error(`footprint overlap scan dropped a claim (${dropped.code}${dropped.entry === undefined ? '' : `: ${dropped.entry.slice(0, 40)}`}): the overlaps are not complete`);
   return found.pairs;
 }
 

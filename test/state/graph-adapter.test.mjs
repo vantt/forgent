@@ -37,6 +37,13 @@ test('a non-string footprint entry is unreadable, not dropped', () => {
   assert.deepEqual(pairs, [{ a: 'a', b: 'odd', shared: ['42'] }]);
 });
 
+test('an entry or a footprint the package drops as too long or too large conflicts with every other candidate, never reads as absent', () => {
+  const long = `src/${'x'.repeat(1030)}`;
+  assert.deepEqual(collidingFootprints([cand('a', [long]), cand('b', ['docs/'])]).map(({ a, b }) => [a, b]), [['a', 'b']]);
+  const many = Array.from({ length: 513 }, (_, n) => `d${n}/`);
+  assert.deepEqual(collidingFootprints([cand('a', many), cand('b', ['hot/x'])]).map(({ a, b }) => [a, b]), [['a', 'b']]);
+});
+
 test('a pair scan that stops at its cap throws a named error and never answers a partial list', () => {
   const many = Array.from({ length: 460 }, (_, n) => cand(`i${n}`, ['src']));
   assert.throws(() => footprintOverlapAmong(many), (error) => error instanceof GraphAdapterError && error.code === 'footprint-scan-truncated');
