@@ -2,6 +2,8 @@
 contract: plan-v1
 title: "Supervision powers, part 1: the four Rust cores (raise, drone signals, coordination evidence and prune, on-site read and type)"
 status: running
+lead: lead:forgent-261119-1730-supervision-
+base: 2bc1ed73f3932fc2ecc1bbccf4344019181757c7
 priority: P1
 blockedBy: []
 footprint:
@@ -30,7 +32,7 @@ The four new mechanisms the settled discussion asks for exist as tested Rust cor
 a coordination event can be raised by a caller (SP-D3, SP-D7); the watcher raises the SP-D5 tier-1 signals for every
 Identity session of the project; Observe records coordination evidence under registered kinds and can prune it by rule
 (row 17); terminal control reads a session's recent screen and types into a pane (row 19, SP-D6). Part 2
-(`261119-1730-supervision-powers-doors`) wires them to verbs and grants.
+(`261119-1731-supervision-powers-doors`) wires them to verbs and grants.
 
 ## Acceptance criteria
 1. `cargo test -p fgos-supervision` has an owning test that `Queue::raise` records an event once by the id derived from
