@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Throwaway: clean rerun of the supervisor live run (plan 261118-1045 phase 19 step 5), zero interventions; one phase writes one scratch file"
-status: running
+status: done
 lead: head:lead-forgent-261119-2200-supervisor-c
 priority: P3
 blockedBy: []
@@ -30,7 +30,7 @@ Any code, test or doc outside this plan directory.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Write the scratch file](phase-01-write-scratch.md) | - | plans/261119-2200-supervisor-clean-rerun/reports/live-run-scratch.md | 1 | ready |
+| 1 | [Write the scratch file](phase-01-write-scratch.md) | - | plans/261119-2200-supervisor-clean-rerun/reports/live-run-scratch.md | 1 | done |
 
 Checked with `node scripts/plan-contract-check.mjs --plan plans/261119-2200-supervisor-clean-rerun`.
 
