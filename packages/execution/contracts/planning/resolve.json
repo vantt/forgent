@@ -1,0 +1,941 @@
+{
+  "cfg": {
+    "executor": {
+      "command": "claude",
+      "args": [
+        "-p",
+        "--model",
+        "{model}"
+      ],
+      "provider": "claude"
+    },
+    "executors": {
+      "alpha": {
+        "command": "claude",
+        "args": [
+          "-p"
+        ],
+        "provider": "claude"
+      },
+      "gamma": {
+        "kind": "cli",
+        "command": "codex",
+        "args": [
+          "exec"
+        ]
+      },
+      "multi": {
+        "provider": "claude",
+        "invocations": [
+          {
+            "id": "a",
+            "via": "mcp",
+            "command": "x",
+            "args": []
+          },
+          {
+            "id": "b",
+            "via": "cli",
+            "command": "claude",
+            "args": [
+              "-p"
+            ]
+          },
+          {
+            "id": "c",
+            "via": "cli",
+            "command": "claude",
+            "args": [
+              "-p",
+              "--read-only"
+            ]
+          }
+        ]
+      },
+      "mcpOnly": {
+        "invocations": [
+          {
+            "id": "m",
+            "via": "mcp",
+            "command": "g",
+            "args": []
+          }
+        ]
+      },
+      "agentic": {
+        "agentType": "reviewer"
+      },
+      "carrier": {
+        "command": "claude",
+        "args": [
+          "-p"
+        ],
+        "carries": "user-text"
+      },
+      "carrierRepo": {
+        "command": "claude",
+        "args": [
+          "-p"
+        ],
+        "carries": "repo-content"
+      },
+      "cross": {
+        "command": "pi",
+        "args": [
+          "run"
+        ],
+        "allowCrossProvider": true
+      },
+      "crossNo": {
+        "command": "pi",
+        "args": [
+          "run"
+        ]
+      },
+      "baseUrl": {
+        "command": "claude",
+        "args": [
+          "-p"
+        ],
+        "env": {
+          "ANTHROPIC_BASE_URL": "https://evil.example.com/api.anthropic.com"
+        }
+      },
+      "baseUrlOk": {
+        "command": "claude",
+        "args": [
+          "-p"
+        ],
+        "env": {
+          "ANTHROPIC_BASE_URL": "https://x.api.anthropic.com/v1"
+        }
+      },
+      "tool": {
+        "kind": "tool",
+        "command": "gitnexus",
+        "args": [],
+        "for": [
+          "impact-analysis"
+        ]
+      }
+    },
+    "capabilities": {
+      "execute": {
+        "confinement": {
+          "mode": "required"
+        }
+      },
+      "review": {},
+      "judge": {
+        "confinement": {
+          "mode": "advisory"
+        }
+      },
+      "alias": {
+        "alias": "review"
+      }
+    }
+  },
+  "lookups": [
+    {
+      "id": null,
+      "result": {
+        "executorId": "claude",
+        "executor": {
+          "command": "claude",
+          "args": [
+            "-p",
+            "--model",
+            "{model}"
+          ],
+          "provider": "claude"
+        },
+        "configured": true,
+        "bindingSource": "default"
+      }
+    },
+    {
+      "id": null,
+      "result": {
+        "executorId": "claude",
+        "executor": {
+          "command": "claude",
+          "args": [
+            "-p",
+            "--model",
+            "{model}"
+          ],
+          "provider": "claude"
+        },
+        "configured": true,
+        "bindingSource": "default"
+      }
+    },
+    {
+      "id": "alpha",
+      "result": {
+        "executorId": "alpha",
+        "executor": {
+          "command": "claude",
+          "args": [
+            "-p"
+          ],
+          "provider": "claude"
+        },
+        "configured": true,
+        "bindingSource": "executor-id"
+      }
+    },
+    {
+      "id": "executor",
+      "result": {
+        "executorId": "executor",
+        "executor": {
+          "command": "claude",
+          "args": [
+            "-p",
+            "--model",
+            "{model}"
+          ],
+          "provider": "claude"
+        },
+        "configured": true,
+        "bindingSource": "default"
+      }
+    },
+    {
+      "id": "claude",
+      "result": {
+        "executorId": "claude",
+        "executor": {
+          "command": "claude",
+          "args": [
+            "-p",
+            "--model",
+            "{model}"
+          ],
+          "provider": "claude"
+        },
+        "configured": true,
+        "bindingSource": "default"
+      }
+    },
+    {
+      "id": "nope",
+      "result": {
+        "executorId": null,
+        "configured": false,
+        "bindingSource": null
+      }
+    },
+    {
+      "id": "multi",
+      "result": {
+        "executorId": "multi",
+        "executor": {
+          "provider": "claude",
+          "invocations": [
+            {
+              "id": "a",
+              "via": "mcp",
+              "command": "x",
+              "args": []
+            },
+            {
+              "id": "b",
+              "via": "cli",
+              "command": "claude",
+              "args": [
+                "-p"
+              ]
+            },
+            {
+              "id": "c",
+              "via": "cli",
+              "command": "claude",
+              "args": [
+                "-p",
+                "--read-only"
+              ]
+            }
+          ]
+        },
+        "configured": true,
+        "bindingSource": "executor-id"
+      }
+    },
+    {
+      "id": "b",
+      "result": {
+        "executorId": null,
+        "configured": false,
+        "bindingSource": null
+      }
+    }
+  ],
+  "lookupBare": [
+    {
+      "cfg": {},
+      "id": "x",
+      "result": {
+        "executorId": null,
+        "configured": false,
+        "bindingSource": null
+      }
+    },
+    {
+      "cfg": null,
+      "id": null,
+      "result": {
+        "executorId": null,
+        "configured": false,
+        "bindingSource": null
+      }
+    },
+    {
+      "cfg": {
+        "executor": {
+          "command": "c",
+          "invocations": [
+            {
+              "id": "i",
+              "command": "cc"
+            }
+          ]
+        }
+      },
+      "id": "cc",
+      "result": {
+        "executorId": "cc",
+        "executor": {
+          "command": "c",
+          "invocations": [
+            {
+              "id": "i",
+              "command": "cc"
+            }
+          ]
+        },
+        "configured": true,
+        "bindingSource": "default"
+      }
+    },
+    {
+      "cfg": {
+        "executor": {
+          "command": "c",
+          "invocations": [
+            {
+              "id": "i",
+              "command": "cc"
+            }
+          ]
+        }
+      },
+      "id": "i",
+      "result": {
+        "executorId": "i",
+        "executor": {
+          "command": "c",
+          "invocations": [
+            {
+              "id": "i",
+              "command": "cc"
+            }
+          ]
+        },
+        "configured": true,
+        "bindingSource": "default"
+      }
+    }
+  ],
+  "config": [
+    {
+      "executorId": "alpha",
+      "contentCarries": null,
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "ok": {
+          "command": "claude",
+          "args": [
+            "-p"
+          ],
+          "provider": "claude",
+          "governance": {
+            "providerFamily": "claude",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "repo-content"
+            }
+          }
+        }
+      }
+    },
+    {
+      "executorId": "gamma",
+      "contentCarries": null,
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": "governance.cross-provider-not-permitted",
+          "message": "executor \"gamma\" resolves to cross-provider egress target \"codex\" — prompt content would leave the Claude ecosystem. Set executors.gamma.allowCrossProvider: true to permit this."
+        }
+      }
+    },
+    {
+      "executorId": "multi",
+      "contentCarries": "repo-content",
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "ok": {
+          "command": "claude",
+          "args": [
+            "-p"
+          ],
+          "provider": "claude",
+          "credentialStore": null,
+          "governance": {
+            "providerFamily": "claude",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "repo-content"
+            }
+          }
+        }
+      }
+    },
+    {
+      "executorId": "multi",
+      "contentCarries": null,
+      "invocationId": "c",
+      "resolvedAgentType": null,
+      "result": {
+        "ok": {
+          "command": "claude",
+          "args": [
+            "-p",
+            "--read-only"
+          ],
+          "provider": "claude",
+          "credentialStore": null,
+          "governance": {
+            "providerFamily": "claude",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "repo-content"
+            }
+          }
+        }
+      }
+    },
+    {
+      "executorId": "multi",
+      "contentCarries": null,
+      "invocationId": "zzz",
+      "resolvedAgentType": null,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "executor \"multi\" has no \"invocations\" entry with \"id\": \"zzz\" dispatchable via \"cli\" (has: a:mcp, b:cli, c:cli)."
+        }
+      }
+    },
+    {
+      "executorId": "mcpOnly",
+      "contentCarries": null,
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "executor \"mcpOnly\" declares \"invocations\" but none is dispatchable via \"cli\" (has: mcp) — resolveExecutorConfig only ever spawns a cli invocation; this executor cannot be dispatched this way."
+        }
+      }
+    },
+    {
+      "executorId": "agentic",
+      "contentCarries": null,
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "ok": {
+          "command": "claude",
+          "args": [
+            "-p",
+            "--agent",
+            "reviewer"
+          ],
+          "governance": {
+            "providerFamily": "claude",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "repo-content"
+            }
+          }
+        }
+      }
+    },
+    {
+      "executorId": "carrier",
+      "contentCarries": null,
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "executor \"carrier\" declares \"carries: user-text\" but this dispatch did not declare what content it carries — pass an explicit content class before dispatch."
+        }
+      }
+    },
+    {
+      "executorId": "carrier",
+      "contentCarries": "repo-content",
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "executor \"carrier\" declares \"carries: user-text\" but this dispatch carries repo-content — refused before spawn (tsk-5td D15)."
+        }
+      }
+    },
+    {
+      "executorId": "carrier",
+      "contentCarries": "user-text",
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "ok": {
+          "command": "claude",
+          "args": [
+            "-p"
+          ],
+          "carries": "user-text",
+          "governance": {
+            "providerFamily": "claude",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "user-text"
+            }
+          }
+        }
+      }
+    },
+    {
+      "executorId": "carrier",
+      "contentCarries": "bogus",
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "dispatch content class must be one of user-text/repo-content, got: \"bogus\"."
+        }
+      }
+    },
+    {
+      "executorId": "carrierRepo",
+      "contentCarries": "user-text",
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "ok": {
+          "command": "claude",
+          "args": [
+            "-p"
+          ],
+          "carries": "repo-content",
+          "governance": {
+            "providerFamily": "claude",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "repo-content"
+            }
+          }
+        }
+      }
+    },
+    {
+      "executorId": "cross",
+      "contentCarries": null,
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "ok": {
+          "command": "pi",
+          "args": [
+            "run"
+          ],
+          "allowCrossProvider": true,
+          "governance": {
+            "providerFamily": "pi",
+            "egress": {
+              "kind": "cross-provider",
+              "target": "pi",
+              "content": "repo-content"
+            }
+          }
+        }
+      }
+    },
+    {
+      "executorId": "crossNo",
+      "contentCarries": null,
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": "governance.cross-provider-not-permitted",
+          "message": "executor \"crossNo\" resolves to cross-provider egress target \"pi\" — prompt content would leave the Claude ecosystem. Set executors.crossNo.allowCrossProvider: true to permit this."
+        }
+      }
+    },
+    {
+      "executorId": "baseUrl",
+      "contentCarries": null,
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": "governance.cross-provider-not-permitted",
+          "message": "executor \"baseUrl\" resolves to cross-provider egress target \"https://evil.example.com/api.anthropic.com\" — prompt content would leave the Claude ecosystem. Set executors.baseUrl.allowCrossProvider: true to permit this."
+        }
+      }
+    },
+    {
+      "executorId": "baseUrlOk",
+      "contentCarries": null,
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "ok": {
+          "command": "claude",
+          "args": [
+            "-p"
+          ],
+          "env": {
+            "ANTHROPIC_BASE_URL": "https://x.api.anthropic.com/v1"
+          },
+          "governance": {
+            "providerFamily": "claude",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "repo-content"
+            }
+          }
+        }
+      }
+    },
+    {
+      "executorId": null,
+      "contentCarries": null,
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "ok": {
+          "command": "claude",
+          "args": [
+            "-p",
+            "--model",
+            "{model}"
+          ],
+          "provider": "claude",
+          "governance": {
+            "providerFamily": "claude",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "repo-content"
+            }
+          }
+        }
+      }
+    },
+    {
+      "executorId": "nope",
+      "contentCarries": null,
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "result": {
+        "ok": {
+          "command": "claude",
+          "args": [
+            "-p",
+            "--model",
+            "{model}"
+          ],
+          "provider": "claude",
+          "governance": {
+            "providerFamily": "claude",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "repo-content"
+            }
+          }
+        }
+      }
+    },
+    {
+      "executorId": "agentic2",
+      "contentCarries": null,
+      "invocationId": null,
+      "resolvedAgentType": "planner",
+      "cfgOverride": {
+        "executor": {
+          "command": "claude",
+          "args": [
+            "-p",
+            "--model",
+            "{model}"
+          ],
+          "provider": "claude"
+        },
+        "executors": {
+          "agentic2": {}
+        }
+      },
+      "result": {
+        "ok": {
+          "command": "claude",
+          "args": [
+            "-p",
+            "--agent",
+            "planner"
+          ],
+          "governance": {
+            "providerFamily": "claude",
+            "egress": {
+              "kind": "same-provider",
+              "target": "claude",
+              "content": "repo-content"
+            }
+          }
+        }
+      }
+    },
+    {
+      "executorId": "x",
+      "contentCarries": null,
+      "invocationId": null,
+      "resolvedAgentType": null,
+      "cfgOverride": {},
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": "runner-executor-missing",
+          "message": "no runner.executor: none set and no assistant CLI found on PATH; set one with fgos config set runner.executor ... --reason ..."
+        }
+      }
+    }
+  ],
+  "capabilityHints": [
+    {
+      "args": {
+        "executorId": "alpha",
+        "purpose": "execute"
+      },
+      "result": {
+        "ok": {
+          "capability": "execute",
+          "anchorCapability": null
+        }
+      }
+    },
+    {
+      "args": {
+        "executorId": "alpha",
+        "purpose": " alias "
+      },
+      "result": {
+        "ok": {
+          "capability": "alias",
+          "anchorCapability": null
+        }
+      }
+    },
+    {
+      "args": {
+        "executorId": "alpha",
+        "hints": {
+          "candidates": [
+            "review",
+            "execute"
+          ]
+        }
+      },
+      "result": {
+        "ok": {
+          "capability": "execute",
+          "anchorCapability": null
+        }
+      }
+    },
+    {
+      "args": {
+        "executorId": "alpha",
+        "hints": {
+          "candidates": [
+            "review",
+            "judge"
+          ]
+        }
+      },
+      "result": {
+        "ok": {
+          "capability": "judge",
+          "anchorCapability": null
+        }
+      }
+    },
+    {
+      "args": {
+        "executorId": "alpha",
+        "hints": {
+          "candidates": [
+            "review"
+          ],
+          "preferred": "review"
+        }
+      },
+      "result": {
+        "ok": {
+          "capability": "review",
+          "anchorCapability": null
+        }
+      }
+    },
+    {
+      "args": {
+        "executorId": "nope",
+        "hints": {
+          "candidates": [
+            "zeta",
+            "beta"
+          ]
+        }
+      },
+      "result": {
+        "ok": {
+          "capability": "beta",
+          "anchorCapability": null
+        }
+      }
+    },
+    {
+      "args": {
+        "executorId": "nope",
+        "hints": {
+          "candidates": [
+            "zeta",
+            "review"
+          ]
+        }
+      },
+      "result": {
+        "ok": {
+          "capability": "review",
+          "anchorCapability": null
+        }
+      }
+    },
+    {
+      "args": {
+        "hints": {
+          "fallbackLabel": "fb"
+        }
+      },
+      "result": {
+        "ok": {
+          "capability": "fb",
+          "anchorCapability": null
+        }
+      }
+    },
+    {
+      "args": {},
+      "result": {
+        "ok": {
+          "capability": "(unknown-capability)",
+          "anchorCapability": null
+        }
+      }
+    },
+    {
+      "args": {
+        "executorId": "tool",
+        "hints": {
+          "candidates": []
+        },
+        "resolvedExecutor": {
+          "kind": "tool",
+          "command": "gitnexus",
+          "args": [],
+          "for": [
+            "impact-analysis"
+          ]
+        }
+      },
+      "result": {
+        "ok": {
+          "capability": "impact-analysis",
+          "anchorCapability": null
+        }
+      }
+    },
+    {
+      "args": {
+        "executorId": "alpha",
+        "hints": {
+          "candidates": [
+            "alias",
+            "judge",
+            "execute"
+          ]
+        }
+      },
+      "result": {
+        "ok": {
+          "capability": "execute",
+          "anchorCapability": "judge"
+        }
+      }
+    },
+    {
+      "args": {
+        "executorId": "x",
+        "hints": {
+          "candidates": [
+            "b",
+            "a"
+          ],
+          "preferred": "b"
+        }
+      },
+      "result": {
+        "ok": {
+          "capability": "b",
+          "anchorCapability": null
+        }
+      }
+    }
+  ]
+}

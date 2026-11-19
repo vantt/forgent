@@ -45,6 +45,23 @@ pub fn random_hex128() -> io::Result<String> {
         .collect())
 }
 
+/// A random (version 4, RFC 9562 variant) UUID in its lowercase hyphenated form, as `crypto.randomUUID()`
+/// writes it, from the kernel.
+pub fn uuid_v4() -> io::Result<String> {
+    let mut bytes = random_bytes::<16>()?;
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    let hex: String = bytes.iter().map(|b| format!("{b:02x}")).collect();
+    Ok(format!(
+        "{}-{}-{}-{}-{}",
+        &hex[0..8],
+        &hex[8..12],
+        &hex[12..16],
+        &hex[16..20],
+        &hex[20..32]
+    ))
+}
+
 /// Lowercase ASCII letters and digits of `input`, every other run of
 /// characters collapsed to one hyphen, no leading or trailing hyphen. May be
 /// empty; the caller decides what an empty slug means.
@@ -166,7 +183,7 @@ mod iso_tests {
 
 #[cfg(test)]
 mod random_tests {
-    use super::{random_bytes, random_hex128};
+    use super::{random_bytes, random_hex128, uuid_v4};
 
     #[test]
     fn the_host_kernel_generator_gives_distinct_non_zero_bytes() {
@@ -177,5 +194,25 @@ mod random_tests {
         let hex = random_hex128().expect("the host generator works");
         assert_eq!(hex.len(), 32);
         assert!(hex.bytes().all(|c| c.is_ascii_hexdigit()));
+    }
+
+    #[test]
+    fn a_uuid_is_hyphenated_lowercase_hex_with_version_4_and_the_rfc_variant() {
+        let id = uuid_v4().expect("the host generator works");
+        let groups: Vec<&str> = id.split('-').collect();
+        assert_eq!(
+            groups.iter().map(|g| g.len()).collect::<Vec<_>>(),
+            [8, 4, 4, 4, 12],
+            "{id}"
+        );
+        assert!(id
+            .bytes()
+            .all(|c| c == b'-' || c.is_ascii_digit() || (b'a'..=b'f').contains(&c)));
+        assert!(groups[2].starts_with('4'), "{id}");
+        assert!(
+            matches!(groups[3].as_bytes()[0], b'8' | b'9' | b'a' | b'b'),
+            "{id}"
+        );
+        assert_ne!(id, uuid_v4().expect("the host generator works"));
     }
 }

@@ -19,6 +19,7 @@ fn main() {
     let publisher = WritePublisher {
         catch_up: Arc::new(|_, _| Err(CatchUpRefusal::Refused(no_land()))),
         path_clean: Arc::new(|_, _| Err(no_land())),
+        path_oid: Arc::new(|_, _| Err(no_land())),
         publish: Arc::new(|_, _, _, _| Err(no_land())),
     };
     let args: Vec<String> = std::env::args().skip(1).collect();

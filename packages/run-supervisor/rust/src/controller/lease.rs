@@ -270,21 +270,6 @@ fn is_dead(holder: &Value) -> bool {
     judge_here(&Record::from_json(holder)) == Verdict::Dead
 }
 
-fn random_token() -> io::Result<String> {
-    let mut bytes = fgos_identity::text::random_bytes::<16>()?;
-    bytes[6] = (bytes[6] & 0x0f) | 0x40;
-    bytes[8] = (bytes[8] & 0x3f) | 0x80;
-    let hex: String = bytes.iter().map(|b| format!("{b:02x}")).collect();
-    Ok(format!(
-        "{}-{}-{}-{}-{}",
-        &hex[0..8],
-        &hex[8..12],
-        &hex[12..16],
-        &hex[16..20],
-        &hex[20..32]
-    ))
-}
-
 /// Acquire per-Run control: a monotonic `controlEpoch` plus a unique `controlToken` fencing successive controller
 /// acquisitions of the same Run. Synchronous and fs-only.
 pub fn acquire_run_control(run_dir: &Path, options: &AcquireOptions) -> io::Result<AcquireOutcome> {
@@ -337,7 +322,7 @@ pub fn acquire_run_control(run_dir: &Path, options: &AcquireOptions) -> io::Resu
             }
         }
         // No token means no generation: the error is returned below and the placeholder outcome never read.
-        let token = match random_token() {
+        let token = match fgos_identity::text::uuid_v4() {
             Ok(token) => token,
             Err(err) => {
                 failure = Some(err);

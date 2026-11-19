@@ -560,11 +560,7 @@ fn a_home_with_no_write_back_target_is_removed_after_the_credentials_port_says_n
 // ---- fingerprint ---------------------------------------------------------------------------------------------------
 
 fn sha256_hex(text: &str) -> String {
-    use sha2::{Digest, Sha256};
-    Sha256::digest(text.as_bytes())
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect()
+    fgos_execution::handoff::sha256_hex(text.as_bytes())
 }
 
 #[test]
@@ -932,4 +928,63 @@ fn the_driver_backed_probes_hold_on_a_sound_sandbox_and_catch_their_red_falsifie
     let all = run_all_confinement_probes(&bwrap, &dir("all"), true, &ports);
     assert_eq!(all.results.len(), 10, "{}", all.message);
     let _ = fs::remove_dir_all(&base);
+}
+
+fn plant_seat_home(
+    root: &Path,
+    name: &str,
+    write_back: &Value,
+    supervisor: Option<Value>,
+) -> PathBuf {
+    let run_dir = root.join(format!("run-{name}"));
+    let home = root.join(format!("t/{name}/home"));
+    fs::create_dir_all(&home).unwrap();
+    let descriptors = run_dir.join("protected/confinement-finalization");
+    fs::create_dir_all(&descriptors).unwrap();
+    fs::write(
+        descriptors.join("launch-1.json"),
+        json!({ "resources": [{ "pathRef": home.to_string_lossy(), "credentialWriteBack": write_back }] }).to_string(),
+    )
+    .unwrap();
+    if let Some(supervisor) = supervisor {
+        fs::write(
+            run_dir.join("supervisor-binding.json"),
+            json!({ "supervisor": supervisor }).to_string(),
+        )
+        .unwrap();
+    }
+    cleanup::write_attempt_home_record(
+        &home,
+        &json!({ "attemptId": name, "runDir": run_dir.to_string_lossy(), "dispatchId": name, "launchCommandId": "launch-1" }),
+    )
+    .unwrap();
+    home
+}
+
+#[test]
+fn the_live_seat_homes_of_a_store_are_found_from_host_records_alone() {
+    use fgos_execution_engine::credentials::LiveSeatHomes;
+    let base = scratch("live-seats");
+    let target = json!({ "provider": "claude-miu", "accountId": "acct", "kind": "home-files", "home": "/h", "layout": "claude-config-credentials-json", "runtimeDir": "/r" });
+    let mut other = target.clone();
+    other["accountId"] = json!("someone-else");
+    let live = plant_seat_home(
+        &base,
+        "live",
+        &target,
+        Some(json!({ "pid": std::process::id() })),
+    );
+    plant_seat_home(&base, "dead", &target, Some(json!({ "pid": DEAD_PID })));
+    plant_seat_home(
+        &base,
+        "other",
+        &other,
+        Some(json!({ "pid": std::process::id() })),
+    );
+    plant_seat_home(&base, "unbound", &target, None);
+    let records = cleanup::AttemptHomeRecords {
+        temp_roots: vec![base.join("t")],
+    };
+    assert_eq!(records.homes(&target), vec![live]);
+    fs::remove_dir_all(base).unwrap();
 }

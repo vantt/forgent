@@ -1,0 +1,1457 @@
+{
+  "assignmentId": "asgn_demo",
+  "deadPid": 2147483000,
+  "cases": [
+    {
+      "name": "the first admission builds the attempt directory",
+      "steps": [
+        {
+          "setup": [],
+          "call": {
+            "builders": [
+              "plan",
+              "effective"
+            ]
+          },
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/dispatch-plan.json": {
+              "plan": "dispatch",
+              "runId": "run_asgn_demo_01"
+            },
+            "asg/runs/01/effective-execution-contract.json": {
+              "contract": "effective",
+              "runId": "run_asgn_demo_01"
+            },
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "no dispatch plan or contract when the builders give none",
+      "steps": [
+        {
+          "setup": [],
+          "call": {
+            "builders": [
+              "plan-none"
+            ]
+          },
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "the same retry tuple resumes the same attempt",
+      "steps": [
+        {
+          "setup": [],
+          "call": {
+            "retryId": "r1"
+          },
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": "r1",
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": "r1",
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        },
+        {
+          "setup": [],
+          "call": {
+            "retryId": "r1"
+          },
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": true
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": "r1",
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": "r1",
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "a retry id reused with another payload is refused",
+      "steps": [
+        {
+          "setup": [],
+          "call": {
+            "retryId": "r1"
+          },
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": "r1",
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": "r1",
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        },
+        {
+          "setup": [],
+          "call": {
+            "retryId": "r1",
+            "payloadDigest": "sha256:bbb"
+          },
+          "result": {
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "admission-duplicate-retry",
+              "phase": "pre-admission",
+              "message": "executeAssignment: retryId \"r1\" for assignment \"asgn_demo\" was already admitted with a different destination/payload digest -- refusing (duplicate-retry)"
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": "r1",
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": "r1",
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "a retry id reused with another destination is refused",
+      "steps": [
+        {
+          "setup": [],
+          "call": {
+            "retryId": "r1"
+          },
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": "r1",
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": "r1",
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        },
+        {
+          "setup": [],
+          "call": {
+            "retryId": "r1",
+            "destination": "herdr"
+          },
+          "result": {
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "admission-duplicate-retry",
+              "phase": "pre-admission",
+              "message": "executeAssignment: retryId \"r1\" for assignment \"asgn_demo\" was already admitted with a different destination/payload digest -- refusing (duplicate-retry)"
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": "r1",
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": "r1",
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "a new retry must name the current run as its predecessor",
+      "steps": [
+        {
+          "setup": [],
+          "call": {
+            "retryId": "r1"
+          },
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": "r1",
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": "r1",
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        },
+        {
+          "setup": [],
+          "call": {
+            "retryId": "r2"
+          },
+          "result": {
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "admission-invalid-predecessor",
+              "phase": "pre-admission",
+              "message": "executeAssignment: predecessorRunId \"null\" for assignment \"asgn_demo\" does not match the current committed Run \"run_asgn_demo_01\" -- refusing (invalid-predecessor)"
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": "r1",
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": "r1",
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        },
+        {
+          "setup": [
+            {
+              "path": "asg/runs/01/result.json",
+              "json": {
+                "outcome": "pass"
+              }
+            }
+          ],
+          "call": {
+            "retryId": "r2",
+            "predecessorRunId": "run_asgn_demo_01"
+          },
+          "result": {
+            "ok": {
+              "attemptNum": 2,
+              "attemptStr": "02",
+              "runId": "run_asgn_demo_02",
+              "runDir": "asg/runs/02",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": "r1",
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/admission/generations/0000000002.json": {
+              "attempt": 2,
+              "attemptStr": "02",
+              "runId": "run_asgn_demo_02",
+              "retryId": "r2",
+              "predecessorRunId": "run_asgn_demo_01",
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/result.json": {
+              "outcome": "pass"
+            },
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": "r1",
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            },
+            "asg/runs/02/": null,
+            "asg/runs/02/run.json": {
+              "runId": "run_asgn_demo_02",
+              "attempt": 2,
+              "retryId": "r2",
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "an aborted retry id is refused",
+      "steps": [
+        {
+          "setup": [
+            {
+              "path": "asg/admission/markers/r9.aborted.json",
+              "json": {
+                "aborted": true
+              }
+            }
+          ],
+          "call": {
+            "retryId": "r9"
+          },
+          "result": {
+            "error": {
+              "name": "RunnerConfigError",
+              "code": null,
+              "phase": null,
+              "message": "executeAssignment: retryId \"r9\" for assignment \"asgn_demo\" was aborted -- refuse identity reuse"
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/markers/": null,
+            "asg/admission/markers/r9.aborted.json": {
+              "aborted": true
+            },
+            "asg/runs/": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "an attempt that settled admits the next one",
+      "steps": [
+        {
+          "setup": [],
+          "call": {},
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        },
+        {
+          "setup": [
+            {
+              "path": "asg/runs/01/result.json",
+              "json": {
+                "outcome": "pass"
+              }
+            }
+          ],
+          "call": {},
+          "result": {
+            "ok": {
+              "attemptNum": 2,
+              "attemptStr": "02",
+              "runId": "run_asgn_demo_02",
+              "runDir": "asg/runs/02",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/admission/generations/0000000002.json": {
+              "attempt": 2,
+              "attemptStr": "02",
+              "runId": "run_asgn_demo_02",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/result.json": {
+              "outcome": "pass"
+            },
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            },
+            "asg/runs/02/": null,
+            "asg/runs/02/run.json": {
+              "runId": "run_asgn_demo_02",
+              "attempt": 2,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "a settled attempt is refused when the caller opts in",
+      "steps": [
+        {
+          "setup": [],
+          "call": {},
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        },
+        {
+          "setup": [
+            {
+              "path": "asg/runs/01/result.json",
+              "json": {
+                "outcome": "pass"
+              }
+            }
+          ],
+          "call": {
+            "refuseIfSettled": true
+          },
+          "result": {
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "admission-run-already-settled",
+              "phase": "pre-admission",
+              "message": "executeAssignment: assignment \"asgn_demo\"'s prior attempt \"run_asgn_demo_01\" (attempt 1) already settled -- the caller opted into refuseIfSettled and must resume/link that result instead of dispatching a fresh attempt over it"
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/result.json": {
+              "outcome": "pass"
+            },
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "an attempt in flight is not raced",
+      "steps": [
+        {
+          "setup": [],
+          "call": {},
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        },
+        {
+          "setup": [],
+          "call": {},
+          "result": {
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "admission-run-in-flight",
+              "phase": "pre-admission",
+              "message": "executeAssignment: assignment \"asgn_demo\"'s prior attempt \"run_asgn_demo_01\" (attempt 1) has not settled and its control holder is alive or its liveness could not be disproven -- refusing a new attempt that would race it (pass --force-new-attempt to override)"
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "an attempt in flight is overridden on purpose",
+      "steps": [
+        {
+          "setup": [],
+          "call": {},
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        },
+        {
+          "setup": [],
+          "call": {
+            "forceNewAttempt": true
+          },
+          "result": {
+            "ok": {
+              "attemptNum": 2,
+              "attemptStr": "02",
+              "runId": "run_asgn_demo_02",
+              "runDir": "asg/runs/02",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/admission/generations/0000000002.json": {
+              "attempt": 2,
+              "attemptStr": "02",
+              "runId": "run_asgn_demo_02",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            },
+            "asg/runs/02/": null,
+            "asg/runs/02/run.json": {
+              "runId": "run_asgn_demo_02",
+              "attempt": 2,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "an attempt whose admitter is gone is replaced",
+      "steps": [
+        {
+          "setup": [
+            {
+              "path": "asg/admission/generations/0000000001.json",
+              "json": {
+                "attempt": 1,
+                "attemptStr": "01",
+                "runId": "run_asgn_demo_01",
+                "retryId": null,
+                "predecessorRunId": null,
+                "destination": "cli",
+                "admissionPayloadDigest": "sha256:aaa",
+                "admittedAt": "2026-11-19T00:00:00.000Z",
+                "admittedBy": {
+                  "id": "phantom"
+                }
+              }
+            },
+            {
+              "path": "asg/runs/01/run.json",
+              "json": {
+                "runId": "run_asgn_demo_01"
+              }
+            },
+            {
+              "path": "asg/runs/01/control/generations/0000000001.json",
+              "json": {
+                "purpose": "settled"
+              }
+            }
+          ],
+          "call": {},
+          "result": {
+            "ok": {
+              "attemptNum": 2,
+              "attemptStr": "02",
+              "runId": "run_asgn_demo_02",
+              "runDir": "asg/runs/02",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/admission/generations/0000000002.json": {
+              "attempt": 2,
+              "attemptStr": "02",
+              "runId": "run_asgn_demo_02",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/control/": null,
+            "asg/runs/01/control/generations/": null,
+            "asg/runs/01/control/generations/0000000001.json": {
+              "purpose": "settled"
+            },
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01"
+            },
+            "asg/runs/02/": null,
+            "asg/runs/02/run.json": {
+              "runId": "run_asgn_demo_02",
+              "attempt": 2,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "an expected run id the ledger would not give is refused",
+      "steps": [
+        {
+          "setup": [],
+          "call": {
+            "expectedRunId": "run_asgn_demo_07"
+          },
+          "result": {
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "admission-invalid-predecessor",
+              "phase": "pre-admission",
+              "message": "executeAssignment: predecessorRunId \"null\" for assignment \"asgn_demo\" does not match the current committed Run \"null\" -- refusing (invalid-predecessor)"
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/runs/": null
+          }
+        }
+      ]
+    },
+    {
+      "name": "an expected run id the ledger gives is admitted",
+      "steps": [
+        {
+          "setup": [],
+          "call": {
+            "expectedRunId": "run_asgn_demo_01"
+          },
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "a crash between the commit and the rename resumes the attempt",
+      "steps": [
+        {
+          "setup": [
+            {
+              "path": "asg/admission/generations/0000000001.json",
+              "json": {
+                "attempt": 1,
+                "attemptStr": "01",
+                "runId": "run_asgn_demo_01",
+                "retryId": "rx",
+                "predecessorRunId": null,
+                "destination": "cli",
+                "admissionPayloadDigest": "sha256:aaa",
+                "admittedAt": "2026-11-19T00:00:00.000Z",
+                "admittedBy": {
+                  "id": "phantom"
+                }
+              }
+            }
+          ],
+          "call": {
+            "retryId": "rx"
+          },
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": "rx",
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": "rx",
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "an attempt directory that already exists is resumed",
+      "steps": [
+        {
+          "setup": [
+            {
+              "path": "asg/admission/generations/0000000001.json",
+              "json": {
+                "attempt": 1,
+                "attemptStr": "01",
+                "runId": "run_asgn_demo_01",
+                "retryId": "rx",
+                "predecessorRunId": null,
+                "destination": "cli",
+                "admissionPayloadDigest": "sha256:aaa",
+                "admittedAt": "2026-11-19T00:00:00.000Z",
+                "admittedBy": {
+                  "id": "phantom"
+                }
+              }
+            },
+            {
+              "path": "asg/runs/01/run.json",
+              "json": {
+                "runId": "run_asgn_demo_01"
+              }
+            }
+          ],
+          "call": {
+            "retryId": "rx"
+          },
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": true
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": "rx",
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "attempt numbers skip the directories that exist",
+      "steps": [
+        {
+          "setup": [
+            {
+              "path": "asg/runs/05/run.json",
+              "json": {}
+            },
+            {
+              "path": "asg/runs/notes/x.json",
+              "json": {}
+            }
+          ],
+          "call": {},
+          "result": {
+            "ok": {
+              "attemptNum": 6,
+              "attemptStr": "06",
+              "runId": "run_asgn_demo_06",
+              "runDir": "asg/runs/06",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 6,
+              "attemptStr": "06",
+              "runId": "run_asgn_demo_06",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/05/": null,
+            "asg/runs/05/run.json": {},
+            "asg/runs/06/": null,
+            "asg/runs/06/run.json": {
+              "runId": "run_asgn_demo_06",
+              "attempt": 6,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            },
+            "asg/runs/notes/": null,
+            "asg/runs/notes/x.json": {}
+          }
+        }
+      ]
+    },
+    {
+      "name": "attempt numbers follow the ledger past the directories",
+      "steps": [
+        {
+          "setup": [
+            {
+              "path": "asg/admission/generations/0000000009.json",
+              "json": {
+                "attempt": 9,
+                "attemptStr": "09",
+                "runId": "run_asgn_demo_09",
+                "retryId": null,
+                "predecessorRunId": null,
+                "destination": "cli",
+                "admissionPayloadDigest": "sha256:aaa",
+                "admittedAt": "2026-11-19T00:00:00.000Z",
+                "admittedBy": {
+                  "id": "phantom"
+                }
+              }
+            },
+            {
+              "path": "asg/runs/09/result.json",
+              "json": {}
+            }
+          ],
+          "call": {},
+          "result": {
+            "ok": {
+              "attemptNum": 10,
+              "attemptStr": "10",
+              "runId": "run_asgn_demo_10",
+              "runDir": "asg/runs/10",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000009.json": {
+              "attempt": 9,
+              "attemptStr": "09",
+              "runId": "run_asgn_demo_09",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/admission/generations/0000000010.json": {
+              "attempt": 10,
+              "attemptStr": "10",
+              "runId": "run_asgn_demo_10",
+              "retryId": null,
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/09/": null,
+            "asg/runs/09/result.json": {},
+            "asg/runs/10/": null,
+            "asg/runs/10/run.json": {
+              "runId": "run_asgn_demo_10",
+              "attempt": 10,
+              "retryId": null,
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "abandoned staging of a dead process is removed when its retry and digest match",
+      "steps": [
+        {
+          "setup": [
+            {
+              "path": "asg/admission/generations/0000000001.json",
+              "json": {
+                "attempt": 1,
+                "attemptStr": "01",
+                "runId": "run_asgn_demo_01",
+                "retryId": "rs",
+                "predecessorRunId": null,
+                "destination": "cli",
+                "admissionPayloadDigest": "sha256:aaa",
+                "admittedAt": "2026-11-19T00:00:00.000Z",
+                "admittedBy": {
+                  "id": "phantom"
+                }
+              }
+            },
+            {
+              "path": "asg/runs/.staging-01-2147483000-aaaa/run.json",
+              "json": {
+                "retryId": "rs",
+                "payloadDigest": "aaa"
+              }
+            },
+            {
+              "path": "asg/runs/.staging-01-2147483000-bbbb/run.json",
+              "json": {
+                "retryId": "other",
+                "payloadDigest": "aaa"
+              }
+            },
+            {
+              "path": "asg/runs/.staging-01/leftover.txt",
+              "json": {
+                "x": 1
+              }
+            },
+            {
+              "path": "asg/runs/.staging-02-x/run.json",
+              "json": {
+                "retryId": "rs",
+                "payloadDigest": "aaa"
+              }
+            }
+          ],
+          "call": {
+            "retryId": "rs"
+          },
+          "result": {
+            "ok": {
+              "attemptNum": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "runDir": "asg/runs/01",
+              "resumed": false
+            }
+          },
+          "tree": {
+            "asg/": null,
+            "asg/admission/": null,
+            "asg/admission/generations/": null,
+            "asg/admission/generations/0000000001.json": {
+              "attempt": 1,
+              "attemptStr": "01",
+              "runId": "run_asgn_demo_01",
+              "retryId": "rs",
+              "predecessorRunId": null,
+              "destination": "cli",
+              "admissionPayloadDigest": "sha256:aaa",
+              "admittedAt": "<time>",
+              "admittedBy": "<holder>"
+            },
+            "asg/runs/": null,
+            "asg/runs/.staging-01-2147483000-bbbb/": null,
+            "asg/runs/.staging-01-2147483000-bbbb/run.json": {
+              "retryId": "other",
+              "payloadDigest": "aaa"
+            },
+            "asg/runs/.staging-02-x/": null,
+            "asg/runs/.staging-02-x/run.json": {
+              "retryId": "rs",
+              "payloadDigest": "aaa"
+            },
+            "asg/runs/01/": null,
+            "asg/runs/01/run.json": {
+              "runId": "run_asgn_demo_01",
+              "attempt": 1,
+              "retryId": "rs",
+              "payloadDigest": "sha256:aaa",
+              "status": "admitted"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

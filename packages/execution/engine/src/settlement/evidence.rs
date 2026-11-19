@@ -7,6 +7,7 @@ use std::path::Path;
 use fgos_execution::handoff::sha256_hex;
 use serde_json::{json, Map, Value};
 
+use crate::confinement::driver::js::relative;
 use crate::credentials::files::read_agent_file;
 use crate::run_result::claim::CLAIM_FRICTIONS_MAX;
 use crate::run_result::{is_verdict_seat, validate_agent_result_claim_contract, ClaimContext};
@@ -519,28 +520,6 @@ pub struct WorkerArtifacts {
     pub worker_artifact_paths: Vec<String>,
 }
 
-pub fn relative_path(root: &Path, path: &Path) -> String {
-    match path.strip_prefix(root) {
-        Ok(rel) => rel.to_string_lossy().into_owned(),
-        Err(_) => pathdiff(root, path),
-    }
-}
-
-/// `path.relative(root, path)` for a path outside `root`: `..` steps up to the common ancestor, then down.
-fn pathdiff(root: &Path, path: &Path) -> String {
-    let a: Vec<_> = root.components().collect();
-    let b: Vec<_> = path.components().collect();
-    let common = a.iter().zip(&b).take_while(|(x, y)| x == y).count();
-    let mut parts: Vec<String> = Vec::new();
-    for _ in common..a.len() {
-        parts.push("..".into());
-    }
-    for c in &b[common..] {
-        parts.push(c.as_os_str().to_string_lossy().into_owned());
-    }
-    parts.join("/")
-}
-
 /// Reads the agent's result claim and report from the run directory; a claim that fails validation is recorded as
 /// invalid. `given_result_path`: `None` lets settlement look for the claim; `Some(None)` is a receipt that names none.
 pub fn read_worker_artifacts(
@@ -596,7 +575,7 @@ pub fn read_worker_artifacts(
                 report_sha = Some(sha256_hex(&bytes));
             }
         }
-        let rel = relative_path(root, &report_path);
+        let rel = relative(root, &report_path);
         worker_artifacts
             .push(json!({"path": rel, "kind": "agent-report", "valid": report_sha.is_some()}));
         if let Some(sha) = report_sha {
@@ -605,7 +584,9 @@ pub fn read_worker_artifacts(
     }
     if result_exists {
         let path = result_path.as_ref().expect("checked above");
-        worker_artifacts.push(json!({"path": relative_path(root, path), "kind": "agent-result", "valid": !claim_invalid}));
+        worker_artifacts.push(
+            json!({"path": relative(root, path), "kind": "agent-result", "valid": !claim_invalid}),
+        );
     }
     let worker_artifact_paths = worker_artifacts
         .iter()

@@ -1165,7 +1165,10 @@ const SPENT_FILE = '.gate-spent';
 function isolateLogin(layout, from, to, { loadSqlite }) {
   fs.mkdirSync(to, { mode: 0o700 });
   if (layout !== ompLayout) {
-    for (const name of layout.files) fs.writeFileSync(path.join(to, name), readCopyBytes(path.join(from, name)), { mode: 0o600, flag: 'wx' });
+    for (const name of layout.files) {
+      fs.mkdirSync(path.dirname(path.join(to, name)), { recursive: true, mode: 0o700 });
+      fs.writeFileSync(path.join(to, name), readCopyBytes(path.join(from, name)), { mode: 0o600, flag: 'wx' });
+    }
     return;
   }
   const { columns, rows } = withDatabase(path.join(from, 'agent.db'), { loadSqlite, readOnly: true }, (db) => ({
@@ -1244,6 +1247,61 @@ async function applyAgentCopies({ accountDir, layout, layoutName, provider, cred
   }
 }
 
+/**
+ * Take the newest valid login a seat that still runs holds for this store, under the account lock the caller holds.
+ * A seat renews inside its private home with the store's single-use refresh token, so until its home is finalized
+ * the store holds a spent pair and only that home holds a good one. `homes` are the live seat homes the host records
+ * name for this store (never found by looking inside a home). A candidate counts only when it is newer than the
+ * store's entry (strictly later expiry, another refresh token), its access token is still ahead and it names no
+ * other account. The newest is proven before it is installed: the probe runs on an isolated copy of its login, given
+ * no tools, and only a call that succeeds, or that renewed the copy, installs the copy through the store's
+ * compare-before-write apply. A call that renewed the copy but cannot be applied yet leaves it among the pending
+ * copies. Never cools the account. Returns whether the store now holds the seat's login.
+ */
+async function takeLiveSeatLogin({ accountDir, layout, layoutName, provider, credentialSource, home, homes, lock, probeTimeoutMs, spawnFn, env, loadSqlite, now }) {
+  const source = layout.read(home, { loadSqlite });
+  const selected = source.ok ? selectProviderEntry(source.entries, provider) : null;
+  if (!selected?.ok) return false;
+  const key = selected.entry.key;
+  const entryIn = (dir) => {
+    const read = layout.read(dir, { loadSqlite, agent: true });
+    return read.ok ? read.entries.find((entry) => entry.key === key) ?? null : null;
+  };
+  let best = null;
+  for (const dir of homes) {
+    try {
+      const entry = entryIn(dir);
+      if (!entry || !(entry.expiresMs > now())) continue;
+      if (judgeCopy({ layout, provider, sourceHome: home, copyHome: dir, now: now(), loadSqlite }) !== 'newer') continue;
+      if (sameAccount({ layout, provider, sourceHome: home, copyHome: dir, loadSqlite }) === false) continue;
+      if (!best || entry.expiresMs > best.expiresMs) best = { dir, expiresMs: entry.expiresMs };
+    } catch { /* a home that cannot be read is no candidate */ }
+  }
+  if (!best) return false;
+  // A staging name under pending/: a runner killed during the call leaves the copy where the sweep finds it.
+  const probeHome = path.join(accountDir, PENDING_DIR, `.tmp-${process.pid}-${crypto.randomBytes(4).toString('hex')}`);
+  try {
+    fs.mkdirSync(path.dirname(probeHome), { recursive: true, mode: 0o700 });
+    isolateLogin(layout, best.dir, probeHome, { loadSqlite });
+    const taken = entryIn(probeHome)?.refresh ?? null;
+    const plan = withKillTimeout(credentialProbeCommand({ ...credentialSource, home: probeHome }, { noTools: true }), probeTimeoutMs, env);
+    if (!plan) return false;
+    const probe = await runCredentialProbe(plan, { spawnFn: spawnFn ?? lock.spawnHolding, timeoutMs: probeTimeoutMs, env });
+    const renewed = (entryIn(probeHome)?.refresh ?? null) !== taken;
+    if (!probe.ok && !renewed) return false;
+    const applied = applyRenewedCredential({ layoutName, sourceHome: home, copyHome: probeHome, provider, requireFuture: true, now: now(), loadSqlite });
+    if (applied.status === 'apply-deferred' && renewed) {
+      fs.renameSync(probeHome, path.join(accountDir, PENDING_DIR, pendingName(now())));
+      return false;
+    }
+    if (applied.status !== 'applied') return false;
+    clearFailure(accountDir);
+    return true;
+  } catch {
+    return false;
+  } finally { dropCopy(probeHome); }
+}
+
 // ---------------------------------------------------------------------------------------------------
 // Refresh-ahead
 // ---------------------------------------------------------------------------------------------------
@@ -1251,7 +1309,9 @@ async function applyAgentCopies({ accountDir, layout, layoutName, provider, cred
 /**
  * Renew the login of `credentialSource` once, in an fgOS-held scratch copy, when it is closer to expiry
  * than `thresholdMs`; apply the renewed entry to the real store. Never throws and never returns a value
- * of a credential: `{status: 'fresh'|'renewed'|'failed'|'cooldown'|'skipped', reason}`.
+ * of a credential: `{status: 'fresh'|'renewed'|'failed'|'cooldown'|'skipped', reason}`. `liveSeatHomes(target)`
+ * names the private homes of seats still running on this store; the newest valid login one of them renewed is
+ * taken first (takeLiveSeatLogin), so a store whose refresh token a running seat already spent is not renewed with it.
  */
 export async function refreshAhead({
   provider,
@@ -1266,6 +1326,7 @@ export async function refreshAhead({
   env,
   loadSqlite = defaultLoadSqlite,
   now = Date.now,
+  liveSeatHomes = () => [],
 } = {}) {
   try {
     const layoutName = credentialLayout(credentialSource);
@@ -1307,13 +1368,17 @@ export async function refreshAhead({
       return { status: 'skipped', reason: 'lock-busy' };
     }
     try {
+      let homes = [];
+      try { homes = liveSeatHomes(credentialWriteBackTarget({ provider, accountId, credentialSource, runtimeDir })) ?? []; } catch { /* no seat home is found */ }
+      const taken = homes.length > 0
+        && await takeLiveSeatLogin({ accountDir, layout, layoutName, provider, credentialSource, home, homes, lock, probeTimeoutMs, spawnFn, env, loadSqlite, now });
       await applyAgentCopies({ accountDir, layout, layoutName, provider, credentialSource, home, lock, probeTimeoutMs, cooldownMs, spawnFn, env, loadSqlite, now });
       applyLeftovers({ accountDir, layoutName, provider, sourceHome: home, now: now(), loadSqlite });
       const source = layout.read(home, { loadSqlite });
       if (!source.ok) return { status: 'skipped', reason: source.code };
       const entry = entryOf(source);
       if (!entry.ok) return { status: 'skipped', reason: entry.code };
-      if (!inWindow(entry.entry)) return { status: 'fresh', reason: 'outside-window' };
+      if (!inWindow(entry.entry)) return taken ? { status: 'renewed', reason: 'live-seat' } : { status: 'fresh', reason: 'outside-window' };
       if (inCooldown(accountDir, cooldownMs, now())) return { status: 'cooldown', reason: 'recent-failure' };
       return await renewInScratch({
         layout, layoutName, provider, credentialSource, home, accountDir, key: entry.entry.key, lock, probeTimeoutMs, spawnFn, env, loadSqlite, now,
@@ -1394,8 +1459,8 @@ async function renewInScratch({ layout, layoutName, provider, credentialSource, 
  * home is built and write-back when one is removed; without it neither runs.
  */
 export function createCredentialRenewal(options = {}) {
-  return function renewCredential({ provider, accountId, credentialSource, runtimeDir }) {
-    return refreshAhead({ ...options, provider, accountId, credentialSource, runtimeDir });
+  return function renewCredential({ provider, accountId, credentialSource, runtimeDir, liveSeatHomes }) {
+    return refreshAhead({ ...options, ...(liveSeatHomes ? { liveSeatHomes } : {}), provider, accountId, credentialSource, runtimeDir });
   };
 }
 

@@ -20,10 +20,11 @@ use crate::run_result::vocabulary::LEASE_CONFLICT_FAILURE_CODE;
 use crate::run_result::{normalize_run_result_v3, read_settled_result};
 use crate::transport::visibility_session::{iso_now, mark_run_settled};
 
+use crate::confinement::driver::js::relative;
+
 use super::evidence::{
     classify_evidence_to_outcome_facts, compute_changed_files, declare_report, declared_scope_of,
-    find_mutated_dirty_before_files, read_worker_artifacts, relative_path, with_launch_facts,
-    EvidenceInput,
+    find_mutated_dirty_before_files, read_worker_artifacts, with_launch_facts, EvidenceInput,
 };
 use super::ports::{FaultRecordInput, ProviderFaultSink, SettlementGit};
 
@@ -205,8 +206,8 @@ pub fn settle_refused_lease(input: &RefusedLease<'_>) -> Result<Value> {
             "runtime": {
                 "exitCode": null,
                 "executionError": {"code": code, "message": stderr_text},
-                "stdoutLog": relative_path(input.repo_root, &input.run_dir.join("stdout.log")),
-                "stderrLog": relative_path(input.repo_root, &input.run_dir.join("stderr.log")),
+                "stdoutLog": relative(input.repo_root, &input.run_dir.join("stdout.log")),
+                "stderrLog": relative(input.repo_root, &input.run_dir.join("stderr.log")),
             },
             "evidence": evidence,
         }),
@@ -832,11 +833,11 @@ pub fn settle_run_outcome(ports: &SettlementPorts<'_>, input: &SettleInput<'_>) 
     }
     runtime.insert(
         "stdoutLog".into(),
-        json!(relative_path(&root, &run_dir.join("stdout.log"))),
+        json!(relative(&root, &run_dir.join("stdout.log"))),
     );
     runtime.insert(
         "stderrLog".into(),
-        json!(relative_path(&root, &run_dir.join("stderr.log"))),
+        json!(relative(&root, &run_dir.join("stderr.log"))),
     );
     put("runtime", Value::Object(runtime));
     put(
