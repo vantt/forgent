@@ -380,6 +380,10 @@
           "reason": "the runner's case run directory (its twin is run_dirs.rs)"
         },
         {
+          "path": "packages/execution/rust/src/case_paths/mod.rs",
+          "reason": "the Rust port of case-run-paths.mjs on the same vectors; the execution crate's one spelling of the case runs root, which hand-off naming asks instead of repeating it"
+        },
+        {
           "path": "apps/fgos/src/wiring/run_dirs.rs",
           "reason": "the host lists run directories for the lock report; both sides read test/rust-host/fixtures/run-dirs-vectors.json"
         }

@@ -198,7 +198,7 @@ fn seat_rules_replay() {
                 .map(|()| Value::Null)
                 .map_err(seat_err),
             "effectiveRigorOf" => {
-                seats::effective_rigor_of(a0, a1, a2.get("fallback").and_then(Value::as_str))
+                seats::unit_rigor(a0, a1, a2.get("fallback").and_then(Value::as_str))
                     .map(|r| opt_str(r.as_deref()))
                     .map_err(seat_err)
             }

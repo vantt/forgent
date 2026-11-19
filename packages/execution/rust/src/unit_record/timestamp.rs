@@ -8,13 +8,12 @@ fn digits(text: &str, len: usize) -> Option<i64> {
         .flatten()
 }
 
-fn days_from_civil(year: i64, month: i64, day: i64) -> i64 {
-    let y = if month <= 2 { year - 1 } else { year };
-    let era = y.div_euclid(400);
-    let yoe = y - era * 400;
-    let doy = (153 * (month + if month > 2 { -3 } else { 9 }) + 2) / 5 + day - 1;
-    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
-    era * 146_097 + doe - 719_468
+/// Days since the epoch through the civil-time door. Counting from the first of the month keeps the JavaScript
+/// roll-over: a day past the month's end lands in the next month.
+fn epoch_day(year: i64, month: i64, day: i64) -> Option<i64> {
+    let first =
+        fgos_host_runtime::civil_time::days_from_civil(year, u32::try_from(month).ok()?, 1)?;
+    Some(first + day - 1)
 }
 
 /// Epoch milliseconds of an ISO 8601 timestamp, or `None` when the text is not one. The spellings are the ones
@@ -33,7 +32,7 @@ pub fn parse_timestamp_ms(text: &str) -> Option<i64> {
     if parts.next().is_some() || !(1..=12).contains(&month) || !(1..=31).contains(&day) {
         return None;
     }
-    let mut millis = days_from_civil(year, month, day) * 86_400_000;
+    let mut millis = epoch_day(year, month, day)? * 86_400_000;
     let Some(time) = time else {
         return Some(millis);
     };

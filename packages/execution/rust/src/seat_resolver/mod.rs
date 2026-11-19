@@ -10,18 +10,15 @@ mod resolve;
 mod seat_ledger;
 pub(crate) mod value;
 
-pub use capability::{
-    capability_rigor_of, capability_verify_of, min_checkers_of, own_min_checkers_of,
-    resolve_stronger_rigor, rigor_rank,
-};
+pub use capability::{capability_verify_of, min_checkers_of, own_min_checkers_of, rigor_rank};
 pub use legacy::{
     collaboration_of_record, is_seat_record, is_verdict_result, is_verify_result, legacy_family_of,
     legacy_seats_of, seat_key_of, seats_of_record,
 };
 pub use resolve::{
     assert_no_seat_tier, assert_no_unit_tier, bind_seat_of, check_declared_seats, checker_plan_of,
-    effective_rigor_of, requires_distinct_families, resolve_seats, seat_kind, seat_launches_of,
-    seat_of_record, workflow_tier_of, CheckerPlanEntry, PlanOptions, ResolveOptions, CHECKER_SEATS,
+    requires_distinct_families, resolve_seats, seat_kind, seat_launches_of, seat_of_record,
+    unit_rigor, workflow_tier_of, CheckerPlanEntry, PlanOptions, ResolveOptions, CHECKER_SEATS,
     LOOP_NAMES, RESERVED_SEAT_IDS, SEAT_ROLES, SYNC_SEAT, VERIFY_SEAT,
 };
 pub use seat_ledger::{BindBarrier, SeatLedger};

@@ -2,7 +2,6 @@
 //! Two lookups: the exact key, then its `<prefix>:*` entry (the text before the first colon).
 
 use super::value::{get, str_at};
-use super::SeatResolutionError;
 use serde_json::Value;
 
 const RIGOR_VALUES: [&str; 4] = ["low", "standard", "high", "critical"];
@@ -45,29 +44,6 @@ fn entries_of<'a>(cfg: &'a Value, capability: Option<&str>) -> Vec<(String, &'a 
         .collect()
 }
 
-/// The rigor a capability declares: its exact entry, else the `<prefix>:*` entry's.
-pub fn capability_rigor_of(
-    cfg: &Value,
-    capability: Option<&str>,
-) -> Result<Option<String>, SeatResolutionError> {
-    let rigor = entries_of(cfg, capability)
-        .into_iter()
-        .filter_map(|(_, entry)| entry.get("rigor"))
-        .next();
-    match rigor {
-        None => Ok(None),
-        Some(r) if r.as_str().is_some_and(|s| RIGOR_VALUES.contains(&s)) => {
-            Ok(r.as_str().map(str::to_string))
-        }
-        Some(r) => Err(SeatResolutionError::range(format!(
-            "invalid capability rigor \"{}\" for \"{}\". Valid rigors: [{}]",
-            r.as_str().map_or_else(|| r.to_string(), str::to_string),
-            capability.unwrap_or_default(),
-            RIGOR_VALUES.join(", ")
-        ))),
-    }
-}
-
 /// The first defined `minCheckers` (an empty list is defined: it clears the default) with its key.
 pub fn min_checkers_of<'a>(
     cfg: &'a Value,
@@ -91,34 +67,6 @@ pub fn capability_verify_of<'a>(cfg: &'a Value, capability: Option<&str>) -> Opt
 fn exact_entry<'a>(cfg: &'a Value, name: Option<&str>) -> Option<&'a Value> {
     let name = name?;
     section(cfg)?.get(name).filter(|v| is_entry(v))
-}
-
-/// Stronger of two rigors (`undefined` loses); an unknown value is refused by name.
-pub fn resolve_stronger_rigor(
-    a: Option<&Value>,
-    b: Option<&str>,
-) -> Result<Option<String>, SeatResolutionError> {
-    let a = a.filter(|v| !v.is_null());
-    for v in [
-        a.map(|v| v.as_str().map_or_else(|| v.to_string(), str::to_string)),
-        b.map(str::to_string),
-    ]
-    .into_iter()
-    .flatten()
-    {
-        if !RIGOR_VALUES.contains(&v.as_str()) {
-            return Err(SeatResolutionError::range(format!(
-                "invalid rigor \"{v}\". Valid rigors: [{}]",
-                RIGOR_VALUES.join(", ")
-            )));
-        }
-    }
-    let a = a.and_then(Value::as_str);
-    Ok(match (a, b) {
-        (None, b) => b.map(str::to_string),
-        (a, None) => a.map(str::to_string),
-        (Some(a), Some(b)) => Some(if rigor_rank(b) > rigor_rank(a) { b } else { a }.to_string()),
-    })
 }
 
 /// The unit's own `capability` string.
