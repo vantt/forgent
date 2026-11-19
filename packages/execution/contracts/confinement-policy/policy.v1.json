@@ -1,0 +1,7920 @@
+{
+  "contract": "confinement-policy-vectors.v1",
+  "constants": {
+    "builtinPolicies": {
+      "host-write-denied": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "workspace-write": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace-git-metadata",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    "builtinPolicyIds": [
+      "host-write-denied",
+      "workspace-write"
+    ],
+    "confinementModes": [
+      "required",
+      "preferred",
+      "unconfined"
+    ],
+    "controlAxes": {
+      "hostWrite": [
+        "deny",
+        "allow"
+      ],
+      "hostRead": [
+        "deny",
+        "blind",
+        "allow"
+      ],
+      "networkEgress": [
+        "deny",
+        "filtered",
+        "allow"
+      ],
+      "process": [
+        "isolated",
+        "host"
+      ],
+      "home": [
+        "private",
+        "host"
+      ],
+      "session": [
+        "isolated",
+        "shared"
+      ],
+      "workspace": [
+        "own",
+        "shared"
+      ]
+    },
+    "controlOrder": {
+      "hostWrite": {
+        "deny": 2,
+        "allow": 1
+      },
+      "hostRead": {
+        "deny": 3,
+        "blind": 2,
+        "allow": 1
+      },
+      "networkEgress": {
+        "deny": 3,
+        "filtered": 2,
+        "allow": 1
+      },
+      "process": {
+        "isolated": 2,
+        "host": 1
+      },
+      "home": {
+        "private": 2,
+        "host": 1
+      },
+      "session": {
+        "isolated": 2,
+        "shared": 1
+      },
+      "workspace": {
+        "own": 2,
+        "shared": 1
+      }
+    },
+    "grantAccessLevels": {
+      "read-write": 3,
+      "write": 2,
+      "read": 1
+    },
+    "workspacePathsResource": "workspace-paths",
+    "mailboxRecordResource": "mailbox-record",
+    "peerSessionsResource": "peer-sessions",
+    "blindHiddenRoots": [
+      "{fgosDir}/assignments",
+      "{fgosDir}/workflow-runs",
+      "{fgosDir}/dispatch-runs",
+      "{fgosDir}/runtime/mailbox",
+      "{confinementTempRoot}"
+    ],
+    "machinePrivateRoots": [
+      "{home}/.fgos/private",
+      "{runtimeDir}",
+      "{claudeSocketBase}/cc-socks",
+      "{home}/.config/herdr",
+      "{xdgConfigHome}/herdr",
+      "{herdrSocketDir}",
+      "{loginStore}",
+      "{confinementRoot}"
+    ],
+    "defaultSeatTimeoutMs": 900000,
+    "sessionSocketDir": "cc-socks"
+  },
+  "networkFilter": [
+    {
+      "name": "canonical dns rule",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "ok": null,
+      "after": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "empty allow list",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": []
+      },
+      "ok": null,
+      "after": {
+        "defaultAction": "deny",
+        "allow": []
+      }
+    },
+    {
+      "name": "ipv4 cidr is canonicalised",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.1.2.3/8"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "ok": null,
+      "after": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.0.0.0/8"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ipv4 cidr prefix 0",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.1.2.3/0"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "ok": null,
+      "after": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "0.0.0.0/0"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ipv4 cidr prefix 32",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.1.2.3/32"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "ok": null,
+      "after": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.1.2.3/32"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ipv4 prefix out of range",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.0.0.0/33"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) IPv4 CIDR prefix must be between 0 and 32, got 33."
+    },
+    {
+      "name": "ipv4 octet out of range",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.0.0.300/8"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) invalid IPv4 octet in \"10.0.0.300/8\"."
+    },
+    {
+      "name": "ipv6 cidr is lowercased",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "FE80::1/64"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "ok": null,
+      "after": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "fe80::1/64"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ipv6 prefix out of range",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "fe80::1/129"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) IPv6 CIDR prefix must be between 0 and 128, got 129."
+    },
+    {
+      "name": "cidr without a slash",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.0.0.0"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) invalid CIDR \"10.0.0.0\"."
+    },
+    {
+      "name": "cidr with two slashes",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.0.0.0/8/8"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) invalid CIDR \"10.0.0.0/8/8\"."
+    },
+    {
+      "name": "cidr prefix not digits",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.0.0.0/x"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) invalid CIDR prefix \"x\"."
+    },
+    {
+      "name": "cidr that is not an address",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "host/8"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) invalid CIDR \"host/8\"."
+    },
+    {
+      "name": "not an object",
+      "frozen": false,
+      "input": "deny",
+      "error": "runner config (networkFilter) must be an object."
+    },
+    {
+      "name": "an array",
+      "frozen": false,
+      "input": [],
+      "error": "runner config (networkFilter) must be an object."
+    },
+    {
+      "name": "unknown key",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [],
+        "extra": 1
+      },
+      "error": "runner config (networkFilter) contains unknown key \"extra\"."
+    },
+    {
+      "name": "default action allow",
+      "frozen": false,
+      "input": {
+        "defaultAction": "allow",
+        "allow": []
+      },
+      "error": "runner config (networkFilter) \"defaultAction\" must be \"deny\", got: \"allow\"."
+    },
+    {
+      "name": "allow not an array",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": {}
+      },
+      "error": "runner config (networkFilter) \"allow\" must be an array of allowlist rules."
+    },
+    {
+      "name": "rule not an object",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          3
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) must be an object."
+    },
+    {
+      "name": "rule unknown key",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              443
+            ],
+            "extra": 1
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) contains unknown key \"extra\"."
+    },
+    {
+      "name": "protocol icmp",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "icmp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) \"protocol\" must be \"tcp\" or \"udp\", got: \"icmp\"."
+    },
+    {
+      "name": "destination not an object",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": "x",
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) \"destination\" must be an object."
+    },
+    {
+      "name": "destination unknown key",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "a",
+              "extra": 1
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) contains unknown key \"extra\"."
+    },
+    {
+      "name": "destination kind url",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "url",
+              "value": "a"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) \"kind\" must be \"dns\" or \"cidr\", got: \"url\"."
+    },
+    {
+      "name": "destination value blank",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "  "
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) \"value\" must be a non-empty string."
+    },
+    {
+      "name": "dns wildcard",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "*.example.com"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) DNS destination \"*.example.com\" must not contain wildcard \"*\"."
+    },
+    {
+      "name": "ports empty",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": []
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) \"ports\" must be a non-empty array of port numbers."
+    },
+    {
+      "name": "port zero",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              0
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) port 0 must be an integer between 1 and 65535."
+    },
+    {
+      "name": "port too large",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              65536
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) port 65536 must be an integer between 1 and 65535."
+    },
+    {
+      "name": "port fractional",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              1.5
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) port 1.5 must be an integer between 1 and 65535."
+    },
+    {
+      "name": "port a string",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              "80"
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) port \"80\" must be an integer between 1 and 65535."
+    },
+    {
+      "name": "duplicate port",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              80,
+              80
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) duplicate port 80 in allowlist."
+    },
+    {
+      "name": "duplicate rule regardless of port order",
+      "frozen": false,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              80,
+              443
+            ]
+          },
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              443,
+              80
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[1]) duplicate allow rule entry."
+    },
+    {
+      "name": "canonical dns rule (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "ok": null,
+      "after": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "empty allow list (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": []
+      },
+      "ok": null,
+      "after": {
+        "defaultAction": "deny",
+        "allow": []
+      }
+    },
+    {
+      "name": "ipv4 cidr is canonicalised (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.1.2.3/8"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) CIDR must be canonical: got \"10.1.2.3/8\", expected \"10.0.0.0/8\"."
+    },
+    {
+      "name": "ipv4 cidr prefix 0 (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.1.2.3/0"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) CIDR must be canonical: got \"10.1.2.3/0\", expected \"0.0.0.0/0\"."
+    },
+    {
+      "name": "ipv4 cidr prefix 32 (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.1.2.3/32"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "ok": null,
+      "after": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.1.2.3/32"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ipv4 prefix out of range (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.0.0.0/33"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) IPv4 CIDR prefix must be between 0 and 32, got 33."
+    },
+    {
+      "name": "ipv4 octet out of range (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.0.0.300/8"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) invalid IPv4 octet in \"10.0.0.300/8\"."
+    },
+    {
+      "name": "ipv6 cidr is lowercased (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "FE80::1/64"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) CIDR must be canonical: got \"FE80::1/64\", expected \"fe80::1/64\"."
+    },
+    {
+      "name": "ipv6 prefix out of range (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "fe80::1/129"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) IPv6 CIDR prefix must be between 0 and 128, got 129."
+    },
+    {
+      "name": "cidr without a slash (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.0.0.0"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) invalid CIDR \"10.0.0.0\"."
+    },
+    {
+      "name": "cidr with two slashes (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.0.0.0/8/8"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) invalid CIDR \"10.0.0.0/8/8\"."
+    },
+    {
+      "name": "cidr prefix not digits (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "10.0.0.0/x"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) invalid CIDR prefix \"x\"."
+    },
+    {
+      "name": "cidr that is not an address (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "cidr",
+              "value": "host/8"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) invalid CIDR \"host/8\"."
+    },
+    {
+      "name": "not an object (frozen)",
+      "frozen": true,
+      "input": "deny",
+      "error": "runner config (networkFilter) must be an object."
+    },
+    {
+      "name": "an array (frozen)",
+      "frozen": true,
+      "input": [],
+      "error": "runner config (networkFilter) must be an object."
+    },
+    {
+      "name": "unknown key (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [],
+        "extra": 1
+      },
+      "error": "runner config (networkFilter) contains unknown key \"extra\"."
+    },
+    {
+      "name": "default action allow (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "allow",
+        "allow": []
+      },
+      "error": "runner config (networkFilter) \"defaultAction\" must be \"deny\", got: \"allow\"."
+    },
+    {
+      "name": "allow not an array (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": {}
+      },
+      "error": "runner config (networkFilter) \"allow\" must be an array of allowlist rules."
+    },
+    {
+      "name": "rule not an object (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          3
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) must be an object."
+    },
+    {
+      "name": "rule unknown key (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              443
+            ],
+            "extra": 1
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) contains unknown key \"extra\"."
+    },
+    {
+      "name": "protocol icmp (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "icmp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) \"protocol\" must be \"tcp\" or \"udp\", got: \"icmp\"."
+    },
+    {
+      "name": "destination not an object (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": "x",
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) \"destination\" must be an object."
+    },
+    {
+      "name": "destination unknown key (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "a",
+              "extra": 1
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) contains unknown key \"extra\"."
+    },
+    {
+      "name": "destination kind url (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "url",
+              "value": "a"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) \"kind\" must be \"dns\" or \"cidr\", got: \"url\"."
+    },
+    {
+      "name": "destination value blank (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "  "
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) \"value\" must be a non-empty string."
+    },
+    {
+      "name": "dns wildcard (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "*.example.com"
+            },
+            "ports": [
+              443
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0].destination) DNS destination \"*.example.com\" must not contain wildcard \"*\"."
+    },
+    {
+      "name": "ports empty (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": []
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) \"ports\" must be a non-empty array of port numbers."
+    },
+    {
+      "name": "port zero (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              0
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) port 0 must be an integer between 1 and 65535."
+    },
+    {
+      "name": "port too large (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              65536
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) port 65536 must be an integer between 1 and 65535."
+    },
+    {
+      "name": "port fractional (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              1.5
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) port 1.5 must be an integer between 1 and 65535."
+    },
+    {
+      "name": "port a string (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              "80"
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) port \"80\" must be an integer between 1 and 65535."
+    },
+    {
+      "name": "duplicate port (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              80,
+              80
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[0]) duplicate port 80 in allowlist."
+    },
+    {
+      "name": "duplicate rule regardless of port order (frozen)",
+      "frozen": true,
+      "input": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              80,
+              443
+            ]
+          },
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              443,
+              80
+            ]
+          }
+        ]
+      },
+      "error": "runner config (networkFilter.allow[1]) duplicate allow rule entry."
+    }
+  ],
+  "policyShape": [
+    {
+      "name": "host-write-denied built-in",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "after": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "workspace-write built-in",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace-git-metadata",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace-git-metadata",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "after": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace-git-metadata",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "not an object",
+      "frozen": false,
+      "input": 4,
+      "error": "runner config (policy) must be an object."
+    },
+    {
+      "name": "an array",
+      "frozen": false,
+      "input": [],
+      "error": "runner config (policy) must be an object."
+    },
+    {
+      "name": "unknown top-level key",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ],
+        "backend": "x"
+      },
+      "error": "runner config (policy) contains unknown key \"backend\". Allowed keys: contract, controls, grants, networkFilter."
+    },
+    {
+      "name": "wrong contract",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v2",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy) \"contract\" must be \"confinement-policy.v1\", got: \"confinement-policy.v2\"."
+    },
+    {
+      "name": "controls missing",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "grants": []
+      },
+      "error": "runner config (policy) \"controls\" must be an object."
+    },
+    {
+      "name": "controls an array",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": [],
+        "grants": []
+      },
+      "error": "runner config (policy) \"controls\" must be an object."
+    },
+    {
+      "name": "unknown control",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared",
+          "extra": "x"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.controls) contains unknown control \"extra\". Allowed controls: hostWrite, hostRead, networkEgress, process, home, session, workspace."
+    },
+    {
+      "name": "missing control",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.controls) is missing required control \"hostRead\"."
+    },
+    {
+      "name": "illegal control value",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "maybe",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.controls.hostRead) must be one of deny/blind/allow, got: \"maybe\"."
+    },
+    {
+      "name": "grants not an array",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": {}
+      },
+      "error": "runner config (policy) \"grants\" must be an array."
+    },
+    {
+      "name": "grant not an object",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          "x"
+        ]
+      },
+      "error": "runner config (policy.grants[0]) must be an object."
+    },
+    {
+      "name": "grant unknown key",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch",
+            "paths": [
+              "a"
+            ]
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) contains unknown key \"paths\". Allowed keys: resource, access, scope, optional."
+    },
+    {
+      "name": "grant resource blank",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": " ",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) \"resource\" must be a non-empty string."
+    },
+    {
+      "name": "duplicate grant",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "run-output",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[1]) duplicate resource grant for \"run-output\"."
+    },
+    {
+      "name": "grant access illegal",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "rw",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) \"access\" must be one of read-write/write/read, got: \"rw\"."
+    },
+    {
+      "name": "grant scope illegal",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "machine"
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) \"scope\" must be \"dispatch\", got: \"machine\"."
+    },
+    {
+      "name": "grant optional not a boolean",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch",
+            "optional": "yes"
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) \"optional\" must be a boolean when present."
+    },
+    {
+      "name": "grant optional boolean",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch",
+            "optional": true
+          }
+        ]
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch",
+            "optional": true
+          }
+        ]
+      },
+      "after": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch",
+            "optional": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "workspace-paths grant",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              "plans",
+              "docs/backlog.md"
+            ]
+          }
+        ]
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              "plans",
+              "docs/backlog.md"
+            ]
+          }
+        ]
+      },
+      "after": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              "plans",
+              "docs/backlog.md"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "workspace-paths grant without paths",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) \"paths\" must be a non-empty array of project-relative paths."
+    },
+    {
+      "name": "workspace-paths under .fgos",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              ".fgos/x"
+            ]
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) path \".fgos/x\" lies under \".fgos\", which holds the attempt's own run directory; a grant never binds it writable."
+    },
+    {
+      "name": "filtered without a filter",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy) \"networkFilter\" is required when networkEgress is \"filtered\"."
+    },
+    {
+      "name": "filtered with a filter",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      },
+      "after": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "filter without filtered egress",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": []
+        }
+      },
+      "error": "runner config (policy) \"networkFilter\" is only permitted when networkEgress is \"filtered\"."
+    },
+    {
+      "name": "filtered with a bad filter",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "allow",
+          "allow": []
+        }
+      },
+      "error": "runner config (policy.networkFilter) \"defaultAction\" must be \"deny\", got: \"allow\"."
+    },
+    {
+      "name": "filtered with a non-canonical cidr",
+      "frozen": false,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "cidr",
+                "value": "10.1.2.3/8"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "cidr",
+                "value": "10.0.0.0/8"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      },
+      "after": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "cidr",
+                "value": "10.0.0.0/8"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "host-write-denied built-in (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "after": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "workspace-write built-in (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace-git-metadata",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace-git-metadata",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "after": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace-git-metadata",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "not an object (frozen)",
+      "frozen": true,
+      "input": 4,
+      "error": "runner config (policy) must be an object."
+    },
+    {
+      "name": "an array (frozen)",
+      "frozen": true,
+      "input": [],
+      "error": "runner config (policy) must be an object."
+    },
+    {
+      "name": "unknown top-level key (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ],
+        "backend": "x"
+      },
+      "error": "runner config (policy) contains unknown key \"backend\". Allowed keys: contract, controls, grants, networkFilter."
+    },
+    {
+      "name": "wrong contract (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v2",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy) \"contract\" must be \"confinement-policy.v1\", got: \"confinement-policy.v2\"."
+    },
+    {
+      "name": "controls missing (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "grants": []
+      },
+      "error": "runner config (policy) \"controls\" must be an object."
+    },
+    {
+      "name": "controls an array (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": [],
+        "grants": []
+      },
+      "error": "runner config (policy) \"controls\" must be an object."
+    },
+    {
+      "name": "unknown control (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared",
+          "extra": "x"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.controls) contains unknown control \"extra\". Allowed controls: hostWrite, hostRead, networkEgress, process, home, session, workspace."
+    },
+    {
+      "name": "missing control (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.controls) is missing required control \"hostRead\"."
+    },
+    {
+      "name": "illegal control value (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "maybe",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.controls.hostRead) must be one of deny/blind/allow, got: \"maybe\"."
+    },
+    {
+      "name": "grants not an array (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": {}
+      },
+      "error": "runner config (policy) \"grants\" must be an array."
+    },
+    {
+      "name": "grant not an object (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          "x"
+        ]
+      },
+      "error": "runner config (policy.grants[0]) must be an object."
+    },
+    {
+      "name": "grant unknown key (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch",
+            "paths": [
+              "a"
+            ]
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) contains unknown key \"paths\". Allowed keys: resource, access, scope, optional."
+    },
+    {
+      "name": "grant resource blank (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": " ",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) \"resource\" must be a non-empty string."
+    },
+    {
+      "name": "duplicate grant (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "run-output",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[1]) duplicate resource grant for \"run-output\"."
+    },
+    {
+      "name": "grant access illegal (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "rw",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) \"access\" must be one of read-write/write/read, got: \"rw\"."
+    },
+    {
+      "name": "grant scope illegal (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "machine"
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) \"scope\" must be \"dispatch\", got: \"machine\"."
+    },
+    {
+      "name": "grant optional not a boolean (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch",
+            "optional": "yes"
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) \"optional\" must be a boolean when present."
+    },
+    {
+      "name": "grant optional boolean (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch",
+            "optional": true
+          }
+        ]
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch",
+            "optional": true
+          }
+        ]
+      },
+      "after": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch",
+            "optional": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "workspace-paths grant (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              "plans",
+              "docs/backlog.md"
+            ]
+          }
+        ]
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              "plans",
+              "docs/backlog.md"
+            ]
+          }
+        ]
+      },
+      "after": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              "plans",
+              "docs/backlog.md"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "workspace-paths grant without paths (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) \"paths\" must be a non-empty array of project-relative paths."
+    },
+    {
+      "name": "workspace-paths under .fgos (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "workspace-paths",
+            "access": "read-write",
+            "scope": "dispatch",
+            "paths": [
+              ".fgos/x"
+            ]
+          }
+        ]
+      },
+      "error": "runner config (policy.grants[0]) path \".fgos/x\" lies under \".fgos\", which holds the attempt's own run directory; a grant never binds it writable."
+    },
+    {
+      "name": "filtered without a filter (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "error": "runner config (policy) \"networkFilter\" is required when networkEgress is \"filtered\"."
+    },
+    {
+      "name": "filtered with a filter (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      },
+      "after": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "filter without filtered egress (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": []
+        }
+      },
+      "error": "runner config (policy) \"networkFilter\" is only permitted when networkEgress is \"filtered\"."
+    },
+    {
+      "name": "filtered with a bad filter (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "allow",
+          "allow": []
+        }
+      },
+      "error": "runner config (policy.networkFilter) \"defaultAction\" must be \"deny\", got: \"allow\"."
+    },
+    {
+      "name": "filtered with a non-canonical cidr (frozen)",
+      "frozen": true,
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "filtered",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ],
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "cidr",
+                "value": "10.1.2.3/8"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      },
+      "error": "runner config (policy.networkFilter.allow[0].destination) CIDR must be canonical: got \"10.1.2.3/8\", expected \"10.0.0.0/8\"."
+    }
+  ],
+  "workspacePaths": [
+    {
+      "name": "named directory and file",
+      "input": [
+        "plans",
+        "docs/backlog.md"
+      ],
+      "ok": null
+    },
+    {
+      "name": "dot-relative",
+      "input": [
+        "./plans"
+      ],
+      "ok": null
+    },
+    {
+      "name": "not an array",
+      "input": "plans",
+      "error": "runner config (grant) \"paths\" must be a non-empty array of project-relative paths."
+    },
+    {
+      "name": "empty array",
+      "input": [],
+      "error": "runner config (grant) \"paths\" must be a non-empty array of project-relative paths."
+    },
+    {
+      "name": "entry not a string",
+      "input": [
+        3
+      ],
+      "error": "runner config (grant) \"paths\" entries must be non-empty strings, got: 3."
+    },
+    {
+      "name": "entry blank",
+      "input": [
+        "  "
+      ],
+      "error": "runner config (grant) \"paths\" entries must be non-empty strings, got: \"  \"."
+    },
+    {
+      "name": "absolute posix",
+      "input": [
+        "/etc"
+      ],
+      "error": "runner config (grant) path \"/etc\" is absolute; a workspace path is relative to the project root."
+    },
+    {
+      "name": "absolute windows drive",
+      "input": [
+        "C:\\x"
+      ],
+      "error": "runner config (grant) path \"C:\\\\x\" is absolute; a workspace path is relative to the project root."
+    },
+    {
+      "name": "climbs with ..",
+      "input": [
+        "a/../b"
+      ],
+      "error": "runner config (grant) path \"a/../b\" climbs out of the project root with \"..\"."
+    },
+    {
+      "name": "climbs with backslash ..",
+      "input": [
+        "a\\..\\b"
+      ],
+      "error": "runner config (grant) path \"a\\\\..\\\\b\" climbs out of the project root with \"..\"."
+    },
+    {
+      "name": "under .fgos",
+      "input": [
+        ".fgos/runtime"
+      ],
+      "error": "runner config (grant) path \".fgos/runtime\" lies under \".fgos\", which holds the attempt's own run directory; a grant never binds it writable."
+    },
+    {
+      "name": "under .FGOS upper case",
+      "input": [
+        ".FGOS/runtime"
+      ],
+      "error": "runner config (grant) path \".FGOS/runtime\" lies under \".fgos\", which holds the attempt's own run directory; a grant never binds it writable."
+    },
+    {
+      "name": "under ./.fgos",
+      "input": [
+        "./.fgos"
+      ],
+      "error": "runner config (grant) path \"./.fgos\" lies under \".fgos\", which holds the attempt's own run directory; a grant never binds it writable."
+    },
+    {
+      "name": "only mentions .fgos deeper down",
+      "input": [
+        "docs/.fgos"
+      ],
+      "ok": null
+    },
+    {
+      "name": "glob star",
+      "input": [
+        "plans/*"
+      ],
+      "error": "runner config (grant) path \"plans/*\" contains a glob character; name the exact path."
+    },
+    {
+      "name": "glob question",
+      "input": [
+        "a?"
+      ],
+      "error": "runner config (grant) path \"a?\" contains a glob character; name the exact path."
+    },
+    {
+      "name": "glob bracket",
+      "input": [
+        "a[1]"
+      ],
+      "error": "runner config (grant) path \"a[1]\" contains a glob character; name the exact path."
+    },
+    {
+      "name": "glob brace",
+      "input": [
+        "a{b}"
+      ],
+      "error": "runner config (grant) path \"a{b}\" contains a glob character; name the exact path."
+    }
+  ],
+  "capabilityShape": [
+    {
+      "name": "required with policy",
+      "input": {
+        "mode": "required",
+        "policy": "host-write-denied"
+      },
+      "ok": {
+        "mode": "required",
+        "policy": "host-write-denied"
+      }
+    },
+    {
+      "name": "preferred with override flag",
+      "input": {
+        "mode": "preferred",
+        "policy": "workspace-write",
+        "allowInvocationOverride": true
+      },
+      "ok": {
+        "mode": "preferred",
+        "policy": "workspace-write",
+        "allowInvocationOverride": true
+      }
+    },
+    {
+      "name": "unconfined",
+      "input": {
+        "mode": "unconfined"
+      },
+      "ok": {
+        "mode": "unconfined"
+      }
+    },
+    {
+      "name": "unconfined with override false",
+      "input": {
+        "mode": "unconfined",
+        "allowInvocationOverride": false
+      },
+      "ok": {
+        "mode": "unconfined",
+        "allowInvocationOverride": false
+      }
+    },
+    {
+      "name": "unconfined with override true",
+      "input": {
+        "mode": "unconfined",
+        "allowInvocationOverride": true
+      },
+      "error": "runner config (cap) \"allowInvocationOverride\" must be false or omitted when mode is \"unconfined\"."
+    },
+    {
+      "name": "unconfined with policy",
+      "input": {
+        "mode": "unconfined",
+        "policy": "x"
+      },
+      "error": "runner config (cap) contains disallowed key \"policy\" for mode \"unconfined\"."
+    },
+    {
+      "name": "unconfined with unknown key",
+      "input": {
+        "mode": "unconfined",
+        "backend": "x"
+      },
+      "error": "runner config (cap) contains disallowed key \"backend\" for mode \"unconfined\"."
+    },
+    {
+      "name": "not an object",
+      "input": "required",
+      "error": "runner config (cap) must be an object."
+    },
+    {
+      "name": "mode illegal",
+      "input": {
+        "mode": "strict",
+        "policy": "x"
+      },
+      "error": "runner config (cap) \"mode\" must be one of required/preferred/unconfined, got: \"strict\"."
+    },
+    {
+      "name": "required without policy",
+      "input": {
+        "mode": "required"
+      },
+      "error": "runner config (cap) \"policy\" must be a non-empty string when mode is \"required\"."
+    },
+    {
+      "name": "required with blank policy",
+      "input": {
+        "mode": "required",
+        "policy": " "
+      },
+      "error": "runner config (cap) \"policy\" must be a non-empty string when mode is \"required\"."
+    },
+    {
+      "name": "required with unknown key",
+      "input": {
+        "mode": "required",
+        "policy": "x",
+        "backend": "b"
+      },
+      "error": "runner config (cap) contains unknown key \"backend\"."
+    },
+    {
+      "name": "override flag not a boolean",
+      "input": {
+        "mode": "required",
+        "policy": "x",
+        "allowInvocationOverride": "yes"
+      },
+      "error": "runner config (cap) \"allowInvocationOverride\" must be a boolean when present."
+    }
+  ],
+  "overrideShape": [
+    {
+      "name": "harden a control",
+      "override": {
+        "controls": {
+          "networkEgress": "deny"
+        }
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "ok": {
+        "controls": {
+          "networkEgress": "deny"
+        }
+      },
+      "after": {
+        "controls": {
+          "networkEgress": "deny"
+        }
+      }
+    },
+    {
+      "name": "equal control",
+      "override": {
+        "controls": {
+          "hostWrite": "deny"
+        }
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "ok": {
+        "controls": {
+          "hostWrite": "deny"
+        }
+      },
+      "after": {
+        "controls": {
+          "hostWrite": "deny"
+        }
+      }
+    },
+    {
+      "name": "downgrade a control",
+      "override": {
+        "controls": {
+          "hostWrite": "allow"
+        }
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override.controls.hostWrite) override downgrade: \"allow\" is less protective than base policy \"deny\"."
+    },
+    {
+      "name": "unknown axis",
+      "override": {
+        "controls": {
+          "bogus": "deny"
+        }
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override.controls) unknown control axis \"bogus\"."
+    },
+    {
+      "name": "illegal value",
+      "override": {
+        "controls": {
+          "hostRead": "maybe"
+        }
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override.controls.hostRead) must be one of deny/blind/allow, got: \"maybe\"."
+    },
+    {
+      "name": "controls not an object",
+      "override": {
+        "controls": []
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override) \"controls\" must be an object."
+    },
+    {
+      "name": "controls without a base policy",
+      "override": {
+        "controls": {
+          "hostWrite": "deny"
+        }
+      },
+      "base": null,
+      "baseMode": "preferred",
+      "error": "runner config (override) cannot override controls or networkFilter without a base policy."
+    },
+    {
+      "name": "mode hardened",
+      "override": {
+        "mode": "required"
+      },
+      "base": null,
+      "baseMode": "preferred",
+      "ok": {
+        "mode": "required"
+      },
+      "after": {
+        "mode": "required"
+      }
+    },
+    {
+      "name": "mode illegal",
+      "override": {
+        "mode": "unconfined"
+      },
+      "base": null,
+      "baseMode": "preferred",
+      "error": "runner config (override) \"mode\" override must be \"required\" or \"preferred\", got: \"unconfined\"."
+    },
+    {
+      "name": "mode downgrade",
+      "override": {
+        "mode": "preferred"
+      },
+      "base": null,
+      "baseMode": "required",
+      "error": "runner config (override) cannot downgrade mode from \"required\" to \"preferred\"."
+    },
+    {
+      "name": "unknown key",
+      "override": {
+        "backend": "x"
+      },
+      "base": null,
+      "baseMode": "preferred",
+      "error": "runner config (override) contains unknown key \"backend\"."
+    },
+    {
+      "name": "not an object",
+      "override": 5,
+      "base": null,
+      "baseMode": "preferred",
+      "error": "runner config (override) must be an object."
+    },
+    {
+      "name": "grant narrowed",
+      "override": {
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "ok": {
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "after": {
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "grant equal",
+      "override": {
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "ok": {
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "after": {
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "grant widened",
+      "override": {
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override.grants[0]) override cannot widen access for \"run-output\" from \"write\" to \"read-write\"."
+    },
+    {
+      "name": "grant not in base",
+      "override": {
+        "grants": [
+          {
+            "resource": "workspace",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override.grants[0]) override cannot add new grant for \"workspace\"."
+    },
+    {
+      "name": "grant without a base policy",
+      "override": {
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "base": null,
+      "baseMode": "preferred",
+      "error": "runner config (override.grants[0]) override cannot add grant for \"run-output\" without a base policy."
+    },
+    {
+      "name": "grants not an array",
+      "override": {
+        "grants": {}
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override) \"grants\" must be an array."
+    },
+    {
+      "name": "grant not an object",
+      "override": {
+        "grants": [
+          1
+        ]
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override.grants[0]) must be an object."
+    },
+    {
+      "name": "grant unknown key",
+      "override": {
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "read",
+            "scope": "dispatch",
+            "optional": true
+          }
+        ]
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override.grants[0]) contains unknown key \"optional\". Allowed keys: resource, access, scope."
+    },
+    {
+      "name": "grant resource blank",
+      "override": {
+        "grants": [
+          {
+            "resource": "",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override.grants[0]) \"resource\" must be a non-empty string."
+    },
+    {
+      "name": "grant duplicate",
+      "override": {
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "read",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "run-output",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override.grants[1]) duplicate resource grant for \"run-output\"."
+    },
+    {
+      "name": "grant access illegal",
+      "override": {
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "x",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override.grants[0]) \"access\" must be one of read-write/write/read, got: \"x\"."
+    },
+    {
+      "name": "grant scope illegal",
+      "override": {
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "read",
+            "scope": "x"
+          }
+        ]
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override.grants[0]) \"scope\" must be \"dispatch\", got: \"x\"."
+    },
+    {
+      "name": "filtered override needs a filter",
+      "override": {
+        "controls": {
+          "networkEgress": "filtered"
+        }
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override) \"networkFilter\" is required when networkEgress is \"filtered\"."
+    },
+    {
+      "name": "filtered override with a filter",
+      "override": {
+        "controls": {
+          "networkEgress": "filtered"
+        },
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "ok": {
+        "controls": {
+          "networkEgress": "filtered"
+        },
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      },
+      "after": {
+        "controls": {
+          "networkEgress": "filtered"
+        },
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "filter without filtered egress",
+      "override": {
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": []
+        }
+      },
+      "base": "host-write-denied",
+      "baseMode": "preferred",
+      "error": "runner config (override) \"networkFilter\" is only permitted when networkEgress is \"filtered\"."
+    },
+    {
+      "name": "filter narrowing a filtered base",
+      "override": {
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      },
+      "base": "filtered",
+      "baseMode": "preferred",
+      "ok": {
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      },
+      "after": {
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "filter adding a port to a filtered base",
+      "override": {
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443,
+                80
+              ]
+            }
+          ]
+        }
+      },
+      "base": "filtered",
+      "baseMode": "preferred",
+      "error": "runner config (override.networkFilter.allow[0]) override cannot add port 80 not permitted by base policy."
+    },
+    {
+      "name": "filter adding a destination to a filtered base",
+      "override": {
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "tcp",
+              "destination": {
+                "kind": "dns",
+                "value": "other.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      },
+      "base": "filtered",
+      "baseMode": "preferred",
+      "error": "runner config (override.networkFilter.allow[0]) override cannot add rule with destination \"other.example.com\" (tcp) not in base policy."
+    },
+    {
+      "name": "filter with the wrong protocol for a filtered base",
+      "override": {
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": [
+            {
+              "protocol": "udp",
+              "destination": {
+                "kind": "dns",
+                "value": "api.example.com"
+              },
+              "ports": [
+                443
+              ]
+            }
+          ]
+        }
+      },
+      "base": "filtered",
+      "baseMode": "preferred",
+      "error": "runner config (override.networkFilter.allow[0]) override cannot add rule with destination \"api.example.com\" (udp) not in base policy."
+    },
+    {
+      "name": "filter that is itself bad",
+      "override": {
+        "networkFilter": {
+          "defaultAction": "allow",
+          "allow": []
+        }
+      },
+      "base": "filtered",
+      "baseMode": "preferred",
+      "error": "runner config (override.networkFilter) \"defaultAction\" must be \"deny\", got: \"allow\"."
+    }
+  ],
+  "overrideBases": {
+    "host-write-denied": {
+      "contract": "confinement-policy.v1",
+      "controls": {
+        "hostWrite": "deny",
+        "hostRead": "allow",
+        "networkEgress": "allow",
+        "process": "host",
+        "home": "host",
+        "session": "shared",
+        "workspace": "shared"
+      },
+      "grants": [
+        {
+          "resource": "run-output",
+          "access": "write",
+          "scope": "dispatch"
+        },
+        {
+          "resource": "private-home",
+          "access": "read-write",
+          "scope": "dispatch"
+        },
+        {
+          "resource": "executor-credentials",
+          "access": "read",
+          "scope": "dispatch"
+        }
+      ]
+    },
+    "filtered": {
+      "contract": "confinement-policy.v1",
+      "controls": {
+        "hostWrite": "deny",
+        "hostRead": "allow",
+        "networkEgress": "filtered",
+        "process": "host",
+        "home": "host",
+        "session": "shared",
+        "workspace": "shared"
+      },
+      "grants": [
+        {
+          "resource": "run-output",
+          "access": "write",
+          "scope": "dispatch"
+        }
+      ],
+      "networkFilter": {
+        "defaultAction": "deny",
+        "allow": [
+          {
+            "protocol": "tcp",
+            "destination": {
+              "kind": "dns",
+              "value": "api.example.com"
+            },
+            "ports": [
+              443,
+              8443
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "legacyNormalization": [
+    {
+      "name": "null",
+      "input": null,
+      "ok": null
+    },
+    {
+      "name": "an array",
+      "input": [],
+      "ok": null
+    },
+    {
+      "name": "empty object",
+      "input": {},
+      "ok": null
+    },
+    {
+      "name": "legacy flags all on",
+      "input": {
+        "privateHome": true,
+        "isolatedSession": true,
+        "ownWorktree": true
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "allow",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "private",
+          "session": "isolated",
+          "workspace": "own"
+        },
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "legacy flags all off but present",
+      "input": {
+        "privateHome": false,
+        "isolatedSession": false,
+        "ownWorktree": false
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "allow",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": []
+      }
+    },
+    {
+      "name": "legacy private home only",
+      "input": {
+        "privateHome": true
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "allow",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "private",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "legacy with a backend",
+      "input": {
+        "privateHome": true,
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "allow",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "private",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backend": "bwrap-main"
+      }
+    },
+    {
+      "name": "legacy via home/session/workspace words",
+      "input": {
+        "home": "private",
+        "session": "isolated",
+        "workspace": "own"
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "allow",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "private",
+          "session": "isolated",
+          "workspace": "own"
+        },
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "legacy words that do not match",
+      "input": {
+        "home": "host",
+        "session": "shared",
+        "workspace": "shared"
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "allow",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": []
+      }
+    },
+    {
+      "name": "legacy flag with controls",
+      "input": {
+        "ownWorktree": true,
+        "controls": {
+          "home": "private",
+          "session": "isolated",
+          "workspace": "shared"
+        }
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "allow",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "private",
+          "session": "isolated",
+          "workspace": "own"
+        },
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "already a v1 policy",
+      "input": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "v1 contract without controls",
+      "input": {
+        "contract": "confinement-policy.v1"
+      },
+      "ok": null
+    },
+    {
+      "name": "controls only",
+      "input": {
+        "controls": {
+          "hostWrite": "deny"
+        }
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": []
+      }
+    },
+    {
+      "name": "controls with private home",
+      "input": {
+        "controls": {
+          "home": "private",
+          "hostRead": "blind"
+        },
+        "backend": "b",
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": []
+        }
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "allow",
+          "hostRead": "blind",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "private",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          }
+        ],
+        "backend": "b",
+        "networkFilter": {
+          "defaultAction": "deny",
+          "allow": []
+        }
+      }
+    },
+    {
+      "name": "controls with grants",
+      "input": {
+        "controls": {
+          "workspace": "own"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ]
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "allow",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "own"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "controls not an object",
+      "input": {
+        "controls": 4
+      },
+      "ok": null
+    }
+  ],
+  "resolvePolicy": [
+    {
+      "name": "built-in id",
+      "id": "host-write-denied",
+      "custom": {},
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "built-in id wins over custom",
+      "id": "workspace-write",
+      "custom": {
+        "workspace-write": {
+          "contract": "x"
+        }
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "workspace-git-metadata",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "custom id",
+      "id": "mine",
+      "custom": {
+        "mine": {
+          "contract": "confinement-policy.v1",
+          "controls": {
+            "hostWrite": "deny",
+            "hostRead": "allow",
+            "networkEgress": "allow",
+            "process": "host",
+            "home": "host",
+            "session": "shared",
+            "workspace": "shared"
+          },
+          "grants": [
+            {
+              "resource": "run-output",
+              "access": "write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "private-home",
+              "access": "read-write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "executor-credentials",
+              "access": "read",
+              "scope": "dispatch"
+            }
+          ]
+        }
+      },
+      "ok": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    {
+      "name": "unknown id",
+      "id": "nope",
+      "custom": {
+        "mine": {}
+      },
+      "ok": null
+    },
+    {
+      "name": "blank id",
+      "id": "  ",
+      "custom": {},
+      "ok": null
+    },
+    {
+      "name": "not a string",
+      "id": 7,
+      "custom": {},
+      "ok": null
+    },
+    {
+      "name": "custom map missing",
+      "id": "mine",
+      "custom": null,
+      "ok": null
+    }
+  ],
+  "posture": [
+    {
+      "name": "workspace-write",
+      "binding": {
+        "posture": "workspace-write"
+      },
+      "ctx": {},
+      "ok": {
+        "posture": "workspace-write",
+        "policyId": "workspace-write",
+        "policy": {
+          "contract": "confinement-policy.v1",
+          "controls": {
+            "hostWrite": "deny",
+            "hostRead": "allow",
+            "networkEgress": "allow",
+            "process": "host",
+            "home": "host",
+            "session": "shared",
+            "workspace": "shared"
+          },
+          "grants": [
+            {
+              "resource": "run-output",
+              "access": "write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "private-home",
+              "access": "read-write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "executor-credentials",
+              "access": "read",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "workspace",
+              "access": "read-write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "workspace-git-metadata",
+              "access": "read",
+              "scope": "dispatch"
+            }
+          ]
+        },
+        "requirement": {
+          "mode": "required",
+          "policyId": "workspace-write",
+          "policy": {
+            "contract": "confinement-policy.v1",
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": [
+              {
+                "resource": "run-output",
+                "access": "write",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "private-home",
+                "access": "read-write",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "executor-credentials",
+                "access": "read",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "workspace",
+                "access": "read-write",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "workspace-git-metadata",
+                "access": "read",
+                "scope": "dispatch"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "read-only",
+      "binding": {
+        "posture": "read-only"
+      },
+      "ctx": {},
+      "ok": {
+        "posture": "read-only",
+        "policyId": "host-write-denied",
+        "policy": {
+          "contract": "confinement-policy.v1",
+          "controls": {
+            "hostWrite": "deny",
+            "hostRead": "allow",
+            "networkEgress": "allow",
+            "process": "host",
+            "home": "host",
+            "session": "shared",
+            "workspace": "shared"
+          },
+          "grants": [
+            {
+              "resource": "run-output",
+              "access": "write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "private-home",
+              "access": "read-write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "executor-credentials",
+              "access": "read",
+              "scope": "dispatch"
+            }
+          ]
+        },
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "contract": "confinement-policy.v1",
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": [
+              {
+                "resource": "run-output",
+                "access": "write",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "private-home",
+                "access": "read-write",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "executor-credentials",
+                "access": "read",
+                "scope": "dispatch"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "anything else is read-only",
+      "binding": {
+        "posture": "bogus"
+      },
+      "ctx": {},
+      "ok": {
+        "posture": "read-only",
+        "policyId": "host-write-denied",
+        "policy": {
+          "contract": "confinement-policy.v1",
+          "controls": {
+            "hostWrite": "deny",
+            "hostRead": "allow",
+            "networkEgress": "allow",
+            "process": "host",
+            "home": "host",
+            "session": "shared",
+            "workspace": "shared"
+          },
+          "grants": [
+            {
+              "resource": "run-output",
+              "access": "write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "private-home",
+              "access": "read-write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "executor-credentials",
+              "access": "read",
+              "scope": "dispatch"
+            }
+          ]
+        },
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "contract": "confinement-policy.v1",
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": [
+              {
+                "resource": "run-output",
+                "access": "write",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "private-home",
+                "access": "read-write",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "executor-credentials",
+                "access": "read",
+                "scope": "dispatch"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "no binding",
+      "ctx": {},
+      "ok": {
+        "posture": "read-only",
+        "policyId": "host-write-denied",
+        "policy": {
+          "contract": "confinement-policy.v1",
+          "controls": {
+            "hostWrite": "deny",
+            "hostRead": "allow",
+            "networkEgress": "allow",
+            "process": "host",
+            "home": "host",
+            "session": "shared",
+            "workspace": "shared"
+          },
+          "grants": [
+            {
+              "resource": "run-output",
+              "access": "write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "private-home",
+              "access": "read-write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "executor-credentials",
+              "access": "read",
+              "scope": "dispatch"
+            }
+          ]
+        },
+        "requirement": {
+          "mode": "required",
+          "policyId": "host-write-denied",
+          "policy": {
+            "contract": "confinement-policy.v1",
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": [
+              {
+                "resource": "run-output",
+                "access": "write",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "private-home",
+                "access": "read-write",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "executor-credentials",
+                "access": "read",
+                "scope": "dispatch"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "custom policies do not shadow the built-ins",
+      "binding": {
+        "posture": "workspace-write"
+      },
+      "ctx": {
+        "runnerConfig": {
+          "confinementPolicies": {
+            "workspace-write": {
+              "contract": "x"
+            }
+          }
+        }
+      },
+      "ok": {
+        "posture": "workspace-write",
+        "policyId": "workspace-write",
+        "policy": {
+          "contract": "confinement-policy.v1",
+          "controls": {
+            "hostWrite": "deny",
+            "hostRead": "allow",
+            "networkEgress": "allow",
+            "process": "host",
+            "home": "host",
+            "session": "shared",
+            "workspace": "shared"
+          },
+          "grants": [
+            {
+              "resource": "run-output",
+              "access": "write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "private-home",
+              "access": "read-write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "executor-credentials",
+              "access": "read",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "workspace",
+              "access": "read-write",
+              "scope": "dispatch"
+            },
+            {
+              "resource": "workspace-git-metadata",
+              "access": "read",
+              "scope": "dispatch"
+            }
+          ]
+        },
+        "requirement": {
+          "mode": "required",
+          "policyId": "workspace-write",
+          "policy": {
+            "contract": "confinement-policy.v1",
+            "controls": {
+              "hostWrite": "deny",
+              "hostRead": "allow",
+              "networkEgress": "allow",
+              "process": "host",
+              "home": "host",
+              "session": "shared",
+              "workspace": "shared"
+            },
+            "grants": [
+              {
+                "resource": "run-output",
+                "access": "write",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "private-home",
+                "access": "read-write",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "executor-credentials",
+                "access": "read",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "workspace",
+                "access": "read-write",
+                "scope": "dispatch"
+              },
+              {
+                "resource": "workspace-git-metadata",
+                "access": "read",
+                "scope": "dispatch"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "postureInvocation": [
+    {
+      "name": "no candidate",
+      "candidate": null,
+      "ctx": {},
+      "ok": {
+        "ok": false,
+        "invocation": null
+      },
+      "canApply": false
+    },
+    {
+      "name": "candidate without executor",
+      "candidate": {},
+      "ctx": {},
+      "ok": {
+        "ok": false,
+        "invocation": null
+      },
+      "canApply": false
+    },
+    {
+      "name": "executor not configured",
+      "candidate": {
+        "executor": "x"
+      },
+      "ctx": {
+        "executors": {}
+      },
+      "ok": {
+        "ok": false,
+        "invocation": null
+      },
+      "canApply": false
+    },
+    {
+      "name": "native agent runs in process",
+      "candidate": {
+        "executor": "x",
+        "invocation": "inv"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "agentType": "lead"
+          }
+        }
+      },
+      "ok": {
+        "ok": true,
+        "invocation": "inv"
+      },
+      "canApply": true
+    },
+    {
+      "name": "native agent without a named invocation",
+      "candidate": {
+        "executor": "x"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "agentType": "lead"
+          }
+        }
+      },
+      "ok": {
+        "ok": true,
+        "invocation": null
+      },
+      "canApply": true
+    },
+    {
+      "name": "agent with a command is not native",
+      "candidate": {
+        "executor": "x"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "agentType": "lead",
+            "command": "c"
+          }
+        }
+      },
+      "ok": {
+        "ok": false,
+        "invocation": null
+      },
+      "canApply": false
+    },
+    {
+      "name": "named invocation with the backend",
+      "candidate": {
+        "executor": "x",
+        "invocation": "main"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "invocations": [
+              {
+                "id": "main",
+                "via": "cli",
+                "confinement": {
+                  "backend": "b1"
+                }
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": true,
+        "invocation": "main"
+      },
+      "canApply": true
+    },
+    {
+      "name": "named invocation inherits the executor backend",
+      "candidate": {
+        "executor": "x",
+        "invocation": "main"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "confinement": {
+              "backend": "b1"
+            },
+            "invocations": [
+              {
+                "id": "main",
+                "via": "cli"
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": true,
+        "invocation": "main"
+      },
+      "canApply": true
+    },
+    {
+      "name": "named invocation that does not exist",
+      "candidate": {
+        "executor": "x",
+        "invocation": "gone"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "confinement": {
+              "backend": "b1"
+            },
+            "invocations": [
+              {
+                "id": "main",
+                "via": "cli"
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": false,
+        "invocation": null
+      },
+      "canApply": false
+    },
+    {
+      "name": "no invocation named: first cli invocation with a backend",
+      "candidate": {
+        "executor": "x"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "invocations": [
+              {
+                "id": "a",
+                "via": "mcp"
+              },
+              {
+                "id": "b",
+                "via": "cli",
+                "confinement": {
+                  "backend": "b1"
+                }
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": true,
+        "invocation": "b"
+      },
+      "canApply": true
+    },
+    {
+      "name": "herdr-spawn invocation skipped without herdr",
+      "candidate": {
+        "executor": "x"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "invocations": [
+              {
+                "id": "h",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "confinement": {
+                  "backend": "b1"
+                }
+              },
+              {
+                "id": "c",
+                "via": "cli",
+                "confinement": {
+                  "backend": "b1"
+                }
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": true,
+        "invocation": "c"
+      },
+      "canApply": true
+    },
+    {
+      "name": "herdr-spawn invocation taken with herdr",
+      "candidate": {
+        "executor": "x"
+      },
+      "ctx": {
+        "herdrPresent": true,
+        "executors": {
+          "x": {
+            "invocations": [
+              {
+                "id": "h",
+                "via": "cli",
+                "adapter": "herdr-spawn",
+                "confinement": {
+                  "backend": "b1"
+                }
+              },
+              {
+                "id": "c",
+                "via": "cli",
+                "confinement": {
+                  "backend": "b1"
+                }
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": true,
+        "invocation": "h"
+      },
+      "canApply": true
+    },
+    {
+      "name": "invocation without an id that is not the first cli one",
+      "candidate": {
+        "executor": "x"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "invocations": [
+              {
+                "id": "a",
+                "via": "cli"
+              },
+              {
+                "via": "cli",
+                "confinement": {
+                  "backend": "b1"
+                }
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": false,
+        "invocation": null
+      },
+      "canApply": false
+    },
+    {
+      "name": "invocation without an id that is the first cli one",
+      "candidate": {
+        "executor": "x"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "invocations": [
+              {
+                "via": "cli",
+                "confinement": {
+                  "backend": "b1"
+                }
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": true,
+        "invocation": null
+      },
+      "canApply": true
+    },
+    {
+      "name": "executor level backend only",
+      "candidate": {
+        "executor": "x"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "confinement": {
+              "backend": "b1"
+            }
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": true,
+        "invocation": null
+      },
+      "canApply": true
+    },
+    {
+      "name": "no backend declared",
+      "candidate": {
+        "executor": "x",
+        "invocation": "main"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "invocations": [
+              {
+                "id": "main",
+                "via": "cli"
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": false,
+        "invocation": null
+      },
+      "canApply": false
+    },
+    {
+      "name": "backend not in the registry",
+      "candidate": {
+        "executor": "x",
+        "invocation": "main"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "confinement": {
+              "backend": "zz"
+            },
+            "invocations": [
+              {
+                "id": "main",
+                "via": "cli"
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": false,
+        "invocation": null
+      },
+      "canApply": false
+    },
+    {
+      "name": "backend disabled",
+      "candidate": {
+        "executor": "x",
+        "invocation": "main"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "confinement": {
+              "backend": "b1"
+            },
+            "invocations": [
+              {
+                "id": "main",
+                "via": "cli"
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": false
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": false,
+        "invocation": null
+      },
+      "canApply": false
+    },
+    {
+      "name": "backend of another type",
+      "candidate": {
+        "executor": "x",
+        "invocation": "main"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "confinement": {
+              "backend": "b1"
+            },
+            "invocations": [
+              {
+                "id": "main",
+                "via": "cli"
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "docker",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": false,
+        "invocation": null
+      },
+      "canApply": false
+    },
+    {
+      "name": "executable missing",
+      "candidate": {
+        "executor": "x",
+        "invocation": "main"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "confinement": {
+              "backend": "b1"
+            },
+            "invocations": [
+              {
+                "id": "main",
+                "via": "cli"
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": []
+      },
+      "ok": {
+        "ok": false,
+        "invocation": null
+      },
+      "canApply": false
+    },
+    {
+      "name": "named executable available",
+      "candidate": {
+        "executor": "x",
+        "invocation": "main"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "confinement": {
+              "backend": "b1"
+            },
+            "invocations": [
+              {
+                "id": "main",
+                "via": "cli"
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true,
+            "executable": "sandbox-run"
+          }
+        },
+        "available": [
+          "sandbox-run"
+        ]
+      },
+      "ok": {
+        "ok": true,
+        "invocation": "main"
+      },
+      "canApply": true
+    },
+    {
+      "name": "named executable missing while bwrap exists",
+      "candidate": {
+        "executor": "x",
+        "invocation": "main"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "confinement": {
+              "backend": "b1"
+            },
+            "invocations": [
+              {
+                "id": "main",
+                "via": "cli"
+              }
+            ]
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true,
+            "executable": "sandbox-run"
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": false,
+        "invocation": null
+      },
+      "canApply": false
+    },
+    {
+      "name": "registry unreadable",
+      "candidate": {
+        "executor": "x",
+        "invocation": "main"
+      },
+      "ctx": {
+        "executors": {
+          "x": {
+            "confinement": {
+              "backend": "b1"
+            },
+            "invocations": [
+              {
+                "id": "main",
+                "via": "cli"
+              }
+            ]
+          }
+        },
+        "registry": "unreadable",
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": false,
+        "invocation": null
+      },
+      "canApply": false
+    },
+    {
+      "name": "executors from the runner config",
+      "candidate": {
+        "executor": "x",
+        "invocation": "main"
+      },
+      "ctx": {
+        "runnerConfig": {
+          "executors": {
+            "x": {
+              "confinement": {
+                "backend": "b1"
+              },
+              "invocations": [
+                {
+                  "id": "main",
+                  "via": "cli"
+                }
+              ]
+            }
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": true,
+        "invocation": "main"
+      },
+      "canApply": true
+    },
+    {
+      "name": "executors from runner.executors",
+      "candidate": {
+        "executor": "x",
+        "invocation": "main"
+      },
+      "ctx": {
+        "runnerConfig": {
+          "runner": {
+            "executors": {
+              "x": {
+                "confinement": {
+                  "backend": "b1"
+                },
+                "invocations": [
+                  {
+                    "id": "main",
+                    "via": "cli"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "registry": {
+          "b1": {
+            "type": "bwrap",
+            "enabled": true
+          }
+        },
+        "available": [
+          "bwrap"
+        ]
+      },
+      "ok": {
+        "ok": true,
+        "invocation": "main"
+      },
+      "canApply": true
+    }
+  ],
+  "bypassPairing": [
+    {
+      "input": {
+        "isBypass": false,
+        "hasOwnWorktree": false,
+        "hasPrivateHome": false,
+        "hasIsolatedSession": false
+      },
+      "ok": {
+        "satisfied": true,
+        "missing": []
+      }
+    },
+    {
+      "input": {
+        "isBypass": false,
+        "hasOwnWorktree": false,
+        "hasPrivateHome": false,
+        "hasIsolatedSession": true
+      },
+      "ok": {
+        "satisfied": true,
+        "missing": []
+      }
+    },
+    {
+      "input": {
+        "isBypass": false,
+        "hasOwnWorktree": false,
+        "hasPrivateHome": true,
+        "hasIsolatedSession": false
+      },
+      "ok": {
+        "satisfied": true,
+        "missing": []
+      }
+    },
+    {
+      "input": {
+        "isBypass": false,
+        "hasOwnWorktree": false,
+        "hasPrivateHome": true,
+        "hasIsolatedSession": true
+      },
+      "ok": {
+        "satisfied": true,
+        "missing": []
+      }
+    },
+    {
+      "input": {
+        "isBypass": false,
+        "hasOwnWorktree": true,
+        "hasPrivateHome": false,
+        "hasIsolatedSession": false
+      },
+      "ok": {
+        "satisfied": true,
+        "missing": []
+      }
+    },
+    {
+      "input": {
+        "isBypass": false,
+        "hasOwnWorktree": true,
+        "hasPrivateHome": false,
+        "hasIsolatedSession": true
+      },
+      "ok": {
+        "satisfied": true,
+        "missing": []
+      }
+    },
+    {
+      "input": {
+        "isBypass": false,
+        "hasOwnWorktree": true,
+        "hasPrivateHome": true,
+        "hasIsolatedSession": false
+      },
+      "ok": {
+        "satisfied": true,
+        "missing": []
+      }
+    },
+    {
+      "input": {
+        "isBypass": false,
+        "hasOwnWorktree": true,
+        "hasPrivateHome": true,
+        "hasIsolatedSession": true
+      },
+      "ok": {
+        "satisfied": true,
+        "missing": []
+      }
+    },
+    {
+      "input": {
+        "isBypass": true,
+        "hasOwnWorktree": false,
+        "hasPrivateHome": false,
+        "hasIsolatedSession": false
+      },
+      "ok": {
+        "satisfied": false,
+        "missing": [
+          "home: private (privateHome)",
+          "session: isolated (isolatedSession)",
+          "workspace: own (ownWorktree)"
+        ]
+      }
+    },
+    {
+      "input": {
+        "isBypass": true,
+        "hasOwnWorktree": false,
+        "hasPrivateHome": false,
+        "hasIsolatedSession": true
+      },
+      "ok": {
+        "satisfied": false,
+        "missing": [
+          "home: private (privateHome)",
+          "workspace: own (ownWorktree)"
+        ]
+      }
+    },
+    {
+      "input": {
+        "isBypass": true,
+        "hasOwnWorktree": false,
+        "hasPrivateHome": true,
+        "hasIsolatedSession": false
+      },
+      "ok": {
+        "satisfied": false,
+        "missing": [
+          "session: isolated (isolatedSession)",
+          "workspace: own (ownWorktree)"
+        ]
+      }
+    },
+    {
+      "input": {
+        "isBypass": true,
+        "hasOwnWorktree": false,
+        "hasPrivateHome": true,
+        "hasIsolatedSession": true
+      },
+      "ok": {
+        "satisfied": false,
+        "missing": [
+          "workspace: own (ownWorktree)"
+        ]
+      }
+    },
+    {
+      "input": {
+        "isBypass": true,
+        "hasOwnWorktree": true,
+        "hasPrivateHome": false,
+        "hasIsolatedSession": false
+      },
+      "ok": {
+        "satisfied": false,
+        "missing": [
+          "home: private (privateHome)",
+          "session: isolated (isolatedSession)"
+        ]
+      }
+    },
+    {
+      "input": {
+        "isBypass": true,
+        "hasOwnWorktree": true,
+        "hasPrivateHome": false,
+        "hasIsolatedSession": true
+      },
+      "ok": {
+        "satisfied": false,
+        "missing": [
+          "home: private (privateHome)"
+        ]
+      }
+    },
+    {
+      "input": {
+        "isBypass": true,
+        "hasOwnWorktree": true,
+        "hasPrivateHome": true,
+        "hasIsolatedSession": false
+      },
+      "ok": {
+        "satisfied": false,
+        "missing": [
+          "session: isolated (isolatedSession)"
+        ]
+      }
+    },
+    {
+      "input": {
+        "isBypass": true,
+        "hasOwnWorktree": true,
+        "hasPrivateHome": true,
+        "hasIsolatedSession": true
+      },
+      "ok": {
+        "satisfied": true,
+        "missing": []
+      }
+    }
+  ],
+  "controlDelivery": [
+    {
+      "input": {
+        "launchKind": "session"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": null,
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": null,
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": null,
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": null,
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": true
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": true
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required"
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required"
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required"
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "required"
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "unconfined"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "unconfined"
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "unconfined"
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "unconfined"
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "session",
+        "requirement": {
+          "mode": "unconfined"
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": null,
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": null,
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": null,
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": null,
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required"
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required"
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required"
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "required"
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "unconfined"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "unconfined"
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "unconfined"
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "unconfined"
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "launchKind": "worker",
+        "requirement": {
+          "mode": "unconfined"
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {},
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": null,
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": null,
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": null,
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": null,
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required",
+          "policy": {
+            "controls": {
+              "hostWrite": "allow"
+            }
+          }
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required"
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required"
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required"
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "required"
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": true,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "preferred",
+          "policy": {
+            "controls": {
+              "hostWrite": "deny"
+            }
+          }
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "unconfined"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "unconfined"
+        },
+        "backend": null
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "unconfined"
+        },
+        "backend": ""
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "unconfined"
+        },
+        "backend": "bwrap-main"
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    },
+    {
+      "input": {
+        "requirement": {
+          "mode": "unconfined"
+        },
+        "backend": {
+          "id": "b"
+        }
+      },
+      "ok": {
+        "backendDelivers": false,
+        "rootWorkspaceAllowed": false
+      }
+    }
+  ]
+}
