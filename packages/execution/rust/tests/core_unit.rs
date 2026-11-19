@@ -6,7 +6,7 @@
 //! bound and checker plan of a resolved pattern (collaboration).
 
 use fgos_execution::patterns::{
-    check_catalog, detect_retired_pattern_keys, format_retired_key_sentence, loop_of,
+    check_catalog, deep_equal, detect_retired_pattern_keys, format_retired_key_sentence, loop_of,
     resolve_collaboration, CollaborationError, CollaborationFailure, DeclaredSeat, LoopTables,
     ParamDef, ResolveOptions, SeatError, Seating, RESERVED_PATTERN_NAMES, RETIRED_CONFIG_KEYS,
     RETIRED_GATED_NAME, SEAT_BINDING_MARKER_PATH,
@@ -235,7 +235,7 @@ impl RunRequestHost for FlagsOnlyHost {
     fn provider_ids(&self, _main_root: &str) -> Result<Vec<String>, Refusal> {
         unreachable!()
     }
-    fn resolve_persona(&self, _name: &str, _project_root: &str) -> Result<(), String> {
+    fn check_agent_definition(&self, _name: &str, _project_root: &str) -> Result<(), String> {
         unreachable!()
     }
     fn plan_dir_problem(&self, _name: &str, _main_root: &str) -> Result<Option<String>, String> {
@@ -354,7 +354,7 @@ impl RunRequestHost for VectorRunHost<'_> {
     fn provider_ids(&self, _main_root: &str) -> Result<Vec<String>, Refusal> {
         unreachable!("no vector names --provider: the runner config read needs the host")
     }
-    fn resolve_persona(&self, _name: &str, _project_root: &str) -> Result<(), String> {
+    fn check_agent_definition(&self, _name: &str, _project_root: &str) -> Result<(), String> {
         unreachable!("no vector names --persona")
     }
     fn plan_dir_problem(&self, _name: &str, _main_root: &str) -> Result<Option<String>, String> {
@@ -556,6 +556,22 @@ fn pattern_catalog_is_checked_and_merged_as_node_does() {
             (None, Ok(_)) => panic!("{name}: Node threw but Rust returned"),
         }
     }
+}
+
+/// Node compares one JavaScript number where `serde_json` keeps an integer and a float apart; no recorded vector can
+/// show the difference, since `JSON.stringify` writes both as `1`.
+#[test]
+fn deep_equal_reads_a_whole_number_and_its_float_spelling_as_one_number() {
+    let whole: Value = serde_json::from_str(r#"{"rounds": 2, "list": [1, {"x": 3}]}"#).unwrap();
+    let float: Value =
+        serde_json::from_str(r#"{"list": [1.0, {"x": 3.0}], "rounds": 2.0}"#).unwrap();
+    assert!(deep_equal(&whole, &float));
+    assert!(!deep_equal(&json!({"rounds": 2}), &json!({"rounds": 2.5})));
+    assert!(!deep_equal(
+        &json!({"rounds": 2}),
+        &json!({"rounds": 2, "x": 1})
+    ));
+    assert!(!deep_equal(&json!([1, 2]), &json!([2, 1])));
 }
 
 #[test]

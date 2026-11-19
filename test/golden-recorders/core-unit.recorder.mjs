@@ -280,6 +280,7 @@ const buildInputs = [
   ['a prompt builds a read-only unit', { flags: {}, positional: ['Summarise the repo'], roots: ROOTS }],
   ['prompt with every unit flag but the ones that read config', { flags: { writes: 'src/a.mjs, docs', input: 'a.md,b.md', capability: 'code:implement', rigor: 'high', verify: 'npm test' }, positional: ['Fix it'], roots: ROOTS }],
   ['prompt id slug folds accents and punctuation', { flags: {}, positional: ['  Sửa lỗi đăng nhập — Ünïcode!! '], roots: ROOTS }],
+  ['prompt id slug keeps the ASCII part of a mixed fold', { flags: {}, positional: ['Mix ¼ cup at 40°C, ŉ ℡'], roots: ROOTS }],
   ['prompt id slug falls back to task', { flags: {}, positional: ['!!!'], roots: ROOTS }],
   ['prompt id slug is cut at forty characters', { flags: {}, positional: ['a'.repeat(30) + ' ' + 'b'.repeat(30)], roots: ROOTS }],
   ['empty prompt', { flags: {}, positional: [''], roots: ROOTS }],

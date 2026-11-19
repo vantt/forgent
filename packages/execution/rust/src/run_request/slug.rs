@@ -2,13 +2,15 @@
 //! else collapse to one dash, the name is cut at 40 characters, and `fallback` stands in when nothing is left.
 //!
 //! The fold is Unicode compatibility decomposition (NFKD) with the combining marks dropped, as `String.prototype.normalize`
-//! does it in the Node twin. The table of [`super::slug_table::FOLD`] is generated from that very call (every code point
-//! up to U+1FFFF whose decomposition leaves only ASCII once marks are removed); a code point that leaves non-ASCII
-//! behind reads as a separator, as it does there. Regenerate with:
+//! does it in the Node twin. The table of [`super::slug_table::FOLD`] is generated from that very call: every code
+//! point whose decomposition, once marks are removed, differs from it and keeps some printable ASCII, with each part
+//! that is not printable ASCII written as `-` (Node lowercases it and it falls into a separator run there too, so
+//! `¼` reads as `1-4`). A code point not in the table reads as a separator, as it does there. Regenerate with:
 //!
 //! ```text
-//! for cp in 0xA0..=0x1FFFF (not surrogates, not U+0300..U+036F): s = String.fromCodePoint(cp).normalize('NFKD')
-//!   .replace(/[̀-ͯ]/g,'').replace(/[đĐ]/g,'d'); keep (cp, s) when s differs and is printable ASCII.
+//! for cp in 0xA0..=0x10FFFF (not surrogates, not U+0300..U+036F): s = String.fromCodePoint(cp).normalize('NFKD')
+//!   .replace(/[̀-ͯ]/g,'').replace(/[đĐ]/g,'d'); keep (cp, s with every char outside 0x20..0x7E as '-') when s
+//!   differs from the code point and has a char in 0x20..0x7E.
 //! ```
 
 use super::slug_table::FOLD;

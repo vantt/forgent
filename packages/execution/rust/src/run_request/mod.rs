@@ -54,7 +54,7 @@ pub trait RunRequestHost {
     /// The ids of the agent executors the project's runner config registers.
     fn provider_ids(&self, main_root: &str) -> Result<Vec<String>, Refusal>;
     /// Whether the persona resolves to an agent definition; the refusal sentence if not.
-    fn resolve_persona(&self, name: &str, project_root: &str) -> Result<(), String>;
+    fn check_agent_definition(&self, name: &str, project_root: &str) -> Result<(), String>;
     /// The Convention plan-name rule: why `name` is not a plan directory name, `None` when it is.
     fn plan_dir_problem(&self, name: &str, main_root: &str) -> Result<Option<String>, String>;
     /// Whether `<main_root>/<plan_dir>` is a real directory, not a link.
@@ -456,7 +456,7 @@ fn adhoc_unit_from_prompt(
     }
     if flags.contains_key("persona") {
         let persona = require_field(flags.get("persona"), "--persona requires a persona name")?;
-        host.resolve_persona(&text_of(persona), main_root)
+        host.check_agent_definition(&text_of(persona), main_root)
             .map_err(Refusal::config)?;
     }
     let plan = plan_from_flags(flags, main_root, host)?;

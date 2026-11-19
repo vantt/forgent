@@ -703,6 +703,36 @@
    }
   },
   {
+   "name": "prompt id slug keeps the ASCII part of a mixed fold",
+   "flags": {},
+   "positional": [
+    "Mix ¼ cup at 40°C, ŉ ℡"
+   ],
+   "roots": {
+    "cwd": "/repo/work",
+    "main": "/repo",
+    "linkedAt": "/repo/work"
+   },
+   "expect": {
+    "ok": {
+     "unitData": {
+      "id": "adhoc-mix-1-4-cup-at-40-c-n-tel-HEX4",
+      "objective": "Mix ¼ cup at 40°C, ŉ ℡",
+      "capability": "execute",
+      "writes": []
+     },
+     "caseAdmission": {
+      "port": "case-admission",
+      "repoRoot": "/repo"
+     },
+     "raiseAuthorized": false,
+     "accountPin": "strict",
+     "overrides": [],
+     "cwd": "/repo/work"
+    }
+   }
+  },
+  {
    "name": "prompt id slug falls back to task",
    "flags": {},
    "positional": [

@@ -60,9 +60,21 @@ pub struct CatalogCheck {
     pub problems: Vec<CollaborationError>,
 }
 
-/// Structural equality of two JSON values: arrays by position, objects by key set.
+/// Structural equality of two JSON values as Node's `deepEqual` reads them: arrays by position, objects by key set,
+/// and numbers by value, so `1` and `1.0` (one JavaScript number, two `serde_json` representations) are equal.
 pub fn deep_equal(a: &Value, b: &Value) -> bool {
-    a == b
+    match (a, b) {
+        (Value::Number(x), Value::Number(y)) => x.as_f64() == y.as_f64(),
+        (Value::Array(x), Value::Array(y)) => {
+            x.len() == y.len() && x.iter().zip(y).all(|(p, q)| deep_equal(p, q))
+        }
+        (Value::Object(x), Value::Object(y)) => {
+            x.len() == y.len()
+                && x.iter()
+                    .all(|(key, p)| y.get(key).is_some_and(|q| deep_equal(p, q)))
+        }
+        _ => a == b,
+    }
 }
 
 fn is_plain_object(value: &Value) -> bool {
