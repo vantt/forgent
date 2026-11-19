@@ -5,7 +5,7 @@ discussion: open
 ## 1. Trạng thái hiện tại
 
 2026-11-19: discussion opened from backlog row `p-mc25x5pfi6` (owner approval via Miu). Starting point scouted
-(§2, §3). Nothing settled yet. Round 4: whole proposal written under §3, waiting for the owner's reaction. Round 2: owner agreed #2 and #3; merged #4/#5; shaper reported that Work keeps a full item store (1215 items) plus gates, outcomes, learnings, docs/topics and decisions in the Event Store, side by side with the backlog. Round 1 done: owner reframed #1 (content of a row, not its storage); shaper proposed a short row + link and a 5-value backlog status list, explained #3–#5. Waiting for the owner's reaction. Plan 261119-1615 phase 4 (add-rows) is on hold
+(§2, §3). Nothing settled yet. Round 5: owner agreed proposal point 1; naming/placement answered under §3. Round 4: whole proposal written under §3, waiting for the owner's reaction. Round 2: owner agreed #2 and #3; merged #4/#5; shaper reported that Work keeps a full item store (1215 items) plus gates, outcomes, learnings, docs/topics and decisions in the Event Store, side by side with the backlog. Round 1 done: owner reframed #1 (content of a row, not its storage); shaper proposed a short row + link and a 5-value backlog status list, explained #3–#5. Waiting for the owner's reaction. Plan 261119-1615 phase 4 (add-rows) is on hold
 until the backlog shape is decided here.
 
 ## 2. Mục tiêu & đề bài
@@ -43,6 +43,12 @@ Explained to the owner round 1: #3 (migrate legacy plans by the existing map, th
 8. **Migration:** a one-time script converts the 296 rows to item files (free-text status → status + Notes; ~4 "partly" rows split by hand); plans migrate by the plan-v1 map (owner decides `partial`, `deferred`); then both checks fail instead of warn.
 9. **Effect on plan 261119-1615 phase 4:** add-rows is no longer needed (a new item is a new file); phase 4 is replaced by "session write creates one item file" plus a grant path change (`docs/backlog.md` → `docs/backlog/`); whether `session write` creates a new file today is to be checked (`apps/fgos/src/wiring/session_write_publish.rs`).
 
+Round 5 (owner agreed point 1 of the proposal; asked naming and placement). Shaper's answer, not settled:
+- Names: `plans/` and `discussions/` are plural collections of many things (like `reports/`, `journals/`, `handoffs/`); `backlog` is already a collective noun (one list of items), so `backlog/`, never `backlogs` (that would mean several backlogs).
+- File names: backlog item `<id>-<slug>.md` (minted id is the authority for `source:` and the check, slug only for humans, may go stale after a title change). Discussion stays `<slug>/`: there is no mint kind for discussions (`fgos identity mint` kinds: work, backlog, d-adr, decision-file, question) and adding one is a new mechanism; links go discussion → backlog id through `source:`.
+- Placement: portfolio files are stateful records, not evergreen docs (`.claude/rules/documentation-management.md`), so the backlog moves next to plans: items `plans/backlog/<id>-<slug>.md`, generated index `plans/backlog.md`. Precedent: `plans/` already holds non-plan dirs (`reports/`, `journals/`, `handoffs/`). Discussions stay in `docs/discussions/` for now (convention rule `doc-discussion-scratchpad-*` in `packages/convention/contracts/convention.rules.v1.json`, skills point there); moving them is a separate choice.
+- Needs: a convention rule for the backlog item kind (paths come from `fgos convention path`, never hand-built); Miu/supervisor grants change from `docs/backlog.md` to `plans/backlog*`.
+
 ## 4. Quyết định đã chốt
 
 | D-ID | Decision | Date | Source |
@@ -56,6 +62,7 @@ Explained to the owner round 1: #3 (migrate legacy plans by the existing map, th
 - 2026-11-19 17:4x — owner round 2: agrees #2 (5 backlog statuses) and #3 (migrate plans, check fails); asks whether Work uses the Event Store more than said; merge #4 and #5 to see what Work handles with the Event Store. Shaper scouted the consumer registry, Work stream contract and the live view and reported.
 - 2026-11-19 18:0x — owner round 3: asks how other systems approach this. Shaper surveyed (web search + known designs): one file per task with frontmatter (Backlog.md), JSONL in git + local SQLite cache, later Dolt (beads), issues as git objects with an operation log (git-bug), append-only ticket change artifacts compiled into a table (Fossil), per-feature spec/plan/tasks files (GitHub Spec Kit), DB + activity log (Jira, Linear), no backlog at all (Shape Up). Pattern reported: items as files with one schema, history as an append log, a rebuildable cache/index, one CLI door for writes. Still waiting on the round-2 question (273 open Work items).
 - 2026-11-19 18:2x — owner round 4: asks for a careful, complete restatement of our proposal. Shaper wrote the whole proposal under §3.
+- 2026-11-19 18:4x — owner round 5: agrees point 1 (three kinds, one-direction links); asks backlog vs backlogs, discussion vs discussions, id-slug for both, whether items stay one file each, and `plans/backlog.md`. Shaper answered under §3 (round 5 block).
 
 ## 6. Thiết kế đã chốt {#design}
 
