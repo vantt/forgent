@@ -966,12 +966,15 @@ mappings. Doctor additionally refuses fetch wildcards that
 could include local/branch event namespaces. Lock-directory setup refuses symlink
 ancestors and ensures mode 0700.
 
-The callable store part of rebuild loads every consumer module before deleting
-any cache. Each registered module exports `rebuildFromStore(ctx)`, receives the
-prepared `store`, `heldRanks` and validated `maxAttempts`, and owns its reducer,
-gate and bounded current-view installation. The adapter removes only the cache
-path declared by the manifest. The shipped registry remains empty until cutover;
-fixture payloads prove two registered consumers refold real events. There is no
+The callable store part of rebuild loads every consumer module that declares a
+`rebuildModule` before invoking any of them (a registry-only consumer keeps no view and is skipped).
+Each such module exports `rebuildFromStore(ctx)`, receives the
+prepared `store`, `heldRanks`, validated `maxAttempts` and `fgosDir` (the main checkout's `.fgos`,
+joined by the rebuild door from the trusted main root), and owns its reducer,
+gate and bounded current-view installation or, for identity, the drop of its own cache. The adapter
+only reads each consumer's `cachePath` afterwards to report its cursor cover. The shipped registry
+lists the consumers of `packages/event-store/contracts/consumers.v1.json`; fixture payloads prove
+two registered consumers refold real events. There is no
 second rebuild verb or new consumer registration mechanism.
 
 Evidence and reproduction commands:
