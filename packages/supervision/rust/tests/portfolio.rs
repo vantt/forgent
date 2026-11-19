@@ -338,3 +338,42 @@ fn a_draft_plan_without_a_table_still_reads() {
         "---\ntitle: t\nstatus: draft\npriority: P1\ncreated: 2026-11-01\n---\n\nno table yet\n";
     assert!(read_plan("p", text).unwrap().phases.is_empty());
 }
+
+#[test]
+fn a_present_frontmatter_list_key_that_is_not_a_list_is_refused() {
+    let body = format!("{HEAD}| 1 | a | - | x/ | 1 | todo |\n");
+    for key in ["blockedBy: 7\n", "footprint: src/a/\n", "source: true\n"] {
+        assert_eq!(
+            refusal(key, &body),
+            "plan-frontmatter-entry-invalid",
+            "{key:?}"
+        );
+    }
+}
+
+#[test]
+fn a_malformed_table_is_refused_for_every_status_but_no_table_stays_readable() {
+    let head = "---\ntitle: t\nstatus: draft\npriority: P1\ncreated: 2026-11-01\n---\n\n";
+    let wave0 = format!("{head}{HEAD}| 1 | a | - | x/ | 0 | todo |\n");
+    assert_eq!(
+        read_plan("p", &wave0).unwrap_err().code(),
+        "phase-wave-invalid"
+    );
+    assert_eq!(
+        read_plan("p", &format!("{head}{HEAD}")).unwrap_err().code(),
+        "phase-table-empty"
+    );
+    assert!(read_plan("p", &format!("{head}no table\n")).is_ok());
+}
+
+#[test]
+fn only_whole_entry_markdown_is_unwrapped_in_a_footprint_cell() {
+    let body = format!(
+        "{HEAD}| 1 | a | - | `src/[a](b)/x`, [`src/c/**`](d.md), src/[e](f)/g | 1 | todo |\n"
+    );
+    let plan = read_plan("p", &text_with("", &body)).unwrap();
+    assert_eq!(
+        plan.phases[0].footprint,
+        ["src/[a](b)/x", "src/c/**", "src/[e](f)/g"][..]
+    );
+}

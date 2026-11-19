@@ -154,7 +154,10 @@ pub fn read_plan(dir: &str, text: &str) -> Result<Plan, PlanRefusal> {
                     ))),
                 })
                 .collect(),
-            _ => Ok(Vec::new()),
+            None | Some(Value::Null) => Ok(Vec::new()),
+            Some(_) => Err(PlanRefusal::FrontmatterEntryInvalid(format!(
+                "{dir}: {key} is not a list"
+            ))),
         }
     };
     let vocab = vocabulary();
@@ -174,7 +177,10 @@ pub fn read_plan(dir: &str, text: &str) -> Result<Plan, PlanRefusal> {
     let phases = if status == "ready" || status == "running" {
         read_phase_table(dir, body)?
     } else {
-        read_phase_table(dir, body).unwrap_or_default()
+        match read_phase_table(dir, body) {
+            Err(PlanRefusal::TableMissing(_)) => Vec::new(),
+            other => other?,
+        }
     };
     Ok(Plan {
         dir: dir.to_string(),
@@ -323,6 +329,30 @@ fn cells(line: &str) -> Vec<String> {
     out
 }
 
+/// One footprint entry with only whole-entry markdown unwrapped: backticks around the whole entry,
+/// or a link whose text is the whole entry. Characters inside a code span are never touched.
+fn unwrap_entry(entry: &str) -> String {
+    let mut s = entry.trim();
+    loop {
+        if s.len() >= 2
+            && s.starts_with('`')
+            && s.ends_with('`')
+            && !s[1..s.len() - 1].contains('`')
+        {
+            return s[1..s.len() - 1].trim().to_string();
+        }
+        let link = s.strip_prefix('[').and_then(|r| {
+            let close = r.find("](")?;
+            let url = r[close + 2..].strip_suffix(')')?;
+            (!r[..close].contains('[') && !url.contains(')')).then(|| &r[..close])
+        });
+        match link {
+            Some(text) => s = text.trim(),
+            None => return s.to_string(),
+        }
+    }
+}
+
 /// A cell without markdown links (`[text](url)` becomes `text`) and backticks; every `*` stays.
 fn keep_stars(cell: &str) -> String {
     let mut out = String::new();
@@ -372,7 +402,7 @@ fn path_list(cell: &str) -> Vec<String> {
         .replace("<br/>", ",")
         .replace("<br />", ",")
         .split(',')
-        .map(keep_stars)
+        .map(unwrap_entry)
         .filter(|s| !s.is_empty())
         .collect()
 }
