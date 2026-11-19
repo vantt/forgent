@@ -3,7 +3,6 @@
 //! shape is the one the Node tier writes, so a Node lease and a Rust lease can meet on one machine.
 
 use std::collections::BTreeMap;
-use std::io::Write as _;
 use std::path::{Path, PathBuf};
 
 use fgos_holder_lock::{Acquire, HoldersList, LockScope, Resource, ScopeError, Wait};
@@ -24,7 +23,6 @@ pub const DEFAULT_QUARANTINE_PROBE_COOLDOWN_MS: i64 = 30 * 60 * 1000;
 pub const NEVER_MS: i64 = 9_007_199_254_740_991;
 const STATE_LOCK_WAIT_MS: u64 = 30_000;
 const ACCOUNT_LOCK_WAIT_MS: u64 = 30_000;
-const AUDIT_LOG_MAX_BYTES: u64 = 1024 * 1024;
 
 #[derive(Debug, thiserror::Error)]
 pub enum AccountsError {
@@ -527,10 +525,9 @@ impl<'h> Accounts<'h> {
         let dir = state_path.parent().unwrap_or_else(|| Path::new("."));
         std::fs::create_dir_all(dir).map_err(io)?;
         let (_, audit_path) = state_paths(dir);
-        let appended: std::io::Result<()> = state
-            .audit
-            .iter()
-            .try_for_each(|record| append_capped(&audit_path, record));
+        let appended: std::io::Result<()> = state.audit.iter().try_for_each(|record| {
+            fgos_observe::invocation_fault::append_capped(&audit_path, record)
+        });
         if let Err(error) = appended {
             eprintln!("fgos: warning: provider-capacity audit log not written ({error}); its unwritten records are dropped");
         }
@@ -1560,32 +1557,4 @@ pub fn direct_verdict(rows: &[Value]) -> Option<&'static str> {
 /// detail is evidence, not a contract).
 fn js_parse_message(error: &serde_json::Error) -> String {
     error.to_string()
-}
-
-/// One JSON record per line in a private, size-capped log: past 1 MiB the oldest half of the lines goes first.
-fn append_capped(log: &Path, record: &Value) -> std::io::Result<()> {
-    if let Some(parent) = log.parent() {
-        std::fs::create_dir_all(parent)?;
-    }
-    if let Ok(meta) = std::fs::metadata(log) {
-        if meta.len() > AUDIT_LOG_MAX_BYTES {
-            let text = std::fs::read_to_string(log)?;
-            let lines: Vec<&str> = text.split('\n').filter(|l| !l.is_empty()).collect();
-            let kept = lines[lines.len().div_ceil(2)..].join("\n");
-            let temp = log.with_extension(format!("jsonl.tmp-{}", std::process::id()));
-            std::fs::write(&temp, format!("{kept}\n"))?;
-            std::fs::rename(&temp, log)?;
-        }
-    }
-    let mut file = std::fs::OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(log)?;
-    writeln!(file, "{record}")?;
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        std::fs::set_permissions(log, std::fs::Permissions::from_mode(0o600))?;
-    }
-    Ok(())
 }

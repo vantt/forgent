@@ -2,8 +2,6 @@
 //! the command that makes one cheap call with it. Account inventory, the legacy state key and `credentialStoreOf`
 //! are `fgos-execution`'s and are not copied here.
 
-use std::path::{Component, Path};
-
 use serde_json::{json, Map, Value};
 
 /// The CLI an invocation runs: the basename of its command, lower-cased; `None` when there is none.
@@ -44,106 +42,15 @@ pub fn account_credential_sources(account: &Value) -> Vec<&Value> {
         .collect()
 }
 
-/// An account's credential home as an absolute path: a leading `~`, `${HOME}` or `$HOME` is `home_dir`. `None`
-/// when the value is empty, not a string, or not absolute once expanded.
+/// An account's credential home as an absolute path (`fgos-execution`'s reading): a leading `~`, `${HOME}` or
+/// `$HOME` is `home_dir`. `None` when the value is absent, empty, not absolute once expanded, or names the home
+/// while `home_dir` is unknown.
 pub fn expand_credential_home(home: Option<&str>, home_dir: Option<&str>) -> Option<String> {
-    let home = home.filter(|h| !h.trim().is_empty())?;
-    let home_dir = home_dir.unwrap_or_default();
-    let tails = [("${HOME}", 7), ("$HOME", 5), ("~", 1)];
-    let expanded = tails
-        .iter()
-        .find_map(|(prefix, len)| {
-            let rest = home.strip_prefix(prefix)?;
-            (rest.is_empty() || rest.starts_with('/'))
-                .then(|| format!("{home_dir}{}", &home[*len..]))
-        })
-        .unwrap_or_else(|| home.to_string());
-    Path::new(&expanded).is_absolute().then_some(expanded)
+    fgos_execution::accounts::expand_credential_home(home?, home_dir)
 }
 
-fn relative_without_parent(path: &str) -> bool {
-    !path.trim().is_empty()
-        && !Path::new(path).is_absolute()
-        && !path.starts_with(['/', '\\'])
-        && !path.split(['/', '\\']).any(|part| part == "..")
-        && Path::new(path).components().all(|c| {
-            !matches!(
-                c,
-                Component::ParentDir | Component::RootDir | Component::Prefix(_)
-            )
-        })
-}
-
-fn is_cli_key(key: &str) -> bool {
-    let mut chars = key.chars();
-    chars
-        .next()
-        .is_some_and(|c| c.is_ascii_lowercase() || c.is_ascii_digit())
-        && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '-')
-}
-
-fn is_env_name(name: &str) -> bool {
-    let mut chars = name.chars();
-    chars
-        .next()
-        .is_some_and(|c| c.is_ascii_alphabetic() || c == '_')
-        && chars.all(|c| c.is_ascii_alphanumeric() || c == '_')
-}
-
-/// Why `store` is not a valid `credentialStore` declaration, or `None` when it is.
-pub fn credential_store_problem(store: &Value) -> Option<String> {
-    const KEYS: [&str; 4] = ["use", "homeEnv", "files", "sessionDir"];
-    let Some(fields) = store.as_object() else {
-        return Some("must be an object {use, homeEnv, files?, sessionDir?}".into());
-    };
-    if let Some(key) = fields.keys().find(|key| !KEYS.contains(&key.as_str())) {
-        return Some(format!(
-            "contains unknown key \"{key}\" (allowed: {})",
-            KEYS.join(", ")
-        ));
-    }
-    if !fields
-        .get("use")
-        .and_then(Value::as_str)
-        .is_some_and(is_cli_key)
-    {
-        return Some(
-            "\"use\" must name a login store, a lowercase key such as \"codex\" or \"pi\"".into(),
-        );
-    }
-    if !fields
-        .get("homeEnv")
-        .and_then(Value::as_str)
-        .is_some_and(is_env_name)
-    {
-        return Some("\"homeEnv\" must be an environment variable name".into());
-    }
-    if let Some(files) = fields.get("files") {
-        let list: Option<Vec<&str>> = files
-            .as_array()
-            .filter(|list| !list.is_empty())
-            .and_then(|list| list.iter().map(Value::as_str).collect());
-        match list {
-            Some(list) if list.iter().all(|f| relative_without_parent(f)) => {
-                let mut seen = std::collections::BTreeSet::new();
-                if !list.iter().all(|f| seen.insert(*f)) {
-                    return Some("\"files\" must not repeat a path".into());
-                }
-            }
-            _ => {
-                return Some(
-                    "\"files\" must be a non-empty list of relative paths without \"..\"".into(),
-                )
-            }
-        }
-    }
-    if let Some(dir) = fields.get("sessionDir") {
-        if !dir.as_str().is_some_and(relative_without_parent) {
-            return Some("\"sessionDir\" must be a relative path without \"..\"".into());
-        }
-    }
-    None
-}
+/// Why `store` is not a valid `credentialStore` declaration, or `None` when it is: the config check's own reading.
+pub use fgos_execution::runner_check::credential_store_problem;
 
 /// A capacity selection made ready for the invocation that is launched: the store the invocation reads picks the
 /// account's login store as `credentialSource` (null when the account declares none for it). An invocation that

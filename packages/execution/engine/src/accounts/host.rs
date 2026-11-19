@@ -53,7 +53,19 @@ impl Default for SystemHost {
 
 #[cfg(unix)]
 fn local_offset_min() -> i64 {
-    let Ok(output) = std::process::Command::new("date").arg("+%z").output() else {
+    // The program sees only the variables that decide its search and its zone.
+    let env: Vec<(String, String)> = ["PATH", "TZ"]
+        .iter()
+        .filter_map(|name| std::env::var(name).ok().map(|v| (name.to_string(), v)))
+        .collect();
+    let Ok(fgos_process::spawn::Outcome::Exited(output)) = fgos_process::spawn::run_bounded(
+        "date",
+        ["+%z"],
+        &env,
+        None,
+        None,
+        std::time::Duration::from_secs(5),
+    ) else {
         return 0;
     };
     let text = String::from_utf8_lossy(&output.stdout);

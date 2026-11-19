@@ -21,9 +21,9 @@ use fgos_execution_engine::accounts::credential::{
     account_credential_sources, command_cli, credential_source_for_cli, credential_store_problem,
     expand_credential_home, provider_capacity_for_invocation, redact_selection,
 };
-use fgos_execution_engine::accounts::credential_probe::{
-    credential_probe_command, with_kill_timeout, ProbePlan,
-};
+use fgos_execution_engine::accounts::credential_probe::credential_probe_command;
+#[cfg(unix)]
+use fgos_execution_engine::accounts::credential_probe::{with_kill_timeout, ProbePlan};
 use fgos_execution_engine::accounts::fault::{
     classify_fault, describe_provider_signal, parse_quota_reset_clock_time,
     parse_quota_reset_window_ms, FaultInput,
@@ -684,11 +684,12 @@ fn iso_text_and_epoch_milliseconds_convert_as_date_does() {
         ms_from_iso("2026-11-19T05:00:30.5Z"),
         Some(1_795_064_430_500)
     );
+    // A bare date is UTC midnight, as `Date.parse` reads it.
+    assert_eq!(ms_from_iso("2026-11-19"), Some(1_795_046_400_000));
     for text in [
         "garbage",
         "",
         "2026-13-01T00:00:00Z",
-        "2026-11-19",
         "2026-11-19Tzz:00:00Z",
     ] {
         assert_eq!(ms_from_iso(text), None, "{text}");
@@ -811,6 +812,8 @@ fn the_probe_call_is_built_per_credential_layout_as_node_built_it() {
     }
 }
 
+// Unix only: on Windows `timeout.exe` is another program, so the call is never wrapped there.
+#[cfg(unix)]
 #[test]
 fn the_probe_call_ends_on_its_own_when_coreutils_timeout_exists_and_runs_as_it_is_when_not() {
     let plan = ProbePlan {

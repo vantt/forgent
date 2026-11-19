@@ -742,7 +742,7 @@ const RIGOR_OVERRIDES_WHY: &str =
     "express per-tier models in runner.modelPolicies.<family> instead.";
 
 /// Why `credentialStore` is not a valid declaration, or None when it is.
-fn credential_store_problem(store: &Value) -> Option<String> {
+pub fn credential_store_problem(store: &Value) -> Option<String> {
     const KEYS: [&str; 4] = ["use", "homeEnv", "files", "sessionDir"];
     let Some(fields) = store.as_object() else {
         return Some("must be an object {use, homeEnv, files?, sessionDir?}".to_string());

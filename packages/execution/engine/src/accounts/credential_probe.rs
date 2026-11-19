@@ -141,28 +141,15 @@ pub fn credential_probe_command(
     None
 }
 
-fn is_executable_file(path: &Path) -> bool {
-    let Ok(meta) = std::fs::metadata(path) else {
-        return false;
-    };
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::PermissionsExt;
-        meta.is_file() && meta.permissions().mode() & 0o111 != 0
-    }
-    #[cfg(not(unix))]
-    {
-        meta.is_file()
-    }
-}
-
 /// Make a call end on its own even when its runner dies: coreutils `timeout` ends it after the limit (and kills it
 /// five seconds after that). Without `timeout` on PATH the plan runs as it is.
 pub fn with_kill_timeout(plan: ProbePlan, timeout_ms: u64, path_var: &str) -> ProbePlan {
-    let bin = std::env::split_paths(path_var)
-        .filter(|dir| !dir.as_os_str().is_empty())
-        .map(|dir| dir.join("timeout"))
-        .find(|candidate| is_executable_file(candidate));
+    // Only coreutils `timeout` takes these arguments; Windows has a `timeout.exe` that does something else.
+    let bin = if cfg!(windows) {
+        None
+    } else {
+        fgos_process::spawn::resolve_program("timeout", path_var, "", false)
+    };
     let Some(bin) = bin else { return plan };
     let seconds = (timeout_ms.div_ceil(1000)).max(1);
     let mut args = vec![
@@ -267,60 +254,27 @@ impl ProbeRunner for ProcessRunner {
         env: &BTreeMap<String, String>,
         timeout_ms: u64,
     ) -> Result<RawRun, String> {
-        use std::io::Read as _;
-        let mut command = std::process::Command::new(&plan.command);
-        command
-            .args(&plan.args)
-            .env_clear()
-            .envs(env)
-            .current_dir(&plan.home)
-            .stdin(std::process::Stdio::null())
-            .stdout(std::process::Stdio::piped())
-            .stderr(std::process::Stdio::piped());
-        let mut child = command
-            .spawn()
-            .map_err(|e| format!("could not start {}: {e}", plan.command))?;
-        let drain = |mut pipe: Option<Box<dyn std::io::Read + Send>>| {
-            std::thread::spawn(move || {
-                let mut bytes = Vec::new();
-                if let Some(pipe) = pipe.as_mut() {
-                    let _ = pipe.read_to_end(&mut bytes);
-                }
-                bytes
-            })
-        };
-        let out = drain(
-            child
-                .stdout
-                .take()
-                .map(|p| Box::new(p) as Box<dyn std::io::Read + Send>),
-        );
-        let err = drain(
-            child
-                .stderr
-                .take()
-                .map(|p| Box::new(p) as Box<dyn std::io::Read + Send>),
-        );
-        let deadline = Instant::now() + Duration::from_millis(timeout_ms);
-        let (mut timed_out, status) = loop {
-            match child.try_wait() {
-                Ok(Some(status)) => break (false, Some(status)),
-                Ok(None) if Instant::now() >= deadline => {
-                    let _ = child.kill();
-                    break (true, child.wait().ok());
-                }
-                Ok(None) => std::thread::sleep(Duration::from_millis(20)),
-                Err(e) => return Err(format!("could not run {}: {e}", plan.command)),
+        let env: Vec<(String, String)> = env.iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+        let outcome = fgos_process::spawn::run_bounded(
+            &plan.command,
+            &plan.args,
+            &env,
+            Some(Path::new(&plan.home)),
+            None,
+            Duration::from_millis(timeout_ms),
+        )
+        .map_err(|e| format!("could not start {}: {e}", plan.command))?;
+        let (exit_code, timed_out, stdout, stderr) = match outcome {
+            fgos_process::spawn::Outcome::Exited(out) => {
+                (out.status.code(), false, out.stdout, out.stderr)
+            }
+            fgos_process::spawn::Outcome::TimedOut { stdout, stderr } => {
+                (None, true, stdout, stderr)
             }
         };
-        let (stdout, stderr) = (
-            out.join().unwrap_or_default(),
-            err.join().unwrap_or_default(),
-        );
         let (output, stdout) = merged(&stdout, &stderr);
-        timed_out &= status.is_some();
         Ok(RawRun {
-            exit_code: status.and_then(|s| s.code()),
+            exit_code,
             timed_out,
             output,
             stdout,
