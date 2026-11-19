@@ -22,7 +22,7 @@ mod record;
 mod remove;
 mod resolve;
 
-pub use agent_file::{read_agent_file, refuse_symlink};
+pub use agent_file::{open_agent_file, read_agent_file, refuse_symlink};
 pub use error::CleanupError;
 pub use homes::CleanupHomes;
 pub use host::{CleanupHost, SystemHost};

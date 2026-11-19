@@ -1,0 +1,578 @@
+{
+  "cleanupTrust": [
+    {
+      "name": "none-written",
+      "context": null,
+      "result": {
+        "result": "done",
+        "detail": {
+          "trust": "none-written"
+        }
+      },
+      "storeAfter": {}
+    },
+    {
+      "name": "context-unusable",
+      "context": {
+        "kind": "codex-toml"
+      },
+      "result": {
+        "result": "done",
+        "detail": {
+          "trust": "context-unusable"
+        }
+      },
+      "storeAfter": {}
+    },
+    {
+      "name": "claude-never-removed",
+      "context": {
+        "kind": "claude",
+        "target": "/x",
+        "projectPath": "/p"
+      },
+      "result": {
+        "result": "done",
+        "detail": {
+          "trust": "not-removed",
+          "kind": "claude"
+        }
+      },
+      "storeAfter": {}
+    },
+    {
+      "name": "unknown-kind",
+      "context": {
+        "kind": "other",
+        "target": "/x",
+        "projectPath": "/p"
+      },
+      "result": {
+        "result": "done",
+        "detail": {
+          "trust": "not-removed",
+          "kind": "other"
+        }
+      },
+      "storeAfter": {}
+    },
+    {
+      "name": "codex-removed",
+      "context": {
+        "kind": "codex-toml",
+        "target": "<run>/store/config.toml",
+        "projectPath": "/work/p",
+        "store": "[projects.\"/work/p\"]\ntrust_level = \"trusted\"\n"
+      },
+      "result": {
+        "result": "done",
+        "detail": {
+          "trust": "removed",
+          "kind": "codex-toml"
+        }
+      },
+      "storeAfter": {
+        "store/config.toml": ""
+      }
+    },
+    {
+      "name": "codex-already-gone",
+      "context": {
+        "kind": "codex-toml",
+        "target": "<run>/store/config.toml",
+        "projectPath": "/work/other",
+        "store": "[projects.\"/work/p\"]\ntrust_level = \"trusted\"\n"
+      },
+      "result": {
+        "result": "done",
+        "detail": {
+          "trust": "already-gone",
+          "kind": "codex-toml"
+        }
+      },
+      "storeAfter": {
+        "store/config.toml": "[projects.\"/work/p\"]\ntrust_level = \"trusted\"\n"
+      }
+    },
+    {
+      "name": "agy-removed",
+      "context": {
+        "kind": "agy-json",
+        "target": "<run>/store/settings.json",
+        "projectPath": "/work/p",
+        "store": "{\"trustedWorkspaces\":[\"/work/p\",\"/work/q\"]}\n"
+      },
+      "result": {
+        "result": "done",
+        "detail": {
+          "trust": "removed",
+          "kind": "agy-json"
+        }
+      },
+      "storeAfter": {
+        "store/settings.json": "{\n  \"trustedWorkspaces\": [\n    \"/work/q\"\n  ]\n}\n"
+      }
+    },
+    {
+      "name": "agy-already-gone",
+      "context": {
+        "kind": "agy",
+        "target": "<run>/store/settings.json",
+        "projectPath": "/work/z",
+        "store": "{\"trustedWorkspaces\":[\"/work/p\"]}\n"
+      },
+      "result": {
+        "result": "done",
+        "detail": {
+          "trust": "already-gone",
+          "kind": "agy"
+        }
+      },
+      "storeAfter": {
+        "store/settings.json": "{\"trustedWorkspaces\":[\"/work/p\"]}\n"
+      }
+    }
+  ],
+  "settleAttempt": [
+    {
+      "name": "exited-with-claim",
+      "receipt": {
+        "outcome": "exited",
+        "outboxResult": "result-1.json",
+        "gateExit": {
+          "exitCode": 0,
+          "exitedAt": "2026-11-19T00:00:00.000Z"
+        }
+      },
+      "outbox": {
+        "result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        },
+        "report-1.md": "# Report\n\nThe parser rejects empty input because the length check runs first.\n"
+      },
+      "noBaseline": false,
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "first": {
+        "result": "done",
+        "detail": {
+          "settled": "now",
+          "runId": "run_a_01",
+          "status": "settled"
+        }
+      },
+      "second": {
+        "result": "done",
+        "detail": {
+          "settled": "already"
+        }
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": null,\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"attempt/outbox/report-1.md\",\n      \"kind\": \"agent-report\",\n      \"valid\": true\n    },\n    {\n      \"path\": \"attempt/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [\n    {\n      \"path\": \"attempt/outbox/report-1.md\",\n      \"sha256\": \"5fa2d35b8276a9766816d10c5c863837520d7465818679a642f6314d43cbe6b0\"\n    }\n  ],\n  \"reportDeclaration\": {\n    \"complete\": true,\n    \"incompleteReason\": null\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"inconclusive\"\n    },\n    \"confidence\": {\n      \"level\": \"no-evidence\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"verdict\",\n      \"reason\": \"verdict-inconclusive\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"attempt/stdout.log\",\n    \"stderrLog\": \"attempt/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": null,\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"attempt/outbox/report-1.md\",\n      \"attempt/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "captured stdout\n",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "exited-no-claim",
+      "receipt": {
+        "outcome": "exited",
+        "gateExit": {
+          "exitCode": 0,
+          "exitedAt": "2026-11-19T00:00:00.000Z"
+        }
+      },
+      "outbox": {},
+      "noBaseline": false,
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "first": {
+        "result": "done",
+        "detail": {
+          "settled": "now",
+          "runId": "run_a_01",
+          "status": "settled"
+        }
+      },
+      "second": {
+        "result": "done",
+        "detail": {
+          "settled": "already"
+        }
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": null,\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"inconclusive\"\n    },\n    \"confidence\": {\n      \"level\": \"no-evidence\",\n      \"basis\": [\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"unknown\",\n      \"code\": \"no-report\"\n    },\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"infra\",\n      \"reason\": \"infra-no-report\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"attempt/stdout.log\",\n    \"stderrLog\": \"attempt/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": null,\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "captured stdout\n",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "timeout",
+      "receipt": {
+        "outcome": "timeout",
+        "gateExit": {
+          "exitedAt": "2026-11-19T00:00:00.000Z"
+        }
+      },
+      "outbox": {},
+      "noBaseline": false,
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "first": {
+        "result": "done",
+        "detail": {
+          "settled": "now",
+          "runId": "run_a_01",
+          "status": "settled"
+        }
+      },
+      "second": {
+        "result": "done",
+        "detail": {
+          "settled": "already"
+        }
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 124,\n  \"signal\": \"SIGTERM\",\n  \"timedOut\": true,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": null,\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"failed\",\n      \"exitCode\": 124\n    },\n    \"assessment\": {\n      \"verdict\": \"not-applicable\"\n    },\n    \"confidence\": {\n      \"level\": \"failed\",\n      \"basis\": [\n        \"captured-stdout\",\n        \"timeout\",\n        \"failed-exit\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"resource\",\n      \"code\": \"execution-timeout\"\n    },\n    \"policy\": {\n      \"disposition\": \"needs-input\",\n      \"code\": \"execution-timeout\"\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"infra\",\n      \"reason\": \"infra-exec-failed\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 124,\n    \"stdoutLog\": \"attempt/stdout.log\",\n    \"stderrLog\": \"attempt/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"Execution timed out\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": null,\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "captured stdout\n",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "cancelled-by-terminal-stop",
+      "receipt": {
+        "outcome": "cancelled",
+        "reason": "terminal:blocked:usage-limit",
+        "publishedAt": "2026-11-19T00:00:00.000Z",
+        "providerSignal": {
+          "status": 429
+        }
+      },
+      "outbox": {},
+      "noBaseline": false,
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "first": {
+        "result": "done",
+        "detail": {
+          "settled": "now",
+          "runId": "run_a_01",
+          "status": "settled"
+        }
+      },
+      "second": {
+        "result": "done",
+        "detail": {
+          "settled": "already"
+        }
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 1,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": null,\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"failed\",\n      \"exitCode\": 1\n    },\n    \"assessment\": {\n      \"verdict\": \"not-applicable\"\n    },\n    \"confidence\": {\n      \"level\": \"failed\",\n      \"basis\": [\n        \"captured-stdout\",\n        \"failed-exit\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"provider\",\n      \"code\": \"provider-limit\",\n      \"cause\": \"quota\",\n      \"providerSignal\": {\n        \"status\": 429\n      }\n    },\n    \"policy\": {\n      \"disposition\": \"needs-input\",\n      \"code\": \"provider-limit\"\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"provider\",\n      \"reason\": \"provider-quota\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 1,\n    \"stdoutLog\": \"attempt/stdout.log\",\n    \"stderrLog\": \"attempt/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"the agent was stopped: terminal:blocked:usage-limit. The account's quota or credits are used up: wait for the reset or add credits; the seat walk falls back to another account or candidate.\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": null,\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "captured stdout\n",
+        "stderr.log": "the agent was stopped: terminal:blocked:usage-limit. The account's quota or credits are used up: wait for the reset or add credits; the seat walk falls back to another account or candidate."
+      }
+    },
+    {
+      "name": "abandoned-not-started",
+      "receipt": {
+        "outcome": "abandoned-not-started",
+        "reason": "no-slot",
+        "publishedAt": "2026-11-19T00:00:00.000Z"
+      },
+      "outbox": {},
+      "noBaseline": true,
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "first": {
+        "result": "done",
+        "detail": {
+          "settled": "now",
+          "runId": "run_a_01",
+          "status": "settled"
+        }
+      },
+      "second": {
+        "result": "done",
+        "detail": {
+          "settled": "already"
+        }
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 1,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": null,\n  \"gitAfter\": null,\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"failed\",\n      \"exitCode\": 1\n    },\n    \"assessment\": {\n      \"verdict\": \"not-applicable\"\n    },\n    \"confidence\": {\n      \"level\": \"failed\",\n      \"basis\": [\n        \"captured-stdout\",\n        \"failed-exit\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"provider\",\n      \"code\": \"nonzero-process-exit\"\n    },\n    \"policy\": {\n      \"disposition\": \"needs-input\",\n      \"code\": \"nonzero-process-exit\"\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"infra\",\n      \"reason\": \"infra-exec-failed\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 1,\n    \"stdoutLog\": \"attempt/stdout.log\",\n    \"stderrLog\": \"attempt/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"abandoned-not-started: the agent never received its brief (no-slot)\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": null,\n    \"gitAfter\": null,\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "captured stdout\n",
+        "stderr.log": "abandoned-not-started: the agent never received its brief (no-slot)"
+      }
+    },
+    {
+      "name": "claim-after-stop",
+      "receipt": {
+        "outcome": "cancelled",
+        "outboxResult": "result-2.json",
+        "publishedAt": "2026-11-19T00:00:00.000Z",
+        "gateExit": {
+          "stoppedBy": "orphan",
+          "cause": "orphan-result",
+          "signal": "SIGTERM",
+          "exitedAt": "2026-11-19T00:00:00.000Z"
+        }
+      },
+      "outbox": {
+        "result-2.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        },
+        "report-2.md": "# Report\n\nThe parser rejects empty input because the length check runs first.\n"
+      },
+      "noBaseline": false,
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "first": {
+        "result": "done",
+        "detail": {
+          "settled": "now",
+          "runId": "run_a_01",
+          "status": "settled"
+        }
+      },
+      "second": {
+        "result": "done",
+        "detail": {
+          "settled": "already"
+        }
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": null,\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"attempt/outbox/report-2.md\",\n      \"kind\": \"agent-report\",\n      \"valid\": true\n    },\n    {\n      \"path\": \"attempt/outbox/result-2.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [\n    {\n      \"path\": \"attempt/outbox/report-2.md\",\n      \"sha256\": \"5fa2d35b8276a9766816d10c5c863837520d7465818679a642f6314d43cbe6b0\"\n    }\n  ],\n  \"reportDeclaration\": {\n    \"complete\": true,\n    \"incompleteReason\": null\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"inconclusive\"\n    },\n    \"confidence\": {\n      \"level\": \"no-evidence\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"verdict\",\n      \"reason\": \"verdict-inconclusive\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"attempt/stdout.log\",\n    \"stderrLog\": \"attempt/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": null,\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"attempt/outbox/report-2.md\",\n      \"attempt/outbox/result-2.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "captured stdout\n",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "outbox-name-outside-outbox",
+      "receipt": {
+        "outcome": "exited",
+        "outboxResult": "../x.json",
+        "gateExit": {
+          "exitCode": 0,
+          "exitedAt": "2026-11-19T00:00:00.000Z"
+        }
+      },
+      "outbox": {},
+      "noBaseline": false,
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "first": {
+        "error": {
+          "name": "StepError",
+          "code": "io",
+          "message": "receipt.json names an outbox result outside the outbox"
+        }
+      },
+      "second": {
+        "error": {
+          "name": "StepError",
+          "code": "io",
+          "message": "receipt.json names an outbox result outside the outbox"
+        }
+      },
+      "written": {
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"running\"\n}\n"
+      }
+    },
+    {
+      "name": "baseline-missing",
+      "receipt": {
+        "outcome": "exited",
+        "gateExit": {
+          "exitCode": 0,
+          "exitedAt": "2026-11-19T00:00:00.000Z"
+        }
+      },
+      "outbox": {},
+      "noBaseline": true,
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "first": {
+        "error": {
+          "name": "StepError",
+          "code": "io",
+          "message": "evaluator baseline missing or unreadable at <scratch>/s59/attempt/controller/evaluator-baseline.json"
+        }
+      },
+      "second": {
+        "error": {
+          "name": "StepError",
+          "code": "io",
+          "message": "evaluator baseline missing or unreadable at <scratch>/s59/attempt/controller/evaluator-baseline.json"
+        }
+      },
+      "written": {
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"running\"\n}\n"
+      }
+    },
+    {
+      "name": "receipt-of-other-attempt",
+      "receipt": {
+        "attemptId": "other",
+        "outcome": "exited"
+      },
+      "outbox": {},
+      "noBaseline": false,
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "first": {
+        "error": {
+          "name": "StepError",
+          "code": "io",
+          "message": "receipt.json is missing or belongs to another attempt"
+        }
+      },
+      "second": {
+        "error": {
+          "name": "StepError",
+          "code": "io",
+          "message": "receipt.json is missing or belongs to another attempt"
+        }
+      },
+      "written": {
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"running\"\n}\n"
+      }
+    }
+  ],
+  "entry": [
+    {
+      "stepId": "nope",
+      "env": {
+        "FGOS_STATE_ROOT": "/s",
+        "HOME": "/h"
+      },
+      "exit": 65,
+      "line": {
+        "v": 1,
+        "protocol": 1,
+        "result": "error",
+        "code": "envelope-invalid",
+        "message": "the envelope has no step nope"
+      }
+    },
+    {
+      "stepId": "cleanup-trust",
+      "env": {
+        "HOME": "/h"
+      },
+      "exit": 65,
+      "line": {
+        "v": 1,
+        "protocol": 1,
+        "result": "error",
+        "code": "envelope-invalid",
+        "message": "step environment lacks FGOS_STATE_ROOT"
+      }
+    },
+    {
+      "stepId": "cleanup-trust",
+      "env": {
+        "FGOS_STATE_ROOT": "/s",
+        "HOME": "/h"
+      },
+      "exit": 0,
+      "line": {
+        "v": 1,
+        "protocol": 1,
+        "result": "done",
+        "detail": {
+          "trust": "none-written"
+        }
+      }
+    },
+    {
+      "stepId": "cleanup-trust",
+      "noEnvelope": true,
+      "exit": 65,
+      "line": {
+        "v": 1,
+        "protocol": 1,
+        "result": "error",
+        "code": "envelope-invalid",
+        "message": "envelope.json cannot be read: ENOENT"
+      }
+    }
+  ]
+}

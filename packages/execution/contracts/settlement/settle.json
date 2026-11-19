@@ -1,0 +1,1924 @@
+{
+  "settle": [
+    {
+      "name": "clean-pass-with-changes",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        },
+        "worker-output/outbox/report-1.md": "# Report\n\nThe parser rejects empty input because the length check runs first.\n"
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [
+          "src/a.mjs"
+        ],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [\n    \"src/a.mjs\"\n  ],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [\n    \"src/a.mjs\"\n  ],\n  \"changedFileReasons\": {\n    \"src/a.mjs\": \"new-dirty-after-run\"\n  },\n  \"attribution\": [\n    {\n      \"path\": \"src/a.mjs\",\n      \"firstObserved\": \"post-run\",\n      \"level\": \"correlated\",\n      \"basis\": [\n        \"pre-post-git-snapshot\"\n      ],\n      \"coverageMatched\": true\n    }\n  ],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/report-1.md\",\n      \"kind\": \"agent-report\",\n      \"valid\": true\n    },\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [\n    {\n      \"path\": \"run/worker-output/outbox/report-1.md\",\n      \"sha256\": \"5fa2d35b8276a9766816d10c5c863837520d7465818679a642f6314d43cbe6b0\"\n    }\n  ],\n  \"reportDeclaration\": {\n    \"complete\": true,\n    \"incompleteReason\": null\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"pass\"\n    },\n    \"confidence\": {\n      \"level\": \"verified\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\",\n        \"workspace-git-diff\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"ok\",\n      \"reason\": \"completed-pass\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [\n      \"src/a.mjs\"\n    ],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [\n      {\n        \"path\": \"src/a.mjs\",\n        \"firstObserved\": \"post-run\",\n        \"level\": \"correlated\",\n        \"basis\": [\n          \"pre-post-git-snapshot\"\n        ],\n        \"coverageMatched\": true\n      }\n    ],\n    \"artifacts\": [\n      \"run/worker-output/outbox/report-1.md\",\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "producer-no-change",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"inconclusive\"\n    },\n    \"confidence\": {\n      \"level\": \"no-evidence\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"verdict\",\n      \"reason\": \"verdict-inconclusive\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "reader-with-report",
+      "assignment": {
+        "assignmentId": "asgn_b",
+        "workId": "w-1",
+        "role": "researcher",
+        "operation": "research",
+        "mutation": "read-only"
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        },
+        "worker-output/outbox/report-1.md": "# Report\n\nThe parser rejects empty input because the length check runs first.\n"
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_b",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"read-only\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/report-1.md\",\n      \"kind\": \"agent-report\",\n      \"valid\": true\n    },\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_b\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"researcher\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [\n    {\n      \"path\": \"run/worker-output/outbox/report-1.md\",\n      \"sha256\": \"5fa2d35b8276a9766816d10c5c863837520d7465818679a642f6314d43cbe6b0\"\n    }\n  ],\n  \"reportDeclaration\": {\n    \"complete\": true,\n    \"incompleteReason\": null\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"pass\"\n    },\n    \"confidence\": {\n      \"level\": \"reported\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"ok\",\n      \"reason\": \"completed-pass\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"run/worker-output/outbox/report-1.md\",\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_b\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "reader-placeholder-report",
+      "assignment": {
+        "assignmentId": "asgn_b",
+        "workId": "w-1",
+        "role": "researcher",
+        "operation": "research",
+        "mutation": "read-only"
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        },
+        "worker-output/outbox/report-1.md": "TODO\n"
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_b",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"read-only\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/report-1.md\",\n      \"kind\": \"agent-report\",\n      \"valid\": false\n    },\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_b\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"researcher\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"inconclusive\"\n    },\n    \"confidence\": {\n      \"level\": \"no-evidence\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"verdict\",\n      \"reason\": \"verdict-inconclusive\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_b\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "no-claim-no-report",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {},
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": null
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"inconclusive\"\n    },\n    \"confidence\": {\n      \"level\": \"no-evidence\",\n      \"basis\": [\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"unknown\",\n      \"code\": \"no-report\"\n    },\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"infra\",\n      \"reason\": \"infra-no-report\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "report-without-claim",
+      "assignment": {
+        "assignmentId": "asgn_b",
+        "workId": "w-1",
+        "role": "researcher",
+        "operation": "research",
+        "mutation": "read-only"
+      },
+      "files": {
+        "worker-output/outbox/report-1.md": "# Report\n\nThe parser rejects empty input because the length check runs first.\n"
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_b",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": null
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"read-only\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/report-1.md\",\n      \"kind\": \"agent-report\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_b\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"researcher\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [\n    {\n      \"path\": \"run/worker-output/outbox/report-1.md\",\n      \"sha256\": \"5fa2d35b8276a9766816d10c5c863837520d7465818679a642f6314d43cbe6b0\"\n    }\n  ],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"seat-did-not-finish\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"inconclusive\"\n    },\n    \"confidence\": {\n      \"level\": \"no-evidence\",\n      \"basis\": [\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"verdict\",\n      \"reason\": \"verdict-inconclusive\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"run/worker-output/outbox/report-1.md\"\n    ],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_b\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "invalid-claim",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "status": "done"
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": false\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"failed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"not-applicable\"\n    },\n    \"confidence\": {\n      \"level\": \"failed\",\n      \"basis\": [\n        \"invalid-agent-result-claim\",\n        \"captured-stdout\",\n        \"failed-exit\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"contract\",\n      \"code\": \"invalid-agent-result-claim\"\n    },\n    \"policy\": {\n      \"disposition\": \"refuse\",\n      \"code\": \"invalid-agent-result-claim\"\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"policy\",\n      \"reason\": \"policy-invalid-agent-result-claim\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"agent-result.json was present but failed schema validation\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "claim-not-json",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": "not json"
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": false\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"failed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"not-applicable\"\n    },\n    \"confidence\": {\n      \"level\": \"failed\",\n      \"basis\": [\n        \"invalid-agent-result-claim\",\n        \"captured-stdout\",\n        \"failed-exit\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"contract\",\n      \"code\": \"invalid-agent-result-claim\"\n    },\n    \"policy\": {\n      \"disposition\": \"refuse\",\n      \"code\": \"invalid-agent-result-claim\"\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"policy\",\n      \"reason\": \"policy-invalid-agent-result-claim\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"agent-result.json was present but failed schema validation\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "claim-blocked",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "blocked",
+          "summary": "s",
+          "blocker": "needs a key"
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"2bc7002e7e0c90db5de496bac4ca0eb3df4c7cdf4b5785c1c61590fc8e1dab9a\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"blocked\"\n    },\n    \"confidence\": {\n      \"level\": \"reported\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"blocked\",\n      \"reason\": \"verdict-blocked\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"blocked\",\n    \"summary\": \"s\",\n    \"blocker\": \"needs a key\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "claim-failed",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "failed",
+          "summary": "s",
+          "error": "broke"
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"c0be9c55de414617c614877ce4ec2f97113fcbc8e3361dbe00cd6ffec026a6da\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"failed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"not-applicable\"\n    },\n    \"confidence\": {\n      \"level\": \"failed\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\",\n        \"failed-exit\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"provider\",\n      \"code\": \"agent-failed\"\n    },\n    \"policy\": {\n      \"disposition\": \"needs-input\",\n      \"code\": \"agent-failed\"\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"infra\",\n      \"reason\": \"infra-exec-failed\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"failed\",\n    \"summary\": \"s\",\n    \"error\": \"broke\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "reviewer-findings",
+      "assignment": {
+        "assignmentId": "asgn_c",
+        "workId": "w-1",
+        "role": "reviewer",
+        "operation": "review",
+        "mutation": "read-only"
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "failed",
+          "summary": "f",
+          "error": "e",
+          "evidenceRefs": [
+            "report-1.md"
+          ],
+          "assessment": {
+            "verdict": "findings",
+            "severityFloor": "high"
+          }
+        },
+        "worker-output/outbox/report-1.md": "# Report\n\nThe parser rejects empty input because the length check runs first.\n"
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_c",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"read-only\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/report-1.md\",\n      \"kind\": \"agent-report\",\n      \"valid\": true\n    },\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_c\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"reviewer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"a3c7f89c080ef87c7da23b0f204e58ac65b61b0382d50e75f7583a111c6cace3\",\n  \"settleReports\": [\n    {\n      \"path\": \"run/worker-output/outbox/report-1.md\",\n      \"sha256\": \"5fa2d35b8276a9766816d10c5c863837520d7465818679a642f6314d43cbe6b0\"\n    }\n  ],\n  \"reportDeclaration\": {\n    \"complete\": true,\n    \"incompleteReason\": null\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"findings\"\n    },\n    \"confidence\": {\n      \"level\": \"reported\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"verdict\",\n      \"reason\": \"reviewer-findings\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"failed\",\n    \"summary\": \"f\",\n    \"error\": \"e\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ],\n    \"assessment\": {\n      \"verdict\": \"findings\",\n      \"severityFloor\": \"high\"\n    }\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"run/worker-output/outbox/report-1.md\",\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_c\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "reviewer-pass",
+      "assignment": {
+        "assignmentId": "asgn_c",
+        "workId": "w-1",
+        "role": "reviewer",
+        "operation": "review",
+        "mutation": "read-only"
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "s",
+          "assessment": {
+            "verdict": "pass"
+          }
+        },
+        "worker-output/outbox/report-1.md": "# Report\n\nThe parser rejects empty input because the length check runs first.\n"
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_c",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"read-only\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/report-1.md\",\n      \"kind\": \"agent-report\",\n      \"valid\": true\n    },\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_c\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"reviewer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"9c68ea88fdfaa9c4d3955c2f7666609a52cce570408026a3cf3848a9ebc65ce0\",\n  \"settleReports\": [\n    {\n      \"path\": \"run/worker-output/outbox/report-1.md\",\n      \"sha256\": \"5fa2d35b8276a9766816d10c5c863837520d7465818679a642f6314d43cbe6b0\"\n    }\n  ],\n  \"reportDeclaration\": {\n    \"complete\": true,\n    \"incompleteReason\": null\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"pass\"\n    },\n    \"confidence\": {\n      \"level\": \"reported\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"ok\",\n      \"reason\": \"completed-pass\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"s\",\n    \"assessment\": {\n      \"verdict\": \"pass\"\n    }\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"run/worker-output/outbox/report-1.md\",\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_c\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "nonzero-exit",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {},
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 2,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": null
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 2,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"failed\",\n      \"exitCode\": 2\n    },\n    \"assessment\": {\n      \"verdict\": \"not-applicable\"\n    },\n    \"confidence\": {\n      \"level\": \"failed\",\n      \"basis\": [\n        \"captured-stdout\",\n        \"failed-exit\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"provider\",\n      \"code\": \"nonzero-process-exit\"\n    },\n    \"policy\": {\n      \"disposition\": \"needs-input\",\n      \"code\": \"nonzero-process-exit\"\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"infra\",\n      \"reason\": \"infra-exec-failed\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 2,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "timeout",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {},
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 124,
+        "signal": "SIGTERM",
+        "isTimeout": true,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": null
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 124,\n  \"signal\": \"SIGTERM\",\n  \"timedOut\": true,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"failed\",\n      \"exitCode\": 124\n    },\n    \"assessment\": {\n      \"verdict\": \"not-applicable\"\n    },\n    \"confidence\": {\n      \"level\": \"failed\",\n      \"basis\": [\n        \"captured-stdout\",\n        \"timeout\",\n        \"failed-exit\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"resource\",\n      \"code\": \"execution-timeout\"\n    },\n    \"policy\": {\n      \"disposition\": \"needs-input\",\n      \"code\": \"execution-timeout\"\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"infra\",\n      \"reason\": \"infra-exec-failed\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 124,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"Execution timed out\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "killed-by-signal",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": null,
+        "signal": "SIGKILL",
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": null,\n  \"signal\": \"SIGKILL\",\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"failed\",\n      \"exitCode\": null\n    },\n    \"assessment\": {\n      \"verdict\": \"not-applicable\"\n    },\n    \"confidence\": {\n      \"level\": \"failed\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\",\n        \"failed-exit\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"provider\",\n      \"code\": \"nonzero-process-exit\"\n    },\n    \"policy\": {\n      \"disposition\": \"needs-input\",\n      \"code\": \"nonzero-process-exit\"\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"infra\",\n      \"reason\": \"infra-exec-failed\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": null,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "execution-error",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {},
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 1,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "executionError": {
+          "message": "abandoned-not-started: the agent never received its brief"
+        },
+        "agentResultPath": null
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 1,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"failed\",\n      \"exitCode\": 1\n    },\n    \"assessment\": {\n      \"verdict\": \"not-applicable\"\n    },\n    \"confidence\": {\n      \"level\": \"failed\",\n      \"basis\": [\n        \"captured-stdout\",\n        \"failed-exit\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"provider\",\n      \"code\": \"nonzero-process-exit\"\n    },\n    \"policy\": {\n      \"disposition\": \"needs-input\",\n      \"code\": \"nonzero-process-exit\"\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"infra\",\n      \"reason\": \"infra-exec-failed\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 1,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"abandoned-not-started: the agent never received its brief\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": "abandoned-not-started: the agent never received its brief"
+      }
+    },
+    {
+      "name": "provider-limit-quota",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {},
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 1,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "adapterOutcome": "provider-limit",
+        "providerStopCause": "quota",
+        "providerSignal": {
+          "status": 429,
+          "requestedWait": "2h"
+        },
+        "agentResultPath": null
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 1,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"failed\",\n      \"exitCode\": 1\n    },\n    \"assessment\": {\n      \"verdict\": \"not-applicable\"\n    },\n    \"confidence\": {\n      \"level\": \"failed\",\n      \"basis\": [\n        \"captured-stdout\",\n        \"failed-exit\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"provider\",\n      \"code\": \"provider-limit\",\n      \"cause\": \"quota\",\n      \"providerSignal\": {\n        \"status\": 429,\n        \"requestedWait\": \"2h\"\n      }\n    },\n    \"policy\": {\n      \"disposition\": \"needs-input\",\n      \"code\": \"provider-limit\"\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"provider\",\n      \"reason\": \"provider-quota\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 1,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "provider-limit-credential",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {},
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 1,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "adapterOutcome": "provider-limit",
+        "providerStopCause": "credential",
+        "agentResultPath": null
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 1,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"failed\",\n      \"exitCode\": 1\n    },\n    \"assessment\": {\n      \"verdict\": \"not-applicable\"\n    },\n    \"confidence\": {\n      \"level\": \"failed\",\n      \"basis\": [\n        \"captured-stdout\",\n        \"failed-exit\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"provider\",\n      \"code\": \"provider-limit\",\n      \"cause\": \"credential\"\n    },\n    \"policy\": {\n      \"disposition\": \"needs-input\",\n      \"code\": \"provider-limit\"\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"provider\",\n      \"reason\": \"provider-credential\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 1,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "blocked-on-person",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {},
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 1,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "adapterOutcome": "blocked",
+        "agentResultPath": null
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 1,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"failed\",\n      \"exitCode\": 1\n    },\n    \"assessment\": {\n      \"verdict\": \"not-applicable\"\n    },\n    \"confidence\": {\n      \"level\": \"failed\",\n      \"basis\": [\n        \"captured-stdout\",\n        \"failed-exit\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"provider\",\n      \"code\": \"blocked\"\n    },\n    \"policy\": {\n      \"disposition\": \"needs-input\",\n      \"code\": \"blocked\"\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"blocked\",\n      \"reason\": \"provider-blocked\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 1,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "lost-uncommitted-path",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {},
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [
+          "src/lost.mjs"
+        ],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": null
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [\n    \"src/lost.mjs\"\n  ],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [\n    {\n      \"path\": \"src/lost.mjs\",\n      \"firstObserved\": \"pre-launch\",\n      \"level\": \"excluded\",\n      \"basis\": [\n        \"pre-launch-dirt-cleared\"\n      ],\n      \"coverageMatched\": false\n    }\n  ],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"inconclusive\"\n    },\n    \"confidence\": {\n      \"level\": \"no-evidence\",\n      \"basis\": [\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": {\n      \"family\": \"unknown\",\n      \"code\": \"no-report\"\n    },\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"infra\",\n      \"reason\": \"infra-no-report\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"warnings\": [\n    {\n      \"code\": \"uncommitted-paths-lost\",\n      \"paths\": [\n        \"src/lost.mjs\"\n      ]\n    }\n  ],\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [\n      {\n        \"path\": \"src/lost.mjs\",\n        \"firstObserved\": \"pre-launch\",\n        \"level\": \"excluded\",\n        \"basis\": [\n          \"pre-launch-dirt-cleared\"\n        ],\n        \"coverageMatched\": false\n      }\n    ],\n    \"artifacts\": [],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "dirty-outside-scope",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [
+          "docs/x.md",
+          "src/y.mjs"
+        ],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [\n    \"docs/x.md\",\n    \"src/y.mjs\"\n  ],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [\n    \"docs/x.md\",\n    \"src/y.mjs\"\n  ],\n  \"changedFileReasons\": {\n    \"docs/x.md\": \"new-dirty-after-run\",\n    \"src/y.mjs\": \"new-dirty-after-run\"\n  },\n  \"attribution\": [\n    {\n      \"path\": \"docs/x.md\",\n      \"firstObserved\": \"post-run\",\n      \"level\": \"correlated\",\n      \"basis\": [\n        \"pre-post-git-snapshot\"\n      ],\n      \"coverageMatched\": false\n    },\n    {\n      \"path\": \"src/y.mjs\",\n      \"firstObserved\": \"post-run\",\n      \"level\": \"correlated\",\n      \"basis\": [\n        \"pre-post-git-snapshot\"\n      ],\n      \"coverageMatched\": true\n    }\n  ],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"pass\"\n    },\n    \"confidence\": {\n      \"level\": \"verified\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\",\n        \"workspace-git-diff\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"ok\",\n      \"reason\": \"completed-pass\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"warnings\": [\n    {\n      \"code\": \"outside-write-scope-correlated\",\n      \"level\": \"correlated\",\n      \"basis\": [\n        \"pre-post-git-snapshot\"\n      ],\n      \"paths\": [\n        \"docs/x.md\"\n      ]\n    }\n  ],\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [\n      \"docs/x.md\",\n      \"src/y.mjs\"\n    ],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [\n      {\n        \"path\": \"docs/x.md\",\n        \"firstObserved\": \"post-run\",\n        \"level\": \"correlated\",\n        \"basis\": [\n          \"pre-post-git-snapshot\"\n        ],\n        \"coverageMatched\": false\n      },\n      {\n        \"path\": \"src/y.mjs\",\n        \"firstObserved\": \"post-run\",\n        \"level\": \"correlated\",\n        \"basis\": [\n          \"pre-post-git-snapshot\"\n        ],\n        \"coverageMatched\": true\n      }\n    ],\n    \"artifacts\": [\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "pre-existing-dirt-kept",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [
+          "old.txt"
+        ],
+        "dirtyAfter": [
+          "old.txt",
+          "src/new.mjs"
+        ],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [\n    \"old.txt\"\n  ],\n  \"dirtyAfter\": [\n    \"old.txt\",\n    \"src/new.mjs\"\n  ],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [\n    \"src/new.mjs\"\n  ],\n  \"changedFileReasons\": {\n    \"src/new.mjs\": \"new-dirty-after-run\"\n  },\n  \"attribution\": [\n    {\n      \"path\": \"old.txt\",\n      \"firstObserved\": \"pre-launch\",\n      \"level\": \"excluded\",\n      \"basis\": [\n        \"pre-launch-git-status\"\n      ],\n      \"coverageMatched\": false\n    },\n    {\n      \"path\": \"src/new.mjs\",\n      \"firstObserved\": \"post-run\",\n      \"level\": \"correlated\",\n      \"basis\": [\n        \"pre-post-git-snapshot\"\n      ],\n      \"coverageMatched\": true\n    }\n  ],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"pass\"\n    },\n    \"confidence\": {\n      \"level\": \"verified\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\",\n        \"workspace-git-diff\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"ok\",\n      \"reason\": \"completed-pass\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [\n      \"src/new.mjs\"\n    ],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [\n      {\n        \"path\": \"old.txt\",\n        \"firstObserved\": \"pre-launch\",\n        \"level\": \"excluded\",\n        \"basis\": [\n          \"pre-launch-git-status\"\n        ],\n        \"coverageMatched\": false\n      },\n      {\n        \"path\": \"src/new.mjs\",\n        \"firstObserved\": \"post-run\",\n        \"level\": \"correlated\",\n        \"basis\": [\n          \"pre-post-git-snapshot\"\n        ],\n        \"coverageMatched\": true\n      }\n    ],\n    \"artifacts\": [\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "frictions-cut-at-limit",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ],
+          "frictions": [
+            {
+              "kind": "awkward",
+              "layer": "cli",
+              "errorClass": "class-0",
+              "detail": "d0"
+            },
+            {
+              "kind": "awkward",
+              "layer": "cli",
+              "errorClass": "class-1",
+              "detail": "d1"
+            },
+            {
+              "kind": "awkward",
+              "layer": "cli",
+              "errorClass": "class-2",
+              "detail": "d2"
+            },
+            {
+              "kind": "awkward",
+              "layer": "cli",
+              "errorClass": "class-3",
+              "detail": "d3"
+            },
+            {
+              "kind": "awkward",
+              "layer": "cli",
+              "errorClass": "class-4",
+              "detail": "d4"
+            },
+            {
+              "kind": "awkward",
+              "layer": "cli",
+              "errorClass": "class-5",
+              "detail": "d5"
+            },
+            {
+              "kind": "awkward",
+              "layer": "cli",
+              "errorClass": "class-6",
+              "detail": "d6"
+            }
+          ]
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [
+          "src/a.mjs"
+        ],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [\n    \"src/a.mjs\"\n  ],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [\n    \"src/a.mjs\"\n  ],\n  \"changedFileReasons\": {\n    \"src/a.mjs\": \"new-dirty-after-run\"\n  },\n  \"attribution\": [\n    {\n      \"path\": \"src/a.mjs\",\n      \"firstObserved\": \"post-run\",\n      \"level\": \"correlated\",\n      \"basis\": [\n        \"pre-post-git-snapshot\"\n      ],\n      \"coverageMatched\": true\n    }\n  ],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"24737f39cde7bc3f776f4ee9128b7f168b7d938526d0b29d036295617e5173b1\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"pass\"\n    },\n    \"confidence\": {\n      \"level\": \"verified\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\",\n        \"workspace-git-diff\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"ok\",\n      \"reason\": \"completed-pass\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ],\n    \"frictions\": [\n      {\n        \"kind\": \"awkward\",\n        \"layer\": \"cli\",\n        \"errorClass\": \"class-0\",\n        \"detail\": \"d0\"\n      },\n      {\n        \"kind\": \"awkward\",\n        \"layer\": \"cli\",\n        \"errorClass\": \"class-1\",\n        \"detail\": \"d1\"\n      },\n      {\n        \"kind\": \"awkward\",\n        \"layer\": \"cli\",\n        \"errorClass\": \"class-2\",\n        \"detail\": \"d2\"\n      },\n      {\n        \"kind\": \"awkward\",\n        \"layer\": \"cli\",\n        \"errorClass\": \"class-3\",\n        \"detail\": \"d3\"\n      },\n      {\n        \"kind\": \"awkward\",\n        \"layer\": \"cli\",\n        \"errorClass\": \"class-4\",\n        \"detail\": \"d4\"\n      }\n    ],\n    \"frictionsDropped\": 2\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [\n      \"src/a.mjs\"\n    ],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [\n      {\n        \"path\": \"src/a.mjs\",\n        \"firstObserved\": \"post-run\",\n        \"level\": \"correlated\",\n        \"basis\": [\n          \"pre-post-git-snapshot\"\n        ],\n        \"coverageMatched\": true\n      }\n    ],\n    \"artifacts\": [\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "legacy-flat-claim",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "agent-result.json": {
+          "status": "done",
+          "summary": "old"
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [
+          "src/a.mjs"
+        ],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [\n    \"src/a.mjs\"\n  ],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [\n    \"src/a.mjs\"\n  ],\n  \"changedFileReasons\": {\n    \"src/a.mjs\": \"new-dirty-after-run\"\n  },\n  \"attribution\": [\n    {\n      \"path\": \"src/a.mjs\",\n      \"firstObserved\": \"post-run\",\n      \"level\": \"correlated\",\n      \"basis\": [\n        \"pre-post-git-snapshot\"\n      ],\n      \"coverageMatched\": true\n    }\n  ],\n  \"artifacts\": [\n    {\n      \"path\": \"run/agent-result.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"adafad1dbe1fb0d194140e8b4cd8a8fbdeccac0e73de3b81d54cc6d7aa721344\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"pass\"\n    },\n    \"confidence\": {\n      \"level\": \"verified\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\",\n        \"workspace-git-diff\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"ok\",\n      \"reason\": \"completed-pass\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"status\": \"done\",\n    \"summary\": \"old\"\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [\n      \"src/a.mjs\"\n    ],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [\n      {\n        \"path\": \"src/a.mjs\",\n        \"firstObserved\": \"post-run\",\n        \"level\": \"correlated\",\n        \"basis\": [\n          \"pre-post-git-snapshot\"\n        ],\n        \"coverageMatched\": true\n      }\n    ],\n    \"artifacts\": [\n      \"run/agent-result.json\"\n    ],\n    \"tests\": []\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "with-policy-and-digests",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [
+          "src/a.mjs"
+        ],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "effectivePolicy": {
+          "persona": "code-reviewer",
+          "seat": "doer"
+        },
+        "executorRedirected": true,
+        "reasoningEffort": "high",
+        "modelWarnings": [
+          {
+            "code": "model-drift",
+            "requested": "a",
+            "ran": "b"
+          }
+        ],
+        "inputDigests": [
+          {
+            "path": "brief.md",
+            "sha256": "abc"
+          }
+        ],
+        "resolvedExecutorId": "codex-cli",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [\n    \"src/a.mjs\"\n  ],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [\n    \"src/a.mjs\"\n  ],\n  \"changedFileReasons\": {\n    \"src/a.mjs\": \"new-dirty-after-run\"\n  },\n  \"attribution\": [\n    {\n      \"path\": \"src/a.mjs\",\n      \"firstObserved\": \"post-run\",\n      \"level\": \"correlated\",\n      \"basis\": [\n        \"pre-post-git-snapshot\"\n      ],\n      \"coverageMatched\": true\n    }\n  ],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"codex-cli\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"executorRedirected\": true,\n  \"policy\": {\n    \"persona\": \"code-reviewer\",\n    \"seat\": \"doer\",\n    \"launch\": {\n      \"effortRendered\": \"high\",\n      \"modelDrift\": [\n        {\n          \"code\": \"model-drift\",\n          \"requested\": \"a\",\n          \"ran\": \"b\"\n        }\n      ]\n    }\n  },\n  \"promptEnvelope\": {\n    \"persona\": {\n      \"ref\": \"code-reviewer\",\n      \"delivery\": \"section\",\n      \"applied\": true,\n      \"source\": null\n    }\n  },\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"inputDigests\": [\n    {\n      \"path\": \"brief.md\",\n      \"sha256\": \"abc\"\n    }\n  ],\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"pass\"\n    },\n    \"confidence\": {\n      \"level\": \"verified\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\",\n        \"workspace-git-diff\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"ok\",\n      \"reason\": \"completed-pass\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [\n      \"src/a.mjs\"\n    ],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [\n      {\n        \"path\": \"src/a.mjs\",\n        \"firstObserved\": \"post-run\",\n        \"level\": \"correlated\",\n        \"basis\": [\n          \"pre-post-git-snapshot\"\n        ],\n        \"coverageMatched\": true\n      }\n    ],\n    \"artifacts\": [\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "herdr-adapter",
+      "assignment": {
+        "assignmentId": "asgn_b",
+        "workId": "w-1",
+        "role": "researcher",
+        "operation": "research",
+        "mutation": "read-only"
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        },
+        "worker-output/outbox/report-1.md": "# Report\n\nThe parser rejects empty input because the length check runs first.\n"
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_b",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "herdr-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"read-only\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/report-1.md\",\n      \"kind\": \"agent-report\",\n      \"valid\": true\n    },\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_b\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"herdr-spawn\",\n  \"confinement\": null,\n  \"role\": \"researcher\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [\n    {\n      \"path\": \"run/worker-output/outbox/report-1.md\",\n      \"sha256\": \"5fa2d35b8276a9766816d10c5c863837520d7465818679a642f6314d43cbe6b0\"\n    }\n  ],\n  \"reportDeclaration\": {\n    \"complete\": true,\n    \"incompleteReason\": null\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"pass\"\n    },\n    \"confidence\": {\n      \"level\": \"reported\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"ok\",\n      \"reason\": \"completed-pass\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"run/worker-output/outbox/report-1.md\",\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_b\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "prepared-confinement-backend",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        },
+        "protected/prepared-invocation/attempt-1.json": {
+          "backend": {
+            "type": "bwrap"
+          },
+          "workerInvocation": {
+            "command": "/usr/bin/codex",
+            "args": [
+              "exec"
+            ],
+            "env": {
+              "HOME": "/h"
+            },
+            "cwd": "/w"
+          }
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [
+          "src/a.mjs"
+        ],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "agentResultPath": "worker-output/outbox/result-1.json"
+      },
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [\n    \"src/a.mjs\"\n  ],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [\n    \"src/a.mjs\"\n  ],\n  \"changedFileReasons\": {\n    \"src/a.mjs\": \"new-dirty-after-run\"\n  },\n  \"attribution\": [\n    {\n      \"path\": \"src/a.mjs\",\n      \"firstObserved\": \"post-run\",\n      \"level\": \"correlated\",\n      \"basis\": [\n        \"pre-post-git-snapshot\"\n      ],\n      \"coverageMatched\": true\n    }\n  ],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": \"bwrap\",\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"pass\"\n    },\n    \"confidence\": {\n      \"level\": \"verified\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\",\n        \"workspace-git-diff\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"ok\",\n      \"reason\": \"completed-pass\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"codex-cli\",\n    \"reason\": \"footer-missing\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [\n      \"src/a.mjs\"\n    ],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [\n      {\n        \"path\": \"src/a.mjs\",\n        \"firstObserved\": \"post-run\",\n        \"level\": \"correlated\",\n        \"basis\": [\n          \"pre-post-git-snapshot\"\n        ],\n        \"coverageMatched\": true\n      }\n    ],\n    \"artifacts\": [\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "recover-after-control-settled",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn"
+      },
+      "preSettled": true,
+      "outcome": {
+        "status": "settled"
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "result.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 1,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"inconclusive\"\n    },\n    \"confidence\": {\n      \"level\": \"no-evidence\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"verdict\",\n      \"reason\": \"verdict-inconclusive\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"settled\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": ""
+      }
+    },
+    {
+      "name": "superseded-controller",
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "files": {
+        "worker-output/outbox/result-1.json": {
+          "contract": {
+            "id": "agent-result-claim",
+            "version": 2
+          },
+          "status": "done",
+          "summary": "did it",
+          "evidenceRefs": [
+            "report-1.md"
+          ]
+        }
+      },
+      "runMeta": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "claude",
+        "status": "running"
+      },
+      "args": {
+        "exitCode": 0,
+        "signal": null,
+        "isTimeout": false,
+        "durationMs": null,
+        "settledAt": "2026-11-19T00:00:00.000Z",
+        "stdoutText": "out",
+        "stderrText": "",
+        "gitBefore": "aaa",
+        "gitAfter": "aaa",
+        "dirtyBefore": [],
+        "dirtyAfter": [],
+        "launchCommandId": "attempt-1",
+        "adapter": "cli-spawn",
+        "controlEpoch": 99,
+        "controlToken": "stale-token"
+      },
+      "outcome": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": "run-control-superseded",
+          "message": "executeAssignment: control token for Run \"run_a_01\" (epoch 99) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller"
+        }
+      },
+      "written": {
+        "exit.json": "{\n  \"exitCode\": 0,\n  \"signal\": null,\n  \"timedOut\": false,\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"durationMs\": null\n}\n",
+        "evidence.json": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": \"aaa\",\n  \"gitAfter\": \"aaa\",\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [\n    {\n      \"path\": \"run/worker-output/outbox/result-1.json\",\n      \"kind\": \"agent-result\",\n      \"valid\": true\n    }\n  ],\n  \"tests\": []\n}\n",
+        "run.json": "{\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"executorId\": \"claude\",\n  \"status\": \"running\"\n}\n",
+        "stdout.log": "out",
+        "stderr.log": "",
+        "result.superseded.json": "{\n  \"contract\": {\n    \"id\": \"assignment-run-result\",\n    \"version\": 3\n  },\n  \"runId\": \"run_a_01\",\n  \"assignmentId\": \"asgn_a\",\n  \"workId\": \"w-1\",\n  \"controlEpoch\": 99,\n  \"controlToken\": \"<token>\",\n  \"executorId\": \"claude\",\n  \"adapter\": \"cli-spawn\",\n  \"confinement\": null,\n  \"role\": \"producer\",\n  \"settledAt\": \"2026-11-19T00:00:00.000Z\",\n  \"claimSha256\": \"ba71dc495251e250af431920132e11889cc37f5e3d64370fb0671d2d098bbdc1\",\n  \"settleReports\": [],\n  \"reportDeclaration\": {\n    \"complete\": false,\n    \"incompleteReason\": \"no-report\"\n  },\n  \"classification\": {\n    \"execution\": {\n      \"status\": \"completed\",\n      \"exitCode\": 0\n    },\n    \"assessment\": {\n      \"verdict\": \"inconclusive\"\n    },\n    \"confidence\": {\n      \"level\": \"no-evidence\",\n      \"basis\": [\n        \"valid-agent-result-claim\",\n        \"captured-stdout\"\n      ]\n    },\n    \"failure\": null,\n    \"policy\": {\n      \"disposition\": \"allow\",\n      \"code\": null\n    },\n    \"delivery\": {\n      \"mode\": \"fresh\"\n    },\n    \"provenance\": \"native-v3\",\n    \"outcome\": {\n      \"category\": \"verdict\",\n      \"reason\": \"verdict-inconclusive\"\n    }\n  },\n  \"runtime\": {\n    \"exitCode\": 0,\n    \"stdoutLog\": \"run/stdout.log\",\n    \"stderrLog\": \"run/stderr.log\"\n  },\n  \"agentClaim\": {\n    \"contract\": {\n      \"id\": \"agent-result-claim\",\n      \"version\": 2\n    },\n    \"status\": \"done\",\n    \"summary\": \"did it\",\n    \"evidenceRefs\": [\n      \"report-1.md\"\n    ]\n  },\n  \"runnerNote\": {\n    \"summary\": \"Settled\"\n  },\n  \"usage\": {\n    \"inputTokens\": null,\n    \"outputTokens\": null,\n    \"totalTokens\": null,\n    \"cacheReadTokens\": null,\n    \"cacheCreationTokens\": null,\n    \"reasoningTokens\": null,\n    \"source\": \"unsupported\",\n    \"reason\": \"unsupported-cli\"\n  },\n  \"evidence\": {\n    \"gitBefore\": \"aaa\",\n    \"gitAfter\": \"aaa\",\n    \"gitBeforeSource\": \"pre-launch\",\n    \"changedFiles\": [],\n    \"mutatedDirtyBeforeFiles\": [],\n    \"attribution\": [],\n    \"artifacts\": [\n      \"run/worker-output/outbox/result-1.json\"\n    ],\n    \"tests\": [],\n    \"findingRefs\": [\n      \"report-1.md\"\n    ]\n  }\n}\n"
+      }
+    }
+  ],
+  "refused": [
+    {
+      "name": "capacity-refused",
+      "refusal": {
+        "reason": "provider-capacity.no-account",
+        "detail": "all quarantined"
+      },
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "policy": {
+        "persona": "code-reviewer",
+        "seat": "doer"
+      },
+      "stderr": "provider capacity refused for \"codex\": provider-capacity.no-account (all quarantined)",
+      "evidence": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": null,\n  \"gitAfter\": null,\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+      "result": {
+        "execution": {
+          "status": "failed",
+          "exitCode": null
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "captured-stdout",
+            "failed-exit"
+          ]
+        },
+        "failure": {
+          "family": "provider",
+          "code": "provider-capacity-refused",
+          "message": "provider capacity refused for \"codex\": provider-capacity.no-account (all quarantined)"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "provider-capacity-refused"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "infra",
+          "reason": "infra-exec-failed"
+        }
+      },
+      "resultFields": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "codex-cli",
+        "role": "producer",
+        "operation": null,
+        "runtime": {
+          "exitCode": null,
+          "stdoutLog": "run/stdout.log",
+          "stderrLog": "run/stderr.log"
+        },
+        "classification": {
+          "execution": {
+            "status": "failed",
+            "exitCode": null
+          },
+          "assessment": {
+            "verdict": "not-applicable"
+          },
+          "confidence": {
+            "level": "failed",
+            "basis": [
+              "captured-stdout",
+              "failed-exit"
+            ]
+          },
+          "failure": {
+            "family": "provider",
+            "code": "provider-capacity-refused",
+            "message": "provider capacity refused for \"codex\": provider-capacity.no-account (all quarantined)"
+          },
+          "policy": {
+            "disposition": "needs-input",
+            "code": "provider-capacity-refused"
+          },
+          "delivery": {
+            "mode": "fresh"
+          },
+          "provenance": "native-v3",
+          "outcome": {
+            "category": "infra",
+            "reason": "infra-exec-failed"
+          }
+        }
+      },
+      "settledAtShape": "string"
+    },
+    {
+      "name": "lease-conflict",
+      "refusal": {
+        "reason": "provider-capacity.lease-conflict"
+      },
+      "assignment": {
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "role": "producer",
+        "operation": "edit",
+        "mutation": "mutates-repo",
+        "writes": [
+          "src/**"
+        ]
+      },
+      "policy": {
+        "persona": "code-reviewer",
+        "seat": "doer"
+      },
+      "stderr": "provider capacity refused for \"codex\": provider-capacity.lease-conflict",
+      "evidence": "{\n  \"operationMutability\": \"mutates-repo\",\n  \"gitBefore\": null,\n  \"gitAfter\": null,\n  \"gitBeforeSource\": \"pre-launch\",\n  \"dirtyBefore\": [],\n  \"dirtyAfter\": [],\n  \"mutatedDirtyBeforeFiles\": [],\n  \"changedFiles\": [],\n  \"changedFileReasons\": {},\n  \"attribution\": [],\n  \"artifacts\": [],\n  \"tests\": []\n}\n",
+      "result": {
+        "execution": {
+          "status": "failed",
+          "exitCode": null
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "captured-stdout",
+            "failed-exit"
+          ]
+        },
+        "failure": {
+          "family": "provider",
+          "code": "provider-capacity-lease-conflict",
+          "message": "provider capacity refused for \"codex\": provider-capacity.lease-conflict"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "provider-capacity-lease-conflict"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v3",
+        "outcome": {
+          "category": "infra",
+          "reason": "infra-exec-failed"
+        }
+      },
+      "resultFields": {
+        "runId": "run_a_01",
+        "assignmentId": "asgn_a",
+        "workId": "w-1",
+        "executorId": "codex-cli",
+        "role": "producer",
+        "operation": null,
+        "runtime": {
+          "exitCode": null,
+          "stdoutLog": "run/stdout.log",
+          "stderrLog": "run/stderr.log"
+        },
+        "classification": {
+          "execution": {
+            "status": "failed",
+            "exitCode": null
+          },
+          "assessment": {
+            "verdict": "not-applicable"
+          },
+          "confidence": {
+            "level": "failed",
+            "basis": [
+              "captured-stdout",
+              "failed-exit"
+            ]
+          },
+          "failure": {
+            "family": "provider",
+            "code": "provider-capacity-lease-conflict",
+            "message": "provider capacity refused for \"codex\": provider-capacity.lease-conflict"
+          },
+          "policy": {
+            "disposition": "needs-input",
+            "code": "provider-capacity-lease-conflict"
+          },
+          "delivery": {
+            "mode": "fresh"
+          },
+          "provenance": "native-v3",
+          "outcome": {
+            "category": "infra",
+            "reason": "infra-exec-failed"
+          }
+        }
+      },
+      "settledAtShape": "string"
+    }
+  ]
+}

@@ -161,7 +161,7 @@ fn publish_immutable_proof(path: &Path, record: &Value) -> Result<(), RequestErr
 }
 
 /// Writes `record` over whatever was there, durably.
-fn publish_mutable_projection(path: &Path, record: &Value) -> Result<(), RequestError> {
+pub(super) fn publish_mutable_projection(path: &Path, record: &Value) -> Result<(), RequestError> {
     let (dir, name) = split(path);
     std::fs::create_dir_all(dir).map_err(|e| io_error("projection", dir, e))?;
     replace_durably_with_mode(dir, name, &pretty(record), 0o644)
