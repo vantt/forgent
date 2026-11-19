@@ -1,0 +1,7312 @@
+{
+  "validate": [
+    {
+      "value": null,
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": null,
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": null,
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": null,
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": null,
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": null,
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": null,
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": null,
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": null,
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": null,
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": null,
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": null,
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": [],
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": [],
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": [],
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": [],
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": [],
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": [],
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": [],
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": [],
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": [],
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": [],
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": [],
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": [],
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": "x",
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": "x",
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": "x",
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": "x",
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": "x",
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": "x",
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": "x",
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": "x",
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": "x",
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": "x",
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": "x",
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": "x",
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": 7,
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": 7,
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": 7,
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": 7,
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": 7,
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": 7,
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": 7,
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": 7,
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": 7,
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": 7,
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": 7,
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": 7,
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json must be a JSON object"
+      }
+    },
+    {
+      "value": {},
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: undefined"
+      }
+    },
+    {
+      "value": {},
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: undefined"
+      }
+    },
+    {
+      "value": {},
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: undefined"
+      }
+    },
+    {
+      "value": {},
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: undefined"
+      }
+    },
+    {
+      "value": {},
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: undefined"
+      }
+    },
+    {
+      "value": {},
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: undefined"
+      }
+    },
+    {
+      "value": {},
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: undefined"
+      }
+    },
+    {
+      "value": {},
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: undefined"
+      }
+    },
+    {
+      "value": {},
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: undefined"
+      }
+    },
+    {
+      "value": {},
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: undefined"
+      }
+    },
+    {
+      "value": {},
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: undefined"
+      }
+    },
+    {
+      "value": {},
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: undefined"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {},
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {},
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 1
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 1
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 1
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 1
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 1
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 1
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 1
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 1
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 1
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 1
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 1
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 1
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": null,
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": null,
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": null,
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": null,
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": null,
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": null,
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": null,
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": null,
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": null,
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": null,
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": null,
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": null,
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": [],
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": [],
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": [],
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": [],
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": [],
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": [],
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": [],
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": [],
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": [],
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": [],
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": [],
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": [],
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "x",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "x",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "x",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "x",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "x",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "x",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "x",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "x",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "x",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "x",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "x",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "x",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json contract must be {id:\"agent-result-claim\",version:2}"
+      }
+    },
+    {
+      "value": {
+        "status": "settled",
+        "summary": "s"
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: \"settled\""
+      }
+    },
+    {
+      "value": {
+        "status": "settled",
+        "summary": "s"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: \"settled\""
+      }
+    },
+    {
+      "value": {
+        "status": "settled",
+        "summary": "s"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: \"settled\""
+      }
+    },
+    {
+      "value": {
+        "status": "settled",
+        "summary": "s"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: \"settled\""
+      }
+    },
+    {
+      "value": {
+        "status": "settled",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: \"settled\""
+      }
+    },
+    {
+      "value": {
+        "status": "settled",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: \"settled\""
+      }
+    },
+    {
+      "value": {
+        "status": "settled",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: \"settled\""
+      }
+    },
+    {
+      "value": {
+        "status": "settled",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: \"settled\""
+      }
+    },
+    {
+      "value": {
+        "status": "settled",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: \"settled\""
+      }
+    },
+    {
+      "value": {
+        "status": "settled",
+        "summary": "s"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: \"settled\""
+      }
+    },
+    {
+      "value": {
+        "status": "settled",
+        "summary": "s"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: \"settled\""
+      }
+    },
+    {
+      "value": {
+        "status": "settled",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json status must be one of [done, blocked, failed, no-evidence]; got: \"settled\""
+      }
+    },
+    {
+      "value": {
+        "status": "done"
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "  "
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "  "
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "  "
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "  "
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "  "
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "  "
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "  "
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "  "
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "  "
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "  "
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "  "
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "  "
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json requires non-empty summary (a required non-empty string)"
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s"
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": " "
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": " "
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": " "
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": " "
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": " "
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": " "
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": " "
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": " "
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": " "
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": " "
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": " "
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": " "
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"blocked\" requires blocker: a non-empty string when status is \"blocked\""
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      },
+      "context": {},
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "blocked",
+        "summary": "s",
+        "blocker": "b"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s"
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      },
+      "context": {},
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": "e"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": null
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": null
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": null
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": null
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": null
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": null
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": null
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": null
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": null
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": null
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": null
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "failed",
+        "summary": "s",
+        "error": null
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {},
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": {
+          "code": 1
+        }
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": []
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": ""
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": ""
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": ""
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": ""
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": ""
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": ""
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": ""
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": ""
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": ""
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": ""
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": ""
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "s",
+        "error": ""
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json with status \"failed\" requires error: a non-empty string or object when status is \"failed\""
+      }
+    },
+    {
+      "value": {
+        "status": "no-evidence",
+        "summary": "s"
+      },
+      "context": {},
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "no-evidence",
+        "summary": "s"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "no-evidence",
+        "summary": "s"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "no-evidence",
+        "summary": "s"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "no-evidence",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "no-evidence",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "no-evidence",
+        "summary": "s"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "no-evidence",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "no-evidence",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "no-evidence",
+        "summary": "s"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "no-evidence",
+        "summary": "s"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "no-evidence",
+        "summary": "s"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a"
+        ]
+      },
+      "context": {},
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a"
+        ]
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a"
+        ]
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a"
+        ]
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a"
+        ]
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a"
+        ]
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a"
+        ]
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a"
+        ]
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a"
+        ]
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a"
+        ]
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a"
+        ]
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a"
+        ]
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": []
+      },
+      "context": {},
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": []
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": []
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": []
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": []
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": []
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": []
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": []
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": []
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": []
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": []
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": []
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          " "
+        ]
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          " "
+        ]
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          " "
+        ]
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          " "
+        ]
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          " "
+        ]
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          " "
+        ]
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          " "
+        ]
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          " "
+        ]
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          " "
+        ]
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          " "
+        ]
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          " "
+        ]
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          " "
+        ]
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          1
+        ]
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          1
+        ]
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          1
+        ]
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          1
+        ]
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          1
+        ]
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          1
+        ]
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          1
+        ]
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          1
+        ]
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          1
+        ]
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          1
+        ]
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          1
+        ]
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": [
+          "a",
+          1
+        ]
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": "a"
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": "a"
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": "a"
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": "a"
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": "a"
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": "a"
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": "a"
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": "a"
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": "a"
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": "a"
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": "a"
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": "a"
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": null
+      },
+      "context": {},
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": null
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": null
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": null
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": null
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": null
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": null
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": null
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": null
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": null
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": null
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "evidenceRefs": null
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json evidenceRefs must be an array of non-empty strings if provided"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "pass"
+        }
+      },
+      "context": {},
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "pass"
+        }
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "pass"
+        }
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "pass"
+        }
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "pass"
+        }
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "pass"
+        }
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "pass"
+        }
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "pass"
+        }
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "pass"
+        }
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "pass"
+        }
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "pass"
+        }
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "pass"
+        }
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        }
+      },
+      "context": {},
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        }
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        }
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        }
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        }
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        }
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        }
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        }
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        }
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        }
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        }
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        }
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": []
+      },
+      "context": {},
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": []
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": []
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": []
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": []
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": []
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": []
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": []
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": []
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": []
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": []
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": []
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": null
+      },
+      "context": {},
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": null
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": null
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": null
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": null
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": null
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": null
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": null
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": null
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": null
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": null
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "s",
+        "assessment": null
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": false,
+        "reason": "agent-result.json for this assessment role requires assessment.verdict one of [pass, findings, blocked, inconclusive, not-applicable]"
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        },
+        "stance": "x",
+        "frictions": [],
+        "needsWrites": [
+          "a"
+        ]
+      },
+      "context": {},
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        },
+        "stance": "x",
+        "frictions": [],
+        "needsWrites": [
+          "a"
+        ]
+      },
+      "context": {
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        },
+        "stance": "x",
+        "frictions": [],
+        "needsWrites": [
+          "a"
+        ]
+      },
+      "context": {
+        "role": "red-team"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        },
+        "stance": "x",
+        "frictions": [],
+        "needsWrites": [
+          "a"
+        ]
+      },
+      "context": {
+        "role": "producer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        },
+        "stance": "x",
+        "frictions": [],
+        "needsWrites": [
+          "a"
+        ]
+      },
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        },
+        "stance": "x",
+        "frictions": [],
+        "needsWrites": [
+          "a"
+        ]
+      },
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        },
+        "stance": "x",
+        "frictions": [],
+        "needsWrites": [
+          "a"
+        ]
+      },
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        },
+        "stance": "x",
+        "frictions": [],
+        "needsWrites": [
+          "a"
+        ]
+      },
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        },
+        "stance": "x",
+        "frictions": [],
+        "needsWrites": [
+          "a"
+        ]
+      },
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        },
+        "stance": "x",
+        "frictions": [],
+        "needsWrites": [
+          "a"
+        ]
+      },
+      "context": {
+        "operation": "recheck-1"
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        },
+        "stance": "x",
+        "frictions": [],
+        "needsWrites": [
+          "a"
+        ]
+      },
+      "context": {
+        "operation": 7
+      },
+      "out": {
+        "valid": true
+      }
+    },
+    {
+      "value": {
+        "status": "done",
+        "summary": "s",
+        "assessment": {
+          "verdict": "maybe"
+        },
+        "stance": "x",
+        "frictions": [],
+        "needsWrites": [
+          "a"
+        ]
+      },
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "out": {
+        "valid": true
+      }
+    }
+  ],
+  "verdictSeat": [
+    {
+      "context": {},
+      "verdictSeat": false,
+      "assessmentRequired": false,
+      "requirement": {
+        "required": false,
+        "path": "assessment.verdict",
+        "allowed": [
+          "pass",
+          "findings",
+          "blocked",
+          "inconclusive",
+          "not-applicable"
+        ]
+      }
+    },
+    {
+      "context": {
+        "role": "reviewer"
+      },
+      "verdictSeat": true,
+      "assessmentRequired": true,
+      "requirement": {
+        "required": true,
+        "path": "assessment.verdict",
+        "allowed": [
+          "pass",
+          "findings",
+          "blocked",
+          "inconclusive",
+          "not-applicable"
+        ]
+      }
+    },
+    {
+      "context": {
+        "role": "red-team"
+      },
+      "verdictSeat": true,
+      "assessmentRequired": true,
+      "requirement": {
+        "required": true,
+        "path": "assessment.verdict",
+        "allowed": [
+          "pass",
+          "findings",
+          "blocked",
+          "inconclusive",
+          "not-applicable"
+        ]
+      }
+    },
+    {
+      "context": {
+        "role": "producer"
+      },
+      "verdictSeat": false,
+      "assessmentRequired": false,
+      "requirement": {
+        "required": false,
+        "path": "assessment.verdict",
+        "allowed": [
+          "pass",
+          "findings",
+          "blocked",
+          "inconclusive",
+          "not-applicable"
+        ]
+      }
+    },
+    {
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "verdictSeat": true,
+      "assessmentRequired": true,
+      "requirement": {
+        "required": true,
+        "path": "assessment.verdict",
+        "allowed": [
+          "pass",
+          "findings",
+          "blocked",
+          "inconclusive",
+          "not-applicable"
+        ]
+      }
+    },
+    {
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "verdictSeat": false,
+      "assessmentRequired": false,
+      "requirement": {
+        "required": false,
+        "path": "assessment.verdict",
+        "allowed": [
+          "pass",
+          "findings",
+          "blocked",
+          "inconclusive",
+          "not-applicable"
+        ]
+      }
+    },
+    {
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "verdictSeat": false,
+      "assessmentRequired": false,
+      "requirement": {
+        "required": false,
+        "path": "assessment.verdict",
+        "allowed": [
+          "pass",
+          "findings",
+          "blocked",
+          "inconclusive",
+          "not-applicable"
+        ]
+      }
+    },
+    {
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "verdictSeat": true,
+      "assessmentRequired": true,
+      "requirement": {
+        "required": true,
+        "path": "assessment.verdict",
+        "allowed": [
+          "pass",
+          "findings",
+          "blocked",
+          "inconclusive",
+          "not-applicable"
+        ]
+      }
+    },
+    {
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "verdictSeat": true,
+      "assessmentRequired": true,
+      "requirement": {
+        "required": true,
+        "path": "assessment.verdict",
+        "allowed": [
+          "pass",
+          "findings",
+          "blocked",
+          "inconclusive",
+          "not-applicable"
+        ]
+      }
+    },
+    {
+      "context": {
+        "operation": "recheck-1"
+      },
+      "verdictSeat": false,
+      "assessmentRequired": true,
+      "requirement": {
+        "required": true,
+        "path": "assessment.verdict",
+        "allowed": [
+          "pass",
+          "findings",
+          "blocked",
+          "inconclusive",
+          "not-applicable"
+        ]
+      }
+    },
+    {
+      "context": {
+        "operation": 7
+      },
+      "verdictSeat": false,
+      "assessmentRequired": false,
+      "requirement": {
+        "required": false,
+        "path": "assessment.verdict",
+        "allowed": [
+          "pass",
+          "findings",
+          "blocked",
+          "inconclusive",
+          "not-applicable"
+        ]
+      }
+    },
+    {
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "verdictSeat": false,
+      "assessmentRequired": true,
+      "requirement": {
+        "required": true,
+        "path": "assessment.verdict",
+        "allowed": [
+          "pass",
+          "findings",
+          "blocked",
+          "inconclusive",
+          "not-applicable"
+        ]
+      }
+    }
+  ],
+  "render": [
+    {
+      "context": {},
+      "text": "- \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n- \"status\" must be exactly one of: done | blocked | failed | no-evidence\n- \"summary\" must be a required non-empty string\n- \"blocker\" must be a non-empty string when status is \"blocked\"\n- \"error\" must be a non-empty string or object when status is \"failed\"\n- \"evidenceRefs\" must be an array of non-empty strings if provided\n- \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n- \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated"
+    },
+    {
+      "context": {
+        "role": "reviewer"
+      },
+      "text": "- \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n- \"status\" must be exactly one of: done | blocked | failed | no-evidence\n- \"summary\" must be a required non-empty string\n- \"blocker\" must be a non-empty string when status is \"blocked\"\n- \"error\" must be a non-empty string or object when status is \"failed\"\n- \"evidenceRefs\" must be an array of non-empty strings if provided\n- \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n- \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- \"assessment.verdict\" is required for this assessment role and must be one of: pass | findings | blocked | inconclusive | not-applicable"
+    },
+    {
+      "context": {
+        "role": "red-team"
+      },
+      "text": "- \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n- \"status\" must be exactly one of: done | blocked | failed | no-evidence\n- \"summary\" must be a required non-empty string\n- \"blocker\" must be a non-empty string when status is \"blocked\"\n- \"error\" must be a non-empty string or object when status is \"failed\"\n- \"evidenceRefs\" must be an array of non-empty strings if provided\n- \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n- \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- \"assessment.verdict\" is required for this assessment role and must be one of: pass | findings | blocked | inconclusive | not-applicable"
+    },
+    {
+      "context": {
+        "role": "producer"
+      },
+      "text": "- \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n- \"status\" must be exactly one of: done | blocked | failed | no-evidence\n- \"summary\" must be a required non-empty string\n- \"blocker\" must be a non-empty string when status is \"blocked\"\n- \"error\" must be a non-empty string or object when status is \"failed\"\n- \"evidenceRefs\" must be an array of non-empty strings if provided\n- \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n- \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated"
+    },
+    {
+      "context": {
+        "posture": {
+          "verdict": true
+        }
+      },
+      "text": "- \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n- \"status\" must be exactly one of: done | blocked | failed | no-evidence\n- \"summary\" must be a required non-empty string\n- \"blocker\" must be a non-empty string when status is \"blocked\"\n- \"error\" must be a non-empty string or object when status is \"failed\"\n- \"evidenceRefs\" must be an array of non-empty strings if provided\n- \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n- \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- \"assessment.verdict\" is required for this assessment role and must be one of: pass | findings | blocked | inconclusive | not-applicable"
+    },
+    {
+      "context": {
+        "posture": {
+          "verdict": false
+        },
+        "role": "reviewer"
+      },
+      "text": "- \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n- \"status\" must be exactly one of: done | blocked | failed | no-evidence\n- \"summary\" must be a required non-empty string\n- \"blocker\" must be a non-empty string when status is \"blocked\"\n- \"error\" must be a non-empty string or object when status is \"failed\"\n- \"evidenceRefs\" must be an array of non-empty strings if provided\n- \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n- \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated"
+    },
+    {
+      "context": {
+        "posture": {},
+        "role": "reviewer"
+      },
+      "text": "- \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n- \"status\" must be exactly one of: done | blocked | failed | no-evidence\n- \"summary\" must be a required non-empty string\n- \"blocker\" must be a non-empty string when status is \"blocked\"\n- \"error\" must be a non-empty string or object when status is \"failed\"\n- \"evidenceRefs\" must be an array of non-empty strings if provided\n- \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n- \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated"
+    },
+    {
+      "context": {
+        "assignment": {
+          "role": "reviewer"
+        }
+      },
+      "text": "- \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n- \"status\" must be exactly one of: done | blocked | failed | no-evidence\n- \"summary\" must be a required non-empty string\n- \"blocker\" must be a non-empty string when status is \"blocked\"\n- \"error\" must be a non-empty string or object when status is \"failed\"\n- \"evidenceRefs\" must be an array of non-empty strings if provided\n- \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n- \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- \"assessment.verdict\" is required for this assessment role and must be one of: pass | findings | blocked | inconclusive | not-applicable"
+    },
+    {
+      "context": {
+        "assignment": {
+          "posture": {
+            "verdict": true
+          },
+          "operation": "x"
+        }
+      },
+      "text": "- \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n- \"status\" must be exactly one of: done | blocked | failed | no-evidence\n- \"summary\" must be a required non-empty string\n- \"blocker\" must be a non-empty string when status is \"blocked\"\n- \"error\" must be a non-empty string or object when status is \"failed\"\n- \"evidenceRefs\" must be an array of non-empty strings if provided\n- \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n- \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- \"assessment.verdict\" is required for this assessment role and must be one of: pass | findings | blocked | inconclusive | not-applicable"
+    },
+    {
+      "context": {
+        "operation": "recheck-1"
+      },
+      "text": "- \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n- \"status\" must be exactly one of: done | blocked | failed | no-evidence\n- \"summary\" must be a required non-empty string\n- \"blocker\" must be a non-empty string when status is \"blocked\"\n- \"error\" must be a non-empty string or object when status is \"failed\"\n- \"evidenceRefs\" must be an array of non-empty strings if provided\n- \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n- \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- \"assessment.verdict\" is required for this assessment role and must be one of: pass | findings | blocked | inconclusive | not-applicable"
+    },
+    {
+      "context": {
+        "operation": 7
+      },
+      "text": "- \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n- \"status\" must be exactly one of: done | blocked | failed | no-evidence\n- \"summary\" must be a required non-empty string\n- \"blocker\" must be a non-empty string when status is \"blocked\"\n- \"error\" must be a non-empty string or object when status is \"failed\"\n- \"evidenceRefs\" must be an array of non-empty strings if provided\n- \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n- \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated"
+    },
+    {
+      "context": {
+        "assignment": {
+          "operation": "plan-recheck"
+        }
+      },
+      "text": "- \"contract\" may be omitted only for legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n- \"status\" must be exactly one of: done | blocked | failed | no-evidence\n- \"summary\" must be a required non-empty string\n- \"blocker\" must be a non-empty string when status is \"blocked\"\n- \"error\" must be a non-empty string or object when status is \"failed\"\n- \"evidenceRefs\" must be an array of non-empty strings if provided\n- \"needsWrites\" must be an array of repo-relative paths if provided: files outside your write scope you needed to write and did not\n- \"frictions\" must be an array of at most 5 entries if provided: each obstacle you met (a workaround, conflicting rules, a missing tool, a wrong or stale doc, a wait or retry) as {\"kind\": bug|instability|missing|awkward|doc, \"layer\": <the layer it sits in>, \"errorClass\": <a short lowercase-hyphenated signature naming the kind of obstacle, the same one each time the same obstacle recurs>, \"detail\": <one or two sentences>}; kind, layer and errorClass are single lines of at most 80 characters that do not start with \"-\"; entries past the limit are dropped and recording never changes your result\n- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated\n- \"assessment.verdict\" is required for this assessment role and must be one of: pass | findings | blocked | inconclusive | not-applicable"
+    }
+  ],
+  "reportPath": [
+    {
+      "in": "/a/b/result-1.json",
+      "out": "/a/b/report-1.md"
+    },
+    {
+      "in": "/a/b/result-12.json",
+      "out": "/a/b/report-12.md"
+    },
+    {
+      "in": "/a/b/result.json",
+      "out": "/a/b/report-1.md"
+    },
+    {
+      "in": "result-3.json",
+      "out": "report-3.md"
+    },
+    {
+      "in": "/a/b/x-result-2.json",
+      "out": "/a/b/report-1.md"
+    },
+    {
+      "in": "/a/b/result-2.json.tmp",
+      "out": "/a/b/report-1.md"
+    },
+    {
+      "in": "/a/b/agent-result.json",
+      "out": "/a/b/report-1.md"
+    }
+  ]
+}

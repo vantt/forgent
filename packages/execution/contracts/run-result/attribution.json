@@ -1,0 +1,1033 @@
+{
+  "workspace": [
+    {
+      "name": "empty",
+      "in": {},
+      "out": {
+        "ok": []
+      }
+    },
+    {
+      "name": "new-change-correlated",
+      "in": {
+        "postRunDirt": [
+          "a.txt"
+        ]
+      },
+      "out": {
+        "ok": [
+          {
+            "path": "a.txt",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "new-change-proven",
+      "in": {
+        "postRunDirt": [
+          "src/a.txt"
+        ],
+        "declaredCoverage": {
+          "paths": [
+            "src"
+          ]
+        },
+        "adapterAttestation": {
+          "writtenPaths": [
+            "src/a.txt"
+          ]
+        }
+      },
+      "out": {
+        "ok": [
+          {
+            "path": "src/a.txt",
+            "firstObserved": "post-run",
+            "level": "proven",
+            "basis": [
+              "adapter-confinement-attestation"
+            ],
+            "coverageMatched": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "new-change-attested-outside-coverage",
+      "in": {
+        "postRunDirt": [
+          "lib/a.txt"
+        ],
+        "declaredCoverage": {
+          "writeScope": [
+            "src"
+          ]
+        },
+        "adapterAttestation": {
+          "attestedPaths": [
+            "lib/a.txt"
+          ]
+        }
+      },
+      "out": {
+        "ok": [
+          {
+            "path": "lib/a.txt",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "pre-existing-unchanged",
+      "in": {
+        "preLaunchDirt": [
+          "p.txt"
+        ],
+        "postRunDirt": [
+          "p.txt"
+        ],
+        "dirtyBeforeHashes": {
+          "p.txt": "h"
+        },
+        "postRunHashes": {
+          "p.txt": "h"
+        }
+      },
+      "out": {
+        "ok": [
+          {
+            "path": "p.txt",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "dirty-before-hash-match"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "pre-existing-mutated-correlated",
+      "in": {
+        "preLaunchDirt": [
+          "p.txt"
+        ],
+        "postRunDirt": [
+          "p.txt"
+        ],
+        "dirtyBeforeHashes": {
+          "p.txt": "h"
+        },
+        "postRunHashes": {
+          "p.txt": "g"
+        }
+      },
+      "out": {
+        "ok": [
+          {
+            "path": "p.txt",
+            "firstObserved": "pre-launch",
+            "level": "correlated",
+            "basis": [
+              "pre-existing-dirt-mutated",
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "pre-existing-mutated-proven",
+      "in": {
+        "preLaunchDirt": [
+          "src/p.txt"
+        ],
+        "postRunDirt": [
+          "src/p.txt"
+        ],
+        "dirtyBeforeHashes": {
+          "src/p.txt": "h"
+        },
+        "postRunHashes": {
+          "src/p.txt": "g"
+        },
+        "declaredCoverage": {
+          "paths": [
+            "src/**"
+          ]
+        },
+        "adapterAttestation": {
+          "writtenPaths": [
+            "src/p.txt"
+          ]
+        }
+      },
+      "out": {
+        "ok": [
+          {
+            "path": "src/p.txt",
+            "firstObserved": "pre-launch",
+            "level": "proven",
+            "basis": [
+              "adapter-confinement-attestation",
+              "pre-existing-dirt-mutated"
+            ],
+            "coverageMatched": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "pre-existing-no-hashes",
+      "in": {
+        "preLaunchDirt": [
+          "p.txt"
+        ],
+        "postRunDirt": [
+          "p.txt"
+        ]
+      },
+      "out": {
+        "ok": [
+          {
+            "path": "p.txt",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "pre-existing-one-hash",
+      "in": {
+        "preLaunchDirt": [
+          "p.txt"
+        ],
+        "postRunDirt": [
+          "p.txt"
+        ],
+        "dirtyBeforeHashes": {
+          "p.txt": "h"
+        }
+      },
+      "out": {
+        "ok": [
+          {
+            "path": "p.txt",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "pre-existing-cleared",
+      "in": {
+        "preLaunchDirt": [
+          "p.txt"
+        ],
+        "postRunDirt": []
+      },
+      "out": {
+        "ok": [
+          {
+            "path": "p.txt",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-dirt-cleared"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "sorted-mixed",
+      "in": {
+        "preLaunchDirt": [
+          "z",
+          "m"
+        ],
+        "postRunDirt": [
+          "a",
+          "m"
+        ],
+        "dirtyBeforeHashes": {
+          "m": "1"
+        },
+        "postRunHashes": {
+          "m": "1"
+        }
+      },
+      "out": {
+        "ok": [
+          {
+            "path": "a",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "m",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "dirty-before-hash-match"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "z",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-dirt-cleared"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "null-lists",
+      "in": {
+        "preLaunchDirt": null,
+        "postRunDirt": null
+      },
+      "out": {
+        "ok": []
+      }
+    },
+    {
+      "name": "attestation-not-array",
+      "in": {
+        "postRunDirt": [
+          "a"
+        ],
+        "declaredCoverage": {
+          "paths": [
+            "a"
+          ]
+        },
+        "adapterAttestation": {
+          "writtenPaths": "a"
+        }
+      },
+      "out": {
+        "ok": [
+          {
+            "path": "a",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "coverage-not-array",
+      "in": {
+        "postRunDirt": [
+          "a"
+        ],
+        "declaredCoverage": {
+          "paths": "a"
+        },
+        "adapterAttestation": {
+          "writtenPaths": [
+            "a"
+          ]
+        }
+      },
+      "out": {
+        "ok": [
+          {
+            "path": "a",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "coverage-glob",
+      "in": {
+        "postRunDirt": [
+          "docs/x/y.md",
+          "docs/z.txt"
+        ],
+        "declaredCoverage": {
+          "paths": [
+            "docs/**/*.md"
+          ]
+        },
+        "adapterAttestation": {
+          "writtenPaths": [
+            "docs/x/y.md",
+            "docs/z.txt"
+          ]
+        }
+      },
+      "out": {
+        "ok": [
+          {
+            "path": "docs/x/y.md",
+            "firstObserved": "post-run",
+            "level": "proven",
+            "basis": [
+              "adapter-confinement-attestation"
+            ],
+            "coverageMatched": true
+          },
+          {
+            "path": "docs/z.txt",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "store-path-never-covered",
+      "in": {
+        "postRunDirt": [
+          ".fgos/x"
+        ],
+        "declaredCoverage": {
+          "paths": [
+            "**"
+          ]
+        },
+        "adapterAttestation": {
+          "writtenPaths": [
+            ".fgos/x"
+          ]
+        }
+      },
+      "out": {
+        "ok": [
+          {
+            "path": ".fgos/x",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      }
+    }
+  ],
+  "claimRefs": [
+    {
+      "in": null,
+      "out": []
+    },
+    {
+      "in": {},
+      "out": []
+    },
+    {
+      "in": {
+        "evidenceRefs": []
+      },
+      "out": []
+    },
+    {
+      "in": {
+        "evidenceRefs": [
+          "a",
+          "b"
+        ]
+      },
+      "out": [
+        {
+          "ref": "a",
+          "level": "correlated",
+          "basis": [
+            "worker-claim-ref"
+          ]
+        },
+        {
+          "ref": "b",
+          "level": "correlated",
+          "basis": [
+            "worker-claim-ref"
+          ]
+        }
+      ]
+    },
+    {
+      "in": {
+        "evidenceRefs": "a"
+      },
+      "out": []
+    },
+    {
+      "in": {
+        "status": "done"
+      },
+      "out": []
+    }
+  ],
+  "policy": [
+    {
+      "name": "empty",
+      "in": {},
+      "out": {
+        "ok": {
+          "disposition": "allow",
+          "code": null,
+          "warnings": []
+        }
+      }
+    },
+    {
+      "name": "contradictory",
+      "in": {
+        "contradictoryClaim": true,
+        "attributions": [
+          {
+            "path": "a",
+            "firstObserved": "post-run",
+            "level": "proven",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": true
+          }
+        ],
+        "isReadOnly": true
+      },
+      "out": {
+        "ok": {
+          "disposition": "refuse",
+          "code": "contradictory-worker-claim",
+          "reason": "Worker claim contradicts independent evidence",
+          "warnings": []
+        }
+      }
+    },
+    {
+      "name": "read-only-proven",
+      "in": {
+        "isReadOnly": true,
+        "attributions": [
+          {
+            "path": "a",
+            "firstObserved": "post-run",
+            "level": "proven",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": true
+          },
+          {
+            "path": "b",
+            "firstObserved": "post-run",
+            "level": "proven",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": true
+          },
+          {
+            "path": "c",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      },
+      "out": {
+        "ok": {
+          "disposition": "refuse",
+          "code": "read-only-mutation",
+          "reason": "Read-only operation wrote: a, b",
+          "warnings": []
+        }
+      }
+    },
+    {
+      "name": "read-only-correlated",
+      "in": {
+        "isReadOnly": true,
+        "attributions": [
+          {
+            "path": "a",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "b",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      },
+      "out": {
+        "ok": {
+          "disposition": "allow",
+          "code": null,
+          "warnings": [
+            {
+              "code": "read-only-mutation-correlated",
+              "level": "correlated",
+              "basis": [
+                "pre-post-git-snapshot"
+              ],
+              "paths": [
+                "a",
+                "b"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "proven-outside-scope",
+      "in": {
+        "writeScope": [
+          "src"
+        ],
+        "attributions": [
+          {
+            "path": "src/a",
+            "firstObserved": "post-run",
+            "level": "proven",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": true
+          },
+          {
+            "path": "lib/b",
+            "firstObserved": "post-run",
+            "level": "proven",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": true
+          },
+          {
+            "path": "lib/c",
+            "firstObserved": "post-run",
+            "level": "proven",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": true
+          }
+        ]
+      },
+      "out": {
+        "ok": {
+          "disposition": "refuse",
+          "code": "outside-write-scope",
+          "reason": "Run wrote outside its allowed write scope: lib/b, lib/c",
+          "warnings": []
+        }
+      }
+    },
+    {
+      "name": "proven-inside-scope",
+      "in": {
+        "writeScope": [
+          "src"
+        ],
+        "attributions": [
+          {
+            "path": "src/a",
+            "firstObserved": "post-run",
+            "level": "proven",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": true
+          }
+        ]
+      },
+      "out": {
+        "ok": {
+          "disposition": "allow",
+          "code": null,
+          "warnings": []
+        }
+      }
+    },
+    {
+      "name": "correlated-outside-scope-warns",
+      "in": {
+        "writeScope": [
+          "src"
+        ],
+        "attributions": [
+          {
+            "path": "src/a",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "lib/b",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      },
+      "out": {
+        "ok": {
+          "disposition": "allow",
+          "code": null,
+          "warnings": [
+            {
+              "code": "outside-write-scope-correlated",
+              "level": "correlated",
+              "basis": [
+                "pre-post-git-snapshot"
+              ],
+              "paths": [
+                "lib/b"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "correlated-inside-scope-quiet",
+      "in": {
+        "writeScope": [
+          "src"
+        ],
+        "attributions": [
+          {
+            "path": "src/a",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      },
+      "out": {
+        "ok": {
+          "disposition": "allow",
+          "code": null,
+          "warnings": []
+        }
+      }
+    },
+    {
+      "name": "no-scope-correlated-quiet",
+      "in": {
+        "attributions": [
+          {
+            "path": "a",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      },
+      "out": {
+        "ok": {
+          "disposition": "allow",
+          "code": null,
+          "warnings": []
+        }
+      }
+    },
+    {
+      "name": "empty-scope-array",
+      "in": {
+        "writeScope": [],
+        "attributions": [
+          {
+            "path": "a",
+            "firstObserved": "post-run",
+            "level": "proven",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": true
+          }
+        ]
+      },
+      "out": {
+        "ok": {
+          "disposition": "allow",
+          "code": null,
+          "warnings": []
+        }
+      }
+    },
+    {
+      "name": "mutated-dirty-before",
+      "in": {
+        "mutatedDirtyBeforeFiles": [
+          "m1",
+          "m2"
+        ],
+        "attributions": []
+      },
+      "out": {
+        "ok": {
+          "disposition": "allow",
+          "code": null,
+          "warnings": [
+            {
+              "code": "mutated-dirty-before-correlated",
+              "level": "correlated",
+              "basis": [
+                "dirty-before-hash-changed"
+              ],
+              "paths": [
+                "m1",
+                "m2"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "mutated-dirty-before-and-read-only",
+      "in": {
+        "isReadOnly": true,
+        "mutatedDirtyBeforeFiles": [
+          "m"
+        ],
+        "attributions": [
+          {
+            "path": "a",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      },
+      "out": {
+        "ok": {
+          "disposition": "allow",
+          "code": null,
+          "warnings": [
+            {
+              "code": "mutated-dirty-before-correlated",
+              "level": "correlated",
+              "basis": [
+                "dirty-before-hash-changed"
+              ],
+              "paths": [
+                "m"
+              ]
+            },
+            {
+              "code": "read-only-mutation-correlated",
+              "level": "correlated",
+              "basis": [
+                "pre-post-git-snapshot"
+              ],
+              "paths": [
+                "a"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "mutated-dirty-before-and-scope",
+      "in": {
+        "writeScope": [
+          "src"
+        ],
+        "mutatedDirtyBeforeFiles": [
+          "m"
+        ],
+        "attributions": [
+          {
+            "path": "lib/x",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      },
+      "out": {
+        "ok": {
+          "disposition": "allow",
+          "code": null,
+          "warnings": [
+            {
+              "code": "mutated-dirty-before-correlated",
+              "level": "correlated",
+              "basis": [
+                "dirty-before-hash-changed"
+              ],
+              "paths": [
+                "m"
+              ]
+            },
+            {
+              "code": "outside-write-scope-correlated",
+              "level": "correlated",
+              "basis": [
+                "pre-post-git-snapshot"
+              ],
+              "paths": [
+                "lib/x"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "pre-launch-ignored",
+      "in": {
+        "isReadOnly": true,
+        "writeScope": [
+          "src"
+        ],
+        "attributions": [
+          {
+            "path": "lib/a",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": false
+          }
+        ]
+      },
+      "out": {
+        "ok": {
+          "disposition": "allow",
+          "code": null,
+          "warnings": []
+        }
+      }
+    },
+    {
+      "name": "glob-scope",
+      "in": {
+        "writeScope": [
+          "docs/**/*.md"
+        ],
+        "attributions": [
+          {
+            "path": "docs/a/b.md",
+            "firstObserved": "post-run",
+            "level": "proven",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": true
+          },
+          {
+            "path": "docs/a/b.txt",
+            "firstObserved": "post-run",
+            "level": "proven",
+            "basis": [
+              "x"
+            ],
+            "coverageMatched": true
+          }
+        ]
+      },
+      "out": {
+        "ok": {
+          "disposition": "refuse",
+          "code": "outside-write-scope",
+          "reason": "Run wrote outside its allowed write scope: docs/a/b.txt",
+          "warnings": []
+        }
+      }
+    },
+    {
+      "name": "empty-mutated",
+      "in": {
+        "mutatedDirtyBeforeFiles": [],
+        "attributions": []
+      },
+      "out": {
+        "ok": {
+          "disposition": "allow",
+          "code": null,
+          "warnings": []
+        }
+      }
+    }
+  ]
+}
