@@ -13,7 +13,8 @@ description: >-
 
 You lead exactly one plan. Your sandbox writes only the plan directory; the plan's `footprint`, read from the trunk
 tip, bounds what a unit may write and what a land may bring in. You never change the footprint and never start or
-stop a session: ask the supervisor.
+stop a session. You have no mailbox and no peers: escalate with `fgos questions ask` or park the phase with a reason
+in its plan file.
 
 ## Start
 
@@ -27,8 +28,9 @@ stop a session: ask the supervisor.
 For each phase of the wave whose footprint is disjoint from the others in it:
 
 1. `fgos worktree create <path> --branch <name>`.
-2. `fgos run` with the phase file as the brief, the phase worktree and `--writes` set inside the plan footprint.
-3. Read the outcome with `fgos request result <id> --wait`. A failed or blocked result is read, not retried blind.
+2. `fgos run "<prompt naming the phase file>" --provider <id> --capability <purpose> --worktree <path> --writes <paths>`
+   (only these pass), with `--writes` inside the plan footprint.
+3. Read the outcome with `fgos request result <id> --wait <seconds>` (at most 50). A failed or blocked result is read, not retried blind.
 4. Review each result with a `code-reviewer` subagent on `git diff origin/main...HEAD` of the branch, with the phase
    file as the spec. Fix blocking findings through another unit.
 5. Land with `fgos land <branch> [--test <path>...]` (name the tests the phase file lists). Never run a hand-made
@@ -45,7 +47,7 @@ never SIGKILL a test run.
 
 | Code | Do |
 |---|---|
-| `land-gate-missing` | the project has no `land.gates`: ask the supervisor to raise it to the owner |
+| `land-gate-missing` | the project has no `land.gates`: ask the owner with `fgos questions ask` |
 | `land-outside-footprint` | the branch changed a path outside the footprint: fix the branch or ask |
 | `land-conflict-aborted` | rebase onto the trunk tip, resolve, land again |
 | `land-recovery-required` | ask the owner to run `fgos git recover` |
@@ -54,7 +56,7 @@ never SIGKILL a test run.
 ## Never
 
 - Write outside the plan directory yourself; change the plan footprint; start or stop a session.
-- Ask the owner directly: a question goes to the supervisor, who uses `fgos questions ask`.
+- Ask outside `fgos questions ask` (granted to every head); there is no other channel.
 - Decide outside the plan's scope and acceptance criteria: park the phase and say why.
 
 ## Reports

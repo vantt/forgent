@@ -25,40 +25,42 @@ chat with the owner.
 
 ## Admit ready plans
 
-`fgos supervisor plans` lists plans with `status`, `priority`, `created`, `blockedBy`, `leadLive` and `headName`.
-Take the `ready` plans whose `blockedBy` plans are all `done`, ordered by `priority` then `created`. Start one while
-live leads < `supervisor.maxLeads` and `fgos slots --json` shows `lanes.free` above zero (null means no ceiling is
-armed: no limit, not zero). For each:
+`fgos supervisor plans --json` returns `plans` (each with `dir`, `status`, `priority`, `admissible`, `headName` and, for
+a running plan, `leadLive`) plus `leadsLive` and `maxLeads`. Rows come in start order. Take the rows with
+`admissible: true` in listing order while `leadsLive` < `maxLeads` (admissible already excludes a footprint overlap
+with a running plan) and `fgos slots --json` shows `lanes.free` above zero (null means no ceiling is armed: no limit,
+not zero). For each:
 
 1. Mark the plan `running` with `fgos land --paths <plan.md> --message "..."`.
 2. `fgos session start lead --name <headName from plans>`.
 
-A name collision (two plans cut to the same head name, flagged by the plans listing) is not started: ask the owner.
+Before a start, check yourself that no live role already holds that `headName`; on a collision do not start, ask the
+owner.
 
 ## Running plans
 
 A `running` plan with `leadLive: false`, or an event `head-gone` or `plan-no-progress`: read the phase table and the
 plan directory, then restart the lead (`fgos session start lead --name <headName>`; the lead resumes from the phase
 table and `fgos request result`), park the plan with a reason in its phase table, or ask the owner. Only the supervisor
-stops a lead (`fgos session stop`); a lead never does.
+stops a lead (`fgos session stop lead --name <headName> --reason "<why>"`); a lead never does.
 
 ## Done plans
 
 Close a `done` plan with one board line (plan program board rules in AGENTS.md) and a backlog update, landed with
-`fgos land --paths`. `fgos session stop` its lead if it is still live.
+`fgos land --paths` (write `docs/backlog.md` with `fgos session write docs/backlog.md < new`; it is a read-only file grant). `fgos session stop lead --name <headName> --reason "plan done"` if its lead is still live.
 
 ## Settled discussion
 
 Event `discussion-settled`: start the one planner with `fgos session start planner --name <headName of the discussion>`,
 unless a plan's `source` already names the discussion or that planner is live (a second starter writes a second
-plan). Stop the planner with `fgos session stop` once its plan is `ready`.
+plan). Stop the planner with `fgos session stop planner --name <name> --reason "plan ready"` once its plan is `ready`.
 
 ## Answered owner question
 
 Event `question-answered`:
 
 - A live busy asker needs nothing: its own hooks show it the answer.
-- An idle or gone asker: `fgos session stop` the idle holder, then start the successor from the event's `successor`
+- An idle or gone asker: `fgos session stop <persona> --name <name> --reason "<why>"` the idle holder, then start the successor from the event's `successor`
   field: `fgos session start <persona> --name <name> --for-question <question id>`. Use the asker's own persona and
   name so the successor holds the asker's `head:` role (Identity has no `answers:` role). The successor writes the
   answer back where the question was asked and runs `fgos questions ack|cancel <id>`. The supervisor never acks or
@@ -66,7 +68,7 @@ Event `question-answered`:
 
 ## Never
 
-- Edit portfolio files outside `fgos land --paths`; land a branch; review a diff; type into a pane.
+- Edit portfolio files outside `fgos land --paths` and `fgos session write`; land a branch; review a diff; type into a pane.
 - Ask the owner except through `fgos questions ask`, in the five-part form of `core/skills/_shared/decision-question.md`,
   batched: collect what you need, ask once.
 - Decide outside the approved frame (plan scope and budget): ask.
