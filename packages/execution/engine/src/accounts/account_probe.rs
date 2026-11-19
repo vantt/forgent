@@ -15,6 +15,7 @@ use super::credential::{
 };
 use super::credential_probe::credential_probe_command;
 use super::fault::describe_provider_signal;
+use crate::assignment::tier_cell::parse_tier_cell;
 
 pub const ACCOUNT_PROBE_PROMPT: &str =
     "Account probe: there is no task. Reply with the single word OK.";
@@ -161,64 +162,18 @@ pub fn probe_model_for(cfg: &Value, executor_id: &str, family: &str) -> (Option<
         let Some(cell) = tiers.and_then(|t| t.get(tier.name())) else {
             continue;
         };
-        let Some(entries) = parse_tier_cell(cell, cell_family) else {
+        // A cell the config reader would refuse names no model to probe.
+        let Ok(entries) = parse_tier_cell(cell, cell_family) else {
             continue;
         };
-        if let Some((model, _)) = entries
+        if let Some(entry) = entries
             .into_iter()
-            .find(|(_, pool)| legacy_state_key(pool) == family)
+            .find(|entry| legacy_state_key(&entry.pool) == family)
         {
-            return (Some(model), format!("{cell_family}.{}", tier.name()));
+            return (Some(entry.model), format!("{cell_family}.{}", tier.name()));
         }
     }
     (None, "invocation-default".into())
-}
-
-/// `[(model, pool)]` of one `modelPolicies` cell; `None` for a cell the reader would refuse.
-fn parse_tier_cell(cell: &Value, family: &str) -> Option<Vec<(String, String)>> {
-    let entries: Vec<&Value> = match cell {
-        Value::Array(list) if list.is_empty() => return None,
-        Value::Array(list) => list.iter().collect(),
-        one => vec![one],
-    };
-    entries
-        .into_iter()
-        .map(|entry| match entry {
-            Value::Object(fields) => {
-                let model = fields
-                    .get("model")
-                    .and_then(Value::as_str)
-                    .filter(|m| !m.trim().is_empty())?;
-                let effort_ok = fields.get("effort").is_none_or(|e| {
-                    e.as_str()
-                        .is_some_and(|e| ["low", "medium", "high", "max"].contains(&e))
-                });
-                if !effort_ok
-                    || !fields
-                        .keys()
-                        .all(|k| ["model", "pool", "effort"].contains(&k.as_str()))
-                {
-                    return None;
-                }
-                match fields.get("pool") {
-                    None => Some((model.to_string(), family.to_string())),
-                    Some(Value::String(pool)) if !pool.trim().is_empty() => {
-                        Some((model.to_string(), pool.clone()))
-                    }
-                    Some(_) => None,
-                }
-            }
-            Value::String(text) if !text.trim().is_empty() => match text.rfind('@') {
-                None => Some((text.clone(), family.to_string())),
-                Some(at) => {
-                    let (model, pool) = (text[..at].trim(), text[at + 1..].trim());
-                    (!model.is_empty() && !pool.is_empty())
-                        .then(|| (model.to_string(), pool.to_string()))
-                }
-            },
-            _ => None,
-        })
-        .collect()
 }
 
 fn read_json(path: &Path) -> Option<Value> {

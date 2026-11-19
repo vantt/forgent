@@ -9,8 +9,8 @@ pub use fgos_execution::executor_model::rendered_effort_levels;
 use fgos_execution::executor_model::{family_of, FamilySource};
 use serde_json::{json, Value};
 
-/// The canonical effort levels fgOS speaks, in the order the config contract lists them.
-pub const REASONING_EFFORT_VALUES: [&str; 4] = ["low", "medium", "high", "max"];
+/// The canonical effort levels fgOS speaks: the tier cell's list, not a second one.
+pub use crate::assignment::tier_cell::REASONING_EFFORT_VALUES;
 
 /// Known policy-shaped flags per provider family: flags that encode runtime policy (model, effort, tool gating,
 /// permission mode or sandbox) rather than pure invocation mechanics.

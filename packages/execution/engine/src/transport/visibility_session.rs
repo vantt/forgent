@@ -18,6 +18,7 @@ use fgos_holder_lock::port::{probe, Probe, Resource};
 use serde_json::{json, Value};
 
 use super::pretty_line;
+use crate::assignment::layout::list_assignment_runs;
 
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 #[error("{message}")]
@@ -307,41 +308,12 @@ fn sub_dirs(dir: &Path) -> Vec<(String, PathBuf)> {
     found
 }
 
-const LAYOUT_MAX_DEPTH: usize = 16;
-
-/// The attempt directories under `assignments/` (a `runs/<attempt>` below any assignment id), symlinks and
-/// depth stopped at: worker-owned descendants are not repositories.
-fn assignment_runs(fgos_dir: &Path) -> Vec<(String, PathBuf)> {
-    fn walk(base: &Path, dir: &Path, depth: usize, out: &mut Vec<(String, PathBuf)>) {
-        for (name, child) in sub_dirs(dir) {
-            if name == "runs" {
-                let id = dir
-                    .strip_prefix(base)
-                    .map(|p| p.to_string_lossy().replace('\\', "/"))
-                    .unwrap_or_default();
-                out.extend(
-                    sub_dirs(&child)
-                        .into_iter()
-                        .map(|(_, run)| (id.clone(), run)),
-                );
-            } else if depth < LAYOUT_MAX_DEPTH {
-                walk(base, &child, depth + 1, out);
-            }
-        }
-    }
-    let base = absolute(&fgos_dir.join("assignments"));
-    let mut out = Vec::new();
-    if fs::symlink_metadata(&base).is_ok_and(|m| m.is_dir()) {
-        walk(&base, &base, 0, &mut out);
-    }
-    out
-}
-
 /// Runs whose record says running although nobody holds their attempt lock: the orphans a reconcile may settle.
 pub fn find_running_runs(fgos_dir: &Path) -> Vec<RunningRun> {
-    let mut candidates: Vec<(Option<String>, PathBuf)> = assignment_runs(fgos_dir)
+    // The assignment layout's own walk: symlinks and the depth limit stop it, worker-owned descendants are unread.
+    let mut candidates: Vec<(Option<String>, PathBuf)> = list_assignment_runs(fgos_dir)
         .into_iter()
-        .map(|(id, dir)| (Some(id), dir))
+        .map(|run| (Some(run.assignment_id), run.run_dir))
         .collect();
     // The retired dispatch-runs writer used <workId>/<timestamp>, not runs/: kept readable, never as assignments.
     for (_, work) in sub_dirs(&fgos_dir.join("dispatch-runs")) {

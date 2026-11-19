@@ -1,0 +1,239 @@
+{
+  "effortValues": [
+    "low",
+    "medium",
+    "high",
+    "max"
+  ],
+  "cells": [
+    {
+      "cell": "gpt-5",
+      "family": "claude",
+      "result": {
+        "ok": [
+          {
+            "model": "gpt-5",
+            "pool": "claude",
+            "explicitPool": false
+          }
+        ]
+      }
+    },
+    {
+      "cell": [
+        "a",
+        "b"
+      ],
+      "family": "claude",
+      "result": {
+        "ok": [
+          {
+            "model": "a",
+            "pool": "claude",
+            "explicitPool": false
+          },
+          {
+            "model": "b",
+            "pool": "claude",
+            "explicitPool": false
+          }
+        ]
+      }
+    },
+    {
+      "cell": {
+        "model": "m",
+        "pool": "p",
+        "effort": "high"
+      },
+      "family": "claude",
+      "result": {
+        "ok": [
+          {
+            "model": "m",
+            "pool": "p",
+            "explicitPool": true,
+            "effort": "high"
+          }
+        ]
+      }
+    },
+    {
+      "cell": [
+        {
+          "model": "m"
+        },
+        "n"
+      ],
+      "family": "claude",
+      "result": {
+        "ok": [
+          {
+            "model": "m",
+            "pool": "claude",
+            "explicitPool": false
+          },
+          {
+            "model": "n",
+            "pool": "claude",
+            "explicitPool": false
+          }
+        ]
+      }
+    },
+    {
+      "cell": [],
+      "family": "claude",
+      "result": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "message": "a tier cell list must name at least one model"
+        }
+      }
+    },
+    {
+      "cell": "",
+      "family": "claude",
+      "result": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "message": "a tier cell entry must be a non-empty string or a {model, pool?, effort?} object, got \"\""
+        }
+      }
+    },
+    {
+      "cell": " ",
+      "family": "claude",
+      "result": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "message": "a tier cell entry must be a non-empty string or a {model, pool?, effort?} object, got \" \""
+        }
+      }
+    },
+    {
+      "cell": {
+        "model": ""
+      },
+      "family": "claude",
+      "result": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "message": "tier cell object {\"model\":\"\"} must name a non-empty string \"model\""
+        }
+      }
+    },
+    {
+      "cell": {
+        "model": "m",
+        "pool": ""
+      },
+      "family": "claude",
+      "result": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "message": "tier cell object {\"model\":\"m\",\"pool\":\"\"} \"pool\" must be a non-empty string when present"
+        }
+      }
+    },
+    {
+      "cell": {
+        "model": "m",
+        "extra": 1
+      },
+      "family": "claude",
+      "result": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "message": "tier cell object {\"model\":\"m\",\"extra\":1} has unknown key \"extra\"; allowed keys: model, pool, effort"
+        }
+      }
+    },
+    {
+      "cell": {
+        "model": "m",
+        "effort": "ultra"
+      },
+      "family": "claude",
+      "result": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "message": "tier cell object {\"model\":\"m\",\"effort\":\"ultra\"} \"effort\" must be one of low/medium/high/max"
+        }
+      }
+    },
+    {
+      "cell": 7,
+      "family": "claude",
+      "result": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "message": "a tier cell entry must be a non-empty string or a {model, pool?, effort?} object, got 7"
+        }
+      }
+    },
+    {
+      "cell": null,
+      "family": "claude",
+      "result": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "message": "a tier cell entry must be a non-empty string or a {model, pool?, effort?} object, got null"
+        }
+      }
+    },
+    {
+      "cell": [
+        null
+      ],
+      "family": "claude",
+      "result": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "message": "a tier cell entry must be a non-empty string or a {model, pool?, effort?} object, got null"
+        }
+      }
+    },
+    {
+      "cell": {
+        "pool": "p"
+      },
+      "family": "claude",
+      "result": {
+        "error": {
+          "name": "Error",
+          "code": null,
+          "message": "tier cell object {\"pool\":\"p\"} must name a non-empty string \"model\""
+        }
+      }
+    },
+    {
+      "cell": {
+        "model": "m",
+        "effort": "max",
+        "pool": "q"
+      },
+      "family": "claude",
+      "result": {
+        "ok": [
+          {
+            "model": "m",
+            "pool": "q",
+            "explicitPool": true,
+            "effort": "max"
+          }
+        ]
+      }
+    }
+  ]
+}

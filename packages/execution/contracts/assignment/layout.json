@@ -1,0 +1,167 @@
+{
+  "maxDepth": 16,
+  "tree": [
+    [
+      "assignments/asgn_a_001/assignment.json",
+      {
+        "assignmentId": "asgn_a_001"
+      }
+    ],
+    [
+      "assignments/asgn_a_001/producer/1/runs/01/run.json",
+      {
+        "runId": "run_a"
+      }
+    ],
+    [
+      "assignments/asgn_a_001/producer/1/runs/02/result.json",
+      {
+        "runId": "run_b"
+      }
+    ],
+    [
+      "assignments/asgn_b_001/reviewer/1/runs/01/",
+      null
+    ],
+    [
+      "assignments/asgn_c_001/producer/1/runs/01/run.json",
+      {
+        "runId": "dup"
+      }
+    ],
+    [
+      "assignments/asgn_c_001/producer/1/runs/02/run.json",
+      {
+        "runId": "dup"
+      }
+    ],
+    [
+      "assignments/asgn_d_001/producer/1/runs/01/worker-output/runs/99/",
+      null
+    ]
+  ],
+  "symlinks": [
+    [
+      "assignments/asgn_e_001",
+      "../elsewhere"
+    ]
+  ],
+  "scan": {
+    "runs": [
+      {
+        "assignmentId": "asgn_a_001/producer/1",
+        "attempt": "01",
+        "runDir": "assignments/asgn_a_001/producer/1/runs/01",
+        "hasAssignmentJson": false
+      },
+      {
+        "assignmentId": "asgn_a_001/producer/1",
+        "attempt": "02",
+        "runDir": "assignments/asgn_a_001/producer/1/runs/02",
+        "hasAssignmentJson": false
+      },
+      {
+        "assignmentId": "asgn_b_001/reviewer/1",
+        "attempt": "01",
+        "runDir": "assignments/asgn_b_001/reviewer/1/runs/01",
+        "hasAssignmentJson": false
+      },
+      {
+        "assignmentId": "asgn_c_001/producer/1",
+        "attempt": "01",
+        "runDir": "assignments/asgn_c_001/producer/1/runs/01",
+        "hasAssignmentJson": false
+      },
+      {
+        "assignmentId": "asgn_c_001/producer/1",
+        "attempt": "02",
+        "runDir": "assignments/asgn_c_001/producer/1/runs/02",
+        "hasAssignmentJson": false
+      },
+      {
+        "assignmentId": "asgn_d_001/producer/1",
+        "attempt": "01",
+        "runDir": "assignments/asgn_d_001/producer/1/runs/01",
+        "hasAssignmentJson": false
+      }
+    ],
+    "skipped": {
+      "symlink": 1
+    },
+    "runDirsSeen": 7
+  },
+  "assignmentDir": [
+    {
+      "id": "asgn_a_001",
+      "dir": "assignments/asgn_a_001"
+    },
+    {
+      "id": "../x",
+      "dir": null
+    },
+    {
+      "id": "",
+      "dir": null
+    },
+    {
+      "id": "a/b",
+      "dir": "assignments/a/b"
+    },
+    {
+      "id": "asgn_ok",
+      "dir": "assignments/asgn_ok"
+    }
+  ],
+  "within": [
+    {
+      "parent": "/a/b",
+      "candidate": "/a/b/c",
+      "within": true
+    },
+    {
+      "parent": "/a/b",
+      "candidate": "/a/b",
+      "within": true
+    },
+    {
+      "parent": "/a/b",
+      "candidate": "/a/bc",
+      "within": false
+    },
+    {
+      "parent": "/a/b",
+      "candidate": "/a",
+      "within": false
+    },
+    {
+      "parent": "/a/b",
+      "candidate": "/a/b/../c",
+      "within": false
+    }
+  ],
+  "findRunDir": [
+    {
+      "runId": "run_a",
+      "dir": "assignments/asgn_a_001/producer/1/runs/01"
+    },
+    {
+      "runId": "run_b",
+      "dir": "assignments/asgn_a_001/producer/1/runs/02"
+    },
+    {
+      "runId": "run_zzz",
+      "dir": null
+    },
+    {
+      "runId": "",
+      "dir": null
+    },
+    {
+      "runId": "dup",
+      "error": {
+        "code": "run-ambiguous",
+        "message": "run \"dup\" has multiple materializations: <fgos>/assignments/asgn_c_001/producer/1/runs/01, <fgos>/assignments/asgn_c_001/producer/1/runs/02"
+      }
+    }
+  ]
+}

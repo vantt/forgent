@@ -1,0 +1,283 @@
+{
+  "version": "1",
+  "readOnlyRoles": [
+    "reviewer",
+    "researcher",
+    "advisor"
+  ],
+  "knownMutatingOps": [
+    "implement-item",
+    "fix-verify-red",
+    "scoped-subtask"
+  ],
+  "readOnlyOps": [
+    "validate-plan",
+    "resolve-question",
+    "scout-blast-radius",
+    "shape-plan",
+    "lock-decisions",
+    "judge-ambiguity",
+    "compound-learn"
+  ],
+  "declared": [
+    {
+      "role": "reviewer",
+      "operation": "review-item",
+      "stamp": {
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "resultKind": "review-verdict"
+      }
+    },
+    {
+      "role": "reviewer",
+      "operation": "validate-plan",
+      "stamp": {
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "resultKind": "gate-verdict",
+        "onAdvance": "derive-plan-verdict-from-plan-md"
+      }
+    },
+    {
+      "role": "implementer",
+      "operation": "implement-item",
+      "stamp": {
+        "mutation": "mutating",
+        "evidence": {
+          "required": "verified"
+        },
+        "resultKind": "work-product"
+      }
+    },
+    {
+      "role": "implementer",
+      "operation": "validate-plan",
+      "stamp": {
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "resultKind": "gate-verdict",
+        "onAdvance": "derive-plan-verdict-from-plan-md"
+      }
+    },
+    {
+      "role": null,
+      "operation": "implement-item",
+      "stamp": {
+        "mutation": "mutating",
+        "evidence": {
+          "required": "verified"
+        },
+        "resultKind": "work-product"
+      }
+    },
+    {
+      "role": "researcher",
+      "operation": "scoped-subtask",
+      "stamp": {
+        "mutation": "mutating",
+        "evidence": {
+          "required": "verified"
+        },
+        "resultKind": "work-product"
+      }
+    },
+    {
+      "role": "advisor",
+      "operation": "something-else",
+      "stamp": {
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "resultKind": "advisory"
+      }
+    },
+    {
+      "role": "planner",
+      "operation": "shape-plan",
+      "stamp": {
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "resultKind": "advisory"
+      }
+    },
+    {
+      "role": "implementer",
+      "operation": "compound-learn",
+      "stamp": {
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "resultKind": "advisory"
+      }
+    },
+    {
+      "role": "implementer",
+      "operation": "fix-verify-red",
+      "stamp": {
+        "mutation": "mutating",
+        "evidence": {
+          "required": "verified"
+        },
+        "resultKind": "work-product"
+      }
+    },
+    {
+      "role": "implementer",
+      "operation": "unknown-op",
+      "stamp": {
+        "mutation": "mutating",
+        "evidence": {
+          "required": "verified"
+        },
+        "resultKind": "work-product"
+      }
+    },
+    {
+      "role": "reviewer",
+      "operation": "scout-blast-radius",
+      "stamp": {
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "resultKind": "advisory"
+      }
+    }
+  ],
+  "inline": [
+    {
+      "name": "read-only-reported",
+      "contract": {
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        }
+      },
+      "carriesStamp": false,
+      "result": {
+        "ok": {
+          "mutation": "read-only",
+          "evidence": {
+            "required": "reported"
+          }
+        }
+      }
+    },
+    {
+      "name": "read-only-verified",
+      "contract": {
+        "mutation": "read-only",
+        "evidence": {
+          "required": "verified"
+        }
+      },
+      "carriesStamp": false,
+      "result": {
+        "ok": {
+          "mutation": "read-only",
+          "evidence": {
+            "required": "verified"
+          }
+        }
+      }
+    },
+    {
+      "name": "mutating-stamped",
+      "contract": {
+        "mutation": "mutating",
+        "evidence": {
+          "required": "verified"
+        },
+        "constraints": [
+          "protocol-operation:flow@1#op"
+        ]
+      },
+      "carriesStamp": true,
+      "result": {
+        "ok": {
+          "mutation": "mutating",
+          "evidence": {
+            "required": "verified"
+          }
+        }
+      }
+    },
+    {
+      "name": "mutating-unstamped",
+      "contract": {
+        "mutation": "mutating",
+        "evidence": {
+          "required": "verified"
+        },
+        "constraints": []
+      },
+      "carriesStamp": false,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "assignment-normalizer: inline contract mutation \"mutating\" carries no engine-reserved protocol-operation stamp -- rejected as a second, defensive gate (ADR-006 §6 / Phase 01 mutation-unlock R6a)"
+        }
+      }
+    },
+    {
+      "name": "bad-mutation",
+      "contract": {
+        "mutation": "sometimes",
+        "evidence": {
+          "required": "reported"
+        }
+      },
+      "carriesStamp": false,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "assignment-normalizer: inline contract missing/invalid \"mutation\" after normalization (must be \"read-only\" or \"mutating\", ADR-006 §6)"
+        }
+      }
+    },
+    {
+      "name": "bad-evidence",
+      "contract": {
+        "mutation": "read-only",
+        "evidence": {
+          "required": "maybe"
+        }
+      },
+      "carriesStamp": false,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "assignment-normalizer: inline contract missing/invalid \"evidence.required\" after normalization"
+        }
+      }
+    },
+    {
+      "name": "no-evidence",
+      "contract": {
+        "mutation": "read-only"
+      },
+      "carriesStamp": false,
+      "result": {
+        "error": {
+          "name": "RunnerConfigError",
+          "code": null,
+          "message": "assignment-normalizer: inline contract missing/invalid \"evidence.required\" after normalization"
+        }
+      }
+    }
+  ]
+}
