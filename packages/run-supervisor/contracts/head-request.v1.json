@@ -26,7 +26,7 @@
   },
   "verbs": {
     "session start": {
-      "args": { "persona": "string, required", "name": "string, required", "beside": "string, optional: the live key of the session whose tab the new one opens next to" },
+      "args": { "persona": "string, required", "name": "string, required", "beside": "string, optional: the live key of the session whose tab the new one opens next to", "forQuestion": "string, optional: the id of an owner question the new head continues (1 to 64 characters of letters, digits, '.', '_' and '-'); the opening text gains one line naming it, and the successor, which holds the asker's own head role, writes the answer back and acks or cancels it" },
       "does": "startHeadSession (src/session-host/head-start.mjs) in the project of the attempt's envelope (envelope.cwd); a live head of the same role is fronted instead of started",
       "data": "the object startHeadSession returns ({already, role, key, ...})"
     },
@@ -97,6 +97,86 @@
       "data": "{accepted: true, gen}",
       "identity": "registered-then-take",
       "rule": "the one verb of a rotation successor, which does not hold the role yet: the supervisor's role step asks Identity only that this attempt's own session is registered and live (session-not-registered otherwise), and after the route child reports done the supervisor moves the envelope's role to this session with Identity's take (register_writer, take) against the gate it launched; a failed move is role-take-failed. The role never moves on a refused answer. Identity stays the only authority for who holds a role; the supervisor only transports the fact that the attempt is that session"
+    },
+    "land": {
+      "args": {
+        "branch": "string, optional: a branch to land; a lead only (land-branch-lead-only for any other persona)",
+        "paths": "array of strings, optional: exact main-checkout paths to commit; every one must lie inside an entry of envelope.session.writes (path-outside-grant)",
+        "tests": "array of strings, optional: test paths for a gate that uses {tests}",
+        "message": "string, optional: the commit message; required with paths"
+      },
+      "does": "answers at once with a ticket (the request id): the route child writes the ticket file and starts a detached runner that runs the host verb `fgos land --json` to its end and rewrites the ticket; `request result` reads it. Exactly one of branch and paths; any other key is bad-args. A lead's branch land passes the footprint of its plan, read from plan.md at the trunk tip, as --footprint; a lead's paths land that would change that footprint in the plan's own plan.md is refused footprint-change-refused",
+      "data": {
+        "ticket": "the request id",
+        "state": "running"
+      },
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): bad-args, land-branch-lead-only, path-outside-grant, footprint-change-refused, ticket-used, plan-not-found, plan-ambiguous"
+    },
+    "run": {
+      "args": {
+        "prompt": "string, one of prompt and unit",
+        "unit": "string, one of prompt and unit: a unit file",
+        "provider": "string, optional",
+        "capability": "string, optional",
+        "writes": "array of strings, optional: each must be covered by the lead's plan footprint (write-outside-footprint)",
+        "worktree": "string, optional: a linked worktree"
+      },
+      "does": "lead only. Answers at once with a ticket as land does; the detached runner runs `fgos run --json` without FGOS_DISPATCH_DEPTH (a lead's phase run is a top-level seat and takes a lane) and the ticket keeps only the unitRunId, whose outcome stays in .fgos/assignments/<unitRunId>/",
+      "data": {
+        "ticket": "the request id",
+        "state": "running"
+      },
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): bad-args, role-mismatch (not a lead), write-outside-footprint, ticket-used, plan-not-found, plan-ambiguous"
+    },
+    "request result": {
+      "args": {
+        "id": "string, optional: a ticket of this role",
+        "wait": "number, optional: seconds to wait for a running ticket to end, at most 50"
+      },
+      "does": "reads this role's own tickets in the role's own ticket folder under .fgos/runtime. With id, that ticket (ticket-unknown for another role's or a missing one); without id, the role's tickets, newest first. A running ticket whose runner record judges dead reads state failed, code runner-gone; an unknown judgement stays running",
+      "data": "{id, verb, state: running|done|failed, exit?, code?, result?, unitRunId?} for one ticket, {tickets: [...]} without id",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): ticket-unknown, bad-args"
+    },
+    "worktree create": {
+      "args": {
+        "path": "string, required",
+        "branch": "string, required (a detached worktree is not this door's: bad-args without it)",
+        "base": "string, optional"
+      },
+      "does": "lead only. Runs the host verb `fgos worktree create <path> --branch <branch> [--base <base>]` within the verb limit and returns its answer",
+      "data": "the host verb's JSON, or {created: true}",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): bad-args, role-mismatch (not a lead), worktree-create-failed"
+    },
+    "session stop": {
+      "args": {
+        "persona": "string, required",
+        "name": "string, required",
+        "reason": "string, optional, at most 200 characters"
+      },
+      "does": "stopHeadSession (src/session-host/head-stop.mjs): closes the pane of the live head through Session Host and writes retiredAt into the lineage's placement.json, which the head-state source reads as retired. Refused role-mismatch unless the persona-name is a lead or planner lineage of this project, the asker of an answered question, or the caller's own role",
+      "data": "{stopped: true} or {stopped: false, reason: not-live}",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): role-mismatch, retire-refused, bad-persona, bad-name"
+    },
+    "supervisor handled": {
+      "args": {
+        "event": "string, required: the id of the event to mark handled"
+      },
+      "does": "the route child runs the host verb `fgos supervisor handled <event> --json` the way the questions verbs run theirs (envelope hostBin) and returns its JSON; the verb itself is the supervision component's",
+      "data": "the host verb's JSON data",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): bad-args and the host verb's own code"
+    },
+    "supervisor done": {
+      "args": {},
+      "does": "as supervisor handled, running `fgos supervisor done --json`; when the answer is {done: true} the route, after its line is written, starts a detached `session stop` of the caller's own role and adds stopping: true",
+      "data": "the host verb's JSON data, with stopping: true when the caller's own stop was started",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): the host verb's own code (events still unhandled)"
     }
   },
   "questionsRoute": {
@@ -129,7 +209,7 @@
     "busy": "another request is running, or another large request (over maxReplyBytes) is being read or run",
     "session-not-registered": "session answered only: Identity does not list this attempt's own session as live; when Identity could not answer the detail is its refusal code only",
     "session-bind-failed": "session bind session only: Identity refused to bind the session; detail is its code",
-    "bad-args": "session write only: args are not exactly {path, content}, both strings",
+    "bad-args": "the args of a verb break its contract shape: for session write not exactly {path, content}, both strings; for any other verb a missing, unknown or mistyped key",
     "path-invalid": "session write only: the path is empty, absolute, or has an empty, `.` or `..` segment",
     "path-not-granted": "session write only: no entry of envelope.session.writes names the path exactly",
     "path-symlink": "session write only: the file or a directory on the way to it is a symbolic link",
@@ -141,6 +221,12 @@
     "write-path-unreadable": "session write only: the state of the path in the main checkout could not be read; nothing was written; detail names why",
     "write-failed": "session write only: the durable write failed; detail names the error and the step (a failure after the rename means the new content may already be in place)",
     "role-take-failed": "session answered only: the route recorded the answer but Identity refused to move the role to this session (detail is its code, for example gate-unknown or head-not-live); the executor then finds no holder change and retires the successor",
+    "ticket-used": "land and run only: a ticket with the request id already exists for this role",
+    "ticket-unknown": "request result only: the role has no ticket with that id",
+    "land-branch-lead-only": "land only: a branch land asked by a persona that is not a lead",
+    "path-outside-grant": "land only: a path that lies in no entry of envelope.session.writes",
+    "write-outside-footprint": "run only: a writes path the lead's plan footprint (read at the trunk tip) does not cover",
+    "footprint-change-refused": "land only: a lead's paths land that changes the footprint of its own plan's plan.md against the trunk tip",
     "verb-failed": "the route child failed; detail is the entry's own code (for example head-key-used, bad-persona, start-refused) or the exit",
     "verb-timeout": "the verb ran longer than verbTimeoutMs"
   },
@@ -156,5 +242,5 @@
   },
   "trust": "the route reads the attempt's own run directory and its envelope as trusted because the sandbox only ever sees it read-only. The guard is the paths grant: a workspace-paths entry under `.fgos` is refused by name (confinement shape, validateWorkspacePaths), so no grant can make that directory writable",
   "log": "one line per request in supervisor.log: `head-request <id> <verb> <done|refused> <code|->`; arguments are never logged and client text is cut to 32 plain characters",
-  "client": "src/session-host/head-request.mjs: `requestHeadStart` connects to FGOS_HEAD_REQUEST_SOCKET after checking the socket file is owned by its own uid; `requestHead(verb, args)` is the one client; `startHead` and `rotateHead` are the one branch per verb (FGOS_CONFINED=1 asks through the socket, refused no-request-socket when the variable is unset, otherwise startHeadSession or requestRotation directly); `requestHeadAnswered` is the successor's call"
+  "client": "src/session-host/head-request.mjs: `requestHeadStart` connects to FGOS_HEAD_REQUEST_SOCKET after checking the socket file is owned by its own uid; `requestHead(verb, args)` is the one client; `startHead` and `rotateHead` are the one branch per verb (FGOS_CONFINED=1 asks through the socket, refused no-request-socket when the variable is unset, otherwise startHeadSession or requestRotation directly); `requestHeadAnswered` is the successor's call; every other verb goes through the generic `requestHead(verb, args)` with the constants of head-request-client.mjs. A long verb (`land`, `run`) answers a ticket at once, because the socket serves one request at a time and caps a verb at verbTimeoutMs; its detached runner outlives the route child"
 }

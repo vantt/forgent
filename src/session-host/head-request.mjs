@@ -15,8 +15,14 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { CONFINED_MARKER_ENV } from '../config/facade.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
-import { HEAD_ANSWERED_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_START_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
-import { headRoleOf, startHeadSession } from './head-start.mjs';
+import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_START_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_SUPERVISOR_HANDLED_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
+import { assertHeadArgs, headRoleOf, startHeadSession } from './head-start.mjs';
+import { footprintOfPlanText, isPlanHeadName, planOfHead } from './head-plan.mjs';
+import { stopHeadSession } from './head-stop.mjs';
+import { spawnDetachedCli } from '../util/spawn-detached-fgos.mjs';
+import { judge, observe, selfRecord } from '../native/process-identity.mjs';
+import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
+import { installOnce, replaceDurably } from '../native/door.mjs';
 import { markSuccessorAnswered, requestRotation, rotationHolds } from '../session-rotation/rotate.mjs';
 
 const confined = (env) => env[CONFINED_MARKER_ENV] === '1';
@@ -28,14 +34,14 @@ const rootOf = (projectRoot) => (typeof projectRoot === 'function' ? projectRoot
  * The one door to start a head, whoever asks. A confined session (`FGOS_CONFINED=1`, which the launch door sets in
  * every sandboxed agent) sends the request through its socket; anyone else calls `startHeadSession` directly. The
  * confinement fact is that marker alone, never the socket variable or a masked path: a confined worker has no socket
- * and is refused `no-request-socket`. `args` is `{ persona, name, beside?, projectRoot? }`; `projectRoot` (a path or a resolver function) is used only
+ * and is refused `no-request-socket`. `args` is `{ persona, name, beside?, forQuestion?, projectRoot? }`; `projectRoot` (a path or a resolver function) is used only
  * outside the sandbox (the supervisor starts a confined caller's head in its own project).
  */
-export async function startHead({ persona, name, beside = null, projectRoot } = {}, { env = process.env, ports = {}, request = requestHeadStart } = {}) {
+export async function startHead({ persona, name, beside = null, forQuestion = null, projectRoot } = {}, { env = process.env, ports = {}, request = requestHeadStart } = {}) {
   if (confined(env)) {
-    return request({ persona, name, ...(beside ? { beside } : {}) }, { socketPath: env[HEAD_REQUEST_SOCKET_ENV] });
+    return request({ persona, name, ...(beside ? { beside } : {}), ...(forQuestion ? { forQuestion } : {}) }, { socketPath: env[HEAD_REQUEST_SOCKET_ENV] });
   }
-  return startHeadSession({ persona, name, beside, projectRoot: rootOf(projectRoot) }, ports);
+  return startHeadSession({ persona, name, beside, forQuestion, projectRoot: rootOf(projectRoot) }, ports);
 }
 
 /**
@@ -92,6 +98,296 @@ function callHeadQuestions({ hostBin, runDir, cwd, request }) {
   throw Object.assign(new Error(run.error ? String(run.error.message) : `the questions route ended with exit ${run.status}`), { code: 'internal' });
 }
 
+// ---- ticket verbs, `request result`, and the host verbs ---------------------------------------------
+
+const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
+const REF_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._/-]{0,199}$/;
+const SELF_PATH = fileURLToPath(import.meta.url);
+const HOST_VERB_TIMEOUT_MS = 55_000;
+const RESULT_WAIT_MAX_S = 50;
+const RESULT_POLL_MS = 200;
+const RESULT_MAX_CHARS = 20_000;
+const LIST_MAX = 50;
+const RUNNER_TIMEOUT_MS = 2 * 60 * 60 * 1000;
+const STOP_WAIT_MS = 15_000;
+const STOP_GRACE_MS = 1_000;
+
+const isStringArray = (v) => Array.isArray(v) && v.every((x) => typeof x === 'string' && x !== '');
+const roleErr = (message) => Object.assign(new Error(message), { code: 'role-mismatch' });
+const personaOf = (envelope) => envelope.session.persona ?? null;
+
+/** A plain project-relative path: no empty, `.` or `..` segment, not absolute. */
+const plainRelative = (p) => typeof p === 'string' && p !== '' && !path.isAbsolute(p) && !p.includes('\\') && !p.includes(',') && !p.split('/').some((seg) => seg === '' || seg === '.' || seg === '..');
+const inGrant = (p, writes) => plainRelative(p) && writes.some((w) => p === w || p.startsWith(`${w.replace(/\/+$/, '')}/`));
+const globRegExp = (glob) => new RegExp(`^${glob.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*\*/g, '\u0000').replace(/\*/g, '[^/]*').replace(/\u0000/g, '.*')}$`);
+/** Whether a footprint entry (a path, a directory or a glob) covers the path. */
+const covered = (p, footprint) => plainRelative(p) && footprint.some((e) => p === e || p.startsWith(`${e.replace(/\/+$/, '')}/`) || (e.includes('*') && globRegExp(e).test(p)));
+
+const planOfCaller = (envelope, projectRoot, ports) => (ports.planOf ?? ((root, persona, name) => planOfHead(root, persona, name, ports.plan ?? {})))(projectRoot, personaOf(envelope), envelope.session.name);
+
+function hostBinOf(envelope) {
+  const { hostBin } = envelope;
+  if (typeof hostBin !== 'string' || hostBin === '') throw Object.assign(new Error('the envelope names no host binary'), { code: 'envelope-invalid' });
+  return hostBin;
+}
+
+const lastJsonLine = (text) => {
+  for (const line of String(text ?? '').trim().split('\n').reverse()) {
+    try { const v = JSON.parse(line); if (v !== null && typeof v === 'object') return v; } catch { /* not the JSON line */ }
+  }
+  return null;
+};
+
+/**
+ * Runs one host verb inside the verb limit and returns its JSON `data` (or the whole line). A non-zero exit throws with the
+ * line's own `code` (or `host-failed`); `ports.hostCall({ hostBin, cwd, argv })` replaces the process in a test.
+ */
+function hostCall({ envelope, projectRoot, argv }, ports) {
+  const call = { hostBin: hostBinOf(envelope), cwd: projectRoot, argv };
+  const run = ports.hostCall ? ports.hostCall(call) : spawnSync(call.hostBin, argv, { cwd: projectRoot, encoding: 'utf8', timeout: HOST_VERB_TIMEOUT_MS, maxBuffer: MAX_REQUEST_BYTES });
+  const line = lastJsonLine(run.stdout);
+  if (run.status === 0) return line?.data ?? line ?? {};
+  const code = line?.code ?? line?.error?.code;
+  throw Object.assign(new Error(String(line?.message ?? line?.error?.message ?? run.error?.message ?? `the host verb ended with exit ${run.status}`).slice(0, 500)), { code: /^[a-z][a-z0-9-]*$/.test(code ?? '') ? code : 'host-failed' });
+}
+
+// -- tickets
+
+const ticketDirOf = (projectRoot, role) => path.join(fgosDirFromRoot(projectRoot), 'runtime', 'head-tickets', role.replace(/^head:/, ''));
+
+function writeTicket(file, ticket, { exclusive = false } = {}) {
+  const dir = path.dirname(file);
+  fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+  const bytes = `${JSON.stringify(ticket)}\n`;
+  if (!exclusive) {
+    replaceDurably(dir, path.basename(file), bytes, 0o600);
+  } else if (installOnce(dir, path.basename(file), bytes, 0o600) === 'already-exists') {
+    throw Object.assign(new Error(`ticket ${ticket.id} already exists`), { code: 'ticket-used' });
+  }
+}
+
+const readTicketFile = (file) => {
+  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (err) {
+    if (err.code === 'ENOENT' || err instanceof SyntaxError) return null;
+    throw err;
+  }
+};
+
+function spawnRunner({ ticketFile, cwd }) {
+  const env = { ...process.env };
+  delete env.FGOS_DISPATCH_DEPTH;
+  return spawnDetachedCli({ args: ['--ticket', ticketFile], cliPath: SELF_PATH, cwd, env });
+}
+
+function spawnStopSelf({ persona, name, projectRoot }) {
+  return spawnDetachedCli({ args: ['--stop-self', '--persona', persona, '--name', name, '--project-root', projectRoot, '--wait-pid', String(process.pid)], cliPath: SELF_PATH, cwd: projectRoot });
+}
+
+/**
+ * Writes the ticket of a long verb and starts its detached runner; answers at once. The request id is the ticket id; a
+ * second ticket with the same id is `ticket-used`. The runner (`runTicket`) is the file's only writer after this.
+ */
+function startTicket({ id, verb, argv, envelope, projectRoot, ports }) {
+  if (typeof id !== 'string' || !ID_PATTERN.test(id)) throw badArgs('the request id is not a ticket id');
+  const file = path.join(ticketDirOf(projectRoot, envelope.session.role), `${id}.json`);
+  const ticket = { id, verb, state: 'running', runner: null, startedAt: new Date().toISOString(), hostBin: hostBinOf(envelope), argv, cwd: projectRoot };
+  writeTicket(file, ticket, { exclusive: true });
+  const started = (ports.spawnRunner ?? spawnRunner)({ ticketFile: file, cwd: projectRoot });
+  if (!started?.pid) {
+    writeTicket(file, { ...ticket, state: 'failed', code: 'spawn-failed', endedAt: new Date().toISOString() });
+    throw Object.assign(new Error(`the runner of ticket ${id} did not start: ${started?.error ?? 'no pid'}`), { code: 'spawn-failed' });
+  }
+  return { ticket: id, state: 'running' };
+}
+
+async function landVerb({ args, envelope, projectRoot, id, ports }) {
+  exactKeys(args, ['branch', 'paths', 'tests', 'message']);
+  const { branch, paths, tests, message } = args;
+  if ((branch === undefined) === (paths === undefined)) throw badArgs('exactly one of branch and paths');
+  if (tests !== undefined && !isStringArray(tests)) throw badArgs('tests must be an array of strings');
+  if (message !== undefined && (typeof message !== 'string' || message === '')) throw badArgs('message must be a non-empty string');
+  const argv = ['land', '--json'];
+  const writes = envelope.session.writes ?? [];
+  const lead = personaOf(envelope) === 'lead';
+  if (branch !== undefined) {
+    if (typeof branch !== 'string' || !REF_PATTERN.test(branch)) throw badArgs('branch must be a branch name');
+    if (!lead) throw Object.assign(new Error('only a lead lands a branch'), { code: 'land-branch-lead-only' });
+    const plan = await planOfCaller(envelope, projectRoot, ports);
+    argv.push('--branch', branch);
+    if (plan.footprint.length > 0) argv.push('--footprint', plan.footprint.join(','));
+  } else {
+    if (!isStringArray(paths) || paths.length === 0) throw badArgs('paths must be a non-empty array of strings');
+    if (message === undefined) throw badArgs('message is required with paths');
+    for (const p of paths) {
+      if (!inGrant(p, writes)) throw Object.assign(new Error(`${JSON.stringify(p)} lies outside the paths this role may write`), { code: 'path-outside-grant' });
+    }
+    if (lead) await refuseFootprintChange({ paths, envelope, projectRoot, ports });
+    argv.push('--paths', paths.join(','), '--message', message);
+  }
+  if (tests?.length) argv.push('--tests', tests.join(','));
+  return startTicket({ id, verb: HEAD_LAND_VERB, argv, envelope, projectRoot, ports });
+}
+
+/** A lead's paths land may not change the footprint of its own plan: the working plan.md against the trunk tip's. */
+async function refuseFootprintChange({ paths, envelope, projectRoot, ports }) {
+  const plan = await planOfCaller(envelope, projectRoot, ports);
+  const planFile = `plans/${plan.dir}/plan.md`;
+  if (!paths.some((p) => p === planFile || planFile.startsWith(`${p.replace(/\/+$/, '')}/`))) return;
+  const working = (ports.readWorking ?? ((file) => { try { return fs.readFileSync(path.join(projectRoot, file), 'utf8'); } catch (err) { if (err.code === 'ENOENT') return null; throw err; } }))(planFile);
+  if (working !== null && JSON.stringify(footprintOfPlanText(working, plan.dir)) !== JSON.stringify(plan.footprint)) {
+    throw Object.assign(new Error(`${planFile} changes the footprint of its own plan`), { code: 'footprint-change-refused' });
+  }
+}
+
+async function runVerb({ args, envelope, projectRoot, id, ports }) {
+  exactKeys(args, ['prompt', 'unit', 'provider', 'capability', 'writes', 'worktree']);
+  if (personaOf(envelope) !== 'lead') throw roleErr('only a lead runs');
+  if ((args.prompt === undefined) === (args.unit === undefined)) throw badArgs('exactly one of prompt and unit');
+  for (const key of ['prompt', 'unit', 'provider', 'capability', 'worktree']) {
+    if (args[key] !== undefined && (typeof args[key] !== 'string' || args[key] === '')) throw badArgs(`${key} must be a non-empty string`);
+  }
+  if (args.writes !== undefined && !isStringArray(args.writes)) throw badArgs('writes must be an array of strings');
+  const argv = ['run', '--json'];
+  if (args.prompt !== undefined) argv.push(args.prompt); else argv.push('--unit', args.unit);
+  if (args.writes?.length) {
+    const plan = await planOfCaller(envelope, projectRoot, ports);
+    for (const p of args.writes) {
+      if (!covered(p, plan.footprint)) throw Object.assign(new Error(`${JSON.stringify(p)} is outside the footprint of plan ${plan.dir}`), { code: 'write-outside-footprint' });
+    }
+    argv.push('--writes', args.writes.join(','));
+  }
+  if (args.provider !== undefined) argv.push('--provider', args.provider);
+  if (args.capability !== undefined) argv.push('--capability', args.capability);
+  if (args.worktree !== undefined) argv.push('--worktree', args.worktree);
+  return startTicket({ id, verb: HEAD_RUN_VERB, argv, envelope, projectRoot, ports });
+}
+
+const unitRunIdOf = (json, depth = 0) => {
+  if (json === null || typeof json !== 'object' || depth > 6) return null;
+  let found = typeof json.unitRunId === 'string' && /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(json.unitRunId) ? json.unitRunId : null;
+  for (const value of Object.values(json)) found = unitRunIdOf(value, depth + 1) ?? found;
+  return found;
+};
+
+/**
+ * The detached runner of one ticket (`head-request.mjs --ticket <file>`): records its own process identity, runs the host
+ * verb to its end and rewrites the ticket `done` or `failed`. A `land` keeps the host's JSON, a `run` only its unitRunId.
+ */
+export function runTicket(file, ports = {}) {
+  const ticket = readTicketFile(file);
+  if (!ticket || ticket.state !== 'running') return null;
+  writeTicket(file, { ...ticket, runner: (ports.selfRecord ?? selfRecord)() });
+  const env = { ...process.env };
+  delete env.FGOS_DISPATCH_DEPTH;
+  const run = (ports.exec ?? spawnSync)(ticket.hostBin, ticket.argv, { cwd: ticket.cwd, env, encoding: 'utf8', timeout: RUNNER_TIMEOUT_MS, maxBuffer: MAX_REQUEST_BYTES });
+  const line = lastJsonLine(run.stdout);
+  const ok = run.status === 0;
+  const done = { ...ticket, runner: (ports.selfRecord ?? selfRecord)(), state: ok ? 'done' : 'failed', exit: run.status, endedAt: new Date().toISOString() };
+  if (!ok) done.code = /^[a-z][a-z0-9-]*$/.test(line?.code ?? '') ? line.code : `exit-${run.status ?? 'signal'}`;
+  if (ticket.verb === HEAD_RUN_VERB) {
+    const unitRunId = unitRunIdOf(line);
+    if (unitRunId) done.unitRunId = unitRunId;
+  } else if (line !== null) {
+    done.result = JSON.stringify(line).length > RESULT_MAX_CHARS ? { truncated: true } : line;
+  }
+  delete done.argv;
+  writeTicket(file, done);
+  return done;
+}
+
+/** What `request result` shows of a ticket; a running one whose runner is judged dead reads failed, `runner-gone`. */
+function viewOf(ticket, projectRoot, { withResult, judgeRunner }) {
+  let { state, code } = ticket;
+  if (state === 'running' && ticket.runner && judgeRunner(ticket.runner) === 'dead') { state = 'failed'; code = 'runner-gone'; }
+  const view = { id: ticket.id, verb: ticket.verb, state, startedAt: ticket.startedAt };
+  if (ticket.endedAt) view.endedAt = ticket.endedAt;
+  if (ticket.exit !== undefined) view.exit = ticket.exit;
+  if (code) view.code = code;
+  if (ticket.unitRunId) {
+    view.unitRunId = ticket.unitRunId;
+    view.assignment = { dir: `.fgos/assignments/${ticket.unitRunId}`, present: fs.existsSync(path.join(fgosDirFromRoot(projectRoot), 'assignments', ticket.unitRunId)) };
+  }
+  if (withResult && ticket.result !== undefined) view.result = ticket.result;
+  return view;
+}
+
+async function requestResult({ args, envelope, projectRoot, ports }) {
+  exactKeys(args, ['id', 'wait']);
+  if (args.wait !== undefined && !(typeof args.wait === 'number' && Number.isFinite(args.wait) && args.wait >= 0)) throw badArgs('wait must be a number of seconds');
+  if (args.id !== undefined && typeof args.id !== 'string') throw badArgs('id must be a string');
+  const dir = ticketDirOf(projectRoot, envelope.session.role);
+  const judgeRunner = ports.judge ?? judge;
+  if (args.id === undefined) {
+    let names = [];
+    try { names = fs.readdirSync(dir).filter((n) => n.endsWith('.json')); } catch (err) { if (err.code !== 'ENOENT') throw err; }
+    const tickets = names.map((n) => readTicketFile(path.join(dir, n))).filter(Boolean)
+      .sort((a, b) => String(b.startedAt).localeCompare(String(a.startedAt))).slice(0, LIST_MAX)
+      .map((t) => viewOf(t, projectRoot, { withResult: false, judgeRunner }));
+    return { tickets };
+  }
+  const file = path.join(dir, `${args.id}.json`);
+  const unknown = () => Object.assign(new Error(`this role has no ticket ${JSON.stringify(args.id)}`), { code: 'ticket-unknown' });
+  if (!ID_PATTERN.test(args.id)) throw unknown();
+  const sleep = ports.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
+  const until = Date.now() + Math.min(args.wait ?? 0, RESULT_WAIT_MAX_S) * 1000;
+  for (;;) {
+    const ticket = readTicketFile(file);
+    if (!ticket) throw unknown();
+    const view = viewOf(ticket, projectRoot, { withResult: true, judgeRunner });
+    if (view.state !== 'running' || Date.now() >= until) return view;
+    await sleep(RESULT_POLL_MS);
+  }
+}
+
+// -- worktree create, session stop
+
+function worktreeCreate({ args, envelope, projectRoot, ports }) {
+  exactKeys(args, ['path', 'branch', 'base']);
+  if (personaOf(envelope) !== 'lead') throw roleErr('only a lead creates worktrees');
+  if (typeof args.path !== 'string' || args.path === '' || args.path.startsWith('-')) throw badArgs('path must be a path');
+  if (typeof args.branch !== 'string' || !REF_PATTERN.test(args.branch)) throw badArgs('branch is required: a detached worktree is not this door\'s');
+  if (args.base !== undefined && (typeof args.base !== 'string' || !REF_PATTERN.test(args.base))) throw badArgs('base must be a ref');
+  const argv = ['worktree', 'create', args.path, '--branch', args.branch, ...(args.base ? ['--base', args.base] : []), '--json'];
+  try {
+    const answer = hostCall({ envelope, projectRoot, argv }, ports);
+    return Object.keys(answer).length > 0 ? answer : { created: true };
+  } catch (err) {
+    if (err.code === 'host-failed') err.code = 'worktree-create-failed';
+    throw err;
+  }
+}
+
+/** The asker of an answered owner question holds `role`: the host's `questions --answered --json` names it. */
+function askerAnswered({ envelope, projectRoot, role, ports }) {
+  if (ports.askerAnswered) return ports.askerAnswered(role);
+  try {
+    const rows = hostCall({ envelope, projectRoot, argv: ['questions', '--answered', '--json'] }, ports);
+    const list = Array.isArray(rows) ? rows : (rows.questions ?? []);
+    return Array.isArray(list) && list.some((q) => (q?.asker?.role ?? q?.askerRole) === role);
+  } catch { return false; }
+}
+
+async function stopVerb({ args, envelope, projectRoot, ports }) {
+  exactKeys(args, ['persona', 'name', 'reason']);
+  if (args.reason !== undefined && (typeof args.reason !== 'string' || args.reason.length > 200)) throw badArgs('reason must be a string of at most 200 characters');
+  assertHeadArgs({ persona: args.persona, name: args.name, projectRoot });
+  const role = headRoleOf(args.persona, args.name);
+  const allowed = role === envelope.session.role || isPlanHeadName(projectRoot, args.persona, args.name, ports.plan ?? {}) || askerAnswered({ envelope, projectRoot, role, ports });
+  if (!allowed) throw roleErr(`${role} is not a lead or planner of this project, the asker of an answered question, or this session's own role`);
+  return stopHeadSession({ persona: args.persona, name: args.name, projectRoot, reason: args.reason ?? null }, ports.stop ?? {});
+}
+
+/** The detached stop of the caller's own session: waits until the route that started it has exited, so the reply is out first. */
+export async function runStopSelf({ persona, name, projectRoot, waitPid }, ports = {}) {
+  const sleep = ports.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
+  const watched = waitPid ? (ports.observe ?? observe)(waitPid) : null;
+  const alive = ports.alive ?? (() => watched !== null && (ports.judge ?? judge)(watched) !== 'dead');
+  const until = Date.now() + STOP_WAIT_MS;
+  while (watched !== null && alive() && Date.now() < until) await sleep(100);
+  await sleep(STOP_GRACE_MS);
+  return stopHeadSession({ persona, name, projectRoot, reason: 'supervisor-done' }, ports.stop ?? {});
+}
+
 /**
  * Runs the verb of one request for the attempt in `runDir`, in this attempt's project: `session start`, `session rotate`,
  * `session answered`, `session restore role` (which only checks its arguments: the supervisor registers the role) or a
@@ -110,9 +406,10 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
     let data;
     switch (request?.verb) {
       case HEAD_START_VERB:
-        exactKeys(args, ['persona', 'name', 'beside']);
+        exactKeys(args, ['persona', 'name', 'beside', 'forQuestion']);
         if (args.beside !== undefined && typeof args.beside !== 'string') throw badArgs('beside must be a string');
-        data = await startHeadSession({ persona: args.persona, name: args.name, beside: args.beside ?? null, projectRoot }, {
+        if (args.forQuestion !== undefined && typeof args.forQuestion !== 'string') throw badArgs('forQuestion must be a string');
+        data = await startHeadSession({ persona: args.persona, name: args.name, beside: args.beside ?? null, forQuestion: args.forQuestion ?? null, projectRoot }, {
           rotationHolds: (lineage) => rotationHolds({ projectRoot, ...lineage }), ...ports,
         });
         break;
@@ -142,6 +439,36 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
         data = ports.questions ? await ports.questions(call) : callHeadQuestions(call);
         break;
       }
+      case HEAD_LAND_VERB:
+        data = await landVerb({ args, envelope, projectRoot, id: request.id, ports });
+        break;
+      case HEAD_RUN_VERB:
+        data = await runVerb({ args, envelope, projectRoot, id: request.id, ports });
+        break;
+      case HEAD_REQUEST_RESULT_VERB:
+        data = await requestResult({ args, envelope, projectRoot, ports });
+        break;
+      case HEAD_WORKTREE_CREATE_VERB:
+        data = worktreeCreate({ args, envelope, projectRoot, ports });
+        break;
+      case HEAD_STOP_VERB:
+        data = await stopVerb({ args, envelope, projectRoot, ports });
+        break;
+      case HEAD_SUPERVISOR_HANDLED_VERB:
+        exactKeys(args, ['event']);
+        if (typeof args.event !== 'string' || !ID_PATTERN.test(args.event)) throw badArgs('event must be an event id');
+        data = hostCall({ envelope, projectRoot, argv: ['supervisor', 'handled', args.event, '--json'] }, ports);
+        break;
+      case HEAD_SUPERVISOR_DONE_VERB:
+        exactKeys(args, []);
+        data = hostCall({ envelope, projectRoot, argv: ['supervisor', 'done', '--json'] }, ports);
+        if (data?.done === true) {
+          // The caller ends its own session after this route has printed its line (the stop waits for this process to exit).
+          const { persona, name } = envelope.session;
+          (ports.spawnStop ?? spawnStopSelf)({ persona, name, projectRoot });
+          data = { ...data, stopping: true };
+        }
+        break;
       default:
         throw Object.assign(new Error(`unknown verb ${JSON.stringify(request?.verb)}`), { code: 'unknown-verb' });
     }
@@ -162,22 +489,40 @@ async function readStdin() {
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
 }
 
+const flagValue = (name) => {
+  const at = process.argv.indexOf(name);
+  return at > 0 ? process.argv[at + 1] : undefined;
+};
+
 if (process.argv[1] && fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url))) {
-  const at = process.argv.indexOf('--run-dir');
-  const runDir = at > 0 ? process.argv[at + 1] : undefined;
-  if (!runDir) {
-    process.stderr.write('usage: head-request.mjs --run-dir <attemptDir>\n');
-    process.exitCode = 2;
-  } else {
-    let request;
-    try { request = await readStdin(); } catch (err) {
-      emit({ result: 'error', code: 'bad-frame', message: String(err.message).slice(0, 500) });
-      process.exitCode = 70;
+  if (process.argv.includes('--ticket')) {
+    const file = flagValue('--ticket');
+    if (!file) process.exitCode = 2; else runTicket(path.resolve(file));
+  } else if (process.argv.includes('--stop-self')) {
+    const [persona, name, projectRoot] = [flagValue('--persona'), flagValue('--name'), flagValue('--project-root')];
+    if (!persona || !name || !projectRoot) process.exitCode = 2;
+    else {
+      try { await runStopSelf({ persona, name, projectRoot, waitPid: Number(flagValue('--wait-pid')) || 0 }); } catch (err) {
+        process.stderr.write(`session stop of ${persona}-${name} failed: ${err.message}\n`);
+        process.exitCode = 70;
+      }
     }
-    if (request !== undefined) {
-      const { exit, line } = await runHeadRequest({ runDir: path.resolve(runDir), request });
-      emit(line);
-      process.exitCode = exit;
+  } else {
+    const runDir = flagValue('--run-dir');
+    if (!runDir) {
+      process.stderr.write('usage: head-request.mjs --run-dir <attemptDir>\n');
+      process.exitCode = 2;
+    } else {
+      let request;
+      try { request = await readStdin(); } catch (err) {
+        emit({ result: 'error', code: 'bad-frame', message: String(err.message).slice(0, 500) });
+        process.exitCode = 70;
+      }
+      if (request !== undefined) {
+        const { exit, line } = await runHeadRequest({ runDir: path.resolve(runDir), request });
+        emit(line);
+        process.exitCode = exit;
+      }
     }
   }
 }

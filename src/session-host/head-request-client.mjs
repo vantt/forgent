@@ -23,6 +23,14 @@ export const HEAD_QUESTIONS_ASK_VERB = 'questions ask';
 export const HEAD_QUESTIONS_ACK_VERB = 'questions ack';
 export const HEAD_QUESTIONS_CANCEL_VERB = 'questions cancel';
 export const HEAD_QUESTIONS_ANSWER_VERB = 'questions answer';
+/** The long verbs answer at once with a ticket (`{ticket, state: 'running'}`); `request result` reads it. */
+export const HEAD_LAND_VERB = 'land';
+export const HEAD_RUN_VERB = 'run';
+export const HEAD_REQUEST_RESULT_VERB = 'request result';
+export const HEAD_WORKTREE_CREATE_VERB = 'worktree create';
+export const HEAD_STOP_VERB = 'session stop';
+export const HEAD_SUPERVISOR_HANDLED_VERB = 'supervisor handled';
+export const HEAD_SUPERVISOR_DONE_VERB = 'supervisor done';
 /** A reply may take as long as the supervisor lets the verb run (60 s) plus its own overhead. */
 const DEFAULT_REPLY_TIMEOUT_MS = 70_000;
 /** A write is also published (fetch, gates, commit, push), which waits on the target's merge slot and the network. */
