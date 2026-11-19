@@ -432,7 +432,7 @@ test('landRunnerItem refuses before publication (not "conflict") when an untrack
 
   const headBefore = headOf(repoRoot);
   const result = await landItem(repoRoot, makeItem());
-  assert.equal(result.outcome, 'main-checkout-dirty-mid-merge');
+  assert.equal(result.outcome, 'main-checkout-dirty-overlap');
   assert.equal(result.branch, 'fgw/demo-item');
   assert.throws(
     () => git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']),

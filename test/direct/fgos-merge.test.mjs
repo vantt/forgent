@@ -533,7 +533,7 @@ test('sync-root outcome guard catches a publication Land refuses over an untrack
   const data = await syncRoot(cwd, 'sync-root-merge-failed');
   assert.notEqual(data.outcome, 'synced', 'must never report success for an outcome it does not recognize');
   assert.equal(data.outcome, 'blocked');
-  assert.equal(data.reason, 'main-checkout-dirty-mid-merge');
+  assert.equal(data.reason, 'main-checkout-dirty-overlap');
 
   assert.equal(gitHead(cwd), headBefore, 'main must be unchanged');
   assert.throws(
@@ -547,7 +547,7 @@ test('sync-root outcome guard catches a publication Land refuses over an untrack
   const frictions = stateView(cwd).frictions?.['sync-root-merge-failed'] ?? [];
   const unhandledFriction = frictions.find((f) => f.errorClass === 'sync-root-unhandled-outcome');
   assert.ok(unhandledFriction, 'frictions must contain an entry with errorClass === "sync-root-unhandled-outcome"');
-  assert.match(unhandledFriction.detail, /unrecognized outcome "main-checkout-dirty-mid-merge"/, 'friction detail names the outcome it refused to report as success');
+  assert.match(unhandledFriction.detail, /unrecognized outcome "main-checkout-dirty-overlap"/, 'friction detail names the outcome it refused to report as success');
 
   const mergedDecisions = decisionsFor(cwd, 'sync-root-merge-failed').filter((e) => /merged/.test(e.payload?.text ?? ''));
   assert.equal(mergedDecisions.length, 0, 'must never record a "merged" decision for a merge that never actually completed');

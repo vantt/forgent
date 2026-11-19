@@ -290,7 +290,7 @@ test('root-into-main merge gate: a path in ownFileSet dirtied on repoRoot AFTER 
   setTimeout(() => fs.writeFileSync(path.join(cwd, 'owned.txt'), 'dirtied by another writer mid-merge\n'), 10);
   const result = await racePromise;
 
-  assert.equal(result.outcome, 'main-checkout-dirty-mid-merge', `expected the second check to catch the race, got ${result.outcome}: ${JSON.stringify(result)}`);
+  assert.equal(result.outcome, 'main-checkout-dirty-overlap', `expected the second check to catch the race, got ${result.outcome}: ${JSON.stringify(result)}`);
   assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore, 'update-ref must never have run');
   assert.equal(fs.readFileSync(path.join(cwd, 'owned.txt'), 'utf8'), 'dirtied by another writer mid-merge\n', 'the dirty write is left exactly as it was -- no working-tree sync was attempted');
 });

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fixed: `fgos land <branch>` now refuses a dirty main checkout only when a dirty path is one the land writes (the commit diff plus the declared footprint), as the main-checkout catch-up already did; machine-local edits such as `.fgos/distribution.json` no longer block it. The refusal is renamed `main-checkout-dirty-overlap` (was `main-checkout-dirty-mid-merge`) and names the path.
 - New verb `fgos watcher tick` and a third OS timer (`watcher-tick`, installed by `fgos doctor --fix` once `watcher.enabled` is on; global-only, active interval 60 s, idle 900 s): one non-LLM pass that runs the watcher definitions in `core/watcher/`, raises supervision events, notifies and wakes the supervisor. Doctor gains `watcher-timer`, `supervisor-events-unhandled`, `supervision-pace` and `land-gates-configured`.
 - New verbs `fgos supervisor wake|plans|queue|handled|done`: the per-project plan supervisor head (`head:supervisor-<project>`) is started when an event is unhandled, lists ready plans, and ends its own session on `done`, which refuses while events are unhandled.
 - New verb `fgos land <branch>` / `fgos land --paths <p>... --message <m>` and config `land.gates` / `land.regenerate`: lands onto the trunk through the Git Land port under the merge slot and pushes. Gates run branch code unconfined, as the owner; a project with no `land.gates` refuses `land-gate-missing`. A lead may land only inside its plan footprint.

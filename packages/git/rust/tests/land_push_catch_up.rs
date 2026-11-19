@@ -298,7 +298,7 @@ fn catch_up_refuses_a_dirty_path_the_move_changes() {
     git(&f.main, &["update-ref", "refs/remotes/origin/trunk", &tip]);
     fs::write(f.main.join("c"), "local edit\n").unwrap();
     let error = catch_up(&f, &f.request.target, "dirty").unwrap_err();
-    assert_eq!(error.cause, "main-checkout-dirty-mid-merge");
+    assert_eq!(error.cause, "main-checkout-dirty-overlap");
     assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), f.request.target);
     assert_eq!(
         fs::read_to_string(f.main.join("c")).unwrap(),
