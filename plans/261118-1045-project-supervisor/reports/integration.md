@@ -76,3 +76,18 @@ Blocked; window closed. Pointers: board lines of 11:4x-12:1x; watcher journal `j
   (3) `supervisor handled a b c` marked only the first id, and (4) handled head-gone events were re-raised with new ids
   (both fixed on the fix branch); (5) idle mode delays detection up to 15 min: backlog `p-xpeg4jshiu`; (6) the timer
   fired every ~120 s: no `AccuracySec`, systemd's 1 min default (fixed on the fix branch).
+
+## Live run, window 2 (2026-11-19 12:49-12:52, release sha256:4685ac59, main e4514d24b) and a correction
+Paused; no lead started.
+- The `doctor --fix` that installed the timer ran a tick that woke the supervisor at 12:49:12 (head live, agy). Stopped
+  at ~12:51 with `fgos session stop`; `watcher.enabled` unset (timer removed).
+- Reason 1: plan `261118-1341-s6a-execution-tier-rust` was `ready` while lead:S6A ran it outside a head, so it was
+  admissible and the supervisor would have started a second lead. Supervisor decision: a plan a lead holds is
+  `running` (S6A set it); before window 3 `supervisor plans` must list only the throwaway plan as admissible.
+- Reason 2: the supervisor again spent its turn on a failing command (state root, git-floor-probe) instead of its
+  queue. A sandbox reproduction of the start ritual and every skill command is the next step and becomes the owning
+  proof, so window 3 confirms rather than discovers.
+- Correction to window 1: the `event-store-io` faults cited there were the lead's own unconfined calls (fault class
+  `event-store-end-trigger`, logged even when the verb succeeds), not the supervisor's. The confined-reads fix
+  (675ea511c) stands on the code audit (`supervisor queue`, `plans`, `slots` need masked paths), not on those faults.
+  The fault being logged for successful verbs is itself a finding.
