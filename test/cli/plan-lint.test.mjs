@@ -4,6 +4,7 @@
 // fgos-faults.test.mjs in this directory.
 
 import '../helpers/process-tmp-root.mjs';
+import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -13,6 +14,8 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 import { writeGlobalConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';
+
+ensureGitAddon(); // the spawned payload loads this checkout's addon through the env it sets
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');

@@ -1,7 +1,10 @@
 import '../helpers/process-tmp-root.mjs';
+import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { connectedComponents, criticalPath, staleBlocked, greedyTopUnblock, goalScopedSet, goalScopedCriticalPath, goalScopedGreedyTopUnblock, whatIf, metricsFrame, graphMetrics, classifyStaleDoing, STALE_DOING_DEFAULTS, classifyStalePostDelivery, STALE_POST_DELIVERY_DEFAULTS, footprintOverlap, detectCycles, computeSchedule } from '../../src/state/graph-metrics.mjs';
+
+ensureGitAddon(); // the graph and write-scope packages answer through the native addon
 
 // Pure lib — every view here is a literal (foldEvents style), no fs, no
 // `.fgos/` writes. connectedComponents groups work items linked by ANY unified

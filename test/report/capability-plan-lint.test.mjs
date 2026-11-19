@@ -1,6 +1,7 @@
 // capability-plan-lint.test.mjs — every check runs against plain text,
 // writes nothing, and never touches Work/.fgos state.
 import '../helpers/process-tmp-root.mjs';
+import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import fs from 'node:fs';
@@ -11,11 +12,12 @@ import {
   lintPlanCapabilityAnnotations,
   lintPhaseUnits,
   resolvePhaseFile,
-  pathsOverlap,
 } from '../../src/report/capability-plan-lint.mjs';
 import { readStandardValue } from '../../src/config/facade.mjs';
 import { execFileSync, spawnSync } from 'node:child_process';
 import os from 'node:os';
+
+ensureGitAddon(); // the write-scope package answers write overlaps through the native addon
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // The standard's runner section, plus a tool executor for impact-analysis whose tool is not installed.
@@ -411,16 +413,33 @@ test('a pin key is caught case-insensitively, tolerating whitespace around the c
   assert.ok(pinned.every((f) => f.severity === 'hard'));
 });
 
-test('pathsOverlap helper correctly identifies overlapping and non-overlapping patterns', () => {
-  assert.equal(pathsOverlap('src/foo.mjs', 'src/foo.mjs'), true);
-  assert.equal(pathsOverlap('src/foo.mjs', 'src/bar.mjs'), false);
-  assert.equal(pathsOverlap('src', 'src/foo.mjs'), true);
-  assert.equal(pathsOverlap('src/foo.mjs', 'src'), true);
-  assert.equal(pathsOverlap('src/runner/**', 'src/runner/execution/unit.mjs'), true);
-  assert.equal(pathsOverlap('src/runner/**', 'src/**'), true);
-  assert.equal(pathsOverlap('src/runner/**', 'src/workflow/**'), false);
-  assert.equal(pathsOverlap('src/*.mjs', 'src/foo.mjs'), true);
-  assert.equal(pathsOverlap('src/*.mjs', 'src/sub/foo.mjs'), false);
+// The overlap rule itself (containment, globs, trailing slashes) is owned by the write-scope package's tests
+// (packages/write-scope/src/lib.rs: scopes_overlap_compares_whole_scopes and colliding_pairs_agree_with_the_naive_oracle); the retired
+// pathsOverlap unit cases live there. This is the one wiring case: the lint asks the package, so the glob case whose
+// answer changed from the old JS rule (a `*` glob and a file one directory down) is now a collision.
+test('lintPhaseUnits asks the write-scope package: src/*.mjs and src/sub/foo.mjs collide (the old JS rule called them disjoint)', () => {
+  const text = `## Units
+- unit: glob-writer
+  capability: docs:write
+  objective: "Write by glob"
+  writes: [src/*.mjs]
+  dependsOn: []
+
+- unit: nested-writer
+  capability: docs:write
+  objective: "Write one level down"
+  writes: [src/sub/foo.mjs]
+  dependsOn: []
+
+- unit: elsewhere
+  capability: docs:write
+  objective: "Write elsewhere"
+  writes: [docs/other.md]
+  dependsOn: []
+`;
+  const collisions = lintPhaseUnits(text).findings.filter((f) => f.code === 'unit.writes-collision');
+  assert.equal(collisions.length, 1);
+  assert.match(collisions[0].message, /"glob-writer" and "nested-writer"/);
 });
 
 test('resolvePhaseFile finds padded and unpadded phase files in a directory', () => {

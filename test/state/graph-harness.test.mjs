@@ -1,7 +1,10 @@
 import '../helpers/process-tmp-root.mjs';
+import { ensureGitAddon } from '../helpers/git-addon.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mergeReadiness, mergeTree, openLeavesSharingTarget, classifyPostLandDrift } from '../../src/state/graph-harness.mjs';
+
+ensureGitAddon(); // footprint conflicts come from the write-scope package through the native addon
 
 // mergeReadiness is pure over a hand-built view (same shape replay.mjs's
 // foldEvents produces: view.work[id] = { id, title, status, deps, ... }).
@@ -67,6 +70,20 @@ test('mergeReadiness: two dep-clear proposed items sharing a footprint conflict 
   assert.deepEqual(result.conflicts, [
     { a: 'a', b: 'b', shared: ['src/x.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] },
   ]);
+});
+
+test('mergeReadiness: items whose footprints contain one another (a directory and a file in it) conflict and leave ready; the old exact-string rule merged them', () => {
+  const view = {
+    work: {
+      dir: item('dir', 'awaiting-approval', [], { footprint: ['src/state/'] }),
+      file: item('file', 'awaiting-approval', [], { footprint: ['src/state/frontier.mjs'] }),
+      apart: item('apart', 'awaiting-approval', [], { footprint: ['docs/x.md'] }),
+    },
+  };
+  const result = mergeReadiness(view);
+  assert.deepEqual(result.conflicts.map(({ a, b, shared }) => ({ a, b, shared })), [{ a: 'dir', b: 'file', shared: ['src/state/'] }]);
+  assert.deepEqual(result.ready, ['apart']);
+  assert.ok(result.mergeSets.some((set) => set.reason === 'footprint-overlap' && set.items.includes('dir') && set.items.includes('file')));
 });
 
 test('mergeReadiness: a dep-clear item conflicting with a dep-WAITING item is still flagged — conflict detection runs over all dep-clear candidates regardless of the other side', () => {

@@ -90,6 +90,57 @@ test('a phase must sit in a later wave than its dependency, and the table needs 
   assert.ok(checkPlanDir(path.join(r2, 'q')).errors.some((e) => e.startsWith('phase table lacks columns: wave')));
 });
 
+// The phase-table reader mirrors the supervisor's (packages/supervision/rust/src/portfolio.rs); the overlap rule itself
+// is owned by the write-scope package's tests (packages/write-scope/src/lib.rs). These cases own the script's wiring.
+const errorsOf = (text) => checkPlanDir(path.join(root({ p: text }), 'p')).errors;
+const phaseRows = (...footprints) => footprints.map((f, n) => `| ${n + 1} | t | - | ${f} | 1 | ready |`);
+
+test('two globs in one directory, and a glob and a file there, are a same-wave overlap (the old rule cut at the first star and called them disjoint)', () => {
+  assert.ok(errorsOf(planText({ rows: phaseRows('`apps/t/tests/q_*.rs`', '`apps/t/tests/s_*.rs`') })).some((e) => e.includes('share wave 1')));
+  assert.ok(errorsOf(planText({ rows: phaseRows('`apps/t/tests/q_*.rs`', '`apps/t/tests/q_a.rs`') })).some((e) => e.includes('share wave 1')));
+  assert.deepEqual(errorsOf(planText({ rows: phaseRows('`apps/t/a/*.rs`', '`apps/t/b/q.rs`') })), []);
+});
+
+test('a footprint cell keeps every star and unwraps only whole-entry backticks or links', () => {
+  assert.deepEqual(errorsOf(planText({ rows: phaseRows('`src/**`, [docs/](d)') })), []);
+  // `**src/a/*.mjs**` is not a whole-entry wrapper: its stars stay, so it is an entry that is not a repo path.
+  assert.ok(errorsOf(planText({ rows: phaseRows('**src/a/*.mjs**') })).some((e) => e.includes('"**src/a/*.mjs**"')));
+});
+
+test('a footprint entry that does not canonicalize is refused at ready and not before', () => {
+  for (const bad of ['`../x`', '`/abs`', '`a\\b`', '`ab**`', '`.`']) {
+    assert.ok(errorsOf(planText({ rows: phaseRows(bad) })).some((e) => e.includes('is not a repo-relative path or glob')), bad);
+  }
+  assert.ok(errorsOf(planText({ fm: { footprint: '[../x]' } })).some((e) => e.startsWith('footprint entry "../x"')));
+  const draft = planText({ fm: { status: 'draft' }, rows: ['| 1 | t | - | `../x` | 1 | draft |'] });
+  assert.deepEqual(errorsOf(draft), []);
+});
+
+test('a malformed phase table is refused for every status; a missing table only for ready or running', () => {
+  const draft = (extra) => planText({ fm: { status: 'draft' }, ...extra });
+  assert.ok(errorsOf(draft({ rows: ['| 1 | t | - | `a/` | 1 | draft |', '| 1 | u | - | `b/` | 2 | draft |'] })).includes('phase id 1 appears twice'));
+  for (const wave of ['0', '1.5', 'x', '-1', '']) {
+    assert.ok(errorsOf(draft({ rows: [`| 1 | t | - | \`a/\` | ${wave} | draft |`] })).includes('phase 1: wave must be an integer from 1'), JSON.stringify(wave));
+  }
+  assert.ok(errorsOf(draft({ rows: [] })).includes('phase table has no rows'));
+  const second = '\n| id | footprint |\n|---|---|\n| 1 | a/ |\n';
+  assert.ok(errorsOf(draft({ tail: SECTIONS + second })).some((e) => e.startsWith('2 tables have a footprint column')));
+  const noTable = (status) => planText({ fm: { status }, rows: [] }).replace(/## Phases[\s\S]*$/, '');
+  assert.ok(!errorsOf(noTable('draft')).includes('no phase table with a footprint column'));
+  assert.ok(errorsOf(noTable('ready')).includes('no phase table with a footprint column'));
+  assert.ok(errorsOf(noTable('running')).includes('no phase table with a footprint column'));
+});
+
+test('a list key that is not a list is refused by name', () => {
+  assert.ok(errorsOf(planText({ fm: { blockedBy: 'some-plan' } })).includes('blockedBy must be a list of plan directory names'));
+  assert.ok(errorsOf(planText({ fm: { footprint: 'src/a/' } })).includes('footprint must be a list of repo-relative paths or globs'));
+});
+
+test('a pair scan that stops at its cap is an error, never a clean verdict', () => {
+  const rows = Array.from({ length: 460 }, (_, n) => `| ${n + 1} | t | - | \`src/a/\` | 1 | ready |`);
+  assert.ok(errorsOf(planText({ rows })).some((e) => e.startsWith('footprint overlap scan stopped at its')));
+});
+
 test('--all reports a plan without the marker as legacy and still exits 0', () => {
   const legacy = '---\ntitle: Old\nstatus: pending\n---\n# Old\n';
   const r = root({ old: legacy, good: planText() });

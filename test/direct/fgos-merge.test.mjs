@@ -786,6 +786,17 @@ test('merge list: two dep-clear proposed items sharing a footprint are excluded 
   assert.deepEqual(data.conflicts, [{ a: 'a', b: 'b', shared: ['src/x.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }]);
 });
 
+test('merge list: items whose footprints contain one another (a directory and a file in it) are conflicts and leave ready; exact-match was the old rule', () => {
+  const cwd = tmpCwdFast();
+  addItem(cwd, 'dir', { footprint: ['src/state/'] });
+  addItem(cwd, 'file', { footprint: ['src/state/frontier.mjs'] });
+  addItem(cwd, 'apart', { footprint: ['docs/x.md'] });
+  for (const id of ['dir', 'file', 'apart']) toProposed(cwd, id);
+  const data = list(cwd);
+  assert.deepEqual(data.ready, ['apart']);
+  assert.deepEqual(data.conflicts, [{ a: 'dir', b: 'file', shared: ['src/state/'], suggestions: ['sequence', 'hoist', 're-slice'] }]);
+});
+
 // ---------------------------------------------------------------------------
 // merge next
 // ---------------------------------------------------------------------------
