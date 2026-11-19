@@ -154,6 +154,7 @@ impl GitDriver {
                 "operationId": e.operation_id,
                 "worktree": land.candidate.worktree,
                 "worktreePresent": worktree_present,
+                "writer": chain.intent().writer_identity,
                 "pins": pins,
                 "updatedAtMs": updated_at_ms,
             }));

@@ -437,6 +437,8 @@ pub struct Kept {
 #[serde(rename_all = "camelCase")]
 pub struct GitRecovered {
     pub recovered: Vec<String>,
+    /// Finished Land chains of the caller whose candidate worktree and pins were released.
+    pub freed: Vec<String>,
     pub kept: Vec<Kept>,
     pub message: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -472,7 +474,7 @@ pub fn recover_git_operations(
 ) -> Result<GitRecovered, FactError> {
     let main = main_checkout_of(cwd);
     let Some((driver, repo)) = open(state_root, cwd, &main)? else {
-        return Ok(recovered(Vec::new(), Vec::new(), None));
+        return Ok(recovered(Vec::new(), Vec::new(), Vec::new(), None));
     };
     let operations: Vec<Value> = pending(&driver, &repo)?
         .into_iter()
@@ -485,8 +487,14 @@ pub fn recover_git_operations(
         .collect();
     let mut settled = Vec::new();
     let mut kept = Vec::new();
+    let writer = std::cell::OnceCell::new();
+    let own_writer = || {
+        writer
+            .get_or_init(|| writer_for(&plain_path(repo.trusted_main_root()).join(".fgos")))
+            .clone()
+    };
     if !operations.is_empty() {
-        let writer = writer_for(&plain_path(repo.trusted_main_root()).join(".fgos"));
+        let writer = own_writer();
         for operation in &operations {
             let id = operation["operationId"].as_str().unwrap_or_default();
             match driver.reconcile_operation(&repo, Vec::new(), &writer, id, None) {
@@ -501,7 +509,54 @@ pub fn recover_git_operations(
             }
         }
     }
-    Ok(recovered(settled, kept, merge_head(&driver, &repo)))
+    let freed = free_own_retained_land(&driver, &repo, &own_writer, &mut kept)?;
+    Ok(recovered(settled, freed, kept, merge_head(&driver, &repo)))
+}
+
+/// Releases the candidate worktree and pins of every finished Land chain the caller's writer started, the same
+/// acknowledgement a land's own consumer gives. A chain of another writer is named with its writer and left alone;
+/// a chain still pending never appears in the listing.
+fn free_own_retained_land(
+    driver: &GitDriver,
+    repo: &RepoHandle,
+    own_writer: &dyn Fn() -> String,
+    kept: &mut Vec<Kept>,
+) -> Result<Vec<String>, FactError> {
+    let listing = driver.list_retained_land(repo, SCAN_BOUND)?;
+    let mut freed = Vec::new();
+    for candidate in listing["candidates"].as_array().into_iter().flatten() {
+        let id = candidate["operationId"].as_str().unwrap_or_default();
+        let owner = candidate["writer"].as_str().unwrap_or_default();
+        let writer = own_writer();
+        if owner != writer {
+            kept.push(Kept {
+                operation_id: id.to_owned(),
+                cause: "land-authority-mismatch".to_owned(),
+                writer: Some(owner.to_owned()),
+            });
+            continue;
+        }
+        match driver.acknowledge_land(
+            repo,
+            &writer,
+            id,
+            "git-recover-retained",
+            &wal::OsFileSystem,
+        ) {
+            Ok(deferred) if deferred.is_empty() => freed.push(id.to_owned()),
+            Ok(deferred) => kept.push(Kept {
+                operation_id: id.to_owned(),
+                cause: deferred.join("; "),
+                writer: None,
+            }),
+            Err(error) => kept.push(Kept {
+                operation_id: id.to_owned(),
+                cause: error.cause,
+                writer: None,
+            }),
+        }
+    }
+    Ok(freed)
 }
 
 /// A main-checkout catch-up journals as `RefUpdate` under its own binding; it is settled here too, since no other
@@ -513,8 +568,13 @@ fn is_main_checkout_catch_up(operation: &Value, repo: &RepoHandle) -> bool {
     })
 }
 
-fn recovered(settled: Vec<String>, kept: Vec<Kept>, merge: Option<String>) -> GitRecovered {
-    let message = if settled.is_empty() && kept.is_empty() {
+fn recovered(
+    settled: Vec<String>,
+    freed: Vec<String>,
+    kept: Vec<Kept>,
+    merge: Option<String>,
+) -> GitRecovered {
+    let message = if settled.is_empty() && freed.is_empty() && kept.is_empty() {
         "no interrupted Land, ScopedCommit or remote transfer operation".to_owned()
     } else {
         let mut parts = Vec::new();
@@ -522,6 +582,12 @@ fn recovered(settled: Vec<String>, kept: Vec<Kept>, merge: Option<String>) -> Gi
             parts.push(format!(
                 "recovered interrupted Git operations: {}",
                 settled.join(", ")
+            ));
+        }
+        if !freed.is_empty() {
+            parts.push(format!(
+                "released retained Land candidates: {}",
+                freed.join(", ")
             ));
         }
         if !kept.is_empty() {
@@ -534,6 +600,7 @@ fn recovered(settled: Vec<String>, kept: Vec<Kept>, merge: Option<String>) -> Gi
     };
     GitRecovered {
         recovered: settled,
+        freed,
         kept,
         message,
         next: merge
@@ -557,13 +624,18 @@ mod tests {
 
     #[test]
     fn nothing_to_recover_says_so_and_a_merge_names_the_command_that_ends_it() {
-        let nothing = recovered(Vec::new(), Vec::new(), None);
+        let nothing = recovered(Vec::new(), Vec::new(), Vec::new(), None);
         assert_eq!(
             nothing.message,
             "no interrupted Land, ScopedCommit or remote transfer operation"
         );
         assert_eq!((nothing.merge_in_progress, nothing.next), (None, None));
-        let merging = recovered(Vec::new(), Vec::new(), Some("abc123".to_owned()));
+        let merging = recovered(
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Some("abc123".to_owned()),
+        );
         assert_eq!(merging.merge_in_progress.as_deref(), Some("abc123"));
         assert_eq!(
             merging.next.as_deref(),
@@ -575,6 +647,7 @@ mod tests {
     fn a_kept_operation_names_its_cause_and_the_writer_only_when_authority_is_the_cause() {
         let message = recovered(
             vec!["done-1".to_owned()],
+            Vec::new(),
             vec![
                 kept("land-1", "land-authority-mismatch", "w-a"),
                 kept("push-1", "remote-authority-mismatch", "w-b"),

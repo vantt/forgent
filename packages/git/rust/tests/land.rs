@@ -908,6 +908,55 @@ fn current_target_is_pinned_after_destination_acquisition_and_replays_after_clea
 }
 
 #[test]
+fn a_retained_land_with_its_candidate_present_never_blocks_the_next_land() {
+    let f = Fixture::new();
+    let mut first = f
+        .driver
+        .prepare_land(
+            &f.repo,
+            vec![],
+            &f.request,
+            "fixture",
+            "first",
+            &wal::OsFileSystem,
+            0,
+        )
+        .unwrap();
+    let held = first.candidate().unwrap().worktree.clone();
+    let verification = evidence(&first);
+    f.driver
+        .publish_land(&f.repo, &mut first, &verification, &wal::OsFileSystem, 0)
+        .unwrap();
+    drop(first);
+    assert!(held.exists());
+    git(&f.main, &["reset", "--hard", &f.request.target]);
+    let mut second = f
+        .driver
+        .prepare_land(
+            &f.repo,
+            vec![],
+            &f.request,
+            "fixture",
+            "second",
+            &wal::OsFileSystem,
+            0,
+        )
+        .unwrap();
+    let verification = evidence(&second);
+    f.driver
+        .publish_land(&f.repo, &mut second, &verification, &wal::OsFileSystem, 0)
+        .unwrap();
+    assert!(held.exists(), "the first chain is still retained");
+    assert_eq!(
+        f.driver.list_retained_land(&f.repo, 100).unwrap()["candidates"]
+            .as_array()
+            .unwrap()
+            .len(),
+        2
+    );
+}
+
+#[test]
 fn retained_listing_skips_chains_that_hold_nothing() {
     let f = Fixture::new();
     let mut session = f
