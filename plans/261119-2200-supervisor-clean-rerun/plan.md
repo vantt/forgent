@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Throwaway: clean rerun of the supervisor live run (plan 261118-1045 phase 19 step 5), zero interventions; one phase writes one scratch file"
-status: ready
+status: draft
 priority: P3
 blockedBy: []
 footprint:
