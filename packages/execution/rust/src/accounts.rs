@@ -37,9 +37,9 @@ pub(crate) fn is_inside(path: &str) -> bool {
     !is_absolute(path) && !path.split(['/', '\\']).any(|part| part == "..")
 }
 
-/// An account's credential home as an absolute path: a leading `~`, `${HOME}` or `$HOME` is the user's home
-/// directory. `None` when the value is empty, not absolute once expanded, or the home is not known.
-fn expand_credential_home(home: &str, machine: &dyn Machine) -> Option<String> {
+/// An account's credential home as an absolute path: a leading `~`, `${HOME}` or `$HOME` is `home_dir`, the
+/// user's home directory. `None` when the value is empty, not absolute once expanded, or the home is not known.
+pub fn expand_credential_home(home: &str, home_dir: Option<&str>) -> Option<String> {
     if home.trim().is_empty() {
         return None;
     }
@@ -49,14 +49,15 @@ fn expand_credential_home(home: &str, machine: &dyn Machine) -> Option<String> {
             .strip_prefix(prefix)
             .filter(|rest| rest.is_empty() || rest.starts_with('/'))
         {
-            expanded = format!("{}{rest}", machine.home_dir()?);
+            expanded = format!("{}{rest}", home_dir?);
             break;
         }
     }
     is_absolute(&expanded).then_some(expanded)
 }
 
-pub(crate) fn is_cli_key(key: &str) -> bool {
+/// A login-store key: a lowercase letter or digit, then lowercase letters, digits, `_` or `-`.
+pub fn is_cli_key(key: &str) -> bool {
     let mut chars = key.chars();
     chars
         .next()
@@ -306,7 +307,8 @@ pub fn read_llm_accounts(runner: &Value, machine: &dyn Machine) -> LlmAccounts {
                     problem("store-path", &store_at, "must be a directory path");
                     continue;
                 };
-                let Some(expanded) = expand_credential_home(text, machine) else {
+                let Some(expanded) = expand_credential_home(text, machine.home_dir().as_deref())
+                else {
                     problem(
                         "store-path",
                         &store_at,

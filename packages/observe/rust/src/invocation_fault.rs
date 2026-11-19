@@ -197,12 +197,12 @@ fn make_private(_log: &Path) -> io::Result<()> {
     Ok(())
 }
 
-/// Appends one whole line to the log: the file is created 0600 and, past the cap,
-/// loses its oldest half first. Takes no lock: one `write` of a whole line under
+/// The capped-log door: appends one whole line to the log; the file is created 0600 and,
+/// past the cap, loses its oldest half first. The log's grandparent must exist. Takes no lock: one `write` of a whole line under
 /// `O_APPEND` keeps concurrent appends from tearing a line, but the halving
 /// (read, temp file, rename) can drop an append made while it runs. A lost
 /// diagnostic line past the cap is accepted, as on the Node side.
-fn append_capped(log: &Path, record: &Value) -> io::Result<()> {
+pub fn append_capped(log: &Path, record: &Value) -> io::Result<()> {
     if let Some(parent) = log.parent() {
         // `create_dir`, not `create_dir_all`: a store that vanished since the
         // check must not be recreated here.

@@ -1,0 +1,3363 @@
+{
+  "contract": "accounts-account-probe.v1",
+  "recordedBy": "test/golden-recorders/accounts.recorder.mjs",
+  "home": "/home/vector",
+  "config": {
+    "llmAccounts": {
+      "openai": {
+        "work": {
+          "label": "Work",
+          "credentialStore": {
+            "codex": "/home/vector/.codex-work",
+            "pi": "/home/vector/.pi-work"
+          }
+        },
+        "spare": {
+          "credentialStore": {
+            "codex": "/home/vector/.codex-spare"
+          }
+        },
+        "off": {
+          "disabled": true,
+          "credentialStore": {
+            "codex": "/home/vector/.codex-off"
+          }
+        }
+      },
+      "z-ai": {
+        "main": {
+          "credentialStore": {
+            "pi": "/home/vector/.pi-glm"
+          }
+        }
+      }
+    },
+    "executors": {
+      "pi-executor": {
+        "providerModel": "openai",
+        "invocations": [
+          {
+            "id": "pi-work",
+            "via": "cli",
+            "command": "pi",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "credentialStore": {
+              "use": "pi",
+              "homeEnv": "PI_CODING_AGENT_DIR",
+              "files": [
+                "auth.json"
+              ],
+              "sessionDir": "sessions"
+            }
+          },
+          {
+            "id": "pi-plain",
+            "via": "cli",
+            "command": "/usr/bin/pi",
+            "env": {
+              "PI_CODING_AGENT_DIR": "/home/vector/.pi-work"
+            }
+          }
+        ]
+      },
+      "codex-executor": {
+        "providerModel": "openai",
+        "confinement": {
+          "backend": "bwrap"
+        },
+        "invocations": [
+          {
+            "id": "codex-main",
+            "via": "cli",
+            "command": "codex",
+            "credentialStore": {
+              "use": "codex",
+              "homeEnv": "CODEX_HOME"
+            }
+          },
+          {
+            "id": "codex-spare",
+            "via": "cli",
+            "command": "codex"
+          },
+          {
+            "id": "codex-api",
+            "via": "api",
+            "command": "codex"
+          }
+        ]
+      },
+      "glm-executor": {
+        "providerModel": "z-ai",
+        "invocations": [
+          {
+            "id": "pi-glm",
+            "via": "cli",
+            "command": "pi"
+          }
+        ]
+      }
+    },
+    "modelPolicies": {
+      "openai": {
+        "standard": "gpt-5-mini",
+        "flagship": [
+          {
+            "model": "gpt-5-pro",
+            "pool": "openai"
+          },
+          "gpt-5@other"
+        ],
+        "advanced": {
+          "model": "gpt-5",
+          "effort": "high"
+        }
+      }
+    }
+  },
+  "inventory": {
+    "openai-codex": {
+      "accounts": {
+        "work": {
+          "id": "work",
+          "label": "Work",
+          "disabled": false,
+          "credentialSources": {
+            "codex": {
+              "kind": "codex-home",
+              "home": "/home/vector/.codex-work",
+              "cli": "codex"
+            },
+            "pi": {
+              "kind": "home-files",
+              "home": "/home/vector/.pi-work",
+              "files": [
+                "auth.json"
+              ],
+              "cli": "pi"
+            }
+          }
+        },
+        "spare": {
+          "id": "spare",
+          "label": "spare",
+          "disabled": false,
+          "credentialSources": {
+            "codex": {
+              "kind": "codex-home",
+              "home": "/home/vector/.codex-spare",
+              "cli": "codex"
+            }
+          }
+        },
+        "off": {
+          "id": "off",
+          "label": "off",
+          "disabled": true,
+          "credentialSources": {
+            "codex": {
+              "kind": "codex-home",
+              "home": "/home/vector/.codex-off",
+              "cli": "codex"
+            }
+          }
+        }
+      }
+    },
+    "z-ai": {
+      "accounts": {
+        "main": {
+          "id": "main",
+          "label": "main",
+          "disabled": false,
+          "credentialSources": {
+            "pi": {
+              "kind": "home-files",
+              "home": "/home/vector/.pi-glm",
+              "files": [
+                "auth.json"
+              ],
+              "cli": "pi"
+            }
+          }
+        }
+      }
+    }
+  },
+  "runFiles": {
+    "none": {},
+    "trustScreen": {
+      "herdr-diagnosis.json": {
+        "detectionScreen": "Do you trust the files in this folder?\nYes / No",
+        "explain": {
+          "matchedRule": "codex-trust-dialog",
+          "promptText": "trust this folder?"
+        }
+      },
+      "visibility.json": {
+        "screen": "screen text"
+      }
+    },
+    "trustRuleOnly": {
+      "herdr-diagnosis.json": {
+        "explain": {
+          "matchedRule": "claude-trust-prompt"
+        }
+      }
+    },
+    "visibilityOnly": {
+      "visibility.json": {
+        "screen": "bwrap: no permissions to create new namespace"
+      }
+    },
+    "brokenJson": {
+      "herdr-diagnosis.json": "{nope"
+    }
+  },
+  "classify": [
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": true,
+        "text": "thinking\nOK\n"
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "OK"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": true,
+        "text": "done without the word"
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "done without the word"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": true,
+        "text": ""
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "settled"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "credential",
+        "providerSignal": {
+          "status": 401
+        }
+      },
+      "result": {
+        "outcome": "auth",
+        "evidence": "HTTP 401"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "credential",
+        "providerSignal": null
+      },
+      "result": {
+        "outcome": "auth",
+        "evidence": "the login is rejected"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "quota",
+        "providerSignal": {
+          "resetHint": "resets in 1h"
+        }
+      },
+      "result": {
+        "outcome": "quota",
+        "evidence": "resets in 1h"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "quota"
+      },
+      "result": {
+        "outcome": "quota",
+        "evidence": "the account has used up its quota"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "provider",
+        "providerSignal": {
+          "status": 503,
+          "statusWord": "UNAVAILABLE"
+        }
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "HTTP 503, UNAVAILABLE"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "provider"
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "the provider refused the call"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "x\nEROFS: read-only file system\ny",
+        "failureCode": "oops"
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "EROFS: read-only file system"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "EROFSX nothing\nOperation not permitted here",
+        "failureCode": null
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "Operation not permitted here"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "confinement refused by policy",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "confinement refused by policy"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "the call timed out after 90s",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "timeout",
+        "evidence": "the call timed out after 90s"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "run-timeout"
+      },
+      "result": {
+        "outcome": "timeout",
+        "evidence": "run-timeout"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "timed_out"
+      },
+      "result": {
+        "outcome": "timeout",
+        "evidence": "timed_out"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "time-out"
+      },
+      "result": {
+        "outcome": "timeout",
+        "evidence": "time-out"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "times out"
+      },
+      "result": {
+        "outcome": "timeout",
+        "evidence": "times out"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "runtime outage"
+      },
+      "result": {
+        "outcome": "timeout",
+        "evidence": "runtime outage"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "\n  \nsomething broke\nsecond",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "something broke"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "",
+        "failureCode": null
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "no output"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "no output"
+      }
+    },
+    {
+      "runFiles": "none",
+      "input": {
+        "ok": false,
+        "text": "a",
+        "failureCode": "provider-limit",
+        "cause": null
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "a"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": true,
+        "text": "thinking\nOK\n"
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "OK"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": true,
+        "text": "done without the word"
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "done without the word"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": true,
+        "text": ""
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "settled"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "credential",
+        "providerSignal": {
+          "status": 401
+        }
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "credential",
+        "providerSignal": null
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "quota",
+        "providerSignal": {
+          "resetHint": "resets in 1h"
+        }
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "quota"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "provider",
+        "providerSignal": {
+          "status": 503,
+          "statusWord": "UNAVAILABLE"
+        }
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "provider"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "x\nEROFS: read-only file system\ny",
+        "failureCode": "oops"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "EROFSX nothing\nOperation not permitted here",
+        "failureCode": null
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "confinement refused by policy",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "the call timed out after 90s",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "run-timeout"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "timed_out"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "time-out"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "times out"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "runtime outage"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "\n  \nsomething broke\nsecond",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "",
+        "failureCode": null
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustScreen",
+      "input": {
+        "ok": false,
+        "text": "a",
+        "failureCode": "provider-limit",
+        "cause": null
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "trust this folder?",
+        "matchedRule": "codex-trust-dialog"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": true,
+        "text": "thinking\nOK\n"
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "OK"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": true,
+        "text": "done without the word"
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "done without the word"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": true,
+        "text": ""
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "settled"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "credential",
+        "providerSignal": {
+          "status": 401
+        }
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "credential",
+        "providerSignal": null
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "quota",
+        "providerSignal": {
+          "resetHint": "resets in 1h"
+        }
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "quota"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "provider",
+        "providerSignal": {
+          "status": 503,
+          "statusWord": "UNAVAILABLE"
+        }
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "provider"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "x\nEROFS: read-only file system\ny",
+        "failureCode": "oops"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "EROFSX nothing\nOperation not permitted here",
+        "failureCode": null
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "confinement refused by policy",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "the call timed out after 90s",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "run-timeout"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "timed_out"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "time-out"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "times out"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "runtime outage"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "\n  \nsomething broke\nsecond",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "",
+        "failureCode": null
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "trustRuleOnly",
+      "input": {
+        "ok": false,
+        "text": "a",
+        "failureCode": "provider-limit",
+        "cause": null
+      },
+      "result": {
+        "outcome": "blocked-trust-prompt",
+        "evidence": "herdr rule claude-trust-prompt",
+        "matchedRule": "claude-trust-prompt"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": true,
+        "text": "thinking\nOK\n"
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "OK"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": true,
+        "text": "done without the word"
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "done without the word"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": true,
+        "text": ""
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "settled"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "credential",
+        "providerSignal": {
+          "status": 401
+        }
+      },
+      "result": {
+        "outcome": "auth",
+        "evidence": "HTTP 401"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "credential",
+        "providerSignal": null
+      },
+      "result": {
+        "outcome": "auth",
+        "evidence": "the login is rejected"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "quota",
+        "providerSignal": {
+          "resetHint": "resets in 1h"
+        }
+      },
+      "result": {
+        "outcome": "quota",
+        "evidence": "resets in 1h"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "quota"
+      },
+      "result": {
+        "outcome": "quota",
+        "evidence": "the account has used up its quota"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "provider",
+        "providerSignal": {
+          "status": 503,
+          "statusWord": "UNAVAILABLE"
+        }
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "HTTP 503, UNAVAILABLE"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "provider"
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "the provider refused the call"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "x\nEROFS: read-only file system\ny",
+        "failureCode": "oops"
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "EROFS: read-only file system"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "EROFSX nothing\nOperation not permitted here",
+        "failureCode": null
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "Operation not permitted here"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "confinement refused by policy",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "confinement refused by policy"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "the call timed out after 90s",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "bwrap: no permissions to create new namespace"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "run-timeout"
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "bwrap: no permissions to create new namespace"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "timed_out"
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "bwrap: no permissions to create new namespace"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "time-out"
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "bwrap: no permissions to create new namespace"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "times out"
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "bwrap: no permissions to create new namespace"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "runtime outage"
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "bwrap: no permissions to create new namespace"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "\n  \nsomething broke\nsecond",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "bwrap: no permissions to create new namespace"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "",
+        "failureCode": null
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "bwrap: no permissions to create new namespace"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "bwrap: no permissions to create new namespace"
+      }
+    },
+    {
+      "runFiles": "visibilityOnly",
+      "input": {
+        "ok": false,
+        "text": "a",
+        "failureCode": "provider-limit",
+        "cause": null
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "bwrap: no permissions to create new namespace"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": true,
+        "text": "thinking\nOK\n"
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "OK"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": true,
+        "text": "done without the word"
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "done without the word"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": true,
+        "text": ""
+      },
+      "result": {
+        "outcome": "ok",
+        "evidence": "settled"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "credential",
+        "providerSignal": {
+          "status": 401
+        }
+      },
+      "result": {
+        "outcome": "auth",
+        "evidence": "HTTP 401"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "credential",
+        "providerSignal": null
+      },
+      "result": {
+        "outcome": "auth",
+        "evidence": "the login is rejected"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "quota",
+        "providerSignal": {
+          "resetHint": "resets in 1h"
+        }
+      },
+      "result": {
+        "outcome": "quota",
+        "evidence": "resets in 1h"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "quota"
+      },
+      "result": {
+        "outcome": "quota",
+        "evidence": "the account has used up its quota"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "provider",
+        "providerSignal": {
+          "status": 503,
+          "statusWord": "UNAVAILABLE"
+        }
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "HTTP 503, UNAVAILABLE"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "x",
+        "failureCode": "provider-limit",
+        "cause": "provider"
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "the provider refused the call"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "x\nEROFS: read-only file system\ny",
+        "failureCode": "oops"
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "EROFS: read-only file system"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "EROFSX nothing\nOperation not permitted here",
+        "failureCode": null
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "Operation not permitted here"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "confinement refused by policy",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "sandbox",
+        "evidence": "confinement refused by policy"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "the call timed out after 90s",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "timeout",
+        "evidence": "the call timed out after 90s"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "run-timeout"
+      },
+      "result": {
+        "outcome": "timeout",
+        "evidence": "run-timeout"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "timed_out"
+      },
+      "result": {
+        "outcome": "timeout",
+        "evidence": "timed_out"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "time-out"
+      },
+      "result": {
+        "outcome": "timeout",
+        "evidence": "time-out"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "times out"
+      },
+      "result": {
+        "outcome": "timeout",
+        "evidence": "times out"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "ok",
+        "failureCode": "runtime outage"
+      },
+      "result": {
+        "outcome": "timeout",
+        "evidence": "runtime outage"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "\n  \nsomething broke\nsecond",
+        "failureCode": "x"
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "something broke"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "",
+        "failureCode": null
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "no output"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "no output"
+      }
+    },
+    {
+      "runFiles": "brokenJson",
+      "input": {
+        "ok": false,
+        "text": "a",
+        "failureCode": "provider-limit",
+        "cause": null
+      },
+      "result": {
+        "outcome": "other",
+        "evidence": "a"
+      }
+    }
+  ],
+  "verdict": [
+    {
+      "rows": [],
+      "verdict": "nothing-to-probe"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "no-probe"
+        }
+      ],
+      "verdict": "nothing-to-probe"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "ok"
+        }
+      ],
+      "verdict": "healthy"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "ok"
+        },
+        {
+          "leg": "harness",
+          "outcome": "ok",
+          "inVerdict": true
+        }
+      ],
+      "verdict": "healthy"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "auth"
+        },
+        {
+          "leg": "direct",
+          "outcome": "quota"
+        }
+      ],
+      "verdict": "account-fault"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "auth"
+        },
+        {
+          "leg": "harness",
+          "outcome": "ok",
+          "inVerdict": true
+        }
+      ],
+      "verdict": "mixed"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "auth"
+        },
+        {
+          "leg": "harness",
+          "outcome": "ok",
+          "inVerdict": false
+        }
+      ],
+      "verdict": "account-fault"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "auth"
+        },
+        {
+          "leg": "harness",
+          "outcome": "sandbox",
+          "inVerdict": true
+        }
+      ],
+      "verdict": "account-fault"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "ok"
+        },
+        {
+          "leg": "harness",
+          "outcome": "blocked-trust-prompt",
+          "inVerdict": true
+        }
+      ],
+      "verdict": "harness-fault"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "ok"
+        },
+        {
+          "leg": "harness",
+          "outcome": "sandbox",
+          "inVerdict": false
+        }
+      ],
+      "verdict": "healthy"
+    },
+    {
+      "rows": [
+        {
+          "leg": "harness",
+          "outcome": "auth",
+          "inVerdict": true
+        },
+        {
+          "leg": "harness",
+          "outcome": "quota",
+          "inVerdict": true
+        }
+      ],
+      "verdict": "account-fault"
+    },
+    {
+      "rows": [
+        {
+          "leg": "harness",
+          "outcome": "ok",
+          "inVerdict": true
+        },
+        {
+          "leg": "harness",
+          "outcome": "other",
+          "inVerdict": true
+        }
+      ],
+      "verdict": "mixed"
+    },
+    {
+      "rows": [
+        {
+          "leg": "harness",
+          "outcome": "auth",
+          "inVerdict": false
+        }
+      ],
+      "verdict": "nothing-to-probe"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "ok"
+        },
+        {
+          "leg": "direct",
+          "outcome": "other"
+        }
+      ],
+      "verdict": "mixed"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "other"
+        }
+      ],
+      "verdict": "mixed"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "ok"
+        },
+        {
+          "leg": "direct",
+          "outcome": "auth"
+        }
+      ],
+      "verdict": "mixed"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "no-probe"
+        },
+        {
+          "leg": "harness",
+          "outcome": "ok",
+          "inVerdict": true
+        }
+      ],
+      "verdict": "healthy"
+    },
+    {
+      "rows": [
+        {
+          "leg": "direct",
+          "outcome": "quota"
+        },
+        {
+          "leg": "harness",
+          "outcome": "quarantined",
+          "inVerdict": false
+        }
+      ],
+      "verdict": "account-fault"
+    },
+    {
+      "rows": [
+        {
+          "leg": "harness",
+          "outcome": "quarantined",
+          "inVerdict": false
+        }
+      ],
+      "verdict": "nothing-to-probe"
+    }
+  ],
+  "invocations": [
+    {
+      "provider": "openai",
+      "accountId": "work",
+      "executorId": null,
+      "plan": {
+        "provider": "openai-codex",
+        "accountId": "work",
+        "account": {
+          "id": "work",
+          "label": "Work",
+          "disabled": false,
+          "credentialSources": {
+            "codex": {
+              "kind": "codex-home",
+              "home": "/home/vector/.codex-work",
+              "cli": "codex"
+            },
+            "pi": {
+              "kind": "home-files",
+              "home": "/home/vector/.pi-work",
+              "files": [
+                "auth.json"
+              ],
+              "cli": "pi"
+            }
+          }
+        },
+        "invocations": [
+          {
+            "executorId": "pi-executor",
+            "invocationId": "pi-work",
+            "cli": "pi",
+            "adapter": "cli-spawn",
+            "confined": true,
+            "via": "lease"
+          },
+          {
+            "executorId": "pi-executor",
+            "invocationId": "pi-plain",
+            "cli": "pi",
+            "adapter": "cli-spawn",
+            "confined": false,
+            "via": "env"
+          },
+          {
+            "executorId": "codex-executor",
+            "invocationId": "codex-main",
+            "cli": "codex",
+            "adapter": "cli-spawn",
+            "confined": true,
+            "via": "lease"
+          }
+        ]
+      }
+    },
+    {
+      "provider": "openai",
+      "accountId": "spare",
+      "executorId": null,
+      "plan": {
+        "provider": "openai-codex",
+        "accountId": "spare",
+        "account": {
+          "id": "spare",
+          "label": "spare",
+          "disabled": false,
+          "credentialSources": {
+            "codex": {
+              "kind": "codex-home",
+              "home": "/home/vector/.codex-spare",
+              "cli": "codex"
+            }
+          }
+        },
+        "invocations": [
+          {
+            "executorId": "codex-executor",
+            "invocationId": "codex-main",
+            "cli": "codex",
+            "adapter": "cli-spawn",
+            "confined": true,
+            "via": "lease"
+          },
+          {
+            "executorId": "codex-executor",
+            "invocationId": "codex-spare",
+            "cli": "codex",
+            "adapter": "cli-spawn",
+            "confined": true,
+            "via": "name"
+          }
+        ]
+      }
+    },
+    {
+      "provider": "codex",
+      "accountId": "spare",
+      "executorId": null,
+      "plan": {
+        "provider": "openai-codex",
+        "accountId": "spare",
+        "account": {
+          "id": "spare",
+          "label": "spare",
+          "disabled": false,
+          "credentialSources": {
+            "codex": {
+              "kind": "codex-home",
+              "home": "/home/vector/.codex-spare",
+              "cli": "codex"
+            }
+          }
+        },
+        "invocations": [
+          {
+            "executorId": "codex-executor",
+            "invocationId": "codex-main",
+            "cli": "codex",
+            "adapter": "cli-spawn",
+            "confined": true,
+            "via": "lease"
+          },
+          {
+            "executorId": "codex-executor",
+            "invocationId": "codex-spare",
+            "cli": "codex",
+            "adapter": "cli-spawn",
+            "confined": true,
+            "via": "name"
+          }
+        ]
+      }
+    },
+    {
+      "provider": "openai",
+      "accountId": "work",
+      "executorId": "pi-executor",
+      "plan": {
+        "provider": "openai-codex",
+        "accountId": "work",
+        "account": {
+          "id": "work",
+          "label": "Work",
+          "disabled": false,
+          "credentialSources": {
+            "codex": {
+              "kind": "codex-home",
+              "home": "/home/vector/.codex-work",
+              "cli": "codex"
+            },
+            "pi": {
+              "kind": "home-files",
+              "home": "/home/vector/.pi-work",
+              "files": [
+                "auth.json"
+              ],
+              "cli": "pi"
+            }
+          }
+        },
+        "invocations": [
+          {
+            "executorId": "pi-executor",
+            "invocationId": "pi-work",
+            "cli": "pi",
+            "adapter": "cli-spawn",
+            "confined": true,
+            "via": "lease"
+          },
+          {
+            "executorId": "pi-executor",
+            "invocationId": "pi-plain",
+            "cli": "pi",
+            "adapter": "cli-spawn",
+            "confined": false,
+            "via": "env"
+          }
+        ]
+      }
+    },
+    {
+      "provider": "openai",
+      "accountId": "off",
+      "executorId": null,
+      "plan": {
+        "provider": "openai-codex",
+        "accountId": "off",
+        "account": {
+          "id": "off",
+          "label": "off",
+          "disabled": true,
+          "credentialSources": {
+            "codex": {
+              "kind": "codex-home",
+              "home": "/home/vector/.codex-off",
+              "cli": "codex"
+            }
+          }
+        },
+        "invocations": [
+          {
+            "executorId": "codex-executor",
+            "invocationId": "codex-main",
+            "cli": "codex",
+            "adapter": "cli-spawn",
+            "confined": true,
+            "via": "lease"
+          }
+        ]
+      }
+    },
+    {
+      "provider": "openai",
+      "accountId": "ghost",
+      "executorId": null,
+      "plan": {
+        "provider": "openai-codex",
+        "accountId": "ghost",
+        "account": null,
+        "invocations": []
+      }
+    },
+    {
+      "provider": "z-ai",
+      "accountId": "main",
+      "executorId": null,
+      "plan": {
+        "provider": "z-ai",
+        "accountId": "main",
+        "account": {
+          "id": "main",
+          "label": "main",
+          "disabled": false,
+          "credentialSources": {
+            "pi": {
+              "kind": "home-files",
+              "home": "/home/vector/.pi-glm",
+              "files": [
+                "auth.json"
+              ],
+              "cli": "pi"
+            }
+          }
+        },
+        "invocations": []
+      }
+    },
+    {
+      "provider": "glm",
+      "accountId": "main",
+      "executorId": null,
+      "plan": {
+        "provider": "z-ai",
+        "accountId": "main",
+        "account": {
+          "id": "main",
+          "label": "main",
+          "disabled": false,
+          "credentialSources": {
+            "pi": {
+              "kind": "home-files",
+              "home": "/home/vector/.pi-glm",
+              "files": [
+                "auth.json"
+              ],
+              "cli": "pi"
+            }
+          }
+        },
+        "invocations": []
+      }
+    },
+    {
+      "provider": "unmanaged",
+      "accountId": "x",
+      "executorId": null,
+      "plan": {
+        "provider": "unmanaged",
+        "accountId": "x",
+        "account": null,
+        "invocations": []
+      }
+    }
+  ],
+  "probeModel": [
+    {
+      "executorId": "codex-executor",
+      "family": "openai",
+      "result": {
+        "model": null,
+        "modelSource": "invocation-default"
+      }
+    },
+    {
+      "executorId": "pi-executor",
+      "family": "openai",
+      "result": {
+        "model": null,
+        "modelSource": "invocation-default"
+      }
+    },
+    {
+      "executorId": "glm-executor",
+      "family": "z-ai",
+      "result": {
+        "model": null,
+        "modelSource": "invocation-default"
+      }
+    },
+    {
+      "executorId": "ghost",
+      "family": "openai",
+      "result": {
+        "model": null,
+        "modelSource": "invocation-default"
+      }
+    },
+    {
+      "executorId": "codex-executor",
+      "family": "other",
+      "result": {
+        "model": "gpt-5",
+        "modelSource": "openai.flagship"
+      }
+    }
+  ],
+  "pinned": [
+    {
+      "provider": "openai",
+      "accountId": "work",
+      "config": {
+        "llmAccounts": {
+          "openai": {
+            "work": {
+              "label": "Work",
+              "credentialStore": {
+                "codex": "/home/vector/.codex-work",
+                "pi": "/home/vector/.pi-work"
+              }
+            }
+          },
+          "z-ai": {
+            "main": {
+              "credentialStore": {
+                "pi": "/home/vector/.pi-glm"
+              }
+            }
+          }
+        },
+        "executors": {
+          "pi-executor": {
+            "providerModel": "openai",
+            "invocations": [
+              {
+                "id": "pi-work",
+                "via": "cli",
+                "command": "pi",
+                "confinement": {
+                  "backend": "bwrap"
+                },
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "files": [
+                    "auth.json"
+                  ],
+                  "sessionDir": "sessions"
+                }
+              },
+              {
+                "id": "pi-plain",
+                "via": "cli",
+                "command": "/usr/bin/pi",
+                "env": {
+                  "PI_CODING_AGENT_DIR": "/home/vector/.pi-work"
+                }
+              }
+            ]
+          },
+          "codex-executor": {
+            "providerModel": "openai",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "invocations": [
+              {
+                "id": "codex-main",
+                "via": "cli",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                }
+              },
+              {
+                "id": "codex-spare",
+                "via": "cli",
+                "command": "codex"
+              },
+              {
+                "id": "codex-api",
+                "via": "api",
+                "command": "codex"
+              }
+            ]
+          },
+          "glm-executor": {
+            "providerModel": "z-ai",
+            "invocations": [
+              {
+                "id": "pi-glm",
+                "via": "cli",
+                "command": "pi"
+              }
+            ]
+          }
+        },
+        "modelPolicies": {
+          "openai": {
+            "standard": "gpt-5-mini",
+            "flagship": [
+              {
+                "model": "gpt-5-pro",
+                "pool": "openai"
+              },
+              "gpt-5@other"
+            ],
+            "advanced": {
+              "model": "gpt-5",
+              "effort": "high"
+            }
+          }
+        }
+      }
+    },
+    {
+      "provider": "codex",
+      "accountId": "spare",
+      "config": {
+        "llmAccounts": {
+          "openai": {
+            "spare": {
+              "credentialStore": {
+                "codex": "/home/vector/.codex-spare"
+              }
+            }
+          },
+          "z-ai": {
+            "main": {
+              "credentialStore": {
+                "pi": "/home/vector/.pi-glm"
+              }
+            }
+          }
+        },
+        "executors": {
+          "pi-executor": {
+            "providerModel": "openai",
+            "invocations": [
+              {
+                "id": "pi-work",
+                "via": "cli",
+                "command": "pi",
+                "confinement": {
+                  "backend": "bwrap"
+                },
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "files": [
+                    "auth.json"
+                  ],
+                  "sessionDir": "sessions"
+                }
+              },
+              {
+                "id": "pi-plain",
+                "via": "cli",
+                "command": "/usr/bin/pi",
+                "env": {
+                  "PI_CODING_AGENT_DIR": "/home/vector/.pi-work"
+                }
+              }
+            ]
+          },
+          "codex-executor": {
+            "providerModel": "openai",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "invocations": [
+              {
+                "id": "codex-main",
+                "via": "cli",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                }
+              },
+              {
+                "id": "codex-spare",
+                "via": "cli",
+                "command": "codex"
+              },
+              {
+                "id": "codex-api",
+                "via": "api",
+                "command": "codex"
+              }
+            ]
+          },
+          "glm-executor": {
+            "providerModel": "z-ai",
+            "invocations": [
+              {
+                "id": "pi-glm",
+                "via": "cli",
+                "command": "pi"
+              }
+            ]
+          }
+        },
+        "modelPolicies": {
+          "openai": {
+            "standard": "gpt-5-mini",
+            "flagship": [
+              {
+                "model": "gpt-5-pro",
+                "pool": "openai"
+              },
+              "gpt-5@other"
+            ],
+            "advanced": {
+              "model": "gpt-5",
+              "effort": "high"
+            }
+          }
+        }
+      }
+    },
+    {
+      "provider": "z-ai",
+      "accountId": "main",
+      "config": {
+        "llmAccounts": {
+          "openai": {
+            "work": {
+              "label": "Work",
+              "credentialStore": {
+                "codex": "/home/vector/.codex-work",
+                "pi": "/home/vector/.pi-work"
+              }
+            },
+            "spare": {
+              "credentialStore": {
+                "codex": "/home/vector/.codex-spare"
+              }
+            },
+            "off": {
+              "disabled": true,
+              "credentialStore": {
+                "codex": "/home/vector/.codex-off"
+              }
+            }
+          },
+          "z-ai": {
+            "main": {
+              "credentialStore": {
+                "pi": "/home/vector/.pi-glm"
+              }
+            }
+          }
+        },
+        "executors": {
+          "pi-executor": {
+            "providerModel": "openai",
+            "invocations": [
+              {
+                "id": "pi-work",
+                "via": "cli",
+                "command": "pi",
+                "confinement": {
+                  "backend": "bwrap"
+                },
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "files": [
+                    "auth.json"
+                  ],
+                  "sessionDir": "sessions"
+                }
+              },
+              {
+                "id": "pi-plain",
+                "via": "cli",
+                "command": "/usr/bin/pi",
+                "env": {
+                  "PI_CODING_AGENT_DIR": "/home/vector/.pi-work"
+                }
+              }
+            ]
+          },
+          "codex-executor": {
+            "providerModel": "openai",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "invocations": [
+              {
+                "id": "codex-main",
+                "via": "cli",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                }
+              },
+              {
+                "id": "codex-spare",
+                "via": "cli",
+                "command": "codex"
+              },
+              {
+                "id": "codex-api",
+                "via": "api",
+                "command": "codex"
+              }
+            ]
+          },
+          "glm-executor": {
+            "providerModel": "z-ai",
+            "invocations": [
+              {
+                "id": "pi-glm",
+                "via": "cli",
+                "command": "pi"
+              }
+            ]
+          }
+        },
+        "modelPolicies": {
+          "openai": {
+            "standard": "gpt-5-mini",
+            "flagship": [
+              {
+                "model": "gpt-5-pro",
+                "pool": "openai"
+              },
+              "gpt-5@other"
+            ],
+            "advanced": {
+              "model": "gpt-5",
+              "effort": "high"
+            }
+          }
+        }
+      }
+    },
+    {
+      "provider": "openai",
+      "accountId": "ghost",
+      "config": {
+        "llmAccounts": {
+          "z-ai": {
+            "main": {
+              "credentialStore": {
+                "pi": "/home/vector/.pi-glm"
+              }
+            }
+          }
+        },
+        "executors": {
+          "pi-executor": {
+            "providerModel": "openai",
+            "invocations": [
+              {
+                "id": "pi-work",
+                "via": "cli",
+                "command": "pi",
+                "confinement": {
+                  "backend": "bwrap"
+                },
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "files": [
+                    "auth.json"
+                  ],
+                  "sessionDir": "sessions"
+                }
+              },
+              {
+                "id": "pi-plain",
+                "via": "cli",
+                "command": "/usr/bin/pi",
+                "env": {
+                  "PI_CODING_AGENT_DIR": "/home/vector/.pi-work"
+                }
+              }
+            ]
+          },
+          "codex-executor": {
+            "providerModel": "openai",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "invocations": [
+              {
+                "id": "codex-main",
+                "via": "cli",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                }
+              },
+              {
+                "id": "codex-spare",
+                "via": "cli",
+                "command": "codex"
+              },
+              {
+                "id": "codex-api",
+                "via": "api",
+                "command": "codex"
+              }
+            ]
+          },
+          "glm-executor": {
+            "providerModel": "z-ai",
+            "invocations": [
+              {
+                "id": "pi-glm",
+                "via": "cli",
+                "command": "pi"
+              }
+            ]
+          }
+        },
+        "modelPolicies": {
+          "openai": {
+            "standard": "gpt-5-mini",
+            "flagship": [
+              {
+                "model": "gpt-5-pro",
+                "pool": "openai"
+              },
+              "gpt-5@other"
+            ],
+            "advanced": {
+              "model": "gpt-5",
+              "effort": "high"
+            }
+          }
+        }
+      }
+    },
+    {
+      "provider": "glm",
+      "accountId": "main",
+      "config": {
+        "llmAccounts": {
+          "openai": {
+            "work": {
+              "label": "Work",
+              "credentialStore": {
+                "codex": "/home/vector/.codex-work",
+                "pi": "/home/vector/.pi-work"
+              }
+            },
+            "spare": {
+              "credentialStore": {
+                "codex": "/home/vector/.codex-spare"
+              }
+            },
+            "off": {
+              "disabled": true,
+              "credentialStore": {
+                "codex": "/home/vector/.codex-off"
+              }
+            }
+          },
+          "z-ai": {
+            "main": {
+              "credentialStore": {
+                "pi": "/home/vector/.pi-glm"
+              }
+            }
+          }
+        },
+        "executors": {
+          "pi-executor": {
+            "providerModel": "openai",
+            "invocations": [
+              {
+                "id": "pi-work",
+                "via": "cli",
+                "command": "pi",
+                "confinement": {
+                  "backend": "bwrap"
+                },
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "files": [
+                    "auth.json"
+                  ],
+                  "sessionDir": "sessions"
+                }
+              },
+              {
+                "id": "pi-plain",
+                "via": "cli",
+                "command": "/usr/bin/pi",
+                "env": {
+                  "PI_CODING_AGENT_DIR": "/home/vector/.pi-work"
+                }
+              }
+            ]
+          },
+          "codex-executor": {
+            "providerModel": "openai",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "invocations": [
+              {
+                "id": "codex-main",
+                "via": "cli",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                }
+              },
+              {
+                "id": "codex-spare",
+                "via": "cli",
+                "command": "codex"
+              },
+              {
+                "id": "codex-api",
+                "via": "api",
+                "command": "codex"
+              }
+            ]
+          },
+          "glm-executor": {
+            "providerModel": "z-ai",
+            "invocations": [
+              {
+                "id": "pi-glm",
+                "via": "cli",
+                "command": "pi"
+              }
+            ]
+          }
+        },
+        "modelPolicies": {
+          "openai": {
+            "standard": "gpt-5-mini",
+            "flagship": [
+              {
+                "model": "gpt-5-pro",
+                "pool": "openai"
+              },
+              "gpt-5@other"
+            ],
+            "advanced": {
+              "model": "gpt-5",
+              "effort": "high"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "contractOf": {
+    "objective": "Account probe: there is no task. Reply with the single word OK.",
+    "contextRefs": [],
+    "constraints": [],
+    "expectedOutputs": [
+      "the single word OK"
+    ],
+    "mutation": "read-only",
+    "evidence": {
+      "required": "reported"
+    },
+    "role": "reviewer",
+    "budget": {
+      "timeoutMs": 180000,
+      "maxRuns": 1
+    }
+  },
+  "contractCustom": {
+    "objective": "p",
+    "contextRefs": [],
+    "constraints": [],
+    "expectedOutputs": [
+      "the single word OK"
+    ],
+    "mutation": "read-only",
+    "evidence": {
+      "required": "reported"
+    },
+    "role": "reviewer",
+    "budget": {
+      "timeoutMs": 5,
+      "maxRuns": 1
+    }
+  },
+  "binding": {
+    "assignmentId": "a",
+    "policy": {
+      "keep": 1,
+      "preferExecutor": "e",
+      "preferInvocation": "i"
+    },
+    "binding": {
+      "executor": "e",
+      "invocation": "i",
+      "posture": "read-only"
+    }
+  },
+  "bindingNoPolicy": {
+    "assignmentId": "a",
+    "binding": {
+      "executor": "e",
+      "invocation": "i",
+      "posture": "read-only"
+    },
+    "policy": {
+      "preferExecutor": "e",
+      "preferInvocation": "i"
+    }
+  },
+  "pins": [
+    {
+      "value": "openai/work",
+      "result": {
+        "pool": "openai",
+        "id": "work"
+      }
+    },
+    {
+      "value": " openai/work ",
+      "result": {
+        "pool": "openai",
+        "id": "work"
+      }
+    },
+    {
+      "value": "openai",
+      "result": {
+        "refused": {
+          "reason": "account-pin-invalid",
+          "detail": "a pinned account must be written pool/account (for example openai/work), got \"openai\": name the pool the account belongs to"
+        }
+      }
+    },
+    {
+      "value": "/work",
+      "result": {
+        "refused": {
+          "reason": "account-pin-invalid",
+          "detail": "a pinned account must be written pool/account (for example openai/work), got \"/work\": name the pool the account belongs to"
+        }
+      }
+    },
+    {
+      "value": "openai/",
+      "result": {
+        "refused": {
+          "reason": "account-pin-invalid",
+          "detail": "a pinned account must be written pool/account (for example openai/work), got \"openai/\": name the pool the account belongs to"
+        }
+      }
+    },
+    {
+      "value": "",
+      "result": {
+        "refused": {
+          "reason": "account-pin-invalid",
+          "detail": "a pinned account must be written pool/account (for example openai/work), got \"\""
+        }
+      }
+    },
+    {
+      "value": "   ",
+      "result": {
+        "refused": {
+          "reason": "account-pin-invalid",
+          "detail": "a pinned account must be written pool/account (for example openai/work), got \"   \""
+        }
+      }
+    },
+    {
+      "value": "a/b/c",
+      "result": {
+        "pool": "a",
+        "id": "b/c"
+      }
+    },
+    {
+      "value": null,
+      "result": {
+        "refused": {
+          "reason": "account-pin-invalid",
+          "detail": "a pinned account must be written pool/account (for example openai/work), got null"
+        }
+      }
+    },
+    {
+      "value": 7,
+      "result": {
+        "refused": {
+          "reason": "account-pin-invalid",
+          "detail": "a pinned account must be written pool/account (for example openai/work), got 7"
+        }
+      }
+    }
+  ],
+  "runnerConfigForBinding": [
+    {
+      "bound": {
+        "account": {
+          "pool": "openai",
+          "id": "work"
+        }
+      },
+      "config": {
+        "llmAccounts": {
+          "openai": {
+            "work": {
+              "label": "Work",
+              "credentialStore": {
+                "codex": "/home/vector/.codex-work",
+                "pi": "/home/vector/.pi-work"
+              }
+            }
+          },
+          "z-ai": {
+            "main": {
+              "credentialStore": {
+                "pi": "/home/vector/.pi-glm"
+              }
+            }
+          }
+        },
+        "executors": {
+          "pi-executor": {
+            "providerModel": "openai",
+            "invocations": [
+              {
+                "id": "pi-work",
+                "via": "cli",
+                "command": "pi",
+                "confinement": {
+                  "backend": "bwrap"
+                },
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "files": [
+                    "auth.json"
+                  ],
+                  "sessionDir": "sessions"
+                }
+              },
+              {
+                "id": "pi-plain",
+                "via": "cli",
+                "command": "/usr/bin/pi",
+                "env": {
+                  "PI_CODING_AGENT_DIR": "/home/vector/.pi-work"
+                }
+              }
+            ]
+          },
+          "codex-executor": {
+            "providerModel": "openai",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "invocations": [
+              {
+                "id": "codex-main",
+                "via": "cli",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                }
+              },
+              {
+                "id": "codex-spare",
+                "via": "cli",
+                "command": "codex"
+              },
+              {
+                "id": "codex-api",
+                "via": "api",
+                "command": "codex"
+              }
+            ]
+          },
+          "glm-executor": {
+            "providerModel": "z-ai",
+            "invocations": [
+              {
+                "id": "pi-glm",
+                "via": "cli",
+                "command": "pi"
+              }
+            ]
+          }
+        },
+        "modelPolicies": {
+          "openai": {
+            "standard": "gpt-5-mini",
+            "flagship": [
+              {
+                "model": "gpt-5-pro",
+                "pool": "openai"
+              },
+              "gpt-5@other"
+            ],
+            "advanced": {
+              "model": "gpt-5",
+              "effort": "high"
+            }
+          }
+        }
+      }
+    },
+    {
+      "bound": {
+        "account": {
+          "pool": "codex",
+          "id": "spare"
+        }
+      },
+      "config": {
+        "llmAccounts": {
+          "openai": {
+            "spare": {
+              "credentialStore": {
+                "codex": "/home/vector/.codex-spare"
+              }
+            }
+          },
+          "z-ai": {
+            "main": {
+              "credentialStore": {
+                "pi": "/home/vector/.pi-glm"
+              }
+            }
+          }
+        },
+        "executors": {
+          "pi-executor": {
+            "providerModel": "openai",
+            "invocations": [
+              {
+                "id": "pi-work",
+                "via": "cli",
+                "command": "pi",
+                "confinement": {
+                  "backend": "bwrap"
+                },
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "files": [
+                    "auth.json"
+                  ],
+                  "sessionDir": "sessions"
+                }
+              },
+              {
+                "id": "pi-plain",
+                "via": "cli",
+                "command": "/usr/bin/pi",
+                "env": {
+                  "PI_CODING_AGENT_DIR": "/home/vector/.pi-work"
+                }
+              }
+            ]
+          },
+          "codex-executor": {
+            "providerModel": "openai",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "invocations": [
+              {
+                "id": "codex-main",
+                "via": "cli",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                }
+              },
+              {
+                "id": "codex-spare",
+                "via": "cli",
+                "command": "codex"
+              },
+              {
+                "id": "codex-api",
+                "via": "api",
+                "command": "codex"
+              }
+            ]
+          },
+          "glm-executor": {
+            "providerModel": "z-ai",
+            "invocations": [
+              {
+                "id": "pi-glm",
+                "via": "cli",
+                "command": "pi"
+              }
+            ]
+          }
+        },
+        "modelPolicies": {
+          "openai": {
+            "standard": "gpt-5-mini",
+            "flagship": [
+              {
+                "model": "gpt-5-pro",
+                "pool": "openai"
+              },
+              "gpt-5@other"
+            ],
+            "advanced": {
+              "model": "gpt-5",
+              "effort": "high"
+            }
+          }
+        }
+      }
+    },
+    {
+      "bound": {},
+      "config": {
+        "llmAccounts": {
+          "openai": {
+            "work": {
+              "label": "Work",
+              "credentialStore": {
+                "codex": "/home/vector/.codex-work",
+                "pi": "/home/vector/.pi-work"
+              }
+            },
+            "spare": {
+              "credentialStore": {
+                "codex": "/home/vector/.codex-spare"
+              }
+            },
+            "off": {
+              "disabled": true,
+              "credentialStore": {
+                "codex": "/home/vector/.codex-off"
+              }
+            }
+          },
+          "z-ai": {
+            "main": {
+              "credentialStore": {
+                "pi": "/home/vector/.pi-glm"
+              }
+            }
+          }
+        },
+        "executors": {
+          "pi-executor": {
+            "providerModel": "openai",
+            "invocations": [
+              {
+                "id": "pi-work",
+                "via": "cli",
+                "command": "pi",
+                "confinement": {
+                  "backend": "bwrap"
+                },
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "files": [
+                    "auth.json"
+                  ],
+                  "sessionDir": "sessions"
+                }
+              },
+              {
+                "id": "pi-plain",
+                "via": "cli",
+                "command": "/usr/bin/pi",
+                "env": {
+                  "PI_CODING_AGENT_DIR": "/home/vector/.pi-work"
+                }
+              }
+            ]
+          },
+          "codex-executor": {
+            "providerModel": "openai",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "invocations": [
+              {
+                "id": "codex-main",
+                "via": "cli",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                }
+              },
+              {
+                "id": "codex-spare",
+                "via": "cli",
+                "command": "codex"
+              },
+              {
+                "id": "codex-api",
+                "via": "api",
+                "command": "codex"
+              }
+            ]
+          },
+          "glm-executor": {
+            "providerModel": "z-ai",
+            "invocations": [
+              {
+                "id": "pi-glm",
+                "via": "cli",
+                "command": "pi"
+              }
+            ]
+          }
+        },
+        "modelPolicies": {
+          "openai": {
+            "standard": "gpt-5-mini",
+            "flagship": [
+              {
+                "model": "gpt-5-pro",
+                "pool": "openai"
+              },
+              "gpt-5@other"
+            ],
+            "advanced": {
+              "model": "gpt-5",
+              "effort": "high"
+            }
+          }
+        }
+      }
+    },
+    {
+      "bound": null,
+      "config": {
+        "llmAccounts": {
+          "openai": {
+            "work": {
+              "label": "Work",
+              "credentialStore": {
+                "codex": "/home/vector/.codex-work",
+                "pi": "/home/vector/.pi-work"
+              }
+            },
+            "spare": {
+              "credentialStore": {
+                "codex": "/home/vector/.codex-spare"
+              }
+            },
+            "off": {
+              "disabled": true,
+              "credentialStore": {
+                "codex": "/home/vector/.codex-off"
+              }
+            }
+          },
+          "z-ai": {
+            "main": {
+              "credentialStore": {
+                "pi": "/home/vector/.pi-glm"
+              }
+            }
+          }
+        },
+        "executors": {
+          "pi-executor": {
+            "providerModel": "openai",
+            "invocations": [
+              {
+                "id": "pi-work",
+                "via": "cli",
+                "command": "pi",
+                "confinement": {
+                  "backend": "bwrap"
+                },
+                "credentialStore": {
+                  "use": "pi",
+                  "homeEnv": "PI_CODING_AGENT_DIR",
+                  "files": [
+                    "auth.json"
+                  ],
+                  "sessionDir": "sessions"
+                }
+              },
+              {
+                "id": "pi-plain",
+                "via": "cli",
+                "command": "/usr/bin/pi",
+                "env": {
+                  "PI_CODING_AGENT_DIR": "/home/vector/.pi-work"
+                }
+              }
+            ]
+          },
+          "codex-executor": {
+            "providerModel": "openai",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "invocations": [
+              {
+                "id": "codex-main",
+                "via": "cli",
+                "command": "codex",
+                "credentialStore": {
+                  "use": "codex",
+                  "homeEnv": "CODEX_HOME"
+                }
+              },
+              {
+                "id": "codex-spare",
+                "via": "cli",
+                "command": "codex"
+              },
+              {
+                "id": "codex-api",
+                "via": "api",
+                "command": "codex"
+              }
+            ]
+          },
+          "glm-executor": {
+            "providerModel": "z-ai",
+            "invocations": [
+              {
+                "id": "pi-glm",
+                "via": "cli",
+                "command": "pi"
+              }
+            ]
+          }
+        },
+        "modelPolicies": {
+          "openai": {
+            "standard": "gpt-5-mini",
+            "flagship": [
+              {
+                "model": "gpt-5-pro",
+                "pool": "openai"
+              },
+              "gpt-5@other"
+            ],
+            "advanced": {
+              "model": "gpt-5",
+              "effort": "high"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

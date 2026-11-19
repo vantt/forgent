@@ -15,6 +15,7 @@ fgos-agent-protocol = { path = "../../agent-protocol/rust" }
 fgos-terminal-control = { path = "../../terminal-control/rust" }
 fgos-session-host = { path = "../../session-host/rust" }
 fgos-run-result = { path = "../../run-result/rust" }
+fgos-observe = { path = "../../observe/rust" }
 fgos-host-runtime = { path = "../../host-runtime/rust" }
 fgos-git = { path = "../../git/rust" }
 fgos-process = { path = "../../process/rust" }

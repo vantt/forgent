@@ -1,0 +1,315 @@
+{
+  "contract": "accounts-login-homes.v1",
+  "recordedBy": "test/golden-recorders/accounts.recorder.mjs",
+  "note": "paths are relative to a scratch home the test rebuilds: <HOME> stands for it; real-pi is a directory, .pi/agent a link to it",
+  "runner": {
+    "llmAccounts": {
+      "openai": {
+        "work": {
+          "credentialStore": {
+            "codex": "<HOME>/.codex",
+            "pi": "<HOME>/real-pi",
+            "claude": "/elsewhere/claude"
+          }
+        },
+        "spare": {
+          "credentialStore": {
+            "codex": "/elsewhere/codex",
+            "agy": ""
+          }
+        }
+      }
+    },
+    "executors": {
+      "e": {
+        "invocations": [
+          {
+            "id": "i",
+            "credentialStore": {
+              "use": "codex",
+              "homeEnv": "CODEX_HOME"
+            }
+          },
+          {
+            "id": "j",
+            "credentialStore": {
+              "use": "pi",
+              "homeEnv": "HOME"
+            }
+          },
+          {
+            "id": "k",
+            "credentialStore": {
+              "use": "x",
+              "homeEnv": "EXTRA_HOME"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "defaultStores": [
+    {
+      "env": {},
+      "hits": [
+        {
+          "pool": "openai",
+          "account": "work",
+          "cli": "codex",
+          "key": "runner.llmAccounts.openai.work.credentialStore.codex"
+        },
+        {
+          "pool": "openai",
+          "account": "work",
+          "cli": "pi",
+          "key": "runner.llmAccounts.openai.work.credentialStore.pi"
+        }
+      ]
+    },
+    {
+      "env": {
+        "CODEX_HOME": "/elsewhere/codex"
+      },
+      "hits": [
+        {
+          "pool": "openai",
+          "account": "work",
+          "cli": "codex",
+          "key": "runner.llmAccounts.openai.work.credentialStore.codex"
+        },
+        {
+          "pool": "openai",
+          "account": "work",
+          "cli": "pi",
+          "key": "runner.llmAccounts.openai.work.credentialStore.pi"
+        },
+        {
+          "pool": "openai",
+          "account": "spare",
+          "cli": "codex",
+          "key": "runner.llmAccounts.openai.spare.credentialStore.codex"
+        }
+      ]
+    },
+    {
+      "env": {
+        "CODEX_HOME": "<HOME>/.codex"
+      },
+      "hits": [
+        {
+          "pool": "openai",
+          "account": "work",
+          "cli": "codex",
+          "key": "runner.llmAccounts.openai.work.credentialStore.codex"
+        },
+        {
+          "pool": "openai",
+          "account": "work",
+          "cli": "pi",
+          "key": "runner.llmAccounts.openai.work.credentialStore.pi"
+        }
+      ]
+    },
+    {
+      "env": {
+        "EXTRA_HOME": "/extra",
+        "PI_CODING_AGENT_DIR": "<HOME>/real-pi"
+      },
+      "hits": [
+        {
+          "pool": "openai",
+          "account": "work",
+          "cli": "codex",
+          "key": "runner.llmAccounts.openai.work.credentialStore.codex"
+        },
+        {
+          "pool": "openai",
+          "account": "work",
+          "cli": "pi",
+          "key": "runner.llmAccounts.openai.work.credentialStore.pi"
+        }
+      ]
+    }
+  ],
+  "machineStores": [
+    {
+      "env": {},
+      "inPlaceCli": null,
+      "stores": [
+        "<HOME>/.codex",
+        "<HOME>/real-pi",
+        "/elsewhere/claude",
+        "/elsewhere/codex",
+        "<HOME>/.pi/agent",
+        "<HOME>/.omp/agent",
+        "<HOME>/.claude",
+        "<HOME>/.gemini"
+      ]
+    },
+    {
+      "env": {
+        "CODEX_HOME": "/elsewhere/codex"
+      },
+      "inPlaceCli": null,
+      "stores": [
+        "<HOME>/.codex",
+        "<HOME>/real-pi",
+        "/elsewhere/claude",
+        "/elsewhere/codex",
+        "<HOME>/.pi/agent",
+        "<HOME>/.omp/agent",
+        "<HOME>/.claude",
+        "<HOME>/.gemini"
+      ]
+    },
+    {
+      "env": {
+        "CODEX_HOME": "<HOME>/.codex"
+      },
+      "inPlaceCli": null,
+      "stores": [
+        "<HOME>/.codex",
+        "<HOME>/real-pi",
+        "/elsewhere/claude",
+        "/elsewhere/codex",
+        "<HOME>/.pi/agent",
+        "<HOME>/.omp/agent",
+        "<HOME>/.claude",
+        "<HOME>/.gemini"
+      ]
+    },
+    {
+      "env": {
+        "EXTRA_HOME": "/extra",
+        "PI_CODING_AGENT_DIR": "<HOME>/real-pi"
+      },
+      "inPlaceCli": null,
+      "stores": [
+        "<HOME>/.codex",
+        "<HOME>/real-pi",
+        "/elsewhere/claude",
+        "/elsewhere/codex",
+        "<HOME>/.pi/agent",
+        "<HOME>/.omp/agent",
+        "<HOME>/.claude",
+        "<HOME>/.gemini",
+        "/extra"
+      ]
+    },
+    {
+      "env": {},
+      "inPlaceCli": "codex",
+      "stores": [
+        "<HOME>/real-pi",
+        "/elsewhere/claude",
+        "/elsewhere/codex",
+        "<HOME>/.pi/agent",
+        "<HOME>/.omp/agent",
+        "<HOME>/.claude",
+        "<HOME>/.gemini"
+      ]
+    },
+    {
+      "env": {
+        "CODEX_HOME": "/elsewhere/codex"
+      },
+      "inPlaceCli": "codex",
+      "stores": [
+        "<HOME>/real-pi",
+        "/elsewhere/claude",
+        "<HOME>/.pi/agent",
+        "<HOME>/.omp/agent",
+        "<HOME>/.claude",
+        "<HOME>/.gemini"
+      ]
+    },
+    {
+      "env": {
+        "CODEX_HOME": "<HOME>/.codex"
+      },
+      "inPlaceCli": "codex",
+      "stores": [
+        "<HOME>/real-pi",
+        "/elsewhere/claude",
+        "/elsewhere/codex",
+        "<HOME>/.pi/agent",
+        "<HOME>/.omp/agent",
+        "<HOME>/.claude",
+        "<HOME>/.gemini"
+      ]
+    },
+    {
+      "env": {
+        "EXTRA_HOME": "/extra",
+        "PI_CODING_AGENT_DIR": "<HOME>/real-pi"
+      },
+      "inPlaceCli": "codex",
+      "stores": [
+        "<HOME>/real-pi",
+        "/elsewhere/claude",
+        "/elsewhere/codex",
+        "<HOME>/.pi/agent",
+        "<HOME>/.omp/agent",
+        "<HOME>/.claude",
+        "<HOME>/.gemini",
+        "/extra"
+      ]
+    },
+    {
+      "env": {},
+      "inPlaceCli": "pi",
+      "stores": [
+        "<HOME>/.codex",
+        "/elsewhere/claude",
+        "/elsewhere/codex",
+        "<HOME>/.omp/agent",
+        "<HOME>/.claude",
+        "<HOME>/.gemini"
+      ]
+    },
+    {
+      "env": {
+        "CODEX_HOME": "/elsewhere/codex"
+      },
+      "inPlaceCli": "pi",
+      "stores": [
+        "<HOME>/.codex",
+        "/elsewhere/claude",
+        "/elsewhere/codex",
+        "<HOME>/.omp/agent",
+        "<HOME>/.claude",
+        "<HOME>/.gemini"
+      ]
+    },
+    {
+      "env": {
+        "CODEX_HOME": "<HOME>/.codex"
+      },
+      "inPlaceCli": "pi",
+      "stores": [
+        "<HOME>/.codex",
+        "/elsewhere/claude",
+        "/elsewhere/codex",
+        "<HOME>/.omp/agent",
+        "<HOME>/.claude",
+        "<HOME>/.gemini"
+      ]
+    },
+    {
+      "env": {
+        "EXTRA_HOME": "/extra",
+        "PI_CODING_AGENT_DIR": "<HOME>/real-pi"
+      },
+      "inPlaceCli": "pi",
+      "stores": [
+        "<HOME>/.codex",
+        "/elsewhere/claude",
+        "/elsewhere/codex",
+        "<HOME>/.omp/agent",
+        "<HOME>/.claude",
+        "<HOME>/.gemini",
+        "/extra"
+      ]
+    }
+  ]
+}

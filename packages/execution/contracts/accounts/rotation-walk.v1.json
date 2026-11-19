@@ -1,0 +1,827 @@
+{
+  "contract": "accounts-rotation-walk.v1",
+  "recordedBy": "test/golden-recorders/accounts.recorder.mjs",
+  "unit": {
+    "bindings": {
+      "producer/1": [
+        {
+          "assignmentId": "a1",
+          "boundAt": "2026-11-19T05:00:00.000Z",
+          "binding": {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "openai",
+            "model": "m",
+            "reasoningEffort": "high",
+            "leaseAccount": "work"
+          },
+          "outcome": "provider-limit",
+          "failureCause": "credential"
+        },
+        {
+          "assignmentId": "a2",
+          "boundAt": "2026-11-19T05:01:00.000Z",
+          "fallbackFrom": {
+            "kind": "next-candidate"
+          },
+          "binding": {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "z-ai",
+            "model": "m",
+            "reasoningEffort": "high",
+            "leaseAccount": "main"
+          },
+          "leaseConflict": true
+        },
+        {
+          "assignmentId": "a3",
+          "boundAt": "2026-11-19T05:02:00.000Z",
+          "binding": {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "z-ai",
+            "model": "m",
+            "reasoningEffort": "high",
+            "leaseAccount": "main"
+          },
+          "outcome": "provider-limit"
+        },
+        {
+          "assignmentId": "a4",
+          "boundAt": "2026-11-19T05:03:00.000Z",
+          "binding": {
+            "executor": "e",
+            "invocation": "i",
+            "model": "m"
+          }
+        },
+        {
+          "assignmentId": "a5",
+          "boundAt": "2026-11-19T05:04:00.000Z",
+          "binding": {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "openai",
+            "model": "m",
+            "reasoningEffort": "high",
+            "leaseAccount": "spare"
+          },
+          "outcome": "provider-limit"
+        },
+        {
+          "assignmentId": "a6",
+          "boundAt": "garbage",
+          "binding": {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "openai",
+            "model": "m",
+            "reasoningEffort": "high",
+            "leaseAccount": "spare"
+          }
+        }
+      ],
+      "producer/2": [
+        {
+          "assignmentId": "b1",
+          "binding": {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "openai",
+            "model": "big",
+            "reasoningEffort": "high"
+          }
+        },
+        {
+          "assignmentId": "b2",
+          "binding": {
+            "refused": true,
+            "executor": "e"
+          }
+        }
+      ],
+      "producer/3": [
+        {
+          "assignmentId": "c1",
+          "binding": {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "z-ai",
+            "model": "m",
+            "reasoningEffort": "high"
+          }
+        }
+      ],
+      "reviewer/1": [
+        {
+          "assignmentId": "d1",
+          "binding": {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "openai",
+            "model": "m",
+            "reasoningEffort": "high"
+          }
+        }
+      ],
+      "producer/x": [
+        {
+          "assignmentId": "e1",
+          "binding": {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "openai",
+            "model": "m",
+            "reasoningEffort": "high"
+          }
+        }
+      ],
+      "producer/broken": "nope"
+    }
+  },
+  "mayRotate": [
+    {
+      "rotation": null,
+      "spent": 0,
+      "result": false
+    },
+    {
+      "rotation": null,
+      "spent": 1,
+      "result": false
+    },
+    {
+      "rotation": null,
+      "spent": 2,
+      "result": false
+    },
+    {
+      "rotation": null,
+      "spent": 3,
+      "result": false
+    },
+    {
+      "rotation": {
+        "total": 3,
+        "healthy": 0
+      },
+      "spent": 0,
+      "result": false
+    },
+    {
+      "rotation": {
+        "total": 3,
+        "healthy": 0
+      },
+      "spent": 1,
+      "result": false
+    },
+    {
+      "rotation": {
+        "total": 3,
+        "healthy": 0
+      },
+      "spent": 2,
+      "result": false
+    },
+    {
+      "rotation": {
+        "total": 3,
+        "healthy": 0
+      },
+      "spent": 3,
+      "result": false
+    },
+    {
+      "rotation": {
+        "total": 3,
+        "healthy": 2
+      },
+      "spent": 0,
+      "result": true
+    },
+    {
+      "rotation": {
+        "total": 3,
+        "healthy": 2
+      },
+      "spent": 1,
+      "result": true
+    },
+    {
+      "rotation": {
+        "total": 3,
+        "healthy": 2
+      },
+      "spent": 2,
+      "result": false
+    },
+    {
+      "rotation": {
+        "total": 3,
+        "healthy": 2
+      },
+      "spent": 3,
+      "result": false
+    },
+    {
+      "rotation": {
+        "total": 1,
+        "healthy": 1
+      },
+      "spent": 0,
+      "result": false
+    },
+    {
+      "rotation": {
+        "total": 1,
+        "healthy": 1
+      },
+      "spent": 1,
+      "result": false
+    },
+    {
+      "rotation": {
+        "total": 1,
+        "healthy": 1
+      },
+      "spent": 2,
+      "result": false
+    },
+    {
+      "rotation": {
+        "total": 1,
+        "healthy": 1
+      },
+      "spent": 3,
+      "result": false
+    },
+    {
+      "rotation": {
+        "total": 2,
+        "healthy": 1
+      },
+      "spent": 0,
+      "result": true
+    },
+    {
+      "rotation": {
+        "total": 2,
+        "healthy": 1
+      },
+      "spent": 1,
+      "result": false
+    },
+    {
+      "rotation": {
+        "total": 2,
+        "healthy": 1
+      },
+      "spent": 2,
+      "result": false
+    },
+    {
+      "rotation": {
+        "total": 2,
+        "healthy": 1
+      },
+      "spent": 3,
+      "result": false
+    }
+  ],
+  "tried": [
+    {
+      "at": -1,
+      "result": []
+    },
+    {
+      "at": 0,
+      "result": []
+    },
+    {
+      "at": 1,
+      "result": [
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "openai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "work"
+        }
+      ]
+    },
+    {
+      "at": 2,
+      "result": [
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "openai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "work"
+        }
+      ]
+    },
+    {
+      "at": 3,
+      "result": [
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "openai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "work"
+        },
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "z-ai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "main"
+        }
+      ]
+    },
+    {
+      "at": 4,
+      "result": [
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "z-ai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "main"
+        }
+      ]
+    },
+    {
+      "at": 5,
+      "result": [
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "z-ai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "main"
+        }
+      ]
+    },
+    {
+      "at": 6,
+      "result": [
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "openai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "work"
+        },
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "z-ai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "main"
+        },
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "openai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "spare"
+        },
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "openai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "spare"
+        }
+      ]
+    },
+    {
+      "at": 9,
+      "result": [
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "openai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "work"
+        },
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "z-ai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "main"
+        },
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "openai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "spare"
+        },
+        {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "openai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "spare"
+        }
+      ]
+    }
+  ],
+  "triedNotArray": [
+    [],
+    []
+  ],
+  "failed": [
+    [
+      {
+        "pool": "openai",
+        "account": "work"
+      },
+      {
+        "pool": "z-ai",
+        "account": "main"
+      },
+      {
+        "pool": "openai",
+        "account": "spare"
+      }
+    ],
+    [
+      {
+        "pool": "openai",
+        "account": "work"
+      },
+      {
+        "pool": "z-ai",
+        "account": "main"
+      }
+    ],
+    [],
+    []
+  ],
+  "kept": [
+    {
+      "seat": "producer",
+      "round": 1,
+      "result": null
+    },
+    {
+      "seat": "producer",
+      "round": 2,
+      "result": {
+        "executor": "e",
+        "invocation": "i",
+        "pool": "openai",
+        "model": "m",
+        "reasoningEffort": "high",
+        "leaseAccount": "spare"
+      }
+    },
+    {
+      "seat": "producer",
+      "round": 3,
+      "result": {
+        "executor": "e",
+        "invocation": "i",
+        "pool": "openai",
+        "model": "m",
+        "reasoningEffort": "high",
+        "leaseAccount": "spare"
+      }
+    },
+    {
+      "seat": "producer",
+      "round": 4,
+      "result": {
+        "executor": "e",
+        "invocation": "i",
+        "pool": "z-ai",
+        "model": "m",
+        "reasoningEffort": "high"
+      }
+    },
+    {
+      "seat": "reviewer",
+      "round": 1,
+      "result": null
+    },
+    {
+      "seat": "reviewer",
+      "round": 2,
+      "result": {
+        "executor": "e",
+        "invocation": "i",
+        "pool": "openai",
+        "model": "m",
+        "reasoningEffort": "high"
+      }
+    },
+    {
+      "seat": "ghost",
+      "round": 9,
+      "result": null
+    }
+  ],
+  "faultPools": [
+    {
+      "boundBefore": null,
+      "pools": [
+        "openai"
+      ]
+    },
+    {
+      "boundBefore": 0,
+      "pools": []
+    },
+    {
+      "boundBefore": 1795064460000,
+      "pools": [
+        "openai"
+      ]
+    },
+    {
+      "boundBefore": 1795064430000,
+      "pools": []
+    },
+    {
+      "boundBefore": "neg-infinity",
+      "pools": []
+    }
+  ],
+  "walkState": [
+    {
+      "seat": "producer",
+      "round": 1,
+      "assignmentId": "a1",
+      "result": {
+        "tried": [],
+        "failedAccounts": [],
+        "excludePools": []
+      }
+    },
+    {
+      "seat": "producer",
+      "round": 1,
+      "assignmentId": "a2",
+      "result": {
+        "tried": [
+          {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "openai",
+            "model": "m",
+            "reasoningEffort": "high",
+            "leaseAccount": "work"
+          }
+        ],
+        "failedAccounts": [
+          {
+            "pool": "openai",
+            "account": "work"
+          }
+        ],
+        "excludePools": [
+          "openai"
+        ]
+      }
+    },
+    {
+      "seat": "producer",
+      "round": 1,
+      "assignmentId": "a3",
+      "result": {
+        "tried": [
+          {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "openai",
+            "model": "m",
+            "reasoningEffort": "high",
+            "leaseAccount": "work"
+          }
+        ],
+        "failedAccounts": [
+          {
+            "pool": "openai",
+            "account": "work"
+          },
+          {
+            "pool": "z-ai",
+            "account": "main"
+          }
+        ],
+        "excludePools": [
+          "openai"
+        ]
+      }
+    },
+    {
+      "seat": "producer",
+      "round": 1,
+      "assignmentId": "a4",
+      "result": {
+        "tried": [
+          {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "openai",
+            "model": "m",
+            "reasoningEffort": "high",
+            "leaseAccount": "work"
+          },
+          {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "z-ai",
+            "model": "m",
+            "reasoningEffort": "high",
+            "leaseAccount": "main"
+          }
+        ],
+        "failedAccounts": [
+          {
+            "pool": "openai",
+            "account": "work"
+          },
+          {
+            "pool": "z-ai",
+            "account": "main"
+          }
+        ],
+        "excludePools": [
+          "openai"
+        ]
+      }
+    },
+    {
+      "seat": "producer",
+      "round": 1,
+      "assignmentId": "a5",
+      "result": {
+        "tried": [
+          {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "z-ai",
+            "model": "m",
+            "reasoningEffort": "high",
+            "leaseAccount": "main"
+          }
+        ],
+        "failedAccounts": [
+          {
+            "pool": "openai",
+            "account": "work"
+          },
+          {
+            "pool": "z-ai",
+            "account": "main"
+          }
+        ],
+        "excludePools": [
+          "openai"
+        ]
+      }
+    },
+    {
+      "seat": "producer",
+      "round": 1,
+      "assignmentId": "a6",
+      "result": {
+        "tried": [
+          {
+            "executor": "e",
+            "invocation": "i",
+            "pool": "z-ai",
+            "model": "m",
+            "reasoningEffort": "high",
+            "leaseAccount": "main"
+          }
+        ],
+        "failedAccounts": [
+          {
+            "pool": "openai",
+            "account": "work"
+          },
+          {
+            "pool": "z-ai",
+            "account": "main"
+          },
+          {
+            "pool": "openai",
+            "account": "spare"
+          }
+        ],
+        "excludePools": []
+      }
+    },
+    {
+      "seat": "producer",
+      "round": 1,
+      "assignmentId": "zz",
+      "result": {
+        "tried": [],
+        "failedAccounts": [],
+        "excludePools": []
+      }
+    },
+    {
+      "seat": "producer",
+      "round": 2,
+      "assignmentId": "b1",
+      "result": {
+        "tried": [],
+        "failedAccounts": [],
+        "excludePools": [],
+        "continuity": {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "openai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "spare"
+        }
+      }
+    },
+    {
+      "seat": "producer",
+      "round": 3,
+      "assignmentId": "c1",
+      "result": {
+        "tried": [],
+        "failedAccounts": [],
+        "excludePools": [],
+        "continuity": {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "openai",
+          "model": "m",
+          "reasoningEffort": "high",
+          "leaseAccount": "spare"
+        }
+      }
+    },
+    {
+      "seat": "reviewer",
+      "round": 1,
+      "assignmentId": "d1",
+      "result": {
+        "tried": [],
+        "failedAccounts": [],
+        "excludePools": []
+      }
+    },
+    {
+      "seat": "producer",
+      "round": "x",
+      "assignmentId": "e1",
+      "result": {
+        "tried": [],
+        "failedAccounts": [],
+        "excludePools": [],
+        "continuity": {
+          "executor": "e",
+          "invocation": "i",
+          "pool": "z-ai",
+          "model": "m",
+          "reasoningEffort": "high"
+        }
+      }
+    },
+    {
+      "seat": "ghost",
+      "round": 1,
+      "assignmentId": "q",
+      "result": {
+        "tried": [],
+        "failedAccounts": [],
+        "excludePools": []
+      }
+    }
+  ],
+  "walkStateNoUnit": {
+    "tried": [],
+    "failedAccounts": [],
+    "excludePools": []
+  }
+}

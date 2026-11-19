@@ -1,0 +1,533 @@
+{
+  "contract": "accounts-session-probe.v1",
+  "recordedBy": "test/golden-recorders/accounts.recorder.mjs",
+  "config": {
+    "executors": {
+      "pi": {
+        "invocations": [
+          {
+            "id": "plain",
+            "via": "cli",
+            "credentialStore": {
+              "use": "pi",
+              "homeEnv": "X",
+              "files": [
+                "auth.json",
+                "bin/fd"
+              ],
+              "sessionDir": "sessions"
+            }
+          },
+          {
+            "id": "boxed",
+            "via": "cli",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "credentialStore": {
+              "use": "pi",
+              "homeEnv": "X",
+              "files": [
+                "auth.json"
+              ]
+            }
+          },
+          {
+            "id": "api",
+            "via": "api"
+          }
+        ]
+      },
+      "inherits": {
+        "confinement": {
+          "backend": "bwrap"
+        },
+        "invocations": [
+          {
+            "id": "one",
+            "via": "cli"
+          },
+          {
+            "id": "two",
+            "via": "cli",
+            "confinement": {
+              "backend": "bwrap"
+            }
+          }
+        ]
+      },
+      "none": {
+        "invocations": [
+          {
+            "id": "api",
+            "via": "api"
+          }
+        ]
+      },
+      "tool": {
+        "kind": "tool",
+        "invocations": [
+          {
+            "id": "t",
+            "via": "cli"
+          }
+        ]
+      }
+    }
+  },
+  "runFiles": {
+    "kept": {
+      "steps/finalize-home.json": {
+        "detail": {
+          "homes": 1,
+          "transcriptPath": "transcript",
+          "homeLayout": [
+            {
+              "path": "auth.json",
+              "kind": "file",
+              "files": 1,
+              "bytes": 10
+            },
+            {
+              "path": "sessions",
+              "kind": "dir",
+              "files": 2,
+              "bytes": 300
+            },
+            {
+              "path": "bin",
+              "kind": "dir",
+              "files": 1,
+              "bytes": 5
+            }
+          ],
+          "warnings": [
+            {
+              "code": "w",
+              "message": "m",
+              "extra": 1
+            }
+          ]
+        }
+      },
+      "transcript/a.jsonl": "abc",
+      "transcript/sub/b.jsonl": "defgh"
+    },
+    "mismatch": {
+      "steps/finalize-home.json": {
+        "detail": {
+          "homes": 1,
+          "homeLayout": [
+            {
+              "path": "auth.json",
+              "kind": "file",
+              "files": 1,
+              "bytes": 10
+            },
+            {
+              "path": "agent-sessions",
+              "kind": "dir",
+              "files": 3,
+              "bytes": 90
+            },
+            {
+              "path": "logs",
+              "kind": "dir",
+              "files": 0,
+              "bytes": 0
+            }
+          ],
+          "warnings": []
+        }
+      }
+    },
+    "copyFailed": {
+      "steps/finalize-home.json": {
+        "detail": {
+          "homes": 1,
+          "homeLayout": [],
+          "warnings": [
+            {
+              "code": "session-copy-failed",
+              "message": "denied"
+            }
+          ]
+        }
+      }
+    },
+    "noHome": {
+      "steps/finalize-home.json": {
+        "detail": {
+          "homes": 0,
+          "homeLayout": []
+        }
+      }
+    },
+    "noStep": {}
+  },
+  "keep": [
+    {
+      "runFiles": "kept",
+      "invocation": "plain",
+      "result": {
+        "step": {
+          "detail": {
+            "homes": 1,
+            "transcriptPath": "transcript",
+            "homeLayout": [
+              {
+                "path": "auth.json",
+                "kind": "file",
+                "files": 1,
+                "bytes": 10
+              },
+              {
+                "path": "sessions",
+                "kind": "dir",
+                "files": 2,
+                "bytes": 300
+              },
+              {
+                "path": "bin",
+                "kind": "dir",
+                "files": 1,
+                "bytes": 5
+              }
+            ],
+            "warnings": [
+              {
+                "code": "w",
+                "message": "m",
+                "extra": 1
+              }
+            ]
+          }
+        },
+        "declaredSessionDir": "sessions",
+        "observedSessionPaths": [
+          {
+            "path": "sessions",
+            "kind": "dir",
+            "files": 2,
+            "bytes": 300
+          }
+        ],
+        "transcriptPath": "<RUN-DIR>/transcript",
+        "files": 2,
+        "bytes": 8,
+        "warnings": [
+          {
+            "code": "w",
+            "message": "m"
+          }
+        ],
+        "fix": null,
+        "hasHome": true
+      }
+    },
+    {
+      "runFiles": "kept",
+      "invocation": "boxed",
+      "result": {
+        "step": {
+          "detail": {
+            "homes": 1,
+            "transcriptPath": "transcript",
+            "homeLayout": [
+              {
+                "path": "auth.json",
+                "kind": "file",
+                "files": 1,
+                "bytes": 10
+              },
+              {
+                "path": "sessions",
+                "kind": "dir",
+                "files": 2,
+                "bytes": 300
+              },
+              {
+                "path": "bin",
+                "kind": "dir",
+                "files": 1,
+                "bytes": 5
+              }
+            ],
+            "warnings": [
+              {
+                "code": "w",
+                "message": "m",
+                "extra": 1
+              }
+            ]
+          }
+        },
+        "declaredSessionDir": null,
+        "observedSessionPaths": [
+          {
+            "path": "sessions",
+            "kind": "dir",
+            "files": 2,
+            "bytes": 300
+          },
+          {
+            "path": "bin",
+            "kind": "dir",
+            "files": 1,
+            "bytes": 5
+          }
+        ],
+        "transcriptPath": "<RUN-DIR>/transcript",
+        "files": 2,
+        "bytes": 8,
+        "warnings": [
+          {
+            "code": "w",
+            "message": "m"
+          }
+        ],
+        "fix": "set sessionDir: sessions on executors.pi.invocations[boxed].credentialStore in core/config-standard/runner.yaml",
+        "hasHome": true
+      }
+    },
+    {
+      "runFiles": "mismatch",
+      "invocation": "plain",
+      "result": {
+        "step": {
+          "detail": {
+            "homes": 1,
+            "homeLayout": [
+              {
+                "path": "auth.json",
+                "kind": "file",
+                "files": 1,
+                "bytes": 10
+              },
+              {
+                "path": "agent-sessions",
+                "kind": "dir",
+                "files": 3,
+                "bytes": 90
+              },
+              {
+                "path": "logs",
+                "kind": "dir",
+                "files": 0,
+                "bytes": 0
+              }
+            ],
+            "warnings": []
+          }
+        },
+        "declaredSessionDir": "sessions",
+        "observedSessionPaths": [
+          {
+            "path": "agent-sessions",
+            "kind": "dir",
+            "files": 3,
+            "bytes": 90
+          },
+          {
+            "path": "logs",
+            "kind": "dir",
+            "files": 0,
+            "bytes": 0
+          }
+        ],
+        "transcriptPath": null,
+        "files": 0,
+        "bytes": 0,
+        "warnings": [],
+        "fix": "set sessionDir: agent-sessions on executors.pi.invocations[plain].credentialStore in core/config-standard/runner.yaml",
+        "hasHome": true
+      }
+    },
+    {
+      "runFiles": "mismatch",
+      "invocation": "boxed",
+      "result": {
+        "step": {
+          "detail": {
+            "homes": 1,
+            "homeLayout": [
+              {
+                "path": "auth.json",
+                "kind": "file",
+                "files": 1,
+                "bytes": 10
+              },
+              {
+                "path": "agent-sessions",
+                "kind": "dir",
+                "files": 3,
+                "bytes": 90
+              },
+              {
+                "path": "logs",
+                "kind": "dir",
+                "files": 0,
+                "bytes": 0
+              }
+            ],
+            "warnings": []
+          }
+        },
+        "declaredSessionDir": null,
+        "observedSessionPaths": [
+          {
+            "path": "agent-sessions",
+            "kind": "dir",
+            "files": 3,
+            "bytes": 90
+          },
+          {
+            "path": "logs",
+            "kind": "dir",
+            "files": 0,
+            "bytes": 0
+          }
+        ],
+        "transcriptPath": null,
+        "files": 0,
+        "bytes": 0,
+        "warnings": [],
+        "fix": "set sessionDir: agent-sessions on executors.pi.invocations[boxed].credentialStore in core/config-standard/runner.yaml",
+        "hasHome": true
+      }
+    },
+    {
+      "runFiles": "copyFailed",
+      "invocation": "plain",
+      "result": {
+        "step": {
+          "detail": {
+            "homes": 1,
+            "homeLayout": [],
+            "warnings": [
+              {
+                "code": "session-copy-failed",
+                "message": "denied"
+              }
+            ]
+          }
+        },
+        "declaredSessionDir": "sessions",
+        "observedSessionPaths": [],
+        "transcriptPath": null,
+        "files": 0,
+        "bytes": 0,
+        "warnings": [
+          {
+            "code": "session-copy-failed",
+            "message": "denied"
+          }
+        ],
+        "fix": null,
+        "hasHome": true
+      }
+    },
+    {
+      "runFiles": "noHome",
+      "invocation": "plain",
+      "result": {
+        "step": {
+          "detail": {
+            "homes": 0,
+            "homeLayout": []
+          }
+        },
+        "declaredSessionDir": "sessions",
+        "observedSessionPaths": [],
+        "transcriptPath": null,
+        "files": 0,
+        "bytes": 0,
+        "warnings": [],
+        "fix": null,
+        "hasHome": false
+      }
+    },
+    {
+      "runFiles": "noStep",
+      "invocation": "plain",
+      "result": {
+        "step": null,
+        "declaredSessionDir": "sessions",
+        "observedSessionPaths": [],
+        "transcriptPath": null,
+        "files": 0,
+        "bytes": 0,
+        "warnings": [],
+        "fix": null,
+        "hasHome": false
+      }
+    },
+    {
+      "runFiles": null,
+      "invocation": "plain",
+      "result": {
+        "step": null,
+        "declaredSessionDir": "sessions",
+        "observedSessionPaths": [],
+        "transcriptPath": null,
+        "files": 0,
+        "bytes": 0,
+        "warnings": [],
+        "fix": null,
+        "hasHome": false
+      }
+    }
+  ],
+  "invocations": [
+    {
+      "executorId": "pi",
+      "invocationId": null,
+      "id": "boxed"
+    },
+    {
+      "executorId": "pi",
+      "invocationId": "api",
+      "error": "executor \"pi\" has no cli invocation \"api\" (has: plain, boxed)"
+    },
+    {
+      "executorId": "pi",
+      "invocationId": "boxed",
+      "id": "boxed"
+    },
+    {
+      "executorId": "pi",
+      "invocationId": "ghost",
+      "error": "executor \"pi\" has no cli invocation \"ghost\" (has: plain, boxed)"
+    },
+    {
+      "executorId": "inherits",
+      "invocationId": null,
+      "id": "one"
+    },
+    {
+      "executorId": "none",
+      "invocationId": null,
+      "error": "executor \"none\" has no cli invocation to probe"
+    },
+    {
+      "executorId": "tool",
+      "invocationId": null,
+      "error": "no agent executor \"tool\" in the runner config"
+    },
+    {
+      "executorId": "absent",
+      "invocationId": null,
+      "error": "no agent executor \"absent\" in the runner config"
+    }
+  ],
+  "categories": [
+    "kept",
+    "run-failed",
+    "no-private-home",
+    "dir-undeclared",
+    "dir-mismatch",
+    "no-session-written",
+    "copy-failed"
+  ],
+  "cheapestTier": "nano"
+}
