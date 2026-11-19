@@ -1,6 +1,6 @@
 # Phase 19b: unit run host composition
 
-Wave 8, second of three serial phases (19 -> 19b -> 19c). Depends on: 19. Effort 2d. Rust only, no route change: the host
+Wave 9, second of three serial phases (19 -> 19b -> 19c). Depends on: 19. Effort 2d. Rust only, no route change: the host
 composes the ports that engine `unit_run`, the assignment runner and settlement ask for, so 19c can serve `fgos run` from them.
 
 ## Context

@@ -1,6 +1,6 @@
 # Phase 19: Node seam, admission peer and payload launcher (first part of `fgos run` native)
 
-Wave 8, first of three serial phases (19 -> 19b -> 19c). Depends on: 18; plan 1045 phase 6 on `main` (met: `done`, lane pool `47165e3bf`). Effort 3d. First verb cut-over: run the re-sync step of the
+Wave 8, first of three serial phases (own waves 8, 9, 10) (19 -> 19b -> 19c). Depends on: 18; plan 1045 phase 6 on `main` (met: `done`, lane pool `47165e3bf`). Effort 3d. First verb cut-over: run the re-sync step of the
 phase-lead rules first.
 
 ## Context

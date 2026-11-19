@@ -1,6 +1,6 @@
 # Phase 22: close, doors, docs, canary, integration gate
 
-Wave 11. Depends on: every other phase. Effort 3d. Integration phase (plan-contract section 4).
+Wave 13. Depends on: every other phase. Effort 3d. Integration phase (plan-contract section 4).
 
 ## Context
 

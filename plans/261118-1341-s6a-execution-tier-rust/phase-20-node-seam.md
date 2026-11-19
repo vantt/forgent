@@ -1,10 +1,10 @@
 # Phase 20: Node consumer seam; Execution Core Node deleted
 
-Wave 9. Depends on: 17, 19. Effort 3d. Cut-over phase: run the re-sync step of the phase-lead rules first.
+Wave 11. Depends on: 17, 19c. Effort 3d. Cut-over phase: run the re-sync step of the phase-lead rules first.
 
 ## Context
 
-After phase 19 the host serves `fgos run`, the internal execution routes and the attempt steps, and
+After phase 19c the host serves `fgos run`, the internal execution routes and the attempt steps, and
 `src/native/execution-door.mjs` exists. The Node callers above tier 5 (phase 00 §2, every import and string hit
 classed) still import `src/runner/execution/**`, `src/run-supervisor/**` and parts of `src/runner/dispatch/**`. This
 phase moves every one onto a door (P4, P14, P15, P18) and deletes the 23 files of those two directories that no Node
@@ -64,7 +64,7 @@ survivors need no edit here.
 - Files that phase 21 owns but that import one of the 23 files this phase deletes switch those imports here (import
   lines only): `bin/fgos.mjs:57` (`enableCancelOnSignal`, `cancel-opt-in.mjs`), `:2384` (`runUnit` in the dispatch
   arm), `:3371` and `:3418` (`resolveGitRoots` in the `session` and `request` arms) (`:2274` is phase 02's
-  `capability-config.mjs` move, `:2497-2498` phase 19's `run` arm); and `scripts/git/e3-bench.mjs:297` (string path
+  `capability-config.mjs` move, `:2497-2498` phase 19c's `run` arm); and `scripts/git/e3-bench.mjs:297` (string path
   `src/runner/execution/commit-unit-work.mjs`, caught by step 4's check). Imports of phase 21's files stay for 21:
   `bin/fgos.mjs:3724` (`DispatchError`, `dispatch-error.mjs`), `src/verbs/dispatch/show-run.mjs:20-21` and
   `src/verbs/dispatch/recover.mjs:24,28` (`adoptRun`, `currentGeneration`, `controlDirs`, `deriveUnitState`).

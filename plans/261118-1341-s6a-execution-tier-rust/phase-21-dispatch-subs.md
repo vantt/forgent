@@ -1,6 +1,6 @@
 # Phase 21: dispatch subs native; Dispatch Node deleted
 
-Wave 10. Depends on: 11b, 20. Effort 2.5d. Cut-over phase: run the re-sync step of the phase-lead rules first.
+Wave 12. Depends on: 11b, 20. Effort 2.5d. Cut-over phase: run the re-sync step of the phase-lead rules first.
 
 ## Context
 
@@ -10,7 +10,7 @@ lines on `f031ab0c8`; `src/runner/dispatch/cli.mjs` 355 with the `execute`/`log`
 `node src/runner/dispatch.mjs ...` alias). `bin/fgos.mjs:51-91` imports the config loader, `RunnerConfigError`,
 `enableCancelOnSignal` (`:57`, switched by phase 20 with `src/run-supervisor/`) and the five use cases; dynamic
 imports into `src/runner/dispatch/` at `bin/fgos.mjs:2118,2372,2377,2383,3636` (V1; on `f031ab0c8`; the execution and
-run-supervisor ones at `:2384,3371,3418,3724` are phase 20's, `:2274` phase 02's, `:2497-2498` phase 19's).
+run-supervisor ones at `:2384,3371,3418,3724` are phase 20's, `:2274` phase 02's, `:2497-2498` phase 19c's).
 `inspect --attention` also runs the project's `core/attention/definitions` through the host's `metrics query --def`
 (`src/verbs/dispatch/inspect.mjs`, `b67e22e97`). Engine
 modules: accounts (probes), transport (`runtime-inspection`, `visibility-session`, `attention-view`; the native `inspect --attention` asks Observe

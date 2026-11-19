@@ -1,6 +1,6 @@
 # Phase 19c: `fgos run` route flip, internal execution ops, attempt-step route
 
-Wave 8, last of three serial phases (19 -> 19b -> 19c). Depends on: 19b. Effort 2d. Cut-over phase: run the re-sync step of
+Wave 10, last of three serial phases (19 -> 19b -> 19c). Depends on: 19b. Effort 2d. Cut-over phase: run the re-sync step of
 the phase-lead rules first. First verb cut-over: nothing in flight at landing.
 
 ## Context
@@ -53,9 +53,8 @@ This phase serves the verb from engine `unit_run`. Node callers of `runUnit` (Wo
 `cli_projector.rs`, `apps/fgos/tests/cli_tests.rs`, `packages/host-runtime/rust/src/catalog.rs`,
 `packages/run-supervisor/rust/src/attempt_step.rs`, `packages/execution/contracts/execution-routes/**`,
 `src/cli/command-registry.mjs`, `bin/fgos.mjs`, `test/cli/run-verb.test.mjs`, `test/rust-host/**`,
-`.github/workflows/release-assets-check.yml`. `src/native/execution-door.mjs` and `docs/architecture-manifest.json` are edited
-here too (serial after 19, which owns them in the plan table); the `mod` lines in `apps/fgos/src/wiring/mod.rs` are a one-line
-serial edit after 19b.
+`apps/fgos/src/wiring/mod.rs` (mod lines for run, execution_routes, attempt_step), `src/native/execution-door.mjs` and
+`docs/architecture-manifest.json`, `.github/workflows/release-assets-check.yml`.
 
 ## Steps
 
