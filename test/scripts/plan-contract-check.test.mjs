@@ -79,6 +79,14 @@ test('phases of one wave with overlapping footprints are an error', () => {
   const rows = ['| 1 | a | - | `src/a/` | 1 | ready |', '| 2 | b | - | `src/a/file.mjs` | 1 | ready |'];
   const r = root({ p: planText({ rows }) });
   assert.ok(checkPlanDir(path.join(r, 'p')).errors.some((e) => e.includes('share wave 1')));
+  // A done wave is history: a done phase, or any phase of a done plan, is not checked; an active pair still is.
+  const doneRows = ['| 1 | a | - | `src/a/` | 1 | done |', '| 2 | b | - | `src/a/file.mjs` | 1 | ready |', '| 3 | c | - | `src/a/other.mjs` | 1 | ready |'];
+  const shared = checkPlanDir(path.join(root({ p: planText({ rows: doneRows }) }), 'p')).errors.filter((e) => e.includes('share wave'));
+  assert.deepEqual(shared, []);
+  const activeRows = ['| 1 | a | - | `src/a/` | 1 | done |', '| 2 | b | - | `src/a/file.mjs` | 1 | ready |', '| 3 | c | - | `src/a/` | 1 | running |'];
+  assert.ok(checkPlanDir(path.join(root({ p: planText({ rows: activeRows }) }), 'p')).errors.some((e) => e.includes('phases 2 and 3 share wave 1')));
+  const donePlan = root({ p: planText({ fm: { status: 'done' }, rows }) });
+  assert.equal(checkPlanDir(path.join(donePlan, 'p')).errors.filter((e) => e.includes('share wave')).length, 0);
 });
 
 test('a phase must sit in a later wave than its dependency, and the table needs its columns', () => {

@@ -96,6 +96,7 @@ export function findPhaseTable(body) {
 }
 
 const WAVE = /^\+?[0-9]+$/;
+const HISTORICAL = new Set(['done', 'withdrawn']);
 
 /**
  * Checks the phase table, as the supervisor's reader refuses it: a table that exists is read strictly whatever the
@@ -134,9 +135,13 @@ function checkPhaseTable(body, errors, status) {
     if (!dep) errors.push(`phase ${p.id}: depends on unknown phase ${d}`);
     else if (dep.wave >= p.wave) errors.push(`phase ${p.id} (wave ${p.wave}) depends on ${d} (wave ${dep.wave}): a phase runs in a later wave than its dependencies`);
   }
-  const waves = new Set(phases.map((p) => p.wave).filter(Number.isInteger));
+  // Same-wave overlap is a rule about phases that can still run together: a finished or withdrawn phase, and
+  // every phase of a finished or withdrawn plan, is history that no lane can change.
+  if (HISTORICAL.has(status)) return;
+  const live = phases.filter((p) => !HISTORICAL.has(p.status));
+  const waves = new Set(live.map((p) => p.wave).filter(Number.isInteger));
   for (const wave of waves) {
-    const same = phases.filter((p) => p.wave === wave && p.footprint.length);
+    const same = live.filter((p) => p.wave === wave && p.footprint.length);
     // Ids may repeat in a malformed table (already an error); the scan keys on position.
     let pairs;
     try { pairs = collisions(same.map((p, n) => ({ id: String(n), footprint: p.footprint }))); } catch (e) { errors.push(e.message); continue; }
