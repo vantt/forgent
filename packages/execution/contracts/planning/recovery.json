@@ -1,0 +1,3320 @@
+{
+  "defaultTtlMs": 300000,
+  "now": "2026-11-19T02:00:00.000Z",
+  "plan": [
+    {
+      "name": "needs-adopt/resume",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "controlEpoch": 3,
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "ack-1.json"
+          }
+        ],
+        "attemptFiles": [
+          "receipt.json"
+        ]
+      },
+      "intent": "resume",
+      "evidence": [
+        {
+          "id": "receipt.json",
+          "type": "attempt-receipt"
+        },
+        {
+          "id": "ack-1.json",
+          "type": "worker-result"
+        }
+      ],
+      "facts": {
+        "ok": {
+          "status": "ok",
+          "action": {
+            "type": "adopt",
+            "attemptId": "a-1"
+          },
+          "reason": "attempt a-1 is needs-adopt (no holder, not closed) -- adopt settles it and closes it"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "recommendation",
+          "snapshotHash": "daa4e92806398bee9df4875a2456461d5a06ded600b6fbeee5de1020dff6263f",
+          "expectedControlEpoch": 3,
+          "actionKey": "f25cc6664a016ba406d2ef1012316a72c356be298346ece4f665e87ad04ace43",
+          "evidenceIds": [
+            "receipt.json",
+            "ack-1.json"
+          ],
+          "action": {
+            "type": "adopt",
+            "attemptId": "a-1"
+          },
+          "expiresAt": "2026-11-19T02:05:00.000Z",
+          "reason": "attempt a-1 is needs-adopt (no holder, not closed) -- adopt settles it and closes it"
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "recommendation",
+          "snapshotHash": "daa4e92806398bee9df4875a2456461d5a06ded600b6fbeee5de1020dff6263f",
+          "expectedControlEpoch": 3,
+          "actionKey": "f8b922454620cd2e55af1f3c460226657f31a5a4bef80bfd68e1ea6e763e57d0",
+          "evidenceIds": [
+            "receipt.json",
+            "ack-1.json"
+          ],
+          "action": {
+            "type": "adopt",
+            "attemptId": "a-1"
+          },
+          "expiresAt": "2026-11-19T02:00:01.000Z",
+          "reason": "attempt a-1 is needs-adopt (no holder, not closed) -- adopt settles it and closes it"
+        }
+      }
+    },
+    {
+      "name": "needs-adopt/reassign",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "controlEpoch": 3,
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "ack-1.json"
+          }
+        ],
+        "attemptFiles": [
+          "receipt.json"
+        ]
+      },
+      "intent": "reassign",
+      "evidence": [
+        {
+          "id": "receipt.json",
+          "type": "attempt-receipt"
+        },
+        {
+          "id": "ack-1.json",
+          "type": "worker-result"
+        }
+      ],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)",
+          "evidenceIds": [
+            "receipt.json",
+            "ack-1.json"
+          ]
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)",
+          "evidenceIds": [
+            "receipt.json",
+            "ack-1.json"
+          ]
+        }
+      }
+    },
+    {
+      "name": "needs-adopt/bogus",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "controlEpoch": 3,
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "ack-1.json"
+          }
+        ],
+        "attemptFiles": [
+          "receipt.json"
+        ]
+      },
+      "intent": "bogus",
+      "evidence": [
+        {
+          "id": "receipt.json",
+          "type": "attempt-receipt"
+        },
+        {
+          "id": "ack-1.json",
+          "type": "worker-result"
+        }
+      ],
+      "facts": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "plan": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "planDefaultTtl": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      }
+    },
+    {
+      "name": "open/resume",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "open",
+          "attemptId": "a-9"
+        },
+        "outbox": []
+      },
+      "intent": "resume",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "ok",
+          "action": {
+            "type": "adopt",
+            "attemptId": "a-9"
+          },
+          "reason": "attempt a-9 is open (no holder, not closed) -- adopt settles it and closes it"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "recommendation",
+          "snapshotHash": "fd2abb540a438bd80af1b2f868f383f58290f2af025b21cfa09ff46c28005648",
+          "expectedControlEpoch": 0,
+          "actionKey": "5bc7e54b6b2d9299630bebbbcf96e705ffda80c69d3a64a4e3b993427427bb8b",
+          "evidenceIds": [],
+          "action": {
+            "type": "adopt",
+            "attemptId": "a-9"
+          },
+          "expiresAt": "2026-11-19T02:05:00.000Z",
+          "reason": "attempt a-9 is open (no holder, not closed) -- adopt settles it and closes it"
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "recommendation",
+          "snapshotHash": "fd2abb540a438bd80af1b2f868f383f58290f2af025b21cfa09ff46c28005648",
+          "expectedControlEpoch": 0,
+          "actionKey": "aaf6732fb32ac6b7a84b07ddf3306e17ca4def72ccdb0c511344fd1d6c17ef0d",
+          "evidenceIds": [],
+          "action": {
+            "type": "adopt",
+            "attemptId": "a-9"
+          },
+          "expiresAt": "2026-11-19T02:00:01.000Z",
+          "reason": "attempt a-9 is open (no holder, not closed) -- adopt settles it and closes it"
+        }
+      }
+    },
+    {
+      "name": "open/reassign",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "open",
+          "attemptId": "a-9"
+        },
+        "outbox": []
+      },
+      "intent": "reassign",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "open/bogus",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "open",
+          "attemptId": "a-9"
+        },
+        "outbox": []
+      },
+      "intent": "bogus",
+      "evidence": [],
+      "facts": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "plan": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "planDefaultTtl": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      }
+    },
+    {
+      "name": "closed/resume",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "closed",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "resume",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "closed/reassign",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "closed",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "reassign",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "closed/bogus",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "closed",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "bogus",
+      "evidence": [],
+      "facts": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "plan": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "planDefaultTtl": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      }
+    },
+    {
+      "name": "running/resume",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "running",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "resume",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is running: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "attempt is running: a supervisor or an adopter owns it -- nothing to recover while it runs",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "attempt is running: a supervisor or an adopter owns it -- nothing to recover while it runs",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "running/reassign",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "running",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "reassign",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is running: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "attempt is running: a supervisor or an adopter owns it -- nothing to recover while it runs",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "attempt is running: a supervisor or an adopter owns it -- nothing to recover while it runs",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "running/bogus",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "running",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "bogus",
+      "evidence": [],
+      "facts": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "plan": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "planDefaultTtl": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      }
+    },
+    {
+      "name": "being-adopted/resume",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "being-adopted",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "resume",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is being-adopted: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "attempt is being-adopted: a supervisor or an adopter owns it -- nothing to recover while it runs",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "attempt is being-adopted: a supervisor or an adopter owns it -- nothing to recover while it runs",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "being-adopted/reassign",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "being-adopted",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "reassign",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is being-adopted: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "attempt is being-adopted: a supervisor or an adopter owns it -- nothing to recover while it runs",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "attempt is being-adopted: a supervisor or an adopter owns it -- nothing to recover while it runs",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "being-adopted/bogus",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "being-adopted",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "bogus",
+      "evidence": [],
+      "facts": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "plan": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "planDefaultTtl": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      }
+    },
+    {
+      "name": "unprobed/resume",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "outbox": []
+      },
+      "intent": "resume",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "the attempt is unprobed: only an attempt with no holder that is not closed can be adopted"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "the attempt is unprobed: only an attempt with no holder that is not closed can be adopted",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "the attempt is unprobed: only an attempt with no holder that is not closed can be adopted",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "unprobed/reassign",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "outbox": []
+      },
+      "intent": "reassign",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "unprobed/bogus",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "outbox": []
+      },
+      "intent": "bogus",
+      "evidence": [],
+      "facts": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "plan": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "planDefaultTtl": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      }
+    },
+    {
+      "name": "no-attempt-id/resume",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt"
+        },
+        "outbox": []
+      },
+      "intent": "resume",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "the attempt has no readable attemptId in its envelope -- never guessing what to adopt"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "the attempt has no readable attemptId in its envelope -- never guessing what to adopt",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "the attempt has no readable attemptId in its envelope -- never guessing what to adopt",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "no-attempt-id/reassign",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt"
+        },
+        "outbox": []
+      },
+      "intent": "reassign",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "no-attempt-id/bogus",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt"
+        },
+        "outbox": []
+      },
+      "intent": "bogus",
+      "evidence": [],
+      "facts": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "plan": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "planDefaultTtl": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      }
+    },
+    {
+      "name": "settled/resume",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "resume",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "run already settled -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "run already settled -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "settled/reassign",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "reassign",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "run already settled -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "run already settled -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "settled/bogus",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "bogus",
+      "evidence": [],
+      "facts": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "plan": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "planDefaultTtl": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      }
+    },
+    {
+      "name": "settled-signal/resume",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "settledSignal": {
+          "outcome": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "resume",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "run already settled -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "run already settled -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "settled-signal/reassign",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "settledSignal": {
+          "outcome": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "reassign",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "run already settled -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "run already settled -- there is nothing to recover",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "settled-signal/bogus",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "settledSignal": {
+          "outcome": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "bogus",
+      "evidence": [],
+      "facts": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "plan": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "planDefaultTtl": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      }
+    },
+    {
+      "name": "settled-but-adoptable/resume",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "resume",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "ok",
+          "action": {
+            "type": "adopt",
+            "attemptId": "a-1"
+          },
+          "reason": "attempt a-1 is needs-adopt (no holder, not closed) -- adopt settles it and closes it"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "recommendation",
+          "snapshotHash": "21ef8b463738d55c5f142d0ddb78a83ee5991acef8b6855caaff78e1793342da",
+          "expectedControlEpoch": 0,
+          "actionKey": "94e74c8ec8593b0cd7590e697440a202e8bb48878952143b597da3488b7816ff",
+          "evidenceIds": [],
+          "action": {
+            "type": "adopt",
+            "attemptId": "a-1"
+          },
+          "expiresAt": "2026-11-19T02:05:00.000Z",
+          "reason": "attempt a-1 is needs-adopt (no holder, not closed) -- adopt settles it and closes it"
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "recommendation",
+          "snapshotHash": "21ef8b463738d55c5f142d0ddb78a83ee5991acef8b6855caaff78e1793342da",
+          "expectedControlEpoch": 0,
+          "actionKey": "28537058988dcea399a7c4b7791bd3f0d2b7c78afd56676ebf75cb025f886bc1",
+          "evidenceIds": [],
+          "action": {
+            "type": "adopt",
+            "attemptId": "a-1"
+          },
+          "expiresAt": "2026-11-19T02:00:01.000Z",
+          "reason": "attempt a-1 is needs-adopt (no holder, not closed) -- adopt settles it and closes it"
+        }
+      }
+    },
+    {
+      "name": "settled-but-adoptable/reassign",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "reassign",
+      "evidence": [],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)",
+          "evidenceIds": []
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "reassign has no action: a dead controller's attempt is finished through adopt (intent resume)",
+          "evidenceIds": []
+        }
+      }
+    },
+    {
+      "name": "settled-but-adoptable/bogus",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "intent": "bogus",
+      "evidence": [],
+      "facts": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "plan": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "planDefaultTtl": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      }
+    },
+    {
+      "name": "unknown-evidence/resume",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "weird.bin"
+          },
+          {
+            "name": "result-2.json"
+          },
+          {
+            "name": "result.json"
+          },
+          {
+            "name": "report-1.md"
+          }
+        ]
+      },
+      "intent": "resume",
+      "evidence": [
+        {
+          "id": "weird.bin",
+          "type": "unknown"
+        },
+        {
+          "id": "result-2.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "result.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "report-1.md",
+          "type": "worker-result"
+        }
+      ],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "unrecognized evidence type(s): weird.bin:unknown -- never guessing an action over evidence this door cannot interpret"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "unrecognized evidence type(s): weird.bin:unknown -- never guessing an action over evidence this door cannot interpret",
+          "evidenceIds": [
+            "weird.bin",
+            "result-2.json",
+            "result.json",
+            "report-1.md"
+          ]
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "unrecognized evidence type(s): weird.bin:unknown -- never guessing an action over evidence this door cannot interpret",
+          "evidenceIds": [
+            "weird.bin",
+            "result-2.json",
+            "result.json",
+            "report-1.md"
+          ]
+        }
+      }
+    },
+    {
+      "name": "unknown-evidence/reassign",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "weird.bin"
+          },
+          {
+            "name": "result-2.json"
+          },
+          {
+            "name": "result.json"
+          },
+          {
+            "name": "report-1.md"
+          }
+        ]
+      },
+      "intent": "reassign",
+      "evidence": [
+        {
+          "id": "weird.bin",
+          "type": "unknown"
+        },
+        {
+          "id": "result-2.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "result.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "report-1.md",
+          "type": "worker-result"
+        }
+      ],
+      "facts": {
+        "ok": {
+          "status": "park",
+          "reason": "unrecognized evidence type(s): weird.bin:unknown -- never guessing an action over evidence this door cannot interpret"
+        }
+      },
+      "plan": {
+        "ok": {
+          "kind": "park",
+          "reason": "unrecognized evidence type(s): weird.bin:unknown -- never guessing an action over evidence this door cannot interpret",
+          "evidenceIds": [
+            "weird.bin",
+            "result-2.json",
+            "result.json",
+            "report-1.md"
+          ]
+        }
+      },
+      "planDefaultTtl": {
+        "ok": {
+          "kind": "park",
+          "reason": "unrecognized evidence type(s): weird.bin:unknown -- never guessing an action over evidence this door cannot interpret",
+          "evidenceIds": [
+            "weird.bin",
+            "result-2.json",
+            "result.json",
+            "report-1.md"
+          ]
+        }
+      }
+    },
+    {
+      "name": "unknown-evidence/bogus",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "weird.bin"
+          },
+          {
+            "name": "result-2.json"
+          },
+          {
+            "name": "result.json"
+          },
+          {
+            "name": "report-1.md"
+          }
+        ]
+      },
+      "intent": "bogus",
+      "evidence": [
+        {
+          "id": "weird.bin",
+          "type": "unknown"
+        },
+        {
+          "id": "result-2.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "result.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "report-1.md",
+          "type": "worker-result"
+        }
+      ],
+      "facts": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "plan": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      },
+      "planDefaultTtl": {
+        "error": {
+          "name": "RecoveryPlannerError",
+          "code": "invalid-intent",
+          "message": "requestedIntent must be one of resume/reassign, got: \"bogus\""
+        }
+      }
+    }
+  ],
+  "actionLegal": [
+    {
+      "name": "needs-adopt",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "controlEpoch": 3,
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "ack-1.json"
+          }
+        ],
+        "attemptFiles": [
+          "receipt.json"
+        ]
+      },
+      "evidence": [
+        {
+          "id": "receipt.json",
+          "type": "attempt-receipt"
+        },
+        {
+          "id": "ack-1.json",
+          "type": "worker-result"
+        }
+      ],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-1"
+      },
+      "result": {
+        "ok": {
+          "status": "ok",
+          "reason": "adopt remains legal: attempt is needs-adopt"
+        }
+      }
+    },
+    {
+      "name": "needs-adopt",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "controlEpoch": 3,
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "ack-1.json"
+          }
+        ],
+        "attemptFiles": [
+          "receipt.json"
+        ]
+      },
+      "evidence": [
+        {
+          "id": "receipt.json",
+          "type": "attempt-receipt"
+        },
+        {
+          "id": "ack-1.json",
+          "type": "worker-result"
+        }
+      ],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-9"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "adopt names a different attempt than the one this run directory now holds"
+        }
+      }
+    },
+    {
+      "name": "needs-adopt",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "controlEpoch": 3,
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "ack-1.json"
+          }
+        ],
+        "attemptFiles": [
+          "receipt.json"
+        ]
+      },
+      "evidence": [
+        {
+          "id": "receipt.json",
+          "type": "attempt-receipt"
+        },
+        {
+          "id": "ack-1.json",
+          "type": "worker-result"
+        }
+      ],
+      "action": {
+        "type": "kill"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "unrecognized action type \"kill\""
+        }
+      }
+    },
+    {
+      "name": "needs-adopt",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "controlEpoch": 3,
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "ack-1.json"
+          }
+        ],
+        "attemptFiles": [
+          "receipt.json"
+        ]
+      },
+      "evidence": [
+        {
+          "id": "receipt.json",
+          "type": "attempt-receipt"
+        },
+        {
+          "id": "ack-1.json",
+          "type": "worker-result"
+        }
+      ],
+      "action": {
+        "type": 7
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "action is missing or malformed -- never guessing what was meant"
+        }
+      }
+    },
+    {
+      "name": "needs-adopt",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "controlEpoch": 3,
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "ack-1.json"
+          }
+        ],
+        "attemptFiles": [
+          "receipt.json"
+        ]
+      },
+      "evidence": [
+        {
+          "id": "receipt.json",
+          "type": "attempt-receipt"
+        },
+        {
+          "id": "ack-1.json",
+          "type": "worker-result"
+        }
+      ],
+      "action": null,
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "action is missing or malformed -- never guessing what was meant"
+        }
+      }
+    },
+    {
+      "name": "open",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "open",
+          "attemptId": "a-9"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-1"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "adopt names a different attempt than the one this run directory now holds"
+        }
+      }
+    },
+    {
+      "name": "open",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "open",
+          "attemptId": "a-9"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-9"
+      },
+      "result": {
+        "ok": {
+          "status": "ok",
+          "reason": "adopt remains legal: attempt is open"
+        }
+      }
+    },
+    {
+      "name": "open",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "open",
+          "attemptId": "a-9"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "kill"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "unrecognized action type \"kill\""
+        }
+      }
+    },
+    {
+      "name": "open",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "open",
+          "attemptId": "a-9"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": 7
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "action is missing or malformed -- never guessing what was meant"
+        }
+      }
+    },
+    {
+      "name": "open",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "open",
+          "attemptId": "a-9"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": null,
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "action is missing or malformed -- never guessing what was meant"
+        }
+      }
+    },
+    {
+      "name": "closed",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "closed",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-1"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "closed",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "closed",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-9"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "closed",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "closed",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "kill"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "closed",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "closed",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": 7
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "closed",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "closed",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": null,
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "running",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "running",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-1"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is running: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      }
+    },
+    {
+      "name": "running",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "running",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-9"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is running: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      }
+    },
+    {
+      "name": "running",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "running",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "kill"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is running: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      }
+    },
+    {
+      "name": "running",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "running",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": 7
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is running: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      }
+    },
+    {
+      "name": "running",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "running",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": null,
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is running: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      }
+    },
+    {
+      "name": "being-adopted",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "being-adopted",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-1"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is being-adopted: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      }
+    },
+    {
+      "name": "being-adopted",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "being-adopted",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-9"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is being-adopted: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      }
+    },
+    {
+      "name": "being-adopted",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "being-adopted",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "kill"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is being-adopted: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      }
+    },
+    {
+      "name": "being-adopted",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "being-adopted",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": 7
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is being-adopted: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      }
+    },
+    {
+      "name": "being-adopted",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "being-adopted",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": null,
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "attempt is being-adopted: a supervisor or an adopter owns it -- nothing to recover while it runs"
+        }
+      }
+    },
+    {
+      "name": "unprobed",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-1"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "adopt names a different attempt than the one this run directory now holds"
+        }
+      }
+    },
+    {
+      "name": "unprobed",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-9"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "adopt names a different attempt than the one this run directory now holds"
+        }
+      }
+    },
+    {
+      "name": "unprobed",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "kill"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "unrecognized action type \"kill\""
+        }
+      }
+    },
+    {
+      "name": "unprobed",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": 7
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "action is missing or malformed -- never guessing what was meant"
+        }
+      }
+    },
+    {
+      "name": "unprobed",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": null,
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "action is missing or malformed -- never guessing what was meant"
+        }
+      }
+    },
+    {
+      "name": "no-attempt-id",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-1"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "adopt names a different attempt than the one this run directory now holds"
+        }
+      }
+    },
+    {
+      "name": "no-attempt-id",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-9"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "adopt names a different attempt than the one this run directory now holds"
+        }
+      }
+    },
+    {
+      "name": "no-attempt-id",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "kill"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "unrecognized action type \"kill\""
+        }
+      }
+    },
+    {
+      "name": "no-attempt-id",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": 7
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "action is missing or malformed -- never guessing what was meant"
+        }
+      }
+    },
+    {
+      "name": "no-attempt-id",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": null,
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "action is missing or malformed -- never guessing what was meant"
+        }
+      }
+    },
+    {
+      "name": "settled",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-1"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "settled",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-9"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "settled",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "kill"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "settled",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": 7
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "settled",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": null,
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "settled-signal",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "settledSignal": {
+          "outcome": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-1"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "settled-signal",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "settledSignal": {
+          "outcome": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-9"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "settled-signal",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "settledSignal": {
+          "outcome": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "kill"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "settled-signal",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "settledSignal": {
+          "outcome": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": 7
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "settled-signal",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "settledSignal": {
+          "outcome": "settled"
+        },
+        "attempt": {
+          "state": "held",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": null,
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "run already settled -- there is nothing to recover"
+        }
+      }
+    },
+    {
+      "name": "settled-but-adoptable",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-1"
+      },
+      "result": {
+        "ok": {
+          "status": "ok",
+          "reason": "adopt remains legal: attempt is needs-adopt"
+        }
+      }
+    },
+    {
+      "name": "settled-but-adoptable",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-9"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "adopt names a different attempt than the one this run directory now holds"
+        }
+      }
+    },
+    {
+      "name": "settled-but-adoptable",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": "kill"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "unrecognized action type \"kill\""
+        }
+      }
+    },
+    {
+      "name": "settled-but-adoptable",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": {
+        "type": 7
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "action is missing or malformed -- never guessing what was meant"
+        }
+      }
+    },
+    {
+      "name": "settled-but-adoptable",
+      "snapshot": {
+        "run": {
+          "status": "settled"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": []
+      },
+      "evidence": [],
+      "action": null,
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "action is missing or malformed -- never guessing what was meant"
+        }
+      }
+    },
+    {
+      "name": "unknown-evidence",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "weird.bin"
+          },
+          {
+            "name": "result-2.json"
+          },
+          {
+            "name": "result.json"
+          },
+          {
+            "name": "report-1.md"
+          }
+        ]
+      },
+      "evidence": [
+        {
+          "id": "weird.bin",
+          "type": "unknown"
+        },
+        {
+          "id": "result-2.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "result.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "report-1.md",
+          "type": "worker-result"
+        }
+      ],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-1"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "unrecognized evidence type(s): weird.bin:unknown -- never guessing an action over evidence this door cannot interpret"
+        }
+      }
+    },
+    {
+      "name": "unknown-evidence",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "weird.bin"
+          },
+          {
+            "name": "result-2.json"
+          },
+          {
+            "name": "result.json"
+          },
+          {
+            "name": "report-1.md"
+          }
+        ]
+      },
+      "evidence": [
+        {
+          "id": "weird.bin",
+          "type": "unknown"
+        },
+        {
+          "id": "result-2.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "result.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "report-1.md",
+          "type": "worker-result"
+        }
+      ],
+      "action": {
+        "type": "adopt",
+        "attemptId": "a-9"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "unrecognized evidence type(s): weird.bin:unknown -- never guessing an action over evidence this door cannot interpret"
+        }
+      }
+    },
+    {
+      "name": "unknown-evidence",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "weird.bin"
+          },
+          {
+            "name": "result-2.json"
+          },
+          {
+            "name": "result.json"
+          },
+          {
+            "name": "report-1.md"
+          }
+        ]
+      },
+      "evidence": [
+        {
+          "id": "weird.bin",
+          "type": "unknown"
+        },
+        {
+          "id": "result-2.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "result.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "report-1.md",
+          "type": "worker-result"
+        }
+      ],
+      "action": {
+        "type": "kill"
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "unrecognized evidence type(s): weird.bin:unknown -- never guessing an action over evidence this door cannot interpret"
+        }
+      }
+    },
+    {
+      "name": "unknown-evidence",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "weird.bin"
+          },
+          {
+            "name": "result-2.json"
+          },
+          {
+            "name": "result.json"
+          },
+          {
+            "name": "report-1.md"
+          }
+        ]
+      },
+      "evidence": [
+        {
+          "id": "weird.bin",
+          "type": "unknown"
+        },
+        {
+          "id": "result-2.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "result.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "report-1.md",
+          "type": "worker-result"
+        }
+      ],
+      "action": {
+        "type": 7
+      },
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "unrecognized evidence type(s): weird.bin:unknown -- never guessing an action over evidence this door cannot interpret"
+        }
+      }
+    },
+    {
+      "name": "unknown-evidence",
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "weird.bin"
+          },
+          {
+            "name": "result-2.json"
+          },
+          {
+            "name": "result.json"
+          },
+          {
+            "name": "report-1.md"
+          }
+        ]
+      },
+      "evidence": [
+        {
+          "id": "weird.bin",
+          "type": "unknown"
+        },
+        {
+          "id": "result-2.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "result.json",
+          "type": "worker-result"
+        },
+        {
+          "id": "report-1.md",
+          "type": "worker-result"
+        }
+      ],
+      "action": null,
+      "result": {
+        "ok": {
+          "status": "park",
+          "reason": "unrecognized evidence type(s): weird.bin:unknown -- never guessing an action over evidence this door cannot interpret"
+        }
+      }
+    }
+  ],
+  "apply": [
+    {
+      "name": "ok",
+      "input": {
+        "snapshot": {
+          "run": {
+            "status": "running"
+          },
+          "controlEpoch": 3,
+          "attempt": {
+            "state": "needs-adopt",
+            "attemptId": "a-1"
+          },
+          "outbox": [
+            {
+              "name": "ack-1.json"
+            }
+          ],
+          "attemptFiles": [
+            "receipt.json"
+          ]
+        },
+        "evidence": [
+          {
+            "id": "receipt.json",
+            "type": "attempt-receipt"
+          },
+          {
+            "id": "ack-1.json",
+            "type": "worker-result"
+          }
+        ],
+        "action": {
+          "type": "adopt",
+          "attemptId": "a-1"
+        },
+        "expectedSnapshot": "daa4e92806398bee9df4875a2456461d5a06ded600b6fbeee5de1020dff6263f",
+        "expectedControlEpoch": 3,
+        "expectedExpiresAt": "2026-11-19T02:05:00.000Z",
+        "actionKey": "f25cc6664a016ba406d2ef1012316a72c356be298346ece4f665e87ad04ace43",
+        "now": 1795053600000
+      },
+      "result": {
+        "ok": {
+          "outcome": "ok"
+        }
+      }
+    },
+    {
+      "name": "key-mismatch",
+      "input": {
+        "snapshot": {
+          "run": {
+            "status": "running"
+          },
+          "controlEpoch": 3,
+          "attempt": {
+            "state": "needs-adopt",
+            "attemptId": "a-1"
+          },
+          "outbox": [
+            {
+              "name": "ack-1.json"
+            }
+          ],
+          "attemptFiles": [
+            "receipt.json"
+          ]
+        },
+        "evidence": [
+          {
+            "id": "receipt.json",
+            "type": "attempt-receipt"
+          },
+          {
+            "id": "ack-1.json",
+            "type": "worker-result"
+          }
+        ],
+        "action": {
+          "type": "adopt",
+          "attemptId": "a-1"
+        },
+        "expectedSnapshot": "daa4e92806398bee9df4875a2456461d5a06ded600b6fbeee5de1020dff6263f",
+        "expectedControlEpoch": 3,
+        "expectedExpiresAt": "2026-11-19T02:05:00.000Z",
+        "actionKey": "deadbeef",
+        "now": 1795053600000
+      },
+      "result": {
+        "ok": {
+          "outcome": "plan-stale",
+          "reason": "actionKey does not match the action/snapshot/epoch/expiresAt it was issued for -- refusing a mismatched replay"
+        }
+      }
+    },
+    {
+      "name": "snapshot-changed",
+      "input": {
+        "snapshot": {
+          "run": {
+            "status": "running"
+          },
+          "controlEpoch": 3,
+          "attempt": {
+            "state": "needs-adopt",
+            "attemptId": "a-1"
+          },
+          "outbox": [],
+          "attemptFiles": [
+            "receipt.json"
+          ]
+        },
+        "evidence": [
+          {
+            "id": "receipt.json",
+            "type": "attempt-receipt"
+          },
+          {
+            "id": "ack-1.json",
+            "type": "worker-result"
+          }
+        ],
+        "action": {
+          "type": "adopt",
+          "attemptId": "a-1"
+        },
+        "expectedSnapshot": "daa4e92806398bee9df4875a2456461d5a06ded600b6fbeee5de1020dff6263f",
+        "expectedControlEpoch": 3,
+        "expectedExpiresAt": "2026-11-19T02:05:00.000Z",
+        "actionKey": "f25cc6664a016ba406d2ef1012316a72c356be298346ece4f665e87ad04ace43",
+        "now": 1795053600000
+      },
+      "result": {
+        "ok": {
+          "outcome": "plan-stale",
+          "reason": "the run's observed state (visibility/outbox) has changed since this recommendation was issued -- snapshot hash mismatch"
+        }
+      }
+    },
+    {
+      "name": "epoch-advanced",
+      "input": {
+        "snapshot": {
+          "run": {
+            "status": "running"
+          },
+          "controlEpoch": 4,
+          "attempt": {
+            "state": "needs-adopt",
+            "attemptId": "a-1"
+          },
+          "outbox": [
+            {
+              "name": "ack-1.json"
+            }
+          ],
+          "attemptFiles": [
+            "receipt.json"
+          ]
+        },
+        "evidence": [
+          {
+            "id": "receipt.json",
+            "type": "attempt-receipt"
+          },
+          {
+            "id": "ack-1.json",
+            "type": "worker-result"
+          }
+        ],
+        "action": {
+          "type": "adopt",
+          "attemptId": "a-1"
+        },
+        "expectedSnapshot": "87d67b78b6347e28da390c665ba6745e0b0e29e1699a2037299a72926d55e79a",
+        "expectedControlEpoch": 3,
+        "expectedExpiresAt": "2026-11-19T02:05:00.000Z",
+        "actionKey": "e1f57b53fd90060f7f57c6056c7ffd6df873536ffa117a19306e38d015134442",
+        "now": 1795053600000
+      },
+      "result": {
+        "ok": {
+          "outcome": "plan-stale",
+          "reason": "the run's control epoch has advanced since this recommendation was issued (expected 3, now 4)"
+        }
+      }
+    },
+    {
+      "name": "expired",
+      "input": {
+        "snapshot": {
+          "run": {
+            "status": "running"
+          },
+          "controlEpoch": 3,
+          "attempt": {
+            "state": "needs-adopt",
+            "attemptId": "a-1"
+          },
+          "outbox": [
+            {
+              "name": "ack-1.json"
+            }
+          ],
+          "attemptFiles": [
+            "receipt.json"
+          ]
+        },
+        "evidence": [
+          {
+            "id": "receipt.json",
+            "type": "attempt-receipt"
+          },
+          {
+            "id": "ack-1.json",
+            "type": "worker-result"
+          }
+        ],
+        "action": {
+          "type": "adopt",
+          "attemptId": "a-1"
+        },
+        "expectedSnapshot": "daa4e92806398bee9df4875a2456461d5a06ded600b6fbeee5de1020dff6263f",
+        "expectedControlEpoch": 3,
+        "expectedExpiresAt": "2026-11-19T02:05:00.000Z",
+        "actionKey": "f25cc6664a016ba406d2ef1012316a72c356be298346ece4f665e87ad04ace43",
+        "now": 1795054200000
+      },
+      "result": {
+        "ok": {
+          "outcome": "plan-expired",
+          "reason": "this recommendation expired at 2026-11-19T02:05:00.000Z"
+        }
+      }
+    },
+    {
+      "name": "now-iso-string",
+      "input": {
+        "snapshot": {
+          "run": {
+            "status": "running"
+          },
+          "controlEpoch": 3,
+          "attempt": {
+            "state": "needs-adopt",
+            "attemptId": "a-1"
+          },
+          "outbox": [
+            {
+              "name": "ack-1.json"
+            }
+          ],
+          "attemptFiles": [
+            "receipt.json"
+          ]
+        },
+        "evidence": [
+          {
+            "id": "receipt.json",
+            "type": "attempt-receipt"
+          },
+          {
+            "id": "ack-1.json",
+            "type": "worker-result"
+          }
+        ],
+        "action": {
+          "type": "adopt",
+          "attemptId": "a-1"
+        },
+        "expectedSnapshot": "daa4e92806398bee9df4875a2456461d5a06ded600b6fbeee5de1020dff6263f",
+        "expectedControlEpoch": 3,
+        "expectedExpiresAt": "2026-11-19T02:05:00.000Z",
+        "actionKey": "f25cc6664a016ba406d2ef1012316a72c356be298346ece4f665e87ad04ace43",
+        "now": "2026-11-19T02:00:00.000Z"
+      },
+      "result": {
+        "ok": {
+          "outcome": "ok"
+        }
+      }
+    },
+    {
+      "name": "bad-expiry",
+      "input": {
+        "snapshot": {
+          "run": {
+            "status": "running"
+          },
+          "controlEpoch": 3,
+          "attempt": {
+            "state": "needs-adopt",
+            "attemptId": "a-1"
+          },
+          "outbox": [
+            {
+              "name": "ack-1.json"
+            }
+          ],
+          "attemptFiles": [
+            "receipt.json"
+          ]
+        },
+        "evidence": [
+          {
+            "id": "receipt.json",
+            "type": "attempt-receipt"
+          },
+          {
+            "id": "ack-1.json",
+            "type": "worker-result"
+          }
+        ],
+        "action": {
+          "type": "adopt",
+          "attemptId": "a-1"
+        },
+        "expectedSnapshot": "daa4e92806398bee9df4875a2456461d5a06ded600b6fbeee5de1020dff6263f",
+        "expectedControlEpoch": 3,
+        "expectedExpiresAt": "soon",
+        "actionKey": "4fc9c255f17f74a69bbb15ce26e5633de5ffc9418719680d2a84f0b15ac93502",
+        "now": 1795053600000
+      },
+      "result": {
+        "ok": {
+          "outcome": "plan-expired",
+          "reason": "this recommendation expired at soon"
+        }
+      }
+    },
+    {
+      "name": "attempt-closed",
+      "input": {
+        "snapshot": {
+          "run": {
+            "status": "running"
+          },
+          "controlEpoch": 3,
+          "attempt": {
+            "state": "closed",
+            "attemptId": "a-1"
+          },
+          "outbox": [
+            {
+              "name": "ack-1.json"
+            }
+          ],
+          "attemptFiles": [
+            "receipt.json"
+          ]
+        },
+        "evidence": [
+          {
+            "id": "receipt.json",
+            "type": "attempt-receipt"
+          },
+          {
+            "id": "ack-1.json",
+            "type": "worker-result"
+          }
+        ],
+        "action": {
+          "type": "adopt",
+          "attemptId": "a-1"
+        },
+        "expectedSnapshot": "3e18df6a4b80f8cbbaf3b5f913861f4c6afb5f4a3a7bf0eb6512bc00b74353ea",
+        "expectedControlEpoch": 3,
+        "expectedExpiresAt": "2026-11-19T02:05:00.000Z",
+        "actionKey": "27cc3959048732d55376678a5091290d2a4db839b63a89640d13a664e17138d2",
+        "now": 1795053600000
+      },
+      "result": {
+        "ok": {
+          "outcome": "park",
+          "reason": "the attempt is already closed -- there is nothing to recover"
+        }
+      }
+    }
+  ],
+  "hash": [
+    {
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "controlEpoch": 3,
+        "attempt": {
+          "state": "needs-adopt",
+          "attemptId": "a-1"
+        },
+        "outbox": [
+          {
+            "name": "ack-1.json"
+          }
+        ],
+        "attemptFiles": [
+          "receipt.json"
+        ]
+      },
+      "hash": "daa4e92806398bee9df4875a2456461d5a06ded600b6fbeee5de1020dff6263f"
+    },
+    {
+      "snapshot": {
+        "run": {
+          "status": "running"
+        },
+        "attempt": {
+          "state": "open",
+          "attemptId": "a-9"
+        },
+        "outbox": []
+      },
+      "hash": "fd2abb540a438bd80af1b2f868f383f58290f2af025b21cfa09ff46c28005648"
+    },
+    {
+      "snapshot": {
+        "b": 1,
+        "a": [
+          2,
+          {
+            "z": 1,
+            "y": "é\n\""
+          }
+        ]
+      },
+      "hash": "758a93aac163f65bf021cf49400575a6e481a9d200a4501ff5ecb5ca142fc7ea"
+    }
+  ]
+}
