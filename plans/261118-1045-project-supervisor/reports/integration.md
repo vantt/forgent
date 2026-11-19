@@ -132,3 +132,19 @@ failed land settles itself (cb915d9d9); confined reads (675ea511c, 1ca464995).
 Still open for this plan: the asker-restart and timer-drift fixes (branch sv/fix-asker-restart-timer-drift),
 phase 19 step 6 (land-branch.sh removal), and reverting the head pins to claude (owner decision 15:24) when the
 plan closes.
+
+## Clean rerun and close (2026-11-19 22:29-22:35, release cd85600e)
+Acceptance 8 met with zero interventions: plan `261119-2200-supervisor-clean-rerun` set `ready` (335a58c72) → the
+watcher woke the supervisor, which continued past its start ritual (woken-head opening fix 9aa914260), admitted the
+plan (`running` d861e54f7), started its lead (`lead taken` dc2d5cb8e) and ended its wake → the lead ran phase 1,
+waited on its run ticket in the same turn (0414ccf9b), landed it through `fgos land` (c30db87c4) and marked the plan
+`done` (8b2b44abb). Nobody typed into a pane, stopped a session or answered a question.
+The first rerun attempt (22:06) stopped after the supervisor's start ritual (the opening read as a finished turn);
+recorded, fixed in 9aa914260, rerun clean on the next release.
+Discussion path: no new `discussion-settled` event fell inside the rerun; Miu's live `work-data-model` planner stayed
+the only planner. Proven earlier the same day: one planner started for `secretary-supervisor-powers` (17:28).
+Close: claude pins for supervisor/lead/planner reverted (3933cfa3e); phase 19 step 6 done (land-branch.sh copied to
+/tmp/fgos-work/land-branch.sh, then removed); both throwaway plans removed (97bae3ea8).
+Open follow-ups (backlog): p-ycausep3zs (a head keeps its start release), p-dcntoale6b (`.fgos/config.yaml` through
+the land door), p-k6apgwaddh (busy vs recovery), p-l57a7tjhu7 remainder (unprovable writers), p-xpeg4jshiu (idle
+delay), p-sksopwqyto (hard ceiling for timeoutMs 0 seats), p-pn4q63tcf5 (event-store sweep race).
