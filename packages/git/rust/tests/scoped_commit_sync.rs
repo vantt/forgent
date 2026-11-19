@@ -320,6 +320,11 @@ fn sync_prepare_applies_declared_bytes_for_a_store_path_the_producer_deleted() {
         assert!(prepared.resolver_grant.is_empty());
         assert!(prepared.staged.contains(&shard.to_string()));
         assert!(git(&f.tree, &["show", &format!(":{shard}")]) == declared.trim_end());
+        let chain = wal::Wal::open(&f.repo)
+            .unwrap()
+            .inspect("declared")
+            .unwrap();
+        assert!(serde_json::to_vec(&chain.records()[0]).unwrap().len() < 64 * 1024);
         // The same id with the same bytes continues the open operation.
         assert_eq!(prepare(&files).unwrap().state, "in-progress");
         for other in [None, Some(format!("{declared}4\n").into_bytes())] {

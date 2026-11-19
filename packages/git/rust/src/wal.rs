@@ -3503,50 +3503,83 @@ mod tests {
 
     #[test]
     fn intent_recorded_with_declared_bytes_by_an_earlier_release_reads_and_compacts() {
-        let t = Temp::new();
-        let w = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
-        let worktree = t.0.join("tree").to_string_lossy().into_owned();
-        let declared = |path: &str, bytes: Option<Vec<u8>>| {
-            IntentFile::Bytes(crate::LandFile {
-                path: path.into(),
-                bytes,
+        let declared = || {
+            [
+                (".fgos/events/s.jsonl", Some(b"1\n2\n".to_vec())),
+                ("gone", None),
+            ]
+            .map(|(path, bytes)| {
+                IntentFile::Bytes(crate::LandFile {
+                    path: path.into(),
+                    bytes,
+                })
             })
+            .to_vec()
         };
-        let mut i = intent(&w);
-        i.kind = OperationKind::Sync(Box::new(SyncIntent {
-            reference: Some("refs/heads/producer".into()),
-            worktree: worktree.clone(),
-            head: "a".repeat(40),
-            target: "b".repeat(40),
-            message: "sync".into(),
-            files: vec![
-                declared(".fgos/events/s.jsonl", Some(b"1\n2\n".to_vec())),
-                declared("gone", None),
-            ],
-        }));
-        i.resource_set = vec![format!("worktree:{worktree}")];
-        i.expected = Tip::Oid("a".repeat(40));
-        i.next = Tip::Oid("b".repeat(40));
-        let Begin::Created(written) = w.begin("legacy", i, &Authority).unwrap() else {
-            panic!()
-        };
-        // The record carries the bytes exactly as earlier releases wrote them.
-        let raw = fs::read_to_string(w.root.path().join("legacy").join(record_name(0))).unwrap();
-        assert!(raw.contains(r#""bytes":[49,10,50,10]"#) && !raw.contains("blob"));
-        let read = w.inspect("legacy").unwrap();
-        assert_eq!(read.intent(), written.intent());
-        let c = w
-            .append(&read, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
-            .unwrap();
-        let mut r = reader(c.intent());
-        r.pin = ObservedRef::Direct(Tip::Absent);
-        let compact = w.compact(&c, &r, &Authority).unwrap();
-        assert!(!w.root.path().join("legacy").exists());
-        assert_eq!(compact.request, written.intent().request_digest);
-        assert_eq!(
-            w.compacted("legacy").unwrap().unwrap().digest,
-            compact.digest
-        );
+        for land in [false, true] {
+            let t = Temp::new();
+            let w = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
+            let worktree = t.0.join("tree").to_string_lossy().into_owned();
+            let mut i = intent(&w);
+            i.resource_set = vec![format!("worktree:{worktree}")];
+            i.expected = Tip::Oid("a".repeat(40));
+            i.next = Tip::Oid("b".repeat(40));
+            i.kind = if land {
+                let destination = "refs/heads/trunk".to_string();
+                i.resource_set.insert(0, destination.clone());
+                let tree = "d".repeat(40);
+                OperationKind::Land(Box::new(LandIntent {
+                    request: LandIntentRequest {
+                        source: "c".repeat(40),
+                        target: "a".repeat(40),
+                        destination,
+                        message: "land".into(),
+                        squash: false,
+                        footprint: None,
+                        subtree: None,
+                        files: declared(),
+                    },
+                    candidate: crate::LandCandidate {
+                        worktree: PathBuf::from(&worktree),
+                        source: "c".repeat(40),
+                        target: "a".repeat(40),
+                        candidate: "b".repeat(40),
+                        tree_digest: canonical_digest(&tree).unwrap(),
+                        tree,
+                    },
+                }))
+            } else {
+                OperationKind::Sync(Box::new(SyncIntent {
+                    reference: Some("refs/heads/producer".into()),
+                    worktree: worktree.clone(),
+                    head: "a".repeat(40),
+                    target: "b".repeat(40),
+                    message: "sync".into(),
+                    files: declared(),
+                }))
+            };
+            let Begin::Created(written) = w.begin("legacy", i, &Authority).unwrap() else {
+                panic!()
+            };
+            // The record carries the bytes exactly as earlier releases wrote them.
+            let raw =
+                fs::read_to_string(w.root.path().join("legacy").join(record_name(0))).unwrap();
+            assert!(raw.contains(r#""bytes":[49,10,50,10]"#) && !raw.contains("blob"));
+            let read = w.inspect("legacy").unwrap();
+            assert_eq!(read.intent(), written.intent());
+            let c = w
+                .append(&read, Phase::Outcome(Outcome::AbandonedBeforeAttempt))
+                .unwrap();
+            let mut r = reader(c.intent());
+            r.pin = ObservedRef::Direct(Tip::Absent);
+            let compact = w.compact(&c, &r, &Authority).unwrap();
+            assert!(!w.root.path().join("legacy").exists());
+            assert_eq!(compact.request, written.intent().request_digest);
+            assert_eq!(
+                w.compacted("legacy").unwrap().unwrap().digest,
+                compact.digest
+            );
+        }
     }
     #[test]
     fn compact_retains_binding_and_receipt_before_deletion() {
