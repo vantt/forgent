@@ -1,7 +1,8 @@
 ---
 contract: plan-v1
 title: "Supervision powers, part 2: verbs, request-socket entries, grants, personas and the live grant audit"
-status: draft
+status: ready
+base: 9f91e8bb8731b21791e3d73f6be361042aa28378
 priority: P1
 blockedBy:
   - 261119-1730-supervision-powers-cores
@@ -95,7 +96,7 @@ by design. The plan is `draft` until both blockers are `done`; it is then set `r
 move under the caps lane meanwhile). Checked with `node scripts/plan-contract-check.mjs` and `fgos resource-check --plan`.
 
 ## Admission note
-Owner-approved 2026-11-20 (4baa754d5). Held at `draft` by the supervisor until it can pass plan-contract-check as `ready`: it is blocked by part 1 (cores) and by plan 261119-1615 (done), it needs a `base` sha when ready, and its footprint overlaps plan 261118-1341 (S6A) on docs/platform/agent-confinement/spec.md, src/cli/command-registry.mjs, src/session-host/head-request.mjs and test/session-host/head-request.test.mjs, which S6A phase 20 edits. Flip to `ready` with a fresh `base` once cores is done and the overlap with S6A is sequenced (either S6A phase 20 has landed, or this plan lands first and S6A rebases on it).
+Owner-approved 2026-11-20 (4baa754d5). `ready` is the waiting state: the supervisor admits this plan by itself once every `blockedBy` plan is done and no `running` plan's footprint overlaps it (`admissible()` in packages/supervision/rust/src/portfolio.rs); the `plan-done` event of part 1 wakes it. While plan 261118-1341 (S6A) runs, its overlap on docs/platform/agent-confinement/spec.md, src/cli/command-registry.mjs, src/session-host/head-request.mjs and test/session-host/head-request.test.mjs holds this plan back, so it starts after S6A closes; plan-contract-check reports that overlap as an error until the check and admission agree.
 
 ## Owner questions
 None.
