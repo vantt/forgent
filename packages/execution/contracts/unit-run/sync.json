@@ -1,0 +1,262 @@
+{
+  "effectiveWriteScope": [
+    {
+      "unitRecord": {
+        "writeScope": [
+          "src/**"
+        ],
+        "unit": {
+          "writes": [
+            "lib/**"
+          ]
+        },
+        "sync": {
+          "status": "conflicted",
+          "scopeAdded": [
+            "a.txt"
+          ]
+        }
+      },
+      "scope": [
+        "src/**",
+        "a.txt"
+      ]
+    },
+    {
+      "unitRecord": {
+        "writeScope": [
+          "src/**"
+        ],
+        "unit": {
+          "writes": [
+            "lib/**"
+          ]
+        },
+        "sync": {
+          "status": "merged",
+          "scopeAdded": [
+            "a.txt"
+          ]
+        }
+      },
+      "scope": [
+        "src/**"
+      ]
+    },
+    {
+      "unitRecord": {
+        "writeScope": [
+          "src/**"
+        ],
+        "unit": {
+          "writes": [
+            "lib/**"
+          ]
+        }
+      },
+      "scope": [
+        "src/**"
+      ]
+    },
+    {
+      "unitRecord": {
+        "unit": {
+          "writes": [
+            "lib/**"
+          ]
+        },
+        "sync": {
+          "status": "conflicted"
+        }
+      },
+      "scope": [
+        "lib/**"
+      ]
+    },
+    {
+      "unitRecord": {
+        "sync": {
+          "status": "conflicted",
+          "scopeAdded": [
+            "z"
+          ]
+        }
+      },
+      "scope": [
+        "z"
+      ]
+    }
+  ],
+  "syncBrief": [
+    {
+      "sync": null,
+      "brief": ""
+    },
+    {
+      "sync": {
+        "status": "merged",
+        "ref": "main",
+        "sha": "abc"
+      },
+      "brief": ""
+    },
+    {
+      "sync": {
+        "status": "conflicted",
+        "ref": "main",
+        "sha": "0123456789abcdef0123",
+        "conflicts": [
+          "a.txt",
+          "b/c.txt"
+        ]
+      },
+      "brief": "\n## Merge to finish\nThe runner merged `main` (0123456789ab) into this branch and git stopped on conflicts in:\n- a.txt\n- b/c.txt\nEdit each of these files so that no conflict marker (`<<<<<<<`, `=======`, `>>>>>>>`, `|||||||`) is left, keeping what both sides meant. They are in your write scope.\nNever run git yourself (no `git add`, `git merge --continue`, `git merge --abort`, `git commit`): the runner concludes the merge commit after your round passes, and refuses it while a marker is left."
+    }
+  ],
+  "syncSummary": [
+    {
+      "sync": null,
+      "summary": null
+    },
+    {
+      "sync": {
+        "status": "merged",
+        "ref": "main",
+        "sha": "abc",
+        "started": true,
+        "mergeStaged": [
+          "x"
+        ],
+        "nativeHead": "h",
+        "nextOperationId": "n",
+        "operationId": "o"
+      },
+      "summary": {
+        "status": "merged",
+        "ref": "main",
+        "sha": "abc",
+        "operationId": "o"
+      }
+    }
+  ],
+  "syncOnlyPass": [
+    {
+      "sync": {
+        "status": "merged",
+        "ref": "main",
+        "sha": "abc",
+        "commit": {
+          "sha": "c1",
+          "subject": "chore(sync): merge main",
+          "files": [
+            "a"
+          ]
+        }
+      },
+      "result": {
+        "outcome": "pass",
+        "results": [
+          {
+            "outcome": "pass",
+            "seat": "sync",
+            "round": 0,
+            "commit": {
+              "status": "committed",
+              "sha": "c1",
+              "subject": "chore(sync): merge main",
+              "outOfScope": [],
+              "preExistingInScope": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "sync": {
+        "status": "up-to-date",
+        "ref": "main",
+        "sha": "abc"
+      },
+      "result": {
+        "outcome": "pass",
+        "results": [
+          {
+            "outcome": "pass",
+            "seat": "sync",
+            "round": 0,
+            "commit": {
+              "status": "no-changes",
+              "outOfScope": [],
+              "preExistingInScope": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "sync": {
+        "status": "merged",
+        "ref": "main",
+        "sha": "abc",
+        "commit": {
+          "by": "outside"
+        },
+        "warnings": [
+          {
+            "code": "w",
+            "message": "m"
+          }
+        ]
+      },
+      "result": {
+        "outcome": "pass",
+        "results": [
+          {
+            "outcome": "pass",
+            "seat": "sync",
+            "round": 0,
+            "commit": {
+              "status": "no-changes",
+              "outOfScope": [],
+              "preExistingInScope": [],
+              "warnings": [
+                {
+                  "code": "w",
+                  "message": "m"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "syncOnlyNotOwed": [
+    {
+      "unitRecord": {
+        "sync": {
+          "status": "merged"
+        },
+        "unit": {
+          "syncOnly": false
+        },
+        "bindings": {}
+      },
+      "result": null
+    },
+    {
+      "unitRecord": {
+        "sync": {
+          "status": "merged"
+        },
+        "unit": {
+          "syncOnly": true
+        },
+        "bindings": {
+          "producer/1": {}
+        }
+      },
+      "result": null
+    }
+  ]
+}

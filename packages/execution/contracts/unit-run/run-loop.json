@@ -1,0 +1,2171 @@
+{
+  "providerLimit": [
+    {
+      "name": "lease conflict on a pinned account stops",
+      "result": {
+        "runResult": {
+          "classification": {
+            "outcome": {
+              "category": "infra"
+            },
+            "failure": {
+              "code": "provider-capacity-lease-conflict"
+            }
+          }
+        }
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "transport": "process",
+        "pool": "anthropic",
+        "leaseAccount": "a1",
+        "account": {
+          "pool": "anthropic",
+          "id": "a1"
+        }
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit"
+        }
+      ],
+      "attemptNo": 0,
+      "answer": {
+        "stop": {
+          "fallbackExhausted": {
+            "from": {
+              "executor": "claude",
+              "invocation": "claude-cli",
+              "transport": "process"
+            },
+            "reason": "account-pinned",
+            "detail": "account \"anthropic/a1\" was pinned, but it cannot be leased now; pin another account or wait for this one"
+          }
+        }
+      }
+    },
+    {
+      "name": "lease conflict rebinds from a fresh view",
+      "result": {
+        "runResult": {
+          "classification": {
+            "outcome": {
+              "category": "infra"
+            },
+            "failure": {
+              "code": "provider-capacity-lease-conflict"
+            }
+          }
+        }
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "transport": "process",
+        "pool": "anthropic",
+        "leaseAccount": "a1"
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "leaseConflict": true
+        }
+      ],
+      "attemptNo": 0,
+      "answer": {
+        "rebind": {
+          "from": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "reason": "lease-conflict",
+          "failedAccounts": [
+            {
+              "pool": "anthropic",
+              "account": "a1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "lease conflict past the bound is refused",
+      "result": {
+        "runResult": {
+          "classification": {
+            "outcome": {
+              "category": "infra"
+            },
+            "failure": {
+              "code": "provider-capacity-lease-conflict"
+            }
+          }
+        }
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "transport": "process",
+        "pool": "anthropic",
+        "leaseAccount": "a1"
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "leaseConflict": true
+        },
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "leaseConflict": true
+        },
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "leaseConflict": true
+        },
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "leaseConflict": true
+        },
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "leaseConflict": true
+        },
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "leaseConflict": true
+        },
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "leaseConflict": true
+        },
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "leaseConflict": true
+        },
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "leaseConflict": true
+        }
+      ],
+      "attemptNo": 8,
+      "answer": {
+        "stop": {
+          "refused": {
+            "reason": "lease-conflict",
+            "detail": "the seat's account could not be leased 9 times in a row"
+          }
+        }
+      }
+    },
+    {
+      "name": "a lost brief rebinds the same candidate",
+      "result": {
+        "runResult": {
+          "classification": {
+            "outcome": {
+              "category": "infra"
+            }
+          }
+        }
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "transport": "process",
+        "pool": "anthropic",
+        "leaseAccount": "a1"
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "briefNotDelivered": true
+        }
+      ],
+      "attemptNo": 0,
+      "briefNotDelivered": true,
+      "answer": {
+        "rebind": {
+          "continuity": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "from": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "reason": "brief-not-delivered"
+        }
+      }
+    },
+    {
+      "name": "a brief lost twice stops",
+      "result": {
+        "runResult": {}
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "transport": "process",
+        "pool": "anthropic",
+        "leaseAccount": "a1"
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "briefNotDelivered": true
+        },
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "briefNotDelivered": true
+        }
+      ],
+      "attemptNo": 1,
+      "briefNotDelivered": true,
+      "answer": {
+        "stop": {
+          "fallbackExhausted": {
+            "from": {
+              "executor": "claude",
+              "invocation": "claude-cli",
+              "transport": "process"
+            },
+            "reason": "brief-not-delivered",
+            "detail": "the agent never received its brief in 2 launches in a row"
+          }
+        }
+      }
+    },
+    {
+      "name": "a change that cannot be read stops",
+      "result": {
+        "runResult": {
+          "classification": {
+            "outcome": {
+              "category": "provider"
+            },
+            "failure": {
+              "code": "provider-limit"
+            }
+          }
+        }
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "transport": "process",
+        "pool": "anthropic",
+        "leaseAccount": "a1"
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit"
+        }
+      ],
+      "attemptNo": 0,
+      "changed": {
+        "error": "no snapshot"
+      },
+      "answer": {
+        "stop": {
+          "retryStopped": {
+            "reason": "partial-writes",
+            "paths": []
+          },
+          "fallbackExhausted": {
+            "from": {
+              "executor": "claude",
+              "invocation": "claude-cli",
+              "transport": "process"
+            },
+            "reason": "partial-writes",
+            "detail": "could not tell whether the seat changed the worktree (no snapshot), so it is not run again by itself",
+            "paths": []
+          }
+        }
+      }
+    },
+    {
+      "name": "changed paths stop",
+      "result": {
+        "runResult": {
+          "classification": {
+            "outcome": {
+              "category": "provider"
+            },
+            "failure": {
+              "code": "provider-limit"
+            }
+          }
+        }
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "transport": "process",
+        "pool": "anthropic",
+        "leaseAccount": "a1"
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit"
+        }
+      ],
+      "attemptNo": 0,
+      "changed": {
+        "paths": [
+          "a.txt",
+          "b.txt"
+        ],
+        "headMoved": false
+      },
+      "answer": {
+        "stop": {
+          "retryStopped": {
+            "reason": "partial-writes",
+            "paths": [
+              "a.txt",
+              "b.txt"
+            ],
+            "headMoved": false
+          },
+          "fallbackExhausted": {
+            "from": {
+              "executor": "claude",
+              "invocation": "claude-cli",
+              "transport": "process"
+            },
+            "reason": "partial-writes",
+            "detail": "the seat changed the worktree before its provider limit (a.txt, b.txt); it is not run again on top of that work: keep, finish or undo the changes, then resume",
+            "paths": [
+              "a.txt",
+              "b.txt"
+            ],
+            "headMoved": false
+          }
+        }
+      }
+    },
+    {
+      "name": "a moved head stops a pinned seat",
+      "result": {
+        "runResult": {
+          "classification": {
+            "outcome": {
+              "category": "provider"
+            },
+            "failure": {
+              "code": "provider-limit"
+            }
+          }
+        }
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "transport": "process",
+        "pool": "anthropic",
+        "leaseAccount": "a1",
+        "account": {
+          "pool": "anthropic",
+          "id": "a1"
+        }
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit"
+        }
+      ],
+      "attemptNo": 0,
+      "changed": {
+        "paths": [],
+        "headMoved": true
+      },
+      "answer": {
+        "stop": {
+          "retryStopped": {
+            "reason": "partial-writes",
+            "paths": [],
+            "headMoved": true,
+            "accountPinned": "anthropic/a1"
+          },
+          "fallbackExhausted": {
+            "from": {
+              "executor": "claude",
+              "invocation": "claude-cli",
+              "transport": "process"
+            },
+            "reason": "partial-writes",
+            "detail": "the seat changed the worktree before its provider limit (HEAD moved); it is not run again on top of that work: keep, finish or undo the changes, then resume",
+            "paths": [],
+            "headMoved": true,
+            "accountPinned": "anthropic/a1"
+          }
+        }
+      }
+    },
+    {
+      "name": "a lost brief with changes stops",
+      "result": {
+        "runResult": {}
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "transport": "process",
+        "pool": "anthropic",
+        "leaseAccount": "a1"
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "briefNotDelivered": true
+        }
+      ],
+      "attemptNo": 0,
+      "briefNotDelivered": true,
+      "changed": {
+        "paths": [
+          "x"
+        ],
+        "headMoved": false
+      },
+      "answer": {
+        "stop": {
+          "retryStopped": {
+            "reason": "partial-writes",
+            "paths": [
+              "x"
+            ],
+            "headMoved": false
+          },
+          "fallbackExhausted": {
+            "from": {
+              "executor": "claude",
+              "invocation": "claude-cli",
+              "transport": "process"
+            },
+            "reason": "partial-writes",
+            "detail": "the seat changed the worktree before its brief was lost (x); it is not run again on top of that work: keep, finish or undo the changes, then resume",
+            "paths": [
+              "x"
+            ],
+            "headMoved": false
+          }
+        }
+      }
+    },
+    {
+      "name": "a pinned account is never moved",
+      "result": {
+        "runResult": {
+          "classification": {
+            "outcome": {
+              "category": "provider"
+            },
+            "failure": {
+              "code": "provider-limit"
+            }
+          }
+        }
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "transport": "process",
+        "pool": "anthropic",
+        "leaseAccount": "a1",
+        "account": {
+          "pool": "anthropic",
+          "id": "a1"
+        }
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit"
+        }
+      ],
+      "attemptNo": 0,
+      "changed": {
+        "paths": [],
+        "headMoved": false
+      },
+      "answer": {
+        "stop": {
+          "retryStopped": {
+            "reason": "account-pinned"
+          },
+          "fallbackExhausted": {
+            "from": {
+              "executor": "claude",
+              "invocation": "claude-cli",
+              "transport": "process"
+            },
+            "reason": "account-pinned",
+            "detail": "account \"anthropic/a1\" was pinned, so the seat is not moved to another account or executor; pin another account or wait for this one"
+          }
+        }
+      }
+    },
+    {
+      "name": "walk rotates first when another account is healthy",
+      "result": {
+        "runResult": {
+          "classification": {
+            "outcome": {
+              "category": "provider"
+            },
+            "failure": {
+              "code": "provider-limit"
+            }
+          }
+        }
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "transport": "process",
+        "pool": "anthropic",
+        "leaseAccount": "a1"
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit"
+        }
+      ],
+      "attemptNo": 0,
+      "rotation": {
+        "pool": "anthropic",
+        "total": 3,
+        "healthy": 2
+      },
+      "answer": {
+        "walk": {
+          "rotation": {
+            "continuity": {
+              "executor": "claude",
+              "invocation": "claude-cli",
+              "transport": "process",
+              "pool": "anthropic",
+              "leaseAccount": "a1"
+            },
+            "from": {
+              "executor": "claude",
+              "invocation": "claude-cli",
+              "transport": "process",
+              "pool": "anthropic",
+              "leaseAccount": "a1"
+            },
+            "rotation": true,
+            "failedAccounts": [
+              {
+                "pool": "anthropic",
+                "account": "a1"
+              }
+            ],
+            "detail": {
+              "accountsHealthy": 2
+            }
+          },
+          "step": {
+            "from": {
+              "executor": "claude",
+              "invocation": "claude-cli",
+              "transport": "process",
+              "pool": "anthropic",
+              "leaseAccount": "a1"
+            },
+            "tried": [
+              {
+                "executor": "claude",
+                "invocation": "claude-cli",
+                "transport": "process",
+                "pool": "anthropic",
+                "leaseAccount": "a1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "walk steps on when no account is healthy",
+      "result": {
+        "runResult": {
+          "classification": {
+            "outcome": {
+              "category": "provider"
+            },
+            "failure": {
+              "code": "provider-limit"
+            }
+          }
+        }
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "transport": "process",
+        "pool": "anthropic",
+        "leaseAccount": "a1"
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit"
+        }
+      ],
+      "attemptNo": 0,
+      "rotation": {
+        "pool": "anthropic",
+        "total": 3,
+        "healthy": 0
+      },
+      "answer": {
+        "walk": {
+          "step": {
+            "from": {
+              "executor": "claude",
+              "invocation": "claude-cli",
+              "transport": "process",
+              "pool": "anthropic",
+              "leaseAccount": "a1"
+            },
+            "tried": [
+              {
+                "executor": "claude",
+                "invocation": "claude-cli",
+                "transport": "process",
+                "pool": "anthropic",
+                "leaseAccount": "a1"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "a credential fault names its pool",
+      "result": {
+        "runResult": {
+          "classification": {
+            "outcome": {
+              "category": "provider"
+            },
+            "failure": {
+              "code": "provider-limit",
+              "cause": "credential"
+            }
+          }
+        }
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "transport": "process",
+        "pool": "anthropic",
+        "leaseAccount": "a1"
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit"
+        }
+      ],
+      "attemptNo": 0,
+      "answer": {
+        "walk": {
+          "step": {
+            "from": {
+              "executor": "claude",
+              "invocation": "claude-cli",
+              "transport": "process",
+              "pool": "anthropic",
+              "leaseAccount": "a1"
+            },
+            "tried": [
+              {
+                "executor": "claude",
+                "invocation": "claude-cli",
+                "transport": "process",
+                "pool": "anthropic",
+                "leaseAccount": "a1"
+              }
+            ]
+          },
+          "faultPool": "anthropic"
+        }
+      }
+    },
+    {
+      "name": "rotations spent are counted and bound the next",
+      "result": {
+        "runResult": {
+          "classification": {
+            "outcome": {
+              "category": "provider"
+            },
+            "failure": {
+              "code": "provider-limit"
+            }
+          }
+        }
+      },
+      "bound": {
+        "executor": "claude",
+        "invocation": "claude-cli",
+        "pool": "anthropic",
+        "leaseAccount": "a1"
+      },
+      "attempts": [
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit"
+        },
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "fallbackFrom": {
+            "kind": "account-rotation"
+          }
+        },
+        {
+          "binding": {
+            "executor": "claude",
+            "invocation": "claude-cli",
+            "transport": "process",
+            "pool": "anthropic",
+            "leaseAccount": "a1"
+          },
+          "outcome": "provider-limit",
+          "fallbackFrom": {
+            "kind": "account-rotation"
+          }
+        }
+      ],
+      "attemptNo": 2,
+      "rotation": {
+        "pool": "anthropic",
+        "total": 3,
+        "healthy": 1
+      },
+      "answer": {
+        "walk": {
+          "step": {
+            "from": {
+              "executor": "claude",
+              "invocation": "claude-cli",
+              "pool": "anthropic",
+              "leaseAccount": "a1"
+            },
+            "tried": [
+              {
+                "executor": "claude",
+                "invocation": "claude-cli",
+                "transport": "process",
+                "pool": "anthropic",
+                "leaseAccount": "a1"
+              },
+              {
+                "executor": "claude",
+                "invocation": "claude-cli",
+                "transport": "process",
+                "pool": "anthropic",
+                "leaseAccount": "a1"
+              },
+              {
+                "executor": "claude",
+                "invocation": "claude-cli",
+                "transport": "process",
+                "pool": "anthropic",
+                "leaseAccount": "a1"
+              }
+            ]
+          },
+          "accountRotations": 2
+        }
+      }
+    }
+  ],
+  "snapshot": [
+    {
+      "cfg": {},
+      "snapshot": {
+        "hash": "4fc8f7c129a8ac8ab8ed1f588d89bcaa332c5aabc6e9577edc5c4ea0b1b49701",
+        "runner": {}
+      }
+    },
+    {
+      "cfg": {
+        "defaults": {
+          "tier": "standard"
+        },
+        "maxTier": "deep",
+        "capabilities": {
+          "code:implement": {
+            "verify": "npm test"
+          }
+        },
+        "llmAccounts": {
+          "x": 1
+        },
+        "providers": {
+          "p": {}
+        },
+        "timeoutMs": 1000,
+        "governance": {
+          "rule": true
+        }
+      },
+      "snapshot": {
+        "hash": "d54c15494eec9052a0cec0d030b9700061c6f762c9c5db2d6862fd07c61de757",
+        "runner": {
+          "defaults": {
+            "tier": "standard"
+          },
+          "maxTier": "deep",
+          "capabilities": {
+            "code:implement": {
+              "verify": "npm test"
+            }
+          },
+          "timeoutMs": 1000,
+          "governance": {
+            "rule": true
+          }
+        }
+      }
+    },
+    {
+      "cfg": {
+        "roles": {
+          "producer": {}
+        },
+        "executors": {
+          "claude": {
+            "command": "claude"
+          }
+        },
+        "loops": {},
+        "patterns": {
+          "solo": {}
+        },
+        "maxTier": null,
+        "generatedPaths": [
+          "a/**"
+        ]
+      },
+      "snapshot": {
+        "hash": "b41b0300a6986ca2612553be1cae61806a722282c473aa4595b82b6b8f67511e",
+        "runner": {
+          "roles": {
+            "producer": {}
+          },
+          "executors": {
+            "claude": {
+              "command": "claude"
+            }
+          },
+          "loops": {},
+          "patterns": {
+            "solo": {}
+          },
+          "maxTier": null,
+          "generatedPaths": [
+            "a/**"
+          ]
+        }
+      }
+    }
+  ],
+  "outcomeOfRunResult": [
+    {
+      "runResult": {
+        "classification": {
+          "outcome": {
+            "category": "ok"
+          }
+        }
+      },
+      "outcome": "pass"
+    },
+    {
+      "runResult": {
+        "classification": {
+          "outcome": {
+            "category": "verdict"
+          },
+          "assessment": {
+            "verdict": "findings"
+          }
+        }
+      },
+      "outcome": "findings"
+    },
+    {
+      "runResult": {
+        "classification": {
+          "outcome": {
+            "category": "verdict"
+          },
+          "assessment": {
+            "verdict": "pass"
+          }
+        }
+      },
+      "outcome": "execution-failure"
+    },
+    {
+      "runResult": {
+        "classification": {
+          "outcome": {
+            "category": "blocked"
+          }
+        }
+      },
+      "outcome": "blocked"
+    },
+    {
+      "runResult": {
+        "classification": {
+          "outcome": {
+            "category": "policy"
+          }
+        }
+      },
+      "outcome": "policy-refusal"
+    },
+    {
+      "runResult": {
+        "classification": {
+          "outcome": {
+            "category": "provider"
+          }
+        }
+      },
+      "outcome": "provider-limit"
+    },
+    {
+      "runResult": {
+        "classification": {
+          "outcome": {
+            "category": "infra"
+          },
+          "failure": {
+            "code": "paused-limit"
+          }
+        }
+      },
+      "outcome": "provider-limit"
+    },
+    {
+      "runResult": {
+        "classification": {
+          "outcome": {
+            "category": "infra"
+          },
+          "failure": {
+            "code": "provider-capacity-lease-conflict"
+          }
+        }
+      },
+      "outcome": "provider-limit"
+    },
+    {
+      "runResult": {
+        "classification": {
+          "outcome": {
+            "category": "infra"
+          },
+          "failure": {
+            "code": "other"
+          }
+        }
+      },
+      "outcome": "execution-failure"
+    },
+    {
+      "runResult": {
+        "classification": {
+          "outcome": {
+            "category": "corrupt"
+          }
+        }
+      },
+      "outcome": "execution-failure"
+    }
+  ],
+  "corpusHistory": [
+    {
+      "sample": "v3-solo-settled",
+      "history": [
+        {
+          "seat": "producer",
+          "round": 1,
+          "outcome": "pass"
+        }
+      ]
+    },
+    {
+      "sample": "v3-open-attempt",
+      "history": []
+    }
+  ],
+  "scopeRule": [
+    {
+      "outcome": "pass",
+      "results": [],
+      "unitRecord": {
+        "unit": {
+          "writes": []
+        },
+        "bindings": {}
+      },
+      "ruled": {
+        "outcome": "pass",
+        "error": null,
+        "outOfScope": [],
+        "outOfScopeOnBranch": []
+      }
+    },
+    {
+      "outcome": "pass",
+      "results": [
+        {
+          "commit": {
+            "outOfScope": [
+              "z.txt",
+              "a.txt"
+            ]
+          }
+        }
+      ],
+      "unitRecord": {
+        "unit": {
+          "writes": []
+        },
+        "bindings": {}
+      },
+      "ruled": {
+        "outcome": "findings",
+        "error": null,
+        "outOfScope": [
+          "a.txt",
+          "z.txt"
+        ],
+        "outOfScopeOnBranch": []
+      }
+    },
+    {
+      "outcome": "pass",
+      "results": [],
+      "unitRecord": {
+        "unit": {
+          "writes": []
+        },
+        "bindings": {},
+        "branchBase": {
+          "branch": null,
+          "baseSha": null,
+          "outOfScopeOnBranch": [
+            "b",
+            "a"
+          ]
+        }
+      },
+      "ruled": {
+        "outcome": "findings",
+        "error": null,
+        "outOfScope": [
+          "a",
+          "b"
+        ],
+        "outOfScopeOnBranch": [
+          "a",
+          "b"
+        ]
+      }
+    },
+    {
+      "outcome": "findings",
+      "results": [],
+      "unitRecord": {
+        "unit": {
+          "writes": []
+        },
+        "bindings": {
+          "producer/1": [
+            {
+              "commit": {
+                "outOfScope": [
+                  "c",
+                  "a"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "ruled": {
+        "outcome": "findings",
+        "error": null,
+        "outOfScope": [
+          "a",
+          "c"
+        ],
+        "outOfScopeOnBranch": []
+      }
+    },
+    {
+      "outcome": "execution-failure",
+      "results": [
+        {
+          "commit": {
+            "outOfScope": [
+              "x"
+            ]
+          }
+        }
+      ],
+      "unitRecord": {
+        "unit": {
+          "writes": []
+        },
+        "bindings": {}
+      },
+      "ruled": {
+        "outcome": "execution-failure",
+        "error": null,
+        "outOfScope": [
+          "x"
+        ],
+        "outOfScopeOnBranch": []
+      }
+    }
+  ],
+  "infrastructureReason": [
+    {
+      "started": {
+        "value": false
+      },
+      "ruled": {},
+      "attempts": [],
+      "reason": "not-started"
+    },
+    {
+      "started": {
+        "value": true
+      },
+      "ruled": {
+        "error": "x"
+      },
+      "attempts": [],
+      "reason": "scope-check-failed"
+    },
+    {
+      "started": {
+        "value": true
+      },
+      "ruled": {},
+      "attempts": [
+        {
+          "outcome": "pass"
+        }
+      ],
+      "reason": "execution-failure"
+    },
+    {
+      "started": {
+        "value": true
+      },
+      "ruled": {},
+      "attempts": [
+        {
+          "seat": "verify",
+          "outcome": "execution-failure",
+          "infrastructureReason": "timeout"
+        }
+      ],
+      "reason": "verify-timeout"
+    },
+    {
+      "started": {
+        "value": true
+      },
+      "ruled": {},
+      "attempts": [
+        {
+          "seat": "producer",
+          "outcome": "execution-failure",
+          "commit": {
+            "status": "failed",
+            "reason": "git-error"
+          }
+        }
+      ],
+      "reason": "commit-failed:git-error"
+    },
+    {
+      "started": {
+        "value": true
+      },
+      "ruled": {},
+      "attempts": [
+        {
+          "seat": "producer",
+          "outcome": "execution-failure",
+          "commit": {
+            "status": "failed"
+          }
+        }
+      ],
+      "reason": "commit-failed:unknown"
+    },
+    {
+      "started": {
+        "value": true
+      },
+      "ruled": {},
+      "attempts": [
+        {
+          "seat": "producer",
+          "outcome": "provider-limit",
+          "runResult": {
+            "classification": {
+              "outcome": {
+                "reason": "quota"
+              }
+            }
+          }
+        }
+      ],
+      "reason": "execution-failure"
+    },
+    {
+      "started": {
+        "value": true
+      },
+      "ruled": {},
+      "attempts": [
+        {
+          "seat": "producer",
+          "outcome": "execution-failure"
+        }
+      ],
+      "reason": "execution-failure"
+    }
+  ],
+  "refusedSeats": [
+    {
+      "attempts": [
+        {
+          "seat": "producer",
+          "round": 1,
+          "refused": {
+            "reason": "r",
+            "detail": "d"
+          }
+        },
+        {
+          "seat": "checker",
+          "outcome": "pass"
+        }
+      ],
+      "seats": [
+        {
+          "seat": "producer",
+          "round": 1,
+          "reason": "r",
+          "detail": "d"
+        }
+      ]
+    },
+    {
+      "attempts": [
+        {
+          "seat": "producer",
+          "refused": {
+            "reason": "r"
+          }
+        }
+      ],
+      "seats": [
+        {
+          "seat": "producer",
+          "reason": "r",
+          "detail": ""
+        }
+      ]
+    }
+  ],
+  "failedUnitFacts": [
+    {
+      "scope": {
+        "unitRecord": null,
+        "ceilingHit": false
+      },
+      "admission": {
+        "started": false
+      },
+      "facts": {
+        "outcome": "not-started",
+        "infrastructure": true,
+        "outOfScope": [],
+        "outOfScopeOnBranch": [],
+        "evaluations": [],
+        "started": {
+          "value": false,
+          "reason": "failed-before-start"
+        },
+        "launches": {
+          "ceiling": null,
+          "used": 0,
+          "ceilingHit": false
+        },
+        "results": []
+      }
+    },
+    {
+      "scope": {
+        "unitRecord": {
+          "seatLaunchCeiling": 3,
+          "bindings": {
+            "producer/1": [
+              {
+                "dispatchRetryId": "a"
+              },
+              {
+                "dispatchRetryId": "b",
+                "leaseConflict": true
+              }
+            ]
+          }
+        },
+        "ceilingHit": true
+      },
+      "admission": {
+        "started": true
+      },
+      "facts": {
+        "outcome": "execution-failure",
+        "infrastructure": true,
+        "outOfScope": [],
+        "outOfScopeOnBranch": [],
+        "evaluations": [],
+        "started": {
+          "value": true,
+          "reason": null
+        },
+        "launches": {
+          "ceiling": 3,
+          "used": 1,
+          "ceilingHit": true
+        },
+        "results": []
+      }
+    }
+  ],
+  "start": {
+    "branchBases": [
+      {
+        "value": "<absent>",
+        "answer": {
+          "ok": true,
+          "value": null
+        }
+      },
+      {
+        "value": null,
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": null,
+            "phase": "pre-admission",
+            "message": "runUnit: branchBase must be { branch, baseSha, outOfScopeOnBranch } with branch and baseSha both names or both null"
+          }
+        }
+      },
+      {
+        "value": "x",
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": null,
+            "phase": "pre-admission",
+            "message": "runUnit: branchBase must be { branch, baseSha, outOfScopeOnBranch } with branch and baseSha both names or both null"
+          }
+        }
+      },
+      {
+        "value": {
+          "branch": "b",
+          "baseSha": "s",
+          "outOfScopeOnBranch": [
+            "z",
+            "a",
+            "z"
+          ]
+        },
+        "answer": {
+          "ok": true,
+          "value": {
+            "branch": "b",
+            "baseSha": "s",
+            "outOfScopeOnBranch": [
+              "a",
+              "z"
+            ]
+          }
+        }
+      },
+      {
+        "value": {
+          "branch": null,
+          "baseSha": null,
+          "outOfScopeOnBranch": []
+        },
+        "answer": {
+          "ok": true,
+          "value": {
+            "branch": null,
+            "baseSha": null,
+            "outOfScopeOnBranch": []
+          }
+        }
+      },
+      {
+        "value": {
+          "branch": "b",
+          "baseSha": null,
+          "outOfScopeOnBranch": []
+        },
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": null,
+            "phase": "pre-admission",
+            "message": "runUnit: branchBase must be { branch, baseSha, outOfScopeOnBranch } with branch and baseSha both names or both null"
+          }
+        }
+      },
+      {
+        "value": {
+          "branch": "b",
+          "baseSha": "s"
+        },
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": null,
+            "phase": "pre-admission",
+            "message": "runUnit: branchBase must be { branch, baseSha, outOfScopeOnBranch } with branch and baseSha both names or both null"
+          }
+        }
+      },
+      {
+        "value": {
+          "branch": "b",
+          "baseSha": "s",
+          "outOfScopeOnBranch": [
+            ""
+          ]
+        },
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": null,
+            "phase": "pre-admission",
+            "message": "runUnit: branchBase must be { branch, baseSha, outOfScopeOnBranch } with branch and baseSha both names or both null"
+          }
+        }
+      }
+    ],
+    "pinInputs": [
+      {
+        "value": "<absent>",
+        "answer": {
+          "ok": true,
+          "value": []
+        }
+      },
+      {
+        "value": [
+          "/a",
+          "/b",
+          "/a"
+        ],
+        "answer": {
+          "ok": true,
+          "value": [
+            "/a",
+            "/b"
+          ]
+        }
+      },
+      {
+        "value": [
+          "rel"
+        ],
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": null,
+            "phase": null,
+            "message": "runUnit: pinInputs must be absolute paths"
+          }
+        }
+      },
+      {
+        "value": "x",
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": null,
+            "phase": null,
+            "message": "runUnit: pinInputs must be absolute paths"
+          }
+        }
+      },
+      {
+        "value": [
+          1
+        ],
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": null,
+            "phase": null,
+            "message": "runUnit: pinInputs must be absolute paths"
+          }
+        }
+      }
+    ],
+    "acceptedReports": [
+      {
+        "value": "<absent>",
+        "answer": {
+          "ok": true,
+          "value": []
+        }
+      },
+      {
+        "value": [
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "answer": {
+          "ok": true,
+          "value": [
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          ]
+        }
+      },
+      {
+        "value": [
+          "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        ],
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": null,
+            "phase": null,
+            "message": "runUnit: acceptedReports must be sha256 hex digests"
+          }
+        }
+      },
+      {
+        "value": [
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": null,
+            "phase": null,
+            "message": "runUnit: acceptedReports must be sha256 hex digests"
+          }
+        }
+      },
+      {
+        "value": "x",
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": null,
+            "phase": null,
+            "message": "runUnit: acceptedReports must be sha256 hex digests"
+          }
+        }
+      }
+    ],
+    "seatSchemas": [
+      {
+        "schema": "<absent>",
+        "answer": {
+          "ok": true,
+          "value": null
+        }
+      },
+      {
+        "schema": null,
+        "answer": {
+          "ok": true,
+          "value": null
+        }
+      },
+      {
+        "schema": 1,
+        "answer": {
+          "ok": true,
+          "value": null
+        }
+      },
+      {
+        "schema": 2,
+        "answer": {
+          "ok": true,
+          "value": null
+        }
+      },
+      {
+        "schema": 3,
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": "record-from-newer-release",
+            "phase": null,
+            "message": "cannot resume unit run \"unit-run-1\": unit.json field seatSchema is 3, written by a newer release than this one; resume it with that release"
+          }
+        }
+      },
+      {
+        "schema": "2",
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": "record-from-newer-release",
+            "phase": null,
+            "message": "cannot resume unit run \"unit-run-1\": unit.json field seatSchema is \"2\", written by a newer release than this one; resume it with that release"
+          }
+        }
+      },
+      {
+        "schema": 2.5,
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "RunnerConfigError",
+            "code": "record-from-newer-release",
+            "phase": null,
+            "message": "cannot resume unit run \"unit-run-1\": unit.json field seatSchema is 2.5, written by a newer release than this one; resume it with that release"
+          }
+        }
+      }
+    ],
+    "collaborationPins": {
+      "shippedPatterns": {
+        "solo": {},
+        "reviewed": {},
+        "panel": {},
+        "debate": {}
+      },
+      "snapshot": {
+        "runner": {
+          "patterns": {
+            "mine": {}
+          }
+        }
+      },
+      "live": {
+        "runner": {
+          "patterns": {
+            "live": {}
+          }
+        }
+      },
+      "cases": [
+        {
+          "collaboration": "<absent>",
+          "answer": {
+            "ok": false,
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "collaboration-pin-unusable",
+              "phase": null,
+              "message": "cannot resume unit run \"unit-run-1\": collaboration pin is unreadable"
+            }
+          }
+        },
+        {
+          "collaboration": "x",
+          "answer": {
+            "ok": false,
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "collaboration-pin-unusable",
+              "phase": null,
+              "message": "cannot resume unit run \"unit-run-1\": collaboration pin is unreadable"
+            }
+          }
+        },
+        {
+          "collaboration": {},
+          "answer": {
+            "ok": false,
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "collaboration-pin-unusable",
+              "phase": null,
+              "message": "cannot resume unit run \"unit-run-1\": collaboration pin has invalid pattern name"
+            }
+          }
+        },
+        {
+          "collaboration": {
+            "pattern": {
+              "name": "solo"
+            }
+          },
+          "answer": {
+            "ok": false,
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "collaboration-pin-unusable",
+              "phase": null,
+              "message": "cannot resume unit run \"unit-run-1\": collaboration pin has invalid effective block"
+            }
+          }
+        },
+        {
+          "collaboration": {
+            "pattern": {
+              "name": "solo"
+            },
+            "effective": {
+              "loop": "nope",
+              "params": {}
+            }
+          },
+          "answer": {
+            "ok": false,
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "collaboration-pin-unusable",
+              "phase": null,
+              "message": "cannot resume unit run \"unit-run-1\": collaboration pin names unregistered loop \"nope\""
+            }
+          }
+        },
+        {
+          "collaboration": {
+            "pattern": {
+              "name": "solo"
+            },
+            "effective": {
+              "params": {}
+            }
+          },
+          "answer": {
+            "ok": false,
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "collaboration-pin-unusable",
+              "phase": null,
+              "message": "cannot resume unit run \"unit-run-1\": collaboration pin names unregistered loop \"undefined\""
+            }
+          }
+        },
+        {
+          "collaboration": {
+            "pattern": {
+              "name": "solo"
+            },
+            "effective": {
+              "loop": "solo",
+              "params": []
+            }
+          },
+          "answer": {
+            "ok": false,
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "collaboration-pin-unusable",
+              "phase": null,
+              "message": "cannot resume unit run \"unit-run-1\": collaboration pin has invalid effective params"
+            }
+          }
+        },
+        {
+          "collaboration": {
+            "pattern": {
+              "name": "solo"
+            },
+            "effective": {
+              "loop": "solo",
+              "params": {}
+            }
+          },
+          "answer": {
+            "ok": true,
+            "value": null
+          }
+        },
+        {
+          "collaboration": {
+            "pattern": {
+              "name": "mine"
+            },
+            "effective": {
+              "loop": "reviewed",
+              "params": {}
+            }
+          },
+          "answer": {
+            "ok": true,
+            "value": null
+          }
+        },
+        {
+          "collaboration": {
+            "pattern": {
+              "name": "live"
+            },
+            "effective": {
+              "loop": "panel",
+              "params": {}
+            }
+          },
+          "answer": {
+            "ok": true,
+            "value": null
+          }
+        },
+        {
+          "collaboration": {
+            "pattern": {
+              "name": "gone"
+            },
+            "effective": {
+              "loop": "solo",
+              "params": {}
+            }
+          },
+          "answer": {
+            "ok": false,
+            "error": {
+              "name": "RunnerConfigError",
+              "code": "collaboration-pin-unusable",
+              "phase": null,
+              "message": "cannot resume unit run \"unit-run-1\": collaboration pin names unregistered pattern \"gone\""
+            }
+          }
+        }
+      ]
+    },
+    "requireFreeWorktree": [
+      {
+        "binding": {
+          "answer": "unbound"
+        },
+        "answer": {
+          "ok": true,
+          "value": null
+        }
+      },
+      {
+        "binding": {
+          "answer": "bound",
+          "record": {
+            "caseId": "case-1"
+          }
+        },
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "CaseAdmissionRefusedError",
+            "code": "bound",
+            "phase": null,
+            "message": "case admission refused bound: worktree /w is not free for a run that names no case: bound (case case-1)",
+            "refusal": {
+              "code": "bound",
+              "condition": "worktree /w is not free for a run that names no case: bound (case case-1)"
+            }
+          }
+        }
+      },
+      {
+        "binding": null,
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "CaseAdmissionRefusedError",
+            "code": "binding-view-unavailable",
+            "phase": null,
+            "message": "case admission refused binding-view-unavailable: worktree /w is not free for a run that names no case: binding-view-unavailable",
+            "refusal": {
+              "code": "binding-view-unavailable",
+              "condition": "worktree /w is not free for a run that names no case: binding-view-unavailable"
+            }
+          }
+        }
+      },
+      {
+        "binding": {},
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "CaseAdmissionRefusedError",
+            "code": "binding-view-unavailable",
+            "phase": null,
+            "message": "case admission refused binding-view-unavailable: worktree /w is not free for a run that names no case: binding-view-unavailable",
+            "refusal": {
+              "code": "binding-view-unavailable",
+              "condition": "worktree /w is not free for a run that names no case: binding-view-unavailable"
+            }
+          }
+        }
+      },
+      {
+        "binding": {
+          "condition": "no view"
+        },
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "CaseAdmissionRefusedError",
+            "code": "binding-view-unavailable",
+            "phase": null,
+            "message": "case admission refused binding-view-unavailable: no view",
+            "refusal": {
+              "code": "binding-view-unavailable",
+              "condition": "no view"
+            }
+          }
+        }
+      },
+      {
+        "binding": {
+          "answer": "bound",
+          "condition": "held by x"
+        },
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "CaseAdmissionRefusedError",
+            "code": "bound",
+            "phase": null,
+            "message": "case admission refused bound: held by x",
+            "refusal": {
+              "code": "bound",
+              "condition": "held by x"
+            }
+          }
+        }
+      },
+      {
+        "binding": {
+          "answer": "stale"
+        },
+        "answer": {
+          "ok": false,
+          "error": {
+            "name": "CaseAdmissionRefusedError",
+            "code": "stale",
+            "phase": null,
+            "message": "case admission refused stale: worktree /w is not free for a run that names no case: stale",
+            "refusal": {
+              "code": "stale",
+              "condition": "worktree /w is not free for a run that names no case: stale"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

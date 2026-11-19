@@ -3749,6 +3749,299 @@
    }
   },
   {
+   "id": "reviewed a ceiling spent by the first round stops the second",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "launchCeiling": 3,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "findings",
+     "findings": [
+      "a"
+     ]
+    }
+   },
+   "verify": [
+    {
+     "pass": true
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "findings",
+     "rounds": 1,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "findings",
+       "findings": [
+        "a"
+       ]
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "pass",
+       "findings": []
+      }
+     ],
+     "findings": [
+      "a"
+     ]
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     }
+    ],
+    "ceilingHit": true
+   }
+  },
+  {
+   "id": "reviewed a ceiling left with room for the second round",
+   "loop": "reviewed",
+   "unit": {
+    "id": "u",
+    "objective": "fix",
+    "capability": "code:implement",
+    "writes": [
+     "src"
+    ]
+   },
+   "cfg": {
+    "capabilities": {
+     "code:implement": {
+      "verify": "npm test",
+      "rigor": "standard",
+      "minCheckers": []
+     }
+    },
+    "loops": {
+     "reviewed": {
+      "checkersByRigor": {
+       "standard": [
+        "reviewer"
+       ],
+       "high": [
+        "reviewer",
+        "red-team"
+       ]
+      }
+     }
+    }
+   },
+   "effective": {
+    "loop": "reviewed",
+    "params": {
+     "maxRounds": 3
+    }
+   },
+   "history": [],
+   "launchRoom": null,
+   "launchCeiling": 4,
+   "shippedCheckersByRigor": null,
+   "results": {
+    "producer/1": {
+     "seat": "producer",
+     "round": 1,
+     "outcome": "pass"
+    },
+    "reviewer/1": {
+     "seat": "reviewer",
+     "round": 1,
+     "outcome": "findings",
+     "findings": [
+      "a"
+     ]
+    },
+    "producer/2": {
+     "seat": "producer",
+     "round": 2,
+     "outcome": "pass"
+    },
+    "reviewer/2": {
+     "seat": "reviewer",
+     "round": 2,
+     "outcome": "pass"
+    }
+   },
+   "verify": [
+    {
+     "pass": true
+    },
+    {
+     "pass": true
+    }
+   ],
+   "expected": {
+    "ok": {
+     "outcome": "pass",
+     "rounds": 2,
+     "results": [
+      {
+       "seat": "producer",
+       "round": 1,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 1,
+       "outcome": "findings",
+       "findings": [
+        "a"
+       ]
+      },
+      {
+       "seat": "verify",
+       "round": 1,
+       "outcome": "pass",
+       "findings": []
+      },
+      {
+       "seat": "producer",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "reviewer",
+       "round": 2,
+       "outcome": "pass"
+      },
+      {
+       "seat": "verify",
+       "round": 2,
+       "outcome": "pass",
+       "findings": []
+      }
+     ],
+     "findings": []
+    },
+    "calls": [
+     {
+      "seat": "producer",
+      "objective": "fix",
+      "round": 1
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 1,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 1,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     },
+     {
+      "seat": "producer",
+      "objective": "fix\n\nThe previous round's checks reported these findings. Fix them and change nothing else:\n- a",
+      "round": 2
+     },
+     {
+      "seat": "reviewer",
+      "objective": "You are the reviewer of work another agent just did. Do not do the work again and do not change any file.\nThe work is the latest commit in this worktree (git log -1, git show HEAD) plus any uncommitted change (git status, git diff). The producer's own account of it is listed under Context refs.\nCheck it against the task below and report what is wrong or missing, with file and line evidence, or say plainly that you found nothing.\n\nThe task that was assigned:\nfix",
+      "round": 2,
+      "independentOf": [
+       "producer"
+      ],
+      "inputs": [
+       {
+        "seat": "producer",
+        "round": 2,
+        "outcome": "pass"
+       }
+      ],
+      "batch": 1
+     },
+     {
+      "verify": true
+     }
+    ],
+    "ceilingHit": false
+   }
+  },
+  {
    "id": "reviewed declared seats with a tester",
    "loop": "reviewed",
    "unit": {

@@ -197,6 +197,7 @@ pub struct Reviewed {
     params: Value,
     history: Vec<Value>,
     launch_room: Option<u64>,
+    ceiling_hit: bool,
     max_rounds: u64,
     producer: Value,
     producer_id: String,
@@ -213,6 +214,14 @@ pub struct Reviewed {
 }
 
 impl Reviewed {
+    pub(crate) fn set_launch_room(&mut self, room: Option<u64>) {
+        self.launch_room = room;
+    }
+
+    pub(crate) fn ceiling_hit(&self) -> bool {
+        self.ceiling_hit
+    }
+
     pub(super) fn new(input: LoopInput) -> Result<Reviewed, SeatResolutionError> {
         let max_rounds = max_rounds_of(&input.params)?;
         let seats = resolve_seats(&ResolveOptions {
@@ -243,6 +252,7 @@ impl Reviewed {
             params: input.params,
             history: input.history,
             launch_room: input.launch_room,
+            ceiling_hit: false,
             max_rounds,
             checker_seats,
             checkers,
@@ -372,6 +382,7 @@ impl Reviewed {
                     .launch_room
                     .is_some_and(|room| ((1 + self.checkers.len()) as u64) > room)
             {
+                self.ceiling_hit = true;
                 return Ok(self.finish("findings", r - 1, None));
             }
             // The round is live (partially or not in history). Producer first: a recorded pass, or a producer

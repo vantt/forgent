@@ -102,6 +102,9 @@ pub struct Refusal {
     pub code: String,
     pub condition: String,
     pub violations: Option<Vec<Value>>,
+    /// The port's whole refusal object as it answered, when it answered one: the run reports it unchanged
+    /// (Node keeps it as `CaseAdmissionRefusedError.refusal`).
+    pub answer: Option<Value>,
 }
 
 /// What a port answers to `recheck_effect`.
