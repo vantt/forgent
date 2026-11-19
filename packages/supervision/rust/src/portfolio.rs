@@ -60,6 +60,20 @@ pub enum PlanRefusal {
     StatusUnknown(String),
     #[error("plan-priority-unknown: {0}")]
     PriorityUnknown(String),
+    #[error("plan-frontmatter-entry-invalid: {0}")]
+    FrontmatterEntryInvalid(String),
+    #[error("phase-table-missing: {0}")]
+    TableMissing(String),
+    #[error("phase-table-ambiguous: {0}")]
+    TableAmbiguous(String),
+    #[error("phase-table-empty: {0}")]
+    TableEmpty(String),
+    #[error("phase-table-column-missing: {0}")]
+    ColumnMissing(String),
+    #[error("phase-wave-invalid: {0}")]
+    WaveInvalid(String),
+    #[error("phase-id-duplicate: {0}")]
+    IdDuplicate(String),
 }
 
 impl PlanRefusal {
@@ -69,6 +83,13 @@ impl PlanRefusal {
             PlanRefusal::FrontmatterMissing(_) => "plan-frontmatter-missing",
             PlanRefusal::StatusUnknown(_) => "plan-status-unknown",
             PlanRefusal::PriorityUnknown(_) => "plan-priority-unknown",
+            PlanRefusal::FrontmatterEntryInvalid(_) => "plan-frontmatter-entry-invalid",
+            PlanRefusal::TableMissing(_) => "phase-table-missing",
+            PlanRefusal::TableAmbiguous(_) => "phase-table-ambiguous",
+            PlanRefusal::TableEmpty(_) => "phase-table-empty",
+            PlanRefusal::ColumnMissing(_) => "phase-table-column-missing",
+            PlanRefusal::WaveInvalid(_) => "phase-wave-invalid",
+            PlanRefusal::IdDuplicate(_) => "phase-id-duplicate",
         }
     }
 }
@@ -80,7 +101,8 @@ pub struct Phase {
     pub title: String,
     pub depends_on: Vec<String>,
     pub footprint: Vec<String>,
-    pub wave: Option<u32>,
+    /// An integer from 1.
+    pub wave: u32,
     pub status: String,
 }
 
@@ -121,15 +143,19 @@ pub fn read_plan(dir: &str, text: &str) -> Result<Plan, PlanRefusal> {
         Some(Value::Bool(b)) => b.to_string(),
         _ => String::new(),
     };
-    let list = |key: &str| match get(key) {
-        Some(Value::Seq(items)) => items
-            .iter()
-            .filter_map(|v| match v {
-                Value::Str(s) => Some(s.clone()),
-                _ => None,
-            })
-            .collect(),
-        _ => Vec::new(),
+    let list = |key: &str| -> Result<Vec<String>, PlanRefusal> {
+        match get(key) {
+            Some(Value::Seq(items)) => items
+                .iter()
+                .map(|v| match v {
+                    Value::Str(s) => Ok(s.clone()),
+                    _ => Err(PlanRefusal::FrontmatterEntryInvalid(format!(
+                        "{dir}: {key} holds an entry that is not a string"
+                    ))),
+                })
+                .collect(),
+            _ => Ok(Vec::new()),
+        }
     };
     let vocab = vocabulary();
     let status = scalar("status");
@@ -140,16 +166,26 @@ pub fn read_plan(dir: &str, text: &str) -> Result<Plan, PlanRefusal> {
     if !vocab.priorities.contains(&priority) {
         return Err(PlanRefusal::PriorityUnknown(format!("{dir}: {priority:?}")));
     }
+    let blocked_by = list("blockedBy")?;
+    let footprint = list("footprint")?;
+    let source = list("source")?;
+    // A plan that has not been promoted (or has ended) carries no admission duty, so its table may
+    // still be unwritten or dated; a ready or running plan is read strictly.
+    let phases = if status == "ready" || status == "running" {
+        read_phase_table(dir, body)?
+    } else {
+        read_phase_table(dir, body).unwrap_or_default()
+    };
     Ok(Plan {
         dir: dir.to_string(),
         title: scalar("title"),
         status,
         priority,
         created: scalar("created"),
-        blocked_by: list("blockedBy"),
-        footprint: list("footprint"),
-        source: list("source"),
-        phases: read_phase_table(body),
+        blocked_by,
+        footprint,
+        source,
+        phases,
     })
 }
 
@@ -189,38 +225,33 @@ pub fn order(plans: &mut [Plan]) {
     });
 }
 
-fn normalize(path: &str) -> String {
-    let path = path.replace('\\', "/");
-    let fixed = path.split('*').next().unwrap_or("");
-    fixed.trim_end_matches('/').to_string()
-}
-
-/// Whether two footprint lists share a path: equal, or one inside the other; a glob counts as its
-/// fixed prefix. The same rule as `overlaps` in `scripts/plan-contract-check.mjs`.
-pub fn overlaps(a: &[String], b: &[String]) -> bool {
-    a.iter().any(|x| {
-        b.iter().any(|y| {
-            let (nx, ny) = (normalize(x), normalize(y));
-            nx.is_empty()
-                || ny.is_empty()
-                || nx == ny
-                || nx.starts_with(&format!("{ny}/"))
-                || ny.starts_with(&format!("{nx}/"))
-        })
-    })
+/// Why a plan's own footprint cannot be compared: `footprint-empty` when it names no path,
+/// `footprint-entry-invalid` when an entry is not a repo-relative path or glob. `None` when the
+/// footprint is comparable.
+pub fn footprint_problem(plan: &Plan) -> Option<&'static str> {
+    if plan.footprint.is_empty() {
+        return Some("footprint-empty");
+    }
+    fgos_write_scope::canonicalize_all(&plan.footprint)
+        .is_err()
+        .then_some("footprint-entry-invalid")
 }
 
 /// Plans a supervisor may start now, in input order: status `ready`, every `blockedBy` plan in
-/// `done_dirs`, and no footprint overlap with a `running` plan.
+/// `done_dirs`, a footprint that can be compared, and no footprint overlap with a `running` plan.
+/// A plan with an empty or invalid footprint is not admissible and affects no other plan; a running
+/// plan whose footprint cannot be compared holds back nobody.
 pub fn admissible<'a>(plans: &'a [Plan], done_dirs: &[String]) -> Vec<&'a Plan> {
     plans
         .iter()
         .filter(|p| p.status == "ready")
         .filter(|p| p.blocked_by.iter().all(|b| done_dirs.contains(b)))
+        .filter(|p| footprint_problem(p).is_none())
         .filter(|p| {
-            !plans
-                .iter()
-                .any(|r| r.status == "running" && overlaps(&p.footprint, &r.footprint))
+            !plans.iter().any(|r| {
+                r.status == "running"
+                    && fgos_write_scope::scopes_overlap(&p.footprint, &r.footprint).unwrap_or(false)
+            })
         })
         .collect()
 }
@@ -292,8 +323,8 @@ fn cells(line: &str) -> Vec<String> {
     out
 }
 
-/// A cell without markdown links (`[text](url)` becomes `text`), backticks and asterisks.
-fn plain(cell: &str) -> String {
+/// A cell without markdown links (`[text](url)` becomes `text`) and backticks; every `*` stays.
+fn keep_stars(cell: &str) -> String {
     let mut out = String::new();
     let mut rest = cell;
     while let Some(open) = rest.find('[') {
@@ -315,7 +346,14 @@ fn plain(cell: &str) -> String {
         }
     }
     out.push_str(rest);
-    out.retain(|c| c != '`' && c != '*');
+    out.retain(|c| c != '`');
+    out.trim().to_string()
+}
+
+/// A cell without markdown links, backticks and asterisks.
+fn plain(cell: &str) -> String {
+    let mut out = keep_stars(cell);
+    out.retain(|c| c != '*');
     out.trim().to_string()
 }
 
@@ -334,14 +372,16 @@ fn path_list(cell: &str) -> Vec<String> {
         .replace("<br/>", ",")
         .replace("<br />", ",")
         .split(',')
-        .map(plain)
+        .map(keep_stars)
         .filter(|s| !s.is_empty())
         .collect()
 }
 
-/// The rows of the first markdown table whose header names a footprint column.
-fn read_phase_table(body: &str) -> Vec<Phase> {
+/// The rows of the one markdown table whose header names a footprint column; anything but exactly
+/// one such table, with every column and a sound row, is refused by name.
+fn read_phase_table(dir: &str, body: &str) -> Result<Vec<Phase>, PlanRefusal> {
     let lines: Vec<&str> = body.lines().collect();
+    let mut tables: Vec<(usize, usize)> = Vec::new();
     let mut i = 0;
     while i < lines.len() {
         if !lines[i].trim_start().starts_with('|') {
@@ -352,38 +392,81 @@ fn read_phase_table(body: &str) -> Vec<Phase> {
         while j < lines.len() && lines[j].trim_start().starts_with('|') {
             j += 1;
         }
-        let header: Vec<String> = cells(lines[i])
-            .iter()
-            .map(|h| {
-                h.to_lowercase()
-                    .chars()
-                    .filter(|c| c.is_ascii_lowercase())
-                    .collect()
-            })
-            .collect();
-        if header.iter().any(|h| h == "footprint") {
-            let at = |name: &str| header.iter().position(|h| h == name);
-            let cell = |row: &[String], name: &str| {
-                at(name)
-                    .and_then(|n| row.get(n))
-                    .cloned()
-                    .unwrap_or_default()
-            };
-            return lines[i + 1..j]
-                .iter()
-                .skip(1)
-                .map(|l| cells(l))
-                .map(|row| Phase {
-                    id: plain(&cell(&row, "id")),
-                    title: plain(&cell(&row, "title")),
-                    depends_on: id_list(&cell(&row, "dependson")),
-                    footprint: path_list(&cell(&row, "footprint")),
-                    wave: plain(&cell(&row, "wave")).parse().ok(),
-                    status: plain(&cell(&row, "status")).to_lowercase(),
-                })
-                .collect();
+        if header_of(lines[i]).iter().any(|h| h == "footprint") {
+            tables.push((i, j));
         }
         i = j;
     }
-    Vec::new()
+    let (i, j) = match tables.as_slice() {
+        [] => {
+            return Err(PlanRefusal::TableMissing(format!(
+                "{dir}: no table has a footprint column"
+            )))
+        }
+        [one] => *one,
+        more => {
+            return Err(PlanRefusal::TableAmbiguous(format!(
+                "{dir}: {} tables have a footprint column",
+                more.len()
+            )))
+        }
+    };
+    let header = header_of(lines[i]);
+    if let Some(name) = vocabulary()
+        .table_columns
+        .iter()
+        .find(|c| !header.contains(c))
+    {
+        return Err(PlanRefusal::ColumnMissing(format!("{dir}: column {name}")));
+    }
+    let rows: Vec<Vec<String>> = lines[i + 1..j].iter().skip(1).map(|l| cells(l)).collect();
+    if rows.is_empty() {
+        return Err(PlanRefusal::TableEmpty(format!(
+            "{dir}: the table has no rows"
+        )));
+    }
+    let at = |name: &str| header.iter().position(|h| h == name);
+    let cell = |row: &[String], name: &str| {
+        at(name)
+            .and_then(|n| row.get(n))
+            .cloned()
+            .unwrap_or_default()
+    };
+    let mut phases: Vec<Phase> = Vec::new();
+    for row in &rows {
+        let id = plain(&cell(row, "id"));
+        if phases.iter().any(|p| p.id == id) {
+            return Err(PlanRefusal::IdDuplicate(format!("{dir}: phase {id:?}")));
+        }
+        let wave_text = plain(&cell(row, "wave"));
+        let wave = match wave_text.parse::<u32>() {
+            Ok(w) if w >= 1 => w,
+            _ => {
+                return Err(PlanRefusal::WaveInvalid(format!(
+                    "{dir}: phase {id:?} wave {wave_text:?}"
+                )))
+            }
+        };
+        phases.push(Phase {
+            id,
+            title: plain(&cell(row, "title")),
+            depends_on: id_list(&cell(row, "dependson")),
+            footprint: path_list(&cell(row, "footprint")),
+            wave,
+            status: plain(&cell(row, "status")).to_lowercase(),
+        });
+    }
+    Ok(phases)
+}
+
+fn header_of(line: &str) -> Vec<String> {
+    cells(line)
+        .iter()
+        .map(|h| {
+            h.to_lowercase()
+                .chars()
+                .filter(|c| c.is_ascii_lowercase())
+                .collect()
+        })
+        .collect()
 }

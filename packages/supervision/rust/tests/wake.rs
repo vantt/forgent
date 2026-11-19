@@ -156,7 +156,7 @@ impl Telemetry for Fake {
 
 fn plan(dir: &str, status: &str) -> Plan {
     let text = format!(
-        "---\ntitle: {dir}\nstatus: {status}\npriority: P2\ncreated: 2026-11-01\nfootprint:\n  - {dir}/\n---\n"
+        "---\ntitle: {dir}\nstatus: {status}\npriority: P2\ncreated: 2026-11-01\nfootprint:\n  - {dir}/\n---\n\n| ID | Title | DependsOn | Footprint | Wave | Status |\n|---|---|---|---|---|---|\n| 1 | t | - | `{dir}/` | 1 | todo |\n"
     );
     read_plan(dir, &text).unwrap()
 }
