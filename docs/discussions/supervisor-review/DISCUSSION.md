@@ -1,6 +1,35 @@
 # Discussion: supervisor orchestration review
 
-discussion: open
+discussion: settled
+
+## Hand-off
+
+**Outcome.** A written review of the supervisor orchestration ([advice.md](advice.md)), and five decisions (SR-D1..SR-D5)
+that set the direction for the follow-up work in §7. Each follow-up becomes its own backlog row (through Miu) and its
+own plan (through a planner). Plan 261118-1045 is not changed: the follow-ups start after it lands.
+
+**Constraints.** Laws L9 and L10 (one door; the old path is removed in the same change), RUL104 ("better, not
+bigger"), new code in Rust, design principle 8 (one proof per behaviour), the AGENTS.md install/setup/doctor gate for
+any new config key.
+
+**Non-goals.** Cross-machine supervision of one project. Windows timers. Confined gates (already backlog `p-nqftk5hypy`).
+The idle-mode detection delay (already backlog `p-xpeg4jshiu`).
+
+**Acceptance criteria (for the follow-up plans, one per §7 task):**
+1. Admission and lead start are code. The supervisor LLM wakes only for judgement.
+2. Every head's start ritual is proven in a sandbox before its first turn.
+3. Every branch, plan or not, reaches main only through one merge queue, with an independent review verdict bound to
+   the head SHA.
+4. Every refused merge has a named owner on the L0-L3 ladder, and no item sits unowned.
+5. Every plan has an integration phase. New capability stays dormant behind a temporary switch until that phase, which
+   switches it on, removes the switch and removes the old path in the same change.
+
+**Open points that block only parts:** the values of N and X; the session L2 starts to fix code for a submitter that
+cannot write code; whether grant-only `--paths` lands skip review; stacked submission of a dependent phase; reviewer
+independence with only one provider. The planner of each task decides these.
+
+Sources: §3 (V/I marks), [external-research.md](external-research.md).
+
 
 Backlog: `p-dkiyey4ttl` (docs/backlog.md). Plan under review: `plans/261118-1045-project-supervisor`, live run
 `plans/261119-1142-supervisor-live-run`. Area: `docs/platform/supervision/spec.md`. External sources with
@@ -8,10 +37,11 @@ VERIFIED/INFERENCE marks: [external-research.md](external-research.md) (round 0,
 
 ## 1. Trạng thái hiện tại
 
-Round 2 (2026-11-19). The owner answered Q1: A, with a preflight for the LLM part that remains (G1 and G2,
-provisional until it holds one more round). The owner also raised a new point: "who is allowed to merge? The current
-model feels like no one merges." It is scouted as M1-M4 in §3. Q2 answered A: merge becomes a deterministic queue with an independent review verdict. Q3 answered (a): code runs each merge, and the supervisor owns the queue and arbitrates it. The owner then asked who resolves a merge failure. A responsibility ladder is drafted as M5. The owner asked for the full end-of-plan merge cycle, so §6 now holds a draft of it (round 5). Open: Q4 (confirm the ladder and the cycle). The owner then asked whether merging per phase leaves main untidy, compared with merging a plan only when it is finished. Analysed as M6; Q4 now includes this choice. Window 3 of the live run
-may be in progress, and this discussion stays read-only.
+Round 7 (2026-11-19), settled. The owner agreed to Q4: the cycle in §6, the L0-L3 ladder, and per-phase merging under
+three rules. In the owner's words: "a plan always has an integration step, with a temporary off switch that is removed
+only at the last step". SR-D1..SR-D5 are minted in §4 (local ids, following the secretary-miu `SM-D*` precedent). The
+written review is [advice.md](advice.md), and the follow-ups are in §7. This branch (`shape/supervisor-review`) itself
+has no merger yet (M2); Miu is asked to land it.
 
 ## 2. Mục tiêu & đề bài
 
@@ -67,6 +97,11 @@ compare against.
 
 | D-ID | Quyết định | Ngày | Nguồn |
 |------|------------|------|-------|
+| SR-D1 | Admission (`ready`, `blockedBy` done, `leadsLive < maxLeads`, a free lane, the head name unheld), marking the plan `running` and starting the lead are deterministic code in the wake door. The supervisor LLM wakes only for judgement: a gone or stuck lead, close review, the planner, owner answers. Every head proves its start ritual in a sandbox (preflight) before its first turn. | 2026-11-19 | Q1 = A (round 1), held through rounds 2-7; G1, G2, G5 |
+| SR-D2 | Merge is a deterministic queue, not a role's privilege. Any head submits a branch. Code merges it only with an independent review verdict (a reviewer other than the author unit, bound to the head SHA), green gates, and a diff inside the plan footprint or the submitter's grant. | 2026-11-19 | Q2 = A (round 2), held through round 7; M1-M3 |
+| SR-D3 | Code runs each merge (the watcher tick or the door, through `fgos land`). The supervisor owns the queue and arbitrates it: cross-plan conflicts, priority, orphan branches, a red trunk. | 2026-11-19 | Q3 = (a) (round 3), held through round 7 |
+| SR-D4 | A refused merge follows the ladder: L0 code heals itself (retry, regenerate, `git recover`); L1 the submitter fixes its own branch, N attempts, merging the trunk in and never rebasing; L2 the supervisor (cap exceeded, submitter gone or unable to fix code, cross-plan conflict, a red trunk freezes the queue, an item stuck X ticks); L3 the owner, only through a supervisor question. A gone lead's restarts are capped the same way. | 2026-11-19 | M5 (round 4), Q4 (round 7); G3 |
+| SR-D5 | Merge per phase. Every plan has an integration phase. New capability stays dormant behind a temporary off switch (or simply not wired) until that phase, which switches it on, removes the switch and removes the old path in the same change (L10). A plan closes only after a code close check (phases done, queue empty, branches in the trunk, plan verify green) and a supervisor acceptance review. A withdrawn or parked plan closes only once its dormant code is finished or removed. | 2026-11-19 | M6 (round 6), Q4 owner restatement (round 7); G4 |
 
 ## 5. Q&A log
 
@@ -87,11 +122,13 @@ compare against.
 - 2026-11-19 round 5. Owner: "merge từng phase có làm main bị không chỉnh chu (vì một plan theo lý thuyết phải xong
   hết thì vào main mới tốt) hay là cách nghĩ và cách làm của anh sai". Analysed as M6 (per phase, with a dormant
   capability and the switch-on happening in the integration phase).
+- 2026-11-19 round 6, Q4. Owner: "ok, đồng ý, tức là plan luôn có bước tích hợp và có khóa tạm tắt cho tới bước cuối
+  cùng mới gỡ bỏ." SR-D1..SR-D5 were minted, §6 was marked settled, §7 was filled, and the discussion was settled.
 
 ## 6. Thiết kế đã chốt {#design}
 
-**Draft (round 5), not settled.** This assembles the provisional answers Q1 = A + preflight, Q2 = A, Q3 = (a) and the
-M5 ladder (Q4 open). Verb names marked *(new)* are placeholders for the plan to name. Today's verbs are `fgos land`,
+**Settled (round 7): SR-D1..SR-D5.** Per SR-D5, phases merge one at a time. A plan's new capability stays dormant
+behind a temporary switch until its integration phase, which switches it on and removes the switch and the old path. Verb names marked *(new)* are placeholders for the plan to name. Today's verbs are `fgos land`,
 `fgos run` and `fgos request result`.
 
 ### Cycle of one phase, from unit done to landed
@@ -134,7 +171,8 @@ M5 ladder (Q4 open). Verb names marked *(new)* are placeholders for the plan to 
    - every phase row is `done` or parked with a reason;
    - no queue item of this plan is pending;
    - every phase branch is an ancestor of the trunk;
-   - the plan's verify command, if it has one, passes on the trunk tip.
+   - the plan's verify command, if it has one, passes on the trunk tip;
+   - the integration phase is done and its temporary switch is gone (SR-D5).
 
    A failed check raises `plan-close-blocked`, which goes to L2.
 10. **Supervisor close (judgement).** The supervisor:
@@ -184,12 +222,51 @@ Open inside this draft:
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-(not yet; candidates after Q1: F1-F3 doc fixes, G2 preflight proof, G3 restart cap, G5 held-plan mechanism, G7
-enable-without-start, G1 depending on Q1)
+Order: T0 can go at any time. T1 and T2 come after plan 261118-1045 lands, since they change what its live run proves.
+T3 and T4 go together or in that order. T5 is independent.
+
+### T0 Small corrections {#task-small-fixes}
+- Goal: fix F1-F4 and G7.
+  - F1: the lead skill `land-conflict-aborted` row says rebase; change it to merge the trunk into the branch.
+  - F2: `core/agents/supervisor.yaml` still describes the per-plan role.
+  - F3: the spec header and the plan status are stale.
+  - F4: an `event-store-end-trigger` fault is logged when the verb succeeds.
+  - G7: enabling the watcher must not wake the supervisor.
+- D-IDs: none (corrections). Verify: `npm test` for the touched skills (render check), plus the owning test for F4 and G7.
+
+### T1 Admission in code {#task-admission-in-code}
+- Goal: the wake door admits, marks `running` and starts leads. The supervisor skill keeps only judgement.
+- §6 excerpt: wake to admission. D-IDs: SR-D1. Sibling: T2.
+- Verify: `cargo test -p fgos-supervision` (one owning test per admission rule); a live window confirms.
+
+### T2 Head start preflight {#task-head-preflight}
+- Goal: every head's start ritual and skill commands are proven in a sandbox before its first turn. A failing proof
+  refuses the start with a named cause. This is window 2's planned owning proof, made general.
+- D-IDs: SR-D1. Verify: a sandbox test per persona (supervisor and lead first).
+
+### T3 Merge queue with independent review {#task-merge-queue}
+- Goal: `fgos land` becomes a submission to one queue, run by code. A review unit's verdict is bound to the SHA. Every
+  branch, including orphan ones, merges through it. `land-branch.sh` is retired in the same change (L10).
+- §6 steps 2-7. D-IDs: SR-D2, SR-D3. Sibling: T4.
+- Verify: `cargo test -p fgos-supervision` (queue, verdict binding, refusal without a verdict); a live merge of a
+  shaper branch.
+
+### T4 Failure ladder and caps {#task-failure-ladder}
+- Goal: L0 self-heal (auto `git recover`), the L1 attempt cap N, L2 events (cap, gone, cross-plan, red trunk freezes the
+  queue, stuck X), L3 only through supervisor questions; the same cap for lead restarts.
+- D-IDs: SR-D4. Open: N, X, the L2 fixer session.
+- Verify: one owning test per ladder transition.
+
+### T5 Integration phase and dormant switch in the plan contract {#task-integration-phase}
+- Goal: `core/skills/_shared/plan-contract.md` requires an integration phase and a dormant switch removed in it, and
+  `plan-contract-check` checks it. The close check in code refuses a plan whose switch is still present or whose
+  dormant code is unfinished.
+- §6 steps 8-10. D-IDs: SR-D5.
+- Verify: `plan-contract-check` tests, plus a close-check test.
 
 ## Q1 {#Q1}
 
-Open, asked in the owner's tab on 2026-11-19. The question store refused `discussion:supervisor-review#Q1` as
+Answered in the tab (A + preflight, SR-D1); never entered the store, so nothing to ack. Originally asked in the owner's tab on 2026-11-19. The question store refused `discussion:supervisor-review#Q1` as
 `ref-invalid`, because this file is not on main yet. The input is in `.fgos/runtime/tmp/q1-supervisor-review.json`;
 re-ask it once the discussion lands. The question: should admit and start move from the LLM supervisor to the wake door
 (A, recommended), stay with a preflight added (B), or move to a watcher with no LLM at all (C)?
