@@ -565,8 +565,11 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "session start",
             "session stop",
             "session write",
+            "slots",
             "supervisor done",
             "supervisor handled",
+            "supervisor plans",
+            "supervisor queue",
             "worktree create"
         ]
     );

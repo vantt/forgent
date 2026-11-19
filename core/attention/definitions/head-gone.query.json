@@ -1,7 +1,9 @@
 {
   "name": "head-gone",
   "requires": ["fgos.head.state"],
+  "window": "own",
   "query": {
+    "since": "-30d",
     "kind": ["fgos.head.state"],
     "latest_per": "subject",
     "where_latest": [

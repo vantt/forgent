@@ -376,3 +376,103 @@ fn the_payload_entry_runs_a_head_ask_through_the_real_host_route_and_records_the
         json!(["head:shaper-bob"])
     );
 }
+
+/// The supervisor's side of a head's socket for real: its request server over the attempt's envelope (Identity
+/// asked unstubbed), a route child that is the real Node payload entry, and the real host for the host verbs. Only
+/// the sandbox is absent; the host binary the envelope names is a one-line forwarder because the route child is
+/// started as `<hostBin> internal head-request`, which the Node payload entry, not the host, serves in a checkout.
+#[test]
+fn a_confined_supervisor_reads_its_queue_plans_and_lanes_and_marks_several_events_through_the_real_request_server(
+) {
+    use fgos_run_supervisor::head_request::HeadRequests;
+    use fgos_run_supervisor::route::WritePublisher;
+    use std::os::unix::fs::PermissionsExt;
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::sync::Arc;
+
+    let scene = Scene::new("confined-reads");
+    let project = scene.project();
+    let init = scene.fgos(&["identity", "project", "--init", "--json"], b"");
+    assert!(init.status.success(), "identity project --init: {init:?}");
+    let run_dir = scene.head("head:supervisor-bob", "supervisor");
+    let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let forwarder = scene.root.join("host.sh");
+    fs::write(
+        &forwarder,
+        format!(
+            "#!/bin/sh\nif [ \"$1\" = internal ] && [ \"$2\" = head-request ]; then\n  shift 2\n  [ \"$1\" = --protocol ] && shift 2\n  exec node {} \"$@\"\nfi\nexec {} \"$@\"\n",
+            repo.join("src/session-host/head-request.mjs").display(),
+            fgos_bin().display()
+        ),
+    )
+    .unwrap();
+    fs::set_permissions(&forwarder, fs::Permissions::from_mode(0o755)).unwrap();
+    let socket = scene.root.join("req.sock");
+    let envelope = json!({
+        "v": 3,
+        "cwd": project,
+        "hostBin": forwarder,
+        "identity": { "writerId": "att-supervisor" },
+        "session": {
+            "role": "head:supervisor-bob",
+            "persona": "supervisor",
+            "verbs": ["supervisor queue", "supervisor plans", "slots", "supervisor handled"],
+            "requestSocketPath": socket,
+        },
+        "steps": [{ "stepId": "finalize-home", "env": {
+            "HOME": scene.root.join("home"),
+            "PATH": std::env::var("PATH").unwrap_or_default(),
+            "FGOS_STATE_ROOT": scene.root.join("state"),
+        }}],
+    });
+    fs::write(run_dir.join("envelope.json"), envelope.to_string()).unwrap();
+    let publisher = WritePublisher {
+        catch_up: Arc::new(|_, _| unreachable!("no session write here")),
+        path_clean: Arc::new(|_, _| unreachable!("no session write here")),
+        publish: Arc::new(|_, _, _, _| unreachable!("no session write here")),
+    };
+    let (path, server) =
+        HeadRequests::from_envelope(&envelope, &run_dir, &scene.root.join("state"), &publisher)
+            .unwrap()
+            .expect("a socket");
+    let listener = std::os::unix::net::UnixListener::bind(&path).unwrap();
+    listener.set_nonblocking(true).unwrap();
+    let stop = Arc::new(AtomicBool::new(false));
+    let flag = stop.clone();
+    let pump = std::thread::spawn(move || {
+        while !flag.load(Ordering::SeqCst) {
+            server.poll(&listener);
+            std::thread::sleep(Duration::from_millis(10));
+        }
+    });
+
+    let confined = |args: &[&str]| {
+        scene.fgos_with(
+            args,
+            b"",
+            &[
+                ("FGOS_CONFINED", Path::new("1")),
+                ("FGOS_HEAD_REQUEST_SOCKET", &socket),
+            ],
+        )
+    };
+    let json_of = |out: &Output| -> Value {
+        serde_json::from_slice(&out.stdout).unwrap_or_else(|e| panic!("{e}: {out:?}"))
+    };
+    let queue = confined(&["supervisor", "queue", "--json"]);
+    let slots = confined(&["slots", "--json"]);
+    let plans = confined(&["supervisor", "plans", "--json"]);
+    let handled = confined(&["supervisor", "handled", "no-such-a", "no-such-b", "--json"]);
+    stop.store(true, Ordering::SeqCst);
+    pump.join().unwrap();
+
+    assert!(queue.status.success(), "{queue:?}");
+    assert_eq!(json_of(&queue)["events"], json!([]), "{queue:?}");
+    assert!(slots.status.success(), "{slots:?}");
+    assert!(json_of(&slots)["lanes"].is_object(), "{slots:?}");
+    assert!(plans.status.success(), "{plans:?}");
+    assert!(json_of(&plans)["plans"].is_array(), "{plans:?}");
+    // Both ids reached the host verb, which names the first one it does not know.
+    assert!(!handled.status.success());
+    assert_eq!(json_of(&handled)["code"], "event-unknown", "{handled:?}");
+}

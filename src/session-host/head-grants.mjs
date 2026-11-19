@@ -56,7 +56,7 @@ const GRANTS = Object.freeze({
   shaper: frozen(['docs/discussions'], [...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS]),
   planner: frozen(['plans', 'docs/discussions'], [...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS]),
   // `session write` replaces its read-only backlog file; it never gets `run`.
-  supervisor: frozen(['plans', 'docs/backlog.md'], ['session start', 'session stop', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS, 'supervisor handled', 'supervisor done']),
+  supervisor: frozen(['plans', 'docs/backlog.md'], ['session start', 'session stop', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS, 'supervisor queue', 'supervisor plans', 'slots', 'supervisor handled', 'supervisor done']),
 });
 /** A lead's verbs; its writes are its plan dir, which the caller resolves (this module reads no files). No `session start`. */
 const LEAD_VERBS = Object.freeze([...HEAD_VERBS, ...QUESTION_VERBS, 'run', 'land', 'worktree create', 'request result']);

@@ -31,6 +31,10 @@ export const HEAD_WORKTREE_CREATE_VERB = 'worktree create';
 export const HEAD_STOP_VERB = 'session stop';
 export const HEAD_SUPERVISOR_HANDLED_VERB = 'supervisor handled';
 export const HEAD_SUPERVISOR_DONE_VERB = 'supervisor done';
+/** Reads the sandbox cannot make itself (the event store, Identity and the lock root are masked): not tickets, they answer at once. */
+export const HEAD_SUPERVISOR_QUEUE_VERB = 'supervisor queue';
+export const HEAD_SUPERVISOR_PLANS_VERB = 'supervisor plans';
+export const HEAD_SLOTS_VERB = 'slots';
 /** A reply may take as long as the supervisor lets the verb run (60 s) plus its own overhead. */
 const DEFAULT_REPLY_TIMEOUT_MS = 70_000;
 /** A write is also published (fetch, gates, commit, push), which waits on the target's merge slot and the network. */

@@ -89,7 +89,7 @@ All verbs are planned. Flags, defaults and contracts live in `packages/supervisi
 | `fgos supervisor wake` | watcher, anyone | Start the supervisor if none lives for this project; otherwise do nothing (delivery is the queue). |
 | `fgos supervisor plans` | supervisor | The portfolio in admission order. |
 | `fgos supervisor queue` | supervisor | The unhandled events. |
-| `fgos supervisor handled` | supervisor | Mark an event handled. |
+| `fgos supervisor handled <id>...` | supervisor | Mark one or more events handled. From a confined head, `handled`, `done`, `queue`, `plans` and `slots` go through its request socket (`session-host/spec.md` 8.9). |
 | `fgos supervisor done` | supervisor | Refuses while unhandled events exist; on an empty queue answers done and stops the caller's own session. |
 | `fgos land` | lead (branch), others (`--paths` only) | Land a reviewed phase, or commit exact main-checkout paths. Answers with a ticket. |
 | `fgos request result` | any head | Read a ticket's outcome. |

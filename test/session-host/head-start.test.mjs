@@ -118,7 +118,7 @@ test('the grant table: the persona matches a table key exactly, an unnamed perso
   const base = ['session bind session', 'session rotate', 'session answered', 'session restore role', 'questions ask', 'questions ack', 'questions cancel'];
   assert.deepEqual(grantOf('head:shaper-x'), { writes: ['docs/discussions'], verbs: [...base, 'land', 'request result'], mailbox: false, peers: false }, 'a shaper writes its discussions and lands them but starts nothing, answers nothing, has no mailbox and reaches no peer session');
   assert.deepEqual(grantOf('head:planner-x'), { writes: ['plans', 'docs/discussions'], verbs: [...base, 'land', 'request result'], mailbox: false, peers: false });
-  assert.deepEqual(grantOf('head:supervisor-x'), { writes: ['plans', 'docs/backlog.md'], verbs: ['session start', 'session stop', 'session write', ...base, 'land', 'request result', 'supervisor handled', 'supervisor done'], mailbox: false, peers: false });
+  assert.deepEqual(grantOf('head:supervisor-x'), { writes: ['plans', 'docs/backlog.md'], verbs: ['session start', 'session stop', 'session write', ...base, 'land', 'request result', 'supervisor queue', 'supervisor plans', 'slots', 'supervisor handled', 'supervisor done'], mailbox: false, peers: false });
   assert.ok(!grantOf('head:supervisor-x').verbs.includes('run'), 'a supervisor never runs a unit');
   const lead = grantOf('head:lead-sv-p09', 'lead', { planDir: '261118-1045-project-supervisor' });
   assert.deepEqual(lead, { writes: ['plans/261118-1045-project-supervisor'], verbs: [...base, 'run', 'land', 'worktree create', 'request result'], mailbox: false, peers: false });

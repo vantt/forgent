@@ -25,6 +25,8 @@ The own window slides: its `since` is `-30d` from now, so an incident older than
 
 `plan-ready-waiting` is also `"window": "own"` with `since` `-30d`: Observe cuts by window before `latest_per`, so with the caller's window a plan that became ready before the lookback would never be reported after a missed edge or lost state. A plan ready for longer than 30 days leaves the window the same way.
 
+`head-gone` is also `"window": "own"` with `since` `-30d`: the head-state source stamps a `gone` head with the `startedAt` of its placement, not with the tick, so the row's `max:ts` and the event id stay the same while the head stays gone and a handled incident is not raised again. A placement older than 30 days leaves the window.
+
 Plan subject ids and plan refs are `plans/<name>`, never the bare name.
 
 A lead is a head whose `fgos.head.role` starts `head:lead-` or `lead:` (`lead-ended`, `watcher-active`). `watcher-active` raises one row per running plan or live lead; no row means idle. `watcher-overdue` takes its factor from `watcher.overdueFactor`; `supervisor-idle-burn` tests only the newest tick at or before the wake.

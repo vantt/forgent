@@ -163,12 +163,33 @@
     },
     "supervisor handled": {
       "args": {
-        "event": "string, required: the id of the event to mark handled"
+        "events": "array of strings, required, 1 to 50: the ids of the events to mark handled, each one an event id"
       },
-      "does": "the route child runs the host verb `fgos supervisor handled <event> --json` the way the questions verbs run theirs (envelope hostBin) and returns its JSON; the verb itself is the supervision component's",
-      "data": "the host verb's JSON data",
+      "does": "the route child runs the host verb `fgos supervisor handled <id>... --json` the way the questions verbs run theirs (envelope hostBin) and returns its JSON; the verb itself is the supervision component's, and it marks every id given",
+      "data": "the host verb's JSON data ({handled: <how many this call closed>})",
       "identity": "held",
       "rule": "refusals (verb-failed detail): bad-args and the host verb's own code"
+    },
+    "supervisor queue": {
+      "args": {},
+      "does": "a read, not a ticket verb: the route child runs the host verb `fgos supervisor queue --json` (envelope hostBin) and returns its JSON, because the confined caller cannot open the event store it is read from. Answers within the 60 s verb bound",
+      "data": "the host verb's JSON data ({events: [...]})",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): the host verb's own code (for example event-store-no-repository)"
+    },
+    "supervisor plans": {
+      "args": {},
+      "does": "as supervisor queue, running `fgos supervisor plans --json`: the plans of the trunk tip with their status, admissibility and lead head names, which needs Identity's project handle and live role holders that the sandbox cannot read",
+      "data": "the host verb's JSON data ({plans: [...], unreadable: [...]})",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): the host verb's own code"
+    },
+    "slots": {
+      "args": {},
+      "does": "as supervisor queue, running `fgos slots --json`: the lane view (ceiling, live, free, seats) read from the machine's lock root, which the sandbox cannot read",
+      "data": "the host verb's JSON data ({lanes: {ceiling, live, free, seats}})",
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): the host verb's own code"
     },
     "supervisor done": {
       "args": {},
