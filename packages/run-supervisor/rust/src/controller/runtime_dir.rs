@@ -12,8 +12,6 @@ pub const SOCKET_PATH_MAX_BYTES: usize = 100;
 /// Name length of a hashed attempt socket: 16 hex chars plus `.sock`.
 pub const SOCKET_NAME_BYTES: usize = 21;
 
-const PROC_NET_UNIX: &str = "/proc/net/unix";
-
 /// A runtime directory the controller refuses; `code` is the Node `RuntimeDirError` code.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RuntimeDirError {
@@ -146,28 +144,15 @@ fn is_attempt_socket_name(name: &str) -> bool {
             .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
 }
 
-/// Paths some process has bound a unix socket to, read from the kernel table (Linux). None where the table
-/// does not exist: nothing can then be judged, and nothing is removed. Probing by connecting is not an
-/// option: a live supervisor takes the first connection for its gate.
-fn bound_socket_paths(proc_file: &Path) -> Option<BTreeSet<String>> {
-    let text = fs::read_to_string(proc_file).ok()?;
-    let mut bound = BTreeSet::new();
-    for line in text.split('\n').skip(1) {
-        let fields: Vec<&str> = line.split_whitespace().collect();
-        if fields.len() >= 8 {
-            bound.insert(fields[7..].join(" "));
-        }
-    }
-    Some(bound)
-}
-
 /// Unlinks the attempt sockets (`<hash>.sock`) in the runtime directory that no process holds any more: the
 /// supervisor that listened on one was killed before it could remove the path. Only socket files of this user,
-/// never another file or a directory; a missing directory or kernel table removes nothing. Returns the paths removed.
+/// never another file or a directory; a missing directory or kernel table removes nothing. `bound_sockets` reads
+/// the bound socket paths (`fgos_process::facts::bound_unix_socket_paths` in production): probing by connecting
+/// is not an option, a live supervisor takes the first connection for its gate. Returns the paths removed.
 pub fn remove_orphan_attempt_sockets(
     env: EnvLookup,
     uid: Option<u32>,
-    proc_file: Option<&Path>,
+    bound_sockets: impl FnOnce() -> Option<BTreeSet<String>>,
 ) -> Vec<PathBuf> {
     let Some(uid) = uid else { return Vec::new() };
     let dir = resolve_runtime_socket_dir(env, uid);
@@ -180,7 +165,7 @@ pub fn remove_orphan_attempt_sockets(
         .filter_map(|e| e.ok()?.file_name().into_string().ok())
         .filter(|n| is_attempt_socket_name(n))
         .collect();
-    let Some(bound) = bound_socket_paths(proc_file.unwrap_or(Path::new(PROC_NET_UNIX))) else {
+    let Some(bound) = bound_sockets() else {
         return Vec::new();
     };
     names.sort();

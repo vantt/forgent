@@ -6,7 +6,6 @@ use fgos_run_supervisor::controller::runtime_dir::*;
 use serde_json::Value;
 use std::collections::BTreeMap;
 use std::os::unix::fs::PermissionsExt;
-use std::os::unix::net::UnixListener;
 use std::path::PathBuf;
 
 fn vectors() -> Value {
@@ -91,8 +90,11 @@ fn runtime_dir_is_created_private_and_a_loose_mode_is_refused() {
     let _ = std::fs::remove_dir_all(&root);
 }
 
+// The kernel socket table is Linux's; elsewhere nothing can be judged and nothing is removed.
+#[cfg(target_os = "linux")]
 #[test]
 fn only_attempt_sockets_no_process_holds_are_removed() {
+    use std::os::unix::net::UnixListener;
     let root = scratch("orphans");
     let env: BTreeMap<String, String> =
         [("XDG_RUNTIME_DIR".to_string(), root.display().to_string())].into();
@@ -107,17 +109,18 @@ fn only_attempt_sockets_no_process_holds_are_removed() {
     std::fs::write(&not_a_socket, b"x").unwrap();
     let other_name = dir.join("notes.sock");
     drop(UnixListener::bind(&other_name).unwrap());
-    let removed = remove_orphan_attempt_sockets(&lookup, Some(uid), None);
+    let removed = remove_orphan_attempt_sockets(
+        &lookup,
+        Some(uid),
+        fgos_process::facts::bound_unix_socket_paths,
+    );
     assert_eq!(removed, vec![dead_path.clone()]);
     assert!(
         live_path.exists() && not_a_socket.exists() && other_name.exists() && !dead_path.exists()
     );
     // No kernel table: nothing can be judged, nothing is removed.
-    assert!(
-        remove_orphan_attempt_sockets(&lookup, Some(uid), Some(&root.join("no-such-table")))
-            .is_empty()
-    );
-    assert!(remove_orphan_attempt_sockets(&lookup, None, None).is_empty());
+    assert!(remove_orphan_attempt_sockets(&lookup, Some(uid), || None).is_empty());
+    assert!(remove_orphan_attempt_sockets(&lookup, None, || None).is_empty());
     drop(live);
     let _ = std::fs::remove_dir_all(&root);
 }

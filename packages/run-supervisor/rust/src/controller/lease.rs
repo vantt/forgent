@@ -136,13 +136,6 @@ pub fn build_run_control_holder(id: &str) -> Value {
     Value::Object(object)
 }
 
-/// Best-effort fsync of an already-written file.
-pub fn fsync_file_best_effort(path: &Path) {
-    if let Ok(file) = fs::OpenOptions::new().read(true).write(true).open(path) {
-        let _ = file.sync_all();
-    }
-}
-
 /// Best-effort fsync of a directory; publication already happened by the link itself.
 pub fn fsync_dir_best_effort(dir: &Path) {
     let _ = fgos_durable_file::sync_directory(dir);
