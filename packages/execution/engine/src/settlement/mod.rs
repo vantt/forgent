@@ -16,9 +16,9 @@ pub use evidence::{
     EvidenceInput, WorkerArtifacts,
 };
 pub use pipeline::{
-    commit_run_settlement, ran_confinement_backend, seat_session_dir, settle_refused_lease,
-    settle_run_outcome, usage_request_of, LeaseRefusal, RefusedLease, SettleInput, Settled,
-    SettlementError, SettlementPorts,
+    commit_run_settlement, ran_confinement_backend, settle_refused_lease, settle_run_outcome,
+    usage_request_of, LeaseRefusal, RefusedLease, SettleInput, Settled, SettlementError,
+    SettlementPorts,
 };
 pub use ports::{
     AccountsFaultSink, FaultRecordInput, FrictionSink, GitDoor, ObserveFrictionSink,

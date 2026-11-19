@@ -1,8 +1,11 @@
 // Records the golden vectors of the Rust settlement and steps modules (packages/execution/engine/src/{settlement,steps}/)
 // by running the Node modules they port: src/runner/dispatch/settlement.mjs and src/run-supervisor/{attempt-step,
 // stray-writes,worker-artifacts}.mjs with steps/{settle-attempt,cleanup-trust}.mjs.
-// Run: node test/golden-recorders/settlement.recorder.mjs
+// Run: node test/golden-recorders/settlement.recorder.mjs [--check]
 // Writes under packages/execution/contracts/settlement/: pure.json, settle.json, steps.json.
+//   --check  write nothing: lay every recorded run directory (the bytes tests/settlement.rs proves the Rust
+//            settlement writes) and read it back with this release's Node readers, so a Node release that meets a
+//            run Rust settled still reads its result.json, exit.json, evidence.json and run.json.
 //
 // Run Result derivation, the usage parser and the run control ledger live behind the native door, which a checkout
 // does not ship. Like the run-result recorder, this loads the addon of the activated release (the main checkout's
@@ -36,6 +39,42 @@ const settleStep = await import(path.join(root, 'src', 'run-supervisor', 'steps'
 const cleanupStep = await import(path.join(root, 'src', 'run-supervisor', 'steps', 'cleanup-trust.mjs'));
 const attemptStep = await import(path.join(root, 'src', 'run-supervisor', 'attempt-step.mjs'));
 const runLock = await import(path.join(root, 'src', 'run-supervisor', 'run-lock.mjs'));
+
+const runResult = await import(path.join(root, 'src', 'runner', 'dispatch', 'run-result.mjs'));
+
+if (process.argv.includes('--check')) {
+  const vectors = (name) => JSON.parse(fs.readFileSync(path.join(outDir, name), 'utf8'));
+  const cases = [
+    ...vectors('settle.json').settle.map((c) => ({ name: `settle/${c.name}`, runId: c.runMeta.runId, written: c.written })),
+    ...vectors('steps.json').settleAttempt.map((c) => ({ name: `settle-attempt/${c.name}`, runId: c.runMeta.runId, written: c.written })),
+  ];
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-settlement-check-'));
+  const failures = [];
+  let read = 0;
+  try {
+    for (const c of cases) {
+      const runDir = fs.mkdtempSync(path.join(dir, 'run-'));
+      for (const [file, text] of Object.entries(c.written)) fs.writeFileSync(path.join(runDir, file), text.split('<token>').join('check-token'));
+      for (const file of ['exit.json', 'evidence.json', 'run.json']) {
+        if (c.written[file] === undefined) continue;
+        try { JSON.parse(c.written[file]); } catch (error) { failures.push(`${c.name}: ${file} does not parse: ${error.message}`); }
+      }
+      if (c.written['result.json'] === undefined) continue;
+      const settled = runResult.readSettledResult(runDir, c.runId);
+      if (!settled) failures.push(`${c.name}: Node reads no settled result from result.json`);
+      else if (settled.runId !== c.runId) failures.push(`${c.name}: Node reads run ${settled.runId}, not ${c.runId}`);
+      else read += 1;
+    }
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+  if (failures.length > 0) {
+    console.error(failures.join('\n'));
+    process.exit(1);
+  }
+  console.log(`checked ${cases.length} recorded run directories; Node read ${read} settled results`);
+  process.exit(0);
+}
 
 const plain = (value) => JSON.parse(JSON.stringify(value === undefined ? null : value));
 const scratch = path.join(process.env.TMPDIR || '/tmp', 'fgos-work', `settlement-recorder-${process.pid}`);

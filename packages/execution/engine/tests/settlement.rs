@@ -15,9 +15,10 @@ use fgos_execution_engine::settlement::{
     RefusedLease, SettleInput, SettlementGit, SettlementPorts,
 };
 use fgos_execution_engine::steps::{
-    cleanup_trust, find_worker_claim, provider_stop_of, resolve_worker_artifact_path,
-    run_attempt_step, settle_attempt, terminal_stop_message, watch_writes_outside_workspace,
-    AttemptHomeFinalizer, FinalizedHome, PaneScreen, StepError, StepOutcome, StepPorts,
+    cleanup_trust, finalize_home, find_worker_claim, provider_stop_of,
+    resolve_worker_artifact_path, run_attempt_step, settle_attempt, terminal_stop_message,
+    watch_writes_outside_workspace, AttemptHomeFinalizer, FinalizedHome, HomeState, PaneScreen,
+    StepError, StepOutcome, StepPorts,
 };
 use fgos_run_supervisor::controller::lease::{
     acquire_run_control, build_run_control_holder, settle_run_control, AcquireOptions,
@@ -990,4 +991,69 @@ fn the_git_door_reads_head_dirt_and_the_committed_diff_of_a_real_checkout() {
         changed.changed_files,
         vec!["a.txt".to_string(), "sub/b.txt".to_string()]
     );
+}
+
+struct Homes(Result<HomeState, &'static str>);
+impl AttemptHomeFinalizer for Homes {
+    fn finalize(&self, _: &Path, attempt_id: &str) -> Result<FinalizedHome, StepError> {
+        assert_eq!(attempt_id, "attempt-1");
+        let state = self
+            .0
+            .map_err(|code| StepError::new(code, "home of another attempt"))?;
+        Ok(FinalizedHome {
+            state,
+            homes: 1,
+            transcript_path: Some("protected/session".into()),
+            home_layout: vec![json!({"name": ".codex"})],
+            warnings: vec![],
+        })
+    }
+}
+
+#[test]
+fn finalize_home_retries_a_kept_home_and_removes_the_side_file_only_once_the_home_is_done() {
+    // The step's own decisions over what the Confinement Authority reports; the authority is a port here.
+    let cases: [(&str, Result<HomeState, &str>, Value, bool); 4] = [
+        (
+            "kept",
+            Ok(HomeState::CredentialHomeKept),
+            json!({"result": "retry", "reason": "credential-home-kept"}),
+            true,
+        ),
+        (
+            "cleaned",
+            Ok(HomeState::Cleaned),
+            json!({"result": "done", "detail": {"homes": 1, "transcriptPath": "protected/session", "homeLayout": [{"name": ".codex"}], "warnings": []}}),
+            false,
+        ),
+        (
+            "held",
+            Ok(HomeState::CredentialHomeHeld),
+            json!({"result": "done", "detail": {"homes": 1, "transcriptPath": "protected/session", "homeLayout": [{"name": ".codex"}], "warnings": [], "outcome": "credential-home-held"}}),
+            false,
+        ),
+        (
+            "marker-mismatch",
+            Err("home-marker-mismatch"),
+            json!({"error": {"code": "home-marker-mismatch", "message": "home of another attempt"}}),
+            true,
+        ),
+    ];
+    for (name, state, want, side_stays) in cases {
+        let run_dir = scratch("finalize-home");
+        let side = run_dir.join("side.json");
+        std::fs::write(&side, "{}").unwrap();
+        let envelope = json!({"runDir": run_dir, "attemptId": "attempt-1", "sideFile": side});
+        let first = step_json(finalize_home(&envelope, &Homes(state)));
+        assert_eq!(first, want, "{name}");
+        assert_eq!(side.exists(), side_stays, "{name}: side file");
+        // Run again after a crash: a removed side file is no error.
+        let again = step_json(finalize_home(&envelope, &Homes(state)));
+        assert_eq!(again, want, "{name}: second run");
+    }
+    let refused = finalize_home(
+        &json!({"attemptId": "attempt-1"}),
+        &Homes(Ok(HomeState::Cleaned)),
+    );
+    assert_eq!(refused.unwrap_err().code, "envelope-invalid");
 }

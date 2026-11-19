@@ -15,6 +15,7 @@ use serde_json::{json, Map, Value};
 use crate::accounts::fault::{classify_fault, FaultInput};
 use crate::accounts::host::Host;
 use crate::accounts::{SystemHost, LEASE_CONFLICT_REASON};
+use crate::confinement::request::seat_session_dir;
 use crate::run_result::vocabulary::LEASE_CONFLICT_FAILURE_CODE;
 use crate::run_result::{normalize_run_result_v3, read_settled_result};
 use crate::transport::visibility_session::{iso_now, mark_run_settled};
@@ -263,40 +264,6 @@ fn prepared_invocation_of(run_dir: &Path, launch_command_id: Option<&str>) -> Op
     )
     .ok()?;
     serde_json::from_str(&text).ok()
-}
-
-/// The folder a seat's session is in while its run settles: the copy finalize-home kept in the run directory, else
-/// the session folder of the launch's private home. `None` when the launch declared no session folder.
-pub fn seat_session_dir(run_dir: &Path, launch_command_id: Option<&str>) -> Option<PathBuf> {
-    let kept = run_dir.join("protected").join("session");
-    if std::fs::read_dir(&kept).is_ok_and(|mut d| d.next().is_some()) {
-        return Some(kept);
-    }
-    let id = launch_command_id.filter(|s| !s.is_empty())?;
-    let text = std::fs::read_to_string(
-        run_dir
-            .join("protected")
-            .join("confinement-finalization")
-            .join(format!("{id}.json")),
-    )
-    .ok()?;
-    let descriptor: Value = serde_json::from_str(&text).ok()?;
-    descriptor
-        .get("resources")?
-        .as_array()?
-        .iter()
-        .find_map(|res| {
-            if res.get("resourceId").and_then(Value::as_str) != Some("private-home") {
-                return None;
-            }
-            let session = res.get("sessionDir").and_then(Value::as_str)?;
-            let home = res
-                .get("pathRef")
-                .and_then(Value::as_str)
-                .filter(|s| !s.is_empty())
-                .or_else(|| res.get("path").and_then(Value::as_str))?;
-            Some(Path::new(home).join(session))
-        })
 }
 
 /// The sandbox backend the worker really ran under, or `None` when it ran without one: what the Confinement
