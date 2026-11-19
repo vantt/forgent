@@ -1773,3 +1773,52 @@ fn a_role_gated_verb_from_a_pending_successor_is_refused_role_pending_rotation_n
     );
     assert!(!served.dir.join("argv").exists(), "no route child ran");
 }
+
+fn serve_pending(name: &str, pending: Option<&str>, holds: bool) -> Served {
+    serve_with(
+        name,
+        DONE_LINE,
+        Ok(holds),
+        Identity {
+            pending: pending.map(str::to_string),
+            ..Identity::default()
+        },
+        &["questions list", "session start"],
+        Duration::from_secs(5),
+    )
+}
+
+#[test]
+fn a_pending_successor_reads_the_question_store_but_its_write_verbs_keep_waiting_for_the_role() {
+    let served = serve_pending(
+        "pending-successor-read",
+        Some("planner-x generation 1 still holds the role"),
+        false,
+    );
+    let read = ask(&served.socket, "questions list");
+    assert_eq!(read["code"], serde_json::Value::Null, "read answered: {read}");
+    assert!(served.dir.join("argv").exists(), "the read ran its route child");
+    let write = ask(&served.socket, "session start");
+    assert_eq!(write["code"], "role-pending-rotation");
+    assert_eq!(
+        write["detail"],
+        "planner-x generation 1 still holds the role"
+    );
+}
+
+#[test]
+fn a_caller_that_is_no_successor_of_the_role_gets_no_read_either() {
+    let served = serve_pending("not-a-successor-read", None, false);
+    let read = ask(&served.socket, "questions list");
+    assert_eq!(read["code"], "role-not-held");
+    assert!(!served.dir.join("argv").exists(), "no route child ran");
+}
+
+#[test]
+fn a_successor_that_holds_the_role_after_the_hand_over_gets_reads_and_writes_alike() {
+    let served = serve_pending("handed-over-read", None, true);
+    for verb in ["questions list", "session start"] {
+        let reply = ask(&served.socket, verb);
+        assert_eq!(reply["code"], serde_json::Value::Null, "{verb}: {reply}");
+    }
+}
