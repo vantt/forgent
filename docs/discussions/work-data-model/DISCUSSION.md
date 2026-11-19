@@ -42,6 +42,7 @@ Explained to the owner round 1: #3 (migrate legacy plans by the existing map, th
 
 - 2026-11-19 17:2x — owner round 1: (1) backlog question is wrong — one file or one table, there is always a list plus a file; unclear how much detail a backlog row holds, since once planned the detail lives in the plan in separate files; (2) asks for advice on the status list; (3)(4) asks for explanation; (5) asks to say it more clearly. Shaper scouted row sizes and backlog→plan links and answered with proposals for #1/#2 and explanations for #3–#5.
 - 2026-11-19 17:4x — owner round 2: agrees #2 (5 backlog statuses) and #3 (migrate plans, check fails); asks whether Work uses the Event Store more than said; merge #4 and #5 to see what Work handles with the Event Store. Shaper scouted the consumer registry, Work stream contract and the live view and reported.
+- 2026-11-19 18:0x — owner round 3: asks how other systems approach this. Shaper surveyed (web search + known designs): one file per task with frontmatter (Backlog.md), JSONL in git + local SQLite cache, later Dolt (beads), issues as git objects with an operation log (git-bug), append-only ticket change artifacts compiled into a table (Fossil), per-feature spec/plan/tasks files (GitHub Spec Kit), DB + activity log (Jira, Linear), no backlog at all (Shape Up). Pattern reported: items as files with one schema, history as an append log, a rebuildable cache/index, one CLI door for writes. Still waiting on the round-2 question (273 open Work items).
 
 ## 6. Thiết kế đã chốt {#design}
 
