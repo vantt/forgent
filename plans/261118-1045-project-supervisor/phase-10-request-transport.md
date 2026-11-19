@@ -7,17 +7,22 @@ binds each verb to the caller's grant and plan (PS-14, PS-24). The socket serves
 at 60 s, so a long verb must not run inside the request.
 
 ## Inputs
-- Step 0: after the session-verb plan lands, verbs read `session <x>`, not `head <x>`. Re-grep and use the landed
-  names. A finding that changes PS-10 stops the phase with `NEEDS_CONTEXT`.
+- Step 0: re-checked against main `f0128ff57` (2026-11-19): the session-verb plan landed (`session <x>` verbs), the
+  owner-question store landed its head door (`questions ask|ack|cancel|answer` socket verbs, route child
+  `callHeadQuestions`) and `session write` (publishes through the paths land). Re-grep only if main moved; a finding
+  that changes PS-10 stops the phase with `NEEDS_CONTEXT`.
 - `packages/run-supervisor/contracts/head-request.v1.json`: `verbs`, `order` (busy), `run.verbTimeoutMs` 60000,
   `refusalCodes`.
-- `packages/run-supervisor/rust/src/head_request.rs:33` (`VERB_TIMEOUT`), `:37` (`MAX_CONNECTIONS` 8), `:51`
-  (`role_move`), `:458` (`decide`: grant check, `busy` gate), `:508-516` (`run_verb`: route child, `env_clear` + the
-  step env, group killed on timeout only). The verb whitelist is `cfg.verbs` from the envelope.
-- `src/session-host/head-request.mjs:20-48` (`confined`, `startHead`, `rotateHead`: the per-verb confined branch the
-  generic door replaces for new verbs), `:89-117` (the route `switch`, `exactKeys`, `ownLineage`);
-  `head-request-client.mjs:12-16` (verb constants, `requestHead`); `head-start.mjs:44-54` (placement read/write), `:41`
-  (`lineageDirOf`), `openingText` (the opening a head is typed); today's CLI branch `bin/fgos.mjs:3473-3487`.
+- `packages/run-supervisor/rust/src/head_request.rs:40` (`VERB_TIMEOUT`), `:53` (`MAX_CONNECTIONS` 8), `:76`
+  (`role_move`), `:986` (`decide`: grant check, `busy` gate), `:1067-1080` (`run_verb`: route child, `env_clear` + the
+  step env, group killed on timeout only). Rust client half: `head_client.rs` (`request_head`), used by the host's
+  confined routing (PS-20, phase 16). The verb whitelist is `cfg.verbs` from the envelope.
+- `src/session-host/head-request.mjs:22-54` (`confined`, `startHead`, `rotateHead`: per-verb confined branches that
+  keep their callers), `:64` (`exactKeys`), `:69` (`ownLineage`), `:83` (`callHeadQuestions`: the route child running
+  a host verb with the envelope's `hostBin`, the precedent for `land` and `supervisor`), `:104-150` (`runHeadRequest`,
+  the route `switch`); `head-request-client.mjs:17-25` (verb constants), `:80` (`requestHead(verb, args)`, already
+  generic); `head-start.mjs:45-55` (placement read/write), `:42` (`lineageDirOf`), `:97` (`openingText`); today's CLI
+  branch `bin/fgos.mjs` `case 'session'` (~:3376).
 - Detach door: `src/util/spawn-detached-fgos.mjs:20` (`spawnDetachedCli`); precedent
   `src/session-rotation/rotate.mjs:32,306`.
 - Process identity: `src/native/process-identity.mjs` (`selfRecord`, `judge` -> alive|dead|unknown on a recorded
@@ -49,17 +54,19 @@ at 60 s, so a long verb must not run inside the request.
 0. Re-grep inputs; list the verbs the contract has now; read what the landed head-state source treats as `retired`.
 1. Contract: add verbs `land`, `run`, `request result`, `worktree create`, `session stop`, `supervisor handled`,
    `supervisor done`, each with `args`, `does`, `data`, `identity: held`; `session start` args gain optional
-   `forQuestion`. Add refusal codes `ticket-used`, `ticket-unknown`, `bad-args`, `land-branch-lead-only`,
-   `path-outside-grant`, `write-outside-footprint`, `footprint-change-refused`.
-2. One confined client door in `head-request-client.mjs`: `SOCKET_VERBS` read from the contract's `verbs`, and
-   `requestHeadVerb(verb, args, { socketPath })` over the existing `requestHead`. Phase 16 routes every confined call of
-   a `SOCKET_VERBS` verb to it (PS-20); existing `startHead`/`rotateHead` keep their callers.
+   `forQuestion`. Add refusal codes `ticket-used`, `ticket-unknown`, `land-branch-lead-only`, `path-outside-grant`,
+   `write-outside-footprint`, `footprint-change-refused`. `bad-args` exists ("session write only"): widen its text to
+   every verb whose args break its contract shape, do not add a second code.
+2. Client constants: one constant per new verb in `head-request-client.mjs`, beside the existing ones; Node callers use
+   the existing generic `requestHead(verb, args)`. No new Node client door: the host routes confined calls of these
+   verbs in Rust through `head_client::request_head` (PS-20, phase 16).
 3. `head-plan.mjs`: `planOfHead(projectRoot, persona, name)` resolves a `lead-*`/`planner-*` name to its plan dir by
    the PS-11 rule (strip the project prefix, unique prefix among plans not `done`/`withdrawn`), reads `plan.md` at the
    trunk tip (`resolveTrunk` + `readObjects`, never the working file) and returns `{dir, footprint}`. Refusals
    `plan-not-found`, `plan-ambiguous`. One reader for phase 9's grant and for this route.
 4. Ticket verbs `land` and `run` (route child, `head-request.mjs`):
-   - `land` args `{branch?, paths?, tests?}` (exactly one of `branch`/`paths`). Binding: `paths` outside the caller's
+   - `land` args `{branch?, paths?, tests?, message?}` (exactly one of `branch`/`paths`; `message` is the commit
+     message, required with `paths`, as `LandCommand.message` of phase 7). Binding: `paths` outside the caller's
      grant `writes` refuse `path-outside-grant`; `branch` from any persona but `lead` refuses `land-branch-lead-only`;
      a lead's branch land passes its plan footprint (`planOfHead`) as `--footprint`; a lead's `paths` land that changes
      the `footprint` of its plan's frontmatter against the trunk tip refuses `footprint-change-refused`.
@@ -82,21 +89,24 @@ at 60 s, so a long verb must not run inside the request.
    worktrees are not this door's); runs `fgos worktree create <path> --branch <b>` within the 60 s cap.
 7. `session stop` args `{persona, name, reason?}`, in `head-stop.mjs`: `stopHeadSession({persona, name, projectRoot,
    reason}, ports)` reads the placement (`readHeadPlacement`), calls the host `retire(placement, 'close', { groupKey })`,
-   writes the `retired` signal exactly as the landed head-state source reads it (step 0; if it derives `retired` from
-   the placement's absence, write nothing new), and returns `{stopped: true}`. A role no live session holds returns
+   writes `retiredAt` (RFC 3339, now) into the lineage's `placement.json` through `writeHeadPlacement` (the landed
+   head-state source answers `retired` from it: `apps/fgos/src/wiring/observe_sources/head_state.rs:11-16`), and
+   returns `{stopped: true}`. A role no live session holds returns
    `{stopped: false, reason: "not-live"}`. The route refuses `role-mismatch` for a persona-name that is not a `lead-*`
    or `planner-*` lineage of this project, an asker named by an answered question, or the caller's own.
 8. `session start` with `forQuestion`: passed through `startHead` to `startHeadSession`, which adds one opening line
    (`openingText` in `head-start.mjs`): "You continue question <id>: write its answer back to its origin, then
    `fgos questions ack <id>` (or `cancel`)". The successor holds the asker's own head role, so no flag is needed. No
    other start changes.
-9. `supervisor handled|done`: the route child runs the host verb `fgos supervisor <sub> --json` and returns its JSON.
+9. `supervisor handled|done`: the route child runs the host verb `fgos supervisor <sub> --json` the way
+   `callHeadQuestions` runs `questions` (envelope `hostBin`) and returns its JSON. The host verb lands in phases 12/16;
+   tests here use a fake host.
    On `done` answering `{done: true}`, the route spawns a detached `session stop` of the caller's own role (after the
    reply is written) and adds `stopping: true` (PS-9).
 10. Rust: only if the contract tests need it (`role_move` untouched). One serving proof: a ticket verb returns well
     under `VERB_TIMEOUT` while its detached runner survives the route child's exit.
 11. Node tests, one behaviour each:
-    - `head-request.test.mjs`: a confined caller's `requestHeadVerb` reaches the socket for a new verb; the ticket file
+    - `head-request.test.mjs`: `requestHead` with a new verb reaches the route (fake socket); the ticket file
       is written and `request result` returns `running`, then the outcome; no-id lists the role's tickets; a reused id
       refuses; a dead runner reads `failed`; each binding refusal fires once (`path-outside-grant`,
       `land-branch-lead-only`, `write-outside-footprint`, `footprint-change-refused`); `worktree create` without
