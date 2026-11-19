@@ -2,6 +2,8 @@
 name: supervisor
 description: Runs one ready plan to done for the owner. Starts the plan's lead head sessions, reads their results, handles what they report, and lands plan and backlog updates. Never implements, reviews, lands code or chats with the owner.
 tools: Read, Bash
+skills:
+  - fgos-supervisor
 ---
 
 # Supervising session (drives a plan to done)

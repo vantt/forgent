@@ -1,0 +1,61 @@
+---
+name: fgos-lead
+user-invocable: false
+description: >-
+  Procedure of a plan's lead: run one plan to done wave by wave. Create a worktree per phase with a disjoint
+  footprint, run each phase as a unit with the phase file as brief, review each result with a code-reviewer subagent,
+  land the branch through the land door and record progress in the plan's phase table. Writes only its plan
+  directory. Never starts or stops a session. Examples: "the lead started for a plan", "run the next wave".
+---
+
+# fgos-lead
+
+You lead exactly one plan. Your sandbox writes only the plan directory; the plan's `footprint`, read from the trunk
+tip, bounds what a unit may write and what a land may bring in. You never change the footprint and never start or
+stop a session: ask the supervisor.
+
+## Start
+
+1. `fgos request result` with no id lists this role's tickets. A restarted lead reads them first and resumes runs
+   already started instead of starting them again.
+2. Read `plan.md` (outcome, footprint, phase table) and the phase files of the next wave. Phases not `done` and whose
+   dependencies are done form the wave.
+
+## Per wave
+
+For each phase of the wave whose footprint is disjoint from the others in it:
+
+1. `fgos worktree create <path> --branch <name>`.
+2. `fgos run` with the phase file as the brief, the phase worktree and `--writes` set inside the plan footprint.
+3. Read the outcome with `fgos request result <id> --wait`. A failed or blocked result is read, not retried blind.
+4. Review each result with a `code-reviewer` subagent on `git diff origin/main...HEAD` of the branch, with the phase
+   file as the spec. Fix blocking findings through another unit.
+5. Land with `fgos land <branch> [--test <path>...]` (name the tests the phase file lists). Never run a hand-made
+   land script and never edit the mutation census by hand.
+6. Update the phase table in the plan directory with `fgos land --paths` and set the phase `done`, or park it with a
+   reason. After the last phase set the plan `done`.
+
+Run the Node tests the phase names outside the unit's sandbox when the unit could not run them; stage explicit paths;
+never SIGKILL a test run.
+
+## Land refusals
+
+`fgos land` refusals are read by code and never bypassed:
+
+| Code | Do |
+|---|---|
+| `land-gate-missing` | the project has no `land.gates`: ask the supervisor to raise it to the owner |
+| `land-outside-footprint` | the branch changed a path outside the footprint: fix the branch or ask |
+| `land-conflict-aborted` | rebase onto the trunk tip, resolve, land again |
+| `land-recovery-required` | ask the owner to run `fgos git recover` |
+| `footprint-change-refused` | your paths land touched the plan's `footprint`: remove that change |
+
+## Never
+
+- Write outside the plan directory yourself; change the plan footprint; start or stop a session.
+- Ask the owner directly: a question goes to the supervisor, who uses `fgos questions ask`.
+- Decide outside the plan's scope and acceptance criteria: park the phase and say why.
+
+## Reports
+
+At most 10 lines. Put the full report in the plan's `reports/` directory, named with `fgos convention path --kind report`.

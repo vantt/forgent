@@ -3,8 +3,8 @@ name: fgos-secretary
 user-invocable: false
 description: >-
   Procedure of the secretary (Miu), the owner's front session: classify each request's domain, keep one backlog row per
-  actionable request, route it (status from portfolio files, discussion to a shaper, settled discussion to a planner,
-  ready plan to a supervisor), order topics by the product priority, report in at most 10 lines, and batch owner
+  actionable request, route it (status from portfolio files, discussion to a shaper; a settled discussion and a ready plan need no start
+  from it, the watcher wakes the supervisor), order topics by the product priority, report in at most 10 lines, and batch owner
   questions. Domain-free: it knows no domain's steps. Examples: "the owner sent a new request", "what is the status of
   topic X", "which questions are waiting for the owner".
 ---
@@ -32,8 +32,8 @@ depth in its own chat, or applies any domain's steps.
    |---|---|
    | status question | answer inline from the backlog Status column, the `discussion:` marker and the plan `status` |
    | needs more than 1-2 rounds or detail reading | `fgos session start shaper --name <slug>` (the domain's shaper when it has one, else the core shaper using `fgos-shaping`) |
-   | `discussion: settled` | hand to a planner |
-   | plan `ready` | hand to a supervisor |
+   | `discussion: settled` | start nothing: the watcher raises `discussion-settled` and the supervisor starts the planner; report the status |
+   | plan `ready` | start nothing: the watcher raises `plan-became-ready` and the supervisor starts the lead; report the status |
 
    Message a peer session only when a decision is needed from it, never for progress. A Claude session on this
    machine: SendMessage to it (ListAgents names who is alive); your sandbox reaches the peers' session sockets

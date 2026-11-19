@@ -5,7 +5,7 @@ description: >-
   Run N already-decomposed children of one item concurrently instead of one
   at a time. Given a parent id and a candidate set (children of that
   parent, or a milestone's targets), waves the candidates through
-  computeSchedule, asks the engine for worker-slot room, then fires a
+  computeSchedule, reads the lane pool for its report, then fires a
   batch of up to 5 Agents each running /fgOS:pick end to end, reads live
   state back (never an Agent's own narration), self-recovers from recoverable
   worktree-isolation races, and auto-approves each leaf that reaches
@@ -60,36 +60,14 @@ own judgment.
 - **Every child runs a full `/fgOS:pick <id>`.** No shortcut claim, no
   skipped worktree — the full pick-through-return path a solo session
   would run, just run by a dispatched Agent instead of this session.
-- **Ask the engine for worker-slots before firing a batch, and fire only
-  as many as it grants.** Read `fgos slots --json` fresh before every
-  batch — the CLI is the only door a prose skill has into the engine. A
-  `execution.hasRoom: false` answer means the machine is full: fire
-  nothing, wait, and re-ask. Never work around a refusal, and never
-  substitute this skill's own count of Agents it happens to have fired —
-  a worker-slot is held by a running work item, engine state, not by an
-  Agent that has not claimed one yet.
-
-  **Trim the batch to `execution.free`.** The engine's enforcing gate
-  claims ONE item per call, so firing a batch of five against one free
-  slot lands one item and refuses four, deterministically — it does not
-  buy a wave, it just spawns four Agents that die at the claim door and
-  come back as failed candidates. Splitting across two waves is the
-  cheaper trade. `computeSchedule`'s own wave packing already batches by
-  footprint; this skill additionally never lets a single batch exceed **5
-  members** — a maximum batch SIZE, not a ceiling of its own. The ceiling
-  belongs to the engine, and the batch actually fired is `min(5,
-  execution.free)`.
-
-  **`execution.free` is `null` when no ceiling is armed, and that means no
-  limit — not zero.** Worker-slot ceilings ship unarmed by default, and in
-  that state the engine answers `hasRoom: true`, `ceiling: null`, `free:
-  null`, `reason: "no-ceiling-configured"` — no ceiling exists to trim
-  against, so the batch is `min(5, batch.length)` and every candidate in
-  it fires. Trim against `execution.free` only when it is a real number,
-  which is exactly when `execution.reason` reads `room-available`. Reading
-  `free: null` as `0` fires nothing at all while the machine is wide open,
-  in the unarmed default every repo starts in — never confuse absent with
-  zero free slots.
+- **Read the lane pool before firing a batch, for the report only.** Read
+  `fgos slots --json` fresh before every batch and report `lanes.free`. It
+  does not trim or hold the batch: the gate is at seat start, where a seat
+  past the pool waits up to `workerSlots.laneWaitSec` and then returns
+  `lane-pool-full`. The batch is `min(5, batch.length)`, a maximum batch
+  SIZE; a seat that returns `lane-pool-full` is reported for its own id and
+  the wave moves on. Never substitute this skill's own count of Agents it
+  has fired for the engine's lane view.
 - **Consult the dispatch decision protocol before firing each candidate —
   never hardcode native dispatch unconditionally.** For each id in the
   batch, in the same per-candidate serial step the announce line below
@@ -191,7 +169,7 @@ participates in the in-process branch beyond the initial `decide` call.
 
 ## Workflow
 
-Full step-by-step detail — the exact slot-polling, batch-trimming, and
+Full step-by-step detail — the exact lane-pool read, and
 per-candidate dispatch bash — lives in
 `references/wave-dispatch-mechanics.md`. This is the high-level shape,
 run once per iteration until no open candidate remains:
@@ -210,12 +188,10 @@ as if it reached a terminal status).
 frontier, only this candidate set. Filter to `ready`: scheduled candidates
 that also pass the pre-check (frontier membership + dep resolution).
 
-### Step 3: Fire batches of up to 5, slot-gated
+### Step 3: Fire batches of up to 5, lane-pool report
 For each batch of up to 5 ids from `ready`: read `fgos slots --json`
-fresh; if the lane is full, wait and re-ask (never work around the
-refusal); trim the batch to `execution.free` when it is a real number
-(fire the whole batch when it is `null` — the unarmed, no-limit default);
-for each id in the trimmed batch, consult the dispatch decision protocol,
+fresh and note `lanes.free` in the report (the gate is at seat start, not
+here); for each id in the batch, consult the dispatch decision protocol,
 print its announce line, and add it to the firing set when the decision
 says `in-process` — otherwise report it as needing a person instead.
 
@@ -265,15 +241,10 @@ concern — this skill is invocable on its own with just `parentId` +
 - treating the pre-check as authoritative — skipping the real
   `/fgOS:pick` claim, or retrying a pre-check-passed-but-claim-failed
   candidate blindly
-- firing a batch without asking `fgos slots` first, or firing one anyway
-  after the engine answered `hasRoom: false`
-- firing more than `execution.free` Agents, when it is a real number,
-  because the batch was already computed — every one past that number
-  dies at the claim door and comes back as a false failure; or letting
-  one batch exceed 5 members
-- reading a `null` `execution.free` as a full lane and firing nothing —
-  null is the unarmed default, so the whole batch fires; refuse only on
-  `hasRoom: false`
+- firing a batch without reading `fgos slots --json` first, or letting one
+  batch exceed 5 members
+- retrying a seat that returned `lane-pool-full` blindly, or treating
+  `lanes.free` as a gate instead of a report line
 - polling a full lane forever instead of handing back to the caller once
   it is clear the lane is wedged rather than busy
 - counting the Agents this skill itself fired as if that were the
@@ -296,8 +267,8 @@ Violating the letter of the rules is violating the spirit of the rules.
 
 ## References
 
-- `references/wave-dispatch-mechanics.md` — exact per-step bash: the slot
-  poll loop, batch trimming, the per-candidate dispatch-decide/announce
+- `references/wave-dispatch-mechanics.md` — exact per-step bash: the lane-pool read,
+  the per-candidate dispatch-decide/announce
   sequence, and the approve-ranking pass
 
 ## Workflow Position

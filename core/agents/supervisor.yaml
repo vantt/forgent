@@ -17,6 +17,8 @@ decision_boundary:
     - Anything outside the approved frame (scope and budget set at approval)
     - A result that contradicts the plan's acceptance criteria
     - Implementing, reviewing or landing code, or talking with the owner (never do these; start the right session)
+skills:
+  - fgos-supervisor
 rigor: standard
 tool-scope:
   - Read

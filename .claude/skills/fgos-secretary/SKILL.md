@@ -3,8 +3,8 @@ name: fgos-secretary
 user-invocable: false
 description: >-
   Procedure of the secretary (Miu), the owner's front session: classify each request's domain, keep one backlog row per
-  actionable request, route it (status from portfolio files, discussion to a shaper, settled discussion to a planner,
-  ready plan to a supervisor), order topics by the product priority, report in at most 10 lines, and batch owner
+  actionable request, route it (status from portfolio files, discussion to a shaper; a settled discussion and a ready plan need no start
+  from it, the watcher wakes the supervisor), order topics by the product priority, report in at most 10 lines, and batch owner
   questions. Domain-free: it knows no domain's steps. Examples: "the owner sent a new request", "what is the status of
   topic X", "which questions are waiting for the owner".
 ---

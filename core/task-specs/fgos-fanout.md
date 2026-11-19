@@ -8,12 +8,12 @@ domain: core | role: orchestrator | capability: wave-dispatch | requires-skill: 
 
 ## Output
 - Wave schedule calculated via `computeSchedule(view, candidateIds)`.
-- Dispatched Agents running `/fgOS:pick <id>` (up to 5 per batch, slot-gated via `fgos slots`).
+- Dispatched Agents running `/fgOS:pick <id>` (up to 5 per batch, lane-pool report via `fgos slots --json`).
 - Auto-approved leaf items (`fgos approve <id>`) that reach `awaiting-approval` (except those tripping risk-keyword floor `HEAVY_KEYWORDS`).
 - Final status report of all candidate child items.
 
 ## Gates
-- Soft: Batch size trimmed to `min(5, execution.free)` (or `min(5, batch.length)` when `execution.free` is `null`). Candidate dispatch protocol consult (`decide --work <id>`) before dispatch. Skill-layer self-recovery on worktree-isolation races via `EnterWorktree`.
+- Soft: Batch size `min(5, batch.length)`; `lanes.free` from `fgos slots --json` is reported, the gate is at seat start (`lane-pool-full` after `workerSlots.laneWaitSec`). Candidate dispatch protocol consult (`decide --work <id>`) before dispatch. Skill-layer self-recovery on worktree-isolation races via `EnterWorktree`.
 - Hard: Auto-approves leaves only; parent item gate (`parentId`) is NEVER auto-approved by fanout. Leaves tripping risk keywords escalate to human.
 
 ## Verify-template
