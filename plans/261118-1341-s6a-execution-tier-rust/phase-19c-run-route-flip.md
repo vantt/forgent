@@ -47,6 +47,8 @@ This phase serves the verb from engine `unit_run`. Node callers of `runUnit` (Wo
   worker's writing run refused before admission; one case per internal op. `test/cli/run-verb.test.mjs` cut to its one wiring
   proof or deleted, its behaviours owned by their Rust proofs.
 
+- Carried in from 19b (landed bbf64a66d): call `HostUnitRun::run_unit` (installs signal handlers with dispatch.cancelWaitMs), not the engine's run_unit directly; Windows cancel-on-signal has no console handler in any crate yet (part of the Windows decision); pane-preparation errors come back as a coded runner-config error — map to Node's dispatch error class if a caller reads it; the 19b e2e tests are Linux-only.
+
 ## Footprint
 
 `apps/fgos/src/wiring/run.rs`, `execution_routes.rs`, `attempt_step.rs`, `apps/fgos/src/main.rs`, `routing.rs`,
