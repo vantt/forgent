@@ -147,7 +147,7 @@ that cannot be named is possible.
 ## 8. Boundaries and what it replaces
 
 `graph` is below the door and below the Work adapter and imports nothing from either (design principle 2).
-The door plan adds `src/state/graph-adapter.mjs` in the `domain` layer, which reaches the package through the
+The door plan adds src/state/graph-adapter.mjs (a new file, not yet in the tree) in the `domain` layer, which reaches the package through the
 kernel door `src/native/door.mjs` and maps Work items to this input.
 
 The ordering and cycle code in the repository today, and what this plan does with it:

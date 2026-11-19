@@ -76,7 +76,7 @@ The grammar is lexical: it reads the bytes of the entry and nothing else (sectio
 ## 4. Coverage
 
 `matches(path, scope)` answers whether a repo-relative path lies in a scope. A plain entry covers the path
-itself and everything beneath it, by whole segments (`docs` covers `docs/a` and not `docs-old/a`). An entry
+itself and everything beneath it, by whole segments (`lib` covers `lib/a` and not `lib-old/a`). An entry
 containing a glob must match the whole path. A queried path that is absolute, escapes with `..`, or carries
 a backslash or NUL never matches, and nothing under `.fgos` ever matches, not even `**`. Query bytes are
 never trimmed, and a byte path that is not UTF-8 is refused with a lossless hex diagnostic.
@@ -94,11 +94,11 @@ everything. Two scopes may overlap when any entry of one may overlap any entry o
 
 | a | b | may overlap | why |
 |---|---|---|---|
-| `src` | `src/a.mjs` | yes | `src/a.mjs` lies inside `src` |
-| `src/fo*` | `src/foo.mjs` | yes | prefix of the first is `src`, which holds `src/foo.mjs` |
-| `src/a/**` | `src/b/**` | no | prefixes `src/a` and `src/b` are disjoint |
+| `lib` | `lib/a.mjs` | yes | `lib/a.mjs` lies inside `lib` |
+| `lib/fo*` | `lib/foo.mjs` | yes | prefix of the first is `lib`, which holds `lib/foo.mjs` |
+| `lib/a/**` | `lib/b/**` | no | prefixes `lib/a` and `lib/b` are disjoint |
 | `docs` | `docs-old/x` | no | whole segments only |
-| `src/a*` | `src/b*` | yes | both prefixes are `src`; the rule does not look inside a segment |
+| `lib/a*` | `lib/b*` | yes | both prefixes are `lib`; the rule does not look inside a segment |
 | `**` | anything | yes | empty prefix |
 
 This is the rule `fgos_write_scope::overlaps` applies to the prefixes of two entries
@@ -114,13 +114,13 @@ file is covered by both entries.** Proof sketch: a path covered by a plain entry
 covered by a glob entry starts with its literal leading segments, so every path covered by an entry starts
 with that entry's prefix. A path covered by both entries starts with both prefixes, and two prefixes of one
 path are always equal or one inside the other. The converse does not hold: the rule is conservative, so
-`src/a*` and `src/b*` may-overlap although no file matches both. A refusal built on it says so, and a caller
+`lib/a*` and `lib/b*` may-overlap although no file matches both. A refusal built on it says so, and a caller
 that must run beside another narrows its entries.
 
 The word *lexical* is part of the contract. These are **outside** it, and every verdict that rests on
 may-overlap carries this caveat:
 
-- **Case folding.** `src/x` and `SRC/x` are different entries here; on a case-insensitive file system they
+- **Case folding.** `lib/x` and `LIB/x` are different entries here; on a case-insensitive file system they
   name one file.
 - **Unicode normalisation.** Two spellings of one name (precomposed and decomposed) are different entries.
 - **Symlinks.** A path that goes through a symlink inside the repository is compared as written.
@@ -138,10 +138,10 @@ or recorded as debt.
 
 | # | Meaning | Where | What it does | Fate |
 |---|---|---|---|---|
-| 1 | Equal strings only | `footprintOverlapAmong`, `src/state/graph-metrics.mjs:599` | `src` and `src/a.mjs` do not collide; globs compared as strings. Not sound | Replaced by the chosen meaning in the Work adapter (door plan) |
-| 2 | Containment, character cut | `overlaps`, `scripts/plan-contract-check.mjs:34`; `overlaps`, `packages/supervision/rust/src/portfolio.rs:200` | Cuts the entry at the first `*` character, not at a segment, and does not canonicalize: `src/fo*` becomes `src/fo`, which does not contain `src/foo.mjs`; `./src` is not `src`. Not sound. Both readers also delete every `*` before the rule sees it (`portfolio.rs:318`, `plan-contract-check.mjs:42`) | Replaced (door plan) |
+| 1 | Equal strings only | `footprintOverlapAmong`, `src/state/graph-metrics.mjs:599` | `lib` and `lib/a.mjs` do not collide; globs compared as strings. Not sound | Replaced by the chosen meaning in the Work adapter (door plan) |
+| 2 | Containment, character cut | `overlaps`, `scripts/plan-contract-check.mjs:34`; `overlaps`, `packages/supervision/rust/src/portfolio.rs:200` | Cuts the entry at the first `*` character, not at a segment, and does not canonicalize: `lib/fo*` becomes `lib/fo`, which does not contain `lib/foo.mjs`; `./src` is not `lib`. Not sound. Both readers also delete every `*` before the rule sees it (`portfolio.rs:318`, `plan-contract-check.mjs:42`) | Replaced (door plan) |
 | 3 | Containment, segment cut | `fgos_write_scope::overlaps`; `writeScopesOverlap` | The chosen meaning | **Chosen** |
-| 4 | Regex glob | `pathsOverlap`, `src/report/capability-plan-lint.mjs:99` | Tests one entry as a regex against the other's text: `src/a*` and `src/*b` come out disjoint although `src/ab` matches both. Not sound | Replaced (door plan) |
+| 4 | Regex glob | `pathsOverlap`, `src/report/capability-plan-lint.mjs:99` | Tests one entry as a regex against the other's text: `lib/a*` and `lib/*b` come out disjoint although `lib/ab` matches both. Not sound | Replaced (door plan) |
 | 5 | Glob intersection | `globsMeet`, `src/runner/dispatch/write-scope.mjs:142` (built on `segmentsMeet`, line 111) | Segment-wise intersection of two patterns, used by propose and classify. Answers a different question (can two patterns name a file, plain entries as exact paths, not subtrees) | Recorded debt, not a target: allow-listed with a `retiredBy` by the door plan |
 
 The seven sites are: the Rust crate and the JS port (meaning 3, two sites), the plan-check script and the
@@ -216,7 +216,7 @@ error. The referee takes `truncated` as a fact and emits the blocking `facts-tru
 Git (`packages/git/rust/src/land.rs:286`, `scoped_commit.rs`), the Node addon
 (`packages/git/node-addon/src/git/write_scope.rs`) and the supervisor
 (`packages/supervision/rust/src/land.rs:463`, `Cargo.toml:10`). It has had no spec of its own and no row in
-`component-boundary.md`. The git spec already asked for a leaf: RUL84 says the lowest shared write-scope
+`component-boundary.md`. The git spec already asked for a leaf: RUL84 (one write-scope matcher) says the lowest shared write-scope
 leaf owns grammar, matcher and expansion, "may initially be a leaf module of the Git package but imports no
 operations or consumer" (`docs/platform/git/spec.md`, section 6). This plan keeps that rule and takes the
 step the sentence anticipated: its own directory and its own spec. The crate name `fgos-write-scope` and its
@@ -226,7 +226,7 @@ dependency-free status do not change.
 component only reads and compares spellings.
 
 **The JS port.** `src/runner/dispatch/write-scope.mjs` is a second implementation of the single-scope
-functions, not the thin facade that RUL84 asked for; the facade switch was never made. Until dispatch moves,
+functions, not the thin facade that RUL84 (one write-scope matcher) asked for; the facade switch was never made. Until dispatch moves,
 the port stays and is pinned to the Rust rule by `test/git/write-scope-parity.test.mjs`, which runs the
 golden suite `test/runner/write-scope.test.mjs` through the addon as well as through Node. Plan phase 3 adds
 whole-scope `overlaps` cases to that one golden suite so both sides run them; no second parity file exists.
