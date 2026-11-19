@@ -182,6 +182,7 @@ fn serve_with(
         cwd: dir.clone(),
         env: BTreeMap::from([("OUT".to_string(), dir.to_string_lossy().into_owned())]),
         verbs: verbs.iter().map(|v| v.to_string()).collect(),
+        role: "head:secretary-miu".to_string(),
         writes: GRANTED_WRITES.iter().map(|w| w.to_string()).collect(),
         verb_timeout: timeout,
         holds_role: Box::new(move || {
@@ -431,10 +432,17 @@ fn a_verb_the_envelope_does_not_grant_is_refused() {
     let served = granted("verb", DONE_LINE);
     let reply = ask(&served.socket, "land");
     assert_eq!(reply["code"], "verb-not-granted");
+    let detail = "land is not in the grant of head:secretary-miu (granted: session start)";
+    assert_eq!(
+        reply["detail"], detail,
+        "names the verb and the role: {reply}"
+    );
     assert!(!served.dir.join("argv").exists());
     assert_eq!(
         wait_for_log(&served, "refused"),
-        vec!["head-request r1 land refused verb-not-granted"]
+        vec![format!(
+            "head-request r1 land refused verb-not-granted: {detail}"
+        )]
     );
 }
 
@@ -1090,6 +1098,7 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_r
         cwd: dir.clone(),
         env: BTreeMap::new(),
         verbs: vec![BIND_VERB.to_string()],
+        role: role.to_string(),
         writes: Vec::new(),
         verb_timeout: Duration::from_secs(5),
         holds_role: Box::new(move || identity_holds(&r1, role, "att-bind", Some(&g1))),

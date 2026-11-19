@@ -132,6 +132,8 @@ pub struct Config {
     pub env: BTreeMap<String, String>,
     /// Verbs `envelope.session.verbs` allows.
     pub verbs: Vec<String>,
+    /// `envelope.session.role` (`head:<persona>-<name>`): named in the refusal of a verb its grant lacks.
+    pub role: String,
     /// Project-relative paths `envelope.session.writes` grants; [`WRITE_VERB`] writes only a regular file one names
     /// exactly, beneath `cwd`.
     pub writes: Vec<String>,
@@ -292,6 +294,7 @@ impl HeadRequests {
             cwd: cwd.clone(),
             env: step_env,
             verbs,
+            role: role.clone(),
             writes,
             verb_timeout: VERB_TIMEOUT,
             holds_role: Box::new({
@@ -1209,7 +1212,15 @@ fn decide(cfg: &Config, busy: &AtomicBool, request: &Request, peer: Option<u32>)
         }
     }
     if !cfg.verbs.contains(&request.verb) {
-        return refused("verb-not-granted");
+        return Outcome::Refused {
+            code: "verb-not-granted",
+            detail: Some(format!(
+                "{} is not in the grant of {} (granted: {})",
+                request.verb,
+                cfg.role,
+                cfg.verbs.join(", ")
+            )),
+        };
     }
     if request.verb == WRITE_VERB {
         if let Err(why) = (cfg.caller_under_gate)(peer) {

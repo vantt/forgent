@@ -14,7 +14,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { replaceDurably } from '../native/door.mjs';
 import { createSessionHost } from './client.mjs';
-import { grantOf } from './head-grants.mjs';
+import { grantOf, HEAD_PERSONAS } from './head-grants.mjs';
 import { planOfHead } from './head-plan.mjs';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
@@ -171,13 +171,19 @@ export function nextHeadGeneration(projectRoot, persona, name) {
   return gen;
 }
 
+/** The persona names with the ones that hold a head grant first: the refusal message is cut, and these are the ones the caller wanted. */
+export function personasHeadsFirst(names) {
+  const sorted = [...new Set(names)].sort();
+  return [...sorted.filter((name) => HEAD_PERSONAS.includes(name)), ...sorted.filter((name) => !HEAD_PERSONAS.includes(name))];
+}
+
 async function defaultPin({ persona, projectRoot }) {
   const { pinPersona, AgentNotFoundError, scanAgentTiers } = await import('../runner/agent-definitions.mjs');
   try {
     return pinPersona(persona, { projectRoot });
   } catch (err) {
     if (!(err instanceof AgentNotFoundError)) throw err;
-    const known = [...new Set(scanAgentTiers({ projectRoot }).flatMap((tier) => tier.entries.map((entry) => entry.name)))].sort();
+    const known = personasHeadsFirst(scanAgentTiers({ projectRoot }).flatMap((tier) => tier.entries.map((entry) => entry.name)));
     throw new HeadStartError('persona-not-found', `no persona named "${persona}"; known personas: ${known.join(', ') || '(none)'}`, { cause: err, known });
   }
 }

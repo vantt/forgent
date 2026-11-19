@@ -91,7 +91,7 @@ function refusalOf(verb, reply) {
   const wrapped = reply.code === 'verb-failed' && typeof reply.detail === 'string' && USE_CASE_CODE.test(reply.detail);
   const code = wrapped ? reply.detail : String(reply.code ?? 'refused');
   const why = typeof reply.message === 'string' && reply.message !== '' ? `: ${reply.message}` : '';
-  return new HeadRequestError(code, `${verb} was refused: ${reply.code ?? 'no code'}${reply.detail ? ` (${reply.detail})` : ''}${why}`, { detail: reply.detail ?? null, supervisorCode: reply.code ?? null, message: reply.message ?? null });
+  return new HeadRequestError(code, `${verb} was refused: ${reply.code ?? 'no code'}${reply.detail ? ` (${reply.detail})` : ''}${why}`, { detail: reply.detail ?? null, supervisorCode: reply.code ?? null, replyMessage: reply.message ?? null });
 }
 
 /**
