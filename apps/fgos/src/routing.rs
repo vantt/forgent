@@ -512,6 +512,7 @@ pub fn confined_head_call(cli_args: &[OsString]) -> Option<Result<ConfinedCall, 
         ("supervisor", Some("queue")) => "supervisor queue",
         ("supervisor", Some("plans")) => "supervisor plans",
         ("slots", _) => "slots",
+        ("questions", None | Some("list")) => "questions list",
         _ => return None,
     };
     let built = (|| -> Result<Value, String> {
@@ -629,6 +630,24 @@ pub fn confined_head_call(cli_args: &[OsString]) -> Option<Result<ConfinedCall, 
             }
             "supervisor queue" | "supervisor plans" | "slots" if !words.is_empty() => {
                 return Err(format!("bad-args: {verb} takes no arguments"));
+            }
+            "questions list" => {
+                // `questions` or `questions list`; the flags are the list's own (`--all`, `--answered`).
+                if !words.is_empty() {
+                    return Err("bad-args: questions list takes no arguments".to_owned());
+                }
+                let which = match (
+                    call.flags().flag("all").is_some(),
+                    call.flags().flag("answered").is_some(),
+                ) {
+                    (true, true) => {
+                        return Err("bad-args: --all and --answered exclude each other".to_owned())
+                    }
+                    (true, false) => "all",
+                    (false, true) => "answered",
+                    (false, false) => "open",
+                };
+                args.insert("which".to_owned(), json!(which));
             }
             _ => {}
         }
@@ -1134,6 +1153,33 @@ mod confined_tests {
             .unwrap()
             .unwrap_err();
         assert!(refused.starts_with("bad-args"), "{refused}");
+    }
+
+    #[test]
+    fn a_confined_questions_list_maps_its_which_flag_and_leaves_the_other_sub_commands_alone() {
+        for (words, which) in [
+            (&["questions"][..], "open"),
+            (&["questions", "--json"][..], "open"),
+            (&["questions", "list", "--json"][..], "open"),
+            (&["questions", "--answered", "--json"][..], "answered"),
+            (&["questions", "--all"][..], "all"),
+        ] {
+            assert_eq!(
+                built(words),
+                ConfinedCall {
+                    verb: "questions list",
+                    args: json!({ "which": which })
+                },
+                "{words:?}"
+            );
+        }
+        assert!(confined(&["questions", "--all", "--answered"])
+            .unwrap()
+            .is_err());
+        assert!(confined(&["questions", "list", "extra"]).unwrap().is_err());
+        for sub in ["ask", "ack", "cancel", "answer", "show"] {
+            assert!(confined(&["questions", sub, "q1"]).is_none(), "{sub}");
+        }
     }
 
     #[test]
