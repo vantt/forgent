@@ -22,6 +22,7 @@ fgos-process = { path = "../../process/rust" }
 fgos-config = { path = "../../config/rust" }
 fgos-durable-file = { path = "../../durable-file/rust" }
 fgos-holder-lock = { path = "../../holder-lock/rust" }
+fgos-identity = { path = "../../identity/rust", default-features = false }
 fgos-secrets = { path = "../../secrets/rust" }
 fgos-canonical-json = { path = "../../canonical-json/rust" }
 fgos-write-scope = { path = "../../write-scope" }
