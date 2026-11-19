@@ -37,9 +37,10 @@ VERIFIED/INFERENCE marks: [external-research.md](external-research.md) (round 0,
 
 ## 1. Trạng thái hiện tại
 
-Round 9 (2026-11-19, reopened on `shape/supervisor-review-2`). Round 8 adopted the standard vocabulary (§3 T-VOCAB).
-Round 9: owner chose A for the text switch (G8, provisional, feeds T5). Open: Q5 (G9), whether merging, now code in
-the domain-free supervision layer, moves behind a domain port with agents deciding; this reopens SR-D2/SR-D3.
+Round 10 (2026-11-19, reopened on `shape/supervisor-review-2`). Round 8 adopted the standard vocabulary (§3 T-VOCAB).
+Round 9: owner chose A for the text switch (G8, provisional, feeds T5). Round 10: owner chose A on Q5 (G9): integration
+has three layers (domain-free supervision with an integrate port, domain doctrine where agents decide, the domain door
+in code); §6 and T3/T5 regenerated. SR-D2/SR-D3 get superseded once G8/G9 hold another round.
 Still to raise: §3 issues 1 (T0-T5 backlog rows, via Miu), 2 (merge queue throughput), 4 (implicit decisions).
 
 Round 7 (2026-11-19), settled. The owner agreed to Q4: the cycle in §6, the L0-L3 ladder, and per-phase merging under
@@ -93,7 +94,7 @@ source). I = inference (my reasoning).
 | M5 | Responsibility ladder for a failed merge (draft). The refusal codes are the ones `packages/supervision/rust/src` emits today.<br>**L0 code heals itself:** `land-target-changed`, `land-retries-exhausted` and `land-remote-diverged` (re-fetch and retry), regeneration of a generated-file conflict, and `land-recovery-required` / `land-remote-outcome-unknown` (run `fgos git recover`, then retry once).<br>**L1 submitter fixes its own branch:** `land-conflict-aborted` (merge the trunk into the branch, never rebase), `land-gate-failed`, a rejected review verdict, `land-outside-footprint` / `footprint-change-refused`, `land-regenerate-failed`. Capped at N attempts.<br>**L2 supervisor (queue owner):** the cap is exceeded; the submitter is gone, or is a persona that cannot fix code (shaper, secretary); two branches conflict across plans; the trunk itself fails the gate (not the author's fault: freeze the queue and open a fix item); an item has sat unhandled for X ticks.<br>**L3 owner, only through a supervisor question:** project config (`land-gate-missing`, `land-target-unknown`), widening a footprint, a recover that fails, a trunk that stays red. | **open: Q4** | V: refusal codes (grep of `packages/supervision/rust/src`); `fgos-lead/SKILL.md:45-53` (today every refusal goes to the lead or the owner, with no L0 and no L2). I: the ladder |
 | M6 | Merge per phase or per plan. Per-phase merging is trunk-based development: small batches, branches that live short, and a main that stays green at every commit. Merging the plan at the end is a long-lived feature branch: main receives only finished work, at the cost of a large diff (review is weaker), conflicts with up to `maxLeads` = 4 parallel plans, and late integration. The owner's goal (main stays tidy) is right. Per phase has one real risk: a half-finished capability, or an old path left beside the new one, sits on main (L10). Live example: plan 1045 landed phases 1-18, yet `land-branch.sh` still lives beside `fgos land` (step 6 pending). Proposed middle: keep per-phase merging, and add three rules. (1) Each phase leaves main green and coherent. (2) The new capability stays dormant (not wired or enabled) until the plan's integration phase, which switches it on and removes the old path in the same change. (3) A withdrawn or parked plan does not close until its dormant code is finished or removed. | **open: Q4** | V: L9 (run ≠ merge ≠ durable, `platform-foundations.md:308`), L10; spec `config.maxLeads` 4; plan.md:120 and integration.md step 6. V (round 8): trunk-based development definition (trunkbaseddevelopment.com); I: the DORA/Accelerate finding that short-lived branches correlate with delivery performance. Terms: row T-VOCAB |
 | G8 | (owner: A, round 9, provisional) SR-D5's switch for text. Prose (skills, specs, AGENTS.md) takes effect when it lands, so it has no switch: text that describes new behaviour lands in the same phase that switches the behaviour on (the integration phase). Prior art: the Git lane built native ports unwired and switched callers and `docs/platform/git/spec.md` in one commit, 82ca7102a. The plan declares `toggles:` and `retires:` in its frontmatter; each toggle carries a marker naming the plan; the close check (§6 step 9) runs `rg` and raises `plan-close-blocked` while a marker or a retired path remains; `plan-contract-check` requires the integration phase to state what it switches on and what it removes ("none" allowed). The agent decides where; code checks that it kept its word. | owner: A (round 9) | V: 82ca7102a; L10 prose did not stop `land-branch.sh` staying beside `fgos land` (integration.md step 6). I: Fowler's toggle "time bombs" (not fetched) |
-| G9 | Merge is coding-domain mechanics inside the domain-free supervision layer. `packages/supervision/rust/src/land.rs` imports `fgos_git` and merges, gates and pushes; SR-D3 puts "code runs each merge" in the watcher tick. Plans and the portfolio are domain-free (domains/coding, domains/marketing, domains/council exist), and a marketing plan has no branch to merge. Owner (round 9): orchestration follows the portfolio and the plan, is domain-agnostic, and detailed work such as merging should be handled intelligently, not hard-coded. | **open: Q5** | V: land.rs:1-12; `ls domains`; spec header "Canonical for … the landing use case". Owner round 9 |
+| G9 | Merge is coding-domain mechanics inside the domain-free supervision layer. `packages/supervision/rust/src/land.rs` imports `fgos_git` and merges, gates and pushes; SR-D3 puts "code runs each merge" in the watcher tick. Plans and the portfolio are domain-free (domains/coding, domains/marketing, domains/council exist), and a marketing plan has no branch to merge. Owner (round 9): orchestration follows the portfolio and the plan, is domain-agnostic, and detailed work such as merging should be handled intelligently, not hard-coded. | owner: A (round 10, provisional): three layers, §6 | V: land.rs:1-12; `ls domains`; spec header "Canonical for … the landing use case". Owner round 9 |
 | T-VOCAB | Vocabulary for SR-D2..SR-D5, adopted by the owner (round 8) for use in plans and specs. **Trunk-based development** (merge per phase, short branches, one trunk). **Merge queue** (SR-D2/D3: code tests trunk + branch before it becomes trunk; the "Not Rocket Science Rule"). **Release toggle** (SR-D5's temporary off switch; Fowler: transitional, "should generally not stick around much longer than a week or two"). **Dark launch** (code on main but not switched on). **Parallel change / expand–migrate–contract** (SR-D5's integration phase: add the new path, move callers, remove the old path and the toggle); **branch by abstraction** when the replaced thing is a live mechanism. **Stale review dismissal** (SR-D2: a verdict bound to the SHA). **Escalation ladder** (SR-D4 L0-L3). **Restart intensity** (SR-D4 restart cap, OTP). | clear | V (fetched round 8): trunkbaseddevelopment.com ("a single branch called 'trunk'"); martinfowler.com/articles/feature-toggles.html (Release Toggles); martinfowler.com/bliki/ParallelChange.html ("also known as expand and contract"); docs.github.com managing-a-merge-queue ("ensuring the branch is never broken"; PRs grouped into a `merge_group` with the PRs ahead). I: Not Rocket Science Rule (graydon2.dreamwidth.org/1597.html returned 403), Fowler BranchByAbstraction, GitHub stale review dismissal, OTP restart intensity (not fetched) |
 | F4 | `event-store-end-trigger` faults are logged for verbs that succeed, which misled the window-1 diagnosis. | finding already in the tree | V: integration.md correction |
 
@@ -143,100 +144,98 @@ compare against.
   điều phối là theo portfolio và plan là chủ đạo và cũng là domain agnostic. nên công việc chi tiết như merge cũng nên
   được handle thông minh chứ không phải hard code". Scouted as G9; Q5 asked. This reopens SR-D2/SR-D3.
 
+- 2026-11-19 round 10, Q5 (three layers for integration). Owner: "A". G9 recorded as provisional; §6 regenerated with
+  the integrate port, review before submit, no merge loop in the watcher; T3 and T5 rewritten.
+
 ## 6. Thiết kế đã chốt {#design}
 
-**Settled (round 7): SR-D1..SR-D5.** Per SR-D5, phases merge one at a time. A plan's new capability stays dormant
-behind a temporary switch until its integration phase, which switches it on and removes the switch and the old path. Verb names marked *(new)* are placeholders for the plan to name. Today's verbs are `fgos land`,
-`fgos run` and `fgos request result`.
+**Settled: SR-D1, SR-D4, SR-D5. Provisional (round 9, owner A, awaiting a second round): G8 (switch for text) and G9
+(three layers for integration), which revise SR-D2/SR-D3.** Verb names marked *(new)* are placeholders for the plan to
+name. Today's verbs are `fgos land`, `fgos run` and `fgos request result`.
 
-### Cycle of one phase, from unit done to landed
+### Three layers of integration (G9)
+
+| Layer | Holds | Decides | Runs |
+|---|---|---|---|
+| Supervision (domain-free) | plan, phase, "a result to integrate", outcome events, the L0-L3 ladder, unowned-item detection | agents (lead, supervisor) | code keeps the state and raises events |
+| Domain doctrine (`domains/<d>/AGENTS.md` + the domain's skills) | what integration means in the domain: for coding, review → merge → gates; for another domain, e.g. approve → publish | the agent reads it and decides when to submit, whether and by whom to review, how to fix a conflict, the order between plans, when to escalate | — |
+| Domain door (coding: `fgos land`, Git ports) | the merge slot, the candidate, gates, push, publish, L0 self-heal | nothing beyond its refusals | code, because it must be exact |
+
+Supervision talks to the domain door through one port, "integrate this result" *(new)*. `land.rs` moves out of the
+supervision crate into the coding side behind that port (design principle 3). There is no merge loop in the watcher:
+ordering comes from the agents, and the target's merge slot already keeps one merge at a time.
+
+### Cycle of one coding phase, from unit done to landed
 
 1. **Unit done.** The lead's `fgos run --writes <footprint paths> --worktree <wt>` finishes on branch `<plan>/pNN`.
    The lead reads `fgos request result`. A failed or blocked unit is handled by the lead, as today.
-2. **Submit.** The lead submits the branch to the merge queue: `fgos land <branch>` becomes a submission *(changed)*.
-   It returns a ticket at once and records a `merge-submitted` event (branch, head SHA, plan, submitter role, tests the
-   phase names). The lead does not wait: it goes on with phases of the wave that do not depend on this one.
-3. **Queue picks it up** (code: the watcher tick or the door itself, one item at a time per target, in plan-priority
-   order).
-4. **Independent review.** If no verdict exists for this exact head SHA, the queue dispatches a read-only review unit
-   *(new)*. The unit runs on `git diff <trunk>...<branch>`, with the phase file as the spec, through an executor other
-   than the author unit's where one is available. The verdict is bound to the SHA, so a new push needs a new verdict.
-   A reject goes to L1 with its findings.
-5. **Land** (today's `fgos land` door, unchanged inside):
-   - fetch;
-   - prepare a merge candidate (trunk tip + branch) while holding the rank-20 merge slot;
-   - footprint check;
-   - regenerate generated files;
-   - `land.gates` plus the phase's tests;
-   - push the candidate to origin;
-   - fast-forward local main.
-
-   L0 failures (remote moved, generated-file conflict, crash needing recover) heal here without waking anyone.
-6. **Outcome event.** The result is either `merge-landed` (trunk SHA) or `merge-refused` (code and ladder level L1, L2
-   or L3).
-   - A busy lead sees the outcome through its own hooks or `request result`.
-   - An idle or gone lead is resumed by the supervisor, the same way an answered question resumes its asker.
-7. **Lead records it.** On `merge-landed` the lead sets the phase `done` in its phase table, a `--paths` land of its
-   own plan dir (grant-only paths; whether these skip review is open, see below). On `merge-refused` at L1 the lead
-   fixes the branch through another unit (for a conflict, merge the trunk into the branch, never rebase) and submits
-   again, at most N attempts. After that the item rises to L2.
+2. **Independent review (agent decision, per coding doctrine).** The lead has the diff `git diff <trunk>...<branch>`
+   reviewed against the phase file by a reviewer other than the author unit (another executor where one is available).
+   The verdict is bound to the head SHA; a new push needs a new verdict. Review runs in parallel with other phases, before
+   the branch reaches the merge slot.
+3. **Submit.** The lead calls the integrate port with the branch and its verdict. The coding adapter refuses a branch with
+   no verdict for its exact SHA, a diff outside the plan footprint or the submitter's grant, and red gates.
+4. **Land** (the `fgos land` door, unchanged inside): fetch; prepare the candidate (trunk tip + branch) under the rank-20
+   merge slot; footprint check; regenerate generated files; `land.gates` plus the phase's tests; push; fast-forward
+   local main. L0 failures (remote moved, generated-file conflict, crash needing recover) heal here.
+5. **Outcome event.** `integrated` (trunk SHA) or `integration-refused` (code and ladder level). A busy lead sees it in
+   its own result; an idle or gone lead is resumed by the supervisor, as an answered question resumes its asker.
+6. **Lead records it.** On success the lead sets the phase `done` (a `--paths` land of its plan dir). On an L1 refusal
+   it fixes the branch through another unit (for a conflict, merge the trunk into the branch, never rebase) and submits
+   again, at most N attempts; then the item rises to L2.
+7. **Branches with no plan** (a shaper branch, a fix branch, an ad-hoc `fgos run` result) are raised as events; the
+   supervisor takes them through steps 2-6 itself.
 
 ### End of the plan
 
-8. **Last phase landed.** The lead sets the plan `done` (a `--paths` land) and stops starting work. It never stops its
-   own session.
-9. **Close check, code first.** The flip to `done` raises `plan-done`. Before any LLM turn, code checks:
-   - every phase row is `done` or parked with a reason;
-   - no queue item of this plan is pending;
-   - every phase branch is an ancestor of the trunk;
-   - the plan's verify command, if it has one, passes on the trunk tip;
-   - the integration phase is done and its temporary switch is gone (SR-D5).
+8. **Integration phase.** It switches on what the plan kept dormant, lands the text that describes the new behaviour in
+   the same phase, removes every declared toggle and every retired path (G8).
+9. **Last phase landed.** The lead sets the plan `done` and stops starting work. It never stops its own session.
+10. **Close check, code first.** The flip to `done` raises `plan-done`. Before any LLM turn, code checks:
+    - every phase row is `done` or parked with a reason;
+    - no integration of this plan is pending;
+    - for coding, every phase branch is an ancestor of the trunk (a domain check through the port);
+    - the plan's verify command, if it has one, passes on the trunk tip;
+    - no marker of a toggle the plan declared in `toggles:` remains, and no path in `retires:` still exists (`rg`).
 
-   A failed check raises `plan-close-blocked`, which goes to L2.
-10. **Supervisor close (judgement).** The supervisor:
-    - reads the acceptance criteria against the evidence;
-    - writes one board line and a backlog update (`--paths` and `session write`);
-    - stops the lead (`fgos session stop lead`);
-    - has the plan's worktrees removed and its lanes released (they are kernel locks, freed when the seat ends).
+    A failed check raises `plan-close-blocked`, which goes to L2.
+11. **Supervisor close (judgement).** Reads the acceptance criteria against the evidence; writes one board line and a
+    backlog update; stops the lead (`fgos session stop lead`); has the plan's worktrees removed and lanes released. If
+    the evidence falls short, it reopens a phase or asks the owner (L3).
 
-    If the evidence does not meet the acceptance criteria, it reopens a phase or asks the owner (L3).
+### Who resolves a failure (SR-D4 ladder, now domain policy)
 
-### Who resolves a failure (M5 ladder)
-
-L0 code → L1 submitter (N attempts) → L2 supervisor (cap exceeded, submitter gone or unable to fix code, cross-plan
-conflict, red trunk freezes the queue, item stuck X ticks) → L3 owner, only through a supervisor question.
+L0 the domain door → L1 submitter (N attempts) → L2 supervisor (cap exceeded, submitter gone or unable to fix code,
+cross-plan conflict, red trunk freezes integration, item stuck X ticks) → L3 owner, only through a supervisor question.
+The levels are domain-free; which refusal falls on which level is written in the domain doctrine.
 
 ```mermaid
 sequenceDiagram
-  participant L as Lead
-  participant Q as Merge queue (code)
+  participant L as Lead (agent)
   participant R as Review unit
-  participant D as fgos land door
-  participant S as Supervisor (LLM)
-  L->>Q: submit branch (ticket)
-  Note over L: continues independent phases
-  Q->>R: review diff @SHA (if no verdict)
-  R-->>Q: verdict
-  alt reject
-    Q-->>L: merge-refused L1 (findings)
-  else approve
-    Q->>D: land (merge slot, gates, push, publish)
-    D-->>Q: landed / refused (L0 heals inside)
-    Q-->>L: merge-landed or merge-refused L1
-    Q-->>S: L2 events only (cap, gone, cross-plan, red trunk, stuck)
-  end
-  L->>L: phase done (--paths); last phase → plan done
-  Q->>Q: plan-done close check (code)
-  Q-->>S: plan-done / plan-close-blocked
+  participant P as Integrate port (supervision)
+  participant D as Coding door: fgos land
+  participant S as Supervisor (agent)
+  L->>R: review diff @SHA (coding doctrine)
+  R-->>L: verdict
+  L->>P: integrate(branch, verdict)
+  P->>D: land (merge slot, gates, push, publish; L0 heals inside)
+  D-->>P: landed / refused (level)
+  P-->>L: integrated or integration-refused L1
+  P-->>S: L2 events only (cap, gone, cross-plan, red trunk, stuck, orphan branch)
+  L->>L: phase done; integration phase removes toggles and old paths; plan done
+  P->>P: plan-done close check (code)
+  P-->>S: plan-done / plan-close-blocked
   S->>S: acceptance review, board + backlog, stop lead, clean worktrees
 ```
 
-Open inside this draft:
-- whether grant-only `--paths` lands (phase table, backlog) skip the review verdict;
+Open:
+- whether grant-only `--paths` lands skip the review verdict;
 - what session L2 starts to fix a branch whose submitter cannot fix code;
 - the values of N and X;
 - whether the lead may submit a dependent phase stacked on an unlanded one, or must wait;
-- reviewer independence when only one provider is available.
+- reviewer independence when only one provider is available;
+- the integrate port's contract, and where the coding adapter lives (Git crate or a coding crate).
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
@@ -262,12 +261,14 @@ T3 and T4 go together or in that order. T5 is independent.
   refuses the start with a named cause. This is window 2's planned owning proof, made general.
 - D-IDs: SR-D1. Verify: a sandbox test per persona (supervisor and lead first).
 
-### T3 Merge queue with independent review {#task-merge-queue}
-- Goal: `fgos land` becomes a submission to one queue, run by code. A review unit's verdict is bound to the SHA. Every
-  branch, including orphan ones, merges through it. `land-branch.sh` is retired in the same change (L10).
-- §6 steps 2-7. D-IDs: SR-D2, SR-D3. Sibling: T4.
-- Verify: `cargo test -p fgos-supervision` (queue, verdict binding, refusal without a verdict); a live merge of a
-  shaper branch.
+### T3 Integrate port and independent review {#task-merge-queue}
+- Goal: supervision gets a domain-free "integrate a result" port; `land.rs` moves to the coding side behind it. The
+  coding doctrine and the lead skill carry the review-before-submit rule; the adapter refuses a branch without a verdict
+  bound to its SHA. Branches with no plan reach the supervisor as events. `land-branch.sh` is retired in the same change
+  (L10).
+- §6 layers table and steps 2-7. D-IDs: SR-D2, SR-D3 (as revised by G9 once minted). Sibling: T4.
+- Verify: `cargo test` of the adapter (refusal without a verdict, verdict bound to SHA, footprint); the architecture test
+  proves the supervision crate no longer imports `fgos_git`; a live integration of a shaper branch.
 
 ### T4 Failure ladder and caps {#task-failure-ladder}
 - Goal: L0 self-heal (auto `git recover`), the L1 attempt cap N, L2 events (cap, gone, cross-plan, red trunk freezes the
@@ -275,11 +276,12 @@ T3 and T4 go together or in that order. T5 is independent.
 - D-IDs: SR-D4. Open: N, X, the L2 fixer session.
 - Verify: one owning test per ladder transition.
 
-### T5 Integration phase and dormant switch in the plan contract {#task-integration-phase}
-- Goal: `core/skills/_shared/plan-contract.md` requires an integration phase and a dormant switch removed in it, and
-  `plan-contract-check` checks it. The close check in code refuses a plan whose switch is still present or whose
-  dormant code is unfinished.
-- §6 steps 8-10. D-IDs: SR-D5.
+### T5 Integration phase, declared toggles and retirements {#task-integration-phase}
+- Goal: `core/skills/_shared/plan-contract.md` requires an integration phase that states what it switches on and what it
+  removes ("none" allowed), and frontmatter `toggles:` / `retires:`; `plan-contract-check` checks both. Text describing
+  new behaviour lands in the integration phase. The close check refuses a plan while a declared toggle marker or a
+  retired path remains.
+- §6 steps 8-10. D-IDs: SR-D5 (with G8 once minted).
 - Verify: `plan-contract-check` tests, plus a close-check test.
 
 ## Q1 {#Q1}
