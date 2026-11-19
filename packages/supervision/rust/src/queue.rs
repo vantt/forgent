@@ -21,6 +21,14 @@ const STREAM: &str = "project";
 const STALE: &str = "stale-view";
 const MAX_ATTEMPTS: usize = 8;
 
+/// The closed list of coordination event kinds a caller may raise.
+pub const COORDINATION_KINDS: [&str; 3] = [
+    "coordination-handoff",
+    "coordination-chore",
+    "coordination-help",
+];
+pub const CALLER_KINDS: [&str; 3] = COORDINATION_KINDS;
+
 /// A refusal with a fixed code (`event-unknown`, `store-unavailable`, `bad-event`) and its cause.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 #[error("{code}: {detail}")]
@@ -56,7 +64,64 @@ pub enum Raised {
 }
 
 impl RaisedEvent {
-    fn validate(&self) -> Result<(), QueueError> {
+    /// Build a coordination event for a caller from `kind`, `subject`, `reason`, `next_command`,
+    /// and the current instant (`iso_utc_now`), deriving `id` through `watcher::event_id`.
+    /// The kinds a caller may raise are `coordination-handoff`, `coordination-chore`, and
+    /// `coordination-help`. Any other kind is refused with `bad-event`.
+    pub fn coordination(
+        kind: &str,
+        subject: &str,
+        reason: &str,
+        next_command: &str,
+    ) -> Result<Self, QueueError> {
+        Self::coordination_at(kind, subject, reason, next_command, &iso_utc_now())
+    }
+
+    /// Build a coordination event at an explicit timestamp `ts`.
+    pub fn coordination_at(
+        kind: &str,
+        subject: &str,
+        reason: &str,
+        next_command: &str,
+        ts: &str,
+    ) -> Result<Self, QueueError> {
+        let bad = |detail: &str| QueueError {
+            code: "bad-event",
+            detail: detail.to_owned(),
+        };
+        if !COORDINATION_KINDS.contains(&kind) {
+            return Err(bad(&format!("unsupported coordination kind: {kind}")));
+        }
+        if subject.is_empty() {
+            return Err(bad("ref is empty"));
+        }
+        if ts.is_empty() {
+            return Err(bad("ts is empty"));
+        }
+        let id = crate::watcher::event_id(kind, subject, ts);
+        let event = Self {
+            id,
+            kind: kind.to_owned(),
+            subject: subject.to_owned(),
+            ts: ts.to_owned(),
+            reason: reason.to_owned(),
+            next_command: next_command.to_owned(),
+        };
+        event.validate()?;
+        Ok(event)
+    }
+
+    /// Alias for `coordination`: a caller-side constructor.
+    pub fn caller(
+        kind: &str,
+        subject: &str,
+        reason: &str,
+        next_command: &str,
+    ) -> Result<Self, QueueError> {
+        Self::coordination(kind, subject, reason, next_command)
+    }
+
+    pub fn validate(&self) -> Result<(), QueueError> {
         let bad = |detail: &str| QueueError {
             code: "bad-event",
             detail: detail.to_owned(),
@@ -69,6 +134,11 @@ impl RaisedEvent {
         }
         if !valid_id(&self.id) {
             return Err(bad("id is not 16 lowercase hex characters"));
+        }
+        if self.kind.starts_with("coordination-")
+            && !COORDINATION_KINDS.contains(&self.kind.as_str())
+        {
+            return Err(bad(&format!("unsupported coordination kind: {}", self.kind)));
         }
         Ok(())
     }
@@ -93,7 +163,7 @@ impl RaisedEvent {
     }
 }
 
-fn valid_id(id: &str) -> bool {
+pub fn valid_id(id: &str) -> bool {
     id.len() == 16
         && id
             .bytes()

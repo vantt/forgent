@@ -2,7 +2,8 @@
 //! The event queue over real clones: one Event Store per clone, peers joined through a bare remote.
 use fgos_event_store::layout::Layout;
 use fgos_git::{GitDriver, ResolveRepo};
-use fgos_supervision::queue::{Queue, Raised, RaisedEvent};
+use fgos_supervision::queue::{Queue, Raised, RaisedEvent, COORDINATION_KINDS};
+use fgos_supervision::watcher::event_id;
 use std::{
     fs,
     os::unix::fs::PermissionsExt,
@@ -321,5 +322,101 @@ fn two_overlapping_raises_of_one_id_append_one_new_and_one_duplicate() {
             1,
             "{results:?}"
         );
+    }
+}
+
+#[test]
+fn caller_coordination_event_id_derives_from_watcher_event_id() {
+    let ts = "2026-11-20T00:00:00.000Z";
+    let event = RaisedEvent::coordination_at(
+        "coordination-handoff",
+        "plan-alpha",
+        "handing off wave 1",
+        "fgos run wave-1",
+        ts,
+    )
+    .unwrap();
+    assert_eq!(
+        event.id,
+        event_id("coordination-handoff", "plan-alpha", ts)
+    );
+    assert_eq!(event.kind, "coordination-handoff");
+    assert_eq!(event.subject, "plan-alpha");
+    assert_eq!(event.ts, ts);
+    assert_eq!(event.reason, "handing off wave 1");
+    assert_eq!(event.next_command, "fgos run wave-1");
+
+    // Also verify the default instant constructor derives id identically
+    let live = RaisedEvent::coordination("coordination-chore", "item-x", "reason", "").unwrap();
+    assert_eq!(live.id, event_id(&live.kind, &live.subject, &live.ts));
+    assert!(!live.ts.is_empty());
+}
+
+#[test]
+fn caller_coordination_event_unknown_kind_is_refused_as_bad_event() {
+    let w = World::new();
+    let c = w.clone("a", "machine-aa");
+    let q = c.queue();
+
+    // Unknown kinds via constructor
+    for bad_kind in ["unknown-kind", "coordination-unknown", "lane-waiting", ""] {
+        let err = RaisedEvent::coordination(bad_kind, "item-1", "reason", "cmd").unwrap_err();
+        assert_eq!(err.code, "bad-event");
+    }
+
+    // Empty ref via constructor
+    let err = RaisedEvent::coordination("coordination-chore", "", "reason", "cmd").unwrap_err();
+    assert_eq!(err.code, "bad-event");
+
+    // Direct raise with an unregistered coordination kind is refused as bad-event
+    let bad_raised = RaisedEvent {
+        id: "00000000000000aa".into(),
+        kind: "coordination-unregistered".into(),
+        subject: "item-1".into(),
+        ts: "2026-11-20T00:00:00.000Z".into(),
+        reason: "reason".into(),
+        next_command: "cmd".into(),
+    };
+    let err = q.raise(bad_raised).unwrap_err();
+    assert_eq!(err.code, "bad-event");
+}
+
+#[test]
+fn caller_coordination_event_raise_once_raise_twice_and_handled_leaves_queue() {
+    let w = World::new();
+    let c = w.clone("a", "machine-aa");
+    let q = c.queue();
+
+    for kind in COORDINATION_KINDS {
+        let event = RaisedEvent::coordination_at(
+            kind,
+            &format!("subject-for-{kind}"),
+            "test coordination reason",
+            "fgos supervisor next",
+            "2026-11-20T01:00:00.000Z",
+        )
+        .unwrap();
+
+        // Raise once: returns Raised::New
+        assert_eq!(q.raise(event.clone()).unwrap(), Raised::New);
+        assert_eq!(q.unhandled_count().unwrap(), 1);
+
+        // Raise twice: returns Raised::Duplicate
+        assert_eq!(q.raise(event.clone()).unwrap(), Raised::Duplicate);
+        assert_eq!(q.unhandled_count().unwrap(), 1);
+
+        let unhandled = q.unhandled().unwrap();
+        assert_eq!(unhandled.len(), 1);
+        assert_eq!(unhandled[0].id, event.id);
+        assert_eq!(unhandled[0].kind, *kind);
+        assert_eq!(unhandled[0].subject, format!("subject-for-{kind}"));
+
+        // Handled event leaves the queue
+        assert_eq!(q.mark_handled(&[event.id.clone()], "supervisor").unwrap(), 1);
+        assert_eq!(q.unhandled_count().unwrap(), 0);
+        assert!(q.unhandled().unwrap().is_empty());
+
+        // Second mark_handled is a no-op
+        assert_eq!(q.mark_handled(&[event.id], "supervisor").unwrap(), 0);
     }
 }
