@@ -123,6 +123,19 @@ pub fn take_for(lock_root: &Path, envelope: &Value) -> Result<Lane, TakeError> {
     }
 }
 
+/// The part of the lane wait an armed envelope's deadlines include that a seat did not spend: the envelope
+/// carries `softAt` as if the whole wait were spent, so the supervisor takes this much back once it holds its
+/// lane. Zero for an unarmed pool or an envelope without `lanes`, which carry no wait in their deadlines.
+pub fn unused_wait(envelope: &Value, waited: Duration) -> Duration {
+    match config_of(envelope) {
+        Some(LaneConfig {
+            ceiling: Some(_),
+            wait_ms,
+        }) => Duration::from_millis(wait_ms).saturating_sub(waited),
+        _ => Duration::ZERO,
+    }
+}
+
 /// What adopt records when a live worker it re-owns finds the pool full: the worker is already running and is
 /// never ended for a lane.
 pub const POOL_OVER: &str = "lane-pool-over";

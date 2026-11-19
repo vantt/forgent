@@ -427,6 +427,13 @@ impl Watch {
         Some(Duration::from_nanos(at.saturating_sub(boottime_ns())))
     }
 
+    /// Take `unused` back from the soft deadline: the envelope counted a whole lane wait the seat did not spend.
+    fn give_back(&mut self, unused: Duration) {
+        if let Some((_, at)) = self.soft_at.as_mut() {
+            *at = at.saturating_sub(unused.as_nanos() as u64);
+        }
+    }
+
     fn soft_deadline_passed(&self) -> bool {
         self.soft_left().is_some_and(|left| left.is_zero())
     }
@@ -582,15 +589,21 @@ fn supervise(args: &SuperviseArgs, publisher: &WritePublisher) -> Result<i32, Re
         });
     }
     locks.complete(&envelope, &run_dir)?;
-    let watch = Watch::from(&envelope, &run_dir).map_err(|why| Refusal {
+    let mut watch = Watch::from(&envelope, &run_dir).map_err(|why| Refusal {
         exit: EXIT_ENVELOPE_INVALID,
         code: "envelope-invalid",
         why,
     })?;
     // A top-level worker seat holds one lane of the machine pool from here to the end of `supervise`; the
     // agent has exited by then. A head session and a nested dispatch carry no `lanes` and take none.
+    // The envelope's soft deadline counts the whole lane wait; only the time really waited stays in it. The hard
+    // ceiling is the gate's own backstop, read from the digest-sealed envelope, and keeps the whole wait.
+    let lane_asked = Instant::now();
     let _lane = match crate::lanes::take_for(&fgos_holder_lock::lock_root(), &envelope) {
-        Ok(lane) => lane,
+        Ok(lane) => {
+            watch.give_back(crate::lanes::unused_wait(&envelope, lane_asked.elapsed()));
+            lane
+        }
         Err(crate::lanes::TakeError::PoolFull(full)) => {
             return not_started(
                 &envelope,

@@ -320,3 +320,37 @@ fn the_adopt_door_takes_no_lane_for_a_worker_the_lock_admission_ended_and_a_full
     );
     drop(seat);
 }
+
+#[test]
+fn a_seat_gives_back_the_lane_wait_it_did_not_spend() {
+    let armed = json!({"lanes": {"ceiling": 4, "waitMs": 900_000}});
+    let ms = Duration::from_millis;
+    assert_eq!(
+        lanes::unused_wait(&armed, ms(0)),
+        ms(900_000),
+        "a free lane at once keeps the bare budget"
+    );
+    assert_eq!(
+        lanes::unused_wait(&armed, ms(30_000)),
+        ms(870_000),
+        "a waited lane keeps the time waited"
+    );
+    assert_eq!(lanes::unused_wait(&armed, ms(950_000)), ms(0));
+    let unarmed = json!({"lanes": {"ceiling": null, "waitMs": 900_000}});
+    assert_eq!(
+        lanes::unused_wait(&unarmed, ms(0)),
+        ms(0),
+        "an unarmed pool added no wait"
+    );
+    assert_eq!(
+        lanes::unused_wait(&json!({}), ms(0)),
+        ms(0),
+        "no lanes field added no wait"
+    );
+    let session = json!({"session": {"id": "s"}, "lanes": {"ceiling": 4, "waitMs": 900_000}});
+    assert_eq!(
+        lanes::unused_wait(&session, ms(0)),
+        ms(0),
+        "a session takes no lane"
+    );
+}
