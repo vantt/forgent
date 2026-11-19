@@ -495,3 +495,66 @@ fn a_project_file_cannot_set_what_runs_or_loosen_how_it_is_confined() {
         let _ = fs::remove_dir_all(&dir);
     }
 }
+
+const REGENERATE: [&str; 6] = [
+    "land:",
+    "  regenerate:",
+    "    run: node scripts/regen.mjs",
+    "    files:",
+    "      - packages/contracts/a.json",
+    "      - packages/contracts/b.json",
+];
+
+#[test]
+fn land_regenerate_comes_whole_from_the_trusted_root_so_a_worktree_without_it_still_reads() {
+    // The trusted main checkout states the entry; the linked worktree's own file has none.
+    let (snap, dir) = bundled_snapshot(
+        "regenerate-trusted",
+        json!({"main/.fgos/config.yaml": REGENERATE, "project/.fgos/config.yaml": ["gateBypass:", "  level: light"]}),
+    );
+    let snap =
+        snap.unwrap_or_else(|e| panic!("land.regenerate of the trusted root was refused: {e:?}"));
+    assert_eq!(
+        at(&snap.value, "land.regenerate.files"),
+        Some(&json!([
+            "packages/contracts/a.json",
+            "packages/contracts/b.json"
+        ]))
+    );
+    assert_eq!(
+        at(&snap.value, "land.regenerate.run"),
+        Some(&json!("node scripts/regen.mjs"))
+    );
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn land_regenerate_in_a_project_file_with_run_and_files_reads_and_one_without_files_is_refused() {
+    let (snap, dir) = bundled_snapshot(
+        "regenerate-project",
+        json!({"project/.fgos/config.yaml": REGENERATE}),
+    );
+    let snap =
+        snap.unwrap_or_else(|e| panic!("land.regenerate with run and files was refused: {e:?}"));
+    assert_eq!(
+        at(&snap.value, "land.regenerate.files")
+            .and_then(Value::as_array)
+            .map(Vec::len),
+        Some(2)
+    );
+    let _ = fs::remove_dir_all(&dir);
+    let (snap, dir) = bundled_snapshot(
+        "regenerate-no-files",
+        json!({"project/.fgos/config.yaml": ["land:", "  regenerate:", "    run: node scripts/regen.mjs"]}),
+    );
+    let Err(SnapshotError::Refused(found)) = snap else {
+        panic!("a regenerate without files was accepted")
+    };
+    assert!(
+        found
+            .iter()
+            .any(|r| r.path.as_deref() == Some("land.regenerate.files")),
+        "{found:?}"
+    );
+    let _ = fs::remove_dir_all(&dir);
+}
