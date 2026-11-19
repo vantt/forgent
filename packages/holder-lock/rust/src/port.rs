@@ -231,18 +231,30 @@ impl Handle {
         self.file.as_ref().expect("live handle owns its file")
     }
 
-    /// A second descriptor of the same open file description, for a caller that hands the lock to a child
-    /// (`&[&File]` of a supervisor start): the lock outlives this handle only while a duplicate is open. The
-    /// child must mark the descriptor close-on-exec before anything else, as the supervisor route does: a copy
-    /// that stays inheritable reads as a borrower, and the release of this handle ends it.
+    /// Moves an exclusive lock to a child: the returned `File` is the holder's own descriptor, to be passed to the
+    /// child's spawn as an inherited descriptor (the `&[&File]` of a supervisor start). The child marks it
+    /// close-on-exec before anything else, as the supervisor route does. The handle keeps nothing, so its drop
+    /// settles at once; dropping the returned `File` after the spawn leaves the child's copy as the last one,
+    /// and if the spawn fails that drop closes the last descriptor and the kernel frees the lock.
     ///
-    /// After handing a duplicate to a child, the parent drops its handle (the supervisor route does so through
-    /// `AttemptLocks::release_attempt`). Neither a drop nor [`release`] unlocks the description; both only close
-    /// this copy. An explicit unlock would end the child's lock too (flock state is per open file description),
-    /// so this crate never issues one on a holder's description. While the child's copy stays open, the close
-    /// waits out the kill wait and settles as `Stuck`.
-    pub fn try_clone_file(&self) -> io::Result<File> {
-        self.file().try_clone()
+    /// Nothing here unlocks the description: flock state is per open file description, so an explicit unlock
+    /// would end the child's lock too. A shared handle is refused (a second shared holder could still be in this
+    /// process), and so is every platform without `flock`, where a lock does not pass to a child with its handle;
+    /// a refused handle is released as by [`release`].
+    pub fn hand_over(mut self) -> io::Result<File> {
+        if self.mode != Mode::Ex {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "only an exclusive holder hands its lock over",
+            ));
+        }
+        if !cfg!(unix) {
+            return Err(io::Error::new(
+                io::ErrorKind::Unsupported,
+                "a lock passes to a child only where flock holds it",
+            ));
+        }
+        Ok(self.file.take().expect("live handle owns its file"))
     }
 
     fn settle_release(&mut self) -> Release {
