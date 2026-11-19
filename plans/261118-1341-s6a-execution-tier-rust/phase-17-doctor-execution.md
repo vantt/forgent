@@ -1,6 +1,6 @@
 # Phase 17: doctor rows, executor, accounts, run supervisor, terminal
 
-Wave 6. Depends on: 5, 9, 10, 11, 13b, 15. Effort 2.5d. Cut-over phase: run the re-sync step of the phase-lead rules
+Wave 6. Depends on: 5, 9, 10, 11, 11b, 13b, 15. Effort 2.5d. Cut-over phase: run the re-sync step of the phase-lead rules
 first (`src/setup`, `src/runner/agent-definitions.mjs`).
 
 ## Context
@@ -36,7 +36,7 @@ deleted row module. "person's agent config writes" (`:173`) has no Node reader d
 ## Requirements
 
 - Rust judges in `apps/fgos/src/wiring/doctor/{execution,run_supervisor,terminal}.rs` (extend S5's `execution.rs`)
-  over `fgos-execution` (executor model), engine `accounts`, `credentials`, `transport`, `contract` (prompt templates),
+  over `fgos-execution` (executor model), engine `accounts`, `credentials`, `transport`, `transport_round` (terminal inspection, 11b), `contract` (prompt templates),
   `fgos-run-supervisor::controller` (runtime dir, trust store, config), `fgos-terminal-control`; registry rows to
   `inRust`.
 - `agent-type-names-unique`: the host's agent listing (S5 `packages/execution/rust/src/agents.rs` +
@@ -46,9 +46,13 @@ deleted row module. "person's agent config writes" (`:173`) has no Node reader d
   `src/runner/agent-roster.mjs:13`, `scripts/project-agents.mjs:37`, and the tier-5 `run-request.mjs:12`,
   `unit-run-start.mjs:22`, `dispatch/assignment.mjs:48` until 20/21) keep the functions they use (phase 00 census
   decides; nothing they use is deleted).
-- `seat-binding-route` (P11): if phase 00 shows a Node caller of `src/seat-binding/client.mjs` remaining after phase
-  20, the row is judged in Rust by probing the route the client calls; else it is deleted with a "behaviour removed"
-  note and phase 20 deletes the client.
+- `seat-binding-route` (P11, decided by the plan lead in phase 0, 2026-11-19, from `reports/facts-part-b.md` §4): the
+  client keeps Node callers after phase 20 (the callers above tier 5 that bind through `bind.mjs` today,
+  `src/runner/loop.mjs:83`, `src/setup/seat-binding-checks.mjs:3`, `blind-steps-proven-pools.mjs:13`,
+  `src/session-host/head-start.mjs:121`, switch onto it in phase 20), so the row moves: it is judged in Rust by probing
+  the host seat-binding route the client calls (`apps/fgos/src/wiring/seat_binding.rs`), and the Node body
+  (`registrations.mjs:2253`) and its test (`test/seat-binding/route-doctor-check.test.mjs`) retire to that Rust owner.
+  Phase 20 keeps the client.
 - Delete the Node row modules and bodies; their tests retire to Rust owners; parity table grows to these rows.
 - The Node listing in `agent-definitions.mjs` imports `RunnerConfigError` from `src/runner/dispatch/runner-config-error.mjs`
   (`:21`); if the file survives this phase, that import switches in phase 20 with the other config callers.
@@ -56,8 +60,7 @@ deleted row module. "person's agent config writes" (`:173`) has no Node reader d
   (`bind.mjs`, `dry-bind.mjs`, `capability-config.mjs`, `patterns/catalog.mjs`, `shipped-catalog.mjs`), but their rows
   (`seat-binding-dry-bind`, `blind-steps-use-proven-pools`) are `bridge:S6b` on `main`, not S6a: they stay Node and
   are not touched here; their imports switch in phase 20 with the other Workflow-layer callers.
-- The measured-count proofs move by the 22 rows, `runtime-socket-dir`'s fix and `seat-binding-route` (moved or
-  deleted per P11).
+- The measured-count proofs move by the 22 rows, `runtime-socket-dir`'s fix and `seat-binding-route` (moved, P11).
 
 ## Steps
 

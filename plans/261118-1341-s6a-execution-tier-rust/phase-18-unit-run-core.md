@@ -1,6 +1,6 @@
 # Phase 18: unit run core and the admission peer protocol
 
-Wave 7. Depends on: 6b, 6c, 16b. Effort 2.5d. Library only (engine module `unit_run`). Citations re-read on
+Wave 7. Depends on: 6b, 6c, 16b. Effort 2.25d. Library only (engine module `unit_run`). Citations re-read on
 `f031ab0c8` (2026-11-19); since `b5b237534` `run.mjs`/`unit-run-start.mjs` changed only by the `.fgos` join door
 (`691255ad0`) and the writer-id change (`b7486e847`), no admission behaviour.
 
@@ -10,8 +10,9 @@ Wave 7. Depends on: 6b, 6c, 16b. Effort 2.5d. Library only (engine module `unit_
 `assertRepositoryForWrites`, `detectHerdrPresent`, `settleAdmission:217-233`), `unit-run-start.mjs` (516: admission and
 resume; `resolveBinding` on every standalone writing run, `requireFreeWorktree:199-205`), `unit-sync.mjs`, `custody-door.mjs`
 (`runUnderCustody`, `runVerify`, `custodyHeld`, `worktreeKey`, `worktreeAdminScope`), `commit-unit-work.mjs` (227,
-commit of declared `writes` through Git ScopedCommit), `partial-writes.mjs`, `dry-bind.mjs` (`simulateUnitBindings`),
-`unit-run-record.mjs` (`judgeUnitRun`, `removeUnitRun`, `unitRunFacts`), `unit-run-history.mjs`. The loops are pure in
+commit of declared `writes` through Git ScopedCommit), `partial-writes.mjs`,
+`unit-run-record.mjs` (`judgeUnitRun`, `removeUnitRun`, `unitRunFacts`), `unit-run-history.mjs`: 8 files, 2 298 lines on `f031ab0c8`. The bind facade (`bind.mjs`, `dry-bind.mjs`) is ported
+by phase 16 (`planning::bind_facade`); this module calls it. The loops are pure in
 `fgos-execution` (6b); this module runs their commands (launch a seat through 16b, verify, commit). The `CaseAdmission`
 trait (6b) gets its one S6a adapter here: the admission peer (P13, P17).
 
@@ -29,7 +30,11 @@ trait (6b) gets its one S6a adapter here: the admission peer (P13, P17).
   Windows (pipes only).
 - Contract file `packages/execution/contracts/admission-peer/admission-peer.v1.json` (message shapes, framing prefix,
   vectors) and the `run-unit` request and result schema from phase 00 §3 (every `runUnit` option Workflow and Work pass,
-  the result shape, and error classes such as `custody-predecessor-unknown` carried as `errorClass`).
+  the result shape, and error classes such as `custody-predecessor-unknown` carried as `errorClass`). An error result
+  also carries an error type tag naming the Node error class a caller branches on with `instanceof`
+  (`CaseAdmissionRefusedError`, `src/workflow/runner.mjs:277`; `RunnerConfigError`, `src/runner/work-dispatch.mjs:297`;
+  facts-part-b §3 C) with that class's fields (`code`, message, refusal details), so phase 19's door rethrows an
+  instance (P14). Vectors cover one result per tag.
 - The port is asked only where Node asks it today (phase 00 §3); a run that never asks opens no channel.
 - Records (F6, F12, F13): the unit-run record (`unit.json`), the run control ledger and provenance under
   `.fgos/assignments/<unitRunId>/` stay byte-compatible with Node's, so (a) 6c's `run_facts` judges them unchanged

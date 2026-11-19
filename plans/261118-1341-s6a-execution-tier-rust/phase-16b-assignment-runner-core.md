@@ -1,6 +1,6 @@
 # Phase 16b: assignment runner
 
-Wave 6. Depends on: 7b, 8b, 10, 11, 13b, 14, 16; plan 1045 phase 6 on `main` (met). Effort 2.5d. Library only (engine
+Wave 6. Depends on: 7b, 8b, 10, 11, 11b, 13b, 14, 16; plan 1045 phase 6 on `main` (met). Effort 2.5d. Library only (engine
 module `assignment_runner`). Split from the old phase 16.
 
 ## Context

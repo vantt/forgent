@@ -14,7 +14,7 @@ editing it. If a fact moved, stop and report to the plan lead with the new `file
 
 - S5 (`261115-2328`) phases 11 and 12 and the worktree-door plan (`261118-1455-s6a-worktree-door`) are on `main`
   (whole plan, `blockedBy`).
-- Plan 1045 phase 6 is on `main` before phases 5, 11, 16b, 19 start (D4). It is a phase-level landing of 1045 that
+- Plan 1045 phase 6 is on `main` before phases 5, 11, 11b, 16b, 19 start (D4). It is a phase-level landing of 1045 that
   does not wait for 1045 `ready` (1045 P3, P5, P8 landed while that plan was `draft`). Met on `f031ab0c8`: 1045
   phases 1-18 are `done` (lane pool `47165e3bf`, lane-wait fix `2dbabb340`); only 1045 phase 19 (integration docs, live
   run) is open. Read its board row first.
