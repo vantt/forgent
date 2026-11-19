@@ -314,29 +314,14 @@ pub fn redacted_reference(attestation: &Value) -> Result<Value, DriverError> {
     }))
 }
 
-fn hex(bytes: &[u8]) -> String {
+pub(super) fn hex(bytes: &[u8]) -> String {
     bytes.iter().map(|b| format!("{b:02x}")).collect()
 }
 
 /// `new Date(ms).toISOString()`.
 fn iso(ms: i64) -> String {
-    let (days, rem) = (ms.div_euclid(86_400_000), ms.rem_euclid(86_400_000));
-    let z = days + 719_468;
-    let era = z.div_euclid(146_097);
-    let doe = z.rem_euclid(146_097);
-    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
-    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
-    let mp = (5 * doy + 2) / 153;
-    let day = doy - (153 * mp + 2) / 5 + 1;
-    let month = if mp < 10 { mp + 3 } else { mp - 9 };
-    let year = yoe + era * 400 + i64::from(month <= 2);
-    format!(
-        "{year:04}-{month:02}-{day:02}T{:02}:{:02}:{:02}.{:03}Z",
-        rem / 3_600_000,
-        rem / 60_000 % 60,
-        rem / 1000 % 60,
-        rem % 1000
-    )
+    fgos_host_runtime::civil_time::format_unix_millis_rfc3339(ms, 0)
+        .expect("a zero offset always formats")
 }
 
 /// The cache of passed falsification probes, in memory and in the store, keyed by the probe's fingerprint.

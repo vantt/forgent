@@ -6,7 +6,7 @@
 //! guarantee; the one narrow exception is provisioning a selected account's login files into a private home, which
 //! grants nothing away and is not a confinement control. Inherited file descriptors are closed inside the sandbox.
 
-use super::attestation::assert_store_isolated;
+use super::attestation::{assert_store_isolated, hex};
 use super::contract::{Assessment, BackendDriver, Mismatch, Prepared};
 use super::ports::{Credentials, EnvFn, PrivateHomeHost, ResourceResolver};
 use super::{js, DriverError, ErrorKind};
@@ -303,11 +303,7 @@ pub fn launch_digest(
 ) -> String {
     let value = json!({ "bwrapPrefix": bwrap_prefix, "gateCommand": gate_command, "agentArgv": agent_argv });
     let text = canonical_json(&value).expect("argv strings are finite JSON");
-    let hex: String = Sha256::digest(text.as_bytes())
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect();
-    format!("sha256:{hex}")
+    format!("sha256:{}", hex(&Sha256::digest(text.as_bytes())))
 }
 
 /// The local bwrap driver: its ports are the resource resolver (confinement policy), the private-home records
@@ -1159,8 +1155,13 @@ fn run_smoke(binary: &str, path_env: &str) -> SmokeResult {
         passed: false,
         message: format!("{binary} is unavailable or failed smoke test: {why}"),
     };
-    let Some(program) = fgos_process::spawn::resolve_program(binary, path_env, "", cfg!(windows))
-    else {
+    // A bare name is looked up in `path_env`, with the process PATHEXT on Windows, as a spawn by name would.
+    let Some(program) = fgos_process::spawn::resolve_program(
+        binary,
+        path_env,
+        &std::env::var("PATHEXT").unwrap_or_default(),
+        cfg!(windows),
+    ) else {
         return failed(format!("{binary}: not found on PATH"));
     };
     match fgos_process::spawn::run_bounded(
