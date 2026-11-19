@@ -161,5 +161,9 @@ Dated 2026-11-18, from [the plan](../../../plans/261118-1045-project-supervisor/
 - PS-22: pace definitions are never raised; doctor row `supervision-pace` reads them, because a stopped watcher cannot report itself.
 - PS-23: one planner starter per settled discussion, the supervisor; the secretary hands over by reporting.
 - PS-24: owner answer Q1 = (A): the lead's sandbox writes only its plan dir; the plan's footprint bounds `run --writes` and the branch diff of `land`. The plan first waited on Q1; the owner answered it the same day.
+- PS-20 (delivery, 2026-11-19): the confined door moved into the Rust `head_client` through one host arm, following the `questions` precedent; `apps/fgos/src/wiring/questions.rs` still keys its confined routing on the socket variable and is a known follow-up.
+- `run` through the request socket takes no `unit`: a unit file written by a sandboxed head cannot be bound by the supervisor, so only `--writes` runs are served.
+- The commit-time footprint check reads only the frontmatter footprint of the tree being committed, before the push.
+- The supervisor grant holds `session write` for its own backlog file, so a confined supervisor edits it through its supervisor and not through a shell.
 
 Three deliberate departures from the settled wording, reported to the owner: the landing door serialises through the Git Land port's merge slot instead of a `land` holder-lock (PS-2); the supervisor singleton is an Identity role instead of a holder-lock (PS-8); the supervisor, which the settled design says never lands, lands portfolio edits with `land --paths` only, never code (PS-6, PS-14). Item 4 of the settled design (the plan's footprint as sandbox writes) was amended by Q1 (PS-24).
