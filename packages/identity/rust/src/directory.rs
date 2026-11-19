@@ -1615,7 +1615,9 @@ impl Hit<'_> {
 /// with a bounded wait: a role take stores the new holder and then strips the old one while holding that lock, so a
 /// scan between the two writes sees two holders that the rescan, taken after the take finished, sees as one. Still
 /// `ambiguous` under the lock is real, and so is returned; a lock that stays busy returns the first answer. An
-/// ambiguity among shared (other machines') sessions only is returned without taking the lock.
+/// ambiguity among shared (other machines') sessions only is returned without taking the lock. Never call `resolve`
+/// while this process holds the `identity-directory` lock: the rescan's flock on a second descriptor would wait out
+/// the bound and fall back to the first answer.
 pub fn resolve(
     root: &Path,
     query: &str,
