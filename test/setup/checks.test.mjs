@@ -45,48 +45,25 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, with no repo
   assert.deepEqual(
     DOCTOR_CHECKS.map((c) => c.id).sort(),
     [
-      'provider-capacity-state',
-      'run-supervisor-route',
-      'runtime-socket-dir',
-      'run-attempts-stuck',
-      'run-supervisor-config',
       'root-drift',
       'work-classification-vocabulary',
       'work-step-vocabulary',
       'work-recorded-conflicts',
       'delivered-not-on-trunk',
-      'seat-binding-route',
       'worker-slots-ceiling-usable',
       'workflow-capabilities-configured',
       'workflow-case-binding-sentinel',
       'workflow-case-bindings',
-      'agent-type-names-unique',
       'domain-registry-compiled',
       // Phase 01 group D: the three preconditions for an interactive dispatch.
-      'terminal-control',
-      'terminal-allocations',
-      'trust-store-readable',
       // Phase 07 (herdr-trust-supervisor R3): codex-toml/agy trust stores had
       // no doctor coverage at all -- only claude-json's default path did.
-      'non-claude-trust-stores-readable',
-      'confined-pane-accounts',
-      'agent-cli-project-trusted',
       'seat-binding-dry-bind',
       'blind-steps-use-proven-pools',
-      'herdr-executor-kinds',
       // Phase 06 (executor-policy-dispatch-seams): legacy policy-shaped
       // executor/capability warnings, named with their migration target.
-      'executor-profile-warnings',
-      'session-keep-declared',
       // Phase 09: rust-host-r1-kernel release tree builder and doctor.
-      'operation-prompt-templates-valid',
       'runner-patterns-config',
-      'executor-family-unique',
-      'executor-skills-installed',
-      'tier-fallback',
-      'model-policy-pools',
-      'llm-accounts-shape',
-      'llm-accounts-default-login-home',
     ].sort(),
   );
 });
@@ -406,41 +383,6 @@ test('work-step-vocabulary lists every violating id, not just the first', () => 
   assert.match(message, /bad-one/);
   assert.match(message, /bad-two/);
   fs.rmSync(dir, { recursive: true, force: true });
-});
-
-test('provider-capacity-state doctor check reports quarantine without clearing it', () => {
-  const homeDir = mkTemp('doctor-provider-capacity-home-');
-  const cwd = mkTemp('doctor-provider-capacity-cwd-');
-  const fgosHome = path.join(homeDir, '.fgos');
-  fs.mkdirSync(fgosHome, { recursive: true });
-  writeAccountsFile(fgosHome, { llmAccounts: { openai: { tetnu: { label: 'Tetnu', credentialStore: { codex: path.join(homeDir, 'codex-tetnu') } } } } });
-  const stateDir = path.join(fgosHome, 'runtime', 'provider-capacity');
-  fs.mkdirSync(stateDir, { recursive: true });
-  const statePath = path.join(stateDir, 'state.json');
-  fs.writeFileSync(statePath, JSON.stringify({
-    contract: 'provider-capacity-state.v1',
-    providers: {
-      'openai-codex': {
-        accounts: {
-          tetnu: {
-            quarantine: { reasonCode: 'auth-token', kind: 'manual-clear', quarantinedAt: '2026-09-16T00:00:00.000Z' },
-            leases: {},
-          },
-        },
-      },
-    },
-    assignments: {},
-    audit: [],
-  }, null, 2));
-  withHome(homeDir, () => {
-    const { passed, message } = checkById('provider-capacity-state').check(cwd);
-    assert.equal(passed, false);
-    assert.match(message, /auth-token:manual-clear/);
-    const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-    assert.equal(state.providers['openai-codex'].accounts.tetnu.quarantine.reasonCode, 'auth-token');
-  });
-  fs.rmSync(homeDir, { recursive: true, force: true });
-  fs.rmSync(cwd, { recursive: true, force: true });
 });
 
 // ─── main-checkout-hook-wired (tsk-3w8): str65's main-checkout lock only ───

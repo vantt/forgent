@@ -18,7 +18,7 @@ import { findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainW
 import { writeGlobalConfig, writeProjectConfig, writeRawLegacyProjectConfig } from '../helpers/config-fixture.mjs';
 
 import { nativeDoor } from '../../src/native/door.mjs';
-import { allAgentYamlFiles, checkAgentClaimsResolve, checkAgentTypeNamesUnique, readAgentSkills } from '../../src/setup/registrations.mjs';
+import { allAgentYamlFiles, checkAgentClaimsResolve, readAgentSkills } from '../../src/setup/registrations.mjs';
 
 // The claude-plugin-marketplace row runs the `claude` CLI when it is on PATH.
 // FGOS_CLAUDE_COMMAND (the row's test-only seam, mirroring bin/fgos.mjs's
@@ -71,7 +71,7 @@ test('a new module can register a check via registrations.mjs and see it in chec
 
 test('registering a check with a duplicate id throws rather than silently shadowing the original', () => {
   assert.throws(
-    () => registerCheck({ id: 'tier-fallback', description: 'dup', check: () => ({ passed: true, message: '' }) }),
+    () => registerCheck({ id: 'root-drift', description: 'dup', check: () => ({ passed: true, message: '' }) }),
     /already registered/,
   );
 });
@@ -161,54 +161,6 @@ test('task-spec and workflow-operation checks still fail when the install root l
     assert.match(coverage.message, /not found/);
   } finally {
     fs.rmSync(emptyRoot, { recursive: true, force: true });
-  }
-});
-
-test('agent-type-names-unique doctor check fails on a duplicate within one tier and accepts a higher tier replacing a lower one', () => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-unique-test-'));
-  try {
-    const write = (rel, name) => {
-      fs.mkdirSync(path.join(tempDir, path.dirname(rel)), { recursive: true });
-      fs.writeFileSync(path.join(tempDir, rel), `name: ${name}\ndescription: a persona\n`);
-    };
-    // The fixture directory is both the project and the installed payload whose domains are read.
-    const check = () => checkAgentTypeNamesUnique(tempDir, { projectTiersOnly: true, installRoot: tempDir });
-
-    // A name in core, a domain and the workspace is three tiers replacing one another, not a duplicate.
-    write('core/agents/dup-agent.yaml', 'dup-agent');
-    write('domains/coding/agents/dup-agent.yaml', 'dup-agent');
-    write('fgos/agents/dup-agent.yaml', 'dup-agent');
-    const shadowing = check();
-    assert.equal(shadowing.passed, true, shadowing.message);
-    assert.match(shadowing.message, /dup-agent \(replaces domains\/coding\/agents\/dup-agent\.yaml\)/);
-
-    // The same name in two domains is one tier defining it twice.
-    write('domains/finance/agents/dup-agent.yaml', 'dup-agent');
-    const sameTier = check();
-    assert.equal(sameTier.passed, false);
-    assert.match(sameTier.message, /duplicate agent-type name "dup-agent" in domains\/\*\/agents/);
-    assert.match(sameTier.message, /domains\/coding\/agents\/dup-agent\.yaml, domains\/finance\/agents\/dup-agent\.yaml/);
-  } finally {
-    fs.rmSync(tempDir, { recursive: true, force: true });
-  }
-});
-
-test('agent-type-names-unique doctor check reports a workspace definition with the wrong shape or extension', () => {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-shape-test-'));
-  try {
-    const dir = path.join(tempDir, 'fgos', 'agents');
-    fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(path.join(dir, 'wrong-name.yaml'), 'name: other\ndescription: a persona\n');
-    fs.writeFileSync(path.join(dir, 'no-description.yaml'), 'name: no-description\n');
-    fs.writeFileSync(path.join(dir, 'typo.yml'), 'name: typo\ndescription: a persona\n');
-    const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
-    const result = entry.check(tempDir);
-    assert.equal(result.passed, false);
-    assert.match(result.message, /fgos\/agents\/wrong-name\.yaml: must declare name: wrong-name/);
-    assert.match(result.message, /fgos\/agents\/no-description\.yaml: must declare a non-empty description/);
-    assert.match(result.message, /fgos\/agents\/typo\.yml is ignored: only \.yaml files are read/);
-  } finally {
-    fs.rmSync(tempDir, { recursive: true, force: true });
   }
 });
 
@@ -1174,14 +1126,36 @@ test('the order the bodies register in is the order the registry runs them in', 
   assert.deepEqual(REGISTERED_FIX_IDS, fixes.map((fix) => fix.id).filter((id) => !FIXES_RUN_IN_RUST.includes(id)));
 });
 
-test('the registry gives 80 rows and 28 fixes to Rust and 37 rows and 2 fixes to the bridge, as measured', () => {
+test('the registry gives 103 rows and 29 fixes to Rust and 13 rows and 1 fix to the bridge, as measured', () => {
   const { rows, fixes } = registryEntries();
   const bridged = (list) => list.filter((entry) => entry.owner.startsWith('bridge:'));
   const byStep = (step) => bridged(rows).filter((row) => row.owner === `bridge:${step}`).length;
-  assert.deepEqual(['S6a', 'S6b', 'S7'].map(byStep), [23, 6, 7]);
-  assert.equal(rows.length - bridged(rows).length, 80);
-  assert.equal(bridged(fixes).length, 2);
-  assert.equal(fixes.length - bridged(fixes).length, 28);
+  assert.deepEqual(['S6a', 'S6b', 'S7'].map(byStep), [0, 6, 7]);
+  assert.equal(rows.length - bridged(rows).length, 103);
+  assert.equal(bridged(fixes).length, 1);
+  assert.equal(fixes.length - bridged(fixes).length, 29);
+});
+
+// A body whose helper was deleted with another row (a ReferenceError, a missing import) fails only when it runs, and
+// the bridge reports a thrown body as that row's failure, so nothing else notices. Every body Node still has runs
+// here once, in a plain project, and must return a verdict instead of throwing.
+test('every row body Node still registers runs in a plain project and returns a verdict without throwing', async () => {
+  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-node-rows-'));
+  try {
+    execFileSync('git', ['init', '-q'], { cwd: project });
+    const thrown = [];
+    for (const { id, check } of DOCTOR_CHECKS.filter((entry) => REGISTERED_CHECK_IDS.includes(entry.id))) {
+      try {
+        const result = await check(project);
+        if (typeof result?.passed !== 'boolean') thrown.push(`${id}: returned no verdict`);
+      } catch (error) {
+        thrown.push(`${id}: ${error?.name}: ${error?.message}`);
+      }
+    }
+    assert.deepEqual(thrown, []);
+  } finally {
+    fs.rmSync(project, { recursive: true, force: true });
+  }
 });
 
 test('an owner is rust:<component> or bridge:<step>, and a bridged one names the step that removes it', () => {

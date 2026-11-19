@@ -98,7 +98,30 @@
       "confinement-probe-freshness",
       "confinement-blind-read",
       "confinement-strict-readiness",
-      "confinement-herdr-maturity"
+      "confinement-herdr-maturity",
+      "executor-family-unique",
+      "executor-skills-installed",
+      "tier-fallback",
+      "model-policy-pools",
+      "llm-accounts-shape",
+      "llm-accounts-default-login-home",
+      "agent-type-names-unique",
+      "provider-capacity-state",
+      "run-supervisor-route",
+      "runtime-socket-dir",
+      "run-attempts-stuck",
+      "run-supervisor-config",
+      "operation-prompt-templates-valid",
+      "terminal-control",
+      "terminal-allocations",
+      "herdr-executor-kinds",
+      "executor-profile-warnings",
+      "session-keep-declared",
+      "trust-store-readable",
+      "confined-pane-accounts",
+      "non-claude-trust-stores-readable",
+      "agent-cli-project-trusted",
+      "seat-binding-route"
     ],
     "fixes": [
       "lock-dirs",
@@ -128,7 +151,8 @@
       "bin-discovery-cache",
       "confinement-backend-registry-readable",
       "confinement-orphaned-resources-reaped",
-      "credential-copies-retained"
+      "credential-copies-retained",
+      "runtime-socket-dir"
     ]
   },
   "layers": {
@@ -202,60 +226,32 @@
     {
       "id": "executor-family-unique",
       "description": "each agent family (providerModel) is served by exactly one executor; its transports are invocations of that executor",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/config.mjs",
-        "src/runner/dispatch/provider-adapter.mjs",
-        "src/runner/dispatch/tier-cell.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "executor-skills-installed",
       "description": "every skill an executor declares in supports.skills exists in the skill directory of each CLI the executor invokes, in the main checkout; fails naming the missing path",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/config.mjs",
-        "src/runner/dispatch/provider-adapter.mjs",
-        "src/runner/dispatch/tier-cell.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "tier-fallback",
       "description": "every family runner.tierFallback lists for a tier has a modelPolicies cell at that tier and an agent executor; warns otherwise",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/config.mjs",
-        "src/runner/dispatch/provider-adapter.mjs",
-        "src/runner/dispatch/tier-cell.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "model-policy-pools",
       "description": "every pool a runner.modelPolicies cell names (model@pool) is declared in runner.llmAccounts, since a pool with no account is skipped by the walk; warns otherwise",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/config.mjs",
-        "src/runner/dispatch/provider-adapter.mjs",
-        "src/runner/dispatch/tier-cell.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "llm-accounts-shape",
       "description": "runner.llmAccounts is global-only and well formed: pool names without \"@\" or a family alias, every account with a credentialStore directory per CLI",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/config.mjs",
-        "src/runner/dispatch/provider-adapter.mjs",
-        "src/runner/dispatch/tier-cell.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "llm-accounts-default-login-home",
       "description": "warns when a runner.llmAccounts credentialStore is its CLI's own default login home (a pane renewing a copy of that login can log out the real sessions); never fails, no fix",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/llm-accounts.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "domain-registry-compiled",
@@ -269,12 +265,7 @@
     {
       "id": "agent-type-names-unique",
       "description": "agent definition names are unique in the project's own tiers (the workspace tier, and the core tier when the project ships one); a higher tier replaces a lower one whole, and workspace-tier files have the shape the renderer needs; the installed fgOS's own domain and core tiers are judged by npm test",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/agent-definitions.mjs",
-        "src/runner/dispatch/assignment-layout.mjs",
-        "src/runner/agent-listing.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "main-checkout-hook-wired",
@@ -383,10 +374,7 @@
     {
       "id": "provider-capacity-state",
       "description": "provider-capacity account leases/quarantine state is reportable; doctor never auto-clears quarantine",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/provider-capacity.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "lock-kernel-semantics",
@@ -407,43 +395,23 @@
     {
       "id": "run-supervisor-route",
       "description": "the host binary serves supervise, gate, adopt and attempt-step at protocol 1 and names the containment driver agents run in and its level (kernel or best-effort)",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/run-supervisor/protocol.mjs",
-        "src/run-supervisor/runtime-dir.mjs",
-        "src/run-supervisor/client.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "runtime-socket-dir",
       "description": "the runtime socket directory exists, is owned by this user and is 0700",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/run-supervisor/protocol.mjs",
-        "src/run-supervisor/runtime-dir.mjs",
-        "src/run-supervisor/client.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "run-attempts-stuck",
       "description": "read-only pointer: attempts with no closed.json and no lock holder, an attempt whose release was removed named with what to restore; the next fgos run adopts them, or run fgos dispatch recover (a warning, never a failure)",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/run-supervisor/protocol.mjs",
-        "src/run-supervisor/runtime-dir.mjs",
-        "src/run-supervisor/client.mjs"
-      ],
+      "owner": "rust:execution",
       "pointer": true
     },
     {
       "id": "run-supervisor-config",
       "description": "dispatch.gateKillGraceMs and dispatch.cancelWaitMs read through the config door (each at least 1000 ms) and the cancel wait is not shorter than the grace",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/run-supervisor/protocol.mjs",
-        "src/run-supervisor/runtime-dir.mjs",
-        "src/run-supervisor/client.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "mailbox-hook",
@@ -521,26 +489,17 @@
     {
       "id": "operation-prompt-templates-valid",
       "description": "every operation prompt template in the project tier (.fgos/prompt-templates) validates against bounded variables and schema; the release's domain and core templates are judged by npm test",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/operation-prompt-templates.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "terminal-control",
       "description": "the terminal-control driver (herdr) answers, which capabilities it declares and which server it talks to, and terminal.* after the config merge with each value and its source; a bad FGOS_HERDR_ANCHOR_PANE or terminal.* value fails, a missing herdr only warns",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/transport.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "terminal-allocations",
       "description": "terminal slots past allocationGraceMs that never launched and retained panes past their time; reports only, closes nothing",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/transport.mjs"
-      ],
+      "owner": "rust:execution",
       "pointer": true
     },
     {
@@ -551,67 +510,38 @@
     {
       "id": "herdr-executor-kinds",
       "description": "every executor dispatched through a herdr pane names an agent kind herdr can start, and none depends on an outdated herdr integration hook",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/transport.mjs",
-        "src/runner/dispatch/config.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "executor-profile-warnings",
       "description": "legacy executor entries hardcoding policy-shaped flags or account-pool-like env, each named with its documented migration target",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/config.mjs",
-        "src/runner/dispatch/provider-adapter.mjs",
-        "src/runner/dispatch/tool-providers.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "session-keep-declared",
       "description": "read-only pointer: confined agent invocations that declare no session directory keep no seat transcript; fgos dispatch probe-session <executorId> shows where the CLI writes it (a warning, never a failure; doctor never runs the probe)",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/config.mjs",
-        "src/runner/dispatch/provider-capacity.mjs"
-      ],
+      "owner": "rust:execution",
       "pointer": true
     },
     {
       "id": "trust-store-readable",
       "description": "the agent folder-trust store is readable and carries a usable \"projects\" object, so a dispatch into a fresh worktree can be pre-trusted instead of stopping at a dialog",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/run-supervisor/trust-store.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "confined-pane-accounts",
       "description": "every confined invocation that reads a login store has an account in the global provider inventory with at least one of that store's credential files, so its agent starts logged in",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/provider-capacity.mjs",
-        "src/runner/dispatch/config.mjs",
-        "src/runner/dispatch/llm-accounts.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "non-claude-trust-stores-readable",
       "description": "every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, the same read a live dispatch will do",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/run-supervisor/trust-store.mjs",
-        "src/runner/dispatch/config.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "agent-cli-project-trusted",
       "description": "the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a \"Trust this folder?\" prompt",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/runner/dispatch/config.mjs",
-        "src/run-supervisor/trust-store.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "seat-binding-dry-bind",
@@ -768,10 +698,7 @@
     {
       "id": "seat-binding-route",
       "description": "the host Seat Binding runs answers ladder on the internal seat-binding route at protocol 2, the protocol the Node client speaks (its message names the protocol it sent)",
-      "owner": "bridge:S6a",
-      "judge": [
-        "src/seat-binding/client.mjs"
-      ]
+      "owner": "rust:execution"
     },
     {
       "id": "event-store-open-root",
@@ -863,7 +790,7 @@
     },
     {
       "id": "runtime-socket-dir",
-      "owner": "bridge:S6a"
+      "owner": "rust:execution"
     },
     {
       "id": "mailbox-sync-timer",

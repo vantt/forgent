@@ -28,25 +28,12 @@ import { domainCatalog } from '../util/domain-dirs.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { checkCompiledDomains } from '../util/domain-compile.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
-import { defaultLoginHomeStores } from '../runner/dispatch/llm-accounts.mjs';
-import { checkSessionKeepDeclared } from './session-keep-declared.mjs';
-import { INSTALL_ROOT, agentShapeProblem, findAgentDuplicates, readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
-import { isWithinDir } from '../runner/dispatch/assignment-layout.mjs';
+import { readAgentDefinition, scanAgentTiers } from '../runner/agent-definitions.mjs';
 import { ownedSkillNames } from './skill-wrappers.mjs';
-import { agentRenderWarnings, listAgents } from '../runner/agent-listing.mjs';
-import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
-import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import { declaredActivities, readWorkflowCatalog, withUnreadableDefinitions } from './workflow-catalog-reader.mjs';
-import {
-  checkExecutorFamilyUnique,
-  checkExecutorSkillsInstalled,
-  checkTierFallback,
-  checkModelPolicyPools,
-  checkLlmAccountsShape,
-} from './model-pool-checks.mjs';
 import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 
-import { MODEL_POLICY_TIERS, validateRunnerLoopsShape, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
+import { validateRunnerLoopsShape, attributeRunnerConfigError } from '../runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
 import { shippedCatalog } from '../runner/dispatch/shipped-catalog.mjs';
 import { checkCatalog } from '../runner/execution/patterns/catalog.mjs';
@@ -61,21 +48,12 @@ import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork } from '../state/store.mjs';
 import { driftStatus, unmergedDeliveries } from '../state/drift-status.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
-import { getDomain, resolveDomainName, effectiveStep, domainSteps, skillForStep } from '../state/domain-registry.mjs';
+import { getDomain, resolveDomainName, effectiveStep, domainSteps } from '../state/domain-registry.mjs';
 import { unservedToolAbilityOf } from '../runner/dispatch/tool-providers.mjs';
 import { checkConfig, globalFgosDir, readConfig, readMachineConfig, readProjectConfigSource } from '../config/facade.mjs';
 import { parseYaml } from '../util/yaml.mjs';
-import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
-import { inspectProviderCapacity, providerAccountInventory, credentialStoreOf, credentialSourceForCli } from '../runner/dispatch/provider-capacity.mjs';
-import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
-import { createTerminalControl } from '../terminal-control/client.mjs';
-import { readCodexTrust, readAgyStore, defaultAgySettingsPath, operatorClaudeStorePath } from '../run-supervisor/trust-store.mjs';
 import { foldEvents } from '../state/replay.mjs';
-import { discoverProjectPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
-import { createSeatBindingClient, PROTOCOL as SEAT_BINDING_PROTOCOL, resolveSeatBindingHost } from '../seat-binding/client.mjs';
 import { checkSeatBindingDryBind } from './seat-binding-checks.mjs';
-import { checkRunSupervisorRoute, checkRuntimeSocketDir, fixRuntimeSocketDir, checkRunAttemptsStuck, checkRunSupervisorConfig } from './run-supervisor-checks.mjs';
-import { checkTerminalControl, checkTerminalAllocations } from './terminal-control-checks.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 
 /** The door's findings for a project: one read per doctor run, shared by every bridged row that asks. A row called without a run reads for itself. */
@@ -597,7 +575,7 @@ function parseTaskSpecHeaderFields(headerLine) {
 }
 
 // The definition files the one door resolves for `cwd`, in its tier order. A name is listed once: the first tier
-// that holds it wins, as listAgents resolves it. A name defined twice inside one tier is the duplicate check's finding.
+// that holds it wins, as listAgents resolves it. A name defined twice inside one tier is the agent-type-names-unique row's finding.
 export function allAgentYamlFiles(cwd) {
   const seen = new Set();
   return scanAgentTiers({ projectRoot: cwd }).flatMap((tier) => tier.entries)
@@ -681,109 +659,9 @@ export function checkAgentClaimsResolve(cwd) {
   return { passed: true, message: 'every task-spec\'s requires-skill/agent eligibility declaration resolves to real agent skills' };
 }
 
-// A name is unique within a tier (fgos/agents, domains/*/agents, core/agents); a higher tier shadows a
-// lower one by whole-file replacement (RUL13). The customer's own tier is also checked for shape.
-// `projectTiersOnly` leaves out every tier read from inside the release (a project without its own
-// domains/ or core/agents/ reads the installed ones); npm test judges those with the option off.
-export function checkAgentTypeNamesUnique(cwd, { projectTiersOnly = false, installRoot } = {}) {
-  const fullScan = scanAgentTiers({ projectRoot: cwd, ...(installRoot && { installRoot }) });
-  const scan = projectTiersOnly
-    ? fullScan.filter((tier) => !tier.dirs.some((dir) => isWithinDir(INSTALL_ROOT, dir)))
-    : fullScan;
-  const problems = findAgentDuplicates(scan).map(({ label, name, files }) => `duplicate agent-type name "${name}" in ${label} (${files.join(', ')})`);
-
-  const tierLabels = Object.fromEntries(fullScan.map((tier) => [tier.tier, tier.label]));
-  const workspace = scan.find((tier) => tier.tier === 'workspace') ?? { entries: [], ignored: [] };
-  const lowerEntries = fullScan.filter((tier) => tier.tier !== 'workspace').flatMap((tier) => tier.entries);
-  const customizations = [];
-  const notes = [];
-  for (const entry of workspace.entries) {
-    let text;
-    try {
-      text = fs.readFileSync(entry.file, 'utf8');
-    } catch (error) {
-      problems.push(`${entry.rel}: cannot be read (${error.message})`);
-      continue;
-    }
-    const problem = agentShapeProblem(entry.name, text);
-    if (problem) problems.push(`${entry.rel}: ${problem}`);
-    // Keys the renderer drops are not an error (the file still seats); they are said here because
-    // nothing else says it, and a persona that silently loses its voice or boundary is a failure.
-    for (const warning of agentRenderWarnings(text)) notes.push(`${entry.rel}: ${warning}`);
-    const shadowed = lowerEntries.find((lower) => lower.name === entry.name);
-    customizations.push(shadowed ? `${entry.name} (replaces ${shadowed.rel})` : entry.name);
-  }
-  for (const rel of workspace.ignored) problems.push(`${rel} is ignored: only .yaml files are read`);
-
-  // A project that ships its own core/agents/ is read there instead of the install, so the
-  // installed core definitions it lacks cannot be seated; this is reported, not failed, because a project may
-  // choose that.
-  for (const hidden of listAgents({ projectRoot: cwd }).masked) {
-    notes.push(`installed persona "${hidden.name}" (${hidden.source}) is hidden by ${hidden.hiddenBy}; copy it there or into ${tierLabels.workspace} to seat it`);
-  }
-
-  if (problems.length > 0) {
-    return { passed: false, message: `agent definitions: ${problems.join('; ')}` };
-  }
-  const tail = notes.length > 0 ? `; warning: ${notes.join('; ')}` : '';
-  return {
-    passed: true,
-    message: (customizations.length > 0
-      ? `agent-type names are unique within each tier; ${tierLabels.workspace} holds ${customizations.join(', ')}`
-      : `agent-type names are unique within each tier (${fullScan.map((tier) => tier.label).join(', ')})`) + tail,
-  };
-}
-
 registerCheck({
   id: 'runner-patterns-config',
   check: (cwd, run) => checkRunnerPatternsConfig(cwd, run),
-});
-
-registerCheck({
-  id: 'executor-family-unique',
-  check: (cwd) => checkExecutorFamilyUnique(cwd),
-});
-
-registerCheck({
-  id: 'executor-skills-installed',
-  check: (cwd) => checkExecutorSkillsInstalled(cwd),
-});
-
-registerCheck({
-  id: 'tier-fallback',
-  check: (cwd) => checkTierFallback(cwd),
-});
-
-registerCheck({
-  id: 'model-policy-pools',
-  check: (cwd) => checkModelPolicyPools(cwd),
-});
-
-registerCheck({
-  id: 'llm-accounts-shape',
-  check: (cwd) => checkLlmAccountsShape(cwd),
-});
-
-// A store on a CLI's own default login home can be renewed by a pane and make the provider revoke the real refresh
-// token (decision 86 Q2). The owner ruled it warns and never refuses, so a single-account user still runs.
-export function checkLlmAccountsDefaultLoginHome(cwd) {
-  let runnerConfig;
-  try {
-    runnerConfig = loadRunnerConfigForDir(cwd);
-  } catch (err) {
-    return { passed: true, message: `runner config not loadable here, not evaluated: ${err.message}` };
-  }
-  const hits = defaultLoginHomeStores(runnerConfig);
-  if (hits.length === 0) return { passed: true, message: 'no runner.llmAccounts store sits on its CLI default login home' };
-  return {
-    passed: true,
-    message: `warning: stores on a default login home: ${hits.map((h) => h.key).join(', ')}; a pane renewing a copy of that login can make the provider revoke the real refresh token and log out your own sessions -- log in a second directory (CLAUDE_CONFIG_DIR=<own dir> claude /login, or the CLI's own home variable) and point the key at it`,
-  };
-}
-
-registerCheck({
-  id: 'llm-accounts-default-login-home',
-  check: (cwd) => checkLlmAccountsDefaultLoginHome(cwd),
 });
 
 // The definition tiers of a shipped release cannot change after build, so `npm test` judges them
@@ -804,11 +682,6 @@ export function checkDomainRegistryCompiled({ payloadRoot } = {}) {
 registerCheck({
   id: 'domain-registry-compiled',
   check: () => checkDomainRegistryCompiled(),
-});
-
-registerCheck({
-  id: 'agent-type-names-unique',
-  check: (cwd) => checkAgentTypeNamesUnique(cwd, { projectTiersOnly: true }),
 });
 
 // tsk-5m7 (docs/history/tsk-3bn-merge-conductor-harness-v2/): a real
@@ -1069,62 +942,10 @@ registerCheck({
   check: (cwd, run) => checkDeliveredNotOnTrunk(cwd, run),
 });
 
-function checkProviderCapacityState() {
-  let report;
-  try {
-    report = inspectProviderCapacity({ runnerConfig: machineRunner() });
-  } catch (err) {
-    return { passed: false, message: `provider-capacity state unreadable: ${err.message}` };
-  }
-  const providers = Object.values(report.providers || {});
-  const accounts = providers.flatMap((provider) => Object.values(provider.accounts || {}));
-  if (!accounts.length) {
-    return { passed: true, message: 'inactive — no global runner.llmAccounts inventory configured' };
-  }
-  const quarantined = accounts.filter((account) => account.quarantine);
-  if (!quarantined.length) {
-    return { passed: true, message: `provider-capacity healthy — ${accounts.length} account(s), no quarantine` };
-  }
-  // C2a: inspectProviderCapacity's account shape names the field
-  // `accountId`, not `id` (always undefined here before this fix), and a
-  // quarantine record's own field is `kind` ('temporary' | 'manual-clear'
-  // | 'manual-clear' evidence), never a `manualClear` boolean.
-  const summary = quarantined
-    .map((account) => `${account.accountId}:${account.quarantine.reasonCode || 'quarantined'}${account.quarantine.kind === 'manual-clear' ? ':manual-clear' : ''}${account.quarantine.until ? `:until=${account.quarantine.until}` : ''}`)
-    .join(', ');
-  return {
-    passed: false,
-    message: `provider-capacity quarantine present (${summary}) — inspect with "fgos dispatch inspect --provider-capacity"; clear manually with "fgos dispatch reconcile provider-capacity clear-quarantine" after the operator fix`,
-  };
-}
-
-registerCheck({
-  id: 'provider-capacity-state',
-  check: () => checkProviderCapacityState(),
-});
-
 // Run supervisor (docs/platform/run-supervisor/spec.md): the host routes with the containment driver agents
 // run in, the runtime socket directory, attempts nobody holds (and the units awaiting resume) and the
 // gate's kill grace with the cancel wait.
 // `dispatch.gateKillGraceMs` and `dispatch.cancelWaitMs` take their values from the dispatch section of the standard and are never written by setup.
-registerCheck({
-  id: 'run-supervisor-route',
-  check: (cwd) => checkRunSupervisorRoute(cwd),
-});
-registerCheck({
-  id: 'runtime-socket-dir',
-  check: () => checkRuntimeSocketDir(),
-});
-registerCheck({
-  id: 'run-attempts-stuck',
-  check: (cwd) => checkRunAttemptsStuck(cwd),
-});
-registerCheck({
-  id: 'run-supervisor-config',
-  check: (cwd) => checkRunSupervisorConfig(cwd),
-});
-registerFix({ id: 'runtime-socket-dir', fix: () => fixRuntimeSocketDir() });
-
 // A capability a core/domain Workflow unit names is a label unless a kind: tool executor declares it in `for`: a
 // label's seats bind through the role, persona and tier tables. A tool ability whose tool is not present is
 // refused at run time with no earlier signal, so this row names it.
@@ -1210,26 +1031,6 @@ export const IRON_LAW_LEVELS = Object.freeze(['ask', 'warn']);
 export const DEFAULT_IRON_LAW_LEVEL = 'ask';
 
 
-function checkOperationPromptTemplatesValid(cwd) {
-  try {
-    const entries = discoverProjectPromptTemplates({ cwd });
-    return {
-      passed: true,
-      message: `${entries.length} project operation prompt template(s) discovered and validated cleanly`,
-    };
-  } catch (err) {
-    if (err instanceof TemplateResolutionError) {
-      return { passed: false, message: `malformed operation prompt template -- ${err.message}` };
-    }
-    throw err;
-  }
-}
-
-registerCheck({
-  id: 'operation-prompt-templates-valid',
-  check: (cwd) => checkOperationPromptTemplatesValid(cwd),
-});
-
 // Phase 01 group D (plans/260906-1831-dispatch-visibility-v0): the three things
 // that must hold before an interactive dispatch can work at all, each turned from
 // a runtime surprise into a doctor line.
@@ -1243,297 +1044,6 @@ registerCheck({
 // neither of them visible to any executor profile. A second, independent reading
 // of the same invariant is cheap, and it catches a config that arrived by some
 // route the loader never saw.
-
-/** The folder-trust store must be readable and well-formed, or every dispatch
- * into a fresh worktree stops at a trust dialog with nobody there to answer it. */
-export function checkTrustStoreWritable(storePath = operatorClaudeStorePath()) {
-  let raw;
-  try {
-    raw = fs.readFileSync(storePath, 'utf8');
-  } catch (err) {
-    // claude installed but never run has no store yet: normal for a new user, so a warning with the next step.
-    if (err.code === 'ENOENT') return { passed: true, message: `warning: no trust store at ${storePath} yet, claude creates it on first run; run \`claude\` once, then \`fgos doctor\`` };
-    return { passed: false, message: `trust store at ${storePath} is unreadable: ${err.message}` };
-  }
-  try {
-    const parsed = JSON.parse(raw);
-    if (!parsed.projects || typeof parsed.projects !== 'object' || Array.isArray(parsed.projects)) {
-      return { passed: false, message: `trust store at ${storePath} has no usable "projects" object -- its shape has changed` };
-    }
-    return { passed: true, message: `trust store at ${storePath} is readable (${Object.keys(parsed.projects).length} entries)` };
-  } catch (err) {
-    return { passed: false, message: `trust store at ${storePath} is not valid JSON: ${err.message}` };
-  }
-}
-
-/** `checkTrustStoreWritable` only ever reads the default claude-json path --
- * an executor declaring `interactiveMode.trustStore.kind: 'codex-toml'` or
- * `'agy'`/`'agy-json'` had no doctor coverage at all before this, so an
- * unreadable codex config.toml or agy settings.json surfaced for the first
- * time as a live dispatch failure instead of a doctor line. Reuses the same
- * readers `seedCodexTrust`/`seedAgyTrust` use, so a "readable" verdict here
- * means the exact same read the real dispatch will do also succeeds. */
-export function checkTrustStoresReadable(cwd, runnerCfg = {}) {
-  const problems = [];
-  const notes = [];
-  const seen = new Set();
-
-  function checkOne(trustStore, env, label) {
-    if (!trustStore || (trustStore.kind !== 'codex-toml' && trustStore.kind !== 'agy' && trustStore.kind !== 'agy-json')) return;
-    const storePath = trustStore.kind === 'codex-toml'
-      ? (trustStore.path ?? path.join(env?.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml'))
-      : (trustStore.path ?? defaultAgySettingsPath(env?.HOME ?? os.homedir()));
-    const dedupeKey = `${trustStore.kind}:${storePath}`;
-    if (seen.has(dedupeKey)) return;
-    seen.add(dedupeKey);
-    try {
-      if (trustStore.kind === 'codex-toml') {
-        readCodexTrust(storePath, path.resolve(cwd));
-      } else {
-        readAgyStore(storePath);
-      }
-      notes.push(`${label}: ${trustStore.kind} trust store at ${storePath} is readable`);
-    } catch (err) {
-      problems.push(`${label}: ${trustStore.kind} trust store at ${storePath} is unreadable (${err.message})`);
-    }
-  }
-
-  for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
-    for (const inv of executor?.invocations ?? []) {
-      checkOne(inv?.interactiveMode?.trustStore, inv?.env, `executor "${id}" invocation "${inv?.id ?? '?'}"`);
-    }
-  }
-
-  if (problems.length > 0) {
-    return { passed: false, message: problems.join('; ') };
-  }
-  return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no codex-toml or agy trust store declared' };
-}
-
-/**
- * A confined invocation that reads a login store starts in an empty private home: the account's login only
- * gets there when the machine-global provider account inventory names it. Without that entry the agent
- * starts logged out, and the first symptom is a pane sitting at a sign-in screen until the idle limit. This
- * is the doctor line that names it, per invocation, before a run does. Files of the store that are absent
- * are noted; a store with none of its files present fails, since nothing would be copied.
- */
-export function checkConfinedPaneAccounts(runnerCfg = {}, providerInventory = undefined) {
-  let inventory;
-  if (providerInventory) {
-    // The machine-global read: an unusable global config is reported by its reason (code and path only).
-    if (providerInventory.inventoryUnreadable) return { passed: false, message: `provider account inventory is unreadable: ${providerInventory.inventoryUnreadable}` };
-    inventory = providerInventory.inventory;
-  } else {
-    inventory = providerAccountInventory(runnerCfg);
-  }
-  const expandHome = (value) => String(value ?? '').replace(/^\$\{HOME\}(?=\/|$)/, os.homedir()).replace(/^\$HOME(?=\/|$)/, os.homedir()).replace(/^~(?=\/|$)/, os.homedir());
-  const problems = [];
-  const notes = [];
-  for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
-    for (const inv of executor?.invocations ?? []) {
-      const command = inv?.command;
-      const store = credentialStoreOf(inv);
-      if (!store) continue;
-      const label = `executor "${id}" invocation "${inv.id ?? '?'}"`;
-      // A CLI this machine does not have starts no pane, so its login is nobody's to find.
-      if (!isCommandAvailable(command)) { notes.push(`${label}: ${path.basename(command ?? '')} is not installed, not checked`); continue; }
-      const provider = legacyStateKey(executor.providerModel ?? executor.provider);
-      const providerEntry = Object.hasOwn(inventory, provider) ? inventory[provider] : undefined;
-      const accountMap = providerEntry?.accounts;
-      const accounts = accountMap && typeof accountMap === 'object' ? Object.keys(accountMap).filter((key) => Object.hasOwn(accountMap, key)).map((key) => accountMap[key]) : [];
-      if (accounts.length === 0) {
-        problems.push(`${label}: no runner.llmAccounts pool for ${provider} in the global config, so its pane starts in an empty private home, logged out`);
-        continue;
-      }
-      // An account that keeps one login per CLI reaches this invocation only through the store it names.
-      for (const account of accounts) {
-        const source = credentialSourceForCli(account, store.use);
-        if (!source) {
-          problems.push(`${label}: account "${account.id}" declares no credential source for store "${store.use}", so an agent leased to it starts logged out`);
-          continue;
-        }
-        const home = expandHome(source.home);
-        const files = store.files ?? (source.kind === 'home-files' ? source.files : ['auth.json']);
-        const missing = files.filter((rel) => !fs.existsSync(path.join(home, rel)));
-        if (missing.length === files.length) problems.push(`${label}: account "${account.id}" has none of ${files.join(', ')} under ${home}, so nothing is copied and its agent starts logged out`);
-        else if (missing.length > 0) notes.push(`${label}: account "${account.id}" has ${files.length - missing.length} of ${files.length} credential file(s); absent: ${missing.join(', ')}`);
-        else notes.push(`${label}: account "${account.id}" has its ${files.length} credential file(s)`);
-      }
-    }
-  }
-  if (problems.length > 0) return { passed: false, message: problems.join('; ') };
-  return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no confined invocation reads a login store' };
-}
-
-/** What herdr says it can start and which integration hooks it has, asked through the
- * terminal-control port. `null` for either when herdr cannot be asked or its text cannot be
- * read: absence is already `terminal-control`'s business, and reporting it twice helps nobody. */
-function askHerdrFacts() {
-  try {
-    const report = createTerminalControl({ herdrBin: resolveHerdrBin() }).capabilities({ agents: true });
-    const known = (value) => (value !== null && typeof value === 'object' ? value : null);
-    return { kinds: known(report.agentKinds), integrations: known(report.integrations) };
-  } catch {
-    return { kinds: null, integrations: null };
-  }
-}
-
-/** herdr calls the Antigravity CLI `agy` when starting an agent but
- * `antigravity-cli` when installing its integration hook. Same tool, two
- * spellings, so a check that reads both surfaces has to bridge them. */
-const HERDR_KIND_TO_INTEGRATION = Object.freeze({ agy: 'antigravity-cli' });
-
-/**
- * Every executor dispatched through a herdr pane must name an agent kind
- * herdr can actually start, and that kind's integration hook must not be a
- * stale version.
- *
- * An `outdated` hook fails: it is installed, so herdr reads agent state
- * through it, and it is the wrong version, so what it reports may be wrong.
- * `not installed` only warns -- herdr falls back to its own detection, and
- * since nothing in this dispatch path concludes completion from agent state
- * any more, a missing hook costs latency and precision rather than
- * correctness.
- */
-/** The first `via: 'cli'` invocation of an executor entry; undefined when it has none. */
-function resolveCliInvocation(executor) {
-  return (executor?.invocations ?? []).find((i) => i.via === 'cli');
-}
-
-export function checkHerdrExecutorKinds(runnerCfg = {}, ask = askHerdrFacts) {
-  const executors = Object.entries(runnerCfg.executors ?? {});
-  const herdrExecutors = [];
-  for (const [id, executor] of executors) {
-    const invocation = resolveCliInvocation(executor) ?? {};
-    if (invocation.adapter !== 'herdr-spawn') continue;
-    const declared = invocation.interactiveMode?.kind;
-    const command = invocation.command;
-    herdrExecutors.push({ id, kind: declared ?? (command ? path.basename(command) : null) });
-  }
-  if (herdrExecutors.length === 0) {
-    return { passed: true, message: 'no executor dispatches through a herdr pane' };
-  }
-
-  const { kinds: supported, integrations: status } = ask();
-  if (!supported) {
-    return { passed: true, message: 'herdr could not be asked which agent kinds it supports; kinds not evaluated' };
-  }
-
-  const unknown = herdrExecutors.filter((e) => !e.kind || !supported.includes(e.kind));
-  if (unknown.length > 0) {
-    return {
-      passed: false,
-      message: `executors name an agent kind herdr cannot start: ${unknown.map((e) => `${e.id} (${e.kind ?? 'none declared'})`).join('; ')}. herdr supports: ${supported.join(', ')}`,
-    };
-  }
-
-  const notes = [];
-  const stale = [];
-  for (const e of herdrExecutors) {
-    const name = HERDR_KIND_TO_INTEGRATION[e.kind] ?? e.kind;
-    const state = status?.[name];
-    if (state === 'outdated') stale.push(`${e.id} (kind ${e.kind}, hook ${name})`);
-    else if (state === 'not installed') notes.push(`${e.id}: no ${name} integration hook installed`);
-  }
-  if (stale.length > 0) {
-    return {
-      passed: false,
-      message: `executors depend on an outdated herdr integration hook, so the agent state it reports may be wrong: ${stale.join('; ')}. Run: herdr integration install <name>`,
-    };
-  }
-  return {
-    passed: true,
-    message: `every herdr executor names a supported kind${notes.length > 0 ? ` (${notes.join('; ')})` : ''}`,
-  };
-}
-
-registerCheck({
-  id: 'terminal-control',
-  check: (cwd) => checkTerminalControl(cwd),
-});
-registerCheck({
-  id: 'terminal-allocations',
-  check: (cwd) => checkTerminalAllocations(cwd),
-});
-
-registerCheck({
-  id: 'herdr-executor-kinds',
-  check: (cwd) => {
-    try {
-      return checkHerdrExecutorKinds(loadRunnerConfigForDir(cwd));
-    } catch (err) {
-      return { passed: true, message: `runner config not loadable here, herdr executor kinds not evaluated: ${err.message}` };
-    }
-  },
-});
-
-registerCheck({
-  id: 'executor-profile-warnings',
-  check: (cwd) => {
-    try {
-      return checkExecutorProfileWarnings(cwd, loadRunnerConfigForDir(cwd));
-    } catch (err) {
-      return { passed: true, message: `runner config not loadable here, executor-profile warnings not evaluated: ${err.message}` };
-    }
-  },
-});
-
-registerCheck({
-  id: 'session-keep-declared',
-  check: (cwd) => {
-    try {
-      return checkSessionKeepDeclared(loadRunnerConfigForDir(cwd));
-    } catch (err) {
-      return { passed: true, message: `runner config not loadable here, session directories not evaluated: ${err.message}` };
-    }
-  },
-});
-
-registerCheck({
-  id: 'trust-store-readable',
-  check: () => (isCommandAvailable('claude')
-    ? checkTrustStoreWritable()
-    : { passed: true, status: 'skip', message: 'skipped: claude is not installed on this machine, so no trust dialog can stop a dispatch' }),
-});
-
-registerCheck({
-  id: 'confined-pane-accounts',
-  check: (cwd) => {
-    // The account inventory is the machine's (global config and accounts file), so it is read from there whatever
-    // the cwd. Executors come from the project config merged with the machine's; with no usable project config
-    // the machine's own executors are judged.
-    const providerInventory = readDoctorProviderInventory();
-    let runnerCfg;
-    try {
-      runnerCfg = loadRunnerConfigForDir(cwd);
-    } catch (err) {
-      let globalRunner = {};
-      try { globalRunner = machineRunner(); } catch { /* the inventory read reports an unreadable global config */ }
-      if (!globalRunner.executors || typeof globalRunner.executors !== 'object') {
-        if (providerInventory.inventoryUnreadable) return checkConfinedPaneAccounts({}, providerInventory);
-        return { passed: true, message: `runner config not loadable here, confined pane accounts not evaluated: ${err.message}` };
-      }
-      runnerCfg = { executors: globalRunner.executors };
-    }
-    return checkConfinedPaneAccounts(runnerCfg, providerInventory);
-  },
-});
-
-registerCheck({
-  id: 'non-claude-trust-stores-readable',
-  check: (cwd) => {
-    try {
-      return checkTrustStoresReadable(cwd, loadRunnerConfigForDir(cwd));
-    } catch (err) {
-      return { passed: true, message: `runner config not loadable here, non-claude trust stores not evaluated: ${err.message}` };
-    }
-  },
-});
-
-registerCheck({
-  id: 'agent-cli-project-trusted',
-  check: (cwd) => checkAgentCliProjectTrusted(cwd, { loadRunnerConfig: loadRunnerConfigForDir }),
-});
 
 // Async: the check drives the runner's own pattern code, which is promise-based. `fgos doctor`
 // awaits every check, so a check may return its result directly or as a promise.
@@ -1549,37 +1059,6 @@ registerCheck({
   check: (cwd) => checkBlindStepsUseProvenPools(cwd, {
     loadRunnerConfig: loadRunnerConfigForDir,
   }),
-});
-
-/**
- * The host Seat Binding would run (the same resolution the client uses:
- * the activation host inside an activated release, FGOS_HOST_BIN outside one)
- * answers `ladder` at this payload's protocol. Asked directly, never through the client's
- * cached host, so an old activated release shows up as a version mismatch.
- */
-export function checkSeatBindingRoute(cwd, { hostBin } = {}) {
-  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
-  const fgosDir = fgosDirFromRoot(root);
-  const { bin, tried, activated } = hostBin
-    ? { bin: hostBin, tried: [], activated: false }
-    : resolveSeatBindingHost({ cwd, fgosDir });
-  if (!bin) {
-    return { passed: false, message: `no host binary for the seat binding route (tried ${tried.join('; ')}) -- run fgctl init/repair, or set FGOS_HOST_BIN` };
-  }
-  try {
-    const ladder = createSeatBindingClient({ hostBin: bin }).tierLadder();
-    return {
-      passed: true,
-      message: `${bin} (${activated ? 'activation host' : 'host in reach'}) answers ladder at protocol ${SEAT_BINDING_PROTOCOL}, hostVersion ${ladder.hostVersion}, ${ladder.vocabulary.length} tiers`,
-    };
-  } catch (err) {
-    return { passed: false, message: `${bin} -> ${err.code ?? 'error'}: ${err.message}` };
-  }
-}
-
-registerCheck({
-  id: 'seat-binding-route',
-  check: (cwd) => checkSeatBindingRoute(cwd),
 });
 
 // Workflow case bindings (docs/platform/workflow/spec.md#6-business-rules RUL-WF-27): the binding records are a view of each

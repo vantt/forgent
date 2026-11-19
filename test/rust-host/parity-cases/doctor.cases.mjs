@@ -1,4 +1,5 @@
-// Doctor parity table for the nine confinement rows and their three fixes: every call the base release answers,
+// Doctor parity table for the nine confinement rows and their three fixes, and the executor, accounts, run supervisor,
+// trust and terminal rows with the socket directory fix: every call the base release answers,
 // on a fresh world per entry (a project of each shape, its own HOME, TMPDIR and state root). Only the rows and
 // fixes named in `CONFINEMENT_ROWS` / `CONFINEMENT_FIXES` are compared (id, status, passed, fix, message, detail);
 // the rows another owner judges are out of this table. `--fix` cases also compare what the run left on disk, and
@@ -57,6 +58,23 @@ add('backend-registry-with-no-bwrap-instance', [{ do: 'backendRegistry', text: J
 add('confinement-root-open-to-others-then-fixed', [{ do: 'looseConfinementRoot' }, call([]), call(['--fix']), call([])], { disk: true });
 add('pending-login-copy-without-an-inventory', [{ do: 'pendingLoginCopy' }, call([]), call(['--fix']), call([])], { disk: true });
 add('fix-twice-is-idempotent', [call(['--fix']), call(['--fix']), call([])], { disk: true });
+
+// Executor and accounts rows over what the runner declares: a family served twice, a tier fallback naming a family
+// with no cell, a pool no account backs, an accounts section of the wrong shape, a legacy policy-shaped executor.
+add('two-executors-serving-one-family', [{ do: 'confinementConfig', runner: { executors: { a: { kind: 'agent', providerModel: 'fam', invocations: [{ id: 'a-cli', via: 'cli', command: 'claude', args: [] }] }, b: { kind: 'agent', providerModel: 'fam', invocations: [{ id: 'b-cli', via: 'cli', command: 'claude', args: [] }] } } } }, call([])]);
+add('tier-fallback-naming-a-family-with-no-cell', [{ do: 'confinementConfig', runner: { tierFallback: { standard: ['nobody'] } } }, call([])]);
+add('model-policy-naming-a-pool-no-account-backs', [{ do: 'confinementConfig', runner: { modelPolicies: { standard: { claude: 'sonnet@ghost' } } } }, call([])]);
+add('llm-accounts-pool-name-with-an-at-sign', [{ do: 'confinementConfig', runner: { llmAccounts: { 'bad@pool': { one: { credentialStore: { claude: '/tmp/one' } } } } } }, call([])]);
+add('executor-hardcoding-a-policy-shaped-flag', [{ do: 'confinementConfig', runner: { executors: { legacy: { kind: 'agent', providerModel: 'fam', invocations: [{ id: 'legacy-cli', via: 'cli', command: 'claude', args: ['--dangerously-skip-permissions'] }] } } } }, call([])]);
+add('confined-invocation-reading-a-store-with-no-account', [{ do: 'confinementConfig', runner: { executors: { pane: { kind: 'agent', providerModel: 'fam', invocations: [{ id: 'pane-cli', via: 'cli', adapter: 'herdr-spawn', command: 'claude', args: [], credentialStore: { use: 'claude', homeEnv: 'CLAUDE_CONFIG_DIR' } }] } } } }, call([])]);
+add('herdr-executor-naming-an-unknown-kind', [{ do: 'confinementConfig', runner: { executors: { weird: { kind: 'agent', providerModel: 'fam', invocations: [{ id: 'weird-cli', via: 'cli', adapter: 'herdr-spawn', command: 'claude', args: [], interactiveMode: { exitCommand: '/exit', kind: 'notreal' } }] } } } }, call([])]);
+
+// The run supervisor, runtime directory, trust and terminal rows over the machine they read.
+add('runtime-socket-directory-fix-twice', [call([]), call(['--fix']), call(['--fix']), call([])], { disk: true });
+add('run-supervisor-wait-shorter-than-grace', [{ do: 'confinementConfig', dispatch: { gateKillGraceMs: 5000, cancelWaitMs: 2000 } }, call([])]);
+add('terminal-setting-with-a-bad-value', [{ do: 'confinementConfig', terminal: { allocationGraceMs: 'soon' } }, call([])]);
+add('workspace-agents-of-the-wrong-shape-and-a-persona-replacing-a-core-one', [{ do: 'agentFile', name: 'wrong-name.yaml', text: 'name: other\ndescription: a persona\n' }, { do: 'agentFile', name: 'typo.yml', text: 'name: typo\ndescription: a persona\n' }, call([]), { do: 'removeAgentFiles' }, { do: 'agentFile', name: 'code-reviewer.yaml', text: 'name: code-reviewer\ndescription: my reviewer\n' }, call([])]);
+add('operation-prompt-template-with-a-forbidden-variable', [{ do: 'promptTemplate', name: 'invalid-tmpl', text: 'Forbidden: {forbiddenVar}' }, call([])]);
 
 const MACHINE_ID_SLUG = os.hostname().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
@@ -171,7 +189,16 @@ function act(world, step) {
       initFixtureRepo(world.other);
       return null;
     case 'confinementConfig':
-      writeProjectConfig(world.repo, { runner: step.runner });
+      writeProjectConfig(world.repo, { ...(step.runner ? { runner: step.runner } : {}), ...(step.dispatch ? { dispatch: step.dispatch } : {}), ...(step.terminal ? { terminal: step.terminal } : {}) });
+      return null;
+    case 'agentFile':
+      writeAt(path.join(world.repo, 'fgos', 'agents'), step.name, step.text);
+      return null;
+    case 'removeAgentFiles':
+      fs.rmSync(path.join(world.repo, 'fgos', 'agents'), { recursive: true, force: true });
+      return null;
+    case 'promptTemplate':
+      writeAt(path.join(world.repo, '.fgos', 'prompt-templates'), `${step.name}.md`, step.text);
       return null;
     case 'backendRegistry':
       writeAt(path.join(world.home, '.fgos'), 'confinement-backends.json', step.text.replaceAll('$WORLD', world.root));
@@ -389,8 +416,9 @@ function disk(world, norm) {
 /** Rows the base release answers and this release no longer has: the row is deleted with the `setup` verb that kept its
  * source line, so both sides are compared without it. */
 const RETIRED_ROWS = new Set(['shell-integration-sourced']);
-const CONFINEMENT_FIXES = new Set(['confinement-backend-registry-readable', 'confinement-orphaned-resources-reaped', 'credential-copies-retained']);
-const CONFINEMENT_ROWS = new Set(['confinement-policies-declared', 'confinement-backend-registry-readable', 'confinement-orphaned-resources-reaped', 'credential-copies-retained', 'confinement-bwrap-platform', 'confinement-probe-freshness', 'confinement-blind-read', 'confinement-strict-readiness', 'confinement-herdr-maturity']);
+const CONFINEMENT_FIXES = new Set(['confinement-backend-registry-readable', 'confinement-orphaned-resources-reaped', 'credential-copies-retained', 'runtime-socket-dir']);
+const CONFINEMENT_ROWS = new Set(['confinement-policies-declared', 'confinement-backend-registry-readable', 'confinement-orphaned-resources-reaped', 'credential-copies-retained', 'confinement-bwrap-platform', 'confinement-probe-freshness', 'confinement-blind-read', 'confinement-strict-readiness', 'confinement-herdr-maturity',
+  'executor-family-unique', 'executor-skills-installed', 'tier-fallback', 'model-policy-pools', 'llm-accounts-shape', 'llm-accounts-default-login-home', 'agent-type-names-unique', 'provider-capacity-state', 'executor-profile-warnings', 'session-keep-declared', 'confined-pane-accounts', 'operation-prompt-templates-valid', 'herdr-executor-kinds', 'run-supervisor-route', 'runtime-socket-dir', 'run-attempts-stuck', 'run-supervisor-config', 'terminal-control', 'terminal-allocations', 'trust-store-readable', 'non-claude-trust-stores-readable', 'agent-cli-project-trusted', 'seat-binding-route']);
 const RETIRED_PRETTY_LINE = /^[✓✗] shell-integration source line present in detected rc file\(s\)/;
 
 /** The pretty text without the line of a retired row. */

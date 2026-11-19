@@ -21,7 +21,6 @@ import {
 import { deriveLegacyInventory, legacyStateKey, readLlmAccounts } from '../../src/runner/dispatch/llm-accounts.mjs';
 import { configPinnedToAccount } from '../../src/runner/dispatch/provider-account-probe.mjs';
 import { loadRunnerConfigForDir } from '../../src/runner/dispatch/config.mjs';
-import { checkById } from '../setup/helpers/setup-checks-harness.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import { writeAccountsFile as writeAccountsFileIn, writeProjectConfig } from '../helpers/config-fixture.mjs';
 
@@ -249,28 +248,3 @@ test('the declared account order survives the merge of the global config into a 
   }
 });
 
-test('doctor warns about a store no invocation declares files for, and stays quiet when every store is covered', () => {
-  const runCheck = (runner) => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pool-doctor-'));
-    const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pool-doctor-home-'));
-    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
-    fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
-    const { llmAccounts, executors: _executors, modelPolicies: _policies, ...projectRunner } = runner;
-    writeProjectConfig(dir, { runner: { ...projectRunner, defaults: { tier: 'standard' }, patterns: { seatBinding: { schema: 1 } } } });
-    writeAccountsFile(home, { llmAccounts });
-    const prev = process.env.HOME;
-    process.env.HOME = home;
-    try {
-      return checkById('llm-accounts-shape').check(dir);
-    } finally {
-      process.env.HOME = prev;
-    }
-  };
-  const covered = runCheck(config({ openrouter }));
-  assert.equal(covered.passed, true);
-  assert.match(covered.message, /declares 2 accounts in 1 pools/);
-
-  const uncovered = runCheck(config({ openrouter: { 'or-a': { credentialStore: { zed: '/srv/zed/or-a' } } } }));
-  assert.equal(uncovered.passed, true);
-  assert.match(uncovered.message, /^warning: .*openrouter\/or-a \(zed\)/);
-});
