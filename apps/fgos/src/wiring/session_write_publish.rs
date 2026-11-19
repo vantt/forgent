@@ -15,7 +15,7 @@
 
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use fgos_config::detect::PathDetectors;
 use fgos_git::{
@@ -32,6 +32,15 @@ use serde_json::Value;
 const REMOTE: &str = "origin";
 /// How long the land waits for the target's merge slot and the main checkout.
 const WAIT_MS: u64 = 30_000;
+/// How long one catch-up attempt waits for the merge slot while retrying.
+const BUSY_ATTEMPT_WAIT_MS: u64 = 5_000;
+/// How long the retries run in all. The last attempt may start at the end of it and itself wait a few seconds per lock
+/// (worktree-admin, merge slot, main checkout), so a write answers within about 60 s: far inside the client's 180 s
+/// write reply timeout. `session write` has no route child, so the 60 s verb timeout does not bound it.
+const BUSY_BUDGET: Duration = Duration::from_millis(45_000);
+/// Pause before the next attempt: doubles from the first up to the cap.
+const BUSY_BACKOFF_FIRST: Duration = Duration::from_millis(500);
+const BUSY_BACKOFF_CAP: Duration = Duration::from_millis(4_000);
 /// Status entries per page (the Git door's own bound) and pages read at most: a checkout with more changed paths than
 /// this is not a checkout to write into.
 const STATUS_PAGE: usize = 4096;
@@ -244,8 +253,53 @@ fn grant(checkout: &Checkout) -> Result<RemoteGrant, PublishRefusal> {
     })
 }
 
-/// Fast-forwards the main checkout of `root` to its remote tip as `writer`, under the target's merge slot.
+/// Runs `attempt` until it does not refuse Busy (Git's retryable class, carried as [`CatchUpRefusal::Busy`]), pausing
+/// with doubling backoff between tries, for at most `budget`. A Busy that outlasts the budget comes back as that last
+/// Busy; any other result is returned as it is. `sleep` and `now` are parameters so the schedule is provable without
+/// waiting.
+pub fn retry_busy(
+    budget: Duration,
+    mut attempt: impl FnMut() -> Result<(), CatchUpRefusal>,
+    sleep: impl Fn(Duration),
+    now: impl Fn() -> Instant,
+) -> Result<(), CatchUpRefusal> {
+    let start = now();
+    let mut pause = BUSY_BACKOFF_FIRST;
+    loop {
+        match attempt() {
+            Err(busy @ CatchUpRefusal::Busy { .. }) => {
+                if now().duration_since(start) + pause > budget {
+                    return Err(busy);
+                }
+            }
+            other => return other,
+        }
+        sleep(pause);
+        pause = (pause * 2).min(BUSY_BACKOFF_CAP);
+    }
+}
+
+/// Fast-forwards the main checkout of `root` to its remote tip as `writer`, under the target's merge slot. A Busy
+/// refusal (a live writer's operation pending, a lock held) is retried within [`BUSY_BUDGET`].
 fn catch_up_main(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
+    catch_up_main_within(root, writer, BUSY_BUDGET)
+}
+
+/// [`catch_up_main`] with its own retry budget, for a caller that must bound the wait.
+pub fn catch_up_main_within(
+    root: &Path,
+    writer: &str,
+    budget: Duration,
+) -> Result<(), CatchUpRefusal> {
+    retry_busy(
+        budget,
+        || catch_up_once(root, writer),
+        std::thread::sleep,
+        Instant::now,
+    )
+}
+
+fn catch_up_once(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
     let checkout = open(root).map_err(CatchUpRefusal::Refused)?;
     let target = checked_out_branch(&checkout).map_err(CatchUpRefusal::Refused)?;
     let grant = grant(&checkout).map_err(CatchUpRefusal::Refused)?;
@@ -257,7 +311,7 @@ fn catch_up_main(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
         operation_id: &operation_id,
         runner: &ShellRunner,
         log_dir: &checkout.main.join(".fgos").join("runtime").join("land"),
-        wait_ms: WAIT_MS,
+        wait_ms: BUSY_ATTEMPT_WAIT_MS,
     };
     let command = LandCommand {
         target: Some(target),
@@ -265,6 +319,10 @@ fn catch_up_main(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
     };
     catch_up(&command, &ports).map_err(|why| match why.code.as_str() {
         "land-target-ahead" => CatchUpRefusal::BranchAhead(why.detail),
+        _ if why.retryable => CatchUpRefusal::Busy {
+            code: why.code,
+            detail: why.detail,
+        },
         _ => CatchUpRefusal::Refused(refusal(&why.code, why.detail)),
     })
 }

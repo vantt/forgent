@@ -282,11 +282,60 @@ fn a_stale_base_is_refused_and_the_current_one_written(scene: &Scene) {
     assert_eq!(reply["data"]["commit"], scene.remote_tip());
 }
 
+/// Holds the project's worktree-admin lock, as another live Git writer does, until dropped.
+fn hold_worktree_admin(scene: &Scene) -> fgos_holder_lock::LockScope<'static> {
+    let mut holder = fgos_holder_lock::LockScope::seeded(vec![]).unwrap();
+    let params = std::collections::BTreeMap::from([(
+        "fgosDir".to_string(),
+        scene.project.join(".fgos").to_string_lossy().into_owned(),
+    )]);
+    holder
+        .acquire("worktree-admin", &params, fgos_holder_lock::Wait::Ms(0))
+        .unwrap();
+    holder
+}
+
+/// The real catch-up against a held worktree-admin lock: released before the budget ends the write catches up and
+/// lands; never released it is Busy naming Git's own code, and the checkout is untouched. (A step of the scene's one
+/// scenario.) Each attempt itself waits 5 s on the lock, so the budgets here are small.
+fn a_held_worktree_admin_is_waited_out_or_answered_busy(scene: &Scene) {
+    use fgos_run_supervisor::route::CatchUpRefusal;
+    let before = git(&scene.project, &["rev-parse", "HEAD"]);
+
+    scene.move_remote("busy-never.md");
+    let holder = hold_worktree_admin(scene);
+    let result = session_write_publish::catch_up_main_within(
+        &scene.project,
+        "att-own",
+        Duration::from_secs(1),
+    );
+    let Err(CatchUpRefusal::Busy { code, .. }) = result else {
+        panic!("not Busy: {result:?}");
+    };
+    assert_eq!(code, "worktree-admin-held");
+    assert_eq!(git(&scene.project, &["rev-parse", "HEAD"]), before);
+
+    // Released after the first attempt's own wait ran out: the retry catches up.
+    let releaser = std::thread::spawn(move || {
+        std::thread::sleep(Duration::from_secs(6));
+        drop(holder);
+    });
+    session_write_publish::catch_up_main_within(&scene.project, "att-own", Duration::from_secs(40))
+        .expect("the catch-up lands once the lock is released");
+    releaser.join().unwrap();
+    assert_eq!(
+        git(&scene.project, &["rev-parse", "HEAD"]),
+        scene.remote_tip()
+    );
+    assert!(scene.project.join("busy-never.md").exists());
+}
+
 #[test]
 fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_forced_or_silently_lost(
 ) {
     let scene = Scene::new();
     a_stale_base_is_refused_and_the_current_one_written(&scene);
+    a_held_worktree_admin_is_waited_out_or_answered_busy(&scene);
 
     // 1. Published: the main checkout first catches up to the remote tip, only the written path is committed (the
     // other dirty path stays out), the subject names the head role, and the remote then holds the commit.
@@ -387,4 +436,105 @@ fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_fo
         "third\n"
     );
     assert_eq!(scene.remote_tip(), tip);
+}
+
+/// A virtual clock: `sleep` advances it, so the retry schedule is proven without waiting.
+struct Clock {
+    origin: std::time::Instant,
+    slept: std::cell::RefCell<Vec<Duration>>,
+}
+
+impl Clock {
+    fn new() -> Self {
+        Self {
+            origin: std::time::Instant::now(),
+            slept: Default::default(),
+        }
+    }
+    fn now(&self) -> std::time::Instant {
+        self.origin + self.slept.borrow().iter().sum::<Duration>()
+    }
+}
+
+fn busy(code: &str) -> fgos_run_supervisor::route::CatchUpRefusal {
+    fgos_run_supervisor::route::CatchUpRefusal::Busy {
+        code: code.to_owned(),
+        detail: "pending fetch".to_owned(),
+    }
+}
+
+#[test]
+fn a_catch_up_refused_busy_while_a_writer_is_pending_lands_once_the_writer_settles() {
+    let clock = Clock::new();
+    let mut tries = 0;
+    let result = session_write_publish::retry_busy(
+        Duration::from_secs(45),
+        || {
+            tries += 1;
+            match tries {
+                1 => Err(busy("resource-busy")),
+                2 => Err(busy("merge-slot-busy")),
+                _ => Ok(()),
+            }
+        },
+        |d| clock.slept.borrow_mut().push(d),
+        || clock.now(),
+    );
+    assert_eq!(result, Ok(()));
+    assert_eq!(tries, 3);
+    assert_eq!(
+        *clock.slept.borrow(),
+        [Duration::from_millis(500), Duration::from_millis(1000)],
+        "backoff doubles"
+    );
+}
+
+#[test]
+fn a_catch_up_whose_writer_never_settles_is_busy_naming_the_last_code_inside_the_budget() {
+    let clock = Clock::new();
+    let budget = Duration::from_secs(45);
+    let result = session_write_publish::retry_busy(
+        budget,
+        || Err(busy("resource-busy")),
+        |d| clock.slept.borrow_mut().push(d),
+        || clock.now(),
+    );
+    assert_eq!(
+        result,
+        Err(busy("resource-busy")),
+        "the last Busy is returned"
+    );
+    let waited: Duration = clock.slept.borrow().iter().sum();
+    assert!(waited <= budget, "{waited:?}");
+    assert!(
+        clock
+            .slept
+            .borrow()
+            .iter()
+            .all(|d| *d <= Duration::from_secs(4)),
+        "backoff is capped"
+    );
+}
+
+#[test]
+fn a_catch_up_refusal_that_is_not_busy_is_returned_at_once_not_retried() {
+    use fgos_run_supervisor::route::{CatchUpRefusal, PublishRefusal};
+    let mut tries = 0;
+    let result = session_write_publish::retry_busy(
+        Duration::from_secs(45),
+        || {
+            tries += 1;
+            Err(CatchUpRefusal::Refused(PublishRefusal {
+                code: "resource-recovery-required".to_owned(),
+                detail: "chain gone".to_owned(),
+            }))
+        },
+        |_| panic!("no pause"),
+        std::time::Instant::now,
+    );
+    assert_eq!(tries, 1);
+    assert!(
+        matches!(result, Err(CatchUpRefusal::Refused(_))),
+        "{result:?}"
+    );
 }

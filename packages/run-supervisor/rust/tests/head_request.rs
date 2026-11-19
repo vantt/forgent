@@ -616,6 +616,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "verb-timeout",
             "write-base-stale",
             "write-branch-ahead",
+            "write-busy",
             "write-catch-up-refused",
             "write-failed",
             "write-outside-footprint",
@@ -1428,6 +1429,14 @@ fn head_write_whose_catch_up_is_refused_is_refused_by_name_before_the_clean_chec
             CatchUpRefusal::Refused(refusal("main-checkout-catch-up-refused", "dirty")),
             "write-catch-up-refused",
             "main-checkout-catch-up-refused: dirty",
+        ),
+        (
+            CatchUpRefusal::Busy {
+                code: "resource-busy".into(),
+                detail: "fetch op-1 pending".into(),
+            },
+            "write-busy",
+            "resource-busy: fetch op-1 pending",
         ),
     ] {
         let publish = Publish {
