@@ -44,6 +44,8 @@ trait (6b) gets its one S6a adapter here: the admission peer (P13, P17).
   integration tests: solo read-only, reviewed with writes committed, admission refused, recheck refused (nothing
   committed), peer that dies mid-run (the run fails closed, no commit), a stray unprefixed line on the channel ignored.
 
+- Carried in (2026-11-19): read the port list in phase-16b's file; this phase or 19 implements each runner port (ExecutePorts + SeatPorts, TerminalPrep, CredentialRenewal) — say which here before coding. Lock handover is `Handle::lend` (attempt lock fd 3 closed at binding, cwd lease fd 4 kept until closeAttempt); declare/clear a lock domain before lending. Windows writes-files runs are refused by name (`windows-cwd-lease-holder-missing`) and stay on Node until phase 19's Windows decision.
+
 ## Steps
 
 Commit the recorder; record vectors; red `engine/tests/unit_run.rs`; port; green; report.
