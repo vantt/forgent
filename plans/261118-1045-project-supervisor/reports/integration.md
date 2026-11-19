@@ -107,3 +107,28 @@ Paused; no lead started.
 - Open: the head executor (agy, Gemini 3.8 Flash) drifts into investigation in every window except the first
   supervisor; owner decision pending on a stronger executor for heads. Leftovers that lure heads are to be cleared
   before window 6. Acceptance 8 (a plan from `ready` to `done` with nobody typing) is not yet proven.
+
+## Live run, window 6 to close (2026-11-19 15:34-21:57, heads on claude; releases 64ee4dcf → 4f7ea1d8)
+Result: the throwaway plan `261119-1142-supervisor-live-run` went `ready` → `running` (750471a9e) → phase 1 landed
+by its lead through `fgos land` (12c9c3fa7) → `done` (8a79ee13a). All three commits were made by the supervisor and
+lead heads through the land door; no person committed or typed a land.
+What ran on its own: the watcher woke the supervisor; the supervisor admitted the plan, named its lead, started the
+lead, ended every wake with `supervisor done`; `lead-ended` restarts of a gone lead (5 times); the stuck-stop of an
+idle supervisor (107e6c8c9, first live case 16:36); one planner started for a settled discussion (PS-23); the
+question-answered event fired on the fixed definition (0414ccf9b) and woke the supervisor; the lead asked owner
+questions instead of investigating (q-f74scrmcij, q-y7brsup6gb, q-ixu4hnbgyd).
+Where people stepped in (so acceptance 8 is met with these caveats, each now a fix or a backlog row):
+- owner answers to the three questions (by design, through Miu);
+- the lead SUPERVISION ran `fgos session stop` on the lead four times: a lead stays on its start release
+  (backlog p-ycausep3zs); a lead ended its turn on a running ticket (fixed 0414ccf9b); the question-answered
+  handler did not restart an idle asker (fix in progress); a stale question blocked a restart;
+- the supervisor session typed once into the lead's pane after the first answer (21:1x);
+- config steps: land.regenerate off/on (head PATH lacked cargo: fixed 0414ccf9b; doctor did not re-render the
+  timer: fix in progress, forced re-render done 21:5x).
+Bugs found and fixed during the run: run argv order through the socket (530050e8e); refusal message capture;
+supervisor done + stuck-stop (107e6c8c9); question-answered ts + named tick problems, lead ticket wait, cargo PATH,
+regenerate `when` (0414ccf9b); config reader for land.regenerate (e2d37914a); land dirty overlap (2a4da5a87);
+failed land settles itself (cb915d9d9); confined reads (675ea511c, 1ca464995).
+Still open for this plan: the asker-restart and timer-drift fixes (branch sv/fix-asker-restart-timer-drift),
+phase 19 step 6 (land-branch.sh removal), and reverting the head pins to claude (owner decision 15:24) when the
+plan closes.
