@@ -189,13 +189,26 @@ function hostCall({ envelope, projectRoot, argv }, ports) {
     if (size > HOST_ANSWER_MAX_BYTES) throw Object.assign(new Error(`the host verb answered ${size} bytes, over the ${HOST_ANSWER_MAX_BYTES} one reply carries`), { code: 'reply-too-large' });
     return data;
   }
-  // The host prints a refusal as `fgos: <message> [<code>]` on stderr and nothing on stdout.
+  const { code, message } = refusalOf(run, line);
+  throw Object.assign(new Error((message ?? run.error?.message ?? `the host verb ended with exit ${run.status}`).slice(0, 500)), { code: code ?? 'host-failed' });
+}
+
+/**
+ * The host's refusal of a failed run: its JSON line's `code`/`message` (also under `error`), else the stderr line
+ * `fgos: <message> [<code>]` the host prints with nothing on stdout. A field the host did not give is undefined.
+ */
+function refusalOf(run, line) {
   const refusal = /^fgos: (.*) \[([a-z][a-z0-9-]*)\]$/.exec(String(run.stderr ?? '').trim().split('\n').pop() ?? '');
   const code = line?.code ?? line?.error?.code ?? refusal?.[2];
-  throw Object.assign(new Error(String(line?.message ?? line?.error?.message ?? refusal?.[1] ?? run.error?.message ?? `the host verb ended with exit ${run.status}`).slice(0, 500)), { code: /^[a-z][a-z0-9-]*$/.test(code ?? '') ? code : 'host-failed' });
+  const message = line?.message ?? line?.error?.message ?? refusal?.[1];
+  return { code: /^[a-z][a-z0-9-]*$/.test(code ?? '') ? code : undefined, message: typeof message === 'string' ? message : undefined };
 }
 
 // -- tickets
+
+/** A failed ticket keeps the host's reason, bounded: the message at most this many characters, the stderr tail this many lines and characters. */
+const FAILURE_MESSAGE_MAX_CHARS = 1024;
+const STDERR_TAIL_LINES = 12;
 
 const HEAD_ROLE_PATTERN = /^head:[a-z][a-z0-9-]*$/;
 const ticketDirOf = (projectRoot, role) => {
@@ -334,14 +347,20 @@ export function runTicket(file, ports = {}) {
   const line = lastJsonLine(run.stdout);
   const ok = run.status === 0;
   const done = { ...ticket, runner: (ports.selfRecord ?? selfRecord)(), state: ok ? 'done' : 'failed', exit: run.status, endedAt: new Date().toISOString() };
-  if (!ok) done.code = /^[a-z][a-z0-9-]*$/.test(line?.code ?? '') ? line.code : `exit-${run.status ?? 'signal'}`;
+  if (!ok) {
+    const refusal = refusalOf(run, line);
+    done.code = refusal.code ?? `exit-${run.status ?? 'signal'}`;
+    const message = refusal.message ?? run.error?.message;
+    if (message) done.message = message.slice(0, FAILURE_MESSAGE_MAX_CHARS);
+    const tail = String(run.stderr ?? '').trim().split('\n').slice(-STDERR_TAIL_LINES).join('\n').slice(-FAILURE_MESSAGE_MAX_CHARS);
+    if (tail) done.stderrTail = tail;
+  }
   if (ticket.verb === HEAD_RUN_VERB) {
     const unitRunId = unitRunIdOf(line);
     if (unitRunId) done.unitRunId = unitRunId;
   } else if (line !== null) {
     done.result = JSON.stringify(line).length > RESULT_MAX_CHARS ? { truncated: true } : line;
   }
-  delete done.argv;
   writeTicket(file, done);
   return done;
 }
@@ -371,6 +390,9 @@ function viewOf(ticket, projectRoot, { withResult, judgeRunner }) {
   if (ticket.endedAt) view.endedAt = ticket.endedAt;
   if (ticket.exit !== undefined) view.exit = ticket.exit;
   if (code) view.code = code;
+  if (ticket.message) view.message = ticket.message;
+  if (ticket.stderrTail) view.stderrTail = ticket.stderrTail;
+  if (ticket.argv) view.argv = ticket.argv;
   if (ticket.unitRunId) {
     view.unitRunId = ticket.unitRunId;
     view.assignment = assignmentOf(projectRoot, ticket.unitRunId);

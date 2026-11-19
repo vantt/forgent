@@ -36,7 +36,7 @@ For each phase of the wave whose footprint is disjoint from the others in it:
    `fgos questions ask`; never investigate it in the host's source.
 2. `fgos run "<prompt naming the phase file>" --provider <id> --capability <purpose> --worktree <path> --writes <paths>`
    (only these pass), with `--writes` inside the plan footprint.
-3. Read the outcome with `fgos request result <id> --wait <seconds>` (at most 50). A failed or blocked result is read, not retried blind.
+3. Read the outcome with `fgos request result <id> --wait <seconds>` (at most 50). A failed or blocked result is read, not retried blind: a failed ticket's `code` and `message` (with `argv` and `stderrTail`) say why.
 4. Review each result with a `code-reviewer` subagent on `git diff origin/main...HEAD` of the branch, with the phase
    file as the spec. Fix blocking findings through another unit.
 5. Land with `fgos land <branch> [--test <path>...]` (name the tests the phase file lists). Never run a hand-made
