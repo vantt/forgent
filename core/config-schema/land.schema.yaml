@@ -45,3 +45,9 @@ properties:
         items:
           type: string
           minLength: 1
+      when:
+        description: Path globs; the command runs only if a landed path matches one. Absent runs it on every landing.
+        type: array
+        items:
+          type: string
+          minLength: 1

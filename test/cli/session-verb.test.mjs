@@ -63,6 +63,18 @@ test('request result reads the tickets of FGOS_HEAD_ROLE and refuses a missing r
   assert.match(unknown.stderr, /ticket-unknown/);
 });
 
+test('request result takes its wait as the separate-token form `--wait 50`, as the contract documents it', () => {
+  const cwd = project();
+  const env = { ...unconfined, FGOS_HEAD_ROLE: 'head:lead-demo' };
+  // An unknown ticket is refused as ticket-unknown only when the wait was read as a number of seconds.
+  const spaced = run(cwd, ['request', 'result', 'nope1', '--wait', '50', '--json'], env);
+  assert.equal(spaced.status, EXIT_PRECONDITION, spaced.stderr);
+  assert.match(spaced.stderr, /ticket-unknown/);
+  const bad = run(cwd, ['request', 'result', 'nope1', '--wait', 'soon', '--json'], env);
+  assert.equal(bad.status, EXIT_VALIDATION, bad.stderr);
+  assert.match(bad.stderr, /seconds/);
+});
+
 test('a confined caller without a request socket is refused as precondition by every subcommand, starting or writing nothing', () => {
   const cwd = project();
   for (const args of [['start', 'secretary', '--name', 'miu'], ['rotate', 'secretary', '--name', 'miu'], ['stop', 'secretary', '--name', 'miu'], ['write', 'docs/backlog.md']]) {

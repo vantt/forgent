@@ -308,6 +308,7 @@ fn a_conflicting_census_lands_regenerated() {
         regenerate: Some(Regenerate {
             run: "cp src.txt census.txt".into(),
             files: vec!["census.txt".into()],
+            when: Vec::new(),
         }),
     };
     let out = f.land(&branch("topic"), &cfg).unwrap();
@@ -697,6 +698,7 @@ fn a_branch_edit_of_a_regenerated_file_outside_the_footprint_refuses() {
         regenerate: Some(Regenerate {
             run: "cp src.txt census.txt".into(),
             files: vec!["census.txt".into()],
+            when: Vec::new(),
         }),
     };
     let mut cmd = branch("topic");
@@ -973,4 +975,30 @@ fn a_paths_land_without_a_footprint_does_not_look_at_plan_files() {
         .land(&paths(&[PLAN_PATH]), &config(vec![gate("true")]))
         .unwrap();
     assert_eq!(out.main_sha, f.remote_tip());
+}
+
+#[test]
+fn a_regeneration_with_when_runs_only_when_a_landed_path_matches() {
+    for (glob, ran) in [("*.rs", false), ("*.txt", true)] {
+        let f = Fixture::new();
+        let file = "src.txt";
+        f.topic("topic", &[(file, "x\n")]);
+        let marker = std::env::temp_dir().join(format!(
+            "fgos-regen-when-{}-{}",
+            std::process::id(),
+            if ran { "ran" } else { "skipped" }
+        ));
+        let _ = fs::remove_file(&marker);
+        let cfg = LandConfig {
+            gates: vec![gate("true")],
+            regenerate: Some(Regenerate {
+                run: format!("touch {}", marker.display()),
+                files: vec!["census.txt".into()],
+                when: vec![glob.into()],
+            }),
+        };
+        f.land(&branch("topic"), &cfg).unwrap();
+        assert_eq!(marker.exists(), ran, "{glob}");
+        let _ = fs::remove_file(&marker);
+    }
 }

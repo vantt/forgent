@@ -63,6 +63,8 @@ pub struct Gate {
 pub struct Regenerate {
     pub run: String,
     pub files: Vec<String>,
+    /// Path globs; empty means the regeneration always runs.
+    pub when: Vec<String>,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -669,6 +671,19 @@ impl Lander<'_> {
         Ok(())
     }
 
+    /// Whether `when` is empty (always) or matches at least one of `changed`.
+    fn any_matches(&self, changed: &[String], when: &[String]) -> Result<bool, LandRefusal> {
+        if when.is_empty() {
+            return Ok(true);
+        }
+        for path in changed {
+            if self.matches_any(path, when)? {
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
     /// Run the gates whose `when` matches a changed path, in order, stopping at the first failure.
     fn run_gates(
         &self,
@@ -684,19 +699,7 @@ impl Lander<'_> {
             .collect::<Vec<_>>()
             .join(" ");
         for gate in &self.config.gates {
-            let applies = if gate.when.is_empty() {
-                true
-            } else {
-                let mut hit = false;
-                for path in changed {
-                    if self.matches_any(path, &gate.when)? {
-                        hit = true;
-                        break;
-                    }
-                }
-                hit
-            };
-            if !applies {
+            if !self.any_matches(changed, &gate.when)? {
                 continue;
             }
             let command = gate.run.replace("{tests}", &quoted);
@@ -978,7 +981,17 @@ impl Lander<'_> {
                 "no candidate; run `fgos git recover`",
             )
         };
-        if let Some(regen) = &self.config.regenerate {
+        let regenerates = match &self.config.regenerate {
+            Some(regen) if !regen.when.is_empty() => {
+                let (session, _) = live.as_ref().ok_or_else(no_candidate)?;
+                let candidate = session.candidate().ok_or_else(no_candidate)?;
+                let oid = oid_of(p.repo, &candidate.candidate)?;
+                let changed = self.changed_paths(target, &oid)?;
+                self.any_matches(&changed, &regen.when)?
+            }
+            _ => true,
+        };
+        if let (Some(regen), true) = (&self.config.regenerate, regenerates) {
             let (session, id) = live.as_ref().ok_or_else(no_candidate)?;
             if session.candidate().is_none() {
                 return Err(no_candidate());

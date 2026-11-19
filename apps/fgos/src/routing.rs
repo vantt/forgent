@@ -1212,6 +1212,10 @@ mod confined_tests {
             built(&["request", "result", "t1", "--wait", "30"]).args,
             json!({"id": "t1", "wait": 30.0})
         );
+        assert_eq!(
+            built(&["request", "result", "--wait", "50", "t1", "--json"]).args,
+            json!({"id": "t1", "wait": 50.0})
+        );
         assert_eq!(built(&["request", "result"]).args, json!({}));
         assert_eq!(
             built(&["worktree", "create", "../w", "--branch", "b"]).args,

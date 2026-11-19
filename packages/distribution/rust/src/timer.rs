@@ -544,8 +544,9 @@ pub struct Host {
     pub herdr_env: Vec<(String, String)>,
 }
 
-/// The binaries a watcher wake launches: the payload's Node, herdr and the agent CLIs the runner starts.
-const WAKE_TOOLS: [&str; 4] = ["node", "herdr", "claude", "codex"];
+/// The binaries a watcher wake launches: the payload's Node, herdr and the agent CLIs the runner starts, and
+/// cargo, which a head's land regeneration needs to build the git addon.
+const WAKE_TOOLS: [&str; 5] = ["node", "herdr", "claude", "codex", "cargo"];
 
 /// The directories of `tools` found on `path_var`, first match per tool, de-duplicated.
 fn resolve_tool_dirs(path_var: &str, tools: &[&str]) -> Vec<String> {
@@ -1428,9 +1429,31 @@ mod tests {
         std::fs::write(&node, "#!/bin/sh\n").unwrap();
         std::fs::set_permissions(&node, std::os::unix::fs::PermissionsExt::from_mode(0o755))
             .unwrap();
-        let path_var = format!("{}:/usr/bin:relative", nvm.display());
+        let cargo_bin = bin.join("cargo/bin");
+        std::fs::create_dir_all(&cargo_bin).unwrap();
+        let cargo = cargo_bin.join("cargo");
+        std::fs::write(&cargo, "#!/bin/sh\n").unwrap();
+        std::fs::set_permissions(&cargo, std::os::unix::fs::PermissionsExt::from_mode(0o755))
+            .unwrap();
+        let path_var = format!(
+            "{}:{}:/usr/bin:relative",
+            nvm.display(),
+            cargo_bin.display()
+        );
         let dirs = resolve_tool_dirs(&path_var, &WAKE_TOOLS);
-        assert_eq!(dirs, vec![nvm.to_string_lossy().into_owned()]);
+        assert_eq!(
+            dirs,
+            vec![
+                nvm.to_string_lossy().into_owned(),
+                cargo_bin.to_string_lossy().into_owned()
+            ],
+            "the node dir and the cargo dir are both carried"
+        );
+        assert_eq!(
+            resolve_tool_dirs(&format!("{}:/usr/bin", nvm.display()), &WAKE_TOOLS),
+            vec![nvm.to_string_lossy().into_owned()],
+            "no cargo on the installing PATH leaves the PATH without one"
+        );
 
         for (platform, with) in [
             ("linux", true),
@@ -1446,6 +1469,7 @@ mod tests {
             let vars = schedule.service_vars(&h);
             let path = &vars.iter().find(|(k, _)| k == "PATH").unwrap().1;
             assert_eq!(path.contains(&dirs[0]), with, "{platform}");
+            assert_eq!(path.contains(&dirs[1]), with, "{platform}");
             assert!(path.starts_with(&h.probe_path()));
             let spec = UnitSpec {
                 stem: &stem,
