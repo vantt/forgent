@@ -32,6 +32,8 @@
     },
     "rules": [
       "Unknown fields at any level are refused by name.",
+      "An object that repeats a key is refused as `duplicate-key` when the input is read from JSON text; an already decoded value cannot carry one.",
+      "A `priority` entry that is empty or longer than maxIdBytes is refused as id-empty or id-too-long, like any other id.",
       "Node order, and edge order per `from`, are part of the input: the output is a pure function of the input including order.",
       "Duplicate edges and duplicate exclusion pairs change nothing and appear once in outputs.",
       "An ordering edge from a node to itself is a cycle of one node."
@@ -39,6 +41,7 @@
   },
   "refusals": [
     "input-not-object",
+    "duplicate-key",
     "unknown-field",
     "nodes-missing",
     "node-malformed",
@@ -71,7 +74,7 @@
       "cycleKinds": "the edge kind of each step, same length as cycle (the last entry is the closing edge)"
     },
     "danglingEntry": "{ source: 'edge' | 'exclusion', index, from?, to?, a?, b?, missing: list of the absent ids }",
-    "deferralEntry": "{ node, earliest, placedAt, reasons: [ { layer, partner } ] }: in each layer from `earliest` up to but excluding `placedAt`, `partner` is the first node already placed in that layer that is excluded with `node`",
+    "deferralEntry": "{ node, earliest, placedAt, reasons: [ { layer, partner } ] }: `reasons` lists only the layers in which `node` was ready (every dependency placed in an earlier layer) and was held back by an exclusion partner; `partner` is the first node placed in that layer that is excluded with `node`. A delay caused by a dependency's own deferral carries no reason here and is explained by that dependency's entry, so `reasons` may be empty",
     "criticalPathEntry": "{ depth: number of nodes on the path, path: ids from the deepest node down through the dependency it waits on longest }; an empty graph gives { depth: 0, path: [] }"
   },
   "queries": {
@@ -79,12 +82,12 @@
       "input": "the graph input plus one node id",
       "output": "the shortest cycle through that id, in the shape of cycleEntry.cycle and cycleKinds, or null when the id is on no cycle",
       "refusals": [ "cycle-through-unknown-id" ],
-      "cost": "linear in the size of the component"
+      "cost": "O(V+E) per call: the ordering adjacency of the whole graph is built, then only what is reachable from the id is searched"
     }
   },
   "tieBreaks": [
     "Smallest id means smallest by UTF-8 byte order.",
-    "Cycle: among the shortest cycles through the component's smallest id, the one whose id sequence is lexicographically smallest, computed linearly (breadth-first distances back to the root, then a greedy walk choosing the smallest successor that stays on a shortest path). cycle_through(id) uses the same rule rooted at the chosen id.",
+    "Cycle: among the shortest cycles through the component's smallest id, the one whose id sequence is lexicographically smallest, computed linearly (breadth-first distances back to the root, then a greedy walk choosing the smallest successor that stays on a shortest path). cycle_through(id) uses the same rule rooted at the chosen id. Where several edges join the same two nodes, the step's kind is the kind of the first declared of them.",
     "Layers: a node's earliest layer is 0 when it waits for nothing, else one more than the greatest layer of the nodes it waits for. Under exclusions, layers are filled one at a time: the nodes whose dependencies are all placed in earlier layers are offered in priority order and each is placed unless an already placed node of that layer is excluded with it.",
     "Priority: the `priority` list, then input order for ids not listed. No two nodes tie because every node has one input position.",
     "Critical path: the first strict maximum wins, over nodes in input order and, for one node, over its dependencies in edge input order.",

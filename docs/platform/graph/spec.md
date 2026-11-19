@@ -74,10 +74,10 @@ they exist so a cycle report can say which relation closes the loop, which matte
 | Output | Definition |
 |---|---|
 | `cycles` | One entry per non-trivial component, ordered by its smallest id. Each carries the component's members, its induced ordering edges, **one canonical shortest cycle** through the smallest member as an id list with the edge kind of each step, rooted at that member |
-| `cycle_through(id)` | A bounded query: the shortest cycle through a chosen member, in the same shape, or null when the id is on no cycle. Linear in the component's size |
+| `cycle_through(id)` | A bounded query: the shortest cycle through a chosen member, in the same shape, or null when the id is on no cycle. O(V+E) per call: the whole graph's adjacency is built, then only what is reachable from the id is searched |
 | `dangling` | Every edge or exclusion pair that names an id that is not a node, with the absent ids. Never turned into a node, never part of a computation |
 | `layers` | Topological layers by earliest possible layer, then adjusted for exclusions (section 5). Null when a cycle exists |
-| `deferrals` | For each node placed later than its earliest possible layer, the layers it was held out of and the first excluded node already in each. Null when `layers` is null |
+| `deferrals` | For each node placed later than its earliest possible layer, the layers in which it was ready and held out, and the first excluded node already placed in each. A delay caused by a dependency's own deferral carries no reason here: that dependency's entry explains it. Null when `layers` is null |
 | `criticalPath` | The longest chain of waits, unweighted: `{ depth, path }` with `depth` the number of nodes and `path` listing them from the deepest node down through the dependency it waits on longest. Null when a cycle exists |
 | `groups` | Independent groups: nodes in different groups share no dependency, no `related` edge and no exclusion pair, so they can be worked entirely in parallel |
 
@@ -86,7 +86,7 @@ truncation apparatus, and the output must hash the same on every rebuild. A pers
 needs one cycle with its path and enough context to break it. When the canonical cycle cannot be broken
 because one of its edges belongs to a plan the planner does not control, the component's members and induced
 edges show the other ways round, and `cycle_through(id)` shows the shortest loop through any member of
-interest. All three are linear, so there is no cap and no truncation. All cycles are not enumerated (plan
+interest. All three cost at most O(V+E), so there is no cap and no truncation. All cycles are not enumerated (plan
 decisions 7, 27; the pkm survey took only the idea of pruning by component and rooting at the smallest id).
 
 ## 5. Tie-break rules
@@ -103,13 +103,15 @@ caller, never a heuristic of the package.
   cannot be chosen by the next rule), then, at each later step, the smallest successor id whose distance
   back to the root is one less than the current node's, until the root is reached. Only nodes of the
   component take part. `cycle_through(id)` uses the same rule with
-  the chosen id as the root. A self-edge is a cycle of that one node.
+  the chosen id as the root. A self-edge is a cycle of that one node. Where several edges join the same two nodes, the
+  step's kind is the kind of the first declared of them.
 - **Layers without exclusions.** A node's layer is 0 when it waits for nothing, otherwise one more than the
   greatest layer among the nodes it waits for.
 - **Layers under exclusions.** Layers are filled one at a time. In layer *n*, the nodes whose dependencies
   are all placed in earlier layers are offered in priority order; each is placed unless an already placed
   node of that layer is excluded with it, in which case it is deferred to the next layer and the blocking
-  partner is recorded. The priority is the caller's `priority` list, then input order for ids not listed;
+  partner is recorded. A node is recorded only for the layers in which it was ready; a node that
+  waits because a dependency was deferred has no reason of its own, and that dependency's entry explains it. The priority is the caller's `priority` list, then input order for ids not listed;
   because every node has one input position no two nodes tie. Nothing is ever refused for an exclusion: a
   conflicting node waits, as `computeSchedule` does today.
 - **Critical path.** The first strict maximum wins, over nodes in input order and, for one node, over its
@@ -120,7 +122,7 @@ caller, never a heuristic of the package.
 
 | Class | What | Behaviour |
 |---|---|---|
-| Refusal | Malformed input: wrong shape, unknown field, empty or non-string or overlong id, duplicate id, malformed edge, unknown edge kind, an exclusion of a node with itself, a duplicate or unknown id in `priority`, input beyond a limit | Nothing is computed. The error names the code, the field or limit, and the index of the first offending item, and quotes no more than the id-length limit |
+| Refusal | Malformed input: wrong shape, unknown field, empty or non-string or overlong id, duplicate id, malformed edge, unknown edge kind, an exclusion of a node with itself, a duplicate, empty, overlong or unknown id in `priority`, an object that repeats a key (read from text), input beyond a limit | Nothing is computed. The error names the code, the field or limit, and the index of the first offending item, and quotes no more than the id-length limit |
 | Result | A fact about well-formed input: cycles, dangling references, layers, deferrals, critical path, groups | Always returned |
 
 A cycle is a result, not a refusal: it is the thing the caller asked to know about. When one exists,
@@ -199,3 +201,4 @@ directory and in the crate (`fgos-graph`) and is never exposed as a verb of that
 | plan decision 26 | The package keeps the name `graph`; it is not a verb and differs from `fgos graph` | section 8 |
 | plan decision 27 | One canonical shortest cycle per component, with members, induced edges and `cycle_through(id)`; all cycles are not enumerated | section 4 |
 | phase 1 | The edge-kind registry has three ordering kinds and one non-ordering kind; limits were fixed from measured maxima | sections 3, 7 |
+| phase 4 | The crate `fgos-graph` implements the contract with serde and serde_json only. Input is read from a decoded JSON value so unknown fields and shape errors are refused by name; text that is not JSON is refused as `input-not-object`; a field of the wrong container type (`edges`, `exclusions`, `priority` not a list) is refused with that field's own refusal code (`edge-malformed`, `exclusion-malformed`, `priority-unknown-id`); an edge or exclusion end that is empty is malformed, over-long is `id-too-long`, absent from the nodes is dangling. Strongly connected components use an iterative Tarjan; `cycle_through` restricts its backward search to what is reachable from the chosen id, so each call costs O(V+E) (adjacency of the whole graph, then a search of what is reachable). Induced edges per component are built in one pass over the edges, and exclusion layering stamps each placed node's partners with the layer rather than rescanning partners per deferral. Text input is read through a small duplicate-key-refusing reader built on serde_json (no new crate), so a repeated object key is refused as `duplicate-key`; a decoded value has none. The step kind of a cycle is the first declared edge between the two nodes. Layer nodes are listed in placement (priority) order. A deferral entry exists for every node placed after its earliest layer; its `reasons` name only the layers in which the node was ready and held out by an exclusion, and are empty when a dependency's deferral alone delayed it. Intended differences 1 to 6 each have a named test (`intended_difference_N_...`). The seeded layering test checks placement by priority and every deferral reason against a direct simulation | sections 4, 5, 6, 8 |
