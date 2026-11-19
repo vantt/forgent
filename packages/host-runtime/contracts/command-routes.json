@@ -1222,6 +1222,24 @@
     "store": "require",
     "mutates_store": true
   },
+  "resource-check": {
+    "selector": "resource-check",
+    "route_kind": "native",
+    "operation_id": "resource-check.run",
+    "owner_path": "apps/fgos",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ],
+    "accepted_flags": [
+      "dir",
+      "json",
+      "help",
+      "plan",
+      "units",
+      "policy"
+    ],
+    "store": "none"
+  },
   "resync-worktree": {
     "selector": "resync-worktree",
     "route_kind": "native",

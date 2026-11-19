@@ -159,6 +159,7 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::git_incidents::STATUS_DESCRIPTOR,
     wiring::git_incidents::RECOVER_DESCRIPTOR,
     wiring::lock_status::DESCRIPTOR,
+    wiring::resource_check::DESCRIPTOR,
     wiring::lock_fence::DESCRIPTOR,
     wiring::doctor::DESCRIPTOR,
     wiring::wire_agents::DESCRIPTOR,
@@ -445,6 +446,9 @@ fn main() {
         ));
     }
     service.register_provider(Arc::new(wiring::lock_status::LockStatusProvider::new()));
+    service.register_provider(Arc::new(
+        wiring::resource_check::ResourceCheckProvider::new(),
+    ));
     service.register_provider(Arc::new(wiring::lock_fence::LockFenceProvider::new()));
     service.register_provider(Arc::new(wiring::doctor::DoctorProvider::new()));
     service.register_provider(Arc::new(wiring::wire_agents::WireAgentsProvider::new()));
