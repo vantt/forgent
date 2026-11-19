@@ -800,78 +800,16 @@ pub fn validate_inspection_selector(options: &InspectionOptions) -> Result<Selec
 /// date-time with `Z` or `±hh:mm`. Every field must survive a round trip through the calendar, so `2026-02-30` is
 /// refused, not rolled over into March, and a time with no offset is refused rather than read in the local zone.
 pub fn parse_attention_since(since: &str) -> Result<i64, String> {
-    let refusal = || {
+    use fgos_host_runtime::civil_time::{parse_date_midnight_millis, parse_rfc3339_millis};
+    // The civil-time door also reads a lower-case `t`/`z` and years below 1000; this bound does not.
+    let in_grammar = !since.starts_with('0') && !since.bytes().any(|b| b == b't' || b == b'z');
+    let instant = match since.len() {
+        10 => parse_date_midnight_millis(since),
+        _ => parse_rfc3339_millis(since),
+    };
+    instant.filter(|_| in_grammar).ok_or_else(|| {
         "dispatch inspect --attention requires --since <YYYY-MM-DD, or a date-time with Z or ±hh:mm>".to_string()
-    };
-    let b = since.as_bytes();
-    let digits = |from: usize, len: usize| -> Option<u32> {
-        let part = since.get(from..from + len)?;
-        part.bytes()
-            .all(|c| c.is_ascii_digit())
-            .then(|| part.parse().ok())
-            .flatten()
-    };
-    let (year, month, day) = (
-        digits(0, 4).ok_or_else(refusal)?,
-        digits(5, 2).ok_or_else(refusal)?,
-        digits(8, 2).ok_or_else(refusal)?,
-    );
-    if b.get(4) != Some(&b'-') || b.get(7) != Some(&b'-') || year < 1000 {
-        return Err(refusal());
-    }
-    let days = fgos_host_runtime::civil_time::days_from_civil(year as i64, month, day)
-        .ok_or_else(refusal)?;
-    if since.len() == 10 {
-        return Ok(days * 86_400_000);
-    }
-    // A full date-time: `T`, hh:mm:ss, optional fraction, then `Z` or `±hh:mm`.
-    let (hour, minute, second) = (
-        digits(11, 2).ok_or_else(refusal)?,
-        digits(14, 2).ok_or_else(refusal)?,
-        digits(17, 2).ok_or_else(refusal)?,
-    );
-    if b.get(10) != Some(&b'T')
-        || b.get(13) != Some(&b':')
-        || b.get(16) != Some(&b':')
-        || hour > 23
-        || minute > 59
-        || second > 59
-    {
-        return Err(refusal());
-    }
-    let mut rest = &since[19..];
-    let mut fraction_ms = 0i64;
-    if let Some(after) = rest.strip_prefix('.') {
-        let n = after.bytes().take_while(u8::is_ascii_digit).count();
-        if n == 0 {
-            return Err(refusal());
-        }
-        let frac = &after[..n];
-        fraction_ms = format!("{:0<3}", &frac[..frac.len().min(3)])
-            .parse()
-            .map_err(|_| refusal())?;
-        rest = &after[n..];
-    }
-    let offset_ms = match rest {
-        "Z" => 0,
-        zone if zone.len() == 6
-            && (zone.starts_with('+') || zone.starts_with('-'))
-            && zone.as_bytes()[3] == b':' =>
-        {
-            let hh: i64 = zone[1..3].parse().map_err(|_| refusal())?;
-            let mm: i64 = zone[4..6].parse().map_err(|_| refusal())?;
-            if hh > 23 || mm > 59 {
-                return Err(refusal());
-            }
-            let sign = if zone.starts_with('-') { -1 } else { 1 };
-            sign * (hh * 60 + mm) * 60_000
-        }
-        _ => return Err(refusal()),
-    };
-    Ok(days * 86_400_000
-        + (hour as i64 * 3600 + minute as i64 * 60 + second as i64) * 1000
-        + fraction_ms
-        - offset_ms)
+    })
 }
 
 /// Inspect the runtime of `root` by one selector. `now` stamps the observation.

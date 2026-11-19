@@ -744,7 +744,8 @@
       "patterns": ["homedir\\(\\)\\s*,\\s*['\\\"]\\.fgos['\\\"]", "\\b(?:homeDir|home)\\s*,\\s*['\\\"]\\.fgos['\\\"]", "\\bhome\\.join\\(\\\"\\.fgos\\\"\\)", "pub fn home_dir\\(", "fn global_dir\\(", "export function globalFgosDir", "get\\(\\\"HOME\\\"\\)"],
       "allowed": [
         "packages/config/rust/src/machine.rs",
-        "src/config/facade.mjs"
+        "src/config/facade.mjs",
+        { "path": "packages/execution/engine/src/transport_round/round.rs", "reason": "reads the attempt environment's HOME (the agent's source home for its private home and agy trust store, the Node twin's `fullEnv.HOME ?? os.homedir()`); it never joins .fgos, and machine::global_dir answers the machine's ~/.fgos, not an agent's home" }
       ],
       "debt": [
         { "path": "src/runner/dispatch/llm-accounts.mjs", "reason": "machineLoginStores takes a homeDir parameter (default os.homedir()) and joins .fgos itself, so a caller can name a home the global directory door does not know" },
