@@ -532,11 +532,12 @@ struct Renewals(RefCell<Vec<String>>, bool);
 impl CredentialRenewal for Renewals {
     fn renew(&self, ask: &RenewAsk<'_>) -> Result<Option<Value>, String> {
         self.0.borrow_mut().push(format!(
-            "{}/{}:{}:{}",
+            "{}/{}:{}:{}:{}",
             ask.provider,
             ask.account_id,
             ask.credential_source["cli"].as_str().unwrap_or("-"),
-            ask.runtime_dir.display()
+            ask.runtime_dir.display(),
+            ask.seat_timeout_ms
         ));
         if self.1 {
             Err("renewal broke".into())
@@ -567,7 +568,8 @@ fn a_login_is_renewed_only_when_the_caller_opted_in_and_the_launch_may_copy_it()
             "multi",
             None,
             Some("confined"),
-            Some(dir)
+            Some(dir),
+            None
         ),
         selected()
     );
@@ -579,7 +581,8 @@ fn a_login_is_renewed_only_when_the_caller_opted_in_and_the_launch_may_copy_it()
             "multi",
             None,
             Some("unconfined"),
-            Some(dir)
+            Some(dir),
+            None
         ),
         selected()
     );
@@ -594,7 +597,8 @@ fn a_login_is_renewed_only_when_the_caller_opted_in_and_the_launch_may_copy_it()
             "multi",
             None,
             Some("confined"),
-            Some(dir)
+            Some(dir),
+            None
         ),
         refused
     );
@@ -608,16 +612,25 @@ fn a_login_is_renewed_only_when_the_caller_opted_in_and_the_launch_may_copy_it()
         None,
         Some("confined"),
         Some(dir),
+        None,
     );
     assert_eq!(
         renewals.0.borrow().as_slice(),
-        ["openai/a1:codex:/rt", "openai/a1:claude:/rt"]
+        ["openai/a1:codex:/rt:900000", "openai/a1:claude:/rt:900000"]
     );
     assert_eq!(
         renewed["credentialWriteBack"],
         json!({ "runtimeDir": "/rt" })
     );
-    // A pinned invocation renews only its own store.
+    // Each store's outcome rides on the lease, so a life-check refusal can name it.
+    assert_eq!(
+        renewed["refreshAhead"],
+        json!([
+            { "cli": "codex", "status": "fresh", "reason": "not-due" },
+            { "cli": "claude", "status": "fresh", "reason": "not-due" },
+        ])
+    );
+    // A pinned invocation renews only its own store, and the renewal is given the seat's own timeout.
     renewals.0.borrow_mut().clear();
     renew_leased_login(
         &selected(),
@@ -627,8 +640,12 @@ fn a_login_is_renewed_only_when_the_caller_opted_in_and_the_launch_may_copy_it()
         Some("two"),
         Some("confined"),
         Some(dir),
+        Some(90 * 60_000),
     );
-    assert_eq!(renewals.0.borrow().as_slice(), ["openai/a1:claude:/rt"]);
+    assert_eq!(
+        renewals.0.borrow().as_slice(),
+        ["openai/a1:claude:/rt:5400000"]
+    );
     // An executor that declares a confinement of its own counts even when the posture asks for none.
     let confined_executor = json!({ "executors": { "c": { "kind": "agent", "command": "claude", "confinement": { "mode": "bwrap" } } } });
     renewals.0.borrow_mut().clear();
@@ -641,8 +658,9 @@ fn a_login_is_renewed_only_when_the_caller_opted_in_and_the_launch_may_copy_it()
         None,
         Some("unconfined"),
         Some(dir),
+        None,
     );
-    assert_eq!(renewals.0.borrow().as_slice(), ["p/a:claude:/rt"]);
+    assert_eq!(renewals.0.borrow().as_slice(), ["p/a:claude:/rt:900000"]);
 }
 
 #[test]
@@ -656,9 +674,14 @@ fn a_renewal_that_fails_never_blocks_the_dispatch() {
         None,
         Some("confined"),
         Some(Path::new("/rt")),
+        None,
     );
     assert_eq!(broken.0.borrow().len(), 2, "each store is still tried");
     assert_eq!(renewed["credentialWriteBack"]["runtimeDir"], "/rt");
+    assert_eq!(
+        renewed["refreshAhead"][0],
+        json!({ "cli": "codex", "status": "failed", "reason": "unexpected-error" })
+    );
 }
 
 // ---- resumed run -------------------------------------------------------------------------------------------

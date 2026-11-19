@@ -923,7 +923,27 @@ fn the_login_copy_refuses_the_launch_instead_of_starting_a_logged_out_worker() {
             life_problem: Some("login expires in 10s".into()),
         },
     );
-    assert_eq!(err.message, "account \"acct\": login expires in 10s");
+    // The refusal ends with what refresh-ahead did for this store on the lease, or `not-run` when nothing ran.
+    assert_eq!(
+        err.message,
+        "account \"acct\": login expires in 10s; refresh-ahead: not-run"
+    );
+    let err = prepare(
+        "life-renewal",
+        &|r| {
+            r["providerCapacity"]["refreshAhead"] = json!([
+                { "cli": "other", "status": "renewed", "reason": "applied" },
+                { "cli": r["providerCapacity"]["credentialSource"]["cli"], "status": "skipped", "reason": "live-seat-owns-renewal" },
+            ])
+        },
+        FakeCredentials {
+            life_problem: Some("login expires in 10s".into()),
+        },
+    );
+    assert_eq!(
+        err.message,
+        "account \"acct\": login expires in 10s; refresh-ahead: skipped live-seat-owns-renewal"
+    );
     let err = prepare(
         "kind",
         &|r| r["providerCapacity"]["credentialSource"]["kind"] = json!("vault"),

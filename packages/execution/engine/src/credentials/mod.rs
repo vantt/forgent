@@ -132,6 +132,15 @@ pub fn read_credential_expiry(
         .collect())
 }
 
+/// The suffix a seat's life-check refusal carries to name what refresh-ahead did for the store:
+/// `; refresh-ahead: <status>[ <reason>]`. Fixed words only, never a credential.
+pub fn refresh_ahead_note(status: &str, reason: Option<&str>) -> String {
+    match reason.filter(|r| !r.is_empty()) {
+        Some(reason) => format!("; refresh-ahead: {status} {reason}"),
+        None => format!("; refresh-ahead: {status}"),
+    }
+}
+
 /// Why a seat may not start on a copy of this login, or `None`. A login whose layout must never refresh inside a
 /// seat needs more access-token life than the seat's timeout; otherwise the CLI would refresh in the home and spend
 /// the source's token. Unreadable is the copy step's business, not a refusal here. Refresh-ahead widens its window by
@@ -160,13 +169,7 @@ pub fn login_life_problem(
         - now;
     (left < timeout).then(|| {
         let status = refresh_ahead
-            .map(|r| {
-                if r.reason.is_empty() {
-                    format!("; refresh-ahead: {}", r.status)
-                } else {
-                    format!("; refresh-ahead: {} {}", r.status, r.reason)
-                }
-            })
+            .map(|r| refresh_ahead_note(r.status, Some(&r.reason)))
             .unwrap_or_default();
         format!(
             "login-expires-before-seat-timeout: the login has {} min of access-token life left and the seat may run {} min, so the seat would refresh it inside its home{status}",

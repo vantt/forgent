@@ -448,8 +448,23 @@ impl BwrapDriver {
             .filter(|t| *t > 0)
             .unwrap_or(DEFAULT_SEAT_TIMEOUT_MS);
         if let Some(problem) = self.credentials.login_life_problem(source, timeout) {
+            // What refresh-ahead did for this store on the lease, so the refusal names it; `not-run` when it was not asked.
+            let cli = source.get("cli").filter(|c| !c.is_null());
+            let renewal = js::at(capacity, &["refreshAhead"])
+                .and_then(Value::as_array)
+                .and_then(|all| {
+                    all.iter()
+                        .find(|e| e.get("cli").filter(|c| !c.is_null()) == cli)
+                });
+            let note = match renewal {
+                Some(r) => crate::credentials::refresh_ahead_note(
+                    r.get("status").and_then(Value::as_str).unwrap_or("unknown"),
+                    r.get("reason").and_then(Value::as_str),
+                ),
+                None => crate::credentials::refresh_ahead_note("not-run", None),
+            };
             return Err(credential_error(format!(
-                "account \"{}\": {problem}",
+                "account \"{}\": {problem}{note}",
                 js::display(capacity.get("accountId"))
             )));
         }
