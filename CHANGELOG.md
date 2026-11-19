@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fixed: a seat start no longer spends a single-use login refresh token that a running seat still holds. While a running seat shares the account's refresh token, refresh-ahead leaves the renewal to that seat (`live-seat-owns-renewal`) and takes the seat's renewed pair on a later start; a running seat's login near its own expiry is never probed, so the probe cannot renew it either.
 - Changed: `fgos dispatch decide` refusals that come from the runner config name the file they read (`config.yaml` or `config.json`) instead of `<file>`, as the Node dispatch path did.
 - Fixed: `fgos dispatch decide` now refuses a seat bound to a bypass invocation (`bypass-invocation-not-allowed`), as the Node dispatch path did, instead of answering it.
 - Fixed: starting a seat whose account login was renewed inside another still-running seat (a head being rotated, or two seats sharing one account) no longer fails with `login-expires-before-seat-timeout`: refresh-ahead first takes the newest valid login from a live seat home of the same account, under the account lock, probes it and installs it into the account store; a dead seat's home is ignored and an older login never replaces a newer one.

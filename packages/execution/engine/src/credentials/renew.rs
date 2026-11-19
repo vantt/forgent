@@ -22,6 +22,9 @@ use super::{
 };
 
 const LOCK_MARGIN_MS: u64 = 30_000;
+/// Access-token life a running seat's login must still have beyond one probe call before it is taken: the call then
+/// uses that token as it is and never renews the copy, which would spend the seat's single-use refresh token.
+const LIVE_SEAT_LIFE_MARGIN_MS: f64 = 10.0 * 60_000.0;
 /// Calls an agent's copy gets before it is set aside; the count is kept inside the copy's own directory.
 const AGENT_COPY_TRIES: u32 = 2;
 const TRIES_FILE: &str = ".gate-tries";
@@ -201,6 +204,17 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
             outcome("fresh", "outside-window")
         };
     }
+    // A running seat that shares the store's refresh token owns its renewal: the next refresh-ahead after the seat
+    // renewed takes its newer pair (take_live_seat_login).
+    if live_seat_shares_refresh(
+        layout,
+        &homes,
+        &entry.key,
+        entry.refresh.as_deref(),
+        options.sqlite,
+    ) {
+        return outcome("skipped", "live-seat-owns-renewal");
+    }
     if in_cooldown(&account_dir, options.cooldown_ms, now()) {
         return outcome("cooldown", "recent-failure");
     }
@@ -374,7 +388,8 @@ fn take_live_seat_login(
         let Some(entry) = entry_in(dir) else {
             continue;
         };
-        if entry.expires_ms <= now()
+        // A login near its own expiry is left to its seat, which renews it; the next refresh-ahead takes the newer pair.
+        if entry.expires_ms - now() <= options.probe_timeout_ms as f64 + LIVE_SEAT_LIFE_MARGIN_MS
             || judge_copy(layout, provider, home, dir, now(), sqlite) != Verdict::Newer
             || same_account(layout, provider, home, dir, sqlite) == Some(false)
         {
@@ -441,6 +456,34 @@ fn take_live_seat_login(
         clear_failure(account_dir);
     }
     taken
+}
+
+/// A refresh token as a digest, so two stores are compared without holding the value side by side; never printed.
+fn refresh_digest(refresh: Option<&str>) -> Option<[u8; 32]> {
+    use sha2::{Digest, Sha256};
+    refresh.map(|r| Sha256::digest(r.as_bytes()).into())
+}
+
+/// Whether a running seat still holds the store's own refresh token for `key`: every seat starts on the store's pair,
+/// and the token is single use, so a renewal here would leave that seat with a spent token at its next refresh.
+fn live_seat_shares_refresh(
+    layout: Layout,
+    homes: &[PathBuf],
+    key: &str,
+    refresh: Option<&str>,
+    sqlite: &dyn SqliteAdapter,
+) -> bool {
+    let Some(own) = refresh_digest(refresh) else {
+        return false;
+    };
+    homes.iter().any(|dir| {
+        layout
+            .read(dir, true, sqlite)
+            .ok()
+            .and_then(|read| read.entries.into_iter().find(|e| e.key == key))
+            .and_then(|e| refresh_digest(e.refresh.as_deref()))
+            == Some(own)
+    })
 }
 
 // ------------------------------------------------------------------------------------------ probe gate
