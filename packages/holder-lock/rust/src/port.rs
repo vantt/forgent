@@ -193,8 +193,20 @@ pub struct Handle {
     /// Release alone decides whether any description copy remains.
     #[cfg_attr(not(unix), allow(dead_code))]
     since: Marks,
-    /// Set once a copy was lent to a child: from then on the release only closes this copy.
-    lent: std::sync::atomic::AtomicBool,
+    /// Whether a copy was lent to a child, and to which one (boxed: a handle rides in large enums).
+    lend: Box<std::sync::Mutex<Lend>>,
+}
+
+/// A handle's lend: once `lent`, the release only closes this copy; `to` is the child the copy went to, recorded
+/// right after its spawn, which a borrow's drain lets keep its copy.
+#[derive(Debug, Default)]
+struct Lend {
+    lent: bool,
+    to: Option<fgos_process::facts::ProcTuple>,
+}
+
+fn lend_of(to: Option<fgos_process::facts::ProcTuple>) -> Box<std::sync::Mutex<Lend>> {
+    Box::new(std::sync::Mutex::new(Lend { lent: false, to }))
 }
 
 /// The per-spawn scan floor and the start of the latest successful proof.
@@ -256,12 +268,49 @@ impl Handle {
             ));
         }
         let copy = self.file().try_clone()?;
-        self.lent.store(true, std::sync::atomic::Ordering::SeqCst);
+        self.lend.lock().unwrap_or_else(|p| p.into_inner()).lent = true;
         Ok(copy)
     }
 
     fn is_lent(&self) -> bool {
-        self.lent.load(std::sync::atomic::Ordering::SeqCst)
+        self.lend.lock().unwrap_or_else(|p| p.into_inner()).lent
+    }
+
+    /// Records the child a lent copy went to, right after its spawn (pid and start time, from the process facts).
+    /// From then on the handle may be borrowed again: a borrow's drain lets that process keep its copy while it
+    /// lives as recorded, and drains every other holder as before. A recorded child that died, or whose pid now
+    /// names another process, is not exempt.
+    pub fn lent_to(&self, child: fgos_process::facts::ProcTuple) {
+        self.lend.lock().unwrap_or_else(|p| p.into_inner()).to = Some(child);
+    }
+
+    /// The recorded child, while it still lives as recorded.
+    fn lent_member_tuple(&self) -> Option<fgos_process::facts::ProcTuple> {
+        let recorded = self
+            .lend
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .to
+            .clone()?;
+        (fgos_process::facts::identity_of(recorded.pid).as_ref() == Some(&recorded))
+            .then_some(recorded)
+    }
+
+    /// The pids a drain treats as members of this holder: the live child its copy was lent to.
+    #[cfg_attr(not(target_os = "linux"), allow(dead_code))]
+    fn lent_members(&self) -> Vec<u32> {
+        self.lent_member_tuple()
+            .map(|child| child.pid.0)
+            .into_iter()
+            .collect()
+    }
+
+    fn lent_to_known(&self) -> bool {
+        self.lend
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .to
+            .is_some()
     }
 
     fn settle_release(&mut self) -> Release {
@@ -360,7 +409,7 @@ impl<'a> BorrowedHandle<'a> {
                     .lock()
                     .map_err(|_| BorrowError::InvalidSpec("lock-history-poisoned".into()))?,
             ),
-            lent: std::sync::atomic::AtomicBool::new(false),
+            lend: lend_of(owner.lent_member_tuple()),
         };
         let borrowed = Self {
             handle,
@@ -409,7 +458,7 @@ impl BorrowedHandle<'static> {
             kill_wait_ms,
             terminate_grace_ms: 3000,
             since: std::sync::Mutex::new((since, since)),
-            lent: std::sync::atomic::AtomicBool::new(false),
+            lend: lend_of(None),
         };
         let loan = Self {
             handle,
@@ -935,7 +984,7 @@ fn acquire_traced(
             kill_wait_ms,
             terminate_grace_ms: 3000,
             since: std::sync::Mutex::new((opened_after, opened_after)),
-            lent: std::sync::atomic::AtomicBool::new(false),
+            lend: lend_of(None),
         });
     }
 }
@@ -953,10 +1002,10 @@ pub fn validate(handle: &Handle) -> Result<(), BorrowError> {
             "only an exclusive lock can be borrowed".into(),
         ));
     }
-    if handle.is_lent() {
-        // A borrow drain would end the child the lock was lent to.
+    if handle.is_lent() && !handle.lent_to_known() {
+        // Until the child the lock was lent to is recorded, a borrow drain could not tell it from a stray holder.
         return Err(BorrowError::InvalidSpec(
-            "a lock lent to a child is not borrowed".into(),
+            "a lock lent to a child is not borrowed before the child is recorded".into(),
         ));
     }
     if !drv.same_file(handle.file(), &handle.resource.path) {
@@ -989,6 +1038,7 @@ pub fn validate_quiescent(handle: &Handle) -> Result<(), BorrowError> {
             handle.file(),
             Duration::from_millis(handle.kill_wait_ms),
             handle.since(),
+            &handle.lent_members(),
         )
         .map_err(|left| BorrowError::ForeignHolder { pids: left.pids })?;
         handle.proven_alone_at(started);
@@ -1106,6 +1156,7 @@ fn finish_borrowed(handle: &Handle, child: &mut MappedChild) -> Result<BorrowOut
         Duration::from_millis(handle.kill_wait_ms),
         since,
         &handle.protected_roots,
+        &handle.lent_members(),
     );
     if leftovers.is_ok() {
         handle.proven_alone_at(started);
@@ -1836,6 +1887,7 @@ pub fn drain_borrowed_description(
         Duration::from_millis(lock.kill_wait_ms),
         driver::flock::Reach::Since(floor),
         protected_roots,
+        &[],
     );
     if drained.is_ok() {
         advance(&lock.since, started);
@@ -2074,6 +2126,7 @@ mod proof_tests {
                     child.id(),
                     Duration::from_secs(2),
                     Some(mark),
+                    &[],
                     &[],
                 )
                 .unwrap();

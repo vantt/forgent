@@ -1,6 +1,7 @@
 //! An exclusive lock lent to a child: the child holds a copy of the description, the parent's handle keeps excluding
 //! every other holder until it is dropped, and that drop only closes the parent's copy, never waiting on the child
-//! or ending it. The lock lasts as long as the last copy.
+//! or ending it. The lock lasts as long as the last copy. Once the child is recorded on the handle, the handle is a
+//! borrow source again and a borrow's drain spares that child alone.
 #![cfg(unix)]
 mod common;
 
@@ -109,15 +110,48 @@ fn a_shared_handle_is_not_lent() {
 }
 
 #[test]
-fn a_lent_lock_is_never_borrowed_since_a_borrow_drain_would_end_the_child() {
+fn a_lent_lock_is_borrowed_once_its_child_is_recorded_and_the_drain_spares_only_that_child() {
     let _serial = serial();
     let dir = temp_dir("lend-borrow");
     let res = resource(&dir, "lend-borrow");
     let (handle, mut child) = lent_to_sleeper(&res);
+    // Between the spawn and the record a drain could not tell the child from a stray holder.
     assert!(
         matches!(validate(&handle), Err(BorrowError::InvalidSpec(_))),
-        "a lent handle is refused as a borrow source"
+        "a lent handle is no borrow source before its child is recorded"
     );
-    drop(handle);
+    let identity = fgos_process::facts::identity_of_child(fgos_process::ProcId(child.0.id()))
+        .expect("the child's identity");
+    handle.lent_to(identity);
+    validate(&handle).expect("a recorded child makes the lent handle a borrow source again");
+
+    // The borrow leaves a stray holder behind: it is drained, the recorded child keeps its copy.
+    let io = BorrowIo {
+        stdin: Vec::new(),
+        stdout_limit: 1024,
+        stderr_limit: 1024,
+        deadline: Instant::now() + Duration::from_secs(20),
+    };
+    let spec = BorrowSpec {
+        argv: vec!["sh".into(), "-c".into(), "sleep 30 & echo borrowed".into()],
+        ..Default::default()
+    };
+    let done = run_borrowed_io(&handle, &spec, &io).expect("the borrow runs beside the child");
+    assert_eq!(done.stdout, b"borrowed\n");
+    assert!(
+        done.outcome.leftovers_killed > 0,
+        "the stray holder is drained"
+    );
+    assert!(
+        child.0.try_wait().unwrap().is_none(),
+        "the recorded child survives the drain"
+    );
+
+    // Dropping the lent handle only closes its copy.
+    let dropping = Instant::now();
+    assert_eq!(release(handle), Release::Released { killed: 0 });
+    assert!(dropping.elapsed() < Duration::from_millis(DEFAULT_KILL_WAIT_MS / 4));
+    assert!(child.0.try_wait().unwrap().is_none());
+    assert_eq!(probe(&res).unwrap(), Probe::Held);
     kill_and_reap(&mut child);
 }
