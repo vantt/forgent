@@ -5,9 +5,9 @@
 
 use fgos_identity::session::{self, Local, PidFacts};
 use fgos_identity::{
-    env_identity, machine, machine_info, os_process_tree, pi_family_cli, resolve, session_for,
-    session_info, tree_identity, writer_answer, HeadRef, ProcStat, ProcessTree, Source, WriterId,
-    WriterIdentity, WriterKey, ENV_ORDER, MAX_ID_LENGTH,
+    env_identity, machine, machine_info, pi_family_cli, resolve, session_for, session_info,
+    tree_identity, writer_answer, HeadRef, ProcStat, ProcessTree, Source, WriterId, WriterIdentity,
+    WriterKey, ENV_ORDER, MAX_ID_LENGTH,
 };
 use serde_json::json;
 use std::collections::HashMap;
@@ -364,6 +364,7 @@ fn the_resolved_pi_session_takes_its_handle_label_from_the_ancestry_and_other_id
 #[cfg(target_os = "linux")]
 #[test]
 fn a_hook_carried_pi_key_with_a_head_pid_gives_the_handle_the_env_path_gives_that_process() {
+    use fgos_identity::os_process_tree;
     let root = state_root();
     fs::write(root.join("machine-id"), "fg-server-abc234\n").unwrap();
     // A process whose kernel command name is `omp`: a shell run through a link of that name.
