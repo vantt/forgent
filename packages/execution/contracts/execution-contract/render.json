@@ -1,0 +1,2633 @@
+{
+  "validate": [
+    {
+      "content": "plain text",
+      "templateId": "tpl",
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "content": "{objective}{role}",
+      "templateId": "tpl",
+      "result": {
+        "ok": [
+          "objective",
+          "role"
+        ]
+      }
+    },
+    {
+      "content": "{contextRefs} {artifactRefs} {expectedOutputs} {constraints} {evidenceContract}",
+      "templateId": "tpl",
+      "result": {
+        "ok": [
+          "contextRefs",
+          "artifactRefs",
+          "expectedOutputs",
+          "constraints",
+          "evidenceContract"
+        ]
+      }
+    },
+    {
+      "content": "{nope}",
+      "templateId": "tpl",
+      "result": {
+        "error": {
+          "name": "TemplateResolutionError",
+          "code": "template-invalid",
+          "message": "operation-prompt-templates [template-invalid]: template \"tpl\" references forbidden or unknown variable \"{nope}\". Only bounded variables are permitted: objective, contextRefs, artifactRefs, expectedOutputs, role, constraints, evidenceContract",
+          "details": {
+            "templateId": "tpl",
+            "variable": "nope",
+            "allowed": [
+              "objective",
+              "contextRefs",
+              "artifactRefs",
+              "expectedOutputs",
+              "role",
+              "constraints",
+              "evidenceContract"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "content": "{ spaced }",
+      "templateId": "tpl",
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "content": "{a.b}",
+      "templateId": "tpl",
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "content": "{}",
+      "templateId": "tpl",
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "content": "{Objective}",
+      "templateId": "tpl",
+      "result": {
+        "error": {
+          "name": "TemplateResolutionError",
+          "code": "template-invalid",
+          "message": "operation-prompt-templates [template-invalid]: template \"tpl\" references forbidden or unknown variable \"{Objective}\". Only bounded variables are permitted: objective, contextRefs, artifactRefs, expectedOutputs, role, constraints, evidenceContract",
+          "details": {
+            "templateId": "tpl",
+            "variable": "Objective",
+            "allowed": [
+              "objective",
+              "contextRefs",
+              "artifactRefs",
+              "expectedOutputs",
+              "role",
+              "constraints",
+              "evidenceContract"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "content": "{objective",
+      "templateId": "tpl",
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "content": "objective}",
+      "templateId": "tpl",
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "content": "{{objective}}",
+      "templateId": "tpl",
+      "result": {
+        "ok": [
+          "objective"
+        ]
+      }
+    },
+    {
+      "content": "{x-y} {x_y}",
+      "templateId": "tpl",
+      "result": {
+        "error": {
+          "name": "TemplateResolutionError",
+          "code": "template-invalid",
+          "message": "operation-prompt-templates [template-invalid]: template \"tpl\" references forbidden or unknown variable \"{x-y}\". Only bounded variables are permitted: objective, contextRefs, artifactRefs, expectedOutputs, role, constraints, evidenceContract",
+          "details": {
+            "templateId": "tpl",
+            "variable": "x-y",
+            "allowed": [
+              "objective",
+              "contextRefs",
+              "artifactRefs",
+              "expectedOutputs",
+              "role",
+              "constraints",
+              "evidenceContract"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "content": "",
+      "templateId": "tpl",
+      "result": {
+        "ok": []
+      }
+    },
+    {
+      "content": "a {objective} b {objective}",
+      "templateId": "tpl",
+      "result": {
+        "ok": [
+          "objective"
+        ]
+      }
+    },
+    {
+      "content": "{1}",
+      "templateId": "tpl",
+      "result": {
+        "error": {
+          "name": "TemplateResolutionError",
+          "code": "template-invalid",
+          "message": "operation-prompt-templates [template-invalid]: template \"tpl\" references forbidden or unknown variable \"{1}\". Only bounded variables are permitted: objective, contextRefs, artifactRefs, expectedOutputs, role, constraints, evidenceContract",
+          "details": {
+            "templateId": "tpl",
+            "variable": "1",
+            "allowed": [
+              "objective",
+              "contextRefs",
+              "artifactRefs",
+              "expectedOutputs",
+              "role",
+              "constraints",
+              "evidenceContract"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "content": "é {role}",
+      "templateId": "tpl",
+      "result": {
+        "ok": [
+          "role"
+        ]
+      }
+    },
+    {
+      "raw": null,
+      "templateId": "tpl",
+      "result": {
+        "error": {
+          "name": "TemplateResolutionError",
+          "code": "template-invalid",
+          "message": "operation-prompt-templates [template-invalid]: template content for \"tpl\" must be a string",
+          "details": {}
+        }
+      }
+    },
+    {
+      "raw": 7,
+      "templateId": "tpl",
+      "result": {
+        "error": {
+          "name": "TemplateResolutionError",
+          "code": "template-invalid",
+          "message": "operation-prompt-templates [template-invalid]: template content for \"tpl\" must be a string",
+          "details": {}
+        }
+      }
+    },
+    {
+      "raw": {
+        "a": 1
+      },
+      "templateId": "tpl",
+      "result": {
+        "error": {
+          "name": "TemplateResolutionError",
+          "code": "template-invalid",
+          "message": "operation-prompt-templates [template-invalid]: template content for \"tpl\" must be a string",
+          "details": {}
+        }
+      }
+    },
+    {
+      "raw": [
+        "x"
+      ],
+      "templateId": "tpl",
+      "result": {
+        "error": {
+          "name": "TemplateResolutionError",
+          "code": "template-invalid",
+          "message": "operation-prompt-templates [template-invalid]: template content for \"tpl\" must be a string",
+          "details": {}
+        }
+      }
+    },
+    {
+      "raw": null,
+      "templateId": null,
+      "noId": true,
+      "result": {
+        "error": {
+          "name": "TemplateResolutionError",
+          "code": "template-invalid",
+          "message": "operation-prompt-templates [template-invalid]: template content for \"\" must be a string",
+          "details": {}
+        }
+      }
+    }
+  ],
+  "render": [
+    {
+      "name": "empty-variables",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {},
+      "result": {
+        "ok": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev reported\n"
+      }
+    },
+    {
+      "name": "strings",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "objective": "do it",
+        "role": "reviewer",
+        "contextRefs": "ctx text",
+        "artifactRefs": "art text",
+        "expectedOutputs": "out text",
+        "constraints": "con text",
+        "evidenceContract": "verified"
+      },
+      "result": {
+        "ok": "goal do it\nrole reviewer\nctx:\nctx text\nart:\nart text\nout:\nout text\ncon:\ncon text\nev verified\n"
+      }
+    },
+    {
+      "name": "arrays",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "objective": "o",
+        "role": "r",
+        "contextRefs": [
+          "a.md",
+          "b.md"
+        ],
+        "expectedOutputs": [
+          "x",
+          "y"
+        ],
+        "constraints": [
+          "c1",
+          "c2"
+        ],
+        "evidence": {
+          "required": "verified"
+        }
+      },
+      "result": {
+        "ok": "goal o\nrole r\nctx:\n- a.md\n- b.md\nart:\n- a.md\n- b.md\nout:\n- x\n- y\ncon:\n- c1\n- c2\nev verified\n"
+      }
+    },
+    {
+      "name": "empty-arrays",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "contextRefs": [],
+        "expectedOutputs": [],
+        "constraints": []
+      },
+      "result": {
+        "ok": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev reported\n"
+      }
+    },
+    {
+      "name": "artifact-falls-back-to-context",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "contextRefs": [
+          "only-context"
+        ]
+      },
+      "result": {
+        "ok": "goal \nrole \nctx:\n- only-context\nart:\n- only-context\nout:\n- (none)\ncon:\n- (none)\nev reported\n"
+      }
+    },
+    {
+      "name": "artifact-array-own",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "contextRefs": [
+          "c"
+        ],
+        "artifactRefs": [
+          "art"
+        ]
+      },
+      "result": {
+        "ok": "goal \nrole \nctx:\n- c\nart:\n- art\nout:\n- (none)\ncon:\n- (none)\nev reported\n"
+      }
+    },
+    {
+      "name": "stamp-filtered",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "constraints": [
+          "keep",
+          "protocol-operation:flow@1#op",
+          "protocol-operation:x@y#z",
+          "also keep"
+        ]
+      },
+      "result": {
+        "ok": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- keep\n- also keep\nev reported\n"
+      }
+    },
+    {
+      "name": "stamp-only",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "constraints": [
+          "protocol-operation:flow@1#op"
+        ]
+      },
+      "result": {
+        "ok": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev reported\n"
+      }
+    },
+    {
+      "name": "non-string-constraints",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "constraints": [
+          1,
+          null,
+          "ok",
+          {
+            "a": 1
+          }
+        ]
+      },
+      "result": {
+        "ok": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- ok\nev reported\n"
+      }
+    },
+    {
+      "name": "constraints-null",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "constraints": null
+      },
+      "result": {
+        "ok": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev reported\n"
+      }
+    },
+    {
+      "name": "numbers",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "objective": 42,
+        "role": true,
+        "evidenceContract": 7
+      },
+      "result": {
+        "ok": "goal 42\nrole true\nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev 7\n"
+      }
+    },
+    {
+      "name": "items-coerced",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "contextRefs": [
+          1,
+          "a",
+          true,
+          null
+        ],
+        "expectedOutputs": [
+          [
+            1,
+            2
+          ],
+          {
+            "a": 1
+          }
+        ]
+      },
+      "result": {
+        "ok": "goal \nrole \nctx:\n- 1\n- a\n- true\n- null\nart:\n- 1\n- a\n- true\n- null\nout:\n- 1,2\n- [object Object]\ncon:\n- (none)\nev reported\n"
+      }
+    },
+    {
+      "name": "reinjected-placeholder",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "objective": "see {role} and {constraints}",
+        "role": "R {evidenceContract}",
+        "constraints": [
+          "{objective}"
+        ],
+        "evidenceContract": "E"
+      },
+      "result": {
+        "ok": "goal see R E and - {objective}\nrole R E\nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- {objective}\nev E\n"
+      }
+    },
+    {
+      "name": "dollar-signs",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "objective": "$& $1 $$ $`",
+        "role": "$'"
+      },
+      "result": {
+        "ok": "goal {objective} $1 $ goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev reported\n\nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev reported\n"
+      }
+    },
+    {
+      "name": "evidence-contract-wins",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "evidenceContract": "reported",
+        "evidence": {
+          "required": "verified"
+        }
+      },
+      "result": {
+        "ok": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev reported\n"
+      }
+    },
+    {
+      "name": "evidence-null-contract",
+      "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "variables": {
+        "evidenceContract": null,
+        "evidence": {
+          "required": "verified"
+        }
+      },
+      "result": {
+        "ok": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev verified\n"
+      }
+    },
+    {
+      "name": "invalid-template",
+      "content": "x {nope}",
+      "variables": {},
+      "result": {
+        "error": {
+          "name": "TemplateResolutionError",
+          "code": "template-invalid",
+          "message": "operation-prompt-templates [template-invalid]: template \"\" references forbidden or unknown variable \"{nope}\". Only bounded variables are permitted: objective, contextRefs, artifactRefs, expectedOutputs, role, constraints, evidenceContract",
+          "details": {
+            "templateId": "",
+            "variable": "nope",
+            "allowed": [
+              "objective",
+              "contextRefs",
+              "artifactRefs",
+              "expectedOutputs",
+              "role",
+              "constraints",
+              "evidenceContract"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "non-string-template",
+      "content": 5,
+      "variables": {},
+      "result": {
+        "error": {
+          "name": "TemplateResolutionError",
+          "code": "template-invalid",
+          "message": "operation-prompt-templates [template-invalid]: template content for \"\" must be a string",
+          "details": {}
+        }
+      }
+    },
+    {
+      "name": "repeated-placeholder",
+      "content": "{role}-{role}-{objective}",
+      "variables": {
+        "role": "r",
+        "objective": "o"
+      },
+      "result": {
+        "ok": "r-r-o"
+      }
+    }
+  ],
+  "resolve": {
+    "scenario": "render-fixtures",
+    "files": {
+      "pkg/core/prompt-templates/impl-v1.md": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+      "pkg/domains/coding/prompt-templates/coding-only.md": "coding {objective} / {role}\n",
+      "pkg/domains/ops/prompt-templates/coding-only.md": "ops {objective}\n"
+    },
+    "cases": [
+      {
+        "name": "assignment",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {},
+        "result": {
+          "ok": {
+            "renderedBody": "goal build it\nrole implementer\nctx:\n- a.md\n- b.md\nart:\n- a.md\n- b.md\nout:\n- o1\ncon:\n- k1\nev verified\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "assignment-artifact-refs-only",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "artifactRefs": [
+            "x"
+          ]
+        },
+        "options": {},
+        "result": {
+          "ok": {
+            "renderedBody": "goal \nrole \nctx:\n- x\nart:\n- x\nout:\n- (none)\ncon:\n- (none)\nev reported\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:31e3e58650f988fd29d7fcb9ac987fc76cab3746a197d2413baeb89bcc69e1a5",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "assignment-bare",
+        "input": {
+          "contractTemplate": "impl-v1"
+        },
+        "options": {},
+        "result": {
+          "ok": {
+            "renderedBody": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev reported\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:d48245365ef5cfdc36c18e358e369742dce92d6a64ed8cd4c1ae2cb9d3187b72",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "constraints-from-contract",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "contract": {
+            "constraints": [
+              "c-top"
+            ]
+          }
+        },
+        "options": {},
+        "result": {
+          "ok": {
+            "renderedBody": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- c-top\nev reported\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:d8f7d65cfafa5835a93514f9e8319e808cbd9ad083619077705f63bf21b5501f",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "constraints-from-provenance-contract",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "provenance": {
+            "contract": {
+              "constraints": [
+                "c-prov"
+              ]
+            }
+          },
+          "contract": {
+            "constraints": [
+              "ignored"
+            ]
+          }
+        },
+        "options": {},
+        "result": {
+          "ok": {
+            "renderedBody": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- c-prov\nev reported\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:8dd3e5d5f7417f6bd5d33bb25a2cdaf3bd36e8a85a7eb40d9c6993f8a94fb871",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "constraints-top-level",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "constraints": [
+            "c-flat"
+          ]
+        },
+        "options": {},
+        "result": {
+          "ok": {
+            "renderedBody": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- c-flat\nev reported\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:60168531ec9891541e2e7649da3656ba6d8d2d8bc6052d84d1a1cf31705dec2f",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "evidence-contract-field",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "evidenceContract": "verified"
+        },
+        "options": {},
+        "result": {
+          "ok": {
+            "renderedBody": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev verified\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:9da373fba8c2bd69fb384d3ea7735cfd54a278a2b7c6993dc06e3c81b24459bf",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "string-id-with-variables",
+        "input": "impl-v1",
+        "options": {
+          "variables": {
+            "objective": "v",
+            "role": "r"
+          }
+        },
+        "result": {
+          "ok": {
+            "renderedBody": "goal v\nrole r\nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev reported\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:c1ed4c4465e4151ece954640677dbd8eea745ebfc02d694fa9c73ae887a3c13f",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "string-id-with-assignment",
+        "input": "impl-v1",
+        "options": {
+          "assignment": {
+            "objective": "a"
+          }
+        },
+        "result": {
+          "ok": {
+            "renderedBody": "goal a\nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev reported\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:81f8e826f792f7c03c7675b822980b66ea8df8ff78f554356a0de418ba0dd3d1",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "string-id-bare",
+        "input": "impl-v1",
+        "options": {},
+        "result": {
+          "ok": {
+            "renderedBody": "goal \nrole \nctx:\n- (none)\nart:\n- (none)\nout:\n- (none)\ncon:\n- (none)\nev reported\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:d48245365ef5cfdc36c18e358e369742dce92d6a64ed8cd4c1ae2cb9d3187b72",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "domain-from-assignment",
+        "input": {
+          "contractTemplate": "coding-only",
+          "domain": "coding",
+          "objective": "o",
+          "role": "r"
+        },
+        "options": {},
+        "result": {
+          "ok": {
+            "renderedBody": "coding o / r\n",
+            "templateProvenance": {
+              "id": "coding-only",
+              "tier": "domain",
+              "source": "domain:coding",
+              "filePath": "domains/coding/prompt-templates/coding-only.md",
+              "contentDigest": "sha256:85487967153f7bba74386151cc920897c9200a4eaff937bcd36a94d5767ca252",
+              "renderedPromptDigest": "sha256:e75089870dedf6f404520c8ccb1705e3f7f5f81edb1762213976612a8ed4b320",
+              "templateSnapshot": "coding {objective} / {role}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "domain-from-options",
+        "input": {
+          "contractTemplate": "coding-only",
+          "objective": "o"
+        },
+        "options": {
+          "domain": "ops"
+        },
+        "result": {
+          "ok": {
+            "renderedBody": "ops o\n",
+            "templateProvenance": {
+              "id": "coding-only",
+              "tier": "domain",
+              "source": "domain:ops",
+              "filePath": "domains/ops/prompt-templates/coding-only.md",
+              "contentDigest": "sha256:9863b71efb5ee9ebb0970728ebc9768d9272ae8c7c2c8cf1d39fc4c245a3cbda",
+              "renderedPromptDigest": "sha256:1b13b6991b00f63a9a2a5e87d7b35e7b82f7667164dae9281ac565eab28a0cfc",
+              "templateSnapshot": "ops {objective}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "domain-ambiguous",
+        "input": {
+          "contractTemplate": "coding-only",
+          "objective": "o"
+        },
+        "options": {},
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-ambiguous",
+            "message": "operation-prompt-templates [template-ambiguous]: template id \"coding-only\" collides across domains \"domain:coding\" and \"domain:ops\"",
+            "details": {
+              "templateId": "coding-only",
+              "source1": "domain:coding",
+              "source2": "domain:ops"
+            }
+          }
+        }
+      },
+      {
+        "name": "not-found",
+        "input": {
+          "contractTemplate": "absent"
+        },
+        "options": {},
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-not-found",
+            "message": "operation-prompt-templates [template-not-found]: no operation prompt template found for id \"absent\" (searched project, domain, and core tiers)",
+            "details": {
+              "templateId": "absent",
+              "cwd": "$TMP/render-fixtures/project"
+            }
+          }
+        }
+      },
+      {
+        "name": "bad-id",
+        "input": {
+          "contractTemplate": "no good"
+        },
+        "options": {},
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-invalid",
+            "message": "operation-prompt-templates [template-invalid]: invalid template id \"no good\"",
+            "details": {}
+          }
+        }
+      },
+      {
+        "name": "no-contract-template",
+        "input": {
+          "objective": "x"
+        },
+        "options": {},
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-invalid",
+            "message": "operation-prompt-templates [template-invalid]: assignment does not declare valid contractTemplate string",
+            "details": {}
+          }
+        }
+      },
+      {
+        "name": "contract-template-not-string",
+        "input": {
+          "contractTemplate": 7
+        },
+        "options": {},
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-invalid",
+            "message": "operation-prompt-templates [template-invalid]: assignment does not declare valid contractTemplate string",
+            "details": {}
+          }
+        }
+      },
+      {
+        "name": "null-input",
+        "input": null,
+        "options": {},
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-invalid",
+            "message": "operation-prompt-templates [template-invalid]: assignment object or templateId string is required",
+            "details": {}
+          }
+        }
+      },
+      {
+        "name": "number-input",
+        "input": 5,
+        "options": {},
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-invalid",
+            "message": "operation-prompt-templates [template-invalid]: assignment object or templateId string is required",
+            "details": {}
+          }
+        }
+      },
+      {
+        "name": "array-input",
+        "input": [
+          "x"
+        ],
+        "options": {},
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-invalid",
+            "message": "operation-prompt-templates [template-invalid]: assignment does not declare valid contractTemplate string",
+            "details": {}
+          }
+        }
+      },
+      {
+        "name": "pinned-from-assignment",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            },
+            "template": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        },
+        "options": {},
+        "result": {
+          "ok": {
+            "renderedBody": "goal build it\nrole implementer\nctx:\n- a.md\n- b.md\nart:\n- a.md\n- b.md\nout:\n- o1\ncon:\n- k1\nev verified\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-from-options",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "ok": {
+            "renderedBody": "goal build it\nrole implementer\nctx:\n- a.md\n- b.md\nart:\n- a.md\n- b.md\nout:\n- o1\ncon:\n- k1\nev verified\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-from-pinned-option",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "pinnedTemplate": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "ok": {
+            "renderedBody": "goal build it\nrole implementer\nctx:\n- a.md\n- b.md\nart:\n- a.md\n- b.md\nout:\n- o1\ncon:\n- k1\nev verified\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-id-only-string-input",
+        "input": "impl-v1",
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          },
+          "variables": {
+            "contractTemplate": "impl-v1",
+            "objective": "build it",
+            "role": "implementer",
+            "contextRefs": [
+              "a.md",
+              "b.md"
+            ],
+            "expectedOutputs": [
+              "o1"
+            ],
+            "evidence": {
+              "required": "verified"
+            },
+            "provenance": {
+              "inline": {
+                "contract": {
+                  "constraints": [
+                    "k1",
+                    "protocol-operation:flow@1#op"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "result": {
+          "ok": {
+            "renderedBody": "goal build it\nrole implementer\nctx:\n- a.md\n- b.md\nart:\n- a.md\n- b.md\nout:\n- o1\ncon:\n- k1\nev verified\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-wins-over-disk-change",
+        "input": {
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            },
+            "template": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        },
+        "options": {},
+        "result": {
+          "ok": {
+            "renderedBody": "goal build it\nrole implementer\nctx:\n- a.md\n- b.md\nart:\n- a.md\n- b.md\nout:\n- o1\ncon:\n- k1\nev verified\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-array",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": [
+            "x"
+          ]
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template provenance must be a non-null object",
+            "details": {
+              "pinnedTemplate": [
+                "x"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-string",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": "x"
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template provenance must be a non-null object",
+            "details": {
+              "pinnedTemplate": "x"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-no-snapshot",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template provenance contains missing or non-string templateSnapshot",
+            "details": {
+              "pinnedTemplate": {
+                "id": "impl-v1",
+                "tier": "core",
+                "source": "core",
+                "filePath": "core/prompt-templates/impl-v1.md",
+                "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+                "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-blank-snapshot",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "   "
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template provenance contains missing or non-string templateSnapshot",
+            "details": {
+              "pinnedTemplate": {
+                "id": "impl-v1",
+                "tier": "core",
+                "source": "core",
+                "filePath": "core/prompt-templates/impl-v1.md",
+                "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+                "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+                "templateSnapshot": "   "
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-snapshot-not-string",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": 5
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template provenance contains missing or non-string templateSnapshot",
+            "details": {
+              "pinnedTemplate": {
+                "id": "impl-v1",
+                "tier": "core",
+                "source": "core",
+                "filePath": "core/prompt-templates/impl-v1.md",
+                "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+                "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+                "templateSnapshot": 5
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-no-id",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template provenance missing non-empty id",
+            "details": {
+              "pinnedTemplate": {
+                "tier": "core",
+                "source": "core",
+                "filePath": "core/prompt-templates/impl-v1.md",
+                "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+                "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+                "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-blank-id",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": " ",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template provenance missing non-empty id",
+            "details": {
+              "pinnedTemplate": {
+                "id": " ",
+                "tier": "core",
+                "source": "core",
+                "filePath": "core/prompt-templates/impl-v1.md",
+                "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+                "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+                "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-id-mismatch",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "other",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template id \"other\" does not match contractTemplate \"impl-v1\"",
+            "details": {
+              "pinnedId": "other",
+              "templateId": "impl-v1"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-id-mismatch-no-template",
+        "input": {
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "other",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "ok": {
+            "renderedBody": "goal build it\nrole implementer\nctx:\n- a.md\n- b.md\nart:\n- a.md\n- b.md\nout:\n- o1\ncon:\n- k1\nev verified\n",
+            "templateProvenance": {
+              "id": "other",
+              "tier": "core",
+              "source": "core",
+              "filePath": "core/prompt-templates/impl-v1.md",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-tier-blank",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": " ",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template tier must be a non-empty string when present",
+            "details": {
+              "pinnedTemplate": {
+                "id": "impl-v1",
+                "tier": " ",
+                "source": "core",
+                "filePath": "core/prompt-templates/impl-v1.md",
+                "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+                "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+                "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-tier-number",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": 3,
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template tier must be a non-empty string when present",
+            "details": {
+              "pinnedTemplate": {
+                "id": "impl-v1",
+                "tier": 3,
+                "source": "core",
+                "filePath": "core/prompt-templates/impl-v1.md",
+                "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+                "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+                "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-source-blank",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template source must be a non-empty string when present",
+            "details": {
+              "pinnedTemplate": {
+                "id": "impl-v1",
+                "tier": "core",
+                "source": "",
+                "filePath": "core/prompt-templates/impl-v1.md",
+                "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+                "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+                "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-file-path-number",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": 4,
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template filePath must be a string or null when present",
+            "details": {
+              "pinnedTemplate": {
+                "id": "impl-v1",
+                "tier": "core",
+                "source": "core",
+                "filePath": 4,
+                "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+                "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+                "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-file-path-blank",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": " ",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template filePath must be a string or null when present",
+            "details": {
+              "pinnedTemplate": {
+                "id": "impl-v1",
+                "tier": "core",
+                "source": "core",
+                "filePath": " ",
+                "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+                "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+                "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-file-path-null",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": null,
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "ok": {
+            "renderedBody": "goal build it\nrole implementer\nctx:\n- a.md\n- b.md\nart:\n- a.md\n- b.md\nout:\n- o1\ncon:\n- k1\nev verified\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": null,
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+              "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-no-content-digest",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template provenance missing required contentDigest",
+            "details": {
+              "pinnedTemplate": {
+                "id": "impl-v1",
+                "tier": "core",
+                "source": "core",
+                "filePath": "core/prompt-templates/impl-v1.md",
+                "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+                "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-content-digest-number",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": 5,
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template provenance missing required contentDigest",
+            "details": {
+              "pinnedTemplate": {
+                "id": "impl-v1",
+                "tier": "core",
+                "source": "core",
+                "filePath": "core/prompt-templates/impl-v1.md",
+                "contentDigest": 5,
+                "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+                "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-content-digest-malformed",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:xyz",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template contentDigest is malformed: \"sha256:xyz\"",
+            "details": {
+              "contentDigest": "sha256:xyz"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-content-digest-upper",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:D975C38F06C1713C59B51E82391F6B27C2F6AB6B41BBD1BAA9A3BC60D13213DB",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template contentDigest is malformed: \"sha256:D975C38F06C1713C59B51E82391F6B27C2F6AB6B41BBD1BAA9A3BC60D13213DB\"",
+            "details": {
+              "contentDigest": "sha256:D975C38F06C1713C59B51E82391F6B27C2F6AB6B41BBD1BAA9A3BC60D13213DB"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-content-digest-wrong",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template contentDigest mismatch: expected \"sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db\", got \"sha256:0000000000000000000000000000000000000000000000000000000000000000\"",
+            "details": {
+              "expectedContentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+              "actualContentDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-no-rendered-digest",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template provenance missing required renderedPromptDigest",
+            "details": {
+              "pinnedTemplate": {
+                "id": "impl-v1",
+                "tier": "core",
+                "source": "core",
+                "filePath": "core/prompt-templates/impl-v1.md",
+                "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+                "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-rendered-digest-malformed",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "nope",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: pinned template renderedPromptDigest is malformed: \"nope\"",
+            "details": {
+              "renderedPromptDigest": "nope"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-rendered-digest-wrong",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db",
+            "renderedPromptDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+            "templateSnapshot": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-provenance-mismatch",
+            "message": "operation-prompt-templates [template-provenance-mismatch]: rendered prompt digest mismatch for pinned template \"impl-v1\": expected \"sha256:1111111111111111111111111111111111111111111111111111111111111111\", computed \"sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2\"",
+            "details": {
+              "expectedRenderedPromptDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+              "computedRenderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-snapshot-bad-variable",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "core",
+            "source": "core",
+            "filePath": "core/prompt-templates/impl-v1.md",
+            "contentDigest": "sha256:654efd8580a2b0b7e8aa8ccd3f9faa950fd57d9398e0479d3799e08a1a962dbb",
+            "renderedPromptDigest": "sha256:7e2692095a6de77f23bbf30209e074846df54e9606cb3b423cf1fe5cd8c4ead2",
+            "templateSnapshot": "snap {nope}\n"
+          }
+        },
+        "result": {
+          "error": {
+            "name": "TemplateResolutionError",
+            "code": "template-invalid",
+            "message": "operation-prompt-templates [template-invalid]: template \"impl-v1\" references forbidden or unknown variable \"{nope}\". Only bounded variables are permitted: objective, contextRefs, artifactRefs, expectedOutputs, role, constraints, evidenceContract",
+            "details": {
+              "templateId": "impl-v1",
+              "variable": "nope",
+              "allowed": [
+                "objective",
+                "contextRefs",
+                "artifactRefs",
+                "expectedOutputs",
+                "role",
+                "constraints",
+                "evidenceContract"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-defaults-tier-source",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "templateSnapshot": "pinned only {objective}\n",
+            "contentDigest": "sha256:4b7fadb653a5c6a294cbb9632d68a7152df127f4fc1511a1eb665959579bb142",
+            "renderedPromptDigest": "sha256:0147839cc3a543d52351821c18340c17659c709b4b4f1e5767f6627c0892acc0"
+          }
+        },
+        "result": {
+          "ok": {
+            "renderedBody": "pinned only build it\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "pinned",
+              "source": "pinned",
+              "filePath": null,
+              "contentDigest": "sha256:4b7fadb653a5c6a294cbb9632d68a7152df127f4fc1511a1eb665959579bb142",
+              "renderedPromptDigest": "sha256:0147839cc3a543d52351821c18340c17659c709b4b4f1e5767f6627c0892acc0",
+              "templateSnapshot": "pinned only {objective}\n"
+            }
+          }
+        }
+      },
+      {
+        "name": "pinned-file-path-kept",
+        "input": {
+          "contractTemplate": "impl-v1",
+          "objective": "build it",
+          "role": "implementer",
+          "contextRefs": [
+            "a.md",
+            "b.md"
+          ],
+          "expectedOutputs": [
+            "o1"
+          ],
+          "evidence": {
+            "required": "verified"
+          },
+          "provenance": {
+            "inline": {
+              "contract": {
+                "constraints": [
+                  "k1",
+                  "protocol-operation:flow@1#op"
+                ]
+              }
+            }
+          }
+        },
+        "options": {
+          "templateProvenance": {
+            "id": "impl-v1",
+            "tier": "t",
+            "source": "s",
+            "filePath": "p/x.md",
+            "templateSnapshot": "pinned only {objective}\n",
+            "contentDigest": "sha256:4b7fadb653a5c6a294cbb9632d68a7152df127f4fc1511a1eb665959579bb142",
+            "renderedPromptDigest": "sha256:0147839cc3a543d52351821c18340c17659c709b4b4f1e5767f6627c0892acc0"
+          }
+        },
+        "result": {
+          "ok": {
+            "renderedBody": "pinned only build it\n",
+            "templateProvenance": {
+              "id": "impl-v1",
+              "tier": "t",
+              "source": "s",
+              "filePath": "p/x.md",
+              "contentDigest": "sha256:4b7fadb653a5c6a294cbb9632d68a7152df127f4fc1511a1eb665959579bb142",
+              "renderedPromptDigest": "sha256:0147839cc3a543d52351821c18340c17659c709b4b4f1e5767f6627c0892acc0",
+              "templateSnapshot": "pinned only {objective}\n"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

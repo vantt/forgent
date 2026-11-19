@@ -1,0 +1,975 @@
+{
+  "coreDir": [
+    "core",
+    "prompt-templates"
+  ],
+  "fileRe": "\\.(md|txt)$",
+  "idRe": "^[A-Za-z0-9._-]+$",
+  "boundedVariables": [
+    "objective",
+    "contextRefs",
+    "artifactRefs",
+    "expectedOutputs",
+    "role",
+    "constraints",
+    "evidenceContract"
+  ],
+  "scenarios": [
+    {
+      "name": "tiers",
+      "files": {
+        "pkg/core/prompt-templates/B-x.md": "core B {objective}\n",
+        "pkg/core/prompt-templates/a1.md": "core a1\n",
+        "pkg/core/prompt-templates/a-1.md": "core a-1\n",
+        "pkg/core/prompt-templates/a_1.md": "core a_1\n",
+        "pkg/core/prompt-templates/a.1.md": "core a.1\n",
+        "pkg/core/prompt-templates/A2.md": "core A2\n",
+        "pkg/core/prompt-templates/a2.md": "core a2\n",
+        "pkg/core/prompt-templates/b.txt": "core b txt {role}\r\n",
+        "pkg/core/prompt-templates/UP.MD": "core UP\n",
+        "pkg/core/prompt-templates/skip.json": "{\"not\":\"a template\"}",
+        "pkg/core/prompt-templates/shared.md": "core shared\n",
+        "pkg/core/prompt-templates/uni.md": "héllo ✓ 😀 {objective}\n",
+        "pkg/domains/coding/prompt-templates/c.md": "coding c {constraints}\n",
+        "pkg/domains/coding/prompt-templates/shared-domain.md": "coding shared-domain\n",
+        "pkg/domains/coding/prompt-templates/shared.md": "coding shared\n",
+        "pkg/domains/ops/prompt-templates/d.md": "ops d\n",
+        "pkg/domains/ops/other.txt": "not a template dir\n",
+        "pkg/domains/loose-file": "not a domain\n",
+        "project/.fgos/prompt-templates/p.md": "project p\n",
+        "project/.fgos/prompt-templates/shared.md": "project shared\n"
+      },
+      "symlinks": {},
+      "calls": [
+        {
+          "call": {
+            "fn": "discoverProject"
+          },
+          "result": {
+            "ok": [
+              {
+                "id": "p",
+                "tier": "project",
+                "source": "project",
+                "filePath": "$TMP/tiers/project/.fgos/prompt-templates/p.md",
+                "relativeFilePath": "../project/.fgos/prompt-templates/p.md",
+                "content": "project p\n",
+                "contentDigest": "sha256:f0a7f295e24ba1970f2c7fec6900ba8575a0801f281d7df068e698ca1ceb289d"
+              },
+              {
+                "id": "shared",
+                "tier": "project",
+                "source": "project",
+                "filePath": "$TMP/tiers/project/.fgos/prompt-templates/shared.md",
+                "relativeFilePath": "../project/.fgos/prompt-templates/shared.md",
+                "content": "project shared\n",
+                "contentDigest": "sha256:5ba9855c405425347b06e0d6d34819f3b2d29dc76f3fb10887428848982dd15e"
+              }
+            ]
+          }
+        },
+        {
+          "call": {
+            "fn": "discoverAll"
+          },
+          "result": {
+            "ok": [
+              {
+                "id": "p",
+                "tier": "project",
+                "source": "project",
+                "filePath": "$TMP/tiers/project/.fgos/prompt-templates/p.md",
+                "relativeFilePath": "../project/.fgos/prompt-templates/p.md",
+                "content": "project p\n",
+                "contentDigest": "sha256:f0a7f295e24ba1970f2c7fec6900ba8575a0801f281d7df068e698ca1ceb289d"
+              },
+              {
+                "id": "shared",
+                "tier": "project",
+                "source": "project",
+                "filePath": "$TMP/tiers/project/.fgos/prompt-templates/shared.md",
+                "relativeFilePath": "../project/.fgos/prompt-templates/shared.md",
+                "content": "project shared\n",
+                "contentDigest": "sha256:5ba9855c405425347b06e0d6d34819f3b2d29dc76f3fb10887428848982dd15e"
+              },
+              {
+                "id": "c",
+                "tier": "domain",
+                "source": "domain:coding",
+                "filePath": "$TMP/tiers/pkg/domains/coding/prompt-templates/c.md",
+                "relativeFilePath": "domains/coding/prompt-templates/c.md",
+                "content": "coding c {constraints}\n",
+                "contentDigest": "sha256:4184f522cf2dad2afa2a7fdbd922c1605915997f104328152b6a2fd6af298ded"
+              },
+              {
+                "id": "shared-domain",
+                "tier": "domain",
+                "source": "domain:coding",
+                "filePath": "$TMP/tiers/pkg/domains/coding/prompt-templates/shared-domain.md",
+                "relativeFilePath": "domains/coding/prompt-templates/shared-domain.md",
+                "content": "coding shared-domain\n",
+                "contentDigest": "sha256:d094a6ddb14d60656c88cb22cd5ee43c73aa79c8cb1a264eb839af40d76f40a4"
+              },
+              {
+                "id": "d",
+                "tier": "domain",
+                "source": "domain:ops",
+                "filePath": "$TMP/tiers/pkg/domains/ops/prompt-templates/d.md",
+                "relativeFilePath": "domains/ops/prompt-templates/d.md",
+                "content": "ops d\n",
+                "contentDigest": "sha256:edf4790dc645e0f5a0a2f25f91db9cdc1eabe2ab50f5bd0c2b294fcc3ae5aba0"
+              },
+              {
+                "id": "a_1",
+                "tier": "core",
+                "source": "core",
+                "filePath": "$TMP/tiers/pkg/core/prompt-templates/a_1.md",
+                "relativeFilePath": "core/prompt-templates/a_1.md",
+                "content": "core a_1\n",
+                "contentDigest": "sha256:e24e7b6c013cb042ba315656e026397bd5be0b1e25b48395d118d6ce7b1dac47"
+              },
+              {
+                "id": "a-1",
+                "tier": "core",
+                "source": "core",
+                "filePath": "$TMP/tiers/pkg/core/prompt-templates/a-1.md",
+                "relativeFilePath": "core/prompt-templates/a-1.md",
+                "content": "core a-1\n",
+                "contentDigest": "sha256:2b287ca7089d89a7f8c82fed4d9f9e13b7efc1749e594d173e46586b84b084d6"
+              },
+              {
+                "id": "a.1",
+                "tier": "core",
+                "source": "core",
+                "filePath": "$TMP/tiers/pkg/core/prompt-templates/a.1.md",
+                "relativeFilePath": "core/prompt-templates/a.1.md",
+                "content": "core a.1\n",
+                "contentDigest": "sha256:4f432e4ba755038aa95585e936f16e5d29ff44b896cd59cc3870accc48f60cd7"
+              },
+              {
+                "id": "a1",
+                "tier": "core",
+                "source": "core",
+                "filePath": "$TMP/tiers/pkg/core/prompt-templates/a1.md",
+                "relativeFilePath": "core/prompt-templates/a1.md",
+                "content": "core a1\n",
+                "contentDigest": "sha256:dd5e9023ee7bd007d8523aa87e99de5703ed4ce2ac7dd1cd3efa8ae7d2422380"
+              },
+              {
+                "id": "a2",
+                "tier": "core",
+                "source": "core",
+                "filePath": "$TMP/tiers/pkg/core/prompt-templates/a2.md",
+                "relativeFilePath": "core/prompt-templates/a2.md",
+                "content": "core a2\n",
+                "contentDigest": "sha256:b036f38f6bfe1d079ee02af5527715626920eae489654b6e5cf3a492ae652977"
+              },
+              {
+                "id": "A2",
+                "tier": "core",
+                "source": "core",
+                "filePath": "$TMP/tiers/pkg/core/prompt-templates/A2.md",
+                "relativeFilePath": "core/prompt-templates/A2.md",
+                "content": "core A2\n",
+                "contentDigest": "sha256:383313d8e617635b714430fdb927e1f7d0a56bbad4988f54d7a4fb5a531b8476"
+              },
+              {
+                "id": "B-x",
+                "tier": "core",
+                "source": "core",
+                "filePath": "$TMP/tiers/pkg/core/prompt-templates/B-x.md",
+                "relativeFilePath": "core/prompt-templates/B-x.md",
+                "content": "core B {objective}\n",
+                "contentDigest": "sha256:8004cffd77587d635eac84e5f3428986ddda313f7add98c908b6f82b17b10750"
+              },
+              {
+                "id": "b",
+                "tier": "core",
+                "source": "core",
+                "filePath": "$TMP/tiers/pkg/core/prompt-templates/b.txt",
+                "relativeFilePath": "core/prompt-templates/b.txt",
+                "content": "core b txt {role}\r\n",
+                "contentDigest": "sha256:ee40826091dd48e10d09da93e7f9d98d02cfbae1c006c1a107ce60648f91f339"
+              },
+              {
+                "id": "uni",
+                "tier": "core",
+                "source": "core",
+                "filePath": "$TMP/tiers/pkg/core/prompt-templates/uni.md",
+                "relativeFilePath": "core/prompt-templates/uni.md",
+                "content": "héllo ✓ 😀 {objective}\n",
+                "contentDigest": "sha256:236da9c46df10a66c6cb862e1a46eb783962172542935eaa94a7df7f702b972b"
+              },
+              {
+                "id": "UP",
+                "tier": "core",
+                "source": "core",
+                "filePath": "$TMP/tiers/pkg/core/prompt-templates/UP.MD",
+                "relativeFilePath": "core/prompt-templates/UP.MD",
+                "content": "core UP\n",
+                "contentDigest": "sha256:da4089754d2a55e808724d0dc55c75d828d70af012a7946d9dcbca76f62ae139"
+              }
+            ]
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "p"
+          },
+          "result": {
+            "ok": {
+              "id": "p",
+              "tier": "project",
+              "source": "project",
+              "filePath": "$TMP/tiers/project/.fgos/prompt-templates/p.md",
+              "relativeFilePath": "../project/.fgos/prompt-templates/p.md",
+              "content": "project p\n",
+              "contentDigest": "sha256:f0a7f295e24ba1970f2c7fec6900ba8575a0801f281d7df068e698ca1ceb289d"
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "shared"
+          },
+          "result": {
+            "ok": {
+              "id": "shared",
+              "tier": "project",
+              "source": "project",
+              "filePath": "$TMP/tiers/project/.fgos/prompt-templates/shared.md",
+              "relativeFilePath": "../project/.fgos/prompt-templates/shared.md",
+              "content": "project shared\n",
+              "contentDigest": "sha256:5ba9855c405425347b06e0d6d34819f3b2d29dc76f3fb10887428848982dd15e"
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "shared",
+            "domain": "coding"
+          },
+          "result": {
+            "ok": {
+              "id": "shared",
+              "tier": "project",
+              "source": "project",
+              "filePath": "$TMP/tiers/project/.fgos/prompt-templates/shared.md",
+              "relativeFilePath": "../project/.fgos/prompt-templates/shared.md",
+              "content": "project shared\n",
+              "contentDigest": "sha256:5ba9855c405425347b06e0d6d34819f3b2d29dc76f3fb10887428848982dd15e"
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "c",
+            "domain": "coding"
+          },
+          "result": {
+            "ok": {
+              "id": "c",
+              "tier": "domain",
+              "source": "domain:coding",
+              "filePath": "$TMP/tiers/pkg/domains/coding/prompt-templates/c.md",
+              "relativeFilePath": "domains/coding/prompt-templates/c.md",
+              "content": "coding c {constraints}\n",
+              "contentDigest": "sha256:4184f522cf2dad2afa2a7fdbd922c1605915997f104328152b6a2fd6af298ded"
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "c",
+            "domain": "ops"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-not-found",
+              "message": "operation-prompt-templates [template-not-found]: no operation prompt template found for id \"c\" (searched project, domain, and core tiers)",
+              "details": {
+                "templateId": "c",
+                "cwd": "$TMP/tiers/project",
+                "domain": "ops"
+              }
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "c"
+          },
+          "result": {
+            "ok": {
+              "id": "c",
+              "tier": "domain",
+              "source": "domain:coding",
+              "filePath": "$TMP/tiers/pkg/domains/coding/prompt-templates/c.md",
+              "relativeFilePath": "domains/coding/prompt-templates/c.md",
+              "content": "coding c {constraints}\n",
+              "contentDigest": "sha256:4184f522cf2dad2afa2a7fdbd922c1605915997f104328152b6a2fd6af298ded"
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "d"
+          },
+          "result": {
+            "ok": {
+              "id": "d",
+              "tier": "domain",
+              "source": "domain:ops",
+              "filePath": "$TMP/tiers/pkg/domains/ops/prompt-templates/d.md",
+              "relativeFilePath": "domains/ops/prompt-templates/d.md",
+              "content": "ops d\n",
+              "contentDigest": "sha256:edf4790dc645e0f5a0a2f25f91db9cdc1eabe2ab50f5bd0c2b294fcc3ae5aba0"
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "a1"
+          },
+          "result": {
+            "ok": {
+              "id": "a1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "$TMP/tiers/pkg/core/prompt-templates/a1.md",
+              "relativeFilePath": "core/prompt-templates/a1.md",
+              "content": "core a1\n",
+              "contentDigest": "sha256:dd5e9023ee7bd007d8523aa87e99de5703ed4ce2ac7dd1cd3efa8ae7d2422380"
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "UP"
+          },
+          "result": {
+            "ok": {
+              "id": "UP",
+              "tier": "core",
+              "source": "core",
+              "filePath": "$TMP/tiers/pkg/core/prompt-templates/UP.MD",
+              "relativeFilePath": "core/prompt-templates/UP.MD",
+              "content": "core UP\n",
+              "contentDigest": "sha256:da4089754d2a55e808724d0dc55c75d828d70af012a7946d9dcbca76f62ae139"
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "uni"
+          },
+          "result": {
+            "ok": {
+              "id": "uni",
+              "tier": "core",
+              "source": "core",
+              "filePath": "$TMP/tiers/pkg/core/prompt-templates/uni.md",
+              "relativeFilePath": "core/prompt-templates/uni.md",
+              "content": "héllo ✓ 😀 {objective}\n",
+              "contentDigest": "sha256:236da9c46df10a66c6cb862e1a46eb783962172542935eaa94a7df7f702b972b"
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "nope"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-not-found",
+              "message": "operation-prompt-templates [template-not-found]: no operation prompt template found for id \"nope\" (searched project, domain, and core tiers)",
+              "details": {
+                "templateId": "nope",
+                "cwd": "$TMP/tiers/project"
+              }
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "bad id!"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-invalid",
+              "message": "operation-prompt-templates [template-invalid]: invalid template id \"bad id!\"",
+              "details": {}
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": ""
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-invalid",
+              "message": "operation-prompt-templates [template-invalid]: invalid template id \"\"",
+              "details": {}
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "d",
+            "domain": "missing"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-not-found",
+              "message": "operation-prompt-templates [template-not-found]: no operation prompt template found for id \"d\" (searched project, domain, and core tiers)",
+              "details": {
+                "templateId": "d",
+                "cwd": "$TMP/tiers/project",
+                "domain": "missing"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "empty",
+      "files": {},
+      "symlinks": {},
+      "calls": [
+        {
+          "call": {
+            "fn": "discoverProject"
+          },
+          "result": {
+            "ok": []
+          }
+        },
+        {
+          "call": {
+            "fn": "discoverAll"
+          },
+          "result": {
+            "ok": []
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "x"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-not-found",
+              "message": "operation-prompt-templates [template-not-found]: no operation prompt template found for id \"x\" (searched project, domain, and core tiers)",
+              "details": {
+                "templateId": "x",
+                "cwd": "$TMP/empty/project"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "duplicate-in-dir",
+      "files": {
+        "pkg/core/prompt-templates/x.md": "a\n",
+        "pkg/core/prompt-templates/x.txt": "b\n"
+      },
+      "symlinks": {},
+      "calls": [
+        {
+          "call": {
+            "fn": "discoverAll"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-ambiguous",
+              "message": "operation-prompt-templates [template-ambiguous]: duplicate template id \"x\" within core (x.txt conflicts with x.md)",
+              "details": {
+                "templateId": "x",
+                "tier": "core",
+                "source": "core",
+                "fileName": "x.txt",
+                "existingFile": "x.md"
+              }
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "x"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-ambiguous",
+              "message": "operation-prompt-templates [template-ambiguous]: duplicate template id \"x\" within core (x.txt conflicts with x.md)",
+              "details": {
+                "templateId": "x",
+                "tier": "core",
+                "source": "core",
+                "fileName": "x.txt",
+                "existingFile": "x.md"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "duplicate-in-project",
+      "files": {
+        "project/.fgos/prompt-templates/x.md": "a\n",
+        "project/.fgos/prompt-templates/X.MD": "b\n",
+        "project/.fgos/prompt-templates/x.txt": "c\n"
+      },
+      "symlinks": {},
+      "calls": [
+        {
+          "call": {
+            "fn": "discoverProject"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-ambiguous",
+              "message": "operation-prompt-templates [template-ambiguous]: duplicate template id \"x\" within project (x.txt conflicts with x.md)",
+              "details": {
+                "templateId": "x",
+                "tier": "project",
+                "source": "project",
+                "fileName": "x.txt",
+                "existingFile": "x.md"
+              }
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "x"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-ambiguous",
+              "message": "operation-prompt-templates [template-ambiguous]: duplicate template id \"x\" within project (x.txt conflicts with x.md)",
+              "details": {
+                "templateId": "x",
+                "tier": "project",
+                "source": "project",
+                "fileName": "x.txt",
+                "existingFile": "x.md"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "cross-domain",
+      "files": {
+        "pkg/domains/a/prompt-templates/t.md": "a\n",
+        "pkg/domains/b/prompt-templates/t.md": "b\n",
+        "pkg/domains/b/prompt-templates/u.md": "u\n"
+      },
+      "symlinks": {},
+      "calls": [
+        {
+          "call": {
+            "fn": "discoverAll"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-ambiguous",
+              "message": "operation-prompt-templates [template-ambiguous]: template id \"t\" collides across domains \"a\" and \"b\"",
+              "details": {
+                "templateId": "t",
+                "domain1": "a",
+                "domain2": "b"
+              }
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "t"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-ambiguous",
+              "message": "operation-prompt-templates [template-ambiguous]: template id \"t\" collides across domains \"domain:a\" and \"domain:b\"",
+              "details": {
+                "templateId": "t",
+                "source1": "domain:a",
+                "source2": "domain:b"
+              }
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "t",
+            "domain": "a"
+          },
+          "result": {
+            "ok": {
+              "id": "t",
+              "tier": "domain",
+              "source": "domain:a",
+              "filePath": "$TMP/cross-domain/pkg/domains/a/prompt-templates/t.md",
+              "relativeFilePath": "domains/a/prompt-templates/t.md",
+              "content": "a\n",
+              "contentDigest": "sha256:87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7"
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "u"
+          },
+          "result": {
+            "ok": {
+              "id": "u",
+              "tier": "domain",
+              "source": "domain:b",
+              "filePath": "$TMP/cross-domain/pkg/domains/b/prompt-templates/u.md",
+              "relativeFilePath": "domains/b/prompt-templates/u.md",
+              "content": "u\n",
+              "contentDigest": "sha256:ea46748e171abd2dd4dba5b86bb6589334d86bba2df8d50cbb16b36c83b0856a"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "unknown-variable",
+      "files": {
+        "pkg/core/prompt-templates/bad.md": "uses {nope} and {objective}\n",
+        "pkg/core/prompt-templates/good.md": "{objective}\n"
+      },
+      "symlinks": {},
+      "calls": [
+        {
+          "call": {
+            "fn": "discoverAll"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-invalid",
+              "message": "operation-prompt-templates [template-invalid]: template \"bad\" references forbidden or unknown variable \"{nope}\". Only bounded variables are permitted: objective, contextRefs, artifactRefs, expectedOutputs, role, constraints, evidenceContract",
+              "details": {
+                "templateId": "bad",
+                "variable": "nope",
+                "allowed": [
+                  "objective",
+                  "contextRefs",
+                  "artifactRefs",
+                  "expectedOutputs",
+                  "role",
+                  "constraints",
+                  "evidenceContract"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "good"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-invalid",
+              "message": "operation-prompt-templates [template-invalid]: template \"bad\" references forbidden or unknown variable \"{nope}\". Only bounded variables are permitted: objective, contextRefs, artifactRefs, expectedOutputs, role, constraints, evidenceContract",
+              "details": {
+                "templateId": "bad",
+                "variable": "nope",
+                "allowed": [
+                  "objective",
+                  "contextRefs",
+                  "artifactRefs",
+                  "expectedOutputs",
+                  "role",
+                  "constraints",
+                  "evidenceContract"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "bad"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-invalid",
+              "message": "operation-prompt-templates [template-invalid]: template \"bad\" references forbidden or unknown variable \"{nope}\". Only bounded variables are permitted: objective, contextRefs, artifactRefs, expectedOutputs, role, constraints, evidenceContract",
+              "details": {
+                "templateId": "bad",
+                "variable": "nope",
+                "allowed": [
+                  "objective",
+                  "contextRefs",
+                  "artifactRefs",
+                  "expectedOutputs",
+                  "role",
+                  "constraints",
+                  "evidenceContract"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bad-file-name",
+      "files": {
+        "pkg/core/prompt-templates/we ird.md": "x\n",
+        "pkg/core/prompt-templates/ok.md": "x\n"
+      },
+      "symlinks": {},
+      "calls": [
+        {
+          "call": {
+            "fn": "discoverAll"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-invalid",
+              "message": "operation-prompt-templates [template-invalid]: template filename \"we ird.md\" produces invalid template id \"we ird\" (must match /^[A-Za-z0-9._-]+$/)",
+              "details": {
+                "fileName": "we ird.md",
+                "templateId": "we ird"
+              }
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "ok"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-invalid",
+              "message": "operation-prompt-templates [template-invalid]: template filename \"we ird.md\" produces invalid template id \"we ird\" (must match /^[A-Za-z0-9._-]+$/)",
+              "details": {
+                "fileName": "we ird.md",
+                "templateId": "we ird"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "path-escape",
+      "files": {
+        "outside.md": "outside\n",
+        "pkg/core/prompt-templates/ok.md": "x\n"
+      },
+      "symlinks": {
+        "pkg/core/prompt-templates/link.md": "outside.md"
+      },
+      "calls": [
+        {
+          "call": {
+            "fn": "discoverAll"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-path-escape",
+              "message": "operation-prompt-templates [template-path-escape]: template \"$TMP/path-escape/pkg/core/prompt-templates/link.md\" resolves outside its scan root \"$TMP/path-escape/pkg/core/prompt-templates\"",
+              "details": {
+                "rootDir": "$TMP/path-escape/pkg/core/prompt-templates",
+                "filePath": "$TMP/path-escape/pkg/core/prompt-templates/link.md"
+              }
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "ok"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-path-escape",
+              "message": "operation-prompt-templates [template-path-escape]: template \"$TMP/path-escape/pkg/core/prompt-templates/link.md\" resolves outside its scan root \"$TMP/path-escape/pkg/core/prompt-templates\"",
+              "details": {
+                "rootDir": "$TMP/path-escape/pkg/core/prompt-templates",
+                "filePath": "$TMP/path-escape/pkg/core/prompt-templates/link.md"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "project-only-dir",
+      "files": {
+        "project/.fgos/prompt-templates/only.md": "only {role}\n"
+      },
+      "symlinks": {},
+      "calls": [
+        {
+          "call": {
+            "fn": "discoverProject"
+          },
+          "result": {
+            "ok": [
+              {
+                "id": "only",
+                "tier": "project",
+                "source": "project",
+                "filePath": "$TMP/project-only-dir/project/.fgos/prompt-templates/only.md",
+                "relativeFilePath": "../project/.fgos/prompt-templates/only.md",
+                "content": "only {role}\n",
+                "contentDigest": "sha256:dc38b8257d1e246e8235b0a5904ee12662a1626d1da913a15cf6a2aca52110ab"
+              }
+            ]
+          }
+        },
+        {
+          "call": {
+            "fn": "discoverAll"
+          },
+          "result": {
+            "ok": [
+              {
+                "id": "only",
+                "tier": "project",
+                "source": "project",
+                "filePath": "$TMP/project-only-dir/project/.fgos/prompt-templates/only.md",
+                "relativeFilePath": "../project/.fgos/prompt-templates/only.md",
+                "content": "only {role}\n",
+                "contentDigest": "sha256:dc38b8257d1e246e8235b0a5904ee12662a1626d1da913a15cf6a2aca52110ab"
+              }
+            ]
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "only"
+          },
+          "result": {
+            "ok": {
+              "id": "only",
+              "tier": "project",
+              "source": "project",
+              "filePath": "$TMP/project-only-dir/project/.fgos/prompt-templates/only.md",
+              "relativeFilePath": "../project/.fgos/prompt-templates/only.md",
+              "content": "only {role}\n",
+              "contentDigest": "sha256:dc38b8257d1e246e8235b0a5904ee12662a1626d1da913a15cf6a2aca52110ab"
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "load",
+            "id": "core-missing"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-not-found",
+              "message": "operation-prompt-templates [template-not-found]: no operation prompt template found for id \"core-missing\" (searched project, domain, and core tiers)",
+              "details": {
+                "templateId": "core-missing",
+                "cwd": "$TMP/project-only-dir/project"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "render-fixtures",
+      "files": {
+        "pkg/core/prompt-templates/impl-v1.md": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+        "pkg/domains/coding/prompt-templates/coding-only.md": "coding {objective} / {role}\n",
+        "pkg/domains/ops/prompt-templates/coding-only.md": "ops {objective}\n"
+      },
+      "symlinks": {},
+      "calls": [
+        {
+          "call": {
+            "fn": "load",
+            "id": "impl-v1"
+          },
+          "result": {
+            "ok": {
+              "id": "impl-v1",
+              "tier": "core",
+              "source": "core",
+              "filePath": "$TMP/render-fixtures/pkg/core/prompt-templates/impl-v1.md",
+              "relativeFilePath": "core/prompt-templates/impl-v1.md",
+              "content": "goal {objective}\nrole {role}\nctx:\n{contextRefs}\nart:\n{artifactRefs}\nout:\n{expectedOutputs}\ncon:\n{constraints}\nev {evidenceContract}\n",
+              "contentDigest": "sha256:d975c38f06c1713c59b51e82391f6b27c2f6ab6b41bbd1baa9a3bc60d13213db"
+            }
+          }
+        },
+        {
+          "call": {
+            "fn": "discoverAll"
+          },
+          "result": {
+            "error": {
+              "name": "TemplateResolutionError",
+              "code": "template-ambiguous",
+              "message": "operation-prompt-templates [template-ambiguous]: template id \"coding-only\" collides across domains \"coding\" and \"ops\"",
+              "details": {
+                "templateId": "coding-only",
+                "domain1": "coding",
+                "domain2": "ops"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
