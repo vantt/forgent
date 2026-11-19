@@ -11,7 +11,7 @@ footprint:
   - packages/run-supervisor/rust/src/route.rs
   - packages/run-supervisor/rust/src/supervise/terminal.rs
   - packages/run-supervisor/rust/tests/head_request.rs
-  - packages/run-supervisor/rust/tests/**
+  - packages/run-supervisor/rust/tests/head_role_binding.rs
   - packages/run-supervisor/rust/examples/internal_harness.rs
   - packages/run-supervisor/contracts/head-request.v1.json
   - apps/fgos/src/wiring/session_write_publish.rs
@@ -24,13 +24,17 @@ footprint:
   - src/session-host/head-grants.mjs
   - core/agents/shaper.yaml
   - core/skills/fgos-secretary/SKILL.md
+  - .agents/skills/fgos-secretary/SKILL.md
+  - .claude/skills/fgos-secretary/SKILL.md
+  - plugins/fgOS/skills/fgos-secretary/SKILL.md
   - test/cli/session-verb.test.mjs
-  - test/session-host/**
+  - test/session-host/head-start.test.mjs
+  - test/session-host/head-request.test.mjs
   - docs/platform/session-host/spec.md
   - docs/platform/agent-confinement/spec.md
   - docs/backlog.md
   - CHANGELOG.md
-base: a33b7c9f0
+base: a33b7c9f047a1c3aabbea339633d3c7e92a44939
 source:
   - .fgos/runtime/tmp/sc-lead-brief.md
   - docs/backlog.md
@@ -79,17 +83,22 @@ The Git core change for live pending writers (lead:OPC); a general backlog tool 
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Session write refuses a stale base](phase-01-stale-base.md) | - | 6cd8d63ab's 11 files, core/skills/fgos-secretary/SKILL.md, docs/platform/session-host/spec.md, packages/run-supervisor/contracts/head-request.v1.json, CHANGELOG.md | 1 | pending |
-| 2 | [Role bound at head start and rotation](phase-02-role-binding.md) | - | packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/** (not head_request.rs), src/session-host/head-start.mjs (start refusal only) | 1 | pending |
-| 3 | [Shaper persona, persona-not-found, head TMPDIR](phase-03-shaper-tmpdir.md) | 2 (head-start.mjs) | core/agents/shaper.yaml, src/session-host/head-start.mjs, src/session-host/head-grants.mjs, test/session-host/**, bin/fgos.mjs (HEAD_ARGUMENT_CODES only) | 2 | pending |
-| 4 | [Session write add-rows](phase-04-add-rows.md) | 1 | head_request.rs, session_write_publish.rs + tests, bin/fgos.mjs, head-request-client.mjs, command-registry.mjs, fgos-secretary skill, session-host spec, docs/backlog.md (move trailing rows into the open table) | 2 | pending |
-| 5 | [Session write waits on a live writer](phase-05-busy-retry.md) | 1, lead:OPC Git busy code | apps/fgos/src/wiring/session_write_publish.rs + test, session-host spec | 3 | pending |
-| 6 | [Live grant audit from Miu's sandbox](phase-06-grant-audit.md) | 1-5 released | core/skills/fgos-secretary/SKILL.md, docs/platform/agent-confinement/spec.md, src/session-host/head-grants.mjs (only if a gap is found) | 4 | pending |
+| 1 | [Session write refuses a stale base](phase-01-stale-base.md) | - | 6cd8d63ab's 11 files, core/skills/fgos-secretary/SKILL.md, docs/platform/session-host/spec.md, packages/run-supervisor/contracts/head-request.v1.json, CHANGELOG.md | 1 | running |
+| 2 | [Role bound at head start and rotation](phase-02-role-binding.md) | - | packages/run-supervisor/rust/src/supervise/terminal.rs, packages/run-supervisor/rust/tests/head_role_binding.rs, src/session-host/head-start.mjs (start refusal only) | 1 | running |
+| 3 | [Shaper persona, persona-not-found, head TMPDIR](phase-03-shaper-tmpdir.md) | 2 | core/agents/shaper.yaml, src/session-host/head-start.mjs, src/session-host/head-grants.mjs, test/session-host/head-start.test.mjs, test/session-host/head-request.test.mjs, bin/fgos.mjs (HEAD_ARGUMENT_CODES only) | 2 | ready |
+| 4 | [Session write add-rows](phase-04-add-rows.md) | 1 | head_request.rs, session_write_publish.rs + tests, bin/fgos.mjs, head-request-client.mjs, command-registry.mjs, fgos-secretary skill, session-host spec, docs/backlog.md (move trailing rows into the open table) | 2 | ready |
+| 5 | [Session write waits on a live writer](phase-05-busy-retry.md) | 1 | apps/fgos/src/wiring/session_write_publish.rs + test, session-host spec | 3 | ready |
+| 6 | [Live grant audit from Miu's sandbox](phase-06-grant-audit.md) | 1, 2, 3, 4, 5 | core/skills/fgos-secretary/SKILL.md, docs/platform/agent-confinement/spec.md, src/session-host/head-grants.mjs (only if a gap is found) | 4 | ready |
 
 ## Owner questions
 None. Shaper persona decided by the supervisor inside the frame; Git busy semantics decided by lead:OPC.
 
 ## Shared files
+Shared with active plan 261118-1341 (lead:S6A), coordinated by the supervisor: packages/run-supervisor/rust/src/{head_request,route,supervise/terminal}.rs,
+packages/run-supervisor/rust/tests/{head_request,head_role_binding}.rs, packages/run-supervisor/rust/examples/internal_harness.rs,
+packages/run-supervisor/contracts/head-request.v1.json, apps/fgos/src/wiring/session_write_publish.rs,
+apps/fgos/tests/{session_write_publish,questions_head}.rs, bin/fgos.mjs, src/cli/command-registry.mjs,
+src/session-host/head-start.mjs, test/cli/session-verb.test.mjs, test/session-host/{head-start,head-request}.test.mjs.
 `bin/fgos.mjs` is touched by phases 1, 3, 4 (different blocks; later phases rebase). `packages/git/contracts/mutation-census.v1.json`
 is regenerated at land time on top of main. Supervisor skill and route belong to lead:SUPERVISION; `src/runner/dispatch/**`
 to lead:S6A: a phase that needs them stops and asks.
