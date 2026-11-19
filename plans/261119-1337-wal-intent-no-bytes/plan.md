@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Land and Sync intents record declared files as path + blob OID, never bytes (backlog p-hzyvmj3zyf)"
-status: running
+status: done
 lead: lead:WAL-INTENT
 priority: P1
 blockedBy: []
@@ -43,7 +43,7 @@ Chunking or raising MAX_RECORD; changing LandRequest/LandFile as the caller-faci
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Intent records path + blob OID](phase-01-intent-no-bytes.md) | - | packages/git/rust/src/{wal,land,sync,lib}.rs, packages/git/rust/tests/{land,scoped_commit_sync}.rs, packages/supervision/rust/src/land.rs, docs/platform/git/spec.md | 1 | running |
+| 1 | [Intent records path + blob OID](phase-01-intent-no-bytes.md) | - | packages/git/rust/src/{wal,land,sync,lib}.rs, packages/git/rust/tests/{land,scoped_commit_sync}.rs, packages/supervision/rust/src/land.rs, docs/platform/git/spec.md | 1 | done |
 
 ## Owner questions
 None (decided by lead:OPC).
