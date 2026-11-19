@@ -6,6 +6,7 @@
 //!   the main checkout is fast-forwarded to the remote tip before anything is written. A branch with commits its
 //!   remote lacks (an earlier publish committed but could not push) comes back as `BranchAhead`.
 //! - `path_clean` answers whether the path has no uncommitted change in the main checkout (Git's own status read).
+//! - `path_oid` is the git blob id of the file as the main checkout holds it, hashed by the Git door (never written).
 //! - `publish` lands the path: only that path is committed with the subject `docs(<role>): write <path>` and the
 //!   head's writer key, and the checked-out branch is pushed without force. The gates are the project's `land.gates`
 //!   whose `when` matches the path; a land refusal comes back by its own name.
@@ -41,6 +42,7 @@ pub fn publisher() -> WritePublisher {
     WritePublisher {
         catch_up: std::sync::Arc::new(catch_up_main),
         path_clean: std::sync::Arc::new(path_clean),
+        path_oid: std::sync::Arc::new(path_oid),
         publish: std::sync::Arc::new(publish),
     }
 }
@@ -123,6 +125,29 @@ fn path_clean(root: &Path, path: &str) -> Result<bool, PublishRefusal> {
         "write-status-unreadable",
         "the checkout has too many changed paths to read",
     ))
+}
+
+/// The git blob id of the file `path` as the main checkout of `root` holds it, computed by the Git door without
+/// installing the object. A symlink or a non-file is refused: only a regular granted file has a content to compare.
+fn path_oid(root: &Path, path: &str) -> Result<String, PublishRefusal> {
+    let checkout = open(root)?;
+    let file = checkout.main.join(path);
+    let unreadable = |e: std::io::Error| refusal("write-path-unreadable", format!("{path}: {e}"));
+    if !std::fs::symlink_metadata(&file)
+        .map_err(unreadable)?
+        .is_file()
+    {
+        return Err(refusal(
+            "write-path-unreadable",
+            format!("{path} is not a regular file"),
+        ));
+    }
+    let bytes = std::fs::read(&file).map_err(unreadable)?;
+    checkout
+        .driver
+        .hash_object(&checkout.repo, fgos_git::ObjectType::Blob, &bytes)
+        .map(|oid| oid.as_str().to_owned())
+        .map_err(|e| refusal("write-git-unavailable", e.cause))
 }
 
 /// The project's `land.gates` and `land.regenerate` through the config door: project over global over the standard.

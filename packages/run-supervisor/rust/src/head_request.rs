@@ -116,6 +116,7 @@ const DETAIL_LOG_CHARS: usize = 300;
 
 type LogLine = Box<dyn Fn(&str) + Send + Sync>;
 type CatchesUp = Box<dyn Fn(&Path) -> Result<(), CatchUpRefusal> + Send + Sync>;
+type PathOid = Box<dyn Fn(&Path, &str) -> Result<String, PublishRefusal> + Send + Sync>;
 type PathClean = Box<dyn Fn(&Path, &str) -> Result<bool, PublishRefusal> + Send + Sync>;
 type PublishesWrite = Box<dyn Fn(&Path, &str) -> Result<String, PublishRefusal> + Send + Sync>;
 
@@ -156,6 +157,9 @@ pub struct Config {
     /// [`WRITE_VERB`], before the write: does `path` (granted, beneath `cwd`) have no uncommitted change in the main
     /// checkout. An error is refused `write-path-unreadable`.
     pub path_clean: PathClean,
+    /// [`WRITE_VERB`]: the git blob id of the content `path` has in the main checkout now. Read before the catch-up
+    /// (when the request names no `base`) and after it; an error is refused `write-path-unreadable`.
+    pub path_oid: PathOid,
     /// [`WRITE_VERB`], after the write: publishes `path` and returns the commit. A refusal comes back in the reply by
     /// its own name, the file stays written, nothing is forced.
     pub publish_write: PublishesWrite,
@@ -313,6 +317,10 @@ impl HeadRequests {
             path_clean: Box::new({
                 let path_clean = publisher.path_clean.clone();
                 move |root, path| path_clean(root, path)
+            }),
+            path_oid: Box::new({
+                let path_oid = publisher.path_oid.clone();
+                move |root, path| path_oid(root, path)
             }),
             publish_write: Box::new({
                 let (publish, role, writer_id) =
@@ -608,23 +616,30 @@ fn plain_relative(path: &str) -> bool {
             .all(|c| matches!(c, std::path::Component::Normal(_)))
 }
 
-/// [`WRITE_VERB`], the checks: `args` is exactly `{path, content}`, both strings (`bad-args`), the path is plain and
-/// relative (`path-invalid`) and named exactly by an entry of `writes` (`path-not-granted`). Returns the path and the
-/// content.
+/// [`WRITE_VERB`], the checks: `args` is `{path, content}` and optionally `base`, all strings (`bad-args`), the path
+/// is plain and relative (`path-invalid`) and named exactly by an entry of `writes` (`path-not-granted`). Returns the
+/// path, the content and the base (the git blob id of the content the writer read) when given.
 pub fn granted_write<'a>(
     writes: &[String],
     args: &'a Value,
-) -> Result<(&'a str, &'a str), WriteRefusal> {
-    let text = |name: &str| {
-        args[name]
-            .as_str()
-            .filter(|_| args.as_object().is_some_and(|o| o.len() == 2))
-    };
-    let (Some(rel), Some(content)) = (text("path"), text("content")) else {
-        return Err(write_refused(
+) -> Result<(&'a str, &'a str, Option<&'a str>), WriteRefusal> {
+    let bad = || {
+        write_refused(
             "bad-args",
-            "args must be exactly {path, content}, both strings".to_string(),
-        ));
+            "args must be {path, content} and optionally base, all strings".to_string(),
+        )
+    };
+    let object = args.as_object().ok_or_else(bad)?;
+    let base = match object.get("base") {
+        None => None,
+        Some(value) => Some(value.as_str().filter(|b| !b.is_empty()).ok_or_else(bad)?),
+    };
+    if object.len() != 2 + usize::from(base.is_some()) {
+        return Err(bad());
+    }
+    let text = |name: &str| args[name].as_str();
+    let (Some(rel), Some(content)) = (text("path"), text("content")) else {
+        return Err(bad());
     };
     if !plain_relative(rel) {
         return Err(write_refused("path-invalid", None));
@@ -632,7 +647,7 @@ pub fn granted_write<'a>(
     if !writes.iter().any(|granted| granted == rel) {
         return Err(write_refused("path-not-granted", None));
     }
-    Ok((rel, content))
+    Ok((rel, content, base))
 }
 
 /// [`WRITE_VERB`], the write: replace the granted file `rel` beneath `root` with `content`. It must be an existing
@@ -671,16 +686,30 @@ pub fn install_granted(root: &Path, rel: &str, content: &str) -> Result<usize, W
 
 /// [`WRITE_VERB`] in full, in contract order: the argument and grant checks, the catch-up of the main checkout to its
 /// remote tip (`write-branch-ahead`, `write-catch-up-refused`), the path has no uncommitted change
-/// (`write-path-dirty`), the atomic write, then the publish; every refusal before the write leaves nothing written. A
+/// (`write-path-dirty`), the base check (`write-base-stale`), the atomic write, then the publish; every refusal before the write leaves nothing written. A
 /// publish refusal is a reply that names it beside the bytes written, not a refusal of the request.
 fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
     let refuse_with = |why: WriteRefusal| Outcome::Refused {
         code: why.code,
         detail: why.detail,
     };
-    let (rel, content) = match granted_write(&cfg.writes, args) {
+    let (rel, content, base) = match granted_write(&cfg.writes, args) {
         Ok(granted) => granted,
         Err(why) => return refuse_with(why),
+    };
+    let unreadable = |why: PublishRefusal| Outcome::Refused {
+        code: "write-path-unreadable",
+        detail: Some(format!("{}: {}", why.code, why.detail)),
+    };
+    // The content the writer read: its own `base`, else what the file held when the request arrived, which the
+    // catch-up below may move.
+    let read_oid = || (cfg.path_oid)(&cfg.cwd, rel);
+    let expected = match base {
+        Some(base) => base.to_owned(),
+        None => match read_oid() {
+            Ok(oid) => oid,
+            Err(why) => return unreadable(why),
+        },
     };
     match (cfg.catch_up)(&cfg.cwd) {
         Ok(()) => {}
@@ -706,6 +735,18 @@ fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
                 detail: Some(format!("{}: {}", why.code, why.detail)),
             }
         }
+    }
+    match read_oid() {
+        Ok(current) if current == expected => {}
+        Ok(current) => {
+            return Outcome::Refused {
+                code: "write-base-stale",
+                detail: Some(format!(
+                    "{rel} is now {current}, the write was based on {expected}; read it again and redo the edit"
+                )),
+            }
+        }
+        Err(why) => return unreadable(why),
     }
     let bytes = match install_granted(&cfg.cwd, rel, content) {
         Ok(bytes) => bytes,

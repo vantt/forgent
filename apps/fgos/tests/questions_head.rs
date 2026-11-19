@@ -434,6 +434,7 @@ impl ServedSupervisor {
         let publisher = WritePublisher {
             catch_up: Arc::new(|_, _| unreachable!("no session write here")),
             path_clean: Arc::new(|_, _| unreachable!("no session write here")),
+            path_oid: Arc::new(|_, _| unreachable!("no session write here")),
             publish: Arc::new(|_, _, _, _| unreachable!("no session write here")),
         };
         let (path, server) =
