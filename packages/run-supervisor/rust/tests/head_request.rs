@@ -435,6 +435,37 @@ fn a_second_request_while_one_runs_is_busy_and_the_tick_is_never_held() {
     assert_eq!(ask(&served.socket, "session start")["result"], "done");
 }
 
+/// A long verb (`land`, `run`) answers a ticket at once: the route child starts its runner detached and exits, so the
+/// reply comes long before the verb limit while the runner goes on and finishes after the request is over.
+#[test]
+fn a_ticket_verb_answers_at_once_while_its_detached_runner_outlives_the_route_child() {
+    let served = serve(
+        "ticket",
+        r#"cat > /dev/null; (setsid sh -c 'sleep 2; echo finished > "$0/runner-done"' "$OUT" >/dev/null 2>&1 </dev/null &); echo '{"v":1,"protocol":1,"result":"done","data":{"ticket":"r1","state":"running"}}'"#,
+        Ok(true),
+        &["land"],
+        Duration::from_secs(20),
+    );
+    let started = Instant::now();
+    let reply = ask(&served.socket, "land");
+    assert!(
+        started.elapsed() < Duration::from_secs(1),
+        "the reply waited for the runner: {:?}",
+        started.elapsed()
+    );
+    assert_eq!(reply["result"], "done");
+    assert_eq!(reply["data"]["state"], "running");
+    assert!(!served.dir.join("runner-done").exists());
+    let until = Instant::now() + Duration::from_secs(10);
+    while !served.dir.join("runner-done").exists() && Instant::now() < until {
+        std::thread::sleep(Duration::from_millis(50));
+    }
+    assert!(
+        served.dir.join("runner-done").exists(),
+        "the runner did not survive the route child"
+    );
+}
+
 #[test]
 fn a_verb_that_outlives_its_limit_is_killed_and_refused_verb_timeout() {
     let served = serve(
@@ -485,21 +516,27 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "bad-frame",
             "busy",
             "caller-not-under-gate",
+            "footprint-change-refused",
+            "land-branch-lead-only",
             "not-a-file",
             "path-invalid",
             "path-not-granted",
+            "path-outside-grant",
             "path-symlink",
             "peer-uid",
             "role-not-held",
             "role-take-failed",
             "session-bind-failed",
             "session-not-registered",
+            "ticket-unknown",
+            "ticket-used",
             "verb-failed",
             "verb-not-granted",
             "verb-timeout",
             "write-branch-ahead",
             "write-catch-up-refused",
             "write-failed",
+            "write-outside-footprint",
             "write-path-dirty",
             "write-path-unreadable"
         ]
@@ -514,16 +551,23 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
     assert_eq!(
         verbs,
         [
+            "land",
             "questions ack",
             "questions answer",
             "questions ask",
             "questions cancel",
+            "request result",
+            "run",
             "session answered",
             "session bind session",
             "session restore role",
             "session rotate",
             "session start",
-            "session write"
+            "session stop",
+            "session write",
+            "supervisor done",
+            "supervisor handled",
+            "worktree create"
         ]
     );
     assert_eq!(

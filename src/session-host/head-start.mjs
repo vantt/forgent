@@ -22,6 +22,7 @@ const PERSONA_PATTERN = /^[a-z][a-z0-9-]{0,63}$/;
 const NAME_PATTERN = /^[a-z0-9-]{1,32}$/;
 const PLACEMENT_FILE = 'placement.json';
 const FILE_MODE = 0o600;
+const QUESTION_ID_PATTERN = /^[A-Za-z0-9._-]{1,64}$/;
 
 /** How long a head session may live before its supervisor ends it, whatever it is doing (7 days). */
 export const HEAD_HARD_CEILING_MS = 7 * 24 * 60 * 60 * 1000;
@@ -88,13 +89,13 @@ export function slotKeyOf(record) {
 }
 
 /** The opening a head session is typed: its persona section, the skills line the persona carries, and the start ritual. */
-async function defaultOpening({ persona, name, projectRoot, pinned, handoff }) {
+async function defaultOpening({ persona, name, projectRoot, pinned, handoff, forQuestion = null }) {
   const { renderPersonaSection } = await import('../runner/agent-definitions.mjs');
-  return openingText({ persona, name, personaLines: renderPersonaSection(persona, { projectRoot, pinnedText: pinned.text }), handoff });
+  return openingText({ persona, name, personaLines: renderPersonaSection(persona, { projectRoot, pinnedText: pinned.text }), handoff, forQuestion });
 }
 
 /** Pure: the opening text from its parts, so a test reads the exact words a head is given. */
-export function openingText({ persona, name, personaLines, handoff = null }) {
+export function openingText({ persona, name, personaLines, handoff = null, forQuestion = null }) {
   return [
     ...personaLines,
     '',
@@ -106,6 +107,7 @@ export function openingText({ persona, name, personaLines, handoff = null }) {
       : '1. There is no earlier handoff for this session; start from the portfolio.',
     '2. Read the portfolio: `fgos questions` for the owner questions still open, and docs/backlog.md for the work in flight.',
     '3. Say in one line which pending question you resumed, or that none is pending.',
+    ...(forQuestion ? ['', `You continue question ${forQuestion}: write its answer back to its origin, then \`fgos questions ack ${forQuestion}\` (or \`cancel\`).`] : []),
   ].join('\n');
 }
 
@@ -157,10 +159,11 @@ async function defaultHandoff({ persona, name, projectRoot }) {
 
 // ---- the use case -------------------------------------------------------------------------------
 
-export function assertHeadArgs({ persona, name, projectRoot, gen = null }) {
+export function assertHeadArgs({ persona, name, projectRoot, gen = null, forQuestion = null }) {
   if (!PERSONA_PATTERN.test(persona ?? '')) throw new HeadStartError('bad-persona', `persona must be an agent name (a-z, 0-9, hyphen; starts with a letter), got ${JSON.stringify(persona)}`);
   if (!NAME_PATTERN.test(name ?? '')) throw new HeadStartError('bad-name', `name must be 1 to 32 characters of a-z, 0-9 and hyphen, got ${JSON.stringify(name)}`);
   if (typeof projectRoot !== 'string' || projectRoot === '') throw new HeadStartError('bad-project-root', 'projectRoot is required');
+  if (forQuestion !== null && !QUESTION_ID_PATTERN.test(forQuestion ?? '')) throw new HeadStartError('bad-question', `forQuestion must be a question id (letters, digits, dot, underscore, hyphen; at most 64), got ${JSON.stringify(forQuestion)}`);
   if (gen !== null && (!Number.isInteger(gen) || gen < 1)) throw new HeadStartError('bad-generation', `gen must be a positive integer, got ${JSON.stringify(gen)}`);
 }
 
@@ -170,12 +173,13 @@ export function assertHeadArgs({ persona, name, projectRoot, gen = null }) {
  * start; the rotation executor calls it for a successor while the predecessor still holds the role, and records the
  * placement itself once the predecessor is gone.
  *
- * `gen` is the generation of the lineage (absent: the first unused one); `beside` is the live key of the session whose
+ * `gen` is the generation of the lineage (absent: the first unused one); `forQuestion` is the id of an owner question the
+ * new head continues (one more opening line); `beside` is the live key of the session whose
  * tab the new one opens next to. `ports` as for `startHeadSession` (`pin`, `handoff`, `opening`, `runnerConfig`, `bind`,
  * `launch`). Returns `{ role, gen, key, placement, runDir, cli, persona }`; a refusal throws `HeadStartError`.
  */
-export async function placeHead({ persona, name, projectRoot, beside = null, gen = null } = {}, ports = {}) {
-  assertHeadArgs({ persona, name, projectRoot, gen });
+export async function placeHead({ persona, name, projectRoot, beside = null, gen = null, forQuestion = null } = {}, ports = {}) {
+  assertHeadArgs({ persona, name, projectRoot, gen, forQuestion });
   const role = headRoleOf(persona, name);
   const generation = gen ?? nextHeadGeneration(projectRoot, persona, name);
   const key = headKeyOf(persona, name, generation);
@@ -183,7 +187,7 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
   try { grant = grantOf(role, persona); } catch (err) { throw new HeadStartError('grant-invalid', err.message); }
   const pinned = await (ports.pin ?? defaultPin)({ persona, projectRoot });
   const handoff = await (ports.handoff ?? defaultHandoff)({ persona, name, projectRoot });
-  const text = await (ports.opening ?? defaultOpening)({ persona, name, projectRoot, pinned, handoff });
+  const text = await (ports.opening ?? defaultOpening)({ persona, name, projectRoot, pinned, handoff, forQuestion });
   const runnerConfig = await (ports.runnerConfig ?? defaultRunnerConfig)(projectRoot);
   const binding = await (ports.bind ?? bindHeadSeat)({ persona, key, runnerConfig });
 
@@ -210,8 +214,8 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
  * Returns `{ already: true, role, key, fronted }` for a role a live session holds, else
  * `{ already: false, role, key, placement, runDir, cli }`. A refusal throws `HeadStartError` with a code.
  */
-export async function startHeadSession({ persona, name, projectRoot, beside = null, gen = null } = {}, ports = {}) {
-  assertHeadArgs({ persona, name, projectRoot, gen });
+export async function startHeadSession({ persona, name, projectRoot, beside = null, gen = null, forQuestion = null } = {}, ports = {}) {
+  assertHeadArgs({ persona, name, projectRoot, gen, forQuestion });
   const role = headRoleOf(persona, name);
   if (ports.rotationHolds?.({ persona, name })) {
     throw new HeadStartError('rotation-in-progress', `a rotation of ${persona}-${name} holds its lock; start nothing until it ends`);
@@ -230,7 +234,7 @@ export async function startHeadSession({ persona, name, projectRoot, beside = nu
     return { already: true, role, key, fronted: true };
   }
 
-  const placed = await placeHead({ persona, name, projectRoot, beside, gen }, ports);
+  const placed = await placeHead({ persona, name, projectRoot, beside, gen, forQuestion }, ports);
   writeHeadPlacement(lineageDir, { role, gen: placed.gen, placement: placed.placement, runDir: placed.runDir, persona: placed.persona, startedAt: new Date().toISOString() });
   return { already: false, role, key: placed.key, placement: placed.placement, runDir: placed.runDir, cli: placed.cli };
 }

@@ -11,7 +11,9 @@ import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { HeadRequestError, MAX_FRAME_BYTES, MAX_REQUEST_BYTES, requestHead, requestHeadStart, requestHeadWrite } from '../../src/session-host/head-request-client.mjs';
-import { rotateHead, runHeadRequest, startHead } from '../../src/session-host/head-request.mjs';
+import { rotateHead, runHeadRequest, runStopSelf, runTicket, startHead } from '../../src/session-host/head-request.mjs';
+import { lineageDirOf, openingText, writeHeadPlacement } from '../../src/session-host/head-start.mjs';
+import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
 
 const scratch = (t) => {
@@ -129,7 +131,7 @@ test('the payload entry runs session start in the project of its envelope and re
   assert.equal(refused.line.result, 'error');
   assert.equal(refused.line.code, 'placement-unknown', 'the use case ran in the envelope\'s project and found no recorded placement');
 
-  const unknownVerb = await runHeadRequest({ runDir, request: { verb: 'land', args: {} } }, ports);
+  const unknownVerb = await runHeadRequest({ runDir, request: { verb: 'session explode', args: {} } }, ports);
   assert.equal(unknownVerb.line.code, 'unknown-verb');
   const strayArg = await runHeadRequest({ runDir, request: { verb: 'session start', args: { persona: 'planner', name: 'x', projectRoot: '/etc' } } }, ports);
   assert.equal(strayArg.line.code, 'bad-args', 'the sandbox cannot choose the project');
@@ -237,4 +239,202 @@ test('a busy reply of the supervisor reaches the caller as the code busy, so the
   serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'refused', code: 'busy' }));
   await listening();
   await assert.rejects(requestHead('questions ask', { input: {}, ref: 'plan:p' }, { socketPath }), (err) => err.code === 'busy');
+});
+
+// ---- the confined door for long verbs: tickets, bindings, host verbs, stop, forQuestion ------------------
+
+const PLAN = { dir: 'p', footprint: ['src/a/**', 'docs/x.md'] };
+
+/** An attempt directory of a head `persona`-`name` in `project`, and the ports a ticket verb needs (no real runner or git). */
+function headCase(t, { persona = 'lead', name = 'proj-p', writes = ['plans/p'] } = {}) {
+  const runDir = scratch(t);
+  const project = scratch(t);
+  fs.writeFileSync(path.join(runDir, 'envelope.json'), JSON.stringify({ v: 3, cwd: project, hostBin: '/the/fgos', unitRunId: 'head-x-1', session: { role: `head:${persona}-${name}`, persona, name, verbs: [], writes, requestSocketPath: '/run/s.sock' } }));
+  const spawned = [];
+  const ports = { planOf: async () => PLAN, spawnRunner: (call) => { spawned.push(call); return { pid: 4242 }; }, readWorking: () => null };
+  const ask = (verb, args, id = 't1', extra = {}) => runHeadRequest({ runDir, request: { id, verb, args } }, { ...ports, ...extra });
+  const ticketFile = (id) => path.join(fgosDirFromRoot(project), 'runtime', 'head-tickets', `${persona}-${name}`, `${id}.json`);
+  return { runDir, project, spawned, ask, ticketFile, ports };
+}
+
+test('a client call of a new verb reaches the route as one REQUEST frame and returns its data', async (t) => {
+  const socketPath = path.join(scratch(t), 'req.sock');
+  const seen = serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'done', data: { ticket: request.id, state: 'running' } }));
+  await listening();
+  const answer = await requestHead('land', { paths: ['plans/p/a.md'], message: 'docs: a' }, { socketPath });
+  assert.equal(answer.state, 'running');
+  assert.equal(seen[0].verb, 'land');
+});
+
+test('a land answers a ticket at once, the runner finishes it and request result reads the outcome', async (t) => {
+  const { ask, spawned, ticketFile } = headCase(t);
+  const started = await ask('land', { paths: ['plans/p/a.md'], message: 'docs(p): a', tests: ['test/a.test.mjs'] });
+  assert.deepEqual(started, { exit: 0, line: { result: 'done', data: { ticket: 't1', state: 'running' } } });
+  assert.equal(spawned[0].ticketFile, ticketFile('t1'));
+  const written = JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8'));
+  assert.deepEqual([written.state, written.verb, written.runner], ['running', 'land', null]);
+  assert.deepEqual(written.argv, ['land', '--json', '--paths', 'plans/p/a.md', '--message', 'docs(p): a', '--tests', 'test/a.test.mjs']);
+  assert.equal((await ask('request result', { id: 't1' }, 'r1')).line.data.state, 'running');
+  runTicket(ticketFile('t1'), { selfRecord: () => ({ pid: 1, startTime: 1 }), exec: () => ({ status: 0, stdout: 'noise\n{"result":"done","data":{"mainSha":"abc"}}\n' }) });
+  const done = (await ask('request result', { id: 't1' }, 'r2')).line.data;
+  assert.deepEqual([done.state, done.exit, done.result.data.mainSha], ['done', 0, 'abc']);
+  runTicket(ticketFile('t1'), { exec: () => assert.fail('a finished ticket is never run twice') });
+});
+
+test('request result without an id lists the role tickets newest first and never another role', async (t) => {
+  const { ask, ticketFile, project } = headCase(t);
+  await ask('land', { paths: ['plans/p/a.md'], message: 'm' }, 'old');
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  await ask('run', { prompt: 'do it' }, 'new');
+  const other = path.join(fgosDirFromRoot(project), 'runtime', 'head-tickets', 'lead-other');
+  fs.mkdirSync(other, { recursive: true });
+  fs.writeFileSync(path.join(other, 'foreign.json'), JSON.stringify({ id: 'foreign', verb: 'land', state: 'running', startedAt: new Date().toISOString() }));
+  const list = (await ask('request result', {}, 'r1')).line.data.tickets;
+  assert.deepEqual(list.map((x) => x.id), ['new', 'old']);
+  assert.equal((await ask('request result', { id: 'foreign' }, 'r2')).line.code, 'ticket-unknown');
+  assert.equal((await ask('request result', { id: '../x' }, 'r3')).line.code, 'ticket-unknown');
+  assert.ok(fs.existsSync(ticketFile('old')));
+});
+
+test('a ticket id that was used already refuses ticket-used and leaves the first ticket as it was', async (t) => {
+  const { ask, ticketFile } = headCase(t);
+  await ask('land', { paths: ['plans/p/a.md'], message: 'm' });
+  const before = fs.readFileSync(ticketFile('t1'), 'utf8');
+  assert.equal((await ask('land', { paths: ['plans/p/b.md'], message: 'm' })).line.code, 'ticket-used');
+  assert.equal(fs.readFileSync(ticketFile('t1'), 'utf8'), before);
+});
+
+test('the runner record is judged: dead is failed with runner-gone, unknown stays running', async (t) => {
+  const { ask, ticketFile } = headCase(t);
+  await ask('run', { prompt: 'x' });
+  runTicketStart(ticketFile('t1'));
+  const gone = (await ask('request result', { id: 't1' }, 'r1', { judge: () => 'dead' })).line.data;
+  assert.deepEqual([gone.state, gone.code], ['failed', 'runner-gone']);
+  assert.equal((await ask('request result', { id: 't1' }, 'r2', { judge: () => 'unknown' })).line.data.state, 'running');
+});
+
+/** Gives a ticket the runner record its detached runner writes first. */
+function runTicketStart(file) {
+  const ticket = JSON.parse(fs.readFileSync(file, 'utf8'));
+  fs.writeFileSync(file, JSON.stringify({ ...ticket, runner: { pid: 999999, startTime: 1 } }));
+}
+
+test('request result waits for a running ticket to end, at most the seconds asked', async (t) => {
+  const { ask, ticketFile } = headCase(t);
+  await ask('run', { prompt: 'x' });
+  let polls = 0;
+  const sleep = async () => {
+    polls += 1;
+    if (polls === 2) runTicket(ticketFile('t1'), { selfRecord: () => ({ pid: 1, startTime: 1 }), exec: () => ({ status: 0, stdout: '{"data":{"results":[{"unitRunId":"unit-run-77-abc"}]}}\n' }) });
+  };
+  const waited = (await ask('request result', { id: 't1', wait: 30 }, 'r1', { sleep })).line.data;
+  assert.deepEqual([waited.state, waited.unitRunId, waited.assignment.dir], ['done', 'unit-run-77-abc', '.fgos/assignments/unit-run-77-abc']);
+  assert.equal(waited.assignment.present, false);
+  assert.equal((await ask('request result', { id: 't1', wait: 'soon' }, 'r2')).line.code, 'bad-args');
+});
+
+test('a run ticket starts fgos run without the dispatch depth marker, with the prompt as its own argument', async (t) => {
+  const { ask, ticketFile } = headCase(t);
+  process.env.FGOS_DISPATCH_DEPTH = '2';
+  t.after(() => { delete process.env.FGOS_DISPATCH_DEPTH; });
+  await ask('run', { prompt: '--not-a-flag', writes: ['src/a/b.mjs'], provider: 'codex', worktree: '../wt' });
+  const ticket = JSON.parse(fs.readFileSync(ticketFile('t1'), 'utf8'));
+  assert.deepEqual(ticket.argv, ['run', '--json', '--not-a-flag', '--writes', 'src/a/b.mjs', '--provider', 'codex', '--worktree', '../wt']);
+  let seen;
+  runTicket(ticketFile('t1'), { selfRecord: () => ({ pid: 1, startTime: 1 }), exec: (bin, argv, options) => { seen = { bin, argv, env: options.env }; return { status: 0, stdout: '{}' }; } });
+  assert.equal(seen.bin, '/the/fgos');
+  assert.equal(seen.argv[0], 'run');
+  assert.equal(Object.hasOwn(seen.env, 'FGOS_DISPATCH_DEPTH'), false);
+});
+
+test('the bindings refuse a path outside the grant, a branch from a non-lead, a write outside the footprint and a footprint change, once each', async (t) => {
+  const lead = headCase(t);
+  assert.equal((await lead.ask('land', { paths: ['src/x.mjs'], message: 'm' })).line.code, 'path-outside-grant');
+  assert.equal((await lead.ask('land', { paths: ['plans/p/../../x'], message: 'm' }, 't2')).line.code, 'path-outside-grant');
+  assert.equal((await lead.ask('run', { prompt: 'x', writes: ['src/other/b.mjs'] }, 't3')).line.code, 'write-outside-footprint');
+  const edited = '---\nfootprint:\n  - src/a/**\n  - src/new/**\n---\n';
+  const changing = await lead.ask('land', { paths: ['plans/p/plan.md'], message: 'm' }, 't4', { readWorking: () => edited });
+  assert.equal(changing.line.code, 'footprint-change-refused');
+  const same = '---\nfootprint:\n  - src/a/**\n  - docs/x.md\n---\n';
+  assert.equal((await lead.ask('land', { paths: ['plans/p/plan.md'], message: 'm' }, 't5', { readWorking: () => same })).exit, 0);
+  const branch = await lead.ask('land', { branch: 'task/p-1' }, 't6');
+  assert.equal(branch.exit, 0);
+  assert.deepEqual(JSON.parse(fs.readFileSync(lead.ticketFile('t6'), 'utf8')).argv, ['land', '--json', '--branch', 'task/p-1', '--footprint', 'src/a/**,docs/x.md']);
+  const planner = headCase(t, { persona: 'planner', name: 'proj-p', writes: ['docs/discussions'] });
+  assert.equal((await planner.ask('land', { branch: 'task/p-1' })).line.code, 'land-branch-lead-only');
+  assert.equal((await planner.ask('land', { paths: ['docs/discussions/a.md'], message: 'm' }, 't2')).exit, 0);
+  assert.equal((await planner.ask('run', { prompt: 'x' }, 't3')).line.code, 'role-mismatch');
+  assert.equal((await lead.ask('land', { branch: 'b', paths: ['plans/p/a'], message: 'm' }, 't7')).line.code, 'bad-args');
+  assert.equal((await lead.ask('land', { paths: ['plans/p/a'], message: 'm', extra: 1 }, 't8')).line.code, 'bad-args');
+});
+
+test('worktree create without a branch is refused, with one it runs the host verb', async (t) => {
+  const { ask } = headCase(t);
+  const calls = [];
+  const hostCall = (call) => { calls.push(call); return { status: 0, stdout: '{"data":{"path":"/wt","branch":"task/x"}}\n' }; };
+  assert.equal((await ask('worktree create', { path: '../wt' }, 'w1', { hostCall })).line.code, 'bad-args');
+  assert.equal(calls.length, 0);
+  const done = await ask('worktree create', { path: '../wt', branch: 'task/x', base: 'main' }, 'w2', { hostCall });
+  assert.deepEqual(done.line.data, { path: '/wt', branch: 'task/x' });
+  assert.deepEqual(calls[0].argv, ['worktree', 'create', '../wt', '--branch', 'task/x', '--base', 'main', '--json']);
+  const failing = await ask('worktree create', { path: '../wt', branch: 'task/x' }, 'w3', { hostCall: () => ({ status: 1, stdout: '' }) });
+  assert.equal(failing.line.code, 'worktree-create-failed');
+});
+
+test('supervisor done on an empty queue answers stopping and starts the stop of the caller own role', async (t) => {
+  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
+  const stops = [];
+  const base = { spawnStop: (call) => stops.push(call) };
+  const busy = await ask('supervisor done', {}, 'd1', { ...base, hostCall: () => ({ status: 1, stdout: '{"code":"events-unhandled","message":"2 left"}\n' }) });
+  assert.equal(busy.line.code, 'events-unhandled');
+  assert.equal(stops.length, 0);
+  const done = await ask('supervisor done', {}, 'd2', { ...base, hostCall: (call) => ({ status: 0, stdout: `{"data":{"done":true,"argv":${JSON.stringify(call.argv)}}}\n` }) });
+  assert.deepEqual(done.line.data, { done: true, argv: ['supervisor', 'done', '--json'], stopping: true });
+  assert.equal(stops.length, 1);
+  assert.deepEqual([stops[0].persona, stops[0].name], ['supervisor', 'proj']);
+  const handled = await ask('supervisor handled', { event: 'ev-1' }, 'h1', { hostCall: (call) => ({ status: 0, stdout: `{"data":{"argv":${JSON.stringify(call.argv)}}}\n` }) });
+  assert.deepEqual(handled.line.data.argv, ['supervisor', 'handled', 'ev-1', '--json']);
+});
+
+test('the detached stop of the own session waits for the route to exit, then stops the role', async () => {
+  const order = [];
+  let alive = 2;
+  await runStopSelf({ persona: 'supervisor', name: 'proj', projectRoot: '/p', waitPid: 77 }, {
+    observe: () => ({ pid: 77, startTime: 1 }),
+    alive: () => { order.push('alive?'); alive -= 1; return alive > 0; },
+    sleep: async () => { order.push('sleep'); },
+    stop: { identity: () => ({ live: false }), host: {} },
+  });
+  assert.deepEqual(order.slice(0, 3), ['alive?', 'sleep', 'alive?']);
+});
+
+test('session stop is allowed for a lead of this project, the own role and an asker of an answered question, and refused for any other', async (t) => {
+  const { ask, project } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
+  const lineage = lineageDirOf(project, 'lead', 'proj-p');
+  writeHeadPlacement(lineage, { role: 'head:lead-proj-p', gen: 1, placement: { host: 'terminal', key: 'k1' }, runDir: '/r', persona: 'lead', startedAt: '2026-11-19T00:00:00Z' });
+  const stop = { identity: () => ({ live: true }), host: { retireAsync: async () => ({ result: 'retired' }) } };
+  const ports = { stop, plan: { handle: 'proj' }, askerAnswered: () => false };
+  const stopped = await ask('session stop', { persona: 'lead', name: 'proj-p', reason: 'plan done' }, 's1', ports);
+  assert.deepEqual(stopped.line.data, { stopped: true });
+  assert.equal((await ask('session stop', { persona: 'secretary', name: 'miu' }, 's2', ports)).line.code, 'role-mismatch');
+  assert.equal((await ask('session stop', { persona: 'lead', name: 'other-p' }, 's3', ports)).line.code, 'role-mismatch');
+  assert.equal((await ask('session stop', { persona: 'secretary', name: 'miu' }, 's4', { ...ports, askerAnswered: (role) => role === 'head:secretary-miu' })).line.data.stopped, false);
+  assert.equal((await ask('session stop', { persona: 'supervisor', name: 'proj' }, 's5', ports)).line.data.stopped, false);
+  assert.equal((await ask('session stop', { persona: '../x', name: 'p' }, 's6', ports)).line.code, 'bad-persona');
+});
+
+test('session start passes forQuestion down to the opening, and the opening carries one line naming the question', async (t) => {
+  const project = scratch(t);
+  const seen = [];
+  const ports = {
+    pin: async () => ({ name: 'planner', text: '' }), handoff: async () => null, runnerConfig: async () => ({}), bind: async () => ({ cli: 'x' }),
+    opening: async (ask) => { seen.push(ask.forQuestion); return 'opening'; },
+    launch: async () => ({ placement: { host: 'terminal', key: 'k' }, runDir: '/r' }), identity: () => ({ live: false }), host: {},
+  };
+  await startHead({ persona: 'planner', name: 'q', forQuestion: 'q-42', projectRoot: project }, { env: {}, ports });
+  assert.deepEqual(seen, ['q-42']);
+  const text = openingText({ persona: 'planner', name: 'q', personaLines: ['P'], forQuestion: 'q-42' });
+  assert.match(text, /You continue question q-42: write its answer back to its origin, then `fgos questions ack q-42` \(or `cancel`\)\./);
+  assert.doesNotMatch(openingText({ persona: 'planner', name: 'q', personaLines: ['P'] }), /You continue question/);
+  await assert.rejects(startHead({ persona: 'planner', name: 'q', forQuestion: 'bad id!', projectRoot: project }, { env: {}, ports }), (err) => err.code === 'bad-question');
 });
