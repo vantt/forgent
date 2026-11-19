@@ -3356,17 +3356,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // A confined head's one way to change a granted file: its supervisor writes it outside the sandbox.
         const target = requireField(positional[1], 'session write requires a path: fgos session write <path> < new-content');
         if (process.stdin.isTTY) throw new StoreError('validation', 'session write reads the new content from stdin: fgos session write <path> < new-content');
-        const { requestHeadWrite, blobOid } = await import('../src/session-host/head-request-client.mjs');
-        // The content the edit is based on: the blob id the caller names, else that of the copy it reads on disk now.
-        // The supervisor refuses write-base-stale when the file moved on since; no readable copy sends no base and the
-        // supervisor compares against what the file held when the request arrived.
-        let base = optionalField(flags.base, 'session write --base requires a git blob id (omit --base to use the file as it is on disk)');
-        if (base === undefined) {
-          const { resolveGitRoots: gitRootsOf } = await import('../src/runner/execution/run.mjs');
-          let root = process.cwd();
-          try { root = gitRootsOf(root).worktreeRoot; } catch { /* no git here: the path is read from the cwd */ }
-          try { base = blobOid(fs.readFileSync(path.resolve(root, target))); } catch { base = undefined; }
-        }
+        const { requestHeadWrite } = await import('../src/session-host/head-request-client.mjs');
+        // The blob id of the copy the edit was built from. Without it no base is sent and the supervisor compares
+        // against what the file held when the request arrived, so only a move during its catch-up is caught.
+        const base = optionalField(flags.base, 'session write --base requires a git blob id (git hash-object --no-filters <copy you edited>)');
         const chunks = [];
         for await (const chunk of process.stdin) chunks.push(chunk);
         try {

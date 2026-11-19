@@ -2488,12 +2488,12 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos session stop shaper --name <slug> --reason "answer received"'],
       },
       write: {
-        description: 'From inside a confined head: replace a granted file with the content on stdin. The head\'s supervisor checks the path (project-relative, named exactly by the grant, a regular file with no symbolic link on the way) and writes it atomically outside the sandbox, where the file is read-only. Refused write-base-stale, writing nothing, when the file changed since the copy the writer read (re-read it and redo the edit). Answers {path, bytes}.',
+        description: 'From inside a confined head: replace a granted file with the content on stdin. The head\'s supervisor checks the path (project-relative, named exactly by the grant, a regular file with no symbolic link on the way) and writes it atomically outside the sandbox, where the file is read-only. Refused write-base-stale, writing nothing, when the file differs from the copy named by --base after the supervisor\'s catch-up (re-read it and redo the edit). The protection against newer rows holds when --base is the blob id of the copy that was edited; without --base only a move during the catch-up is caught. Answers {path, bytes}.',
         parameters: {
           type: 'object',
           properties: {
             path: { type: 'string', description: 'Positional: the project-relative path of the granted file, e.g. docs/backlog.md.' },
-            base: { type: 'string', description: 'The git blob id of the file content the edit was based on (git hash-object <path> of the copy read). Default: the blob id of the file as it is on disk when the command starts.' },
+            base: { type: 'string', description: 'The git blob id of the file content the edit was based on (git hash-object --no-filters <copy> of the copy edited). Without it no base is sent and the file is compared with what it held when the request arrived.' },
           },
           positional: ['path'],
           required: ['path'],

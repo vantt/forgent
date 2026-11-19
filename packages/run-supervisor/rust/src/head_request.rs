@@ -671,6 +671,16 @@ pub fn granted_write<'a>(
 /// fsync), so nothing is resolved by path after the check; a failure there is `write-failed`. Returns the bytes
 /// written.
 pub fn install_granted(root: &Path, rel: &str, content: &str) -> Result<usize, WriteRefusal> {
+    let (dir, name, mode) = open_granted(root, rel)?;
+    dir.replace(&name, content.as_bytes(), mode)
+        .map_err(|e| write_refused("write-failed", format!("{} at {}", e.source, e.step)))?;
+    Ok(content.len())
+}
+
+/// The granted file's directory (opened once, no-follow at every component), its name and its mode: the checks of
+/// [`install_granted`] without writing, so the request can refuse a symlink or a non-file with the contract's code
+/// before anything reads the file's content.
+fn open_granted(root: &Path, rel: &str) -> Result<(Dir, std::ffi::OsString, u32), WriteRefusal> {
     let beneath = |error: BeneathError| match error {
         BeneathError::Refused(BeneathRefusal::Symlink) => write_refused("path-symlink", None),
         BeneathError::Refused(BeneathRefusal::Escape) => write_refused("path-invalid", None),
@@ -683,8 +693,6 @@ pub fn install_granted(root: &Path, rel: &str, content: &str) -> Result<usize, W
     let name = relative
         .file_name()
         .ok_or_else(|| write_refused("path-invalid", None))?;
-    // The directory is opened once, no-follow at every component, and every later step works on that descriptor: a
-    // directory swapped on the way after this point is never followed.
     let dir = if parent.as_os_str().is_empty() {
         Dir::open(root)
     } else {
@@ -693,9 +701,7 @@ pub fn install_granted(root: &Path, rel: &str, content: &str) -> Result<usize, W
     .map_err(beneath)?
     .ok_or_else(missing)?;
     let mode = dir.file_mode(name).map_err(beneath)?.ok_or_else(missing)?;
-    dir.replace(name, content.as_bytes(), mode)
-        .map_err(|e| write_refused("write-failed", format!("{} at {}", e.source, e.step)))?;
-    Ok(content.len())
+    Ok((dir, name.to_owned(), mode))
 }
 
 /// [`WRITE_VERB`] in full, in contract order: the argument and grant checks, the catch-up of the main checkout to its
@@ -715,6 +721,9 @@ fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
         code: "write-path-unreadable",
         detail: Some(format!("{}: {}", why.code, why.detail)),
     };
+    if let Err(why) = open_granted(&cfg.cwd, rel) {
+        return refuse_with(why);
+    }
     // The content the writer read: its own `base`, else what the file held when the request arrived, which the
     // catch-up below may move.
     let read_oid = || (cfg.path_oid)(&cfg.cwd, rel);

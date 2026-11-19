@@ -246,10 +246,17 @@ fn serve_with(
             }
         }),
         // The stub's blob id of a file is a hex digest of its content, so a test names the id it read.
+        // Like the real adapter, it refuses a symlink or a non-file, so a test shows the request checks the granted
+        // path before reading its content.
         path_oid: Box::new(|root, path| {
-            Ok(stub_oid(
-                &fs::read_to_string(root.join(path)).unwrap_or_default(),
-            ))
+            let file = root.join(path);
+            if !fs::symlink_metadata(&file).map(|m| m.is_file()).unwrap_or(false) {
+                return Err(PublishRefusal {
+                    code: "write-path-unreadable".into(),
+                    detail: format!("{path} is not a regular file"),
+                });
+            }
+            Ok(stub_oid(&fs::read_to_string(file).unwrap_or_default()))
         }),
         publish_write: Box::new({
             let publish = identity.publish.clone();

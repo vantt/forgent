@@ -4,7 +4,7 @@
 // test/session-rotation/rotate.test.mjs; what session write does, in packages/run-supervisor/rust/tests/head_request.rs.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync, spawn } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
@@ -106,7 +106,7 @@ test('a published session write prints the commit it landed as one line', async 
   }
 });
 
-test('a session write sends the blob id of the file as it is on disk as the base of the edit, or the one --base names', async () => {
+test('a session write sends no base unless --base names one, and passes that one through unchanged', async () => {
   const cwd = project();
   fs.mkdirSync(path.join(cwd, 'docs'), { recursive: true });
   fs.writeFileSync(path.join(cwd, 'docs/backlog.md'), 'old\n');
@@ -139,7 +139,6 @@ test('a session write sends the blob id of the file as it is on disk as the base
   } finally {
     server.close();
   }
-  const onDisk = execFileSync('git', ['hash-object', 'docs/backlog.md'], { cwd, encoding: 'utf8' }).trim();
-  assert.equal(seen[0].base, onDisk);
+  assert.equal('base' in seen[0], false);
   assert.equal(seen[1].base, 'abc123');
 });

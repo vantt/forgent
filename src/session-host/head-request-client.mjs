@@ -151,8 +151,8 @@ export const requestHeadRestoreRole = (args, options) => requestHead(HEAD_RESTOR
  * that file read-only. Returns `{path, bytes, commit}` once the commit is pushed. A file that was written but not
  * published is a HeadRequestError `write-not-published` (message `written, not published: <refusal> <detail>`,
  * `refusal`, `detail` and `data` on the error): the file stays written and uncommitted. `base` is the git blob id of the
- * content the writer read; a file that changed since is refused `write-base-stale` and nothing is written (see
- * {@link blobOid}).
+ * copy the writer edited (`git hash-object --no-filters <copy>`); a file that differs from it after the supervisor's
+ * catch-up is refused `write-base-stale` and nothing is written. Without `base` only a move during that catch-up is caught.
  */
 export async function requestHeadWrite({ path, content, base }, options = {}) {
   const args = base === undefined ? { path, content } : { path, content, base };
@@ -162,10 +162,4 @@ export async function requestHeadWrite({ path, content, base }, options = {}) {
     throw new HeadRequestError('write-not-published', `written, not published: ${refusal} ${detail}`, { refusal, detail, data });
   }
   return data;
-}
-
-/** The git blob id (SHA-1 object format) of `bytes`: what `git hash-object` prints for a file with that content. */
-export function blobOid(bytes) {
-  const body = Buffer.from(bytes);
-  return crypto.createHash('sha1').update(`blob ${body.length}\0`).update(body).digest('hex');
 }
