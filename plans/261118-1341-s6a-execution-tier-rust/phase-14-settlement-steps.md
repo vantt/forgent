@@ -4,11 +4,17 @@ Wave 4. Depends on: 5, 10, 12. Effort 2d. Library only (engine modules `settleme
 
 ## Context
 
-`src/runner/dispatch/settlement.mjs` (907) settles an attempt into the Run Result and the account lease. The run
-supervisor runs post-receipt steps through `attempt_step.rs`, which today finds `node` on `PATH` and runs
-`src/run-supervisor/attempt-step.mjs` with `steps/settle-attempt.mjs` (259), `steps/cleanup-trust.mjs`,
-`steps/finalize-home.mjs` (stages a renewed login only), plus `stray-writes.mjs`, `worker-artifacts.mjs`,
-`step-support.mjs`. P9: the steps run in Rust, composed from the engine in host wiring; `fgos-run-supervisor` gains no
+`src/runner/dispatch/settlement.mjs` (956) settles an attempt into the Run Result and the account lease. The run
+supervisor runs post-receipt steps through `attempt_step.rs` (`packages/run-supervisor/rust/src/attempt_step.rs`:
+`ENTRY` `:15`, `node_program` `:91`), which today finds `node` on `PATH` and runs
+`src/run-supervisor/attempt-step.mjs` (89) with `steps/settle-attempt.mjs` (342), `steps/cleanup-trust.mjs` (37),
+`steps/finalize-home.mjs` (20, stages a renewed login only), plus `stray-writes.mjs` (71), `worker-artifacts.mjs`
+(75), `step-support.mjs` (44). Behaviour added on `main` since `b5b237534` that the port carries (re-sync rule):
+settlement asks `fgos-run-result`'s usage parser through the addon and records `parser-unavailable` on failure
+(`725522d1e`; no Node parser left to port); worker-claim `frictions` recorded after the outcome is settled through
+the friction door, never changing it (`05256c653`, `19d765c1a`, `888cb9a36`, in `settlement.mjs` and
+`settle-attempt.mjs`); the record projection line dropped by `36445e48f`. The lane-extended settlement wait
+(`52af20744`) lives in `direct-launch.mjs` (phase 05's controller), not here. P9: the steps run in Rust, composed from the engine in host wiring; `fgos-run-supervisor` gains no
 engine dependency (phase 19 wires `attempt_step.rs` to the host route).
 
 ## Requirements

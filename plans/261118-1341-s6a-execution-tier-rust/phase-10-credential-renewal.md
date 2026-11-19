@@ -7,7 +7,8 @@ Wave 3. Depends on: 3. Lands after 09. Effort 2d. Library only (engine module `c
 `src/runner/dispatch/provider-credential-renewal.mjs` (1 488): copy credential files into a private home
 (`copyCredentialFiles`), refresh-ahead, staging and write-back (`credentialWriteBackTarget`, `inventoryAccount`),
 retained copies and pending-over-limit judgements, interrupted-staging sweep, `readCredentialExpiry`,
-`DEFAULT_REFRESH_AHEAD_MIN_THRESHOLD_MS`; its `listLeftovers` is a local function over an account directory
+`DEFAULT_REFRESH_AHEAD_MIN_THRESHOLD_MS` (`:55`; `copyCredentialFiles` `:159`, `readCredentialExpiry` `:634`,
+`inventoryAccount` `:994`, `credentialWriteBackTarget` `:1411`; unchanged since `b5b237534`); its `listLeftovers` is a local function over an account directory
 (`:768`), not the checkout door's (V12). Users: the bwrap driver
 (phase 08), finalize-home step (phase 14), rows `credential-copies-retained` (15) and the account rows (17),
 `scripts/lib/mailbox-live-confined.mjs` (phase 20 seam). Spec: agent-confinement §9.3, component-boundary row

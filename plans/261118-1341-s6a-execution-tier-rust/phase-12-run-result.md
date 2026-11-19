@@ -4,9 +4,13 @@ Wave 3. Depends on: 3. Effort 1.5d. Library only (engine module `run_result`).
 
 ## Context
 
-`src/runner/dispatch/`: `run-result.mjs` (1 139: write and read the Run Result, v2 and v3 readers),
-`evidence-attribution.mjs` (250), `agent-result-claim-contract.mjs` (113). Outcome types already live in Rust
-(`fgos-run-result`, `packages/run-result/rust`; Node reaches them through the addon's `runResult` namespace).
+`src/runner/dispatch/`: `run-result.mjs` (1 137: write and read the Run Result, v2 and v3 readers; `08fecc824` took
+the duration from one source), `evidence-attribution.mjs` (250), `agent-result-claim-contract.mjs` (120; the claim's
+`frictions` side channel, `CLAIM_FRICTIONS_MAX`, `CLAIM_FRICTION_FIELD_MAX`, added by `05256c653`). Outcome types
+already live in Rust (`fgos-run-result`, `packages/run-result/rust`; Node reaches them through the addon's `runResult`
+namespace). Also already in `fgos-run-result` since `b5b237534`, reused and not ported: token-usage parsing
+(`src/usage/`, addon `runResult` ABI 2, `725522d1e`) and the run attempt, unit and verify record projection from unit
+summaries (`src/projection/`, `36445e48f`, `4974994d1`, `08fecc824`).
 `docs/platform/runner/contracts/unit-run-result.md` is the contract.
 
 ## Requirements

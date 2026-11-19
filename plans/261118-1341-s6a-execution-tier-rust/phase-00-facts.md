@@ -1,6 +1,6 @@
 # Phase 00: facts, census, port map, corpus
 
-Wave 1. Depends on: `blockedBy` met (S5 phases 11 and 12 and the worktree-door plan on `main`). Effort 2d. Writes
+Wave 1. Depends on: `blockedBy` met (S5 phases 11 and 12 and the worktree-door plan on `main`; met: S5 done `56c909b09`, worktree door `c5e87b849`). Effort 2d. Writes
 `reports/` and the Node-era record corpus.
 
 ## Context
@@ -37,17 +37,19 @@ Produce `reports/facts.md`; every row cites `file:line` on the recorded `main` s
    `execution` namespace, P4b/P15), `move-down` (tier-0 leaf moved by phase 02, P19), `move-up` (only one Node layer
    uses it: `git mv` target named), `row` (dies with a doctor row of phase 15 or 17), `script`. Owner phase per row.
    Known misses of the old scan that must appear: `src/runner/{operation-choice,fanout-batch,work-compat,operation-capability,loop,agent-definitions}.mjs`,
-   `src/session-host/head-start.mjs:108,121,126`, `scripts/record-mailbox-hook-fixtures.mjs:1188`,
-   `bin/fgos.mjs:2127,2314,3450,3687,3775`.
+   `src/session-host/head-start.mjs:121,135,140`, `scripts/record-mailbox-hook-fixtures.mjs:1188`,
+   `bin/fgos.mjs:2118,2274,3418,3636,3724` (re-read on `f031ab0c8`; were `:2127,2314,3450,3687,3775` and head-start
+   `:108,121,126` on `b5b237534`).
 3. **Admission and Workflow calls.** For a standalone `fgos run` (read-only, `--writes`, `--case/--activity`, from a
    confined worker) and for each Workflow and Work caller of `runUnit`: which of the six peer operations
    (`resolveBinding`, `admit`, `recheckEffect`, `settle`, `activityUnitOf`, `confinedWriteRefusal`) and events
    (`unitRunCreated`, `caseAdmitted`) are used, read from `src/runner/execution/{run,unit-run-start,run-request}.mjs`
-   (`run-request.mjs:321-328,351,356`; `unit-run-start.mjs:197-204`) and `bin/fgos.mjs:2544`. Every `runUnit` option
-   each caller passes (Workflow `src/workflow/runner.mjs:160-180`; Work `operation-choice.mjs:2327-2341`,
-   `work-dispatch.mjs:129-143`, `fanout-batch.mjs:108-118`) and every error class a caller branches on
-   (e.g. `custody-predecessor-unknown`, `runner.mjs:182`): the `run-unit` request and result schema of P14.
-4. **Doctor rows.** The 30 `bridge:S6a` rows plus `seat-binding-route`: Node judge `file:line`, `fixes` entry, the
+   (`run-request.mjs:321-328,351,356`; `unit-run-start.mjs:199-205`) and `bin/fgos.mjs:2499-2505`. Every `runUnit` option
+   each caller passes (Workflow `src/workflow/runner.mjs:158-177,189`; Work `operation-choice.mjs:2327-2342`,
+   `work-dispatch.mjs:129-144`, `fanout-batch.mjs:98-108`) and every error class a caller branches on
+   (e.g. `custody-predecessor-unknown`, `runner.mjs:179`): the `run-unit` request and result schema of P14.
+4. **Doctor rows.** The 32 `bridge:S6a` rows on `f031ab0c8` (30 at plan time, plus `llm-accounts-default-login-home`
+   from `aafe1b601`, plus `seat-binding-route`, owner `bridge:S6a` since S5 phase 11): Node judge `file:line`, `fixes` entry, the
    Rust module that will judge it, phase 15 or 17. The live Node callers of `src/seat-binding/client.mjs` (P11).
 5. **Doors rows.** Every row with S6a in `retiredBy` and every row whose `allowed`/`debt` names a path or symbol a
    phase deletes or moves, with the phase that edits it (V4). On `b5b237534` these are: "agent hook table"
@@ -70,8 +72,9 @@ Produce `reports/facts.md`; every row cites `file:line` on the recorded `main` s
    fixture), scrub prompt and brief bodies to fixed text, and commit it under `packages/execution/contracts/corpus/`
    with a README naming each sample's generation (F13).
 8. **Prior art.** `git log -S` / `-G` on each moved exported symbol and on renamed ids; anything removed earlier and
-   why (AGENTS.md "Prior art before design"). Known: `adopt` (`packages/run-supervisor/rust/src/adopt.rs:142,174`,
-   `--scan`) and the `dispatch-cwd` holder-lock resource (`packages/holder-lock/rust/src/fence.rs:865`) already exist
+   why (AGENTS.md "Prior art before design"). Known: `adopt` (`packages/run-supervisor/rust/src/adopt.rs:148,180`,
+   `--scan`) and the `dispatch-cwd` holder-lock resource (`packages/holder-lock/contracts/lock-registry.v1.json:145`,
+   test `packages/holder-lock/rust/src/fence.rs:865`) already exist
    in Rust (V11).
 9. **Collisions.** Board rows and open branches of plans 1045, 0947, 1159 touching the footprint; landed shas.
 10. **Baselines.** `git-one-door-scan` count, Node line counts per directory, `test/suite-baseline.json` shares of the

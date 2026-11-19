@@ -16,7 +16,9 @@ runner check. This phase ports `src/runner/execution/unit.mjs` (321, `validateUn
 - Modules `packages/execution/rust/src/{unit,run_request,patterns}/` (stubs from phase 3).
 - Golden vectors under `packages/execution/contracts/core-unit/` recorded by
   `test/golden-recorders/core-unit.recorder.mjs` (committed); Rust tests `packages/execution/rust/tests/core_unit.rs`.
-- No new dependency beyond phase 3's (`fgos-write-scope` for write-scope canonicalisation).
+- No new dependency beyond phase 3's (`fgos-write-scope` for write-scope canonicalisation; the crate moved to
+  `packages/write-scope` in `3ee940891`).
+- Line counts and the cited `run-request.mjs:321-328,351` re-read on `f031ab0c8`: unchanged since `b5b237534`.
 
 ## Steps
 
