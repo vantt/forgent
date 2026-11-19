@@ -242,6 +242,29 @@ test('a busy reply of the supervisor reaches the caller as the code busy, so the
   await assert.rejects(requestHead('questions ask', { input: {}, ref: 'plan:p' }, { socketPath }), (err) => err.code === 'busy');
 });
 
+test('a role-pending-rotation reply is retried with backoff until the role moves, then reports the code by name when the wait budget ends', async (t) => {
+  const socketPath = path.join(scratch(t), 'req.sock');
+  let calls = 0;
+  const seen = serveOnce(t, socketPath, (request) => (++calls < 3
+    ? { type: 'REPLY', id: request.id, result: 'refused', code: 'role-pending-rotation', detail: 'planner-x generation 1 still holds the role' }
+    : { type: 'REPLY', id: request.id, result: 'done', data: { ok: true } }));
+  await listening();
+  assert.deepEqual(await requestHead('questions list', {}, { socketPath, rotationBackoffMs: 5 }), { ok: true });
+  assert.equal(seen.length, 3);
+
+  const stuck = path.join(scratch(t), 'stuck.sock');
+  serveOnce(t, stuck, (request) => ({ type: 'REPLY', id: request.id, result: 'refused', code: 'role-pending-rotation', detail: 'planner-x generation 1 still holds the role' }));
+  await listening();
+  await assert.rejects(requestHead('questions list', {}, { socketPath: stuck, rotationBackoffMs: 5, rotationWaitMs: 60 }), (err) => err.code === 'role-pending-rotation' && err.detail.includes('generation 1'));
+});
+
+test('a refusal from the route child carries its bounded message to the caller, so a confined session start shows why', async (t) => {
+  const socketPath = path.join(scratch(t), 'req.sock');
+  serveOnce(t, socketPath, (request) => ({ type: 'REPLY', id: request.id, result: 'refused', code: 'verb-failed', detail: 'persona-not-found', message: 'no persona nope; known: planner, shaper' }));
+  await listening();
+  await assert.rejects(requestHeadStart({ persona: 'nope', name: 'x' }, { socketPath }), (err) => err.code === 'persona-not-found' && err.message.includes('known: planner, shaper') && err.message.includes('no persona nope'));
+});
+
 // ---- the confined door for long verbs: tickets, bindings, host verbs, stop, forQuestion ------------------
 
 const PLAN = { dir: 'p', footprint: ['src/a/**', 'docs/x.md'] };

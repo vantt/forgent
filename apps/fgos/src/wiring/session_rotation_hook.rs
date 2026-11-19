@@ -10,7 +10,9 @@
 //! show the model. Files read: `packages/session-host/contracts/rotation-files.v1.json`.
 use super::mailbox_config::effective_config;
 use super::mailbox_identity::state_root;
-use fgos_run_supervisor::head_client::{request_head, ClientError, REPLY_TIMEOUT};
+use fgos_run_supervisor::head_client::{
+    request_head_waiting, ClientError, RotationWait, REPLY_TIMEOUT,
+};
 use fgos_session_host::rotation::decide::{decide, AtRest, RotationConfig};
 use fgos_session_host::rotation::handoff::{
     awaits_answer, lineage_dir, read_latest, rotation_id_of, session_start_context,
@@ -233,9 +235,11 @@ fn run(args: &[OsString]) {
                 let socket = head.socket.as_deref().ok_or_else(|| ClientError {
                     code: "no-request-socket".into(),
                     detail: None,
+                    message: None,
                 })?;
                 let id = format!("hook-{}-{}", std::process::id(), now_ms());
-                request_head(socket, verb, args, &id, REPLY_TIMEOUT)
+                // The stop hook answers at once: it never waits out a rotation hand-over.
+                request_head_waiting(socket, verb, args, &id, REPLY_TIMEOUT, RotationWait::NONE)
             };
             let session_id = || {
                 let root = state_root()?;
@@ -429,6 +433,7 @@ mod tests {
             Err(ClientError {
                 code: "verb-not-granted".into(),
                 detail: None,
+                message: None,
             }),
         );
         assert_eq!(result.unwrap_err(), "session rotate: verb-not-granted");

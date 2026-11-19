@@ -72,6 +72,14 @@ function decodeFrame(buffer) {
   return frame;
 }
 
+/**
+ * A rotation successor's role-gated verb is refused `role-pending-rotation` while its predecessor still holds the
+ * role; the client waits with doubling backoff for at most the rotation handover budget, then reports the code.
+ */
+const ROTATION_WAIT_MS = 60_000;
+const ROTATION_BACKOFF_MS = 500;
+const ROTATION_BACKOFF_MAX_MS = 4_000;
+
 const USE_CASE_CODE = /^[a-z][a-z0-9-]*$/;
 
 /**
@@ -82,15 +90,30 @@ const USE_CASE_CODE = /^[a-z][a-z0-9-]*$/;
 function refusalOf(verb, reply) {
   const wrapped = reply.code === 'verb-failed' && typeof reply.detail === 'string' && USE_CASE_CODE.test(reply.detail);
   const code = wrapped ? reply.detail : String(reply.code ?? 'refused');
-  return new HeadRequestError(code, `${verb} was refused: ${reply.code ?? 'no code'}${reply.detail ? ` (${reply.detail})` : ''}`, { detail: reply.detail ?? null, supervisorCode: reply.code ?? null });
+  const why = typeof reply.message === 'string' && reply.message !== '' ? `: ${reply.message}` : '';
+  return new HeadRequestError(code, `${verb} was refused: ${reply.code ?? 'no code'}${reply.detail ? ` (${reply.detail})` : ''}${why}`, { detail: reply.detail ?? null, supervisorCode: reply.code ?? null, message: reply.message ?? null });
 }
 
 /**
  * Asks for `verb` over the request socket and returns its `data`. A refusal throws `HeadRequestError` with the
- * supervisor's code (`verb-not-granted`, `role-not-held`, `busy`, ...), or for `verb-failed` the entry's own code
+ * supervisor's code (`verb-not-granted`, `role-not-held`, `busy`, ...; `role-pending-rotation` is retried first, see below), or for `verb-failed` the entry's own code
  * (`bad-persona`, `rotation-in-progress`, ...); a socket that is gone is `request-socket-unavailable`. The socket file must belong to this user.
  */
-export function requestHead(verb, args, { socketPath = process.env[HEAD_REQUEST_SOCKET_ENV], timeoutMs = DEFAULT_REPLY_TIMEOUT_MS } = {}) {
+export async function requestHead(verb, args, options = {}) {
+  const { rotationWaitMs = ROTATION_WAIT_MS, rotationBackoffMs = ROTATION_BACKOFF_MS } = options;
+  const until = Date.now() + rotationWaitMs;
+  for (let delay = rotationBackoffMs; ; delay = Math.min(delay * 2, ROTATION_BACKOFF_MAX_MS)) {
+    try {
+      return await requestHeadOnce(verb, args, options);
+    } catch (err) {
+      const left = until - Date.now();
+      if (!(err instanceof HeadRequestError) || err.code !== 'role-pending-rotation' || left <= 0) throw err;
+      await new Promise((resolve) => setTimeout(resolve, Math.min(delay, left)));
+    }
+  }
+}
+
+function requestHeadOnce(verb, args, { socketPath = process.env[HEAD_REQUEST_SOCKET_ENV], timeoutMs = DEFAULT_REPLY_TIMEOUT_MS } = {}) {
   if (typeof socketPath !== 'string' || socketPath === '') {
     return Promise.reject(new HeadRequestError('no-request-socket', `${HEAD_REQUEST_SOCKET_ENV} is not set: this session has no request socket, so it holds no verbs`));
   }

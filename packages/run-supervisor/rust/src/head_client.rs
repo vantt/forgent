@@ -23,6 +23,9 @@ pub const REPLY_TIMEOUT: Duration = Duration::from_millis(70_000);
 pub struct ClientError {
     pub code: String,
     pub detail: Option<String>,
+    /// The refusal's own bounded one-line text (a route child's explanation, e.g. `persona-not-found` with the
+    /// personas it knows). It may contain local paths of this user's machine; show it only to the same user.
+    pub message: Option<String>,
 }
 
 impl ClientError {
@@ -30,6 +33,16 @@ impl ClientError {
         Self {
             code: code.to_string(),
             detail: detail.into(),
+            message: None,
+        }
+    }
+
+    /// The detail and the message as one line for a refusal text: `detail: message`, or whichever exists.
+    pub fn explanation(&self) -> String {
+        match (&self.detail, &self.message) {
+            (Some(d), Some(m)) => format!("{d}: {m}"),
+            (Some(t), None) | (None, Some(t)) => t.clone(),
+            (None, None) => String::new(),
         }
     }
 }
@@ -37,8 +50,12 @@ impl ClientError {
 impl std::fmt::Display for ClientError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self.detail {
-            Some(d) => write!(f, "{} ({d})", self.code),
-            None => f.write_str(&self.code),
+            Some(d) => write!(f, "{} ({d})", self.code)?,
+            None => f.write_str(&self.code)?,
+        }
+        match &self.message {
+            Some(m) => write!(f, ": {m}"),
+            None => Ok(()),
         }
     }
 }
@@ -53,20 +70,83 @@ fn use_case_code(text: &str) -> bool {
 fn refusal(reply: &Value) -> ClientError {
     let code = reply["code"].as_str().unwrap_or("refused");
     let detail = reply["detail"].as_str().map(str::to_string);
-    match (&detail, code) {
-        (Some(d), "verb-failed") if use_case_code(d) => ClientError {
-            code: d.clone(),
-            detail,
-        },
-        _ => ClientError {
-            code: code.to_string(),
-            detail,
-        },
+    let message = reply["message"].as_str().map(str::to_string);
+    let code = match &detail {
+        Some(d) if code == "verb-failed" && use_case_code(d) => d.clone(),
+        _ => code.to_string(),
+    };
+    ClientError {
+        code,
+        detail,
+        message,
     }
 }
 
+/// How long a role-gated request waits for a rotation hand-over: the supervisor refuses `role-pending-rotation`
+/// while the predecessor still holds the role, and the request is repeated with doubling pauses (`first_pause`, up
+/// to [`ROTATION_PAUSE_MAX`]) until the budget is spent. The JS client (`src/session-host/head-request-client.mjs`)
+/// uses the same budget (60 s) and pauses (0.5 s doubling to 4 s).
+#[derive(Debug, Clone, Copy)]
+pub struct RotationWait {
+    pub budget: Duration,
+    pub first_pause: Duration,
+}
+
+impl RotationWait {
+    /// What every caller gets from [`request_head`].
+    pub const DEFAULT: Self = Self {
+        budget: Duration::from_secs(60),
+        first_pause: Duration::from_millis(500),
+    };
+    /// No waiting: for a caller that must answer at once (the rotation stop hook).
+    pub const NONE: Self = Self {
+        budget: Duration::ZERO,
+        first_pause: Duration::ZERO,
+    };
+}
+
+/// The longest pause between two attempts of a rotation wait.
+pub const ROTATION_PAUSE_MAX: Duration = Duration::from_secs(4);
+
 /// Asks for `verb` over the socket at `socket` and returns its `data`. The socket file must belong to this user.
+/// A `role-pending-rotation` refusal is waited out for [`RotationWait::DEFAULT`] first.
 pub fn request_head(
+    socket: &Path,
+    verb: &str,
+    args: &Value,
+    id: &str,
+    timeout: Duration,
+) -> Result<Value, ClientError> {
+    request_head_waiting(socket, verb, args, id, timeout, RotationWait::DEFAULT)
+}
+
+/// [`request_head`] with an explicit rotation budget (the one place the retry lives).
+pub fn request_head_waiting(
+    socket: &Path,
+    verb: &str,
+    args: &Value,
+    id: &str,
+    timeout: Duration,
+    wait: RotationWait,
+) -> Result<Value, ClientError> {
+    let until = std::time::Instant::now() + wait.budget;
+    let mut pause = wait.first_pause;
+    loop {
+        match request_head_once(socket, verb, args, id, timeout) {
+            Err(e) if e.code == "role-pending-rotation" => {
+                let left = until.saturating_duration_since(std::time::Instant::now());
+                if left.is_zero() {
+                    return Err(e);
+                }
+                std::thread::sleep(pause.min(left));
+                pause = (pause * 2).min(ROTATION_PAUSE_MAX);
+            }
+            other => return other,
+        }
+    }
+}
+
+fn request_head_once(
     socket: &Path,
     verb: &str,
     args: &Value,
@@ -252,5 +332,83 @@ mod tests {
                 .code,
             "request-too-large"
         );
+    }
+
+    /// Serves `n` connections: the first `pending` answer `role-pending-rotation`, the rest `done`.
+    fn serve_n(
+        tag: &str,
+        n: usize,
+        pending: usize,
+    ) -> (std::path::PathBuf, std::thread::JoinHandle<usize>) {
+        let dir = std::env::temp_dir().join(format!("hc-{}-{tag}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("s.sock");
+        let _ = std::fs::remove_file(&path);
+        let listener = UnixListener::bind(&path).unwrap();
+        let handle = std::thread::spawn(move || {
+            for i in 0..n {
+                let (mut conn, _) = listener.accept().unwrap();
+                let r = read_frame(&mut conn).unwrap();
+                let frame = if i < pending {
+                    json!({ "type": "REPLY", "id": r["id"], "result": "refused", "code": "role-pending-rotation", "detail": "head:p-n-1" })
+                } else {
+                    json!({ "type": "REPLY", "id": r["id"], "result": "done", "data": { "ok": true } })
+                };
+                write_frame(&mut conn, &frame).unwrap();
+            }
+            n
+        });
+        (path, handle)
+    }
+
+    #[test]
+    fn a_rotation_wait_stops_when_the_role_arrives_and_gives_up_after_its_budget() {
+        let short = RotationWait {
+            budget: Duration::from_secs(5),
+            first_pause: Duration::from_millis(10),
+        };
+        let (path, server) = serve_n("arrives", 3, 2);
+        let data = request_head_waiting(&path, "v", &json!({}), "a", Duration::from_secs(5), short)
+            .unwrap();
+        assert_eq!(data, json!({ "ok": true }));
+        assert_eq!(server.join().unwrap(), 3);
+
+        let (path, _server) = serve_n("never", 1000, 1000);
+        let tiny = RotationWait {
+            budget: Duration::from_millis(150),
+            first_pause: Duration::from_millis(10),
+        };
+        let started = std::time::Instant::now();
+        let err = request_head_waiting(&path, "v", &json!({}), "a", Duration::from_secs(5), tiny)
+            .unwrap_err();
+        assert_eq!(err.code, "role-pending-rotation");
+        assert!(started.elapsed() >= Duration::from_millis(150));
+        assert!(started.elapsed() < Duration::from_secs(3));
+
+        let (path, server) = serve_n("none", 1, 1);
+        let err = request_head_waiting(
+            &path,
+            "v",
+            &json!({}),
+            "a",
+            Duration::from_secs(5),
+            RotationWait::NONE,
+        )
+        .unwrap_err();
+        assert_eq!(err.code, "role-pending-rotation");
+        server.join().unwrap();
+    }
+
+    #[test]
+    fn a_refusal_carries_the_message_of_the_reply() {
+        let (path, server) = serve("message", |r| {
+            Some(
+                json!({ "type": "REPLY", "id": r["id"], "result": "refused", "code": "verb-failed", "detail": "persona-not-found", "message": "known: a, b" }),
+            )
+        });
+        let err = request_head(&path, "v", &json!({}), "a", Duration::from_secs(5)).unwrap_err();
+        assert_eq!(err.message.as_deref(), Some("known: a, b"));
+        assert_eq!(err.explanation(), "persona-not-found: known: a, b");
+        server.join().unwrap();
     }
 }
