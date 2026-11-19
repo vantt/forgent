@@ -28,7 +28,7 @@ const POLL_MS = 100;
  * pane's foreground (session-host spec section 8.2), so the head ends the way a rotation ends the old head: its own
  * supervisor is asked to stop it (`cancel-requested.json`), its release step closes the pane, and only then is the pane
  * retired. `retiredAt` is written first, before anything that can end the route child (a head stopping its own role), and
- * is put back as it was when the head cannot be ended: `HeadStopError` `stop-not-ended` or `retire-refused`.
+ * is put back as it was only when no stop request could be written (`stop-not-ended`); after a request it stays, and a head that does not end in time (`stop-not-ended`) or a pane that will not close (`retire-refused`) is reported with the stamp kept.
  *
  * `ports` (for a test): `host` (Session Host client: `retireAsync(placement, 'close', { groupKey })`),
  * `identity({ role, projectRoot }) -> { live }`, `now() -> Date`, `groupKeyOf(record) -> string`,
@@ -43,11 +43,14 @@ export async function stopHeadSession({ persona, name, projectRoot, reason = nul
 
   const retiredAt = (ports.now?.() ?? new Date()).toISOString();
   writeHeadPlacement(dir, { ...record, retiredAt, ...(reason ? { retiredReason: String(reason).slice(0, 200) } : {}) });
-  const undo = () => writeHeadPlacement(dir, record);
+  // The stamp is put back only while nothing was asked of the head: once its stop request is written the head may end at
+  // any moment, so the stamp stays and the error names the unfinished stop.
+  let requested = false;
   try {
     if (record.runDir) {
       const end = ports.end ?? ((runDir) => requestCancel(runDir, 'session-stop'));
       if (!end(record.runDir)) throw new HeadStopError('stop-not-ended', `${role} could not be asked to stop: no stop request could be written for ${record.runDir}`);
+      requested = true;
       const closed = ports.closed ?? ((runDir) => fs.existsSync(path.join(runDir, 'closed.json')));
       const sleep = ports.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
       const until = Date.now() + (ports.waitMs ?? CLOSE_WAIT_MS);
@@ -61,7 +64,7 @@ export async function stopHeadSession({ persona, name, projectRoot, reason = nul
       throw new HeadStopError('retire-refused', `${role} could not be closed: ${answer.code ?? answer.result}${answer.detail ? ` (${answer.detail})` : ''}`);
     }
   } catch (err) {
-    undo();
+    if (!requested) writeHeadPlacement(dir, record);
     throw err;
   }
   return { stopped: true };
