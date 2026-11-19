@@ -4,8 +4,8 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 
+use fgos_execution::handoff::sha256_hex;
 use serde_json::{json, Map, Value};
-use sha2::{Digest, Sha256};
 
 use crate::credentials::files::read_agent_file;
 use crate::run_result::claim::CLAIM_FRICTIONS_MAX;
@@ -19,13 +19,6 @@ pub const MAX_AGENT_FILE_BYTES: u64 = 4 * 1024 * 1024;
 
 fn str_of<'a>(value: &'a Value, key: &str) -> Option<&'a str> {
     value.get(key).and_then(Value::as_str)
-}
-
-pub fn sha256_hex(bytes: &[u8]) -> String {
-    Sha256::digest(bytes)
-        .iter()
-        .map(|b| format!("{b:02x}"))
-        .collect()
 }
 
 /// A claim keeps at most [`CLAIM_FRICTIONS_MAX`] frictions; the rest are counted in `frictionsDropped`, never stored

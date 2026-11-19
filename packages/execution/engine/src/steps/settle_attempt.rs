@@ -50,7 +50,21 @@ fn read_tail(file: &Path) -> String {
     let Ok(mut open) = std::fs::File::open(file) else {
         return String::new();
     };
-    let size = open.metadata().map_or(0, |m| m.len());
+    let Ok(opened) = open.metadata() else {
+        return String::new();
+    };
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        // The name must still be the file that was looked at: a link swapped in between is no capture.
+        if meta.dev() != opened.dev() || meta.ino() != opened.ino() {
+            return String::new();
+        }
+    }
+    if !opened.is_file() {
+        return String::new();
+    }
+    let size = opened.len();
     let length = size.min(CAPTURE_TAIL_BYTES);
     if open.seek(SeekFrom::Start(size - length)).is_err() {
         return String::new();
@@ -77,17 +91,17 @@ fn evaluator_baseline(run_dir: &Path, outcome: Option<&str>) -> Result<Option<Va
             ),
         ));
     };
-    let mut body = baseline.clone();
-    let digest = body.as_object_mut().and_then(|o| o.remove("digest"));
-    if let Some(Value::String(digest)) = digest.filter(|d| d != &json!("")) {
-        let canonical = fgos_canonical_json::canonical_json(&body)
-            .map_err(|e| StepError::new("internal", e.to_string()))?;
-        if digest
-            != format!(
-                "sha256:{}",
-                crate::settlement::evidence::sha256_hex(canonical.as_bytes())
-            )
-        {
+    // The digest of the baseline without its `digest` key, the way the controller sealed it.
+    let sealed = baseline.get("digest").filter(|d| match d {
+        Value::Null | Value::Bool(false) => false,
+        Value::String(s) => !s.is_empty(),
+        Value::Number(n) => n.as_f64() != Some(0.0),
+        _ => true,
+    });
+    if let Some(digest) = sealed {
+        let computed = fgos_run_supervisor::envelope::digest(&baseline)
+            .map_err(|e| StepError::new("internal", format!("{e:?}")))?;
+        if digest.as_str() != Some(computed.as_str()) {
             return Err(StepError::new(
                 "internal",
                 "evaluator baseline digest mismatch",
