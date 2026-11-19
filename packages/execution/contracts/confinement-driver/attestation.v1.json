@@ -1,0 +1,773 @@
+{
+  "note": "recorded from src/runner/dispatch/confinement/attestation-store.mjs; store directories are fixed paths that need not exist",
+  "contract": "confinement-attestation.v1",
+  "refContract": "confinement-attestation-ref.v1",
+  "requiredChannels": [
+    "filesystem",
+    "inherited-fd",
+    "stdio",
+    "host-ipc",
+    "network"
+  ],
+  "phases": [
+    "prepared",
+    "completed",
+    "failed",
+    "refused"
+  ],
+  "outcomes": [
+    "enforced",
+    "unconfined",
+    "degraded",
+    "refused",
+    "unknown"
+  ],
+  "defaultProbeTtlMs": 3600000,
+  "good": {
+    "contract": "confinement-attestation.v1",
+    "dispatchId": "d1",
+    "phase": "completed",
+    "outcome": "enforced",
+    "channels": [
+      {
+        "name": "filesystem",
+        "state": "x"
+      },
+      {
+        "name": "inherited-fd",
+        "state": "x"
+      },
+      {
+        "name": "stdio",
+        "state": "x"
+      },
+      {
+        "name": "host-ipc",
+        "state": "x"
+      },
+      {
+        "name": "network",
+        "state": "x"
+      }
+    ],
+    "coverage": {
+      "control:hostWrite": "satisfied"
+    },
+    "effectiveControls": {
+      "hostWrite": "deny"
+    },
+    "mismatches": [
+      {
+        "code": "a",
+        "detail": "b"
+      },
+      "plain"
+    ]
+  },
+  "variants": [
+    {
+      "name": "good",
+      "attestation": {
+        "contract": "confinement-attestation.v1",
+        "dispatchId": "d1",
+        "phase": "completed",
+        "outcome": "enforced",
+        "channels": [
+          {
+            "name": "filesystem",
+            "state": "x"
+          },
+          {
+            "name": "inherited-fd",
+            "state": "x"
+          },
+          {
+            "name": "stdio",
+            "state": "x"
+          },
+          {
+            "name": "host-ipc",
+            "state": "x"
+          },
+          {
+            "name": "network",
+            "state": "x"
+          }
+        ],
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "effectiveControls": {
+          "hostWrite": "deny"
+        },
+        "mismatches": [
+          {
+            "code": "a",
+            "detail": "b"
+          },
+          "plain"
+        ]
+      },
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "not-object",
+      "attestation": [],
+      "out": {
+        "error": "attestation must be an object."
+      }
+    },
+    {
+      "name": "wrong-contract",
+      "attestation": {
+        "contract": "x",
+        "dispatchId": "d1",
+        "phase": "completed",
+        "outcome": "enforced",
+        "channels": [
+          {
+            "name": "filesystem",
+            "state": "x"
+          },
+          {
+            "name": "inherited-fd",
+            "state": "x"
+          },
+          {
+            "name": "stdio",
+            "state": "x"
+          },
+          {
+            "name": "host-ipc",
+            "state": "x"
+          },
+          {
+            "name": "network",
+            "state": "x"
+          }
+        ],
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "effectiveControls": {
+          "hostWrite": "deny"
+        },
+        "mismatches": [
+          {
+            "code": "a",
+            "detail": "b"
+          },
+          "plain"
+        ]
+      },
+      "out": {
+        "error": "attestation contract must be \"confinement-attestation.v1\", got \"x\"."
+      }
+    },
+    {
+      "name": "no-dispatch",
+      "attestation": {
+        "contract": "confinement-attestation.v1",
+        "dispatchId": "",
+        "phase": "completed",
+        "outcome": "enforced",
+        "channels": [
+          {
+            "name": "filesystem",
+            "state": "x"
+          },
+          {
+            "name": "inherited-fd",
+            "state": "x"
+          },
+          {
+            "name": "stdio",
+            "state": "x"
+          },
+          {
+            "name": "host-ipc",
+            "state": "x"
+          },
+          {
+            "name": "network",
+            "state": "x"
+          }
+        ],
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "effectiveControls": {
+          "hostWrite": "deny"
+        },
+        "mismatches": [
+          {
+            "code": "a",
+            "detail": "b"
+          },
+          "plain"
+        ]
+      },
+      "out": {
+        "error": "attestation dispatchId must be a non-empty string."
+      }
+    },
+    {
+      "name": "bad-phase",
+      "attestation": {
+        "contract": "confinement-attestation.v1",
+        "dispatchId": "d1",
+        "phase": "later",
+        "outcome": "enforced",
+        "channels": [
+          {
+            "name": "filesystem",
+            "state": "x"
+          },
+          {
+            "name": "inherited-fd",
+            "state": "x"
+          },
+          {
+            "name": "stdio",
+            "state": "x"
+          },
+          {
+            "name": "host-ipc",
+            "state": "x"
+          },
+          {
+            "name": "network",
+            "state": "x"
+          }
+        ],
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "effectiveControls": {
+          "hostWrite": "deny"
+        },
+        "mismatches": [
+          {
+            "code": "a",
+            "detail": "b"
+          },
+          "plain"
+        ]
+      },
+      "out": {
+        "error": "attestation phase must be one of prepared/completed/failed/refused, got \"later\"."
+      }
+    },
+    {
+      "name": "bad-outcome",
+      "attestation": {
+        "contract": "confinement-attestation.v1",
+        "dispatchId": "d1",
+        "phase": "completed",
+        "outcome": "ok",
+        "channels": [
+          {
+            "name": "filesystem",
+            "state": "x"
+          },
+          {
+            "name": "inherited-fd",
+            "state": "x"
+          },
+          {
+            "name": "stdio",
+            "state": "x"
+          },
+          {
+            "name": "host-ipc",
+            "state": "x"
+          },
+          {
+            "name": "network",
+            "state": "x"
+          }
+        ],
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "effectiveControls": {
+          "hostWrite": "deny"
+        },
+        "mismatches": [
+          {
+            "code": "a",
+            "detail": "b"
+          },
+          "plain"
+        ]
+      },
+      "out": {
+        "error": "attestation outcome must be one of enforced/unconfined/degraded/refused/unknown, got \"ok\"."
+      }
+    },
+    {
+      "name": "channels-not-array",
+      "attestation": {
+        "contract": "confinement-attestation.v1",
+        "dispatchId": "d1",
+        "phase": "completed",
+        "outcome": "enforced",
+        "channels": {},
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "effectiveControls": {
+          "hostWrite": "deny"
+        },
+        "mismatches": [
+          {
+            "code": "a",
+            "detail": "b"
+          },
+          "plain"
+        ]
+      },
+      "out": {
+        "error": "attestation channels must be an array."
+      }
+    },
+    {
+      "name": "channel-missing",
+      "attestation": {
+        "contract": "confinement-attestation.v1",
+        "dispatchId": "d1",
+        "phase": "completed",
+        "outcome": "enforced",
+        "channels": [
+          {
+            "name": "filesystem",
+            "state": "x"
+          },
+          {
+            "name": "inherited-fd",
+            "state": "x"
+          },
+          {
+            "name": "stdio",
+            "state": "x"
+          },
+          {
+            "name": "host-ipc",
+            "state": "x"
+          }
+        ],
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "effectiveControls": {
+          "hostWrite": "deny"
+        },
+        "mismatches": [
+          {
+            "code": "a",
+            "detail": "b"
+          },
+          "plain"
+        ]
+      },
+      "out": {
+        "error": "attestation channels is missing required channel \"network\"."
+      }
+    }
+  ],
+  "isolation": [
+    {
+      "name": "no-resources",
+      "store": "/srv/state/att",
+      "resources": [],
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "read-only-overlap",
+      "store": "/srv/state/att",
+      "resources": [
+        {
+          "resource": "a",
+          "access": "read",
+          "hostTarget": "/srv/state/att"
+        }
+      ],
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "writable-disjoint",
+      "store": "/srv/state/att",
+      "resources": [
+        {
+          "resource": "w",
+          "access": "write",
+          "hostTarget": "/srv/work"
+        }
+      ],
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "writable-same",
+      "store": "/srv/state/att",
+      "resources": [
+        {
+          "resource": "w",
+          "access": "write",
+          "hostTarget": "/srv/state/att"
+        }
+      ],
+      "out": {
+        "error": "attestation store directory \"/srv/state/att\" overlaps with writable resource \"w\" at \"/srv/state/att\" (fail closed)."
+      }
+    },
+    {
+      "name": "store-inside-writable",
+      "store": "/srv/state/att",
+      "resources": [
+        {
+          "resource": "w",
+          "access": "read-write",
+          "hostTarget": "/srv/state"
+        }
+      ],
+      "out": {
+        "error": "attestation store directory \"/srv/state/att\" overlaps with writable resource \"w\" at \"/srv/state\" (fail closed)."
+      }
+    },
+    {
+      "name": "writable-inside-store",
+      "store": "/srv/state/att",
+      "resources": [
+        {
+          "resource": "w",
+          "access": "write",
+          "hostTarget": "/srv/state/att/sub"
+        }
+      ],
+      "out": {
+        "error": "attestation store directory \"/srv/state/att\" overlaps with writable resource \"w\" at \"/srv/state/att/sub\" (fail closed)."
+      }
+    },
+    {
+      "name": "sibling-prefix",
+      "store": "/srv/state/att",
+      "resources": [
+        {
+          "resource": "w",
+          "access": "write",
+          "hostTarget": "/srv/state/att2"
+        }
+      ],
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "no-host-target",
+      "store": "/srv/state/att",
+      "resources": [
+        {
+          "resource": "w",
+          "access": "write"
+        }
+      ],
+      "out": {
+        "ok": true
+      }
+    },
+    {
+      "name": "execution-target-fallback",
+      "store": "/srv/state/att",
+      "resources": [
+        {
+          "resource": "w",
+          "access": "write",
+          "executionTarget": {
+            "path": "/srv/state"
+          }
+        }
+      ],
+      "out": {
+        "error": "attestation store directory \"/srv/state/att\" overlaps with writable resource \"w\" at \"/srv/state\" (fail closed)."
+      }
+    },
+    {
+      "name": "blank-store",
+      "store": "",
+      "resources": [],
+      "out": {
+        "error": "attestation storeDir must be a non-empty string."
+      }
+    }
+  ],
+  "refs": [
+    {
+      "name": "good",
+      "attestation": {
+        "contract": "confinement-attestation.v1",
+        "dispatchId": "d1",
+        "phase": "completed",
+        "outcome": "enforced",
+        "channels": [
+          {
+            "name": "filesystem",
+            "state": "x"
+          },
+          {
+            "name": "inherited-fd",
+            "state": "x"
+          },
+          {
+            "name": "stdio",
+            "state": "x"
+          },
+          {
+            "name": "host-ipc",
+            "state": "x"
+          },
+          {
+            "name": "network",
+            "state": "x"
+          }
+        ],
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "effectiveControls": {
+          "hostWrite": "deny"
+        },
+        "mismatches": [
+          {
+            "code": "a",
+            "detail": "b"
+          },
+          "plain"
+        ]
+      },
+      "out": {
+        "ok": {
+          "contract": "confinement-attestation-ref.v1",
+          "dispatchId": "d1",
+          "phase": "completed",
+          "outcome": "enforced",
+          "digest": "sha256:13d7fcf950b0805a32b158863489b79d410e39f82d5df52bf7e681faf6fb2d04",
+          "ref": "attestation:d1:completed",
+          "mismatches": [
+            "a",
+            "plain"
+          ]
+        }
+      }
+    },
+    {
+      "name": "bad",
+      "attestation": {
+        "contract": "confinement-attestation.v1",
+        "dispatchId": "d1",
+        "phase": "x",
+        "outcome": "enforced",
+        "channels": [
+          {
+            "name": "filesystem",
+            "state": "x"
+          },
+          {
+            "name": "inherited-fd",
+            "state": "x"
+          },
+          {
+            "name": "stdio",
+            "state": "x"
+          },
+          {
+            "name": "host-ipc",
+            "state": "x"
+          },
+          {
+            "name": "network",
+            "state": "x"
+          }
+        ],
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "effectiveControls": {
+          "hostWrite": "deny"
+        },
+        "mismatches": [
+          {
+            "code": "a",
+            "detail": "b"
+          },
+          "plain"
+        ]
+      },
+      "out": {
+        "error": "attestation phase must be one of prepared/completed/failed/refused, got \"x\"."
+      }
+    },
+    {
+      "name": "no-mismatches",
+      "attestation": {
+        "contract": "confinement-attestation.v1",
+        "dispatchId": "d1",
+        "phase": "completed",
+        "outcome": "enforced",
+        "channels": [
+          {
+            "name": "filesystem",
+            "state": "x"
+          },
+          {
+            "name": "inherited-fd",
+            "state": "x"
+          },
+          {
+            "name": "stdio",
+            "state": "x"
+          },
+          {
+            "name": "host-ipc",
+            "state": "x"
+          },
+          {
+            "name": "network",
+            "state": "x"
+          }
+        ],
+        "coverage": {
+          "control:hostWrite": "satisfied"
+        },
+        "effectiveControls": {
+          "hostWrite": "deny"
+        }
+      },
+      "out": {
+        "ok": {
+          "contract": "confinement-attestation-ref.v1",
+          "dispatchId": "d1",
+          "phase": "completed",
+          "outcome": "enforced",
+          "digest": "sha256:9ce8e8714410f0b992ab5ece2a45a020e360a53e80dad34f0b748667024aec3b",
+          "ref": "attestation:d1:completed",
+          "mismatches": []
+        }
+      }
+    }
+  ],
+  "storeDirs": [
+    {
+      "name": "context",
+      "context": {
+        "attestationStoreDir": "/srv/ctx/att"
+      },
+      "dir": "/srv/ctx/att"
+    },
+    {
+      "name": "none",
+      "context": {},
+      "dir": null
+    }
+  ],
+  "store": {
+    "saved": {
+      "dispatchId": "d1",
+      "phase": "completed",
+      "file": "d1.completed.json"
+    },
+    "loaded": {
+      "contract": "confinement-attestation.v1",
+      "dispatchId": "d1",
+      "phase": "completed",
+      "outcome": "enforced",
+      "channels": [
+        {
+          "name": "filesystem",
+          "state": "x"
+        },
+        {
+          "name": "inherited-fd",
+          "state": "x"
+        },
+        {
+          "name": "stdio",
+          "state": "x"
+        },
+        {
+          "name": "host-ipc",
+          "state": "x"
+        },
+        {
+          "name": "network",
+          "state": "x"
+        }
+      ],
+      "coverage": {
+        "control:hostWrite": "satisfied"
+      },
+      "effectiveControls": {
+        "hostWrite": "deny"
+      },
+      "mismatches": [
+        {
+          "code": "a",
+          "detail": "b"
+        },
+        "plain"
+      ]
+    },
+    "missing": null,
+    "plan": {
+      "dispatchId": "d2",
+      "file": "d2.plan.json"
+    },
+    "planOverlap": {
+      "error": "attestation store directory \"<dir>\" overlaps with writable resource \"w\" at \"<dir>\" (fail closed)."
+    },
+    "files": [
+      "d1.completed.json",
+      "d2.plan.json"
+    ]
+  },
+  "probe": {
+    "fingerprint": {
+      "backend": "bwrap",
+      "version": 1
+    },
+    "saved": {
+      "contract": "confinement-probe-cache.v1",
+      "fingerprint": {
+        "backend": "bwrap",
+        "version": 1
+      },
+      "fpDigest": "cbc16f2907450b562fbbda8dfb78a2725a87fa1c06488d1ea185b49a34fa37b5",
+      "passed": true,
+      "passedAt": "1970-01-01T00:00:01.000Z",
+      "passedAtMs": 1000,
+      "message": "m",
+      "results": [
+        1
+      ]
+    },
+    "fileCount": 1,
+    "fresh": {
+      "passed": true,
+      "message": "m",
+      "results": [
+        1
+      ],
+      "passedAt": "1970-01-01T00:00:01.000Z",
+      "cached": true
+    },
+    "stale": null,
+    "notPassed": null
+  }
+}
