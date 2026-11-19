@@ -19,8 +19,9 @@ use crate::executor_model::{
     resolve_executor_governance, resolve_executor_provider, with_default_executor, Governance,
     Mechanism, ModelError,
 };
+use crate::js::{text as js_text, truthy};
 use crate::ports::Machine;
-use crate::runner_check::{check_runner_config, RunnerCheckError};
+use crate::runner_config::{load_runner_config, DoorRead, RunnerConfigError};
 use crate::tools::{tool_providers, ToolProbe, ToolStatus};
 use fgos_seat_binding::Tier;
 use serde_json::{json, Map, Value};
@@ -42,36 +43,6 @@ fn present<'a>(value: &'a Value, key: &str) -> Option<&'a Value> {
 
 fn str_of<'a>(value: &'a Value, key: &str) -> Option<&'a str> {
     value.get(key).and_then(Value::as_str)
-}
-
-/// JavaScript truthiness of a JSON value.
-fn truthy(value: Option<&Value>) -> bool {
-    match value {
-        None | Some(Value::Null) => false,
-        Some(Value::Bool(b)) => *b,
-        Some(Value::Number(n)) => n.as_f64().is_some_and(|f| f != 0.0),
-        Some(Value::String(s)) => !s.is_empty(),
-        Some(_) => true,
-    }
-}
-
-/// A value as a JavaScript template literal renders it.
-fn js_text(value: Option<&Value>) -> String {
-    match value {
-        None => "undefined".into(),
-        Some(Value::Null) => "null".into(),
-        Some(Value::String(s)) => s.clone(),
-        Some(Value::Array(items)) => items
-            .iter()
-            .map(|item| match item {
-                Value::Null => String::new(),
-                other => js_text(Some(other)),
-            })
-            .collect::<Vec<_>>()
-            .join(","),
-        Some(Value::Object(_)) => "[object Object]".into(),
-        Some(other) => other.to_string(),
-    }
 }
 
 // ---- the request and the answer --------------------------------------------------------------------------
@@ -315,6 +286,25 @@ pub struct RunnerOrigin {
     pub column: Option<u32>,
 }
 
+impl RunnerOrigin {
+    /// The origin as the runner config loader reads it: `{ path, layer, file?, line?, column? }`.
+    pub fn to_json(&self) -> Value {
+        let mut out = Map::new();
+        out.insert("path".into(), json!(self.path));
+        out.insert("layer".into(), json!(self.layer));
+        for (key, value) in [
+            ("file", self.file.as_ref().map(|f| json!(f))),
+            ("line", self.line.map(|l| json!(l))),
+            ("column", self.column.map(|c| json!(c))),
+        ] {
+            if let Some(value) = value {
+                out.insert(key.into(), value);
+            }
+        }
+        Value::Object(out)
+    }
+}
+
 /// The effective runner section of one project, with the origins of the keys whose refusals are attributed to a
 /// file and line (`runner.modelPolicies`, `runner.rigorToTier`, `runner.patterns`, `runner.loops`).
 #[derive(Debug, Clone, PartialEq)]
@@ -336,8 +326,6 @@ pub trait Workspace {
     fn project_config_present(&self, root: &str) -> bool;
     /// The effective runner section of the project at `root`, through the config door.
     fn load_runner(&self, root: &str) -> Result<LoadedRunner, DecideFailure>;
-    /// `path.join(root, '.fgos')` as the platform writes it.
-    fn fgos_dir(&self, root: &str) -> String;
 }
 
 // ---- the config root and the guard -----------------------------------------------------------------------
@@ -387,204 +375,36 @@ pub fn guard_cwd_repo_root(
     )))
 }
 
-// ---- attributing a runner refusal ------------------------------------------------------------------------
+// ---- the runner config ----------------------------------------------------------------------------------
 
-fn parent_path(path: &str) -> Option<String> {
-    if path.ends_with(']') {
-        return path.rfind('[').map(|at| path[..at].to_string());
-    }
-    path.rfind('.').map(|at| path[..at].to_string())
-}
-
-/// Where in which file a refused value sits, nearest first: its own origin, else its nearest ancestor's, else
-/// the origins under it, else the first line of its nearest existing parent entry.
-pub fn origin_locations(
-    origins: &[RunnerOrigin],
-    paths: &[String],
-    project_dir: Option<&str>,
-) -> Vec<String> {
-    let mut locations: Vec<String> = Vec::new();
-    for target in paths {
-        let mut matched: Vec<&RunnerOrigin> =
-            origins.iter().filter(|o| o.path == *target).collect();
-        if matched.is_empty() {
-            let mut cur = target.clone();
-            while cur.contains('.') || cur.contains('[') {
-                let Some(parent) = parent_path(&cur) else {
-                    break;
-                };
-                cur = parent;
-                let found: Vec<&RunnerOrigin> = origins.iter().filter(|o| o.path == cur).collect();
-                if !found.is_empty() {
-                    matched = found;
-                    break;
-                }
-            }
-            if matched.is_empty() {
-                let (dot, bracket) = (format!("{target}."), format!("{target}["));
-                matched = origins
-                    .iter()
-                    .filter(|o| o.path.starts_with(&dot) || o.path.starts_with(&bracket))
-                    .collect();
-            }
-            let mut parent = target.clone();
-            while matched.is_empty() && parent.split('.').count() > 3 {
-                parent = parent[..parent.rfind('.').unwrap_or(0)].to_string();
-                let (dot, bracket) = (format!("{parent}."), format!("{parent}["));
-                let mut first_per_file: Vec<&RunnerOrigin> = Vec::new();
-                for origin in origins
-                    .iter()
-                    .filter(|o| o.path.starts_with(&dot) || o.path.starts_with(&bracket))
-                {
-                    match first_per_file
-                        .iter_mut()
-                        .find(|held| held.file == origin.file)
-                    {
-                        Some(held) => {
-                            if origin.line.unwrap_or(u32::MAX) < held.line.unwrap_or(u32::MAX) {
-                                *held = origin;
-                            }
-                        }
-                        None => first_per_file.push(origin),
-                    }
-                }
-                matched = first_per_file;
-            }
-        }
-        for entry in matched {
-            let file = entry.file.as_deref();
-            let display = if entry.layer == "global"
-                || file.is_some_and(|f| f.starts_with("global:"))
-            {
-                format!(
-                    "~/.fgos/{}",
-                    file.map_or("<file>", |f| f.strip_prefix("global:").unwrap_or(f))
-                )
-            } else if entry.layer == "project" || file.is_some_and(|f| f.starts_with("project:")) {
-                let rel = file.map_or("<file>", |f| f.strip_prefix("project:").unwrap_or(f));
-                match project_dir {
-                    Some(dir) => format!("{dir}/.fgos/{rel}"),
-                    None => format!(".fgos/{rel}"),
-                }
-            } else if entry.layer == "shipped" || entry.layer == "standard" {
-                "<standard>".to_string()
-            } else {
-                file.unwrap_or("<file>").to_string()
-            };
-            let location = match entry.line {
-                Some(line) => format!("{display}:{line}"),
-                None => display,
-            };
-            if !locations.contains(&location) {
-                locations.push(location);
-            }
-        }
-    }
-    locations
-}
-
-/// The dotted parent every path shares.
-fn common_dotted_parent(paths: &[String]) -> String {
-    match paths {
-        [] => String::new(),
-        [one] => one.clone(),
-        [first, rest @ ..] => {
-            let mut common = Vec::new();
-            for (i, seg) in first.split('.').enumerate() {
-                if rest.iter().all(|p| p.split('.').nth(i) == Some(seg)) {
-                    common.push(seg);
-                } else {
-                    break;
-                }
-            }
-            common.join(".")
-        }
-    }
-}
-
-/// A runner refusal named by the file and line its value comes from, when its origins say: the refusal of the
-/// check as the config load raises it.
-pub fn attribute_runner_refusal(
-    refusal: RunnerCheckError,
-    origins: &[RunnerOrigin],
-    project_dir: &str,
-) -> ModelError {
-    let paths: Vec<String> = if !refusal.paths.is_empty() {
-        refusal.paths.clone()
-    } else {
-        refusal.path.iter().cloned().collect()
-    };
-    if refusal.error.name != "RunnerConfigError" || paths.is_empty() {
-        return refusal.error;
-    }
-    let locations = origin_locations(origins, &paths, Some(project_dir));
-    if locations.is_empty() {
-        return refusal.error;
-    }
-    let subpath = match paths.as_slice() {
-        [one] => Some(one.strip_prefix("runner.").unwrap_or(one).to_string()),
-        many => Some(common_dotted_parent(many))
-            .map(|c| c.strip_prefix("runner.").unwrap_or(&c).to_string())
-            .filter(|c| !c.is_empty()),
-    };
-    let detail = refusal.detail.unwrap_or(refusal.error.message);
-    ModelError {
-        name: "RunnerConfigError",
-        code: refusal.error.code,
-        message: format!(
-            "runner config ({}{}) {detail}",
-            locations.join(", "),
-            subpath.map_or_else(String::new, |s| format!(" {s}"))
-        ),
-    }
-}
-
-/// `runner.rigorToTier` set in the global file is refused naming that file.
-pub fn refuse_global_rigor_to_tier(origins: &[RunnerOrigin]) -> Result<(), ModelError> {
-    let Some(at) = origins.iter().find(|o| {
-        o.layer == "global"
-            && (o.path == "runner.rigorToTier" || o.path.starts_with("runner.rigorToTier."))
-    }) else {
-        return Ok(());
-    };
-    let file = at.file.as_deref().unwrap_or("<file>");
-    let position = match (at.line, at.column) {
-        (Some(line), column) => format!(":{line}:{}", js_text(column.map(|c| json!(c)).as_ref())),
-        (None, _) => String::new(),
-    };
-    Err(ModelError::runner(format!(
-        "~/.fgos/{}{position} runner.rigorToTier no longer exists: rigor no longer chooses a tier; delete the key.",
-        file.strip_prefix("global:").unwrap_or(file)
-    )))
-}
-
-/// The runner config of the project at `root` as `decide` reads it: the door's section, the global
-/// `rigorToTier` refusal, then the semantic check under the label `<root>/.fgos runner`, its refusal attributed.
-/// The warnings the check gives are returned for the caller to print.
+/// The runner config of the project at `root` as `decide` reads it: the door's section through the one runner
+/// config loader ([`load_runner_config`]). The warnings the check gives are returned for the caller to print.
 pub fn load_checked_runner(
     workspace: &dyn Workspace,
     root: &str,
 ) -> Result<(Value, Vec<String>), DecideFailure> {
-    let loaded = workspace.load_runner(root)?;
-    check_loaded_runner(loaded, &workspace.fgos_dir(root), root)
+    check_loaded_runner(workspace.load_runner(root)?, root)
 }
 
-/// The checks [`load_checked_runner`] runs over a runner section already loaded: the global `rigorToTier` refusal
-/// and the runner config's own semantic check.
+/// A runner section already loaded, through the one runner config loader: the global `rigorToTier` refusal, the
+/// semantic check with its refusal attributed to the file and line its value came from, the confinement of every
+/// executor brought to one policy shape.
 pub fn check_loaded_runner(
     loaded: LoadedRunner,
-    fgos_dir: &str,
     root: &str,
 ) -> Result<(Value, Vec<String>), DecideFailure> {
-    refuse_global_rigor_to_tier(&loaded.origins).map_err(DecideFailure::Refused)?;
-    let label = format!("{fgos_dir} runner");
-    match check_runner_config(&loaded.runner, &label) {
-        Ok(warnings) => Ok((loaded.runner, warnings)),
-        Err(refusal) => Err(DecideFailure::Refused(attribute_runner_refusal(
-            refusal,
-            &loaded.origins,
-            root,
-        ))),
+    let origins = loaded.origins.iter().map(RunnerOrigin::to_json).collect();
+    let door = DoorRead::Read {
+        runner: loaded.runner,
+        origins,
+    };
+    match load_runner_config(root, door) {
+        Ok(checked) => Ok((checked.config, checked.warnings)),
+        Err(RunnerConfigError::Door(door)) => Err(DecideFailure::ConfigDoor {
+            code: door.code,
+            message: door.message,
+        }),
+        Err(RunnerConfigError::Config(failure)) => Err(DecideFailure::Refused(failure.error)),
     }
 }
 

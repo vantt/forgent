@@ -21,7 +21,7 @@ use fgos_execution::decide::{
 use fgos_execution::executor_model::ModelError;
 use fgos_execution::explain::explain_capability;
 use fgos_execution::hook::{dispatch_verdict, serve_hook, HookCall, Verdict};
-use fgos_execution::runner_check::retired_pattern_key_at;
+use fgos_execution::runner_config::door_refusal;
 use fgos_host_runtime::{
     CategorisedRefusal, ContractRef, EventSink, HostInvocation, InvocationControl, JsonOutcome,
     OperationId, OperationProvider, OperationRequest, ProviderDescriptor, ProviderError,
@@ -360,10 +360,6 @@ impl Workspace for HostWorkspace {
             .collect();
         Ok(LoadedRunner { runner, origins })
     }
-
-    fn fgos_dir(&self, root: &str) -> String {
-        Path::new(root).join(".fgos").to_string_lossy().into_owned()
-    }
 }
 
 /// The config of the project at `root` through the config door: project over global over the standard, the
@@ -385,14 +381,32 @@ fn read_snapshot(root: &Path) -> Result<fgos_config::snapshot::Snapshot, DecideF
             message: refusal.detail,
         })?;
     fgos_config::snapshot::snapshot(&ctx, &roots).map_err(|error| match error {
-        SnapshotError::Refused(refusals) => retired_key_failure(&ctx, &roots, &refusals)
-            .unwrap_or_else(|| door_failure(SnapshotError::Refused(refusals))),
+        SnapshotError::Refused(refusals) => refused_door(&ctx, &roots, &refusals),
         other => door_failure(other),
     })
 }
 
-/// Where a config check or refusal points: path, file, line, column.
-type Place = (Option<String>, Option<String>, Option<u32>, Option<u32>);
+/// Where a config check finding or refusal points, as the runner config loader reads it: `{ path?, file?, line?,
+/// column? }`.
+fn place(
+    path: &Option<String>,
+    file: &Option<String>,
+    line: Option<u32>,
+    column: Option<u32>,
+) -> Value {
+    let mut out = serde_json::Map::new();
+    for (key, value) in [
+        ("path", path.as_ref().map(|p| Value::from(p.as_str()))),
+        ("file", file.as_ref().map(|f| Value::from(f.as_str()))),
+        ("line", line.map(Value::from)),
+        ("column", column.map(Value::from)),
+    ] {
+        if let Some(value) = value {
+            out.insert(key.into(), value);
+        }
+    }
+    Value::Object(out)
+}
 
 /// The places of the config check's findings. The check is the config component's doctor, which runs on Unix; the
 /// refusals alone name the places elsewhere.
@@ -400,10 +414,10 @@ type Place = (Option<String>, Option<String>, Option<u32>, Option<u32>);
 fn check_places(
     ctx: &fgos_config::snapshot::Context<'_>,
     roots: &fgos_config::snapshot::SnapshotRequest,
-) -> Vec<Place> {
+) -> Vec<Value> {
     fgos_config::doctor::check(ctx, roots, std::time::SystemTime::now())
         .into_iter()
-        .map(|f| (f.path, f.file, f.line, f.column))
+        .map(|f| place(&f.path, &f.file, f.line, f.column))
         .collect()
 }
 
@@ -411,52 +425,28 @@ fn check_places(
 fn check_places(
     _ctx: &fgos_config::snapshot::Context<'_>,
     _roots: &fgos_config::snapshot::SnapshotRequest,
-) -> Vec<Place> {
+) -> Vec<Value> {
     Vec::new()
 }
 
-/// A refusal of the config door that lies on a retired `runner.patterns` key says so, naming the file, the position
-/// and what replaced the key (code `config-key-retired`). The places come from the config check's findings first,
-/// then from the refusals themselves, one sentence per key and file.
-fn retired_key_failure(
+/// A refusal of the config door as the runner config loader words it ([`door_refusal`]): a retired
+/// `runner.patterns` key says what replaced it, naming the file and position (code `config-key-retired`);
+/// any other refusal keeps the door's code and message.
+fn refused_door(
     ctx: &fgos_config::snapshot::Context<'_>,
     roots: &fgos_config::snapshot::SnapshotRequest,
     refusals: &[fgos_config::error::ConfigRefusal],
-) -> Option<DecideFailure> {
-    let mut places = check_places(ctx, roots);
-    places.extend(
-        refusals
-            .iter()
-            .map(|r| (r.path.clone(), r.file.clone(), r.line, r.column)),
-    );
-    let mut sentences: Vec<String> = Vec::new();
-    let mut seen: Vec<(String, String)> = Vec::new();
-    for (path, file, line, column) in places {
-        let Some((key, instruction)) = path.as_deref().and_then(retired_pattern_key_at) else {
-            continue;
-        };
-        let file_text = file.as_deref().unwrap_or_default();
-        if seen.iter().any(|(k, f)| *k == key && f == file_text) {
-            continue;
-        }
-        seen.push((key.clone(), file_text.to_owned()));
-        let shown = match file.as_deref() {
-            Some(global) if global.starts_with("global:") => {
-                format!("~/.fgos/{}", &global["global:".len()..])
-            }
-            Some(other) => other.to_owned(),
-            None => "<file>".to_owned(),
-        };
-        let at = match (line, column) {
-            (Some(line), Some(column)) => format!(":{line}:{column}"),
-            _ => String::new(),
-        };
-        sentences.push(format!("{shown}{at}: {key} was retired; {instruction}."));
+) -> DecideFailure {
+    let (code, message) = refusals_text(refusals);
+    let places: Vec<Value> = refusals
+        .iter()
+        .map(|r| place(&r.path, &r.file, r.line, r.column))
+        .collect();
+    let refused = door_refusal(&code, &message, &places, &check_places(ctx, roots));
+    DecideFailure::ConfigDoor {
+        code: refused.code,
+        message: refused.message,
     }
-    (!sentences.is_empty()).then(|| DecideFailure::ConfigDoor {
-        code: "config-key-retired".into(),
-        message: sentences.join("\n"),
-    })
 }
 
 // ---- decide -------------------------------------------------------------------------------------------------

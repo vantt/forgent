@@ -626,6 +626,8 @@
       "allowed": [
         "src/config/facade.mjs",
         { "path": "src/runner/dispatch/config.mjs", "reason": "names the file in the display of a finding's origin; reads nothing" },
+        { "path": "packages/execution/rust/src/runner_config/mod.rs", "reason": "the Rust twin of src/runner/dispatch/config.mjs: names the global file a refusal shows when its origin carries none; reads nothing (the pure crate cannot depend on fgos-config)" },
+        { "path": "packages/execution/rust/src/runner_config/origins.rs", "reason": "the Rust twin of src/runner/dispatch/config.mjs: names the file in the display of a finding's origin; reads nothing (the pure crate cannot depend on fgos-config)" },
         { "path": "packages/config/rust/src/files.rs", "reason": "the fgos-config crate owns the file names" },
         { "path": "packages/config/rust/src/machine.rs", "reason": "the fgos-config crate lists the machine files it reads" }
       ],

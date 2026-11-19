@@ -97,9 +97,7 @@ impl<'a> Config<'a> {
     /// The runner config as the loader returns it, or what it refused with.
     fn loaded(&self) -> Result<Value, String> {
         let loaded = self.read().clone()?;
-        let root = self.root.to_string_lossy();
-        let fgos_dir = self.root.join(".fgos").to_string_lossy().into_owned();
-        check_loaded_runner(loaded, &fgos_dir, &root)
+        check_loaded_runner(loaded, &self.root.to_string_lossy())
             .map(|(runner, _)| runner)
             .map_err(|failure| failure.message().to_owned())
     }
