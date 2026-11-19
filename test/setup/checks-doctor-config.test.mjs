@@ -51,20 +51,6 @@ function declareExecutor(cwd, id, fields) {
   writeProjectConfig(cwd, cfg);
 }
 
-test('executor-profile-warnings warns, without failing, that a prefer on a tool-served capability is ignored', () => {
-  const cwd = mkTemp('fgos-tool-prefer-ignored-');
-  initializeWorkRepository(cwd);
-  declareExecutor(cwd, 'echo-tool', { kind: 'tool', for: ['test-capability'], invocations: [{ via: 'cli', command: process.execPath, args: [] }] });
-  const cfg = readProjectConfig(cwd);
-  cfg.runner.capabilities['test-capability'].prefer = ['echo-tool'];
-  writeProjectConfig(cwd, cfg);
-  const { passed, message } = checkById('executor-profile-warnings').check(cwd);
-  assert.equal(passed, true, message);
-  assert.match(message, /^warning:/);
-  assert.match(message, /tool-purpose-prefer-ignored\.test-capability/);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
-
 // `workerSlots.ceiling` is a machine setting (global file only), so each case reads it from a throwaway HOME.
 function ceilingCheck(cwd, home) {
   return withHome(home, () => checkById('worker-slots-ceiling-usable').check(cwd));

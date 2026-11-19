@@ -70,13 +70,3 @@ test('the agent-type row judges no tier read from inside the release, so a plain
   }
 });
 
-test('the template row reads only the project tier, so a broken packaged template cannot fail a project', () => {
-  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-project-templates-'));
-  try {
-    const result = doctorRow('operation-prompt-templates-valid').check(project);
-    assert.equal(result.passed, true, result.message);
-    assert.match(result.message, /^0 project operation prompt template/);
-  } finally {
-    fs.rmSync(project, { recursive: true, force: true });
-  }
-});

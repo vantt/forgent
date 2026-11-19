@@ -14,7 +14,9 @@ pub mod identity;
 pub mod mailbox;
 pub mod observe;
 pub mod packaging;
+pub mod run_supervisor;
 pub mod supervision;
+pub mod terminal;
 
 use crate::routing::Call;
 use fgos_distribution::doctor::{
@@ -227,7 +229,9 @@ const GROUPS: &[&Rows] = &[
     &mailbox::GROUP,
     &observe::GROUP,
     &packaging::GROUP,
+    &run_supervisor::GROUP,
     &supervision::GROUP,
+    &terminal::GROUP,
 ];
 
 /// The rows and fixes a Rust component judges in process, by id. The registry's `inRust` lists must equal
@@ -557,11 +561,11 @@ mod tests {
         assert_eq!(registry.rows.len(), 116);
         assert_eq!(
             (count("S5"), count("S6a"), count("S6b"), count("S7")),
-            (0, 23, 6, 7)
+            (0, 1, 6, 7)
         );
-        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 80);
+        assert_eq!(registry.row_ids(OwnerKind::Native).len(), 102);
         assert_eq!(registry.fixes.len(), 30);
-        assert_eq!(registry.fix_ids(OwnerKind::Bridge).len(), 2);
+        assert_eq!(registry.fix_ids(OwnerKind::Bridge).len(), 1);
     }
 
     #[test]
