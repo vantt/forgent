@@ -1,6 +1,6 @@
 {
   "contract": "observe-kinds.v1",
-  "subjectKinds": ["plan", "session", "discussion"],
+  "subjectKinds": ["plan", "session", "discussion", "event"],
   "attrs": {
     "fgos.watcher.mode": { "type": "string", "values": ["active", "idle"] },
     "fgos.watcher.outcome": { "type": "string", "values": ["noop", "woke-supervisor", "notified", "error", "skipped-busy"] },
@@ -35,7 +35,7 @@
       ]
     },
     "fgos.supervisor.wake": {
-      "subjects": ["session"],
+      "subjects": ["session", "event"],
       "attrs": ["fgos.supervisor.trigger", "fgos.supervisor.outcome"],
       "measures": []
     },
