@@ -380,6 +380,52 @@ fn a_failing_gate_names_its_failing_test_keeps_the_full_log_and_settles_its_own_
     assert_eq!(fixed.main_sha, f.remote_tip());
 }
 
+fn pins(f: &Fixture) -> String {
+    git(&f.main, &["for-each-ref", "refs/fgos/git-operations"])
+}
+
+#[test]
+fn a_push_that_cannot_reach_the_remote_is_not_settled_and_names_the_recovery_verb() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    let away = f.temp.join("remote-away.git");
+    let hide = format!("mv {} {}", f.remote.display(), away.display());
+    let refusal = f
+        .land(&branch("topic"), &config(vec![gate(&hide)]))
+        .unwrap_err();
+    assert!(refusal.detail.contains("fgos git recover"), "{refusal:?}");
+    assert!(!pins(&f).is_empty(), "the operation stays for recovery");
+}
+
+#[test]
+fn a_publish_that_fails_after_the_push_is_not_settled_and_names_the_recovery_verb() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    // A gate edits a file the land writes in the main checkout, after the push is the only step
+    // left: publish refuses the dirty overlap with the remote already holding the candidate.
+    let dirty = format!("echo local > {}", f.main.join("a").display());
+    let refusal = f
+        .land(&branch("topic"), &config(vec![gate(&dirty)]))
+        .unwrap_err();
+    assert!(refusal.detail.contains("fgos git recover"), "{refusal:?}");
+    assert!(!pins(&f).is_empty(), "the operation stays for recovery");
+}
+
+#[test]
+fn a_rejected_push_settles_the_operation_and_a_second_land_works() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    let refusal = f
+        .land(&branch("topic"), &config(vec![gate(&mover(&f, false))]))
+        .unwrap_err();
+    assert_eq!(refusal.code, "land-retries-exhausted");
+    assert_eq!(pins(&f), "", "every rejected attempt was settled");
+    let out = f
+        .land(&branch("topic"), &config(vec![gate("true")]))
+        .unwrap();
+    assert_eq!(out.main_sha, f.remote_tip());
+}
+
 #[test]
 fn the_remote_moving_once_between_prepare_and_push_lands_on_the_second_try() {
     let f = Fixture::new();

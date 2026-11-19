@@ -31,6 +31,8 @@ const FAILURE_LINES: usize = 25;
 /// Longest kept line, and the most of a log's end scanned for failure lines.
 const LINE_BYTES: usize = 300;
 const SCAN_BYTES: u64 = 4 * 1024 * 1024;
+/// The most of a failed command's output a log keeps (its end).
+const LOG_BYTES: u64 = 8 * 1024 * 1024;
 /// Largest object (commit, tree or declared file) read while preparing a land.
 const OBJECT_LIMIT: usize = 32 * 1024 * 1024;
 
@@ -149,6 +151,21 @@ impl CommandRunner for ShellRunner {
             .status()?;
         Ok(status.success())
     }
+}
+
+/// Cut a log that outgrew `LOG_BYTES` down to its last `LOG_BYTES`.
+fn keep_log_end(path: &Path) -> std::io::Result<()> {
+    let len = std::fs::metadata(path)?.len();
+    if len <= LOG_BYTES {
+        return Ok(());
+    }
+    let mut file = File::open(path)?;
+    file.seek(SeekFrom::Start(len - LOG_BYTES))?;
+    let mut kept = Vec::with_capacity(LOG_BYTES as usize);
+    file.read_to_end(&mut kept)?;
+    let trimmed = path.with_extension("log.trim");
+    std::fs::write(&trimmed, kept)?;
+    std::fs::rename(&trimmed, path)
 }
 
 fn is_failure_line(line: &str) -> bool {
@@ -704,6 +721,7 @@ impl Lander<'_> {
             let _ = std::fs::remove_file(&partial);
             return Ok(());
         }
+        let _ = keep_log_end(&partial);
         let sealed = self.log_path(id, "");
         let (digest, gate_log) = match std::fs::rename(&partial, &sealed) {
             Ok(()) => (failure_digest(&sealed), Some(sealed)),
@@ -905,6 +923,23 @@ impl Lander<'_> {
         attempt
     }
 
+    /// Leave the session unsettled: the remote or main may already have moved, so only
+    /// `fgos git recover` may decide what happened.
+    fn unsettled(
+        &self,
+        live: &mut Option<(fgos_git::LandSession, String)>,
+        mut refusal: LandRefusal,
+    ) -> LandRefusal {
+        live.take();
+        if !refusal.detail.contains("fgos git recover") {
+            refusal.detail = format!(
+                "{}; the push or publish may have happened: run `fgos git recover`",
+                refusal.detail
+            );
+        }
+        refusal
+    }
+
     /// Everything after prepare: regenerate, gate, push, publish. `live` holds the session until
     /// it publishes; whatever is still in it when this returns is settled by the caller.
     fn drive(
@@ -957,8 +992,12 @@ impl Lander<'_> {
         // candidate: refuse before anything reaches the remote.
         self.require_clean_candidate(&candidate)?;
 
-        if !self.push_candidate(session, target_branch)? {
-            return Ok(Attempt::RemoteMoved);
+        // Once the push was attempted, only a clean rejection proves nothing was published; any
+        // other outcome leaves the session unsettled for `fgos git recover`.
+        match self.push_candidate(session, target_branch) {
+            Ok(true) => {}
+            Ok(false) => return Ok(Attempt::RemoteMoved),
+            Err(refusal) => return Err(self.unsettled(live, refusal)),
         }
         let digest = Sha256::digest(format!("{}\n{}", candidate.candidate, gates_run.join("\n")));
         let evidence = LandEvidence {
@@ -969,9 +1008,12 @@ impl Lander<'_> {
             evidence_digest: hex(&digest),
         };
         let (session, _) = live.as_mut().ok_or_else(no_candidate)?;
-        p.git
-            .publish_land(p.repo, session, &evidence, &wal::OsFileSystem, p.wait_ms)
-            .map_err(at("publish"))?;
+        let published =
+            p.git
+                .publish_land(p.repo, session, &evidence, &wal::OsFileSystem, p.wait_ms);
+        if let Err(e) = published {
+            return Err(self.unsettled(live, at("publish")(e)));
+        }
         live.take();
         let main = self.resolve(dest)?.ok_or_else(|| {
             refuse(
