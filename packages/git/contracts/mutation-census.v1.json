@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "20b54816a1c877068bcd730c8a0a560ef19396640c6bc172fd9b8d23534af942",
+  "payloadDigest": "b9828c1b142ccefa2c037121d233375643d8ab00af4acc07db3349d66abe40ca",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -545,9 +545,10 @@
     "packages/execution/engine/src/credentials/copy.rs": "90adc5a6811a69f7a456eb08fdf6c45c5ae861b9b726c2f85d22da4714da827d",
     "packages/execution/engine/src/credentials/files.rs": "59a5a6e8007d90154cd24c28c5bb90946bbe0b0d9aec15aeae9a54f85586e9d9",
     "packages/execution/engine/src/credentials/layout.rs": "8b25a6ab24db08b5ee4ef007b59b5fa43291a427ddb06e00a97b8d9ba9d1a922",
-    "packages/execution/engine/src/credentials/mod.rs": "6fefc06db9dfa28c86e497680dbbf41962f4a5e704e944ac701b5ced989bf04a",
-    "packages/execution/engine/src/credentials/ports.rs": "013c2ecb3de8ea5afb451780504fb74bafd2e180ddeb895414cd398b8761ec8e",
+    "packages/execution/engine/src/credentials/mod.rs": "9c3a3c8395478f511876191472f3e84369e9229797d258c3bc524e70e7b5eba2",
+    "packages/execution/engine/src/credentials/ports.rs": "1f6d04c2b1f55393818952ade3cc349e682c1d6011ed0d96deb8c76e88d56262",
     "packages/execution/engine/src/credentials/renew.rs": "3c60f0cb5503df2cbe50d9ce2b4463b5e6d90ddff18aa67f976af92e86e83cfe",
+    "packages/execution/engine/src/credentials/sqlite.rs": "1c86e7ef600ebfbe930b4bd4a126481688c33ef40432eb1aa8de22315c9cba85",
     "packages/execution/engine/src/credentials/store.rs": "93763dfec525951de6fb7635eff6d19456684c608e6426d95e555258fa17b422",
     "packages/execution/engine/src/lib.rs": "6559895de2183b3735e912d2f907ef31fa84e14b07ffb0ddb153ec3f92665f53",
     "packages/execution/engine/src/planning/admission.rs": "44b9688a8a8c0be27a2d56a0d4ef7fbc722fedeb7d8a0bef29a61220c7fe42f9",
@@ -593,6 +594,7 @@
     "packages/execution/engine/tests/confinement_request.rs": "fccae18d8decb885a2a3ce22a3ab8943b6efc625da00673fbafe39b851bfd3dc",
     "packages/execution/engine/tests/contract.rs": "fc9d1086d9409390a24ed28915bd0edfea4d57baf98c99ed26c70405416b5c22",
     "packages/execution/engine/tests/credentials.rs": "2fc3a4dd0404b258f28a1abbb92c70c2908e62dac7a27b8ba00c1ea3fd5f03aa",
+    "packages/execution/engine/tests/credentials_sqlite.rs": "1d3a17e00b64a2f9efcfb1b6c676e97b5dc1237d9a36b91be009e26002805c43",
     "packages/execution/engine/tests/planning.rs": "2fb55dc25e3336bf0029bc28e00c2a176575ff7d53e07a94e9b2d3c6b7a243de",
     "packages/execution/engine/tests/run_result.rs": "98880a45e8766c03eaef29a505852edb0048528caecc2ee9d9197416911d895b",
     "packages/execution/engine/tests/settlement.rs": "5258862993a9b333f20c9cf50be4f0d2c896bd06a3921b85bf5dc9afc453585a",
