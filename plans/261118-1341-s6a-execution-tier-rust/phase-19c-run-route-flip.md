@@ -76,3 +76,36 @@ macOS and windows-msvc build of the engine-linking binary green.
 Risk: the hook-enforced dispatch flow (`fgos run` from agents) breaks for every project at once. Parity on prompt, unit and
 writes shapes; landing precondition nothing in flight; phase 22 canary. Risk: Node missing makes every `--writes` run fail (it
 needs Node today through the legacy arm). Rollback: revert the phase (Node arm returns).
+
+## Windows lease decision (2026-11-20, evidence)
+
+Evidence, native `windows-latest`, run 44627498081 job "windows lock inheritance probe" (inline C# probe in
+`.github/workflows/release-assets-check.yml`; `LockFileEx` byte 0 length 1, exclusive, fail-immediately, the holder-lock
+Windows driver's call):
+
+| Probe | Result | Reading |
+|---|---|---|
+| a. child `LockFileEx` on the handle it inherited while the parent holds the lock | failed (33, `ERROR_LOCK_VIOLATION`) | the lock belongs to the parent process, not to the handle |
+| a. child `UnlockFileEx` on the inherited handle | failed (158, `ERROR_NOT_LOCKED`) | the child cannot release it either |
+| b. child, fresh handle, while the parent holds | failed (33) | a third party is excluded |
+| c. parent locks, child inherits the handle, parent is terminated; a third process locks | succeeded at +0.5 s and +3.5 s | the lock dies with the process that took it, though the handle lives on in the child |
+| d. child locks on the inherited handle, parent is terminated; a third process locks | failed (33) at +0.5 s and +3.5 s | a lock lives exactly as long as the process that took it |
+
+So on Windows a lock is never lent through a handle (the Unix fd-4 lend cannot exist) and is held only by the process
+that took it, for that process's life (matches `packages/holder-lock/rust/src/driver/windows.rs` header and
+`borrow_windows.rs`).
+
+Decision: **Rust lease-holder endpoint** (`cwdLeaseOwner`), not custody recording on the supervisor side.
+- The unit run's custody spans the whole unit run (every attempt, verify, the commit); a supervisor lives for one
+  attempt. Supervisor-side recording would make the controller release the lease and the supervisor take it again
+  (probe c/d: nothing carries a lock across processes), leaving a window where a successor is admitted between attempts.
+- The controller already holds the cwd lease in its own process (`admit_successor`, engine `unit_run::custody`), which
+  probe d shows is the only process that can hold it. The supervisor already speaks the holder's request channel
+  (`declare_via_holder`, `packages/run-supervisor/rust/src/supervise/windows.rs`; the lock-hold helper's serve loop,
+  `packages/holder-lock/rust/src/route/hold.rs`). The endpoint is that same file request/answer protocol, served by a
+  thread of the controller over its held `Handle` (`predecessor::declare` on the lease record; no new mechanism, no new
+  record, no OS handle passed).
+- Until the endpoint is built and proven on native Windows CI, engine `mutating_launch_refusal` keeps refusing a
+  Windows mutating attempt by name (`windows-cwd-lease-holder-missing`), and Windows `fgos run` stays on the Node route
+  (this pass does not flip the route). Cancel on Ctrl-C/Ctrl-Break on Windows needs a console handler, which no crate
+  installs yet; it lands with the endpoint.
