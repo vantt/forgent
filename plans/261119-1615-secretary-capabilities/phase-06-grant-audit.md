@@ -1,5 +1,8 @@
 # Phase 6: Live grant audit from Miu's sandbox
 
+## Gate
+Phases 1-5 landed, released, and Miu rotated onto that release.
+
 ## Requirements
 1. After phases 1-5 are released and Miu rotated (ask the supervisor), run from her real sandbox (or a throwaway
    secretary head): `fgos identity mint backlog`, `fgos questions list|show|answer`, `fgos session write --base`,
