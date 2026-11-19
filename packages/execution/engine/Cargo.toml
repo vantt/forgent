@@ -1,0 +1,29 @@
+[package]
+name = "fgos-execution-engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Execution's effectful half: confinement, accounts, transport, assignments, settlement and the unit run."
+
+[dependencies]
+# The pure rules stay in fgos-execution; the engine composes them with effects.
+fgos-execution = { path = "../rust" }
+fgos-checkout = { path = "../checkout" }
+fgos-run-supervisor = { path = "../../run-supervisor/rust" }
+fgos-seat-binding = { path = "../../seat-binding/rust" }
+fgos-agent-protocol = { path = "../../agent-protocol/rust" }
+fgos-terminal-control = { path = "../../terminal-control/rust" }
+fgos-session-host = { path = "../../session-host/rust" }
+fgos-run-result = { path = "../../run-result/rust" }
+fgos-git = { path = "../../git/rust" }
+fgos-process = { path = "../../process/rust" }
+fgos-config = { path = "../../config/rust" }
+fgos-durable-file = { path = "../../durable-file/rust" }
+fgos-holder-lock = { path = "../../holder-lock/rust" }
+fgos-secrets = { path = "../../secrets/rust" }
+fgos-canonical-json = { path = "../../canonical-json/rust" }
+fgos-write-scope = { path = "../../write-scope" }
+sha2 = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true, features = ["preserve_order"] }
+thiserror = { workspace = true }
