@@ -180,7 +180,7 @@
     "supervisor plans": {
       "args": {},
       "does": "as supervisor queue, running `fgos supervisor plans --json`: the plans of the trunk tip with their status, admissibility and lead head names, which needs Identity's project handle and live role holders that the sandbox cannot read",
-      "data": "the host verb's JSON data ({plans: [...], unreadable: [...]})",
+      "data": "the host verb's JSON data ({plans: [...], unreadable: [first 10 plans that break their contract], unreadableCount: <all of them>, leadsLive, maxLeads}); the list is capped so the answer fits one reply frame",
       "identity": "held",
       "rule": "refusals (verb-failed detail): the host verb's own code"
     },
@@ -248,7 +248,8 @@
     "write-outside-footprint": "run only: a writes path the lead's plan footprint (read at the trunk tip) does not cover",
     "footprint-change-refused": "land only: a lead's paths land that changes the footprint of its own plan's plan.md against the trunk tip",
     "verb-failed": "the route child failed; detail is the entry's own code (for example head-key-used, bad-persona, start-refused) or the exit",
-    "verb-timeout": "the verb ran longer than verbTimeoutMs"
+    "verb-timeout": "the verb ran longer than verbTimeoutMs",
+    "reply-too-large": "the verb answered, but its data does not fit one reply frame (maxReplyBytes); the detail names the size. A route child that sees a host answer over its own bound refuses with this code too"
   },
   "envelope": {
     "refusal": "envelope-invalid (the supervisor refuses the attempt before the pane is launched)",

@@ -481,26 +481,45 @@ test('supervisor done on an empty queue answers stopping and starts the stop of 
   assert.deepEqual(done.line.data, { done: true, argv: ['supervisor', 'done', '--json'], stopping: true });
   assert.equal(stops.length, 1);
   assert.deepEqual([stops[0].persona, stops[0].name], ['supervisor', 'proj']);
-  const echo = { hostCall: (call) => ({ status: 0, stdout: `{"data":{"argv":${JSON.stringify(call.argv)}}}\n` }) };
-  const handled = await ask('supervisor handled', { events: ['ev-1', 'ev-2', 'ev-3'] }, 'h1', echo);
-  assert.deepEqual(handled.line.data.argv, ['supervisor', 'handled', 'ev-1', 'ev-2', 'ev-3', '--json'], 'every id reaches the host verb');
-  for (const events of [[], ['-x'], 'ev-1', [1]]) assert.equal((await ask('supervisor handled', { events }, 'h2', echo)).line.code, 'bad-args');
-  assert.equal((await ask('supervisor handled', { event: 'ev-1' }, 'h3', echo)).line.code, 'bad-args', 'the single-id key is gone');
 });
+
+const echoArgv = { hostCall: (call) => ({ status: 0, stdout: `{"data":{"argv":${JSON.stringify(call.argv)}}}\n` }) };
 
 test('the confined reads supervisor queue, supervisor plans and slots run the host verb and return its JSON', async (t) => {
   const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
-  const echo = { hostCall: (call) => ({ status: 0, stdout: `{"data":{"argv":${JSON.stringify(call.argv)}}}\n` }) };
-  assert.deepEqual((await ask('supervisor queue', {}, 'q1', echo)).line.data.argv, ['supervisor', 'queue', '--json']);
-  assert.deepEqual((await ask('supervisor plans', {}, 'q2', echo)).line.data.argv, ['supervisor', 'plans', '--json']);
-  assert.deepEqual((await ask('slots', {}, 'q3', echo)).line.data.argv, ['slots', '--json']);
-  assert.equal((await ask('slots', { x: 1 }, 'q4', echo)).line.code, 'bad-args');
-  const refused = await ask('supervisor queue', {}, 'q5', { hostCall: () => ({ status: 1, stdout: '{"code":"event-store-no-repository","message":"none"}\n' }) });
-  assert.equal(refused.line.code, 'event-store-no-repository');
+  assert.deepEqual((await ask('supervisor queue', {}, 'q1', echoArgv)).line.data.argv, ['supervisor', 'queue', '--json']);
+  assert.deepEqual((await ask('supervisor plans', {}, 'q2', echoArgv)).line.data.argv, ['supervisor', 'plans', '--json']);
+  assert.deepEqual((await ask('slots', {}, 'q3', echoArgv)).line.data.argv, ['slots', '--json']);
+  assert.equal((await ask('slots', { x: 1 }, 'q4', echoArgv)).line.code, 'bad-args');
+});
+
+test('a host refusal keeps its code, from the JSON line or from stderr', async (t) => {
+  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
+  const json = await ask('supervisor queue', {}, 'q5', { hostCall: () => ({ status: 1, stdout: '{"code":"event-store-no-repository","message":"none"}\n' }) });
+  assert.equal(json.line.code, 'event-store-no-repository');
+  const stderr = await ask('supervisor handled', { events: ['nope'] }, 'q7', { hostCall: () => ({ status: 4, stdout: '', stderr: 'fgos: no event raised with id nope [event-unknown]\n' }) });
+  assert.equal(stderr.line.code, 'event-unknown');
+});
+
+test('the host answer is read as one indented document, and an answer that is no JSON or too large is refused by name', async (t) => {
+  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
   const pretty = await ask('supervisor queue', {}, 'q6', { hostCall: () => ({ status: 0, stdout: JSON.stringify({ contract: 'fgos.v1', data: { events: [{ id: 'e1' }] } }, null, 2) }) });
-  assert.deepEqual(pretty.line.data, { events: [{ id: 'e1' }] }, 'the host prints its --json answer as one indented document');
-  const onStderr = await ask('supervisor handled', { events: ['nope'] }, 'q7', { hostCall: () => ({ status: 4, stdout: '', stderr: 'fgos: no event raised with id nope [event-unknown]\n' }) });
-  assert.equal(onStderr.line.code, 'event-unknown', 'a host refusal is printed on stderr as `fgos: <message> [<code>]`');
+  assert.deepEqual(pretty.line.data, { events: [{ id: 'e1' }] });
+  const text = await ask('supervisor queue', {}, 'q8', { hostCall: () => ({ status: 0, stdout: 'queue: 2 events\n' }) });
+  assert.equal(text.line.code, 'host-output-unreadable');
+  const empty = await ask('supervisor queue', {}, 'q9', { hostCall: () => ({ status: 0, stdout: '' }) });
+  assert.equal(empty.line.code, 'host-output-unreadable');
+  const big = await ask('supervisor plans', {}, 'q10', { hostCall: () => ({ status: 0, stdout: JSON.stringify({ data: { plans: 'x'.repeat(61_000) } }) }) });
+  assert.equal(big.line.code, 'reply-too-large');
+  assert.match(big.line.message, /\d{5} bytes/);
+});
+
+test('supervisor handled sends every id to the host verb and refuses a bad id list', async (t) => {
+  const { ask } = headCase(t, { persona: 'supervisor', name: 'proj', writes: [] });
+  const handled = await ask('supervisor handled', { events: ['ev-1', 'ev-2', 'ev-3'] }, 'h1', echoArgv);
+  assert.deepEqual(handled.line.data.argv, ['supervisor', 'handled', 'ev-1', 'ev-2', 'ev-3', '--json']);
+  for (const events of [[], ['-x'], 'ev-1', [1]]) assert.equal((await ask('supervisor handled', { events }, 'h2', echoArgv)).line.code, 'bad-args');
+  assert.equal((await ask('supervisor handled', { event: 'ev-1' }, 'h3', echoArgv)).line.code, 'bad-args', 'the single-id key is gone');
 });
 
 test('supervisor done reports stopping only when the detached stop process started', async (t) => {

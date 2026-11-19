@@ -340,6 +340,23 @@ fn a_granted_request_runs_the_route_child_and_returns_its_line() {
 }
 
 #[test]
+fn an_answer_too_large_for_one_reply_frame_is_refused_by_name_and_never_dropped() {
+    // The route's line (kept up to 65536 bytes) just fits; the reply around the same data does not.
+    let served = granted(
+        "too-large",
+        r#"cat > /dev/null; printf '{"v":1,"protocol":1,"result":"done","data":{"big":"%s"}}\n' "$(head -c 65480 /dev/zero | tr '\0' a)""#,
+    );
+    let reply = ask(&served.socket, "session start");
+    assert_eq!(reply["result"], "refused", "{reply}");
+    assert_eq!(reply["code"], "reply-too-large");
+    assert!(
+        reply["detail"].as_str().unwrap().contains("bytes"),
+        "{reply}"
+    );
+    wait_for_log(&served, "refused reply-too-large");
+}
+
+#[test]
 fn a_role_identity_does_not_give_this_session_is_refused_before_the_verb_is_looked_at() {
     for holds in [Ok(false), Err("machine-id-missing".to_string())] {
         let failed = holds.is_err();
@@ -524,6 +541,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "path-outside-grant",
             "path-symlink",
             "peer-uid",
+            "reply-too-large",
             "role-not-held",
             "role-take-failed",
             "session-bind-failed",
