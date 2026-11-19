@@ -49,6 +49,38 @@ pub fn write_scope(method: String, args: Value) -> Result<Value> {
             )
             .map_err(error)?))
         }
+        "overlaps" => Ok(json!(fgos_write_scope::scopes_overlap(
+            &strings("a")?,
+            &strings("b")?
+        )
+        .map_err(error)?)),
+        "collidingPairs" => {
+            let items = args["items"]
+                .as_array()
+                .ok_or_else(|| error("invalid items"))?
+                .iter()
+                .map(|i| {
+                    Ok(fgos_write_scope::Item {
+                        id: i["id"]
+                            .as_str()
+                            .ok_or_else(|| error("invalid item id"))?
+                            .to_owned(),
+                        scopes: serde_json::from_value(i["scopes"].clone()).map_err(error)?,
+                    })
+                })
+                .collect::<Result<Vec<_>>>()?;
+            let found = fgos_write_scope::colliding_pairs(&items);
+            Ok(json!({
+                "pairs": found.pairs.iter().map(|p| json!({"a": p.a, "b": p.b, "shared": p.shared})).collect::<Vec<_>>(),
+                "problems": found.problems.iter().map(|p| {
+                    let mut v = json!({"item": p.item, "code": p.code});
+                    if let Some(e) = &p.entry { v["entry"] = json!(e); }
+                    if let Some(w) = &p.why { v["why"] = json!(w); }
+                    v
+                }).collect::<Vec<_>>(),
+                "truncated": found.truncated.as_ref().map(|t| json!({"reason": t.reason, "limit": t.limit})),
+            }))
+        }
         _ => Err(error("unknown-write-scope-method")),
     }
 }

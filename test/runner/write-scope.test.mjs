@@ -8,6 +8,7 @@ import {
   expandGenerated,
   matchesWriteScope,
   partitionPaths,
+  writeScopesOverlap,
 } from '../../src/runner/dispatch/write-scope.mjs';
 
 test('canonicalizeWriteEntry: spellings of one directory collapse to one entry', () => {
@@ -134,4 +135,31 @@ test('repeated ** collapse to one, and matching stays fast on deep paths', () =>
   assert.equal(matchesWriteScope(`${deep}/x`, ['**/*/**/*/**/*/**/*/**/y']), false);
   assert.equal(matchesWriteScope(`${deep}/y`, ['**/*/**/*/**/*/**/*/**/y']), true);
   assert.ok(Date.now() - started < 500, `took ${Date.now() - started}ms`);
+});
+
+test('writeScopesOverlap: whole scopes may overlap by literal leading segments, as spelled', () => {
+  for (const [a, b, want] of [
+    [['lib'], ['lib/a.mjs'], true],
+    [['lib/fo*'], ['lib/foo.mjs'], true],
+    [['lib/a/**'], ['lib/b/**'], false],
+    [['docs'], ['docs-old/x'], false],
+    [['lib/a*'], ['lib/b*'], true],
+    [['**'], ['anything/x'], true],
+    [['./lib/', 'zzz'], [' lib/x '], true],
+    [['a/**/**/b'], ['a/c'], true],
+    [['\ufeffdocs'], ['docs/x'], true],
+    [['\u3000src\u3000'], ['src/y'], true],
+    [['a//b', 'c'], ['a/b/**'], true],
+    [['x/y'], ['x/z', 'w'], false],
+  ]) {
+    assert.equal(writeScopesOverlap(a, b), want, `${JSON.stringify(a)} vs ${JSON.stringify(b)}`);
+    assert.equal(writeScopesOverlap(b, a), want, `symmetric ${JSON.stringify(b)} vs ${JSON.stringify(a)}`);
+  }
+});
+
+test('writeScopesOverlap: a malformed entry is refused, never dropped', () => {
+  for (const bad of ['.', '', '../x', '/x', 'a\\b', 'ab**', ':(top)x']) {
+    assert.throws(() => writeScopesOverlap([bad], ['x']), WriteScopeError, JSON.stringify(bad));
+    assert.throws(() => writeScopesOverlap(['x'], [bad]), WriteScopeError, JSON.stringify(bad));
+  }
 });

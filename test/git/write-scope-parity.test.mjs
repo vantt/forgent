@@ -12,6 +12,7 @@ const call=(method,args)=>{try{return native.writeScope(method,args);}catch(e){t
 export const canonicalizeWriteEntry=raw=>call('canonicalize',{raw});
 export const canonicalizeWrites=scope=>call('canonicalizeAll',{scope});
 export const expandGenerated=(scope,mappings=[])=>call('expand',{scope,mappings});
+export const writeScopesOverlap=(a,b)=>call('overlaps',{a,b});
 export const matchesWriteScope=(path,scope)=>typeof path==='string'&&call('matches',{path,scope});
 export const partitionPaths=(paths,scope)=>({inScope:paths.filter(p=>matchesWriteScope(p,scope)),outOfScope:paths.filter(p=>!matchesWriteScope(p,scope))});
 `;

@@ -5,11 +5,11 @@ Document type: BA-grade area specification
 Audience: Owner, maintainer, implementation agent
 Purpose: One authority for what a declared path scope means and whether two scopes can touch the same path, for one scope and for a whole set of them
 Design status: Settled by the owner in the discussion of plans/261119-0030-resource-referee-graph-write-scope-stack (decisions 1-6, 17, 19, 22); the numeric limits were measured in phase 1
-Implementation: Partial. The grammar, the matcher and the pairwise literal-prefix test exist as the crate fgos-write-scope under packages/write-scope (the move from packages/git/write-scope landed in plan phase 2); the set-level function is plan phase 3
+Implementation: Partial. The grammar, the matcher and the pairwise literal-prefix test exist as the crate fgos-write-scope under packages/write-scope (the move from packages/git/write-scope landed in plan phase 2); the set-level function `colliding_pairs` and the whole-scope `scopes_overlap` landed in plan phase 3
 Canonical: Yes for the scope below, from the day the plan lands
 Owner: Write-scope component (proposed)
 Source: packages/write-scope (crate fgos-write-scope; moved there from packages/git/write-scope in plan phase 2, name unchanged)
-Contracts: none of its own file; the numeric limits are in section 8 until plan phase 3 turns them into constants with their one owning test
+Contracts: none of its own file; the numeric limits of section 8 are constants of the crate (`MAX_ENTRY_BYTES`, `MAX_ENTRIES_PER_ITEM`, `MAX_PAIRS`, `MAX_COMPARISONS`), owned by the Rust tests in `packages/write-scope/src/lib.rs`
 Provenance: plans/261119-0030-resource-referee-graph-write-scope-stack/plan.md and reports/facts.md at base 40949614f077844005a986ca1f0f75c0c5e8f508 (2026-11-19)
 Writer type: Agent draft writer
 Canonical for: The scope-entry grammar, what a scope covers, the one may-overlap meaning, the lexical caveat, the set-level colliding-pairs function, the error policy for an entry that cannot be read and for an empty scope, and the limits of the set-level function
@@ -258,3 +258,4 @@ a `retiredBy`.
 | plan decision 19 | Deterministic pairwise comparison, no trie, no measurement gate | section 6 |
 | plan decision 22 | The contract is lexical: case folding, Unicode normalisation and symlinks are outside it | section 5.2 |
 | phase 1 | The meaning is containment by literal leading segments; the numeric limits above were fixed from measured maxima | sections 5.1, 8 |
+| phase 3 | `colliding_pairs` is a pairwise comparison over canonical prefixes, proven against a naive oracle in Rust; entries are deduplicated by canonical form keeping the first declared spelling; an item with no entries is `scope-empty` and skipped, an item whose entries are all unreadable is reported and compares nothing; the caps cut exactly at the limit (reaching it without exceeding it is not truncation). The addon exposes whole-scope `overlaps` and `collidingPairs`; `writeScopesOverlap` joins the one golden suite, run by Node and through the addon | sections 6, 7, 8, 9 |
