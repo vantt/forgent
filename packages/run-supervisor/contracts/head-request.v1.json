@@ -22,7 +22,7 @@
   },
   "frames": {
     "REQUEST": { "direction": "client -> supervisor", "fields": { "type": "REQUEST", "id": "string, 1 to 64 characters of letters, digits, '.', '_' and '-'", "verb": "string, one of verbs", "args": "object" }, "rule": "one connection carries one request" },
-    "REPLY": { "direction": "supervisor -> client", "fields": { "type": "REPLY", "id": "the request's id, null when no valid id was read", "result": { "enum": ["done", "refused"] }, "data": "object, present when done: the verb's own result", "code": "refusal code, present when refused", "detail": "string, optional" } }
+    "REPLY": { "direction": "supervisor -> client", "fields": { "type": "REPLY", "id": "the request's id, null when no valid id was read", "result": { "enum": ["done", "refused"] }, "data": "object, present when done: the verb's own result", "code": "refusal code, present when refused", "detail": "string, optional", "message": "string, optional: present only on a verb-failed refusal, the route child's own text (the reason behind its code, for example the persona names a persona-not-found lists), control characters replaced and cut to 300 characters" } }
   },
   "verbs": {
     "session start": {
@@ -215,7 +215,7 @@
   "order": [
     "peer uid",
     "one request frame",
-    "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed). For `session answered`, `session restore role` and `session bind session` the step is instead: this attempt's own session is registered and live (session-not-registered, failing closed the same way)",
+    "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed; role-pending-rotation instead when the live holder is this head's own earlier generation). For `session answered`, `session restore role` and `session bind session` the step is instead: this attempt's own session is registered and live (session-not-registered, failing closed the same way)",
     "verb: must be one of envelope.session.verbs (verb-not-granted)",
     "peer (session write only): the connecting process runs under the gate (caller-not-under-gate)",
     "busy: at most one request runs at a time (busy)",
@@ -232,6 +232,7 @@
     "peer-uid": "the connection is not from the supervisor's own user",
     "bad-frame": "oversize, not one JSON object, no REQUEST type, an id outside the rule, a verb that is not a string or args that is not an object",
     "role-not-held": "Identity does not give this attempt's session the envelope's role; when Identity could not answer the detail is its refusal code only (its text goes to supervisor.log, never to the client)",
+    "role-pending-rotation": "a role-gated verb from a rotation successor (same persona and name as the live holder, a higher generation) whose role its live predecessor still holds, the move of `session answered` or `session restore role` not done yet; detail names the predecessor. Retryable: the client waits with backoff for at most 60 s, then reports the code. Any other caller without the role stays role-not-held",
     "verb-not-granted": "the verb is not in envelope.session.verbs",
     "busy": "another request is running, or another large request (over maxReplyBytes) is being read or run",
     "session-not-registered": "session answered only: Identity does not list this attempt's own session as live; when Identity could not answer the detail is its refusal code only",

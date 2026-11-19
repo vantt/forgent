@@ -21,9 +21,9 @@ use fgos_identity::resolve::{HeadRef, WriterKey, ENV_ORDER};
 use fgos_process::{facts, ProcId};
 use fgos_run_supervisor::go_channel::{read_frame, write_frame, MAX_FRAME_BYTES};
 use fgos_run_supervisor::head_request::{
-    identity_bind, identity_holds, identity_registered, identity_take, CatchUpRefusal, Config,
-    HeadRequests, HoldError, PublishRefusal, WritePublisher, BIND_VERB, MAX_REQUEST_BYTES,
-    MAX_REQUEST_VALUES, WRITE_VERB,
+    identity_bind, identity_holds, identity_pending_rotation, identity_registered, identity_take,
+    CatchUpRefusal, Config, HeadRequests, HoldError, PublishRefusal, WritePublisher, BIND_VERB,
+    MAX_REQUEST_BYTES, MAX_REQUEST_VALUES, WRITE_VERB,
 };
 use serde_json::{json, Value};
 
@@ -69,6 +69,8 @@ fn serve(
 /// a session write's caller must run under, checked for real (by default this test process, the one that connects).
 struct Identity {
     registered: Result<bool, String>,
+    /// What the pending-rotation check answers when the role is not held: the predecessor's name, or none.
+    pending: Option<String>,
     take: Result<(), String>,
     took: Arc<Mutex<u32>>,
     gate: HeadRef,
@@ -136,6 +138,7 @@ impl Default for Identity {
     fn default() -> Identity {
         Identity {
             registered: Ok(true),
+            pending: None,
             take: Ok(()),
             took: Arc::new(Mutex::new(0)),
             gate: head_of(std::process::id()),
@@ -186,6 +189,10 @@ fn serve_with(
                 code,
                 detail: "internal identity text".into(),
             })
+        }),
+        pending_rotation: Box::new({
+            let pending = identity.pending.clone();
+            move || Ok(pending.clone())
         }),
         registered: Box::new({
             let registered = identity.registered.clone();
@@ -539,6 +546,8 @@ fn a_failing_route_child_is_verb_failed_with_its_own_code_in_the_detail() {
     assert_eq!(reply["result"], "refused");
     assert_eq!(reply["code"], "verb-failed");
     assert_eq!(reply["detail"], "head-key-used");
+    // The route's own text reaches the client, on one line and bounded.
+    assert_eq!(reply["message"], "x");
 
     let silent = granted("silent", "cat > /dev/null; exit 3");
     let reply = ask(&silent.socket, "session start");
@@ -596,6 +605,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "peer-uid",
             "reply-too-large",
             "role-not-held",
+            "role-pending-rotation",
             "role-take-failed",
             "session-bind-failed",
             "session-not-registered",
@@ -1061,6 +1071,7 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_r
         writes: Vec::new(),
         verb_timeout: Duration::from_secs(5),
         holds_role: Box::new(move || identity_holds(&r1, role, "att-bind", Some(&g1))),
+        pending_rotation: Box::new(|| Ok(None)),
         registered: Box::new(move || identity_registered(&r2, "att-bind", Some(&g2))),
         take_role: Box::new(move |take| identity_take(&r3, &r3, role, "att-bind", &g3, take)),
         bind_session: Box::new(move |args, peer| {
@@ -1624,4 +1635,102 @@ fn a_second_large_request_is_busy_before_its_body_is_read() {
     // A small request is not held by the large slot.
     assert_eq!(ask(&served.socket, "session start")["result"], "done");
     drop(first);
+}
+
+// ---- a rotation successor waits for its role --------------------------------------------------------------
+
+/// Registers `writer_id` as generation `gen` of head `planner-x`, holding `roles`.
+fn register_head(root: &Path, writer_id: &str, gen: u64, roles: &[&str]) {
+    let pid = std::process::id();
+    let head = HeadRef {
+        pid,
+        start_time: facts::identity_of(ProcId(pid)).unwrap().start_time,
+    };
+    let key = WriterKey {
+        source: ENV_ORDER[0],
+        value: writer_id,
+    };
+    let ids = fgos_identity::directory::Ids {
+        head: Some(fgos_identity::directory::HeadIds {
+            persona: "planner".into(),
+            name: "x".into(),
+            gen,
+        }),
+        ..Default::default()
+    };
+    let roles: Vec<String> = roles.iter().map(|r| r.to_string()).collect();
+    fgos_identity::directory::register_writer(root, None, &key, &head, &roles, false, Some(&ids))
+        .unwrap_or_else(|r| panic!("register {writer_id}: {} {}", r.reason, r.detail));
+}
+
+#[test]
+fn a_successor_whose_role_is_still_held_by_its_live_predecessor_is_pending_rotation_until_the_role_moves(
+) {
+    let role = "head:planner-x";
+    let root = state_root("pending-rotation", true);
+    register_head(&root, "att-old", 1, &[role]);
+    register_head(&root, "att-new", 2, &[]);
+    let own = |gen| fgos_identity::directory::HeadIds {
+        persona: "planner".into(),
+        name: "x".into(),
+        gen,
+    };
+    assert_eq!(identity_holds(&root, role, "att-new", None), Ok(false));
+    let pending = identity_pending_rotation(&root, role, Some(&own(2))).unwrap();
+    assert!(
+        pending
+            .as_deref()
+            .is_some_and(|d| d.contains("planner-x generation 1")),
+        "{pending:?}"
+    );
+    // The predecessor itself, another head's attempt and an attempt that names no head are never pending.
+    assert_eq!(
+        identity_pending_rotation(&root, role, Some(&own(1))),
+        Ok(None)
+    );
+    assert_eq!(identity_pending_rotation(&root, role, None), Ok(None));
+    let other = fgos_identity::directory::HeadIds {
+        persona: "planner".into(),
+        name: "y".into(),
+        gen: 2,
+    };
+    assert_eq!(
+        identity_pending_rotation(&root, role, Some(&other)),
+        Ok(None)
+    );
+    // After the move the successor holds the role and nothing is pending.
+    let pid = std::process::id();
+    let gate = HeadRef {
+        pid,
+        start_time: facts::identity_of(ProcId(pid)).unwrap().start_time,
+    };
+    identity_take(&root, &root, role, "att-new", &gate, true).expect("take");
+    assert_eq!(identity_holds(&root, role, "att-new", None), Ok(true));
+    assert_eq!(
+        identity_pending_rotation(&root, role, Some(&own(2))),
+        Ok(None)
+    );
+}
+
+#[test]
+fn a_role_gated_verb_from_a_pending_successor_is_refused_role_pending_rotation_not_role_not_held() {
+    let identity = Identity {
+        pending: Some("planner-x generation 1 still holds the role".into()),
+        ..Identity::default()
+    };
+    let served = serve_with(
+        "pending-rotation-route",
+        DONE_LINE,
+        Ok(false),
+        identity,
+        &["session start"],
+        Duration::from_secs(5),
+    );
+    let reply = ask(&served.socket, "session start");
+    assert_eq!(reply["code"], "role-pending-rotation");
+    assert_eq!(
+        reply["detail"],
+        "planner-x generation 1 still holds the role"
+    );
+    assert!(!served.dir.join("argv").exists(), "no route child ran");
 }
