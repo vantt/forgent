@@ -273,3 +273,21 @@ eventStore:
     # @fgos:doc Seconds between syncs with the remote; 0 turns the timer off. Minimum: 0. Default: 300.
     # @fgos:why [d1289d42-7a12-4c3e-a3bc-dc1d687aaf99] owner 2026-11-06: cross-machine mail should arrive in about a minute; an empty fetch measured 0.64 s
     intervalSec: 60
+# @fgos:doc How a finished plan branch lands on the trunk: the gates it must pass and the files it regenerates.
+land:
+  # @fgos:doc Gates a landing runs, each a command and optional path globs; a gate with when runs only if a landed path matches one, and without when it always runs. Default: [].
+  # @fgos:why [e5f414aa-bf4e-4ec8-a51e-149fed09b1eb] this repo's land gates (the land-branch.sh checks) run only for code paths, so a docs, backlog or plans write publishes with no gate
+  gates:
+    - run: node scripts/run-tests.mjs test/architecture.test.mjs test/setup/git-mutation-census.test.mjs test/scripts/doc-health.test.mjs test/scripts/check-decision-citation-drift.test.mjs test/scripts/mailbox-behaviour-v7n.test.mjs test/rust-host/command-routes.test.mjs test/cli/fgos-manifest.test.mjs {tests}
+      when:
+        - src/**
+        - apps/**
+        - packages/**
+        - bin/**
+        - scripts/**
+        - test/**
+    - run: cargo fmt --all --check
+      when:
+        - apps/**/*.rs
+        - packages/**/*.rs
+        - test/**/*.rs
