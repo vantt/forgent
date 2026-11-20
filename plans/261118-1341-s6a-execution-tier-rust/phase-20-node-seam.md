@@ -79,7 +79,7 @@ survivors need no edit here.
   `test/runner/execution/**` files importing one of the 23, `test/run-supervisor/attempt-steps.test.mjs` (imports
   `attempt-step.mjs`, `steps/settle-attempt.mjs`), `test/workflow/**`, `test/helpers/{run-unit-with-port,run-unit-repo-fixture}.mjs`
   (`execution/run.mjs`), the test importers outside those directories (scan on `f031ab0c8`):
-  `test/convention/seat-id.test.mjs` (`handoff-refs.mjs`; its `seat-resolver.mjs` import switches to the addon too), `test/portfolio/work-questions.test.mjs`,
+  `test/convention/seat-id.test.mjs` (`handoff-refs.mjs`; its `seat-resolver.mjs` import switches to the addon too),
   `test/seat-binding/client.test.mjs`, `test/session-host/**`, and the other files phase 00 §6 assigns here are retired,
   switched or moved (report table). The other 13 importers in `test/run-supervisor/` and the helpers that import only
   phase 21's files (`test/helpers/{declared-assignment,ownership-marker,packaged-definitions,work-seat-config,executor-model-vectors.helper}.mjs`)
@@ -91,6 +91,8 @@ survivors need no edit here.
   switch to the client or the door here; `bind.mjs` keeps only its dispatch importers and goes in phase 21.
 
 - Precondition (supervisor 2026-11-19): SECRETARY-CAPS phase 9 (rotation race fix in src/session-rotation/rotate.mjs, src/session-host/head-start.mjs, test/session-rotation/*, identity directory.rs) is in main first; build on it, else tell the supervisor. S5's runner_check.rs js_trim/js_number/js_json copies and its private confinement policy-id list fold into the shared fgos-execution helpers when this phase touches runner_check.rs.
+
+- Deferred to plan 261120-0625 (supervisor 2026-11-20): before editing any of `test/portfolio/work-questions.test.mjs`, `test/runner/dispatch-confinement-backend-p03.test.mjs`, `test/runner/dispatch-confinement-machine-private.test.mjs`, `test/runner/dispatch-confinement-policies.test.mjs`, `test/session-host/head-start.test.mjs`, `test/session-host/head-permission-mode.test.mjs`, `src/runner/agent-roster.mjs`, re-add it to this phase's footprint (plan.md frontmatter and row) and rebase onto whatever 0625 has landed in it.
 
 ## Footprint
 
@@ -113,7 +115,7 @@ only, not `test/run-supervisor/**`); of `test/session-host/` only `head-start` a
 ## Validation
 
 `ls` of each of the 23 files fails; `node scripts/run-tests.mjs` over `test/workflow/**`,
-`test/runner/loop*.test.mjs`, `test/runner/operation-choice.test.mjs`, `test/session-host/head-start.test.mjs` and every
+`test/runner/loop*.test.mjs`, `test/runner/operation-choice.test.mjs` and every
 test importing a switched file; `test/architecture.test.mjs`; lead-rules gates.
 
 ## Risk and rollback
