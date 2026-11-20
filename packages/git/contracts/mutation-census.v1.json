@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f28f5a04902625ab27764cba26123e6420a43356b41c0940f8c86e66fbc361a3",
+  "payloadDigest": "4b90775fe7efbda599ac425dbea7aeb2b015bcea8b7687d8e2406a2bb082bce9",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1209,7 +1209,7 @@
     "packages/supervision/rust/src/supervisor.rs": "dde5f8af422b134edb3322bfd8883f0fb0997e7c590808f012639952c3e2d7c4",
     "packages/supervision/rust/src/wake.rs": "a13206df2d30b25293db75f080d6de26472069a1c47aa72953b03b47efe6576b",
     "packages/supervision/rust/src/watcher.rs": "6c9da881261aaa866e5b89465b2a5c80a14997e8fbf6a96d82aa47a69a34fae1",
-    "packages/supervision/rust/tests/definitions.rs": "6e591944d7d5e4bd0693c8982a102312fde798b02909f2dea01cd7e9469e5bda",
+    "packages/supervision/rust/tests/definitions.rs": "f464020d91fa602bb22cf710422aa4ae49e07269f253ddd802a5d0d866f93af5",
     "packages/supervision/rust/tests/discussion_source.rs": "f083e37ab0509dd978b17e1982323b8e1d2aa3000c02bb44d418e228fa140848",
     "packages/supervision/rust/tests/land.rs": "6d2509a9c02a0d00d09e450a9976369e550ca7797fa373eba65321e8f0ee16cd",
     "packages/supervision/rust/tests/portfolio.rs": "55b779e72ad9328e52fd36ed6969929dfc6cf2135e498bd128b428d8d80f5e62",

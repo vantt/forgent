@@ -1,0 +1,41 @@
+{
+  "name": "session-idle",
+  "requires": [
+    "fgos.session.activity"
+  ],
+  "params": {
+    "limit": {
+      "configKey": "watcher.sessionIdleLimit"
+    }
+  },
+  "query": {
+    "kind": [
+      "fgos.session.activity"
+    ],
+    "by": [
+      "subject.id"
+    ],
+    "agg": [
+      "count",
+      "max:ts"
+    ],
+    "having": [
+      {
+        "lhs": {
+          "agg": {
+            "agg": "count"
+          }
+        },
+        "op": "gt",
+        "rhs": {
+          "param": "limit"
+        }
+      }
+    ]
+  },
+  "row": {
+    "kind": "session-idle",
+    "reason": "a session has been idle",
+    "nextCommand": "fgos supervisor plans"
+  }
+}

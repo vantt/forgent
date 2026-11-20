@@ -1,0 +1,48 @@
+{
+  "name": "session-gone",
+  "requires": [
+    "fgos.head.state"
+  ],
+  "params": {
+    "limit": {
+      "configKey": "watcher.sessionGoneLimit"
+    }
+  },
+  "query": {
+    "kind": [
+      "fgos.head.state"
+    ],
+    "where": [
+      {
+        "field": "fgos.head.state",
+        "op": "eq",
+        "value": "gone"
+      }
+    ],
+    "by": [
+      "subject.id"
+    ],
+    "agg": [
+      "count",
+      "max:ts"
+    ],
+    "having": [
+      {
+        "lhs": {
+          "agg": {
+            "agg": "count"
+          }
+        },
+        "op": "gt",
+        "rhs": {
+          "param": "limit"
+        }
+      }
+    ]
+  },
+  "row": {
+    "kind": "session-gone",
+    "reason": "a session has gone",
+    "nextCommand": "fgos supervisor plans"
+  }
+}

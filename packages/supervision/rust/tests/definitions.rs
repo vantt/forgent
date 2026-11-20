@@ -11,7 +11,7 @@ use fgos_observe::{ObserveRequest, RecordSource};
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 
-const RAISED: [&str; 9] = [
+const RAISED: [&str; 12] = [
     "plan-became-ready",
     "plan-done",
     "plan-priority-changed",
@@ -21,6 +21,9 @@ const RAISED: [&str; 9] = [
     "discussion-settled",
     "supervisor-wake-failed",
     "supervisor-stuck",
+    "session-gone",
+    "session-idle",
+    "session-no-result",
 ];
 const QUESTIONS: [&str; 1] = ["question-answered"];
 const PACE: [&str; 3] = ["watcher-active", "watcher-overdue", "supervisor-idle-burn"];
@@ -94,13 +97,17 @@ fn scratch(name: &str) -> PathBuf {
 }
 
 /// The declarations of the upstream kinds, read from the files that own them.
-const UPSTREAM_KINDS: [(&str, &str); 3] = [
+const UPSTREAM_KINDS: [(&str, &str); 4] = [
     (
         "questions.json",
         "packages/questions/rust/observe-kinds.json",
     ),
     ("heads-and-plans.json", "apps/fgos/observe-kinds.json"),
     ("runs.json", "packages/run-result/rust/observe-kinds.json"),
+    (
+        "transcripts.json",
+        "packages/observe/rust/transcript-kinds.json",
+    ),
 ];
 
 /// A project root holding the upstream kinds as their owners declare them, this crate's own kinds and `lines`.
@@ -399,6 +406,9 @@ fn a_definition_whose_required_kind_is_undeclared_is_unmeasured_not_zero_rows() 
                 ("watcher.wakeFailureLimit", 3.0),
                 ("watcher.stuckWakeLimit", 4.0),
                 ("watcher.overdueFactor", 3.0),
+                ("watcher.sessionGoneLimit", 0.0),
+                ("watcher.sessionIdleLimit", 0.0),
+                ("watcher.sessionNoResultLimit", 0.0),
             ]),
         );
         assert_eq!(

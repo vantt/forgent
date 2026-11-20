@@ -62,3 +62,18 @@ properties:
     type: integer
     minimum: 1
     x-fgos-scope: both
+  sessionGoneLimit:
+    description: Consecutive gone states before a session-gone row is raised.
+    type: integer
+    minimum: 0
+    x-fgos-scope: both
+  sessionIdleLimit:
+    description: Consecutive idle periods before a session-idle row is raised.
+    type: integer
+    minimum: 0
+    x-fgos-scope: both
+  sessionNoResultLimit:
+    description: Consecutive runs without a result before a session-no-result row is raised.
+    type: integer
+    minimum: 0
+    x-fgos-scope: both
