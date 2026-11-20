@@ -79,6 +79,18 @@ pub enum ConventionError {
     Io(String),
 }
 
+pub fn is_valid_backlog_id(id: &str) -> bool {
+    id.len() == 12
+        && id.starts_with("p-")
+        && id[2..].bytes().all(|b| matches!(b, b'a'..=b'z' | b'2'..=b'7'))
+}
+
+pub fn is_valid_discussion_id(id: &str) -> bool {
+    id.len() == 13
+        && id.starts_with("ds-")
+        && id[3..].bytes().all(|b| matches!(b, b'a'..=b'z' | b'2'..=b'7'))
+}
+
 pub fn convention_name(input: &NameInput<'_>) -> Result<NameOutcome, ConventionError> {
     convention_name_with_rules(packaged_rules(), input)
 }
@@ -89,34 +101,84 @@ pub fn convention_name_with_rules(
 ) -> Result<NameOutcome, ConventionError> {
     let rule = rules
         .by_kind(input.kind)
+        .or_else(|| match input.kind {
+            "backlog" if input.slug.is_empty() || input.slug == "index" => {
+                rules.by_kind("backlog-index")
+            }
+            "backlog" => rules.by_kind("backlog-item"),
+            "index" => rules.by_kind("backlog-index"),
+            _ => None,
+        })
         .filter(|rule| rule.shape == RuleShape::NameTemplate)
         .ok_or_else(|| ConventionError::InvalidKind(input.kind.to_owned()))?;
-    let slug = normalize_slug(input.slug).ok_or(ConventionError::InvalidSlug)?;
-    let artifact_type = match rule
+    let template = rule
         .template
         .as_deref()
-        .unwrap_or_default()
-        .contains("{type}")
-    {
-        true => Some(normalize_type(
-            input.artifact_type.ok_or(ConventionError::InvalidType)?,
-        )?),
-        false => None,
-    };
+        .ok_or_else(|| ConventionError::InvalidKind(input.kind.to_owned()))?;
+
     let (at, offset, stamp) = resolve_time(input)?;
-    let name = rule
-        .template
-        .as_deref()
-        .ok_or_else(|| ConventionError::InvalidKind(input.kind.to_owned()))?
-        .replace("{type}", artifact_type.as_deref().unwrap_or_default())
-        .replace("{YYMMDD-HHMM}", &stamp)
-        .replace("{slug}", &slug);
+
+    let name = if template.contains("{id}") {
+        let (id, raw_slug) = parse_id_and_slug(rule.kind.as_str(), input)?;
+        let slug = normalize_slug(raw_slug).ok_or(ConventionError::InvalidSlug)?;
+        template.replace("{id}", id).replace("{slug}", &slug)
+    } else if template.contains("{YYMMDD-HHMM}") {
+        let slug = normalize_slug(input.slug).ok_or(ConventionError::InvalidSlug)?;
+        let artifact_type = match template.contains("{type}") {
+            true => Some(normalize_type(
+                input.artifact_type.ok_or(ConventionError::InvalidType)?,
+            )?),
+            false => None,
+        };
+        template
+            .replace("{type}", artifact_type.as_deref().unwrap_or_default())
+            .replace("{YYMMDD-HHMM}", &stamp)
+            .replace("{slug}", &slug)
+    } else if template.contains("{slug}") {
+        let slug = normalize_slug(input.slug).ok_or(ConventionError::InvalidSlug)?;
+        template.replace("{slug}", &slug)
+    } else {
+        template.to_owned()
+    };
+
     Ok(NameOutcome {
         kind: rule.kind.clone(),
         name,
         at,
         offset,
     })
+}
+
+fn parse_id_and_slug<'a>(
+    kind: &str,
+    input: &'a NameInput<'_>,
+) -> Result<(&'a str, &'a str), ConventionError> {
+    if kind == "backlog-item" || kind == "backlog" {
+        if let Some(artifact_type) = input.artifact_type {
+            if is_valid_backlog_id(artifact_type) {
+                return Ok((artifact_type, input.slug));
+            }
+        }
+        if input.slug.len() >= 14
+            && is_valid_backlog_id(&input.slug[..12])
+            && input.slug.as_bytes()[12] == b'-'
+        {
+            return Ok((&input.slug[..12], &input.slug[13..]));
+        }
+    } else if kind == "discussion" {
+        if let Some(artifact_type) = input.artifact_type {
+            if is_valid_discussion_id(artifact_type) {
+                return Ok((artifact_type, input.slug));
+            }
+        }
+        if input.slug.len() >= 15
+            && is_valid_discussion_id(&input.slug[..13])
+            && input.slug.as_bytes()[13] == b'-'
+        {
+            return Ok((&input.slug[..13], &input.slug[14..]));
+        }
+    }
+    Err(ConventionError::InvalidSlug)
 }
 
 pub fn convention_path(
@@ -126,6 +188,14 @@ pub fn convention_path(
     let rules = packaged_rules();
     let rule = rules
         .by_kind(input.kind)
+        .or_else(|| match input.kind {
+            "backlog" if input.slug.is_empty() || input.slug == "index" => {
+                rules.by_kind("backlog-index")
+            }
+            "backlog" => rules.by_kind("backlog-item"),
+            "index" => rules.by_kind("backlog-index"),
+            _ => None,
+        })
         .filter(|rule| rule.shape == RuleShape::NameTemplate)
         .ok_or_else(|| ConventionError::InvalidKind(input.kind.to_owned()))?;
     let named = convention_name_with_rules(rules, input)?;
@@ -360,6 +430,27 @@ fn check_path(rules: &RuleSet, path: &str) -> Option<Violation> {
         });
     }
     let file_name = path.rsplit('/').next().unwrap_or(path);
+    if file_name.ends_with(".md") && looks_like_named_file(file_name) {
+        let is_in_report_root = rules
+            .by_kind("report")
+            .is_some_and(|r| r.roots.iter().any(|root| path.starts_with(root.as_str())));
+        let is_in_journal_root = rules
+            .by_kind("journal")
+            .is_some_and(|r| r.roots.iter().any(|root| path.starts_with(root.as_str())));
+        let is_in_plan = rules
+            .rules
+            .iter()
+            .filter(|rule| rule.shape == RuleShape::NameTemplate)
+            .any(|rule| accepted_plan_location(rule, path));
+        if !is_in_report_root && !is_in_journal_root && !is_in_plan {
+            let report = rules.by_kind("report")?;
+            return Some(violation(
+                path,
+                "wrong-location",
+                &format!("recognized {} is outside an accepted location", report.kind),
+            ));
+        }
+    }
     let scoped = rules
         .rules
         .iter()
@@ -411,11 +502,30 @@ fn accepted_plan_location(rule: &Rule, path: &str) -> bool {
 }
 
 fn validate_scoped(rule: &Rule, root: &str, path: &str, file_name: &str) -> Option<Violation> {
+    let template = rule.template.as_deref().expect("validated name rule");
+    if template.contains('/') {
+        let Some(rel) = path.strip_prefix(root) else {
+            return Some(violation(
+                path,
+                "pattern-mismatch",
+                "name does not match an accepted template",
+            ));
+        };
+        let match_result = match_nested_template(template, rel);
+        return match match_result {
+            TemplateMatch::Valid => None,
+            _ => Some(violation(
+                path,
+                "pattern-mismatch",
+                "name does not match an accepted template",
+            )),
+        };
+    }
     if path[root.len()..].contains('/') {
         return None;
     }
     let result = std::iter::once(match_template(
-        rule.template.as_deref().expect("validated name rule"),
+        template,
         file_name,
         false,
     ))
@@ -450,9 +560,43 @@ enum TemplateMatch {
 fn match_template(template: &str, file_name: &str, allow_gh_type: bool) -> TemplateMatch {
     if template.contains("{YYMMDD-HHMM}") {
         match_short_timestamp_template(template, file_name, allow_gh_type)
+    } else if template.contains("{id}") {
+        match_id_template(template, file_name)
+    } else if template == file_name {
+        TemplateMatch::Valid
     } else {
         TemplateMatch::NoMatch
     }
+}
+
+fn match_id_template(template: &str, file_name: &str) -> TemplateMatch {
+    if template == "{id}-{slug}.md" {
+        if let Some(stem) = file_name.strip_suffix(".md") {
+            if stem.len() >= 14 && is_valid_backlog_id(&stem[..12]) && stem.as_bytes()[12] == b'-' {
+                let slug = &stem[13..];
+                if normalize_slug(slug).as_deref() == Some(slug) {
+                    return TemplateMatch::Valid;
+                }
+            }
+        }
+    }
+    TemplateMatch::NoMatch
+}
+
+fn match_nested_template(template: &str, rel: &str) -> TemplateMatch {
+    if template == "{id}-{slug}/DISCUSSION.md" {
+        let parts: Vec<&str> = rel.split('/').collect();
+        if parts.len() == 2 && parts[1] == "DISCUSSION.md" {
+            let dir = parts[0];
+            if dir.len() >= 15 && is_valid_discussion_id(&dir[..13]) && dir.as_bytes()[13] == b'-' {
+                let slug = &dir[14..];
+                if normalize_slug(slug).as_deref() == Some(slug) {
+                    return TemplateMatch::Valid;
+                }
+            }
+        }
+    }
+    TemplateMatch::NoMatch
 }
 
 fn match_compatibility(rule: &Rule, compatibility: &str, file_name: &str) -> TemplateMatch {

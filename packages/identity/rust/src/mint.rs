@@ -2,7 +2,7 @@
 //! two machines never mint the same work item, decision number or backlog id
 //! (docs/platform/identity/spec.md, section 4a).
 //!
-//! Random kinds (`work`, `backlog`, `question`) are `<prefix>-<10 base32>`: 50 random bits,
+//! Random kinds (`work`, `backlog`, `question`, `discussion`) are `<prefix>-<10 base32>`: 50 random bits,
 //! no state, never derived from content. Sequence kinds (`d-adr`,
 //! `decision-file`) keep their exact format and are claimed one number at a
 //! time from a counter ref through the Git component.
@@ -19,6 +19,7 @@ pub enum RandomKind {
     Work,
     Backlog,
     Question,
+    Discussion,
 }
 
 impl RandomKind {
@@ -27,6 +28,7 @@ impl RandomKind {
             RandomKind::Work => "tsk",
             RandomKind::Backlog => "p",
             RandomKind::Question => "q",
+            RandomKind::Discussion => "ds",
         }
     }
 }
@@ -64,7 +66,14 @@ pub enum Kind {
 }
 
 /// The kind names, in the order they are listed to a caller.
-pub const KIND_NAMES: &[&str] = &["work", "backlog", "d-adr", "decision-file", "question"];
+pub const KIND_NAMES: &[&str] = &[
+    "work",
+    "backlog",
+    "d-adr",
+    "decision-file",
+    "question",
+    "discussion",
+];
 
 impl Kind {
     pub fn parse(name: &str) -> Option<Kind> {
@@ -74,6 +83,7 @@ impl Kind {
             "d-adr" => Kind::Sequence(SequenceKind::DAdr),
             "decision-file" => Kind::Sequence(SequenceKind::DecisionFile),
             "question" => Kind::Random(RandomKind::Question),
+            "discussion" => Kind::Random(RandomKind::Discussion),
             _ => return None,
         })
     }
@@ -83,6 +93,7 @@ impl Kind {
             Kind::Random(RandomKind::Work) => "work",
             Kind::Random(RandomKind::Backlog) => "backlog",
             Kind::Random(RandomKind::Question) => "question",
+            Kind::Random(RandomKind::Discussion) => "discussion",
             Kind::Sequence(kind) => kind.counter(),
         }
     }

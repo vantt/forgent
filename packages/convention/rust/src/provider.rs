@@ -122,10 +122,7 @@ pub fn dispatch(request: &ConventionRequest) -> Result<serde_json::Value, Conven
                     .as_deref()
                     .ok_or_else(|| ConventionError::InvalidKind(String::new()))?,
                 artifact_type: request.artifact_type.as_deref(),
-                slug: request
-                    .slug
-                    .as_deref()
-                    .ok_or(ConventionError::InvalidSlug)?,
+                slug: request.slug.as_deref().unwrap_or(""),
                 at: request.at.as_deref(),
                 now_millis,
                 local_offset_seconds: local_offset_seconds(),
