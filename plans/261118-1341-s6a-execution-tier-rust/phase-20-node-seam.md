@@ -94,6 +94,8 @@ survivors need no edit here.
 
 - Deferred to plan 261120-0625 (supervisor 2026-11-20): before editing any of `test/portfolio/work-questions.test.mjs`, `test/runner/dispatch-confinement-backend-p03.test.mjs`, `test/runner/dispatch-confinement-machine-private.test.mjs`, `test/runner/dispatch-confinement-policies.test.mjs`, `test/session-host/head-start.test.mjs`, `test/session-host/head-permission-mode.test.mjs`, `src/runner/agent-roster.mjs`, re-add it to this phase's footprint (plan.md frontmatter and row) and rebase onto whatever 0625 has landed in it.
 
+- Deferred to plan 261120-1547 (session start task binding, lead:BIND; supervisor 2026-11-21): before editing `src/session-host/head-start.mjs`, re-add it to this phase's footprint (plan.md frontmatter and row) and rebase onto BIND's landed change.
+
 ## Footprint
 
 As the plan table row 20 (the 23 files by name, never the two directories; `test/run-supervisor/attempt-steps.test.mjs`
