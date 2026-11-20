@@ -25,6 +25,9 @@ pub use contract::*;
 pub use provider::{
     ObserveProvider, ObserveWiring, OBSERVE_FRICTION_DESCRIPTOR, OBSERVE_METRICS_DESCRIPTOR,
 };
+pub use record::store::{
+    parse_retention_duration, prune, prune_with_lock_wait, PruneError, PruneReport, RecordDoor,
+};
 pub use shard::{shard_path, writer_shard_name};
 pub use store_lock::{
     acquire_store_lock, acquire_store_lock_within, ObserveLockError, StoreLockGuard,

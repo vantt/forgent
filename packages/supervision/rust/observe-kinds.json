@@ -12,7 +12,11 @@
     },
     "fgos.discussion.from": { "type": "string" },
     "fgos.discussion.to": { "type": "string" },
-    "fgos.discussion.path": { "type": "string" }
+    "fgos.discussion.path": { "type": "string" },
+    "fgos.coordination.act": { "type": "string", "values": ["handoff", "chore", "wake", "ask", "replace", "tune", "type", "read"] },
+    "fgos.coordination.from": { "type": "string" },
+    "fgos.coordination.to": { "type": "string" },
+    "fgos.coordination.outcome": { "type": "string" }
   },
   "measures": {
     "fgos.watcher.interval": { "unit": "s", "aggs": ["max", "p50"] },
@@ -44,6 +48,18 @@
       "subjects": ["discussion"],
       "attrs": ["fgos.discussion.from", "fgos.discussion.to", "fgos.discussion.path"],
       "measures": []
+    },
+    "fgos.coordination.act": {
+      "subjects": ["session", "event"],
+      "attrs": [
+        "fgos.coordination.act",
+        "fgos.coordination.from",
+        "fgos.coordination.to",
+        "fgos.coordination.outcome"
+      ],
+      "measures": [],
+      "prunable": true,
+      "retention": "30d"
     }
   }
 }

@@ -43,6 +43,10 @@ pub struct KindDef {
     pub attrs: BTreeSet<String>,
     #[serde(default)]
     pub measures: BTreeSet<String>,
+    #[serde(default)]
+    pub prunable: bool,
+    #[serde(default)]
+    pub retention: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]

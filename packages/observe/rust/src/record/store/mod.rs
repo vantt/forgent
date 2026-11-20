@@ -5,8 +5,12 @@
 
 mod door;
 mod health;
+mod prune;
 mod source;
 
 pub use door::{new_record_id, RecordDoor, WriteOutcome, DEFAULT_LOCK_WAIT};
 pub use health::{Health, HealthSource, HEALTH_DECLARATION, HEALTH_KIND};
+pub use prune::{
+    parse_retention_duration, prune, prune_with_lock_wait, prune_with_now, PruneError, PruneReport,
+};
 pub use source::{RecordStoreSource, RECORDS_STORE};

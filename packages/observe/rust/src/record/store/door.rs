@@ -2,9 +2,10 @@
 //! its lock bound: every failure is counted in the writer's health and reported as a [`WriteOutcome`].
 
 use super::health::{bump, Delta};
+use super::prune::{prune_with_lock_wait, PruneError, PruneReport};
 use super::source::RECORDS_STORE;
 use crate::record::registry::{load_registry, EmbeddedDeclaration, Registry};
-use crate::record::types::Record;
+use crate::record::types::{Record, SubjectRef};
 use crate::shard::{append_lines, encode_line, open_regular, shard_path, TornTail};
 use crate::store_lock::{acquire_store_lock_within, StoreLockGuard};
 use serde::Deserialize;
@@ -194,6 +195,31 @@ impl RecordDoor {
             Err(WriteOutcome::Rejected(e) | WriteOutcome::Failed(e)) => Err(e),
             Err(other) => Err(format!("{other:?}")),
         }
+    }
+
+    /// Prune eligible records across all writer shards under the observe lock.
+    pub fn prune(
+        &self,
+        settled_subjects: &[SubjectRef],
+        apply: bool,
+    ) -> Result<PruneReport, PruneError> {
+        let registry = self.registry().map_err(|e| match e {
+            WriteOutcome::Failed(msg) => PruneError::Registry(msg),
+            _ => PruneError::Registry(format!("{e:?}")),
+        })?;
+        let report = prune_with_lock_wait(
+            &self.root,
+            registry,
+            settled_subjects,
+            apply,
+            self.lock_wait,
+        )?;
+        if apply {
+            let mut state = self.state.lock().unwrap_or_else(PoisonError::into_inner);
+            state.seen.ids.clear();
+            state.seen.offset = 0;
+        }
+        Ok(report)
     }
 
     fn checked(&self, mut record: Record) -> Checked {
