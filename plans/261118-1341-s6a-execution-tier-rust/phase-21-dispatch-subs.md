@@ -77,7 +77,10 @@ transitively, e.g. `assignment-runner.mjs:10,13,44,46,47,69,92-96`, `plan.mjs:19
 ## Footprint
 
 As the plan table row 21, which holds `src/runner/execution/**`, `src/run-supervisor/**`, `test/run-supervisor/**` and
-`test/helpers/**` in addition to the dispatch paths.
+`test/helpers/**` in addition to the dispatch paths, plus the importers outside those directories found by the seam and string scans:
+`test/architecture.test.mjs`, `test/session-host/{head-start,head-permission-mode}.test.mjs`, `test/setup/{capability-catalog-doctrine,
+gate-kill-grace,packaged-definitions,seat-binding-dry-bind}.test.mjs`, `test/state/domain-registry-compiled.test.mjs`,
+`test/event-store/background-seal-confined.test.mjs` (imports `test/run-supervisor/support/direct-harness.mjs`).
 
 ## Steps
 

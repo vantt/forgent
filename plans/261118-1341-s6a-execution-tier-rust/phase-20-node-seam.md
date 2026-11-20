@@ -95,7 +95,8 @@ survivors need no edit here.
 ## Footprint
 
 As the plan table row 20 (the 23 files by name, never the two directories; `test/run-supervisor/attempt-steps.test.mjs`
-only, not `test/run-supervisor/**`).
+only, not `test/run-supervisor/**`); of `test/session-host/` only `head-start` and `head-permission-mode`, whose imports die; `test/architecture.test.mjs`,
+`test/state/domain-registry-compiled.test.mjs` and `test/scripts/mailbox-live-confined.test.mjs` for the deleted and switched files they name).
 
 ## Steps
 
