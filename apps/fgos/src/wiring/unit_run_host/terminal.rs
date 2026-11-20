@@ -290,8 +290,11 @@ fn env_of(value: Option<&Value>) -> Env {
         .collect()
 }
 
-fn dispatch_refusal(error: DispatchError) -> RunnerConfigError {
-    let mut out = RunnerConfigError::coded(error.message, &error.code);
+/// A refusal of the herdr round as the runner error the seat port returns, still named the `DispatchError` Node's
+/// round threw, so the unit run reports it as that class.
+pub(super) fn dispatch_refusal(error: DispatchError) -> RunnerConfigError {
+    let mut out =
+        RunnerConfigError::coded(error.message, &error.code).with("name", json!("DispatchError"));
     for (key, value) in error.detail {
         out = out.with(&key, value);
     }

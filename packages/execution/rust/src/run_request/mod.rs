@@ -361,7 +361,7 @@ pub fn plan_from_flags(
 /// Node's `path.resolve(base, path)` on this platform: `path` joined onto `base` (an absolute `path`, or on Windows one
 /// with its own drive, stands alone; a rooted one keeps only the drive of `base`), with `.` and `..` segments and
 /// repeated or trailing separators resolved lexically, never past the root. The result uses the platform separator.
-fn resolve_path(base: &str, path: &str) -> String {
+pub fn resolve_path(base: &str, path: &str) -> String {
     use std::path::{Component, Path, PathBuf};
     let mut out = PathBuf::new();
     for component in Path::new(base).join(path).components() {

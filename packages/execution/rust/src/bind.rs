@@ -894,6 +894,42 @@ pub fn run_timeout_problem(value: &Value, label: &str) -> Option<String> {
     None
 }
 
+/// `90m`, `5400s`, `2h`, `600000ms` (`parseRunTimeout`, `src/runner/dispatch/config.mjs`): one whole number and one
+/// unit as milliseconds, checked like any run timeout; the refusal sentence otherwise.
+pub fn parse_run_timeout(text: &str, label: &str) -> Result<u64, String> {
+    let trimmed = crate::unit::js_trim(text);
+    let split = trimmed
+        .find(|c: char| !c.is_ascii_digit())
+        .unwrap_or(trimmed.len());
+    let (digits, unit) = trimmed.split_at(split);
+    let unit_ms = match unit {
+        "ms" => 1.0,
+        "s" => 1_000.0,
+        "m" => 60_000.0,
+        "h" => 3_600_000.0,
+        _ => 0.0,
+    };
+    if digits.is_empty() || unit_ms == 0.0 {
+        return Err(format!(
+            "{label} takes a whole number and a unit (ms, s, m or h), e.g. 90m or 5400s; got: {}",
+            Value::String(text.to_string())
+        ));
+    }
+    // `Number(digits) * unit`, as Node counts it: a number too large to count is named by the text typed.
+    let ms = digits.parse::<f64>().unwrap_or(f64::INFINITY) * unit_ms;
+    if ms > 9_007_199_254_740_991.0 {
+        return Err(format!(
+            "{label} is too large: {trimmed} (at most {}h)",
+            RUN_TIMEOUT_MAX_MS / 3_600_000
+        ));
+    }
+    let ms = ms as i64;
+    match run_timeout_problem(&json!(ms), label) {
+        Some(problem) => Err(problem),
+        None => Ok(ms as u64),
+    }
+}
+
 /// The run timeout an override or the unit asks for, and its source; an unusable one is the refusal's detail.
 fn timeout_of(over: Option<&Value>, unit: &Value) -> Result<(Value, String), String> {
     if let Some(ms) = over.and_then(|over| over.get("timeoutMs")) {
@@ -1157,5 +1193,42 @@ pub fn preflight(
     Preflight {
         agent_cli_missing: agent_cli_missing_refusal(runner, &session.executor_session(), machine),
         pin_quarantined_until,
+    }
+}
+
+#[cfg(test)]
+mod run_timeout_text {
+    use super::parse_run_timeout;
+
+    #[test]
+    fn a_typed_duration_is_one_whole_number_and_one_unit_inside_the_floor_and_ceiling() {
+        for (text, ms) in [
+            ("90m", 5_400_000),
+            ("5400s", 5_400_000),
+            ("2h", 7_200_000),
+            ("600000ms", 600_000),
+            (" 90m ", 5_400_000),
+        ] {
+            assert_eq!(parse_run_timeout(text, "--timeout"), Ok(ms), "{text}");
+        }
+        for bad in [
+            "", "90", "m", "1.5h", "-5m", "90 m", "1h30m", "90min", "abc",
+        ] {
+            let refused = parse_run_timeout(bad, "--timeout").unwrap_err();
+            assert_eq!(
+                refused,
+                format!("--timeout takes a whole number and a unit (ms, s, m or h), e.g. 90m or 5400s; got: {}", serde_json::json!(bad)),
+            );
+        }
+        assert!(parse_run_timeout("30s", "--timeout")
+            .unwrap_err()
+            .contains("at least 1m"));
+        assert!(parse_run_timeout("5h", "--timeout")
+            .unwrap_err()
+            .contains("at most 4h"));
+        let huge = format!("{}ms", "9".repeat(400));
+        let refused = parse_run_timeout(&huge, "--timeout").unwrap_err();
+        assert!(refused.starts_with(&format!("--timeout is too large: {}", &huge[..20])));
+        assert!(refused.ends_with("(at most 4h)"), "{refused}");
     }
 }

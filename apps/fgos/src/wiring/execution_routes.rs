@@ -33,7 +33,7 @@ use std::sync::Arc;
 
 use fgos_execution::admission::{Admission, CaseAdmission, Recheck};
 use fgos_execution_engine::unit_run::peer::{
-    PeerAdmission, PeerChannel, PeerError, DEFAULT_DEADLINE, OP_ADMIT,
+    PeerAdmission, PeerChannel, DEFAULT_DEADLINE, OP_ADMIT,
 };
 use fgos_execution_engine::unit_run::run_unit_contract::{ok_result, RunUnitError};
 use fgos_execution_engine::unit_run::verify::{Verdict, Verified};
@@ -191,15 +191,16 @@ fn timeout_ms(request: &Value) -> Result<Option<u64>, String> {
     }
 }
 
-/// One peer shared by the run's admission port and its two events.
-struct SharedPeer(Arc<PeerAdmission>);
+/// One port shared by a unit run's host and the other askers of the same port (the run's two events, the
+/// request `fgos run` builds before the run exists).
+pub struct SharedPort<P>(pub Arc<P>);
 
-impl CaseAdmission for SharedPeer {
-    type Error = PeerError;
-    fn resolve_binding(&self, ask: &Value) -> Result<Value, PeerError> {
+impl<P: CaseAdmission> CaseAdmission for SharedPort<P> {
+    type Error = P::Error;
+    fn resolve_binding(&self, ask: &Value) -> Result<Value, P::Error> {
         self.0.resolve_binding(ask)
     }
-    fn admit(&self, proposal: &Value) -> Result<Admission, PeerError> {
+    fn admit(&self, proposal: &Value) -> Result<Admission, P::Error> {
         self.0.admit(proposal)
     }
     fn recheck_effect(
@@ -207,10 +208,10 @@ impl CaseAdmission for SharedPeer {
         reservation_id: &str,
         case_id: &str,
         paths: &[String],
-    ) -> Result<Recheck, PeerError> {
+    ) -> Result<Recheck, P::Error> {
         self.0.recheck_effect(reservation_id, case_id, paths)
     }
-    fn settle(&self, reservation_id: &str, settle: &Value) -> Result<(), PeerError> {
+    fn settle(&self, reservation_id: &str, settle: &Value) -> Result<(), P::Error> {
         self.0.settle(reservation_id, settle)
     }
     fn activity_unit_of(
@@ -218,14 +219,14 @@ impl CaseAdmission for SharedPeer {
         main_root: &str,
         case_id: &str,
         activity: &str,
-    ) -> Result<Option<Value>, PeerError> {
+    ) -> Result<Option<Value>, P::Error> {
         self.0.activity_unit_of(main_root, case_id, activity)
     }
     fn confined_write_refusal(
         &self,
         main_root: &str,
         case_id: Option<&str>,
-    ) -> Result<Option<String>, PeerError> {
+    ) -> Result<Option<String>, P::Error> {
         self.0.confined_write_refusal(main_root, case_id)
     }
 }
@@ -242,24 +243,32 @@ pub fn attempt_host() -> Result<AttemptHost, String> {
     })
 }
 
-/// A unit run over `peer`, the caller's admission port when `admission` says it serves one; the two events always
-/// reach the caller. Returns the `run-unit-result` document.
-pub fn run_unit_over(options: &Value, peer: PeerChannel, admission: bool) -> Value {
-    let attempt_host = match attempt_host() {
-        Ok(host) => host,
-        Err(message) => return RunUnitError::other("error", message).to_json(),
-    };
-    let shared = Arc::new(PeerAdmission::new(peer));
+/// The composed host of one unit run this process starts over `admission`: the session and the provider capacity
+/// runtime directory `options` names, attempts launched with this host binary and its payload. Every caller that
+/// runs a unit in this process (the `run-unit` op, `fgos run`) builds its host here.
+pub fn unit_run_host<A: CaseAdmission>(
+    options: &Value,
+    admission: Option<A>,
+) -> Result<HostUnitRun<A>, String> {
+    let attempt_host = attempt_host()?;
     let session = options.get("session").cloned().unwrap_or_else(|| json!({}));
-    let mut host = HostUnitRun::new(
-        admission.then(|| SharedPeer(Arc::clone(&shared))),
-        session,
-        attempt_host,
-    );
+    let mut host = HostUnitRun::new(admission, session, attempt_host);
     host.runtime_dir = options
         .get("providerCapacityRuntimeDir")
         .and_then(Value::as_str)
         .map(PathBuf::from);
+    Ok(host)
+}
+
+/// A unit run over `peer`, the caller's admission port when `admission` says it serves one; the two events always
+/// reach the caller. Returns the `run-unit-result` document.
+pub fn run_unit_over(options: &Value, peer: PeerChannel, admission: bool) -> Value {
+    let shared = Arc::new(PeerAdmission::new(peer));
+    let mut host = match unit_run_host(options, admission.then(|| SharedPort(Arc::clone(&shared))))
+    {
+        Ok(host) => host,
+        Err(message) => return RunUnitError::other("error", message).to_json(),
+    };
     let created = Arc::clone(&shared);
     host.on_unit_run_created = Some(Box::new(move |unit_run_id, _| {
         let _ = created.channel().unit_run_created(unit_run_id);

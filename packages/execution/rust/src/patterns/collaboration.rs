@@ -278,7 +278,7 @@ impl Resolver<'_> {
     }
 
     /// The accepted scalar spellings (`key=value` strings, pairs, key/value objects, a map) as `(key, value)` pairs.
-    fn scalar_pairs(&self, scalars: &Value) -> Result<Vec<(Value, Option<Value>)>, Failure> {
+    fn scalar_pairs(scalars: &Value) -> Result<Vec<(Value, Option<Value>)>, Failure> {
         let Some(items) = scalars.as_array() else {
             return Ok(scalars
                 .as_object()
@@ -304,7 +304,10 @@ impl Resolver<'_> {
                 }
                 Value::Object(entry) => {
                     if let Some(key) = entry.get("key") {
-                        pairs.push((key.clone(), entry.get("value").cloned()));
+                        // A run request's scalar is `{ key, raw }` whose `value` reads `raw` (`makeScalar`,
+                        // `src/runner/execution/run-request.mjs`); as data the getter is gone, so `raw` stands in.
+                        let value = entry.get("value").or_else(|| entry.get("raw"));
+                        pairs.push((key.clone(), value.cloned()));
                     } else {
                         if entry.is_empty() {
                             return Err(invalid("scalar object entry cannot be empty"));
@@ -331,7 +334,7 @@ impl Resolver<'_> {
         if !(scalars.is_object() || scalars.is_array()) {
             return Err(invalid("request scalars must be an array or object"));
         }
-        for (key, raw) in self.scalar_pairs(scalars)? {
+        for (key, raw) in Self::scalar_pairs(scalars)? {
             let Some(key) = key.as_str().filter(|k| !k.is_empty()) else {
                 return Err(invalid("scalar parameter key must be a non-empty string"));
             };
@@ -1050,4 +1053,21 @@ pub fn resolve_collaboration(
         entry,
         pin,
     })
+}
+
+#[cfg(test)]
+mod scalar_spelling {
+    use super::Resolver;
+    use serde_json::json;
+
+    /// `fgos run --param k=v` hands its scalar as data, `{ key, raw }`, whose `value` Node reads through a getter
+    /// over `raw`: the data spelling names the same value as the `{ key, value }` spelling.
+    #[test]
+    fn a_run_requests_key_raw_scalar_names_its_raw_as_the_value() {
+        let as_data = Resolver::scalar_pairs(&json!([{ "key": "maxRounds", "raw": "2" }])).unwrap();
+        let as_value =
+            Resolver::scalar_pairs(&json!([{ "key": "maxRounds", "value": "2" }])).unwrap();
+        assert_eq!(as_data, as_value);
+        assert_eq!(as_data, vec![(json!("maxRounds"), Some(json!("2")))]);
+    }
 }

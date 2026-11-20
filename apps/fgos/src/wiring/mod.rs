@@ -53,6 +53,7 @@ pub mod questions_hook;
 #[path = "questions_hook_unsupported.rs"]
 pub mod questions_hook;
 pub mod resource_check;
+pub mod run;
 pub mod run_dirs;
 pub mod seat_binding;
 #[cfg(unix)]

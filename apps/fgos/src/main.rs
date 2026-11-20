@@ -168,6 +168,7 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::dispatch_decide::DECIDE_DESCRIPTOR,
     wiring::dispatch_decide::EXPLAIN_DESCRIPTOR,
     wiring::agents::DESCRIPTOR,
+    wiring::run::DESCRIPTOR,
     wiring::worktree::CREATE_DESCRIPTOR,
     wiring::worktree::REMOVE_DESCRIPTOR,
     wiring::worktree::RESYNC_DESCRIPTOR,
@@ -482,6 +483,7 @@ fn main() {
     service.register_provider(Arc::new(wiring::agents::AgentsProvider::new(
         active_payload_root,
     )));
+    service.register_provider(Arc::new(wiring::run::RunProvider::new()));
     let tracker = service.tracker();
 
     match lane {

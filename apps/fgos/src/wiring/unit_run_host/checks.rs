@@ -89,7 +89,7 @@ pub fn assert_run_timeout(value: &Value) -> Result<(), RunUnitError> {
 /// The two facts `existingPlanRef` asks of the machine: the Convention plan-name rule and whether the plan is a
 /// real directory under the main checkout. The request's other questions belong to the `fgos run` route, which
 /// builds the request; the plan check never asks them.
-struct PlanChecks;
+pub(crate) struct PlanChecks;
 
 const PLAN_CHECK_ONLY: &str = "the plan check asks only the plan-name rule and the plan directory";
 

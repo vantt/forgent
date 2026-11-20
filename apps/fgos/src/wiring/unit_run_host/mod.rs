@@ -23,9 +23,6 @@
 //! * [`session_attempt`]: a head session's launch, engine `launch_session_attempt` over the assignment runner's
 //!   machine.
 
-// Nothing routes to the host until `fgos run` and the `run-unit` internal op are served from engine `unit_run`;
-// until then only the owning tests below call these adapters.
-#![cfg_attr(not(test), allow(dead_code))]
 // The ports answer with the `run-unit` error document the caller rethrows (engine `unit_run` carries the same allow):
 // boxing it would only move the same fields behind a pointer at each call.
 #![allow(clippy::result_large_err)]

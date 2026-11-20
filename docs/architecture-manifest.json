@@ -448,6 +448,7 @@
       "allowed": ["packages/process/rust/src/spawn.rs"],
       "debt": [
         { "path": "apps/fgos-gateway/src/gateway.rs", "reason": "watches its own gateway child (try_wait) for liveness; a service, not a bounded run" },
+        { "path": "apps/fgos/src/wiring/run.rs", "reason": "polls the admission peer it started (try_wait) for a short grace once the run closed its channel; the peer lives as long as the run, not a bounded run" },
         { "path": "packages/config/rust/src/detect.rs", "reason": "searches PATH (absolute entries only) for the detection candidates of the contract" },
         { "path": "packages/distribution/rust/src/init.rs", "reason": "resolve_node_path looks for node on PATH for the install preflight" },
         { "path": "packages/git/rust/src/driver.rs", "reason": "finds git on PATH (absolute entries only) and bounds its own git children with a deadline loop of its own" },
@@ -1541,6 +1542,10 @@
         {
           "path": "apps/fgos/src/wiring/doctor/bridge.rs",
           "reason": "the one bridge to the Node-owned doctor rows"
+        },
+        {
+          "path": "apps/fgos/src/wiring/run.rs",
+          "reason": "fgos run starts the Workflow's admission peer through legacy_exec when the run asks the case admission port, until Workflow admission is Rust"
         },
         {
           "path": "packages/distribution/rust/src/agent_hooks.rs",

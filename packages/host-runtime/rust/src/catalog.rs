@@ -421,6 +421,17 @@ pub const CATALOG: &[OperationDescriptor] = &[
         streaming_mode: StreamingMode::None,
     },
     OperationDescriptor {
+        operation_id: OperationId::from_static("run.unit"),
+        owning_component_id: Cow::Borrowed("execution"),
+        request_contract: ContractRef::from_static("run.unit.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("run.unit.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("execution.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
         operation_id: OperationId::from_static("dispatch.explain"),
         owning_component_id: Cow::Borrowed("execution"),
         request_contract: ContractRef::from_static("dispatch.explain.request", "1.0.0"),
@@ -506,8 +517,8 @@ mod tests {
     #[test]
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
-        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run and the init run, the dispatch decide and explain, the agents list, the supervision tick, supervisor read and write, land and slots, and the resource-check run.
-        assert_eq!(CATALOG.len(), 44);
+        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run and the init run, the dispatch decide and explain, the unit run, the agents list, the supervision tick, supervisor read and write, land and slots, and the resource-check run.
+        assert_eq!(CATALOG.len(), 45);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -545,6 +556,7 @@ mod tests {
         assert!(ids.contains(&"init.run"));
         assert!(ids.contains(&"dispatch.decide"));
         assert!(ids.contains(&"dispatch.explain"));
+        assert!(ids.contains(&"run.unit"));
         assert!(ids.contains(&"agents.list"));
         assert!(ids.contains(&"questions.read"));
         assert!(ids.contains(&"questions.write"));
