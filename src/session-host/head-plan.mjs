@@ -124,3 +124,53 @@ export async function planOfHead(projectRoot, persona, name, ports = {}) {
   if (live.length > 1) throw new HeadPlanError('plan-ambiguous', `${live.length} plans start with ${JSON.stringify(dirPrefix)}: ${live.map((p) => p.dir).join(', ')}`);
   return { dir: live[0].dir, footprint: footprintOf(live[0].text, live[0].dir) };
 }
+
+// ---- the task of a head: a plan for a lead, a discussion for a planner or shaper ------------------------
+
+const DISCUSSION_PERSONAS = new Set(['planner', 'shaper']);
+const DISCUSSION_ROOTS = ['docs/discussions', 'plans/discussions'];
+const DISCUSSION_FILE = 'DISCUSSION.md';
+
+/** The feature directories of `root` (a path relative to the project) that hold a DISCUSSION.md. */
+function defaultListDiscussionDirs(projectRoot, root) {
+  let entries;
+  try { entries = fs.readdirSync(path.join(projectRoot, root), { withFileTypes: true }); } catch { return []; }
+  return entries.filter((e) => e.isDirectory() && fs.existsSync(path.join(projectRoot, root, e.name, DISCUSSION_FILE))).map((e) => e.name).sort();
+}
+
+/**
+ * The discussion a `planner-*` or `shaper-*` head belongs to: `{ kind: 'discussion', dir, path }`, the path relative to the
+ * project. The name is the feature directory or a prefix of it, with the project handle prefix and `-` optional in front.
+ * A directory spelled exactly wins over longer ones that merely start with it; none is `discussion-not-found`, more than
+ * one `task-ambiguous`. `ports` (for a test): `handle`, `listDiscussionDirs(projectRoot, root) -> dir[]`.
+ */
+export function discussionOfHead(projectRoot, persona, name, ports = {}) {
+  if (!DISCUSSION_PERSONAS.has(persona)) throw new HeadPlanError('discussion-not-found', `persona ${JSON.stringify(persona)} owns no discussion (planner and shaper do)`);
+  const handle = ports.handle ?? (() => { try { return projectHandleOf(projectRoot); } catch { return null; } })();
+  const prefix = handle === null ? null : cut(handle, PROJECT_PREFIX).replace(/-+$/, '');
+  const key = prefix !== null && typeof name === 'string' && name.startsWith(`${prefix}-`) && name.length > prefix.length + 1 ? name.slice(prefix.length + 1) : name;
+  const list = ports.listDiscussionDirs ?? defaultListDiscussionDirs;
+  const found = [];
+  for (const root of DISCUSSION_ROOTS) {
+    for (const dir of list(projectRoot, root)) if (typeof key === 'string' && key !== '' && dir.startsWith(key)) found.push({ dir, root });
+  }
+  const exact = found.filter((f) => f.dir === key);
+  const hits = exact.length > 0 ? exact : found;
+  if (hits.length === 0) throw new HeadPlanError('discussion-not-found', `no discussion directory starts with ${JSON.stringify(key)} under ${DISCUSSION_ROOTS.join(' or ')}`);
+  if (hits.length > 1) throw new HeadPlanError('task-ambiguous', `${hits.length} discussions start with ${JSON.stringify(key)}: ${hits.map((h) => `${h.root}/${h.dir}`).join(', ')}`);
+  return { kind: 'discussion', dir: hits[0].dir, path: `${hits[0].root}/${hits[0].dir}/${DISCUSSION_FILE}` };
+}
+
+/**
+ * The task a head name is bound to, or null for a persona that has none (secretary, supervisor): a lead's live plan
+ * (`{ kind: 'plan', dir, path, footprint }`) or a planner's or shaper's discussion. A bound persona whose name matches
+ * nothing throws `HeadPlanError`. `ports` as for `planOfHead` and `discussionOfHead`.
+ */
+export async function taskOfHead(projectRoot, persona, name, ports = {}) {
+  if (persona === 'lead') {
+    const plan = await (ports.planOfHead ?? planOfHead)(projectRoot, persona, name, ports);
+    return { kind: 'plan', dir: plan.dir, path: `${PLANS_DIR}/${plan.dir}/plan.md`, footprint: plan.footprint };
+  }
+  if (DISCUSSION_PERSONAS.has(persona)) return discussionOfHead(projectRoot, persona, name, ports);
+  return null;
+}
