@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { HeadPlanError, isPlanHeadName, planOfHead } from '../../src/session-host/head-plan.mjs';
+import { discussionOfHead, HeadPlanError, isPlanHeadName, planOfHead, taskOfHead } from '../../src/session-host/head-plan.mjs';
 
 const planText = (status, footprint) => `---\ncontract: plan-v1\nstatus: ${status}\nfootprint:\n${footprint.map((f) => `  - ${f}`).join('\n')}\n---\n# plan\n`;
 
@@ -77,4 +77,44 @@ test('without an injected handle the Identity project handle of project.json nam
 test('a project with no minted handle resolves no head name', async (t) => {
   const root = repoWith(t, { '261118-1045-p': ['running', ['a']] });
   await assert.rejects(planOfHead(root, 'lead', 'forgent-261118-1045'), (err) => err instanceof HeadPlanError && err.code === 'plan-not-found' && /no minted handle/.test(err.message));
+});
+
+/** Feature directories (name -> has DISCUSSION.md) under a root, written into a scratch project. */
+function discussionsIn(t, tree) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-head-disc-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  for (const [dir, has] of Object.entries(tree)) {
+    fs.mkdirSync(path.join(root, dir), { recursive: true });
+    if (has) fs.writeFileSync(path.join(root, dir, 'DISCUSSION.md'), '# d\n');
+  }
+  return root;
+}
+
+test('a planner and a shaper name resolve to the feature discussion, with or without the handle prefix', (t) => {
+  const root = discussionsIn(t, { 'docs/discussions/account-lease': true, 'docs/discussions/execution-fanout': true, 'docs/discussions/no-file': false });
+  const ports = { handle: 'proj' };
+  const want = { kind: 'discussion', dir: 'account-lease', path: 'docs/discussions/account-lease/DISCUSSION.md' };
+  assert.deepEqual(discussionOfHead(root, 'planner', 'proj-account-lease', ports), want);
+  assert.deepEqual(discussionOfHead(root, 'shaper', 'account', ports), want);
+  assert.throws(() => discussionOfHead(root, 'shaper', 'no-file', ports), { code: 'discussion-not-found' });
+});
+
+test('an unbound discussion name is not found, a prefix of two is ambiguous, an exact name wins over longer ones', (t) => {
+  const root = discussionsIn(t, { 'docs/discussions/dispatch-a': true, 'docs/discussions/dispatch-b': true, 'docs/discussions/fan': true, 'docs/discussions/fan-out': true });
+  const ports = { handle: 'proj' };
+  assert.throws(() => discussionOfHead(root, 'planner', 'zzz', ports), (err) => err instanceof HeadPlanError && err.code === 'discussion-not-found');
+  assert.throws(() => discussionOfHead(root, 'planner', 'dispatch', ports), { code: 'task-ambiguous' });
+  assert.equal(discussionOfHead(root, 'planner', 'fan', ports).dir, 'fan');
+});
+
+test('taskOfHead binds a lead to its plan, a planner to its discussion, and a secretary or supervisor to nothing', async (t) => {
+  const root = repoWith(t, { '261118-1045-p': ['running', ['src/a/**']] });
+  fs.mkdirSync(path.join(root, 'docs', 'discussions', 'feat'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'docs', 'discussions', 'feat', 'DISCUSSION.md'), '# d\n');
+  const ports = { handle: 'proj' };
+  assert.deepEqual(await taskOfHead(root, 'lead', 'proj-261118-1045', ports), { kind: 'plan', dir: '261118-1045-p', path: 'plans/261118-1045-p/plan.md', footprint: ['src/a/**'] });
+  assert.equal((await taskOfHead(root, 'planner', 'feat', ports)).path, 'docs/discussions/feat/DISCUSSION.md');
+  assert.equal(await taskOfHead(root, 'secretary', 'miu', ports), null);
+  assert.equal(await taskOfHead(root, 'supervisor', 'sv', ports), null);
+  await assert.rejects(taskOfHead(root, 'lead', 'proj-999', ports), { code: 'plan-not-found' });
 });

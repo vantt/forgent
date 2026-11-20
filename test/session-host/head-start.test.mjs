@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { seedStubAgentClis } from '../helpers/agent-clis.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
-import { bindHeadSeat, headKeyOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, openingText, personasHeadsFirst, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
+import { bindHeadSeat, headKeyOf, taskBriefOf, headRoleOf, HeadStartError, HEAD_HARD_CEILING_MS, lineageDirOf, openingText, personasHeadsFirst, placeHead, readHeadPlacement, startHeadSession } from '../../src/session-host/head-start.mjs';
 import { grantOf } from '../../src/session-host/head-grants.mjs';
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { headOf } from '../../src/runner/dispatch/session-attempt.mjs';
@@ -18,7 +18,13 @@ seedFileLocalBwrapRegistry();
 seedStubAgentClis('alpha-bin');
 
 const PERSONA_TEXT = 'name: planner\ndescription: Plans the work in small verified steps.\npersona:\n  voice: calm\n';
-const scratch = () => fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-head-start-'));
+/** A project root whose docs/discussions holds the `probe` feature, the discussion the planner and shaper heads of these tests are bound to. */
+function scratch() {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-head-start-'));
+  fs.mkdirSync(path.join(root, 'docs', 'discussions', 'probe'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'docs', 'discussions', 'probe', 'DISCUSSION.md'), '# probe\n');
+  return root;
+}
 
 function fakes({ live = false, record = null, fronted = 'fronted', launchFails = null } = {}) {
   const calls = { launch: [], front: [] };
@@ -30,7 +36,7 @@ function fakes({ live = false, record = null, fronted = 'fronted', launchFails =
     identity: () => (live ? { live, record } : { live }),
     pin: ({ persona }) => ({ name: persona, text: PERSONA_TEXT }),
     handoff: () => null,
-    opening: ({ persona, name, pinned, handoff }) => openingText({ persona, name, personaLines: ['# Persona', `Description: ${pinned.text.split('\n')[1].slice('description: '.length)}`], handoff }),
+    opening: ({ persona, name, pinned, handoff, task }) => openingText({ persona, name, personaLines: ['# Persona', `Description: ${pinned.text.split('\n')[1].slice('description: '.length)}`], handoff, task }),
     runnerConfig: () => ({ marker: 'config' }),
     bind: ({ key }) => ({ executor: 'alpha', key }),
     launch: (request) => {
@@ -280,4 +286,42 @@ test('a wakeable head persona opening ends by telling it to continue in the same
   for (const persona of ['secretary', 'shaper']) {
     assert.equal(renderOnWake(persona, { projectRoot: process.cwd() }), null, persona);
   }
+});
+
+test('a planner and a shaper head open with the path of their discussion and the first step, a lead with its plan', async () => {
+  const projectRoot = scratch();
+  const { calls, ports } = fakes();
+  await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, ports);
+  await startHeadSession({ persona: 'shaper', name: 'probe', projectRoot }, ports);
+  const [planner, shaper] = calls.launch.map((r) => r.opening);
+  assert.match(planner, /# Task\nYour task is docs\/discussions\/probe\/DISCUSSION\.md\.\nRead the discussion, write plans\/<dir>\/plan\.md .*plan-contract-check.* fgos land --paths\./);
+  assert.match(shaper, /# Task\nYour task is docs\/discussions\/probe\/DISCUSSION\.md\.\nRead domains\/<domain>\/AGENTS\.md/);
+  const planOfHead = () => ({ dir: '261118-1045-project-supervisor', footprint: [] });
+  await startHeadSession({ persona: 'lead', name: 'sv-p09', projectRoot }, { ...ports, planOfHead });
+  assert.match(calls.launch[2].opening, /# Task\nYour task is plans\/261118-1045-project-supervisor\/plan\.md\.\nRead the phase table, check which wave or phase is next/);
+  assert.equal(taskBriefOf('secretary', { path: 'x' }), null, 'a persona without a task gets no task section');
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('a planner or shaper head bound to no discussion is refused by name before anything is launched or recorded', async () => {
+  const projectRoot = scratch();
+  const { calls, ports } = fakes();
+  for (const persona of ['planner', 'shaper']) {
+    await assert.rejects(startHeadSession({ persona, name: 'nothing-here', projectRoot }, ports), { code: 'discussion-not-found' });
+    assert.equal(readHeadPlacement(lineageDirOf(projectRoot, persona, 'nothing-here')), null);
+  }
+  assert.equal(calls.launch.length, 0);
+  fs.rmSync(projectRoot, { recursive: true, force: true });
+});
+
+test('a hand start and an automated start of the same head name type the same opening', async () => {
+  const projectRoot = scratch();
+  const { ports } = fakes();
+  const openings = [];
+  const record = (request) => { openings.push(request.opening); return { placement: { host: 'terminal', key: `cmd_${request.key}` }, runDir: `/run/${request.key}` }; };
+  // Both doors call startHeadSession(persona, name); the second is a rotation-style placeHead of the same lineage.
+  await startHeadSession({ persona: 'planner', name: 'probe', projectRoot }, { ...ports, launch: record });
+  await placeHead({ persona: 'planner', name: 'probe', projectRoot, gen: 2 }, { ...ports, launch: record });
+  assert.equal(openings[0], openings[1]);
+  fs.rmSync(projectRoot, { recursive: true, force: true });
 });

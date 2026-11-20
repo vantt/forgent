@@ -721,6 +721,7 @@ test('session start passes forQuestion down to the opening, and the opening carr
   const project = scratch(t);
   const seen = [];
   const ports = {
+    taskOfHead: async () => ({ kind: 'discussion', dir: 'q', path: 'docs/discussions/q/DISCUSSION.md' }),
     pin: async () => ({ name: 'planner', text: '' }), handoff: async () => null, runnerConfig: async () => ({}), bind: async () => ({ cli: 'x' }),
     opening: async (ask) => { seen.push(ask.forQuestion); return 'opening'; },
     launch: async () => ({ placement: { host: 'terminal', key: 'k' }, runDir: '/r' }), identity: () => ({ live: false }), host: {},

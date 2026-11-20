@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Changed: `fgos session start` for a `lead`, `planner` or `shaper` head now binds the name to its plan or discussion and puts the exact path and first step in the opening; a name that matches no plan or discussion is refused by name (`plan-not-found`, `discussion-not-found`, `task-ambiguous`) before anything launches.
 - Fixed: a woken supervisor, lead or planner head no longer ends its turn after the start ritual: its opening now ends with an `on_wake` line telling it to continue in the same turn into its skill procedure up to its done step.
 - Fixed: `fgos doctor` now reads a watcher timer unit as stale when its PATH cannot reach a tool the wake needs (for example `cargo` after a release starts needing it) and the registered fix re-renders it; an installed unit's other caller-chosen values stay pinned, so a disabled or unchanged timer is left alone.
 - Fixed: the supervisor skill now gives one numbered procedure for an answered owner question: an idle live asker is stopped and its successor started with `--for-question`, so the answer no longer leaves the asker blocked.

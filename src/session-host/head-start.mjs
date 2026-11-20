@@ -15,7 +15,7 @@ import { spawnSync } from 'node:child_process';
 import { replaceDurably } from '../native/door.mjs';
 import { createSessionHost } from './client.mjs';
 import { grantOf, HEAD_PERSONAS } from './head-grants.mjs';
-import { planOfHead } from './head-plan.mjs';
+import { taskOfHead } from './head-plan.mjs';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
@@ -93,18 +93,28 @@ export function slotKeyOf(record) {
 }
 
 /** The opening a head session is typed: its persona section, the skills line the persona carries, and the start ritual. */
-async function defaultOpening({ persona, name, projectRoot, pinned, handoff, forQuestion = null }) {
+async function defaultOpening({ persona, name, projectRoot, pinned, handoff, forQuestion = null, task = null }) {
   const { renderPersonaSection, renderOnWake } = await import('../runner/agent-definitions.mjs');
-  return openingText({ persona, name, personaLines: renderPersonaSection(persona, { projectRoot, pinnedText: pinned.text }), handoff, forQuestion, onWake: renderOnWake(persona, { projectRoot, pinnedText: pinned.text }) });
+  return openingText({ persona, name, personaLines: renderPersonaSection(persona, { projectRoot, pinnedText: pinned.text }), handoff, forQuestion, task, onWake: renderOnWake(persona, { projectRoot, pinnedText: pinned.text }) });
 }
 
-/** Pure: the opening text from its parts, so a test reads the exact words a head is given. */
-export function openingText({ persona, name, personaLines, handoff = null, forQuestion = null, onWake = null }) {
+const FIRST_STEPS = {
+  lead: 'Read the phase table, check which wave or phase is next, create its worktree, and run it to done.',
+  planner: 'Read the discussion, write plans/<dir>/plan.md and its phase files per the plan contract, run node scripts/plan-contract-check.mjs, and land via fgos land --paths.',
+  shaper: 'Read domains/<domain>/AGENTS.md, conduct the design discussion, and maintain DISCUSSION.md.',
+};
+
+/** The task a head is bound to as the opening states it: `{ path, firstStep }`, or null for a persona with no task. */
+export const taskBriefOf = (persona, task) => (task && FIRST_STEPS[persona] ? { path: task.path, firstStep: FIRST_STEPS[persona] } : null);
+
+/** Pure: the opening text from its parts, so a test reads the exact words a head is given. `task` is `{ path, firstStep }`. */
+export function openingText({ persona, name, personaLines, handoff = null, forQuestion = null, onWake = null, task = null }) {
   return [
     ...personaLines,
     '',
     `You are the long-lived head session "${name}" (role ${headRoleOf(persona, name)}).`,
     '',
+    ...(task ? ['# Task', `Your task is ${task.path}.`, task.firstStep, ''] : []),
     '# Start ritual',
     handoff
       ? `1. Read the latest handoff of this session first: ${handoff.path}. It describes state as it was; verify it against the repo before acting.`
@@ -212,7 +222,7 @@ export function assertHeadArgs({ persona, name, projectRoot, gen = null, forQues
  *
  * `gen` is the generation of the lineage (absent: the first unused one); `forQuestion` is the id of an owner question the
  * new head continues (one more opening line); `beside` is the live key of the session whose
- * tab the new one opens next to. `ports` as for `startHeadSession` (`planOfHead(projectRoot, persona, name) -> { dir }`, `pin`, `handoff`, `opening`, `runnerConfig`, `bind`,
+ * tab the new one opens next to. `ports` as for `startHeadSession` (`taskOfHead(projectRoot, persona, name) -> { dir, path } | null`, `planOfHead(projectRoot, persona, name) -> { dir }` for a lead, `pin`, `handoff`, `opening`, `runnerConfig`, `bind`,
  * `launch`). Returns `{ role, gen, key, placement, runDir, cli, persona }`; a refusal throws `HeadStartError`.
  */
 export async function placeHead({ persona, name, projectRoot, beside = null, gen = null, forQuestion = null } = {}, ports = {}) {
@@ -221,14 +231,15 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
   const generation = gen ?? nextHeadGeneration(projectRoot, persona, name);
   const key = headKeyOf(persona, name, generation);
   let grant;
+  let task = null;
   try {
-    // A lead writes only its plan directory, resolved here (a start and a rotation take the same path) because the grant table reads no files.
-    const planDir = persona === 'lead' ? (await (ports.planOfHead ?? planOfHead)(projectRoot, persona, name)).dir : null;
-    grant = grantOf(role, persona, { planDir });
-  } catch (err) { throw new HeadStartError('grant-invalid', err.message); }
+    // The task is resolved here, before anything is launched or recorded (a start and a rotation take the same path). A lead writes only its plan directory, because the grant table reads no files.
+    task = await (ports.taskOfHead ?? ((root, p, n) => taskOfHead(root, p, n, { planOfHead: ports.planOfHead })))(projectRoot, persona, name);
+    grant = grantOf(role, persona, { planDir: persona === 'lead' ? task.dir : null });
+  } catch (err) { throw new HeadStartError(persona === 'lead' ? 'grant-invalid' : (err.code ?? 'task-not-found'), err.message); }
   const pinned = await (ports.pin ?? defaultPin)({ persona, projectRoot });
   const handoff = await (ports.handoff ?? defaultHandoff)({ persona, name, projectRoot });
-  const text = await (ports.opening ?? defaultOpening)({ persona, name, projectRoot, pinned, handoff, forQuestion });
+  const text = await (ports.opening ?? defaultOpening)({ persona, name, projectRoot, pinned, handoff, forQuestion, task: taskBriefOf(persona, task) });
   const runnerConfig = await (ports.runnerConfig ?? defaultRunnerConfig)(projectRoot);
   const binding = await (ports.bind ?? bindHeadSeat)({ persona, key, runnerConfig });
 
