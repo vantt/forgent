@@ -5116,3 +5116,208 @@ fn resync_worktree_refuses_a_flag_without_its_value() {
         Some(4)
     );
 }
+
+/// The prefix of the answer line of `fgos internal execution`.
+const EXECUTION_PREFIX: &str = "\u{1e}FGOS-EXECUTION ";
+const ADMISSION_PEER_PREFIX: &str = "\u{1e}FGOS-ADMISSION-PEER ";
+
+/// A scratch directory of one test, removed when dropped.
+struct ExecutionScratch(PathBuf);
+
+impl ExecutionScratch {
+    fn new(tag: &str) -> Self {
+        let dir = std::env::temp_dir().join(format!(
+            "fgos-execution-route-{tag}-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&dir).unwrap();
+        Self(dir)
+    }
+}
+
+impl Drop for ExecutionScratch {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
+}
+
+/// Runs `fgos internal execution <args>` with `request` as its first stdin line, answering every admission peer
+/// request with `peer(op, payload)`; returns the exit code and the framed answer line.
+fn execution_route(
+    args: &[&str],
+    request: &serde_json::Value,
+    env: &[(&str, &Path)],
+    peer: &dyn Fn(&str, &serde_json::Value) -> serde_json::Value,
+) -> (Option<i32>, serde_json::Value) {
+    use std::io::{BufRead, BufReader, Write};
+    use std::process::Stdio;
+    let mut command = host_command();
+    command
+        .args(["internal", "execution"])
+        .args(args)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    for (key, value) in env {
+        command.env(key, value);
+    }
+    let mut child = command.spawn().expect("failed to execute fgos");
+    let mut stdin = child.stdin.take().unwrap();
+    writeln!(stdin, "{request}").unwrap();
+    let mut answer = None;
+    for line in BufReader::new(child.stdout.take().unwrap()).lines() {
+        let line = line.unwrap();
+        if let Some(body) = line.strip_prefix(EXECUTION_PREFIX) {
+            answer = Some(serde_json::from_str(body).unwrap());
+        } else if let Some(body) = line.strip_prefix(ADMISSION_PEER_PREFIX) {
+            let message: serde_json::Value = serde_json::from_str(body).unwrap();
+            let result = peer(message["op"].as_str().unwrap(), &message["payload"]);
+            let reply = serde_json::json!({ "protocol": 1, "id": message["id"], "result": result });
+            writeln!(stdin, "{ADMISSION_PEER_PREFIX}{reply}").unwrap();
+        }
+    }
+    drop(stdin);
+    let status = child.wait().unwrap();
+    let answer = answer.unwrap_or_else(|| panic!("no framed answer (exit {:?})", status.code()));
+    (status.code(), answer)
+}
+
+fn no_peer(op: &str, _: &serde_json::Value) -> serde_json::Value {
+    panic!("the op asked the peer {op}")
+}
+
+#[test]
+fn the_execution_route_refuses_another_protocol_and_an_unknown_op_before_reading_a_request() {
+    let request = serde_json::json!({});
+    let (code, line) = execution_route(&["verify", "--protocol", "2"], &request, &[], &no_peer);
+    assert_eq!(code, Some(3));
+    assert_eq!(line["error"]["code"], "host-version-mismatch");
+    assert_eq!(line["protocol"], 1);
+    let (code, line) = execution_route(&["launch", "--protocol", "1"], &request, &[], &no_peer);
+    assert_eq!(code, Some(2));
+    assert_eq!(line["error"]["code"], "usage");
+    let (code, line) = execution_route(&["verify", "--protocol", "1"], &request, &[], &no_peer);
+    assert_eq!(code, Some(65), "{line}");
+    assert_eq!(line["error"]["code"], "invalid-request");
+}
+
+// The command is a POSIX shell line.
+#[cfg(unix)]
+#[test]
+fn the_execution_route_verify_op_answers_the_facts_of_its_command() {
+    let scratch = ExecutionScratch::new("verify");
+    let request = serde_json::json!({ "command": "echo seen; exit 3", "cwd": scratch.0 });
+    let (code, line) = execution_route(&["verify", "--protocol", "1"], &request, &[], &no_peer);
+    assert_eq!(code, Some(0), "{line}");
+    let verified = &line["result"]["verified"];
+    assert_eq!(verified["verdict"], "findings");
+    assert_eq!(verified["status"], 3);
+    assert_eq!(verified["tail"], "seen");
+    assert!(verified["outputDigest"]
+        .as_str()
+        .unwrap()
+        .starts_with("sha256:"));
+}
+
+// The command is a POSIX shell line.
+#[cfg(unix)]
+#[test]
+fn the_execution_route_custody_op_asks_the_peer_admit_first_and_runs_nothing_it_refused() {
+    let scratch = ExecutionScratch::new("custody");
+    let (fgos_dir, worktree) = (scratch.0.join("fgos"), scratch.0.join("tree"));
+    fs::create_dir_all(&fgos_dir).unwrap();
+    fs::create_dir_all(&worktree).unwrap();
+    let marker = scratch.0.join("ran");
+    let verify = serde_json::json!({ "command": format!("touch '{}'", marker.display()) });
+    let refused = serde_json::json!({ "fgosDir": fgos_dir, "worktree": worktree, "admit": { "unitRunId": "g-1" }, "verify": verify });
+    let (code, line) = execution_route(
+        &["custody", "--protocol", "1"],
+        &refused,
+        &[],
+        &|op, payload| {
+            assert_eq!(op, "admit");
+            assert_eq!(payload["unitRunId"], "g-1");
+            serde_json::json!({ "refused": { "code": "case-admission-busy", "condition": "busy" } })
+        },
+    );
+    assert_eq!(code, Some(0), "{line}");
+    assert_eq!(
+        line["result"]["admission"]["refused"]["code"],
+        "case-admission-busy"
+    );
+    assert!(line["result"].get("verified").is_none());
+    assert!(!marker.exists(), "a refused admission ran the command");
+
+    let held = serde_json::json!({ "fgosDir": fgos_dir, "worktree": worktree, "verify": verify });
+    let (code, line) = execution_route(&["custody", "--protocol", "1"], &held, &[], &no_peer);
+    assert_eq!(code, Some(0), "{line}");
+    assert_eq!(line["result"]["verified"]["verdict"], "pass");
+    assert!(marker.exists());
+}
+
+#[test]
+fn the_execution_route_sweep_and_cancel_ops_answer_for_a_root_and_a_directory_without_attempts() {
+    let scratch = ExecutionScratch::new("sweep");
+    let request = serde_json::json!({ "assignmentsRoot": scratch.0 });
+    let (code, line) = execution_route(
+        &["sweep-attempts", "--protocol", "1"],
+        &request,
+        &[],
+        &no_peer,
+    );
+    assert_eq!(code, Some(0), "{line}");
+    assert_eq!(
+        line["result"],
+        serde_json::json!({ "adopt": [], "adoptError": null })
+    );
+    let request = serde_json::json!({ "runDir": scratch.0, "signal": "session-stop" });
+    let (code, line) = execution_route(&["cancel", "--protocol", "1"], &request, &[], &no_peer);
+    assert_eq!(code, Some(0), "{line}");
+    assert_eq!(line["result"]["requested"], false);
+    assert!(!scratch.0.join("cancel-requested.json").exists());
+}
+
+#[test]
+fn the_execution_route_run_unit_op_refuses_an_option_outside_the_contract_and_answers_a_refused_run(
+) {
+    let scratch = ExecutionScratch::new("run-unit");
+    let manifest = ensure_dev_manifest();
+    let root = repo_root();
+    let env = [
+        ("HOME", scratch.0.as_path()),
+        ("FGOS_ACTIVE_RELEASE_PATH", root.as_path()),
+        ("FGOS_ACTIVE_MANIFEST_PATH", manifest.as_path()),
+    ];
+    let unknown =
+        serde_json::json!({ "request": { "options": { "bogus": 1 } }, "admission": false });
+    let (code, line) = execution_route(&["run-unit", "--protocol", "1"], &unknown, &env, &no_peer);
+    assert_eq!(code, Some(65), "{line}");
+    assert!(line["error"]["message"]
+        .as_str()
+        .unwrap()
+        .contains("\"bogus\""));
+
+    // A unit the run refuses before any unit run exists: the refusal is the run's answer, not a fault of the route,
+    // and it carries the class tag the door rethrows.
+    let outside = serde_json::json!({
+        "request": { "options": {
+            "cwd": scratch.0,
+            "unitData": { "id": "u1", "capability": "execute", "writes": [] },
+        } },
+        "admission": false,
+    });
+    let (code, line) = execution_route(&["run-unit", "--protocol", "1"], &outside, &env, &no_peer);
+    assert_eq!(code, Some(0), "{line}");
+    assert_eq!(line["result"]["contract"]["id"], "run-unit-result");
+    assert_eq!(line["result"]["ok"], false);
+    assert_eq!(line["result"]["error"]["tag"], "RunnerConfigError");
+    assert!(line["result"]["error"]["message"]
+        .as_str()
+        .unwrap()
+        .contains("objective"));
+    let _ = fs::remove_dir_all(manifest.parent().unwrap());
+}

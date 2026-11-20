@@ -242,6 +242,15 @@ fn main() {
                 .collect();
             std::process::exit(fgos_distribution::source_payload::route_main(&rest));
         }
+        // `execution <op> --protocol 1`: the long or effectful Execution operations of the Node payload's
+        // Execution seam (see `wiring::execution_routes`).
+        if args.get(2).is_some_and(|a| a == "execution") {
+            let rest: Vec<String> = args[3..]
+                .iter()
+                .map(|a| a.to_string_lossy().into_owned())
+                .collect();
+            std::process::exit(wiring::execution_routes::main(&rest));
+        }
         // The run supervisor's routes: supervise, gate, adopt, attempt-step.
         let rest: Vec<String> = args[2..]
             .iter()

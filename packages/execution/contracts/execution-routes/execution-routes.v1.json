@@ -1,0 +1,36 @@
+{
+  "contract": { "id": "execution-routes", "version": 1 },
+  "description": "The long or effectful Execution operations a Node caller above the Execution tier reaches through src/native/execution-door.mjs (executionOp, runUnitInHost): one host process per call, `fgos internal execution <op> --protocol 1`. Implemented by apps/fgos/src/wiring/execution_routes.rs.",
+  "invocation": {
+    "argv": ["internal", "execution", "<op>", "--protocol", "1"],
+    "request": "The first line of stdin: one JSON object, the op's payload.",
+    "answer": "One framed line on stdout: prefix, one JSON object, newline. Every other stdout line is an admission peer frame (contracts/admission-peer) or stray output and is never read as the answer.",
+    "prefix": "\u001eFGOS-EXECUTION ",
+    "ok": { "v": 1, "protocol": 1, "op": "string", "result": "the op's result" },
+    "error": { "v": 1, "protocol": 1, "op": "string", "error": { "code": "usage | host-version-mismatch | invalid-request", "message": "string" } },
+    "exit": { "0": "answered (a run-unit error result is an answer)", "2": "usage", "3": "host-version-mismatch: --protocol is not 1, checked before the op", "65": "invalid-request: the payload is not a JSON object or misses a field" },
+    "peer": "run-unit and custody (with admit) ask the caller's case admission port over this process's stdout (requests) and stdin (answers), after the request line. The caller serves it with serveAdmissionPeer; pipes only."
+  },
+  "operations": {
+    "run-unit": {
+      "payload": { "request": "the run-unit-request document (contracts/unit-run/run-unit.v1.json); an option outside its list is refused by name", "admission": "boolean: the caller serves a case admission port; without it the run has none. The two events (unitRunCreated, caseAdmitted) always reach the caller." },
+      "result": "the run-unit-result document: { ok: true, result } or { ok: false, error } (the door rethrows the error's class)"
+    },
+    "custody": {
+      "payload": { "fgosDir": "string", "worktree": "string, an existing directory", "admit": "object?, the proposal asked of the peer's admit before the command runs", "verify": { "command": "string", "timeoutMs": "number?" } },
+      "result": { "admission": "the peer's admit answer, when admit was given; a refused one runs nothing", "admissionError": "{ code, message }? the peer could not answer", "verified": "the verify answer, when the command ran", "warnings": "string[]? custody-handoff-not-recorded", "custodyError": "{ code, message }? custody could not be taken" }
+    },
+    "verify": {
+      "payload": { "command": "string", "cwd": "string", "timeoutMs": "number?" },
+      "result": { "verified": "{ verdict: pass|findings } or { infrastructure: timeout|not-run }, with status, how, tail, durationMs, outputDigest (runVerify)" }
+    },
+    "sweep-attempts": {
+      "payload": { "assignmentsRoot": "string" },
+      "result": { "adopt": "the adopt verdict lines ({ v, protocol, attemptDir, state, outcome?, pendingStep?, reason? }) or null", "adoptError": "string|null" }
+    },
+    "cancel": {
+      "payload": { "runDir": "string", "signal": "string, e.g. session-stop" },
+      "result": { "requested": "boolean: a cancel request is on disk for the attempt afterwards" }
+    }
+  }
+}

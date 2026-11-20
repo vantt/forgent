@@ -137,8 +137,9 @@ pub fn is_main_checkout(worktree: &Path) -> bool {
 
 /// `sweepAttempts` (`src/run-supervisor/client.mjs:118`) as `run.mjs:303` calls it: adopt judges every attempt
 /// directory under `assignments_root` that is not closed and finishes what a dead supervisor left, then the attempt
-/// sockets no supervisor holds are removed. Best effort; nothing is returned.
-pub fn sweep_attempts(assignments_root: &Path) {
+/// sockets no supervisor holds are removed. Best effort: what adopt judged comes back (the `sweep-attempts`
+/// internal op reports it; a unit run ignores it).
+pub fn sweep_attempts(assignments_root: &Path) -> fgos_run_supervisor::controller::sweep::Swept {
     use fgos_run_supervisor::controller::runtime_dir::{
         current_uid, process_env, remove_orphan_attempt_sockets,
     };
@@ -154,7 +155,7 @@ pub fn sweep_attempts(assignments_root: &Path) {
                 fgos_process::facts::bound_unix_socket_paths,
             );
         },
-    );
+    )
 }
 
 /// A refusal of the runner config loader as the `run-unit` error the caller rethrows: its class tag, code and

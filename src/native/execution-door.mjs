@@ -5,8 +5,13 @@
 // their old modules, so an error thrown in process and one rethrown from a native result are the same class),
 // the admission peer server (the Workflow's case admission port served as framed JSON lines over a stream pair,
 // `packages/execution/contracts/admission-peer/admission-peer.v1.json`), and the rethrow of a native `run-unit`
-// error result (`packages/execution/contracts/unit-run/run-unit.v1.json`).
+// error result (`packages/execution/contracts/unit-run/run-unit.v1.json`), and the calls of the host's Execution
+// operations (`fgos internal execution <op> --protocol 1`, `packages/execution/contracts/execution-routes/
+// execution-routes.v1.json`): `executionOp` and `runUnitInHost`, one host process per call, spawned asynchronously.
+// Besides Node built-ins it imports only the tier-0 host lookup (`src/util/host-bin-path.mjs`).
+import { spawn } from 'node:child_process';
 import readline from 'node:readline';
+import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 
 export function commonDottedParent(paths) {
   if (!Array.isArray(paths) || paths.length === 0) return '';
@@ -91,15 +96,21 @@ const OPERATIONS = Object.freeze({
 export async function serveAdmissionPeer(port, input, output, events = {}) {
   const lines = readline.createInterface({ input, crlfDelay: Infinity });
   for await (const line of lines) {
-    if (!line.startsWith(ADMISSION_PEER_PREFIX)) continue;
-    let message;
-    try {
-      message = JSON.parse(line.slice(ADMISSION_PEER_PREFIX.length));
-    } catch {
-      continue;
-    }
-    output.write(frame(await answer(port, message, events)));
+    const answered = await answerPeerLine(port, line, events);
+    if (answered !== null) output.write(answered);
   }
+}
+
+/** The framed answer to one line of the channel, or null for a line that is no peer message (stray output). */
+async function answerPeerLine(port, line, events) {
+  if (!line.startsWith(ADMISSION_PEER_PREFIX)) return null;
+  let message;
+  try {
+    message = JSON.parse(line.slice(ADMISSION_PEER_PREFIX.length));
+  } catch {
+    return null;
+  }
+  return frame(await answer(port, message, events));
 }
 
 async function answer(port, message, events) {
@@ -175,4 +186,144 @@ export function runUnitErrorOf(result) {
     thrown.errorClass = error.errorClass;
   }
   return thrown;
+}
+
+/** The prefix of the answer line of an Execution operation; every other line is a peer frame or stray output. */
+export const EXECUTION_PREFIX = '\u001eFGOS-EXECUTION ';
+/** The protocol of `fgos internal execution`. */
+export const EXECUTION_PROTOCOL = 1;
+
+/** A call of a host Execution operation that got no answer of the operation: no host, a dead host, a refusal. */
+export class ExecutionRouteError extends Error {
+  constructor(code, message) {
+    super(message);
+    this.name = 'ExecutionRouteError';
+    this.code = code;
+  }
+}
+
+function hostBinOf(cwd) {
+  const { bin, tried } = resolveActiveHostBin({ cwd });
+  if (!bin) throw new ExecutionRouteError('execution-no-host-binary', `no fgos host binary to run the Execution operation: looked at ${tried.join(', ')}`);
+  return bin;
+}
+
+/**
+ * One host Execution operation: `payload` goes to `fgos internal execution <op> --protocol 1` on its stdin; the
+ * answer line's `result` comes back. `port` (with `events`) is the case admission port the operation may ask over
+ * the child's stdout and stdin; without one only the two events are served. The child is spawned asynchronously
+ * and never through a shell. A child that ends without an answer resolves `{ ended: { code, signal, stderr } }`
+ * for the caller to judge; a refusal of the route (usage, protocol, request) throws ExecutionRouteError.
+ */
+async function callHost(op, payload, { cwd = process.cwd(), port = {}, events = {} } = {}) {
+  const bin = hostBinOf(cwd);
+  const child = spawn(bin, ['internal', 'execution', op, '--protocol', String(EXECUTION_PROTOCOL)], {
+    cwd,
+    env: routeEnv(),
+    stdio: ['pipe', 'pipe', 'pipe'],
+    windowsHide: true,
+  });
+  let stderr = '';
+  child.stderr.setEncoding('utf8');
+  child.stderr.on('data', (chunk) => {
+    if (stderr.length < 64 * 1024) stderr += chunk;
+  });
+  const ended = new Promise((resolve, reject) => {
+    child.once('error', (err) => reject(new ExecutionRouteError('execution-no-host-binary', `cannot run ${bin}: ${err.message}`)));
+    child.once('close', (code, signal) => resolve({ code, signal }));
+  });
+  // A host that exits before it reads the request closes the pipe; its exit and stderr say why.
+  child.stdin.on('error', () => {});
+  child.stdin.write(`${JSON.stringify(payload)}\n`);
+  let answerLine = null;
+  const lines = readline.createInterface({ input: child.stdout, crlfDelay: Infinity });
+  for await (const line of lines) {
+    if (line.startsWith(EXECUTION_PREFIX)) {
+      try {
+        answerLine = JSON.parse(line.slice(EXECUTION_PREFIX.length));
+      } catch {
+        answerLine = null;
+      }
+      continue;
+    }
+    const answered = await answerPeerLine(port, line, events);
+    if (answered !== null && child.stdin.writable) child.stdin.write(answered);
+  }
+  child.stdin.end();
+  const { code, signal } = await ended;
+  if (answerLine === null) {
+    if (/unknown internal route|unknown verb "internal"/.test(stderr)) {
+      throw new ExecutionRouteError(HOST_VERSION_MISMATCH, `${bin} has no execution route: the active release is older than this payload`);
+    }
+    return { ended: { code, signal, stderr: stderr.trim().slice(0, 2000) } };
+  }
+  if (answerLine.protocol !== EXECUTION_PROTOCOL) {
+    throw new ExecutionRouteError(HOST_VERSION_MISMATCH, `${HOST_VERSION_MISMATCH}: the host speaks protocol ${answerLine.protocol ?? 'none'}, this payload ${EXECUTION_PROTOCOL}`);
+  }
+  if (answerLine.error) {
+    throw new ExecutionRouteError(answerLine.error.code ?? 'execution-route-failed', `fgos internal execution ${op}: ${answerLine.error.message ?? 'refused'}`);
+  }
+  return { result: answerLine.result };
+}
+
+/**
+ * The result of one host Execution operation (`custody`, `verify`, `sweep-attempts`, `cancel`; the contract names
+ * each payload and result). `options.caseAdmission` is the port `custody` asks `admit` of when its payload names a
+ * proposal. A host that ends without an answer throws ExecutionRouteError `execution-route-no-answer`.
+ */
+export async function executionOp(op, payload, { cwd, caseAdmission } = {}) {
+  const called = await callHost(op, payload, { cwd, port: caseAdmission ?? {} });
+  if (called.ended) {
+    const { code, signal, stderr } = called.ended;
+    throw new ExecutionRouteError('execution-route-no-answer', `fgos internal execution ${op} ended without an answer (${signal ? `signal ${signal}` : `exit ${code}`})${stderr ? `: ${stderr}` : ''}`);
+  }
+  return called.result;
+}
+
+/**
+ * `runUnit(request)` run by the host's engine: the same options (plain data; `caseAdmission`, `onUnitRunCreated`
+ * and `onCaseAdmitted` are passed beside it) and the same result. An error result is rethrown as the class its tag
+ * names (`runUnitErrorOf`), so `instanceof RunnerConfigError` holds for a refusal and an admission refusal. A host
+ * that ends without an answer settles nothing: when a reservation was admitted and not settled the call returns
+ * `{ unsettled: { reservationId } }`, and the Workflow's dead-reservation sweep decides it; otherwise it throws
+ * ExecutionRouteError `execution-route-no-answer`.
+ */
+export async function runUnitInHost(request, { caseAdmission, onUnitRunCreated, onCaseAdmitted } = {}) {
+  const BESIDE = new Set(['caseAdmission', 'onUnitRunCreated', 'onCaseAdmitted']);
+  const options = Object.fromEntries(Object.entries(request ?? {}).filter(([key, value]) => value !== undefined && !BESIDE.has(key)));
+  let admitted = null;
+  let settled = false;
+  const port = caseAdmission
+    ? {
+        ...Object.fromEntries(Object.keys(OPERATIONS).filter((op) => typeof caseAdmission[op] === 'function').map((op) => [op, caseAdmission[op].bind(caseAdmission)])),
+        ...(typeof caseAdmission.settle === 'function'
+          ? {
+              settle: async (reservationId, settle) => {
+                const done = await caseAdmission.settle(reservationId, settle);
+                if (reservationId === admitted) settled = true;
+                return done;
+              },
+            }
+          : {}),
+      }
+    : {};
+  const events = {
+    onUnitRunCreated: (unitRunId) => onUnitRunCreated?.(unitRunId),
+    onCaseAdmitted: async (caseId, reservationId) => {
+      admitted = reservationId;
+      await onCaseAdmitted?.({ caseId, reservationId });
+    },
+  };
+  const payload = {
+    request: { contract: { id: 'run-unit-request', version: 1 }, options },
+    admission: Boolean(caseAdmission),
+  };
+  const called = await callHost('run-unit', payload, { cwd: typeof options.cwd === 'string' ? options.cwd : process.cwd(), port, events });
+  if (called.ended) {
+    if (admitted !== null && !settled) return { unsettled: { reservationId: admitted } };
+    const { code, signal, stderr } = called.ended;
+    throw new ExecutionRouteError('execution-route-no-answer', `fgos internal execution run-unit ended without an answer (${signal ? `signal ${signal}` : `exit ${code}`})${stderr ? `: ${stderr}` : ''}`);
+  }
+  if (called.result?.ok === false) throw runUnitErrorOf(called.result);
+  return called.result?.result;
 }

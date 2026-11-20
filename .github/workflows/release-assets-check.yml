@@ -116,3 +116,157 @@ jobs:
           test/rust-host/fgctl-init-activation.test.mjs
           test/rust-host/fgctl-init-preflight-tail.test.mjs
           test/rust-host/release-tree.test.mjs
+
+  # The host binary and the execution engine's tests, compiled and linked natively on macOS.
+  macos-host-build:
+    name: macOS host build
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rust toolchain
+        run: |
+          rustup toolchain install
+          rustup show
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+
+      # The host binary links the fgos-execution-engine crate.
+      - name: Build the host (release)
+        run: cargo build --release -p fgos
+
+      - name: Compile and link the execution engine tests
+        run: cargo test -p fgos-execution-engine --no-run
+
+  # Evidence only: measures how Win32 LockFileEx byte-range locks (byte 0, length 1, exclusive,
+  # fail immediately, as the holder-lock windows driver takes them) behave across handle
+  # inheritance and process death. Every answer is a line starting with "PROBE "; a "no" answer
+  # never fails the job, only a probe that cannot run does.
+  windows-lock-inheritance-probe:
+    name: windows lock inheritance probe
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Probe LockFileEx handle inheritance
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $d = Join-Path $env:RUNNER_TEMP 'lockprobe'
+          New-Item -ItemType Directory -Force $d | Out-Null
+          $src = @'
+          using System;
+          using System.IO;
+          using System.Text;
+          using System.Threading;
+          using System.Diagnostics;
+          using System.Reflection;
+          using System.Runtime.InteropServices;
+          static class Probe {
+            [StructLayout(LayoutKind.Sequential)] struct SA { public int n; public IntPtr d; public int inh; }
+            [StructLayout(LayoutKind.Sequential)] struct OV { public IntPtr a, b; public uint lo, hi; public IntPtr ev; }
+            [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)] struct SI {
+              public int cb; public string r, dk, t; public int x, y, xs, ys, xc, yc, fill, flags;
+              public short show, res2; public IntPtr res2p, hin, hout, herr; }
+            [StructLayout(LayoutKind.Sequential)] struct PI { public IntPtr hp, ht; public int pid, tid; }
+            [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+            static extern IntPtr CreateFileW(string n, uint acc, uint share, ref SA sa, uint disp, uint fl, IntPtr t);
+            [DllImport("kernel32", SetLastError = true)] static extern bool CloseHandle(IntPtr h);
+            [DllImport("kernel32", SetLastError = true)] static extern bool LockFileEx(IntPtr h, uint fl, uint res, uint lo, uint hi, ref OV o);
+            [DllImport("kernel32", SetLastError = true)] static extern bool UnlockFileEx(IntPtr h, uint res, uint lo, uint hi, ref OV o);
+            [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+            static extern bool CreateProcessW(string app, StringBuilder cmd, IntPtr pa, IntPtr ta, bool inherit, uint fl,
+              IntPtr env, string dir, ref SI si, out PI pi);
+
+            static string Lk(IntPtr h) {
+              OV o = new OV();
+              return LockFileEx(h, 3, 0, 1, 0, ref o) ? "succeeded" : "failed (" + Marshal.GetLastWin32Error() + ")";
+            }
+            static string Un(IntPtr h) {
+              OV o = new OV();
+              return UnlockFileEx(h, 0, 1, 0, ref o) ? "succeeded" : "failed (" + Marshal.GetLastWin32Error() + ")";
+            }
+            static IntPtr Open(string f, bool inherit) {
+              SA sa = new SA(); sa.n = Marshal.SizeOf(typeof(SA)); sa.inh = inherit ? 1 : 0;
+              IntPtr h = CreateFileW(f, 0xC0000000, 3, ref sa, 3, 0x80, IntPtr.Zero);
+              if (h == new IntPtr(-1)) throw new Exception("CreateFileW " + Marshal.GetLastWin32Error());
+              return h;
+            }
+            static void Say(string dir, string l) { File.AppendAllText(Path.Combine(dir, "result.txt"), l + "\n"); }
+            static bool WaitFor(string path) {
+              for (int i = 0; i < 300 && !File.Exists(path); i++) Thread.Sleep(100);
+              return File.Exists(path);
+            }
+
+            static void Parent(string f, string dir, string sc) {
+              IntPtr h = Open(f, true);
+              if (sc != "d") Say(dir, "setup.parent-lock: " + Lk(h));
+              SI si = new SI(); si.cb = Marshal.SizeOf(typeof(SI)); PI pi;
+              StringBuilder cmd = new StringBuilder("\"" + Assembly.GetExecutingAssembly().Location + "\" c \"" + f + "\" \"" + dir + "\" " + h.ToInt64() + " " + sc);
+              if (!CreateProcessW(null, cmd, IntPtr.Zero, IntPtr.Zero, true, 0, IntPtr.Zero, null, ref si, out pi))
+                throw new Exception("CreateProcessW " + Marshal.GetLastWin32Error());
+              if (sc == "ab") { Process.GetProcessById(pi.pid).WaitForExit(30000); return; }
+              if (!WaitFor(Path.Combine(dir, "child-ready"))) throw new Exception("child never became ready");
+              Process.GetCurrentProcess().Kill(); // TerminateProcess on the locking/handle-owning parent
+            }
+
+            static void Child(string f, string dir, IntPtr inh, string sc) {
+              if (sc == "ab") {
+                IntPtr fr = Open(f, false);
+                Say(dir, "b.child-fresh-handle-lock-while-parent-holds: " + Lk(fr));
+                CloseHandle(fr);
+                Say(dir, "a.child-lock-on-inherited-handle: " + Lk(inh));
+                Say(dir, "a.child-unlock-on-inherited-handle: " + Un(inh));
+                return;
+              }
+              if (sc == "d") Say(dir, "d.child-lock-on-inherited-handle: " + Lk(inh));
+              File.WriteAllText(Path.Combine(dir, "child-ready"), "1");
+              WaitFor(Path.Combine(dir, "stop")); // keeps the inherited handle open until told to stop
+            }
+
+            static int Main(string[] a) {
+              string dir = a[2];
+              try {
+                if (a[0] == "t") { IntPtr h = Open(a[1], false); Say(dir, a[3] + ": " + Lk(h)); CloseHandle(h); }
+                else if (a[0] == "p") Parent(a[1], dir, a[3]);
+                else Child(a[1], dir, new IntPtr(long.Parse(a[3])), a[4]);
+                return 0;
+              } catch (Exception e) { Say(dir, "probe-error: " + e.Message); return 2; }
+            }
+          }
+          '@
+          Set-Content -Path "$d\probe.cs" -Value $src
+          $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+          & $csc /nologo "/out:$d\probe.exe" "$d\probe.cs"
+          if ($LASTEXITCODE -ne 0) { throw 'probe did not compile' }
+          $exe = "$d\probe.exe"
+
+          function Run-Scenario($s) {
+            $sd = Join-Path $d $s
+            New-Item -ItemType Directory -Force $sd | Out-Null
+            $f = Join-Path $sd 'f.bin'
+            [IO.File]::WriteAllBytes($f, [byte[]](0,0,0,0))
+            & $exe t $f $sd 'control.fresh-lock-on-unlocked-file'
+            $p = Start-Process $exe -ArgumentList "p `"$f`" `"$sd`" $s" -PassThru -NoNewWindow
+            if (-not $p.WaitForExit(40000)) { Stop-Process -Id $p.Id -Force; throw "parent timed out in scenario $s" }
+            if ($s -ne 'ab') {
+              $tag = if ($s -eq 'c') { 'c.third-process-lock-after-parent-death' } else { 'd.third-process-lock-after-parent-death' }
+              Start-Sleep -Milliseconds 500
+              & $exe t $f $sd "$tag+0.5s"
+              Start-Sleep -Seconds 3
+              & $exe t $f $sd "$tag+3.5s"
+              New-Item -ItemType File -Force (Join-Path $sd 'stop') | Out-Null
+              Start-Sleep -Seconds 1
+            }
+            $rf = Join-Path $sd 'result.txt'
+            if (-not (Test-Path $rf)) { throw "scenario $s produced no result" }
+            Get-Content $rf
+          }
+
+          $lines = @()
+          foreach ($s in 'ab', 'c', 'd') { $lines += Run-Scenario $s }
+          $lines | ForEach-Object { "PROBE $_" }
+          "PROBE legend: 'failed (33)' = ERROR_LOCK_VIOLATION. For the c.* and d.* lines, 'failed (33)' means the lock SURVIVED the parent's death; 'succeeded' means it was released."
+          if ($lines -match 'probe-error') { throw 'the probe itself failed to run' }
+          if ($lines.Count -lt 12) { throw "expected 12 result lines, got $($lines.Count)" }

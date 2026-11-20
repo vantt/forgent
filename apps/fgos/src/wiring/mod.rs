@@ -5,6 +5,7 @@ pub mod dispatch_decide;
 pub mod doctor;
 pub mod event_store_clone;
 pub mod events;
+pub mod execution_routes;
 pub mod gateway_control;
 pub mod git_incidents;
 pub mod head_questions;
