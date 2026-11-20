@@ -12,6 +12,7 @@
 pub mod containment;
 pub mod control;
 pub mod facts;
+pub mod interrupt;
 #[cfg(unix)]
 pub mod mapped;
 pub mod path;

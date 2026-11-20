@@ -429,6 +429,13 @@ pub fn prepare_attempt_seat(
         .and_then(|locks| locks.cwd_lease_file())
         .map(|lease| lease.to_string_lossy().into_owned())
         .filter(|_| seat.mutating);
+    // A lock is held only by the process that took it on Windows: the supervisor declares its domain on the
+    // controller's lease through the channel the controller serves while it hands the attempt over.
+    let cwd_lease_owner = cwd_lease_file.as_ref().filter(|_| cfg!(windows)).map(|_| {
+        super::launch::cwd_lease_owner_dir(&attempt_run_dir)
+            .to_string_lossy()
+            .into_owned()
+    });
     let extra_steps: Vec<String> = if attempt.terminal {
         vec!["cleanup-trust".into()]
     } else {
@@ -459,7 +466,7 @@ pub fn prepare_attempt_seat(
         gate_kill_grace_ms: seat.settings.gate_kill_grace_ms,
         kill_wait_ms: seat.settings.kill_wait_ms,
         cwd_lease_file: cwd_lease_file.as_deref(),
-        cwd_lease_owner: None,
+        cwd_lease_owner: cwd_lease_owner.as_deref(),
         identity: Some(&identity),
         terminal: terminal.as_ref(),
         extra_steps: &extra_steps,

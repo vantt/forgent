@@ -5,11 +5,13 @@
 //! The attempt lock and, for an attempt that writes, the cwd lease are lent to the supervisor as descriptors 3 and 4
 //! (`Handle::lend`): the supervisor holds them for the attempt's life, and the controller's lent handles only close,
 //! never waiting on the child. Where a lock does not pass to a child with its handle (Windows), the controller
-//! releases its attempt copy right after the spawn and the supervisor takes the attempt lock itself; a mutating
-//! attempt is refused before admission there (`execute::mutating_launch_refusal`).
+//! releases its attempt copy right after the spawn and the supervisor takes the attempt lock itself; the cwd lease
+//! stays here, and until the binding a thread of the controller serves the lease's request channel the envelope
+//! names (`cwdLeaseOwner`), on which the supervisor declares its domain ([`serving_lease_owner`]).
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Child;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use fgos_run_supervisor::adopt::{adopt_one, AdoptArgs, Target};
 use fgos_run_supervisor::controller::cancel::{begin_launch, end_launch, register, unregister};
@@ -46,7 +48,7 @@ pub fn start_and_bind(
     begin_launch(&run_dir).map_err(|e| RunnerConfigError::coded(e.to_string(), "run-cancelled"))?;
     let outcome = (|| {
         #[cfg(unix)]
-        let mut started = {
+        let (started, bound) = {
             // Node's `spawnWithLocks([attempt, cwdLease])`: the supervisor gets a copy of the attempt lock as descriptor
             // 3 and, for an attempt that writes, of the cwd lease as descriptor 4. Both handles stay here, lent: the
             // attempt copy closes once the binding is known, the cwd lease stays until the attempt is closed (its
@@ -81,12 +83,12 @@ pub fn start_and_bind(
                 })?);
             }
             let handover: Vec<&std::fs::File> = descriptors.iter().collect();
-            let started = start_supervisor(envelope, &handover, &attempt.step_env, extra_env)
+            let mut started = start_supervisor(envelope, &handover, &attempt.step_env, extra_env)
                 .map_err(|e| {
-                    launch_failed(format!(
-                        "executeAssignment: the supervisor did not start ({e})"
-                    ))
-                })?;
+                launch_failed(format!(
+                    "executeAssignment: the supervisor did not start ({e})"
+                ))
+            })?;
             drop(descriptors);
             // The supervisor now holds every lent copy: each lent handle records it, so a later borrow of the
             // custody lets it keep its copy and drains any other holder.
@@ -100,23 +102,40 @@ pub fn start_and_bind(
                     handle.lent_to(child.clone());
                 }
             }
-            started
+            attempt.handed_over = true;
+            let bound = wait_for_binding(&run_dir, &mut started.child, binding_wait_ms(envelope));
+            (started, bound)
         };
         #[cfg(not(unix))]
-        let mut started = {
-            let started =
-                start_supervisor(envelope, &[], &attempt.step_env, extra_env).map_err(|e| {
-                    launch_failed(format!(
-                        "executeAssignment: the supervisor did not start ({e})"
-                    ))
-                })?;
-            if let Some(locks) = attempt.locks.as_mut() {
-                locks.release_attempt();
-            }
-            started
+        let (started, bound) = {
+            // The lease stays in this process (a lock is held only by the process that took it): until the binding
+            // is known, the channel the envelope names answers the supervisor's declaration of its domain on it.
+            let (attempt_lock, own_lease) = match attempt.locks.as_mut() {
+                Some(locks) => (Some(&mut locks.attempt), locks.cwd_lease.as_ref()),
+                None => (None, None),
+            };
+            let step_env = &attempt.step_env;
+            let handed_over = &mut attempt.handed_over;
+            serving_lease_owner(
+                envelope["cwdLeaseOwner"].as_str(),
+                own_lease.or(custody),
+                || {
+                    let mut started = start_supervisor(envelope, &[], step_env, extra_env)
+                        .map_err(|e| {
+                            launch_failed(format!(
+                                "executeAssignment: the supervisor did not start ({e})"
+                            ))
+                        })?;
+                    if let Some(lock) = attempt_lock {
+                        *lock = None;
+                    }
+                    *handed_over = true;
+                    let bound =
+                        wait_for_binding(&run_dir, &mut started.child, binding_wait_ms(envelope));
+                    Ok::<_, RunnerConfigError>((started, bound))
+                },
+            )??
         };
-        attempt.handed_over = true;
-        let bound = wait_for_binding(&run_dir, &mut started.child, binding_wait_ms(envelope));
         if bound == Binding::Bound {
             register(&run_dir);
         }
@@ -127,6 +146,55 @@ pub fn start_and_bind(
     }
     end_launch(&run_dir);
     outcome
+}
+
+/// Where the controller serves the request channel of the cwd lease it holds to the supervisor of one attempt that
+/// writes (the envelope's `cwdLeaseOwner`): a directory of that attempt.
+pub fn cwd_lease_owner_dir(run_dir: &Path) -> PathBuf {
+    run_dir.join("cwd-lease-owner")
+}
+
+/// Run `body` while a thread of this process serves the request channel of `lease` at `owner`
+/// (`fgos_holder_lock::route::serve_requests`), the lock-hold helper's own loop: the supervisor declares its domain
+/// there on the lease this process holds. No owner named, `body` runs alone. The channel stops when `body` ends,
+/// however it ends.
+pub fn serving_lease_owner<T>(
+    owner: Option<&str>,
+    lease: Option<&fgos_holder_lock::Handle>,
+    body: impl FnOnce() -> T,
+) -> Result<T, RunnerConfigError> {
+    let Some(owner) = owner else {
+        return Ok(body());
+    };
+    let lease = lease.ok_or_else(|| {
+        launch_failed(
+            "executeAssignment: the envelope names a cwd lease owner but this controller holds no cwd lease".into(),
+        )
+    })?;
+    let dir = Path::new(owner);
+    std::fs::create_dir_all(dir).map_err(|e| {
+        launch_failed(format!(
+            "executeAssignment: the cwd lease owner channel {} could not be made ({e})",
+            dir.display()
+        ))
+    })?;
+    struct Stop<'a>(&'a AtomicBool);
+    impl Drop for Stop<'_> {
+        fn drop(&mut self) {
+            self.0.store(true, Ordering::SeqCst);
+        }
+    }
+    let stop = AtomicBool::new(false);
+    Ok(std::thread::scope(|scope| {
+        scope.spawn(|| {
+            fgos_holder_lock::route::serve_requests(dir, lease, &mut |tick| {
+                std::thread::sleep(tick);
+                stop.load(Ordering::SeqCst)
+            })
+        });
+        let _stop = Stop(&stop);
+        body()
+    }))
 }
 
 /// What the wait for the settled answer is given.

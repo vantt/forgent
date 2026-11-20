@@ -115,7 +115,8 @@ impl Drop for CancelHold {
 }
 
 /// `holdCancelOnSignal(options)` (`src/runner/execution/run.mjs:259`): a process that asked for it
-/// (`enable_cancel_on_signal`) has Ctrl-C and SIGTERM cancel every attempt it delivered; one handler serves all its
+/// (`enable_cancel_on_signal`) has Ctrl-C and SIGTERM (Ctrl-Break on a Windows console) cancel every attempt it
+/// delivered; one handler serves all its
 /// units, installed with the first with the project's `dispatch.cancelWaitMs` and removed with the last.
 pub fn hold_cancel_on_signal(options: &Value) -> Result<CancelHold, RunUnitError> {
     if !cancel::cancel_on_signal_enabled() {
@@ -139,14 +140,7 @@ pub fn hold_cancel_on_signal(options: &Value) -> Result<CancelHold, RunUnitError
             });
         let wait_ms = read_cancel_wait_ms(project_root.as_deref())
             .map_err(|e| RunUnitError::config(e.to_string(), None, None))?;
-        #[cfg(unix)]
-        {
-            held.1 = Some(Box::new(cancel::install_cancel_on_signal(wait_ms)));
-        }
-        // No crate installs a console Ctrl-C/Ctrl-Break handler yet (the run supervisor's gate only sends
-        // CTRL_BREAK): on Windows a cancel waits for the route's Windows decision.
-        #[cfg(not(unix))]
-        let _ = wait_ms;
+        held.1 = Some(Box::new(cancel::install_cancel_on_signal(wait_ms)));
     }
     held.0 += 1;
     Ok(CancelHold(true))

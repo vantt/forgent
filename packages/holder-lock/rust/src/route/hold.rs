@@ -381,6 +381,30 @@ mod borrow {
     }
 }
 
+/// Serve the holder's request channel in `work` over `handle`, which this
+/// process holds, until `stop(tick)` says stop (it waits up to `tick` for
+/// that); a borrow still running is then ended and joined before this returns.
+/// The lock-hold helper serves its private work directory with it; a process
+/// that holds a lease itself serves one to the supervisor it names it to (the
+/// envelope's `cwdLeaseOwner`), so the supervisor declares its domain on a lock
+/// it cannot hold. The requests are files, `req-<n>.json`, each answered by
+/// `result-<n>.json` (contract `internal-route.lock-hold.v1.json`).
+pub fn serve_requests(work: &Path, handle: &port::Handle, stop: &mut dyn FnMut(Duration) -> bool) {
+    let mut seen = BTreeSet::new();
+    // The scope joins a running borrow before the lock is released: on parent
+    // death its job is ended at once and emptied (bounded by the kill wait).
+    std::thread::scope(|scope| {
+        let mut flight = Flight::none();
+        loop {
+            if stop(TICK) {
+                flight.cancel();
+                break;
+            }
+            serve(work, &mut seen, handle, &mut flight, scope);
+        }
+    });
+}
+
 /// Take the lock, answer through `ready.json`, and hold it until
 /// `parent_gone(tick)` reports the parent gone (it waits up to `tick` for
 /// that). Returns the process exit code.
@@ -415,19 +439,7 @@ pub(super) fn run(args: &HoldArgs, mut parent_gone: impl FnMut(Duration) -> bool
         // `handle` drops here: nothing is held when this exits.
         return ready_failed(&err);
     }
-    let mut seen = BTreeSet::new();
-    // The scope joins a running borrow before the lock is released: on parent
-    // death its job is ended at once and emptied (bounded by the kill wait).
-    std::thread::scope(|scope| {
-        let mut flight = Flight::none();
-        loop {
-            if parent_gone(TICK) {
-                flight.cancel();
-                break;
-            }
-            serve(&args.work, &mut seen, &handle, &mut flight, scope);
-        }
-    });
+    serve_requests(&args.work, &handle, &mut parent_gone);
     // Unlock explicitly, then close: every borrow's domain is empty by now.
     match port::release(handle) {
         port::Release::Released { .. } => EXIT_OK,
