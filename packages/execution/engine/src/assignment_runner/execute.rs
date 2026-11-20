@@ -212,9 +212,10 @@ fn absolute(path: &Path) -> PathBuf {
 }
 
 /// Why a mutating attempt cannot launch from this route on this platform. On Windows a lock does not pass to a
-/// child with its handle: Node holds the cwd lease in a lock-hold helper and names it to the supervisor
-/// (`cwdLeaseOwner`), and the Rust controller has no such holder endpoint yet, so the supervisor would try to take a
-/// lease the controller still holds. Windows mutating launches stay on the Node route until that design exists.
+/// child with its handle: the controller keeps the cwd lease and serves its request channel to the supervisor
+/// (`cwdLeaseOwner`, [`super::launch::serving_lease_owner`]), but a writing unit run is not yet proven end to end on
+/// native Windows (the Git door takes no borrowed custody there), so Windows mutating launches stay on the Node
+/// route until it is.
 pub fn mutating_launch_refusal(windows: bool) -> Option<DispatchError> {
     windows.then(|| {
         DispatchError::new(

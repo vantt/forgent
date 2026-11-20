@@ -250,79 +250,57 @@ pub fn cancel_flow(signal: &str, flow: CancelFlow<'_>) {
     (flow.exit)(code);
 }
 
-#[cfg(unix)]
-mod handlers {
-    use super::*;
-    use std::sync::atomic::AtomicI32;
+/// Removes the handlers (and stops the watcher) when dropped.
+pub struct CancelHandlers {
+    stop: std::sync::Arc<AtomicBool>,
+    _caught: fgos_process::interrupt::Caught,
+}
 
-    static PENDING: AtomicI32 = AtomicI32::new(0);
-
-    extern "C" fn on_signal(signal: libc::c_int) {
-        PENDING.store(signal, Ordering::SeqCst);
-    }
-
-    /// Removes the handlers (and stops the watcher) when dropped.
-    pub struct CancelHandlers {
-        stop: std::sync::Arc<AtomicBool>,
-    }
-
-    impl Drop for CancelHandlers {
-        fn drop(&mut self) {
-            self.stop.store(true, Ordering::SeqCst);
-            for signal in [libc::SIGINT, libc::SIGTERM] {
-                unsafe { libc::signal(signal, libc::SIG_DFL) };
-            }
-        }
-    }
-
-    /// Handle SIGINT and SIGTERM: the first runs `cancel_flow` and exits 130 or 143; the second exits at once.
-    pub fn install_cancel_on_signal(cancel_wait_ms: u64) -> CancelHandlers {
-        let stop = std::sync::Arc::new(AtomicBool::new(false));
-        PENDING.store(0, Ordering::SeqCst);
-        for signal in [libc::SIGINT, libc::SIGTERM] {
-            unsafe {
-                libc::signal(
-                    signal,
-                    on_signal as extern "C" fn(libc::c_int) as libc::sighandler_t,
-                )
-            };
-        }
-        let watcher_stop = stop.clone();
-        std::thread::spawn(move || {
-            let mut first: Option<i32> = None;
-            while !watcher_stop.load(Ordering::SeqCst) {
-                let signal = PENDING.swap(0, Ordering::SeqCst);
-                if signal != 0 {
-                    if let Some(code) = first {
-                        std::process::exit(code);
-                    }
-                    let name = if signal == libc::SIGINT {
-                        "SIGINT"
-                    } else {
-                        "SIGTERM"
-                    };
-                    first = exit_code_of(name);
-                    // The flow runs on its own thread so a second signal is still seen while it waits.
-                    let name = name.to_string();
-                    std::thread::spawn(move || {
-                        let mut exit = |code: i32| std::process::exit(code);
-                        let mut stderr = std::io::stderr();
-                        cancel_flow(
-                            &name,
-                            CancelFlow {
-                                cancel_wait_ms,
-                                exit: &mut exit,
-                                stderr: &mut stderr,
-                            },
-                        );
-                    });
-                }
-                std::thread::sleep(Duration::from_millis(10));
-            }
-        });
-        CancelHandlers { stop }
+impl Drop for CancelHandlers {
+    fn drop(&mut self) {
+        self.stop.store(true, Ordering::SeqCst);
     }
 }
 
-#[cfg(unix)]
-pub use handlers::{install_cancel_on_signal, CancelHandlers};
+/// Handle SIGINT and SIGTERM (Ctrl-C and Ctrl-Break on a Windows console, which read as SIGINT): the first runs
+/// `cancel_flow` and exits 130 or 143; the second exits at once.
+pub fn install_cancel_on_signal(cancel_wait_ms: u64) -> CancelHandlers {
+    use fgos_process::interrupt::{self, Interrupt};
+    let stop = std::sync::Arc::new(AtomicBool::new(false));
+    let caught = interrupt::catch();
+    let watcher_stop = stop.clone();
+    std::thread::spawn(move || {
+        let mut first: Option<i32> = None;
+        while !watcher_stop.load(Ordering::SeqCst) {
+            if let Some(kind) = interrupt::take() {
+                if let Some(code) = first {
+                    std::process::exit(code);
+                }
+                let name = match kind {
+                    Interrupt::Interrupt => "SIGINT",
+                    Interrupt::Terminate => "SIGTERM",
+                };
+                first = exit_code_of(name);
+                // The flow runs on its own thread so a second signal is still seen while it waits.
+                let name = name.to_string();
+                std::thread::spawn(move || {
+                    let mut exit = |code: i32| std::process::exit(code);
+                    let mut stderr = std::io::stderr();
+                    cancel_flow(
+                        &name,
+                        CancelFlow {
+                            cancel_wait_ms,
+                            exit: &mut exit,
+                            stderr: &mut stderr,
+                        },
+                    );
+                });
+            }
+            std::thread::sleep(Duration::from_millis(10));
+        }
+    });
+    CancelHandlers {
+        stop,
+        _caught: caught,
+    }
+}

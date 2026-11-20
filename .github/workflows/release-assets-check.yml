@@ -138,6 +138,28 @@ jobs:
       - name: Compile and link the execution engine tests
         run: cargo test -p fgos-execution-engine --no-run
 
+  # A writing attempt on native Windows: the controller holds the cwd lease in its own process and serves its
+  # request channel (cwdLeaseOwner); the real supervisor declares its job there before GO and a stub agent writes
+  # its file. Then a Ctrl-Break to a controller's process group cancels its attempts as SIGINT does on Unix.
+  windows-cwd-lease-owner:
+    name: windows cwd lease owner
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rust toolchain
+        run: |
+          rustup toolchain install
+          rustup show
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+
+      - name: The supervisor declares its job through the controller's cwd lease channel
+        run: cargo test --release -p fgos --test windows_cwd_lease_owner -- --nocapture
+
+      - name: A Ctrl-Break cancels the controller's attempts
+        run: cargo test --release -p fgos-run-supervisor --test windows_cancel_on_ctrl_break -- --nocapture
+
   # Evidence only: measures how Win32 LockFileEx byte-range locks (byte 0, length 1, exclusive,
   # fail immediately, as the holder-lock windows driver takes them) behave across handle
   # inheritance and process death. Every answer is a line starting with "PROBE "; a "no" answer
