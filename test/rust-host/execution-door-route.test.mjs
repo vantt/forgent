@@ -1,14 +1,15 @@
 // The Node Execution seam over the host's Execution operations (`src/native/execution-door.mjs` over
 // `fgos internal execution`, FGOS_HOST_BIN built from this checkout): the call reaches the route and its answer
-// comes back as the door's result, a refused unit run is rethrown as its class, and the caller's case admission
-// port is served over the child's pipes. The operations' outcomes are owned by the route's Rust proofs.
+// comes back as the door's result, a refused unit run is rethrown as its class, a refused session launch as the
+// error Node's launch threw, and the caller's case admission port is served over the child's pipes. The
+// operations' outcomes are owned by the route's Rust proofs.
 import '../helpers/process-tmp-root.mjs';
 import { test, after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { executionOp, runUnitInHost, RunnerConfigError, ExecutionRouteError } from '../../src/native/execution-door.mjs';
+import { executionOp, runUnitInHost, launchSessionInHost, RunnerConfigError, ExecutionRouteError } from '../../src/native/execution-door.mjs';
 
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-execution-door-'));
 const savedHome = process.env.HOME;
@@ -54,4 +55,17 @@ test('runUnitInHost rethrows a refused unit run as the class its result names', 
     (err) => err instanceof RunnerConfigError && /objective/.test(err.message),
   );
   assert.deepEqual(created, []);
+});
+
+test('launchSessionInHost rethrows a refused launch with the code and message Node\'s launch threw', async () => {
+  const projectRoot = path.join(scratch, 'project');
+  const used = path.join(projectRoot, '.fgos', 'assignments', 'head-planner-p-1', 'runs', '01');
+  fs.mkdirSync(used, { recursive: true });
+  fs.writeFileSync(path.join(used, 'envelope.json'), '{}');
+  const request = {
+    binding: { executor: 'stub' }, runnerConfig: {}, key: 'head-planner-p-1', role: 'head:planner-p',
+    grant: { verbs: [], writes: [], mailbox: false, peers: false }, opening: 'hello', ceilingMs: 60000,
+    env: { FGOS_HEAD_PERSONA: 'planner' }, projectRoot, beside: null, display: { id: 'p', title: 'planner' },
+  };
+  await assert.rejects(launchSessionInHost(request), (err) => err.name === 'SessionLaunchError' && err.code === 'head-key-used' && /used once/.test(err.message));
 });

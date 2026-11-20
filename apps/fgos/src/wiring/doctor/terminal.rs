@@ -221,6 +221,20 @@ pub(crate) fn project_route_config(root: &Path) -> Value {
     read_entries(root).map_or_else(|_| json!({}), |entries| route_config(&entries))
 }
 
+/// `retainFailedPaneMsOf(repoRoot)` (`src/terminal-control/config.mjs:98`): the project's `terminal.retainFailedPaneMs`
+/// when it is a positive number of milliseconds, else `null` (a failed pane stays until a person closes it).
+pub(crate) fn project_retain_failed_pane_ms(root: &Path) -> Value {
+    read_entries(root)
+        .ok()
+        .and_then(|entries| {
+            entries
+                .into_iter()
+                .find(|e| e.name == "retainFailedPaneMs")
+                .and_then(|e| e.value.as_u64().filter(|ms| *ms > 0))
+        })
+        .map_or(Value::Null, Value::from)
+}
+
 /// One sentence per breach of the two rules whose inputs are not the core's: the dispatch ready timeout and the
 /// round's retain time. The core refuses the rest.
 fn config_problems(entries: &[Entry]) -> Vec<String> {

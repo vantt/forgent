@@ -110,6 +110,12 @@ pub struct SeatInput<'a> {
     pub case_context: Option<(&'a str, &'a str)>,
     /// A head session: the role, verbs and writes it holds; typed verbatim as its opening.
     pub session: Option<&'a Value>,
+    /// What a session's pane is typed verbatim instead of the brief rendered around `prompt`.
+    pub opening: Option<&'a str>,
+    /// How a session's pane is named (`{ id, title }`).
+    pub display: Option<&'a Value>,
+    /// The live key of the session whose tab a session's pane opens next to.
+    pub beside: Option<&'a str>,
     pub ceiling_ms: Option<u64>,
     pub request_socket: Option<&'a str>,
     pub retain_failed_pane_ms: Option<Value>,

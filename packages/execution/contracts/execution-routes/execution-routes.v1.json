@@ -1,6 +1,6 @@
 {
   "contract": { "id": "execution-routes", "version": 1 },
-  "description": "The long or effectful Execution operations a Node caller above the Execution tier reaches through src/native/execution-door.mjs (executionOp, runUnitInHost): one host process per call, `fgos internal execution <op> --protocol 1`. Implemented by apps/fgos/src/wiring/execution_routes.rs.",
+  "description": "The long or effectful Execution operations a Node caller above the Execution tier reaches through src/native/execution-door.mjs (executionOp, runUnitInHost, launchSessionInHost): one host process per call, `fgos internal execution <op> --protocol 1`. Implemented by apps/fgos/src/wiring/execution_routes.rs.",
   "invocation": {
     "argv": ["internal", "execution", "<op>", "--protocol", "1"],
     "request": "The first line of stdin: one JSON object, the op's payload.",
@@ -15,6 +15,11 @@
     "run-unit": {
       "payload": { "request": "the run-unit-request document (contracts/unit-run/run-unit.v1.json); an option outside its list is refused by name", "admission": "boolean: the caller serves a case admission port; without it the run has none. The two events (unitRunCreated, caseAdmitted) always reach the caller." },
       "result": "the run-unit-result document: { ok: true, result } or { ok: false, error } (the door rethrows the error's class)"
+    },
+    "launch-session": {
+      "payload": { "binding": "object: bind()'s answer for the head seat (executor, invocation?, model, tier, reasoningEffort?, leaseAccount?, pool?)", "runnerConfig": "object: the project's runner config (the default executor is applied by the host)", "key": "string: the head key; .fgos/assignments/<key>/runs/01 is the attempt directory, used once", "role": "string: head:<persona>-<name>", "grant": { "verbs": "string[]", "writes": "string[]", "mailbox": "boolean?", "peers": "boolean?" }, "opening": "string: typed verbatim into the pane", "ceilingMs": "number: the session's hard ceiling, positive", "env": "object<string,string>?: added to the agent's launch environment", "projectRoot": "string", "beside": "string|null: the live key of the session whose tab the new one opens next to", "display": "{ id, title }|null", "opts": "{ providerCapacityRuntimeDir? }?" },
+      "result": { "placement": "{ host: 'terminal', key }: key is the attempt id", "runDir": "string", "attemptId": "string", "refused": "{ code, message, ...extra }: instead of the three fields above when the launch was refused (head-key-used, lease-refused with refusal, launch-unknown with launchState, or the code of the step that refused); the door rethrows it as an error carrying those fields" },
+      "implementation": "launchSessionAttempt (src/runner/dispatch/session-attempt.mjs): engine transport_round::session_attempt over the host's AttemptDriver (apps/fgos/src/wiring/unit_run_host/session_attempt.rs); returns once the supervisor bound the attempt, never waits for the session to end"
     },
     "custody": {
       "payload": { "fgosDir": "string", "worktree": "string, an existing directory", "admit": "object?, the proposal asked of the peer's admit before the command runs", "verify": { "command": "string", "timeoutMs": "number?" } },

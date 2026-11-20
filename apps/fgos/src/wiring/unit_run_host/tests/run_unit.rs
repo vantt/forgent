@@ -23,10 +23,10 @@ use super::{git, repo, Scratch};
 
 const CHILD: &str = "FGOS_UNIT_RUN_HOST_TEST_CHILD";
 
-/// Runs `body` in a child of this test binary with a scratch HOME and nothing of this process's environment but
+/// Runs `body`, the test `name` of `module` (its `module_path!()`), in a child of this test binary with a scratch HOME and nothing of this process's environment but
 /// PATH, the locale and the user, and a Git identity of its own; with `bwrap`, the scratch global config registers this machine's bwrap. A machine
 /// without a working bwrap skips a confined run (the repository's rule for bwrap-dependent proofs).
-fn hermetic(name: &str, bwrap: bool, body: fn()) {
+pub(super) fn hermetic(module: &str, name: &str, bwrap: bool, body: fn()) {
     if std::env::var_os(CHILD).is_some() {
         return body();
     }
@@ -68,9 +68,7 @@ fn hermetic(name: &str, bwrap: bool, body: fn()) {
     let shared_before = dispatch_dirs(&shared_root);
     let test = format!(
         "{}::{name}",
-        module_path!()
-            .split_once("::")
-            .map_or(module_path!(), |(_, rest)| rest)
+        module.split_once("::").map_or(module, |(_, rest)| rest)
     );
     let mut child = std::process::Command::new(std::env::current_exe().unwrap());
     child
@@ -177,7 +175,7 @@ impl CaseAdmission for FreePort {
 
 /// The stub agent marks `agent-ran` in its run directory and, when the scratch `write-me` names a file, writes it in
 /// its cwd.
-fn stub_bin(scratch: &Scratch) -> (PathBuf, PathBuf) {
+pub(super) fn stub_bin(scratch: &Scratch) -> (PathBuf, PathBuf) {
     use std::os::unix::fs::PermissionsExt;
     let bin = scratch.0.join("bin");
     std::fs::create_dir_all(&bin).unwrap();
@@ -200,7 +198,7 @@ fn stub_bin(scratch: &Scratch) -> (PathBuf, PathBuf) {
 }
 
 /// The stub executor, named by its path so the machine finds it whatever PATH the test process has.
-fn runner(bin: &Path) -> Value {
+pub(super) fn runner(bin: &Path) -> Value {
     json!({
         "executors": { "stub": { "kind": "agent", "providerModel": "stub", "allowCrossProvider": true, "invocations": [
             { "id": "stub-cli", "via": "cli", "adapter": "cli-spawn", "command": bin.join("stub-agent"), "args": ["{prompt}"],
@@ -300,6 +298,7 @@ fn host_of(port: Option<FreePort>, bin: &Path, host: &Path) -> HostUnitRun<FreeP
 #[test]
 fn a_read_only_unit_runs_end_to_end_through_the_composed_host() {
     hermetic(
+        module_path!(),
         "a_read_only_unit_runs_end_to_end_through_the_composed_host",
         true,
         read_only_run,
@@ -333,6 +332,7 @@ fn read_only_run() {
 #[test]
 fn a_writing_unit_runs_under_its_custody_and_commits_its_declared_write() {
     hermetic(
+        module_path!(),
         "a_writing_unit_runs_under_its_custody_and_commits_its_declared_write",
         true,
         writing_run,
@@ -403,6 +403,7 @@ fn writing_run() {
 #[test]
 fn a_cancelled_controller_starts_no_unit_run() {
     hermetic(
+        module_path!(),
         "a_cancelled_controller_starts_no_unit_run",
         false,
         cancelled_run,

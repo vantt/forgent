@@ -5321,3 +5321,46 @@ fn the_execution_route_run_unit_op_refuses_an_option_outside_the_contract_and_an
         .contains("objective"));
     let _ = fs::remove_dir_all(manifest.parent().unwrap());
 }
+
+#[test]
+fn the_execution_route_launch_session_op_refuses_an_incomplete_request_and_answers_a_refused_launch(
+) {
+    let scratch = ExecutionScratch::new("launch-session");
+    let manifest = ensure_dev_manifest();
+    let root = repo_root();
+    let env = [
+        ("HOME", scratch.0.as_path()),
+        ("FGOS_ACTIVE_RELEASE_PATH", root.as_path()),
+        ("FGOS_ACTIVE_MANIFEST_PATH", manifest.as_path()),
+    ];
+    let mut request = serde_json::json!({
+        "binding": { "executor": "stub" }, "runnerConfig": {}, "key": "head-planner-p-1", "role": "head:planner-p",
+        "grant": { "verbs": [], "writes": [] }, "opening": "hello", "ceilingMs": 60000, "projectRoot": scratch.0,
+    });
+    request.as_object_mut().unwrap().remove("key");
+    let (code, line) = execution_route(
+        &["launch-session", "--protocol", "1"],
+        &request,
+        &env,
+        &no_peer,
+    );
+    assert_eq!(code, Some(65), "{line}");
+    assert!(line["error"]["message"].as_str().unwrap().contains("key"));
+
+    // A head key is used once: a key whose attempt directory already holds an attempt is refused before anything is
+    // taken, and the refusal is the op's answer, carrying the code the door rethrows.
+    request["key"] = serde_json::json!("head-planner-p-1");
+    let used = scratch.0.join(".fgos/assignments/head-planner-p-1/runs/01");
+    fs::create_dir_all(&used).unwrap();
+    fs::write(used.join("envelope.json"), "{}").unwrap();
+    let (code, line) = execution_route(
+        &["launch-session", "--protocol", "1"],
+        &request,
+        &env,
+        &no_peer,
+    );
+    assert_eq!(code, Some(0), "{line}");
+    assert_eq!(line["result"]["refused"]["code"], "head-key-used", "{line}");
+    assert!(line["result"].get("placement").is_none());
+    let _ = fs::remove_dir_all(manifest.parent().unwrap());
+}

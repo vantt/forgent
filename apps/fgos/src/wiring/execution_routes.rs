@@ -12,6 +12,10 @@
 //! * `run-unit`: `{ request, admission }`, `request` the `run-unit-request` document; `admission` says whether the
 //!   caller serves a case admission port (it always serves the two events). The result is the `run-unit-result`
 //!   document, an error result included: a run that refused is an answer, not a fault of the route.
+//! * `launch-session`: what `launchSessionAttempt` is given (`{ binding, runnerConfig, key, role, grant, opening,
+//!   ceilingMs, env?, projectRoot, beside?, display?, opts? }`): start a head session as a supervised terminal attempt
+//!   and return once its supervisor bound it. Result `{ placement: { host, key }, runDir, attemptId }`; a launch
+//!   refusal is an answer, `{ refused: { code, message, ...extra } }`.
 //! * `custody`: `{ fgosDir, worktree, admit?, verify: { command, timeoutMs? } }`: the verify command run as the
 //!   successor holder of the worktree's custody, admitted first through the peer when `admit` names a proposal
 //!   (`runUnderCustody` around `port.admit` and `runVerify`, `src/workflow/case-gate.mjs:84`). A refused admission
@@ -50,7 +54,14 @@ pub const EXIT_VERSION_MISMATCH: i32 = 3;
 pub const EXIT_INVALID_REQUEST: i32 = 65;
 
 /// The operations this route serves, in the contract's order.
-pub const OPS: [&str; 5] = ["run-unit", "custody", "verify", "sweep-attempts", "cancel"];
+pub const OPS: [&str; 6] = [
+    "run-unit",
+    "launch-session",
+    "custody",
+    "verify",
+    "sweep-attempts",
+    "cancel",
+];
 
 /// Run the route with the args after `execution`; returns the exit code.
 pub fn main(args: &[String]) -> i32 {
@@ -131,6 +142,7 @@ pub fn run(
     let peer = move || PeerChannel::with_deadline(input, output, DEFAULT_DEADLINE);
     let answered = match op {
         "run-unit" => run_unit(&request, peer),
+        "launch-session" => launch_session(&request),
         "custody" => custody(&request, peer),
         "verify" => verify_op(&request),
         "sweep-attempts" => sweep_attempts(&request),
@@ -277,6 +289,19 @@ fn run_unit(request: &Value, peer: impl FnOnce() -> PeerChannel) -> Result<Value
         .and_then(Value::as_bool)
         .unwrap_or(false);
     Ok(run_unit_over(&checked["options"], peer(), admission))
+}
+
+fn launch_session(request: &Value) -> Result<Value, String> {
+    use super::unit_run_host::session_attempt::{self, SessionRequest};
+    let request = SessionRequest::from_json(request)?;
+    let launched = attempt_host()
+        .map_err(|message| {
+            fgos_execution_engine::transport_round::session_attempt::SessionLaunchError::new(
+                "error", message,
+            )
+        })
+        .and_then(|host| session_attempt::launch_session(&request, host, None));
+    Ok(session_attempt::launched_json(launched))
 }
 
 /// Node's `runVerify` answer: `verdict` or `infrastructure`, and the facts of the run.
