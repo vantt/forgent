@@ -110,7 +110,7 @@ The plan consists of seven phases taken directly from DISCUSSION.md section 7 an
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Identity and convention for the new kinds](phase-01-ids-and-paths.md) | - | packages/identity/rust/src/**, packages/identity/contracts/**, packages/convention/rust/src/**, packages/convention/contracts/**, packages/identity/rust/tests/**, packages/convention/rust/tests/** | 1 | ready |
+| 1 | [Identity and convention for the new kinds](phase-01-ids-and-paths.md) | - | packages/identity/rust/src/**, packages/identity/contracts/**, packages/convention/rust/src/**, packages/convention/contracts/**, packages/identity/rust/tests/**, packages/convention/rust/tests/** | 1 | parked (ticket c-653-1795165237835 exceeded 12 wait intervals in running state) |
 | 2 | [Item contract, check and generated index](phase-02-item-check.md) | 1 | packages/portfolio/**, src/portfolio/**, apps/fgos/src/wiring/portfolio.rs, apps/fgos/tests/portfolio_check.rs, test/portfolio/** | 2 | ready |
 | 3 | [Concurrent claim is refused at landing](phase-03-claim-test.md) | - | apps/fgos/tests/concurrent_plan_claim.rs | 1 | ready |
 | 4 | [Replace plan 261119-1615 phase 4](phase-04-1615-phase4.md) | 2 | apps/fgos/src/wiring/session_write_publish.rs, apps/fgos/tests/session_write_publish.rs, src/session-host/head-grants.mjs, test/session-host/head-grants.test.mjs | 3 | ready |
