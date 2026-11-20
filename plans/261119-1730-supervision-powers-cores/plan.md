@@ -71,7 +71,7 @@ choice (discussion Non-goals).
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Raise a coordination event from a caller](phase-01-raise-core.md) | - | packages/supervision/rust/src/queue.rs, packages/supervision/rust/tests/queue.rs | 1 | done |
-| 2 | [Drone definitions for the four session signals](phase-02-drone-definitions.md) | - | core/watcher/definitions/**, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/** | 1 | ready |
+| 2 | [Drone definitions for the four session signals](phase-02-drone-definitions.md) | - | core/watcher/definitions/**, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/** | 1 | done |
 | 3 | [Coordination evidence kinds and the Observe prune door](phase-03-evidence-prune.md) | - | packages/observe/rust/**, packages/supervision/rust/observe-kinds.json | 1 | ready |
 | 4 | [Bounded recent read and pane typing in terminal control](phase-04-on-site-core.md) | - | packages/terminal-control/rust/**, packages/terminal-control/contracts/** | 1 | ready |
 | 5 | [Merge and full gate](phase-05-integration.md) | 1, 2, 3, 4 | plans/261119-1730-supervision-powers-cores/** | 2 | ready |
