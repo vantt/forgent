@@ -1,0 +1,15 @@
+{
+  "now": "2026-11-18T12:00:00Z",
+  "group": {
+    "subject.id": "r1"
+  },
+  "since": "2026-11-18T10:00:00Z",
+  "ts": "2026-11-18T11:00:00Z",
+  "config": {
+    "watcher.sessionNoResultLimit": 0
+  },
+  "later": {
+    "now": "2026-11-18T12:30:00Z",
+    "since": "2026-11-18T10:30:00Z"
+  }
+}

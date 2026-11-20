@@ -30,3 +30,9 @@ watcher:
   wakeFailureLimit: 3
   # @fgos:doc Consecutive already-live wakes with events still unhandled before a supervisor-stuck row is raised. In wakes. Minimum: 1. Default: 15.
   stuckWakeLimit: 15
+  # @fgos:doc Consecutive gone states before a session-gone row is raised. Minimum: 0. Default: 0.
+  sessionGoneLimit: 0
+  # @fgos:doc Consecutive idle periods before a session-idle row is raised. Minimum: 0. Default: 0.
+  sessionIdleLimit: 0
+  # @fgos:doc Consecutive runs without a result before a session-no-result row is raised. Minimum: 0. Default: 0.
+  sessionNoResultLimit: 0

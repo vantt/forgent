@@ -1,0 +1,41 @@
+{
+  "name": "session-no-result",
+  "requires": [
+    "fgos.run.settled"
+  ],
+  "params": {
+    "limit": {
+      "configKey": "watcher.sessionNoResultLimit"
+    }
+  },
+  "query": {
+    "kind": [
+      "fgos.run.settled"
+    ],
+    "by": [
+      "subject.id"
+    ],
+    "agg": [
+      "count",
+      "max:ts"
+    ],
+    "having": [
+      {
+        "lhs": {
+          "agg": {
+            "agg": "count"
+          }
+        },
+        "op": "gt",
+        "rhs": {
+          "param": "limit"
+        }
+      }
+    ]
+  },
+  "row": {
+    "kind": "session-no-result",
+    "reason": "a session had no result",
+    "nextCommand": "fgos supervisor plans"
+  }
+}

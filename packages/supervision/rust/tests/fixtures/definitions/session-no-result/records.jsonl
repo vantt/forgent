@@ -1,0 +1,1 @@
+{"v":2,"id":"snr1","kind":"fgos.run.settled","ts":"2026-11-18T11:00:00Z","subject":{"kind":"run","id":"r1"},"attrs":{"fgos.run.category":"corrupt","fgos.run.reason":"no-result"},"basis":"observed","origin":{"source":"fixture"}}
