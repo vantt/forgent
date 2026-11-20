@@ -4,7 +4,7 @@
 - Phase 6 landed.
 - Section 7 anchor `#task-plan-status` of `docs/discussions/work-data-model/DISCUSSION.md`, decision D-ADR0082.
 - Backlog row `p-xmpheuduez`.
-- Owner question `q-x3ata7iuej` answered in the question store.
+- Owner question `q-x3ata7iuej` answered in the question store: "Map partial to draft, deferred to withdrawn" (2026-11-20).
 - `core/skills/_shared/plan-contract.md` and `scripts/plan-contract-check.mjs`.
 
 ## Files it may write
@@ -20,7 +20,7 @@
    - `in-progress` -> `running`
    - `completed`, `complete`, `landed`, `done` -> `done`
    - `cancelled`, `archived` -> `withdrawn`
-   - Migrate `plans/261006-1408-advisory-capability-completion/plan.md` (`partial`) and `plans/261007-1800-observe-overdue-run-signal-deferred/plan.md` (`deferred`) according to owner decision `q-x3ata7iuej`.
+   - Migrate `plans/261006-1408-advisory-capability-completion/plan.md` (`partial`) -> `draft` and `plans/261007-1800-observe-overdue-run-signal-deferred/plan.md` (`deferred`) -> `withdrawn` according to owner decision `q-x3ata7iuej` (answered 2026-11-20: "Map partial to draft, deferred to withdrawn").
 2. Add `contract: plan-v1` marker where missing on migrated plans.
 3. Update `scripts/plan-contract-check.mjs`:
    - Change legacy status warning to hard error when running `node scripts/plan-contract-check.mjs --all`.

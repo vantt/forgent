@@ -2,7 +2,7 @@
 contract: plan-v1
 title: "Work data model: the shape of the portfolio data"
 status: ready
-base: 75d7565babfab65409468a519031386ecccf2d75
+base: 2ac57a7495da325e050e9251ae62d90adfbf73f0
 priority: P1
 blockedBy: []
 footprint:
@@ -32,7 +32,15 @@ footprint:
   - src/runner/agent-roster.mjs
   - packages/supervision/rust/src/discussion_source.rs
   - packages/questions/rust/src/refcheck.rs
-  - test/**
+  - test/e2e/fixture-marketing-domain.test.mjs
+  - test/runner/dispatch-confinement-backend-p03.test.mjs
+  - test/runner/dispatch-confinement-machine-private.test.mjs
+  - test/runner/dispatch-confinement-policies.test.mjs
+  - test/session-host/head-permission-mode.test.mjs
+  - test/session-host/head-request.test.mjs
+  - test/session-host/head-start.test.mjs
+  - test/session-rotation/rotate.test.mjs
+  - test/state/domain-fields.test.mjs
   - apps/fgos/src/wiring/land.rs
   - apps/fgos/tests/landing_source_items.rs
   - scripts/plan-contract-check.mjs
@@ -105,16 +113,16 @@ The plan consists of seven phases taken directly from DISCUSSION.md section 7 an
 | 2 | [Item contract, check and generated index](phase-02-item-check.md) | 1 | packages/portfolio/**, src/portfolio/**, apps/fgos/src/wiring/portfolio.rs, apps/fgos/tests/portfolio_check.rs, test/portfolio/** | 2 | ready |
 | 3 | [Concurrent claim is refused at landing](phase-03-claim-test.md) | - | apps/fgos/tests/concurrent_plan_claim.rs | 1 | ready |
 | 4 | [Replace plan 261119-1615 phase 4](phase-04-1615-phase4.md) | 2 | apps/fgos/src/wiring/session_write_publish.rs, apps/fgos/tests/session_write_publish.rs, src/session-host/head-grants.mjs, test/session-host/head-grants.test.mjs | 3 | ready |
-| 5 | [Migration of backlog and discussions](phase-05-migration.md) | 1, 2, 4 | plans/backlog/**, plans/discussions/**, plans/backlog.md, docs/backlog.md, docs/discussions/**, scripts/migrate-portfolio.mjs, src/runner/agent-roster.mjs, packages/supervision/rust/src/discussion_source.rs, packages/questions/rust/src/refcheck.rs, test/** | 4 | ready |
+| 5 | [Migration of backlog and discussions](phase-05-migration.md) | 1, 2, 4 | plans/backlog/**, plans/discussions/**, plans/backlog.md, docs/backlog.md, docs/discussions/**, scripts/migrate-portfolio.mjs, src/runner/agent-roster.mjs, packages/supervision/rust/src/discussion_source.rs, packages/questions/rust/src/refcheck.rs, test/e2e/fixture-marketing-domain.test.mjs, test/runner/dispatch-confinement-*.test.mjs, test/session-host/head-request.test.mjs, test/session-host/head-start.test.mjs, test/session-host/head-permission-mode.test.mjs, test/session-rotation/rotate.test.mjs, test/state/domain-fields.test.mjs | 4 | ready |
 | 6 | [Landing writes item done](phase-06-landing-done.md) | 2, 5 | apps/fgos/src/wiring/land.rs, apps/fgos/tests/landing_source_items.rs | 5 | ready |
-| 7 | [Plan statuses held to plan-v1](phase-07-plan-status.md) | 6 | scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, plans/261006-1408-advisory-capability-completion/plan.md, plans/261007-1800-observe-overdue-run-signal-deferred/plan.md | 6 | draft |
+| 7 | [Plan statuses held to plan-v1](phase-07-plan-status.md) | 6 | scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, plans/261006-1408-advisory-capability-completion/plan.md, plans/261007-1800-observe-overdue-run-signal-deferred/plan.md | 6 | ready |
 
 Wave 1 runs independent foundational phases: phase 1 (identity and convention rules) and phase 3 (claim refusal test); footprints are disjoint. Wave 2 builds the item contract, check and index generator. Wave 3 updates session write and grants for individual item files. Wave 4 migrates existing backlog rows and discussions into `plans/`. Wave 5 enables landing auto-completion for source items. Wave 6 enforces strict plan-v1 statuses.
 
-Phases 1-6 are marked `ready` and may execute. Phase 7 is held at `draft` awaiting owner question `q-x3ata7iuej`.
+All phases 1-7 are marked `ready` and may execute in wave order (wave 1 through wave 6).
 
 ## Owner questions
-- `q-x3ata7iuej`: Decide plan-v1 mapped statuses for legacy plans marked partial and deferred (blocks phase 07).
+- `q-x3ata7iuej`: Decided by owner 2026-11-20: "Map partial to draft, deferred to withdrawn" (`plans/261006-1408-advisory-capability-completion/plan.md` -> `draft`, `plans/261007-1800-observe-overdue-run-signal-deferred/plan.md` -> `withdrawn`). Acked; unblocks phase 07.
 
 ## Risks and rollback
 - Migration footprint: Phase 5 moves all discussions and splits `docs/backlog.md`. Rollback: atomic revert of the migration commit.

@@ -7,7 +7,7 @@ discussion: settled
 > **Constraints:** no new Event Store stream; paths only through `fgos convention path`; ids only through `fgos identity mint`; new code in Rust; migration ships as an upgrade verb for other projects; L10: hard-coded paths moved to the door in the same change.
 > **Non-goals:** Work code or a Work/UI adapter; moving the plan claim to the Event Store; a cross-machine supervisor lock.
 > **Acceptance:** the new check passes on the migrated repository and fails on each rule's fixture; `node scripts/plan-contract-check.mjs --all` exits 0; `git grep docs/discussions docs/backlog.md` finds no live code path; `npm test` and `cargo test --workspace` green; the concurrent-claim test proves a second claim is refused at landing.
-> **Open, blocking only part:** owner decides the two legacy plans `partial` and `deferred` (blocks only the plan-status task).
+> **Owner question q-x3ata7iuej answered (2026-11-20):** Map partial to draft, deferred to withdrawn (unblocks the plan-status task).
 > **Source:** backlog `p-mc25x5pfi6`.
 > discussion: settled
 
@@ -109,6 +109,7 @@ Round 12: **owner chose (a)** for the ~273 open Work items: a separate backlog i
 - 2026-11-19 20:0x — owner round 11: (a), mandatory backlog `source:` for new discussions and plans.
 - 2026-11-19 20:1x — owner round 12: (a), open Work items go to a separate triage backlog item. Shaper drafted §6 and §7 from all agreed points.
 - 2026-11-19 21:0x — owner round 13: confirmed the design; asked about the Event Store (answered: no new stream, git history logs files, Work streams frozen) and whether a frontmatter claim can be grabbed (answered: exclusion is Identity roles + landing merge slot; owner chose (i), a concurrent-claim test, not a cross-machine lock). D-ADR0082 minted and recorded; discussion settled.
+- 2026-11-20 09:51 — owner answered question q-x3ata7iuej: "Map partial to draft, deferred to withdrawn" (plans/261006-1408 -> draft, plans/261007-1800 -> withdrawn). Planner head resumed, acked question, and promoted phase 07 to ready.
 
 ## 6. Thiết kế đã chốt {#design}
 

@@ -17,7 +17,15 @@
 - `src/runner/agent-roster.mjs`
 - `packages/supervision/rust/src/discussion_source.rs`
 - `packages/questions/rust/src/refcheck.rs`
-- `test/**`
+- `test/e2e/fixture-marketing-domain.test.mjs`
+- `test/runner/dispatch-confinement-backend-p03.test.mjs`
+- `test/runner/dispatch-confinement-machine-private.test.mjs`
+- `test/runner/dispatch-confinement-policies.test.mjs`
+- `test/session-host/head-permission-mode.test.mjs`
+- `test/session-host/head-request.test.mjs`
+- `test/session-host/head-start.test.mjs`
+- `test/session-rotation/rotate.test.mjs`
+- `test/state/domain-fields.test.mjs`
 
 ## Steps
 1. Create and execute migration script `scripts/migrate-portfolio.mjs`:
