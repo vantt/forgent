@@ -228,6 +228,14 @@ impl Registry {
         self.kinds.get(name).map(|(def, _)| def)
     }
 
+    pub fn is_prunable(&self, kind: &str) -> bool {
+        self.kind(kind).is_some_and(|k| k.prunable)
+    }
+
+    pub fn retention(&self, kind: &str) -> Option<&str> {
+        self.kind(kind).and_then(|k| k.retention.as_deref())
+    }
+
     pub fn attr(&self, name: &str) -> Option<&AttrDef> {
         self.attrs.get(name).map(|(def, _)| def)
     }
