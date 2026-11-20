@@ -33,8 +33,8 @@ lands it.
   pointer), `docs/platform/component-boundary.md` rows (Execution Core, Executor Model, Dispatch Transport &
   Confinement: Rust sources), `docs/reading-map.md` (new crates and contracts), a settled-decision entry for P1-P22 in
   the runner's decision holder `docs/platform/runner/decisions/` (governance decision-scope table; the runner
-  `spec.md` has no "Lịch sử quyết định" section), id from `fgos identity mint d-adr`, `docs/backlog.md` (rows the phases found, incl. the dead-reservation proof
-  defect of phase 20), `CHANGELOG.md` `## [Unreleased]`: `fgos run` and `fgos dispatch` subs native; every
+  `spec.md` has no "Lịch sử quyết định" section), id from `fgos identity mint d-adr`, backlog rows the phases found (incl. the dead-reservation proof
+  defect of phase 20) written through `fgos session write`, never by editing `docs/backlog.md`, `CHANGELOG.md` `## [Unreleased]`: `fgos run` and `fgos dispatch` subs native; every
   `fgos run --writes` starts a Node peer until Workflow moves; upgrade line for projects that pin a release: let runs
   finish (`fgos dispatch inspect` shows none open) before `fgctl upgrade` (F13).
 - Reverse-read check (F12): the previous release (the one activated before the series) reads the Rust-written
@@ -46,7 +46,8 @@ lands it.
   the renewal integration path against a real login), and `fgos doctor`; then reactivate the base release
   (`previousArtifactDigest` in `.fgos/installation/activation.json`) and confirm it still reads what the canary wrote.
   Results in `reports/close.md`.
-- Program row S6a marked landed when the series is on main (both plans named in the row).
+- Program row S6a marked landed when the series is on main (both plans named in the row;
+  `plans/261114-2051-rust-verb-migration-program/plan.md`, in this phase's footprint).
 - Integration gate on the integration head: `cargo test --workspace`, one full `npm test` (ask the big lead),
   `node scripts/git-one-door-scan.mjs --root .`, clippy `-D warnings` workspace, msvc and aarch64-apple-darwin checks;
   then the big lead lands the series; on main: build, stage, activate with nothing in flight, `fgos doctor` through the

@@ -51,12 +51,20 @@ This phase serves the verb from engine `unit_run`. Node callers of `runUnit` (Wo
 
 ## Footprint
 
-`apps/fgos/src/wiring/run.rs`, `execution_routes.rs`, `attempt_step.rs`, `apps/fgos/src/main.rs`, `routing.rs`,
-`cli_projector.rs`, `apps/fgos/tests/cli_tests.rs`, `packages/host-runtime/rust/src/catalog.rs`,
-`packages/run-supervisor/rust/src/attempt_step.rs`, `packages/execution/contracts/execution-routes/**`,
-`src/cli/command-registry.mjs`, `bin/fgos.mjs`, `test/cli/run-verb.test.mjs`, `test/rust-host/**`,
-`apps/fgos/src/wiring/mod.rs` (mod lines for run, execution_routes, attempt_step), `src/native/execution-door.mjs` and
-`docs/architecture-manifest.json`, `.github/workflows/release-assets-check.yml`.
+As the plan table row 19c (evidence: branches `s6/p19c-2`, `s6/p19c-run`, `s6/p19c-run-flip`, `s6/p19c-win`):
+`apps/fgos/src/wiring/{run,execution_routes,attempt_step,steps_runner,mod}.rs`, `apps/fgos/src/wiring/unit_run_host/**`,
+`apps/fgos/src/wiring/doctor/terminal.rs`, `apps/fgos/src/{main,routing,cli_projector}.rs`,
+`apps/fgos/tests/{cli_tests,windows_cwd_lease_owner}.rs`, `packages/host-runtime/rust/src/catalog.rs` and
+`packages/host-runtime/contracts/command-route{s,-annotations}.json`, `packages/run-supervisor/rust/{src,tests}/**`,
+`packages/run-supervisor/rust/examples/internal_harness.rs`, `packages/run-supervisor/contracts/internal-route.run-supervisor.v1.json`,
+`packages/execution/contracts/execution-routes/**`, `packages/execution/engine/src/assignment_runner/**`,
+`packages/execution/rust/src/{bind.rs,patterns/**,run_request/**}`, `packages/holder-lock/rust/src/route.rs` and
+`route/hold.rs`, `packages/process/rust/{Cargo.toml,src/lib.rs,src/interrupt.rs}`, `packages/git/contracts/mutation-census.v1.json`,
+`.github/workflows/release-assets-check.yml`, `docs/architecture-manifest.json`, `docs/platform/run-supervisor/spec.md`,
+`src/cli/command-registry.mjs`, `bin/fgos.mjs`, `src/native/execution-door.mjs`, `test/cli/{run-verb,dir-differs-from-cwd,
+execution-outcome-exit-codes,fgos-case-doors}.test.mjs`, `test/helpers/cli-entry.mjs`, `test/run-supervisor/{cancel-registry,
+crash-matrix-adopt-resume,resume-adopts}.test.mjs`, `test/run-supervisor/support/**`, `test/runner/dispatch-execute-effort.test.mjs`,
+`test/rust-host/**`, `test/workflow/{confined-nested-write,workflow-runner-cli}.test.mjs`.
 
 ## Steps
 
