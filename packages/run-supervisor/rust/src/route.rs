@@ -53,6 +53,12 @@ pub struct WritePublisher {
     pub publish: Arc<PublishFn>,
 }
 
+/// The port the `attempt-step` route runs a step of a verified attempt through, filled by the composition root
+/// (`apps/fgos`) with the Execution engine's post-receipt steps and handed to [`main`] as a parameter:
+/// `(step_id, run_dir)` prints the step's one result line and returns its exit code. This crate runs no step
+/// itself and depends on no engine.
+pub type StepRunner = dyn Fn(&str, &Path) -> i32;
+
 /// Why argv was refused; `exit_code` says which code the route ends with.
 #[derive(Debug, PartialEq, Eq)]
 pub enum ArgsError {
@@ -187,8 +193,14 @@ fn probe(route: &str, args: &[String]) -> i32 {
 }
 
 /// Dispatch `fgos internal <route> ...` for the routes this crate owns; `publisher` is the port a supervised head's
-/// `session write` is published through. `None`: the route is not one of ours.
-pub fn main(route: &str, args: &[String], publisher: &WritePublisher) -> Option<i32> {
+/// `session write` is published through, `steps` the one `attempt-step` runs a step through. `None`: the route is
+/// not one of ours.
+pub fn main(
+    route: &str,
+    args: &[String],
+    publisher: &WritePublisher,
+    steps: &StepRunner,
+) -> Option<i32> {
     if !matches!(
         route,
         "supervise" | "gate" | "adopt" | "attempt-step" | "head-request"
@@ -203,7 +215,7 @@ pub fn main(route: &str, args: &[String], publisher: &WritePublisher) -> Option<
         "gate" => crate::gate::run(args),
         "adopt" => crate::adopt::run(args),
         "head-request" => head_request(args),
-        _ => crate::attempt_step::run(args),
+        _ => crate::attempt_step::run(args, steps),
     })
 }
 
@@ -274,6 +286,11 @@ mod tests {
             }),
             publish: Arc::new(move |_, _, _, _| Err(unused.clone())),
         };
-        assert_eq!(main("lock-fd", &argv(&["--probe"]), &publisher), None);
+        assert_eq!(
+            main("lock-fd", &argv(&["--probe"]), &publisher, &|_, _| {
+                EXIT_INTERNAL
+            }),
+            None
+        );
     }
 }

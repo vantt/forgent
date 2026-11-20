@@ -1352,8 +1352,8 @@ fn run_verb(cfg: &Config, request: &Request) -> Outcome {
     }
 }
 
-/// `fgos internal head-request --protocol 1 --run-dir <attemptDir>`: the host half of one request, the same
-/// hand-over as `attempt-step` (one helper), to the Node payload that runs the verb.
+/// `fgos internal head-request --protocol 1 --run-dir <attemptDir>`: the host half of one request: the envelope
+/// checks `attempt-step` makes (one helper), then the hand-over to the Node payload that runs the verb.
 pub fn run(args: &[String]) -> i32 {
     let flags = match Flags::parse(args, &["run-dir"], 0) {
         Ok(flags) => flags,

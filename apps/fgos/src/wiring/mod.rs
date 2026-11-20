@@ -1,6 +1,7 @@
 //! Source wiring modules for composition root.
 
 pub mod agents;
+pub mod attempt_step;
 pub mod dispatch_decide;
 pub mod doctor;
 pub mod event_store_clone;

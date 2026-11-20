@@ -251,15 +251,21 @@ fn main() {
                 .collect();
             std::process::exit(wiring::execution_routes::main(&rest));
         }
-        // The run supervisor's routes: supervise, gate, adopt, attempt-step.
+        // The run supervisor's routes: supervise, gate, adopt, attempt-step, head-request.
         let rest: Vec<String> = args[2..]
             .iter()
             .map(|a| a.to_string_lossy().into_owned())
             .collect();
         // A head's `session write` is published through the paths land, handed to the supervisor route as its port.
         let publisher = wiring::session_write_publish::publisher();
+        // A post-receipt step runs from the Execution engine, handed to the supervisor route as its step runner.
         if let Some(route) = rest.first() {
-            if let Some(code) = fgos_run_supervisor::route::main(route, &rest[1..], &publisher) {
+            if let Some(code) = fgos_run_supervisor::route::main(
+                route,
+                &rest[1..],
+                &publisher,
+                &wiring::attempt_step::run_step,
+            ) {
                 std::process::exit(code);
             }
         }
