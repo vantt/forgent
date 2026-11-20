@@ -1,8 +1,9 @@
 ---
 contract: plan-v1
 title: "Work data model: the shape of the portfolio data"
-status: ready
-base: 2ac57a7495da325e050e9251ae62d90adfbf73f0
+status: running
+lead: head:lead-forgent-261120-0625-work-data-mo
+base: 8288e13ab08becd109d0c0746243b5502010aa8d
 priority: P1
 blockedBy: []
 footprint:
