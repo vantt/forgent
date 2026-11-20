@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Session start task binding: resolve head names to discussion or plan in opening brief"
-status: ready
+status: draft
 base: 041b5f64b6fae816f231f17f4eb7fa0f71924878
 priority: P1
 blockedBy: []
@@ -57,3 +57,7 @@ None. The behavior and requirements are settled in backlog row `p-l22vozecxg` an
 - Risk: Name collision when resolving partial slugs. Mitigation: Unique prefix check already implemented in `head-plan.mjs` throws `task-ambiguous` on multiple matches.
 - Risk: Divergence between hand start and supervisor start. Mitigation: Both paths route through `startHeadSession` / `placeHead` in `head-start.mjs`.
 - Rollback: `git revert` of the landing commit cleanly restores previous generic start ritual behavior.
+
+## Manual start note (2026-11-21)
+
+Kept `draft` so the automated supervisor does not admit it; the supervisor starts a Claude lead by hand and sets `running` with that lead in the same change.
