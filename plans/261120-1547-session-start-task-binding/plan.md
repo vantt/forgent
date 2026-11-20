@@ -1,8 +1,9 @@
 ---
 contract: plan-v1
 title: "Session start task binding: resolve head names to discussion or plan in opening brief"
-status: draft
-base: 041b5f64b6fae816f231f17f4eb7fa0f71924878
+status: running
+lead: lead:BIND
+base: 5cf5d7b36eb71a4242f4e5a74325f9ad3055f9d8
 priority: P1
 blockedBy: []
 footprint:
