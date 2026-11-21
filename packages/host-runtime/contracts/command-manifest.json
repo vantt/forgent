@@ -3174,7 +3174,7 @@
       },
       "examples": [
         "fgos land plan-x",
-        "fgos land --paths plans/backlog/p-24dxhwq7zr-councils-cost-many-tokens-because-they-are.md --message \"docs: backlog item\" --test test/x.test.mjs"
+        "fgos land --paths plans/backlog/<id>-<slug>.md --message \"docs: backlog item\" --test test/x.test.mjs"
       ],
       "touchesState": true,
       "externalEffect": true,
@@ -5250,7 +5250,7 @@
       "examples": [
         "fgos session start secretary --name miu",
         "fgos session rotate secretary --name miu",
-        "fgos session write plans/backlog/p-24dxhwq7zr-councils-cost-many-tokens-because-they-are.md < \"$TMPDIR/item.md\""
+        "fgos session write plans/backlog/<id>-<slug>.md < \"$TMPDIR/item.md\""
       ],
       "subcommands": {
         "start": {
@@ -5363,7 +5363,7 @@
             ]
           },
           "examples": [
-            "fgos session write plans/backlog/p-24dxhwq7zr-councils-cost-many-tokens-because-they-are.md < \"$TMPDIR/item.md\""
+            "fgos session write plans/backlog/<id>-<slug>.md < \"$TMPDIR/item.md\""
           ]
         },
         "read": {
