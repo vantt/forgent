@@ -17,14 +17,15 @@ import { useReleaseFixture, fixture, runFgctl, runFgctlRaw, removeStateHome } fr
 
 useReleaseFixture();
 
-// What the bridge answers per row id; every row it is not told about passes. The registry decides the level of a row
-// and the fix of a failing one: a fail of a row a registered fix repairs names `fgos doctor --fix`.
+// What the bridge answers per row id; every row it is not told about passes. Only rows the registry still bridges
+// (owner `bridge:*`) reach it, so the canned ids are bridged rows. The registry decides the level of a row and the
+// fix of a failing one: a fail of a row a registered fix repairs names `fgos doctor --fix`.
 const CANNED = {
   ok: {},
-  pending: { 'tier-fallback': { passed: true, message: 'warning: drifted', fixCommand: 'fgos doctor --fix' } },
+  pending: { 'workflow-case-bindings': { passed: true, message: 'warning: drifted', fixCommand: 'fgos doctor --fix' } },
   failing: {
-    'executor-family-unique': { passed: false, message: 'install the thing' },
-    'runtime-socket-dir': { passed: false, message: 'the socket directory is missing' },
+    'workflow-capabilities-configured': { passed: false, message: 'install the thing' },
+    'workflow-case-bindings': { passed: false, message: 'a binding record is missing' },
   },
 };
 
@@ -88,11 +89,14 @@ function withProject(fn) {
   }
 }
 
-/** The machine files a machine that has been set up holds: the host judges them itself, so a doctor over a bare home would name a fix. */
+/** The machine files a machine that has been set up holds (the gateway token and the confinement backend registry):
+ * the host judges them itself, so a doctor over a bare home would name a fix. */
 function withMachineFiles(home) {
   const token = gatewayTokenPath(path.join(home, '.fgos'));
   fs.mkdirSync(path.dirname(token), { recursive: true, mode: 0o700 });
   fs.writeFileSync(token, 'closing-block-token\n', { mode: 0o600 });
+  const registry = { contract: 'confinement-backend-registry.v1', confinementBackends: { bwrap: { type: 'bwrap', enabled: true, executable: '/usr/bin/bwrap' } } };
+  fs.writeFileSync(path.join(home, '.fgos', 'confinement-backends.json'), `${JSON.stringify(registry)}\n`);
 }
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -204,7 +208,7 @@ test('init lists each failing check with its fix, exits 2 (precondition) and mar
       const env = { HOME: home, PATH, CANNED_DOCTOR: JSON.stringify(CANNED.failing) };
       const res = runFgctlRaw(['init', '--from', release.dir], { cwd: proj, stateHome: state, env });
       assert.equal(res.status, 2, 'precondition, the exit-code table\'s code for a ready-later release');
-      assert.equal(res.stdout, '2 checks need you:\n  1. executor-family-unique: install the thing\n  2. runtime-socket-dir: fgos doctor --fix\n');
+      assert.equal(res.stdout, '2 checks need you:\n  1. workflow-capabilities-configured: install the thing\n  2. workflow-case-bindings: fgos doctor --fix\n');
       assert.match(res.stderr, /not ready/);
       assert.equal(transactionStatus(state), 'ready-degraded');
       assert.ok(fs.existsSync(path.join(proj, '.fgos', 'installation', 'activation.json')), 'the release stays activated');
