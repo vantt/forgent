@@ -677,25 +677,43 @@ mod quiesce {
         }
     }
 
-    /// Whether the scanned process runs as this process's effective user.
-    /// A non-dumpable process (ssh-agent, gpg-agent) keeps its `/proc/<pid>`
-    /// directory and status uid, so the uid the scan already read answers it.
+    /// Whether the scanned process may run as this process's effective user.
+    /// A user that could not be read is possibly the same one: an unknown
+    /// owner must not look like another user's process. A non-dumpable
+    /// process (ssh-agent, gpg-agent) keeps its `/proc/<pid>` directory and
+    /// status uid, so the uid the scan already read answers it.
     #[cfg(target_os = "linux")]
-    fn same_user(view: &ProcView) -> bool {
+    fn maybe_same_user(view: &ProcView) -> bool {
         // SAFETY: geteuid has no preconditions.
-        view.effective_uid == Some(unsafe { libc::geteuid() })
+        view.effective_uid
+            .is_none_or(|uid| uid == unsafe { libc::geteuid() })
     }
 
     /// On Windows `effective_uid` carries a digest of the token's user SID.
     #[cfg(windows)]
-    fn same_user(view: &ProcView) -> bool {
-        view.effective_uid.is_some()
-            && view.effective_uid == fgos_process::facts::self_effective_uid()
+    fn maybe_same_user(view: &ProcView) -> bool {
+        view.effective_uid
+            .is_none_or(|uid| Some(uid) == fgos_process::facts::self_effective_uid())
     }
 
     #[cfg(not(any(target_os = "linux", windows)))]
-    fn same_user(_view: &ProcView) -> bool {
+    fn maybe_same_user(_view: &ProcView) -> bool {
         false
+    }
+
+    /// Whether a process that did not place itself in the workspace still
+    /// counts as unreadable: something about it could not be read, it may be
+    /// this user's, and its argv could be fgOS. In workspace-only mode the
+    /// unreadable part must be its cwd (a readable cwd outside the workspace
+    /// is a process elsewhere); an elevated or 32-bit Windows process, or a
+    /// root process on Linux, can hide its cwd, and it must not scan clean.
+    fn counts_as_unreadable(view: &ProcView, workspace_only: bool, same_user: bool) -> bool {
+        let hidden = if workspace_only {
+            view.cwd.is_none()
+        } else {
+            !view.unreadable.is_empty()
+        };
+        hidden && same_user && could_be_fgos(view.cmdline.as_deref())
     }
 
     pub(super) fn scan(
@@ -771,11 +789,7 @@ mod quiesce {
                         "root": root.to_string_lossy(),
                     }));
                 }
-                None if !workspace_only
-                    && !view.unreadable.is_empty()
-                    && same_user(&view)
-                    && could_be_fgos(view.cmdline.as_deref()) =>
-                {
+                None if counts_as_unreadable(&view, workspace_only, maybe_same_user(&view)) => {
                     unreadable += 1
                 }
                 None => {}
@@ -791,11 +805,12 @@ mod quiesce {
 
     #[cfg(test)]
     mod tests {
-        use super::could_be_fgos;
         #[cfg(unix)]
         use super::workspace_argument;
+        use super::{could_be_fgos, counts_as_unreadable};
         #[cfg(any(unix, windows))]
         use super::{workspace_dirs, workspace_hit};
+        use fgos_process::{facts::ProcView, ProcId};
         #[cfg(any(unix, windows))]
         use std::path::{Path, PathBuf};
 
@@ -1025,6 +1040,61 @@ mod quiesce {
                 Some("cmdline")
             );
             std::fs::remove_dir_all(&base).unwrap();
+        }
+
+        fn view(cwd: Option<&str>, argv: Option<&[&str]>, unreadable: &[&str]) -> ProcView {
+            ProcView {
+                effective_uid: None,
+                pid: ProcId(4242),
+                tuple: None,
+                exe: None,
+                cmdline: argv.map(|a| a.iter().map(|s| s.to_string()).collect()),
+                cwd: cwd.map(std::path::PathBuf::from),
+                env_subset: Default::default(),
+                unreadable: unreadable.iter().map(|s| s.to_string()).collect(),
+            }
+        }
+
+        #[test]
+        fn a_workspace_scan_counts_a_process_whose_cwd_is_hidden_when_it_could_be_fgos() {
+            let hidden = ["cwd: access denied"];
+            let fgos = view(None, Some(&["fgos", "run", "x"]), &hidden);
+            let node = view(None, Some(&["node", "bin/fgos.mjs"]), &hidden);
+            let other = view(None, Some(&["svchost.exe", "-k", "x"]), &hidden);
+            let blind = view(None, None, &["cwd: denied", "cmdline: denied"]);
+            for only in [true, false] {
+                assert!(
+                    counts_as_unreadable(&fgos, only, true),
+                    "fgos argv, only={only}"
+                );
+                assert!(
+                    counts_as_unreadable(&node, only, true),
+                    "node argv, only={only}"
+                );
+                assert!(
+                    counts_as_unreadable(&blind, only, true),
+                    "no argv, only={only}"
+                );
+                assert!(
+                    !counts_as_unreadable(&other, only, true),
+                    "unrelated argv, only={only}"
+                );
+                assert!(
+                    !counts_as_unreadable(&fgos, only, false),
+                    "another user, only={only}"
+                );
+            }
+        }
+
+        #[test]
+        fn a_workspace_scan_ignores_a_readable_cwd_outside_the_workspace() {
+            let elsewhere = view(
+                Some("/elsewhere"),
+                Some(&["fgos", "run"]),
+                &["environ: denied"],
+            );
+            assert!(!counts_as_unreadable(&elsewhere, true, true));
+            assert!(counts_as_unreadable(&elsewhere, false, true));
         }
 
         #[test]
