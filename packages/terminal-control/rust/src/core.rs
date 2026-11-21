@@ -849,6 +849,42 @@ impl<'a> Core<'a> {
         self.driver.read_screen(&record.pane_id, lines, source)
     }
 
+    fn resolve_target(&self, target: &str) -> Result<String, Refusal> {
+        if let Ok((store, _)) = self.open() {
+            if store::valid_key(target) {
+                if let Some(record) = store.read_record(target).map_err(store_err)? {
+                    if store.has_marker(target, MarkerKind::Released) {
+                        return Err(unknown(format!("slot `{target}` was released")));
+                    }
+                    return match self.driver.pane_liveness(&record.pane_id)? {
+                        PaneLiveness::Live => Ok(record.pane_id),
+                        PaneLiveness::Gone => Err(unknown(format!(
+                            "pane {} of `{target}` is gone",
+                            record.pane_id
+                        ))),
+                    };
+                }
+            }
+        }
+        match self.driver.pane_liveness(target)? {
+            PaneLiveness::Live => Ok(target.to_string()),
+            PaneLiveness::Gone => Err(unknown(format!("pane {target} is gone"))),
+        }
+    }
+
+    pub fn read_recent(&self, target: &str, lines: u32) -> Result<String, Refusal> {
+        self.need("read.screen")?;
+        let pane_id = self.resolve_target(target)?;
+        let lines = lines.min(crate::port::MAX_RECENT_LINES);
+        self.driver.read_screen(&pane_id, Some(lines), Some("recent"))
+    }
+
+    pub fn type_text(&self, target: &str, text: &str) -> Result<(), Refusal> {
+        self.need("send.text")?;
+        let pane_id = self.resolve_target(target)?;
+        self.driver.send_text(&pane_id, text, false)
+    }
+
     pub fn inspect(&self, key: &str, detail: bool) -> Inspection {
         self.inspect_parts(
             key,

@@ -5,7 +5,9 @@ use fgos_terminal_control::core::{Core, CoreConfig};
 use fgos_terminal_control::driver::herdr::{HerdrConfig, HerdrDriver};
 use fgos_terminal_control::driver::*;
 use fgos_terminal_control::policy::{measured_split::MeasuredSplit, Limits};
-use fgos_terminal_control::port::{AnchorPane, CapabilitiesAsk, Refusal, ServerIncarnation};
+use fgos_terminal_control::port::{
+    AnchorPane, CapabilitiesAsk, Refusal, ServerIncarnation, MAX_RECENT_LINES,
+};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU32, Ordering};
 
@@ -811,6 +813,44 @@ mod incarnation {
             "the fake's shell must run typed text, or the check above proves nothing"
         );
     }
+
+    #[test]
+    fn read_recent_and_type_text_resolve_allocated_key() {
+        use fgos_terminal_control::port::{AllocateRequest, Display};
+
+        let fake = Fake::new("resolve-key");
+        let sock = fake.dir.join("s");
+        let _listener = UnixListener::bind(&sock).unwrap();
+        let fake = fake_at("resolve-key2", &sock);
+        let driver = fake.driver();
+        let core = Core::new(&driver, &MeasuredSplit, core_config(&fake));
+
+        core.allocate(&AllocateRequest {
+            key: "my-slot".into(),
+            group_key: "my-group".into(),
+            display: Display {
+                title: Some("slot-title".into()),
+                ..Default::default()
+            },
+            group_size: None,
+            cwd: None,
+            env: Default::default(),
+        })
+        .unwrap();
+
+        let screen = core.read_recent("my-slot", 50).unwrap();
+        assert_eq!(screen, "line one\nline two\n");
+
+        core.type_text("my-slot", "hello via key").unwrap();
+
+        let calls = fake.calls();
+        assert!(
+            calls
+                .iter()
+                .any(|c| c == "pane send-text wS:p59X hello via key"),
+            "calls should include send-text for resolved pane: {calls:?}"
+        );
+    }
 }
 
 #[test]
@@ -958,5 +998,220 @@ fn agent_kinds_and_integrations_come_from_herdrs_own_text_and_are_unknown_when_i
         driver.agent_facts(),
         AgentFacts::default(),
         "an absent herdr is asked nothing"
+    );
+}
+
+#[test]
+fn read_recent_caps_lines_at_max_recent_lines() {
+    let fake = Fake::new("read-recent-cap");
+    let driver = fake.driver();
+    let core = Core::new(&driver, &MeasuredSplit, core_config(&fake));
+
+    let requested_lines = MAX_RECENT_LINES + 500;
+    let res = core.read_recent("wS:p59Y", requested_lines);
+    assert!(res.is_ok(), "read_recent failed: {res:?}");
+
+    let calls = fake.calls();
+    let read_call = calls
+        .iter()
+        .find(|c| c.starts_with("pane read wS:p59Y"))
+        .expect("herdr pane read should be called");
+
+    assert!(
+        read_call.contains(&format!("--lines {MAX_RECENT_LINES}")),
+        "lines argument must be capped at {MAX_RECENT_LINES}, got: {read_call}"
+    );
+    assert!(
+        !read_call.contains(&format!("--lines {requested_lines}")),
+        "lines argument must not contain uncapped {requested_lines}, got: {read_call}"
+    );
+    assert!(
+        read_call.contains("--source recent"),
+        "must request recent source, got: {read_call}"
+    );
+}
+
+#[test]
+fn read_recent_returns_trailing_lines_in_order() {
+    let expected_screen = "line 1: oldest\nline 2: middle\nline 3: newest\n";
+    let fake = Fake::new("read-recent-order").env("FAKE_HERDR_SCREEN", expected_screen);
+    let driver = fake.driver();
+    let core = Core::new(&driver, &MeasuredSplit, core_config(&fake));
+
+    let screen = core.read_recent("wS:p59Y", 3).unwrap();
+    assert_eq!(screen, expected_screen);
+    let lines: Vec<&str> = screen.lines().collect();
+    assert_eq!(
+        lines,
+        vec!["line 1: oldest", "line 2: middle", "line 3: newest"],
+        "lines must preserve order"
+    );
+}
+
+#[test]
+fn missing_capability_returns_unsupported_refusal() {
+    let absent_driver = HerdrDriver::new(HerdrConfig::new("/nonexistent/herdr-bin"));
+    let fake = Fake::new("missing-caps");
+    let core = Core::new(&absent_driver, &MeasuredSplit, core_config(&fake));
+
+    let read_res = core.read_recent("wS:p59Y", 50);
+    assert!(
+        is_unsupported(read_res.clone()),
+        "read_recent on driver without read.screen must return Unsupported, got {read_res:?}"
+    );
+    assert!(!matches!(read_res, Ok(s) if s.is_empty()));
+
+    let type_res = core.type_text("wS:p59Y", "test text");
+    assert!(
+        is_unsupported(type_res),
+        "type_text on driver without send.text must return Unsupported"
+    );
+
+    assert!(is_unsupported(
+        absent_driver.read_screen("wS:p59Y", Some(50), Some("recent"))
+    ));
+    assert!(is_unsupported(
+        absent_driver.send_text("wS:p59Y", "test text", false)
+    ));
+
+    struct StrippedDriver<'a> {
+        inner: &'a HerdrDriver,
+        stripped: &'static str,
+    }
+
+    impl<'a> TerminalDriver for StrippedDriver<'a> {
+        fn name(&self) -> &'static str {
+            self.inner.name()
+        }
+        fn capabilities(&self) -> Vec<&'static str> {
+            self.inner
+                .capabilities()
+                .into_iter()
+                .filter(|&c| c != self.stripped)
+                .collect()
+        }
+        fn server_incarnation(&self) -> DriverResult<ServerIncarnation> {
+            self.inner.server_incarnation()
+        }
+        fn tab_create(
+            &self,
+            label: &str,
+            cwd: Option<&str>,
+            env: &[(String, String)],
+        ) -> DriverResult<CreatedPane> {
+            self.inner.tab_create(label, cwd, env)
+        }
+        fn pane_split(
+            &self,
+            anchor_pane: &str,
+            direction: Direction,
+            ratio: f64,
+            cwd: Option<&str>,
+            env: &[(String, String)],
+        ) -> DriverResult<CreatedPane> {
+            self.inner.pane_split(anchor_pane, direction, ratio, cwd, env)
+        }
+        fn pane_close(
+            &self,
+            pane: &str,
+            expected: &ServerIncarnation,
+        ) -> DriverResult<CloseOutcome> {
+            self.inner.pane_close(pane, expected)
+        }
+        fn pane_liveness(&self, pane: &str) -> DriverResult<PaneLiveness> {
+            self.inner.pane_liveness(pane)
+        }
+        fn pane_run(&self, pane: &str, command_line: &str) -> DriverResult<()> {
+            self.inner.pane_run(pane, command_line)
+        }
+        fn send_text(&self, pane: &str, text: &str, submit: bool) -> DriverResult<()> {
+            if self.stripped == "send.text" {
+                Err(Refusal::Unsupported {
+                    capability: "send.text".into(),
+                    detail: "stripped".into(),
+                })
+            } else {
+                self.inner.send_text(pane, text, submit)
+            }
+        }
+        fn send_keys(&self, pane: &str, keys: &[String]) -> DriverResult<()> {
+            self.inner.send_keys(pane, keys)
+        }
+        fn read_screen(
+            &self,
+            pane: &str,
+            lines: Option<u32>,
+            source: Option<&str>,
+        ) -> DriverResult<String> {
+            if self.stripped == "read.screen" {
+                Err(Refusal::Unsupported {
+                    capability: "read.screen".into(),
+                    detail: "stripped".into(),
+                })
+            } else {
+                self.inner.read_screen(pane, lines, source)
+            }
+        }
+        fn process_info(&self, pane: &str) -> DriverResult<ProcessInfo> {
+            self.inner.process_info(pane)
+        }
+        fn activity(&self, pane: &str) -> DriverResult<Activity> {
+            self.inner.activity(pane)
+        }
+        fn label_pane(&self, pane: &str, label: &str) -> DriverResult<()> {
+            self.inner.label_pane(pane, label)
+        }
+        fn layout_geometry(&self, pane: &str) -> DriverResult<TabGeometry> {
+            self.inner.layout_geometry(pane)
+        }
+    }
+
+    let fake_normal = Fake::new("stripped-test");
+    let normal_driver = fake_normal.driver();
+
+    let no_read = StrippedDriver {
+        inner: &normal_driver,
+        stripped: "read.screen",
+    };
+    let core_no_read = Core::new(&no_read, &MeasuredSplit, core_config(&fake_normal));
+    let read_res2 = core_no_read.read_recent("wS:p59Y", 20);
+    assert!(is_unsupported(read_res2.clone()));
+    assert!(!matches!(read_res2, Ok(s) if s.is_empty()));
+
+    let no_send = StrippedDriver {
+        inner: &normal_driver,
+        stripped: "send.text",
+    };
+    let core_no_send = Core::new(&no_send, &MeasuredSplit, core_config(&fake_normal));
+    let type_res2 = core_no_send.type_text("wS:p59Y", "test text");
+    assert!(is_unsupported(type_res2));
+}
+
+#[test]
+fn type_text_sends_text_exactly_once_via_pane_send_text() {
+    let fake = Fake::new("type-text-once");
+    let driver = fake.driver();
+    let core = Core::new(&driver, &MeasuredSplit, core_config(&fake));
+
+    let typed = "git status";
+    core.type_text("wS:p59Y", typed).unwrap();
+
+    let calls = fake.calls();
+    let send_calls: Vec<&String> = calls
+        .iter()
+        .filter(|c| c.starts_with("pane send-text"))
+        .collect();
+    assert_eq!(
+        send_calls.len(),
+        1,
+        "type_text must send text exactly once via pane send-text, got calls: {calls:?}"
+    );
+    assert_eq!(
+        send_calls[0],
+        &format!("pane send-text wS:p59Y {typed}")
+    );
+    assert!(
+        !calls.iter().any(|c| c.starts_with("agent prompt")),
+        "type_text must not call agent prompt: {calls:?}"
     );
 }

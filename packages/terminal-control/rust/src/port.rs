@@ -6,6 +6,9 @@
 use crate::driver::AgentFacts;
 use serde::{Deserialize, Serialize};
 
+/// Maximum trailing lines `read_recent` can request (`terminal-control.port.v1.json`).
+pub const MAX_RECENT_LINES: u32 = 1000;
+
 /// Display data written to the terminal and the record; never read back to
 /// decide anything. Ids are kept whole here; the visible label is built from
 /// them in one place, [`Display::tab_label`] and [`Display::pane_label`].
