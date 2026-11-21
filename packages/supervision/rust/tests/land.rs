@@ -4,7 +4,8 @@
 //! are owned by `packages/git/rust/tests/land.rs`; one pass-through proof lives here.
 use fgos_git::{GitDriver, RemoteGrant, RepoHandle, ResolveRepo};
 use fgos_supervision::land::{
-    catch_up, land, Gate, LandCommand, LandConfig, LandPorts, Regenerate, ShellRunner,
+    catch_up, land, BacklogPort, BacklogRef, Gate, LandCommand, LandConfig, LandPorts, Regenerate,
+    ShellRunner,
 };
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -202,6 +203,7 @@ fn ports<'a>(env: &'a Env, next: &'a dyn Fn() -> String, wait_ms: u64) -> LandPo
         runner: &ShellRunner,
         log_dir: &env.log_dir,
         wait_ms,
+        backlog_index: None,
     }
 }
 
@@ -1058,4 +1060,449 @@ fn a_regeneration_with_when_runs_only_when_a_landed_path_matches() {
         assert_eq!(marker.exists(), ran, "{glob}");
         let _ = fs::remove_file(&marker);
     }
+}
+
+const ITEM_A: &str = "plans/backlog/p-aaaaaaaaaa-first.md";
+const ITEM_B: &str = "plans/backlog/p-bbbbbbbbbb-second.md";
+const INDEX: &str = "plans/backlog.md";
+
+const ID_A: &str = "p-aaaaaaaaaa";
+const ID_B: &str = "p-bbbbbbbbbb";
+const ID_C: &str = "p-cccccccccc";
+
+fn item_text(id: &str, status: &str) -> String {
+    format!("---\ncontract: backlog-item-v1\nid: {id}\ntitle: t\nstatus: {status}\npriority: P2\n---\n\n## Why\n\nBecause.\n")
+}
+
+fn plan_with_sources(status: &str, sources: &[&str]) -> String {
+    let lines: String = sources.iter().map(|s| format!("  - {s}\n")).collect();
+    format!("---\ncontract: plan-v1\ntitle: demo\nstatus: {status}\nsource:\n{lines}created: 2026-01-01\n---\n\n# Demo\n")
+}
+
+const CITED: [&str; 3] = [
+    "p-aaaaaaaaaa",
+    "docs/discussions/x/DISCUSSION.md",
+    "p-bbbbbbbbbb",
+];
+
+thread_local! {
+    /// The `committing` list of the last index request on this thread: the port boundary's one wiring proof.
+    static LAST_COMMITTING: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
+}
+
+/// The files the last index request said the land commits, sorted.
+fn last_committing() -> Vec<String> {
+    let mut seen = LAST_COMMITTING.with(|c| c.borrow().clone());
+    seen.sort();
+    seen
+}
+
+/// Stands in for the classifier the composition root owns: minted `p-<10 base32>`, legacy `p-<8 hex>`,
+/// any other `p-` entry invalid, everything else not a backlog reference.
+fn classify(src: &str) -> BacklogRef {
+    // A legacy id may carry dashes of its own.
+    if src.starts_with("wf-") {
+        return BacklogRef::Legacy;
+    }
+    let Some(rest) = src.strip_prefix("p-") else {
+        return BacklogRef::NotBacklog;
+    };
+    if rest.len() == 10 && rest.bytes().all(|b| matches!(b, b'a'..=b'z' | b'2'..=b'7')) {
+        BacklogRef::Minted
+    } else if rest.len() == 8 && rest.bytes().all(|b| b.is_ascii_hexdigit()) {
+        BacklogRef::Legacy
+    } else {
+        BacklogRef::Invalid
+    }
+}
+
+/// Stands in for the generator: one `<file> <status>` line per item file in the checkout. It records
+/// `committing` and refuses a list that holds a glob or a repeat.
+fn fixture_index(root: &Path, committing: &[String]) -> Result<String, String> {
+    let mut unique = committing.to_vec();
+    unique.sort();
+    unique.dedup();
+    if unique.len() != committing.len() || committing.iter().any(|c| c.contains(['*', '?'])) {
+        return Err(format!("committing must be concrete files: {committing:?}"));
+    }
+    LAST_COMMITTING.with(|c| *c.borrow_mut() = committing.to_vec());
+    let mut names: Vec<_> = fs::read_dir(root.join("plans/backlog"))
+        .map_err(|e| e.to_string())?
+        .map(|e| e.unwrap().file_name().to_string_lossy().into_owned())
+        .collect();
+    names.sort();
+    let mut out = String::new();
+    for name in names {
+        let text = fs::read_to_string(root.join("plans/backlog").join(&name)).unwrap();
+        let status = text
+            .lines()
+            .find_map(|l| l.strip_prefix("status: "))
+            .unwrap_or("?");
+        out.push_str(&format!("{name} {status}\n"));
+    }
+    Ok(out)
+}
+
+fn changes_outside_runtime(f: &Fixture) -> Vec<String> {
+    git(&f.main, &["status", "--porcelain"])
+        .lines()
+        .filter(|line| !line.contains(".fgos/"))
+        .map(|line| line.trim().to_owned())
+        .collect()
+}
+
+/// A trunk holding a running plan that cites two items (and a discussion path), with an index.
+fn running_plan_with_items(f: &Fixture) {
+    fs::create_dir_all(f.main.join("plans/backlog")).unwrap();
+    fs::create_dir_all(f.main.join("plans/260101-0000-demo")).unwrap();
+    fs::write(f.main.join(ITEM_A), item_text(ID_A, "in-flight")).unwrap();
+    fs::write(f.main.join(ITEM_B), item_text(ID_B, "proposed")).unwrap();
+    fs::write(f.main.join(INDEX), fixture_index(&f.main, &[]).unwrap()).unwrap();
+    fs::write(f.main.join(PLAN_PATH), plan_with_sources("running", &CITED)).unwrap();
+    git(&f.main, &["add", "."]);
+    git(&f.main, &["commit", "-qm", "plan and items"]);
+    git(&f.main, &["push", "-q", "origin", "trunk"]);
+}
+
+fn land_with_index(
+    f: &Fixture,
+    command: &LandCommand,
+) -> Result<fgos_supervision::land::LandOutcome, fgos_supervision::land::LandRefusal> {
+    let next = || format!("idx-{}", f.ids.fetch_add(1, Ordering::Relaxed));
+    land_with_index_config(f, command, &config(vec![gate("true")]), &next)
+}
+
+fn land_with_index_config(
+    f: &Fixture,
+    command: &LandCommand,
+    config: &LandConfig,
+    next: &dyn Fn() -> String,
+) -> Result<fgos_supervision::land::LandOutcome, fgos_supervision::land::LandRefusal> {
+    let mut with_port = ports(&f.env, next, 30_000);
+    with_port.backlog_index = Some(BacklogPort {
+        classify: &classify,
+        index: &fixture_index,
+    });
+    land(command, config, &with_port)
+}
+
+#[test]
+fn landing_a_plan_that_turns_done_commits_its_cited_items_as_done_and_the_regenerated_index() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    fs::write(f.main.join(PLAN_PATH), plan_with_sources("done", &CITED)).unwrap();
+    // A lead whose footprint covers only its plan directory still lands: the item and index paths are
+    // the door's own writes, and the footprint check reads plan files only.
+    let out = land_with_index(&f, &lead_paths(&[PLAN_PATH])).unwrap();
+    let mut changed: Vec<_> = git(&f.main, &["show", "--name-only", "--format=", "HEAD"])
+        .lines()
+        .map(str::to_owned)
+        .collect();
+    changed.sort();
+    let mut expected = vec![INDEX, ITEM_A, ITEM_B, PLAN_PATH];
+    expected.sort();
+    assert_eq!(changed, expected);
+    // The index generator is told the plan and the closed items, and nothing else.
+    assert_eq!(last_committing(), vec![PLAN_PATH, ITEM_A, ITEM_B]);
+    assert_eq!(out.main_sha, f.remote_tip());
+    assert_eq!(
+        fs::read_to_string(f.main.join(ITEM_A)).unwrap(),
+        item_text(ID_A, "done")
+    );
+    assert_eq!(
+        fs::read_to_string(f.main.join(ITEM_B)).unwrap(),
+        item_text(ID_B, "done")
+    );
+    assert_eq!(
+        fs::read_to_string(f.main.join(INDEX)).unwrap(),
+        "p-aaaaaaaaaa-first.md done\np-bbbbbbbbbb-second.md done\n"
+    );
+    // Runtime state under .fgos/ (the lock directories) is not a change of the checkout.
+    assert_eq!(changes_outside_runtime(&f), Vec::<String>::new());
+}
+
+#[test]
+fn a_plan_citing_an_item_that_has_no_file_is_refused_with_nothing_committed_or_changed() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    let done = plan_with_sources("done", &["p-aaaaaaaaaa", "p-cccccccccc"]);
+    fs::write(f.main.join(PLAN_PATH), &done).unwrap();
+    let tip = f.remote_tip();
+    let refusal = land_with_index(&f, &paths(&[PLAN_PATH])).unwrap_err();
+    assert_eq!(refusal.code, "land-backlog-item-missing", "{refusal}");
+    assert!(refusal.detail.contains("p-cccccccccc"), "{refusal}");
+    assert_eq!(f.remote_tip(), tip);
+    assert_eq!(f.local_tip(), tip);
+    assert_eq!(
+        fs::read_to_string(f.main.join(ITEM_A)).unwrap(),
+        item_text(ID_A, "in-flight")
+    );
+    assert_eq!(fs::read_to_string(f.main.join(PLAN_PATH)).unwrap(), done);
+    // Runtime state under .fgos/ (the merge-slot lock) is not a caller change.
+    let status = git(&f.main, &["status", "--porcelain"]);
+    let changes: Vec<_> = status
+        .lines()
+        .filter(|line| !line.contains(".fgos/"))
+        .map(str::trim)
+        .collect();
+    assert_eq!(changes, vec![format!("M {PLAN_PATH}")]);
+}
+
+#[test]
+fn a_legacy_id_does_not_match_the_file_of_a_longer_id_that_it_prefixes() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    let longer = "plans/backlog/wf-foo-bar-x.md";
+    fs::write(f.main.join(longer), item_text("wf-foo-bar", "proposed")).unwrap();
+    git(&f.main, &["add", "."]);
+    git(&f.main, &["commit", "-qm", "longer legacy item"]);
+    git(&f.main, &["push", "-q", "origin", "trunk"]);
+    let done = plan_with_sources("done", &["wf-foo"]);
+    fs::write(f.main.join(PLAN_PATH), &done).unwrap();
+    // A legacy id that names no item is not an item the door closes: the plan lands alone and the
+    // longer id's item is left as it was.
+    land_with_index(&f, &paths(&[PLAN_PATH])).unwrap();
+    assert_eq!(changed_in_head(&f), vec![PLAN_PATH]);
+    assert_eq!(
+        fs::read_to_string(f.main.join(longer)).unwrap(),
+        item_text("wf-foo-bar", "proposed")
+    );
+}
+
+#[test]
+fn a_plan_land_that_is_not_a_turn_to_done_touches_no_item() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    let head = |f: &Fixture| git(&f.main, &["show", "--name-only", "--format=", "HEAD"]);
+    // Still running: an edit that is not a transition.
+    let running = plan_with_sources("running", &CITED) + "\nNote.\n";
+    fs::write(f.main.join(PLAN_PATH), running).unwrap();
+    land_with_index(&f, &paths(&[PLAN_PATH])).unwrap();
+    assert_eq!(head(&f), PLAN_PATH);
+    // Already done at the tip: a later edit of the done plan changes no item.
+    fs::write(f.main.join(PLAN_PATH), plan_with_sources("done", &CITED)).unwrap();
+    land_with_index(&f, &paths(&[PLAN_PATH])).unwrap();
+    fs::write(f.main.join(ITEM_A), item_text(ID_A, "in-flight")).unwrap();
+    git(&f.main, &["commit", "-qam", "reopen"]);
+    git(&f.main, &["push", "-q", "origin", "trunk"]);
+    let more = plan_with_sources("done", &CITED) + "\nMore.\n";
+    fs::write(f.main.join(PLAN_PATH), more).unwrap();
+    land_with_index(&f, &paths(&[PLAN_PATH])).unwrap();
+    assert_eq!(head(&f), PLAN_PATH);
+    assert_eq!(
+        fs::read_to_string(f.main.join(ITEM_A)).unwrap(),
+        item_text(ID_A, "in-flight")
+    );
+}
+
+fn counter(f: &Fixture) -> impl Fn() -> String + '_ {
+    move || format!("idx-{}", f.ids.fetch_add(1, Ordering::Relaxed))
+}
+
+#[test]
+fn a_local_commit_that_stays_after_a_failed_push_keeps_the_items_it_holds_done_in_the_tree() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    fs::write(f.main.join(PLAN_PATH), plan_with_sources("done", &CITED)).unwrap();
+    // The remote disappears after the gates: the push has no answer and the commit stays.
+    let vanish = format!("mv {r} {r}.gone", r = f.remote.display());
+    let next = counter(&f);
+    let refusal = land_with_index_config(
+        &f,
+        &lead_paths(&[PLAN_PATH]),
+        &config(vec![gate(&vanish)]),
+        &next,
+    )
+    .unwrap_err();
+    for item in [ITEM_A, ITEM_B] {
+        let committed = git(&f.main, &["show", &format!("HEAD:{item}")]);
+        let working = fs::read_to_string(f.main.join(item)).unwrap();
+        assert_eq!(
+            working.trim(),
+            committed.trim(),
+            "{item} after {refusal}: HEAD and the tree agree"
+        );
+    }
+}
+
+#[test]
+fn a_cited_item_with_uncommitted_edits_is_refused_and_keeps_them() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    let edited = item_text(ID_A, "in-flight") + "\nMy own notes.\n";
+    fs::write(f.main.join(ITEM_A), &edited).unwrap();
+    fs::write(f.main.join(PLAN_PATH), plan_with_sources("done", &CITED)).unwrap();
+    let tip = f.local_tip();
+    let refusal = land_with_index(&f, &lead_paths(&[PLAN_PATH])).unwrap_err();
+    assert_eq!(refusal.code, "land-backlog-item-dirty", "{refusal}");
+    assert_eq!(f.local_tip(), tip);
+    assert_eq!(fs::read_to_string(f.main.join(ITEM_A)).unwrap(), edited);
+    assert_eq!(
+        fs::read_to_string(f.main.join(ITEM_B)).unwrap(),
+        item_text(ID_B, "proposed")
+    );
+}
+
+#[test]
+fn a_repeat_land_after_an_interrupted_one_commits_items_already_marked_done_in_the_tree() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    // What a crash between the door's writes and the commit leaves: items done in the tree only.
+    fs::write(f.main.join(ITEM_A), item_text(ID_A, "done")).unwrap();
+    fs::write(f.main.join(INDEX), "stale\n").unwrap();
+    fs::write(f.main.join(PLAN_PATH), plan_with_sources("done", &CITED)).unwrap();
+    land_with_index(&f, &lead_paths(&[PLAN_PATH])).unwrap();
+    for item in [ITEM_A, ITEM_B] {
+        assert_eq!(
+            git(&f.main, &["show", &format!("HEAD:{item}")]),
+            item_text(if item == ITEM_A { ID_A } else { ID_B }, "done").trim(),
+            "{item}"
+        );
+    }
+    assert_eq!(
+        git(&f.main, &["show", &format!("HEAD:{INDEX}")]),
+        "p-aaaaaaaaaa-first.md done\np-bbbbbbbbbb-second.md done"
+    );
+    assert_eq!(changes_outside_runtime(&f), Vec::<String>::new());
+}
+
+#[test]
+fn a_source_that_looks_like_a_backlog_id_but_is_not_minted_is_refused_while_other_shapes_pass() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    let bad = plan_with_sources("done", &["p-aaaaaaaaaa", "p-short"]);
+    fs::write(f.main.join(PLAN_PATH), &bad).unwrap();
+    let refusal = land_with_index(&f, &paths(&[PLAN_PATH])).unwrap_err();
+    assert_eq!(refusal.code, "land-plan-source-invalid", "{refusal}");
+    assert!(refusal.detail.contains("p-short"), "{refusal}");
+    assert_eq!(
+        fs::read_to_string(f.main.join(ITEM_A)).unwrap(),
+        item_text(ID_A, "in-flight")
+    );
+    // A legacy-shaped id is not an item the door closes.
+    let legacy = plan_with_sources("done", &["p-aaaaaaaaaa", "pbi-12", "legacy-7"]);
+    fs::write(f.main.join(PLAN_PATH), legacy).unwrap();
+    land_with_index(&f, &paths(&[PLAN_PATH])).unwrap();
+    assert_eq!(
+        git(&f.main, &["show", &format!("HEAD:{ITEM_A}")]),
+        item_text(ID_A, "done").trim()
+    );
+}
+
+#[test]
+fn a_dropped_cited_item_is_left_as_it_is() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    let dropped = "plans/backlog/p-cccccccccc-third.md";
+    fs::write(f.main.join(dropped), item_text(ID_C, "dropped")).unwrap();
+    git(&f.main, &["add", "."]);
+    git(&f.main, &["commit", "-qm", "dropped item"]);
+    git(&f.main, &["push", "-q", "origin", "trunk"]);
+    let sources = ["p-aaaaaaaaaa", "p-cccccccccc"];
+    fs::write(f.main.join(PLAN_PATH), plan_with_sources("done", &sources)).unwrap();
+    land_with_index(&f, &paths(&[PLAN_PATH])).unwrap();
+    assert_eq!(
+        fs::read_to_string(f.main.join(dropped)).unwrap(),
+        item_text(ID_C, "dropped")
+    );
+    assert_eq!(
+        fs::read_to_string(f.main.join(ITEM_A)).unwrap(),
+        item_text(ID_A, "done")
+    );
+}
+
+fn changed_in_head(f: &Fixture) -> Vec<String> {
+    let mut changed: Vec<_> = git(&f.main, &["show", "--name-only", "--format=", "HEAD"])
+        .lines()
+        .map(str::to_owned)
+        .collect();
+    changed.sort();
+    changed
+}
+
+#[test]
+fn a_plan_turning_done_whose_cited_items_are_all_done_still_commits_the_regenerated_index() {
+    let f = Fixture::new();
+    fs::create_dir_all(f.main.join("plans/backlog")).unwrap();
+    fs::create_dir_all(f.main.join("plans/260101-0000-demo")).unwrap();
+    fs::write(f.main.join(ITEM_A), item_text(ID_A, "done")).unwrap();
+    fs::write(f.main.join(ITEM_B), item_text(ID_B, "dropped")).unwrap();
+    fs::write(f.main.join(INDEX), "stale\n").unwrap();
+    fs::write(f.main.join(PLAN_PATH), plan_with_sources("running", &CITED)).unwrap();
+    git(&f.main, &["add", "."]);
+    git(&f.main, &["commit", "-qm", "plan and settled items"]);
+    git(&f.main, &["push", "-q", "origin", "trunk"]);
+    fs::write(f.main.join(PLAN_PATH), plan_with_sources("done", &CITED)).unwrap();
+    land_with_index(&f, &lead_paths(&[PLAN_PATH])).unwrap();
+    assert_eq!(changed_in_head(&f), vec![PLAN_PATH, INDEX]);
+    assert_eq!(
+        git(&f.main, &["show", &format!("HEAD:{INDEX}")]),
+        "p-aaaaaaaaaa-first.md done\np-bbbbbbbbbb-second.md dropped"
+    );
+}
+
+#[test]
+fn a_legacy_id_that_names_an_item_file_is_closed_and_a_malformed_p_entry_is_refused() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    let legacy = "plans/backlog/p-0123abcd-legacy.md";
+    fs::write(f.main.join(legacy), item_text("p-0123abcd", "proposed")).unwrap();
+    git(&f.main, &["add", "."]);
+    git(&f.main, &["commit", "-qm", "legacy item"]);
+    git(&f.main, &["push", "-q", "origin", "trunk"]);
+    let bad = plan_with_sources("done", &["p-0123abcd", "p-XYZ"]);
+    fs::write(f.main.join(PLAN_PATH), &bad).unwrap();
+    let refusal = land_with_index(&f, &paths(&[PLAN_PATH])).unwrap_err();
+    assert_eq!(refusal.code, "land-plan-source-invalid", "{refusal}");
+    assert!(refusal.detail.contains("p-XYZ"), "{refusal}");
+    let good = plan_with_sources("done", &["p-0123abcd"]);
+    fs::write(f.main.join(PLAN_PATH), good).unwrap();
+    land_with_index(&f, &paths(&[PLAN_PATH])).unwrap();
+    assert_eq!(
+        git(&f.main, &["show", &format!("HEAD:{legacy}")]),
+        item_text("p-0123abcd", "done").trim()
+    );
+}
+
+#[test]
+fn an_item_the_caller_names_lands_with_the_caller_bytes_set_to_done() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    let edited = item_text(ID_A, "in-flight") + "\nMy own notes.\n";
+    fs::write(f.main.join(ITEM_A), &edited).unwrap();
+    let plan = plan_with_sources("done", &["p-aaaaaaaaaa"]);
+    fs::write(f.main.join(PLAN_PATH), plan).unwrap();
+    land_with_index(&f, &paths(&[PLAN_PATH, ITEM_A])).unwrap();
+    assert_eq!(
+        git(&f.main, &["show", &format!("HEAD:{ITEM_A}")]),
+        (item_text(ID_A, "done") + "\nMy own notes.\n").trim()
+    );
+    assert_eq!(last_committing(), vec![PLAN_PATH, ITEM_A]);
+}
+
+#[test]
+fn a_new_item_landed_together_with_the_plan_that_cites_it_is_closed_in_the_same_commit() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    let new_item = "plans/backlog/p-cccccccccc-third.md";
+    fs::write(f.main.join(new_item), item_text(ID_C, "proposed")).unwrap();
+    let plan = plan_with_sources("done", &["p-cccccccccc"]);
+    fs::write(f.main.join(PLAN_PATH), plan).unwrap();
+    land_with_index(&f, &paths(&[PLAN_PATH, new_item])).unwrap();
+    assert_eq!(
+        git(&f.main, &["show", &format!("HEAD:{new_item}")]),
+        item_text(ID_C, "done").trim()
+    );
+}
+
+#[test]
+fn a_glob_in_the_paths_reaches_the_index_as_the_files_it_matches() {
+    let f = Fixture::new();
+    running_plan_with_items(&f);
+    let new_item = "plans/backlog/p-cccccccccc-third.md";
+    fs::write(f.main.join(new_item), item_text(ID_C, "proposed")).unwrap();
+    let plan = plan_with_sources("done", &["p-aaaaaaaaaa"]);
+    fs::write(f.main.join(PLAN_PATH), plan).unwrap();
+    land_with_index(&f, &paths(&[PLAN_PATH, "plans/backlog/p-c*.md"])).unwrap();
+    assert_eq!(last_committing(), vec![PLAN_PATH, ITEM_A, new_item]);
 }
