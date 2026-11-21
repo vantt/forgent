@@ -560,12 +560,17 @@ mod quiesce {
     }
     use fgos_process::facts::{scan as scan_processes, ProcView, Scan, ScanFilter};
 
-    /// Whether `path` lies inside `dir`. On Windows both are compared in
-    /// their plain drive spelling (a canonical path carries the `\\?\` prefix a
-    /// process's recorded directory does not) and without regard to case.
+    /// Whether `path` lies inside `dir`. On Windows `path` is first resolved
+    /// like the workspace directories are (a process records its directory as
+    /// it was typed, possibly an 8.3 short name or a relative spelling), then
+    /// both are compared in their plain drive spelling (a canonical path
+    /// carries the `\\?\` prefix a recorded directory does not) and without
+    /// regard to case.
     fn within(path: &Path, dir: &Path) -> bool {
         #[cfg(windows)]
         {
+            let path = path.canonicalize().unwrap_or_else(|_| path.to_path_buf());
+            let path = path.as_path();
             let plain = |p: &Path| {
                 PathBuf::from(
                     fgos_process::path::plain_path(p)
@@ -972,6 +977,50 @@ mod quiesce {
                     Some(&outside),
                     &dirs,
                     false
+                ),
+                Some("cmdline")
+            );
+            std::fs::remove_dir_all(&base).unwrap();
+        }
+
+        #[cfg(windows)]
+        #[test]
+        fn a_windows_short_name_directory_matches_the_workspace_by_its_long_name() {
+            use std::os::windows::ffi::{OsStrExt, OsStringExt};
+            extern "system" {
+                fn GetShortPathNameW(long: *const u16, short: *mut u16, size: u32) -> u32;
+            }
+            let base =
+                std::env::temp_dir().join(format!("fgos-quiesce-short-{}", std::process::id()));
+            let root = base.join("a workspace with a long name");
+            std::fs::create_dir_all(&root).unwrap();
+            let dirs = workspace_dirs(&root, &[]);
+            let wide: Vec<u16> = root.as_os_str().encode_wide().chain([0]).collect();
+            let mut buffer = vec![0u16; 4096];
+            // SAFETY: a NUL-terminated input and a writable buffer of the stated size.
+            let len = unsafe { GetShortPathNameW(wide.as_ptr(), buffer.as_mut_ptr(), 4096) };
+            // A volume without short names answers the long name; the case still holds.
+            let short = if len == 0 || len as usize >= buffer.len() {
+                root.clone()
+            } else {
+                PathBuf::from(std::ffi::OsString::from_wide(&buffer[..len as usize]))
+            };
+            assert_eq!(
+                workspace_hit(
+                    Some(&argv(&["node.exe", "fgos.mjs"])),
+                    Some(&short),
+                    &dirs,
+                    true
+                ),
+                Some("cwd")
+            );
+            let dir_arg = short.to_string_lossy().into_owned();
+            assert_eq!(
+                workspace_hit(
+                    Some(&argv(&["node.exe", "fgos.mjs", "--dir", &dir_arg])),
+                    Some(&base),
+                    &dirs,
+                    true
                 ),
                 Some("cmdline")
             );
