@@ -521,9 +521,9 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
         });
         break;
       case HEAD_ROTATE_VERB: {
-        exactKeys(args, ['persona', 'name', 'reason', 'stopFacts']);
+        exactKeys(args, ['persona', 'name', 'reason', 'stopFacts', 'measure']);
         ownLineage(args, envelope);
-        data = requestRotation({ persona: args.persona, name: args.name, reason: args.reason, stopFacts: args.stopFacts, projectRoot }, ports.rotation ?? {});
+        data = requestRotation({ persona: args.persona, name: args.name, reason: args.reason, stopFacts: args.stopFacts, measure: args.measure, projectRoot }, ports.rotation ?? {});
         break;
       }
       case HEAD_ANSWERED_VERB:

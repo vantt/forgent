@@ -36,6 +36,11 @@ import { redactText, writeHandoff } from './handoff-store.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
 export const ROTATION_REASONS = Object.freeze(['soft', 'hard', 'manual']);
+/** The reason of a stop that measured below soft: nothing is rotated, the stop is only recorded. */
+export const NO_ROTATION_REASON = 'none';
+export const STOP_TRACE_FILE = 'stop-trace.jsonl';
+const TRACE_MAX_BYTES = 256 * 1024;
+const TRACE_KEEP_LINES = 500;
 export const ROTATION_LOCK = 'session-rotation';
 const ENTRY = fileURLToPath(import.meta.url);
 const FILE_MODE = 0o600;
@@ -77,10 +82,28 @@ export function checkStopFacts(facts) {
   return out;
 }
 
-function checkRequest({ persona, name, reason, stopFacts, projectRoot }) {
+const MEASURE_SOURCES = ['sidecar', 'transcript'];
+
+/** What a stop measured and decided: `{ fraction, source, stale, decision }`, or null when it measured nothing. Anything else is refused. */
+export function checkMeasure(measure) {
+  if (measure === undefined) return undefined;
+  if (measure === null || typeof measure !== 'object' || Array.isArray(measure)) fail('bad-measure', 'measure must be an object');
+  const extra = Object.keys(measure).filter((k) => !['fraction', 'source', 'stale', 'decision'].includes(k));
+  if (extra.length) fail('bad-measure', `unknown measure field ${JSON.stringify(extra[0])}`);
+  const { fraction, source, stale, decision } = measure;
+  if (fraction !== null && !(typeof fraction === 'number' && Number.isFinite(fraction) && fraction >= 0)) fail('bad-measure', 'fraction must be a number of at least 0, or null');
+  if (source !== null && !MEASURE_SOURCES.includes(source)) fail('bad-measure', `source must be ${MEASURE_SOURCES.join(' or ')}, or null`);
+  if (typeof stale !== 'boolean') fail('bad-measure', 'stale must be a boolean');
+  if (typeof decision !== 'string' || decision === '' || decision.length > 60) fail('bad-measure', 'decision must be a string of 1 to 60 characters');
+  return { fraction, source, stale, decision };
+}
+
+function checkRequest({ persona, name, reason, stopFacts, projectRoot, measure }) {
   try { assertHeadArgs({ persona, name, projectRoot }); } catch (err) { fail(err.code ?? 'bad-args', err.message); }
-  if (!ROTATION_REASONS.includes(reason)) fail('bad-reason', `reason must be one of ${ROTATION_REASONS.join(', ')}, got ${JSON.stringify(reason)}`);
-  return { persona, name, reason, projectRoot, stopFacts: checkStopFacts(stopFacts) };
+  const checkedMeasure = checkMeasure(measure);
+  const traceOnly = reason === NO_ROTATION_REASON && checkedMeasure !== undefined;
+  if (!traceOnly && !ROTATION_REASONS.includes(reason)) fail('bad-reason', `reason must be one of ${ROTATION_REASONS.join(', ')}, got ${JSON.stringify(reason)}`);
+  return { persona, name, reason, projectRoot, stopFacts: checkStopFacts(stopFacts), ...(checkedMeasure ? { measure: checkedMeasure } : {}) };
 }
 
 // ---- the token the answer must echo ---------------------------------------------------------------
@@ -115,6 +138,22 @@ const incident = (dir, line) => {
     fs.appendFileSync(path.join(dir, 'incidents.jsonl'), `${JSON.stringify({ at: new Date().toISOString(), ...line })}\n`, { mode: FILE_MODE });
   } catch { /* the incident line is best effort; the returned reason is the record that matters */ }
 };
+
+/**
+ * Appends one line for a stop to the lineage's `stop-trace.jsonl` (what the stop measured, decided and how the request
+ * ended). Best effort like an incident line; the file is cut to its newest lines once it passes its byte bound.
+ */
+export function recordStopTrace(dir, line) {
+  try {
+    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+    const file = path.join(dir, STOP_TRACE_FILE);
+    fs.appendFileSync(file, `${JSON.stringify({ at: new Date().toISOString(), ...line })}\n`, { mode: FILE_MODE });
+    if (fs.statSync(file).size > TRACE_MAX_BYTES) {
+      const kept = fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).slice(-TRACE_KEEP_LINES);
+      replaceDurably(dir, STOP_TRACE_FILE, `${kept.join('\n')}\n`, FILE_MODE);
+    }
+  } catch { /* the trace is best effort; the rotation itself never depends on it */ }
+}
 
 // ---- the successor's answer ------------------------------------------------------------------------
 
@@ -366,6 +405,16 @@ export async function rotateHeadSession(request, ports = {}) {
 export function requestRotation(request, ports = {}) {
   const checked = checkRequest(request);
   const dir = lineageDirOf(checked.projectRoot, checked.persona, checked.name);
+  const outcome = startRotation(checked, dir, ports);
+  if (checked.measure) {
+    const { fraction, source, stale, decision } = checked.measure;
+    recordStopTrace(dir, { fraction, source, stale, decision, reason: checked.reason, outcome: outcome.started ? 'started' : outcome.reason });
+  }
+  return outcome;
+}
+
+function startRotation(checked, dir, ports) {
+  if (checked.reason === NO_ROTATION_REASON) return { started: false, reason: 'below-threshold' };
   if ((ports.holds ?? rotationHolds)(checked)) return { started: false, reason: 'rotation-in-progress' };
   const file = path.join(dir, `request-${crypto.randomBytes(6).toString('hex')}.json`);
   writeJson(dir, path.basename(file), { ...checked, requestedAt: new Date().toISOString() });
