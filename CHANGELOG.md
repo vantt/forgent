@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fixed: a paths land (`fgos land --paths`, and a head's `session write`) whose push the remote rejects no longer leaves its commit on local main, which refused every later land `land-target-ahead`: it undoes its own unpublished commit (the bytes stay), starts over from a fresh sync up to three more times, then refuses `land-retries-exhausted`. A hook-changed commit and a footprint refusal are undone the same way.
 - Fixed: a successful `fgos land <branch>` now releases its candidate worktree (about 5G with its build output) instead of leaving it for `fgos git recover`; a land refused because a dead writer's earlier land is still pending now says to run `fgos git recover`.
 - Changed: a head's tab now reads `role: subject` (for example `lead: head-tab-labels`, `secretary: miu`) with the whole role, and every tab separates its parts with `: ` instead of ` · `. Two plan leads whose plan directories share their first 24 characters now get different head names, so both can start.
 - Changed: `fgos session start` for a `lead`, `planner` or `shaper` head now binds the name to its plan or discussion and puts the exact path and first step in the opening; a name that matches no plan or discussion is refused by name (`plan-not-found`, `discussion-not-found`, `task-ambiguous`) before anything launches.

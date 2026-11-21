@@ -384,14 +384,17 @@ fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_fo
     assert_eq!(scene.remote_tip(), before);
     git(&scene.project, &["checkout", "--", "docs/backlog.md"]);
 
-    // 3. The remote moves outside fgos while the land runs: the push is refused by its own name and nothing is
-    // forced. The commit was already made, so it stays local: the path is committed, the branch is one commit ahead
-    // of its remote, and the next write is refused `write-branch-ahead` before it writes anything.
+    // 3. The remote moves outside fgos while the land runs: the push is rejected, the commit is undone, and the
+    // land starts over from a fresh sync, so the write ends on the remote with no hand push. A remote that moves
+    // on every try ends `land-retries-exhausted` with local main not ahead of the remote and the bytes in place; the
+    // next write is not refused `write-branch-ahead`.
     let mover = scene.root.join("mover.sh");
+    let marker = scene.root.join("moved-once");
     fs::write(
         &mover,
         format!(
-            "cd {o} && git pull -q --ff-only origin trunk && echo x > moved-late.md && git add . && git commit -qm late && git push -q origin trunk\n",
+            "[ -e {m} ] && exit 0; touch {m}; cd {o} && git pull -q --ff-only origin trunk && echo x > moved-late.md && git add . && git commit -qm late && git push -q origin trunk\n",
+            m = marker.display(),
             o = scene.other.display()
         ),
     )
@@ -400,42 +403,18 @@ fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_fo
     let reply = scene.write("docs/backlog.md", "third\n");
     assert_eq!(reply["result"], "done", "{reply}");
     assert_eq!(reply["data"]["bytes"], 6);
+    let commit = reply["data"]["commit"].as_str().expect("published").to_owned();
+    assert_eq!(commit, scene.remote_tip(), "{reply}");
+    assert!(scene.project.join("moved-late.md").exists());
     assert_eq!(
-        reply["data"]["publish"]["refusal"], "land-paths-push-rejected",
-        "{reply}"
-    );
-    assert!(reply["data"].get("commit").is_none());
-    assert_eq!(
-        fs::read_to_string(scene.project.join("docs/backlog.md")).unwrap(),
-        "third\n"
-    );
-    assert_ne!(
         git(&scene.project, &["rev-parse", "refs/heads/trunk"]),
         scene.remote_tip(),
-        "the remote keeps its own tip; nothing was forced"
-    );
-    assert_eq!(
-        git(
-            &scene.project,
-            &["status", "--porcelain", "--", "docs/backlog.md"]
-        ),
-        "",
-        "the path is committed locally"
-    );
-    assert_eq!(
-        git(&scene.project, &["rev-list", "--count", "@{u}..HEAD"]),
-        "1",
-        "one local commit the remote lacks"
+        "local main equals the remote tip"
     );
     let tip = scene.remote_tip();
     let reply = scene.write("docs/backlog.md", "fourth\n");
-    assert_eq!(reply["result"], "refused", "{reply}");
-    assert_eq!(reply["code"], "write-branch-ahead", "{reply}");
-    assert_eq!(
-        fs::read_to_string(scene.project.join("docs/backlog.md")).unwrap(),
-        "third\n"
-    );
-    assert_eq!(scene.remote_tip(), tip);
+    assert_eq!(reply["result"], "done", "a later write is not refused: {reply}");
+    assert_ne!(scene.remote_tip(), tip);
 }
 
 /// A virtual clock: `sleep` advances it, so the retry schedule is proven without waiting.

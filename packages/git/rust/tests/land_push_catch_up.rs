@@ -493,3 +493,29 @@ fn recovery_keeps_a_push_branch_that_points_at_another_commit_and_still_settles(
     );
     assert_eq!(git(&f.main, &["rev-parse", temp]), f.request.target);
 }
+
+#[test]
+fn an_unpublished_commit_is_undone_with_its_bytes_kept_and_refused_once_the_branch_moved() {
+    let f = Fixture::new();
+    let parent = git(&f.main, &["rev-parse", "HEAD"]);
+    fs::write(f.main.join("a"), "written\n").unwrap();
+    git(&f.main, &["commit", "-qam", "unpublished"]);
+    let commit = git(&f.main, &["rev-parse", "HEAD"]);
+    let undo = |commit: &str, parent: &str| {
+        f.driver.undo_unpublished_commit(
+            &f.repo,
+            vec![],
+            &name("refs/heads/trunk"),
+            &oid(&f, commit),
+            &oid(&f, parent),
+        )
+    };
+    // A tip that is not the named commit is refused and touches nothing.
+    let refused = undo(&parent, &parent).unwrap_err();
+    assert_eq!(refused.cause, "undo-commit-refused: branch-moved");
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), commit);
+    undo(&commit, &parent).unwrap();
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), parent);
+    assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "written\n");
+    assert_eq!(git(&f.main, &["status", "--porcelain", "--", "a"]), "M a");
+}
