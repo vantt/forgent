@@ -403,7 +403,10 @@ fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_fo
     let reply = scene.write("docs/backlog.md", "third\n");
     assert_eq!(reply["result"], "done", "{reply}");
     assert_eq!(reply["data"]["bytes"], 6);
-    let commit = reply["data"]["commit"].as_str().expect("published").to_owned();
+    let commit = reply["data"]["commit"]
+        .as_str()
+        .expect("published")
+        .to_owned();
     assert_eq!(commit, scene.remote_tip(), "{reply}");
     assert!(scene.project.join("moved-late.md").exists());
     assert_eq!(
@@ -413,7 +416,10 @@ fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_fo
     );
     let tip = scene.remote_tip();
     let reply = scene.write("docs/backlog.md", "fourth\n");
-    assert_eq!(reply["result"], "done", "a later write is not refused: {reply}");
+    assert_eq!(
+        reply["result"], "done",
+        "a later write is not refused: {reply}"
+    );
     assert_ne!(scene.remote_tip(), tip);
 }
 
