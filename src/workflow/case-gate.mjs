@@ -13,11 +13,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { assertRunTimeoutMs, loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { CaseAdmissionRefusedError, RunnerConfigError } from '../native/execution-door.mjs';
 import { answerOfVerify, outcomeOfVerify, runUnderCustody, runVerify } from '../runner/execution/custody-door.mjs';
 import { verifyCommandOf, verifySeatResult } from '../runner/execution/loops/verify.mjs';
 import { evaluationsOf } from '../runner/execution/outcome.mjs';
-import { CaseAdmissionRefusedError } from '../runner/execution/case-admission-port.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
 import { GATE_RUN_PREFIX } from './case-runtime.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';

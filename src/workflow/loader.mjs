@@ -6,7 +6,7 @@ import path from 'node:path';
 import { describeYamlError, parseYaml } from '../util/yaml.mjs';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { RunnerConfigError } from '../native/execution-door.mjs';
 import { definitionNameOf } from '../convention/definition-names.mjs';
 import { domainCatalog } from '../util/domain-dirs.mjs';
 import { OWN_PAYLOAD_ROOT } from '../util/payload-root.mjs';

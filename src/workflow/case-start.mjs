@@ -18,7 +18,7 @@ import { expandWorkflowSeats, normalizeSeats, personaNameOf, seatedPanelUnits } 
 import { digestContextRefs, digestText } from './ref-digests.mjs';
 import { resolveAgentDefinition } from '../runner/agent-definitions.mjs';
 import { assertReasoningEffort, loadRunnerConfigForDir, parseRunTimeout, assertRunTimeoutMs } from '../runner/dispatch/config.mjs';
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { RunnerConfigError } from '../native/execution-door.mjs';
 import { providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
 import { legacyStateKey } from '../runner/dispatch/llm-accounts.mjs';
 import { parseAccountPin } from '../runner/execution/account-pin.mjs';

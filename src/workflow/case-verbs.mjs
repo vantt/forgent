@@ -8,7 +8,7 @@
 
 import path from 'node:path';
 
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { RunnerConfigError } from '../native/execution-door.mjs';
 import { resolveGitRoots } from '../runner/execution/run.mjs';
 import { runDirOf } from '../runner/execution/case-run-paths.mjs';
 import { appendWorkflowEvent, projectWorkflowState, readWorkflowEvents } from './store.mjs';

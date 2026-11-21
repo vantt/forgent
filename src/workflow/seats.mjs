@@ -13,7 +13,7 @@
 
 import crypto from 'node:crypto';
 
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { RunnerConfigError } from '../native/execution-door.mjs';
 import { validateWorkflowChecked } from './checked.mjs';
 import { unitFieldsOfTemplate } from './steps.mjs';
 

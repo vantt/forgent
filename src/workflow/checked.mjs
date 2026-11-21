@@ -3,7 +3,7 @@
 
 import { validateWorkflow, WorkflowDefinitionError } from './definition.mjs';
 import { MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
-import { RunnerConfigError } from '../runner/dispatch/runner-config-error.mjs';
+import { RunnerConfigError } from '../native/execution-door.mjs';
 import { checkDeclaredSeats, assertNoSeatTier, assertNoUnitTier } from '../runner/execution/seat-resolver.mjs';
 
 /**
