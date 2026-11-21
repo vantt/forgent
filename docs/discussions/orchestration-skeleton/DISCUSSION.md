@@ -11,6 +11,7 @@ discussion: open
 - 2026-11-21 16:35: đã xác định 4 bản sửa của OS-D1 (nguồn: memory `orchestration-stabilize-first-decision` của secretary Miu và tin supervisor gửi Miu sáng 2026-11-21: "1547 first, then the idle-lead nudge, then the names, then the reaper"): `p-l22vozecxg`, `p-waxzxz5mio`, `p-mhwe24fttr`, `p-yqanenewb4`. **Cả 4 đã `done`** (xem §7 `#related`). Điều kiện đậu theo chữ của OS-D1 đã thỏa, nhưng release hold ("no new work until the release hold is lifted", handoff secretary 14:45) vẫn còn hiệu lực. Discussion vẫn `paused` cho tới khi chủ dự án cho mở lại.
 - **2026-11-21 16:16: chủ dự án cho mở lại (OS-D2).** Trạng thái `discussion: open`. Architecture panel (T0) vẫn hoãn. Release hold không bị ảnh hưởng vì discussion không sinh code.
 - **2026-11-21 16:23 (round 6):** chủ dự án trả lời câu hỏi round 5 là "cả hai": mọi thành phần phải có authority, boundary và contract rõ, **và** hệ thống cần một cơ chế hoặc một vai làm nhạc trưởng nắm nhịp điều phối tổng. Câu hỏi mở thành §3 row 9: nhạc trưởng, hay mọi thứ chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan theo chuỗi watcher -> ghi signal -> phản ứng tiếp. Đang chạy 5 agent con (haiku, chỉ đọc) dò lại tier 0 tới 9 từ dưới lên; kết quả sẽ vào bảng §3 row 4b.
+- **2026-11-21 22:15 (round 33): bàn hàng 7 (surface port).** Sáu port của plan nháp multica soát lại với các quyết định mới ở §3 4n: còn bốn port, đề xuất thứ tự. Đang hỏi: thứ tự, và xác nhận OS-D19.
 - **2026-11-21 22:10 (round 32): chủ dự án chọn C -> OS-D18 (sleep); hàng 4 rõ.** Handoff "đóng phiếu này, mở phiếu kia" ghi OS-D19 tạm chốt (chủ dự án chưa nói riêng, chờ phản đối nếu có). Kế tiếp: hàng 7 (surface port), rồi hàng 5 (ngôn ngữ khung).
 - **2026-11-21 21:40 (round 31): bàn đóng hàng 4.** Soát bảng 4a với OS-D7 tới OS-D17 ở §3 4m: trigger, timer theo actor, wake, who-next, facet đã có lời giải; handoff đề xuất thành "đóng phiếu này, mở phiếu kia". Đang hỏi: sleep nghĩa là gì.
 - **2026-11-21 21:30 (round 30): chủ dự án chọn B -> OS-D17; hàng 10 rõ.** Rà soát định kỳ là một Unit chỉ đọc, độc lập, khởi qua `fgos run`; bốn ý mặc định của 4l giữ nguyên. Miu báo discussion component-authority đã settled (21:10): thành phần của skeleton khai báo qua cửa `declare` của nó, và rà soát định kỳ là chỗ đối chiếu mô hình cấu trúc với code.
@@ -52,7 +53,7 @@ discussion: open
 | 4 | Danh mục primitives của Skeleton & vị trí code: triggers (Event Store / watcher), timers (OS timer), start/sleep/wake (`session start`, `supervisor wake`, wake pane/socket), handoff (contract), who-next (`bind()` / `dispatch decide`), surface ports (6 ports) | G13 (`supervisor-review`), `plans/261118-1117-external-ui-integration-multica`. Hiện nằm rải rác giữa Supervision, Session Host, Runner | **Rõ (OS-D7 tới OS-D19, soát ở 4m):** mọi primitive đã có chủ hoặc lời giải; sleep là OS-D18, handoff là OS-D19 (tạm chốt); surface port ở hàng 7 |
 | 5 | Ngôn ngữ khung hợp nhất (One Frame Language): Hợp nhất `plan-v1` (plan/wave/phase) và workflow guide YAML (steps/milestones/guards). Cú pháp, schema và runtime runner nào thi hành? | G16. Hiện fgOS có 2 ngôn ngữ khung riêng rẽ, plan không chạy trên workflow harness | **Chưa rõ: Mở khảo sát thiết kế** |
 | 6 | Universal work facets: Skeleton chỉ đọc các thuộc tính lịch trình phổ quát (actionable/runnable, waiting on what, finished) thay vì work states cụ thể | G14. Schema của facets này là gì để skeleton lập lịch được? | **Rõ (OS-D9 tới OS-D16):** bản ghi lập lịch `{ waitingOn?, outcome?, needs? }` gắn với từng bước đang mở, khoá (`item`, `step`). `waitingOn` có `until`; `person` trỏ tới một câu hỏi của Questions (OS-D16). `needs` có ba dạng, người chơi có thể là tool qua `fgos run` (OS-D15). Cap vòng lặp thuộc khung domain (OS-D13); tài nguyên nặng là cap (OS-D14). Thử ánh xạ ở 4h, 4i, 4j, 4k |
-| 7 | Tích hợp Surface (Multica 6 ports): Portfolio read, Command, Wake door, Notifier, Session placement, Question port | `plans/261118-1117-external-ui-integration-multica`. G13 | **Chưa rõ: Thứ tự ưu tiên cổng & adapter** |
+| 7 | Tích hợp Surface (Multica 6 ports): Portfolio read, Command, Wake door, Notifier, Session placement, Question port | `plans/261118-1117-external-ui-integration-multica`. G13 | **Đang bàn (4n):** sáu port gọn còn bốn sau OS-D8, OS-D16; đề xuất thứ tự lối vào/ra cho người, portfolio read, command, placement |
 | 9 | Nhạc trưởng vs chuỗi phản ứng: có một cơ chế hoặc vai nắm nhịp và điều phối tổng, hay mọi hoạt động chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan qua watcher -> ghi signal -> phản ứng tiếp? | Chủ dự án nêu round 6 (2026-11-21 16:23), "open for discuss". Bằng chứng ở 4c: chuỗi timer -> watcher -> event -> wake đã có trong code; nhạc trưởng thực tế là supervisor LLM, cap không bị code ép; chưa có lối vào signal ngoài | **Hướng đã chốt (OS-D3, OS-D4):** lối vào timer + signal; giữ nhịp là code, diễn giải là LLM được hỏi ý. Không zombie: OS-D5 (4e). **Rõ:** chỗ đặt OS-D7, lối vào OS-D8. Mặc định tạm (đổi nếu chủ dự án phản đối hoặc adapter đầu tiên cần khác): id event của signal ngoài suy từ nguồn + id giao hàng của nguồn, không từ thời điểm, để webhook gửi lại không thành hai event; payload là dữ liệu không tin cậy, event chỉ trỏ tới nó, không bao giờ là lệnh |
 | 10 | Nhịp rà soát định kỳ của LLM: tần suất, nội dung brief, kết quả ghi ở đâu, có rà soát khi hệ thống rảnh không | OS-D5 ý 6; đề xuất biểu đạt bằng watcher definition `review-due` (§3 4e, 4l) | **Rõ (OS-D17)** |
 | 11 | Chống code thừa: quản authority chắc **trên toàn hệ thống** (round 13). Vì sao code thừa (cửa thứ hai, bản sao, twin Rust/Node) vẫn cứ sinh ra, và hệ thống giữ authority bằng cách nào; topic này rộng hơn skeleton, đã tách sang discussion riêng `docs/discussions/component-authority/DISCUSSION.md` (CA-D1, round 14) | Chủ dự án nêu round 12. Bằng chứng ở §3 4f. Trùng với backlog `p-7nja6ilwkr` (G10, điều tra cửa thứ hai, chưa làm) | **Đã tách (OS-D6):** bàn ở `component-authority`, **settled 2026-11-21 21:10**: thành phần của skeleton khai báo qua cửa `declare` của thành phần `component-authority`, với loại quyết định "actors và thời gian"; skeleton phụ thuộc kết quả |
@@ -317,6 +318,26 @@ Không vướng gì: guide đã khai `capability` cho từng unit và gate ngư�
 **Đã chốt: (C), OS-D18.**
 - **(C) Mặc định A; B chỉ cho head đang nói chuyện trực tiếp với một người** (Miu, shaper), vì ở đó ngữ cảnh hội thoại là thứ có giá trị; và kể cả khi đó, ngủ quá một ngưỡng thì về A.
 
+**4n. Surface port soát lại với các quyết định mới (hàng 7, round 33, 2026-11-21 22:15)**
+
+Nguồn: `plans/261118-1117-external-ui-integration-multica/plan.md` (nháp, sáu port). Sau OS-D8, OS-D16 và bản ghi lập lịch, sáu port gọn lại:
+
+| Port nháp | Sau các quyết định | Ghi chú |
+|---|---|---|
+| 3. Wake door (UI gọi `supervisor wake`) | **Thay bằng cửa raise** (OS-D8) | UI ngoài không đánh thức supervisor trực tiếp; nó gửi tín hiệu qua webhook ký, thành event, giữ nhịp quyết. Một lối vào. |
+| 4. Notifier port và 6. Question port | **Gộp làm một port ra** của Questions (OS-D16) | Hỏi người và báo người đi cùng một cửa, adapter theo kênh (mailbox, email, portal, comment của UI). |
+| 1. Portfolio read | **Đọc bản ghi lập lịch**, không chỉ plan | Chiếu chung cho mọi domain: việc nào đang chờ gì, cần ai, kết cục. UI không cần hiểu plan-v1. |
+| 2. Command port | Giữ: các verb Miu và supervisor đã dùng | UI không sửa bên trong; lệnh đi qua cửa có sẵn. |
+| 5. Session placement | Giữ, để sau | UI tự host session phải giữ được confinement; rủi ro cao nhất. |
+
+*Đề xuất thứ tự:*
+1. **Lối vào và lối ra cho người**: webhook ký vào cửa raise, và adapter ra của Questions. Phục vụ OS-D16 (khách, người duyệt) và bậc ưu tiên "Release con người" (chủ dự án trả lời được từ kênh ngoài, không phải ngồi ở terminal).
+2. **Portfolio read** của bản ghi lập lịch (JSON qua CLI và gateway REST): đủ cho mọi UI chiếu một chiều.
+3. **Command port**: khi UI cần tác động ngược.
+4. **Session placement**: sau cùng, chỉ khi có UI thật cần host session.
+
+Multica là adapter đầu tiên được nghĩ tới, không phải lý do của thứ tự; thứ tự trên đúng cho bất kỳ UI hay kênh nào.
+
 ## 4. Quyết định đã chốt
 
 Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
@@ -383,6 +404,7 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-21 21:30 round 30: Chủ dự án: "B". Mint OS-D17. Miu báo qua mailbox: component-authority settled 21:10, thành phần của skeleton (`p-7pjiqfoj7v`) khai báo qua cửa `declare` (`docs/discussions/component-authority/DISCUSSION.md` §6); brief rà soát ý (e) sửa theo vai "rà định kỳ" bên đó giao.
 - 2026-11-21 21:40 round 31: Chủ dự án: "ok 4 trước". Soát bảng 4a với OS-D7 tới OS-D17 ở §3 4m; còn hỏi sleep.
 - 2026-11-21 22:10 round 32: Chủ dự án: "Đồng ý C". Mint OS-D18; ghi handoff thành OS-D19 tạm chốt vì câu trả lời không nói riêng về nó. Hàng 4 rõ.
+- 2026-11-21 22:15 round 33: Bàn hàng 7. Đọc lại plan nháp multica (sáu port); soát ở §3 4n.
 
 ## 6. Thiết kế đã chốt {#design}
 
