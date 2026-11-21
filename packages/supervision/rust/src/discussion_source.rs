@@ -10,7 +10,11 @@
 //! shows the flips it brought in, at the merge, and a root commit is read like any other: a discussion first committed
 //! there goes from `none` to its state.
 //!
-//! Per path the state starts as `none`. A commit that changes the path and carries a readable marker whose value
+//! A discussion is read under both roots it has had in history: `plans/discussions/ds-<id>-<topic>/` (its
+//! `status:` frontmatter, or the marker) and `docs/discussions/<topic>/`. Both name the same discussion by its topic,
+//! so the move between them is no flip.
+//!
+//! Per discussion the state starts as `none`. A commit that changes the path and carries a readable marker whose value
 //! differs from the state emits one record and moves the state. A commit that leaves the marker alone, drops it, or
 //! cannot be read keeps the state: no flip is invented. A deleted file emits nothing. A rename emits nothing either:
 //! the file is the same discussion under a new name, so its state moves with it (taking the marker the renamed file
@@ -33,7 +37,8 @@ const ATTR_FROM: &str = "fgos.discussion.from";
 const ATTR_TO: &str = "fgos.discussion.to";
 const ATTR_PATH: &str = "fgos.discussion.path";
 const NONE_STATE: &str = "none";
-const DISCUSSION_PREFIX: &str = "docs/discussions/";
+/// The roots a discussion has lived under, current first. History keeps the earlier one for good.
+const DISCUSSION_ROOTS: [&str; 2] = ["plans/discussions", "docs/discussions"];
 const DISCUSSION_FILE: &str = "DISCUSSION.md";
 const MARKER_LINES: usize = 12;
 const WALK_COMMITS: usize = 1_000_000;
@@ -80,7 +85,7 @@ impl<H: DiscussionHistory> DiscussionSource<H> {
         let window = ParsedWindow::parse(window)?;
         let commits = self
             .history
-            .commits(&["docs/discussions", "plans/reports"])?;
+            .commits(&[DISCUSSION_ROOTS[0], DISCUSSION_ROOTS[1], "plans/reports"])?;
         let mut states: HashMap<String, String> = HashMap::new();
         let mut out = Vec::new();
         for commit in &commits {
@@ -94,17 +99,18 @@ impl<H: DiscussionHistory> DiscussionSource<H> {
                     .and_then(|text| marker_of(&text));
                 if let Some(source) = &change.from {
                     // A rename is the same discussion under a new name: no flip, the state moves with it.
-                    if let Some(state) = marker.or_else(|| states.get(source).cloned()) {
-                        states.insert(change.path.clone(), state);
+                    let carried = subject_of(source).and_then(|old| states.get(old).cloned());
+                    if let Some(state) = marker.or(carried) {
+                        states.insert(subject.to_owned(), state);
                     }
                     continue;
                 }
-                let previous = states.get(&change.path).cloned();
+                let previous = states.get(subject).cloned();
                 let Some(state) = marker else {
                     continue; // Absent or unreadable marker: the previous state stands.
                 };
                 let from = previous.unwrap_or_else(|| NONE_STATE.to_owned());
-                states.insert(change.path.clone(), state.clone());
+                states.insert(subject.to_owned(), state.clone());
                 if from == state || !window.contains(commit.ts_ms) {
                     continue;
                 }
@@ -164,19 +170,60 @@ fn record(sha: &str, path: &str, subject: &str, ts: String, from: &str, to: Stri
     }
 }
 
-/// The discussion a path belongs to: its directory under `docs/discussions/`, or the stem of a shaping report.
+/// The topic of a discussion directory: the name after its `ds-<10 characters>-` id, or the whole name for a
+/// directory that has none.
+fn topic_of_dir(name: &str) -> &str {
+    match name.strip_prefix("ds-") {
+        Some(rest) if rest.len() > 11 && rest.as_bytes()[10] == b'-' => &rest[11..],
+        _ => name,
+    }
+}
+
+/// The discussion a path belongs to: the topic of its directory under a discussion root, or the stem of a shaping
+/// report.
 fn subject_of(path: &str) -> Option<&str> {
-    if let Some(rest) = path.strip_prefix(DISCUSSION_PREFIX) {
+    for root in DISCUSSION_ROOTS {
+        let Some(rest) = path
+            .strip_prefix(root)
+            .and_then(|rest| rest.strip_prefix('/'))
+        else {
+            continue;
+        };
         let (dir, file) = rest.split_once('/')?;
-        return (file == DISCUSSION_FILE && !dir.is_empty()).then_some(dir);
+        return (file == DISCUSSION_FILE && !dir.is_empty()).then(|| topic_of_dir(dir));
     }
     let rest = path.strip_prefix("plans/reports/")?;
     let stem = rest.strip_suffix(".md")?;
     (rest.starts_with("shaping-") && !stem.contains('/')).then_some(stem)
 }
 
-/// `discussion: <state>` alone on one of the first lines.
+/// The `status:` of a leading frontmatter block, when the value is one word.
+fn frontmatter_status(text: &str) -> Option<String> {
+    let mut lines = text.lines();
+    if lines.next()?.trim_end() != "---" {
+        return None;
+    }
+    for line in lines {
+        if line.trim_end() == "---" {
+            return None;
+        }
+        if let Some(value) = line.strip_prefix("status:") {
+            let value = value.trim().trim_matches('"');
+            let word = !value.is_empty()
+                && value
+                    .chars()
+                    .all(|c| c.is_alphanumeric() || c == '_' || c == '-');
+            return word.then(|| value.to_owned());
+        }
+    }
+    None
+}
+
+/// The state of a discussion: its frontmatter `status:`, else `discussion: <state>` alone on one of the first lines.
 fn marker_of(text: &str) -> Option<String> {
+    if let Some(status) = frontmatter_status(text) {
+        return Some(status);
+    }
     text.lines().take(MARKER_LINES).find_map(|line| {
         let value = line.strip_prefix("discussion:")?.trim();
         let word = !value.is_empty() && value.chars().all(|c| c.is_alphanumeric() || c == '_');
@@ -364,6 +411,21 @@ mod tests {
         assert_eq!(subject_of("docs/discussions/a/DISCUSSION.md"), Some("a"));
         assert_eq!(subject_of("plans/reports/shaping-x.md"), Some("shaping-x"));
         assert_eq!(subject_of("docs/discussions/a/b/DISCUSSION.md"), None);
+        // The moved discussion keeps its topic, so the move between the two roots is one subject.
+        assert_eq!(
+            subject_of("plans/discussions/ds-abcdefghij-a/DISCUSSION.md"),
+            Some("a")
+        );
+        assert_eq!(subject_of("plans/discussions/ds-abcdefghij-a/QUESTIONS.md"), None);
+        assert_eq!(subject_of("plans/discussionsx/a/DISCUSSION.md"), None);
+        assert_eq!(
+            frontmatter_status("---\nid: ds-abcdefghij\nstatus: settled\n---\n\nbody\n"),
+            Some("settled".into())
+        );
+        assert_eq!(
+            marker_of("---\nstatus: open\n---\ndiscussion: settled\n"),
+            Some("open".into())
+        );
         assert_eq!(subject_of("plans/reports/other.md"), None);
     }
 

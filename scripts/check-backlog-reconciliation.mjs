@@ -57,17 +57,40 @@ function proposedIdsFromBacklog(text) {
   return ids;
 }
 
-if (!fs.existsSync(BACKLOG)) {
-  console.error(`FAIL: ${path.relative(repoRoot, BACKLOG)} does not exist.`);
+// A migrated project keeps one file per item under the backlog item root; the legacy table is then a pointer.
+const ITEMS_DIR = path.join(repoRoot, 'plans/backlog');
+const POINTER_MARKER = '<!-- migrated-portfolio-pointer -->';
+
+/** The ids of the item files whose frontmatter status is `proposed`, and the number of item files that say so. */
+function proposedIdsFromItems(dir) {
+  const ids = [];
+  let scanned = 0;
+  for (const name of fs.readdirSync(dir).filter((n) => n.endsWith('.md')).sort()) {
+    const text = fs.readFileSync(path.join(dir, name), 'utf8');
+    const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text)?.[1] ?? '';
+    const id = /^id:\s*(\S+)\s*$/m.exec(front)?.[1];
+    if (/^status:\s*proposed\s*$/m.test(front)) {
+      scanned += 1;
+      if (id) ids.push(id);
+    }
+  }
+  return { ids, scanned };
+}
+
+const legacyText = fs.existsSync(BACKLOG) ? fs.readFileSync(BACKLOG, 'utf8') : null;
+const migrated = legacyText === null || legacyText.includes(POINTER_MARKER);
+if (migrated && !fs.existsSync(ITEMS_DIR)) {
+  console.error(`FAIL: neither ${path.relative(repoRoot, BACKLOG)} nor ${path.relative(repoRoot, ITEMS_DIR)} exists.`);
   process.exit(1);
 }
-const backlog = fs.readFileSync(BACKLOG, 'utf8');
-const proposed = proposedIdsFromBacklog(backlog);
+const fromItems = migrated ? proposedIdsFromItems(ITEMS_DIR) : null;
+const backlog = legacyText ?? '';
+const proposed = fromItems ? fromItems.ids : proposedIdsFromBacklog(backlog);
 
 // Self-consistency: the parser must agree with a whole-file scan. A parser
 // that disagrees with itself must never produce a passing run — that is
 // exactly the silent under-count this check exists to make impossible.
-const scanned = (backlog.match(/\|\s*proposed\s*\|/g) ?? []).length;
+const scanned = fromItems ? fromItems.scanned : (backlog.match(/\|\s*proposed\s*\|/g) ?? []).length;
 if (proposed.length !== scanned) {
   console.error(
     `FAIL: parser disagrees with itself — classified ${proposed.length} proposed rows, ` +

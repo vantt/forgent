@@ -153,11 +153,22 @@ pub struct ItemResult {
     pub content: String,
 }
 
-/// Validates whether an id matches `p-<10 base32>`.
+/// Validates whether an id is a backlog id: `p-<10 base32>` when minted, or one of the shapes rows carried before
+/// minting (`p-<8 hex>`, `STR<n>`, `wf-<words>`), which keep their ids (convention rule `backlog-id`).
 pub fn is_valid_backlog_id(id: &str) -> bool {
-    id.starts_with("p-")
-        && id.len() == 12
-        && id[2..].chars().all(|c| matches!(c, 'a'..='z' | '2'..='7'))
+    let minted = id.len() == 12
+        && id.starts_with("p-")
+        && id[2..].chars().all(|c| matches!(c, 'a'..='z' | '2'..='7'));
+    let hex = id.len() == 10
+        && id.starts_with("p-")
+        && id[2..].chars().all(|c| matches!(c, '0'..='9' | 'a'..='f'));
+    let str_row = id.len() > 3
+        && id.starts_with("STR")
+        && id[3..].chars().all(|c| c.is_ascii_alphanumeric());
+    let wf_row = id.len() > 3
+        && id.starts_with("wf-")
+        && id[3..].chars().all(|c| matches!(c, 'a'..='z' | '0'..='9' | '-'));
+    minted || hex || str_row || wf_row
 }
 
 /// Validates whether an id matches `ds-<10 base32>`.
@@ -852,7 +863,7 @@ pub fn check_portfolio(
 
     for d in &discussions {
         for src in &d.source {
-            if src.starts_with("p-") {
+            if is_valid_backlog_id(src) {
                 if !item_ids.contains(src.as_str()) {
                     errors.push(format!(
                         "unknown-source: discussion {} cites non-existent backlog item '{}'",
@@ -870,7 +881,7 @@ pub fn check_portfolio(
 
     for p in &plans {
         for src in &p.source {
-            if src.starts_with("p-") {
+            if is_valid_backlog_id(src) {
                 if !item_ids.contains(src.as_str()) {
                     errors.push(format!(
                         "unknown-source: plan {} cites non-existent backlog item '{}'",
@@ -902,7 +913,7 @@ pub fn check_portfolio(
 
     // 6. New discussion or plan must cite at least one backlog item
     for d in &discussions {
-        let has_backlog = d.source.iter().any(|s| s.starts_with("p-"));
+        let has_backlog = d.source.iter().any(|s| is_valid_backlog_id(s));
         if !has_backlog {
             let is_new = options.strict || options.new_files.contains(&d.rel_path);
             let msg = format!(
@@ -918,7 +929,7 @@ pub fn check_portfolio(
     }
 
     for p in &plans {
-        let has_backlog = p.source.iter().any(|s| s.starts_with("p-"));
+        let has_backlog = p.source.iter().any(|s| is_valid_backlog_id(s));
         if !has_backlog {
             let is_new = options.strict || options.new_files.contains(&p.rel_path);
             let msg = format!(

@@ -50,6 +50,13 @@ function readIdRegistries(root) {
     const id = /^\|\s*([^|\s][^|]*?)\s*\|/.exec(line)?.[1];
     if (id && id !== 'ID' && !/^-+$/.test(id)) backlogIds.push(id);
   }
+  // A migrated project keeps one file per item; its id is the `id:` of the frontmatter.
+  const itemsDir = path.join(root, 'plans/backlog');
+  for (const file of markdownFilesUnder(itemsDir)) {
+    const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(readText(file) ?? '')?.[1] ?? '';
+    const id = /^id:\s*(\S+)\s*$/m.exec(front)?.[1];
+    if (id) backlogIds.push(id);
+  }
   // One decision may be recorded in several area specs; it is the same decision while every
   // heading gives it the same short title, and two titles under one number are two decisions.
   const adrTitles = new Map();

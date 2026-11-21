@@ -82,6 +82,30 @@ fn exists(root: &Path, relative: &str) -> bool {
     root.join(relative).exists()
 }
 
+/// Where discussions live: the portfolio root (`ds-<id>-<topic>/`), then the earlier root some checkouts still
+/// carry until their migration runs (`fgos migrate portfolio`). The earlier root goes when every checkout has moved.
+const DISCUSSION_ROOTS: [&str; 2] = ["plans/discussions", "docs/discussions"];
+
+/// The topic of a discussion directory: the name after its `ds-<10 characters>-` id.
+fn topic_of_dir(name: &str) -> &str {
+    match name.strip_prefix("ds-") {
+        Some(rest) if rest.len() > 11 && rest.as_bytes()[10] == b'-' => &rest[11..],
+        _ => name,
+    }
+}
+
+/// A discussion exists when a directory of that topic is under one of the discussion roots, with or without its id.
+fn discussion_exists(root: &Path, topic: &str) -> bool {
+    DISCUSSION_ROOTS.iter().any(|dir| {
+        exists(root, &format!("{dir}/{topic}"))
+            || std::fs::read_dir(root.join(dir)).is_ok_and(|entries| {
+                entries
+                    .filter_map(Result::ok)
+                    .any(|entry| topic_of_dir(&entry.file_name().to_string_lossy()) == topic)
+            })
+    })
+}
+
 fn phase_file_exists(root: &Path, dir: &str, nn: &str) -> bool {
     let prefix = format!("phase-{nn}");
     std::fs::read_dir(root.join("plans").join(dir))
@@ -116,11 +140,11 @@ fn head_of(root: &Path, value: &str) -> Result<(String, String), Refusal> {
 }
 
 /// Checks `value` against the three forms and against the files of the checkout `root`:
-/// `docs/discussions/<topic>/`, `plans/<dir>/plan.md` (and its `phase-<nn>-*.md`), or the case run directory
+/// `plans/discussions/ds-<id>-<topic>/`, `plans/<dir>/plan.md` (and its `phase-<nn>-*.md`), or the case run directory
 /// `.fgos/workflow-runs/<runId>`.
 pub fn check(root: &Path, value: &str) -> Result<Ref, Refusal> {
     let found = match parse(value)? {
-        Target::Discussion { topic } => exists(root, &format!("docs/discussions/{topic}")),
+        Target::Discussion { topic } => discussion_exists(root, topic),
         Target::Plan { dir, phase: None } => exists(root, &format!("plans/{dir}/plan.md")),
         Target::Plan {
             dir,
