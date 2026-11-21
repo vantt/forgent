@@ -1104,6 +1104,8 @@ impl GitDriver {
                 .open(destination)
                 .map_err(failure)?
         };
+        #[cfg(not(unix))]
+        let extraction_directory = windows_extract::open_directory(destination)?;
         // Containment is compared in one spelling: Windows canonicalizes to the verbatim `\\?\D:\` form.
         let destination = plain_path(&destination.canonicalize().map_err(failure)?);
         if destination.starts_with(plain_path(checkout::root(&repo)?))
@@ -1179,17 +1181,13 @@ impl GitDriver {
         }
         #[cfg(not(unix))]
         {
-            use std::io::Write;
-            // The destination was checked to be a directory above and this process holds the checkout's custody;
-            // `create_new` refuses an existing name, a link included, so nothing is overwritten or followed.
-            let mut output = fs::OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .open(destination.join(filename))
-                .map_err(failure)?;
-            output.write_all(&bytes).map_err(failure)?;
-            output.sync_all().map_err(failure)?;
-            Ok(())
+            windows_extract::create_beneath(
+                &destination,
+                &extraction_directory,
+                filename,
+                &bytes,
+                || {},
+            )
         }
     }
     fn restore_evidence_authority<'a>(
@@ -1384,5 +1382,161 @@ impl GitDriver {
                 warnings
             },
         })
+    }
+}
+
+/// The Windows answer to `openat`: the checked directory is held open with a share mode that refuses rename and
+/// delete, so neither it nor an ancestor can be swapped for a junction between the containment check and the
+/// create, and the created file is verified to sit directly under the checked directory.
+#[cfg(not(unix))]
+mod windows_extract {
+    use super::{failure, Path, Result};
+    use std::ffi::OsString;
+    use std::fs::{File, OpenOptions};
+    use std::io::Write;
+    use std::os::windows::{
+        ffi::OsStringExt,
+        fs::{MetadataExt, OpenOptionsExt},
+        io::AsRawHandle,
+    };
+    use windows_sys::Win32::Foundation::HANDLE;
+    use windows_sys::Win32::Storage::FileSystem::{
+        FileDispositionInfo, GetFinalPathNameByHandleW, SetFileInformationByHandle, DELETE,
+        FILE_ATTRIBUTE_REPARSE_POINT, FILE_DISPOSITION_INFO, FILE_FLAG_BACKUP_SEMANTICS,
+        FILE_FLAG_OPEN_REPARSE_POINT, FILE_NAME_NORMALIZED, FILE_SHARE_READ, FILE_SHARE_WRITE,
+        VOLUME_NAME_DOS,
+    };
+
+    /// Opens the directory itself (never what a link at the leaf points to) and refuses a reparse point. The share
+    /// mode leaves out `FILE_SHARE_DELETE`, which is what stops a rename while the handle lives.
+    pub(super) fn open_directory(path: &Path) -> Result<File> {
+        let dir = OpenOptions::new()
+            .read(true)
+            .share_mode(FILE_SHARE_READ | FILE_SHARE_WRITE)
+            .custom_flags(FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT)
+            .open(path)
+            .map_err(failure)?;
+        let metadata = dir.metadata().map_err(failure)?;
+        if !metadata.is_dir() || metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0 {
+            return Err(failure("restore-extract-directory-required"));
+        }
+        Ok(dir)
+    }
+
+    fn final_path(file: &File) -> std::io::Result<std::path::PathBuf> {
+        let mut buffer = vec![0u16; 512];
+        loop {
+            // SAFETY: the pointer and length describe `buffer`; the handle is open for the call.
+            let n = unsafe {
+                GetFinalPathNameByHandleW(
+                    file.as_raw_handle() as HANDLE,
+                    buffer.as_mut_ptr(),
+                    buffer.len() as u32,
+                    FILE_NAME_NORMALIZED | VOLUME_NAME_DOS,
+                )
+            } as usize;
+            if n == 0 {
+                return Err(std::io::Error::last_os_error());
+            }
+            if n >= buffer.len() {
+                buffer.resize(n + 1, 0);
+                continue;
+            }
+            return Ok(OsString::from_wide(&buffer[..n]).into());
+        }
+    }
+
+    /// Marks the open file for deletion when its last handle closes; no path is involved.
+    fn delete_through_handle(file: &File) {
+        let info = FILE_DISPOSITION_INFO { DeleteFile: true };
+        // SAFETY: `info` is plain data of the size passed; the handle was opened with DELETE access.
+        unsafe {
+            SetFileInformationByHandle(
+                file.as_raw_handle() as HANDLE,
+                FileDispositionInfo,
+                (&info as *const FILE_DISPOSITION_INFO).cast(),
+                std::mem::size_of::<FILE_DISPOSITION_INFO>() as u32,
+            );
+        }
+    }
+
+    /// Writes `bytes` to a new `filename` under `destination`, the canonical checked directory, which `held` must
+    /// still be. `after_check` runs between the identity check and the create.
+    pub(super) fn create_beneath(
+        destination: &Path,
+        held: &File,
+        filename: &std::ffi::OsStr,
+        bytes: &[u8],
+        after_check: impl FnOnce(),
+    ) -> Result<()> {
+        let checked = crate::refs::file_key(destination)?;
+        let key = crate::refs::file_key_of(held)?;
+        if key.device != checked.device || key.index != checked.index {
+            return Err(failure("restore-extract-directory-changed"));
+        }
+        after_check();
+        // `create_new` refuses an existing name, a link included, so nothing is overwritten or followed.
+        let mut output = OpenOptions::new()
+            .write(true)
+            .access_mode(windows_sys::Win32::Foundation::GENERIC_WRITE | DELETE)
+            .create_new(true)
+            .open(destination.join(filename))
+            .map_err(failure)?;
+        let beneath = final_path(&output)
+            .map(|path| {
+                path.parent()
+                    .is_some_and(|p| fgos_process::path::plain_path(p) == destination)
+            })
+            .unwrap_or(false);
+        if !beneath {
+            delete_through_handle(&output);
+            return Err(failure("restore-extract-directory-changed"));
+        }
+        output.write_all(bytes).map_err(failure)?;
+        output.sync_all().map_err(failure)?;
+        Ok(())
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+        use std::fs;
+
+        fn scratch(tag: &str) -> std::path::PathBuf {
+            let dir =
+                std::env::temp_dir().join(format!("fgos-extract-{tag}-{}", std::process::id()));
+            let _ = fs::remove_dir_all(&dir);
+            fs::create_dir_all(&dir).unwrap();
+            dir.canonicalize()
+                .map(|p| fgos_process::path::plain_path(&p))
+                .unwrap()
+        }
+
+        #[test]
+        fn a_held_directory_cannot_be_renamed_so_the_write_lands_where_it_was_checked() {
+            let base = scratch("held");
+            let (checked, moved) = (base.join("out"), base.join("moved"));
+            fs::create_dir(&checked).unwrap();
+            let held = open_directory(&checked).unwrap();
+            assert!(fs::rename(&checked, &moved).is_err());
+            create_beneath(&checked, &held, "f".as_ref(), b"data", || {}).unwrap();
+            assert_eq!(fs::read(checked.join("f")).unwrap(), b"data");
+            drop(held);
+            let _ = fs::remove_dir_all(&base);
+        }
+
+        #[test]
+        fn a_directory_that_is_no_longer_the_held_one_is_refused_before_any_write() {
+            let base = scratch("changed");
+            let (held_dir, other) = (base.join("held"), base.join("other"));
+            fs::create_dir(&held_dir).unwrap();
+            fs::create_dir(&other).unwrap();
+            let held = open_directory(&held_dir).unwrap();
+            let refused = create_beneath(&other, &held, "f".as_ref(), b"data", || {}).unwrap_err();
+            assert!(refused.cause.contains("restore-extract-directory-changed"));
+            assert!(!other.join("f").exists());
+            drop(held);
+            let _ = fs::remove_dir_all(&base);
+        }
     }
 }
