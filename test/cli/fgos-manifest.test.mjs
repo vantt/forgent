@@ -57,15 +57,14 @@ const EARLY_PATH_VERBS = new Set(['hook']);
 
 test('manifest verb-name set equals the set of verbs runVerb() actually dispatches', () => {
   const dispatched = [...new Set(dispatchedVerbs())].sort();
-  // A native verb with `legacyOn` keeps its Node arm for the platforms the host hands it over on.
-  const registered = COMMAND_REGISTRY.filter((entry) => (entry.native !== true || entry.legacyOn !== undefined) && !EARLY_PATH_VERBS.has(entry.name)).map((entry) => entry.name).sort();
+  const registered = COMMAND_REGISTRY.filter((entry) => entry.native !== true && !EARLY_PATH_VERBS.has(entry.name)).map((entry) => entry.name).sort();
   assert.deepEqual(registered, dispatched);
 });
 
 test('every registry entry has touchesState, externalEffect, paginated booleans, a store mode and the required keys', () => {
   const baseKeys = ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'store', 'touchesState'];
   for (const entry of COMMAND_REGISTRY) {
-    const expectedKeys = [...baseKeys, ...(entry.native !== undefined ? ['native'] : []), ...(entry.legacyOn !== undefined ? ['legacyOn'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : []), ...(entry.guide !== undefined ? ['guide'] : []), ...(entry.retiredFlags !== undefined ? ['retiredFlags'] : []), ...['mutatesStore', 'landsWork', 'eventStoreChild'].filter((k) => entry[k] !== undefined)].sort();
+    const expectedKeys = [...baseKeys, ...(entry.native !== undefined ? ['native'] : []), ...(entry.subcommands !== undefined ? ['subcommands'] : []), ...(entry.guide !== undefined ? ['guide'] : []), ...(entry.retiredFlags !== undefined ? ['retiredFlags'] : []), ...['mutatesStore', 'landsWork', 'eventStoreChild'].filter((k) => entry[k] !== undefined)].sort();
     assert.deepEqual(
       Object.keys(entry).sort(),
       expectedKeys,

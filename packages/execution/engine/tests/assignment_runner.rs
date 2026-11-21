@@ -1521,18 +1521,6 @@ mod end_to_end {
     }
 
     #[test]
-    fn a_mutating_launch_is_refused_by_name_where_no_cwd_lease_holder_can_be_named() {
-        let refusal = mutating_launch_refusal(true).expect("Windows refuses");
-        assert_eq!(refusal.code, "windows-cwd-lease-holder-missing");
-        assert!(
-            refusal.message.contains("Node launch route"),
-            "{}",
-            refusal.message
-        );
-        assert!(mutating_launch_refusal(false).is_none());
-    }
-
-    #[test]
     fn a_direct_assignment_is_admitted_launched_under_a_supervisor_and_settles() {
         let _exec = SCRIPT_EXEC.lock().unwrap_or_else(|e| e.into_inner());
         let (ports, root, run_dir) = rig("e2e", 0.0);

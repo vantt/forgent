@@ -213,20 +213,6 @@ fn absolute(path: &Path) -> PathBuf {
     std::path::absolute(path).unwrap_or_else(|_| path.to_path_buf())
 }
 
-/// Why a mutating attempt cannot launch from this route on this platform. On Windows a lock does not pass to a
-/// child with its handle: the controller keeps the cwd lease and serves its request channel to the supervisor
-/// (`cwdLeaseOwner`, [`super::launch::serving_lease_owner`]), but a writing unit run is not yet proven end to end on
-/// native Windows (the Git door takes no borrowed custody there), so Windows mutating launches stay on the Node
-/// route until it is.
-pub fn mutating_launch_refusal(windows: bool) -> Option<DispatchError> {
-    windows.then(|| {
-        DispatchError::new(
-            "windows-cwd-lease-holder-missing",
-            "a mutating attempt cannot launch from the native route on Windows: the controller has no cwd lease holder endpoint to name to the supervisor (cwdLeaseOwner); Windows runs it through the Node launch route",
-        )
-    })
-}
-
 fn json_text(value: &Value) -> String {
     serde_json::to_string(value).unwrap_or_default()
 }
@@ -575,15 +561,6 @@ pub fn execute_assignment(
         .with("executorId", json!(resolved_executor_id))
         .with("capability", capability.clone())
         .into());
-    }
-    if effective_mutation == "mutating" {
-        if let Some(refusal) = mutating_launch_refusal(cfg!(windows)) {
-            return Err(refusal
-                .with("cwd", json!(cwd_text))
-                .with("executorId", json!(resolved_executor_id))
-                .with("capability", capability.clone())
-                .into());
-        }
     }
     let timeout_ms = opts
         .timeout_ms

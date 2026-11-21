@@ -1,5 +1,7 @@
 // test/cli/run-verb.test.mjs -- the one wiring proof of `fgos run` end to end: a prompt reaches the host's unit run,
-// which binds the stub executor, runs it confined through the run supervisor and prints the envelope of its result.
+// which binds the stub executor, runs it confined through the run supervisor and prints the envelope of its result;
+// with --writes the run commits the declared path on the linked worktree's branch. The writing case also runs on
+// native Windows CI (job "windows cwd lease owner"), where the host serves the verb too.
 // What the flags build is owned by the run request vectors (fgos-execution), the run's outcomes by engine `unit_run`
 // and the host's unit run tests, the call's wiring by the `fgos run` cases of apps/fgos/tests/cli_tests.rs.
 
@@ -20,7 +22,8 @@ import { capabilityServedBy, writeProjectConfig } from '../helpers/config-fixtur
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
-function setupTestRepo() {
+/** A project whose one stub executor runs `echo-worker.mjs` in a bwrap seat; the worker first runs `prelude`. */
+function setupTestRepo({ prelude = '' } = {}) {
   const tmp = makeFixtureDir('fgos-cli-run-test-');
   execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'CLI Test'], { cwd: tmp, stdio: 'ignore' });
@@ -34,6 +37,7 @@ function setupTestRepo() {
     echoScript,
     `
     import fs from 'node:fs';
+    ${prelude}
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
     const match = /Write structured JSON to (\\S+result-1\\.json)/.exec(prompt);
@@ -86,7 +90,7 @@ function setupTestRepo() {
   return tmp;
 }
 
-test('fgos run "<prompt>" builds a read-only unit from the prompt, runs it and prints the envelope of its result', () => {
+test('fgos run "<prompt>" builds a read-only unit from the prompt, runs it and prints the envelope of its result', { skip: process.platform === 'win32' && 'the stub seat is confined by bwrap, which Windows lacks' }, () => {
   const tmp = setupTestRepo();
   const run = spawnFgos(BIN_FGOS, ['run', 'Write the release notes', '--capability', 'docs:write', '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
   assert.equal(run.status, 0, run.stderr);
@@ -98,4 +102,33 @@ test('fgos run "<prompt>" builds a read-only unit from the prompt, runs it and p
   assert.equal(unit.objective, 'Write the release notes');
   assert.equal(unit.capability, 'docs:write');
   assert.deepEqual(unit.writes, []);
+});
+
+// A writing run on every platform, Windows included, is served by the host (there is no Node route left). Where the
+// seat's confinement backend exists (bwrap, Linux) the run commits only the declared path on the worktree's branch,
+// through the engine's custody of the linked worktree; Windows has no confinement backend, so the same call is
+// refused by the seat's posture before any agent starts, and nothing is committed.
+test('fgos run --writes commits the declared path through custody where the seat can be confined, and is refused by its posture where not', () => {
+  // The worker writes the declared file in its cwd (the worktree) beside its result.
+  const tmp = setupTestRepo({ prelude: "fs.writeFileSync('notes.md', 'notes\\n');" });
+  fs.writeFileSync(path.join(tmp, '.gitignore'), '.fgos/\necho-worker.mjs\n');
+  execFileSync('git', ['add', '.gitignore'], { cwd: tmp, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-qm', 'seed'], { cwd: tmp, stdio: 'ignore' });
+  const worktree = path.join(makeFixtureDir('fgos-cli-run-wt-'), 'wt');
+  execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', worktree], { cwd: tmp, stdio: 'ignore' });
+  const seed = execFileSync('git', ['-C', worktree, 'rev-parse', 'wt'], { encoding: 'utf8' }).trim();
+  const run = spawnFgos(BIN_FGOS, ['run', 'Write the notes', '--capability', 'docs:write', '--writes', 'notes.md', '--worktree', worktree, '--dir', tmp], { cwd: tmp, encoding: 'utf8' });
+  if (process.platform === 'win32') {
+    assert.equal(run.status, 4, run.stderr || run.stdout);
+    const { data } = JSON.parse(run.stdout);
+    assert.equal(data.outcome, 'policy-refusal');
+    assert.equal(data.results.at(-1).refused.reason, 'posture-unavailable');
+    assert.equal(execFileSync('git', ['-C', worktree, 'rev-parse', 'wt'], { encoding: 'utf8' }).trim(), seed);
+    return;
+  }
+  assert.equal(run.status, 0, run.stderr || run.stdout);
+  assert.equal(JSON.parse(run.stdout).data.outcome, 'pass', run.stdout);
+  const committed = execFileSync('git', ['-C', worktree, 'log', '-1', '--format=', '--name-only', 'wt'], { encoding: 'utf8' });
+  assert.deepEqual(committed.trim().split(/\r?\n/), ['notes.md']);
+  assert.equal(fs.readFileSync(path.join(worktree, 'notes.md'), 'utf8'), 'notes\n');
 });

@@ -29,9 +29,8 @@
 //! (the attempt copy until the binding, the cwd lease until the attempt is closed) and closing a lent handle never
 //! waits on the child. A lock does not pass to a child with its handle on Windows: the controller releases its
 //! attempt copy right after the spawn and the supervisor takes the attempt lock itself, as Node does; the cwd lease
-//! stays with the controller, which serves its request channel to the supervisor (`cwdLeaseOwner`) until the
-//! binding. A mutating attempt is still refused there by name (`windows-cwd-lease-holder-missing`) and stays on the
-//! Node launch route until a writing unit run is proven on native Windows. Nothing here writes a
+//! stays with the controller, which serves its request channel to the supervisor (`cwdLeaseOwner`) for the attempt's
+//! whole life, and the Git door commits under it through a borrowed copy of the held lease. Nothing here writes a
 //! script and then executes it; a caller that does, in a host with other threads, opens it close-on-exec and closes
 //! it before the exec (the tests take one lock around such a pair).
 //!

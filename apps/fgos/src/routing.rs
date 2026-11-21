@@ -51,10 +51,6 @@ pub struct CommandRouteDescriptor {
     /// legacy payload.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub native_subcommands: Option<Vec<String>>,
-    /// On a native selector: the platforms (Node's `process.platform` names) on which the host still hands the whole
-    /// verb to the legacy payload.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub legacy_on: Option<Vec<String>>,
     /// What the verb does about the `.fgos/` store: `none`, `open`, `read` or `require`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub store: Option<String>,
@@ -310,31 +306,8 @@ pub fn declared(declaration: &Option<Declaration>, call: &Call) -> bool {
     }
 }
 
-/// This platform as Node's `process.platform` names it.
-pub fn node_platform() -> &'static str {
-    if cfg!(windows) {
-        "win32"
-    } else if cfg!(target_os = "macos") {
-        "darwin"
-    } else {
-        "linux"
-    }
-}
-
-/// Whether a native route is handed to the legacy payload on this platform.
-pub fn handed_to_legacy(route: &CommandRouteDescriptor) -> bool {
-    route.route_kind == "native"
-        && route
-            .legacy_on
-            .as_ref()
-            .is_some_and(|platforms| platforms.iter().any(|p| p == node_platform()))
-}
-
 /// The lane of an invocation of `route`.
 pub fn decide(route: &CommandRouteDescriptor, call: &Call) -> Lane {
-    if handed_to_legacy(route) {
-        return Lane::Legacy;
-    }
     if route.route_kind == "native" {
         return match &route.operation_id {
             Some(operation_id) => Lane::Native {
@@ -1158,27 +1131,6 @@ mod tests {
             .unwrap()
             .extend(json.as_object().unwrap().clone());
         serde_json::from_value(route).unwrap()
-    }
-
-    #[test]
-    fn a_native_route_handed_to_the_payload_on_this_platform_takes_the_legacy_lane_and_only_here() {
-        let here = fake(serde_json::json!({ "legacy_on": [node_platform()] }));
-        assert!(handed_to_legacy(&here));
-        assert_eq!(decide(&here, &call("probe", &[])), Lane::Legacy);
-        let elsewhere = ["win32", "darwin", "linux"]
-            .into_iter()
-            .filter(|p| *p != node_platform())
-            .collect::<Vec<_>>();
-        let there = fake(serde_json::json!({ "legacy_on": elsewhere }));
-        assert!(!handed_to_legacy(&there));
-        assert_eq!(
-            decide(&there, &call("probe", &[])),
-            Lane::Native {
-                operation_id: "probe.run".into()
-            }
-        );
-        // The table's own run route: native everywhere but Windows.
-        assert_eq!(handed_to_legacy(route("run")), node_platform() == "win32");
     }
 
     #[test]

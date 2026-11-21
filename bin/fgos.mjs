@@ -2521,29 +2521,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         });
       }
     }
-    case 'run': {
-      const { runUnit, resolveGitRoots } = await import('../src/runner/execution/run.mjs');
-      const { buildRunRequest } = await import('../src/runner/execution/run-request.mjs');
-      const { createCaseAdmissionPort, activityUnitOf, confinedWriteRefusal } = await import('../src/workflow/case-admission-port.mjs');
-      // The Workflow's case port is injected so the Execution Core never imports the Workflow.
-      const request = buildRunRequest(flags, positional, {
-        cwd: process.cwd(),
-        gitRoots: resolveGitRoots,
-        caseAdmission: { createPort: createCaseAdmissionPort, activityUnitOf, confinedWriteRefusal },
-      });
-      const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
-      try {
-        return attachDirWarning(await runUnit(request), runWarning);
-      } catch (err) {
-        if (err instanceof RunnerConfigError && err.code && !err.message.includes(err.code)) {
-          err.message = `${err.code}: ${err.message}`;
-        }
-        throw err;
-      }
-    }
-
-
-
     case 'rebuild': {
       const { rebuildStoreUseCase } = await import('../src/verbs/events/rebuild.mjs');
       return rebuildStoreUseCase(eventStoreContext(dir));
