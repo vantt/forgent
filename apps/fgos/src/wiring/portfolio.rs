@@ -439,18 +439,32 @@ pub fn slugify(title: &str) -> String {
     }
 }
 
+/// Borrowed field values of a backlog item to render.
+pub struct BacklogItemFields<'a> {
+    pub id: &'a str,
+    pub title: &'a str,
+    pub status: &'a str,
+    pub priority: &'a str,
+    pub area: &'a str,
+    pub created: &'a str,
+    pub why: &'a str,
+    pub done_when: &'a str,
+    pub notes: &'a str,
+}
+
 /// Formats a backlog item with YAML frontmatter.
-pub fn format_backlog_item(
-    id: &str,
-    title: &str,
-    status: &str,
-    priority: &str,
-    area: &str,
-    created: &str,
-    why: &str,
-    done_when: &str,
-    notes: &str,
-) -> Result<String, PortfolioRefusal> {
+pub fn format_backlog_item(item: &BacklogItemFields) -> Result<String, PortfolioRefusal> {
+    let BacklogItemFields {
+        id,
+        title,
+        status,
+        priority,
+        area,
+        created,
+        why,
+        done_when,
+        notes,
+    } = *item;
     if !is_valid_backlog_id(id) {
         return Err(PortfolioRefusal::InvalidId(format!(
             "invalid backlog id '{id}'"
@@ -542,9 +556,17 @@ pub fn create_item(
     let done_when = req.done_when.as_deref().unwrap_or("...");
     let notes = req.notes.as_deref().unwrap_or("...");
 
-    let content = format_backlog_item(
-        &id, &req.title, status, priority, area, created, why, done_when, notes,
-    )?;
+    let content = format_backlog_item(&BacklogItemFields {
+        id: &id,
+        title: &req.title,
+        status,
+        priority,
+        area,
+        created,
+        why,
+        done_when,
+        notes,
+    })?;
 
     let tmp_path = full_dir.join(format!(".tmp-{id}-{}.tmp", std::process::id()));
     fs::write(&tmp_path, &content)?;
@@ -563,9 +585,9 @@ pub fn create_item(
 pub fn edit_item(repo_root: &Path, req: &EditItemRequest) -> Result<ItemResult, PortfolioRefusal> {
     let backlog_dir = repo_root.join("plans").join("backlog");
     if !backlog_dir.exists() {
-        return Err(PortfolioRefusal::ItemNotFound(format!(
-            "plans/backlog directory not found"
-        )));
+        return Err(PortfolioRefusal::ItemNotFound(
+            "plans/backlog directory not found".to_string(),
+        ));
     }
 
     let entries = fs::read_dir(&backlog_dir)?;
@@ -595,17 +617,17 @@ pub fn edit_item(repo_root: &Path, req: &EditItemRequest) -> Result<ItemResult, 
     let done_when = req.done_when.as_deref().unwrap_or(&parsed.done_when);
     let notes = req.notes.as_deref().unwrap_or(&parsed.notes);
 
-    let content = format_backlog_item(
-        &parsed.id,
+    let content = format_backlog_item(&BacklogItemFields {
+        id: &parsed.id,
         title,
         status,
         priority,
         area,
-        &parsed.created,
+        created: &parsed.created,
         why,
         done_when,
         notes,
-    )?;
+    })?;
 
     let tmp_path = backlog_dir.join(format!(
         ".tmp-edit-{}-{}.tmp",
@@ -855,13 +877,11 @@ pub fn check_portfolio(
                         p.dir, src
                     ));
                 }
-            } else if src.starts_with("ds-") {
-                if !disc_ids.contains(src.as_str()) {
-                    errors.push(format!(
-                        "unknown-source: plan {} cites non-existent discussion '{}'",
-                        p.dir, src
-                    ));
-                }
+            } else if src.starts_with("ds-") && !disc_ids.contains(src.as_str()) {
+                errors.push(format!(
+                    "unknown-source: plan {} cites non-existent discussion '{}'",
+                    p.dir, src
+                ));
             }
         }
     }
@@ -933,21 +953,20 @@ pub fn check_portfolio(
             }
         }
 
-        if it.status == "in-flight" {
-            if !citing_plans.is_empty()
-                && citing_plans
-                    .iter()
-                    .all(|p| p.status == "done" || p.status == "withdrawn")
-            {
-                let has_active_disc = citing_discs
-                    .iter()
-                    .any(|d| d.status == "open" || d.status == "paused");
-                if !has_active_disc {
-                    errors.push(format!(
-                        "drift-in-flight-plans-ended: backlog item '{}' is 'in-flight' but all citing plans are ended and no open discussion cites it",
-                        it.id
-                    ));
-                }
+        if it.status == "in-flight"
+            && !citing_plans.is_empty()
+            && citing_plans
+                .iter()
+                .all(|p| p.status == "done" || p.status == "withdrawn")
+        {
+            let has_active_disc = citing_discs
+                .iter()
+                .any(|d| d.status == "open" || d.status == "paused");
+            if !has_active_disc {
+                errors.push(format!(
+                    "drift-in-flight-plans-ended: backlog item '{}' is 'in-flight' but all citing plans are ended and no open discussion cites it",
+                    it.id
+                ));
             }
         }
     }

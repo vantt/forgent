@@ -8,8 +8,8 @@ use std::path::{Path, PathBuf};
 
 use portfolio::{
     check_portfolio, create_item, edit_item, format_backlog_item, generate_backlog_index,
-    parse_backlog_item, parse_discussion, BacklogItem, CheckOptions, CreateItemRequest, Discussion,
-    EditItemRequest, PlanRef, PortfolioRefusal,
+    parse_backlog_item, parse_discussion, BacklogItem, BacklogItemFields, CheckOptions,
+    CreateItemRequest, Discussion, EditItemRequest, PlanRef, PortfolioRefusal,
 };
 
 fn temp_dir(prefix: &str) -> PathBuf {
@@ -285,17 +285,17 @@ fn test_check_portfolio_clean() {
     fs::create_dir_all(&disc_dir).unwrap();
     fs::create_dir_all(&plan_dir).unwrap();
 
-    let item_text = format_backlog_item(
-        "p-rw5iadsp2p",
-        "Portfolio Item",
-        "in-flight",
-        "P1",
-        "portfolio",
-        "2026-11-21",
-        "Why explanation",
-        "Criteria met",
-        "Notes here",
-    )
+    let item_text = format_backlog_item(&BacklogItemFields {
+        id: "p-rw5iadsp2p",
+        title: "Portfolio Item",
+        status: "in-flight",
+        priority: "P1",
+        area: "portfolio",
+        created: "2026-11-21",
+        why: "Why explanation",
+        done_when: "Criteria met",
+        notes: "Notes here",
+    })
     .unwrap();
     fs::write(backlog_dir.join("p-rw5iadsp2p-item.md"), item_text).unwrap();
 
@@ -412,17 +412,17 @@ fn test_check_portfolio_in_flight_uncited() {
     let backlog_dir = dir.join("plans").join("backlog");
     fs::create_dir_all(&backlog_dir).unwrap();
 
-    let item_text = format_backlog_item(
-        "p-rw5iadsp2p",
-        "Uncited In-flight Item",
-        "in-flight",
-        "P1",
-        "portfolio",
-        "2026-11-21",
-        "Why",
-        "Done",
-        "Notes",
-    )
+    let item_text = format_backlog_item(&BacklogItemFields {
+        id: "p-rw5iadsp2p",
+        title: "Uncited In-flight Item",
+        status: "in-flight",
+        priority: "P1",
+        area: "portfolio",
+        created: "2026-11-21",
+        why: "Why",
+        done_when: "Done",
+        notes: "Notes",
+    })
     .unwrap();
     fs::write(backlog_dir.join("p-rw5iadsp2p-item.md"), item_text).unwrap();
 
@@ -508,17 +508,17 @@ fn test_check_portfolio_drift_detection() {
     fs::create_dir_all(&plan_dir).unwrap();
 
     // Item done with plan running
-    let done_item = format_backlog_item(
-        "p-rw5iadsp2p",
-        "Done Item",
-        "done",
-        "P1",
-        "portfolio",
-        "2026-11-21",
-        "Why",
-        "Done",
-        "Notes",
-    )
+    let done_item = format_backlog_item(&BacklogItemFields {
+        id: "p-rw5iadsp2p",
+        title: "Done Item",
+        status: "done",
+        priority: "P1",
+        area: "portfolio",
+        created: "2026-11-21",
+        why: "Why",
+        done_when: "Done",
+        notes: "Notes",
+    })
     .unwrap();
     fs::write(backlog_dir.join("p-rw5iadsp2p-item.md"), done_item).unwrap();
 
@@ -547,17 +547,17 @@ source:
         .any(|e| e.contains("drift-done-item-plan-running")));
 
     // Item in-flight with all citing plans ended
-    let inflight_item = format_backlog_item(
-        "p-rw5iadsp2p",
-        "Inflight Item",
-        "in-flight",
-        "P1",
-        "portfolio",
-        "2026-11-21",
-        "Why",
-        "Done",
-        "Notes",
-    )
+    let inflight_item = format_backlog_item(&BacklogItemFields {
+        id: "p-rw5iadsp2p",
+        title: "Inflight Item",
+        status: "in-flight",
+        priority: "P1",
+        area: "portfolio",
+        created: "2026-11-21",
+        why: "Why",
+        done_when: "Done",
+        notes: "Notes",
+    })
     .unwrap();
     fs::write(backlog_dir.join("p-rw5iadsp2p-item.md"), inflight_item).unwrap();
 
@@ -594,17 +594,17 @@ fn test_check_portfolio_index_drift() {
     let backlog_dir = dir.join("plans").join("backlog");
     fs::create_dir_all(&backlog_dir).unwrap();
 
-    let item_text = format_backlog_item(
-        "p-rw5iadsp2p",
-        "Item",
-        "proposed",
-        "P1",
-        "portfolio",
-        "2026-11-21",
-        "Why",
-        "Done",
-        "Notes",
-    )
+    let item_text = format_backlog_item(&BacklogItemFields {
+        id: "p-rw5iadsp2p",
+        title: "Item",
+        status: "proposed",
+        priority: "P1",
+        area: "portfolio",
+        created: "2026-11-21",
+        why: "Why",
+        done_when: "Done",
+        notes: "Notes",
+    })
     .unwrap();
     fs::write(backlog_dir.join("p-rw5iadsp2p-item.md"), item_text).unwrap();
 

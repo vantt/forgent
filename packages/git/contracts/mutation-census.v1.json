@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "82db2f319945e41cc638198d0e72f9b08fa56a2a3d0d21f131431bb8b69bf3b0",
+  "payloadDigest": "f9d63005358f526b8393d57253c91e19b334ca1ed5b8c824b163f72465f4ed39",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -147,7 +147,7 @@
     "apps/fgos/src/wiring/observe_sources/plan_history.rs": "38cec91849c282960311c3f851e99ec50608ff253de753a798c3af79d03fb185",
     "apps/fgos/src/wiring/observe_sources/plan_text.rs": "a71317e73180193a53d3e7f9b4b19ad18aef8c989a6e8981ba41108e1b1438c3",
     "apps/fgos/src/wiring/observe_sources/tests/mod.rs": "107a6f777babecb6efcd9047170d7580b4d13f15260324122abc6332ba3b65ec",
-    "apps/fgos/src/wiring/portfolio.rs": "ce3dc549c2fd97ecc58ad36e91e3a7462868f56f27c6e2b157042635ef3a9d69",
+    "apps/fgos/src/wiring/portfolio.rs": "8a79983087eea8177209d90612aef15763803a406707919b836740c35354dc4b",
     "apps/fgos/src/wiring/questions.rs": "ec2c14107042175846799ced967309b167ccd6964e161f65fe6d6cdbf4465d01",
     "apps/fgos/src/wiring/questions_hook.rs": "0e843ad2efe12a28b9d166918804bd956a4f870a52f055f7936ba2c54db65862",
     "apps/fgos/src/wiring/questions_hook_unsupported.rs": "a95f0cf73750cc8878fb8ee62c0506e4f19473d8d8721e36eb274315370bf195",
@@ -184,7 +184,7 @@
     "apps/fgos/tests/internal_lock_routes.rs": "e8516f4876c8263b1baa1f997bcfbb01715e69d740aa508fd01a0d481fee309e",
     "apps/fgos/tests/mailbox_routes.rs": "a35e94cd71509b6fb9de91bf771a0b65a8dbb9e495c5aefefb633b9f3a880643",
     "apps/fgos/tests/mailbox_sync_child.rs": "047e70662085d6f91fa786c9000eb494711f610d37cd63a24f29dc884116763d",
-    "apps/fgos/tests/portfolio_check.rs": "d4e83c1d57562d608254b57f84b02baec30a8459d2099af0504b11db5a402e6b",
+    "apps/fgos/tests/portfolio_check.rs": "a28a9ea0aa9f5608d2caaf4adf641d9e2359421516817d313e75d426cbae479f",
     "apps/fgos/tests/questions_head.rs": "351a1e52ae8ad3f5f0e0586ddf800314fa86464e4894d4187d59a0020a0e9080",
     "apps/fgos/tests/questions_hook.rs": "1c206c5633a8ec75345fdcc4debd1efe30f8aa996aa48e00e3963c426061f5a2",
     "apps/fgos/tests/questions_verb.rs": "b0ccc8a1c82bbf81b7ad84eecfdcf4a2e3c350eb297cf6749645b4ee1a3296dd",
