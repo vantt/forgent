@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Supervision powers, part 2: verbs, request-socket entries, grants, personas and the live grant audit"
-status: draft
+status: ready
 base: 9f91e8bb8731b21791e3d73f6be361042aa28378
 priority: P1
 blockedBy:
@@ -108,6 +108,3 @@ None.
   the audit report lists each dropped power and the reason, and a backlog row is filed for it.
 - Revert path: one revert per phase on `main`; phase 2 reverts the grants alone and leaves the verbs unreachable.
 
-## Freeze note (2026-11-21)
-
-Owner chose to freeze new orchestration powers until four fixes land (p-l22vozecxg, p-waxzxz5mio, p-mhwe24fttr, p-yqanenewb4). This plan stays `draft` until the supervisor sets it `ready` by hand.

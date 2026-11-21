@@ -1,8 +1,8 @@
 ---
 contract: plan-v1
 title: "Supervision powers, part 1: the four Rust cores (raise, drone signals, coordination evidence and prune, on-site read and type)"
-status: draft
-lead: head:lead-forgent-261119-1730-supervision-
+status: running
+lead: lead:CORES
 base: 2bc1ed73f3932fc2ecc1bbccf4344019181757c7
 priority: P1
 blockedBy: []
@@ -26,9 +26,6 @@ created: 2026-11-19
 ---
 
 # Supervision powers, part 1: the cores
-
-## Freeze note
-Owner decision 2026-11-21: orchestration work is frozen after phase 3 (landed in commit `4cf104274`). Phases 4-5 wait for the owner's freeze to lift before resumption. Phase 4 stopped after worktree creation and dispatching unit run ticket `c-8026-1795219232378`; branch `supervision-powers-cores/p04` was preserved.
 
 ## Outcome
 The four new mechanisms the settled discussion asks for exist as tested Rust cores, none of them reachable by a head yet:
@@ -76,7 +73,7 @@ choice (discussion Non-goals).
 | 1 | [Raise a coordination event from a caller](phase-01-raise-core.md) | - | packages/supervision/rust/src/queue.rs, packages/supervision/rust/tests/queue.rs | 1 | done |
 | 2 | [Drone definitions for the four session signals](phase-02-drone-definitions.md) | - | core/watcher/definitions/**, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/** | 1 | done |
 | 3 | [Coordination evidence kinds and the Observe prune door](phase-03-evidence-prune.md) | - | packages/observe/rust/**, packages/supervision/rust/observe-kinds.json | 1 | done |
-| 4 | [Bounded recent read and pane typing in terminal control](phase-04-on-site-core.md) | - | packages/terminal-control/rust/**, packages/terminal-control/contracts/** | 1 | parked (stopped at unit ticket c-8026; branch supervision-powers-cores/p04; owner freeze 2026-11-21) |
+| 4 | [Bounded recent read and pane typing in terminal control](phase-04-on-site-core.md) | - | packages/terminal-control/rust/**, packages/terminal-control/contracts/** | 1 | ready (resume: branch supervision-powers-cores/p04, unit ticket c-8026-1795219232378; the 2026-11-21 freeze was cancelled by the owner) |
 | 5 | [Merge and full gate](phase-05-integration.md) | 1, 2, 3, 4 | plans/261119-1730-supervision-powers-cores/** | 2 | ready |
 
 Checked with `node scripts/plan-contract-check.mjs --plan plans/261119-1730-supervision-powers-cores` and
