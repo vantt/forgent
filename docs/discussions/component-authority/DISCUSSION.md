@@ -4,7 +4,7 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
-2026-11-21 17:05: Mở từ discussion `orchestration-skeleton` (§3 row 11, round 14). Chủ dự án chọn mở discussion riêng (phương án A) vì authority, boundary và contract là yếu tố hạng nhất của **toàn hệ thống**, không riêng skeleton. Stub này do shaper `orchestration-skeleton` viết; chưa có shaper riêng. Đã nhờ secretary Miu tạo backlog row và mở shaper `component-authority`.
+2026-11-21 17:05: Mở từ discussion `orchestration-skeleton` (§3 row 11, round 14). Chủ dự án chọn mở discussion riêng (phương án A) vì authority, boundary và contract là yếu tố hạng nhất của **toàn hệ thống**, không riêng skeleton. Stub này do shaper `orchestration-skeleton` viết; chưa có shaper riêng. Đã gửi mailbox cho secretary Miu (17:05) xin tạo backlog row và mở shaper `component-authority`; lúc 17:27 Miu chưa lấy tin (2 tin chờ, chưa drain lần nào), **chưa có backlog row và chưa có shaper**.
 
 - Bước đầu tiên (§7 T0): điều tra backlog `p-7nja6ilwkr`, tìm nguyên nhân thật vì sao code thừa (cửa thứ hai, bản sao, twin Rust/Node) vẫn cứ sinh ra, trước khi thiết kế sổ authority.
 - Chưa có câu hỏi nào đang mở với chủ dự án.
