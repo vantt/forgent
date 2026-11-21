@@ -36,6 +36,8 @@ footprint:
   - apps/fgctl/tests/git_wal_activation_gate.rs
   - test/distribution/native-addon.test.mjs
   - packages/execution/engine/src/assignment_runner/launch.rs
+  - packages/execution/engine/src/accounts/state.rs
+  - apps/fgos/tests/windows_borrow.rs
   - apps/fgos/src/wiring/unit_run_host/verify.rs
   - apps/fgos/tests/windows_cwd_lease_owner.rs
   - apps/fgos/src/wiring/unit_run_host/tests/run_unit.rs
@@ -123,7 +125,7 @@ narrative goes into the Git spec's decision history.
 |---|---|---|---|---|---|
 | 1 | [LockFileEx handle evidence, linked worktree trust and plain paths on Windows, CI job](phase-01-windows-worktree-and-ci-job.md) | - | packages/holder-lock/rust/tests/windows_lockfileex.rs, packages/git/rust/src/driver.rs, packages/git/rust/src/worktree.rs, packages/git/rust/tests/worktree.rs, packages/distribution/rust/src/release_rows.rs, packages/distribution/rust/src/workspace.rs, .github/workflows/release-assets-check.yml | 1 | ready |
 | 2 | [WAL opens on Windows](phase-02-windows-wal.md) | - | packages/git/rust/src/wal.rs, packages/git/rust/src/wal/**, packages/git/rust/Cargo.toml, Cargo.toml, Cargo.lock | 1 | ready |
-| 3 | [Borrowed handle and borrow I/O on Windows](phase-03-holder-lock-windows-borrow.md) | - | packages/holder-lock/rust/src/port.rs, packages/holder-lock/rust/src/borrow_windows.rs, packages/holder-lock/rust/src/driver/windows.rs, packages/holder-lock/rust/tests/**, .github/workflows/release-assets-check.yml | 2 | ready |
+| 3 | [Borrowed handle and borrow I/O on Windows](phase-03-holder-lock-windows-borrow.md) | - | packages/holder-lock/rust/src/port.rs, packages/holder-lock/rust/src/borrow_windows.rs, packages/holder-lock/rust/src/driver/windows.rs, packages/holder-lock/rust/tests/**, packages/git/rust/src/driver.rs, packages/execution/engine/src/accounts/state.rs, apps/fgos/src/wiring/unit_run_host/verify.rs, apps/fgos/tests/windows_borrow.rs, .github/workflows/release-assets-check.yml | 2 | ready |
 | 4 | [C5 fence and scan on Windows, git-wal-v1 advertised](phase-04-windows-c5.md) | 2 | packages/holder-lock/rust/src/tombstone.rs, packages/holder-lock/rust/src/route.rs, packages/process/rust/src/facts.rs, packages/process/rust/src/platform/windows.rs, packages/process/rust/tests/**, packages/distribution/rust/src/git_gate.rs, packages/distribution/rust/src/init.rs, packages/distribution/rust/src/verify.rs, packages/distribution/rust/tests/**, docs/platform/packaging-distribution/contracts/activation-binding.md, docs/platform/packaging-distribution/contracts/release-manifest.md, scripts/build-rust-distribution.mjs, apps/fgctl/tests/git_wal_activation_gate.rs, test/distribution/native-addon.test.mjs | 2 | ready |
 | 5 | [Git ports take custody on Windows](phase-05-git-ports-windows-custody.md) | 1, 2, 3 | packages/git/rust/src/lib.rs, packages/git/rust/src/scoped_commit.rs, packages/git/rust/src/sync.rs, packages/git/rust/src/land.rs, packages/git/rust/src/refs.rs, packages/git/rust/src/remote.rs, packages/git/rust/src/restore.rs, packages/git/rust/src/recovery.rs, packages/git/rust/src/repository_config.rs, packages/git/rust/src/native_lock.rs, packages/git/rust/src/publication.rs, packages/git/rust/tests/scoped_commit_sync.rs, packages/git/rust/tests/land.rs, packages/git/rust/tests/land_crash_matrix.rs, packages/git/rust/tests/land_push_catch_up.rs, packages/git/rust/tests/safe_restore.rs, packages/git/rust/tests/refs_remote.rs, packages/git/rust/tests/recovery_matrix.rs, packages/git/rust/tests/repository_config.rs, packages/git/rust/tests/borrow_deadline.rs, packages/git/rust/tests/support/**, packages/git/contracts/mutation-census.v1.json, packages/supervision/rust/tests/land.rs, packages/execution/checkout/tests/**, .github/workflows/release-assets-check.yml | 3 | ready |
 | 6 | [Lease channel for the attempt's whole life, verify under custody](phase-06-lease-whole-life-and-verify.md) | 3 | packages/execution/engine/src/assignment_runner/launch.rs, apps/fgos/src/wiring/unit_run_host/verify.rs, apps/fgos/tests/windows_cwd_lease_owner.rs | 3 | ready |
@@ -181,3 +183,10 @@ p-nk6xf5laob and p-w4cxqq2sbw are set done through the portfolio owner when phas
 - 2026-11-21 lead:WINCUSTODY: phases 1, 2, 3, 4 and 6 committed on branches wincustody/p1..p6 (each rebased on p1 with
   its own step in `windows git custody`); phase 1's Windows code proof green in CI 44878105727 (topology 3/3,
   windows_lockfileex 16/16). The unit-run-host tests live in the binary (`wiring::unit_run_host`); phase 7's path fixed.
+- 2026-11-21 lead:WINCUSTODY: CI 44881208297/44881213276: on Windows `run_borrowed_io` took `HelperExe::current()` as its
+  job keeper, which a test harness cannot serve ("job-keeper did not acknowledge"). Decided: `run_borrowed_io(_watched)`
+  take an explicit `&HelperExe` like `run_borrowed`; every caller moves in the same change (git driver, verify, engine
+  accounts state, tests); production passes the current executable. Windows proofs of borrow I/O and of the Git ports
+  therefore run from apps/fgos/tests with the fgos binary as helper (existing pattern: windows_borrow.rs). Phase 6's
+  re-declare proof is green in that run (the lease answers a later declaration). Release-assets-check split agreed with
+  lead:WINCI: this plan owns only the `windows-git-custody` job block.
