@@ -228,9 +228,10 @@ const PARAMETERS_CURRENT_DIRECTORY: usize = 0x38;
 /// The longest path a `UNICODE_STRING` here can describe, in bytes.
 const MAX_PATH_BYTES: usize = 32_768 * 2;
 
-/// Every pid in a Toolhelp process snapshot, the Idle process left out.
-/// `None` when the snapshot cannot be taken.
-pub fn process_ids() -> Option<Vec<ProcId>> {
+/// Every process in a Toolhelp process snapshot as its pid and image file
+/// name (`szExeFile`), the Idle process left out. `None` when the snapshot
+/// cannot be taken.
+pub fn process_entries() -> Option<Vec<(ProcId, String)>> {
     use windows_sys::Win32::Foundation::INVALID_HANDLE_VALUE;
     use windows_sys::Win32::System::Diagnostics::ToolHelp::{
         CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W,
@@ -242,18 +243,26 @@ pub fn process_ids() -> Option<Vec<ProcId>> {
         if snapshot == INVALID_HANDLE_VALUE {
             return None;
         }
-        let mut ids = Vec::new();
+        let mut entries = Vec::new();
         let mut entry: PROCESSENTRY32W = std::mem::zeroed();
         entry.dwSize = std::mem::size_of::<PROCESSENTRY32W>() as u32;
         let mut more = Process32FirstW(snapshot, &mut entry) != 0;
         while more {
             if entry.th32ProcessID != 0 {
-                ids.push(ProcId(entry.th32ProcessID));
+                let len = entry
+                    .szExeFile
+                    .iter()
+                    .position(|&unit| unit == 0)
+                    .unwrap_or(entry.szExeFile.len());
+                entries.push((
+                    ProcId(entry.th32ProcessID),
+                    String::from_utf16_lossy(&entry.szExeFile[..len]),
+                ));
             }
             more = Process32NextW(snapshot, &mut entry) != 0;
         }
         CloseHandle(snapshot);
-        Some(ids)
+        Some(entries)
     }
 }
 
@@ -456,7 +465,15 @@ impl ProcessHandle {
 impl Windows {
     /// The scan view of one process, or `None` when nothing runs there. A
     /// read that fails leaves its field `None` and is named in `unreadable`.
-    fn view_with(&self, pid: ProcId, filter: &ScanFilter, host: &str) -> Option<ProcView> {
+    /// `image_name` is the snapshot's file name of the image; a process that
+    /// cannot be opened still carries it as its `exe`.
+    fn view_with(
+        &self,
+        pid: ProcId,
+        image_name: Option<String>,
+        filter: &ScanFilter,
+        host: &str,
+    ) -> Option<ProcView> {
         let mut unreadable = Vec::new();
         let mut view = ProcView {
             effective_uid: None,
@@ -474,10 +491,10 @@ impl Windows {
             Err(err) if err.raw_os_error() == Some(ERROR_ACCESS_DENIED) => {
                 match ProcessHandle::open(pid, PROCESS_QUERY_LIMITED_INFORMATION) {
                     Ok(handle) => (handle, false),
-                    Err(err) => return Self::unopened(view, &err),
+                    Err(err) => return Self::unopened(view, image_name, &err),
                 }
             }
-            Err(err) => return Self::unopened(view, &err),
+            Err(err) => return Self::unopened(view, image_name, &err),
         };
         match handle.creation_time() {
             Ok(Some(creation)) => {
@@ -521,11 +538,20 @@ impl Windows {
     }
 
     /// A process that could not be opened: gone when no such pid, otherwise
-    /// still a process, named by what could not be read.
-    fn unopened(mut view: ProcView, err: &io::Error) -> Option<ProcView> {
+    /// still a process, named by what could not be read. Its `exe` is the
+    /// bare image file name the snapshot listed, so a caller can still tell
+    /// `svchost.exe` from `node.exe`.
+    fn unopened(
+        mut view: ProcView,
+        image_name: Option<String>,
+        err: &io::Error,
+    ) -> Option<ProcView> {
         if err.raw_os_error() == Some(ERROR_INVALID_PARAMETER) {
             return None;
         }
+        view.exe = image_name
+            .filter(|name| !name.is_empty())
+            .map(PathBuf::from);
         view.unreadable.push(format!("stat: {err}"));
         Some(view)
     }
@@ -575,21 +601,25 @@ impl ProcessPlatform for Windows {
     }
 
     fn scan(&self, filter: &ScanFilter) -> Scan {
-        let Some(ids) = process_ids() else {
+        let Some(entries) = process_entries() else {
             return Scan::Unsupported;
         };
         let own = ProcId(std::process::id());
         let host = self.host();
         Scan::Views(
-            ids.into_iter()
-                .filter(|pid| *pid != own || filter.include_self)
-                .filter_map(|pid| self.view_with(pid, filter, &host))
+            entries
+                .into_iter()
+                .filter(|(pid, _)| *pid != own || filter.include_self)
+                .filter_map(|(pid, name)| self.view_with(pid, Some(name), filter, &host))
                 .collect(),
         )
     }
 
     fn view_of(&self, pid: ProcId, filter: &ScanFilter) -> Option<ProcView> {
-        self.view_with(pid, filter, &self.host())
+        let name = process_entries()
+            .and_then(|entries| entries.into_iter().find(|(id, _)| *id == pid))
+            .map(|(_, name)| name);
+        self.view_with(pid, name, filter, &self.host())
     }
 
     fn spawn_with_fds(&self, _cmd: Command, _fd_map: &[(FdSlot, &File)]) -> io::Result<Child> {

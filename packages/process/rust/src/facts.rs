@@ -658,7 +658,8 @@ pub struct ProcView {
     /// `unreadable` says so. It is still a process, never dropped from the
     /// scan.
     pub tuple: Option<ProcTuple>,
-    /// The executable it runs.
+    /// The executable it runs. On Windows a process that cannot be opened
+    /// carries only the bare image file name its snapshot entry listed.
     pub exe: Option<PathBuf>,
     /// Its argument vector.
     pub cmdline: Option<Vec<String>>,

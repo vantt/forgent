@@ -633,21 +633,28 @@ mod quiesce {
     /// a fgOS process. Its argv stays readable without ptrace access: a
     /// session helper the user's own service manager runs without ptrace
     /// access (systemd's `(sd-pam)`) names neither node nor a fgOS binary and
-    /// is not counted, or no systemd machine could ever scan clean. An
-    /// unreadable argv says nothing, so it still counts.
-    fn could_be_fgos(argv: Option<&[String]>) -> bool {
-        let Some(argv) = argv else { return true };
-        let Some(first) = argv.first() else {
-            return false;
+    /// is not counted, or no systemd machine could ever scan clean. When the
+    /// argv cannot be read, the image name judges instead (a non-elevated
+    /// Windows user cannot read the command line of System, Registry or
+    /// another user's `svchost.exe`, and those are not fgOS). Only when
+    /// neither is known does it still count.
+    fn could_be_fgos(argv: Option<&[String]>, exe: Option<&Path>) -> bool {
+        let first = match argv {
+            Some(argv) => argv.first().map(String::as_str),
+            None => match exe {
+                Some(exe) => Some(exe.to_str().unwrap_or("")),
+                None => return true,
+            },
         };
+        let Some(first) = first else { return false };
         let base = Path::new(first)
             .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("");
-        // A Windows program name carries its `.exe` and any letter case.
-        #[cfg(windows)]
+        // A Windows program name carries its `.exe` and any letter case; the
+        // image name of a process that could not be opened is judged the same
+        // way on every platform.
         let lowered = base.to_ascii_lowercase();
-        #[cfg(windows)]
         let base = lowered.strip_suffix(".exe").unwrap_or(&lowered);
         crate::origin::is_script_runtime(base) || crate::origin::FGOS_BINARIES.contains(&base)
     }
@@ -665,7 +672,7 @@ mod quiesce {
         dirs: &[PathBuf],
         workspace_only: bool,
     ) -> Option<&'static str> {
-        if !workspace_only && !could_be_fgos(cmdline) {
+        if !workspace_only && !could_be_fgos(cmdline, None) {
             return None;
         }
         if cwd.is_some_and(|cwd| dirs.iter().any(|d| within(cwd, d))) {
@@ -713,7 +720,7 @@ mod quiesce {
         } else {
             !view.unreadable.is_empty()
         };
-        hidden && same_user && could_be_fgos(view.cmdline.as_deref())
+        hidden && same_user && could_be_fgos(view.cmdline.as_deref(), view.exe.as_deref())
     }
 
     /// Why a process counts as unreadable, in words a person can act on.
@@ -1141,32 +1148,77 @@ mod quiesce {
 
         #[test]
         fn an_unreadable_process_counts_only_when_its_argv_could_be_fgos() {
-            assert!(could_be_fgos(None), "no argv at all says nothing");
-            assert!(could_be_fgos(Some(&argv(&["node", "bin/fgos.mjs"]))));
-            assert!(could_be_fgos(Some(&argv(&[
-                "/usr/bin/node",
-                "--test",
-                "x.mjs"
-            ]))));
-            assert!(could_be_fgos(Some(&argv(&["/opt/fgos/bin/fgos", "run"]))));
-            assert!(could_be_fgos(Some(&argv(&["fgos-gateway"]))));
-            assert!(could_be_fgos(Some(&argv(&["nodejs"]))));
-            assert!(could_be_fgos(Some(&argv(&["/usr/bin/node20", "x.mjs"]))));
-            assert!(could_be_fgos(Some(&argv(&["node-22"]))));
-            assert!(could_be_fgos(Some(&argv(&["bun", "run"]))));
-            assert!(could_be_fgos(Some(&argv(&["deno", "run"]))));
+            assert!(could_be_fgos(None, None), "no argv at all says nothing");
+            assert!(could_be_fgos(Some(&argv(&["node", "bin/fgos.mjs"])), None));
+            assert!(could_be_fgos(
+                Some(&argv(&["/usr/bin/node", "--test", "x.mjs"])),
+                None
+            ));
+            assert!(could_be_fgos(
+                Some(&argv(&["/opt/fgos/bin/fgos", "run"])),
+                None
+            ));
+            assert!(could_be_fgos(Some(&argv(&["fgos-gateway"])), None));
+            assert!(could_be_fgos(Some(&argv(&["nodejs"])), None));
+            assert!(could_be_fgos(
+                Some(&argv(&["/usr/bin/node20", "x.mjs"])),
+                None
+            ));
+            assert!(could_be_fgos(Some(&argv(&["node-22"])), None));
+            assert!(could_be_fgos(Some(&argv(&["bun", "run"])), None));
+            assert!(could_be_fgos(Some(&argv(&["deno", "run"])), None));
             assert!(
-                !could_be_fgos(Some(&argv(&["nodemon"]))),
+                !could_be_fgos(Some(&argv(&["nodemon"])), None),
                 "a name that only starts with node is something else"
             );
             assert!(
-                !could_be_fgos(Some(&argv(&["(sd-pam)"]))),
+                !could_be_fgos(Some(&argv(&["(sd-pam)"])), None),
                 "systemd's session helper"
             );
             assert!(
-                !could_be_fgos(Some(&argv(&[]))),
+                !could_be_fgos(Some(&argv(&[])), None),
                 "a zombie or kernel thread has an empty argv"
             );
+        }
+
+        #[test]
+        fn an_unreadable_argv_is_judged_by_the_image_name_and_counts_only_when_nothing_rules_out_fgos(
+        ) {
+            let blind = |image: Option<&str>| {
+                let mut v = view(None, None, &["stat: access denied"]);
+                v.exe = image.map(std::path::PathBuf::from);
+                v
+            };
+            for only in [true, false] {
+                for image in [
+                    "System",
+                    "Registry",
+                    "Memory Compression",
+                    "svchost.exe",
+                    "explorer.exe",
+                ] {
+                    assert!(
+                        !counts_as_unreadable(&blind(Some(image)), only, true),
+                        "{image} with an unreadable user and argv is not fgOS"
+                    );
+                }
+                for image in [
+                    "node.exe",
+                    "NODE.EXE",
+                    "fgos.exe",
+                    "fgos-gateway.exe",
+                    "bun.exe",
+                ] {
+                    assert!(
+                        counts_as_unreadable(&blind(Some(image)), only, true),
+                        "{image} could be fgOS and still counts"
+                    );
+                }
+                assert!(
+                    counts_as_unreadable(&blind(None), only, true),
+                    "no argv and no image name stays fail closed"
+                );
+            }
         }
     }
 }
