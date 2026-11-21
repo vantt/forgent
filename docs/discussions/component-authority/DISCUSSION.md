@@ -9,7 +9,7 @@ discussion: open
 - **Q1 đã trả lời trong chat (18:25): cấm twin Node.** Port sang Rust là cắt chuyển: bản Node bị xóa cùng đợt, lịch sử nằm trong git, và việc chuyển được ghi note đầy đủ tham chiếu bản cũ (§3 row 3d). Chờ thêm một round không đổi ý rồi mint D-ID. `q-djyjckiygr` đã cancel vì trả lời ngoài store.
 - Chủ dự án (18:27): "thực chất nó không phải đơn thuần trùng rust và node". Mẫu pháp y T0 lệch về port; đang chạy **T0c**: điều tra bảy ca trùng khái niệm ở §3 row 2 (hai thành phần cùng nhận một quyết định).
 - Chưa có câu hỏi mới nào đang mở với chủ dự án.
-- Cùng nghĩa khác chữ (§3 row 3b): **không còn coi là thứ yếu.** Con số "3/25" đến từ mẫu lệch về port; ở các ca trùng khái niệm (portfolio/supervision, ba đường handoff) khác chữ chính là thứ che việc trùng. Shaper đề xuất thiết kế cụ thể ở row 3b (hướng D), chờ T0c xác nhận rồi hỏi chủ dự án.
+- Cùng nghĩa khác chữ (§3 row 3b): **là giả thuyết chính, không phải thứ yếu.** Có hai tầng: (a) hàm hoặc helper bị chép dưới tên khác (guard so chữ lọt); (b) **cả một thành phần mới, tên khác, làm việc tương tự thành phần đã có** (portfolio cạnh supervision, watcher cạnh `fgos-runner --watch`, ba ngôn ngữ khung) — tầng (b) là điều chính chủ dự án lo và là đối tượng của T0c. Con số "3/25" đến từ mẫu lệch về port; ở các ca trùng khái niệm (portfolio/supervision, ba đường handoff) khác chữ chính là thứ che việc trùng. Shaper đề xuất thiết kế cụ thể ở row 3b (hướng D), chờ T0c xác nhận rồi hỏi chủ dự án.
 - Tiếp theo: hình dạng sổ (row 4) bỏ trường "twin" khỏi thiết kế; soạn điểm kiểm lúc plan (row 5).
 
 ## 2. Mục tiêu & đề bài
@@ -46,6 +46,7 @@ Chủ dự án (2026-11-21): "component authority/boundary và contracts là r�
 - 2026-11-21 18:25 round 2: Chủ dự án trả lời Q1 trong chat: không giữ bản Node, git giữ lịch sử, chỉ cần note chuyển Rust đầy đủ tham chiếu bản cũ. Ghi §3 row 3d; cancel `q-djyjckiygr`. Shaper đề xuất chỗ ghi note (commit message + lịch sử quyết định của spec khu vực) và vectors làm lưới an toàn.
 - 2026-11-21 18:27 round 2: Chủ dự án: "nhưng thực chất nó không phải đơn thuần trùng rust và node đâu nhé." Shaper thừa nhận mẫu T0 lượt a lệch (lọc theo chữ của các đợt port); ghi giới hạn vào row 3c; mở T0c cho bảy ca trùng khái niệm ở row 2.
 - 2026-11-21 18:35 round 2: Chủ dự án hỏi lại "câu hỏi của anh về keywords thì sao". Shaper rút lại nhận định "đồng nghĩa là thứ yếu" (dựa trên mẫu lệch) và ghi thiết kế D cụ thể vào row 3b.
+- 2026-11-21 18:31 round 2: Chủ dự án nhắc: "em từng nói hệ thống tự tạo ra một component similar với tên khác." Shaper xác nhận câu "khác tên là nguyên nhân phụ" mâu thuẫn với chính §3 row 2 và giả thuyết H1; tách hai tầng (hàm chép tên khác; thành phần mới tên khác làm việc tương tự) và nâng tầng thành phần thành giả thuyết chính.
 
 ## 6. Thiết kế đã chốt {#design}
 
