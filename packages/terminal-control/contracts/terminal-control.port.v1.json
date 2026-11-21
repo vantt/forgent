@@ -1,6 +1,9 @@
 {
   "contract": { "id": "terminal-control-port", "version": 1 },
   "description": "Upper port of terminal-control, addressed by key. Callers (the Node client behind the internal route, /fgOS:terminal) see only these operations; the multiplexer lives behind a driver (driver-capabilities.v1.json). terminal-control knows nothing about runs, deadlines, receipts or work items.",
+  "limits": {
+    "maxRecentLines": 1000
+  },
   "key": {
     "meaning": "caller-chosen id of one slot: today the round's launchCommandId or ad-hoc round id, later the attempt id. One key names at most one pane for its whole life.",
     "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
