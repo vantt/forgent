@@ -24,8 +24,9 @@
 //     backticked repo-root path exists, unless the same line pins a commit sha.
 //     Fenced blocks, patterns and <placeholders> are not references.
 //   - verb reference: in a document that holds current claims, every backticked
-//     `fgos <verb>` names a verb of the command listing, unless the same line pins
-//     a commit sha. No prose context word exempts a mention.
+//     `fgos <verb>` names a verb of the command listing (`fgos --help --json` of the
+//     host, plus the hidden `internal`), unless the same line pins a commit sha. No
+//     prose context word exempts a mention.
 //   - rule-claim owner: the same rule id with the same title, written as a bold
 //     `**RULn (title)**` (also D-ADR numbers and the laws L1-L10), is defined in at
 //     most one document; a second holder cites the owner instead.
@@ -38,19 +39,18 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { listAnchors } from './list-doc-anchors.mjs';
 import { inspectRepo } from './lib/git-ports.mjs';
 import { clickable, relatedLinks, localDestination, headerBlock } from './lib/doc-links.mjs';
-import { invokeHost } from '../src/util/host-bin.mjs';
+import { invokeHost, resolveHostBin } from '../src/util/host-bin.mjs';
 import { conventionCheck } from '../src/convention/convention-client.mjs';
 
 const GOVERNANCE = 'docs/platform/governance.md';
-// The host embeds this file byte for byte as its `fgos --help --json` answer (apps/fgos/src/help.rs),
-// so reading it from the tree under check is the command listing of that same tree.
-const COMMAND_MANIFEST = 'packages/host-runtime/contracts/command-manifest.json';
 // The one verb the listing hides on purpose: the host-to-payload protocol entry.
 const HIDDEN_VERBS = ['internal'];
+const HOST_HELP_TIMEOUT_MS = 10_000;
 
 const isPlatformDoc = (file) => file.startsWith('docs/platform/') && file.endsWith('.md');
 
@@ -210,10 +210,10 @@ export function checkDeadReferences({ files, readFile, exists, classify, isCommi
   });
 }
 
-/** The `fgos` verbs of the command listing in `manifestText`, plus the hidden ones. */
-export function commandVerbs(manifestText) {
-  const commands = JSON.parse(manifestText)?.commands;
-  if (!Array.isArray(commands) || commands.length === 0) throw new Error(`${COMMAND_MANIFEST} lists no commands`);
+/** The `fgos` verbs of a command listing (the `fgos --help --json` answer), plus the hidden ones. */
+export function commandVerbs(listingText) {
+  const commands = JSON.parse(listingText)?.commands;
+  if (!Array.isArray(commands) || commands.length === 0) throw new Error('the command listing (fgos --help --json) lists no commands');
   return new Set([...commands.map((command) => command.name), ...HIDDEN_VERBS]);
 }
 
@@ -320,12 +320,12 @@ function repoRelative(raw) {
 /**
  * Every rule over one source. `paths` null checks the whole platform population; a path list runs
  * the placement port on the paths that exist (deleted ones are not read) and the body rules on the
- * platform documents among them. `classify`, `isCommit` and `placement` are ports; a classification
- * is asked at most once per document.
+ * platform documents among them. `classify`, `isCommit`, `placement` and `verbs` (the command listing,
+ * asked only when a document names a verb) are ports; a classification is asked at most once per document.
  * Returns `{ counts, findings, warnings }`: findings are refusals, warnings are placement verdicts
  * without block posture.
  */
-export function checkDocuments({ source, paths = null, classify, isCommit, placement }) {
+export function checkDocuments({ source, paths = null, classify, isCommit, placement, verbs }) {
   const answers = new Map();
   const classifyOnce = (file) => {
     if (!answers.has(file)) answers.set(file, classify(file));
@@ -345,10 +345,10 @@ export function checkDocuments({ source, paths = null, classify, isCommit, place
   const links = checkPlatformLinks({ files: checked, readFile, exists });
   const metadata = checkPlatformMetadata({ files: checked, readFile, baseline, classify: classifyOnce });
   const dead = checkDeadReferences({ files: checked, readFile, exists, classify: classifyOnce, isCommit });
-  const verbs = checkVerbReferences({ files: checked, readFile, classify: classifyOnce, isCommit,
-    verbs: () => commandVerbs(readFile(COMMAND_MANIFEST)) });
+  let listing = null;
+  const verbRefs = checkVerbReferences({ files: checked, readFile, classify: classifyOnce, isCommit, verbs: () => (listing ??= verbs()) });
   const claims = checkRuleClaims({ files: source.files, readFile, report: present === null ? null : new Set(checked) });
-  findings.push(...links.findings, ...metadata.findings, ...dead.findings, ...verbs.findings, ...claims.findings);
+  findings.push(...links.findings, ...metadata.findings, ...dead.findings, ...verbRefs.findings, ...claims.findings);
   return {
     counts: { files: checked.length, links: links.counts.links, metadataExempt: metadata.counts.exempt, findings: findings.length },
     findings, warnings,
@@ -360,12 +360,32 @@ export function hostClassify(repoRoot) {
   return (file) => invokeHost(['convention', 'classify', '--json', '--', file], { dir: repoRoot });
 }
 
+/**
+ * The command listing port: the verbs of `fgos --help --json` from the host of `repoRoot` (the host renders
+ * it from its embedded manifest; no other file reads that manifest). A host that cannot answer throws with
+ * code `host-unavailable` or `host-exec-error`.
+ */
+export function hostVerbs(repoRoot) {
+  return () => {
+    const hostBin = resolveHostBin(repoRoot);
+    if (!hostBin) throw Object.assign(new Error('Rust host binary unavailable (FGOS_HOST_BIN unset and no active installation manifest)'), { code: 'host-unavailable' });
+    let stdout;
+    try {
+      stdout = execFileSync(hostBin, ['--help', '--json'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: HOST_HELP_TIMEOUT_MS, maxBuffer: 16 * 1024 * 1024 });
+    } catch (err) {
+      const timedOut = err.code === 'ETIMEDOUT';
+      throw Object.assign(new Error(timedOut ? `fgos --help --json timed out after ${HOST_HELP_TIMEOUT_MS}ms` : String(err.stderr || err.message).trim()), { code: 'host-exec-error', timedOut });
+    }
+    return commandVerbs(stdout);
+  };
+}
+
 /** The placement port over the native Convention host of `repoRoot`: one call for every path. */
 export function hostPlacement(repoRoot) {
   return (paths) => conventionCheck(paths, { dir: repoRoot });
 }
 
-export function runCli(argv, cwd = process.cwd(), { classify, placement } = {}) {
+export function runCli(argv, cwd = process.cwd(), { classify, placement, verbs } = {}) {
   const asJson = argv.includes('--json');
   try {
     let repoArg = '.';
@@ -388,6 +408,7 @@ export function runCli(argv, cwd = process.cwd(), { classify, placement } = {}) 
       classify: classify || hostClassify(repoRoot),
       isCommit: gitCommitResolver(repoRoot),
       placement: placement || hostPlacement(repoRoot),
+      verbs: verbs || hostVerbs(repoRoot),
     });
     const { counts, findings, warnings } = result;
     if (asJson) console.log(JSON.stringify({ counts, findings, warnings }));

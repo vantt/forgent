@@ -184,7 +184,6 @@ test('path input checks only the named paths, never reads a deleted one, asks pl
     'docs/platform/governance.md': 'Required baseline:\n```txt\nDocument type:\n```\n',
     'docs/platform/a/spec.md': '# A\n\n[gone](b.md) `src/gone.mjs` `fgos setup`\n',
     'docs/platform/c/spec.md': '# C\n\n[also broken](nope.md)\n',
-    'packages/host-runtime/contracts/command-manifest.json': JSON.stringify({ commands: [{ name: 'run' }] }),
   };
   const read = [];
   const source = {
@@ -197,6 +196,7 @@ test('path input checks only the named paths, never reads a deleted one, asks pl
     source, paths: ['./docs/platform/a/spec.md', 'docs/platform/b.md', 'plans/reports/x.md'],
     classify: (f) => { classified.push(f); return { canonical: true, kind: 'spec', metadataExempt: true }; },
     isCommit: () => false,
+    verbs: () => new Set(['run']),
     placement: (paths) => { placed.push(paths); return { violations: [
       { path: 'docs/platform/a/spec.md', code: 'wrong-location', message: 'blocked', posture: 'block' },
       { path: 'docs/platform/a/spec.md', code: 'pattern-mismatch', message: 'only a warning' },

@@ -628,6 +628,7 @@ async function documentationRefusal(committingToplevel) {
       classify: checker.hostClassify(committingToplevel),
       isCommit: indexCommitResolver(committingToplevel),
       placement: checker.hostPlacement(committingToplevel),
+      verbs: checker.hostVerbs(committingToplevel),
     });
   } catch (error) {
     const category = error?.code ?? 'check-error';
