@@ -22,3 +22,6 @@
 
 ## Rollback
 Revert the commit; test file is removed.
+
+## Outcome
+Closed 2026-11-21 by owner decision `q-fvulgjz2iz`: the behaviour is already proven by its owning tests (see plan acceptance criterion 3); no new test file lands.
