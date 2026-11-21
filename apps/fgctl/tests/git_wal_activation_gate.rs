@@ -38,13 +38,44 @@ fn owner_only(path: &Path) {
     #[cfg(windows)]
     let _ = path;
 }
+/// Compiles the stand-in host once per test process and returns its bytes.
+#[cfg(windows)]
+fn windows_host() -> Vec<u8> {
+    use std::sync::OnceLock;
+    static HOST: OnceLock<Vec<u8>> = OnceLock::new();
+    HOST.get_or_init(|| {
+        let dir = std::env::temp_dir().join(format!("fgctl-stand-in-host-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        let exe = dir.join("fgos.exe");
+        let rustc = std::env::var_os("RUSTC").unwrap_or_else(|| "rustc".into());
+        let source = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/stand_in_host.rs");
+        let built = Command::new(rustc)
+            .args(["--edition", "2021", "-O"])
+            .arg(source)
+            .arg("-o")
+            .arg(&exe)
+            .output()
+            .unwrap();
+        assert!(
+            built.status.success(),
+            "{}",
+            String::from_utf8_lossy(&built.stderr)
+        );
+        let bytes = fs::read(&exe).unwrap();
+        fs::remove_dir_all(dir).unwrap();
+        bytes
+    })
+    .clone()
+}
 fn candidate(root: &Path, wal: bool) {
     // The tail's last call, `doctor --json`, must answer with a doctor result.
     #[cfg(unix)]
     let host: Vec<u8> = b"#!/bin/sh\ncase \"$*\" in *--json*) echo '{\"data\":{\"ok\":true,\"next\":[],\"checks\":[]}}';; esac\nexit 0\n".to_vec();
-    // A Windows host is a real program: this crate's own `fgctl` stands in for it.
+    // The workspace shim launches `bin\fgos.exe` directly on Windows, so the host
+    // must be a real program; it must not be `fgctl`, whose `init` would take the
+    // activation lock the controller still holds while it runs the tail.
     #[cfg(windows)]
-    let host: Vec<u8> = fs::read(env!("CARGO_BIN_EXE_fgctl")).unwrap();
+    let host: Vec<u8> = windows_host();
     let host = host.as_slice();
     let legacy = b"console.log('fixture');\n";
     fs::create_dir_all(root.join("bin")).unwrap();
