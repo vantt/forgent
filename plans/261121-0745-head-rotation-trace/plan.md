@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Every stop decision of a head leaves one line the owner can read"
-status: running
+status: done
 lead: lead:ROTATE
 base: 595a7f0b1194ada7826d774edce61817dd41a8bc
 priority: P1
@@ -48,7 +48,7 @@ No change to soft, hard or any override; no status-line sidecar writer; no new v
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | Hook always asks; host records the line | - | apps/fgos/src/wiring/session_rotation_hook.rs, src/session-host/head-request.mjs, src/session-rotation/rotate.mjs, contracts, spec, tests | 1 | running |
+| 1 | Hook always asks; host records the line | - | apps/fgos/src/wiring/session_rotation_hook.rs, src/session-host/head-request.mjs, src/session-rotation/rotate.mjs, contracts, spec, tests | 1 | done |
 
 ## Owner questions
 Whether secretary soft should be lowered (asked by the supervisor).
