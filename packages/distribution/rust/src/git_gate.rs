@@ -148,12 +148,15 @@ fn validate_predecessor_scan(bytes: &[u8], exit_code: Option<i32>) -> Result<(),
     if scan["v"] != 1
         || scan["protocol"] != 1
         || scan["result"] == "unavailable"
-        || scan["unreadable"].as_u64() != Some(0)
+        || scan["unreadable"].as_u64().is_none()
         || !matches!(exit_code, Some(0 | 10))
     {
         return Err(refusal(
             "git-predecessor-writer-live",
-            format!("process scan unavailable or incomplete: {}", scan["detail"]),
+            format!(
+                "process scan unavailable or incomplete: {}",
+                scan["detail"].as_str().unwrap_or("no detail")
+            ),
         ));
     }
     let processes = scan["processes"]
@@ -202,6 +205,37 @@ fn validate_predecessor_scan(bytes: &[u8], exit_code: Option<i32>) -> Result<(),
                 ),
             ));
         }
+    }
+    if scan["unreadable"].as_u64() != Some(0) {
+        let named = scan["unreadableProcesses"]
+            .as_array()
+            .map(|list| {
+                list.iter()
+                    .map(|p| {
+                        let argv = p["argv"].as_array().map(|a| {
+                            a.iter()
+                                .map(|w| w.as_str().unwrap_or(""))
+                                .collect::<Vec<_>>()
+                                .join(" ")
+                        });
+                        format!(
+                            "pid {} argv {} ({})",
+                            p["pid"],
+                            argv.map_or("unreadable".to_string(), |a| format!("{a:?}")),
+                            p["reason"].as_str().unwrap_or("unreadable")
+                        )
+                    })
+                    .collect::<Vec<_>>()
+                    .join("; ")
+            })
+            .unwrap_or_default();
+        return Err(refusal(
+            "git-predecessor-writer-live",
+            format!(
+                "process scan incomplete: {} unreadable process(es) could be fgOS: {named}",
+                scan["unreadable"]
+            ),
+        ));
     }
     Ok(())
 }

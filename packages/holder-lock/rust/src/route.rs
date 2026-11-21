@@ -716,6 +716,37 @@ mod quiesce {
         hidden && same_user && could_be_fgos(view.cmdline.as_deref())
     }
 
+    /// Why a process counts as unreadable, in words a person can act on.
+    fn unreadable_reason(view: &ProcView, workspace_only: bool) -> String {
+        let mut reasons = Vec::new();
+        if view.cmdline.is_none() {
+            reasons.push("argv unreadable".to_string());
+        }
+        if view.cwd.is_none() {
+            reasons.push("cwd unreadable".to_string());
+        }
+        if view.effective_uid.is_none() {
+            reasons.push("user unreadable".to_string());
+        }
+        if !workspace_only {
+            reasons.extend(
+                view.unreadable
+                    .iter()
+                    .map(|part| format!("{part} unreadable")),
+            );
+        }
+        reasons.dedup();
+        reasons.join(", ")
+    }
+
+    fn unreadable_entry(view: &ProcView, workspace_only: bool) -> Value {
+        json!({
+            "pid": view.pid.0,
+            "argv": view.cmdline,
+            "reason": unreadable_reason(view, workspace_only),
+        })
+    }
+
     pub(super) fn scan(
         roots: &[PathBuf],
         linked: &[PathBuf],
@@ -757,7 +788,7 @@ mod quiesce {
             }
         };
         let mut processes = Vec::new();
-        let mut unreadable = 0u32;
+        let mut unreadable = Vec::new();
         for view in views {
             if exclude.contains(&view.pid.0) {
                 continue;
@@ -777,7 +808,7 @@ mod quiesce {
             match hit {
                 Some((matched, root)) => {
                     if workspace_only && view.cmdline.is_none() {
-                        unreadable += 1;
+                        unreadable.push(unreadable_entry(&view, workspace_only));
                     }
                     processes.push(json!({
                         "pid": view.pid.0,
@@ -790,15 +821,26 @@ mod quiesce {
                     }));
                 }
                 None if counts_as_unreadable(&view, workspace_only, maybe_same_user(&view)) => {
-                    unreadable += 1
+                    unreadable.push(unreadable_entry(&view, workspace_only))
                 }
                 None => {}
             }
         }
-        let clean = processes.is_empty() && unreadable == 0;
+        let clean = processes.is_empty() && unreadable.is_empty();
+        let mut fields = json!({
+            "processes": processes,
+            "unreadable": unreadable.len(),
+            "unreadableProcesses": unreadable,
+        });
+        if !unreadable.is_empty() {
+            fields["detail"] = json!(format!(
+                "{} same-user process(es) could not be read and could be fgOS; see unreadableProcesses for pid, argv and why",
+                unreadable.len()
+            ));
+        }
         emit(
             Some(if clean { "clean" } else { "processes" }),
-            json!({ "processes": processes, "unreadable": unreadable }),
+            fields,
             if clean { EXIT_OK } else { EXIT_NEGATIVE },
         )
     }
