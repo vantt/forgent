@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "discussion.schema.v1.json",
+  "title": "DiscussionFrontmatter",
+  "type": "object",
+  "required": ["id", "title", "status", "source", "created"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ds-[a-z2-7]{10}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": ["open", "paused", "settled"]
+    },
+    "source": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

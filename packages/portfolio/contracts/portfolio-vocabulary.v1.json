@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": 1,
+  "backlogItem": {
+    "requiredFrontmatter": ["id", "title", "status", "priority", "area", "created"],
+    "statuses": ["proposed", "parked", "in-flight", "done", "dropped"],
+    "priorities": ["P0", "P1", "P2", "P3"],
+    "bodySections": ["Why", "Done when", "Notes"]
+  },
+  "discussion": {
+    "requiredFrontmatter": ["id", "title", "status", "source", "created"],
+    "statuses": ["open", "paused", "settled"]
+  },
+  "plan": {
+    "statuses": ["draft", "ready", "running", "done", "withdrawn"]
+  }
+}
