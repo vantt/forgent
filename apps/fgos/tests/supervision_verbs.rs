@@ -116,9 +116,9 @@ impl Scene {
             "---\ncontract: plan-v1\ntitle: demo\nstatus: ready\npriority: P2\nfootprint:\n  - src/**\ncreated: 2026-01-01\n---\n\n# Demo\n\n| id | title | dependson | footprint | wave | status |\n|---|---|---|---|---|---|\n| 1 | one | - | `src/**` | 1 | ready |\n",
         )
         .unwrap();
-        fs::create_dir_all(project.join("docs/discussions/demo")).unwrap();
+        fs::create_dir_all(project.join("plans/discussions/ds-aaaaaaaaaa-demo")).unwrap();
         fs::write(
-            project.join("docs/discussions/demo/DISCUSSION.md"),
+            project.join("plans/discussions/ds-aaaaaaaaaa-demo/DISCUSSION.md"),
             "discussion: settled\n\n# Demo\n",
         )
         .unwrap();

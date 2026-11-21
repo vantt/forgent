@@ -1081,7 +1081,7 @@ fn plan_with_sources(status: &str, sources: &[&str]) -> String {
 
 const CITED: [&str; 3] = [
     "p-aaaaaaaaaa",
-    "docs/discussions/x/DISCUSSION.md",
+    "plans/discussions/ds-aaaaaaaaaa-x/DISCUSSION.md",
     "p-bbbbbbbbbb",
 ];
 

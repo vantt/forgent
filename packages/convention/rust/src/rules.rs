@@ -147,6 +147,18 @@ pub fn packaged_rules() -> &'static RuleSet {
     &RULES
 }
 
+/// The one root discussions live under, from the packaged `discussion` rule, without its trailing slash.
+pub fn discussion_root() -> &'static str {
+    static ROOT: LazyLock<String> = LazyLock::new(|| {
+        packaged_rules()
+            .by_kind("discussion")
+            .and_then(|rule| rule.roots.first())
+            .map(|root| root.trim_end_matches('/').to_owned())
+            .expect("packaged convention rules carry a `discussion` rule")
+    });
+    &ROOT
+}
+
 pub fn parse_rules(input: &str) -> Result<RuleSet, RuleError> {
     let value: serde_json::Value =
         serde_json::from_str(input).map_err(|error| RuleError::InvalidJson(error.to_string()))?;
@@ -306,5 +318,15 @@ impl RuleSet {
         self.rules
             .iter()
             .filter(|rule| rule.shape == RuleShape::PlacementGlob)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::discussion_root;
+
+    #[test]
+    fn discussion_root_is_the_packaged_rule_root_without_its_trailing_slash() {
+        assert_eq!(discussion_root(), "plans/discussions");
     }
 }
