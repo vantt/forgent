@@ -39,23 +39,17 @@ const fail = (msg) => failures.push(msg);
 // One file per backlog item lives under the backlog item root.
 const ITEMS_DIR = path.join(repoRoot, 'plans/backlog');
 
-/** The raw frontmatter block: the text between the first two `---` lines, or '' when there is none. */
-function rawFrontmatter(text) {
-  const m = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(text);
-  return m ? m[1] : '';
-}
-
 /**
  * The ids of the item files whose parsed frontmatter status is `proposed`, and,
- * counted independently of the YAML door, the number of item files whose raw
- * frontmatter block has a `status: proposed` line.
+ * counted independently of the YAML door, the number of item files that have a
+ * `status: proposed` line anywhere (a whole-file line scan, no frontmatter reader).
  */
 function proposedIdsFromItems(dir) {
   const ids = [];
   let scanned = 0;
   for (const name of fs.readdirSync(dir).filter((n) => n.endsWith('.md')).sort()) {
     const text = fs.readFileSync(path.join(dir, name), 'utf8');
-    if (/^status:\s*proposed\s*$/m.test(rawFrontmatter(text))) scanned += 1;
+    if (/^status:\s*proposed\s*$/m.test(text)) scanned += 1;
     let meta = {};
     try {
       meta = readFrontmatter(text, name).meta;
