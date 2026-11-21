@@ -3,7 +3,9 @@ contract: plan-v1
 title: "Component authority: one structural model of layers, components, decision kinds, doors, contracts and files, with generated human views"
 status: draft
 priority: P1
-blockedBy: []
+blockedBy:
+  - 261118-1341-s6a-execution-tier-rust
+  - 261120-0625-work-data-model
 base: bf061ff358fc3c8669195a5989e0ee5f3b2940ee
 footprint:
   - plans/261121-2109-component-authority/**
@@ -162,8 +164,20 @@ parallel in wave 4. Hot files: `components.json` has one writer per wave (phase 
 written by phase 5, then phase 6. The generated views are regenerated and never merged by hand. Phase 2
 touches `governance.md`, `architecture-map.md` and `component-boundary.md` only to change the manifest
 mention; phases 5 and 6 then replace their registry sections with generated blocks. The check
-`node scripts/plan-contract-check.mjs --plan plans/261121-2109-component-authority` passes. No other active
-plan's footprint overlaps this one's.
+`node scripts/plan-contract-check.mjs --plan plans/261121-2109-component-authority` passes while the plan is `draft`.
+
+**Why the plan is `draft`:** two running plans own files this plan must change.
+- `261118-1341-s6a-execution-tier-rust` owns `docs/architecture-manifest.json`, `test/architecture.test.mjs`,
+  `src/setup/**`, `test/setup/**`, `src/runner/dispatch/**`, `docs/reading-map.md`,
+  `docs/platform/component-boundary.md`, `docs/platform/runner/**` and `docs/platform/seat-binding/spec.md`. It edits
+  the door rows that phase 2 moves, so moving them first would fork the manifest.
+- `261120-0625-work-data-model` owns `plans/*/plan.md` (every plan file), `AGENTS.md`, `docs/reading-map.md`,
+  `docs/explanation/core-foundation-domain-boundary.md`, `docs/platform/architecture-map.md`,
+  `docs/platform/system-overview/spec.md` and `docs/platform/documentation/subcomponents/document-identity/spec.md`.
+
+When both are `done`, a planner wake does three things: refreshes `base`, re-reads the manifest (s6a retires some
+door debt, which phase 2 then moves as it stands), and runs the check. If the check passes, it sets `status: ready`.
+Phase 1 touches only new files, `docs/platform/README.md` and `docs/reading-map.md`, and is the first to start.
 
 ## Owner questions
 
