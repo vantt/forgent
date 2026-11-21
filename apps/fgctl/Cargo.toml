@@ -11,4 +11,5 @@ serde_json = { workspace = true }
 
 [dev-dependencies]
 fgos-git = { path = "../../packages/git/rust" }
+fgos-process = { path = "../../packages/process/rust" }
 sha2.workspace = true
