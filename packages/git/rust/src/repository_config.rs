@@ -309,7 +309,7 @@ impl GitDriver {
                     failed(e)
                 }
             })?;
-        let cleanup = StagingFile::new(staging.clone(), file.metadata().map_err(failed)?);
+        let cleanup = StagingFile::new(staging.clone(), &file)?;
         let intent = Intent {
             kind: OperationKind::ConfigChange(Box::new(wal::ConfigChange {
                 config_sequence: Some(wal.next_config_sequence()?),
@@ -453,9 +453,7 @@ impl GitDriver {
             }
             fs::rename(&staging, &config).map_err(failed)?;
             filesystem.checkpoint("config-replaced").map_err(failed)?;
-            File::open(repo.common_dir())
-                .and_then(|f| f.sync_all())
-                .map_err(failed)?;
+            fgos_durable_file::sync_directory(repo.common_dir()).map_err(failed)?;
             if !self.config_change_installed(
                 repo,
                 match &chain.intent().kind {
@@ -511,11 +509,14 @@ fn unproven_config_outcome() -> Outcome {
 /// is evidence for the operator, never permission to unlink another writer.
 struct StagingFile {
     path: std::path::PathBuf,
-    identity: fs::Metadata,
+    identity: crate::refs::FileKey,
 }
 impl StagingFile {
-    fn new(path: std::path::PathBuf, identity: fs::Metadata) -> Self {
-        Self { path, identity }
+    fn new(path: std::path::PathBuf, file: &File) -> Result<Self> {
+        Ok(Self {
+            path,
+            identity: crate::refs::file_key_of(file)?,
+        })
     }
     fn is_owned(&self) -> bool {
         #[cfg(unix)]
@@ -523,14 +524,28 @@ impl StagingFile {
             use std::os::unix::fs::MetadataExt;
             fs::symlink_metadata(&self.path).is_ok_and(|now| {
                 now.is_file()
-                    && now.dev() == self.identity.dev()
-                    && now.ino() == self.identity.ino()
+                    && now.dev() == self.identity.device
+                    && now.ino() == self.identity.index
             })
         }
-        #[cfg(not(unix))]
+        #[cfg(windows)]
         {
-            let _ = &self.identity;
-            false
+            use std::os::windows::fs::{MetadataExt, OpenOptionsExt};
+            const FILE_ATTRIBUTE_REPARSE_POINT: u32 = 0x400;
+            const FILE_FLAG_OPEN_REPARSE_POINT: u32 = 0x0020_0000;
+            // A reparse point is opened as itself, never followed, and is never ours.
+            fs::OpenOptions::new()
+                .read(true)
+                .custom_flags(FILE_FLAG_OPEN_REPARSE_POINT)
+                .open(&self.path)
+                .ok()
+                .is_some_and(|now| {
+                    now.metadata().is_ok_and(|m| {
+                        m.is_file() && m.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT == 0
+                    }) && crate::refs::file_key_of(&now).is_ok_and(|k| {
+                        k.device == self.identity.device && k.index == self.identity.index
+                    })
+                })
         }
     }
 }
