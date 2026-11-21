@@ -49,8 +49,6 @@ This phase serves the verb from engine `unit_run`. Node callers of `runUnit` (Wo
 
 - Carried in from 19b (landed bbf64a66d): call `HostUnitRun::run_unit` (installs signal handlers with dispatch.cancelWaitMs), not the engine's run_unit directly; Windows cancel-on-signal has no console handler in any crate yet (part of the Windows decision); pane-preparation errors come back as a coded runner-config error — map to Node's dispatch error class if a caller reads it; the 19b e2e tests are Linux-only.
 
-- Deferred to plan 261119-1731 (supervision powers doors; supervisor 2026-11-21): before editing `src/cli/command-registry.mjs`, re-add it to this phase's footprint (plan.md frontmatter and row) and rebase onto what 1731 has landed in it.
-
 ## Footprint
 
 As the plan table row 19c (evidence: branches `s6/p19c-2`, `s6/p19c-run`, `s6/p19c-run-flip`, `s6/p19c-win`):
