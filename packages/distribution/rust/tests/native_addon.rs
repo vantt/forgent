@@ -157,3 +157,48 @@ fn running_executable_is_not_rehashed_but_every_other_file_still_is() {
     ));
     std::fs::remove_dir_all(root).unwrap();
 }
+
+#[test]
+fn git_addon_is_required_per_target_by_its_wal_claim() {
+    use fgos_distribution::verify::require_git_addon;
+    let (root, with_addon) = fixture();
+    std::fs::remove_dir_all(root).unwrap();
+    let mut bare = with_addon.clone();
+    bare.components.native_addon = None;
+    let target = |m: &ReleaseManifest, os: &str, claim: bool| {
+        let mut m = m.clone();
+        m.target.os = os.into();
+        m.target.arch = "x64".into();
+        m.capabilities.retain(|c| c != "git-wal-v1");
+        if claim {
+            m.capabilities.push("git-wal-v1".into());
+        }
+        m
+    };
+    assert!(
+        require_git_addon(&target(&bare, "linux", false)).is_err(),
+        "linux-x64 always needs the addon"
+    );
+    assert!(
+        require_git_addon(&target(&bare, "windows", false)).is_ok(),
+        "a windows release that makes no claim stays activatable"
+    );
+    let error = require_git_addon(&target(&bare, "windows", true))
+        .unwrap_err()
+        .to_string();
+    assert!(
+        error.contains("git-addon-missing: windows-x64"),
+        "a windows claim needs the addon: {error}"
+    );
+    let mut without_capability = target(&with_addon, "windows", true);
+    without_capability
+        .components
+        .native_addon
+        .as_mut()
+        .unwrap()
+        .capabilities
+        .clear();
+    assert!(require_git_addon(&without_capability).is_err());
+    assert!(require_git_addon(&target(&with_addon, "windows", true)).is_ok());
+    assert!(require_git_addon(&target(&bare, "macos", true)).is_ok());
+}

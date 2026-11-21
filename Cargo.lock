@@ -229,6 +229,7 @@ dependencies = [
  "fgos-distribution",
  "fgos-git",
  "fgos-holder-lock",
+ "fgos-process",
  "serde_json",
  "sha2",
 ]

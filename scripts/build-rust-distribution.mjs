@@ -26,10 +26,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 export const REPO_ROOT = path.resolve(__dirname, '..');
 
-/** C5 scan and atomic fence support are Linux-only; unsupported targets stay dormant. */
+/** C5 scan and atomic fence placement exist on Linux and Windows x64; other targets stay dormant. */
 export function gitCapabilitiesForHost(platform = process.platform, arch = process.arch) {
   const target = releaseTargetForHost(platform, arch);
-  return target?.manifestTarget.os === 'linux' ? ['git-wal-v1'] : [];
+  return target?.manifestTarget.os === 'linux' || target?.manifestTarget.os === 'windows' ? ['git-wal-v1'] : [];
 }
 
 /**

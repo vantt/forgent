@@ -158,11 +158,13 @@ equality there; later verifiers check exactly three named `name@semver` keys and
 64-hex values, independent of their own build lockfile. Checksums attest declared build inputs; the binary digest authenticates
 payload bytes. CI builds with `--locked`, audits crates with `cargo deny check`,
 and compares the addon digest with a second independent build on the same target.
-Release staging advertises `git-wal-v1` only on the registered Linux target while
-C5 scan and atomic fence admission are Linux-only. A windows-x64 release omits
-the claim and remains activatable. Adding it on Windows requires implemented
-C5/fence admission and Windows tests; lock-taking Git ports meanwhile refuse
-`git-lockscope-unavailable-windows` (Q6).
+`git-wal-v1` is admitted on the registered Linux and Windows x64 targets: the
+controller's C5 scan and fence placement exist on both (activation-binding.md
+section 9). A linux-x64 release must carry the addon with `git-wal-v1`; a
+windows-x64 release that claims `git-wal-v1` must carry it too
+(`git-addon-missing` otherwise), and one that makes no claim remains
+activatable. Targets with neither the scan nor the fence (macOS) refuse a claim
+with `git-wal-unsupported-platform`.
 
 Every staging and activation preflight verifies a present addon, including ABI,
 target, checksum provenance and bytes. Absence remains accepted in this phase.

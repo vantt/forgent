@@ -691,6 +691,96 @@ pub fn view_of(pid: ProcId, filter: &ScanFilter) -> Option<ProcView> {
     platform::current().view_of(pid, filter)
 }
 
+/// Split a Windows command line into its arguments by the rules of
+/// `CommandLineToArgvW`: the program name ends at the next quote (or at white
+/// space when unquoted) with no escapes; after it, white space separates
+/// arguments, `2n` backslashes before a quote give `n` backslashes and toggle
+/// quoting, `2n+1` give `n` backslashes and a literal quote, a doubled quote
+/// inside quotes is one literal quote, and other backslashes are literal. A
+/// NUL ends the line.
+pub fn split_command_line(wide: &[u16]) -> Vec<String> {
+    const QUOTE: u16 = b'"' as u16;
+    const SLASH: u16 = b'\\' as u16;
+    let end = wide.iter().position(|c| *c == 0).unwrap_or(wide.len());
+    let line = &wide[..end];
+    let is_space = |c: u16| c == b' ' as u16 || c == b'\t' as u16;
+    let mut args = Vec::new();
+    let mut i = 0;
+    while i < line.len() && is_space(line[i]) {
+        i += 1;
+    }
+    let mut program = Vec::new();
+    if line.get(i) == Some(&QUOTE) {
+        i += 1;
+        while i < line.len() && line[i] != QUOTE {
+            program.push(line[i]);
+            i += 1;
+        }
+        i = (i + 1).min(line.len());
+    } else {
+        while i < line.len() && !is_space(line[i]) {
+            program.push(line[i]);
+            i += 1;
+        }
+    }
+    if program.is_empty() && i >= line.len() {
+        return args;
+    }
+    args.push(String::from_utf16_lossy(&program));
+    loop {
+        while i < line.len() && is_space(line[i]) {
+            i += 1;
+        }
+        if i >= line.len() {
+            return args;
+        }
+        let mut arg: Vec<u16> = Vec::new();
+        let mut in_quotes = false;
+        while i < line.len() && (in_quotes || !is_space(line[i])) {
+            let mut slashes = 0;
+            while i < line.len() && line[i] == SLASH {
+                slashes += 1;
+                i += 1;
+            }
+            if i < line.len() && line[i] == QUOTE {
+                arg.extend(std::iter::repeat_n(SLASH, slashes / 2));
+                if slashes % 2 == 1 {
+                    arg.push(QUOTE);
+                } else if in_quotes && line.get(i + 1) == Some(&QUOTE) {
+                    arg.push(QUOTE);
+                    i += 1;
+                } else {
+                    in_quotes = !in_quotes;
+                }
+                i += 1;
+            } else {
+                arg.extend(std::iter::repeat_n(SLASH, slashes));
+                if i < line.len() {
+                    arg.push(line[i]);
+                    i += 1;
+                }
+            }
+        }
+        args.push(String::from_utf16_lossy(&arg));
+    }
+}
+
+/// The user identity [`ProcView::effective_uid`] carries on Windows for this
+/// process: a 32-bit digest of the token's user SID, so two processes of one
+/// user compare equal. Two users that collide compare equal too, which only
+/// ever makes a quiescence check stricter. `None` where it cannot be read or
+/// the platform has no such digest.
+pub fn self_effective_uid() -> Option<u32> {
+    #[cfg(windows)]
+    {
+        crate::platform::windows::user_digest_of(ProcId(std::process::id()))
+    }
+    #[cfg(not(windows))]
+    {
+        None
+    }
+}
+
 /// Parse one `/proc/<pid>/stat` line into `(state, start_time)`. The
 /// command name sits in parentheses and may hold spaces, so fields are
 /// counted from the last `)`: state is the first field after it, start
@@ -706,6 +796,32 @@ pub use crate::platform::linux::{locked_fds, own_lock_token, proc_self_pid, Lock
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn a_windows_command_line_splits_by_the_argv_rules() {
+        let split = |line: &str| -> Vec<String> {
+            super::split_command_line(&line.encode_utf16().collect::<Vec<_>>())
+        };
+        assert_eq!(
+            split(r#""C:\Program Files\fgos\fgos.exe" run --dir "D:\my work" x"#),
+            [
+                "C:\\Program Files\\fgos\\fgos.exe",
+                "run",
+                "--dir",
+                "D:\\my work",
+                "x"
+            ]
+        );
+        assert_eq!(
+            split(r#"node a\\b "c\\" d"#),
+            ["node", "a\\\\b", "c\\", "d"]
+        );
+        assert_eq!(split(r#"p "a\"b" "x ""y"" z""#), ["p", "a\"b", "x \"y\" z"]);
+        assert_eq!(split(r#"p a\\"b c" d"#), ["p", "a\\b c", "d"]);
+        assert_eq!(split("  "), Vec::<String>::new());
+        assert_eq!(split(""), Vec::<String>::new());
+        assert_eq!(split("prog\tone  two\0ignored"), ["prog", "one", "two"]);
+    }
+
     #[test]
     fn start_time_displays_the_string_form_each_platform_keeps() {
         assert_eq!(StartTime::Ticks(12345).to_string(), "12345");
