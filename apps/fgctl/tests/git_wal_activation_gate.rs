@@ -1,5 +1,6 @@
 //! Real controller admission, including publication and same-digest paths.
-#![cfg(target_os = "linux")]
+// Fence placement and the process scan exist on Linux and Windows only.
+#![cfg(any(target_os = "linux", target_os = "windows"))]
 use fgos_git::wal::{self, Begin, Intent, OperationKind, Phase, Tip};
 use sha2::{Digest, Sha256};
 use std::{
@@ -11,21 +12,45 @@ use std::{
 fn hash(bytes: &[u8]) -> String {
     format!("sha256:{:x}", Sha256::digest(bytes))
 }
+const OS: &str = if cfg!(windows) { "windows" } else { "linux" };
+const HOST_ENTRY: &str = if cfg!(windows) {
+    "bin/fgos.exe"
+} else {
+    "bin/fgos"
+};
+/// The Git door trusts only owner-only state directories; Windows has no mode bits to set.
+fn owner_only(path: &Path) {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(path, fs::Permissions::from_mode(0o700)).unwrap();
+    }
+    #[cfg(windows)]
+    let _ = path;
+}
 fn candidate(root: &Path, wal: bool) {
-    use std::os::unix::fs::PermissionsExt;
     // The tail's last call, `doctor --json`, must answer with a doctor result.
-    let host = b"#!/bin/sh\ncase \"$*\" in *--json*) echo '{\"data\":{\"ok\":true,\"next\":[],\"checks\":[]}}';; esac\nexit 0\n";
+    #[cfg(unix)]
+    let host: Vec<u8> = b"#!/bin/sh\ncase \"$*\" in *--json*) echo '{\"data\":{\"ok\":true,\"next\":[],\"checks\":[]}}';; esac\nexit 0\n".to_vec();
+    // A Windows host is a real program: this crate's own `fgctl` stands in for it.
+    #[cfg(windows)]
+    let host: Vec<u8> = fs::read(env!("CARGO_BIN_EXE_fgctl")).unwrap();
+    let host = host.as_slice();
     let legacy = b"console.log('fixture');\n";
     fs::create_dir_all(root.join("bin")).unwrap();
     fs::create_dir_all(root.join("libexec/legacy-node/bin")).unwrap();
-    fs::write(root.join("bin/fgos"), host).unwrap();
-    fs::set_permissions(root.join("bin/fgos"), fs::Permissions::from_mode(0o755)).unwrap();
+    fs::write(root.join(HOST_ENTRY), host).unwrap();
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(root.join(HOST_ENTRY), fs::Permissions::from_mode(0o755)).unwrap();
+    }
     fs::write(root.join("libexec/legacy-node/bin/fgos.mjs"), legacy).unwrap();
-    let mut m = serde_json::json!({"schemaVersion":1,"entries":{"fgos":"bin/fgos"},"capabilities":if wal { vec!["git-wal-v1"] } else { vec![] },"components":{"legacyNode":{"root":"libexec/legacy-node","entry":"bin/fgos.mjs","digest":hash(legacy)}},"requires":{},"stateSchemas":{"read":["1"],"write":["1"],"migrations":[]},"target":{"os":"linux","arch":"x64"},"files":[{"path":"bin/fgos","kind":"file","digest":hash(host),"mode":"755","class":"immutable-entry"},{"path":"libexec/legacy-node/bin/fgos.mjs","kind":"file","digest":hash(legacy),"mode":"644","class":"immutable-runtime"}]});
+    let mut m = serde_json::json!({"schemaVersion":1,"entries":{"fgos":HOST_ENTRY},"capabilities":if wal { vec!["git-wal-v1"] } else { vec![] },"components":{"legacyNode":{"root":"libexec/legacy-node","entry":"bin/fgos.mjs","digest":hash(legacy)}},"requires":{},"stateSchemas":{"read":["1"],"write":["1"],"migrations":[]},"target":{"os":OS,"arch":"x64"},"files":[{"path":HOST_ENTRY,"kind":"file","digest":hash(host),"mode":"755","class":"immutable-entry"},{"path":"libexec/legacy-node/bin/fgos.mjs","kind":"file","digest":hash(legacy),"mode":"644","class":"immutable-runtime"}]});
     let addon = b"fixture native addon";
     fs::create_dir_all(root.join("native")).unwrap();
     fs::write(root.join("native/fgos.node"), addon).unwrap();
-    m["components"]["nativeAddon"] = serde_json::json!({"path":"native/fgos.node","digest":format!("{:x}",Sha256::digest(addon)),"target":"linux-x64","napiVersion":8,"capabilities":["git-wal-v1"],"crateChecksums":fgos_distribution::manifest::native_addon_crate_checksums()});
+    m["components"]["nativeAddon"] = serde_json::json!({"path":"native/fgos.node","digest":format!("{:x}",Sha256::digest(addon)),"target":format!("{OS}-x64"),"napiVersion":8,"capabilities":["git-wal-v1"],"crateChecksums":fgos_distribution::manifest::native_addon_crate_checksums()});
     m["files"].as_array_mut().unwrap().push(serde_json::json!({"path":"native/fgos.node","kind":"file","digest":hash(addon),"mode":"644","class":"immutable-runtime"}));
     let path = root.join("manifest.json");
     fs::write(&path, serde_json::to_vec(&m).unwrap()).unwrap();
@@ -58,10 +83,9 @@ impl wal::PublicationAuthority for Authority {
 }
 #[test]
 fn controller_publication_and_idempotent_paths_enforce_wal_and_keep_the_fence() {
-    use std::os::unix::fs::PermissionsExt;
     let root = std::env::temp_dir().join(format!("fgctl-git-c5-{}", std::process::id()));
     fs::create_dir_all(&root).unwrap();
-    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    owner_only(&root);
     let ws = root.join("ws");
     fs::create_dir(&ws).unwrap();
     assert!(Command::new("git")
@@ -94,7 +118,7 @@ fn controller_publication_and_idempotent_paths_enforce_wal_and_keep_the_fence() 
     ]);
     let state = root.join("state");
     fs::create_dir(&state).unwrap();
-    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+    owner_only(&state);
     let old = root.join("old");
     let new = root.join("new");
     candidate(&old, false);
@@ -294,12 +318,13 @@ fn controller_publication_and_idempotent_paths_enforce_wal_and_keep_the_fence() 
     fs::remove_dir_all(root).unwrap();
 }
 
+// Unix only: the launching-shell case needs `sh -c`, which Windows does not have.
+#[cfg(unix)]
 #[test]
 fn the_shell_that_launched_the_upgrade_does_not_block_it() {
-    use std::os::unix::fs::PermissionsExt;
     let root = std::env::temp_dir().join(format!("fgctl-git-c5-shell-{}", std::process::id()));
     fs::create_dir_all(&root).unwrap();
-    fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+    owner_only(&root);
     let ws = root.join("ws");
     fs::create_dir(&ws).unwrap();
     assert!(Command::new("git")
@@ -310,7 +335,7 @@ fn the_shell_that_launched_the_upgrade_does_not_block_it() {
         .success());
     let state = root.join("state");
     fs::create_dir(&state).unwrap();
-    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+    owner_only(&state);
     let (old, new) = (root.join("old"), root.join("new"));
     candidate(&old, false);
     candidate(&new, true);
@@ -366,8 +391,7 @@ fn addon_admission_names_missing_payload_or_capability_and_preserves_activation(
     let state = root.join("state");
     fs::create_dir_all(&state).unwrap();
     // The Git driver refuses a state root that is group or world writable, whatever the umask.
-    use std::os::unix::fs::PermissionsExt;
-    fs::set_permissions(&state, fs::Permissions::from_mode(0o700)).unwrap();
+    owner_only(&state);
     let good = root.join("good");
     candidate(&good, false);
     success(controller(&ws, &state, "init", &good));
@@ -375,7 +399,8 @@ fn addon_admission_names_missing_payload_or_capability_and_preserves_activation(
     let before = fs::read(&activation).unwrap();
     for missing in [true, false] {
         let bad = root.join(if missing { "missing" } else { "capability" });
-        candidate(&bad, false);
+        // A Windows release is only required to carry the addon when it claims git-wal-v1.
+        candidate(&bad, true);
         let manifest = bad.join("manifest.json");
         let mut m: serde_json::Value =
             serde_json::from_slice(&fs::read(&manifest).unwrap()).unwrap();
@@ -444,6 +469,8 @@ fn addon_admission_names_missing_payload_or_capability_and_preserves_activation(
         parsed.target.os = "windows".into();
         parsed.target.arch = "x64".into();
         parsed.components.native_addon = None;
+        assert!(fgos_distribution::verify::require_git_addon(&parsed).is_err());
+        parsed.capabilities.clear();
         assert!(fgos_distribution::verify::require_git_addon(&parsed).is_ok());
     }
     fs::remove_dir_all(root).unwrap();

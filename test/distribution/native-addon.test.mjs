@@ -184,8 +184,8 @@ fs.copyFileSync(process.env.DEV_ADDON_BYTES,path.join(output,${JSON.stringify(na
   } finally { fs.rmSync(temp, {recursive: true, force: true}); }
 });
 
-test('only registered Linux releases advertise C5 and fence-backed Git WAL capability', () => {
+test('only registered Linux and Windows releases advertise C5 and fence-backed Git WAL capability', () => {
   assert.deepEqual(gitCapabilitiesForHost('linux', 'x64'), ['git-wal-v1']);
-  assert.deepEqual(gitCapabilitiesForHost('win32', 'x64'), []);
+  assert.deepEqual(gitCapabilitiesForHost('win32', 'x64'), ['git-wal-v1']);
   assert.deepEqual(gitCapabilitiesForHost('darwin', 'arm64'), []);
 });
