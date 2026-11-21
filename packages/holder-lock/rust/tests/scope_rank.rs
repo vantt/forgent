@@ -1,4 +1,3 @@
-#![cfg(unix)]
 mod common;
 use fgos_holder_lock::{
     acquire, probe, release, Acquire, BorrowedHandle, LockScope, Mode, Probe, Resource, ScopeError,
@@ -131,6 +130,8 @@ fn scope_acquires_exact_template_refuses_before_io_and_closes_before_return() {
     std::fs::remove_dir_all(root).unwrap();
 }
 
+// Reads the registry through `node` on PATH, which only the Unix test jobs provide.
+#[cfg(unix)]
 #[test]
 fn registry_matches_node_for_every_row() {
     let output = std::process::Command::new("node").args(["--input-type=module", "-e", "import {loadLockRegistry,lockEntry} from './src/holder-lock/registry.mjs'; console.log(JSON.stringify(loadLockRegistry().locks.map(l => [l.name,lockEntry(l.name).rank])))"])

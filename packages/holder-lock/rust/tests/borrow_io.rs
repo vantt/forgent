@@ -1,10 +1,10 @@
 //! Real-process acceptance of the synchronous bounded-I/O borrow family.
-#![cfg(unix)]
 mod common;
 
 use common::*;
 use fgos_holder_lock::*;
 use std::fs;
+#[cfg(unix)]
 use std::process::Command;
 use std::time::{Duration, Instant};
 
@@ -29,6 +29,7 @@ fn shell(script: &str, dir: &std::path::Path) -> BorrowSpec {
         ..Default::default()
     }
 }
+#[cfg(unix)]
 fn gone(pid: u32) {
     use fgos_process::facts::{observe, Observed};
     assert!(
@@ -39,6 +40,7 @@ fn gone(pid: u32) {
         "pid {pid} remains live"
     );
 }
+#[cfg(unix)]
 fn pids_gone(dir: &std::path::Path) {
     for pid in fs::read_to_string(dir.join("pids"))
         .unwrap()
@@ -61,6 +63,9 @@ fn child_entry() {
     common::child_entry()
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn contender_blocks_during_borrow_and_acquires_after_return_and_release() {
     let _serial = serial();
@@ -105,6 +110,9 @@ fn contender_blocks_during_borrow_and_acquires_after_return_and_release() {
     fs::remove_dir_all(dir).unwrap();
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn binary_git_hash_object_round_trip_with_hooks_off() {
     let _serial = serial();
@@ -149,6 +157,9 @@ fn binary_git_hash_object_round_trip_with_hooks_off() {
     fs::remove_dir_all(dir).unwrap();
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn full_duplex_binary_capture_does_not_deadlock() {
     let _serial = serial();
@@ -170,6 +181,9 @@ fn full_duplex_binary_capture_does_not_deadlock() {
     fs::remove_dir_all(dir).unwrap();
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn overflow_kills_root_and_borrowing_leftovers_before_refusal() {
     let _serial = serial();
@@ -201,6 +215,9 @@ fn overflow_kills_root_and_borrowing_leftovers_before_refusal() {
     }
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn deadline_kills_and_drains_even_when_child_never_reads_stdin() {
     let _serial = serial();
@@ -239,6 +256,9 @@ fn deadline_kills_and_drains_even_when_child_never_reads_stdin() {
     fs::remove_dir_all(dir).unwrap();
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn successful_root_exit_drains_leftovers_and_captures_tail() {
     let _serial = serial();
@@ -1090,6 +1110,9 @@ fn adopted_direct_child_is_drained_on_borrow_and_release() {
     }
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn deadline_reports_cooperative_cleanup_or_forced_residue() {
     let _serial = serial();
