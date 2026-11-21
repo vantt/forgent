@@ -466,7 +466,8 @@ impl Windows {
     /// The scan view of one process, or `None` when nothing runs there. A
     /// read that fails leaves its field `None` and is named in `unreadable`.
     /// `image_name` is the snapshot's file name of the image; a process that
-    /// cannot be opened still carries it as its `exe`.
+    /// cannot be opened, or whose image path cannot be read, carries it as its
+    /// `exe`.
     fn view_with(
         &self,
         pid: ProcId,
@@ -516,7 +517,15 @@ impl Windows {
         }
         match handle.image_path() {
             Ok(path) => view.exe = Some(path),
-            Err(err) => unreadable.push(format!("exe: {err}")),
+            Err(err) => {
+                // A minimal process (System, Registry, Memory Compression)
+                // opens but answers no image path: keep the snapshot's file
+                // name so a caller can still tell it from `node.exe`.
+                view.exe = image_name
+                    .filter(|name| !name.is_empty())
+                    .map(PathBuf::from);
+                unreadable.push(format!("exe: {err}"));
+            }
         }
         match handle.command_line() {
             Ok(wide) => view.cmdline = Some(split_command_line(&wide)),
