@@ -86,6 +86,8 @@ struct Publish {
     clean: Result<bool, PublishRefusal>,
     /// Content a commit landing during the catch-up puts in the file (the catch-up fast-forwards the checkout).
     landed_by_catch_up: Option<String>,
+    /// A file (path, content) a commit landing during the catch-up creates.
+    landed_by_catch_up_at: Option<(String, String)>,
     commit: Result<String, PublishRefusal>,
     calls: Arc<Mutex<Vec<String>>>,
 }
@@ -96,6 +98,7 @@ impl Default for Publish {
             caught_up: Ok(()),
             clean: Ok(true),
             landed_by_catch_up: None,
+            landed_by_catch_up_at: None,
             commit: Ok("c0ffee".to_string()),
             calls: Arc::new(Mutex::new(Vec::new())),
         }
@@ -238,6 +241,9 @@ fn serve_with(
                 if let Some(landed) = &publish.landed_by_catch_up {
                     fs::write(root.join("docs/backlog.md"), landed).unwrap();
                 }
+                if let Some((path, landed)) = &publish.landed_by_catch_up_at {
+                    fs::write(root.join(path), landed).unwrap();
+                }
                 publish.caught_up.clone()
             }
         }),
@@ -308,13 +314,16 @@ fn serve_with(
 }
 
 /// The writes grant of every test server: a granted file, a granted directory, a file behind a symlinked directory,
-/// a symlink as the file itself, and a file that does not exist.
-const GRANTED_WRITES: [&str; 5] = [
+/// a symlink as the file itself, a file that does not exist, a directory whose plain files may be created, and the
+/// same grant over a symlinked directory.
+const GRANTED_WRITES: [&str; 7] = [
     "docs/backlog.md",
     "plans",
     "link/backlog.md",
     "docs/leaf.md",
     "docs/missing.md",
+    "plans/backlog/*",
+    "link/*",
 ];
 
 const DONE_LINE: &str = r#"cat > "$OUT/stdin.json"; echo "$@" > "$OUT/argv"; echo '{"v":1,"protocol":1,"result":"done","data":{"key":"head-planner-x-1"}}'"#;
@@ -1233,7 +1242,9 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_r
 /// a symlink and a symlink as a granted file.
 fn write_project(dir: &Path) {
     fs::create_dir_all(dir.join("docs")).unwrap();
-    fs::create_dir_all(dir.join("plans")).unwrap();
+    fs::create_dir_all(dir.join("plans/backlog/nested")).unwrap();
+    fs::write(dir.join("plans/target.md"), "keep\n").unwrap();
+    std::os::unix::fs::symlink("../target.md", dir.join("plans/backlog/p-link.md")).unwrap();
     fs::write(dir.join("docs/backlog.md"), "old\n").unwrap();
     fs::set_permissions(
         dir.join("docs/backlog.md"),
@@ -1586,6 +1597,122 @@ fn head_write_refuses_a_path_the_grant_does_not_name_exactly_a_climbing_path_and
         "keep\n"
     );
     assert!(!served.dir.join("docs/missing.md").exists());
+}
+
+#[test]
+fn head_write_under_a_directory_grant_creates_a_new_plain_file_atomically_with_a_fresh_mode_and_publishes_it() {
+    use std::os::unix::fs::MetadataExt;
+    let publish = Publish::default();
+    let served = write_served("write-create", &publish);
+    let reply = write_request(
+        &served.socket,
+        json!({"path": "plans/backlog/p-new-item.md", "content": "item\n"}),
+    );
+    assert_eq!(
+        reply["data"],
+        json!({"path": "plans/backlog/p-new-item.md", "bytes": 5, "commit": "c0ffee"}),
+        "{reply}"
+    );
+    let created = served.dir.join("plans/backlog/p-new-item.md");
+    assert_eq!(fs::read_to_string(&created).unwrap(), "item\n");
+    assert_eq!(fs::metadata(&created).unwrap().mode() & 0o777, 0o644);
+    let mut names: Vec<String> = fs::read_dir(served.dir.join("plans/backlog"))
+        .unwrap()
+        .map(|e| e.unwrap().file_name().to_string_lossy().into_owned())
+        .collect();
+    names.sort();
+    assert_eq!(
+        names,
+        ["nested", "p-link.md", "p-new-item.md"],
+        "no temp file left"
+    );
+    assert_eq!(
+        *publish.calls.lock().unwrap(),
+        [
+            "catch up",
+            r#"clean plans/backlog/p-new-item.md """#,
+            r#"publish plans/backlog/p-new-item.md "item\n""#
+        ]
+    );
+    // The same name again replaces the file it created, keeping its mode.
+    let again = write_request(
+        &served.socket,
+        json!({"path": "plans/backlog/p-new-item.md", "content": "item 2\n"}),
+    );
+    assert_eq!(again["result"], "done", "{again}");
+    assert_eq!(fs::read_to_string(&created).unwrap(), "item 2\n");
+}
+
+#[test]
+fn head_write_under_a_directory_grant_refuses_a_nested_path_a_climbing_path_and_a_symlink_and_writes_nothing() {
+    let served = serve(
+        "write-create-refused",
+        DONE_LINE,
+        Ok(true),
+        &[WRITE_VERB],
+        Duration::from_secs(5),
+    );
+    write_project(&served.dir);
+    let ask = |path: &str| {
+        write_request(&served.socket, json!({"path": path, "content": "x"}))["code"]
+            .as_str()
+            .unwrap_or("done")
+            .to_string()
+    };
+    for (path, code) in [
+        ("plans/backlog/nested/p-deep.md", "path-not-granted"),
+        ("plans/backlog/nested/", "path-invalid"),
+        ("plans/backlog/../p-up.md", "path-invalid"),
+        ("plans/p-sibling.md", "path-not-granted"),
+        ("plans/backlog", "path-not-granted"),
+        ("plans/backlog/p-link.md", "path-symlink"),
+        ("link/p-new.md", "path-symlink"),
+    ] {
+        assert_eq!(ask(path), code, "{path}");
+    }
+    assert_eq!(
+        fs::read_to_string(served.dir.join("plans/target.md")).unwrap(),
+        "keep\n"
+    );
+    assert!(!served.dir.join("plans/backlog/nested/p-deep.md").exists());
+    assert!(!served.dir.join("plans/p-up.md").exists());
+    assert!(!served.dir.join("docs/p-new.md").exists());
+}
+
+#[test]
+fn head_write_creates_nothing_for_an_exact_grant_whose_file_is_missing() {
+    let served = serve(
+        "write-exact-missing",
+        DONE_LINE,
+        Ok(true),
+        &[WRITE_VERB],
+        Duration::from_secs(5),
+    );
+    write_project(&served.dir);
+    let reply = write_request(
+        &served.socket,
+        json!({"path": "docs/missing.md", "content": "x"}),
+    );
+    assert_eq!(reply["code"], "not-a-file", "{reply}");
+    assert!(!served.dir.join("docs/missing.md").exists());
+}
+
+#[test]
+fn head_write_refuses_a_file_that_appears_under_a_directory_grant_while_the_write_waited() {
+    let publish = Publish {
+        landed_by_catch_up_at: Some(("plans/backlog/p-race.md".into(), "theirs\n".into())),
+        ..Publish::default()
+    };
+    let served = write_served("write-create-race", &publish);
+    let reply = write_request(
+        &served.socket,
+        json!({"path": "plans/backlog/p-race.md", "content": "mine\n"}),
+    );
+    assert_eq!(reply["code"], "write-base-stale", "{reply}");
+    assert_eq!(
+        fs::read_to_string(served.dir.join("plans/backlog/p-race.md")).unwrap(),
+        "theirs\n"
+    );
 }
 
 #[test]

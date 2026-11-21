@@ -141,7 +141,7 @@ impl Scene {
             "hostBin": "/bin/false",
             "cwd": project,
             "identity": {"writerId": "att-own"},
-            "session": {"role": ROLE, "verbs": ["session write"], "writes": ["docs/backlog.md"],
+            "session": {"role": ROLE, "verbs": ["session write"], "writes": ["docs/backlog.md", "plans/backlog/*"],
                         "requestSocketPath": socket},
             "steps": [{"stepId": "finalize-home", "env": {}}]
         });
@@ -421,6 +421,67 @@ fn a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_fo
         "a later write is not refused: {reply}"
     );
     assert_ne!(scene.remote_tip(), tip);
+
+    a_new_backlog_item_is_created_validated_and_indexed_in_one_commit(&scene);
+}
+
+/// A backlog item's text: the frontmatter contract and the three body sections.
+fn item_text(id: &str, title: &str) -> String {
+    let fence = concat!("-", "-", "-");
+    format!(
+        "{fence}\nid: {id}\ntitle: {title}\nstatus: proposed\npriority: P2\narea: general\ncreated: 2026-11-21\n{fence}\n\n# Why\n\nbecause\n\n# Done when\n\ndone\n\n# Notes\n\nnone\n"
+    )
+}
+
+/// A head's `session write` of a file that does not exist yet beneath `plans/backlog/*` creates it atomically,
+/// validates the item contract and its `<id>-<slug>.md` name, regenerates `plans/backlog.md` and commits both in one
+/// published commit; an invalid item, a misnamed one and a nested path publish nothing. (A step of the scene's one
+/// scenario.)
+fn a_new_backlog_item_is_created_validated_and_indexed_in_one_commit(scene: &Scene) {
+    fs::create_dir_all(scene.project.join("plans/backlog")).unwrap();
+    let path = "plans/backlog/p-abcdefghi2-first-item.md";
+    let reply = scene.write(path, &item_text("p-abcdefghi2", "First item"));
+    assert_eq!(reply["result"], "done", "{reply}");
+    let commit = reply["data"]["commit"].as_str().expect("published").to_owned();
+    assert_eq!(commit, scene.remote_tip(), "the remote holds the commit");
+    let mut files: Vec<String> = git(
+        &scene.project,
+        &["show", "--format=", "--name-only", &commit],
+    )
+    .lines()
+    .map(str::to_owned)
+    .collect();
+    files.sort();
+    assert_eq!(files, ["plans/backlog.md", path]);
+    let index = fs::read_to_string(scene.project.join("plans/backlog.md")).unwrap();
+    assert!(
+        index.contains("[p-abcdefghi2](backlog/p-abcdefghi2-first-item.md) | First item | proposed | P2"),
+        "{index}"
+    );
+    assert_eq!(git(&scene.project, &["status", "--porcelain"]), "");
+
+    // A second item joins the same index; replacing the first keeps one row each.
+    let second = "plans/backlog/p-bcdefghij2-second.md";
+    let reply = scene.write(second, &item_text("p-bcdefghij2", "Second"));
+    assert_eq!(reply["result"], "done", "{reply}");
+    let index = fs::read_to_string(scene.project.join("plans/backlog.md")).unwrap();
+    assert_eq!(index.matches("| [p-").count(), 2, "{index}");
+
+    // Refused: the item contract, the file name, a nested path. Nothing is published.
+    let tip = scene.remote_tip();
+    let broken = scene.write(
+        "plans/backlog/p-cdefghij23-broken.md",
+        "no frontmatter at all\n",
+    );
+    assert_eq!(broken["data"]["publish"]["refusal"], "write-item-invalid", "{broken}");
+    let misnamed = scene.write(
+        "plans/backlog/wrong-name.md",
+        &item_text("p-defghij234", "Misnamed"),
+    );
+    assert_eq!(misnamed["data"]["publish"]["refusal"], "write-item-invalid", "{misnamed}");
+    let nested = scene.write("plans/backlog/sub/p-efghij2345-deep.md", "x\n");
+    assert_eq!(nested["code"], "path-not-granted", "{nested}");
+    assert_eq!(scene.remote_tip(), tip, "nothing was published");
 }
 
 /// A virtual clock: `sleep` advances it, so the retry schedule is proven without waiting.
