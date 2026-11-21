@@ -1298,6 +1298,12 @@ mod custody_key_tests {
     fn custody_lock_path_is_the_dispatch_cwd_registry_path_of_the_directory() {
         let root = std::env::temp_dir().join(format!("fgos-custody-key-{}", std::process::id()));
         fs::create_dir_all(&root).unwrap();
+        // The driver trusts only a directory no group or other user can write, whatever the umask.
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            fs::set_permissions(&root, fs::Permissions::from_mode(0o700)).unwrap();
+        }
         let root = fs::canonicalize(&root).unwrap();
         let status = Command::new("git")
             .arg("-C")
