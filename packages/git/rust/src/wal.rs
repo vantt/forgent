@@ -102,12 +102,326 @@ fn unsafe_path(path: &Path, uid: u32, mode: u32, root_allowed: bool) -> WalError
         )
     })
 }
+/// Names what makes a Windows WAL path untrustworthy, with the path a person can act on.
+#[cfg(windows)]
+fn unsafe_path(path: &Path, reason: &str) -> WalError {
+    let shown = path.display();
+    WalError::UnsafePath(format!(
+        "{shown} {reason}; remove that write access (icacls \"{shown}\" /remove:g <account>) or run fgos as the account that owns it"
+    ))
+}
+/// The directory a Git door was handed must be spelled exactly as the filesystem
+/// spells it. Windows `canonicalize` answers in the verbatim `\\?\D:\` form, so both
+/// sides are compared in the plain form every other path of this crate uses.
+fn require_canonical(path: &Path) -> WalResult<()> {
+    let canonical = path.canonicalize()?;
+    if fgos_process::path::plain_path(&canonical) != fgos_process::path::plain_path(path) {
+        return Err(non_canonical(path, &canonical));
+    }
+    Ok(())
+}
+/// A directory only its creator may write: mode 0700 on Unix; elsewhere the
+/// parent's inherited access list, which `Directory::open_trusted` then checks.
+fn create_private_dir(path: &Path) -> io::Result<()> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        fs::DirBuilder::new().mode(0o700).create(path)
+    }
+    #[cfg(not(unix))]
+    {
+        fs::create_dir(path)
+    }
+}
 fn non_canonical(path: &Path, canonical: &Path) -> WalError {
     WalError::UnsafePath(format!(
         "{} is not canonical (it resolves to {}); open the repository by its real path",
         path.display(),
         canonical.display()
     ))
+}
+
+/// The Windows counterpart of the Unix owner and mode check, and of the
+/// descriptor-relative open: who owns a WAL directory or record, who may write
+/// to it, and whether a child still sits directly beneath the directory handle
+/// it was opened through.
+#[cfg(windows)]
+mod windows_trust {
+    use std::ffi::{c_void, OsString};
+    use std::fs::{File, OpenOptions};
+    use std::io;
+    use std::os::windows::ffi::OsStringExt;
+    use std::os::windows::fs::{MetadataExt, OpenOptionsExt};
+    use std::os::windows::io::{AsRawHandle, FromRawHandle, OwnedHandle};
+    use std::path::{Path, PathBuf};
+    use std::ptr::null_mut;
+    use windows_sys::Win32::Foundation::{
+        LocalFree, ERROR_SUCCESS, GENERIC_ALL, GENERIC_WRITE, HANDLE,
+    };
+    use windows_sys::Win32::Security::Authorization::{
+        ConvertSidToStringSidW, GetSecurityInfo, SE_FILE_OBJECT,
+    };
+    use windows_sys::Win32::Security::{
+        AclSizeInformation, CreateWellKnownSid, EqualSid, GetAce, GetAclInformation, GetLengthSid,
+        GetTokenInformation, TokenOwner, TokenUser, WinAuthenticatedUserSid,
+        WinBuiltinAdministratorsSid, WinBuiltinUsersSid, WinLocalSystemSid, WinWorldSid,
+        ACCESS_ALLOWED_ACE, ACE_HEADER, ACL, ACL_SIZE_INFORMATION, DACL_SECURITY_INFORMATION,
+        INHERIT_ONLY_ACE, OWNER_SECURITY_INFORMATION, PSECURITY_DESCRIPTOR, PSID,
+        SECURITY_MAX_SID_SIZE, TOKEN_QUERY, WELL_KNOWN_SID_TYPE,
+    };
+    use windows_sys::Win32::Storage::FileSystem::{
+        GetFileInformationByHandle, GetFinalPathNameByHandleW, BY_HANDLE_FILE_INFORMATION, DELETE,
+        FILE_APPEND_DATA, FILE_ATTRIBUTE_REPARSE_POINT, FILE_DELETE_CHILD,
+        FILE_FLAG_BACKUP_SEMANTICS, FILE_FLAG_OPEN_REPARSE_POINT, FILE_NAME_NORMALIZED,
+        FILE_WRITE_ATTRIBUTES, FILE_WRITE_DATA, FILE_WRITE_EA, VOLUME_NAME_DOS, WRITE_DAC,
+        WRITE_OWNER,
+    };
+    use windows_sys::Win32::System::Threading::{GetCurrentProcess, OpenProcessToken};
+
+    /// `ACCESS_ALLOWED_ACE_TYPE`; windows-sys does not export the constant.
+    const ACCESS_ALLOWED: u8 = 0;
+    /// Every right that lets a principal add to, change, delete from or take
+    /// over a directory or record.
+    const WRITE_RIGHTS: u32 = FILE_WRITE_DATA
+        | FILE_APPEND_DATA
+        | FILE_WRITE_EA
+        | FILE_WRITE_ATTRIBUTES
+        | FILE_DELETE_CHILD
+        | DELETE
+        | WRITE_DAC
+        | WRITE_OWNER
+        | GENERIC_WRITE
+        | GENERIC_ALL;
+
+    /// Opens a directory without following a reparse point at the leaf and
+    /// refuses a handle that is one, or is not a directory.
+    pub(super) fn open_directory(path: &Path) -> io::Result<File> {
+        let file = OpenOptions::new()
+            .read(true)
+            .custom_flags(FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT)
+            .open(path)?;
+        let metadata = file.metadata()?;
+        if metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0 || !metadata.is_dir() {
+            return Err(io::Error::new(
+                io::ErrorKind::PermissionDenied,
+                "refused: not a directory (link or reparse point)",
+            ));
+        }
+        Ok(file)
+    }
+
+    /// A `LocalAlloc` block released on drop.
+    struct Local(*mut c_void);
+    impl Drop for Local {
+        fn drop(&mut self) {
+            if !self.0.is_null() {
+                unsafe { LocalFree(self.0) };
+            }
+        }
+    }
+
+    /// Applies the trust rule to an open file or directory: its owner is the
+    /// account running fgos (the common directory may also belong to
+    /// Administrators or SYSTEM), and no access-allowed entry that applies to the
+    /// object grants a write right to Everyone, Users or Authenticated Users.
+    /// The `Err` text finishes the sentence "<path> ...".
+    pub(super) fn check(file: &File, common: bool) -> Result<(), String> {
+        let (mut owner, mut dacl, mut descriptor): (PSID, *mut ACL, PSECURITY_DESCRIPTOR) =
+            (null_mut(), null_mut(), null_mut());
+        let status = unsafe {
+            GetSecurityInfo(
+                file.as_raw_handle() as HANDLE,
+                SE_FILE_OBJECT,
+                OWNER_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION,
+                &mut owner,
+                null_mut(),
+                &mut dacl,
+                null_mut(),
+                &mut descriptor,
+            )
+        };
+        if status != ERROR_SUCCESS {
+            return Err(format!(
+                "has a security descriptor that cannot be read (error {status})"
+            ));
+        }
+        let _descriptor = Local(descriptor);
+        if owner.is_null() {
+            return Err("has no owner".into());
+        }
+        // The token's default owner is who owns what this process creates: the
+        // account itself, or Administrators for an elevated one.
+        let mut trusted = vec![
+            token_sid(TokenUser).ok_or("its owner cannot be compared with the current account")?,
+            token_sid(TokenOwner).ok_or("its owner cannot be compared with the current account")?,
+        ];
+        if common {
+            for kind in [WinBuiltinAdministratorsSid, WinLocalSystemSid] {
+                trusted.extend(well_known(kind));
+            }
+        }
+        if !trusted
+            .iter()
+            .any(|sid| unsafe { EqualSid(owner, sid.as_ptr() as PSID) } != 0)
+        {
+            return Err(format!(
+                "is owned by {}, not by the account running fgos; take ownership of it as that account",
+                sid_text(owner)
+            ));
+        }
+        if dacl.is_null() {
+            return Err("has no access list, so every account may write to it".into());
+        }
+        let mut size = ACL_SIZE_INFORMATION::default();
+        if unsafe {
+            GetAclInformation(
+                dacl,
+                &mut size as *mut _ as *mut c_void,
+                std::mem::size_of::<ACL_SIZE_INFORMATION>() as u32,
+                AclSizeInformation,
+            )
+        } == 0
+        {
+            return Err("has an access list that cannot be read".into());
+        }
+        let broad: Vec<(&str, Vec<u8>)> = [
+            ("Everyone", WinWorldSid),
+            ("Users", WinBuiltinUsersSid),
+            ("Authenticated Users", WinAuthenticatedUserSid),
+        ]
+        .into_iter()
+        .filter_map(|(name, kind)| Some((name, well_known(kind)?)))
+        .collect();
+        for index in 0..size.AceCount {
+            let mut entry: *mut c_void = null_mut();
+            if unsafe { GetAce(dacl, index, &mut entry) } == 0 || entry.is_null() {
+                return Err("has an access list entry that cannot be read".into());
+            }
+            let header = unsafe { *(entry as *const ACE_HEADER) };
+            // Entries that only pass down to children, and denials, grant nothing here.
+            if header.AceType != ACCESS_ALLOWED || header.AceFlags & INHERIT_ONLY_ACE as u8 != 0 {
+                continue;
+            }
+            let ace = entry as *const ACCESS_ALLOWED_ACE;
+            let (mask, sid) = unsafe { ((*ace).Mask, &(*ace).SidStart as *const u32 as PSID) };
+            if mask & WRITE_RIGHTS == 0 {
+                continue;
+            }
+            if let Some((name, _)) = broad
+                .iter()
+                .find(|(_, wide)| unsafe { EqualSid(sid, wide.as_ptr() as PSID) } != 0)
+            {
+                return Err(format!("grants write access to {name}"));
+            }
+        }
+        Ok(())
+    }
+
+    fn well_known(kind: WELL_KNOWN_SID_TYPE) -> Option<Vec<u8>> {
+        let mut sid = vec![0u8; SECURITY_MAX_SID_SIZE as usize];
+        let mut len = sid.len() as u32;
+        (unsafe { CreateWellKnownSid(kind, null_mut(), sid.as_mut_ptr() as PSID, &mut len) } != 0)
+            .then_some(sid)
+    }
+
+    /// A copy of the SID `class` (`TokenUser` or `TokenOwner`) names in this
+    /// process's token; both structures begin with that one SID pointer.
+    fn token_sid(class: i32) -> Option<Vec<u8>> {
+        let mut token: HANDLE = null_mut();
+        if unsafe { OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &mut token) } == 0 {
+            return None;
+        }
+        let token = unsafe { OwnedHandle::from_raw_handle(token as _) };
+        let mut needed = 0u32;
+        unsafe {
+            GetTokenInformation(
+                token.as_raw_handle() as HANDLE,
+                class,
+                null_mut(),
+                0,
+                &mut needed,
+            )
+        };
+        if needed == 0 {
+            return None;
+        }
+        // u64 words keep the buffer aligned for the pointer it starts with.
+        let mut buffer = vec![0u64; (needed as usize).div_ceil(8)];
+        if unsafe {
+            GetTokenInformation(
+                token.as_raw_handle() as HANDLE,
+                class,
+                buffer.as_mut_ptr() as *mut c_void,
+                needed,
+                &mut needed,
+            )
+        } == 0
+        {
+            return None;
+        }
+        let sid = unsafe { *(buffer.as_ptr() as *const PSID) };
+        let len = unsafe { GetLengthSid(sid) } as usize;
+        Some(unsafe { std::slice::from_raw_parts(sid as *const u8, len) }.to_vec())
+    }
+
+    fn sid_text(sid: PSID) -> String {
+        let mut text: *mut u16 = null_mut();
+        if unsafe { ConvertSidToStringSidW(sid, &mut text) } == 0 || text.is_null() {
+            return "an unknown account".into();
+        }
+        let _free = Local(text as *mut c_void);
+        let len = (0..).take_while(|&i| unsafe { *text.add(i) } != 0).count();
+        OsString::from_wide(unsafe { std::slice::from_raw_parts(text, len) })
+            .to_string_lossy()
+            .into_owned()
+    }
+
+    fn final_path(file: &File) -> io::Result<PathBuf> {
+        let mut buffer = vec![0u16; 512];
+        loop {
+            let n = unsafe {
+                GetFinalPathNameByHandleW(
+                    file.as_raw_handle() as HANDLE,
+                    buffer.as_mut_ptr(),
+                    buffer.len() as u32,
+                    FILE_NAME_NORMALIZED | VOLUME_NAME_DOS,
+                )
+            } as usize;
+            if n == 0 {
+                return Err(io::Error::last_os_error());
+            }
+            if n >= buffer.len() {
+                buffer.resize(n + 1, 0);
+                continue;
+            }
+            return Ok(PathBuf::from(OsString::from_wide(&buffer[..n])));
+        }
+    }
+
+    /// The child was opened by the parent's path, which a rename could have
+    /// pointed elsewhere since the parent was opened: the child must still sit
+    /// directly under the directory the parent handle names.
+    pub(super) fn require_beneath(parent: &File, child: &File) -> io::Result<()> {
+        let (parent, child) = (final_path(parent)?, final_path(child)?);
+        if child.parent() == Some(parent.as_path()) {
+            Ok(())
+        } else {
+            Err(io::Error::new(
+                io::ErrorKind::PermissionDenied,
+                "refused: the directory moved while it was being opened",
+            ))
+        }
+    }
+
+    /// `volume:index` of an open file; stable while the file exists.
+    pub(super) fn identity(file: &File) -> io::Result<String> {
+        let mut info: BY_HANDLE_FILE_INFORMATION = unsafe { std::mem::zeroed() };
+        if unsafe { GetFileInformationByHandle(file.as_raw_handle() as HANDLE, &mut info) } == 0 {
+            return Err(io::Error::last_os_error());
+        }
+        let index = (u64::from(info.nFileIndexHigh) << 32) | u64::from(info.nFileIndexLow);
+        Ok(format!("{}:{index}", info.dwVolumeSerialNumber))
+    }
 }
 
 /// An injected filesystem checkpoint is called after each acknowledged WAL
@@ -1267,8 +1581,14 @@ fn validate_transition(records: &[Record], phase: &Phase) -> WalResult<()> {
 
 /// Directory descriptors remain open throughout each operation. All descendants
 /// are resolved relative to those descriptors, never a re-resolved WAL path.
+///
+/// Windows has no descriptor-relative path, so a directory keeps the path it
+/// was opened by beside its handle; `child` opens by that joined path and then
+/// proves the child sits directly beneath the directory this handle names.
 struct Directory {
     file: File,
+    #[cfg(windows)]
+    path: PathBuf,
 }
 impl Directory {
     fn path(&self) -> PathBuf {
@@ -1277,7 +1597,11 @@ impl Directory {
             use std::os::fd::AsRawFd;
             PathBuf::from(format!("/proc/self/fd/{}", self.file.as_raw_fd()))
         }
-        #[cfg(not(target_os = "linux"))]
+        #[cfg(windows)]
+        {
+            self.path.clone()
+        }
+        #[cfg(not(any(target_os = "linux", windows)))]
         {
             PathBuf::new()
         }
@@ -1301,7 +1625,16 @@ impl Directory {
             }
             Ok(Self { file })
         }
-        #[cfg(not(target_os = "linux"))]
+        #[cfg(windows)]
+        {
+            let file = windows_trust::open_directory(path)?;
+            windows_trust::check(&file, common).map_err(|reason| unsafe_path(path, &reason))?;
+            Ok(Self {
+                file,
+                path: fgos_process::path::plain_path(path),
+            })
+        }
+        #[cfg(not(any(target_os = "linux", windows)))]
         {
             let _ = (path, common);
             Err(WalError::Unsupported)
@@ -1322,19 +1655,18 @@ impl Directory {
     ) -> WalResult<Self> {
         let path = self.path().join(name);
         if create {
-            #[cfg(unix)]
-            {
-                use std::os::unix::fs::DirBuilderExt;
-                match fs::DirBuilder::new().mode(0o700).create(&path) {
-                    Ok(()) => {
-                        fsys.checkpoint("mkdir")?;
-                    }
-                    Err(e) if e.kind() == io::ErrorKind::AlreadyExists => (),
-                    Err(e) => return Err(e.into()),
+            #[cfg(any(unix, windows))]
+            match create_private_dir(&path) {
+                Ok(()) => {
+                    fsys.checkpoint("mkdir")?;
                 }
+                Err(e) if e.kind() == io::ErrorKind::AlreadyExists => (),
+                Err(e) => return Err(e.into()),
             }
         }
         let child = Self::open(&path)?;
+        #[cfg(windows)]
+        windows_trust::require_beneath(&self.file, &child.file)?;
         // Also sync pre-existing dirs: a preceding failed creator may have
         // installed the name without ever syncing it. Once this process has
         // synced a directory and its name, both stay durable until that
@@ -1342,6 +1674,9 @@ impl Directory {
         // device, inode and birth time) needs no second fsync.
         if sync {
             let key = durable_key(&child.file);
+            // NTFS has no directory flush that outlives a crash on its own: the
+            // directory entry is made durable by `sync_directory` flushing the
+            // directory handle, and the identity cache below is Unix only.
             if key.is_none()
                 || !DURABLE_DIRECTORIES
                     .lock()
@@ -1435,10 +1770,7 @@ impl<F: FileSystem> Wal<F> {
         Self::with_filesystem(repo.common_dir(), fsys)
     }
     pub fn with_filesystem(common: &Path, fsys: F) -> WalResult<Self> {
-        let canonical = common.canonicalize()?;
-        if canonical != common {
-            return Err(non_canonical(common, &canonical));
-        }
+        require_canonical(common)?;
         let common = Directory::open_trusted(common, true)?;
         let identity = repository_identity(&common)?;
         let fgos = common.child("fgos", true, &fsys)?;
@@ -1457,10 +1789,7 @@ impl<F: FileSystem> Wal<F> {
     /// C5/doctor reader: opens existing descriptors without mkdir or fsync.
     /// NotFound means the WAL has never been initialized, not a corrupt chain.
     pub fn open_existing(common_path: &Path, fsys: F) -> WalResult<Self> {
-        let canonical = common_path.canonicalize()?;
-        if canonical != common_path {
-            return Err(non_canonical(common_path, &canonical));
-        }
+        require_canonical(common_path)?;
         let common = Directory::open_trusted(common_path, true)?;
         let identity = repository_identity(&common)?;
         let fgos = common.child("fgos", false, &fsys)?;
@@ -1567,7 +1896,9 @@ impl<F: FileSystem> Wal<F> {
             &[],
         )
         .map_err(|e| WalError::Io(e.source))?;
-        Ok(dir.path().join(name).canonicalize()?)
+        Ok(fgos_process::path::plain_path(
+            &dir.path().join(name).canonicalize()?,
+        ))
     }
     pub(crate) fn clear_restore_patch(
         &self,
@@ -2042,7 +2373,11 @@ fn repository_identity(dir: &Directory) -> WalResult<String> {
         let m = dir.file.metadata()?;
         Ok(format!("{}:{}", m.dev(), m.ino()))
     }
-    #[cfg(not(unix))]
+    #[cfg(windows)]
+    {
+        Ok(windows_trust::identity(&dir.file)?)
+    }
+    #[cfg(not(any(unix, windows)))]
     {
         let _ = dir;
         Err(WalError::Unsupported)
@@ -2092,6 +2427,13 @@ fn read_json<T: for<'de> Deserialize<'de>>(path: &Path, limit: u64) -> WalResult
         use std::os::unix::fs::OpenOptionsExt;
         options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
     }
+    #[cfg(windows)]
+    let file = {
+        let file = fgos_durable_file::open_no_reparse(&mut options, path)?;
+        windows_trust::check(&file, false).map_err(|reason| unsafe_path(path, &reason))?;
+        file
+    };
+    #[cfg(not(windows))]
     let file = options.open(path)?;
     #[cfg(unix)]
     {
@@ -2925,7 +3267,7 @@ fn is_durable_temporary(name: &str) -> bool {
     name.starts_with(".durable-file-") && name.ends_with(".tmp")
 }
 
-#[cfg(all(test, target_os = "linux"))]
+#[cfg(all(test, any(target_os = "linux", windows)))]
 mod tests {
     use super::*;
     use std::sync::atomic::{AtomicUsize, Ordering};
@@ -2944,10 +3286,7 @@ mod tests {
                 std::process::id(),
                 SERIAL.fetch_add(1, Ordering::Relaxed)
             ));
-            {
-                use std::os::unix::fs::DirBuilderExt;
-                fs::DirBuilder::new().mode(0o700).create(&p).unwrap();
-            }
+            create_private_dir(&p).unwrap();
             Self(p)
         }
     }
@@ -3134,8 +3473,10 @@ mod tests {
     }
     #[test]
     fn corrupt_version_hash_gap_unknown_and_symlink_are_not_empty() {
-        use std::os::unix::fs::symlink;
-        for case in 0..5 {
+        // A symlink needs a privilege Windows tests do not hold; its refusal is
+        // covered where the link is made, by the no-reparse open.
+        let cases = if cfg!(unix) { 5 } else { 4 };
+        for case in 0..cases {
             let t = Temp::new();
             let w = Wal::with_filesystem(&t.0, OsFileSystem).unwrap();
             begun(&w, "one");
@@ -3152,7 +3493,8 @@ mod tests {
                 3 => fs::write(dir.join("unknown"), b"evidence").unwrap(),
                 _ => {
                     fs::remove_file(&p).unwrap();
-                    symlink("/etc/passwd", &p).unwrap();
+                    #[cfg(unix)]
+                    std::os::unix::fs::symlink("/etc/passwd", &p).unwrap();
                 }
             }
             assert!(w.inspect("one").is_err());
@@ -3161,6 +3503,8 @@ mod tests {
             assert!(scan.entries[0].error.is_some());
         }
     }
+    // Unix only: it asserts the mode text and a symlink, neither of which Windows has.
+    #[cfg(unix)]
     #[test]
     fn trust_root_refuses_writable_or_symlink_directory() {
         use std::os::unix::fs::{symlink, PermissionsExt};
@@ -3179,6 +3523,28 @@ mod tests {
         let other = Temp::new();
         symlink(&other.0, t.0.join("fgos")).unwrap();
         assert!(Wal::with_filesystem(&t.0, OsFileSystem).is_err());
+    }
+    #[cfg(windows)]
+    #[test]
+    fn trust_root_refuses_directory_writable_by_everyone() {
+        let t = Temp::new();
+        let fgos = t.0.join("fgos");
+        fs::create_dir(&fgos).unwrap();
+        let granted = std::process::Command::new("icacls")
+            .arg(&fgos)
+            .args(["/grant", "*S-1-1-0:(OI)(CI)(W)"])
+            .output()
+            .unwrap();
+        assert!(granted.status.success(), "icacls failed: {granted:?}");
+        match Wal::with_filesystem(&t.0, OsFileSystem) {
+            Err(WalError::UnsafePath(text)) => {
+                assert!(text.contains("grants write access to Everyone"), "{text}");
+            }
+            other => panic!(
+                "a directory Everyone may write is refused by name: {:?}",
+                other.err()
+            ),
+        }
     }
     struct Admission(bool);
     impl AuthorityAdmission for Admission {
