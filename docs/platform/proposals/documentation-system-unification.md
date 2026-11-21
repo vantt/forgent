@@ -595,6 +595,32 @@ or one constraint while leaving the rest of an older decision active.
 > Evidence: `plans/reports/research-261021-1643-canonical-decision-projection-component.md`
 > and `plans/reports/research-261021-1707-doc-plan-dedup-components.md`.
 >
+> **Candidate mechanism for the reducing half (note added 2026-11-21,
+> documentation lane).** pkm, which fgOS links into its host for locate
+> (`docs/platform/documentation/subcomponents/document-identity/spec.md`
+> section 8.2), now has a role layer whose test case is rules and decisions:
+> - lifecycle roles per type and lifecycle classes (`live`, `replaced`,
+>   `deprecated`, …);
+> - `replaced_by` and `amends`, so a partial amendment leaves both decisions in
+>   force;
+> - codes with duplicate detection (`id`, `id_scope`, rule R16);
+> - coded units under a note, such as one clause or table row, with bare codes
+>   in text turned into edges (`mentions`, rule R17);
+> - `in_force` as of a date, down to the unit;
+> - the audits `stale-citation` (a live document cites a replaced one) and
+>   `implicit-replacement` (a near-identical newer document declares no
+>   relation).
+>
+> These cover the measured gaps above: partial supersession at clause level,
+> and supersession stated only in prose. Before the reducer is built, one
+> question decides whether it uses this layer: are the notes pkm reads the
+> decision documents themselves, or notes projected from `state.decisions`?
+> pkm's own design (`docs/schema-roles.md` section 8) leaves that choice to
+> fgOS. Most of this is on pkm main (toward `v0.4.0`); `in_force` per note,
+> `amends`, R16, R17 and `stale-citation` are in `v0.3.0`. Evidence:
+> `plans/reports/research-261121-1650-pkm-v0-3-capabilities-for-fgos.md`
+> sections 3 and 5.2.
+>
 > **Boundary map reminder.** `docs/platform/component-boundary.md` has no row for
 > the Knowledge and Documentation Engine, the Agent Context Engine, or the
 > decision projection above; its nearest row ("Knowledge, Learning, And

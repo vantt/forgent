@@ -142,7 +142,7 @@ When the new document becomes the owner of something an existing document mentio
 
 The task: specify fgOS's locate port (build step 3 of the [area map](../spec.md#4-build-order)).
 
-**Draft sections:** 1 Purpose; 2 the port's contract (input a draft, output candidates); 3 pkm is linked into the host and OHS runs outside; 4 without OHS the port falls back to full-text search; 5 the doctor rows (OHS present, index fresh); 6 the config keys (index path, model).
+**Draft sections:** 1 Purpose; 2 the port's contract (input a draft, output candidates); 3 pkm is linked into the host and its index worker runs as a process; 4 while the index or model is not ready the port answers from full text; 5 the doctor rows (model present, index fresh); 6 the config keys (index path, model).
 
 **Claims checked:** sections 3, 4, 5 and 6. Sections 1 and 2 are the new design itself. Four parts, one call, region `area=documentation`.
 
@@ -198,7 +198,7 @@ If no note had carried the claim, the writer would `fgos submit` an item "Admiss
 
 ## 12. Example C: New Content Whose Parts Belong To Two Homes
 
-A writer documents two new things learned from one change: (1) a procedure for rebuilding a stale OHS index, and (2) a new rule that every rebuildable cache lives under `.fgos/runtime/`. One call, two parts (illustrative):
+A writer documents two new things learned from one change: (1) a procedure for rebuilding a stale search index, and (2) a new rule that every rebuildable cache lives under `.fgos/runtime/`. One call, two parts (illustrative):
 
 ```txt
 part 1  no candidate carries it; places: documentation (4)
