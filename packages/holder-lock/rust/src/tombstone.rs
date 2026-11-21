@@ -72,6 +72,9 @@ fn is_fence_leftover_name(name: &str) -> bool {
 /// module names are touched, only as a plain file or a plain directory (never
 /// through a symlink), and never the contender's file at the fence path. A
 /// failure to remove is ignored: the leftover is retried at the next placement.
+/// The `.activation-fence-` names do not carry the lock name: this is sound only
+/// while one fence lives per parent directory; a second fence kind beside it must
+/// put its lock name into these names first.
 fn sweep_fence_leftovers(parent: &Path) {
     let Ok(entries) = fs::read_dir(parent) else {
         return;
