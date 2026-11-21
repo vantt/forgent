@@ -52,6 +52,16 @@ resolver = "2"
 [profile.release]
 strip = "symbols"
 
+# A host process verifies its release (every declared file re-hashed, the native addon included) before it hands
+# a run its payload root. Unoptimized SHA-256 made that 2.7 s of every dev-built `run-unit` over a 225 MB debug
+# addon (0.16 s in a release build); the hash crates are optimized in dev builds too.
+[profile.dev.package.sha2]
+opt-level = 3
+[profile.dev.package.digest]
+opt-level = 3
+[profile.dev.package.block-buffer]
+opt-level = 3
+
 [workspace.package]
 version = "0.2.0"
 edition = "2021"
