@@ -80,6 +80,11 @@
     "owner_path": "packages/observe/rust",
     "subcommands": true
   },
+  "migrate": {
+    "operation_id": "migrate.portfolio",
+    "owner_path": "apps/fgos",
+    "subcommands": true
+  },
   "questions": {
     "operation_id": "questions.read",
     "owner_path": "apps/fgos",

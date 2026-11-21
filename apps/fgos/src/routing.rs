@@ -100,6 +100,7 @@ pub static NATIVE_SUBCOMMANDS: &[(&str, &[&str])] = &[
     ("watcher", wiring::supervision::WATCHER_SUBCOMMANDS),
     ("supervisor", wiring::supervision::SUPERVISOR_SUBCOMMANDS),
     ("session", wiring::supervision::SESSION_SUBCOMMANDS),
+    ("migrate", wiring::migrate::AVAILABLE_SUBCOMMANDS),
 ];
 
 /// The sub-command a verb runs when the call names none, by selector.
