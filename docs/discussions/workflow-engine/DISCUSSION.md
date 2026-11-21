@@ -30,6 +30,8 @@ Gap seen in the audit (not a design proposal): I found no hook or wrapper that i
 
 2026-11-21 12:10, owner added: the graph and resource-referee mechanisms exist for planners with schedule and parallelism tools, so the injected standard can also carry a hint that such a tool is there. Audit: the hint is already in the contract. `core/skills/_shared/plan-contract.md` section 4 ("Door check") tells the planner to run `fgos resource-check --units <file>` on the draft and `fgos resource-check --plan <dir>` afterwards, and says to apply the same overlap rule by hand in a project without fgOS. The door answers colliding pairs and shared paths, layers (waves), the critical path, independent groups, dependency cycles and a verdict (`docs/platform/resource-referee/spec.md`, rules `no-exclusion-in-one-layer`, `declared-layers-valid`, `max-layer-width`). Separately `fgos graph` gives work-graph metrics (components, critical path, stale-blocked, what-if) over Work items' dependency and lineage graph; the contract does not mention it, and it reads Work items, not a plan's phase table. I did not verify whether either tool reports durations (a true Gantt); `resource-check` reports layers and the critical path.
 
+2026-11-21 12:30, owner said continue. Drafted the bugfix guide as a difference table in §7 (`#task-bugfix-guide`): same milestones, activities, patterns, guards; only the id, purpose and two decision points change. No file was created. Open: no new diagnose activity (provisional default).
+
 ## 2. Mục tiêu & đề bài
 
 Today a coding Work item always walks one workflow, `coding/feature` (discovery, exploring, planning, executing, and so on). `resolveWorkflow(domain, kind)` already exists in `src/state/domain-registry.mjs` and the registry already has `defaultWorkflow: feature` and an empty `workflowFor: {}`, but the item-walking code does not consult it per item kind. The owner wants a domain to carry more than one workflow, starting with a shorter `bugfix` workflow for coding, with domain-specific logic living in the coding domain pack and none of it in the shared supervisor layer. The outcome of this discussion is a settled slice that a planner can plan: which code paths are wired, what the bugfix workflow's stages are, and how the domain pack plugs in.
@@ -75,6 +77,7 @@ Today a coding Work item always walks one workflow, `coding/feature` (discovery,
 | Does either tool report durations (Gantt)? | not verified | `resource-check` help lists layers and critical path only |
 | Intent (owner 12:00): fgOS injects the standard and verifies at the end; it does not fix foreign planners, whose plans adjust themselves | owner-stated | supersedes the earlier "injection into an external planner" question |
 | Audit: inject text and a verify script exist; the takeover path (`fgos-cook`, `propose`) does not call the contract check, and its refusals are not worded as contract feedback | verified by grep: `plan-sections.mjs` is read only by `scripts/plan-contract-check.mjs`; `propose.mjs` and the cook skill never reference the contract | finding for a planner, outside the bugfix slice |
+| Bugfix guide content | draft in §7 `#task-bugfix-guide`, awaiting owner review | differs from `feature` only in id, purpose and two decision points |
 | Where is "a team under a lead per task type" settled? Today `lead` leads one plan | not found yet | `core/agents/lead.yaml`; `docs/platform/workflow/spec.md` §7.8 has a conductor case driven by `fgos-cook`; ask the owner for the earlier discussion if the scan cannot find it |
 | `feature.yaml` carries no `seats:` yet; spec §10.2 describes a guide part to be added at cutover | open | `grep seats` gives 0 in `domains/coding/workflows/feature.yaml` |
 | Title says "domain task types"; is more than bugfix in scope (other kinds, other domains)? | open | the item only covers coding bugfix |
@@ -99,11 +102,36 @@ Today a coding Work item always walks one workflow, `coding/feature` (discovery,
 - 2026-11-21 11:50 (owner): fgOS stays generic and runs beside other frameworks; planning standard injected before planning so fgOS can run plans by splitting and starting workers. Shaper audited: it is the plan-v1 contract plus `fgos-cook`; recorded in §1 and §3 with one open point (injection is by reading).
 - 2026-11-21 12:00 (owner): fgOS injects and verifies, never fixes foreign planners. Shaper audited the inject, verify and takeover parts; one finding: the takeover path does not call the contract check (§1, §3).
 - 2026-11-21 12:10 (owner): the injected standard may hint at the parallelism tools. Shaper audited: the hint exists for `resource-check`; `fgos graph` is not named; durations unverified.
+- 2026-11-21 12:30 (owner): continue. Shaper wrote the bugfix guide difference table (§7) and a §6 diagram.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Not yet. Nothing is settled enough to synthesize.
+Settled so far (D1, D2): two tiers; a bugfix is a second coding guide, selected through `--guide`, derived from `feature.yaml`'s guide part, adding no mechanism and no plan format. The guide's own content is still a draft, in §7.
+
+```mermaid
+flowchart LR
+  plan[plan-v1 plan: what, split into parallel phases] --> cook[fgos-cook: slices via workflow propose]
+  cook --> guide[guide coding/feature or coding/bugfix: how one case proceeds]
+  guide --> pattern[pattern per activity: solo or reviewed]
+  sup[supervisor: liveness, authority, handoff, wake] -. does not own .-> guide
+```
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Not yet.
+### Bugfix guide {#task-bugfix-guide}
+
+Status: draft, derived by reading `domains/coding/workflows/feature.yaml:126-177`; nothing is created. The aim is a small difference from the feature guide.
+
+| Part of the guide | In `feature` | Proposed for `bugfix` | Why |
+|---|---|---|---|
+| id, purpose | `coding/feature`: request to approved, integrated change | `coding/bugfix`: one bug to an approved, integrated fix, cause shown before the edit | new file `domains/coding/workflows/bugfix.yaml`, recompiled into `compiled.json` |
+| milestones | seven (request-received to merged) | same seven | no new milestone name is needed; the existing evidence rules already fit |
+| activities | eleven | the same eleven names, including the three `propose` requires (`implement-item`, `validate-plan`, `judge-ambiguity`) | reuse; `fix-verify-red`, `review-item`, `scout-blast-radius`, `resolve-question` already serve a bug |
+| patterns | `solo` for judge, lock, shape; `reviewed` for validate and implement | same | the reviewed pattern is what catches regressions |
+| decision points | at `request-received` SHOULD judge-ambiguity; at `decisions-locked` SHOULD shape-plan and validate-plan; at `plan-validated` SHOULD implement-item, MAY fix-verify-red | the part that makes it shorter: at `decisions-locked` SHOULD validate-plan only, MAY scout-blast-radius and shape-plan; at `plan-validated` SHOULD implement-item with a reason that the cause is shown first; keep `fix-verify-red` as a MAY | the owner wants it shorter; as a SHOULD the agent can still add a step when the bug is not clear |
+| must, closure, frame defaults | five guards; closure `approved` | unchanged | the verify receipt stays the only hard gate |
+| bug knowledge | `fix-verify-red.md` already says "prove the cause before changing behavior" and routes to researcher or advisor | none new in the guide; any further bug rule goes in `domains/coding/` (task-specs, skills) | owner D2: no coding logic in the shared layer |
+
+What changes against `feature` is therefore only the file id, the purpose line and two decision points. Provisional default, not asked: no new "diagnose" activity, because a bug's cause-proof is already carried by `fix-verify-red`'s collaboration rule and `scout-blast-radius`; add one only if the owner finds those insufficient.
+
+Draft verify: recompile the domain, then `fgos doctor` row `domain-registry-compiled` is green; `fgos workflow propose --guide coding/bugfix` on a one-slice bug plan returns no `guide-activity-missing`; `test/state/workflow-multiplicity.test.mjs` is extended for the second workflow.
