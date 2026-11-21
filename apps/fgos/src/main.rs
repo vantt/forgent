@@ -177,6 +177,7 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     wiring::supervision::SUPERVISOR_WRITE_DESCRIPTOR,
     wiring::supervision::LAND_DESCRIPTOR,
     wiring::supervision::SLOTS_DESCRIPTOR,
+    wiring::migrate::DESCRIPTOR,
 ];
 
 /// The legacy payload root of the running release, for the verbs that read what it ships (its skills, its scripts).
@@ -474,6 +475,7 @@ fn main() {
         active_payload_root,
     )));
     service.register_provider(Arc::new(wiring::init::InitProvider::new()));
+    service.register_provider(Arc::new(wiring::migrate::MigrateProvider::new()));
     for descriptor in [
         wiring::dispatch_decide::DECIDE_DESCRIPTOR,
         wiring::dispatch_decide::EXPLAIN_DESCRIPTOR,

@@ -388,6 +388,17 @@ pub const CATALOG: &[OperationDescriptor] = &[
         streaming_mode: StreamingMode::None,
     },
     OperationDescriptor {
+        operation_id: OperationId::from_static("migrate.portfolio"),
+        owning_component_id: Cow::Borrowed("packaging"),
+        request_contract: ContractRef::from_static("migrate.portfolio.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("migrate.portfolio.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("migrate.write"),
+        allowed_host_kinds: &["cli"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
         operation_id: OperationId::from_static("resource-check.run"),
         owning_component_id: Cow::Borrowed("resource-check"),
         request_contract: ContractRef::from_static("resource-check.run.request", "1.0.0"),
@@ -517,8 +528,8 @@ mod tests {
     #[test]
     fn catalog_contains_required_operations() {
         // Eleven operations, plus the mailbox's send, inbox, inbox claim, list
-        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run and the init run, the dispatch decide and explain, the unit run, the agents list, the supervision tick, supervisor read and write, land and slots, and the resource-check run.
-        assert_eq!(CATALOG.len(), 45);
+        // and status, the gateway start, stop and status, the git status and recover, the lock status, the lock fence, the doctor run, the wire-agents run, the uninstall run the init run and the migrate portfolio run, the dispatch decide and explain, the unit run, the agents list, the supervision tick, supervisor read and write, land and slots, and the resource-check run.
+        assert_eq!(CATALOG.len(), 46);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
@@ -554,6 +565,7 @@ mod tests {
         assert!(ids.contains(&"wire-agents.run"));
         assert!(ids.contains(&"uninstall.run"));
         assert!(ids.contains(&"init.run"));
+        assert!(ids.contains(&"migrate.portfolio"));
         assert!(ids.contains(&"dispatch.decide"));
         assert!(ids.contains(&"dispatch.explain"));
         assert!(ids.contains(&"run.unit"));

@@ -187,6 +187,12 @@ pub fn project_cli_invocation(
             ContractRef::from_static("init.run.request", "1.0.0"),
             Box::new(crate::wiring::init::project_init_request(args, root)?),
         ),
+        crate::wiring::migrate::OPERATION_ID => (
+            ContractRef::from_static("migrate.portfolio.request", "1.0.0"),
+            Box::new(crate::wiring::migrate::project_migrate_request(
+                args, root,
+            )?),
+        ),
         crate::wiring::dispatch_decide::DECIDE_OPERATION_ID
         | crate::wiring::dispatch_decide::EXPLAIN_OPERATION_ID => (
             ContractRef::new(format!("{operation_id_str}.request"), "1.0.0"),

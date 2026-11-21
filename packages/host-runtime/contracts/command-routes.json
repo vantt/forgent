@@ -1038,6 +1038,25 @@
     },
     "store": "none"
   },
+  "migrate": {
+    "selector": "migrate",
+    "route_kind": "native",
+    "operation_id": "migrate.portfolio",
+    "owner_path": "apps/fgos",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ],
+    "subcommands": true,
+    "subcommand_flags": {
+      "portfolio": [
+        "dir",
+        "json",
+        "help",
+        "dry-run"
+      ]
+    },
+    "store": "none"
+  },
   "move": {
     "selector": "move",
     "route_kind": "legacy-cli",

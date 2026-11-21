@@ -12,10 +12,6 @@
 //!
 //! The legacy paths are built with `concat!` so that the reference rewrite, run over a checkout that contains
 //! this very file, cannot rewrite the tool that is running it.
-//!
-//! The provider, the projector and the descriptor are complete here; the host registers the provider in
-//! `main.rs` and the route table, which is why the module allows dead code until that registration lands.
-#![allow(dead_code)]
 
 use fgos_convention::packaged_rules;
 use fgos_git::GitDriver;
