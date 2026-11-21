@@ -11,6 +11,7 @@ discussion: open
 - 2026-11-21 16:35: đã xác định 4 bản sửa của OS-D1 (nguồn: memory `orchestration-stabilize-first-decision` của secretary Miu và tin supervisor gửi Miu sáng 2026-11-21: "1547 first, then the idle-lead nudge, then the names, then the reaper"): `p-l22vozecxg`, `p-waxzxz5mio`, `p-mhwe24fttr`, `p-yqanenewb4`. **Cả 4 đã `done`** (xem §7 `#related`). Điều kiện đậu theo chữ của OS-D1 đã thỏa, nhưng release hold ("no new work until the release hold is lifted", handoff secretary 14:45) vẫn còn hiệu lực. Discussion vẫn `paused` cho tới khi chủ dự án cho mở lại.
 - **2026-11-21 16:16: chủ dự án cho mở lại (OS-D2).** Trạng thái `discussion: open`. Architecture panel (T0) vẫn hoãn. Release hold không bị ảnh hưởng vì discussion không sinh code.
 - **2026-11-21 16:23 (round 6):** chủ dự án trả lời câu hỏi round 5 là "cả hai": mọi thành phần phải có authority, boundary và contract rõ, **và** hệ thống cần một cơ chế hoặc một vai làm nhạc trưởng nắm nhịp điều phối tổng. Câu hỏi mở thành §3 row 9: nhạc trưởng, hay mọi thứ chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan theo chuỗi watcher -> ghi signal -> phản ứng tiếp. Đang chạy 5 agent con (haiku, chỉ đọc) dò lại tier 0 tới 9 từ dưới lên; kết quả sẽ vào bảng §3 row 4b.
+- **2026-11-21 22:55 (round 41): viết lại toàn bộ §6 và §7 theo OS-D3 tới OS-D21.** Chờ chủ dự án đọc và duyệt §6; duyệt xong thì đặt `discussion: settled` và viết khối bàn giao cho planner.
 - **2026-11-21 22:45 (round 37-40): chủ dự án chốt hàng 5 -> OS-D21; mọi hàng §3 đã rõ.** Khung (khung được duyệt) không phải guide mà là giới hạn của một ca. Chủ dự án bác hướng "toàn số và giới hạn" và cột `guide` trong plan: plan do fgOS hoặc hệ khác làm ra nên chỉ tuân contract tổng quát (cái gì, vì sao); ánh xạ vào guide, workflow, pattern xảy ra lúc thực thi. Kế tiếp: viết khối bàn giao cho planner.
 - **2026-11-21 22:35 (round 36): chủ dự án thấy định nghĩa rõ hơn, hỏi một plan coding do ak:plan làm ra được điều phối thế nào.** Đi thử từ đầu tới cuối theo phương án C ở §3 4p, ghi rõ phần nào hôm nay đã có, phần nào còn thiếu.
 - **2026-11-21 22:21 (round 35): chủ dự án hỏi guide khác plan thế nào và "khung" là gì.** Làm rõ ở §3 4o bằng thuật ngữ có sẵn của `docs/platform/workflow/spec.md` §2.2; chữ "khung" trong discussion này đã dùng lẫn hai nghĩa, đề xuất dùng đúng nghĩa của spec. Đang chờ chủ dự án xác nhận định nghĩa trước khi chọn A/B/C.
@@ -475,102 +476,127 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-21 22:35 round 38: Chủ dự án: "nghe thì có vẻ chính trị và cứng nhắc quá nhỉ, toàn số và giới hạn, không thấy cách làm và chu trình làm. những việc như 1 plan lớn có thể được chia ra nhiều phase, mỗi phase là 1 hay nhiều guide ...". Shaper đề xuất cột `guide` trong bảng phase (`core/skills/_shared/plan-contract.md` §4).
 - 2026-11-21 22:41 round 39: Chủ dự án: "cần nhớ, plan được tạo ra bởi fgos hoặc hệ khác, nên nó cần generic nhất có thể ... bước thực thi plan mới là lúc map vào guide/workflow/patterns." Shaper đồng ý, rút đề xuất cột `guide`.
 - 2026-11-21 22:45 round 40: Chủ dự án: "đồng ý, ghi lại và đóng hàng 5." Mint OS-D21. Mọi hàng §3 rõ.
+- 2026-11-21 22:55 round 41: Chủ dự án: "làm nhé". Viết lại toàn bộ §6 (sơ đồ mới) và §7 (T7.1 tới T7.7 thay T7.1 tới T7.3 cũ).
 - 2026-11-21 22:27 round 37: Chủ dự án: "cần làm rõ, khung trong giải thích trên là gì (là guide?)". Không: khung là giới hạn của riêng một ca; đọc `src/workflow/propose-frame.mjs`; ghi ở §3 4p.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Đây là hình dạng hiện tại cho người đọc lạ. Phần đã chốt dựa trên SR-D6 tới SR-D10 và OS-D3 tới OS-D21; phần ghi "còn mở" đang bàn ở §3.
+Viết lại toàn bộ round 41 (2026-11-21) cho người đọc lạ. Dựa trên SR-D6 tới SR-D10 và OS-D3 tới OS-D21; OS-D12 và OS-D19 là tạm chốt.
 
 ```mermaid
 flowchart TB
-  subgraph Entry ["Lối vào (chỉ hai loại, OS-D3)"]
-    T[Timer: OS timer theo project]
-    X["Signal ngoài: webhook qua gateway, CLI của người, hook"]
+  subgraph Entry ["Lối vào: chỉ timer và tín hiệu ngoài (OS-D3, OS-D8)"]
+    T[Timer của watcher]
+    X["Tín hiệu ngoài: webhook có ký, CLI, câu trả lời của người"]
   end
 
-  subgraph Skeleton ["Skeleton (domain-agnostic, SR-D8)"]
-    R["Cửa raise: mọi lối vào thành event"]
-    ES[(Event Store: event ghi một lần, L1)]
-    C["Nhạc trưởng giữ nhịp (code): đọc event + facet, đo tiến độ, ép cap, quyết ai làm tiếp, raise cần phán đoán"]
-    P["Primitive: start / sleep / wake / rotate / handoff / cap"]
-    SP["Surface port (6 port Multica)"]
+  subgraph Skeleton ["Skeleton: chỉ actor và thời gian (SR-D8)"]
+    R["Cửa raise (queue.rs): mọi lối vào thành event"]
+    ES[(Event Store)]
+    K["Giữ nhịp (code, lớn lên từ wake.rs): đọc event và bản ghi lập lịch, ép cap, khởi hoặc đánh thức người chơi, raise cần phán đoán"]
+    RV["Rà soát định kỳ: Unit chỉ đọc, độc lập (OS-D17)"]
   end
 
   subgraph Domain ["Domain pack (SR-D7)"]
-    DP["Frame, doctrine, door, cột bảng, ánh xạ facet"]
+    G["Guide, pattern, bảng ánh xạ (OS-D21)"]
+    SR["Bản ghi lập lịch: item, step, waitingOn, needs, outcome (OS-D9 tới D12)"]
   end
 
-  subgraph Players ["Người chơi (LLM)"]
-    SV["Diễn giải (LLM, supervisor): phán đoán khi được gọi, chỉnh luật và ngưỡng"]
-    LD[Lead / worker: lái trong khung]
+  subgraph Doors ["Cửa có sẵn mà giữ nhịp gọi"]
+    SH["Session Host, Identity (role, actor)"]
+    B["bind() và fgos run (capability, cả tool)"]
+    Q["Questions: hỏi mọi người (OS-D16)"]
+    RR["Resource referee (cap tài nguyên)"]
   end
 
-  H["Harness: từng bước bền vững, idempotent, quan sát được, có cap, từ chối có lý do (SR-D9)"]
+  SV["Supervisor LLM: chỉ khi cần phán đoán"]
+  LD["Lead: người phán đoán của ca"]
+  W["Worker, reviewer, tool"]
 
   T --> R
   X --> R
-  SP <--> R
-  R --> ES
-  ES --> C
-  DP --> C
-  C -->|cần phán đoán| SV
-  C -->|start / wake| LD
+  R --> ES --> K
+  G --> SR --> K
+  K --> SH & B & Q & RR
+  SH --> LD
+  B --> W
+  K -->|cần phán đoán| SV
   SV -->|quyết định thành event| R
-  LD --> H
-  H -->|kết quả thành event| R
+  LD -->|ánh xạ, chọn đường| R
+  W -->|kết quả thành event| R
+  Q -->|câu trả lời| R
+  K --> RV
+  RV -->|phát hiện thành event| R
 ```
 
-**Hai mức (OS-D3).** Mỗi thành phần trong sơ đồ và mỗi thành phần ở tier 0-9 có authority, boundary và contract riêng; bảng §3 4b là danh sách lỗ hổng phải lấp. Skeleton không gom code của các thành phần khác về một chỗ: nó là hợp đồng nối các chủ đã có (Event Store, Session Host, `bind()`, questions) cộng với nhạc trưởng code là phần nó thật sự sở hữu.
+**Đích (OS-D3).** Mọi thành phần có authority, boundary, contract rõ (sổ chung là thành phần `component-authority`, settled 2026-11-21; mọi thành phần của skeleton khai báo qua cửa `declare` của nó). Hệ thống tự giữ nhịp, không cần người canh.
 
-**Lối vào.** Chỉ timer và signal ngoài khởi động hoạt động. Mọi lối vào đi qua một cửa raise và thành event trong Event Store. Hôm nay đã có timer -> `watcher tick` -> `queue.raise`. Hình dạng lối vào signal ngoài đã chốt (OS-D8): một cửa raise, wake mang `--trigger --ref`, gateway có một route webhook có ký chỉ gọi cửa raise; mỗi nguồn là một adapter làm sau. Mặc định tạm: id event suy từ nguồn + id giao hàng (idempotent), payload là dữ liệu không tin cậy.
+**Lối vào (OS-D3, OS-D8).** Chỉ timer và tín hiệu ngoài khởi động hoạt động. Mọi lối vào đi qua một cửa raise (`packages/supervision/rust/src/queue.rs`) và thành event. Gateway có một route webhook có ký chỉ gọi cửa raise; id event suy từ nguồn cộng id giao hàng (idempotent); payload là dữ liệu không tin cậy. Wake nhận `--trigger <kind> --ref <id>` thay cho "manual" đang hardcode.
 
-**Nhạc trưởng: hai vai (OS-D4).** *Giữ nhịp* là code: luôn chạy, đọc event và facet, áp cap (`maxLeads`, lane, attempt), admit plan, start hoặc wake người chơi, đóng event vô ích, phát hiện người rớt nhịp, và tự thi hành. Nó lớn lên từ wake door trong thành phần Supervision (OS-D7), với authority duy nhất "ai làm tiếp và khi nào, trong cap": watcher cảm nhận, giữ nhịp quyết định, supervisor diễn giải. Mầm hiện có là `wake::decide` (`packages/supervision/rust/src/wake.rs`, đã hexagonal với port queue, identity, start session, activity); lát đầu tiên là T1, chuyển admission từ LLM sang code. *Diễn giải* là LLM (supervisor) được hỏi ý chỉ khi code raise "cần phán đoán": hòa, chuyện lạ, đổi ưu tiên hoặc plan trong khung, có hỏi chủ dự án không. Quyết định của LLM quay lại thành event và code thi hành. Phép thử: suy được từ trạng thái đã ghi + luật thì code quyết; cần hiểu ý định hoặc tình huống mới thì gọi LLM. Khi LLM yếu, chết hay đang rotate, nhịp vẫn giữ; chỉ các câu cần phán đoán phải chờ.
+**Giữ nhịp và diễn giải (OS-D4, OS-D7).** Giữ nhịp là code, lớn lên từ cửa wake (`packages/supervision/rust/src/wake.rs`) trong Supervision, với authority duy nhất "ai làm tiếp và khi nào, trong cap". Nó đọc event và bản ghi lập lịch, ép cap (lane, `maxLeads`, cap vòng lặp, tài nguyên), khởi hoặc đánh thức người chơi, đóng event vô ích, và raise "cần phán đoán" khi luật không đủ. Supervisor LLM chỉ được gọi cho câu cần phán đoán ở mức portfolio; quyết định của nó quay lại thành event. Phép thử: suy được từ trạng thái đã ghi cộng luật thì code quyết; cần ý định hay tình huống mới thì gọi LLM. Lát đầu là T1 (admission trong code). `fgos-runner --watch` rút ở S7.
 
-**Không zombie (OS-D5).** Giữ nhịp phải biết mục tiêu và đo tiến độ chứ không chỉ đo sống, biết khi luật của mình không còn khớp để raise "cần phán đoán", tự canh nhịp của chính mình, giải thích mọi quyết định bằng mã lý do, và được LLM diễn giải chỉnh luật và ngưỡng qua cửa có sẵn. LLM có thêm nhịp rà soát định kỳ (OS-D17): một Unit chỉ đọc, độc lập, khởi qua `fgos run` khi watcher definition `review-due` bắn (mặc định 24 giờ), đối chiếu cả mô hình cấu trúc của `component-authority` với code; kết quả quay lại thành event, người rà không tự sửa. Mầm của cả sáu ý đã có dưới dạng watcher definition (§3 4e); phần còn thiếu được mở rộng qua cùng cửa, không đắp cơ chế mới. Giữ nhịp lớn lên từ cửa wake (OS-D7); vòng lặp thứ hai `fgos-runner --watch` rút ở S7.
+**Không zombie (OS-D5, OS-D17).** Giữ nhịp đo tiến độ chứ không chỉ đo sống, biết giới hạn luật của mình, tự canh nhịp của chính mình, ghi mã lý do cho mọi quyết định, nhận chỉnh ngưỡng qua `watcher tune`. Mỗi 24 giờ (`watcher.reviewIntervalSec`), watcher definition `review-due` khởi một Unit chỉ đọc, độc lập với supervisor, qua `fgos run`: xem bản ghi đứng lâu nhất, "cần phán đoán" còn treo, sức khoẻ của giữ nhịp, đề xuất ngưỡng, và đối chiếu mô hình `component-authority` với code. Mỗi phát hiện là một event; người rà không tự sửa. Bỏ qua chỉ khi không có gì mở và không có event mới.
 
-**Người chơi.** Lead và worker lái trong khung và làm ra giá trị thật; năng lực quan trọng là suy luận, hiểu domain, thích nghi, báo cáo trung thực và báo friction khi khung sai. Quyết định và kết quả của họ quay lại hệ thống dưới dạng event qua cùng cửa raise, nên giữ nhịp luôn nhìn thấy.
+**Bản ghi lập lịch (OS-D9 tới OS-D16).** Giữ nhịp không đọc trạng thái của domain; domain chiếu ra cho nó bản ghi `{ item, step, waitingOn?, needs?, outcome? }`, mỗi bước đang mở một bản ghi, khoá (`item`, `step`) lấy từ id domain đã có (OS-D12). `waitingOn` là `actor | time | event | person` kèm `ref` và hạn `until` tuỳ chọn; quá hạn thì raise (OS-D10). `person` trỏ tới một câu hỏi `q-…` của Questions, cửa hỏi người duy nhất cho chủ dự án, `role` hay `party` bên ngoài; câu trả lời từ ngoài vào qua cửa raise (OS-D16). `needs` là `role` (Session Host), `actor` (Identity, chết thì successor) hoặc `capability` (`bind()`), suy từ bước kế của guide; trống thì raise (OS-D11). Người chơi có thể là tool khai invocation dạng job, chạy qua chính `fgos run` (OS-D15). `outcome` là `done | withdrawn | wontfix | cancelled`. Ưu tiên không phải facet. Cap vòng lặp thuộc khung domain (OS-D13); tài nguyên nặng là cap do resource referee phán (OS-D14). Bản ghi mồ côi (việc gốc đã đóng) thì raise, không tự đóng.
 
-**Facet lập lịch (OS-D9).** Giữ nhịp chỉ đọc hai facet chung: `waitingOn` (không có = làm được ngay; có = `{kind: actor | time | event | person, ref}`) và `outcome` (không có = còn mở; có = kết cục). Domain pack ánh xạ trạng thái riêng của nó (plan status, work status, workflow gate, question state, trạng thái business) vào hai facet; không rõ thì không bao giờ là "làm được ngay". Năng lực (lane, `maxLeads`) là cap của giữ nhịp, không phải facet. `waitingOn` có hạn tùy chọn `until`; quá hạn thì giữ nhịp raise event (OS-D10). Mục thứ ba `needs` (OS-D11) nói bước tiếp cần ai, ở dạng `role`, `actor` hoặc `capability`, suy từ bước tiếp theo của khung và giải ở cửa có sẵn (Session Host, Identity, `bind()`); giữ nhịp không tự chọn ai. Bản ghi gắn với từng bước đang mở, khoá (`item`, `step`); việc có hai bước song song thì có hai bản ghi (OS-D12, tạm chốt). Cap vòng lặp thuộc khung của domain (OS-D13); tài nguyên nặng là cap do resource referee phán (OS-D14). Người chơi là tool qua `fgos run` với invocation dạng job (OS-D15). `waitingOn: person` trỏ tới một câu hỏi của Questions, cửa hỏi người duy nhất cho chủ dự án, người duyệt và khách (OS-D16). Hôm nay chưa có facet chung.
+**Primitive (§3 4a, 4m).** Start, rotate: Session Host. Trigger của domain: `waitingOn: event | time` cộng cửa raise. Timer theo actor: `waitingOn: time` và `until`. Wake: giữ nhịp đánh thức bất kỳ người chơi nào qua `needs`. Sleep (OS-D18): mặc định kết thúc session, tới lượt thì khởi session mới và trao tay; head đang nói chuyện với người (Miu, shaper) được ngồi yên tới một ngưỡng. Handoff (OS-D19, tạm chốt): đóng bản ghi này, mở bản ghi kia; nội dung trao tay theo `docs/platform/runner/contracts/routing-handoff.md`.
 
-**Primitive (§3 4a, 4m).** Start, rotate, cap đã có chủ. Trigger của domain là `waitingOn: event | time` cộng cửa raise; timer theo actor là `waitingOn: time` và `until`; wake là giữ nhịp đánh thức bất kỳ người chơi nào qua `needs`. Sleep mặc định là kết thúc session, trừ head đang nói chuyện với người, có ngưỡng (OS-D18). Handoff là đóng phiếu này, mở phiếu kia, nội dung theo `routing-handoff.md` (OS-D19, tạm chốt).
+**Plan, guide, pattern, khung (OS-D21).** Plan, của fgOS hay hệ khác, chỉ tuân contract tổng quát: đích, phase, phụ thuộc, footprint, tiêu chí xong, status; không nêu guide hay pattern. Lúc thực thi, mỗi phase được ánh xạ vào một hoặc nhiều ca guide theo bảng của domain (coding: `domains/coding/slice-kinds.yaml`) cộng phán đoán của lead; ca thừa hưởng mốc duyệt plan (`--inherit`). Mỗi bước của guide dùng một pattern (người làm cộng người kiểm). "Khung" chỉ là khung được duyệt: giới hạn của một ca (lượt chạy, rigor floor, lệch trước khi hỏi), tính bằng mã, chủ dự án duyệt cùng ánh xạ một lần. Một ngôn ngữ guide; Work step FSM rút theo N12; lead là người phán đoán của ca, không chạy phase ngoài ca, nên chỉ còn một harness. Đi thử một plan coding: §3 4p.
 
-**Plan, guide, pattern (OS-D21).** Plan (của fgOS hay hệ khác) chỉ tuân contract tổng quát: đích, phase, phụ thuộc, footprint, tiêu chí xong, status. Lúc thực thi, mỗi phase được ánh xạ vào một hoặc nhiều ca guide theo bảng của domain cộng phán đoán của lead; mỗi bước của guide dùng một pattern (người làm + người kiểm). Chủ dự án duyệt ánh xạ kèm khung (giới hạn của ca) một lần. Một ngôn ngữ guide; Work step FSM rút theo N12; một harness cho mọi lần chạy.
+**Surface (OS-D20).** Bốn port, theo thứ tự: lối vào và lối ra cho người (webhook vào cửa raise, adapter ra của Questions), portfolio read của bản ghi lập lịch (CLI `--json`, gateway REST), command port, session placement.
 
-**Harness.** Bảo đảm từng bước: ghi một lần, thử lại an toàn, quan sát được, có cap, từ chối kèm mã lỗi chuẩn.
+**Harness (SR-D9).** Từng bước ghi một lần, thử lại an toàn, quan sát được, có cap, từ chối kèm mã lý do.
+
+**Chủ dự án chạm vào:** duyệt plan, duyệt ánh xạ cùng khung, consent trước hiệu ứng (merge, publish), và câu hỏi khi vượt khung, tất cả qua Questions, gom theo "Release con người".
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
-Kế thừa các task phụ thuộc đang chờ từ `supervisor-review` §7 và phân rã các bước tiếp theo:
+Viết lại round 41. Mỗi task khai báo thành phần và cửa nó chạm qua `component-authority` (`locate`, `declare`) trước khi viết code.
 
-### T0 Architecture Advisory Panel Run {#task-architecture-panel}
-- Goal: Khởi chạy `fgos-architecture-panel` với request được trích xuất từ thảo luận này để thu thập ý kiến phản biện độc lập trước khi đóng băng spec.
-- Ref: `q-kjat6xjwfv`.
-- Status: Tạm dừng / Đậu (on hold) chờ 4 bản sửa lỗi ổn định hạ cánh theo quyết định của chủ dự án tại `q-kjat6xjwfv`.
+### T0 Architecture Advisory Panel {#task-architecture-panel}
+- Goal: chạy `fgos-architecture-panel` trên §6 để có phản biện độc lập trước khi đóng spec.
+- Trạng thái: hoãn theo `q-kjat6xjwfv`; bốn bản sửa OS-D1 chờ đã land, chủ dự án quyết lúc mở.
 
-### T1 Admission in code {#task-admission-code}
-- Goal: Đưa logic kiểm tra điều kiện admission vào code (`fgos-supervision`), supervisor giữ quyền phán đoán (p-radq263tbx).
-- Vai trong skeleton: lát đầu tiên của giữ nhịp, lớn lên từ wake door (OS-D4, OS-D7). Ép `maxLeads` và lane trong code, không chỉ báo cho LLM; đưa mặc định `maxLeads` về `core/config-standard`; mỗi quyết định có mã lý do (OS-D5 ý 4).
+### T1 Giữ nhịp lát 1: admission trong code {#task-admission-code}
+- Goal: giữ nhịp trong `wake.rs` admit plan và khởi lead trong cap; ép `maxLeads` và lane bằng code; mặc định `maxLeads` về `core/config-standard`; mọi quyết định có mã lý do (`p-radq263tbx`).
+- D-IDs: OS-D4, OS-D5, OS-D7.
+- Verify nháp: `cargo test -p fgos-supervision` cộng một proof admit vượt cap bị từ chối có mã lý do.
 
-### T2 Head start preflight {#task-head-preflight}
-- Goal: Preflight sandbox kiểm tra ritual và lệnh skill trước turn đầu tiên của head (p-2wb2lfgky3).
+### T7.1 Bản ghi lập lịch và giữ nhịp đọc nó {#task-scheduling-record}
+- Goal: contract bản ghi `{ item, step, waitingOn, needs, outcome }` trong `packages/supervision/contracts/`; projector của domain coding (plan, ca workflow), Questions và Work; giữ nhịp đọc bản ghi, giải `needs` qua Session Host, Identity, `bind()`, xử `until`, bản ghi mồ côi, sleep và wake (OS-D18), handoff (OS-D19); wake nhận `--trigger --ref` (OS-D8).
+- D-IDs: OS-D8 tới OS-D13, OS-D18, OS-D19.
+- Phụ thuộc: T1.
+- Verify nháp: một ca hai bước song song cho ra hai bản ghi và hai người chơi; quá `until` sinh đúng một event.
 
-### T3 Merge queue with independent review {#task-merge-queue}
-- Goal: Hàng đợi merge độc lập cho coding domain, review verdict gắn với SHA (p-r3qqgwtcai).
+### T7.2 Plan generic, ánh xạ lúc thực thi, một harness {#task-plan-mapping}
+- Goal: contract plan tổng quát (xét bỏ `wave` khỏi phần bắt buộc); plan ngoài không đạt bị từ chối kèm lý do (cùng `p-f367pplkhu`); lead ánh xạ phase vào ca guide qua `workflow propose`, chạy phase trong ca; khung thêm kết quả dự định và non-goal cạnh bộ đếm; rút đường lead chạy phase ngoài ca.
+- D-IDs: OS-D21; liên quan N12 (rút Work step FSM, thuộc plan cutover coding).
+- Verify nháp: một plan nhiều phase chạy hết qua ca, không còn `fgos run` của lead ngoài ca.
 
-### T4 Failure ladder and caps {#task-failure-ladder}
-- Goal: Thang trách nhiệm xử lý lỗi L0-L3 và giới hạn số lần thử (p-sdwybf7yre).
+### T7.3 Lối vào và lối ra cho người {#task-surface-people}
+- Goal: route webhook có ký ở gateway chỉ gọi cửa raise; Questions thêm người nhận `to` (`role`, `party`), adapter ra theo kênh, xác thực người trả lời; Workflow human gate hỏi qua Questions (việc gộp thuộc `component-authority`).
+- D-IDs: OS-D8, OS-D16, OS-D20 (port 1).
+- Verify nháp: một câu hỏi gửi `party` ngoài, câu trả lời có ký vào thành `questions.answered`; chữ ký sai bị từ chối.
 
-### T5 Integration phase and dormant switch {#task-integration-phase}
-- Goal: Ràng buộc phase tích hợp, gỡ bỏ toggle và mã nguồn cũ (p-lkzx3oygy4).
+### T7.4 Portfolio read và command port {#task-surface-read}
+- Goal: một bản đọc JSON của bản ghi lập lịch qua CLI `--json` và gateway REST; command port bằng verb có sẵn. Session placement để sau, chỉ khi có UI thật cần.
+- D-IDs: OS-D20 (port 2, 3). Phụ thuộc: T7.1.
 
-### T7.1 Skeleton primitives contract & implementation {#task-skeleton-primitives}
-- Goal: Chuẩn hoá các primitive của skeleton (triggers, timers, start/sleep/wake, handoff, who-next, surface ports) thành contract nối các chủ đã có; giữ nhịp ở Supervision (OS-D7). Lấp ba khoảng trống: sleep, timer theo actor, một contract handoff thay ba đường (§3 4a). Tuân sổ authority của `component-authority` (OS-D6).
+### T7.5 Người chơi là tool {#task-tool-player}
+- Goal: `kind: tool` executor khai invocation dạng job (lệnh, tham số, `writes`, timeout); `bind()` chọn được; runner chạy, commit `writes`, settle như Unit của agent; tool chỉ tra cứu giữ nguyên.
+- D-IDs: OS-D15. Tính năng mới theo RUL104, chủ dự án đã chọn.
+- Verify nháp: một Unit `capability` ra tool job chạy và settle; `fgos run --provider` với tool không có invocation job vẫn bị từ chối.
 
-### T7.2 Unified frame language specification {#task-frame-language}
-- Goal: Thiết kế schema và engine thực thi cho ngôn ngữ khung hợp nhất plan và workflow guide.
+### T7.6 Rà soát định kỳ {#task-periodic-review}
+- Goal: key `watcher.reviewIntervalSec`; definition `review-due`; Unit chỉ đọc với brief cố định; record `fgos.review.done`; phát hiện thành event.
+- D-IDs: OS-D5, OS-D17. Phụ thuộc: T1.
 
-### T7.3 Surface ports projection adapter {#task-surface-ports}
-- Goal: Xây dựng adapter kết nối 6 ports với giao diện bên ngoài (Multica projection).
+### T7.7 Tài nguyên nặng là claim của resource referee {#task-resource-claims}
+- Goal: thêm loại claim tài nguyên máy vào `fgos-resource-referee` (hôm nay phán write-scope); giữ nhịp hỏi trước khi khởi người chơi.
+- D-IDs: OS-D14. Phụ thuộc: T7.1.
+
+### Task kế thừa từ `supervisor-review` §7 (không đổi)
+- T2 head start preflight (`p-2wb2lfgky3`), T3 merge queue (`p-r3qqgwtcai`), T4 failure ladder và cap (`p-sdwybf7yre`; nối với OS-D13 và bước 7 của §3 4p), T5 integration phase và dormant switch (`p-lkzx3oygy4`).
 
 ### Liên quan bên ngoài & theo dõi {#related}
 
