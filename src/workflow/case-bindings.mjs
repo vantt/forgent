@@ -15,12 +15,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
-import { custodyHeld, worktreeKey } from '../runner/execution/custody-door.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
 import { appendWorkflowEvent, fsyncDirectory, readWorkflowEvents } from './store.mjs';
 import { projectCase } from './case-projection.mjs';
-import { runsRoot } from '../runner/execution/case-run-paths.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
+import { custodyHeld, worktreeKey, runsRoot } from '../native/execution-door.mjs';
 
 export const SENTINEL_NAME = '.root';
 

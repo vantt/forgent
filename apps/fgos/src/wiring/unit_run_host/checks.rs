@@ -50,10 +50,7 @@ pub fn assert_run_timeout(value: &Value) -> Result<(), RunUnitError> {
 
 // ---- the plan ---------------------------------------------------------------------------------------------
 
-/// Whether `plan_dir` is a real directory under the main checkout (never through a link).
-pub(crate) fn is_plan_directory(main_root: &str, plan_dir: &str) -> bool {
-    std::fs::symlink_metadata(Path::new(main_root).join(plan_dir)).is_ok_and(|m| m.is_dir())
-}
+pub(crate) use fgos_execution_engine::unit_run::machine_reads::is_plan_directory;
 
 /// `existingPlanRef` (`src/runner/execution/run-request.mjs:174`): a unit file's plan gets the check `--plan` gets.
 pub fn existing_plan_ref(plan: Option<&Value>, main_root: &Path) -> Result<(), RunUnitError> {

@@ -24,10 +24,9 @@ import { judge, observe, selfRecord } from '../native/process-identity.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { assignmentDir } from '../runner/dispatch/assignment-layout.mjs';
 import { canonicalizeWriteEntry, matchesWriteScope } from '../runner/dispatch/write-scope.mjs';
-import { readStoredUnitSummary } from '../runner/execution/unit-summary.mjs';
-import { unitRunFacts } from '../runner/execution/unit-run-record.mjs';
 import { installOnce, replaceDurably } from '../native/door.mjs';
 import { markSuccessorAnswered, requestRotation, rotationHolds } from '../session-rotation/rotate.mjs';
+import { readStoredUnitSummary, unitRunFacts } from '../native/execution-door.mjs';
 
 const confined = (env) => env[CONFINED_MARKER_ENV] === '1';
 // `projectRoot` is a path or a function that finds it; only the unconfined branch resolves it, because the lookup probes

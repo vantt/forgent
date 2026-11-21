@@ -379,6 +379,10 @@
           "reason": "the runner's case run directory (its twin is run_dirs.rs)"
         },
         {
+          "path": "src/native/execution-door.mjs",
+          "reason": "carries case_paths::runs_root of fgos-execution to Node under its Node name (the addon's execution namespace); it lists nothing"
+        },
+        {
           "path": "packages/execution/rust/src/case_paths/mod.rs",
           "reason": "the Rust port of case-run-paths.mjs on the same vectors; the execution crate's one spelling of the case runs root, which hand-off naming asks instead of repeating it"
         },
@@ -1183,6 +1187,10 @@
         {
           "path": "packages/execution/rust/src/runner_check.rs",
           "reason": "the runner config check is derived here from the contracts under packages/execution/contracts"
+        },
+        {
+          "path": "src/native/execution-door.mjs",
+          "reason": "carries the engine's herdr detection (unit_run::machine_reads::herdr_present) to Node under its Node name; it derives nothing"
         }
       ],
       "debt": [

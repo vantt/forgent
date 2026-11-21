@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { eventsFilePath } from '../src/workflow/store.mjs';
-import { runsRoot } from '../src/runner/execution/case-run-paths.mjs';
+import { runsRoot } from '../src/native/execution-door.mjs';
 import {
   buildUnitSummary, readStoredUnitSummary, serializeUnitSummary, unitSummarySkipReason, writeUnitSummary,
 } from '../src/runner/execution/unit-summary.mjs';

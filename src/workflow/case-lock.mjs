@@ -4,8 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { RunnerConfigError } from '../native/execution-door.mjs';
-import { runDirOf } from '../runner/execution/case-run-paths.mjs';
+import { RunnerConfigError, runDirOf } from '../native/execution-door.mjs';
 import { acquireSync, createLockScope, lockHolders, probe, resolveLock } from '../holder-lock/index.mjs';
 import { createAdvanceHold, recoverWorkflowLedgerTail } from './store.mjs';
 import { drainCaseInbox } from './case-runtime.mjs';

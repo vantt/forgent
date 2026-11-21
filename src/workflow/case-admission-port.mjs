@@ -25,7 +25,7 @@ import { workflowCheckout } from './unit-handoff.mjs';
 import { CASE_ID_ENV, CASE_RESERVATION_ENV, currentDispatchDepth } from '../runner/dispatch/adapters.mjs';
 import { seatKeyOf } from '../runner/execution/legacy-seat-read.mjs';
 import { isVerdict } from '../runner/execution/outcome.mjs';
-import { isCaseId, runDirOf } from '../runner/execution/case-run-paths.mjs';
+import { isCaseId, runDirOf } from '../native/execution-door.mjs';
 
 /** Admission reads without `advance`, so it can meet an append in flight. */
 const readEvents = (mainRoot, caseId) => readWorkflowEvents({ repoRoot: mainRoot, workflowRunId: caseId, retryTail: true });
@@ -241,7 +241,7 @@ function admitUnderHold({ mainRoot, hold, id, proposal, writing }) {
  * @param {string} params.repoRoot the main checkout the ledger and the bindings live under
  * @param {string} [params.caseId] the case this port serves, when its caller is that case's proposer
  * @param {object} [params.heldAdvance] the proposer's `advance` hold; given, the port never acquires
- * @returns {import('../runner/execution/case-admission-port.mjs').CaseAdmissionPort}
+ * @returns {{ resolveBinding: Function, admit: Function, recheckEffect: Function, settle: Function }} the case admission port (`packages/execution/contracts/admission-peer/admission-peer.v1.json`)
  */
 export function createCaseAdmissionPort({ repoRoot, caseId = null, heldAdvance = null, env = process.env }) {
   const mainRoot = path.resolve(repoRoot);

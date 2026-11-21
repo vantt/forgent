@@ -10,6 +10,9 @@ use fgos_run_supervisor::controller::cwd_lock::{
 use fgos_run_supervisor::controller::error::DispatchError;
 use serde_json::{json, Value};
 
+/// The lock scope under which a worktree is added to or removed from a repository.
+pub const WORKTREE_ADMIN_SCOPE: &str = "workflow-worktree";
+
 /// Run `body` as the successor holder of `worktree`'s custody: admitted before the body starts, the hand-off
 /// recorded on the object the body returns once it ends, released whichever way it ends (the handle drops). A
 /// body that panics records no hand-off. The body returns an object: a hand-off that cannot be recorded adds a

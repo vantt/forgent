@@ -171,7 +171,7 @@ async function main() {
   // Loaded only for the one request that reads what waits for the owner in the Work layer.
   const workQuestions = async (params) => {
     const [paths, projection, store] = await Promise.all([
-      import('../runner/execution/case-run-paths.mjs'),
+      import('../native/execution-door.mjs'),
       import('../workflow/case-projection.mjs'),
       import('../state/store.mjs'),
     ]);

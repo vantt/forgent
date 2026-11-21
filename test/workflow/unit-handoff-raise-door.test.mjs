@@ -9,7 +9,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { unitOverridesOf } from '../../src/workflow/unit-handoff.mjs';
-import { simulateUnitBindings } from '../../src/runner/execution/dry-bind.mjs';
+import { simulateUnitBindings } from '../../src/seat-binding/client.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 
 seedFileLocalBwrapRegistry();

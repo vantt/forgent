@@ -14,7 +14,7 @@ import { startWorkflow, resumeWorkflow, answerWorkflow } from '../../src/workflo
 import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { acquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { projectCase } from '../../src/workflow/case-projection.mjs';
-import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
+import { resolveUnitInputs } from '../../src/native/execution-door.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 

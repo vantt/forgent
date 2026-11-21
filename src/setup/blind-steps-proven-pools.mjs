@@ -11,7 +11,7 @@
 // or paid for.
 
 import { explainSeat } from '../runner/execution/bind.mjs';
-import { simulateUnitBindings } from '../runner/execution/dry-bind.mjs';
+import { simulateUnitBindings } from '../seat-binding/client.mjs';
 import { readWorkflowCatalog, sourceOf, withUnreadableDefinitions, workflowUnitContract } from './workflow-catalog-reader.mjs';
 
 /**

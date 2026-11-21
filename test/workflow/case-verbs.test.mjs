@@ -14,7 +14,7 @@ import { readWorkflowEvents } from '../../src/workflow/store.mjs';
 import { acquireAdvanceLock, tryAcquireAdvanceLock } from '../../src/workflow/case-lock.mjs';
 import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { readBinding } from '../../src/workflow/case-bindings.mjs';
-import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
+import { resolveUnitInputs } from '../../src/native/execution-door.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { setupWorkflowFixtureRepo } from '../helpers/workflow-fixture-repo.mjs';
 import { capabilityServedBy, readProjectConfig, writeProjectConfig } from '../helpers/config-fixture.mjs';

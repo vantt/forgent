@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { seatIdProblem, isSeatId, assertSeatId, reservedSeatIds } from '../../src/convention/seat-id.mjs';
-import { resolveUnitInputs, HandoffRefError } from '../../src/runner/execution/handoff-refs.mjs';
+import { resolveUnitInputs, RunnerConfigError } from '../../src/native/execution-door.mjs';
 import { checkDeclaredSeats } from '../../src/runner/execution/seat-resolver.mjs';
 
 const golden = JSON.parse(fs.readFileSync(new URL('../../packages/convention/contracts/convention.golden.v1.json', import.meta.url), 'utf8'));
@@ -42,6 +42,6 @@ test('a hand-off ref cannot reach outside the run directory through a seat segme
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-seat-id-'));
   fs.mkdirSync(path.join(root, '.fgos', 'assignments', 'unit-run-a'), { recursive: true });
   for (const seat of ['../unit-run-a', 'a%2Fb', '..', 'runs']) {
-    assert.throws(() => resolveUnitInputs([`unit-run:unit-run-a/${seat}`], root), (err) => err instanceof HandoffRefError || /seat|ref/i.test(err.message), seat);
+    assert.throws(() => resolveUnitInputs([`unit-run:unit-run-a/${seat}`], root), (err) => err instanceof RunnerConfigError || /seat|ref/i.test(err.message), seat);
   }
 });

@@ -52,8 +52,16 @@ pub const EXIT_INVALID_REQUEST: i32 = 65;
 /// Version of the host component that answers; recorded by callers next to the decision it produced.
 pub const HOST_VERSION: &str = env!("CARGO_PKG_VERSION");
 
-const OPS: [&str; 6] = ["bind", "explain", "plan", "preflight", "digest", "ladder"];
-const OPS_TEXT: &str = "bind, explain, plan, preflight, digest or ladder";
+const OPS: [&str; 7] = [
+    "bind",
+    "explain",
+    "plan",
+    "preflight",
+    "digest",
+    "ladder",
+    "dry-bind",
+];
+const OPS_TEXT: &str = "bind, explain, plan, preflight, digest, ladder or dry-bind";
 
 /// The most bytes of any file the machine reads (the registry, a tool index's `meta.json`).
 const READ_CAP: usize = 1024 * 1024;
@@ -209,6 +217,7 @@ fn serve(op: &str, request: &Value) -> (i32, Value) {
                 Err(failure) => failed(op, &failure),
             }
         }
+        "dry-bind" => dry_bind(op, request, runner, &session, &machine, now),
         "plan" => {
             let text = |key: &str| {
                 request
@@ -280,6 +289,106 @@ fn serve(op: &str, request: &Value) -> (i32, Value) {
                 Err(err) => invalid(op, &format!("the answer cannot be encoded: {err}")),
             }
         }
+    }
+}
+
+/// `simulateUnitBindings(unit, runnerConfig, { session, overrides, raiseAuthorized, workflowId, collaboration })`:
+/// every seat the unit's pattern would dispatch, bound in the pattern's order without running any of them. The
+/// collaboration is the caller's when it gives one, else resolved over the bundled catalog (or the `shipped` the
+/// caller names) and the runner section.
+fn dry_bind(
+    op: &str,
+    request: &Value,
+    runner: &Value,
+    session: &Session,
+    machine: &HostMachine,
+    now: u64,
+) -> (i32, Value) {
+    let Some(unit) = request.get("unit").filter(|unit| unit.is_object()) else {
+        return invalid(op, "dry-bind needs a unit");
+    };
+    let resolved;
+    let collaboration = match request.get("collaboration").filter(|c| c.is_object()) {
+        Some(given) => given,
+        None => {
+            // The bundled catalog, unless the caller names the one it resolves against.
+            let shipped = request
+                .get("shipped")
+                .filter(|s| s.is_object())
+                .cloned()
+                .unwrap_or_else(crate::wiring::unit_run_host::machine::shipped_catalog);
+            let pattern = unit.get("pattern");
+            let selectors = json!({
+                "callerObject": pattern.filter(|p| p.is_object()),
+                "callerString": pattern.filter(|p| p.is_string()),
+            });
+            let ask = fgos_execution::patterns::ResolveOptions {
+                unit: Some(unit),
+                selectors: Some(&selectors),
+                request: None,
+                in_case: false,
+                reason: None,
+                runner_config: Some(runner),
+                shipped: Some(&shipped),
+                origins: None,
+            };
+            match fgos_execution::patterns::resolve_collaboration(
+                &ask,
+                &fgos_execution::hosts::CrateTables,
+                &fgos_execution::hosts::CrateSeating,
+            ) {
+                Ok(c) => {
+                    resolved = c.to_json();
+                    &resolved
+                }
+                Err(failure) => {
+                    let (code, message) = match failure {
+                        fgos_execution::patterns::CollaborationFailure::Collaboration(e) => {
+                            (e.code, e.message)
+                        }
+                        fgos_execution::patterns::CollaborationFailure::Seat(e) => {
+                            (e.code, e.message)
+                        }
+                    };
+                    return (
+                        0,
+                        answer(
+                            op,
+                            "failed",
+                            json!({ "failure": { "name": "CollaborationError", "code": code, "message": message } }),
+                        ),
+                    );
+                }
+            }
+        }
+    };
+    let effective = collaboration
+        .pointer("/pin/effective")
+        .or_else(|| collaboration.get("effective"))
+        .filter(|e| !e.is_null())
+        .unwrap_or(collaboration);
+    let options = fgos_execution_engine::planning::bind_facade::DryBindOptions {
+        session: Some(session.bind),
+        overrides: request
+            .get("overrides")
+            .and_then(Value::as_array)
+            .cloned()
+            .unwrap_or_default(),
+        raise_authorized: request.get("raiseAuthorized") == Some(&Value::Bool(true)),
+        workflow_id: request.get("workflowId").and_then(Value::as_str),
+    };
+    match fgos_execution_engine::planning::bind_facade::simulate_unit_bindings(
+        unit, runner, effective, &options, machine, now,
+    ) {
+        Ok(simulated) => (0, answer(op, "ok", json!({ "dryBind": simulated }))),
+        Err(e) => (
+            0,
+            answer(
+                op,
+                "failed",
+                json!({ "failure": { "name": e.name, "code": e.code, "message": e.message } }),
+            ),
+        ),
     }
 }
 
@@ -451,10 +560,7 @@ impl HostMachine {
 
 /// Herdr as the process environment shows it: `HERDR_ENV=1` and an existing `HERDR_SOCKET_PATH`.
 fn herdr_in_environment() -> bool {
-    std::env::var("HERDR_ENV").is_ok_and(|env| env == "1")
-        && std::env::var_os("HERDR_SOCKET_PATH")
-            .filter(|socket| !socket.is_empty())
-            .is_some_and(|socket| Path::new(&socket).exists())
+    fgos_execution_engine::unit_run::machine_reads::herdr_present()
 }
 
 /// A path with a separator is judged by its executable bit, as Node does; a bare name is looked up on `path_env`

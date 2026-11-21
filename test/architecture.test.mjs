@@ -1658,7 +1658,6 @@ const ARM_STATIC_IMPORTS = [
   '../src/report/knowledge-lints.mjs',
   '../src/report/knowledge-projection.mjs',
   '../src/report/knowledge-resolver.mjs',
-  '../src/run-supervisor/cancel-opt-in.mjs',
   '../src/runner/anti-loop.mjs',
   '../src/runner/attestation-guard.mjs',
   '../src/runner/claim-liveness.mjs',

@@ -14,7 +14,7 @@ import { applySettle, drainCaseInbox, recordGateAnswerRound, unconsumedGateRound
 import { bindWorktree, readBinding } from '../../src/workflow/case-bindings.mjs';
 import { acquireDispatchCwdLock } from '../../src/run-supervisor/cwd-lock.mjs';
 import { digestSubject, digestText, digestContextRefs } from '../../src/workflow/ref-digests.mjs';
-import { resolveUnitInputs } from '../../src/runner/execution/handoff-refs.mjs';
+import { resolveUnitInputs } from '../../src/native/execution-door.mjs';
 import { readFrontmatter } from '../../src/util/yaml.mjs';
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { appendAll, append, eventsOf, FRAME, openCase, projectionOf, settle, withHold } from '../helpers/workflow-case-fixture.mjs';

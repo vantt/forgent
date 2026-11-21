@@ -9,11 +9,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { RunnerConfigError } from '../native/execution-door.mjs';
-import { custodyHeld } from '../runner/execution/custody-door.mjs';
-import { gateAnswerFile, runDirOf } from '../runner/execution/case-run-paths.mjs';
-import { unitRunFacts } from '../runner/execution/unit-run-record.mjs';
-import { releasedUnitRunSettle } from '../runner/execution/case-admission-port.mjs';
+import { RunnerConfigError, custodyHeld, gateAnswerFile, runDirOf, unitRunFacts, releasedUnitRunSettle } from '../native/execution-door.mjs';
 import { NOT_STARTED_OUTCOME } from '../runner/execution/outcome.mjs';
 import { appendWorkflowEvent, readWorkflowEvents } from './store.mjs';
 import { gateOfStep, projectCase } from './case-projection.mjs';

@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { replaceDurably } from '../native/door.mjs';
 import { readConfig } from '../config/facade.mjs';
 import { acquireSync, createLockScope, probe } from '../holder-lock/index.mjs';
-import { requestCancel } from '../run-supervisor/cancel-registry.mjs';
+import { requestCancel } from '../native/execution-door.mjs';
 import {
   assertHeadArgs, headKeyOf, headRoleOf, identityHolder, lineageDirOf, nextHeadGeneration, placeHead, readHeadPlacement, slotKeyOf, writeHeadPlacement,
 } from '../session-host/head-start.mjs';

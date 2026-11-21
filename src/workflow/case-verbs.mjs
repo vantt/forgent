@@ -8,9 +8,7 @@
 
 import path from 'node:path';
 
-import { RunnerConfigError } from '../native/execution-door.mjs';
-import { resolveGitRoots } from '../runner/execution/run.mjs';
-import { runDirOf } from '../runner/execution/case-run-paths.mjs';
+import { RunnerConfigError, runDirOf } from '../native/execution-door.mjs';
 import { appendWorkflowEvent, projectWorkflowState, readWorkflowEvents } from './store.mjs';
 import {
   acquireAdvanceLock,
@@ -32,6 +30,7 @@ import { advanceWorkflowRun } from './runner.mjs';
 import { normalizeSeats } from './seats.mjs';
 import { seatProviders } from './seat-providers.mjs';
 import { stepSubjectDigest } from './ref-digests.mjs';
+import { resolveGitRoots } from '../git/inspect.mjs';
 
 const isConductor = (projection) => projection.kind === 'guide';
 

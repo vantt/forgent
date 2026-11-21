@@ -7,7 +7,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { requestCancel } from '../run-supervisor/cancel-registry.mjs';
+import { requestCancel } from '../native/execution-door.mjs';
 import { createSessionHost } from './client.mjs';
 import { headRoleOf, identityHolder, lineageDirOf, readHeadPlacement, writeHeadPlacement } from './head-start.mjs';
 

@@ -27,6 +27,9 @@ fgos-config = { path = "../../config/rust" }
 fgos-run-result = { path = "../../run-result/rust" }
 fgos-agent-protocol = { path = "../../agent-protocol/rust" }
 fgos-checkout = { path = "../../execution/checkout" }
+fgos-execution = { path = "../../execution/rust" }
+fgos-execution-engine = { path = "../../execution/engine" }
+fgos-run-supervisor = { path = "../../run-supervisor/rust", default-features = false, features = ["lease"] }
 
 [build-dependencies]
 napi-build = "=2.2.4"
