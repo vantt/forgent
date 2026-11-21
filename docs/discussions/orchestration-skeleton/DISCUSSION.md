@@ -11,6 +11,7 @@ discussion: open
 - 2026-11-21 16:35: đã xác định 4 bản sửa của OS-D1 (nguồn: memory `orchestration-stabilize-first-decision` của secretary Miu và tin supervisor gửi Miu sáng 2026-11-21: "1547 first, then the idle-lead nudge, then the names, then the reaper"): `p-l22vozecxg`, `p-waxzxz5mio`, `p-mhwe24fttr`, `p-yqanenewb4`. **Cả 4 đã `done`** (xem §7 `#related`). Điều kiện đậu theo chữ của OS-D1 đã thỏa, nhưng release hold ("no new work until the release hold is lifted", handoff secretary 14:45) vẫn còn hiệu lực. Discussion vẫn `paused` cho tới khi chủ dự án cho mở lại.
 - **2026-11-21 16:16: chủ dự án cho mở lại (OS-D2).** Trạng thái `discussion: open`. Architecture panel (T0) vẫn hoãn. Release hold không bị ảnh hưởng vì discussion không sinh code.
 - **2026-11-21 16:23 (round 6):** chủ dự án trả lời câu hỏi round 5 là "cả hai": mọi thành phần phải có authority, boundary và contract rõ, **và** hệ thống cần một cơ chế hoặc một vai làm nhạc trưởng nắm nhịp điều phối tổng. Câu hỏi mở thành §3 row 9: nhạc trưởng, hay mọi thứ chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan theo chuỗi watcher -> ghi signal -> phản ứng tiếp. Đang chạy 5 agent con (haiku, chỉ đọc) dò lại tier 0 tới 9 từ dưới lên; kết quả sẽ vào bảng §3 row 4b.
+- **2026-11-21 20:54 (round 27): bàn chỗ vướng 2 (`person` là người ngoài).** Phân tích và ba phương án ở §3 4k. Đang hỏi: ai giữ việc hỏi một người (chủ dự án, người duyệt, khách hàng).
 - **2026-11-21 20:43 (round 26): chủ dự án chọn B -> OS-D15.** Tool khai invocation dạng job thì làm người chơi qua chính cửa `fgos run`; không có cửa job thứ hai. Còn mở ở mục facet: `person` là người ngoài (§3 4i chỗ 2).
 - **2026-11-21 19:56 (round 25): chủ dự án đồng ý ghi chỗ vướng 4 và 5 -> OS-D13, OS-D14; bàn tiếp chỗ 3 (người chơi là tool).** Phân tích và ba phương án ở §3 4j. Đang hỏi: việc của máy (render, transcode) đi qua cửa nào.
 - **2026-11-21 19:45 (round 22-24): chủ dự án đồng ý phương án A -> OS-D12 (tạm chốt).** Bản ghi lập lịch gắn với từng bước đang mở, khoá là cặp (`item`, `step`). Chỗ vướng 1 của 4i đã giải; còn mở các chỗ 2 tới 5.
@@ -258,6 +259,23 @@ Không vướng gì: guide đã khai `capability` cho từng unit và gate ngư�
 
 **Đã chốt: (B), OS-D15.** *Lưu ý RUL104:* (B) là thêm tính năng, không phải làm cứng phần cũ; chỉ làm khi chủ dự án chọn. Nó phục vụ mission #2 (business workflow như video), không chỉ dogfood.
 
+**4k. `person` là người ngoài (chỗ vướng 2, round 27, 2026-11-21 20:54)**
+
+*Hôm nay có gì (đã đọc):*
+- **Questions** (`docs/platform/component-boundary.md` hàng Questions, crate `packages/questions/rust`): một cửa `fgos questions ask|answer|show|ack|cancel`, câu hỏi năm phần, id `q-` do Identity mint, người hỏi điền từ Identity, sự kiện `questions.*` trong Event Store. Hôm nay chỉ hỏi **chủ dự án**; không có trường người được hỏi.
+- **Workflow human gate** (Work layer, `fgos ask`): guide marketing có bước `approval` với `gate: {kind: human}` và claim `copy-approved` `acceptedBy: owner`, guard `human-consent` gắn digest của bản copy. Đây là cửa hỏi người thứ hai, đứng cạnh Questions (component-boundary ghi Questions "owns no Workflow gate or `fgos ask`").
+- **Surface ports** (plan nháp `261118-1117-external-ui-integration-multica`): notifier port (mailbox trước, rồi kênh ngoài) và question port (đưa câu hỏi năm phần ra UI ngoài).
+- **Luật định danh** (`docs/platform/documentation/subcomponents/document-identity/spec.md`): tên người không phải identifier, dùng `role`; khách hàng dùng account id.
+
+*Hình dạng đề xuất cho giữ nhịp (không phụ thuộc phương án):* `waitingOn: {kind: person, ref: <q-id>, until?}`. Thứ được chờ là **một câu hỏi**, không phải một cái tên; người được hỏi nằm trong câu hỏi dưới dạng `role` hoặc `party` (ví dụ `role: approver`, `party: customer:<account-id>`). Câu trả lời từ ngoài vào đi qua cửa raise (OS-D8: webhook ký, payload là dữ liệu không tin cậy); adapter xác thực người trả lời đúng là `party` đã hỏi. Quá `until` thì raise (OS-D10). Giữ nhịp không biết kênh, không biết địa chỉ.
+
+*Câu còn mở: ai giữ việc hỏi người.*
+- **(A) Một cửa hỏi người cho mọi người.** Questions thêm `to` (mặc định chủ dự án; có thể `role` hoặc `party`), gửi ra qua question/notifier port với adapter theo kênh (mailbox cho chủ dự án, email hoặc portal cho khách), nhận về qua cửa raise thành `questions.answered`. Workflow human gate về lâu dài hỏi qua chính cửa này. Một authority cho "ai đang bị hỏi gì, đã trả lời chưa".
+- **(B) Questions chỉ cho chủ dự án; người ngoài do domain tự lo** bằng adapter riêng, câu trả lời về như một `event` thường. Ít đụng hôm nay, nhưng mỗi domain một đường hỏi người: đúng kiểu code thừa (nguyên tắc 1, 7).
+- **(C) Workflow gate là cửa hỏi người ngoài, Questions giữ cho chủ dự án.** Giữ nguyên hai cửa hiện có, chia theo người được hỏi. Hai authority cho cùng một loại quyết định.
+
+*Ghi chú cho discussion component-authority:* hai cửa hỏi người (Questions và Workflow gate `fgos ask`) là một cặp trùng authority; phương án nào được chọn ở đây thì việc gộp thuộc bên đó.
+
 ## 4. Quyết định đã chốt
 
 Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
@@ -314,6 +332,7 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-21 19:45 round 24: Chủ dự án: "ok đồng ý A". Mint OS-D12 (tạm chốt).
 - 2026-11-21 19:56 round 25: Chủ dự án: "đồng ý ghi 4 và 5, bàn tiếp chỗ 3". Mint OS-D13, OS-D14. Đọc RUL65, `packages/execution/rust/src/tools.rs`, `executor-dispatch-fallback.md`, `runner.yaml` patterns, `resource_check.rs`; phân tích chỗ 3 ở §3 4j.
 - 2026-11-21 20:43 round 26: Chủ dự án: "đồng ý B". Mint OS-D15. Ghi chú: lần land round 25 thất bại `merge-slot-busy` mà shaper không thấy, file bẩn trên main chặn lead work-data-model phase 6 từ 20:00 tới 20:43 (q-2dwvrkgabm); land lại cùng round 26.
+- 2026-11-21 20:54 round 27: Chủ dự án: "đồng ý, bàn tiếp chỗ 2". Đọc hàng Questions của `component-boundary.md`, guide marketing (gate `approval`, `acceptedBy: owner`), plan nháp multica (notifier, question port), luật định danh của document-identity; phân tích ở §3 4k.
 
 ## 6. Thiết kế đã chốt {#design}
 
