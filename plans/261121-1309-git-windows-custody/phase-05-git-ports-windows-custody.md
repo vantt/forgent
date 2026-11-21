@@ -26,6 +26,11 @@ packages/supervision/rust/tests/land.rs, packages/execution/checkout/tests/**,
 4. Add steps to `windows git custody`: `cargo test --release -p fgos-git`, `cargo test --release -p fgos-supervision --test land`,
    `cargo test --release -p fgos-checkout`.
 
+5. Run the WAL-backed worktree tests (packages/git/rust/tests/worktree.rs module `wal_backed`, listed by name in the
+   plan's acceptance 5) on Windows; the Windows proof of the Git ports runs from apps/fgos/tests with the fgos binary as
+   the borrow helper (a library test harness serves no helper role). Add a doc line to driver.rs `spelling()`: the
+   lexical `..` fold is correct only because admin directories contain no symlinks.
+
 ## Verify
 - Linux: `cargo test -p fgos-git -p fgos-supervision -p fgos-checkout`, clippy -D warnings, fmt, msvc check of those
   crates plus `-p fgos`; `rg -n "git-lockscope-unavailable-windows" packages apps` is empty except the S6A-owned

@@ -38,6 +38,8 @@ footprint:
   - packages/execution/engine/src/assignment_runner/launch.rs
   - packages/execution/engine/src/accounts/state.rs
   - apps/fgos/tests/windows_borrow.rs
+  - apps/fgos/tests/windows_git_custody.rs
+  - packages/run-supervisor/rust/tests/controller_launch.rs
   - apps/fgos/src/wiring/unit_run_host/verify.rs
   - apps/fgos/tests/windows_cwd_lease_owner.rs
   - apps/fgos/src/wiring/unit_run_host/tests/run_unit.rs
@@ -107,9 +109,17 @@ narrative goes into the Git spec's decision history.
    `git-wal-v1` activates with the fence placed, and a live predecessor writer refuses.
 4. A Windows unit-run-host test commits a writing Unit's declared paths under custody into the worktree branch
    (`apps/fgos/src/wiring/unit_run_host/tests/run_unit.rs`, run in `windows git custody`).
-5. `rg -n "git-lockscope-unavailable-windows" packages apps` returns nothing; `BorrowedHandle::new` and
+5. The WAL-backed worktree tests in packages/git/rust/tests/worktree.rs (module `wal_backed`, Linux-only since phase 1)
+   run on Windows through the Git ports' Windows proof, by name: killed_move_repairs_only_the_recorded_destination_and_preserves_bytes,
+   killed_create_retains_initializing_lock_until_owned_repair, killed_remove_and_partial_prune_are_owned_and_never_repeat_destroy,
+   clean_git_refusals_settle_attempts_without_replaying_effects, successful_registered_create_rollback_settles_as_not_completed,
+   lock_naming_a_live_process_is_not_a_recovery_finding, lock_naming_a_dead_or_unparseable_or_reused_owner_stays_a_finding,
+   missing_checkout_prune_requires_owned_create_and_preserves_unknown_residue,
+   missing_owned_detached_history_keeps_its_registration_when_no_delivery_ref_exists, and the five discarding_* cases;
+   any that stays Linux-only names its reason.
+6. `rg -n "git-lockscope-unavailable-windows" packages apps` returns nothing; `BorrowedHandle::new` and
    `run_borrowed_io` have no Windows refusal.
-6. Linux gates stay green: `cargo test` for every touched crate, `cargo clippy -D warnings`, `cargo fmt --check`,
+7. Linux gates stay green: `cargo test` for every touched crate, `cargo clippy -D warnings`, `cargo fmt --check`,
    and `cargo check --target x86_64-pc-windows-msvc` for the touched crates.
 
 ## Non-goals
@@ -123,11 +133,11 @@ narrative goes into the Git spec's decision history.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [LockFileEx handle evidence, linked worktree trust and plain paths on Windows, CI job](phase-01-windows-worktree-and-ci-job.md) | - | packages/holder-lock/rust/tests/windows_lockfileex.rs, packages/git/rust/src/driver.rs, packages/git/rust/src/worktree.rs, packages/git/rust/tests/worktree.rs, packages/distribution/rust/src/release_rows.rs, packages/distribution/rust/src/workspace.rs, .github/workflows/release-assets-check.yml | 1 | ready |
+| 1 | [LockFileEx handle evidence, linked worktree trust and plain paths on Windows, CI job](phase-01-windows-worktree-and-ci-job.md) | - | packages/holder-lock/rust/tests/windows_lockfileex.rs, packages/git/rust/src/driver.rs, packages/git/rust/src/worktree.rs, packages/git/rust/tests/worktree.rs, packages/distribution/rust/src/release_rows.rs, packages/distribution/rust/src/workspace.rs, .github/workflows/release-assets-check.yml | 1 | done |
 | 2 | [WAL opens on Windows](phase-02-windows-wal.md) | - | packages/git/rust/src/wal.rs, packages/git/rust/src/wal/**, packages/git/rust/Cargo.toml, Cargo.toml, Cargo.lock | 1 | ready |
-| 3 | [Borrowed handle and borrow I/O on Windows](phase-03-holder-lock-windows-borrow.md) | - | packages/holder-lock/rust/src/port.rs, packages/holder-lock/rust/src/borrow_windows.rs, packages/holder-lock/rust/src/driver/windows.rs, packages/holder-lock/rust/tests/**, packages/git/rust/src/driver.rs, packages/execution/engine/src/accounts/state.rs, apps/fgos/src/wiring/unit_run_host/verify.rs, apps/fgos/tests/windows_borrow.rs, .github/workflows/release-assets-check.yml | 2 | ready |
+| 3 | [Borrowed handle and borrow I/O on Windows](phase-03-holder-lock-windows-borrow.md) | - | packages/holder-lock/rust/src/port.rs, packages/holder-lock/rust/src/borrow_windows.rs, packages/holder-lock/rust/src/driver/windows.rs, packages/holder-lock/rust/tests/**, packages/git/rust/src/driver.rs, packages/execution/engine/src/accounts/state.rs, apps/fgos/src/wiring/unit_run_host/verify.rs, apps/fgos/tests/windows_borrow.rs, packages/git/rust/tests/borrow_deadline.rs, packages/run-supervisor/rust/tests/controller_launch.rs, .github/workflows/release-assets-check.yml | 2 | ready |
 | 4 | [C5 fence and scan on Windows, git-wal-v1 advertised](phase-04-windows-c5.md) | 2 | packages/holder-lock/rust/src/tombstone.rs, packages/holder-lock/rust/src/route.rs, packages/process/rust/src/facts.rs, packages/process/rust/src/platform/windows.rs, packages/process/rust/tests/**, packages/distribution/rust/src/git_gate.rs, packages/distribution/rust/src/init.rs, packages/distribution/rust/src/verify.rs, packages/distribution/rust/tests/**, docs/platform/packaging-distribution/contracts/activation-binding.md, docs/platform/packaging-distribution/contracts/release-manifest.md, scripts/build-rust-distribution.mjs, apps/fgctl/tests/git_wal_activation_gate.rs, test/distribution/native-addon.test.mjs | 2 | ready |
-| 5 | [Git ports take custody on Windows](phase-05-git-ports-windows-custody.md) | 1, 2, 3 | packages/git/rust/src/lib.rs, packages/git/rust/src/scoped_commit.rs, packages/git/rust/src/sync.rs, packages/git/rust/src/land.rs, packages/git/rust/src/refs.rs, packages/git/rust/src/remote.rs, packages/git/rust/src/restore.rs, packages/git/rust/src/recovery.rs, packages/git/rust/src/repository_config.rs, packages/git/rust/src/native_lock.rs, packages/git/rust/src/publication.rs, packages/git/rust/tests/scoped_commit_sync.rs, packages/git/rust/tests/land.rs, packages/git/rust/tests/land_crash_matrix.rs, packages/git/rust/tests/land_push_catch_up.rs, packages/git/rust/tests/safe_restore.rs, packages/git/rust/tests/refs_remote.rs, packages/git/rust/tests/recovery_matrix.rs, packages/git/rust/tests/repository_config.rs, packages/git/rust/tests/borrow_deadline.rs, packages/git/rust/tests/support/**, packages/git/contracts/mutation-census.v1.json, packages/supervision/rust/tests/land.rs, packages/execution/checkout/tests/**, .github/workflows/release-assets-check.yml | 3 | ready |
+| 5 | [Git ports take custody on Windows](phase-05-git-ports-windows-custody.md) | 1, 2, 3 | packages/git/rust/src/lib.rs, packages/git/rust/src/driver.rs, packages/git/rust/tests/worktree.rs, apps/fgos/tests/windows_git_custody.rs, packages/git/rust/src/scoped_commit.rs, packages/git/rust/src/sync.rs, packages/git/rust/src/land.rs, packages/git/rust/src/refs.rs, packages/git/rust/src/remote.rs, packages/git/rust/src/restore.rs, packages/git/rust/src/recovery.rs, packages/git/rust/src/repository_config.rs, packages/git/rust/src/native_lock.rs, packages/git/rust/src/publication.rs, packages/git/rust/tests/scoped_commit_sync.rs, packages/git/rust/tests/land.rs, packages/git/rust/tests/land_crash_matrix.rs, packages/git/rust/tests/land_push_catch_up.rs, packages/git/rust/tests/safe_restore.rs, packages/git/rust/tests/refs_remote.rs, packages/git/rust/tests/recovery_matrix.rs, packages/git/rust/tests/repository_config.rs, packages/git/rust/tests/borrow_deadline.rs, packages/git/rust/tests/support/**, packages/git/contracts/mutation-census.v1.json, packages/supervision/rust/tests/land.rs, packages/execution/checkout/tests/**, .github/workflows/release-assets-check.yml | 3 | ready |
 | 6 | [Lease channel for the attempt's whole life, verify under custody](phase-06-lease-whole-life-and-verify.md) | 3 | packages/execution/engine/src/assignment_runner/launch.rs, apps/fgos/src/wiring/unit_run_host/verify.rs, apps/fgos/tests/windows_cwd_lease_owner.rs | 3 | ready |
 | 7 | [Windows unit-run commit end to end, docs, integration](phase-07-e2e-docs-integration.md) | 4, 5, 6 | apps/fgos/src/wiring/unit_run_host/tests/run_unit.rs, .github/workflows/release-assets-check.yml, docs/platform/holder-lock/spec.md, docs/platform/git/spec.md, docs/platform/run-supervisor/spec.md, CHANGELOG.md | 4 | ready |
 
@@ -190,3 +200,7 @@ p-nk6xf5laob and p-w4cxqq2sbw are set done through the portfolio owner when phas
   therefore run from apps/fgos/tests with the fgos binary as helper (existing pattern: windows_borrow.rs). Phase 6's
   re-declare proof is green in that run (the lease answers a later declaration). Release-assets-check split agreed with
   lead:WINCI: this plan owns only the `windows-git-custody` job block.
+- 2026-11-21 lead:WINCUSTODY: phase 1 DONE, landed 2838b1682 after OPC MERGE (CI 44881148894: windows git custody,
+  windows lock inheritance probe, windows cwd lease owner, msvc assets, focused ubuntu green; focused windows red only on
+  p-xh3zdvzyip). OPC notes carried: phase 5 acceptance names the WAL-backed worktree tests; phase 5 adds a doc line to
+  driver.rs `spelling()` saying the lexical `..` fold is right only because admin dirs hold no symlinks.
