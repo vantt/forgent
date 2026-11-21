@@ -20,3 +20,11 @@ No. `fgos friction record` from this seat fails in the same way as hers:
 `lock-driver-unavailable: observe lock at .fgos/locks/observe.lock: Read-only file system (os error 30)`.
 This adds evidence to p-ndortdckid. Recording also took three refusals before the input was valid: the subject needs `kind:id`, the layer has no `agent-confinement` value, and the disposition allows only advisory, blocked, parked or halted. The head skills' friction section should name the valid values.
 The friction attempted was that `git fetch` from this seat fails because `.git/FETCH_HEAD` is on a read-only file system.
+
+## Late events (10)
+
+- Event `c0f6ba1e194c2c85` arrived between two listings and was marked handled before it was read. Its kind is unknown. If it mattered, the watcher raises it again.
+- session-idle `3bc0ebcb…` ×7 (lead:WINCUSTODY): every one was a false alarm. The lead is mid-turn on phase 6 (`wincustody-p6`, verify.rs borrow path).
+- session-idle `4f660b01…` ×2: this is the reviewer of git-windows-custody. It ended with Status DONE on phases 5 and 6 and is idle, which is expected. It names one non-blocking follow-up for the lead to place: the Git driver should take its helper as a parameter so that a Windows borrow made through the Node addon works.
+- session-idle `unknown`: there is no session to read.
+- 4 of 4 leads are still live, and no plan is admissible.
