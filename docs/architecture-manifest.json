@@ -1277,7 +1277,7 @@
         }
       ],
       "retiredBy": "S6a: the agy permission check leaves Node and its sub-HOME reader with it",
-      "reason": "seven executor-model doctor rows (runner-generated-paths, executor-confinement, invocation-git-write-grants, capability-serves-valid, omp-natives-present, agy-sub-homes-configured, tool-registry-configured) are judged in process by the host over fgos-execution checks.rs (the host adapter apps/fgos/src/wiring/doctor/execution.rs only wires them and defines none of these names), never by a Node body that asks the host back; the Node judge names are retired, and a second judge of the same row must be declared. seat-binding-route stays on the Node bridge (bridge:S6a) because it probes the binary the Node client runs"
+      "reason": "seven executor-model doctor rows (runner-generated-paths, executor-confinement, invocation-git-write-grants, capability-serves-valid, omp-natives-present, agy-sub-homes-configured, tool-registry-configured) are judged in process by the host over fgos-execution checks.rs (the host adapter apps/fgos/src/wiring/doctor/execution.rs only reads and wires them and defines none of these names; the executor, account, agent-definition and template rows are judged in checks.rs too), never by a Node body that asks the host back; the Node judge names are retired, and a second judge of the same row must be declared. seat-binding-route stays on the Node bridge (bridge:S6a) because it probes the binary the Node client runs"
     },
     {
       "job": "capability rows hold jobs and tool abilities",
@@ -1632,7 +1632,7 @@
         "packages/git/node-addon/src/checkout.rs",
         {"path": "packages/git/node-addon/src/git/worktree.rs", "reason": "carries the Git worktree port to Node: its create, remove and prune entries call the driver and decide nothing"},
         {"path": "packages/config/rust/src/bundle.rs", "reason": "names the `worktreeSetup` config section in the bundle's section list; it runs nothing"},
-        {"path": "apps/fgos/src/wiring/doctor/execution.rs", "reason": "names `worktreeSetup` in a check message; it provisions nothing"}
+        {"path": "packages/execution/rust/src/checks.rs", "reason": "names `worktreeSetup` in a check message; it provisions nothing"}
       ],
       "debt": [
         {"path": "src/cli/command-registry.mjs", "reason": "names `worktreeSetup` in the description text of the `worktree` verb"},
