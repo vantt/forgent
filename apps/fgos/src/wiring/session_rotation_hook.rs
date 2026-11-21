@@ -17,7 +17,7 @@ use fgos_session_host::rotation::decide::{decide, AtRest, RotationConfig};
 use fgos_session_host::rotation::handoff::{
     awaits_answer, lineage_dir, read_latest, rotation_id_of, session_start_context,
 };
-use fgos_session_host::rotation::measure::{measure, Sources, FRESH_WAIT};
+use fgos_session_host::rotation::measure::{measure, Source, Sources, FRESH_WAIT};
 use serde_json::{json, Value};
 use std::ffi::OsString;
 use std::io::Read;
@@ -29,6 +29,8 @@ const MAX_TEXT: usize = 8000;
 const MAX_PORTFOLIO: usize = 50;
 const MAX_PATH_CHARS: usize = 300;
 const SIDECAR_FILE: &str = "context-sidecar.jsonl";
+/// The reason of a stop that measured below soft: the host records it and rotates nothing.
+const NO_ROTATION_REASON: &str = "none";
 
 /// Runs one hook call and ends the process with status 0.
 pub fn main(args: &[OsString]) -> ! {
@@ -139,10 +141,23 @@ fn stop(head: &Head, fgos_dir: &Path, payload: &Value, ports: &Ports) -> Result<
         background_tasks: count(payload, "background_tasks"),
         session_crons: count(payload, "session_crons"),
     };
-    let decision = decide(measured.map(|m| m.fraction), thresholds, rest);
-    let Some(reason) = decision.rotate.reason() else {
-        return Ok(());
-    };
+    let decision = decide(measured.as_ref().map(|m| m.fraction), thresholds, rest);
+    // Every stop asks, so the host sees and records each decision; below soft the host starts nothing.
+    let reason = decision.rotate.reason().unwrap_or(NO_ROTATION_REASON);
+    let measure = json!({
+        "fraction": measured.as_ref().map(|m| m.fraction),
+        "source": measured.as_ref().map(|m| match m.source { Source::Sidecar => "sidecar", Source::Transcript => "transcript" }),
+        "stale": measured.as_ref().is_some_and(|m| m.stale),
+        "decision": decision.reason,
+    });
+    if reason == NO_ROTATION_REASON {
+        return (ports.ask)(
+            "session rotate",
+            &json!({ "persona": head.persona, "name": head.name, "reason": reason, "measure": measure }),
+        )
+        .map(|_| ())
+        .map_err(|e| format!("session rotate: {e}"));
+    }
     let portfolio: Vec<&String> = config
         .reload_of(&head.persona)
         .iter()
@@ -156,8 +171,7 @@ fn stop(head: &Head, fgos_dir: &Path, payload: &Value, ports: &Ports) -> Result<
     if let Some(message) = payload_str(payload, "last_assistant_message") {
         facts["lastAssistantMessage"] = json!(bounded(message));
     }
-    let args =
-        json!({ "persona": head.persona, "name": head.name, "reason": reason, "stopFacts": facts });
+    let args = json!({ "persona": head.persona, "name": head.name, "reason": reason, "stopFacts": facts, "measure": measure });
     (ports.ask)("session rotate", &args)
         .map(|_| ())
         .map_err(|e| format!("session rotate: {e}"))
@@ -390,12 +404,22 @@ mod tests {
     }
 
     #[test]
-    fn a_stop_at_or_above_soft_asks_for_a_rotation_with_the_stop_facts_and_below_soft_asks_nothing()
-    {
+    fn a_stop_at_or_above_soft_asks_for_a_rotation_with_the_stop_facts_and_below_soft_asks_for_a_record_only(
+    ) {
         let (fgos_dir, lineage) = fgos("rot");
         let payload = |tokens| json!({ "session_id": "s-1", "transcript_path": transcript(&lineage, tokens), "last_assistant_message": "done" });
         let (calls, result) = run_stop(&head(Some(1)), &fgos_dir, payload(300), Ok(json!({})));
-        assert!(result.is_ok() && calls.is_empty());
+        assert!(result.is_ok());
+        assert_eq!(
+            calls,
+            vec![(
+                "session rotate".to_string(),
+                json!({
+                    "persona": "secretary", "name": "miu", "reason": "none",
+                    "measure": { "fraction": 0.3, "source": "transcript", "stale": true, "decision": "below-soft" }
+                })
+            )]
+        );
         let (calls, result) = run_stop(
             &head(Some(1)),
             &fgos_dir,
@@ -409,7 +433,8 @@ mod tests {
                 "session rotate".to_string(),
                 json!({
                     "persona": "secretary", "name": "miu", "reason": "soft",
-                    "stopFacts": { "portfolio": ["plans/a.md"], "sessionId": "s-1", "lastAssistantMessage": "done" }
+                    "stopFacts": { "portfolio": ["plans/a.md"], "sessionId": "s-1", "lastAssistantMessage": "done" },
+                    "measure": { "fraction": 0.5, "source": "transcript", "stale": true, "decision": "at-or-above-soft" }
                 })
             )]
         );
@@ -418,13 +443,34 @@ mod tests {
     }
 
     #[test]
+    fn a_head_that_stays_above_soft_across_many_stops_asks_at_every_stop() {
+        let (fgos_dir, lineage) = fgos("many");
+        let payload = json!({ "session_id": "s-1", "transcript_path": transcript(&lineage, 500) });
+        for stop_number in 0..25 {
+            // The host's answer (a rotation already running, a refusal) never makes a later stop skip its question.
+            let reply = if stop_number % 2 == 0 {
+                Ok(json!({ "started": false, "reason": "rotation-in-progress" }))
+            } else {
+                Err(ClientError {
+                    code: "spawn-failed".into(),
+                    detail: None,
+                    message: None,
+                })
+            };
+            let (calls, _) = run_stop(&head(Some(1)), &fgos_dir, payload.clone(), reply);
+            assert_eq!(calls.len(), 1, "stop {stop_number} asked once");
+            assert_eq!(calls[0].1["reason"], "soft");
+        }
+    }
+
+    #[test]
     fn a_running_background_task_holds_the_rotation_and_a_refused_request_is_the_error_not_a_panic()
     {
         let (fgos_dir, lineage) = fgos("busy");
         let busy = json!({ "transcript_path": transcript(&lineage, 900), "background_tasks": [{ "id": "b" }] });
-        assert!(run_stop(&head(None), &fgos_dir, busy, Ok(json!({})))
-            .0
-            .is_empty());
+        let (calls, _) = run_stop(&head(None), &fgos_dir, busy, Ok(json!({})));
+        assert_eq!(calls[0].1["reason"], "none");
+        assert_eq!(calls[0].1["measure"]["decision"], "background-work-running");
         let full = json!({ "transcript_path": transcript(&lineage, 900) });
         let (_, result) = run_stop(
             &head(None),
