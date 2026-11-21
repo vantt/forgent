@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Head tab labels read `role: subject` and head names are unique by construction"
-status: running
+status: done
 lead: lead:NAMES
 base: c24ea6e5ba985698ccf7535d35900b0ade6fb906
 priority: P1
@@ -45,7 +45,7 @@ The display fields and `Display::tab_label` (the one place labels are built), `h
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Label rule, head display, unique head names](phase-01-label-rule-and-unique-names.md) | - | packages/terminal-control/**, packages/supervision/**, src/session-host/**, test/session-host/head-name-labels.test.mjs, core/skills/** | 1 | running |
+| 1 | [Label rule, head display, unique head names](phase-01-label-rule-and-unique-names.md) | - | packages/terminal-control/**, packages/supervision/**, src/session-host/**, test/session-host/head-name-labels.test.mjs, core/skills/** | 1 | done |
 
 ## Non-goals
 Worker pane labels, the launch path, head confinement, and any new display field.
