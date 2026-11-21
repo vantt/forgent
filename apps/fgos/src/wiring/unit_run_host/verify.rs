@@ -55,7 +55,18 @@ fn borrowed(command: &str, cwd: &Path, timeout: Duration, custody: &Handle) -> R
             .checked_add(timeout)
             .unwrap_or_else(Instant::now),
     };
-    match run_borrowed_io(custody, &spec, &io) {
+    let helper = match fgos_holder_lock::HelperExe::current() {
+        Ok(helper) => helper,
+        Err(error) => {
+            return Ran {
+                passed: false,
+                status: None,
+                timed_out: false,
+                output: error.to_string(),
+            }
+        }
+    };
+    match run_borrowed_io(custody, &spec, &io, &helper) {
         Ok(done) => {
             let output = format!(
                 "{}{}",

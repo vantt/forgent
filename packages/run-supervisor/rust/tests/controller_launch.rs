@@ -545,7 +545,13 @@ fn under_custody_the_callers_lease_is_lent_to_the_supervisor_which_survives_a_bo
         argv: vec!["sh".into(), "-c".into(), "exit 0".into()],
         ..Default::default()
     };
-    let verified = fgos_holder_lock::run_borrowed_io(&custody, &spec, &io).unwrap();
+    let verified = fgos_holder_lock::run_borrowed_io(
+        &custody,
+        &spec,
+        &io,
+        &fgos_holder_lock::HelperExe::current().unwrap(),
+    )
+    .unwrap();
     assert_eq!(verified.outcome.exit, Some(0));
     assert!(
         supervisor.try_wait().unwrap().is_none(),

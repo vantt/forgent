@@ -390,11 +390,12 @@ pub struct BorrowedHandle<'a> {
 }
 
 impl<'a> BorrowedHandle<'a> {
-    /// Duplicate with CLOEXEC and verify before admitting it to a native scope.
+    /// Duplicate (CLOEXEC on Unix, `DuplicateHandle` on Windows) and verify
+    /// before admitting it to a native scope. On Windows closing the copy
+    /// leaves the owner's `LockFileEx` lock held and the copy never unlocks:
+    /// the drop below takes the file before any unlock can run, and the
+    /// lifetime keeps the copy from outliving the owner.
     pub fn new(owner: &'a Handle) -> Result<Self, BorrowError> {
-        if cfg!(windows) {
-            return Err(BorrowError::Unsupported);
-        }
         validate(owner)?;
         let file = owner.file().try_clone().map_err(BorrowError::Io)?;
         let handle = Handle {
@@ -671,7 +672,7 @@ impl Termination {
 pub enum BorrowError {
     /// The acquired description no longer names the current lock resource.
     ResourceReplaced,
-    /// Explicit bounded I/O is unavailable on this platform.
+    /// Explicit bounded I/O has no implementation on this platform.
     IoUnsupported,
     /// A captured stream exceeded its byte ceiling; cleanup has completed.
     OutputLimit(&'static str),
@@ -717,7 +718,7 @@ impl std::fmt::Display for BorrowError {
             }
             BorrowError::ResourceReplaced => write!(f, "lock-resource-replaced"),
             BorrowError::IoUnsupported => {
-                write!(f, "borrow-io-unsupported: explicit I/O requires Unix")
+                write!(f, "borrow-io-unsupported: no explicit I/O on this platform")
             }
             BorrowError::OutputLimit(stream) => write!(f, "borrow-output-limit: {stream}"),
             BorrowError::Deadline { termination, .. } => {
@@ -1029,8 +1030,13 @@ pub fn validate(handle: &Handle) -> Result<(), BorrowError> {
 }
 
 /// Validate exclusive authority and wait for transient fork/exec copies to
-/// close. Never spawns or signals. Linux only; an observed foreign holder
-/// refuses admission while the caller retains the opaque handle.
+/// close. Never spawns or signals. An observed foreign holder refuses
+/// admission while the caller retains the opaque handle.
+///
+/// Windows: a `LockFileEx` lock belongs to the process that took it and no
+/// handle copy outside this process or a borrow job can carry it, so nothing
+/// else can hold this lock; once `validate` has proven the handle exclusive
+/// and the resource unreplaced, it is proven alone. macOS refuses.
 pub fn validate_quiescent(handle: &Handle) -> Result<(), BorrowError> {
     validate(handle)?;
     #[cfg(target_os = "linux")]
@@ -1047,7 +1053,11 @@ pub fn validate_quiescent(handle: &Handle) -> Result<(), BorrowError> {
         // Resource identity can change while transient holders drain.
         validate(handle)
     }
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(windows)]
+    {
+        Ok(())
+    }
+    #[cfg(not(any(target_os = "linux", windows)))]
     {
         Err(BorrowError::Unsupported)
     }
@@ -1233,16 +1243,20 @@ fn borrowed_request(
     })
 }
 
-/// Synchronous bounded-I/O member of `run_borrowed`, with the same fd mapping,
-/// predecessor handling and per-OS leftover domain. Unix only; Windows keeps
-/// its existing borrow path and refuses this form before starting a child.
+/// Synchronous bounded-I/O member of `run_borrowed`, with the same fd mapping
+/// (Unix) or borrow job (Windows), predecessor handling and per-OS leftover
+/// domain. On Windows the deadline ends the job at once (`Termination` is
+/// `KilledAfterGrace`: there is no cooperative signal to wait out).
 /// The spec's stdio is superseded by explicit input and captured output.
+/// `helper` is the job-keeper executable on Windows and unused on POSIX, as in
+/// [`run_borrowed`].
 pub fn run_borrowed_io(
     handle: &impl AsRef<Handle>,
     spec: &BorrowSpec,
     io: &BorrowIo,
+    helper: &HelperExe,
 ) -> Result<BorrowIoOutcome, BorrowError> {
-    run_borrowed_io_with(handle.as_ref(), spec, io, false)
+    run_borrowed_io_with(handle.as_ref(), spec, io, false, helper)
 }
 
 /// [`run_borrowed_io`] that also marks the child's environment with a per-run
@@ -1254,8 +1268,9 @@ pub fn run_borrowed_io_watched(
     handle: &impl AsRef<Handle>,
     spec: &BorrowSpec,
     io: &BorrowIo,
+    helper: &HelperExe,
 ) -> Result<BorrowIoOutcome, BorrowError> {
-    run_borrowed_io_with(handle.as_ref(), spec, io, true)
+    run_borrowed_io_with(handle.as_ref(), spec, io, true, helper)
 }
 
 fn run_borrowed_io_with(
@@ -1263,15 +1278,24 @@ fn run_borrowed_io_with(
     spec: &BorrowSpec,
     io: &BorrowIo,
     watch: bool,
+    helper: &HelperExe,
 ) -> Result<BorrowIoOutcome, BorrowError> {
     validate(handle)?;
-    #[cfg(not(unix))]
+    #[cfg(not(any(unix, windows)))]
     {
-        let _ = (handle, spec, io, watch);
+        let _ = (handle, spec, io, watch, helper);
         Err(BorrowError::IoUnsupported)
+    }
+    #[cfg(windows)]
+    {
+        // The job holds every member, so a watched run has no escapee to
+        // report: `escaped` stays empty either way.
+        let _ = watch;
+        crate::borrow_windows::run_io(handle, spec, helper, io)
     }
     #[cfg(unix)]
     {
+        let _ = helper;
         run_borrowed_io_posix(handle, spec, io, watch)
     }
 }
@@ -1493,8 +1517,9 @@ fn capture_available(
     }
 }
 
-#[cfg(unix)]
-fn capture_chunk(
+/// One read of `pipe` into `bytes` within `limit`: `Some(true)` more may come,
+/// `Some(false)` end of stream, `None` nothing now (nonblocking pipe).
+pub(crate) fn capture_chunk(
     pipe: &mut impl std::io::Read,
     bytes: &mut Vec<u8>,
     limit: usize,

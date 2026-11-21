@@ -205,7 +205,9 @@ impl BorrowedSpawn for fgos_holder_lock::Handle {
         } else {
             fgos_holder_lock::run_borrowed_io
         };
-        run(self, spec, io).map_err(borrow_failure)
+        let helper = fgos_holder_lock::HelperExe::current()
+            .map_err(|e| borrow_failure(fgos_holder_lock::BorrowError::Spawn(e)))?;
+        run(self, spec, io, &helper).map_err(borrow_failure)
     }
 }
 

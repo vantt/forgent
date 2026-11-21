@@ -286,7 +286,10 @@ impl AccountLock {
         let handle = self
             .handle()
             .ok_or_else(|| io_error("the account lock is released"))?;
-        fgos_holder_lock::run_borrowed_io(&handle, spec, io).map_err(|e| io_error(format!("{e:?}")))
+        let helper =
+            fgos_holder_lock::HelperExe::current().map_err(|e| io_error(format!("{e:?}")))?;
+        fgos_holder_lock::run_borrowed_io(&handle, spec, io, &helper)
+            .map_err(|e| io_error(format!("{e:?}")))
     }
 
     pub fn release(mut self) {

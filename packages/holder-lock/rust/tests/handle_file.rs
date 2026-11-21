@@ -136,7 +136,13 @@ fn a_lent_lock_is_borrowed_once_its_child_is_recorded_and_the_drain_spares_only_
         argv: vec!["sh".into(), "-c".into(), "sleep 30 & echo borrowed".into()],
         ..Default::default()
     };
-    let done = run_borrowed_io(&handle, &spec, &io).expect("the borrow runs beside the child");
+    let done = run_borrowed_io(
+        &handle,
+        &spec,
+        &io,
+        &fgos_holder_lock::HelperExe::current().unwrap(),
+    )
+    .expect("the borrow runs beside the child");
     assert_eq!(done.stdout, b"borrowed\n");
     assert!(
         done.outcome.leftovers_killed > 0,

@@ -1,10 +1,10 @@
 //! Real-process acceptance of the synchronous bounded-I/O borrow family.
-#![cfg(unix)]
 mod common;
 
 use common::*;
 use fgos_holder_lock::*;
 use std::fs;
+#[cfg(unix)]
 use std::process::Command;
 use std::time::{Duration, Instant};
 
@@ -29,6 +29,7 @@ fn shell(script: &str, dir: &std::path::Path) -> BorrowSpec {
         ..Default::default()
     }
 }
+#[cfg(unix)]
 fn gone(pid: u32) {
     use fgos_process::facts::{observe, Observed};
     assert!(
@@ -39,6 +40,7 @@ fn gone(pid: u32) {
         "pid {pid} remains live"
     );
 }
+#[cfg(unix)]
 fn pids_gone(dir: &std::path::Path) {
     for pid in fs::read_to_string(dir.join("pids"))
         .unwrap()
@@ -61,6 +63,9 @@ fn child_entry() {
     common::child_entry()
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn contender_blocks_during_borrow_and_acquires_after_return_and_release() {
     let _serial = serial();
@@ -79,6 +84,7 @@ fn contender_blocks_during_borrow_and_acquires_after_return_and_release() {
                     &dir,
                 ),
                 &bounds(vec![]),
+                &fgos_holder_lock::HelperExe::current().unwrap(),
             )
         });
         let deadline = Instant::now() + Duration::from_secs(5);
@@ -105,6 +111,9 @@ fn contender_blocks_during_borrow_and_acquires_after_return_and_release() {
     fs::remove_dir_all(dir).unwrap();
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn binary_git_hash_object_round_trip_with_hooks_off() {
     let _serial = serial();
@@ -131,7 +140,13 @@ fn binary_git_hash_object_round_trip_with_hooks_off() {
         cwd: Some(dir.clone()),
         ..Default::default()
     };
-    let out = run_borrowed_io(&handle, &spec, &bounds(input.clone())).unwrap();
+    let out = run_borrowed_io(
+        &handle,
+        &spec,
+        &bounds(input.clone()),
+        &fgos_holder_lock::HelperExe::current().unwrap(),
+    )
+    .unwrap();
     assert_eq!(out.outcome.exit, Some(0));
     assert!(out.stderr.is_empty());
     let oid = std::str::from_utf8(&out.stdout).unwrap().trim();
@@ -149,6 +164,9 @@ fn binary_git_hash_object_round_trip_with_hooks_off() {
     fs::remove_dir_all(dir).unwrap();
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn full_duplex_binary_capture_does_not_deadlock() {
     let _serial = serial();
@@ -159,6 +177,7 @@ fn full_duplex_binary_capture_does_not_deadlock() {
         &handle,
         &shell("cat; printf diagnostic >&2", &dir),
         &bounds(input.clone()),
+        &fgos_holder_lock::HelperExe::current().unwrap(),
     )
     .unwrap();
     assert_eq!(out.stdout, input);
@@ -170,6 +189,9 @@ fn full_duplex_binary_capture_does_not_deadlock() {
     fs::remove_dir_all(dir).unwrap();
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn overflow_kills_root_and_borrowing_leftovers_before_refusal() {
     let _serial = serial();
@@ -182,7 +204,13 @@ fn overflow_kills_root_and_borrowing_leftovers_before_refusal() {
         let mut io = bounds(vec![]);
         io.stdout_limit = 32;
         io.stderr_limit = 32;
-        let error = run_borrowed_io(&handle, &shell(&script, &dir), &io).unwrap_err();
+        let error = run_borrowed_io(
+            &handle,
+            &shell(&script, &dir),
+            &io,
+            &fgos_holder_lock::HelperExe::current().unwrap(),
+        )
+        .unwrap_err();
         assert!(
             matches!(error, BorrowError::OutputLimit(s) if s == stream),
             "{error}"
@@ -201,6 +229,9 @@ fn overflow_kills_root_and_borrowing_leftovers_before_refusal() {
     }
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn deadline_kills_and_drains_even_when_child_never_reads_stdin() {
     let _serial = serial();
@@ -216,6 +247,7 @@ fn deadline_kills_and_drains_even_when_child_never_reads_stdin() {
             &dir,
         ),
         &io,
+        &fgos_holder_lock::HelperExe::current().unwrap(),
     )
     .unwrap_err();
     assert_eq!(error.to_string(), "borrow-deadline: terminated");
@@ -239,6 +271,9 @@ fn deadline_kills_and_drains_even_when_child_never_reads_stdin() {
     fs::remove_dir_all(dir).unwrap();
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn successful_root_exit_drains_leftovers_and_captures_tail() {
     let _serial = serial();
@@ -251,6 +286,7 @@ fn successful_root_exit_drains_leftovers_and_captures_tail() {
             &dir,
         ),
         &bounds(vec![]),
+        &fgos_holder_lock::HelperExe::current().unwrap(),
     )
     .unwrap();
     assert_eq!(out.outcome.exit, Some(0));
@@ -281,9 +317,14 @@ fn replaced_lock_inode_refuses_old_handle_before_any_child() {
     );
     let spec = shell("touch spawned", &dir);
     assert_eq!(
-        run_borrowed_io(&old, &spec, &bounds(vec![]))
-            .unwrap_err()
-            .to_string(),
+        run_borrowed_io(
+            &old,
+            &spec,
+            &bounds(vec![]),
+            &fgos_holder_lock::HelperExe::current().unwrap()
+        )
+        .unwrap_err()
+        .to_string(),
         "lock-resource-replaced"
     );
     let helper = HelperExe::current().unwrap();
@@ -343,7 +384,13 @@ fn unrelated_pre_exec_child_survives_borrowed_git() {
             argv: vec!["git".into(), "--version".into()],
             ..Default::default()
         };
-        let out = run_borrowed_io(&handle, &spec, &bounds(vec![])).unwrap();
+        let out = run_borrowed_io(
+            &handle,
+            &spec,
+            &bounds(vec![]),
+            &fgos_holder_lock::HelperExe::current().unwrap(),
+        )
+        .unwrap();
         assert_eq!(out.outcome.exit, Some(0));
         assert_eq!(out.outcome.leftovers_killed, 0);
         assert!(unrelated.join().unwrap().success());
@@ -424,7 +471,13 @@ fn admission_refuses_escapee_and_borrow_cleanup_kills_it() {
     assert!(
         matches!(validate_quiescent(&handle), Err(BorrowError::ForeignHolder { pids }) if pids.contains(&pid))
     );
-    let outcome = run_borrowed_io(&handle, &shell("true", &dir), &bounds(vec![])).unwrap();
+    let outcome = run_borrowed_io(
+        &handle,
+        &shell("true", &dir),
+        &bounds(vec![]),
+        &fgos_holder_lock::HelperExe::current().unwrap(),
+    )
+    .unwrap();
     assert!(outcome.outcome.leftovers_killed > 0);
     assert!(matches!(
         acquire(&res, Mode::Ex, Wait::Try, 2000),
@@ -460,6 +513,7 @@ fn borrowed_grandchild_keeps_fd_and_is_drained() {
         &handle,
         &shell("sh -c 'sleep 30 & echo $! > grandchild'", &dir),
         &bounds(vec![]),
+        &fgos_holder_lock::HelperExe::current().unwrap(),
     )
     .unwrap();
     assert_eq!(out.outcome.exit, Some(0));
@@ -491,18 +545,23 @@ fn setsid_escapee_after_an_earlier_proven_drain_is_still_killed() {
     let handle = held(&res);
     // A proven drain moves the read floor forward.
     assert_eq!(
-        run_borrowed_io(&handle, &shell("true", &dir), &bounds(vec![]))
-            .unwrap()
-            .outcome
-            .exit,
+        run_borrowed_io(
+            &handle,
+            &shell("true", &dir),
+            &bounds(vec![]),
+            &fgos_holder_lock::HelperExe::current().unwrap()
+        )
+        .unwrap()
+        .outcome
+        .exit,
         Some(0)
     );
     std::thread::sleep(Duration::from_millis(30));
     let out = run_borrowed_io(
         &handle,
         &shell("setsid sh -c 'echo $$ > escapee; exec sleep 30' & while [ ! -s escapee ]; do sleep 0.01; done", &dir),
-        &bounds(vec![]),
-    )
+        &bounds(vec![]), &fgos_holder_lock::HelperExe::current().unwrap(),
+)
     .unwrap();
     assert_eq!(out.outcome.exit, Some(0));
     assert!(out.outcome.leftovers_killed > 0);
@@ -739,6 +798,7 @@ fn recipient_release_in_table(drop_only: bool, replace: bool, nested: bool, larg
             ..Default::default()
         },
         &bounds(vec![]),
+        &fgos_holder_lock::HelperExe::current().unwrap(),
     )
     .unwrap();
     assert_eq!(out.outcome.exit, Some(0));
@@ -942,7 +1002,13 @@ fn same_process_reacquirer_and_its_borrow_survive_release() {
                     assert!(Instant::now() < deadline);
                     std::thread::yield_now();
                 };
-                let out = run_borrowed_io(&next, &shell("true", &dir), &bounds(vec![])).unwrap();
+                let out = run_borrowed_io(
+                    &next,
+                    &shell("true", &dir),
+                    &bounds(vec![]),
+                    &fgos_holder_lock::HelperExe::current().unwrap(),
+                )
+                .unwrap();
                 assert_eq!(out.outcome.exit, Some(0));
                 assert_eq!(release(next), Release::Released { killed: 0 });
             });
@@ -1064,7 +1130,13 @@ fn adopted_direct_child_is_drained_on_borrow_and_release() {
             }
             assert!(cmd.status().unwrap().success());
         } else {
-            let out = run_borrowed_io(&handle, &shell(script, &dir), &bounds(vec![])).unwrap();
+            let out = run_borrowed_io(
+                &handle,
+                &shell(script, &dir),
+                &bounds(vec![]),
+                &fgos_holder_lock::HelperExe::current().unwrap(),
+            )
+            .unwrap();
             assert_eq!(out.outcome.exit, Some(0));
             assert!(out.outcome.leftovers_killed > 0);
         }
@@ -1090,6 +1162,9 @@ fn adopted_direct_child_is_drained_on_borrow_and_release() {
     }
 }
 
+// Real children here are `sh` scripts and, on Windows, the borrow needs the `fgos` binary as
+// its helper (see `apps/fgos/tests/windows_borrow.rs`), which this test binary cannot be.
+#[cfg(unix)]
 #[test]
 fn deadline_reports_cooperative_cleanup_or_forced_residue() {
     let _serial = serial();
@@ -1120,7 +1195,13 @@ while True: time.sleep(.01)
         let mut io = bounds(vec![]);
         io.deadline = Instant::now() + Duration::from_secs(5);
         let started = Instant::now();
-        let error = run_borrowed_io(&handle, &spec, &io).unwrap_err();
+        let error = run_borrowed_io(
+            &handle,
+            &spec,
+            &io,
+            &fgos_holder_lock::HelperExe::current().unwrap(),
+        )
+        .unwrap_err();
         assert!(dir.join("ready").exists(), "handler was not installed");
         let expected = if cooperative {
             Termination::Terminated
@@ -1149,7 +1230,13 @@ fn watched_borrow_reports_a_setsid_child_that_dropped_the_borrowed_descriptor() 
     let res = resource(&dir, "io");
     let handle = held(&res);
     let script = "( setsid sleep 30 </dev/null >/dev/null 2>&1 3>&- & echo $! > pids ); sleep 0.1";
-    let unwatched = run_borrowed_io(&handle, &shell(script, &dir), &bounds(Vec::new())).unwrap();
+    let unwatched = run_borrowed_io(
+        &handle,
+        &shell(script, &dir),
+        &bounds(Vec::new()),
+        &fgos_holder_lock::HelperExe::current().unwrap(),
+    )
+    .unwrap();
     assert!(
         unwatched.escaped.is_empty(),
         "an unwatched run reports nothing"
@@ -1163,13 +1250,23 @@ fn watched_borrow_reports_a_setsid_child_that_dropped_the_borrowed_descriptor() 
     };
     let kill = |pid: i32| unsafe { libc::kill(pid, libc::SIGKILL) };
     kill(survivor_pids());
-    let watched =
-        run_borrowed_io_watched(&handle, &shell(script, &dir), &bounds(Vec::new())).unwrap();
+    let watched = run_borrowed_io_watched(
+        &handle,
+        &shell(script, &dir),
+        &bounds(Vec::new()),
+        &fgos_holder_lock::HelperExe::current().unwrap(),
+    )
+    .unwrap();
     let pid = survivor_pids();
     kill(pid);
     assert_eq!(watched.escaped, vec![pid as u32]);
-    let clean =
-        run_borrowed_io_watched(&handle, &shell("true", &dir), &bounds(Vec::new())).unwrap();
+    let clean = run_borrowed_io_watched(
+        &handle,
+        &shell("true", &dir),
+        &bounds(Vec::new()),
+        &fgos_holder_lock::HelperExe::current().unwrap(),
+    )
+    .unwrap();
     assert!(
         clean.escaped.is_empty(),
         "a run that leaves nothing behind reports nothing"

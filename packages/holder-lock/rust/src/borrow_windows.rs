@@ -13,7 +13,7 @@ use std::ffi::OsString;
 use std::fs::File;
 use std::io::{self, Read, Write};
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::mpsc;
+use std::sync::{mpsc, Arc};
 use std::time::{Duration, Instant};
 
 use fgos_process::facts::{self, ProcTuple};
@@ -25,8 +25,9 @@ use fgos_process::{Domain, DomainState, ProcId, WindowsJob};
 
 use crate::driver;
 use crate::port::{
-    borrowed_argv, probe, BorrowError, BorrowOutcome, BorrowSpec, BorrowStdio, BorrowedCheck,
-    Handle, HelperExe, Mode, NotBorrowerReason, Probe, Resource,
+    borrowed_argv, capture_chunk, probe, BorrowError, BorrowIo, BorrowIoOutcome, BorrowOutcome,
+    BorrowSpec, BorrowStdio, BorrowedCheck, Handle, HelperExe, Mode, NotBorrowerReason, Probe,
+    Resource, Termination,
 };
 use crate::predecessor;
 
@@ -122,6 +123,7 @@ fn start_child(
     job: &str,
     program: &str,
     args: &[String],
+    piped: bool,
 ) -> io::Result<Spawned> {
     // Names compare without case, as Windows reads them: a caller's `PATH` replaces the parent's `Path`.
     let mut env: std::collections::BTreeMap<String, (OsString, OsString)> =
@@ -148,6 +150,8 @@ fn start_child(
             .open(path)
     };
     let (stdin, stdout, stderr) = match &spec.stdio {
+        // Explicit I/O supersedes the spec's stdio, as on Unix.
+        _ if piped => (ChildStdio::Piped, ChildStdio::Piped, ChildStdio::Piped),
         BorrowStdio::Inherit => (
             ChildStdio::Inherit,
             ChildStdio::Inherit,
@@ -172,25 +176,173 @@ fn start_child(
     })
 }
 
-/// Wait for the child, ending the job when a cancel arrives.
+/// What ends a borrow's explicit I/O early: the absolute deadline, or a
+/// stream reader or the stdin writer that failed (a byte ceiling, an I/O error).
+struct Limits<'a> {
+    deadline: Instant,
+    fault: &'a AtomicBool,
+}
+
+struct Waited {
+    code: io::Result<u32>,
+    /// The deadline, not the child, ended the wait.
+    deadline_hit: bool,
+}
+
+/// Wait for the child, ending the job when a cancel arrives, the deadline
+/// passes or an I/O fault is raised. Ending the job is the only termination
+/// Windows has: there is no signal to give the child a grace first.
 fn wait_child(
     child: &Spawned,
     job: &fgos_process::platform::windows_job::Job,
     control: &BorrowControl<'_>,
-) -> io::Result<u32> {
-    let Some(cancel) = control.cancel else {
-        return child.wait();
-    };
-    let mut cancelled = false;
+    limits: Option<&Limits<'_>>,
+) -> Waited {
+    if control.cancel.is_none() && limits.is_none() {
+        return Waited {
+            code: child.wait(),
+            deadline_hit: false,
+        };
+    }
+    let mut ended = false;
+    let mut deadline_hit = false;
     loop {
-        if let Some(code) = child.try_wait()? {
-            return Ok(code);
+        if !ended {
+            let stop = if limits.is_some_and(|l| Instant::now() >= l.deadline) {
+                deadline_hit = true;
+                true
+            } else {
+                limits.is_some_and(|l| l.fault.load(Ordering::SeqCst))
+                    || control.cancel.is_some_and(|c| c.load(Ordering::SeqCst))
+            };
+            if stop {
+                ended = true;
+                let _ = job.terminate();
+            }
         }
-        if !cancelled && cancel.load(Ordering::SeqCst) {
-            cancelled = true;
-            let _ = job.terminate();
+        match child.try_wait() {
+            Ok(None) => {}
+            code => {
+                return Waited {
+                    code: code.map(|code| code.unwrap_or_default()),
+                    deadline_hit,
+                }
+            }
         }
         std::thread::sleep(CANCEL_POLL);
+    }
+}
+
+type Streamed = (Vec<u8>, Option<BorrowError>);
+
+/// Read `pipe` to its end or `limit`, off this thread so a child that
+/// ignores a stream cannot hide the deadline.
+fn read_stream(
+    mut pipe: File,
+    limit: usize,
+    stream: &'static str,
+    fault: Arc<AtomicBool>,
+) -> mpsc::Receiver<Streamed> {
+    let (tx, rx) = mpsc::channel();
+    std::thread::spawn(move || {
+        let mut bytes = Vec::new();
+        let failure = loop {
+            match capture_chunk(&mut pipe, &mut bytes, limit, stream) {
+                Ok(Some(true)) => {}
+                Ok(Some(false)) => break None,
+                Ok(None) => std::thread::sleep(EMPTY_POLL),
+                Err(err) => {
+                    fault.store(true, Ordering::SeqCst);
+                    break Some(err);
+                }
+            }
+        };
+        let _ = tx.send((bytes, failure));
+    });
+    rx
+}
+
+/// Write `bytes` to the child, then close the pipe so EOF follows the last
+/// byte. A child that closed its stdin early is not a fault.
+fn write_stdin(
+    mut pipe: File,
+    bytes: Vec<u8>,
+    fault: Arc<AtomicBool>,
+) -> mpsc::Receiver<Option<BorrowError>> {
+    let (tx, rx) = mpsc::channel();
+    std::thread::spawn(move || {
+        let failure = match pipe.write_all(&bytes).and_then(|()| pipe.flush()) {
+            Err(err) if err.kind() != io::ErrorKind::BrokenPipe => {
+                fault.store(true, Ordering::SeqCst);
+                Some(BorrowError::Io(err))
+            }
+            _ => None,
+        };
+        drop(pipe);
+        let _ = tx.send(failure);
+    });
+    rx
+}
+
+/// The piped streams of one explicit-I/O borrow.
+struct Capture {
+    stdin: mpsc::Receiver<Option<BorrowError>>,
+    stdout: mpsc::Receiver<Streamed>,
+    stderr: mpsc::Receiver<Streamed>,
+}
+
+#[derive(Default)]
+struct Captured {
+    stdout: Vec<u8>,
+    stderr: Vec<u8>,
+    fault: Option<BorrowError>,
+}
+
+impl Capture {
+    fn start(child: &mut Spawned, io: &BorrowIo, fault: &Arc<AtomicBool>) -> io::Result<Self> {
+        let (Some(stdin), Some(stdout), Some(stderr)) =
+            (child.stdin.take(), child.stdout.take(), child.stderr.take())
+        else {
+            return Err(io::Error::other("the borrowed child has no pipes"));
+        };
+        Ok(Capture {
+            stdin: write_stdin(stdin, io.stdin.clone(), fault.clone()),
+            stdout: read_stream(stdout, io.stdout_limit, "stdout", fault.clone()),
+            stderr: read_stream(stderr, io.stderr_limit, "stderr", fault.clone()),
+        })
+    }
+
+    /// Collect what the threads read. The job is empty by now, so every
+    /// pipe end its members held is closed; `wait` bounds a pipe something
+    /// outside the job still holds open.
+    fn finish(self, wait: Duration) -> Captured {
+        let mut captured = Captured::default();
+        let mut fault = |failure: Option<BorrowError>| {
+            if captured.fault.is_none() {
+                captured.fault = failure;
+            }
+        };
+        let mut streams = Vec::new();
+        for rx in [&self.stdout, &self.stderr] {
+            match rx.recv_timeout(wait) {
+                Ok((bytes, failure)) => {
+                    streams.push(bytes);
+                    fault(failure);
+                }
+                Err(_) => {
+                    streams.push(Vec::new());
+                    fault(Some(BorrowError::Io(io::Error::other(
+                        "a borrowed stream stayed open after the job ended",
+                    ))));
+                }
+            }
+        }
+        if let Ok(failure) = self.stdin.recv_timeout(wait) {
+            fault(failure);
+        }
+        captured.stderr = streams.pop().unwrap_or_default();
+        captured.stdout = streams.pop().unwrap_or_default();
+        captured
     }
 }
 
@@ -230,6 +382,34 @@ pub(crate) fn run(
     helper: &HelperExe,
     control: &BorrowControl<'_>,
 ) -> Result<BorrowOutcome, BorrowError> {
+    run_core(handle, spec, helper, control, None).map(|(outcome, _)| outcome)
+}
+
+/// [`run`] with the child's stdin, stdout and stderr piped: `io.stdin` in,
+/// bounded capture out, `io.deadline` absolute. The same release rule ends
+/// the job before this returns, whatever ended the call.
+pub(crate) fn run_io(
+    handle: &Handle,
+    spec: &BorrowSpec,
+    helper: &HelperExe,
+    io: &BorrowIo,
+) -> Result<BorrowIoOutcome, BorrowError> {
+    let (outcome, captured) = run_core(handle, spec, helper, &BorrowControl::none(), Some(io))?;
+    Ok(BorrowIoOutcome {
+        outcome,
+        stdout: captured.stdout,
+        stderr: captured.stderr,
+        escaped: Vec::new(),
+    })
+}
+
+fn run_core(
+    handle: &Handle,
+    spec: &BorrowSpec,
+    helper: &HelperExe,
+    control: &BorrowControl<'_>,
+    io: Option<&BorrowIo>,
+) -> Result<(BorrowOutcome, Captured), BorrowError> {
     crate::port::validate(handle)?;
     if !driver::current().supported() {
         return Err(BorrowError::Unsupported);
@@ -293,9 +473,26 @@ pub(crate) fn run(
         let _ = stdin.write_all(b"finished\n").and_then(|()| stdin.flush());
     };
 
-    let child = match start_child(handle, spec, &name, program, args) {
+    let mut child = match start_child(handle, spec, &name, program, args, io.is_some()) {
         Ok(child) => child,
         Err(err) => {
+            let outcome = empty_the_job(&job, &name, Duration::from_millis(handle.kill_wait_ms));
+            finish(keeper_stdin);
+            if outcome.is_ok() {
+                predecessor::remove_record(&record);
+            }
+            return Err(BorrowError::Spawn(err));
+        }
+    };
+    let fault = Arc::new(AtomicBool::new(false));
+    let capture = match io
+        .map(|io| Capture::start(&mut child, io, &fault))
+        .transpose()
+    {
+        Ok(capture) => capture,
+        Err(err) => {
+            let _ = child.kill();
+            let _ = child.wait();
             let outcome = empty_the_job(&job, &name, Duration::from_millis(handle.kill_wait_ms));
             finish(keeper_stdin);
             if outcome.is_ok() {
@@ -316,10 +513,29 @@ pub(crate) fn run(
     if let Some(started) = control.on_started {
         started(child.id());
     }
-    let waited = wait_child(&child, &job, control);
-    let emptied = empty_the_job(&job, &name, Duration::from_millis(handle.kill_wait_ms));
+    let limits = io.map(|io| Limits {
+        deadline: io.deadline,
+        fault: &fault,
+    });
+    let waited = wait_child(&child, &job, control, limits.as_ref());
+    let kill_wait = Duration::from_millis(handle.kill_wait_ms);
+    let emptied = empty_the_job(&job, &name, kill_wait);
     finish(keeper_stdin);
-    settle(waited, emptied, || predecessor::remove_record(&record))
+    let captured = capture.map(|c| c.finish(kill_wait)).unwrap_or_default();
+    // A leftover that could not be killed or a failed wait outranks what the
+    // I/O did, as on Unix.
+    let outcome = settle(waited.code, emptied, || predecessor::remove_record(&record))?;
+    if waited.deadline_hit {
+        return Err(BorrowError::Deadline {
+            termination: Termination::KilledAfterGrace,
+            stdout: captured.stdout,
+            stderr: captured.stderr,
+        });
+    }
+    if let Some(failure) = captured.fault {
+        return Err(failure);
+    }
+    Ok((outcome, captured))
 }
 
 /// A leftover that could not be killed outranks a failed wait (the port's
@@ -375,6 +591,43 @@ mod tests {
         .unwrap_err();
         assert!(matches!(error, BorrowError::Wait(_)));
         assert!(removed);
+    }
+
+    fn echoing(text: &str) -> (std::process::Child, File) {
+        use std::os::windows::io::OwnedHandle;
+        let mut child = std::process::Command::new("cmd.exe")
+            .args(["/C", &format!("echo {text}")])
+            .stdout(std::process::Stdio::piped())
+            .spawn()
+            .expect("cmd.exe");
+        let pipe = File::from(OwnedHandle::from(child.stdout.take().expect("piped")));
+        (child, pipe)
+    }
+
+    #[test]
+    fn a_stream_within_its_ceiling_is_captured_whole_and_raises_no_fault() {
+        let (mut child, pipe) = echoing("abc");
+        let fault = Arc::new(AtomicBool::new(false));
+        let (bytes, failure) = read_stream(pipe, 1024, "stdout", fault.clone())
+            .recv_timeout(Duration::from_secs(10))
+            .expect("the reader ends at end of stream");
+        child.wait().unwrap();
+        assert_eq!(bytes, b"abc\r\n");
+        assert!(failure.is_none());
+        assert!(!fault.load(Ordering::SeqCst));
+    }
+
+    #[test]
+    fn a_stream_over_its_ceiling_stops_the_reader_and_raises_the_fault() {
+        let (mut child, pipe) = echoing("abcdefghij");
+        let fault = Arc::new(AtomicBool::new(false));
+        let (bytes, failure) = read_stream(pipe, 4, "stdout", fault.clone())
+            .recv_timeout(Duration::from_secs(10))
+            .expect("the reader ends at the ceiling");
+        child.wait().unwrap();
+        assert!(bytes.len() <= 4);
+        assert!(matches!(failure, Some(BorrowError::OutputLimit("stdout"))));
+        assert!(fault.load(Ordering::SeqCst));
     }
 }
 
