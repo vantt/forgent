@@ -783,7 +783,7 @@ of it).
 
 #### Lịch sử quyết định
 
-- **2026-11-21 — Pinned MSVC toolchain for reproducible windows-msvc addon link.** The reproducibility claim for `x86_64-pc-windows-msvc` holds for one pinned toolchain. Windows addon builds diverge across runner images (evidence: runner images 20261103.629 (MSVC 14.51) and 20261111.635 (MSVC 14.52), byte-identical builds on one image in CI 44883964974). When a runner image drops the pinned toolset or SDK, both Windows jobs fail by name, and someone changes the one value `MSVC_TOOLSET_VERSION` or `WINDOWS_SDK_VERSION` in `.github/workflows/release-assets.yml` (the `env` block at the top).
+- **2026-11-21 — Pinned MSVC toolchain for reproducible windows-msvc addon link.** The reproducibility claim for `x86_64-pc-windows-msvc` holds for one pinned toolchain (full version 14.52.37025 is pinned). Windows addon builds diverge across runner images (evidence: runner images 20261103.629 (MSVC 14.51) and 20261111.635 (MSVC 14.52), byte-identical builds on one image in CI 44883964974). When a runner image drops the pinned toolset or SDK, both Windows jobs fail by name, and someone changes the one value `MSVC_TOOLSET_VERSION` or `WINDOWS_SDK_VERSION` in `.github/workflows/release-assets.yml` (the `env` block at the top).
 
 - **2026-11-16 — `fgos setup` is retired and the packaging layer is Rust (program step S4; owner answers Q3 = (a), all four verbs move with one bounded bridge, and Q2 = (b), Node stays required until S6).** `fgos wire-agents`, `fgos uninstall`, `fgos init` and `fgos doctor` run in the host. The agent hook table for five CLIs, the person's agent-config readers, the launcher, the managed timers, the shell-rc reader, the coexistence manifest and the skill-stamp reader have one Rust owner in `fgos-distribution`. Doctor has one registry (`doctor-registry.v1.json`) and one engine; rows of layers that S5, S6a, S6b and S7 still own in Node are judged by the one Node rows bridge, an exact-set list in the registry that each of those steps shrinks and S7 deletes (with `init`'s Work-store step). `fgos setup` answers "unknown verb" (the contract's 30-day window ended 2026-10-18); what only it did ends with it: no product verb wires `core.hooksPath` (the fgOS source checkout uses `npm run setup:hooks`, and the row `main-checkout-hook-wired` names it), no command copies fgOS skills into a project (Claude gets them from the plugin `wire-agents` installs), the retired runner-config conversion ends, and no shell-rc source line is written (existing lines keep working and `uninstall` names them); the row `shell-integration-sourced` is gone. `fgos uninstall` refuses `/`, `$HOME` and any directory containing `$HOME` as a precondition (exit 2). `--flag=value` is refused everywhere. Evidence: `plans/261115-1501-rust-verb-migration-s4/` reports.
 
@@ -828,7 +828,7 @@ of it).
 #### Edge Cases Settled
 
 - The reproducible addon digest check for `x86_64-pc-windows-msvc` holds for
-  one pinned toolchain. When a runner image drops the pinned toolset or SDK,
+  one pinned toolchain (full version 14.52.37025 is pinned). When a runner image drops the pinned toolset or SDK,
   both Windows jobs fail by name, and someone changes the one value
   `MSVC_TOOLSET_VERSION` or `WINDOWS_SDK_VERSION` in
   `.github/workflows/release-assets.yml` (the `env` block at the top).
