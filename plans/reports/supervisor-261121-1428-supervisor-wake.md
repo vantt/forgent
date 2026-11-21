@@ -23,3 +23,5 @@ Three leads are live out of a maximum of four, and all four lanes are free. No p
 ## Late event
 
 - `2dcc37a8c3d9ad7c` `session-idle`: all three running plans have a live lead. `lead:S6A` has been idle since 13:10, waiting on its dependency plan 261121-1309-git-windows-custody. `lead:WINCUSTODY` has been idle since 14:14, waiting on Windows CI runs in two background shells. Neither wait is a lack of progress, so I replaced neither lead. Handled.
+- `02c446e6de2c151a` `plan-done` (261121-1314-coding-bugfix-guide): the successor lead set the plan to done (71767ecc8). I added the board line, stopped the lead with reason "plan done", and left the backlog alone because no backlog row exists for this plan; its item tsk-1pv is in the work store. Outside the footprint, there is still no CHANGELOG `[Unreleased]` line for the new guide.
+- `fb57067fe424ae9a` `session-idle`: same session as before, so no new action. Handled.
