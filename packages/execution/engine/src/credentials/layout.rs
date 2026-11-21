@@ -17,6 +17,10 @@ pub const CODEX_REFRESH_INTERVAL_MS: f64 = 8.0 * 24.0 * 60.0 * MINUTE_MS;
 
 const CODEX_AUTH_CLAIM: &str = "https://api.openai.com/auth";
 
+/// The life Claude Code's OAuth issues an access token for: its token endpoint answers `expires_in: 28800` (8 h).
+/// A renewal fgOS makes checks it (`Layout::observed_lifetime_shortfall`), so a provider change is reported.
+pub const CLAUDE_TOKEN_LIFETIME_MS: f64 = 8.0 * 3_600_000.0;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Layout {
     PiAuthJson,
@@ -183,10 +187,22 @@ impl Layout {
         matches!(self, Layout::ClaudeConfig | Layout::ClaudeHome)
     }
 
-    /// The whole life a freshly issued access token of this layout has, when it is known. Claude Code's OAuth issues
-    /// tokens for 8 hours and its store keeps only `expiresAt`, no issue time, so the constant is all there is.
+    /// The whole life a freshly issued access token of this layout has, when it is known. Claude's store keeps only
+    /// `expiresAt`, no issue time, so the constant is all there is.
     pub fn token_lifetime_ms(self) -> Option<f64> {
-        matches!(self, Layout::ClaudeConfig | Layout::ClaudeHome).then_some(8.0 * 3_600_000.0)
+        matches!(self, Layout::ClaudeConfig | Layout::ClaudeHome)
+            .then_some(CLAUDE_TOKEN_LIFETIME_MS)
+    }
+
+    /// The life a token renewed at `renewed_at_ms` was observed to get (`expires_ms - renewed_at_ms`), when it is
+    /// shorter than the layout's `token_lifetime_ms`: the provider then issues shorter tokens than the seat check
+    /// assumes, and the check would admit seats their token cannot cover. Counted from the renewal's start, so a
+    /// slow call never makes a true lifetime look short.
+    pub fn observed_lifetime_shortfall(self, expires_ms: f64, renewed_at_ms: f64) -> Option<f64> {
+        let observed = expires_ms - renewed_at_ms;
+        self.token_lifetime_ms()
+            .filter(|lifetime| observed.is_finite() && observed < *lifetime)
+            .map(|_| observed)
     }
 
     fn claude_file(self) -> &'static str {

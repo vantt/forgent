@@ -36,7 +36,7 @@ use std::path::{Path, PathBuf};
 pub use apply::{apply_renewed_credential, ApplyOutcome, ApplyRequest};
 pub use copy::{copy_credential_files, CopyOptions};
 pub use files::Code;
-pub use layout::{Entry, Layout, CODEX_REFRESH_INTERVAL_MS};
+pub use layout::{Entry, Layout, CLAUDE_TOKEN_LIFETIME_MS, CODEX_REFRESH_INTERVAL_MS};
 pub use ports::{
     AccountLockGuard, AccountLocks, AccountsLocks, AccountsProbe, CredentialProbe, LiveSeatHomes,
     LockBusy, NoLiveSeatHomes, NoLocks, NoSqlite, ProbeRequest, ProbeRun, SqliteAdapter,

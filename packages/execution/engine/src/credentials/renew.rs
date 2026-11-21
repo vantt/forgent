@@ -3,6 +3,7 @@
 
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use super::apply::{
     apply_renewed_credential, judge_copy, select_provider_entry, ApplyOutcome, ApplyRequest,
@@ -22,6 +23,8 @@ use super::{
 };
 
 const LOCK_MARGIN_MS: u64 = 30_000;
+/// Set once the shorter-than-assumed token lifetime has been reported, so it is said once per process.
+static LIFETIME_SHORTFALL_REPORTED: AtomicBool = AtomicBool::new(false);
 /// Access-token life a renewed login needs beyond the seat's timeout and one renewal call.
 const SEAT_RENEWAL_MARGIN_MS: f64 = 10.0 * 60_000.0;
 /// Access-token life a running seat's login must still have beyond one probe call before it is taken: the call then
@@ -100,9 +103,9 @@ pub struct RefreshRequest<'a> {
 
 /// Renew the login of `credential_source` once, in an fgOS-held scratch copy, when it is closer to expiry than the
 /// window (the threshold, widened to the seat's timeout plus one call and a margin when a seat timeout is given);
-/// apply the renewed entry to the real store. A seat that even a freshly issued token could not cover (that sum
-/// exceeds the layout's token lifetime) would keep the window open forever, so nothing is renewed for it
-/// (`seat-longer-than-token-lifetime`) and the life check refuses it once, naming that.
+/// apply the renewed entry to the real store. A seat that even a freshly issued token could not cover (its timeout
+/// plus one call reaches the layout's token lifetime) is not renewed for (`seat-longer-than-token-lifetime`), and
+/// the life check refuses it once, naming that; the window's margin is not part of that cutoff.
 pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>) -> RefreshOutcome {
     let source = request.credential_source;
     let (Some(layout), Some(home)) = (
@@ -124,15 +127,14 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
     let threshold = options
         .threshold_ms
         .unwrap_or_else(|| default_refresh_ahead_threshold_ms(options.probe_timeout_ms as f64));
-    let seat_needs = options
-        .seat_timeout_ms
-        .filter(|t| t.is_finite())
-        .map(|seat| seat + options.probe_timeout_ms as f64 + SEAT_RENEWAL_MARGIN_MS);
-    let threshold = seat_needs.map_or(threshold, |needs| threshold.max(needs));
-    // A seat even a freshly issued token could not cover keeps the window open forever.
-    let seat_outlives_any_token = seat_needs
+    let seat = options.seat_timeout_ms.filter(|t| t.is_finite());
+    let threshold = seat.map_or(threshold, |seat| {
+        threshold.max(seat + options.probe_timeout_ms as f64 + SEAT_RENEWAL_MARGIN_MS)
+    });
+    // A seat that even a token issued at the end of one renewal call could not cover: renewing cannot admit it.
+    let seat_outlives_any_token = seat
         .zip(layout.token_lifetime_ms())
-        .is_some_and(|(needs, lifetime)| needs > lifetime);
+        .is_some_and(|(seat, lifetime)| seat + options.probe_timeout_ms as f64 >= lifetime);
     let lock_wait = options
         .lock_wait_ms
         .unwrap_or(options.probe_timeout_ms + LOCK_MARGIN_MS);
@@ -251,6 +253,37 @@ pub fn refresh_ahead(request: &RefreshRequest<'_>, options: &RefreshOptions<'_>)
     )
 }
 
+/// Says once, numbers only, when a renewal fgOS made got a shorter token than the layout's assumed lifetime, so a
+/// provider change cannot quietly make the seat check admit seats their token cannot cover.
+fn report_lifetime_shortfall(
+    layout: Layout,
+    provider: &str,
+    home: &Path,
+    renewed_at: f64,
+    sqlite: &dyn SqliteAdapter,
+) {
+    let Ok(read) = layout.read(home, false, sqlite) else {
+        return;
+    };
+    let Ok(entry) = select_provider_entry(&read.entries, provider) else {
+        return;
+    };
+    let (Some(observed), Some(assumed)) = (
+        layout.observed_lifetime_shortfall(entry.expires_ms, renewed_at),
+        layout.token_lifetime_ms(),
+    ) else {
+        return;
+    };
+    if !LIFETIME_SHORTFALL_REPORTED.swap(true, Ordering::Relaxed) {
+        eprintln!(
+            "fgos: credential refresh-ahead: a renewed {} access token lives {} min, shorter than the {} min the seat check assumes",
+            layout.name(),
+            (observed / 60_000.0).round(),
+            (assumed / 60_000.0).round()
+        );
+    }
+}
+
 fn renew_in_scratch(
     layout: Layout,
     request: &RefreshRequest<'_>,
@@ -300,6 +333,7 @@ fn renew_in_scratch(
     }
     // The call holds the account lock with this holder: if this process dies mid-call, nobody else redeems the same
     // single-use refresh token until the call has ended too.
+    let renewed_at = now();
     let probe_ok = match options.probe.run(
         &ProbeRequest {
             source,
@@ -360,6 +394,7 @@ fn renew_in_scratch(
             remove_all(&scratch);
             if matches!(other, ApplyOutcome::Applied(_)) {
                 clear_failure(account_dir);
+                report_lifetime_shortfall(layout, request.provider, home, renewed_at, sqlite);
                 return outcome("renewed", "applied");
             }
             let reason = if probe_ok {

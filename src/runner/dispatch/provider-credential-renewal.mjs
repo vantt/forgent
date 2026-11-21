@@ -549,15 +549,17 @@ function ompAgentFilesCheck(home) {
 // the provider signs, so a login renewed inside a private home is staged and kept for the owner, never applied
 // (applyAgentCopies); a renewal fgOS makes itself in a scratch copy of the source is applied as for the other
 // layouts.
-const CLAUDE_TOKEN_LIFETIME_MS = 8 * 60 * MINUTE_MS;
+// The life Claude Code's OAuth issues an access token for: its token endpoint answers `expires_in: 28800` (8 h).
+// A renewal fgOS makes checks it (observedLifetimeShortfall), so a provider change is reported.
+export const CLAUDE_TOKEN_LIFETIME_MS = 8 * 60 * MINUTE_MS;
 function claudeLayoutAt(name, file) {
   const layout = {
     name,
     files: [file],
     // A copy holds the source's own refresh token, so a seat that refreshed inside its home would spend it.
     seatMustNotRefresh: true,
-    // The whole life Claude Code's OAuth issues an access token for; the store keeps only `expiresAt`, no issue
-    // time, so a freshly issued token's life is this constant, not an observed pair.
+    // The whole life a freshly issued token has; the store keeps only `expiresAt`, no issue time, so the constant
+    // is all there is.
     tokenLifetimeMs: CLAUDE_TOKEN_LIFETIME_MS,
     identity: () => null,
     read(home, { agent } = {}) {
@@ -1340,9 +1342,9 @@ const SEAT_RENEWAL_MARGIN_MS = 10 * 60 * 1000;
  * Renew the login of `credentialSource` once, in an fgOS-held scratch copy, when it is closer to expiry
  * than the window: `thresholdMs`, widened for a seat that may run `seatTimeoutMs` to that timeout plus one call
  * and a margin, so a login that cannot outlive the seat is renewed before the seat's life check; apply the renewed entry to the real store.
- * A seat that even a freshly issued token could not cover (its timeout plus one call and the margin exceeds the
- * layout's `tokenLifetimeMs`) would keep that window open forever, so nothing is renewed for it
- * (`seat-longer-than-token-lifetime`) and the life check refuses it once, naming that. Never throws and never returns a value
+ * A seat that even a freshly issued token could not cover (its timeout plus one call reaches the layout's
+ * `tokenLifetimeMs`; the window's margin is not part of that cutoff) is not renewed for
+ * (`seat-longer-than-token-lifetime`), and the life check refuses it once, naming that. Never throws and never returns a value
  * of a credential: `{status: 'fresh'|'renewed'|'failed'|'cooldown'|'skipped', reason}`. `liveSeatHomes(target)`
  * names the private homes of seats still running on this store; the newest valid login one of them renewed is
  * taken first (takeLiveSeatLogin), so a store whose refresh token a running seat already spent is not renewed with it;
@@ -1375,9 +1377,10 @@ export async function refreshAhead({
 
     // Only the dispatched provider's entry counts, both for the window and for "was it renewed".
     const entryOf = (read) => selectProviderEntry(read.entries, provider);
-    const seatNeedsMs = Number.isFinite(seatTimeoutMs) ? seatTimeoutMs + probeTimeoutMs + SEAT_RENEWAL_MARGIN_MS : null;
-    const windowMs = seatNeedsMs === null ? thresholdMs : Math.max(thresholdMs, seatNeedsMs);
-    const seatOutlivesAnyToken = seatNeedsMs !== null && Number.isFinite(layout.tokenLifetimeMs) && seatNeedsMs > layout.tokenLifetimeMs;
+    const hasSeat = Number.isFinite(seatTimeoutMs);
+    const windowMs = hasSeat ? Math.max(thresholdMs, seatTimeoutMs + probeTimeoutMs + SEAT_RENEWAL_MARGIN_MS) : thresholdMs;
+    // A seat that even a token issued at the end of one renewal call could not cover: renewing cannot admit it.
+    const seatOutlivesAnyToken = hasSeat && Number.isFinite(layout.tokenLifetimeMs) && seatTimeoutMs + probeTimeoutMs >= layout.tokenLifetimeMs;
     const inWindow = (entry) => entry.dueMs - now() < windowMs;
     const before = layout.read(home, { loadSqlite });
     if (!before.ok) return { status: 'skipped', reason: before.code };
@@ -1437,6 +1440,32 @@ export async function refreshAhead({
   }
 }
 
+/**
+ * The life a token renewed at `renewedAtMs` was observed to get (`expiresMs - renewedAtMs`), when it is shorter
+ * than the layout's `tokenLifetimeMs`, else null: the provider then issues shorter tokens than the seat check
+ * assumes, and the check would admit seats their token cannot cover. Counted from the renewal's start, so a slow
+ * call never makes a true lifetime look short.
+ */
+export function observedLifetimeShortfall(layoutName, expiresMs, renewedAtMs) {
+  const lifetime = LAYOUTS[layoutName]?.tokenLifetimeMs;
+  const observed = expiresMs - renewedAtMs;
+  return Number.isFinite(lifetime) && Number.isFinite(observed) && observed < lifetime ? observed : null;
+}
+
+let lifetimeShortfallReported = false;
+
+// Says once per process, numbers only, when a renewal fgOS made got a shorter token than the layout's assumed
+// lifetime, so a provider change cannot quietly make the seat check admit seats their token cannot cover.
+function reportLifetimeShortfall({ layout, layoutName, provider, home, renewedAt, loadSqlite }) {
+  if (lifetimeShortfallReported) return;
+  const read = layout.read(home, { loadSqlite });
+  const entry = read.ok ? selectProviderEntry(read.entries, provider) : null;
+  const observed = entry?.ok ? observedLifetimeShortfall(layoutName, entry.entry.expiresMs, renewedAt) : null;
+  if (observed === null) return;
+  lifetimeShortfallReported = true;
+  process.stderr.write(`fgos: credential refresh-ahead: a renewed ${layoutName} access token lives ${Math.round(observed / MINUTE_MS)} min, shorter than the ${Math.round(layout.tokenLifetimeMs / MINUTE_MS)} min the seat check assumes\n`);
+}
+
 async function renewInScratch({ layout, layoutName, provider, credentialSource, home, accountDir, key, lock, probeTimeoutMs, spawnFn, env, loadSqlite, now }) {
   const scratch = path.join(accountDir, `${SCRATCH_PREFIX}${process.pid}-${now()}`);
   const files = credentialSource.kind === 'codex-home' ? layout.files : credentialSource.files;
@@ -1450,6 +1479,7 @@ async function renewInScratch({ layout, layoutName, provider, credentialSource, 
   }
 
   const plan = withKillTimeout(credentialProbeCommand({ ...credentialSource, home: scratch }), probeTimeoutMs, env);
+  const renewedAt = now();
   const probe = plan
     // The call holds the account lock with this holder: if this process dies mid-call, nobody else
     // redeems the same single-use refresh token until the call has ended too.
@@ -1493,6 +1523,7 @@ async function renewInScratch({ layout, layoutName, provider, credentialSource, 
 
   if (applied.status === 'applied') {
     clearFailure(accountDir);
+    reportLifetimeShortfall({ layout, layoutName, provider, home, renewedAt, loadSqlite });
     return { status: 'renewed', reason: 'applied' };
   }
   const reason = !probe.ok ? 'probe-failed' : 'not-renewed';
