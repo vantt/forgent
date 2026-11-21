@@ -100,7 +100,7 @@ impl RunRequestHost for PlanChecks {
     fn process_cwd(&self) -> String {
         unreachable!("{PLAN_CHECK_ONLY}")
     }
-    fn git_roots(&self, _: &str) -> Result<GitRoots, String> {
+    fn git_roots(&self, _: &str) -> Result<GitRoots, Refusal> {
         unreachable!("{PLAN_CHECK_ONLY}")
     }
     fn confined_write_refusal(&self, _: &str, _: Option<&str>) -> Option<String> {

@@ -51,7 +51,8 @@ impl Refusal {
         }
     }
 
-    /// A failure of the machine the shell stands on (git could not answer), not a refusal of the input.
+    /// A failure of the machine the shell stands on (a host question that could not be answered), not a refusal of
+    /// the input: Node passed such an error on as it was thrown.
     pub fn host(message: impl Into<String>) -> Self {
         Refusal {
             name: "Error",

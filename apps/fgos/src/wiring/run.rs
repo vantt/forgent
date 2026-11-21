@@ -257,11 +257,15 @@ impl RunRequestHost for RunMachine<'_> {
     fn process_cwd(&self) -> String {
         self.cwd.clone()
     }
-    fn git_roots(&self, dir: &str) -> Result<GitRoots, String> {
-        machine::git_roots(Path::new(dir), false).map(|roots| GitRoots {
-            main_checkout_root: roots.main_checkout_root.to_string_lossy().into_owned(),
-            is_linked_worktree: roots.is_linked_worktree,
-        })
+    /// `resolveGitRoots` (`src/runner/execution/run.mjs`): a directory Git cannot answer for is a
+    /// `RunnerConfigError`.
+    fn git_roots(&self, dir: &str) -> Result<GitRoots, Refusal> {
+        machine::git_roots(Path::new(dir), false)
+            .map(|roots| GitRoots {
+                main_checkout_root: roots.main_checkout_root.to_string_lossy().into_owned(),
+                is_linked_worktree: roots.is_linked_worktree,
+            })
+            .map_err(Refusal::config)
     }
     fn confined_write_refusal(&self, main_root: &str, case_id: Option<&str>) -> Option<String> {
         self.peer
@@ -334,28 +338,35 @@ impl RunRequestHost for RunMachine<'_> {
     }
 }
 
-/// A request refusal with the exit status of the class Node threw it as. A host failure is the git roots sentence,
-/// which Node's `resolveGitRoots` raises as a `RunnerConfigError`; a `TypeError` carries no category.
-fn request_refusal(refusal: Refusal) -> CategorisedRefusal {
-    match refusal.name {
-        "TypeError" => CategorisedRefusal::unexpected(refusal.message),
-        _ => CategorisedRefusal::new("validation", refusal.message),
+/// The refusal of an error of the Node class `class`, exiting as Node's CLI exited for it (`EXIT_CODES[categoryOf
+/// (err)]`, `bin/fgos.mjs`): `RunnerConfigError` and `CaseAdmissionRefusedError`, which extends it, carry the
+/// `validation` category. No other class `fgos run` can end in carries one (`RunRequestError`, `TypeError`,
+/// `DispatchError`, `SeatResolutionError`, `SeatBindingError`, `YamlParseError`, the confinement errors, a file system
+/// error), so each exits as unexpected.
+fn refusal_of_class(class: &str, message: String) -> CategorisedRefusal {
+    match class {
+        "RunnerConfigError" | "CaseAdmissionRefusedError" => {
+            CategorisedRefusal::new("validation", message)
+        }
+        _ => CategorisedRefusal::unexpected(message),
     }
 }
 
+/// A request refusal, under the class it was raised as.
+fn request_refusal(refusal: Refusal) -> CategorisedRefusal {
+    refusal_of_class(refusal.name, refusal.message)
+}
+
 /// A run that ended in an error, as `fgos run` reports it: a `RunnerConfigError` (or a class that extends it)
-/// names its code when its message does not, and exits with its category; any other error exits as unexpected.
+/// names its code when its message does not; the class decides the exit.
 fn run_refusal(error: RunUnitError) -> CategorisedRefusal {
-    if error.tag == ErrorTag::Error {
-        return CategorisedRefusal::unexpected(error.message);
-    }
     let message = match &error.code {
-        Some(code) if !error.message.contains(code.as_str()) => {
+        Some(code) if error.tag != ErrorTag::Error && !error.message.contains(code.as_str()) => {
             format!("{code}: {}", error.message)
         }
         _ => error.message,
     };
-    CategorisedRefusal::new("validation", message)
+    refusal_of_class(error.tag.as_str(), message)
 }
 
 // ---- the dir warning ----------------------------------------------------------------------------------------

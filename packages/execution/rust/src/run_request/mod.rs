@@ -34,8 +34,9 @@ pub trait RunRequestHost {
     fn cwd(&self) -> String;
     /// The directory a relative path of `--dir` or `--worktree` resolves against.
     fn process_cwd(&self) -> String;
-    /// Git's answer for `dir`, or why it cannot say.
-    fn git_roots(&self, dir: &str) -> Result<GitRoots, String>;
+    /// Git's answer for `dir`, or the refusal the caller raises when it cannot say: the class is the caller's
+    /// (`fgos run` raises a `RunnerConfigError`), so the request passes it on unchanged.
+    fn git_roots(&self, dir: &str) -> Result<GitRoots, Refusal>;
     /// Why a writing run from a confined worker is refused, `None` when the worker's view allows it.
     fn confined_write_refusal(&self, main_root: &str, case_id: Option<&str>) -> Option<String>;
     /// The unit a case's guide names for an activity, if the Workflow port answers one.
@@ -384,9 +385,7 @@ fn is_linked_worktree(flags: &Flags, host: &dyn RunRequestHost) -> Result<bool, 
         Some(w) => resolve_path(&host.process_cwd(), &text_of(w)),
         None => host.cwd(),
     };
-    host.git_roots(&dir)
-        .map(|roots| roots.is_linked_worktree)
-        .map_err(Refusal::host)
+    host.git_roots(&dir).map(|roots| roots.is_linked_worktree)
 }
 
 /// The Unit `fgos run "<prompt>"` stands for: the prompt is its objective, `--writes` its write scope (none: a
@@ -743,11 +742,7 @@ pub fn build_run_request(
     let unit_data = if builds_unit {
         let main_root = match &resolved_dir {
             Some(dir) => dir.clone(),
-            None => {
-                host.git_roots(&host.cwd())
-                    .map_err(Refusal::host)?
-                    .main_checkout_root
-            }
+            None => host.git_roots(&host.cwd())?.main_checkout_root,
         };
         Some(adhoc_unit_from_prompt(prompt, flags, &main_root, host)?)
     } else {

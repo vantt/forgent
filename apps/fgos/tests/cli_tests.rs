@@ -5595,6 +5595,185 @@ fn a_dispatched_writing_run_is_refused_by_the_port_before_any_unit_run_exists_an
     );
 }
 
+/// `fgos run` exits as Node's CLI exited for the class of the error it ends in: a `RunnerConfigError` (here the
+/// directory Git cannot answer for) is `validation`, while a class with no category (a config check of another class,
+/// a unit file that cannot be read) is unexpected, whether the request or the run raised it.
+#[cfg(unix)]
+#[test]
+fn run_exits_with_the_status_of_the_class_its_refusal_was_raised_as() {
+    let world = RunWorld::new("fgos_run_classes", "exit 1");
+    let outside = fresh_dir("fgos_run_classes_outside");
+    let no_repository = world
+        .world
+        .command(&["run", "Check it"])
+        .current_dir(&outside)
+        .env_remove("FGOS_DISPATCH_DEPTH")
+        .output()
+        .unwrap();
+    assert_eq!(
+        no_repository.status.code(),
+        Some(4),
+        "{}",
+        stderr_of(&no_repository)
+    );
+    assert!(
+        stderr_of(&no_repository)
+            .starts_with("fgos: fgos run must run inside a git repository (cwd: "),
+        "{}",
+        stderr_of(&no_repository)
+    );
+
+    let unit = world.world.project.join("no-such-unit.yaml");
+    let unreadable = world.run(&["--unit", unit.to_str().unwrap()], &[]);
+    assert_eq!(
+        unreadable.status.code(),
+        Some(1),
+        "{}",
+        stderr_of(&unreadable)
+    );
+    assert_eq!(
+        stderr_of(&unreadable),
+        format!(
+            "fgos: ENOENT: no such file or directory, open '{}'\n",
+            unit.display()
+        )
+    );
+
+    // A project config may not define the machine's confinement backends: the check raises a
+    // `ConfinementBackendRegistryError`, both where `--provider` reads the config for the request and where the run
+    // first reads it.
+    world.world.project_config("runner:\n  confinementBackends:\n    bwrap:\n      type: bwrap\n  capabilities:\n    docs:write:\n      prefer:\n        - executor: stub\n");
+    for args in [
+        &[
+            "Check it",
+            "--capability",
+            "docs:write",
+            "--provider",
+            "stub",
+        ][..],
+        &["Check it", "--capability", "docs:write"],
+    ] {
+        let forbidden = world.run(args, &[]);
+        assert_eq!(
+            forbidden.status.code(),
+            Some(1),
+            "{args:?}: {}",
+            stderr_of(&forbidden)
+        );
+        assert!(
+            stderr_of(&forbidden).contains("(confinement-backend-registry-forbidden)"),
+            "{args:?}: {}",
+            stderr_of(&forbidden)
+        );
+    }
+    assert!(!world.world.project.join(".fgos/assignments").exists());
+}
+
+/// The refusals a run gives before any unit run exists reach the caller as one `fgos:` line and exit 4, leaving no
+/// unit run behind: an account pin no seat of the unit can take, and a machine with no agent CLI.
+#[cfg(unix)]
+#[test]
+fn run_refuses_an_account_pin_and_a_machine_without_an_agent_cli_before_any_unit_run_exists() {
+    let world = RunWorld::new("fgos_run_refused", "exit 1");
+    let pinned = world.run(
+        &[
+            "Check it",
+            "--capability",
+            "docs:write",
+            "--account",
+            "stub/acct1",
+        ],
+        &[],
+    );
+    assert_eq!(pinned.status.code(), Some(4), "{}", stderr_of(&pinned));
+    assert!(
+        stderr_of(&pinned).starts_with("fgos: the pinned account applies to no seat of this unit"),
+        "{}",
+        stderr_of(&pinned)
+    );
+    assert!(pinned.stdout.is_empty());
+
+    // Every executor of the machine and of the shipped standard starts a program this PATH does not hold.
+    fs::write(
+        world.world.home.join(".fgos/config.yaml"),
+        "runner:\n  executors:\n    stub:\n      kind: agent\n      providerModel: stub\n      allowCrossProvider: true\n      invocations:\n        - id: stub-cli\n          via: cli\n          adapter: cli-spawn\n          command: /no/such/agent-cli\n          args: [\"{prompt}\"]\n",
+    )
+    .unwrap();
+    let missing = world.run(&["Check it", "--capability", "docs:write"], &[]);
+    assert_eq!(missing.status.code(), Some(4), "{}", stderr_of(&missing));
+    assert!(
+        stderr_of(&missing).starts_with(
+            "fgos: agent-cli-missing: no agent CLI is installed on this machine (looked for "
+        ),
+        "{}",
+        stderr_of(&missing)
+    );
+    assert!(stderr_of(&missing).contains("fgos doctor"));
+    assert!(!world.world.project.join(".fgos/assignments").exists());
+}
+
+/// The unit flags of a prompt (`--provider`, `--persona`, `--rigor`) reach the unit the run records, and the
+/// override flags (`--effort`, an `--override` executor pin) its overrides, folded into one; the answer is the
+/// envelope of the run's data. Which binding they give is Seat Binding's (the bind vectors).
+#[cfg(unix)]
+#[test]
+fn run_records_the_unit_flags_and_overrides_of_a_prompt_and_answers_the_run_envelope() {
+    let world = RunWorld::new("fgos_run_flags", "exit 1");
+    let agents = world.world.project.join("fgos/agents");
+    fs::create_dir_all(&agents).unwrap();
+    fs::write(
+        agents.join("test-voice.yaml"),
+        "name: test-voice\ndescription: A test voice\n",
+    )
+    .unwrap();
+    let output = world.run(
+        &[
+            "Check it",
+            "--capability",
+            "docs:write",
+            "--provider",
+            "stub",
+            "--persona",
+            "test-voice",
+            "--rigor",
+            "high",
+            "--effort",
+            "high",
+            "--override",
+            r#"{"executor":"stub"}"#,
+            "--json",
+        ],
+        &[],
+    );
+    // The stub's only invocation cannot carry a read-only seat: the run settles policy-refusal.
+    assert_eq!(output.status.code(), Some(4), "{}", stderr_of(&output));
+    let envelope: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let data = &envelope["data"];
+    assert_eq!(data["outcome"], "policy-refusal", "{data}");
+    assert_eq!(data["results"][0]["seat"], "producer", "{data}");
+    let unit_run_id = data["unitRunId"].as_str().unwrap();
+    let record: serde_json::Value = serde_json::from_str(
+        &fs::read_to_string(
+            world
+                .world
+                .project
+                .join(".fgos/assignments")
+                .join(unit_run_id)
+                .join("unit.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(record["unit"]["prefer"], serde_json::json!(["stub"]));
+    assert_eq!(record["unit"]["persona"], "test-voice");
+    assert_eq!(record["unit"]["rigor"], "high");
+    assert_eq!(
+        record["overrides"],
+        serde_json::json!([{ "executor": "stub", "reasoningEffort": "high" }])
+    );
+    assert_eq!(record["settlement"]["outcome"], data["outcome"]);
+}
+
 /// On Windows the host hands `fgos run` to the legacy payload whole, as it execs every legacy-cli verb: the
 /// invocation is the legacy lane's, never the host's unit run. Proven on native Windows CI only.
 #[cfg(windows)]
