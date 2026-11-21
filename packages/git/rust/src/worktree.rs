@@ -1395,7 +1395,10 @@ impl GitDriver {
         let issues = self.inspect_worktree_orphans(repo)?;
         let issue = issues
             .iter()
-            .find(|issue| issue.path == path && issue.reason == "missing-worktree-preserved")
+            .find(|issue| {
+                issue.reason == "missing-worktree-preserved"
+                    && spelling(&issue.path) == spelling(&path)
+            })
             .ok_or_else(|| failure("worktree-prune-registration-unproven"))?;
         let admin = repo
             .common_dir()

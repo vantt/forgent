@@ -1014,13 +1014,100 @@ pub(crate) fn fingerprint(
     }
     Err(failure("invalid-literal-path"))
 }
+/// The Windows answer: no descriptor-relative open exists, so every parent is checked to be a plain
+/// directory (a symlink or junction refuses, as `O_NOFOLLOW` does on Unix) and the file's identity,
+/// length and write time must agree before and after the read. The mode is the one a regular file
+/// carries on Unix with the read-only bit as the only permission difference (0o100644 / 0o100444).
 #[cfg(not(unix))]
 pub(crate) fn fingerprint(
-    _root: &std::path::Path,
-    _path: &[u8],
-    _remaining: &mut u64,
+    root: &std::path::Path,
+    path: &[u8],
+    remaining: &mut u64,
 ) -> Result<PathFingerprint> {
-    Err(failure("snapshot-platform-unsupported"))
+    use std::io::Read;
+    use std::os::windows::fs::MetadataExt;
+    const REPARSE: u32 = windows_sys::Win32::Storage::FileSystem::FILE_ATTRIBUTE_REPARSE_POINT;
+    let text = std::str::from_utf8(path).map_err(|_| failure("invalid-literal-path"))?;
+    let root = std::fs::symlink_metadata(root)
+        .ok()
+        .filter(|m| m.is_dir() && m.file_attributes() & REPARSE == 0)
+        .map(|_| root)
+        .ok_or_else(|| failure("snapshot-root-unreadable"))?;
+    let mut full = root.to_path_buf();
+    let mut parts = text.split('/').peekable();
+    while let Some(part) = parts.next() {
+        full.push(part);
+        let metadata = match std::fs::symlink_metadata(&full) {
+            Ok(m) => m,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                return Ok(PathFingerprint::Missing)
+            }
+            Err(_) if parts.peek().is_some() => return Err(failure("snapshot-parent-unreadable")),
+            Err(_) => return Err(failure("snapshot-path-unreadable")),
+        };
+        if parts.peek().is_some() {
+            if !metadata.is_dir() || metadata.file_attributes() & REPARSE != 0 {
+                return Err(failure("snapshot-parent-unreadable"));
+            }
+            continue;
+        }
+        if metadata.file_type().is_symlink() {
+            let target = std::fs::read_link(&full)
+                .map_err(|_| failure("snapshot-link-unreadable"))?
+                .to_string_lossy()
+                .replace('\\', "/")
+                .into_bytes();
+            return Ok(PathFingerprint::Link { target });
+        }
+        if !metadata.is_file() {
+            return Ok(PathFingerprint::Type {
+                mode: if metadata.is_dir() { 0o040000 } else { 0 },
+            });
+        }
+        let unreadable = || PathFingerprint::Unreadable {
+            size: metadata.len(),
+            mtime: metadata.last_write_time().to_string(),
+        };
+        let Ok(mut file) = std::fs::File::open(&full) else {
+            return Ok(unreadable());
+        };
+        let key = crate::refs::file_key_of(&file)?;
+        let mut hash = Sha256::new();
+        let mut buffer = [0u8; 65536];
+        loop {
+            let n = match file.read(&mut buffer) {
+                Ok(n) => n,
+                Err(_) => return Ok(unreadable()),
+            };
+            if n == 0 {
+                break;
+            }
+            *remaining = remaining
+                .checked_sub(n as u64)
+                .ok_or_else(|| failure("snapshot-byte-limit"))?;
+            hash.update(&buffer[..n]);
+        }
+        let after = file
+            .metadata()
+            .map_err(|_| failure("snapshot-path-unreadable"))?;
+        let again = crate::refs::file_key_of(&file)?;
+        if key.device != again.device
+            || key.index != again.index
+            || metadata.len() != after.len()
+            || metadata.last_write_time() != after.last_write_time()
+        {
+            return Err(failure("snapshot-path-changed"));
+        }
+        return Ok(PathFingerprint::File {
+            sha256: format!("{:x}", hash.finalize()),
+            mode: if after.permissions().readonly() {
+                0o100444
+            } else {
+                0o100644
+            },
+        });
+    }
+    Err(failure("invalid-literal-path"))
 }
 
 impl GitDriver {
