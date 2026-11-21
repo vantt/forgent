@@ -11,12 +11,15 @@ discussion: open
 - 2026-11-21 16:35: đã xác định 4 bản sửa của OS-D1 (nguồn: memory `orchestration-stabilize-first-decision` của secretary Miu và tin supervisor gửi Miu sáng 2026-11-21: "1547 first, then the idle-lead nudge, then the names, then the reaper"): `p-l22vozecxg`, `p-waxzxz5mio`, `p-mhwe24fttr`, `p-yqanenewb4`. **Cả 4 đã `done`** (xem §7 `#related`). Điều kiện đậu theo chữ của OS-D1 đã thỏa, nhưng release hold ("no new work until the release hold is lifted", handoff secretary 14:45) vẫn còn hiệu lực. Discussion vẫn `paused` cho tới khi chủ dự án cho mở lại.
 - **2026-11-21 16:16: chủ dự án cho mở lại (OS-D2).** Trạng thái `discussion: open`. Architecture panel (T0) vẫn hoãn. Release hold không bị ảnh hưởng vì discussion không sinh code.
 - **2026-11-21 16:23 (round 6):** chủ dự án trả lời câu hỏi round 5 là "cả hai": mọi thành phần phải có authority, boundary và contract rõ, **và** hệ thống cần một cơ chế hoặc một vai làm nhạc trưởng nắm nhịp điều phối tổng. Câu hỏi mở thành §3 row 9: nhạc trưởng, hay mọi thứ chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan theo chuỗi watcher -> ghi signal -> phản ứng tiếp. Đang chạy 5 agent con (haiku, chỉ đọc) dò lại tier 0 tới 9 từ dưới lên; kết quả sẽ vào bảng §3 row 4b.
+- **2026-11-21 16:35 (round 8): chủ dự án xác nhận cái hiểu của shaper là đúng -> OS-D3, ghi thành kim chỉ nam ở §2.** Mọi round sau đo đề xuất theo §2. Tiếp theo: nhạc trưởng code đặt ở đâu (§3 row 9), rồi ba ngôn ngữ khung (row 5) và facet chung (row 6).
 - **2026-11-21 16:30 (round 7):** 5 agent đã về; kết quả ở §3 bảng 4b (tier 0-9) và 4c (luồng điều phối). Đề xuất cho row 9 đang chờ chủ dự án: lối vào chỉ là timer và signal, mọi thứ thành event; nhạc trưởng là code (wake/admission có cap), LLM chỉ phán đoán trong khung.
 - Đang bàn §3 row 4 (danh mục primitive và ai sở hữu). Scout cho thấy gần hết primitive đã có chủ (bảng §3 row 4a). Đề xuất đang chờ chủ dự án phản hồi: skeleton là một contract đặt tên và ghép các chủ đã có, không phải component hay crate mới. Có ba khoảng trống thật: sleep, timer theo actor, facet chung.
 
 ## 2. Mục tiêu & đề bài
 
-Khung xương điều phối (orchestration skeleton) là tầng nền tảng domain-agnostic định hình sớm toàn bộ hệ thống, chỉ sở hữu actor và thời gian (triggers, timers, start/sleep/wake, handoff, who acts next, các surface port hướng ra ngoài như Multica) mà không bao giờ sở hữu trạng thái, bước đi hay cột bảng của bất kỳ domain cụ thể nào (SR-D8). Hệ thống cung cấp một ngôn ngữ khung (frame language) duy nhất để biểu đạt cả plan lẫn workflow guide như những con đường mở có checkpoint thay vì kịch bản ép buộc (SR-D9), kết hợp với một harness tin cậy giúp agent tự do lái tiến trình nhưng bảo đảm từng bước thực thi đều bền vững, ghi nhận một lần, idempotent, quan sát được, chặn cap và từ chối kèm lý do rõ ràng (SR-D9, G15, G16). Các domain pack (`domains/<d>/`) sẽ tự inject trạng thái, cột bảng, phase frame và các door riêng vào khung xương này. Thảo luận này chốt danh mục primitive của skeleton, contract ngôn ngữ khung, ranh giới harness-agent, và cơ chế tích hợp surface để làm chỗ dựa cho các task tiếp theo (admission code, merge queue, failure ladder, toggle tích hợp).
+**Ý định của chủ dự án (kim chỉ nam, OS-D3, chủ dự án xác nhận 2026-11-21).** Chủ dự án muốn hai mức cùng lúc, không chọn một. Ở mức từng thành phần, mỗi thành phần có authority rõ (nó quyết đúng một loại việc), boundary rõ (sở hữu gì, không sở hữu gì) và contract tường minh; bản đồ hiện tại được dò lại từ tầng thấp lên vì chồng chéo, thiếu chủ và code nằm sai nhà là nguồn nghi của sự bất ổn. Ở mức toàn hệ thống, phải có một thứ nắm nhịp để hệ thống tự chạy mà không cần người ngồi canh (bậc ưu tiên "release con người"), đủ chắc để đem fgOS sang project khác và chạy business workflow (mission #1, #2). Hướng nắm nhịp đang theo: lối vào của hệ thống chỉ gồm timer và signal ngoài (ví dụ webhook), mọi thứ đi vào đều được ghi thành event (L1); nhạc trưởng là code chứ không phải LLM, đọc event và facet rồi quyết ai làm tiếp trong cap; các head LLM (supervisor, lead, worker) là người chơi, chỉ được gọi khi cần phán đoán. Mọi đề xuất trong discussion này được đo theo kim chỉ nam này; đề xuất nào đi lệch phải nói rõ lệch ở đâu và vì sao.
+
+**Đề bài.** Khung xương điều phối (orchestration skeleton) là tầng nền domain-agnostic chỉ sở hữu actor và thời gian (trigger, timer, start/sleep/wake, handoff, ai làm tiếp, surface port), không bao giờ sở hữu trạng thái, bước đi hay cột bảng của domain (SR-D8). Hệ thống có một ngôn ngữ khung duy nhất cho cả plan lẫn workflow guide, là những con đường mở có checkpoint chứ không phải kịch bản ép (SR-D9), cùng một harness bảo đảm từng bước bền vững, ghi một lần, idempotent, quan sát được, có cap và từ chối kèm lý do. Domain pack (`domains/<d>/`) inject trạng thái, cột bảng, phase frame và door riêng (SR-D7). Discussion này chốt danh mục primitive và chủ của chúng, nhạc trưởng và lối vào, contract ngôn ngữ khung, facet lập lịch, và cơ chế surface, làm chỗ dựa cho T1, T3, T4, T5.
 
 ## 3. Vấn đề rõ / chưa rõ
 
@@ -25,11 +28,11 @@ Khung xương điều phối (orchestration skeleton) là tầng nền tảng do
 | 1 | Ranh giới Skeleton vs Domain: Skeleton chỉ quản actor và thời gian (triggers, timers, start/sleep/wake, handoff, who acts next, surface ports), không sở hữu work state / board columns | SR-D8, G13, G14 (`supervisor-review`). Rút kinh nghiệm từ Work FSM bị hard-code coding mechanics | **Rõ (SR-D8)** |
 | 2 | Mô hình 3 phần của quy trình: Frame (đường rộng + checkpoints), Agent (lái linh hoạt trong khung, báo friction), Harness (bảo đảm từng bước tin cậy, không ép kịch bản) | SR-D9, G15, G16 (`supervisor-review`). 4/5 lần supervisor live run dừng là do lỗi harness/confinement | **Rõ (SR-D9)** |
 | 3 | Domain Injection: domain pack (`domains/<d>/`) inject phase frames, doctrine, refusal ladder map, doors (coding: review verdict, land door, trunk merge, toggles/retires) | SR-D7, G12. Plan và supervisor hoàn toàn domain-agnostic | **Rõ (SR-D7)** |
-| 4 | Danh mục primitives của Skeleton & vị trí code: triggers (Event Store / watcher), timers (OS timer), start/sleep/wake (`session start`, `supervisor wake`, wake pane/socket), handoff (contract), who-next (`bind()` / `dispatch decide`), surface ports (6 ports) | G13 (`supervisor-review`), `plans/261118-1117-external-ui-integration-multica`. Hiện nằm rải rác giữa Supervision, Session Host, Runner | **Đang bàn (round 5):** gần hết primitive đã có chủ, xem bảng 4a. Đề xuất: skeleton là contract đặt tên, không phải crate mới; chờ chủ dự án phản hồi |
+| 4 | Danh mục primitives của Skeleton & vị trí code: triggers (Event Store / watcher), timers (OS timer), start/sleep/wake (`session start`, `supervisor wake`, wake pane/socket), handoff (contract), who-next (`bind()` / `dispatch decide`), surface ports (6 ports) | G13 (`supervisor-review`), `plans/261118-1117-external-ui-integration-multica`. Hiện nằm rải rác giữa Supervision, Session Host, Runner | **Đang bàn (round 5):** gần hết primitive đã có chủ, xem bảng 4a. Chủ dự án trả lời "cả hai" (OS-D3): mỗi thành phần có authority, boundary, contract riêng, và skeleton có nhạc trưởng code. Kết quả dò ở bảng 4b |
 | 5 | Ngôn ngữ khung hợp nhất (One Frame Language): Hợp nhất `plan-v1` (plan/wave/phase) và workflow guide YAML (steps/milestones/guards). Cú pháp, schema và runtime runner nào thi hành? | G16. Hiện fgOS có 2 ngôn ngữ khung riêng rẽ, plan không chạy trên workflow harness | **Chưa rõ: Mở khảo sát thiết kế** |
 | 6 | Universal work facets: Skeleton chỉ đọc các thuộc tính lịch trình phổ quát (actionable/runnable, waiting on what, finished) thay vì work states cụ thể | G14. Schema của facets này là gì để skeleton lập lịch được? | **Chưa rõ: Đề xuất schema 3 facets** |
 | 7 | Tích hợp Surface (Multica 6 ports): Portfolio read, Command, Wake door, Notifier, Session placement, Question port | `plans/261118-1117-external-ui-integration-multica`. G13 | **Chưa rõ: Thứ tự ưu tiên cổng & adapter** |
-| 9 | Nhạc trưởng vs chuỗi phản ứng: có một cơ chế hoặc vai nắm nhịp và điều phối tổng, hay mọi hoạt động chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan qua watcher -> ghi signal -> phản ứng tiếp? | Chủ dự án nêu round 6 (2026-11-21 16:23), "open for discuss". Bằng chứng ở 4c: chuỗi timer -> watcher -> event -> wake đã có trong code; nhạc trưởng thực tế là supervisor LLM, cap không bị code ép; chưa có lối vào signal ngoài | **Đang bàn; đề xuất ở §5 round 7** |
+| 9 | Nhạc trưởng vs chuỗi phản ứng: có một cơ chế hoặc vai nắm nhịp và điều phối tổng, hay mọi hoạt động chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan qua watcher -> ghi signal -> phản ứng tiếp? | Chủ dự án nêu round 6 (2026-11-21 16:23), "open for discuss". Bằng chứng ở 4c: chuỗi timer -> watcher -> event -> wake đã có trong code; nhạc trưởng thực tế là supervisor LLM, cap không bị code ép; chưa có lối vào signal ngoài | **Hướng đã chốt (OS-D3):** lối vào timer + signal, nhạc trưởng là code, LLM chỉ phán đoán. Còn mở: nhạc trưởng code đặt ở đâu và lấy phần nào từ `wake::decide`, T1; lối vào signal ngoài qua cửa nào |
 | 8 | Tổ chức Architecture Panel (`fgos-architecture-panel`): Khởi động panel độc lập gồm nhiều persona phản biện thiết kế skeleton trước khi chốt spec chi tiết | Khuyến nghị từ backlog row `p-7pjiqfoj7v` và `supervisor-review` §7 T7. Đã gửi câu hỏi `q-kjat6xjwfv`. **Câu trả lời chủ dự án:** Chưa làm bây giờ (`Not now`). Chủ dự án chọn đóng băng việc điều phối mới để ưu tiên ổn định hệ thống; Architecture Panel chờ 4 bản sửa lỗi hạ cánh. Đậu (park) thảo luận `orchestration-skeleton`, không đóng. | **Đã mở lại (OS-D2); panel vẫn hoãn** |
 
 
@@ -85,6 +88,7 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 | SR-D10 | Integration phase, plan khai báo `toggles:` và `retires:`. Close check từ chối nếu còn marker hoặc đường cũ chưa dọn. | 2026-11-19 | `supervisor-review` |
 | OS-D1 | Shaping is parked by owner decision 2026-11-21 until four orchestration fixes land: đóng băng việc điều phối mới, tạm hoãn Architecture Panel, thảo luận `orchestration-skeleton` mở nhưng tạm dừng (parked, not closed) | 2026-11-21 | Quyết định chủ dự án (`q-kjat6xjwfv`) |
 | OS-D2 | Mở lại discussion ngay (2026-11-21 16:16). 4 bản sửa của OS-D1 đã xong; discussion không sinh code nên không đụng release hold. Architecture panel (T0) vẫn hoãn. | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
+| OS-D3 | Kim chỉ nam (§2): hai mức cùng lúc — authority, boundary, contract rõ cho từng thành phần, và một thứ nắm nhịp toàn hệ thống. Lối vào chỉ là timer và signal ngoài, mọi thứ thành event; nhạc trưởng là code, LLM là người chơi chỉ được gọi để phán đoán. Nêu round 6, shaper diễn lại round 7, chủ dự án xác nhận round 8 ("cái hiểu của em là đúng") và yêu cầu ghi lại để không lạc nhịp. | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
 
 ## 5. Q&A log
 
@@ -96,73 +100,66 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-21 16:16 round 5: Chủ dự án: "mở lại ngay đi em" -> OS-D2, `discussion: open`. Scout §3 row 4: đọc `docs/platform/supervision/spec.md` §1-§5 và `docs/platform/session-host/spec.md` §1-§7, ghi kết quả vào bảng 4a. Đề xuất với chủ dự án: skeleton là một contract đặt tên, ghép các chủ đã có (Watcher, Session Host, bind(), Event Store, questions), không lập crate mới (L10, RUL104, design principle 1). Phần việc thật chỉ là ba khoảng trống: sleep, timer theo actor, facet chung. Đang chờ phản hồi.
 - 2026-11-21 16:23 round 6: Chủ dự án: "thật ra là cả 2. anh muốn em bật một loạt agent con, rẻ để dò lại tất cả từ dưới tầng thấp lên trên để làm rõ lại. anh muốn mọi thành phần đều phải có component authority/boundary và contracts rõ ràng. tuy nhiên một cơ chế hay một ai đó làm nhạc trưởng, nắm nhịp, nắm cơ chế điều phối tổng trên hệ thống cũng cần chứ nhỉ (này open for discuss). hoặc đơn thuần mọi thứ bắt đầu bởi timer trigger và external signal trigger (webhook chẳng hạn), sau đó thì watcher sẽ được kích hoạt, rồi kích hoạt ghi nhận signal, rồi tiếp theo diễn ra, ...." Đã chạy `fgos dispatch decide --for explore --needs-soul` (in-process) rồi bật 5 agent Explore (haiku) cho tier 0-1, 2-3, 4-5, 6-8, 9 và luồng điều phối. Mở §3 row 9.
 - 2026-11-21 16:30 round 7: Chủ dự án hỏi "mà em có hiểu ý trong đầu anh đang muốn làm gì không". Shaper diễn lại: hai mức (authority/boundary/contract cho từng thành phần, và một thứ nắm nhịp toàn hệ thống); giả thuyết là lối vào chỉ gồm timer + signal ghi thành event, nhạc trưởng là code chứ không phải LLM. 5 agent về; kiểm tay các điểm chính (watcher.enabled, timer units, maxLeads không bị ép, wake gán cứng `manual`, header supervision spec lạc hậu); ghi vào §3 bảng 4b, 4c. Đề xuất cho row 9 gửi chủ dự án, chưa chốt.
+- 2026-11-21 16:35 round 8: Chủ dự án: "cái hiểu của em là đúng. để đừng lạc nhịp mong muốn của anh, em cần ghi nhận cái hiểu đó." Ý định đã giữ nguyên qua round 6, 7, 8 -> mint OS-D3, viết lại §2 thành kim chỉ nam, dựng lại §6.
 
 ## 6. Thiết kế đã chốt {#design}
 
-**Định hướng tổng thể (Kế thừa SR-D6..SR-D10):**
-
-Khung xương điều phối chia tách rõ rệt giữa cơ chế chung (Skeleton & Harness) và nghiệp vụ đặc thù (Domain Pack):
+Đây là hình dạng hiện tại cho người đọc lạ. Phần đã chốt dựa trên SR-D6 tới SR-D10 và OS-D3; phần ghi "còn mở" đang bàn ở §3.
 
 ```mermaid
 flowchart TB
-  subgraph Surface ["Surface Layer (Multica / Web / CLI)"]
-    SP[6 Hexagonal Ports: Read, Command, Wake, Notify, Placement, Question]
+  subgraph Entry ["Lối vào (chỉ hai loại, OS-D3)"]
+    T[Timer: OS timer theo project]
+    X["Signal ngoài: webhook qua gateway, CLI của người, hook"]
   end
 
-  subgraph Skeleton ["Skeleton Layer (Domain-Agnostic)"]
-    PR[Primitives: Triggers, Timers, Start/Sleep/Wake, Handoff, Who-Next, Caps, Facets]
-    FL[One Frame Language: Plans & Workflow Guides as open roads with checkpoints]
+  subgraph Skeleton ["Skeleton (domain-agnostic, SR-D8)"]
+    R["Cửa raise: mọi lối vào thành event"]
+    ES[(Event Store: event ghi một lần, L1)]
+    C["Nhạc trưởng (code, không LLM): đọc event + facet, ép cap, quyết ai làm tiếp"]
+    P["Primitive: start / sleep / wake / rotate / handoff / cap"]
+    SP["Surface port (6 port Multica)"]
   end
 
-  subgraph Domain ["Domain Layer (Injected)"]
-    DP["Domain Pack (domains/<d>/): Frames, Board Columns, Doctrine, Doors, Refusal Map"]
+  subgraph Domain ["Domain pack (SR-D7)"]
+    DP["Frame, doctrine, door, cột bảng, ánh xạ facet"]
   end
 
-  subgraph Execution ["Execution Layer"]
-    AG[Agents: Supervisor, Lead, Units drive within frames]
-    HA["Harness: Durable execution (recorded, resumable, idempotent, observable, capped)"]
+  subgraph Players ["Người chơi (LLM)"]
+    SV[Supervisor: phán đoán khi được gọi]
+    LD[Lead / worker: lái trong khung]
   end
 
-  SP <--> PR
-  PR --> AG
-  FL --> AG
-  DP --> FL
-  AG --> HA
-  AG -. friction .-> FL
+  H["Harness: từng bước bền vững, idempotent, quan sát được, có cap, từ chối có lý do (SR-D9)"]
+
+  T --> R
+  X --> R
+  SP <--> R
+  R --> ES
+  ES --> C
+  DP --> C
+  C -->|cần phán đoán| SV
+  C -->|start / wake| LD
+  SV -->|quyết định thành event| R
+  LD --> H
+  H -->|kết quả thành event| R
 ```
 
-### Các lớp trách nhiệm
+**Hai mức (OS-D3).** Mỗi thành phần trong sơ đồ và mỗi thành phần ở tier 0-9 có authority, boundary và contract riêng; bảng §3 4b là danh sách lỗ hổng phải lấp. Skeleton không gom code của các thành phần khác về một chỗ: nó là hợp đồng nối các chủ đã có (Event Store, Session Host, `bind()`, questions) cộng với nhạc trưởng code là phần nó thật sự sở hữu.
 
-1. **Skeleton (Domain-Agnostic, SR-D8):**
-   - **Triggers & Timers:** Watcher OS timer định kỳ, Event Store sự kiện kích hoạt, không mang logic nghiệp vụ.
-   - **Start / Sleep / Wake:** `fgos session start` khởi tạo head sandbox; cơ chế sleep/wake qua socket/pane hoặc `fgos supervisor wake`.
-   - **Handoff & Who-Next:** Handoff contract giữa các agent; router `bind()` / `fgos dispatch decide` xác định executor phù hợp theo capability mà không ép buộc vai trò cứng.
-   - **Scheduling Facets:** Skeleton scheduler chỉ đọc 3 facet phổ quát từ các case/plan:
-     - `actionable`: Boolean (đã sẵn sàng chạy, không bị vướng tiền đề).
-     - `waitingOn`: Enum/Object (`{ kind: "actor" | "time" | "event" | "person", ref: "..." }`).
-     - `finished`: Terminal state boolean + kết quả.
-   - **Surface Ports (6 ports từ plan 261118-1117):**
-     1. Portfolio read port (đọc danh sách plan, trạng thái, lane).
-     2. Command port (chạy các verb supervisor/lead).
-     3. Wake door (`fgos supervisor wake --trigger --ref`).
-     4. Notifier port (webhook / mailbox phát thông báo).
-     5. Session placement port (gắn runtime vào terminal/pane).
-     6. Question port (5-part question store).
+**Lối vào.** Chỉ timer và signal ngoài khởi động hoạt động. Mọi lối vào đi qua một cửa raise và thành event trong Event Store. Hôm nay đã có timer -> `watcher tick` -> `queue.raise`; còn thiếu lối vào signal ngoài (gateway chưa có route raise, `POST /v1/runner/tick` đi vòng qua cửa) và wake chưa mang trigger/ref (§3 4c).
 
-2. **One Frame Language (SR-D9):**
-   - Hợp nhất cấu trúc của `plan-v1` và `workflow guide`:
-     - Khai báo mục tiêu, checkpoint bắt buộc (receipts, review verdict, gate).
-     - Đường đi cho phép (`routes: should | may-instead | unlisted`).
-     - Không ép DAG cứng nhắc; cho phép agent tự chọn bước kế tiếp bên trong khung.
+**Nhạc trưởng.** Code, không LLM. Nó đọc event và facet lập lịch, áp cap (`maxLeads`, lane, attempt) và quyết ai làm tiếp: admit plan, start hoặc wake người chơi, đóng event vô ích. Mầm hiện có là `wake::decide` (`packages/supervision/rust/src/wake.rs`), vốn đã tự đóng event `lane-freed` / `plan-priority-changed` khi không có gì admit được. Phần admission chuyển từ LLM sang code là T1. Còn mở: vị trí và contract của nhạc trưởng, và hợp nhất vòng lặp thứ hai `fgos-runner --watch`.
 
-3. **Domain Pack (`domains/<d>/`, SR-D7):**
-   - Cung cấp ngữ nghĩa cụ thể: trạng thái, cột hiển thị (mapping từ facet ra board column), doctrine, quy tắc giải quyết lỗi (refusal ladder map L0-L3) và cửa kiểm tra (như `fgos land`, merge queue).
+**Người chơi.** Supervisor chỉ được gọi khi cần phán đoán (kẹt, lỗi lạ, chọn giữa các phương án ngang nhau, hỏi chủ dự án); lead và worker lái trong khung. Quyết định của họ quay lại hệ thống dưới dạng event qua cùng cửa raise, nên nhạc trưởng luôn nhìn thấy.
 
-4. **Agents:**
-   - Lái quy trình linh hoạt trong khung; ghi nhận friction khi khung bất hợp lý để khung tự tiến hóa.
+**Facet lập lịch (còn mở, §3 row 6).** Nhạc trưởng chỉ đọc ba facet chung: `actionable`, `waitingOn` (`{kind: actor | time | event | person, ref}`), `finished`. Domain pack ánh xạ trạng thái riêng của nó (plan status, work status, workflow gate, question open) vào ba facet này. Hôm nay chưa có facet chung.
 
-5. **Harness:**
-   - Bảo đảm từng bước đáng tin cậy: ghi nhận một lần (durable), có thể thử lại an toàn (idempotent), quan sát được (observable), chặn giới hạn (capped), từ chối kèm mã lỗi chuẩn hóa.
+**Primitive và khoảng trống.** Start, rotate, cap đã có chủ. Còn thiếu sleep ("ngủ chờ X"), timer theo actor ("đánh thức X lúc T"), và một contract handoff duy nhất thay cho ba đường hiện có (§3 4a).
+
+**Ngôn ngữ khung (còn mở, §3 row 5).** Hôm nay có ba: plan-v1, guide YAML, work FSM, chỉ gặp nhau ở `fgos workflow propose`. Đích là một ngôn ngữ: đường mở có checkpoint (`routes: should | may-instead | unlisted`), không DAG cứng.
+
+**Harness.** Bảo đảm từng bước: ghi một lần, thử lại an toàn, quan sát được, có cap, từ chối kèm mã lỗi chuẩn.
 
 ## 7. Danh mục hạng mục / task {#tasks}
 
