@@ -976,10 +976,11 @@ pub(crate) fn adopt_worktree_admin<'a>(
 ) -> Result<LockScope<'a>> {
     let scope = LockScope::seeded(held).map_err(failure)?;
     if let Some(admin) = scope.handle("worktree-admin") {
-        let expected = repo
-            .trusted_main_root()
-            .join(".fgos/locks/worktree-admin.lock");
-        if admin.path() != expected
+        let expected = fgos_process::path::plain_path(repo.trusted_main_root())
+            .join(".fgos")
+            .join("locks")
+            .join("worktree-admin.lock");
+        if fgos_process::path::plain_path(admin.path()) != expected
             || scope
                 .holding()
                 .map_err(failure)?
@@ -1035,7 +1036,9 @@ fn acquire_admin<'a>(
 fn worktree_admin_held(fgos_dir: &Path, wait: Wait) -> OperationError {
     let resource = fgos_holder_lock::Resource::new(
         "worktree-admin",
-        fgos_dir.join("locks/worktree-admin.lock"),
+        fgos_process::path::plain_path(fgos_dir)
+            .join("locks")
+            .join("worktree-admin.lock"),
     );
     let pids: Vec<u32> = match fgos_holder_lock::holders(&resource) {
         Ok(fgos_holder_lock::HoldersList::List(tuples)) => tuples.iter().map(|t| t.pid.0).collect(),
@@ -1121,9 +1124,10 @@ pub(crate) fn file_key_of(file: &fs::File) -> Result<FileKey> {
 pub(crate) fn custody_lock_path(repo: &RepoHandle, root: &Path) -> Result<PathBuf> {
     let key = fgos_holder_lock::cwd_dev_ino(root)
         .ok_or_else(|| failure("checkout-custody-birth-unavailable"))?;
-    Ok(repo
-        .trusted_main_root()
-        .join(format!(".fgos/locks/dispatch-cwd--{key}.lock")))
+    Ok(fgos_process::path::plain_path(repo.trusted_main_root())
+        .join(".fgos")
+        .join("locks")
+        .join(format!("dispatch-cwd--{key}.lock")))
 }
 /// A linked checkout's custody lease, taken once and never waited for: a checkout a live writer holds answers
 /// `checkout-custody-busy`. The one door for a caller that must hold the lease while it acts on `root` (recovery of a
