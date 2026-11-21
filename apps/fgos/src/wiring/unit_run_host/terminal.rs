@@ -295,7 +295,7 @@ fn env_of(value: Option<&Value>) -> Env {
 pub(super) fn dispatch_refusal(error: DispatchError) -> RunnerConfigError {
     let mut out =
         RunnerConfigError::coded(error.message, &error.code).with("name", json!("DispatchError"));
-    for (key, value) in error.detail {
+    for (key, value) in *error.detail {
         out = out.with(&key, value);
     }
     out

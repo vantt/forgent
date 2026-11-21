@@ -213,7 +213,7 @@ fn refusal(error: RunnerConfigError) -> SessionLaunchError {
 
 fn dispatch_refusal(error: DispatchError) -> SessionLaunchError {
     let mut out = SessionLaunchError::new(&error.code, error.message);
-    for (key, value) in error.detail {
+    for (key, value) in *error.detail {
         out = out.with(&key, value);
     }
     out

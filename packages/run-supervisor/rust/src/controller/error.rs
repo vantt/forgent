@@ -11,7 +11,8 @@ use std::fmt;
 pub struct DispatchError {
     pub code: String,
     pub message: String,
-    pub detail: Map<String, Value>,
+    /// Boxed so the error stays small enough to return by value.
+    pub detail: Box<Map<String, Value>>,
     /// The holder-lock driver failed (`lock-driver-unavailable`, `lock-order-violation` and the other codes of the
     /// holder-lock facade): not a refusal of the controller, and the CLI exits with `precondition` for it.
     pub holder_lock: bool,
@@ -22,7 +23,7 @@ impl DispatchError {
         Self {
             code: code.to_string(),
             message: message.into(),
-            detail: Map::new(),
+            detail: Box::default(),
             holder_lock: false,
         }
     }

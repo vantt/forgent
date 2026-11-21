@@ -156,7 +156,7 @@ impl RunUnitError {
     pub fn dispatch(error: &fgos_run_supervisor::controller::error::DispatchError) -> Self {
         let mut out = Self::other(&error.code, error.message.clone());
         out.code = Some(error.code.clone());
-        out.fields = error.detail.clone();
+        out.fields = (*error.detail).clone();
         if error.holder_lock {
             out.tag = ErrorTag::HolderLockError;
         } else {
