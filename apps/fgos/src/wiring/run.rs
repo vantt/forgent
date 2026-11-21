@@ -330,11 +330,11 @@ impl RunRequestHost for RunMachine<'_> {
         let install = crate::active_payload_root()?;
         persona::check_agent_definition(name, Path::new(project_root), &install)
     }
-    fn plan_dir_problem(&self, name: &str, main_root: &str) -> Result<Option<String>, String> {
-        checks::PlanChecks.plan_dir_problem(name, main_root)
+    fn plan_dir_problem(&self, name: &str, _main_root: &str) -> Result<Option<String>, String> {
+        fgos_execution::hosts::plan_dir_problem(name)
     }
     fn is_plan_directory(&self, main_root: &str, plan_dir: &str) -> bool {
-        checks::PlanChecks.is_plan_directory(main_root, plan_dir)
+        checks::is_plan_directory(main_root, plan_dir)
     }
 }
 

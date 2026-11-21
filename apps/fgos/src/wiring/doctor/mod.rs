@@ -151,31 +151,7 @@ impl<'a> Run<'a> {
 /// What the config door says of one refusal, as the Node door client worded it: the id, where (`file:line:column`
 /// and the path), the keyword in parentheses. A row that fails because a config file is refused says exactly this.
 pub(crate) fn config_refusal_text(refusal: &fgos_config::error::ConfigRefusal) -> String {
-    let mut place = refusal.file.clone().unwrap_or_default();
-    if let (false, Some(line), Some(column)) = (place.is_empty(), refusal.line, refusal.column) {
-        place.push_str(&format!(":{line}:{column}"));
-    }
-    if let Some(path) = &refusal.path {
-        place = [place.as_str(), path.as_str()]
-            .iter()
-            .filter(|part| !part.is_empty())
-            .copied()
-            .collect::<Vec<_>>()
-            .join(" ");
-    }
-    let keyword = refusal
-        .detail
-        .as_deref()
-        .and_then(|detail| detail.keyword.clone())
-        .or_else(|| refusal.yaml.as_ref().map(|yaml| yaml.rule.to_string()))
-        .map(|keyword| format!("({keyword})"))
-        .unwrap_or_default();
-    [refusal.code, place.as_str(), keyword.as_str()]
-        .iter()
-        .filter(|part| !part.is_empty())
-        .copied()
-        .collect::<Vec<_>>()
-        .join(" ")
+    refusal.door_text()
 }
 
 /// The refusals of a config read as one sentence (`; ` between them), or the text of any other failure.
