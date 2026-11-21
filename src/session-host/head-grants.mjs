@@ -47,19 +47,33 @@ export const QUESTION_ANSWER_VERB = 'questions answer';
 const frozen = (writes, verbs) => Object.freeze({ writes: Object.freeze(writes), verbs: Object.freeze(verbs), mailbox: false, peers: false });
 /** The verbs that land a branch or paths and read a unit's result; every head that lands asks for results too. */
 const LAND_VERBS = Object.freeze(['land', 'request result']);
+/**
+ * The two coordinators (secretary and supervisor) both raise coordination events, run one unit for an urgent chore
+ * (the secretary's is read-only unless it writes into a linked worktree, held to `secretary.run.*`) and record
+ * coordination evidence (`fgos.coordination.*` kinds only).
+ */
+const COORDINATION_VERBS = Object.freeze(['supervisor raise', 'run', 'metrics record']);
+/** What the secretary reads of the supervision portfolio; the supervisor holds these too. */
+const PORTFOLIO_READ_VERBS = Object.freeze(['supervisor plans', 'supervisor queue', 'slots']);
 
 const GRANTS = Object.freeze({
   secretary: Object.freeze({
     writes: Object.freeze(['plans', 'docs/backlog.md', 'docs/discussions']),
-    verbs: Object.freeze(['session start', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, QUESTION_ANSWER_VERB, ...LAND_VERBS]),
+    // Miu orders and stops heads, raises work on the queue and wakes the supervisor; she never closes an event, types into a pane, reads a session or tunes the watcher. A path land is limited to her granted writes (portfolio files).
+    verbs: Object.freeze(['session start', 'session stop', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, QUESTION_ANSWER_VERB, ...LAND_VERBS, ...PORTFOLIO_READ_VERBS, 'supervisor wake', ...COORDINATION_VERBS]),
     mailbox: true,
     peers: true,
   }),
   // A shaper writes one discussion file and parks owner questions; it neither answers them nor starts sessions. It lands too: a path land is limited to the grant's writes, and fgos-shaping commits the discussion every round.
   shaper: Object.freeze({ ...frozen(['docs/discussions'], [...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS]), mailbox: true }),
   planner: frozen(['plans', 'docs/discussions'], [...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS]),
-  // `session write` replaces its read-only backlog file; it never gets `run`.
-  supervisor: frozen(['plans', 'docs/backlog.md'], ['session start', 'session stop', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS, 'supervisor queue', 'supervisor plans', 'slots', 'supervisor handled', 'supervisor done']),
+  // `session write` replaces its read-only backlog file. It goes on site (`session read`, `session type` into a stuck
+  // session), tunes the watcher, prunes settled evidence, and reaches sessions by mailbox and peers.
+  supervisor: Object.freeze({
+    ...frozen(['plans', 'docs/backlog.md'], ['session start', 'session stop', 'session write', ...HEAD_VERBS, ...QUESTION_VERBS, ...LAND_VERBS, ...PORTFOLIO_READ_VERBS, 'supervisor handled', 'supervisor done', 'session read', 'session type', 'watcher tune', ...COORDINATION_VERBS, 'metrics prune']),
+    mailbox: true,
+    peers: true,
+  }),
 });
 /** A lead's verbs; its writes are its plan dir, which the caller resolves (this module reads no files). No `session start`. */
 const LEAD_VERBS = Object.freeze([...HEAD_VERBS, ...QUESTION_VERBS, 'run', 'land', 'worktree create', 'request result']);
