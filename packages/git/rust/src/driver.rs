@@ -533,11 +533,20 @@ impl GitDriver {
                 for entry in entries {
                     let admin = entry.map_err(io)?.path();
                     let backlink = fs::read(admin.join("gitdir")).map_err(io)?;
-                    let backlink = line(&backlink)?;
-                    let checkout = Path::new(backlink)
+                    let backlink = backlink_target(&admin, line(&backlink)?);
+                    let checkout = backlink
                         .parent()
                         .ok_or_else(|| failure("untrusted-worktree"))?;
-                    if path.starts_with(checkout)
+                    // Both sides in one canonical spelling: git writes the
+                    // backlink with forward slashes (or relative to the admin
+                    // directory), `path` is the OS-canonical form. A checkout
+                    // that is gone cannot contain an existing `path`.
+                    let checkout = match fs::canonicalize(checkout) {
+                        Ok(checkout) => checkout,
+                        Err(e) if e.kind() == std::io::ErrorKind::NotFound => continue,
+                        Err(e) => return Err(io(e)),
+                    };
+                    if path.starts_with(&checkout)
                         && (found.is_none()
                             || work_tree.as_ref().is_none_or(|prior| {
                                 checkout.components().count() > prior.components().count()
@@ -549,7 +558,7 @@ impl GitDriver {
                         {
                             return Err(failure("untrusted-worktree"));
                         }
-                        work_tree = Some(fs::canonicalize(checkout).map_err(io)?);
+                        work_tree = Some(checkout);
                         found = Some(fs::canonicalize(admin).map_err(io)?);
                     }
                 }
@@ -1807,7 +1816,13 @@ impl Output {
         e
     }
 }
-fn text_path(path: &Path) -> Result<String> {
+/// The `.git` file a worktree admin directory's `gitdir` backlink names. Git writes it absolute, or relative to
+/// the admin directory under `worktree.useRelativePaths`.
+pub(crate) fn backlink_target(admin: &Path, backlink: &str) -> PathBuf {
+    admin.join(backlink)
+}
+/// A path as a child git is given it: the plain spelling, never `\\?\D:\`.
+pub(crate) fn text_path(path: &Path) -> Result<String> {
     path.to_str()
         .map(|text| plain_drive_path(text).unwrap_or(text).to_owned())
         .ok_or_else(|| failure("non-utf8-authority-path"))

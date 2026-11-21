@@ -112,8 +112,6 @@ mod tests {
         assert!(matches!(res, Err(WorkspaceError::NotGitRepository)));
     }
 
-    // Only the Unix-only worktree test uses it.
-    #[cfg_attr(not(unix), allow(dead_code))]
     fn git(dir: &Path, args: &[&str]) {
         let status = std::process::Command::new("git")
             .arg("-C")
@@ -125,8 +123,6 @@ mod tests {
         assert!(status.success(), "git {args:?}");
     }
 
-    // Known Git-driver defect (backlog p-nk6xf5laob): a linked worktree is refused as untrusted-worktree on Windows.
-    #[cfg(unix)]
     #[test]
     fn test_workspace_root_of_subdirectory_and_linked_worktree_is_the_main_checkout() {
         let scratch_dir = crate::test_scratch::scratch("fgctl-root");

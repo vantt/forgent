@@ -160,6 +160,28 @@ jobs:
       - name: A Ctrl-Break cancels the controller's attempts
         run: cargo test --release -p fgos-run-supervisor --test windows_cancel_on_ctrl_break -- --nocapture
 
+  # The Git door's custody on native Windows, one step per proof. The first step is measured evidence: how a
+  # LockFileEx lock behaves when its handle is duplicated, used through the copy or inherited, which decides
+  # whether a borrowed copy may stand for the owner's lock. Later steps are added as each piece lands.
+  windows-git-custody:
+    name: windows git custody
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rust toolchain
+        run: |
+          rustup toolchain install
+          rustup show
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+
+      - name: LockFileEx across duplicated and inherited handles
+        run: cargo test --release -p fgos-holder-lock --test windows_lockfileex -- --nocapture
+
+      - name: A linked worktree is trusted and paths reach git in the plain spelling
+        run: cargo test --release -p fgos-git --test worktree
+
   # Evidence only: measures how Win32 LockFileEx byte-range locks (byte 0, length 1, exclusive,
   # fail immediately, as the holder-lock windows driver takes them) behave across handle
   # inheritance and process death. Every answer is a line starting with "PROBE "; a "no" answer
