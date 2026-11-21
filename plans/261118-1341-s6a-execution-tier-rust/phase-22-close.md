@@ -29,7 +29,7 @@ lands it.
   (P12; never reach main). Delete `test/golden-recorders/` (only `seam-scan.mjs` is left by then).
 - Docs: `docs/platform/runner/spec.md` and pointers (Execution Core and Dispatch now Rust: crates, routes, the peer
   protocol, the Node seam and its retirement, retired Node budget lines), `docs/platform/run-supervisor/spec.md`
-  (controller half, `lease` feature and steps in Rust), `docs/platform/agent-confinement/spec.md` (implementation
+  (controller half, `lease` feature and steps in Rust) (implementation
   pointer), `docs/platform/component-boundary.md` rows (Execution Core, Executor Model, Dispatch Transport &
   Confinement: Rust sources), `docs/reading-map.md` (new crates and contracts), a settled-decision entry for P1-P22 in
   the runner's decision holder `docs/platform/runner/decisions/` (governance decision-scope table; the runner
@@ -52,6 +52,8 @@ lands it.
   `node scripts/git-one-door-scan.mjs --root .`, clippy `-D warnings` workspace, msvc and aarch64-apple-darwin checks;
   then the big lead lands the series; on main: build, stage, activate with nothing in flight, `fgos doctor` through the
   installed shim, board line, owner-machine guide.
+
+- Deferred to plan 261119-1731 (supervision powers doors; supervisor 2026-11-21): before editing `docs/platform/agent-confinement/spec.md`, `src/session-host/head-request.mjs`, `test/session-host/head-request.test.mjs`, re-add it to this phase's footprint (plan.md frontmatter and row) and rebase onto what 1731 has landed in it.
 
 ## Steps
 
