@@ -1,7 +1,7 @@
 mod common;
 use common::*;
 use fgos_terminal_control::core::Core;
-use fgos_terminal_control::driver::ForegroundProcess;
+use fgos_terminal_control::driver::{ForegroundProcess, ProcessInfo};
 use fgos_terminal_control::policy::measured_split::MeasuredSplit;
 use fgos_terminal_control::port::*;
 use std::cell::Cell;
@@ -502,6 +502,40 @@ fn a_refused_send_reports_what_the_pane_answered_including_entries_without_a_com
 }
 
 #[test]
+fn a_send_waits_for_a_starting_program_that_has_no_command_line_yet() {
+    // A program whose image is still being replaced has no command line, so the pane lists nothing but
+    // the process as unlisted; typing the brief must wait for it to show up, not refuse as a bare shell.
+    let driver = MemDriver::new(352, 69);
+    let core = core(&driver, &MeasuredSplit, state_dir("send-starting-program"));
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    let mut child = spawn_sleeper();
+    let pid = child.id();
+    driver.set_foreground(
+        &slot.pane_id,
+        900,
+        vec![ForegroundProcess {
+            pid,
+            argv: vec!["sleep".into(), "30".into()],
+        }],
+        pid,
+    );
+    driver
+        .transient_process_info
+        .borrow_mut()
+        .push_back(ProcessInfo {
+            shell_pid: 900,
+            foreground_pgid: pid,
+            foreground: vec![],
+            unlisted: vec![pid],
+        });
+    let outcome = core.send("a", Some("hi"), None, true).unwrap();
+    assert!(matches!(outcome, SendOutcome::Sent), "{outcome:?}");
+    assert_eq!(driver.calls("send.").len(), 1);
+    child.kill().ok();
+    child.wait().ok();
+}
+
+#[test]
 fn immediate_close_without_process_info_is_kept_without_a_release_marker() {
     let driver = MemDriver::with_caps(
         352,
@@ -689,6 +723,46 @@ fn a_pane_whose_foreground_is_a_child_process_gets_nothing_typed_and_ends_not_st
         driver.calls("pane.run").len(),
         before,
         "pane.run delta must be zero"
+    );
+}
+
+#[test]
+fn a_launch_waits_for_the_probe_s_foreground_to_clear_before_typing_the_launcher() {
+    // Right after the shell proved it runs commands its foreground group can still list the probe's
+    // child for a moment; that is not a program holding the pane.
+    let driver = MemDriver::new(352, 69);
+    let core = core(
+        &driver,
+        &MeasuredSplit,
+        state_dir("launch-foreground-settles"),
+    );
+    let slot = core.allocate(&request("a", "g")).unwrap().slot;
+    let info = |foreground: Vec<ForegroundProcess>| ProcessInfo {
+        shell_pid: 900,
+        foreground_pgid: 900,
+        foreground,
+        unlisted: vec![],
+    };
+    let shell = || ForegroundProcess {
+        pid: 900,
+        argv: vec!["bash".into()],
+    };
+    driver.set_foreground(&slot.pane_id, 900, vec![shell()], 900);
+    {
+        let mut transient = driver.transient_process_info.borrow_mut();
+        transient.push_back(info(vec![shell()]));
+        transient.push_back(info(vec![
+            shell(),
+            ForegroundProcess {
+                pid: 9999,
+                argv: vec!["printf".into()],
+            },
+        ]));
+    }
+    let out = core.launch("a", &launch_spec()).unwrap();
+    assert!(
+        !matches!(&out, LaunchOutcome::NotStarted { reason } if reason.contains("foreground is not the shell")),
+        "{out:?}"
     );
 }
 

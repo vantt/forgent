@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "b8b6319325e8e2db6d2d872c59a4f19de65edbbb9c472b5d57d4bf261eaa8126",
+  "payloadDigest": "cf42ba397c13efab55f1bc12068440830a243a171100602ad7e5f4c88094282a",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1221,7 +1221,7 @@
     "packages/supervision/rust/tests/queue.rs": "65ddc71a204003a4e1a62077f6741728cdcaa96d7ee751e31d78bd420d572698",
     "packages/supervision/rust/tests/wake.rs": "6d20df94a3bb0e29a907765ceb3cf0d420b80f8f1c67b11ba1ca6057b0be186c",
     "packages/supervision/rust/tests/watcher.rs": "52b4fe1ce86b1af3d7377a0e1fa928dbd95188f6d834d97c0497b835915590d5",
-    "packages/terminal-control/rust/src/core.rs": "99143f39468e38f14e4c1b2424af68fd1168f1440f202e3feca9305df6fa947d",
+    "packages/terminal-control/rust/src/core.rs": "4126e35d6ffe381a802edf64e8b2afa781eb7a0e02aa7194245d58cc87f89bd5",
     "packages/terminal-control/rust/src/driver/herdr.rs": "8c3df4209429b90138bea12af929cf7456d7f3c7bbbda193dcc585ad7fa9a8eb",
     "packages/terminal-control/rust/src/driver/mod.rs": "72f4bbc3f4d1c55704fbe1e0cedd1d6ed1e526d5f06838c97ac32bbeab8c175c",
     "packages/terminal-control/rust/src/identity.rs": "0f691e1b201d6d12e0d1f2a99f9acc318f3008acea56b5043ceb85dac6062cf6",
@@ -1233,8 +1233,8 @@
     "packages/terminal-control/rust/src/record.rs": "7292ad2d0caf715297d076e90265a339dcfa035e40570defc40cb216909c511f",
     "packages/terminal-control/rust/src/route.rs": "3295c2205d2caccf445245116260726ddcd53b293925f28bab784780fcbd4bcb",
     "packages/terminal-control/rust/src/store.rs": "1b7a86b242a1170a5117223a7819e9efeac3f1f94cfb7038d7ee9f0bfdcd2b33",
-    "packages/terminal-control/rust/tests/common/mod.rs": "3adde7cea1c30bda2b2ec8255819fb149e2746e4810cc28275fee55e95713d50",
-    "packages/terminal-control/rust/tests/core_failures.rs": "2b43f05fd4306a13a59359176a1d061eb890fcb2c45f94341cf3f3d50d0bc90e",
+    "packages/terminal-control/rust/tests/common/mod.rs": "fa4c5e2b83f2b6a50912b4d976093d8b9836d43f8032088d969e2611c30a7080",
+    "packages/terminal-control/rust/tests/core_failures.rs": "c22303705d49dd1b6939c8a6a36a8f7f4857fb11d9a02d78cdca9cebce9d6585",
     "packages/terminal-control/rust/tests/core_rules.rs": "578ace00873dce26afab09e141a85c9b564331924879ccabe49ed89592d5240a",
     "packages/terminal-control/rust/tests/fixtures/herdr/fake-herdr.sh": "d41857790cabc19c284860e918105121c2ea3b5bc73c8e0bbd02ec06004f0f18",
     "packages/terminal-control/rust/tests/herdr_driver_fake.rs": "85e1e60974a232386641ddb64f1cc593735b0eb1e293e563c543615dc2fe913d",
