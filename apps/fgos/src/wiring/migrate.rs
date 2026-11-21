@@ -269,7 +269,10 @@ fn split_cells(line: &str) -> Vec<String> {
 }
 
 /// One table line: `None` for the header and the separator, an error for a row whose cell count is not the header's.
-fn parse_table_line(line: &str, width: &mut Option<usize>) -> Result<Option<LegacyRow>, MigrateError> {
+fn parse_table_line(
+    line: &str,
+    width: &mut Option<usize>,
+) -> Result<Option<LegacyRow>, MigrateError> {
     let mut cells = split_cells(line);
     // `| a | b |` splits into an empty first and last cell.
     if cells.first().is_some_and(|c| c.trim().is_empty()) {

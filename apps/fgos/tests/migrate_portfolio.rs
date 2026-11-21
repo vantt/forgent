@@ -420,7 +420,9 @@ fn in_a_git_checkout_an_untracked_file_is_never_rewritten() {
         .unwrap()
         .success());
     let report = run(&root, false);
-    assert!(report.files_rewritten.contains(&"docs/tracked.md".to_owned()));
+    assert!(report
+        .files_rewritten
+        .contains(&"docs/tracked.md".to_owned()));
     assert_eq!(read(&root, "docs/untracked.md"), text);
     assert!(!read(&root, "docs/tracked.md").contains(OLD_DISCUSSIONS));
 }
@@ -442,8 +444,9 @@ fn a_rerun_after_an_interruption_rewrites_to_directories_that_exist_and_adds_the
     );
     let report = run(&root, false);
     assert_eq!(report.discussions_moved, 0);
-    assert!(read(&root, "docs/guide.md")
-        .contains("plans/discussions/ds-234567abcd-work/DISCUSSION.md"));
+    assert!(
+        read(&root, "docs/guide.md").contains("plans/discussions/ds-234567abcd-work/DISCUSSION.md")
+    );
     let text = read(&root, "plans/discussions/ds-234567abcd-work/DISCUSSION.md");
     assert!(
         text.starts_with("---\nid: ds-234567abcd\n") && text.contains("status: settled"),
@@ -471,7 +474,10 @@ fn a_front_block_without_portfolio_keys_is_merged_not_replaced() {
     assert!(report.check_errors.is_empty(), "{:?}", report.check_errors);
     let cap = read(
         &root,
-        &format!("{}/DISCUSSION.md", report.mapping[&format!("{OLD_DISCUSSIONS}/cap")]),
+        &format!(
+            "{}/DISCUSSION.md",
+            report.mapping[&format!("{OLD_DISCUSSIONS}/cap")]
+        ),
     );
     assert!(
         cap.contains("id: ds-") && cap.contains("item: tsk-x") && cap.contains("status: paused"),
@@ -479,7 +485,10 @@ fn a_front_block_without_portfolio_keys_is_merged_not_replaced() {
     );
     let roll = read(
         &root,
-        &format!("{}/DISCUSSION.md", report.mapping[&format!("{OLD_DISCUSSIONS}/roll")]),
+        &format!(
+            "{}/DISCUSSION.md",
+            report.mapping[&format!("{OLD_DISCUSSIONS}/roll")]
+        ),
     );
     assert!(
         roll.contains("title: Rollup parent")
@@ -507,7 +516,12 @@ fn every_guessed_status_is_listed_in_the_report() {
         report.guessed_statuses
     );
     // The two discussions that name their status are not guesses.
-    assert_eq!(report.guessed_statuses.len(), 1, "{:?}", report.guessed_statuses);
+    assert_eq!(
+        report.guessed_statuses.len(),
+        1,
+        "{:?}",
+        report.guessed_statuses
+    );
 }
 
 #[cfg(unix)]
@@ -524,7 +538,10 @@ fn a_rewritten_file_keeps_its_executable_bit() {
     fs::set_permissions(&path, fs::Permissions::from_mode(0o755)).unwrap();
     run(&root, false);
     assert!(!read(&root, "docs/run.md").contains(OLD_DISCUSSIONS));
-    assert_eq!(fs::metadata(&path).unwrap().permissions().mode() & 0o777, 0o755);
+    assert_eq!(
+        fs::metadata(&path).unwrap().permissions().mode() & 0o777,
+        0o755
+    );
 }
 
 #[test]
@@ -544,7 +561,10 @@ fn relative_links_to_the_legacy_discussions_follow() {
         read(&root, "docs/platform/questions/spec.md"),
         format!("[d](../../../{work}/DISCUSSION.md) and [x](../../../{wdm}/)\n")
     );
-    assert_eq!(read(&root, "docs/other/a.md"), "[d](../../discussions/work/)\n");
+    assert_eq!(
+        read(&root, "docs/other/a.md"),
+        "[d](../../discussions/work/)\n"
+    );
 }
 
 #[test]

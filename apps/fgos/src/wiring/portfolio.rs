@@ -552,8 +552,8 @@ pub fn create_item(
         Some(id) if is_valid_backlog_id(id) => id.clone(),
         Some(id) => {
             return Err(PortfolioRefusal::InvalidId(format!(
-                "invalid backlog id '{id}': a new item takes a minted id (fgos identity mint backlog)"
-            )))
+            "invalid backlog id '{id}': a new item takes a minted id (fgos identity mint backlog)"
+        )))
         }
         None => random(RandomKind::Backlog)?,
     };
