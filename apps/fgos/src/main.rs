@@ -332,7 +332,9 @@ fn main() {
     // doors they have.
     #[cfg(unix)]
     if wiring::supervision::is_confined() {
-        if let Some(confined) = routing::confined_head_call(cli_args) {
+        let head_socket = std::env::var_os(wiring::supervision::HEAD_SOCKET_ENV)
+            .is_some_and(|v| !v.is_empty());
+        if let Some(confined) = routing::confined_head_call(cli_args, head_socket) {
             std::process::exit(wiring::supervision::send_confined(confined));
         }
     }
@@ -488,7 +490,8 @@ fn main() {
 
     match lane {
         Lane::HookProtocol(_) => unreachable!("a hook kind ends the process above"),
-        Lane::Legacy if route.route_kind == "legacy-cli" => {
+        // A native verb the registry still hands to the payload on this platform takes the same lane.
+        Lane::Legacy if route.route_kind == "legacy-cli" || routing::handed_to_legacy(route) => {
             // Check recursion guard immediately. Fails closed if already set.
             if let Err(err) = legacy_exec::check_recursion_guard() {
                 eprintln!("fgos: error: {}", err);

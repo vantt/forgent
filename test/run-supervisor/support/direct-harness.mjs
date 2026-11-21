@@ -6,6 +6,7 @@ import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { capabilityServedBy, machineHome, writeProjectConfig, readProjectConfig } from '../../helpers/config-fixture.mjs';
+import { fgosProcess } from '../../helpers/cli-entry.mjs';
 
 export const BIN_FGOS = path.resolve('bin/fgos.mjs');
 const AGENT = path.resolve('test/run-supervisor/fixtures/direct-agent.mjs');
@@ -128,9 +129,8 @@ export function createProject({ agent = {}, runner = {}, dispatch = null, timeou
 
 /** `fgos run --unit <file>` as a real child process. */
 export function startRun(project, unitFile, { cwd = project.repoDir, args = [] } = {}) {
-  const child = spawn(process.execPath, [BIN_FGOS, 'run', '--unit', unitFile, '--dir', project.repoDir, ...args], {
-    cwd, env: project.env, stdio: ['ignore', 'pipe', 'pipe'],
-  });
+  const call = fgosProcess(BIN_FGOS, ['run', '--unit', unitFile, '--dir', project.repoDir, ...args], project.env);
+  const child = spawn(call.command, call.args, { cwd, env: call.env, stdio: ['ignore', 'pipe', 'pipe'] });
   let stdout = '';
   let stderr = '';
   child.stdout.on('data', (chunk) => { stdout += chunk; });

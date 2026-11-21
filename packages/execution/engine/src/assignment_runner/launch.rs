@@ -207,6 +207,8 @@ pub struct AwaitInput<'a> {
     pub stop_screen: Option<Box<dyn FnOnce() + 'a>>,
     /// The caller's cwd lease the attempt runs under (its custody), lent to the supervisor with the locks.
     pub custody: Option<&'a fgos_holder_lock::Handle>,
+    /// What the supervisor's environment gets beside the step environment (a terminal attempt's herdr endpoint).
+    pub extra_env: &'a Map<String, Value>,
 }
 
 fn adopt_run(run_dir: &Path) -> Result<String, String> {
@@ -235,7 +237,8 @@ pub fn await_binding(
 ) -> Result<InterpretedRunResult, RunnerConfigError> {
     let run_dir = absolute(&attempt.run_dir);
     let run_id = attempt.run_id.clone();
-    let (bound, mut started) = start_and_bind(attempt, input.envelope, &Map::new(), input.custody)?;
+    let (bound, mut started) =
+        start_and_bind(attempt, input.envelope, input.extra_env, input.custody)?;
     await_settled(attempt, &run_dir, &run_id, bound, &mut started.child, input)
 }
 

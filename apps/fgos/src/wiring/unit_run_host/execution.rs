@@ -541,6 +541,10 @@ impl ExecutePorts for HostExecution {
     fn fgos_dir_of_root(&self, root: &Path) -> PathBuf {
         super::machine::fgos_dir(root)
     }
+    /// `retainFailedPaneMsOf(root)` (`src/terminal-control/config.mjs:98`), as the assignment runner reads it.
+    fn retain_failed_pane_ms(&self, root: &Path) -> Value {
+        crate::wiring::doctor::terminal::project_retain_failed_pane_ms(root)
+    }
     /// `createCredentialRenewal()` (`src/runner/execution/run.mjs:1012`).
     fn renewal(&self) -> Option<&dyn CredentialRenewal> {
         Some(&HostRenewal)

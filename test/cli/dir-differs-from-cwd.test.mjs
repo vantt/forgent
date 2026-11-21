@@ -6,13 +6,14 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 import { dirDiffersFromCwdWarning } from '../../src/workflow/dir-guard.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 import { FIXTURE_ROOT, makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { writeTrivialWorkflow } from '../helpers/trivial-workflow.mjs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 const made = [];
 after(() => {
@@ -35,7 +36,7 @@ function fgos(args, cwd) {
   const env = { ...process.env };
   delete env.CLAUDE_CODE_SESSION_ID;
   delete env.FGOS_WORKFLOW_ADVANCE_DETACHED;
-  return spawnSync(process.execPath, [BIN_FGOS, ...args], { cwd, encoding: 'utf8', env });
+  return spawnFgos(BIN_FGOS, args, { cwd, encoding: 'utf8', env });
 }
 
 test('a --dir in another repository than the working directory is reported with a fix', () => {

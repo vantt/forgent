@@ -29,6 +29,7 @@ seedFileLocalBwrapRegistry();
 process.env.HOME = makeFixtureDir('fgos-effort-home-');
 import { assertReasoningEffort } from '../../src/runner/dispatch/config.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/runner-config-error.mjs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 test('renderReasoningEffortArgs puts codex effort in a config override after the exec subcommand', () => {
   const rendered = renderReasoningEffortArgs({ command: '/usr/bin/codex', args: ['exec', '--model', '{model}', '{prompt}'], effort: 'high' });
@@ -242,7 +243,7 @@ test('fgos run --effort reaches bind() as an override, and a level the executor 
   execFileSync('git', ['worktree', 'add', '-q', '-b', 'wt', wt], { cwd: repo });
   const unitFile = path.join(wt, 'unit.json');
   fs.writeFileSync(unitFile, JSON.stringify({ id: 'u', objective: 'x', capability: 'docs:write', writes: ['README.md'] }));
-  const res = spawnSync(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repo, '--effort', 'max', '--json'], { cwd: wt, encoding: 'utf8' });
+  const res = spawnFgos(path.resolve('bin/fgos.mjs'), ['run', '--unit', unitFile, '--dir', repo, '--effort', 'max', '--json'], { cwd: wt, encoding: 'utf8' });
   assert.equal(res.status, 4, res.stderr);
   const { data } = JSON.parse(res.stdout);
   assert.equal(data.outcome, 'policy-refusal');
@@ -274,12 +275,7 @@ test('fgos run --effort still reaches a role that a scoped --override does not n
   const unitFile = path.join(wt, 'unit.json');
   fs.writeFileSync(unitFile, JSON.stringify({ id: 'u', objective: 'x', capability: 'docs:write', writes: ['README.md'] }));
   const override = JSON.stringify({ scope: { role: 'reviewer' }, executor: 'effort-agent' });
-  let out;
-  try {
-    out = execFileSync(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repo, '--override', override, '--effort', 'max', '--json'], { cwd: wt, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
-  } catch (err) {
-    out = err.stdout;
-  }
+  const out = spawnFgos(path.resolve('bin/fgos.mjs'), ['run', '--unit', unitFile, '--dir', repo, '--override', override, '--effort', 'max', '--json'], { cwd: wt, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).stdout;
   const { data } = JSON.parse(out);
   assert.equal(data.outcome, 'policy-refusal');
   assert.deepEqual(data.results[0].refused, { reason: 'effort-unsupported', detail: 'u/producer: invocation "c" cannot render effort max; it renders [low, medium, high]', rendered: ['low', 'medium', 'high'] });

@@ -16,6 +16,7 @@ import { writeTrivialWorkflow } from '../helpers/trivial-workflow.mjs';
 import {
   setupTestRepo, BIN_FGOS, GATE_WORKFLOW, STANCE_CLI_CALL_TIMEOUT_MS, memberSeats, parseCliData, useDistinctFamilies, waitForLedgerEvent,
 } from '../helpers/workflow-runner-fixture.mjs';
+import { fgosProcess } from '../helpers/cli-entry.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -136,7 +137,8 @@ test('workflow and unit CLI options reach the actually dispatched prompts and dr
   useDistinctFamilies(tmp, ['alpha', 'beta', 'gamma', 'delta']);
   const runFgos = (label, args) => {
     try {
-      return parseCliData(execFileSync(process.execPath, [BIN_FGOS, ...args], { cwd: tmp, encoding: 'utf8', timeout: STANCE_CLI_CALL_TIMEOUT_MS }));
+      const call = fgosProcess(BIN_FGOS, args);
+      return parseCliData(execFileSync(call.command, call.args, { cwd: tmp, env: call.env, encoding: 'utf8', timeout: STANCE_CLI_CALL_TIMEOUT_MS }));
     } catch (error) {
       const how = error.signal ? `was killed by ${error.signal} (still running after ${STANCE_CLI_CALL_TIMEOUT_MS} ms)` : `exited ${error.status}`;
       throw new Error(`waiting for ${label}: the CLI ${how}; seat directories under ${path.join(tmp, '.fgos', 'assignments')}\nstderr:\n${error.stderr ?? ''}`, { cause: error });

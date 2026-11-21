@@ -11,6 +11,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { fgosProcess } from '../helpers/cli-entry.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { probe } from '../../src/holder-lock/index.mjs';
 import { BIN_FGOS, bwrapUsable, createProject, readJson, startRun, waitUntil } from './support/direct-harness.mjs';
@@ -34,7 +35,8 @@ const startsOf = (dir) => { try { return fs.readFileSync(here(dir, 'worker-outpu
 const directProject = (agent = { runMs: 1500 }) => ({ project: createProject({ agent }) });
 
 function startResume(project, unitRunId) {
-  const child = spawn(process.execPath, [BIN_FGOS, 'run', '--resume', unitRunId, '--dir', project.repoDir], { cwd: project.repoDir, env: project.env, stdio: ['ignore', 'pipe', 'pipe'] });
+  const call = fgosProcess(BIN_FGOS, ['run', '--resume', unitRunId, '--dir', project.repoDir], project.env);
+  const child = spawn(call.command, call.args, { cwd: project.repoDir, env: call.env, stdio: ['ignore', 'pipe', 'pipe'] });
   let stdout = '';
   let stderr = '';
   child.stdout.on('data', (chunk) => { stdout += chunk; });
@@ -151,7 +153,8 @@ function startTerminalRun(project, id) {
 }
 
 function startTerminalResume(project, unitRunId) {
-  const child = spawn(process.execPath, [BIN_FGOS, 'run', '--resume', unitRunId, '--dir', project.repoDir], { cwd: project.repoDir, env: { ...project.env(), HERDR_ENV: '1' }, stdio: ['ignore', 'pipe', 'pipe'] });
+  const call = fgosProcess(BIN_FGOS, ['run', '--resume', unitRunId, '--dir', project.repoDir], { ...project.env(), HERDR_ENV: '1' });
+  const child = spawn(call.command, call.args, { cwd: project.repoDir, env: call.env, stdio: ['ignore', 'pipe', 'pipe'] });
   let stdout = '';
   let stderr = '';
   child.stdout.on('data', (chunk) => { stdout += chunk; });

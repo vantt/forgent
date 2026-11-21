@@ -129,6 +129,8 @@ pub struct Seated {
     pub resolved_cmd: Value,
     pub launch: Launch,
     pub provider_capacity_evidence: Option<Value>,
+    /// The herdr endpoint a terminal attempt's pane was opened through, for its supervisor; empty otherwise.
+    pub endpoint_env: Map<String, Value>,
 }
 
 /// Runs after Authority resolution with the prepared launch and the provider-capacity evidence.
@@ -402,6 +404,10 @@ pub fn prepare_attempt_seat(
     } else {
         json!(command_cli(&attempt_launch.command))
     };
+    let endpoint_env = pane
+        .as_ref()
+        .map(|pane| pane.endpoint_env.clone())
+        .unwrap_or_default();
     let terminal = pane.as_ref().map(|pane| TerminalInput {
         brief_path: pane.brief_path.clone(),
         outbox_dir: Some(pane.outbox_dir.clone()),
@@ -510,5 +516,6 @@ pub fn prepare_attempt_seat(
         resolved_cmd: resolved,
         launch: prepared,
         provider_capacity_evidence: evidence,
+        endpoint_env,
     })
 }

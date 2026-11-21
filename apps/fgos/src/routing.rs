@@ -51,6 +51,10 @@ pub struct CommandRouteDescriptor {
     /// legacy payload.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub native_subcommands: Option<Vec<String>>,
+    /// On a native selector: the platforms (Node's `process.platform` names) on which the host still hands the whole
+    /// verb to the legacy payload.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub legacy_on: Option<Vec<String>>,
     /// What the verb does about the `.fgos/` store: `none`, `open`, `read` or `require`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub store: Option<String>,
@@ -305,8 +309,31 @@ pub fn declared(declaration: &Option<Declaration>, call: &Call) -> bool {
     }
 }
 
+/// This platform as Node's `process.platform` names it.
+pub fn node_platform() -> &'static str {
+    if cfg!(windows) {
+        "win32"
+    } else if cfg!(target_os = "macos") {
+        "darwin"
+    } else {
+        "linux"
+    }
+}
+
+/// Whether a native route is handed to the legacy payload on this platform.
+pub fn handed_to_legacy(route: &CommandRouteDescriptor) -> bool {
+    route.route_kind == "native"
+        && route
+            .legacy_on
+            .as_ref()
+            .is_some_and(|platforms| platforms.iter().any(|p| p == node_platform()))
+}
+
 /// The lane of an invocation of `route`.
 pub fn decide(route: &CommandRouteDescriptor, call: &Call) -> Lane {
+    if handed_to_legacy(route) {
+        return Lane::Legacy;
+    }
     if route.route_kind == "native" {
         return match &route.operation_id {
             Some(operation_id) => Lane::Native {
@@ -492,26 +519,27 @@ pub struct ConfinedCall {
     pub args: serde_json::Value,
 }
 
-fn head_socket_present() -> bool {
-    std::env::var_os(wiring::supervision::HEAD_SOCKET_ENV).is_some_and(|v| !v.is_empty())
-}
-
 /// The call as the head request contract reads it, or why the call cannot be one. `None`: the call is not of a
 /// verb the contract names, so it takes the route its selector has. This is the one confined rule of the host
-/// (PS-20): a confined caller reaches `land`, `run`, `worktree create`, `request result`, `session stop` and
+/// (PS-20): a confined caller reaches `land`, `worktree create`, `request result`, `session stop`,
 /// `supervisor handled|raise|done`, `watcher tune`, `session read|type` and `metrics record|prune` only through its
-/// supervisor's request socket. The marker and the socket are the
-/// caller's to check; this reads the words only.
+/// supervisor's request socket. `run` goes there only from a head with a grant (`head_socket`: it has a request
+/// socket, as for `metrics record|prune`); a confined worker without one takes the native `run` verb, which refuses its writing run before admission
+/// and lets a read-only one go on, as the Node arm did. The marker is the caller's to check; this reads the words and
+/// that one fact.
 ///
 /// Flags a confined caller must not choose (`land --footprint`, `--target`, `--squash`) are refused here with the
 /// contract's own `bad-args`, since the contract has no key for them.
-pub fn confined_head_call(cli_args: &[OsString]) -> Option<Result<ConfinedCall, String>> {
+pub fn confined_head_call(
+    cli_args: &[OsString],
+    head_socket: bool,
+) -> Option<Result<ConfinedCall, String>> {
     use serde_json::{json, Map, Value};
     let selector = cli_args.first()?.to_string_lossy().into_owned();
     let call = Call::new(cli_args);
     let verb: &'static str = match (selector.as_str(), call.sub_word()) {
         ("land", _) => "land",
-        ("run", _) => "run",
+        ("run", _) if head_socket => "run",
         ("worktree", Some("create")) => "worktree create",
         ("request", Some("result")) => "request result",
         ("session", Some("stop")) => "session stop",
@@ -519,8 +547,8 @@ pub fn confined_head_call(cli_args: &[OsString]) -> Option<Result<ConfinedCall, 
         ("session", Some("type")) => "session type",
         ("watcher", Some("tune")) => "watcher tune",
         // A confined worker has no socket and keeps the local route of these two; only a head asks through its own.
-        ("metrics", Some("record")) if head_socket_present() => "metrics record",
-        ("metrics", Some("prune")) if head_socket_present() => "metrics prune",
+        ("metrics", Some("record")) if head_socket => "metrics record",
+        ("metrics", Some("prune")) if head_socket => "metrics prune",
         ("supervisor", Some("raise")) => "supervisor raise",
         ("supervisor", Some("handled")) => "supervisor handled",
         ("supervisor", Some("done")) => "supervisor done",
@@ -1132,6 +1160,27 @@ mod tests {
     }
 
     #[test]
+    fn a_native_route_handed_to_the_payload_on_this_platform_takes_the_legacy_lane_and_only_here() {
+        let here = fake(serde_json::json!({ "legacy_on": [node_platform()] }));
+        assert!(handed_to_legacy(&here));
+        assert_eq!(decide(&here, &call("probe", &[])), Lane::Legacy);
+        let elsewhere = ["win32", "darwin", "linux"]
+            .into_iter()
+            .filter(|p| *p != node_platform())
+            .collect::<Vec<_>>();
+        let there = fake(serde_json::json!({ "legacy_on": elsewhere }));
+        assert!(!handed_to_legacy(&there));
+        assert_eq!(
+            decide(&there, &call("probe", &[])),
+            Lane::Native {
+                operation_id: "probe.run".into()
+            }
+        );
+        // The table's own run route: native everywhere but Windows.
+        assert_eq!(handed_to_legacy(route("run")), node_platform() == "win32");
+    }
+
+    #[test]
     fn a_call_reads_its_sub_command_and_flags_only_through_the_shared_parser() {
         let route = fake(serde_json::json!({
             "accepted_flags": ["json", "dir"],
@@ -1195,7 +1244,7 @@ mod confined_tests {
 
     fn confined(args: &[&str]) -> Option<Result<ConfinedCall, String>> {
         let os: Vec<OsString> = args.iter().map(OsString::from).collect();
-        confined_head_call(&os)
+        confined_head_call(&os, true)
     }
 
     fn built(args: &[&str]) -> ConfinedCall {
@@ -1313,5 +1362,20 @@ mod confined_tests {
         assert!(confined(&["session", "start", "lead"]).is_none());
         assert!(confined(&["questions", "ask"]).is_none());
         assert!(confined(&["supervisor", "tick"]).is_none());
+    }
+
+    #[test]
+    fn run_goes_to_the_request_socket_only_from_a_head_that_has_one() {
+        let os: Vec<OsString> = ["run", "do it", "--writes", "src/a"]
+            .iter()
+            .map(OsString::from)
+            .collect();
+        assert!(confined_head_call(&os, false).is_none());
+        assert!(confined_head_call(&os, true).is_some());
+        let land: Vec<OsString> = ["land"].iter().map(OsString::from).collect();
+        assert!(
+            confined_head_call(&land, false).is_some(),
+            "only run looks at the socket"
+        );
     }
 }

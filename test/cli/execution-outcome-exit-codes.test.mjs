@@ -14,6 +14,7 @@ import {
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { capabilityServedBy, writeProjectConfig } from '../helpers/config-fixture.mjs';
+import { spawnFgos } from '../helpers/cli-entry.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -182,7 +183,7 @@ test('fgos run exits with code 0 on pass while emitting valid json envelope', ()
       writes: [],
     }));
 
-    const res = spawnSync(process.execPath, [BIN_FGOS, 'run', '--unit', unitFile, '--dir', repoDir], {
+    const res = spawnFgos(BIN_FGOS, ['run', '--unit', unitFile, '--dir', repoDir], {
       cwd: repoDir,
       encoding: 'utf8',
       env: { ...process.env, XDG_STATE_HOME: stateDir },
@@ -209,7 +210,7 @@ test('fgos run exits with code 4 on policy-refusal while emitting valid json env
       writes: [],
     }));
 
-    const res = spawnSync(process.execPath, [BIN_FGOS, 'run', '--unit', unitFile, '--dir', repoDir], {
+    const res = spawnFgos(BIN_FGOS, ['run', '--unit', unitFile, '--dir', repoDir], {
       cwd: repoDir,
       encoding: 'utf8',
       env: { ...process.env, XDG_STATE_HOME: stateDir },
@@ -263,7 +264,7 @@ test('fgos run exits with code 11 on execution-failure via real CLI', () => {
       writes: [],
     }));
 
-    const res = spawnSync(process.execPath, [BIN_FGOS, 'run', '--unit', unitFile, '--dir', repoDir], {
+    const res = spawnFgos(BIN_FGOS, ['run', '--unit', unitFile, '--dir', repoDir], {
       cwd: repoDir,
       encoding: 'utf8',
       env: { ...process.env, XDG_STATE_HOME: stateDir },

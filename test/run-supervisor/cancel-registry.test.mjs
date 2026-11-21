@@ -11,6 +11,7 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 import { RunCancelledError, assertNotCancelled, beginLaunch, endLaunch, installCancelOnSignal, register, registeredRuns, requestCancel, resetCancelRequest, unregister } from '../../src/run-supervisor/cancel-registry.mjs';
 import { bwrapUsable, createProject, readJson, sleep, waitUntil } from './support/direct-harness.mjs';
+import { fgosProcess } from '../helpers/cli-entry.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -21,9 +22,8 @@ const exists = (dir, name) => fs.existsSync(here(dir, name));
 
 // The real CLI is the controller: it asks for the signal handling itself, the wait is the configured one.
 function startController(project, unitFile) {
-  const child = spawn(process.execPath, [FGOS_CLI, 'run', '--unit', unitFile, '--dir', project.repoDir], {
-    cwd: project.repoDir, env: project.env, stdio: ['ignore', 'pipe', 'pipe'],
-  });
+  const call = fgosProcess(FGOS_CLI, ['run', '--unit', unitFile, '--dir', project.repoDir], project.env);
+  const child = spawn(call.command, call.args, { cwd: project.repoDir, env: call.env, stdio: ['ignore', 'pipe', 'pipe'] });
   let stderr = '';
   child.stderr.on('data', (chunk) => { stderr += chunk; });
   const exited = new Promise((resolve) => child.on('exit', (code, signal) => resolve({ code, signal })));

@@ -12,6 +12,7 @@ import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 import { activateGitFixture } from '../../helpers/git-fixture.mjs';
 import { capabilityServedBy, writeProjectConfig } from '../../helpers/config-fixture.mjs';
 import { sleep, waitUntil as pollUntil } from './direct-harness.mjs';
+import { fgosProcess } from '../../helpers/cli-entry.mjs';
 
 export const FAKE_HERDR = path.resolve('packages/run-supervisor/rust/tests/fixtures/fake-herdr-pane.py');
 const AGENT = path.resolve('test/run-supervisor/fixtures/terminal-agent.mjs');
@@ -180,11 +181,8 @@ export async function createTerminalProject({ name = 'tp', confined = false } = 
       });
       const unitFile = path.join(repoDir, 'unit.json');
       fs.writeFileSync(unitFile, JSON.stringify({ id: 'u-1', objective: 'Inspect the docs', capability: 'docs:write', writes: [], ...unit }));
-      const child = spawn(process.execPath, [path.resolve('bin/fgos.mjs'), 'run', '--unit', unitFile, '--dir', repoDir, ...(worktree ? ['--worktree', worktree] : []), ...(caseRef ? ['--case', caseRef.caseId, '--activity', caseRef.activity] : [])], {
-        cwd: repoDir,
-        env: { ...project.env(), HERDR_ENV: '1' },
-        stdio: ['ignore', 'pipe', 'pipe'],
-      });
+      const call = fgosProcess(path.resolve('bin/fgos.mjs'), ['run', '--unit', unitFile, '--dir', repoDir, ...(worktree ? ['--worktree', worktree] : []), ...(caseRef ? ['--case', caseRef.caseId, '--activity', caseRef.activity] : [])], { ...project.env(), HERDR_ENV: '1' });
+      const child = spawn(call.command, call.args, { cwd: repoDir, env: call.env, stdio: ['ignore', 'pipe', 'pipe'] });
       let stdout = '';
       let stderr = '';
       child.stdout.on('data', (chunk) => { stdout += chunk; });

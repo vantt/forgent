@@ -169,6 +169,8 @@ pub trait ExecutePorts: SeatPorts {
     fn attempt_host(&self) -> Result<AttemptHost, RunnerConfigError>;
     fn step_env(&self) -> Map<String, Value>;
     fn launch_settings(&self, root: &Path) -> Result<LaunchSettings, RunnerConfigError>;
+    /// `retainFailedPaneMsOf(root)`: how long a terminal attempt's failed pane is kept, `null` until a person closes it.
+    fn retain_failed_pane_ms(&self, root: &Path) -> Value;
     fn fgos_dir_of_root(&self, root: &Path) -> PathBuf;
     fn clock(&self) -> BuildClock<'_>;
     /// How deep in nested dispatches this controller runs (the machine's own answer unless a port knows better).
@@ -1125,7 +1127,7 @@ fn run_admitted(
         beside: None,
         ceiling_ms: None,
         request_socket: None,
-        retain_failed_pane_ms: None,
+        retain_failed_pane_ms: attempt.terminal.then(|| ports.retain_failed_pane_ms(root)),
         depth: depth as u64,
     };
     let contract_for_hook = contract_input.clone();
@@ -1183,6 +1185,8 @@ fn run_admitted(
             on_chunk,
             stop_screen,
             custody: opts.custody,
+            // The supervisor of a terminal attempt dials the herdr endpoint its pane was opened through.
+            extra_env: &seated.endpoint_env,
         },
     )?;
     Ok(settled)
