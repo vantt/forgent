@@ -877,7 +877,7 @@ fn candidate_files(root: &Path, tracked: Option<Vec<String>>) -> Vec<String> {
 /// Every path the index tracks, through the git driver. `root` holds a `.git`, so it is the top level and
 /// driver paths are already relative to it.
 fn tracked_files(root: &Path) -> Result<Vec<String>, MigrateError> {
-    let git_error = |e: &dyn std::fmt::Display| MigrateError::Io(format!("git-driver: {e}"));
+    let git_error = |e: &dyn std::fmt::Debug| MigrateError::Io(format!("git-driver: {e:?}"));
     let (driver, repo) = GitDriver::open_at(root)
         .map_err(|e| git_error(&e))?
         .ok_or_else(|| MigrateError::Io("git-driver: checkout not opened".into()))?;
