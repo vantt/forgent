@@ -5,8 +5,8 @@ discussion: paused
 ## 1. Trạng thái hiện tại
 
 2026-11-20: Thảo luận được mở từ backlog row `p-7pjiqfoj7v` (nguồn `docs/discussions/supervisor-review/DISCUSSION.md` §7 `#task-orchestration-skeleton`, owner duyệt 2026-11-19 round 19). Đã kế thừa các quyết định cốt lõi SR-D6..SR-D10, bài học Work FSM (G14), nguyên lý harness (G15, G16) và phác thảo 6 ports của Multica (plan `261118-1117-external-ui-integration-multica`).
-- Đã nhận câu trả lời chủ dự án cho `q-kjat6xjwfv`: Đóng băng công việc điều phối mới để ưu tiên ổn định hệ thống; Architecture Advisory Panel và việc định hình chi tiết skeleton tạm hoãn cho đến khi 4 bản sửa lỗi hạ cánh.
-- Trạng thái thảo luận: **Tạm dừng (`discussion: paused`)**, lưu giữ đầy đủ cấu trúc khung và câu hỏi để phục hồi tiếp khi 4 bản sửa lỗi hoàn tất. Không có câu hỏi nào đang mở.
+- Đã nhận câu trả lời chủ dự án cho `q-kjat6xjwfv`: Shaping is parked by owner decision 2026-11-21 until four orchestration fixes land (đóng băng việc điều phối mới để ưu tiên ổn định hệ thống; Architecture Advisory Panel tạm hoãn, thảo luận không đóng).
+- Trạng thái thảo luận: **Tạm dừng (`discussion: paused`)**, thảo luận vẫn mở (not settled, not closed), được đậu lại (parked) chờ 4 bản sửa lỗi điều phối hạ cánh. Không có câu hỏi nào đang mở.
 
 ## 2. Mục tiêu & đề bài
 
@@ -36,13 +36,13 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 | SR-D8 | Skeleton sở hữu actor và thời gian (triggers, timers, start, sleep, wake, handoff, who acts next, surface ports). Không sở hữu work states. Đọc scheduling facets. | 2026-11-19 | `supervisor-review` |
 | SR-D9 | 3 phần quy trình: Frame (đường rộng + checkpoint), Agent (lái trong khung), Harness (bước tin cậy: recorded, resumable, observable, capped, refusal reason). | 2026-11-19 | `supervisor-review` |
 | SR-D10 | Integration phase, plan khai báo `toggles:` và `retires:`. Close check từ chối nếu còn marker hoặc đường cũ chưa dọn. | 2026-11-19 | `supervisor-review` |
-| OS-D1 | Đóng băng công việc điều phối mới, tạm hoãn Architecture Advisory Panel; thảo luận `orchestration-skeleton` tạm dừng (park) chờ 4 bản sửa lỗi hạ cánh trước | 2026-11-20 | Quyết định chủ dự án (`q-kjat6xjwfv`) |
+| OS-D1 | Shaping is parked by owner decision 2026-11-21 until four orchestration fixes land: đóng băng việc điều phối mới, tạm hoãn Architecture Panel, thảo luận `orchestration-skeleton` mở nhưng tạm dừng (parked, not closed) | 2026-11-21 | Quyết định chủ dự án (`q-kjat6xjwfv`) |
 
 ## 5. Q&A log
 
 - 2026-11-20 round 0: Khởi tạo thảo luận từ backlog `p-7pjiqfoj7v` và các kết luận SR-D6..SR-D10 của `supervisor-review`. Tổng hợp dữ liệu từ plan 261118-1117 (multica 6 ports) và các hướng mở G9-G16.
 - 2026-11-20 round 1: Gửi câu hỏi chủ dự án `q-kjat6xjwfv` (hỏi ý kiến về việc mở Architecture Advisory Panel theo khuyến nghị tại backlog `p-7pjiqfoj7v`). Đậu tại question store để chủ dự án trả lời theo nhịp riêng, tiếp tục định hình cấu trúc chi tiết của skeleton.
-- 2026-11-20 round 2: Nhận câu trả lời từ chủ dự án cho `q-kjat6xjwfv` (qua thư ký Miu): "Not now. Owner chose to freeze new orchestration work and stabilize first; the architecture panel waits until the four fixes land. Park the orchestration-skeleton discussion; do not close it." Cập nhật origin, ack câu hỏi `q-kjat6xjwfv`, chuyển trạng thái thảo luận sang `discussion: paused`.
+- 2026-11-21 round 2: Nhận câu trả lời từ chủ dự án cho `q-kjat6xjwfv`: "Not now. Owner chose to freeze new orchestration work and stabilize first; the architecture panel waits until the four fixes land. Park the orchestration-skeleton discussion; do not close it." Shaping is parked by owner decision 2026-11-21 until four orchestration fixes land. Đã ack câu hỏi `q-kjat6xjwfv`, thảo luận chuyển sang trạng thái `discussion: paused`.
 
 ## 6. Thiết kế đã chốt {#design}
 
