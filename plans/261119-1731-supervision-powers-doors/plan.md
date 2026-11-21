@@ -1,8 +1,9 @@
 ---
 contract: plan-v1
 title: "Supervision powers, part 2: verbs, request-socket entries, grants, personas and the live grant audit"
-status: ready
-base: 9f91e8bb8731b21791e3d73f6be361042aa28378
+status: running
+lead: lead:DOORS
+base: 595a7f0b1194ada7826d774edce61817dd41a8bc
 priority: P1
 blockedBy:
   - 261119-1730-supervision-powers-cores
