@@ -34,14 +34,13 @@ import {
   unitPatternOf,
 } from './unit-handoff.mjs';
 import { stepSubjectDigest } from './ref-digests.mjs';
-import { runUnit } from '../runner/execution/run.mjs';
 import { createCaseAdmissionPort } from './case-admission-port.mjs';
 import { closeCaseUnderHold } from './case-close.mjs';
 import { workflowPersonaScope } from './loader.mjs';
 import { unitFieldsOfTemplate } from './steps.mjs';
 import { loopOf } from '../runner/execution/patterns/catalog.mjs';
 import { loadRunnerConfigForDir } from '../runner/dispatch/config.mjs';
-import { CaseAdmissionRefusedError, RunnerConfigError } from '../native/execution-door.mjs';
+import { CaseAdmissionRefusedError, RunnerConfigError, runUnitInHost } from '../native/execution-door.mjs';
 
 /** One log line for the events that mark a step's progress, null for every other event. */
 function progressLine({ ts, type, payload }) {
@@ -138,6 +137,11 @@ function unitFailureReason(unitId, { outcome, results, error }, outOfScope) {
  * again in a new worktree and branch from the trusted base, never from commits an unproven predecessor
  * may still be changing; the predecessor's checkout and branch are kept.
  */
+/** One unit run in the host's engine: the port and the two events go beside the plain request. */
+function runInHost({ caseAdmission, onUnitRunCreated, onCaseAdmitted, ...request }) {
+  return runUnitInHost(request, { caseAdmission, onUnitRunCreated, onCaseAdmitted });
+}
+
 async function runUnitWithRecovery(run, { step, u, unitData, state, base, attempt, recordScheduled }) {
   const { mainRoot, workflowRunId, workflow } = run;
   const started = (unitRunId) => {
@@ -173,7 +177,7 @@ async function runUnitWithRecovery(run, { step, u, unitData, state, base, attemp
     ...(attempt.resumeUnitRunId ? { resumeUnitRunId: attempt.resumeUnitRunId } : { onUnitRunCreated: started }),
   };
   try {
-    return await runUnit(runOptions);
+    return await runInHost(runOptions);
   } catch (err) {
     if (err?.errorClass !== 'custody-predecessor-unknown' || unitData.writes.length === 0) throw err;
     const baseRef = prep.baseRef ?? (base ? state.steps[base.stepId]?.units[base.unitId]?.branch : 'HEAD');
@@ -185,7 +189,7 @@ async function runUnitWithRecovery(run, { step, u, unitData, state, base, attemp
     Object.assign(attempt, { prep: { worktree, branch, baseRef, baseSha, owned: true, created: true, error: null }, resumeUnitRunId: null, unitRunId: null });
     // The recovery checkout is admitted and bound by the run that starts in it.
     run.emit('unit.scheduled', { stepId: step.id, unitId: u.id, worktreePath: worktree, branch, baseRef, baseSha, recovery });
-    return runUnit({ ...runOptions, cwd: worktree, worktree, branchBase: branchBaseOf(attempt.prep), resumeUnitRunId: undefined, onCaseAdmitted: undefined, onUnitRunCreated: started });
+    return runInHost({ ...runOptions, cwd: worktree, worktree, branchBase: branchBaseOf(attempt.prep), resumeUnitRunId: undefined, onCaseAdmitted: undefined, onUnitRunCreated: started });
   }
 }
 
@@ -272,6 +276,10 @@ async function runStepUnit(run, { step, u, state, uState }) {
       throw new RunnerConfigError(attempt.prep.error);
     }
     result = await runUnitWithRecovery(run, { step, u, unitData, state, base, attempt, recordScheduled });
+    // The host ended after admitting the unit and before settling it: nothing is settled here. The unit stays
+    // `running` with its reservation live, as when this controller itself dies, and the dead-reservation sweep of a
+    // later advance decides it from the custody and the unit run's record.
+    if (result?.unsettled) return 'unsettled';
   } catch (error) {
     if (error instanceof CaseAdmissionRefusedError) return refuseUnit(run, { step, u, error, attempt });
     recordScheduled();
@@ -302,7 +310,7 @@ async function runStepUnit(run, { step, u, state, uState }) {
 /**
  * Take one ready step as far as it goes: park at its human gate, or run its units in the order declared.
  *
- * @returns {Promise<'parked'|'failed'|'completed'>}
+ * @returns {Promise<'parked'|'failed'|'unsettled'|'completed'>}
  */
 async function advanceStep(run, step, state) {
   const stepState = state.steps[step.id];
@@ -347,9 +355,14 @@ export async function advanceWorkflowRun({ workflowRunId, workflow, mainRoot, wo
         }
         break;
       }
+      let unsettled = false;
       for (const step of ready) {
-        if (await advanceStep(run, step, read.state) === 'failed') break;
+        const ended = await advanceStep(run, step, read.state);
+        if (ended === 'unsettled') unsettled = true;
+        if (ended === 'failed' || unsettled) break;
       }
+      // A unit the host left unsettled ends this advance with the run `running`; the next advance decides it.
+      if (unsettled) return run.reread().state;
       const next = run.reread();
       const progressed = next.events.length > read.events.length;
       read = next;

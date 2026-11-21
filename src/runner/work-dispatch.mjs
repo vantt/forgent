@@ -12,7 +12,7 @@ import { pathToFileURL } from 'node:url';
 import { resolveTaskSpecPath, resolveContentRoot } from './paths.mjs';
 import { loadAgentRoster, readTaskSpecHeader } from './agent-roster.mjs';
 import { selectTemplate, hashTemplate } from './prompt-templates.mjs';
-import { RunnerConfigError } from '../native/execution-door.mjs';
+import { RunnerConfigError, runUnitInHost } from '../native/execution-door.mjs';
 import { resolveStrongerRigor, RIGOR_VALUES } from './rigor.mjs';
 import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
 import { deriveOperationCapability } from './operation-capability.mjs';
@@ -20,7 +20,7 @@ import { resolveExecutorConfig } from './dispatch/resolve.mjs';
 import { purposeSeatOf } from './dispatch/plan.mjs';
 import { DispatchError } from '../run-supervisor/dispatch-error.mjs';
 import { resolveAgentTypeForTaskSpec, watchWritesOutsideWorkspace, strayWriteWarning } from './dispatch/cli.mjs';
-import { runUnit, resolveGitRoots } from './execution/run.mjs';
+import { resolveGitRoots } from './execution/run.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, workCapabilityHints, buildPrompt } from './work-compat.mjs';
 import { DOMAINS, getDomain, resolveDomainName, effectiveStep, bundleForStep, operationsForStep } from '../state/domain-registry.mjs';
@@ -126,17 +126,18 @@ export async function spawnWorker(work, cfg, cwd, opts = {}) {
   const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: mainRoot, cwd });
 
   let unitRunId = opts.resumeUnitRunId ?? null;
-  const unit = await runUnit({
+  const unit = await runUnitInHost({
     ...(opts.resumeUnitRunId ? { resumeUnitRunId: opts.resumeUnitRunId } : { unitData }),
     worktree: cwd,
     cwd,
     ...(repoRoot ? { repoRoot } : {}),
-    // The claim worktree is no case's: the real port answers `unbound` and the run goes on as before.
-    caseAdmission: createCaseAdmissionPort({ repoRoot: mainRoot }),
     // A Work item chooses no persona, seat or capability and may raise nothing: its rigor and risk add
     // checkers, never a tier.
     raiseAuthorized: false,
     session: { headless: true, herdrPresent: false },
+  }, {
+    // The claim worktree is no case's: the real port answers `unbound` and the run goes on as before.
+    caseAdmission: createCaseAdmissionPort({ repoRoot: mainRoot }),
     onUnitRunCreated: (id) => {
       unitRunId = id;
       opts.onUnitRunCreated?.(id);

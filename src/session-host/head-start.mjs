@@ -147,10 +147,10 @@ export async function bindHeadSeat({ persona, key, runnerConfig }) {
   return binding;
 }
 
-/** The launch of a head: one supervised terminal attempt, loaded lazily so this module does not pull in the runner. */
+/** The launch of a head: one supervised terminal attempt, launched by the host's engine. */
 async function defaultLaunch(request) {
-  const { launchSessionAttempt } = await import('../runner/dispatch/session-attempt.mjs');
-  return launchSessionAttempt(request);
+  const { launchSessionInHost } = await import('../native/execution-door.mjs');
+  return launchSessionInHost(request);
 }
 
 async function defaultRunnerConfig(projectRoot) {

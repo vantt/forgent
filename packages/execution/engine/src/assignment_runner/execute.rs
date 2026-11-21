@@ -17,6 +17,7 @@ use std::path::{Path, PathBuf};
 use fgos_execution::bind::BindSession;
 use fgos_execution::decide::CheckoutFacts;
 use fgos_execution::dispatch_policy::launch_pin_of;
+use fgos_execution::executor_model::with_default_executor;
 use fgos_execution::handoff::sha256_hex;
 use fgos_execution::ports::Machine;
 use fgos_run_supervisor::controller::error::DispatchError;
@@ -408,10 +409,12 @@ pub fn execute_assignment(
                 .map_err(config_error)?,
         ),
     };
-    let cfg = match &opts.runner_config {
+    // The legacy default `runner.executor` layered onto the registry, as Node's executeAssignment does: the bound
+    // executor's launch fields come from it where it stands in for `claude` or its own command.
+    let cfg = with_default_executor(&match &opts.runner_config {
         Some(cfg) => cfg.clone(),
         None => ports.load_runner_config(&root)?,
-    };
+    });
 
     // Storage setup under .fgos/assignments/<assignmentId>/
     let fgos_dir = ports.fgos_dir_of_root(&root);

@@ -60,18 +60,17 @@ test('a Work driver step with writes in an unbound claim worktree runs as before
   assert.deepEqual(fs.existsSync(assignments) ? fs.readdirSync(assignments) : [], [], 'refused before a unit run exists');
 });
 
-// The block of braces that follows `runUnit(` at `start`.
-function callBlock(source, start) {
-  const open = source.indexOf('{', start);
+// The text of the call whose `(` is at `open`: up to its matching `)`.
+function callText(source, open) {
   let depth = 0;
   for (let i = open; i < source.length; i += 1) {
-    if (source[i] === '{') depth += 1;
-    else if (source[i] === '}' && --depth === 0) return source.slice(open, i + 1);
+    if (source[i] === '(') depth += 1;
+    else if (source[i] === ')' && --depth === 0) return source.slice(open, i + 1);
   }
   return '';
 }
 
-test('every production call of runUnit injects the case admission port, so no writer is missed', () => {
+test('every production call of a unit run injects the case admission port, so no writer is missed', () => {
   const files = [
     'bin/fgos.mjs',
     'src/workflow/runner.mjs',
@@ -82,24 +81,23 @@ test('every production call of runUnit injects the case admission port, so no wr
   let calls = 0;
   for (const rel of files) {
     const source = fs.readFileSync(path.join(root, rel), 'utf8');
-    for (const match of source.matchAll(/\brunUnit\((?:\{|runOptions\))/g)) {
+    // `runInHost` is the Workflow runner's one wrapper of runUnitInHost over its shared options.
+    for (const match of source.matchAll(/(?<!function )\b(runUnitInHost|runInHost)\(/g)) {
+      const call = callText(source, match.index + match[1].length);
+      if (/^\(\{ caseAdmission, onUnitRunCreated, onCaseAdmitted, \.\.\.request \}\)/.test(call) || /^\(request, \{ caseAdmission/.test(call)) continue;
       calls += 1;
-      const block = callBlock(source, match.index);
-      if (match[0].includes('runOptions') || block.includes('...runOptions')) {
+      if (/runOptions/.test(call)) {
         assert.match(source, /const runOptions = \{[\s\S]*?caseAdmission: run\.port,[\s\S]*?\n {2}\};/, `${rel}: the shared options carry the port`);
       } else {
-        assert.match(block, /caseAdmission/, `${rel}: runUnit call without caseAdmission`);
+        assert.match(call, /caseAdmission/, `${rel}: ${match[1]} call without caseAdmission`);
       }
     }
   }
-  assert.equal(calls, 6, 'the five writing call sites of runUnit and the read-only session probe door are the ones checked');
-  // buildRunRequest (Workflow's case start) carries the port whenever the project root is known; `fgos run` builds its
-  // request in the host (fgos-execution run_request), which has no Node arm any more.
-  assert.match(fs.readFileSync(path.join(root, 'src/runner/execution/run-request.mjs'), 'utf8'), /portRoot \? \{ caseAdmission: roots\.caseAdmission\.createPort\(\{ repoRoot: portRoot \}\) \}/, 'buildRunRequest carries the port');
-  // The only other places runUnit is defined or named are the Execution Core itself and its host seam
-  // (`runUnitInHost` runs the same request in the host's engine and takes `caseAdmission` beside it; it calls no runUnit).
-  const core = ['src/runner/execution/run.mjs', 'src/native/execution-door.mjs'];
-  const stray = ['src', 'bin'].flatMap((dir) => execFileSync('grep', ['-rl', '--include=*.mjs', 'runUnit(', path.join(root, dir)], { encoding: 'utf8' }).split('\n').filter(Boolean))
-    .map((f) => path.relative(root, f)).filter((f) => !files.includes(f) && !core.includes(f));
+  assert.equal(calls, 6, 'the five writing call sites of a unit run and the read-only session probe door are the ones checked');
+  // The native `fgos run` builds its request, port included, in the host (fgos-execution run_request).
+  // runUnitInHost (the host seam) is the only door to a unit run; nothing else names one.
+  const core = ['src/native/execution-door.mjs'];
+  const stray = ['src', 'bin'].flatMap((dir) => execFileSync('grep', ['-rlE', '--include=*.mjs', 'runUnit(InHost)?\\(', path.join(root, dir)], { encoding: 'utf8' }).split('\n').filter(Boolean))
+    .map((f) => path.relative(root, f)).filter((f) => !files.includes(f) && !core.includes(f) && !f.startsWith('src/runner/execution/'));
   assert.deepEqual(stray, []);
 });

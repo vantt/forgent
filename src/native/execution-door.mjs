@@ -60,6 +60,22 @@ export class RunnerConfigError extends Error {
   }
 }
 
+/**
+ * Raised when spawning or running the executor itself fails at runtime. `errorClass` reuses the vocabulary of
+ * `recovery.mjs`'s `ERROR_CLASSES`, so the runner feeds it straight into `resolveAction`. Declared here once, so
+ * `instanceof` holds for an error rethrown from a native unit run (`runUnitErrorOf`).
+ */
+export class DispatchError extends Error {
+  constructor(errorClass, message, details = {}) {
+    super(message);
+    this.name = 'DispatchError';
+    this.errorClass = errorClass;
+    this.code = details.code ?? errorClass;
+    this.data = details;
+    Object.assign(this, details);
+  }
+}
+
 /** The refusal a unit run throws when the case admission port refuses; the port's own answer rides along as `refusal`. */
 export class CaseAdmissionRefusedError extends RunnerConfigError {
   constructor(refusal) {
@@ -180,6 +196,9 @@ export function runUnitErrorOf(result) {
     thrown.name = 'HolderLockError';
     thrown.code = error.code;
     thrown.category = 'precondition';
+  } else if (fields.name === 'DispatchError') {
+    // A run supervisor DispatchError: its class is its code, its details its fields.
+    thrown = new DispatchError(error.errorClass ?? error.code ?? 'error', error.message ?? 'run-unit failed', { ...(error.code !== undefined ? { code: error.code } : {}) });
   } else {
     thrown = new Error(error.message ?? 'run-unit failed');
     if (error.code !== undefined) thrown.code = error.code;
@@ -187,13 +206,35 @@ export function runUnitErrorOf(result) {
   }
   for (const [key, value] of Object.entries(fields)) {
     // `message` and `stack` are the error's own; `subpath` is derived from `path` and `paths`.
-    if (key === 'message' || key === 'stack' || key === 'subpath') continue;
+    if (key === 'message' || key === 'stack' || key === 'subpath' || (key === 'name' && thrown instanceof DispatchError)) continue;
     thrown[key] = value;
   }
   if (error.tag === 'Error' && typeof error.errorClass === 'string' && !CLASSLESS_IN_NODE.has(error.errorClass)) {
     thrown.errorClass = error.errorClass;
   }
   return thrown;
+}
+
+/**
+ * A version-3 record with the legacy `status` and `confidence` read from its classification; assigning either
+ * replaces the reading with the assigned value. Both are non-enumerable views, so a RunResult that crossed the host's
+ * JSON line gets them back here (`runUnitInHost`), as Node's settle gave them.
+ */
+export function withLegacyView(record) {
+  const view = (name, read) => Object.defineProperty(record, name, {
+    get: read,
+    set(v) { Object.defineProperty(this, name, { value: v, writable: true, configurable: true, enumerable: true }); },
+    enumerable: false,
+    configurable: true,
+  });
+  view('status', function status() {
+    if (this.classification?.outcome?.category === 'ok') return 'done';
+    if (this.classification?.outcome?.category === 'blocked') return 'blocked';
+    if (this.classification?.confidence?.level === 'no-evidence') return 'no-evidence';
+    return 'failed';
+  });
+  view('confidence', function confidence() { return this.classification?.confidence?.level ?? null; });
+  return record;
 }
 
 /** The prefix of the answer line of an Execution operation; every other line is a peer frame or stray output. */
@@ -333,7 +374,11 @@ export async function runUnitInHost(request, { caseAdmission, onUnitRunCreated, 
     throw new ExecutionRouteError('execution-route-no-answer', `fgos internal execution run-unit ended without an answer (${signal ? `signal ${signal}` : `exit ${code}`})${stderr ? `: ${stderr}` : ''}`);
   }
   if (called.result?.ok === false) throw runUnitErrorOf(called.result);
-  return called.result?.result;
+  const result = called.result?.result;
+  for (const seat of Array.isArray(result?.results) ? result.results : []) {
+    if (seat?.runResult && typeof seat.runResult === 'object') withLegacyView(seat.runResult);
+  }
+  return result;
 }
 
 /**

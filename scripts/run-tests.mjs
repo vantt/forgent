@@ -227,9 +227,13 @@ export const KEEP_TMP_ENV = 'FGOS_TEST_KEEP_TMP';
 export const FILE_TIMEOUT_ENV = 'FGOS_TEST_FILE_TIMEOUT_MS';
 export const DEFAULT_FILE_TIMEOUT_MS = 10 * 60 * 1000;
 // Explicit per-file limits (repo-relative posix path -> ms) for a test that is
-// legitimately slower than the default. Empty on purpose: add an entry only
-// with the measured duration that justifies it, never to hide a hang.
-export const FILE_TIMEOUT_OVERRIDES_MS = {};
+// legitimately slower than the default. Add an entry only with the measured
+// duration that justifies it, never to hide a hang.
+export const FILE_TIMEOUT_OVERRIDES_MS = {
+  // 94 Work-loop cases, each unit run a host process since the Work callers run through the host (measured 614 s
+  // alone on fg-server2, 2026-11-22).
+  'test/runner/loop.test.mjs': 15 * 60 * 1000,
+};
 const WATCHDOG_PATH = fileURLToPath(new URL('./lib/test-file-watchdog.mjs', import.meta.url));
 const DEFAULT_WATCHDOG_POLL_MS = 5000;
 // How long the launcher waits for the watchdog to prove it can kill before it gives up on starting the run.

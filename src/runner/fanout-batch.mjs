@@ -3,7 +3,7 @@ import { resolveMainCheckoutRoot, resolveRepoRoot } from './paths.mjs';
 import { loadRunnerConfigForDir } from './dispatch/config.mjs';
 import { listWork } from '../state/store.mjs';
 import { compileDispatchPlan } from './dispatch/plan.mjs';
-import { runUnit } from './execution/run.mjs';
+import { runUnitInHost } from '../native/execution-door.mjs';
 import { createCaseAdmissionPort } from '../workflow/case-admission-port.mjs';
 import { workDispatchHint, workUnitFor } from './work-dispatch.mjs';
 import fs from 'node:fs';
@@ -95,15 +95,16 @@ export async function fanoutBatchExecutorCli(
         picked = true;
 
         const { unitData } = workUnitFor(workItem, { cfg, worktree: wtPath });
-        const unit = await runUnit({
+        const unit = await runUnitInHost({
           unitData,
           worktree: wtPath,
           cwd: wtPath,
           repoRoot: root,
-          caseAdmission: createCaseAdmissionPort({ repoRoot: root }),
           // A fanned-out Work item chooses no persona, seat or capability and may raise nothing.
           raiseAuthorized: false,
           session: { headless: true, herdrPresent: false },
+        }, {
+          caseAdmission: createCaseAdmissionPort({ repoRoot: root }),
           onUnitRunCreated: (id) => { unitRunId = id; },
         });
         unitRunId = unit.unitRunId;

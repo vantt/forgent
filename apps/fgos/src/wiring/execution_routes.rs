@@ -25,9 +25,14 @@
 //!   sockets (`sweepAttempts`). Result `{ adopt, adoptError }`.
 //! * `cancel`: `{ runDir, signal }`: publish the attempt's cancel request (`requestCancel`). Result
 //!   `{ requested }`.
+//!
+//! A `run-unit` process is the unit run's controller for its caller, which keeps stdin open until it read the
+//! answer. Once the request arrived, end of stdin means the caller is gone: the process ends at once, as the
+//! controller inside a dead Node caller did. Nothing is settled; the supervisor and its agent go on, and the next
+//! caller resumes the unit run or the Workflow's dead-reservation sweep decides it.
 
 use std::ffi::OsString;
-use std::io::{BufRead, BufReader, Write};
+use std::io::{BufRead, BufReader, Read, Write};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
@@ -65,15 +70,77 @@ pub const OPS: [&str; 6] = [
 
 /// Run the route with the args after `execution`; returns the exit code.
 pub fn main(args: &[String]) -> i32 {
-    let (code, line) = run(
-        args,
-        Box::new(BufReader::new(std::io::stdin())),
-        Box::new(std::io::stdout()),
-    );
+    let stdin = BufReader::new(std::io::stdin());
+    let input: Box<dyn BufRead + Send> = if args.first().map(String::as_str) == Some("run-unit") {
+        Box::new(CallerLine::new(stdin, Box::new(caller_gone)))
+    } else {
+        Box::new(stdin)
+    };
+    let (code, line) = run(args, input, Box::new(std::io::stdout()));
     let mut out = std::io::stdout().lock();
     let _ = out.write_all(frame(&line).as_bytes());
     let _ = out.flush();
     code
+}
+
+/// The exit of a `run-unit` controller whose caller went away: no answer can reach anyone, nothing is settled.
+/// It ends the process at once, without the exit handlers (a dead controller runs none either), so a caller that
+/// resumes the unit run right after finds no controller left. It writes nothing: no one reads this process any
+/// more, and another thread may hold the stderr lock.
+fn caller_gone() {
+    #[cfg(unix)]
+    // SAFETY: `_exit` ends the process; nothing after it runs.
+    unsafe {
+        libc::_exit(1)
+    };
+    #[cfg(not(unix))]
+    std::process::exit(1);
+}
+
+/// The caller's stdin of a `run-unit` process: after the first line (the request) has arrived, end of input calls
+/// `gone`, because the caller only closes stdin once it has the answer or is dead.
+struct CallerLine<R> {
+    inner: R,
+    seen_line: bool,
+    gone: Box<dyn FnMut() + Send>,
+}
+
+impl<R: BufRead> CallerLine<R> {
+    fn new(inner: R, gone: Box<dyn FnMut() + Send>) -> Self {
+        Self {
+            inner,
+            seen_line: false,
+            gone,
+        }
+    }
+}
+
+impl<R: BufRead> Read for CallerLine<R> {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        let available = self.fill_buf()?;
+        let n = available.len().min(buf.len());
+        buf[..n].copy_from_slice(&available[..n]);
+        self.consume(n);
+        Ok(n)
+    }
+}
+
+impl<R: BufRead> BufRead for CallerLine<R> {
+    fn fill_buf(&mut self) -> std::io::Result<&[u8]> {
+        let empty = self.inner.fill_buf()?.is_empty();
+        if empty && self.seen_line {
+            (self.gone)();
+        }
+        let buf = self.inner.fill_buf()?;
+        if buf.contains(&b'\n') {
+            self.seen_line = true;
+        }
+        Ok(buf)
+    }
+
+    fn consume(&mut self, amount: usize) {
+        self.inner.consume(amount);
+    }
 }
 
 /// The framed answer line.
@@ -392,4 +459,42 @@ fn cancel(request: &Value) -> Result<Value, String> {
     let requested =
         fgos_run_supervisor::controller::cancel::request_cancel(Path::new(run_dir), signal);
     Ok(json!({ "requested": requested }))
+}
+
+#[cfg(test)]
+mod caller_line_tests {
+    use super::*;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    #[test]
+    fn end_of_input_after_the_request_line_means_the_caller_is_gone_and_before_it_does_not() {
+        static GONE: AtomicUsize = AtomicUsize::new(0);
+        let mut empty = CallerLine::new(
+            &b""[..],
+            Box::new(|| {
+                GONE.fetch_add(1, Ordering::SeqCst);
+            }),
+        );
+        let mut line = String::new();
+        assert_eq!(empty.read_line(&mut line).unwrap(), 0);
+        assert_eq!(
+            GONE.load(Ordering::SeqCst),
+            0,
+            "no request yet: an empty stdin is the route's to refuse"
+        );
+        let mut caller = CallerLine::new(
+            &b"{}\n"[..],
+            Box::new(|| {
+                GONE.fetch_add(1, Ordering::SeqCst);
+            }),
+        );
+        assert_eq!(caller.read_line(&mut line).unwrap(), 3);
+        assert_eq!(GONE.load(Ordering::SeqCst), 0);
+        let _ = caller.read_line(&mut line);
+        assert_eq!(
+            GONE.load(Ordering::SeqCst),
+            1,
+            "the request arrived, then stdin ended"
+        );
+    }
 }
