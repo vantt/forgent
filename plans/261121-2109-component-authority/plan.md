@@ -166,7 +166,9 @@ touches `governance.md`, `architecture-map.md` and `component-boundary.md` only 
 mention; phases 5 and 6 then replace their registry sections with generated blocks. The check
 `node scripts/plan-contract-check.mjs --plan plans/261121-2109-component-authority` passes while the plan is `draft`.
 
-**Why the plan is `draft`:** two running plans own files this plan must change.
+**Owner approval (2026-11-21 23:34):** the owner approved this plan and its sibling as written (option A of the approval question lead:SUPERVISOR put to him). It stays `draft` only because the plan-contract check refuses `ready` while its footprint overlaps the running plans below. When every `blockedBy` plan is `done`, the planner or supervisor sets `ready` with no further owner question.
+
+**Why it waits:** two running plans own files this plan must change.
 - `261118-1341-s6a-execution-tier-rust` owns `docs/architecture-manifest.json`, `test/architecture.test.mjs`,
   `src/setup/**`, `test/setup/**`, `src/runner/dispatch/**`, `docs/reading-map.md`,
   `docs/platform/component-boundary.md`, `docs/platform/runner/**` and `docs/platform/seat-binding/spec.md`. It edits

@@ -223,6 +223,8 @@ Phases 1-3 run in parallel in wave 1, phases 4-5 in wave 2 and phases 6-7 in wav
 surfaces are regenerated with `npm run build:skills` in phase 5 only. A retirement phase that finds a caller
 outside its footprint stops and reports instead of widening.
 
+**Owner approval (2026-11-21 23:34):** the owner approved this plan as written (option A of the approval question lead:SUPERVISOR put to him). It stays `draft` only for the refresh below. Once that refresh passes, the planner or supervisor sets `ready` with no further owner question.
+
 **Why the plan is `draft`:** its footprint overlaps four running plans (`Cargo.toml`, `Cargo.lock`, the host
 routing and command manifests, `src/cli/command-registry.mjs`, `packages/process`, `packages/run-supervisor`,
 `packages/git`, `packages/convention/contracts`, `scripts/plan-contract-check.mjs`), and it needs the sibling
