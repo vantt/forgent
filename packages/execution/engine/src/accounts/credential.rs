@@ -1,6 +1,6 @@
 //! The login stores of an account and the call that tests one: which store a CLI reads, where its home is, and
-//! the command that makes one cheap call with it. Account inventory, the legacy state key and `credentialStoreOf`
-//! are `fgos-execution`'s and are not copied here.
+//! the command that makes one cheap call with it. Account inventory, the legacy state key, `credentialStoreOf` and
+//! the per-CLI credential source reading are `fgos-execution`'s and are not copied here.
 
 use serde_json::{json, Map, Value};
 
@@ -16,31 +16,8 @@ pub fn command_cli(command: &str) -> Option<String> {
     (!name.is_empty()).then_some(name)
 }
 
-fn truthy(value: Option<&Value>) -> Option<&Value> {
-    value.filter(|v| !v.is_null() && **v != json!(false) && **v != json!("") && **v != json!(0))
-}
-
-/// The login store of `account` that the CLI `cli` reads: an account with one `credentialSource` gives it to every
-/// CLI; an account with `credentialSources` gives the CLI's own entry, or `None` when it declares none for it.
-pub fn credential_source_for_cli<'a>(account: &'a Value, cli: Option<&str>) -> Option<&'a Value> {
-    if let Some(sources) = truthy(account.get("credentialSources")) {
-        return cli.and_then(|cli| truthy(sources.get(cli)));
-    }
-    truthy(account.get("credentialSource"))
-}
-
-/// Every login store an account declares, the single one or each per-CLI one in declared order.
-pub fn account_credential_sources(account: &Value) -> Vec<&Value> {
-    if let Some(sources) = truthy(account.get("credentialSources")) {
-        return sources
-            .as_object()
-            .map(|map| map.values().collect())
-            .unwrap_or_default();
-    }
-    truthy(account.get("credentialSource"))
-        .into_iter()
-        .collect()
-}
+use fgos_execution::accounts::declared;
+pub use fgos_execution::accounts::{account_credential_sources, credential_source_for_cli};
 
 /// An account's credential home as an absolute path (`fgos-execution`'s reading): a leading `~`, `${HOME}` or
 /// `$HOME` is `home_dir`. `None` when the value is absent, empty, not absolute once expanded, or names the home
@@ -104,7 +81,7 @@ pub fn redact_selection(selection: &Value) -> Value {
     }
     if let Some(receipt) = selection
         .get("leaseReceipt")
-        .filter(|r| truthy(Some(r)).is_some())
+        .filter(|r| declared(Some(r)).is_some())
     {
         out.insert("leaseReceipt".into(), receipt.clone());
     }

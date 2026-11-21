@@ -50,7 +50,10 @@ pub fn parse_tier_cell(cell: &Value, family: &str) -> Result<Vec<TierCellEntry>,
 }
 
 fn parse_string_entry(entry: &Value, family: &str) -> Result<TierCellEntry, String> {
-    let Some(text) = entry.as_str().filter(|text| !js_trim(text).is_empty()) else {
+    let Some(text) = entry
+        .as_str()
+        .filter(|text| !crate::js::trim(text).is_empty())
+    else {
         return Err(format!(
             "a tier cell entry must be a non-empty string or a {{model, pool?, effort?}} object, got {}",
             stringify(entry)
@@ -64,8 +67,8 @@ fn parse_string_entry(entry: &Value, family: &str) -> Result<TierCellEntry, Stri
             effort: None,
         });
     };
-    let model = js_trim(&text[..at]);
-    let pool = js_trim(&text[at + 1..]);
+    let model = crate::js::trim(&text[..at]);
+    let pool = crate::js::trim(&text[at + 1..]);
     if model.is_empty() {
         return Err(format!(
             "tier cell entry {} names no model before \"@\"",
@@ -101,7 +104,7 @@ fn parse_object_entry(entry: &Value, family: &str) -> Result<TierCellEntry, Stri
         object
             .get(key)
             .and_then(Value::as_str)
-            .filter(|text| !js_trim(text).is_empty())
+            .filter(|text| !crate::js::trim(text).is_empty())
     };
     let Some(model) = non_empty("model") else {
         return Err(format!(
@@ -135,10 +138,6 @@ fn parse_object_entry(entry: &Value, family: &str) -> Result<TierCellEntry, Stri
         explicit_pool: pool.is_some(),
         effort,
     })
-}
-
-fn js_trim(text: &str) -> &str {
-    text.trim_matches(crate::assignment::js_space)
 }
 
 /// `JSON.stringify`, compact.

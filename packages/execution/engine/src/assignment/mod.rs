@@ -19,7 +19,8 @@ pub mod brief;
 pub mod builder;
 pub mod layout;
 pub mod normalizer;
-pub mod tier_cell;
+/// The tier cell reader is `fgos-execution`'s: the pure doctor row over `runner.modelPolicies` reads cells by it too.
+pub use fgos_execution::tier_cell;
 pub mod work_item_input;
 pub mod write_scope;
 

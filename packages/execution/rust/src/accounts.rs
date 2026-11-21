@@ -56,6 +56,33 @@ pub fn expand_credential_home(home: &str, home_dir: Option<&str>) -> Option<Stri
     is_absolute(&expanded).then_some(expanded)
 }
 
+/// The value when the config sets it: not null, `false`, `""` or `0`.
+pub fn declared(value: Option<&Value>) -> Option<&Value> {
+    value.filter(|v| !v.is_null() && **v != json!(false) && **v != json!("") && **v != json!(0))
+}
+
+/// The login store of `account` that the CLI `cli` reads: an account with one `credentialSource` gives it to every
+/// CLI; an account with `credentialSources` gives the CLI's own entry, or `None` when it declares none for it.
+pub fn credential_source_for_cli<'a>(account: &'a Value, cli: Option<&str>) -> Option<&'a Value> {
+    if let Some(sources) = declared(account.get("credentialSources")) {
+        return cli.and_then(|cli| declared(sources.get(cli)));
+    }
+    declared(account.get("credentialSource"))
+}
+
+/// Every login store an account declares, the single one or each per-CLI one in declared order.
+pub fn account_credential_sources(account: &Value) -> Vec<&Value> {
+    if let Some(sources) = declared(account.get("credentialSources")) {
+        return sources
+            .as_object()
+            .map(|map| map.values().collect())
+            .unwrap_or_default();
+    }
+    declared(account.get("credentialSource"))
+        .into_iter()
+        .collect()
+}
+
 /// A login-store key: a lowercase letter or digit, then lowercase letters, digits, `_` or `-`.
 pub fn is_cli_key(key: &str) -> bool {
     let mut chars = key.chars();
