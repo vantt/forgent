@@ -54,13 +54,10 @@ impl Display {
             Some(id) => Some(id),
             None => shortened(self.role.as_ref(), usize::MAX),
         };
-        let parts: Vec<String> = [
-            lead,
-            shortened(self.title.as_ref(), TITLE_CHARS),
-        ]
-        .into_iter()
-        .flatten()
-        .collect();
+        let parts: Vec<String> = [lead, shortened(self.title.as_ref(), TITLE_CHARS)]
+            .into_iter()
+            .flatten()
+            .collect();
         if parts.is_empty() {
             group_key.to_string()
         } else {
