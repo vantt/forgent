@@ -498,8 +498,9 @@ pub fn format_backlog_item(
         notes.trim()
     };
 
+    const FENCE: &str = concat!("-", "-", "-");
     let formatted = format!(
-        "---\n{}---\n\n# Why\n\n{}\n\n# Done when\n\n{}\n\n# Notes\n\n{}\n",
+        "{FENCE}\n{}{FENCE}\n\n# Why\n\n{}\n\n# Done when\n\n{}\n\n# Notes\n\n{}\n",
         yaml_str, why_body, done_body, notes_body
     );
     Ok(formatted)

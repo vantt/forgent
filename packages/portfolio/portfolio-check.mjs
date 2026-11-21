@@ -1,7 +1,7 @@
 // portfolio-check.mjs -- Portfolio contract check (D-ADR0082)
 import fs from 'node:fs';
 import path from 'node:path';
-import { readFrontmatter } from '../util/yaml.mjs';
+import { readFrontmatter } from "../../src/util/yaml.mjs";
 import { parseBacklogItem } from './item.mjs';
 import { parseDiscussion } from './discussion.mjs';
 import { generateBacklogIndex } from './index-generator.mjs';

@@ -2,7 +2,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { readFrontmatter, writeFrontmatter } from '../util/yaml.mjs';
+import { uniqueTmpTag } from "../../src/util/unique-tmp-tag.mjs";
+import { readFrontmatter, writeFrontmatter } from "../../src/util/yaml.mjs";
 import {
   ITEM_REQUIRED_KEYS,
   ITEM_STATUSES,
@@ -186,7 +187,7 @@ export function createBacklogItem(repoRoot, data) {
   }
 
   const content = formatBacklogItem({ ...data, id });
-  const tmpPath = `${fullPath}.tmp.${process.pid}.${Date.now()}`;
+  const tmpPath = `${fullPath}.tmp-${uniqueTmpTag()}`;
   fs.writeFileSync(tmpPath, content, 'utf8');
   fs.renameSync(tmpPath, fullPath);
 
@@ -262,7 +263,7 @@ export function editBacklogItem(repoRoot, id, updates) {
     notes,
   });
 
-  const tmpPath = `${fullPath}.tmp.${process.pid}.${Date.now()}`;
+  const tmpPath = `${fullPath}.tmp-${uniqueTmpTag()}`;
   fs.writeFileSync(tmpPath, content, 'utf8');
   fs.renameSync(tmpPath, fullPath);
 

@@ -15,13 +15,13 @@ import {
   createBacklogItem,
   editBacklogItem,
   slugify,
-} from '../../src/portfolio/item.mjs';
+} from '../../packages/portfolio/item.mjs';
 import {
   parseDiscussion,
   formatDiscussion,
-} from '../../src/portfolio/discussion.mjs';
-import { generateBacklogIndex } from '../../src/portfolio/index-generator.mjs';
-import { checkPortfolio } from '../../src/portfolio/portfolio-check.mjs';
+} from '../../packages/portfolio/discussion.mjs';
+import { generateBacklogIndex } from '../../packages/portfolio/index-generator.mjs';
+import { checkPortfolio } from '../../packages/portfolio/portfolio-check.mjs';
 
 function makeTmpDir(prefix = 'fgos-portfolio-test-') {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), prefix));

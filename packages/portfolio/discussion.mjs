@@ -1,5 +1,5 @@
 // discussion.mjs -- Discussion frontmatter parser and formatter (D-ADR0082)
-import { readFrontmatter, writeFrontmatter } from '../util/yaml.mjs';
+import { readFrontmatter, writeFrontmatter } from "../../src/util/yaml.mjs";
 import {
   DISCUSSION_REQUIRED_KEYS,
   DISCUSSION_STATUSES,
