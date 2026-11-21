@@ -14,24 +14,9 @@ use super::workspace_paths::{validate_workspace_paths, WORKSPACE_PATHS_RESOURCE}
 
 type Checked = Result<(), ConfinementPolicyError>;
 
-/// The ids of the built-in policies, in declaration order.
-pub const BUILTIN_POLICY_IDS: [&str; 2] = ["host-write-denied", "workspace-write"];
-
-pub const CONFINEMENT_MODES: [&str; 3] = ["required", "preferred", "unconfined"];
-
-/// Control axes with their legal values, strongest first. The axis order is the order the checks report in.
-pub const CONTROL_AXES: [(&str, &[&str]); 7] = [
-    ("hostWrite", &["deny", "allow"]),
-    ("hostRead", &["deny", "blind", "allow"]),
-    ("networkEgress", &["deny", "filtered", "allow"]),
-    ("process", &["isolated", "host"]),
-    ("home", &["private", "host"]),
-    ("session", &["isolated", "shared"]),
-    ("workspace", &["own", "shared"]),
-];
-
-/// Grant access levels, widest first.
-pub const GRANT_ACCESS_LEVELS: [(&str, u8); 3] = [("read-write", 3), ("write", 2), ("read", 1)];
+pub use fgos_execution::runner_check::{
+    BUILTIN_POLICY_IDS, CONFINEMENT_MODES, CONTROL_AXES, GRANT_ACCESS_LEVELS,
+};
 
 fn axis_values(axis: &str) -> Option<&'static [&'static str]> {
     CONTROL_AXES

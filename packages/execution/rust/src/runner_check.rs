@@ -11,7 +11,10 @@
 
 use crate::accounts::{is_cli_key, is_inside, refuse_retired_provider_accounts};
 use crate::executor_model::{capability_confinement, registered_capability_of, ModelError};
-use crate::js::truthy;
+use crate::js::{
+    integer as js_integer, json_or_undefined as js_json, text as js_display, trim as js_trim,
+    truthy,
+};
 use fgos_convention::packaged_rules;
 use serde_json::{Map, Value};
 use std::fmt;
@@ -74,81 +77,6 @@ type Check = Result<(), RunnerCheckError>;
 
 // ---- reading the JSON the way the Node code reads it -----------------------------------------------------
 
-/// ECMAScript's whitespace, which is not Rust's: it holds the byte order mark and not the next-line character.
-fn js_space(c: char) -> bool {
-    matches!(c, '\u{0009}'..='\u{000d}' | '\u{0020}' | '\u{00a0}' | '\u{1680}' | '\u{2000}'..='\u{200a}' | '\u{2028}' | '\u{2029}' | '\u{202f}' | '\u{205f}' | '\u{3000}' | '\u{feff}')
-}
-
-pub(crate) fn js_trim(text: &str) -> &str {
-    text.trim_matches(js_space)
-}
-
-/// A number as ECMAScript writes it: a whole value has no fraction.
-fn js_number(number: &serde_json::Number) -> String {
-    if let Some(whole) = number.as_i64() {
-        return whole.to_string();
-    }
-    if let Some(whole) = number.as_u64() {
-        return whole.to_string();
-    }
-    match number.as_f64() {
-        Some(x) if x.is_finite() && x.fract() == 0.0 && x.abs() < 1e21 => format!("{x:.0}"),
-        Some(x) => format!("{x}"),
-        None => number.to_string(),
-    }
-}
-
-/// `JSON.stringify(value)` for a value that may be absent (`undefined`).
-fn js_json(value: Option<&Value>) -> String {
-    match value {
-        None => "undefined".to_string(),
-        Some(Value::Null) => "null".to_string(),
-        Some(Value::Bool(flag)) => flag.to_string(),
-        Some(Value::Number(number)) => js_number(number),
-        Some(Value::String(text)) => serde_json::to_string(text).unwrap_or_default(),
-        Some(Value::Array(items)) => format!(
-            "[{}]",
-            items
-                .iter()
-                .map(|item| js_json(Some(item)))
-                .collect::<Vec<_>>()
-                .join(",")
-        ),
-        Some(Value::Object(fields)) => format!(
-            "{{{}}}",
-            fields
-                .iter()
-                .map(|(key, item)| format!(
-                    "{}:{}",
-                    serde_json::to_string(key).unwrap_or_default(),
-                    js_json(Some(item))
-                ))
-                .collect::<Vec<_>>()
-                .join(",")
-        ),
-    }
-}
-
-/// A value as a template literal writes it (`${value}`).
-fn js_display(value: Option<&Value>) -> String {
-    match value {
-        None => "undefined".to_string(),
-        Some(Value::Null) => "null".to_string(),
-        Some(Value::Bool(flag)) => flag.to_string(),
-        Some(Value::Number(number)) => js_number(number),
-        Some(Value::String(text)) => text.clone(),
-        Some(Value::Array(items)) => items
-            .iter()
-            .map(|item| match item {
-                Value::Null => String::new(),
-                other => js_display(Some(other)),
-            })
-            .collect::<Vec<_>>()
-            .join(","),
-        Some(Value::Object(_)) => "[object Object]".to_string(),
-    }
-}
-
 /// A key that is present and not null (the reading of `??`).
 fn present<'a>(value: &'a Value, key: &str) -> Option<&'a Value> {
     value.get(key).filter(|found| !found.is_null())
@@ -167,11 +95,6 @@ fn is_filled(value: Option<&Value>) -> bool {
     value
         .and_then(Value::as_str)
         .is_some_and(|text| !js_trim(text).is_empty())
-}
-
-/// `Number.isInteger`: a JSON number with no fraction, however it was written.
-fn js_integer(value: &Value) -> Option<f64> {
-    value.as_f64().filter(|x| x.is_finite() && x.fract() == 0.0)
 }
 
 // ---- the capability catalog (`runner.capabilities`) ------------------------------------------------------
@@ -205,12 +128,13 @@ fn prefer_sites(runner: &Value) -> Vec<(&Value, String)> {
 
 // ---- the policies of confinement -------------------------------------------------------------------------
 
-const BUILTIN_POLICY_IDS: [&str; 2] = ["host-write-denied", "workspace-write"];
+/// The ids of the built-in policies, in declaration order. The one list: the engine's policy shape re-exports it.
+pub const BUILTIN_POLICY_IDS: [&str; 2] = ["host-write-denied", "workspace-write"];
 
-const CONFINEMENT_MODES: [&str; 3] = ["required", "preferred", "unconfined"];
+pub const CONFINEMENT_MODES: [&str; 3] = ["required", "preferred", "unconfined"];
 
-/// The control axes of a policy and the values each may take, in the order the policy lists them.
-const CONTROL_AXES: [(&str, &[&str]); 7] = [
+/// Control axes with their legal values, strongest first. The axis order is the order the checks report in.
+pub const CONTROL_AXES: [(&str, &[&str]); 7] = [
     ("hostWrite", &["deny", "allow"]),
     ("hostRead", &["deny", "blind", "allow"]),
     ("networkEgress", &["deny", "filtered", "allow"]),
@@ -220,7 +144,12 @@ const CONTROL_AXES: [(&str, &[&str]); 7] = [
     ("workspace", &["own", "shared"]),
 ];
 
-const GRANT_ACCESS_LEVELS: [&str; 3] = ["read-write", "write", "read"];
+/// Grant access levels, widest first.
+pub const GRANT_ACCESS_LEVELS: [(&str, u8); 3] = [("read-write", 3), ("write", 2), ("read", 1)];
+
+fn grant_access_names() -> [&'static str; 3] {
+    GRANT_ACCESS_LEVELS.map(|(name, _)| name)
+}
 
 fn policy_error(message: String) -> ModelError {
     ModelError::confinement_policy(message)
@@ -526,11 +455,11 @@ fn validate_confinement_policy_shape(policy: &Value, label: &str) -> Result<(), 
         if !grant_fields
             .get("access")
             .and_then(Value::as_str)
-            .is_some_and(|access| GRANT_ACCESS_LEVELS.contains(&access))
+            .is_some_and(|access| grant_access_names().contains(&access))
         {
             return Err(policy_error(format!(
                 "runner config ({grant_label}) \"access\" must be one of {}, got: {}.",
-                GRANT_ACCESS_LEVELS.join("/"),
+                grant_access_names().join("/"),
                 js_json(grant_fields.get("access"))
             )));
         }

@@ -6,7 +6,7 @@ use super::retired_keys::{
     RETIRED_GATED_NAME,
 };
 use super::CollaborationError;
-use crate::unit::js_trim;
+use crate::js::trim as js_trim;
 use serde_json::{Map, Value};
 
 /// A seat a pattern declares, as the declared-seat check returns it.
