@@ -1,3 +1,5 @@
+- 2026-11-21 07:52 SUPERVISION: plan 261121-0722-idle-lead-replace DONE. Live idle lead is replaced (source p-waxzxz5mio landed 595a7f0b1).
+- 2026-11-21 07:52 SUPERVISION: plan 261119-1730-supervision-powers-cores DONE. Part 1 four Rust cores landed (ec34f897a); part 2 doors running.
 - 2026-11-21 07:47 SUPERVISION: plan 261121-0707-head-tab-labels DONE. Head tab labels read role: subject and head names unique by construction (source p-mhwe24fttr landed f6f88e8d6).
 - 2026-11-20 06:14 OPC: fix/win-identity-test 1f51b7b07 MERGE (native Windows CI red on fgos-identity tests from 90757718a): the unix-only bind test is gated cfg(unix); child_of and one import are gated linux like their only callers, which clears the msvc dead-code warnings. No assertion changed. The msvc and darwin --tests checks are clean.
 - 2026-11-20 05:13 S6A: IN-MAIN: 19 seam f367c0f53, 19b bbf64a66d (unit run host composed: 41 ports, custody lent with Handle::lent_to, OPC MERGE; e2e under bwrap hermetic), msvc doctor test fix f0726b16f. Next: 19c (route flip, internal ops, Windows decision, macOS CI job).
