@@ -31,7 +31,10 @@ pub struct Display {
     pub session: Option<String>,
 }
 
-const LABEL_SEPARATOR: &str = " · ";
+/// Between the parts of a tab label (`lead: cores`).
+const TAB_SEPARATOR: &str = ": ";
+/// Between the role and the model of a worker pane label.
+const PANE_SEPARATOR: &str = " · ";
 const SHORT_ID_CHARS: usize = 8;
 const TITLE_CHARS: usize = 24;
 
@@ -44,10 +47,15 @@ fn shortened(text: Option<&String>, max: usize) -> Option<String> {
 }
 
 impl Display {
-    /// `<short id> · <title>`; either part alone when the other is missing; the group key when both are.
+    /// `<short id>: <title>`; either part alone when the other is missing; the group key when both are.
+    /// A display with a role and no id (a head) leads with the whole role instead: `<role>: <title>`.
     pub fn tab_label(&self, group_key: &str) -> String {
+        let lead = match shortened(self.id.as_ref(), SHORT_ID_CHARS) {
+            Some(id) => Some(id),
+            None => shortened(self.role.as_ref(), usize::MAX),
+        };
         let parts: Vec<String> = [
-            shortened(self.id.as_ref(), SHORT_ID_CHARS),
+            lead,
             shortened(self.title.as_ref(), TITLE_CHARS),
         ]
         .into_iter()
@@ -56,7 +64,7 @@ impl Display {
         if parts.is_empty() {
             group_key.to_string()
         } else {
-            parts.join(LABEL_SEPARATOR)
+            parts.join(TAB_SEPARATOR)
         }
     }
 
@@ -69,7 +77,7 @@ impl Display {
         match shortened(self.role.as_ref(), TITLE_CHARS) {
             Some(role) => {
                 match shortened(self.model.as_ref().or(self.agent.as_ref()), usize::MAX) {
-                    Some(model) => format!("{role}{LABEL_SEPARATOR}{model}"),
+                    Some(model) => format!("{role}{PANE_SEPARATOR}{model}"),
                     None => role,
                 }
             }

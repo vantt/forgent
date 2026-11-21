@@ -15,7 +15,7 @@ description: >-
 # fgOS terminal
 
 Renames the current herdr pane, when the session is running inside one,
-to `<short id> · <title> | fg.ssid:<first 8 of the fgOS/bee session id>` —
+to `<short id>: <title> | fg.ssid:<first 8 of the fgOS/bee session id>` —
 the short id is the first 8 characters of the task id, the title is cut at
 24 characters, and a task whose title the skill does not know shows the short
 id alone. The port builds that text from the fields the script passes (one
