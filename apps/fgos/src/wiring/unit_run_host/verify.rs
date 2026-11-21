@@ -39,12 +39,11 @@ pub fn verify(
 
 fn borrowed(command: &str, cwd: &Path, timeout: Duration, custody: &Handle) -> Ran {
     use fgos_holder_lock::{run_borrowed_io, BorrowError, BorrowIo, BorrowSpec, BorrowStdio};
-    // The shell the engine's bounded shell uses for the same command.
-    let argv = if cfg!(windows) {
-        vec!["cmd".into(), "/C".into(), command.into()]
-    } else {
-        vec!["sh".into(), "-c".into(), command.into()]
-    };
+    // The platform shell the engine's bounded shell uses for the same command.
+    #[cfg(windows)]
+    let argv = vec!["cmd".into(), "/C".into(), command.into()];
+    #[cfg(not(windows))]
+    let argv = vec!["sh".into(), "-c".into(), command.into()];
     let spec = BorrowSpec {
         argv,
         cwd: Some(cwd.to_path_buf()),
