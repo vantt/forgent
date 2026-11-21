@@ -12,8 +12,8 @@ import { DOMAINS, resolveWorkflow } from '../../src/state/domain-registry.mjs';
 const coding = DOMAINS.coding;
 const synthetic = DOMAINS.synthetic;
 
-test('coding declares exactly one workflow, feature, as the default', () => {
-  assert.deepEqual(Object.keys(coding.workflows), ['feature']);
+test('coding declares bugfix and feature workflows, feature as the default', () => {
+  assert.deepEqual(Object.keys(coding.workflows).sort(), ['bugfix', 'feature']);
   assert.equal(coding.defaultWorkflow, 'feature');
   assert.deepEqual(coding.workflowFor, {});
 });
