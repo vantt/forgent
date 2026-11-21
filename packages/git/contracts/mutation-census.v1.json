@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "6726608887d1014a4d134680effa182a41ff66d730f8fe1ed54246af85db761e",
+  "payloadDigest": "a5d3b234f8d9659aa2477d865fce37abfd0c1debdf7eef460c838af848dc5e78",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1080,7 +1080,7 @@
     "packages/questions/rust/src/caller.rs": "3f414a0989b20b241000992b9846f5160a2cc4a9dd21a40279938882200c21c5",
     "packages/questions/rust/src/lib.rs": "834be7b677ea6f1bfaf234c72bc725836f3d38dbcd87c932b5e6a985b293702b",
     "packages/questions/rust/src/record.rs": "d910e3c486f18e67ced0ed20af3fee25d344f408bb01efd37ec3dc222961099f",
-    "packages/questions/rust/src/refcheck.rs": "51d7bd6fb13e21d53b05feab43277ceff015d488f291d4872367e80bc1445d3b",
+    "packages/questions/rust/src/refcheck.rs": "4a94c4a1e3e7ebcb64d76e5fe2dd32b86dd63bef3676e82f6a646885750d0d26",
     "packages/questions/rust/src/refusal.rs": "9591c87c6cf44b40994dcfbf41b91596b40d0bbb017b51bbeb204d3a14bebbc3",
     "packages/questions/rust/src/shape.rs": "78c30a4de9c6d874bbe4532f1d6c364cbfd805ee4204674936c29aa80f1a6dcc",
     "packages/questions/rust/src/source.rs": "63bfee8ee48460b25e98457fafdcdbb86b4a3bd46d90482f6292c85b54b9ad7d",
@@ -1219,7 +1219,7 @@
     "packages/session-host/rust/src/route.rs": "d9c6a83a87c3a04e84f4f03e72a5c5816688290f1d33aa2fcdecefe49edbd632",
     "packages/session-host/rust/src/types.rs": "c11cdb42d69f78fa2b709f45d801a54bdc6b3447e7786e94c816bd5f12464cc4",
     "packages/session-host/rust/tests/host.rs": "cb88dacad840bde304e2dcf593b959a76cb1d65411b3adfa1002d8be70350a85",
-    "packages/supervision/rust/src/discussion_source.rs": "f38eb060f7229624ac4fec7ea9a2f508f28ccc7d5a1faee5de5f57430cb4404b",
+    "packages/supervision/rust/src/discussion_source.rs": "757f197305b2af1f0ba7fa1ac980563e8ffb1c6ab8fd23ac920f5704e4f9ac9f",
     "packages/supervision/rust/src/land.rs": "3a61dcc802ac227db88d952ba93b8266a76e0b8271a14559cbfac61b90668b24",
     "packages/supervision/rust/src/lib.rs": "8070f2ae2159030a71567ae0ce2da103178415a0703b3de3b9b0f8d76b4cdf15",
     "packages/supervision/rust/src/notify.rs": "2a8ce19013396e3a31c915a903c4762889cc3f902137279e6378c3deb84e8edd",

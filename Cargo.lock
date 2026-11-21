@@ -571,6 +571,7 @@ dependencies = [
 name = "fgos-questions"
 version = "0.2.0"
 dependencies = [
+ "fgos-convention",
  "fgos-durable-file",
  "fgos-event-store",
  "fgos-git",
@@ -661,6 +662,7 @@ dependencies = [
 name = "fgos-supervision"
 version = "0.2.0"
 dependencies = [
+ "fgos-convention",
  "fgos-event-store",
  "fgos-git",
  "fgos-holder-lock",
