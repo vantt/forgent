@@ -7,6 +7,7 @@ discussion: paused
 2026-11-20: Thảo luận được mở từ backlog row `p-7pjiqfoj7v` (nguồn `docs/discussions/supervisor-review/DISCUSSION.md` §7 `#task-orchestration-skeleton`, owner duyệt 2026-11-19 round 19). Đã kế thừa các quyết định cốt lõi SR-D6..SR-D10, bài học Work FSM (G14), nguyên lý harness (G15, G16) và phác thảo 6 ports của Multica (plan `261118-1117-external-ui-integration-multica`).
 - Đã nhận câu trả lời chủ dự án cho `q-kjat6xjwfv`: Shaping is parked by owner decision 2026-11-21 until four orchestration fixes land (đóng băng việc điều phối mới để ưu tiên ổn định hệ thống; Architecture Advisory Panel tạm hoãn, thảo luận không đóng).
 - Trạng thái thảo luận: **Tạm dừng (`discussion: paused`)**, thảo luận vẫn mở (not settled, not closed), được đậu lại (parked) chờ 4 bản sửa lỗi điều phối hạ cánh. Không có câu hỏi nào đang mở.
+- 2026-11-21 16:20: đã ghi bảng tham chiếu các backlog row, plan và discussion liên quan tại §7 `#related` để theo dõi. 4 bản sửa của OS-D1 chưa được tài liệu nào gọi tên; §7 `#related` chỉ ghi các ứng viên, chưa xác nhận.
 
 ## 2. Mục tiêu & đề bài
 
@@ -43,6 +44,7 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-20 round 0: Khởi tạo thảo luận từ backlog `p-7pjiqfoj7v` và các kết luận SR-D6..SR-D10 của `supervisor-review`. Tổng hợp dữ liệu từ plan 261118-1117 (multica 6 ports) và các hướng mở G9-G16.
 - 2026-11-20 round 1: Gửi câu hỏi chủ dự án `q-kjat6xjwfv` (hỏi ý kiến về việc mở Architecture Advisory Panel theo khuyến nghị tại backlog `p-7pjiqfoj7v`). Đậu tại question store để chủ dự án trả lời theo nhịp riêng, tiếp tục định hình cấu trúc chi tiết của skeleton.
 - 2026-11-21 round 2: Nhận câu trả lời từ chủ dự án cho `q-kjat6xjwfv`: "Not now. Owner chose to freeze new orchestration work and stabilize first; the architecture panel waits until the four fixes land. Park the orchestration-skeleton discussion; do not close it." Shaping is parked by owner decision 2026-11-21 until four orchestration fixes land. Đã ack câu hỏi `q-kjat6xjwfv`, thảo luận chuyển sang trạng thái `discussion: paused`.
+- 2026-11-21 16:20 round 3: Chủ dự án yêu cầu liệt kê các plan và backlog liên quan và ghi vào discussion để theo dõi. Đã thêm §7 `#related` (trạng thái đọc từ `docs/backlog.md` và `status:` của từng `plan.md` lúc 16:20). Hỏi lại chủ dự án: 4 bản sửa của OS-D1 là những row nào; chưa có trả lời.
 
 ## 6. Thiết kế đã chốt {#design}
 
@@ -143,3 +145,74 @@ Kế thừa các task phụ thuộc đang chờ từ `supervisor-review` §7 và
 
 ### T7.3 Surface ports projection adapter {#task-surface-ports}
 - Goal: Xây dựng adapter kết nối 6 ports với giao diện bên ngoài (Multica projection).
+
+### Liên quan bên ngoài & theo dõi {#related}
+
+Ảnh chụp lúc 2026-11-21 16:20. Trạng thái backlog đọc từ `docs/backlog.md`, trạng thái plan đọc từ dòng `status:` của từng `plan.md`. Khi một dòng đổi trạng thái, sửa tại chỗ.
+
+**Backlog: row của chính discussion**
+
+| Row | Nội dung | Trạng thái |
+|---|---|---|
+| `p-7pjiqfoj7v` | Shaper discussion `orchestration-skeleton` (priority high) | proposed; đậu theo OS-D1 |
+
+**Backlog: chờ discussion này chốt** (nguồn `supervisor-review` §7)
+
+| Row | Task | Nội dung | Trạng thái |
+|---|---|---|---|
+| `p-radq263tbx` | T1 `#task-admission-code` | Admission trong code; wake door admit plan và start lead | proposed |
+| `p-r3qqgwtcai` | T3 `#task-merge-queue` | Merge queue, review verdict gắn SHA | proposed |
+| `p-sdwybf7yre` | T4 `#task-failure-ladder` | Failure ladder L0-L3 và cap; còn mở N, X, session fixer | proposed |
+| `p-lkzx3oygy4` | T5 `#task-integration-phase` | Integration phase và dormant switch trong plan contract | proposed |
+
+**Backlog: cùng nguồn `supervisor-review`, không chờ discussion này**
+
+| Row | Nội dung | Trạng thái |
+|---|---|---|
+| `p-xdgjxoqluw` | T0: chỉnh sửa nhỏ thiết kế supervisor | proposed |
+| `p-2wb2lfgky3` | T2 `#task-head-preflight`: preflight khi start head | proposed |
+| `p-7nja6ilwkr` | G10: vì sao "cửa thứ hai" lặp lại và các agent song song tự quyết ngầm khác nhau | proposed |
+| `p-dkiyey4ttl` | Đối chiếu thiết kế supervisor với kinh nghiệm đã công bố | proposed |
+
+**Backlog: ổn định điều phối (2026-11-19 đến 21).** Ứng viên cho "4 bản sửa" của OS-D1, chưa xác nhận.
+
+| Row | Nội dung | Trạng thái |
+|---|---|---|
+| `p-ycausep3zs` | Head sống lâu giữ release cũ, bản sửa route không tới (high) | proposed |
+| `p-fel4zoytbn` | Việc khẩn cần lane không giao cho lead đang dở plan (high) | proposed |
+| `p-of5vpvce3e` | Supervisor head từng khởi động trên Gemini, quá yếu (high) | proposed |
+| `p-56oslt7ejt` | Lead skill chưa nói cách chọn worker cho từng task | proposed |
+| `p-ucnc6j52qk` | `session start shaper` cho topic mới phải tạo stub discussion | proposed |
+
+**Backlog: từ discussion `workflow-engine`** (phía tầng workflow, sát ranh giới skeleton)
+
+| Row | Nội dung | Trạng thái |
+|---|---|---|
+| `p-f367pplkhu` | `fgos-cook` và `workflow propose` không chạy check plan-contract với plan ngoài | proposed |
+| `p-zhjqb4sxfk` | Chưa tìm ra chỗ đã chốt "một team dưới lead cho mỗi loại task" | proposed |
+
+**Plan**
+
+| Plan | Trạng thái | Liên quan |
+|---|---|---|
+| `plans/261118-1117-external-ui-integration-multica` | draft | Nguồn 6 surface port (§3 row 7, T7.3) |
+| `plans/261118-1045-project-supervisor` | done | Supervisor nền; T1 chờ plan này land |
+| `plans/261117-1856-secretary-session-spine` | done | Spine session head |
+| `plans/261118-0947-session-verb-for-agent-sessions` | done | Primitive start/sleep/wake (§3 row 4) |
+| `plans/261119-1730-supervision-powers-cores` | done | Quyền supervisor (lõi) |
+| `plans/261119-1731-supervision-powers-doors` | done | Quyền supervisor (cửa) |
+| `plans/261120-1547-session-start-task-binding` | done | Gắn task khi start head |
+| `plans/261121-0707-head-tab-labels` | done | Ổn định head |
+| `plans/261121-0722-idle-lead-replace` | done | Ổn định head |
+| `plans/261121-0745-head-rotation-trace` | done | Ổn định head |
+| `plans/261120-0625-work-data-model` | running (phase 4-7) | Work state; skeleton chỉ đọc facet (§3 row 6) |
+| `plans/261121-1309-git-windows-custody` | running | Không trực tiếp; đang chạy trong release hold |
+
+**Discussion**
+
+| Discussion | Trạng thái | Liên quan |
+|---|---|---|
+| `docs/discussions/supervisor-review/DISCUSSION.md` | settled | Nguồn SR-D6..SR-D10 |
+| `docs/discussions/secretary-supervisor-powers/DISCUSSION.md` | settled | Quyền Miu và supervisor |
+| `docs/discussions/workflow-engine/DISCUSSION.md` | settled | Tự giới hạn ở tầng workflow, không đụng skeleton |
+| `docs/discussions/orchestrator-worker-slots/DISCUSSION.md` | chưa đọc | Tên trùng chủ đề; cần soát khi mở lại |
