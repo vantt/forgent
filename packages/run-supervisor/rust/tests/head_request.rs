@@ -1600,7 +1600,8 @@ fn head_write_refuses_a_path_the_grant_does_not_name_exactly_a_climbing_path_and
 }
 
 #[test]
-fn head_write_under_a_directory_grant_creates_a_new_plain_file_atomically_with_a_fresh_mode_and_publishes_it() {
+fn head_write_under_a_directory_grant_creates_a_new_plain_file_atomically_with_a_fresh_mode_and_publishes_it(
+) {
     use std::os::unix::fs::MetadataExt;
     let publish = Publish::default();
     let served = write_served("write-create", &publish);
@@ -1644,7 +1645,8 @@ fn head_write_under_a_directory_grant_creates_a_new_plain_file_atomically_with_a
 }
 
 #[test]
-fn head_write_under_a_directory_grant_refuses_a_nested_path_a_climbing_path_and_a_symlink_and_writes_nothing() {
+fn head_write_under_a_directory_grant_refuses_a_nested_path_a_climbing_path_and_a_symlink_and_writes_nothing(
+) {
     let served = serve(
         "write-create-refused",
         DONE_LINE,
@@ -1680,7 +1682,8 @@ fn head_write_under_a_directory_grant_refuses_a_nested_path_a_climbing_path_and_
 }
 
 #[test]
-fn head_write_refuses_a_base_for_a_file_that_does_not_exist_yet_and_takes_back_a_created_file_the_publisher_judged_invalid() {
+fn head_write_refuses_a_base_for_a_file_that_does_not_exist_yet_and_takes_back_a_created_file_the_publisher_judged_invalid(
+) {
     let publish = Publish::default();
     let served = write_served("write-create-base", &publish);
     let path = "plans/backlog/p-based.md";
@@ -1690,7 +1693,10 @@ fn head_write_refuses_a_base_for_a_file_that_does_not_exist_yet_and_takes_back_a
     );
     assert_eq!(reply["code"], "write-base-stale", "{reply}");
     assert!(!served.dir.join(path).exists());
-    assert!(publish.calls.lock().unwrap().is_empty(), "nothing was asked of the publisher");
+    assert!(
+        publish.calls.lock().unwrap().is_empty(),
+        "nothing was asked of the publisher"
+    );
 
     let invalid = Publish {
         commit: Err(PublishRefusal {
@@ -1701,8 +1707,14 @@ fn head_write_refuses_a_base_for_a_file_that_does_not_exist_yet_and_takes_back_a
     };
     let served = write_served("write-create-invalid", &invalid);
     let reply = write_request(&served.socket, json!({"path": path, "content": "x\n"}));
-    assert_eq!(reply["data"]["publish"]["refusal"], "write-item-invalid", "{reply}");
-    assert!(!served.dir.join(path).exists(), "a refused new file is not left behind");
+    assert_eq!(
+        reply["data"]["publish"]["refusal"], "write-item-invalid",
+        "{reply}"
+    );
+    assert!(
+        !served.dir.join(path).exists(),
+        "a refused new file is not left behind"
+    );
 }
 
 #[test]

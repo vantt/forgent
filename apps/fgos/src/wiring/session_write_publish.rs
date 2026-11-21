@@ -432,7 +432,10 @@ fn refresh_backlog_index(
     let mut seen = std::collections::HashSet::new();
     for it in &items {
         if !seen.insert(it.id.as_str()) {
-            errors.push(format!("duplicate-id: backlog id '{}' is used twice", it.id));
+            errors.push(format!(
+                "duplicate-id: backlog id '{}' is used twice",
+                it.id
+            ));
         }
     }
     if !errors.is_empty() {

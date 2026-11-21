@@ -442,7 +442,10 @@ fn a_new_backlog_item_is_created_validated_and_indexed_in_one_commit(scene: &Sce
     let path = "plans/backlog/p-abcdefghi2-first-item.md";
     let reply = scene.write(path, &item_text("p-abcdefghi2", "First item"));
     assert_eq!(reply["result"], "done", "{reply}");
-    let commit = reply["data"]["commit"].as_str().expect("published").to_owned();
+    let commit = reply["data"]["commit"]
+        .as_str()
+        .expect("published")
+        .to_owned();
     assert_eq!(commit, scene.remote_tip(), "the remote holds the commit");
     let mut files: Vec<String> = git(
         &scene.project,
@@ -455,7 +458,9 @@ fn a_new_backlog_item_is_created_validated_and_indexed_in_one_commit(scene: &Sce
     assert_eq!(files, ["plans/backlog.md", path]);
     let index = fs::read_to_string(scene.project.join("plans/backlog.md")).unwrap();
     assert!(
-        index.contains("[p-abcdefghi2](backlog/p-abcdefghi2-first-item.md) | First item | proposed | P2"),
+        index.contains(
+            "[p-abcdefghi2](backlog/p-abcdefghi2-first-item.md) | First item | proposed | P2"
+        ),
         "{index}"
     );
     assert_eq!(
@@ -476,18 +481,27 @@ fn a_new_backlog_item_is_created_validated_and_indexed_in_one_commit(scene: &Sce
         "plans/backlog/p-cdefghij23-broken.md",
         "no frontmatter at all\n",
     );
-    assert_eq!(broken["data"]["publish"]["refusal"], "write-item-invalid", "{broken}");
+    assert_eq!(
+        broken["data"]["publish"]["refusal"], "write-item-invalid",
+        "{broken}"
+    );
     let misnamed = scene.write(
         "plans/backlog/wrong-name.md",
         &item_text("p-defghij234", "Misnamed"),
     );
-    assert_eq!(misnamed["data"]["publish"]["refusal"], "write-item-invalid", "{misnamed}");
+    assert_eq!(
+        misnamed["data"]["publish"]["refusal"], "write-item-invalid",
+        "{misnamed}"
+    );
     let nested = scene.write("plans/backlog/sub/p-efghij2345-deep.md", "x\n");
     assert_eq!(nested["code"], "path-not-granted", "{nested}");
     assert_eq!(scene.remote_tip(), tip, "nothing was published");
 
     // A refused new item leaves no file, so the same path retried with valid content is published.
-    assert!(!scene.project.join("plans/backlog/p-cdefghij23-broken.md").exists());
+    assert!(!scene
+        .project
+        .join("plans/backlog/p-cdefghij23-broken.md")
+        .exists());
     assert!(!scene.project.join("plans/backlog/wrong-name.md").exists());
     let retry = scene.write(
         "plans/backlog/p-cdefghij23-broken.md",
@@ -502,8 +516,14 @@ fn a_new_backlog_item_is_created_validated_and_indexed_in_one_commit(scene: &Sce
         "plans/backlog/p-cdefghij23-again.md",
         &item_text("p-cdefghij23", "Again"),
     );
-    assert_eq!(dup["data"]["publish"]["refusal"], "write-item-invalid", "{dup}");
-    assert!(!scene.project.join("plans/backlog/p-cdefghij23-again.md").exists());
+    assert_eq!(
+        dup["data"]["publish"]["refusal"], "write-item-invalid",
+        "{dup}"
+    );
+    assert!(!scene
+        .project
+        .join("plans/backlog/p-cdefghij23-again.md")
+        .exists());
     assert_eq!(scene.remote_tip(), tip);
 
     // An untracked stray item file never reaches the committed index.
@@ -518,7 +538,10 @@ fn a_new_backlog_item_is_created_validated_and_indexed_in_one_commit(scene: &Sce
     );
     assert_eq!(last["result"], "done", "{last}");
     let commit = last["data"]["commit"].as_str().expect("published");
-    let committed = git(&scene.project, &["show", &format!("{commit}:plans/backlog.md")]);
+    let committed = git(
+        &scene.project,
+        &["show", &format!("{commit}:plans/backlog.md")],
+    );
     assert!(committed.contains("p-fghij23456"), "{committed}");
     assert!(!committed.contains("p-stray23456"), "{committed}");
 }
