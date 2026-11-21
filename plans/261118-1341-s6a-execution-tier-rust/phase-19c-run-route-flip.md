@@ -119,3 +119,9 @@ Decision: **Rust lease-holder endpoint** (`cwdLeaseOwner`), not custody recordin
   Windows mutating attempt by name (`windows-cwd-lease-holder-missing`), and Windows `fgos run` stays on the Node route
   (this pass does not flip the route). Cancel on Ctrl-C/Ctrl-Break on Windows needs a console handler, which no crate
   installs yet; it lands with the endpoint.
+
+Result (2026-11-21): the endpoint and the console handler are built and proven on native Windows CI (run 44849384600,
+job "windows cwd lease owner": the controller serves cwdLeaseOwner, the real supervisor declares its job domain on the
+held lease, a stub agent writes, the lease outlives the supervisor; Ctrl-Break gives exit 130 and a cancel request). The
+refusals stay: a writing unit run cannot commit on Windows until the Git door takes custody there (holder-lock
+`BorrowedHandle` is Unix-only). `fgos run` is native on Unix and handed to the Node arm on Windows (`legacyOn`).
