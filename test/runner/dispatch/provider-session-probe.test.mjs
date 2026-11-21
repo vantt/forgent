@@ -1,6 +1,6 @@
 // The session probe runs one tiny read-only seat of one executor and reports where its CLI wrote the session,
 // whether finalize-home kept it, and where the kept copy is. The Assignment door and the id claim are injected;
-// the home, its descriptor and finalize-home itself are real, so a declared folder that does not match what the
+// the home, its descriptor and the home finalization itself are real, so a declared folder that does not match what the
 // fixture CLI wrote is judged by the code that would judge it for a live seat.
 
 import '../../helpers/process-tmp-root.mjs';
@@ -11,7 +11,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { CHEAPEST_TIER, runSessionProbe, sessionProbeInvocation } from '../../../src/runner/dispatch/provider-session-probe.mjs';
-import { finalizeHome } from '../../../src/run-supervisor/steps/finalize-home.mjs';
+import { finalizeAttemptHome } from '../../../src/runner/dispatch/confinement/authority.mjs';
 
 const dirs = [];
 const tmp = (prefix) => {
@@ -39,8 +39,8 @@ const configWith = (credentialStore) => ({
 });
 
 /**
- * An execution door whose "CLI" writes `files` (relative path -> text) into a real private home, then runs the
- * real finalize-home step over it, then records the step the way the supervisor does.
+ * An execution door whose "CLI" writes `files` (relative path -> text) into a real private home, then finalizes the
+ * attempt's homes for real, then records the finalize-home step the way the supervisor does.
  */
 function fixtureDoor({ repoRoot, cfg, files = {}, fail = false, providerLimit = false }) {
   const calls = [];
@@ -69,11 +69,10 @@ function fixtureDoor({ repoRoot, cfg, files = {}, fail = false, providerLimit = 
         resources: [{ pathRef: home, resourceId: 'private-home', ...(invocation.credentialStore?.sessionDir ? { sessionDir: invocation.credentialStore.sessionDir } : {}) }],
       }));
     }
-    const sideFile = path.join(runDir, 'protected', 'attempt-secrets.json');
-    fs.writeFileSync(sideFile, '{}');
-    const done = await finalizeHome({ envelope: { runDir, attemptId: 'att-1', sideFile } });
+    const finalized = finalizeAttemptHome({ runDir, attemptId: 'att-1' });
+    const detail = { homes: finalized.homes, transcriptPath: finalized.transcriptPath, homeLayout: finalized.homeLayout, warnings: finalized.warnings };
     fs.mkdirSync(path.join(runDir, 'steps'), { recursive: true });
-    fs.writeFileSync(path.join(runDir, 'steps', 'finalize-home.json'), JSON.stringify({ v: 1, stepId: 'finalize-home', status: 'done', detail: done.detail }));
+    fs.writeFileSync(path.join(runDir, 'steps', 'finalize-home.json'), JSON.stringify({ v: 1, stepId: 'finalize-home', status: 'done', detail }));
     fs.writeFileSync(path.join(runDir, 'stdout.log'), 'OK\n');
     const passed = {
       policy: { disposition: 'allow' }, delivery: { mode: 'fresh' }, provenance: 'native-v2',

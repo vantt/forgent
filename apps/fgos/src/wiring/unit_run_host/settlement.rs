@@ -15,7 +15,7 @@ use fgos_execution_engine::steps::{
 use fgos_run_supervisor::terminal_slot::Backend;
 use serde_json::Value;
 
-/// `paneScreenOf` (`src/run-supervisor/steps/settle-attempt.mjs:73`): the visible screen of a terminal attempt's
+/// `paneScreenOf` of the Node settle-attempt step this replaced: the visible screen of a terminal attempt's
 /// pane through the terminal control over the herdr endpoint the supervisor recorded beside the attempt; empty for
 /// a direct attempt and for a screen that cannot be read (no evidence, never a failure of the settlement).
 pub struct HostPaneScreen;
@@ -66,7 +66,7 @@ impl AccountLocks for TargetAccountLocks {
     }
 }
 
-/// `finalizeAttemptHome({ runDir, attemptId })` (`src/run-supervisor/steps/finalize-home.mjs:9`): the Confinement
+/// `finalizeAttemptHome({ runDir, attemptId })` of the Node finalize-home step this replaced: the Confinement
 /// Authority's finalization with credential renewal's write-back over the bundled SQLite engine and the account
 /// locks of the target's store.
 pub struct HostHomes;

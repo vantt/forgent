@@ -11,7 +11,7 @@
 //   (3)(4)(7)(9)   pane, retained-pane and herdr-endpoint rules, pane-less binding kept for doctor -> removed
 //       with the pane rules: terminal-control owns panes by key, the home belongs to the attempt
 //   (5)            finalizer field contract -> removed with the digest comparison; finalizeAttemptHome refuses a home whose
-//                  version 2 marker names another attempt or run (test/run-supervisor/attempt-steps.test.mjs)
+//                  version 2 marker names another attempt or run (engine tests/confinement_request.rs, finalizeAttemptHome vectors)
 //   (6)            two reapers over one home -> test/run-supervisor/sweep.test.mjs, two adopters remove it once
 //   (8)            one binding over every prepared home -> removed with the binding
 //

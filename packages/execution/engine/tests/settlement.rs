@@ -1,5 +1,5 @@
 //! Settlement and the post-receipt steps replay the vectors the Node modules recorded
-//! (`test/golden-recorders/settlement.recorder.mjs`): the files a settlement writes from a run directory, the
+//! (the settlement recorder, retired with the Node steps; the vectors stay): the files a settlement writes from a run directory, the
 //! helpers around it, the three steps and the entry that runs them. Each scenario is a run directory built from
 //! the recorded fixture files; the files Rust writes must be the bytes Node wrote, which is also what the previous
 //! Node release reads back.
@@ -724,6 +724,80 @@ fn settle_attempt_settles_once_and_finds_its_receipt_on_a_second_run() {
             assert_eq!(written.get(&file), Some(&want), "{name}: {file}");
         }
     }
+}
+
+/// The settle step's run-control token when the attempt's side file is gone or the control was already settled
+/// in the crash window before `result.json` was published.
+#[test]
+fn settle_attempt_takes_its_run_control_token_from_the_side_file_else_only_from_a_dead_writer() {
+    use fgos_run_supervisor::controller::lease::{control_dirs, list_generations};
+    let friction = Frictions::default();
+    let ports = StepPorts {
+        git: &NoGit,
+        faults: &NoFaults,
+        friction: &friction,
+        pane: &NoPane,
+        finalizer: &NoHomes,
+    };
+    let case = vector("steps.json")["settleAttempt"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["name"] == "exited-with-claim")
+        .unwrap()
+        .clone();
+    let generations = |run_dir: &Path| {
+        list_generations(&control_dirs(run_dir).generations_dir)
+            .unwrap()
+            .len()
+    };
+
+    // Control settled, nothing published: the same token completes the publish with no new epoch.
+    let (run_dir, envelope, token) = attempt_fixture(&case);
+    let side: Value =
+        serde_json::from_str(&std::fs::read_to_string(run_dir.join("side.json")).unwrap()).unwrap();
+    let epoch = side["controlEpoch"].as_u64().unwrap();
+    settle_run_control(&run_dir, epoch, &token, None).unwrap();
+    assert!(!run_dir.join("result.json").exists());
+    let before = generations(&run_dir);
+    let done = step_json(settle_attempt(&run_dir, &envelope, &ports));
+    assert_eq!(done["result"], "done", "{done}");
+    assert!(run_dir.join("result.json").exists());
+    assert_eq!(generations(&run_dir), before);
+
+    // Side file gone while the control's writer lives: retry, nothing published.
+    let (run_dir, envelope, _) = attempt_fixture(&case);
+    std::fs::remove_file(run_dir.join("side.json")).unwrap();
+    let waiting = step_json(settle_attempt(&run_dir, &envelope, &ports));
+    assert_eq!(
+        waiting,
+        json!({"result": "retry", "reason": "run-control-held"})
+    );
+    assert!(!run_dir.join("result.json").exists());
+
+    // Side file gone and the writer dead: the step takes a new epoch and settles.
+    let (run_dir, envelope, _) = attempt_fixture(&case);
+    std::fs::remove_file(run_dir.join("side.json")).unwrap();
+    let mut gone = std::process::Command::new(std::env::current_exe().unwrap())
+        .arg("--list")
+        .stdout(std::process::Stdio::null())
+        .spawn()
+        .unwrap();
+    let dead_pid = gone.id();
+    gone.wait().unwrap();
+    let dir = control_dirs(&run_dir).generations_dir;
+    for entry in std::fs::read_dir(&dir).unwrap() {
+        let file = entry.unwrap().path();
+        let mut record: Value =
+            serde_json::from_str(&std::fs::read_to_string(&file).unwrap()).unwrap();
+        if record.get("holder").is_some_and(Value::is_object) {
+            record["holder"]["pid"] = json!(dead_pid);
+            std::fs::write(&file, record.to_string()).unwrap();
+        }
+    }
+    let taken = step_json(settle_attempt(&run_dir, &envelope, &ports));
+    assert_eq!(taken["result"], "done", "{taken}");
+    assert!(run_dir.join("result.json").exists());
 }
 
 #[test]

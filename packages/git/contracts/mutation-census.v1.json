@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "34c24d08bd657131cf62e85685f4dceb8c5d257fbaaa2b1279ea0aac40cee9f7",
+  "payloadDigest": "9bc359c4cb9f79e71e1d0b2841fd8178f550a616f6d85a8217e155ebba5e9a48",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -173,7 +173,7 @@
     "apps/fgos/src/wiring/unit_run_host/persona.rs": "24e06b1a7c479439f578d2d3030644e238c1e93d3e546c8b4b3b071627b55678",
     "apps/fgos/src/wiring/unit_run_host/records.rs": "bc8d67e38486d9d250643c272853c072bb3db7b52360efe4c21406ecf75a3eb3",
     "apps/fgos/src/wiring/unit_run_host/session_attempt.rs": "99ac26c01f88bdb73d707ce4742a7fe3f81d978ebc07c2cb6d6b1dbafbabf57e",
-    "apps/fgos/src/wiring/unit_run_host/settlement.rs": "682029be63bf046af39d6cd01bd787a0bd14276f06a55d2b771584379429ec6b",
+    "apps/fgos/src/wiring/unit_run_host/settlement.rs": "0705eb7756db621bb274a2eb76e62657b259394dda443576b0fcc75bbf6273da",
     "apps/fgos/src/wiring/unit_run_host/terminal.rs": "c7515140c79a9d1a06a543f2ef795813d90b6ff13ac80f4d9098928ef4f01acc",
     "apps/fgos/src/wiring/unit_run_host/tests/mod.rs": "a22f2cac7cd5a75628e95bd8dbe1d1f6095c25ba5ce940bc8ea8a3aa989a5dce",
     "apps/fgos/src/wiring/unit_run_host/tests/run_unit.rs": "6ae520d5bff45b261383fedb310edc5a1aeaff5145d0a1ffb5b0580c3ff3089a",
@@ -655,7 +655,7 @@
     "packages/execution/engine/tests/credentials_sqlite.rs": "1d3a17e00b64a2f9efcfb1b6c676e97b5dc1237d9a36b91be009e26002805c43",
     "packages/execution/engine/tests/planning.rs": "2fb55dc25e3336bf0029bc28e00c2a176575ff7d53e07a94e9b2d3c6b7a243de",
     "packages/execution/engine/tests/run_result.rs": "98880a45e8766c03eaef29a505852edb0048528caecc2ee9d9197416911d895b",
-    "packages/execution/engine/tests/settlement.rs": "1d856b4285cdb6fb4af34f4ed9f6b3fd1d60e2e1502dda0356e96c74471fec32",
+    "packages/execution/engine/tests/settlement.rs": "79434725a3e99e137a2367d97fd3168109bdae86a3481384b0682e2063e19a10",
     "packages/execution/engine/tests/transport.rs": "df814ba577505861a1e3251497398fe9466d8d15068382a68f7384f59c02c2ae",
     "packages/execution/engine/tests/transport_round.rs": "d9a8b00a12ea3b6e7f2434f3e0a5c0e80ac9ed5e00cf8b32dfe01e139762b314",
     "packages/execution/engine/tests/unit_run.rs": "4848ea6c5bbbd72a34d37b5ce5a5aa4b219d1dba28584f2ff91200fa68bcd100",
@@ -1474,7 +1474,6 @@
     "src/report/knowledge-lints.mjs": "a5e7b235fe2c9fb45cf1378f84cefaa5336100304cdb45eacea37113207442d7",
     "src/report/knowledge-projection.mjs": "f2afac52580e95a7f58c5a3a2562f1021ca5c7ad450f6dd474f185b3e66a020d",
     "src/report/knowledge-resolver.mjs": "75784779a4e11d793cf1fe9307a8db7020f419da05ecc003708dd9ffd324d516",
-    "src/run-supervisor/attempt-step.mjs": "cf4084a9e1e7057243e25fb471ec3a97cbe6355849eb01ed3d110e41195116ee",
     "src/run-supervisor/cancel-opt-in.mjs": "79f61ba06b66c699529d3863c0c02c63ed947d8eb0653e856b5f06f29577f45f",
     "src/run-supervisor/cancel-registry.mjs": "c2e4eda5761ecf342e5b1916bc5e7d3995d6fd1a9e65c7070d53e5ef43c30779",
     "src/run-supervisor/client.mjs": "16445d0a7d4a4a145fc75187da3da8420b92a4a8b38903b88c9fff88c3c54cbc",
@@ -1485,10 +1484,7 @@
     "src/run-supervisor/protocol.mjs": "63bb68a1f04dc6d58a0d7a8d7711308fdcdf718d61d09da4f09047e24d05badd",
     "src/run-supervisor/run-lock.mjs": "1c556b14b63b421536af3137aa35245879ee116706c82cdb24d20b1d35a9a026",
     "src/run-supervisor/runtime-dir.mjs": "a1d4b6a4ddf9841b5a921c524896cd3672a682e40121dcb27a9f0a3ff61df745",
-    "src/run-supervisor/step-support.mjs": "b2e44945f42b1e72065cd0de645c09efd6362c75316b069a7c8a835bfec7a5c0",
     "src/run-supervisor/steps/cleanup-trust.mjs": "00780193859023384c42f52748c541121c53bd4b986d1a5ae9586097932448fc",
-    "src/run-supervisor/steps/finalize-home.mjs": "50ea79039751895c8f1eab16b969d8cda2b82662dd3f6d762d391dae5abf726c",
-    "src/run-supervisor/steps/settle-attempt.mjs": "23895b51cfaf108b06feb1167ccf33a7af64f9762f784049f0b4e44fb076168c",
     "src/run-supervisor/stray-writes.mjs": "a089d31b30aefcf02d5fa0880bc521f5c060af8a4bf3da10c59571a896f1a033",
     "src/run-supervisor/trust-store.mjs": "20d66f79de6608ceb43b1af49dd429d8580a2d0d5e3aad1299968b0922f0d54c",
     "src/run-supervisor/worker-artifacts.mjs": "72fd5bd3bec52dbfe0de9075b6c1e84d7de6a177b8123ad270c6bd9fd76273ae",
@@ -1546,7 +1542,7 @@
     "src/runner/dispatch/runner-config-error.mjs": "f1cf79e848936226739903b20c6cec2e8c2831c7f5bd95f85d5a850f58480490",
     "src/runner/dispatch/runtime-inspection.mjs": "3ce9f61a48afbc739c5c83b261ba09bc3864decd810c13c5d0345ebf467b1649",
     "src/runner/dispatch/session-attempt.mjs": "fdc3057b98b4f964ac2e37804b583b72aa2669fb81484a5562554724f76bde1d",
-    "src/runner/dispatch/settlement.mjs": "cfd864b660cf2a5ee2b49d0fae43a98952fefb84d4670cd6037624d08a418d10",
+    "src/runner/dispatch/settlement.mjs": "d824e52e903c68c07e95506265df335e8bb4bf45e8cc2ed3bf245dd283e28d65",
     "src/runner/dispatch/shipped-catalog.mjs": "ceb40e02a773598eebe4fc8db48e7400bfb76ce938df20268ce166f0539b8025",
     "src/runner/dispatch/terminal-slot.mjs": "a0726de851c54cc06794c8260514664b9939d78c327773dcb89cb78bcc22150f",
     "src/runner/dispatch/tier-cell.mjs": "91024f5f01c60fba321325214d08b4773535d538374f6cfad4b2ccb16b1c2436",
@@ -3049,7 +3045,7 @@
     },
     {
       "path": "packages/execution/engine/tests/settlement.rs",
-      "line": 941,
+      "line": 1015,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"
@@ -4478,14 +4474,6 @@
       "spawn": "spawnSync",
       "binary": "(env FGOS_HOST_BIN)",
       "class": "configured-binary"
-    },
-    {
-      "path": "src/run-supervisor/steps/settle-attempt.mjs",
-      "line": 271,
-      "spawn": "paneScreenOf -> src/run-supervisor/steps/settle-attempt.mjs:81",
-      "binary": "param envelope",
-      "class": "uncalled-wrapper",
-      "function": "settleAttempt"
     },
     {
       "path": "src/runner/dispatch/assignment-runner.mjs",
