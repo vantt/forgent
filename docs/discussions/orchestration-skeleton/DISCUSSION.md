@@ -11,6 +11,7 @@ discussion: open
 - 2026-11-21 16:35: đã xác định 4 bản sửa của OS-D1 (nguồn: memory `orchestration-stabilize-first-decision` của secretary Miu và tin supervisor gửi Miu sáng 2026-11-21: "1547 first, then the idle-lead nudge, then the names, then the reaper"): `p-l22vozecxg`, `p-waxzxz5mio`, `p-mhwe24fttr`, `p-yqanenewb4`. **Cả 4 đã `done`** (xem §7 `#related`). Điều kiện đậu theo chữ của OS-D1 đã thỏa, nhưng release hold ("no new work until the release hold is lifted", handoff secretary 14:45) vẫn còn hiệu lực. Discussion vẫn `paused` cho tới khi chủ dự án cho mở lại.
 - **2026-11-21 16:16: chủ dự án cho mở lại (OS-D2).** Trạng thái `discussion: open`. Architecture panel (T0) vẫn hoãn. Release hold không bị ảnh hưởng vì discussion không sinh code.
 - **2026-11-21 16:23 (round 6):** chủ dự án trả lời câu hỏi round 5 là "cả hai": mọi thành phần phải có authority, boundary và contract rõ, **và** hệ thống cần một cơ chế hoặc một vai làm nhạc trưởng nắm nhịp điều phối tổng. Câu hỏi mở thành §3 row 9: nhạc trưởng, hay mọi thứ chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan theo chuỗi watcher -> ghi signal -> phản ứng tiếp. Đang chạy 5 agent con (haiku, chỉ đọc) dò lại tier 0 tới 9 từ dưới lên; kết quả sẽ vào bảng §3 row 4b.
+- **2026-11-21 18:25 (round 19): chủ dự án đồng ý hai facet `waitingOn`, `outcome` -> OS-D9.** Thử ánh xạ cho plan, work item, question, workflow case và một đơn hàng business (§3 4h): còn vướng gợi ý `needs` (gọi ai) và hạn `until`.
 - **2026-11-21 17:44 (round 17): chủ dự án chốt hình dạng cửa raise và wake, nguồn để sau -> OS-D8.** Row 9 đã rõ. Tiếp theo: facet lập lịch chung (§3 row 6), vì giữ nhịp đọc facet; rồi ngôn ngữ khung (row 5) và chi tiết rà soát (row 10).
 - **2026-11-21 17:36 (round 16): chủ dự án đồng ý giữ nhịp lớn lên từ wake door -> OS-D7.** §6, §7 T1 và T7.1 đã cập nhật. Tiếp theo trong row 9: lối vào signal ngoài.
 - **2026-11-21 17:30 (round 15):** Miu đã land backlog row `p-esa3lau6kd` và start `head:shaper-component-authority`. Discussion này bàn §3 row 9: đề xuất giữ nhịp lớn lên từ wake door trong Supervision (§3 4g), chờ chủ dự án phản hồi.
@@ -39,7 +40,7 @@ discussion: open
 | 3 | Domain Injection: domain pack (`domains/<d>/`) inject phase frames, doctrine, refusal ladder map, doors (coding: review verdict, land door, trunk merge, toggles/retires) | SR-D7, G12. Plan và supervisor hoàn toàn domain-agnostic | **Rõ (SR-D7)** |
 | 4 | Danh mục primitives của Skeleton & vị trí code: triggers (Event Store / watcher), timers (OS timer), start/sleep/wake (`session start`, `supervisor wake`, wake pane/socket), handoff (contract), who-next (`bind()` / `dispatch decide`), surface ports (6 ports) | G13 (`supervisor-review`), `plans/261118-1117-external-ui-integration-multica`. Hiện nằm rải rác giữa Supervision, Session Host, Runner | **Đang bàn (round 5):** gần hết primitive đã có chủ, xem bảng 4a. Chủ dự án trả lời "cả hai" (OS-D3): mỗi thành phần có authority, boundary, contract riêng, và skeleton có nhạc trưởng code. Kết quả dò ở bảng 4b |
 | 5 | Ngôn ngữ khung hợp nhất (One Frame Language): Hợp nhất `plan-v1` (plan/wave/phase) và workflow guide YAML (steps/milestones/guards). Cú pháp, schema và runtime runner nào thi hành? | G16. Hiện fgOS có 2 ngôn ngữ khung riêng rẽ, plan không chạy trên workflow harness | **Chưa rõ: Mở khảo sát thiết kế** |
-| 6 | Universal work facets: Skeleton chỉ đọc các thuộc tính lịch trình phổ quát (actionable/runnable, waiting on what, finished) thay vì work states cụ thể | G14. Schema của facets này là gì để skeleton lập lịch được? | **Chưa rõ: Đề xuất schema 3 facets** |
+| 6 | Universal work facets: Skeleton chỉ đọc các thuộc tính lịch trình phổ quát (actionable/runnable, waiting on what, finished) thay vì work states cụ thể | G14. Schema của facets này là gì để skeleton lập lịch được? | **Rõ một phần (OS-D9):** hai facet `waitingOn`, `outcome`. Thử ánh xạ ở 4h; còn mở: gợi ý `needs`, hạn `until` |
 | 7 | Tích hợp Surface (Multica 6 ports): Portfolio read, Command, Wake door, Notifier, Session placement, Question port | `plans/261118-1117-external-ui-integration-multica`. G13 | **Chưa rõ: Thứ tự ưu tiên cổng & adapter** |
 | 9 | Nhạc trưởng vs chuỗi phản ứng: có một cơ chế hoặc vai nắm nhịp và điều phối tổng, hay mọi hoạt động chỉ bắt đầu từ timer trigger và external signal (webhook) rồi lan qua watcher -> ghi signal -> phản ứng tiếp? | Chủ dự án nêu round 6 (2026-11-21 16:23), "open for discuss". Bằng chứng ở 4c: chuỗi timer -> watcher -> event -> wake đã có trong code; nhạc trưởng thực tế là supervisor LLM, cap không bị code ép; chưa có lối vào signal ngoài | **Hướng đã chốt (OS-D3, OS-D4):** lối vào timer + signal; giữ nhịp là code, diễn giải là LLM được hỏi ý. Không zombie: OS-D5 (4e). **Rõ:** chỗ đặt OS-D7, lối vào OS-D8. Mặc định tạm (đổi nếu chủ dự án phản đối hoặc adapter đầu tiên cần khác): id event của signal ngoài suy từ nguồn + id giao hàng của nguồn, không từ thời điểm, để webhook gửi lại không thành hai event; payload là dữ liệu không tin cậy, event chỉ trỏ tới nó, không bao giờ là lệnh |
 | 10 | Nhịp rà soát định kỳ của LLM: tần suất, nội dung brief, kết quả ghi ở đâu, có rà soát khi hệ thống rảnh không | OS-D5 ý 6; đề xuất biểu đạt bằng watcher definition `review-due` + action `wake-supervisor` (§3 4e) | **Đang bàn** |
@@ -161,6 +162,40 @@ Ba nơi không đồng bộ với nhau và không nơi nào vừa đầy đủ v
 
 *Đề xuất của shaper:* giữ nhịp **lớn lên từ wake door trong thành phần Supervision**, không lập thành phần mới (L10: mở rộng qua cửa, không đắp cạnh cửa). Authority của nó là một loại quyết định duy nhất: **ai làm tiếp và khi nào, trong cap**. Phân vai trong Supervision: watcher **cảm nhận** (phát hiện và ghi event), giữ nhịp **quyết định** (đọc event + facet, ép cap, start/wake người chơi, đóng event vô ích, raise "cần phán đoán"), supervisor LLM **diễn giải** khi được gọi. T1 là lát đầu tiên của giữ nhịp. Vòng `fgos-runner --watch` không được là nhịp thứ hai: hoặc nó retire cùng đường thực thi Node cũ, hoặc nó thành một người chơi được giữ nhịp gọi; cần kiểm nó còn ai dùng.
 
+
+**4h. Thử ánh xạ facet (round 19, 2026-11-21 18:25)**
+
+| Loại việc | Trạng thái của domain | `waitingOn` | `outcome` |
+|---|---|---|---|
+| Plan | `draft` | `actor` (planner đang viết) hoặc `person` (chờ duyệt) | — |
+| Plan | `ready`, mọi `blockedBy` đã `done` | — (làm được ngay) | — |
+| Plan | `ready`, còn `blockedBy` chưa `done` | `event` (`plan-done` của plan kia) | — |
+| Plan | `running` | `actor` (lead của plan) | — |
+| Plan | `done` / `withdrawn` | — | `done` / `withdrawn` |
+| Work item | `backlog` | `person` (chưa ai chọn làm) | — |
+| Work item | `todo` | — | — |
+| Work item | `doing` | `actor` (người đang claim) | — |
+| Work item | `blocked` | `event` hoặc `person`, tùy lý do | — |
+| Work item | `awaiting-approval` / `awaiting-human` | `person` | — |
+| Work item | `delivered` / `retrospective` / `cleanup` | — nếu chưa ai claim, `actor` nếu đã claim | — |
+| Work item | `done` / `wontfix` | — | `done` / `wontfix` |
+| Question | `open` | `person` | — |
+| Question | `answered` | — (người hỏi phải đi tiếp) | — |
+| Question | `acked` / `cancelled` | — | `done` / `cancelled` |
+| Workflow case | gate chưa trả lời | `person` | — |
+| Business: đơn hàng | mới nhận | — | — |
+| Business: đơn hàng | chờ thanh toán, hạn 24 giờ | `event` (webhook thanh toán) **và** hạn `time` | — |
+| Business: đơn hàng | hẹn giao lúc 9 giờ sáng | `time` | — |
+| Business: đơn hàng | đang giao | `actor` (bên vận chuyển, ngoài hệ thống) | — |
+| Business: đơn hàng | đã giao / khách hủy | — | `done` / `cancelled` |
+
+*Chỗ vướng phát hiện được:*
+1. **"Làm được ngay" nhưng ai làm?** Plan `ready` cần một lead, question `answered` cần đúng người hỏi, work `todo` cần executor theo capability của stage. Chỉ hai facet thì giữ nhịp biết *có việc*, nhưng không biết *gọi ai*. Ứng viên: thêm gợi ý `needs` (role hoặc capability cần cho bước tiếp), để giữ nhịp đưa cho `bind()` hoặc Identity giải.
+2. **Chờ có hạn.** Đơn hàng chờ thanh toán là chờ `event` hoặc hết hạn `time`, cái nào tới trước. Ứng viên: `waitingOn` mang thêm `until`; quá hạn thì giữ nhịp raise event (domain quyết làm gì, hoặc "cần phán đoán").
+3. **Năng lực (lane đầy, `maxLeads`) không phải facet.** Đó là cap của giữ nhịp, không phải thứ việc tự chờ. Plan `ready` khi lane đầy vẫn là "làm được ngay"; giữ nhịp tự hoãn.
+4. **Không rõ thì không bao giờ là "làm được ngay".** Work `blocked` không ghi lý do phải ánh xạ thành `person`, giống port `Activity` của wake door không bao giờ đoán "rảnh" (`wake.rs`).
+5. **Actor ngoài hệ thống** (bên vận chuyển) vẫn là `actor`; `ref` trỏ tới bên ngoài, và tiến độ về qua cửa raise (OS-D8).
+
 ## 4. Quyết định đã chốt
 
 Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
@@ -180,6 +215,7 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 | OS-D6 | Authority, boundary và contract là yếu tố hạng nhất của toàn hệ thống, không riêng skeleton; topic tách sang discussion riêng `docs/discussions/component-authority/DISCUSSION.md`, bắt đầu bằng điều tra `p-7nja6ilwkr`. Skeleton phụ thuộc kết quả đó; các thành phần của skeleton tuân sổ authority như mọi thành phần khác. Nêu round 12, sửa phạm vi round 13, chủ dự án chọn A round 14 ("chọn A, mở discussion riêng đi em"). | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
 | OS-D7 | Giữ nhịp lớn lên từ wake door (`packages/supervision/rust/src/wake.rs`) trong thành phần Supervision, không lập thành phần mới. Authority duy nhất: ai làm tiếp và khi nào, trong cap. Trong Supervision: watcher cảm nhận (phát hiện, ghi event), giữ nhịp quyết định (đọc event + facet, ép cap, start/wake, đóng event vô ích, raise "cần phán đoán"), supervisor LLM diễn giải khi được gọi. T1 (`p-radq263tbx`) là lát đầu tiên. `fgos-runner --watch` không là nhịp thứ hai; nó retire ở S7 theo plan `261118-1341-s6a-execution-tier-rust`, và không gì mới được xây trên nó. Đề xuất round 15, chủ dự án đồng ý round 16 ("đồng ý lớn lên từ wake door"). | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
 | OS-D8 | Lối vào signal ngoài: chốt hình dạng cửa, chưa chọn nguồn; mỗi nguồn (GitHub, Multica/UI, business workflow…) là một adapter làm sau. Hình dạng: (a) **một cửa raise duy nhất**, cửa watcher đang dùng (`packages/supervision/rust/src/queue.rs`): signal ghi thành event trong Event Store trước, rồi mới wake; (b) **wake mang lý do** `--trigger <kind> --ref <id>` (port 3 của plan Multica; hôm nay gán cứng `"manual"`, `apps/fgos/src/wiring/supervision.rs:1872`); (c) **gateway có một route webhook có ký** chỉ gọi cửa raise; `POST /v1/runner/tick` (đi vòng cửa `fgos run`) không được là lối vào thứ hai. Đề xuất round 16, chủ dự án chốt round 17 ("Chưa cần nguồn cụ thể: chỉ chốt hình dạng cửa raise và wake, nguồn đầu tiên để sau"). | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
+| OS-D9 | Giữ nhịp chỉ đọc hai facet lập lịch chung: `waitingOn` (không có = làm được ngay; có = chờ `actor` / `time` / `event` / `person`, kèm `ref`) và `outcome` (không có = việc còn mở; có = đã đóng, kèm kết cục `done` / `withdrawn` / `wontfix` / `cancelled`). Mỗi domain tự ánh xạ trạng thái riêng sang hai facet; giữ nhịp không biết trạng thái của domain. `priority` không phải facet: domain và Miu quyết, giữ nhịp chỉ đọc. Thay phác thảo ba facet cũ (`actionable` = chưa có `outcome` và không có `waitingOn`); `finished` đổi tên thành `outcome` vì dễ hiểu nhầm. Đề xuất round 17, đổi tên round 18, chủ dự án đồng ý round 19. | 2026-11-21 | Chủ dự án, trực tiếp trong session shaper |
 
 ## 5. Q&A log
 
@@ -201,10 +237,12 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-21 17:30 round 15: Chủ dự án báo đã kêu mở shaper mới và hỏi "ở đây thì sao". Miu báo qua mailbox: row `p-esa3lau6kd` (0b6a402ad), `head:shaper-component-authority` đã start. Scout `wake.rs`, `portfolio.rs`, T1, `fgos-runner --watch`; đề xuất chỗ đặt giữ nhịp ở §3 4g.
 - 2026-11-21 17:36 round 16: Chủ dự án: "đồng ý lớn lên từ wake door." Mint OS-D7. Scout plan `261118-1341-s6a-execution-tier-rust`: `fgos-runner` và Work loop thuộc S7. Cập nhật §6, §7.
 - 2026-11-21 17:44 round 17: Chủ dự án: "Chưa cần nguồn cụ thể: chỉ chốt hình dạng cửa raise và wake, nguồn đầu tiên để sau". Mint OS-D8. Ghi mặc định tạm về id idempotent và payload không tin cậy vào §3 row 9.
+- 2026-11-21 18:22 round 18: Chủ dự án: "ủa sao finished lại là chưa xong." Shaper nhận cách viết gây nhầm (giá trị "không" của `finished` được viết là "chưa xong"); đề xuất đổi tên `finished` thành `outcome`.
+- 2026-11-21 18:25 round 19: Chủ dự án: "đồng ý, có thể nào nhìn xa thêm 1 bước để thử viễn cảnh domain sẽ map như thế nào không". Mint OS-D9. Thử ánh xạ ở §3 4h, tìm được năm chỗ vướng.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Đây là hình dạng hiện tại cho người đọc lạ. Phần đã chốt dựa trên SR-D6 tới SR-D10 và OS-D3 tới OS-D8; phần ghi "còn mở" đang bàn ở §3.
+Đây là hình dạng hiện tại cho người đọc lạ. Phần đã chốt dựa trên SR-D6 tới SR-D10 và OS-D3 tới OS-D9; phần ghi "còn mở" đang bàn ở §3.
 
 ```mermaid
 flowchart TB
@@ -255,7 +293,7 @@ flowchart TB
 
 **Người chơi.** Lead và worker lái trong khung và làm ra giá trị thật; năng lực quan trọng là suy luận, hiểu domain, thích nghi, báo cáo trung thực và báo friction khi khung sai. Quyết định và kết quả của họ quay lại hệ thống dưới dạng event qua cùng cửa raise, nên giữ nhịp luôn nhìn thấy.
 
-**Facet lập lịch (còn mở, §3 row 6).** Nhạc trưởng chỉ đọc ba facet chung: `actionable`, `waitingOn` (`{kind: actor | time | event | person, ref}`), `finished`. Domain pack ánh xạ trạng thái riêng của nó (plan status, work status, workflow gate, question open) vào ba facet này. Hôm nay chưa có facet chung.
+**Facet lập lịch (OS-D9).** Giữ nhịp chỉ đọc hai facet chung: `waitingOn` (không có = làm được ngay; có = `{kind: actor | time | event | person, ref}`) và `outcome` (không có = còn mở; có = kết cục). Domain pack ánh xạ trạng thái riêng của nó (plan status, work status, workflow gate, question state, trạng thái business) vào hai facet; không rõ thì không bao giờ là "làm được ngay". Năng lực (lane, `maxLeads`) là cap của giữ nhịp, không phải facet. Còn mở (§3 4h): gợi ý `needs` để giữ nhịp biết gọi ai, và hạn `until` cho việc chờ có hạn. Hôm nay chưa có facet chung.
 
 **Primitive và khoảng trống.** Start, rotate, cap đã có chủ. Còn thiếu sleep ("ngủ chờ X"), timer theo actor ("đánh thức X lúc T"), và một contract handoff duy nhất thay cho ba đường hiện có (§3 4a).
 
