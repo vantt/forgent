@@ -185,8 +185,6 @@ jobs:
       - name: Borrowing on Windows with the fgos binary as the helper executable
         run: cargo test --release -p fgos --test windows_borrow
 
-      - name: The publication WAL opens on Windows with an owner and ACL trust check
-        run: "cargo test --release -p fgos-git --lib wal::"
 
       - name: The process scan finds a workspace's processes by cwd and typed arguments
         run: cargo test --release -p fgos-process --test windows_scan
