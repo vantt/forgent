@@ -16,6 +16,8 @@ Q1 (`q-t6xfzdl3eu`) was cancelled: its premise (a missing `stage-fsm.mjs`) is st
 
 This revises the earlier reading: the hardcoded `planning`/`discovery`/`executing` branches in `operation-choice.mjs` belong to the older Work-driver path (the lifecycle part of `feature.yaml`, kept until the cutover by design, decisions N12 and N16), not to the guide tier. The recommendation to migrate that logic before adding bugfix is withdrawn. A bugfix workflow belongs in the guide tier: a second guide with its own milestones and activities, each naming a pattern, with bug-specific knowledge in the coding domain pack. Open: whether the older lifecycle part also needs a bugfix variant.
 
+2026-11-21 11:10, owner confirmed: bugfix goes into the guide tier only, because Work is too rigid and lacks supporting frameworks, which is the reason it is delayed. Minted D1 and D2. Next: shape the bugfix guide itself (milestones, activities, patterns).
+
 ## 2. Mục tiêu & đề bài
 
 Today a coding Work item always walks one workflow, `coding/feature` (discovery, exploring, planning, executing, and so on). `resolveWorkflow(domain, kind)` already exists in `src/state/domain-registry.mjs` and the registry already has `defaultWorkflow: feature` and an empty `workflowFor: {}`, but the item-walking code does not consult it per item kind. The owner wants a domain to carry more than one workflow, starting with a shorter `bugfix` workflow for coding, with domain-specific logic living in the coding domain pack and none of it in the shared supervisor layer. The outcome of this discussion is a settled slice that a planner can plan: which code paths are wired, what the bugfix workflow's stages are, and how the domain pack plugs in.
@@ -47,6 +49,7 @@ Today a coding Work item always walks one workflow, `coding/feature` (discovery,
 | Real gap (older path only): coding stage names hardcoded in the shared layer | verified | `src/runner/operation-choice.mjs:794,932,952` branch on the literals `planning`, `discovery`, `executing` (review loop, secondary operations, needs-research); `src/runner/loop.mjs:1353` and `prompt-templates.mjs:36` also name `discovery`. A stage with a different name falls to the generic fallback, which only picks the primary operation, so a bugfix with its own stage names would run but lose the review loop and `fix-verify-red` smartness. This is the coding logic in the shared layer that the owner wants gone. |
 | Two tiers: pattern (one piece of work) and workflow (a chain of work) | owner-stated 2026-11-21 11:00 | matches D-ADR0073 loops/patterns and the guide tier |
 | The guide tier already runs for `coding/feature`, and `feature.yaml`'s guide part already names a pattern per activity | verified | `src/workflow/*`, `feature.yaml:126-` (its own comment "nothing reads this part until the coding cutover" looks stale; confirm) |
+| Whether the older lifecycle part also needs a bugfix variant | settled by D2: no | owner 2026-11-21 11:10 |
 | Where is "a team under a lead per task type" settled? Today `lead` leads one plan | not found yet | `core/agents/lead.yaml`; `docs/platform/workflow/spec.md` §7.8 has a conductor case driven by `fgos-cook`; ask the owner for the earlier discussion if the scan cannot find it |
 | `feature.yaml` carries no `seats:` yet; spec §10.2 describes a guide part to be added at cutover | open | `grep seats` gives 0 in `domains/coding/workflows/feature.yaml` |
 | Title says "domain task types"; is more than bugfix in scope (other kinds, other domains)? | open | the item only covers coding bugfix |
@@ -55,7 +58,8 @@ Today a coding Work item always walks one workflow, `coding/feature` (discovery,
 
 | ID | Decision | Date |
 |---|---|---|
-| (none yet) | | |
+| D1 | Two tiers: the pattern is the low tier (the agent picks the reliable, high-quality way to do one piece of work); the workflow is the high tier (a chain of pieces of work toward a larger goal). The workflow is a broad frame distilled from core or organisation experience, not a narrow constraint; the persona gives the lead its qualities, skills give it intelligence, nothing is hardcoded. This was already settled by D-ADR0070, 0072, 0073 and 0076; this discussion reconfirms it and builds on it. | 2026-11-21 (owner, three rounds: 10:40, 11:00, 11:10) |
+| D2 | A bugfix is carried by the guide tier only: a second guide in the coding domain pack, with its own milestones and activities that each name a pattern. The Work lifecycle gets no bugfix variant, because Work is too rigid and has no supporting framework, which is why Work is deliberately delayed (D-ADR0076). No new mechanism is added. | 2026-11-21 (owner 11:10, "đúng rồi", after the 11:00 reframing) |
 
 ## 5. Q&A log
 
@@ -64,6 +68,7 @@ Today a coding Work item always walks one workflow, `coding/feature` (discovery,
 - 2026-11-21 10:45 (owner): the vision to be confirmed and the stability concern, summarised in §1. Shaper scanned `docs/platform/workflow/spec.md`, `domainization.md`, `seat-binding/spec.md`, `core/agents/lead.yaml` and the git log for `resolveWorkflow` and `workflowFor`; result in §3. Q1 cancelled as stale.
 - 2026-11-21 10:55 (shaper): read the callers of the kind-aware accessors and the hardcoded stage literals; result in §3 (rows "Per-kind wiring" to "Real gap").
 - 2026-11-21 11:00 (owner): two-tier model and that `fgos-cook` already drives `ak:plan` plans through a workflow. Shaper checked the guide tier in code; hardcoded-stage gap re-read as older-path only (§1).
+- 2026-11-21 11:10 (owner): confirmed guide tier only; Work is delayed because it is too rigid and has no supporting framework. D1 and D2 minted.
 
 ## 6. Thiết kế đã chốt {#design}
 
