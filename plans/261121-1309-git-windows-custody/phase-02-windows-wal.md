@@ -7,7 +7,10 @@
   existing Win32 handle idioms; `windows-sys` is already a dependency of the workspace.
 
 ## Files it may write
-packages/git/rust/src/wal.rs, packages/git/rust/src/wal/** (only if wal.rs is split by an existing boundary)
+packages/git/rust/src/wal.rs, packages/git/rust/src/wal/** (only if wal.rs is split by an existing boundary),
+packages/git/rust/Cargo.toml (a Windows-target `windows-sys` dependency, same version and workspace spelling as
+packages/holder-lock/rust/Cargo.toml), the root Cargo.toml only to add a windows-sys feature the ACL read needs
+(e.g. `Win32_Security_Authorization`), Cargo.lock
 
 ## Steps
 1. Windows arm of `Directory::open_trusted`: open the directory with `FILE_FLAG_BACKUP_SEMANTICS` and
