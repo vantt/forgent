@@ -37,11 +37,15 @@ pub fn verify(
     )
 }
 
-#[cfg(unix)]
 fn borrowed(command: &str, cwd: &Path, timeout: Duration, custody: &Handle) -> Ran {
     use fgos_holder_lock::{run_borrowed_io, BorrowError, BorrowIo, BorrowSpec, BorrowStdio};
+    // The platform shell the engine's bounded shell uses for the same command.
+    #[cfg(windows)]
+    let argv = vec!["cmd".into(), "/C".into(), command.into()];
+    #[cfg(not(windows))]
+    let argv = vec!["sh".into(), "-c".into(), command.into()];
     let spec = BorrowSpec {
-        argv: vec!["sh".into(), "-c".into(), command.into()],
+        argv,
         cwd: Some(cwd.to_path_buf()),
         env: Default::default(),
         clear_env: false,
@@ -98,16 +102,5 @@ fn borrowed(command: &str, cwd: &Path, timeout: Duration, custody: &Handle) -> R
             timed_out: false,
             output: other.to_string(),
         },
-    }
-}
-
-/// A writing run is refused on Windows before it holds custody, so no verify borrows one there.
-#[cfg(not(unix))]
-fn borrowed(_command: &str, _cwd: &Path, _timeout: Duration, _custody: &Handle) -> Ran {
-    Ran {
-        passed: false,
-        status: None,
-        timed_out: false,
-        output: "windows-cwd-lease-holder-missing: a verify under custody runs on the Node route on Windows".into(),
     }
 }

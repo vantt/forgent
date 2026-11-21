@@ -6,7 +6,7 @@
 //! (`Handle::lend`): the supervisor holds them for the attempt's life, and the controller's lent handles only close,
 //! never waiting on the child. Where a lock does not pass to a child with its handle (Windows), the controller
 //! releases its attempt copy right after the spawn and the supervisor takes the attempt lock itself; the cwd lease
-//! stays here, and until the binding a thread of the controller serves the lease's request channel the envelope
+//! stays here, and for the attempt's life a thread of the controller serves the lease's request channel the envelope
 //! names (`cwdLeaseOwner`), on which the supervisor declares its domain ([`serving_lease_owner`]).
 
 use std::path::{Path, PathBuf};
@@ -39,6 +39,21 @@ fn launch_failed(message: String) -> RunnerConfigError {
 /// the caller's cwd lease the attempt runs under, lent when the locks were taken: like the attempt's own locks, it
 /// records the supervisor it went to right after the spawn.
 pub fn start_and_bind(
+    attempt: &mut Attempt,
+    envelope: &Value,
+    extra_env: &Map<String, Value>,
+    custody: Option<&fgos_holder_lock::Handle>,
+) -> Result<(Binding, StartedSupervisor), RunnerConfigError> {
+    serving_attempt_lease(
+        attempt,
+        envelope["cwdLeaseOwner"].as_str(),
+        custody,
+        |attempt| hand_over(attempt, envelope, extra_env, custody),
+    )?
+}
+
+/// Hand the attempt to the supervisor and wait for its binding; the lease channel is served by the caller.
+fn hand_over(
     attempt: &mut Attempt,
     envelope: &Value,
     extra_env: &Map<String, Value>,
@@ -108,33 +123,20 @@ pub fn start_and_bind(
         };
         #[cfg(not(unix))]
         let (started, bound) = {
-            // The lease stays in this process (a lock is held only by the process that took it): until the binding
-            // is known, the channel the envelope names answers the supervisor's declaration of its domain on it.
-            let (attempt_lock, own_lease) = match attempt.locks.as_mut() {
-                Some(locks) => (Some(&mut locks.attempt), locks.cwd_lease.as_ref()),
-                None => (None, None),
-            };
-            let step_env = &attempt.step_env;
-            let handed_over = &mut attempt.handed_over;
-            serving_lease_owner(
-                envelope["cwdLeaseOwner"].as_str(),
-                own_lease.or(custody),
-                || {
-                    let mut started = start_supervisor(envelope, &[], step_env, extra_env)
-                        .map_err(|e| {
-                            launch_failed(format!(
-                                "executeAssignment: the supervisor did not start ({e})"
-                            ))
-                        })?;
-                    if let Some(lock) = attempt_lock {
-                        *lock = None;
-                    }
-                    *handed_over = true;
-                    let bound =
-                        wait_for_binding(&run_dir, &mut started.child, binding_wait_ms(envelope));
-                    Ok::<_, RunnerConfigError>((started, bound))
-                },
-            )??
+            // The lease stays in this process (a lock is held only by the process that took it); the caller serves
+            // the channel the envelope names, on which the supervisor declares its domain.
+            let mut started = start_supervisor(envelope, &[], &attempt.step_env, extra_env)
+                .map_err(|e| {
+                    launch_failed(format!(
+                        "executeAssignment: the supervisor did not start ({e})"
+                    ))
+                })?;
+            if let Some(locks) = attempt.locks.as_mut() {
+                locks.attempt = None;
+            }
+            attempt.handed_over = true;
+            let bound = wait_for_binding(&run_dir, &mut started.child, binding_wait_ms(envelope));
+            (started, bound)
         };
         if bound == Binding::Bound {
             register(&run_dir);
@@ -152,6 +154,24 @@ pub fn start_and_bind(
 /// writes (the envelope's `cwdLeaseOwner`): a directory of that attempt.
 pub fn cwd_lease_owner_dir(run_dir: &Path) -> PathBuf {
     run_dir.join("cwd-lease-owner")
+}
+
+/// Run `body` on the attempt while its lease channel is served: the lease the attempt holds itself (taken out of
+/// its locks for the time, and put back) or else the caller's custody.
+fn serving_attempt_lease<T>(
+    attempt: &mut Attempt,
+    owner: Option<&str>,
+    custody: Option<&fgos_holder_lock::Handle>,
+    body: impl FnOnce(&mut Attempt) -> T,
+) -> Result<T, RunnerConfigError> {
+    let own = owner
+        .and(attempt.locks.as_mut())
+        .and_then(|locks| locks.cwd_lease.take());
+    let served = serving_lease_owner(owner, own.as_ref().or(custody), || body(attempt));
+    if let (Some(lease), Some(locks)) = (own, attempt.locks.as_mut()) {
+        locks.cwd_lease = Some(lease);
+    }
+    served
 }
 
 /// Run `body` while a thread of this process serves the request channel of `lease` at `owner`
@@ -237,9 +257,14 @@ pub fn await_binding(
 ) -> Result<InterpretedRunResult, RunnerConfigError> {
     let run_dir = absolute(&attempt.run_dir);
     let run_id = attempt.run_id.clone();
-    let (bound, mut started) =
-        start_and_bind(attempt, input.envelope, input.extra_env, input.custody)?;
-    await_settled(attempt, &run_dir, &run_id, bound, &mut started.child, input)
+    let owner = input.envelope["cwdLeaseOwner"].as_str();
+    // The channel answers until the attempt is settled, so a supervisor that declares again (adopted, restarted)
+    // is answered too.
+    serving_attempt_lease(attempt, owner, input.custody, |attempt| {
+        let (bound, mut started) =
+            hand_over(attempt, input.envelope, input.extra_env, input.custody)?;
+        await_settled(attempt, &run_dir, &run_id, bound, &mut started.child, input)
+    })?
 }
 
 /// The second half of [`await_binding`]: after the binding, read progress and wait for the settled result.

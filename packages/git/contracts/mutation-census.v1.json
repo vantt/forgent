@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "56632a2c94962b5f743a93120ff63de02ffd98fbed4b63eefdc0407aef203a22",
+  "payloadDigest": "cb2f0bf32c3597a0ade9288daa8477d7edb51494028f587045033d77e092351a",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -179,7 +179,7 @@
     "apps/fgos/src/wiring/unit_run_host/tests/run_unit.rs": "6ae520d5bff45b261383fedb310edc5a1aeaff5145d0a1ffb5b0580c3ff3089a",
     "apps/fgos/src/wiring/unit_run_host/tests/session_attempt.rs": "4180d325caa7cac8737882398df83da89c713a9b473f6105f098a55163318676",
     "apps/fgos/src/wiring/unit_run_host/tests/terminal.rs": "a96c3fc26fad0dcebe2d752cbf05ebe8279c9201f1e3f6c17c863c23da886b12",
-    "apps/fgos/src/wiring/unit_run_host/verify.rs": "c71e5861b3dfae722547d57ffa719ef941c42ec4d5454bab2cfebe00940f09ed",
+    "apps/fgos/src/wiring/unit_run_host/verify.rs": "4270b6fcda346d120d6b7263b9a82f584be67c52838a05ff24c557d0cb94355d",
     "apps/fgos/src/wiring/wire_agents.rs": "a434308907a3e7d87c880ebf95a957e1342b77e83ebe1ee0272002335b7a248c",
     "apps/fgos/src/wiring/worktree.rs": "d783eec09a03bcc50b77659f23bf860137daeef4afd699b7781bcb119676545a",
     "apps/fgos/tests/attention_definitions.rs": "81db902eb0d8bf5515f7574bcf4b13f61db680dc0d569f4db55b4271e4df9a54",
@@ -195,7 +195,7 @@
     "apps/fgos/tests/session_write_publish.rs": "17200b15b0a2a9b1862a24c2eeb28a45502c5984ed5ad0a710cace2e4fa8ff5d",
     "apps/fgos/tests/supervision_verbs.rs": "80a1e044ac7fd9b6d5bb1b89c91e319debb1241fa76f859c81dc5d57291193a1",
     "apps/fgos/tests/windows_borrow.rs": "deeb68f3b777b64c076bfd317baac95b11cff6c0bceede7eb3774a3d6d25f7bf",
-    "apps/fgos/tests/windows_cwd_lease_owner.rs": "788c845e215e7afbc1b462b34b486155c024b0983d340c933d0f43ddbd1bc9ea",
+    "apps/fgos/tests/windows_cwd_lease_owner.rs": "c3e833710c3dfa42f98addbca06e1dd7935470e73880a5ce7bb9622a9991f26a",
     "apps/fgos/tests/windows_doctor_lock_rows.rs": "943ba00e7be5382a532ad47bfa38f6fef888428910e5f70ee18518edeb1eeb63",
     "apps/fgos/tests/windows_lock_hold_route.rs": "9cedd72a21ef501d00d37ce8fe1f52bb33cbfa799774470534c96dc59a4959aa",
     "apps/fgos/tests/windows_predecessor_stress.rs": "1b5268d306deffe0946748a441a1b107427469d310348d6866efd9237b95ada8",
@@ -517,7 +517,7 @@
     "packages/execution/engine/src/assignment_runner/attempt.rs": "8ec03c540a0532972c610996ac18df6a9fcae8af8c661701c24eadc2d75d857f",
     "packages/execution/engine/src/assignment_runner/execute.rs": "997dcd4b84d98a5165b72cd94a89fa4251aba179ede8180e8047856d23bd6740",
     "packages/execution/engine/src/assignment_runner/inputs.rs": "061b8c69fdb951cd9e5ee45f5feb1268eb2803e3fcec49381339866fd1a0f60c",
-    "packages/execution/engine/src/assignment_runner/launch.rs": "2e9af2d78a26e0c88a8802b82329a912bda4e4c57d29b27b9c3151ce28cef0ac",
+    "packages/execution/engine/src/assignment_runner/launch.rs": "31fe5f06634f2e3ab3ec2f1a4dc84df57c2e40c08217debaf612436018108beb",
     "packages/execution/engine/src/assignment_runner/lease.rs": "fd9f4fb90224da3db91861f0d9c8e8214e0ee792b960c3ce8937afd32366d6f1",
     "packages/execution/engine/src/assignment_runner/legality.rs": "728d5e32cd6d5b60a14ce48a1037270c08886639861172a386afb11445e072d6",
     "packages/execution/engine/src/assignment_runner/mod.rs": "6d6aa744ffca8a3831cde8087b28b6cf5ddae145f3457107b763e62db6151242",
@@ -3681,6 +3681,14 @@
       "path": "packages/process/rust/src/mapped.rs",
       "line": 239,
       "spawn": "Command::new",
+      "binary": "cmd",
+      "class": "argv-runner",
+      "resolvedAt": "apps/fgos/src/wiring/unit_run_host/verify.rs:47"
+    },
+    {
+      "path": "packages/process/rust/src/mapped.rs",
+      "line": 239,
+      "spawn": "Command::new",
       "binary": "codex",
       "class": "argv-runner",
       "resolvedAt": "apps/fgos/src/wiring/mailbox_verbs.rs:614"
@@ -3700,14 +3708,6 @@
       "binary": "release",
       "class": "argv-runner",
       "resolvedAt": "apps/fgos/src/wiring/gateway_control.rs:546"
-    },
-    {
-      "path": "packages/process/rust/src/mapped.rs",
-      "line": 239,
-      "spawn": "Command::new",
-      "binary": "sh",
-      "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/unit_run_host/verify.rs:43"
     },
     {
       "path": "packages/process/rust/src/mapped.rs",
