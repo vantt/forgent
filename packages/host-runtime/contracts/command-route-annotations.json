@@ -89,6 +89,10 @@
     "operation_id": "worktree.resync",
     "owner_path": "packages/execution/checkout"
   },
+  "run": {
+    "operation_id": "run.unit",
+    "owner_path": "apps/fgos"
+  },
   "session": {
     "subcommands": true
   },
