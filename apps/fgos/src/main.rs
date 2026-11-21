@@ -332,8 +332,8 @@ fn main() {
     // doors they have.
     #[cfg(unix)]
     if wiring::supervision::is_confined() {
-        let head_socket = std::env::var_os(wiring::supervision::HEAD_SOCKET_ENV)
-            .is_some_and(|v| !v.is_empty());
+        let head_socket =
+            std::env::var_os(wiring::supervision::HEAD_SOCKET_ENV).is_some_and(|v| !v.is_empty());
         if let Some(confined) = routing::confined_head_call(cli_args, head_socket) {
             std::process::exit(wiring::supervision::send_confined(confined));
         }
