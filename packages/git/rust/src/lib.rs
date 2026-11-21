@@ -645,15 +645,6 @@ pub fn contract_versions() -> serde_json::Value {
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-/// Refusal the Node addon's lock-taking constructors still call; the Git ports themselves take custody on Windows.
-/// Removed with the Node writers.
-pub fn require_lock_scope_platform() -> Result<()> {
-    if cfg!(target_os = "windows") {
-        return Err(failure("git-lockscope-unavailable-windows"));
-    }
-    Ok(())
-}
-
 mod scoped_commit;
 pub use scoped_commit::{CommitBaseline, CommitRequest, CommitResult};
 /// Literal Git path, independent of the declaration grammar. JSON strings

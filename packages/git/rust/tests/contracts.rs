@@ -106,12 +106,3 @@ fn every_wal_failure_is_named_by_one_kebab_cause_and_code_in_every_port() {
     let io = fgos_git::OperationError::from(io());
     assert_eq!(io.detail.unwrap()["diagnostic"], "disk");
 }
-
-#[cfg(windows)]
-#[test]
-fn lock_taking_git_refuses_windows_by_name() {
-    assert_eq!(
-        fgos_git::require_lock_scope_platform().unwrap_err().cause,
-        "git-lockscope-unavailable-windows"
-    );
-}

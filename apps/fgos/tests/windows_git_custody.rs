@@ -561,3 +561,65 @@ fn discarding_refuses_an_ignored_directory_that_holds_a_nested_repository_and_de
     );
     f.assert_custody_held();
 }
+
+#[test]
+fn a_missing_checkout_is_pruned_only_when_its_create_is_owned_and_no_unknown_residue_remains() {
+    let _serial = serial();
+    let f = Fixture::new("prune-missing");
+    let owned = f.temp.join("owned");
+    f.create_worker(&owned);
+    let admin = f.repo.common_dir().join("worktrees/owned");
+    fs::remove_dir_all(&owned).unwrap();
+    fs::write(admin.join("unknown"), "keep").unwrap();
+    let refused = f
+        .driver
+        .prune_missing_worktree(&f.repo, f.held(), &owned, "fixture", "prune")
+        .unwrap_err();
+    assert!(refused.cause.contains("residue-uncertain"), "{refused:?}");
+    assert!(admin.join("HEAD").exists());
+    fs::remove_file(admin.join("unknown")).unwrap();
+    f.driver
+        .prune_missing_worktree(&f.repo, f.held(), &owned, "fixture", "prune")
+        .unwrap();
+    assert!(!admin.exists());
+    let unowned = f.temp.join("unowned");
+    git(
+        &f.main,
+        &["worktree", "add", "--detach", unowned.to_str().unwrap()],
+    );
+    fs::remove_dir_all(&unowned).unwrap();
+    let refused = f
+        .driver
+        .prune_missing_worktree(&f.repo, f.held(), &unowned, "fixture", "unowned-prune")
+        .unwrap_err();
+    assert!(refused.cause.contains("ownership-unproven"), "{refused:?}");
+    assert!(f.repo.common_dir().join("worktrees/unowned/HEAD").exists());
+}
+
+#[test]
+fn a_missing_owned_detached_checkout_with_unique_history_keeps_its_registration() {
+    let _serial = serial();
+    let f = Fixture::new("prune-history");
+    let owned = f.temp.join("owned");
+    f.create_worker(&owned);
+    fs::write(owned.join("valuable"), "keep unique history").unwrap();
+    git(&owned, &["add", "valuable"]);
+    git(&owned, &["commit", "-qm", "unique detached history"]);
+    let tip = git(&owned, &["rev-parse", "HEAD"]);
+    fs::remove_dir_all(&owned).unwrap();
+    let refused = f
+        .driver
+        .prune_missing_worktree(&f.repo, f.held(), &owned, "fixture", "unreachable-prune")
+        .unwrap_err();
+    assert!(refused.cause.contains("tip-unreachable"), "{refused:?}");
+    assert_eq!(
+        fs::read_to_string(f.repo.common_dir().join("worktrees/owned/HEAD"))
+            .unwrap()
+            .trim(),
+        tip
+    );
+    assert_eq!(
+        git(&f.main, &["show", &format!("{tip}:valuable")]),
+        "keep unique history"
+    );
+}

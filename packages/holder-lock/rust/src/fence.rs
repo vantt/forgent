@@ -591,7 +591,9 @@ fn resolve_path(
             continue;
         }
         let value = if key == "cwdDevIno" {
-            params.get("cwd").and_then(|cwd| cwd_dev_ino(cwd))
+            params
+                .get("cwd")
+                .and_then(|cwd| cwd_dev_ino(std::path::Path::new(cwd)))
         } else {
             params.get(key).filter(|value| !value.is_empty()).cloned()
         };
@@ -627,13 +629,14 @@ fn normalise(path: &Path) -> PathBuf {
 }
 
 /// `<dev>-<ino>-<birthtimeNs>` of the directory `cwd` names after realpath: one key for every spelling of the
-/// same directory. A directory that does not exist has no key.
+/// same directory. A directory that does not exist has no key (the registry's `<cwdDevIno>`).
+///
+/// The one door for the dispatch-cwd lock key: the controller, the Git custody lease and the lock registry all
+/// take it from here. Where the filesystem reports no creation time the Unix key falls back to the change time,
+/// as Node's `fs.statSync` does, so a Node and a Rust controller contend for one lock file.
 #[cfg(unix)]
-fn cwd_dev_ino(cwd: &str) -> Option<String> {
+pub fn cwd_dev_ino(cwd: &std::path::Path) -> Option<String> {
     use std::os::unix::fs::MetadataExt;
-    if cwd.is_empty() {
-        return None;
-    }
     let meta = std::fs::metadata(std::fs::canonicalize(cwd).ok()?).ok()?;
     let birth = meta
         .created()
@@ -647,9 +650,36 @@ fn cwd_dev_ino(cwd: &str) -> Option<String> {
     Some(format!("{}-{}-{birth}", meta.dev(), meta.ino()))
 }
 
-#[cfg(not(unix))]
-fn cwd_dev_ino(_cwd: &str) -> Option<String> {
-    None
+/// On Windows the same three facts Node's `fs.statSync` reports: the volume serial number, the file index and the
+/// creation time in nanoseconds since the epoch, so a Node and a Rust controller contend for one lock file.
+#[cfg(windows)]
+pub fn cwd_dev_ino(cwd: &std::path::Path) -> Option<String> {
+    use std::os::windows::fs::OpenOptionsExt;
+    use std::os::windows::io::AsRawHandle;
+    use windows_sys::Win32::Storage::FileSystem::{
+        GetFileInformationByHandle, BY_HANDLE_FILE_INFORMATION, FILE_FLAG_BACKUP_SEMANTICS,
+    };
+    let dir = std::fs::canonicalize(cwd).ok()?;
+    // A directory opens only with backup semantics; it is opened for its attributes alone.
+    let handle = std::fs::OpenOptions::new()
+        .access_mode(0)
+        .custom_flags(FILE_FLAG_BACKUP_SEMANTICS)
+        .open(&dir)
+        .ok()?;
+    // SAFETY: a zeroed out-struct filled for a handle this function owns.
+    let info = unsafe {
+        let mut info: BY_HANDLE_FILE_INFORMATION = std::mem::zeroed();
+        if GetFileInformationByHandle(handle.as_raw_handle() as _, &mut info) == 0 {
+            return None;
+        }
+        info
+    };
+    let index = (u64::from(info.nFileIndexHigh) << 32) | u64::from(info.nFileIndexLow);
+    let created = (u64::from(info.ftCreationTime.dwHighDateTime) << 32)
+        | u64::from(info.ftCreationTime.dwLowDateTime);
+    // FILETIME counts 100 ns from 1601; Node's `birthtimeNs` counts ns from 1970.
+    let birth = (i128::from(created) - 116_444_736_000_000_000) * 100;
+    Some(format!("{}-{index}-{birth}", info.dwVolumeSerialNumber))
 }
 
 #[cfg(all(test, unix))]
@@ -869,7 +899,7 @@ mod tests {
             .params
             .insert("cwd".into(), fixture.dir.to_string_lossy().into_owned());
         let result = fence(&request).unwrap();
-        let key = cwd_dev_ino(&fixture.dir.to_string_lossy()).unwrap();
+        let key = cwd_dev_ino(&fixture.dir).unwrap();
         assert!(result
             .path
             .ends_with(&format!("locks/dispatch-cwd--{key}.lock")));
