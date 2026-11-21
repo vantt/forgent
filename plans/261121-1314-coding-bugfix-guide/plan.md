@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "A second coding workflow guide for bugfix"
-status: ready
+status: running
 priority: P1
 blockedBy: []
 footprint:
