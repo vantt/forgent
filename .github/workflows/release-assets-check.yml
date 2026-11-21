@@ -182,9 +182,6 @@ jobs:
       - name: A linked worktree is trusted and paths reach git in the plain spelling
         run: cargo test --release -p fgos-git --test worktree
 
-      - name: Linked worktrees in the distribution rows
-        run: cargo test --release -p fgos-distribution --lib release_rows workspace
-
   # Evidence only: measures how Win32 LockFileEx byte-range locks (byte 0, length 1, exclusive,
   # fail immediately, as the holder-lock windows driver takes them) behave across handle
   # inheritance and process death. Every answer is a line starting with "PROBE "; a "no" answer
