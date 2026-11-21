@@ -14,6 +14,11 @@
     },
     "rotation.json": { "writer": "rotation executor", "readFields": { "gen": "integer, the successor's generation", "id": "the rotation id" } },
     "answered.json": { "writer": "markSuccessorAnswered", "readFields": { "gen": "integer" } },
+    "stop-trace.jsonl": {
+      "writer": "the host, when it handles the `session rotate` request every stop sends (requestRotation, src/session-rotation/rotate.mjs); the hook itself runs inside the head's sandbox, where the lineage folder is read-only",
+      "shape": { "at": "ISO-8601 UTC", "fraction": "number or null (nothing measured)", "source": "sidecar | transcript | null", "stale": "boolean", "decision": "the decide reason, e.g. below-soft, at-or-above-soft, background-work-running, no-measure", "reason": "none | soft | hard", "outcome": "below-threshold | started | rotation-in-progress | spawn-failed" },
+      "readerRule": "for the owner; one line per stop that reached the host, newest 500 kept once the file passes 256 KiB. A hook failure before the request (no .fgos, bad config, no socket, a refused request) reaches stderr only and leaves no line: a known gap"
+    },
     "context-sidecar.jsonl": {
       "writer": "a status-line wrapper, optional; none ships with fgOS",
       "shape": { "ts": "number of epoch milliseconds, or an RFC 3339 string (YYYY-MM-DDTHH:MM:SS[.fff] with Z or +HH:MM) or a YYYY-MM-DD date, read through the civil-time door", "session_id": "string", "context_window": { "context_window_size": "integer", "current_usage": "object of input_tokens, cache_creation_input_tokens, cache_read_input_tokens" } },

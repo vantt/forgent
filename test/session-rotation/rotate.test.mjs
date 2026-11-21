@@ -386,3 +386,28 @@ await import(${JSON.stringify(new URL(`file://${entry}`).href)});
   const events = fs.readFileSync(path.join(dir, 'incidents.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l).event);
   assert.deepEqual(events, ['no-live-head', 'rotation-failed']);
 });
+
+test('every stop request leaves one trace line with its measure and outcome; below threshold starts nothing', (t) => {
+  const { root, dir } = project(t);
+  const measure = (fraction, decision) => ({ fraction, source: 'transcript', stale: true, decision });
+  const never = { holds: () => assert.fail('a below-threshold stop takes no lock'), spawn: () => assert.fail('no executor') };
+  assert.deepEqual(requestRotation({ persona: 'planner', name: 'x', reason: 'none', projectRoot: root, measure: measure(0.33, 'below-soft') }, never), { started: false, reason: 'below-threshold' });
+  assert.deepEqual(requestRotation({ persona: 'planner', name: 'x', reason: 'soft', projectRoot: root, measure: measure(0.5, 'at-or-above-soft') }, { holds: () => true, spawn: never.spawn }), { started: false, reason: 'rotation-in-progress' });
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'none', projectRoot: root }, never), (err) => err.code === 'bad-reason', 'none needs a measure');
+  assert.throws(() => requestRotation({ persona: 'planner', name: 'x', reason: 'none', projectRoot: root, measure: { ...measure(2, 'x'), extra: 1 } }, never), (err) => err.code === 'bad-measure');
+  const lines = fs.readFileSync(path.join(dir, 'stop-trace.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  assert.deepEqual(lines.map(({ at, ...rest }) => rest), [
+    { fraction: 0.33, source: 'transcript', stale: true, decision: 'below-soft', reason: 'none', outcome: 'below-threshold' },
+    { fraction: 0.5, source: 'transcript', stale: true, decision: 'at-or-above-soft', reason: 'soft', outcome: 'rotation-in-progress' },
+  ]);
+});
+
+test('the stop trace keeps its newest lines once it passes its size bound', (t) => {
+  const { root, dir } = project(t);
+  const never = { holds: () => false, spawn: () => assert.fail('no executor') };
+  const big = 'd'.repeat(55);
+  for (let i = 0; i < 3500; i += 1) requestRotation({ persona: 'planner', name: 'x', reason: 'none', projectRoot: root, measure: { fraction: i, source: null, stale: false, decision: big } }, never);
+  const lines = fs.readFileSync(path.join(dir, 'stop-trace.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+  assert.ok(lines.length <= 3500 && lines.length >= 500, `kept ${lines.length}`);
+  assert.equal(lines.at(-1).fraction, 3499, 'the newest line is kept');
+});

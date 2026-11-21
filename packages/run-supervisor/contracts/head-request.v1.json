@@ -31,9 +31,9 @@
       "data": "the object startHeadSession returns ({already, role, key, ...})"
     },
     "session rotate": {
-      "args": { "persona": "string, required", "name": "string, required; with persona it must spell the envelope's own role (head:<persona>-<name>), otherwise role-mismatch: a head asks for its own lineage only", "reason": "soft | hard | manual, required", "stopFacts": "object, optional: sessionId, portfolio (at most 50 paths), delta, lastAssistantMessage, pendingQuestion (strings of at most 8000 characters); anything else is refused bad-stop-facts" },
+      "args": { "persona": "string, required", "name": "string, required; with persona it must spell the envelope's own role (head:<persona>-<name>), otherwise role-mismatch: a head asks for its own lineage only", "reason": "soft | hard | manual, required; `none` only together with `measure` (a stop that measured below soft: it is recorded and nothing is rotated)", "stopFacts": "object, optional: sessionId, portfolio (at most 50 paths), delta, lastAssistantMessage, pendingQuestion (strings of at most 8000 characters); anything else is refused bad-stop-facts", "measure": "object, optional: fraction (number or null), source (sidecar | transcript | null), stale (boolean), decision (the decision reason, at most 60 characters); anything else is refused bad-measure. Every stop of a head sends it, and the host appends one line with the request outcome to the lineage's stop-trace.jsonl (newest 500 lines kept once it passes 256 KiB)" },
       "does": "requestRotation (src/session-rotation/rotate.mjs), the one entry that asks for a rotation (`fgos session rotate` calls the same one): checks the request, writes it under the lineage folder and starts the executor `rotateHeadSession` as a detached process through the detach door, then returns at once; the executor outlives the verb timeout",
-      "data": "{started: true, pid} or {started: false, reason: rotation-in-progress | spawn-failed}",
+      "data": "{started: true, pid} or {started: false, reason: rotation-in-progress | spawn-failed | below-threshold}",
       "identity": "held"
     },
     "session restore role": {
