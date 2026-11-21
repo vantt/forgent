@@ -9,7 +9,7 @@
     "ok": { "v": 1, "protocol": 1, "op": "string", "result": "the op's result" },
     "error": { "v": 1, "protocol": 1, "op": "string", "error": { "code": "usage | host-version-mismatch | invalid-request", "message": "string" } },
     "exit": { "0": "answered (a run-unit error result is an answer)", "2": "usage", "3": "host-version-mismatch: --protocol is not 1, checked before the op", "65": "invalid-request: the payload is not a JSON object or misses a field" },
-    "peer": "run-unit and custody (with admit) ask the caller's case admission port over this process's stdout (requests) and stdin (answers), after the request line. The caller serves it with serveAdmissionPeer; pipes only."
+    "peer": "run-unit and custody (with admit) ask the caller's case admission port over this process's stdout (requests) and stdin (answers), after the request line. The caller serves it with serveAdmissionPeer; pipes only. End of stdin: the caller keeps stdin open until it read the answer, so a run-unit process whose stdin ends after the request line treats the caller as gone and settles nothing for it. On unix it exits at once (status 1, no answer, no exit handlers; the supervisor holds the lent attempt lock and cwd lease). On Windows the controller holds a writing attempt's cwd lease, so it does not exit: the unit run goes on to its end, its peer calls failing closed (peer-closed), and the process then ends normally."
   },
   "operations": {
     "run-unit": {

@@ -27,9 +27,13 @@
 //!   `{ requested }`.
 //!
 //! A `run-unit` process is the unit run's controller for its caller, which keeps stdin open until it read the
-//! answer. Once the request arrived, end of stdin means the caller is gone: the process ends at once, as the
-//! controller inside a dead Node caller did. Nothing is settled; the supervisor and its agent go on, and the next
-//! caller resumes the unit run or the Workflow's dead-reservation sweep decides it.
+//! answer. Once the request arrived, end of stdin means the caller is gone. Where the attempt's locks were lent to
+//! the supervisor (unix) the process ends at once, as the controller inside a dead Node caller did. On Windows the
+//! controller itself holds a writing attempt's cwd lease and serves it to the supervisor for the attempt's whole
+//! life, so ending would drop custody under a writing agent: there it ignores the end of stdin and runs the unit run
+//! to its end, its peer calls failing closed (`peer-closed`), and then exits normally. Either way nothing is
+//! settled for a caller that is gone; the next caller resumes the unit run or the Workflow's dead-reservation sweep
+//! decides it.
 
 use std::ffi::OsString;
 use std::io::{BufRead, BufReader, Read, Write};
@@ -84,18 +88,20 @@ pub fn main(args: &[String]) -> i32 {
 }
 
 /// The exit of a `run-unit` controller whose caller went away: no answer can reach anyone, nothing is settled.
-/// It ends the process at once, without the exit handlers (a dead controller runs none either), so a caller that
-/// resumes the unit run right after finds no controller left. It writes nothing: no one reads this process any
-/// more, and another thread may hold the stderr lock.
+/// On unix it ends the process at once, without the exit handlers (a dead controller runs none either), so a
+/// caller that resumes the unit run right after finds no controller left; the supervisor holds the lent attempt
+/// lock and cwd lease. It writes nothing: no one reads this process any more, and another thread may hold the
+/// stderr lock.
+#[cfg(unix)]
 fn caller_gone() {
-    #[cfg(unix)]
     // SAFETY: `_exit` ends the process; nothing after it runs.
-    unsafe {
-        libc::_exit(1)
-    };
-    #[cfg(not(unix))]
-    std::process::exit(1);
+    unsafe { libc::_exit(1) };
 }
+
+/// On Windows the controller holds a writing attempt's cwd lease for the supervisor, so a gone caller does not end
+/// it: the unit run goes on to its end (its peer calls fail closed, `peer-closed`) and the process exits normally.
+#[cfg(not(unix))]
+fn caller_gone() {}
 
 /// The caller's stdin of a `run-unit` process: after the first line (the request) has arrived, end of input calls
 /// `gone`, because the caller only closes stdin once it has the answer or is dead.

@@ -30,7 +30,9 @@
 //! waits on the child. A lock does not pass to a child with its handle on Windows: the controller releases its
 //! attempt copy right after the spawn and the supervisor takes the attempt lock itself, as Node does; the cwd lease
 //! stays with the controller, which serves its request channel to the supervisor (`cwdLeaseOwner`) for the attempt's
-//! whole life, and the Git door commits under it through a borrowed copy of the held lease. Nothing here writes a
+//! whole life, and the Git door commits under it through a borrowed copy of the held lease. So on Windows the
+//! controller process must outlive its attempt: a host `run-unit` controller whose caller is gone keeps running the
+//! unit run to its end there, where on unix it exits at once and the supervisor keeps the lent handles. Nothing here writes a
 //! script and then executes it; a caller that does, in a host with other threads, opens it close-on-exec and closes
 //! it before the exec (the tests take one lock around such a pair).
 //!
