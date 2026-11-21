@@ -35,7 +35,7 @@ test('missing or mismatched verification and dirty candidate never move the targ
 test('the same destination stays excluded across consumer verification', async () => {
   const f = fixture(); try {
     const p = f.port(); await p.prepare({ operationId: 'first', request: f.request });
-    await assert.rejects(async () => f.port().prepare({ operationId: 'second', request: f.request }), /lock-acquire-unavailable/);
+    await assert.rejects(async () => f.port().prepare({ operationId: 'second', request: f.request }), /merge-slot-busy/);
     // Lower locks are free throughout the consumer phase.
     const scope = createLockScope();
     const admin = acquireSync(scope, 'worktree-admin', { fgosDir: path.join(f.repo, '.fgos') }); assert.equal(admin.result, 'acquired');
@@ -211,7 +211,7 @@ test('prepare waits only for its own full destination slot and pins the target a
       child.once('exit', code => reject(new Error(`holder exited ${code}: ${errors}`)));
     });
     const { target: _oldTarget, ...request } = f.request;
-    await assert.rejects(async () => f.port().prepare({ operationId: 'no-wait-held', request }), /lock-acquire-unavailable/);
+    await assert.rejects(async () => f.port().prepare({ operationId: 'no-wait-held', request }), /merge-slot-busy/);
     child.stdin.write('release after commit');
     const p = f.port();
     const { candidate: c } = await p.prepare({ operationId: 'wait-for-target', request, waitMs: 5000 });

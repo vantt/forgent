@@ -16,7 +16,12 @@ sessionRotation:
   personas:
     # The secretary's successor rereads its portfolio after any rotation: the backlog and the open discussions.
     # An entry that does not exist in the project is left out of the handoff.
+    # Owner decision 2026-11-21: the secretary and the supervisor rotate at 0.15 of the window (about 150k tokens of 1M),
+    # where the owner saw their work lose precision; every other persona keeps the global soft.
     secretary:
+      soft: 0.15
       reload:
         - docs/backlog.md
         - docs/discussions
+    supervisor:
+      soft: 0.15

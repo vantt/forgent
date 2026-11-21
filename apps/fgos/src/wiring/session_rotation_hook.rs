@@ -324,6 +324,20 @@ mod tests {
         RotationConfig::from_section(&json!({ "soft": 0.4, "hard": 0.7, "windowSize": 1000, "personas": { "secretary": { "reload": ["plans/a.md"] } } })).map_err(|e| e.to_string())
     }
 
+    #[test]
+    fn the_shipped_standard_rotates_the_secretary_and_supervisor_at_a_lower_soft_than_every_other_persona() {
+        let (schemas, _) = fgos_config::schema::Schemas::bundled().unwrap();
+        let standard = fgos_config::standard::Standard::bundled(&schemas).unwrap();
+        let config =
+            RotationConfig::from_section(standard.value().get("sessionRotation").unwrap()).unwrap();
+        for persona in ["secretary", "supervisor"] {
+            let t = config.thresholds_for(persona).unwrap();
+            assert_eq!((t.soft, t.hard), (0.15, 0.7), "{persona}");
+        }
+        let t = config.thresholds_for("planner").unwrap();
+        assert_eq!((t.soft, t.hard), (0.4, 0.7));
+    }
+
     /// Runs one stop with a recording verb door; returns the calls and the result.
     fn run_stop(
         head: &Head,
