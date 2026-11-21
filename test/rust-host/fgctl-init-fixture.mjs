@@ -11,7 +11,7 @@ import crypto from 'node:crypto';
 import { waitForSealChildrenOf } from '../helpers/process-tmp-root.mjs';
 import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 import { releaseTargetForHost } from '../../src/util/release-targets.mjs';
-import { REPO_ROOT, buildRustDistribution, releaseOutputDir, computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
+import { REPO_ROOT, buildRustDistribution, releaseOutputDir, computeArtifactDigest } from '../../scripts/build-rust-distribution.mjs';
 
 export const FGCTL_BIN = releaseBinaryPath(releaseOutputDir(), 'fgctl');
 
@@ -45,7 +45,7 @@ export const fixture = { releaseDir: null, digest: null };
  * runs its own payload; handed that pair, its host would run the checkout's payload instead.
  */
 export function withoutActiveRelease(env) {
-  const { FGOS_ACTIVE_RELEASE_PATH, FGOS_ACTIVE_MANIFEST_PATH, FGOS_STATE_ROOT, ...rest } = env;
+  const { FGOS_ACTIVE_RELEASE_PATH, FGOS_ACTIVE_MANIFEST_PATH, ...rest } = env;
   return rest;
 }
 
@@ -75,41 +75,13 @@ export function restampRelease(fromDir, prefix, edit) {
 }
 
 /**
- * Injects a failure into stateHome that causes `fgos init` (the tail's first step) to refuse on every platform
- * (Linux, macOS, Windows) with status 1.
- *
- * On every platform, `fgos init` begins by minting/verifying the machine id (`mint_machine_id` calling
- * `fgos_identity::machine::mint_here`). If `<stateHome>/machine-id` contains an invalid machine id (e.g. uppercase
- * characters), `mint_machine_id` refuses with exit status 1.
- * Static preflight and activation publish do not read `machine-id`, so activation publishes successfully
- * before the tail runs, leaving the transaction in `ready-degraded` and the workspace diagnosable via `fgos version`.
+ * Writes an invalid machine-id into stateHome so that post-publish fgos init
+ * in the runtime tail refuses on every platform.
  */
 export function injectTailFailure(stateHome) {
   if (!stateHome) return;
   fs.mkdirSync(stateHome, { recursive: true });
   fs.writeFileSync(path.join(stateHome, 'machine-id'), 'INVALID_MACHINE_ID\n');
-}
-
-/**
- * A copy of `fromDir` prepared as a candidate for tail-failure tests. Creates a restamped copy
- * of `fromDir` with a distinct digest. Also keeps the doctor-bridge injection where reached.
- */
-export function releaseWithFailingTail(fromDir, prefix, label) {
-  return restampRelease(fromDir, prefix, (manifest, dir) => {
-    const bridgePath = path.join(dir, 'libexec', 'legacy-node', 'src', 'setup', 'doctor-bridge.mjs');
-    if (fs.existsSync(bridgePath)) {
-      const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1') {\n  console.error('simulated ${label} init failure in tail');\n  process.exit(42);\n}\n`;
-      fs.writeFileSync(bridgePath, failInjection + fs.readFileSync(bridgePath, 'utf8'));
-      const newHash = 'sha256:' + hashFile(bridgePath);
-      const newSize = fs.statSync(bridgePath).size;
-      for (const f of manifest.files) {
-        if (f.path === 'libexec/legacy-node/src/setup/doctor-bridge.mjs') {
-          f.digest = newHash;
-          f.size = newSize;
-        }
-      }
-    }
-  });
 }
 
 /**
@@ -120,10 +92,6 @@ export function releaseWithFailingTail(fromDir, prefix, label) {
  * failure keeps its real status.
  */
 export function runFgctlRaw(args, { cwd, stateHome, env = {} } = {}) {
-  const resolvedStateHome = stateHome ?? env.FGOS_STATE_HOME;
-  if (env.SIMULATE_TAIL_FAILURE === '1' && resolvedStateHome) {
-    injectTailFailure(resolvedStateHome);
-  }
   return spawnSync(FGCTL_BIN, args, {
     cwd,
     env: {

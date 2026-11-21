@@ -30,7 +30,7 @@ import {
   pathWithGcLeakingGit,
   processesUnder,
   removeTree, removeStateHome,
-  restampRelease, releaseWithFailingTail,
+  restampRelease, injectTailFailure,
 } from './fgctl-init-fixture.mjs';
 
 const FGOS_BIN = releaseBinaryPath(releaseOutputDir(), 'fgos');
@@ -529,15 +529,15 @@ test('P7: Upgrade candidate preflight failure refuses upgrade and leaves existin
 
 test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable state with ready-degraded transaction', () => {
   const { proj: projDir, state: stateHome } = workspaceAtA.restore();
-  // Release B whose tail fails when SIMULATE_TAIL_FAILURE is set
-  const candidate = releaseWithFailingTail(releaseDirB, 'fgctl-upg-tailfail-cand-', 'upgrade');
+  // Release B whose tail fails
+  const candidate = restampRelease(releaseDirB, 'fgctl-upg-tailfail-cand-');
   const newDigest = candidate.digest;
 
   try {
+    injectTailFailure(stateHome);
     const upgRes = runFgctl(['upgrade', '--from', candidate.dir], {
       cwd: projDir,
       stateHome,
-      env: { SIMULATE_TAIL_FAILURE: '1' },
     });
 
     assert.notEqual(upgRes.status, 0, 'upgrade must fail when tail fails');
@@ -576,8 +576,8 @@ test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable s
 test('P7: Repair local tail failure leaves workspace in diagnosable state with ready-degraded transaction', () => {
   const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-rep-tailfail-state-'));
   const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-rep-tailfail-proj-'));
-  // Release A whose tail fails when SIMULATE_TAIL_FAILURE is set
-  const candidate = releaseWithFailingTail(releaseDirA, 'fgctl-rep-tailfail-cand-', 'repair');
+  // Release A whose tail fails
+  const candidate = restampRelease(releaseDirA, 'fgctl-rep-tailfail-cand-');
   const newDigest = candidate.digest;
 
   try {
@@ -590,10 +590,10 @@ test('P7: Repair local tail failure leaves workspace in diagnosable state with r
     assert.equal(initRes.status, 0);
 
     // Now run fgctl repair with tail failure enabled
+    injectTailFailure(stateHome);
     const repRes = runFgctl(['repair'], {
       cwd: projDir,
       stateHome,
-      env: { SIMULATE_TAIL_FAILURE: '1' },
     });
 
     assert.notEqual(repRes.status, 0, 'repair must fail when tail fails');

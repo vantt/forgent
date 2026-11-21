@@ -7,7 +7,7 @@ import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
 import { computeArtifactDigest, hashFile } from '../../scripts/build-rust-distribution.mjs';
 import { holdLock } from './fgctl-lock-holder.mjs';
-import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit, processesUnder, withoutActiveRelease, removeTree, removeStateHome, releaseWithFailingTail } from './fgctl-init-fixture.mjs';
+import { useReleaseFixture, releaseDirName, fixture, runFgctl, runShim, pathWithGcLeakingGit, processesUnder, withoutActiveRelease, removeTree, removeStateHome, restampRelease, injectTailFailure } from './fgctl-init-fixture.mjs';
 
 useReleaseFixture();
 
@@ -219,7 +219,7 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
   const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-tailfail-home-'));
   const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-tailfail-state-'));
   const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-tailfail-proj-'));
-  const candidate = releaseWithFailingTail(fixture.releaseDir, 'fgctl-tailfail-rel-', 'init');
+  const candidate = restampRelease(fixture.releaseDir, 'fgctl-tailfail-rel-');
   const newDigest = candidate.digest;
 
   try {
@@ -227,10 +227,11 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
     execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
     execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
 
+    injectTailFailure(tempState);
     const res = runFgctl(['init', '--from', candidate.dir], {
       cwd: tempProj,
       stateHome: tempState,
-      env: { HOME: tempHome, SIMULATE_TAIL_FAILURE: '1' },
+      env: { HOME: tempHome },
     });
 
     assert.notEqual(res.status, 0, 'fgctl init must fail when tail command fails');
