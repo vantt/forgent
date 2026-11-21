@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "832a3180459944e5cba0829e847945fce9b0e2ae98f27d059032a4d9427164af",
+  "payloadDigest": "88d0e1c921f3d4e19ba28b73fc6371fc47430e0c7008fc229870b16fe4fa8b94",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1611,10 +1611,10 @@
     "src/seat-binding/client.mjs": "2927a6ac2263bbcbb15ccdcc11d6986b2e7f0da9608c9612f8a190ff614386f1",
     "src/session-host/client.mjs": "e49192345fa315a153ace4c3de0422351b0989bf20b663ae0a77b398767cd0eb",
     "src/session-host/head-grants.mjs": "18d8bf8838e1e7e955d588be8db4dba4708dfeb1ffcffd6f70101a1b60b5edf9",
-    "src/session-host/head-plan.mjs": "9e7f591a9bf2ebb52061e61526d3b11e81b8ceb30e6c7c9a6c8bdaae4a0713b1",
+    "src/session-host/head-plan.mjs": "af330d6fd28cb57660146180d285b94278db2ecd7f8e63ce9873d47022b7e11c",
     "src/session-host/head-request-client.mjs": "e6be28978cf5689af691f2ecbe50f4ad1996abd9c7c62276fb7116d69f537960",
     "src/session-host/head-request.mjs": "bea76843c1a99b72749a496ca36a439c547ec08a2dd5e0f5bf43b47569428eee",
-    "src/session-host/head-start.mjs": "72a704691c18c3ea546db8ee1b458210a603e376eb32d3586f401c0b46a34c67",
+    "src/session-host/head-start.mjs": "2627d8b185fd57f3398120a8509f2d707529e83e0c87be714cb44cf0ebac7352",
     "src/session-host/head-stop.mjs": "4284bc2638e3ac4a71d151763c981d220a017c4f948cefc829115be5a6221ad3",
     "src/session-rotation/handoff-store.mjs": "3d1385774aa7c09573a6e298f82e7bf75d55beb436d9caa7c266cc1735c46128",
     "src/session-rotation/rotate.mjs": "2c75eae786e4506a3a2c74a3f95e3daa7d65909d36f9a9cd2d4732765c89354c",
