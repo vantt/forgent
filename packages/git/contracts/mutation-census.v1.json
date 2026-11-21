@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "cb2f0bf32c3597a0ade9288daa8477d7edb51494028f587045033d77e092351a",
+  "payloadDigest": "cfa7c5ba04bdd7d757da98157b8700c4db3ecbf6c02907ee1b35f0c778f9b8e3",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -766,7 +766,7 @@
     "packages/git/rust/src/sequence.rs": "00ab99823a85eae69ed8acf06d1da968b016cb5ae40464394adf2aa78d015295",
     "packages/git/rust/src/store_admission.rs": "51a90412f4d46c2f46aad1bb6126d40f44998e5495d06a4a8a51d36346fdd275",
     "packages/git/rust/src/sync.rs": "da25d739b6649f27183aba7c4875457e1aedcbfbe6aac028712c6d040c73e925",
-    "packages/git/rust/src/wal.rs": "fa19f7f8ea8cc8a84f6d5b2472b70701368e5a34b01dcdc04e5598dfcbe29b7a",
+    "packages/git/rust/src/wal.rs": "68695dc1216f1801edeba7b11d63261d1b721d864530c312446555ca7cc0d13e",
     "packages/git/rust/src/walk_changes.rs": "2d077c0e39807d5748c57a26f6be351d737cc43d8091f5c4ee2165e83f16cd61",
     "packages/git/rust/src/worktree.rs": "8d60e4ddd939fce3ef00020de16ea336fbf9b952abb164e54d7674ee1fe4071f",
     "packages/git/rust/tests/borrow_deadline.rs": "b4c1ec240fee56120e0730d3f5a0c7a6a7d058b422c1c395b459a4bdc1c5d77f",
@@ -3122,7 +3122,7 @@
     },
     {
       "path": "packages/git/rust/src/wal.rs",
-      "line": 3719,
+      "line": 4136,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

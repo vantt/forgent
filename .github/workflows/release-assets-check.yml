@@ -185,6 +185,9 @@ jobs:
       - name: Borrowing on Windows with the fgos binary as the helper executable
         run: cargo test --release -p fgos --test windows_borrow
 
+      - name: The publication WAL opens on Windows with an owner and ACL trust check
+        run: "cargo test --release -p fgos-git --lib wal::"
+
   # Evidence only: measures how Win32 LockFileEx byte-range locks (byte 0, length 1, exclusive,
   # fail immediately, as the holder-lock windows driver takes them) behave across handle
   # inheritance and process death. Every answer is a line starting with "PROBE "; a "no" answer
