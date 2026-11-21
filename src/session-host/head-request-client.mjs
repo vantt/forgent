@@ -36,6 +36,13 @@ export const HEAD_SUPERVISOR_DONE_VERB = 'supervisor done';
 export const HEAD_SUPERVISOR_QUEUE_VERB = 'supervisor queue';
 export const HEAD_SUPERVISOR_PLANS_VERB = 'supervisor plans';
 export const HEAD_SLOTS_VERB = 'slots';
+/** Coordination verbs: raise an event, read or type into a session, tune the drone, record and prune coordination evidence. */
+export const HEAD_SUPERVISOR_RAISE_VERB = 'supervisor raise';
+export const HEAD_SESSION_READ_VERB = 'session read';
+export const HEAD_SESSION_TYPE_VERB = 'session type';
+export const HEAD_WATCHER_TUNE_VERB = 'watcher tune';
+export const HEAD_METRICS_RECORD_VERB = 'metrics record';
+export const HEAD_METRICS_PRUNE_VERB = 'metrics prune';
 /** A reply may take as long as the supervisor lets the verb run (60 s) plus its own overhead. */
 const DEFAULT_REPLY_TIMEOUT_MS = 70_000;
 /** A write is also published (fetch, gates, commit, push), which waits on the target's merge slot and the network. */

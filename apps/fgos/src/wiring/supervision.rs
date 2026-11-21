@@ -23,7 +23,7 @@ use fgos_observe::record::types::{AttrValue, Basis, Origin, Record, SubjectRef, 
 use fgos_supervision::land::{land, LandCommand, LandPorts, ShellRunner};
 use fgos_supervision::notify::MailboxNotifier;
 use fgos_supervision::portfolio::{self, Plan};
-use fgos_supervision::queue::{Queue, QueueError};
+use fgos_supervision::queue::{Queue, QueueError, Raised, RaisedEvent};
 use fgos_supervision::{supervisor, wake, watcher};
 use serde_json::{json, Value};
 use std::borrow::Cow;
@@ -42,9 +42,11 @@ pub const LAND_OPERATION_ID: &str = "land.run";
 pub const SLOTS_OPERATION_ID: &str = "slots.read";
 
 /// The sub-commands `fgos watcher` serves.
-pub const WATCHER_SUBCOMMANDS: &[&str] = &["tick"];
+pub const WATCHER_SUBCOMMANDS: &[&str] = &["tick", "tune"];
 /// The sub-commands `fgos supervisor` serves.
-pub const SUPERVISOR_SUBCOMMANDS: &[&str] = &["wake", "plans", "queue", "handled", "done"];
+pub const SUPERVISOR_SUBCOMMANDS: &[&str] = &["wake", "plans", "queue", "handled", "raise", "done"];
+/// The sub-commands of `fgos session` the host serves itself; `start`, `rotate`, `stop` and `write` stay in the payload.
+pub const SESSION_SUBCOMMANDS: &[&str] = &["read", "type"];
 
 /// The pace definition: any row means the project has live work (`core/watcher/pace`).
 pub const PACE_DEFINITION: &str = "core/watcher/pace/watcher-active.query.json";
@@ -109,9 +111,31 @@ pub enum Verb {
     Plans,
     Queue,
     Handled { ids: Vec<String> },
+    Raise(RaiseCommand),
     Done,
     Land(LandCommand),
     Slots,
+    Tune(TuneCommand),
+    SessionRead { target: String, lines: u32 },
+    SessionType { target: String, text: String },
+}
+
+/// `supervisor raise`: one coordination event for the queue.
+#[derive(Debug, Clone)]
+pub struct RaiseCommand {
+    pub kind: String,
+    pub subject: String,
+    pub reason: String,
+    pub next: String,
+}
+
+/// `watcher tune`: arm or disarm one definition and set numeric watcher settings.
+#[derive(Debug, Clone)]
+pub struct TuneCommand {
+    /// The definition (row kind) and the action it is routed to (`wake-supervisor` armed, `none` disarmed).
+    pub action: Option<(String, &'static str)>,
+    /// `(key under watcher, integer value)`.
+    pub settings: Vec<(String, i64)>,
 }
 
 impl SupervisionRequest {
@@ -119,8 +143,14 @@ impl SupervisionRequest {
     pub fn operation_id(&self) -> &'static str {
         match self.verb {
             Verb::Tick => TICK_OPERATION_ID,
-            Verb::Wake | Verb::Handled { .. } => SUPERVISOR_WRITE_OPERATION_ID,
-            Verb::Plans | Verb::Queue | Verb::Done => SUPERVISOR_READ_OPERATION_ID,
+            Verb::Wake
+            | Verb::Handled { .. }
+            | Verb::Raise(_)
+            | Verb::Tune(_)
+            | Verb::SessionType { .. } => SUPERVISOR_WRITE_OPERATION_ID,
+            Verb::Plans | Verb::Queue | Verb::Done | Verb::SessionRead { .. } => {
+                SUPERVISOR_READ_OPERATION_ID
+            }
             Verb::Land(_) => LAND_OPERATION_ID,
             Verb::Slots => SLOTS_OPERATION_ID,
         }
@@ -135,10 +165,11 @@ fn validation(message: impl Into<String>) -> CategorisedRefusal {
 fn refused(code: &str, detail: impl std::fmt::Display) -> CategorisedRefusal {
     let message = format!("{detail} [{code}]");
     match code {
-        "events-unhandled" | "land-gate-missing" => {
+        "events-unhandled" | "land-gate-missing" | "target-not-stuck" => {
             CategorisedRefusal::new("precondition", message)
         }
-        "event-unknown" => CategorisedRefusal::new("not-found", message),
+        "event-unknown" | "session-not-found" => CategorisedRefusal::new("not-found", message),
+        "bad-event" => CategorisedRefusal::new("validation", message),
         _ => CategorisedRefusal::unexpected(message),
     }
 }
@@ -164,8 +195,18 @@ pub fn project_request(
         .map(|a| a.to_string_lossy().into_owned())
         .unwrap_or_default();
     let verb = match selector.as_str() {
-        "watcher" => Verb::Tick,
+        "watcher" => match call.sub_word() {
+            Some("tune") => Verb::Tune(tune_command(&call)?),
+            _ => Verb::Tick,
+        },
+        "session" => session_verb(&call)?,
         "supervisor" => match call.sub_word() {
+            Some("raise") => Verb::Raise(RaiseCommand {
+                kind: named_value(&call, "kind")?,
+                subject: named_value(&call, "ref")?,
+                reason: named_value(&call, "reason")?,
+                next: call.value("next").map_err(validation)?.unwrap_or_default(),
+            }),
             Some("wake") => Verb::Wake,
             Some("plans") => Verb::Plans,
             Some("queue") => Verb::Queue,
@@ -190,6 +231,125 @@ pub fn project_request(
         other => return Err(validation(format!("no supervision verb named {other}"))),
     };
     Ok(SupervisionRequest { root, verb, json })
+}
+
+fn named_value(call: &Call, name: &str) -> Result<String, CategorisedRefusal> {
+    call.value(name)
+        .map_err(validation)?
+        .filter(|v| !v.is_empty())
+        .ok_or_else(|| validation(format!("--{name} is required")))
+}
+
+/// The row kind a definition is named by.
+fn valid_definition(name: &str) -> bool {
+    let mut chars = name.chars();
+    chars.next().is_some_and(|c| c.is_ascii_lowercase())
+        && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+}
+
+/// The watcher settings no `watcher tune` touches: the machine switch, the definition list, the actions (which only
+/// `--arm|--disarm` write) and the notify target.
+const UNTUNABLE: &[&str] = &[
+    "enabled",
+    "definitions",
+    "defaultAction",
+    "actions",
+    "notifyTo",
+];
+
+fn tune_command(call: &Call) -> Result<TuneCommand, CategorisedRefusal> {
+    let (arm, disarm) = (
+        call.switch("arm").map_err(validation)?,
+        call.switch("disarm").map_err(validation)?,
+    );
+    if arm && disarm {
+        return Err(validation("--arm and --disarm exclude each other"));
+    }
+    let words = call.arguments();
+    let action = match (words.as_slice(), arm || disarm) {
+        ([], false) => None,
+        ([definition], true) if valid_definition(definition) => Some((
+            definition.clone(),
+            if arm { "wake-supervisor" } else { "none" },
+        )),
+        ([definition], true) => {
+            return Err(validation(format!(
+                "{definition} is not a definition name (lowercase letters, digits and hyphens)"
+            )))
+        }
+        ([_], false) => return Err(validation("a definition needs --arm or --disarm")),
+        ([], true) => return Err(validation("--arm and --disarm need a definition")),
+        _ => return Err(validation("watcher tune takes at most one definition")),
+    };
+    let mut settings = Vec::new();
+    for item in list_of(call, "set")? {
+        let (key, value) = item
+            .split_once('=')
+            .ok_or_else(|| validation(format!("--set needs key=value, got {item}")))?;
+        if key.is_empty() || !key.chars().all(|c| c.is_ascii_alphanumeric()) {
+            return Err(validation(format!("{key} is not a watcher setting name")));
+        }
+        if UNTUNABLE.contains(&key) {
+            return Err(validation(format!("watcher.{key} is not tunable")));
+        }
+        let value = value
+            .parse::<i64>()
+            .map_err(|_| validation(format!("--set {key} needs a whole number, got {value}")))?;
+        settings.push((key.to_owned(), value));
+    }
+    if action.is_none() && settings.is_empty() {
+        return Err(validation(
+            "watcher tune needs a definition with --arm or --disarm, or --set key=value",
+        ));
+    }
+    Ok(TuneCommand { action, settings })
+}
+
+/// Lines `session read` shows when the call names none.
+const DEFAULT_READ_LINES: u32 = 50;
+/// The most text `session type` sends in one call.
+const MAX_TYPED_BYTES: usize = 4096;
+
+fn session_verb(call: &Call) -> Result<Verb, CategorisedRefusal> {
+    let sub = call.sub_word();
+    let words = call.arguments();
+    let [target] = words.as_slice() else {
+        return Err(validation(format!(
+            "session {} takes one target (a role, handle or slot key)",
+            sub.unwrap_or("")
+        )));
+    };
+    match sub {
+        Some("read") => {
+            let lines = match call.value("lines").map_err(validation)? {
+                None => DEFAULT_READ_LINES,
+                Some(text) => text.parse::<u32>().ok().filter(|n| *n > 0).ok_or_else(|| {
+                    validation(format!("--lines needs a positive number, got {text}"))
+                })?,
+            };
+            Ok(Verb::SessionRead {
+                target: target.clone(),
+                lines,
+            })
+        }
+        Some("type") => {
+            let text = named_value(call, "text")?;
+            if text.len() > MAX_TYPED_BYTES {
+                return Err(validation(format!(
+                    "--text is over {MAX_TYPED_BYTES} bytes"
+                )));
+            }
+            Ok(Verb::SessionType {
+                target: target.clone(),
+                text,
+            })
+        }
+        other => Err(validation(format!(
+            "unknown session subcommand {}. The host serves: {}",
+            other.unwrap_or(""),
+            SESSION_SUBCOMMANDS.join(", ")
+        ))),
+    }
 }
 
 /// The list a flag carries: one value per use, each split on commas (the way the request route writes them).
@@ -1339,6 +1499,242 @@ fn run_slots(root: &Path) -> Value {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Coordination: raising, tuning, and reaching a session on site
+
+/// One coordination act in Observe, under the registered `fgos.coordination.act` kind. The write door counts its own
+/// failures; a lost record never changes what the act did.
+fn record_coordination(
+    root: &Path,
+    payload_root: PayloadRoot,
+    act: &str,
+    subject: SubjectRef,
+    outcome: &str,
+) {
+    let record = span_record(
+        "fgos.coordination.act",
+        subject,
+        vec![
+            ("fgos.coordination.act", act.to_owned()),
+            ("fgos.coordination.outcome", outcome.to_owned()),
+        ],
+        Vec::new(),
+    );
+    let _ = record_door(root, payload_root).write(record);
+}
+
+/// The act a raised event kind records.
+fn act_of_kind(kind: &str) -> &'static str {
+    match kind {
+        "coordination-chore" => "chore",
+        "coordination-help" => "ask",
+        _ => "handoff",
+    }
+}
+
+fn raise_event(
+    root: &Path,
+    payload_root: PayloadRoot,
+    command: &RaiseCommand,
+) -> Result<(String, Raised), CategorisedRefusal> {
+    let event = RaisedEvent::coordination(
+        &command.kind,
+        &command.subject,
+        &command.reason,
+        &command.next,
+    )
+    .map_err(queue_refusal)?;
+    let id = event.id.clone();
+    let raised = open_queue(root)?.raise(event).map_err(queue_refusal)?;
+    let outcome = match raised {
+        Raised::New => "raised",
+        Raised::Duplicate => "duplicate",
+    };
+    record_coordination(
+        root,
+        payload_root,
+        act_of_kind(&command.kind),
+        SubjectRef {
+            kind: "event".to_owned(),
+            id: id.clone(),
+        },
+        outcome,
+    );
+    Ok((id, raised))
+}
+
+/// Writes each requested watcher setting through the config door, which holds the schema bounds, and returns the
+/// `key=value` lines it set. A setting the door refuses stops the call and names what was already set.
+fn tune_watcher(
+    root: &Path,
+    payload_root: PayloadRoot,
+    command: &TuneCommand,
+) -> Result<Vec<String>, CategorisedRefusal> {
+    let mut changes: Vec<(String, String)> = command
+        .action
+        .iter()
+        .map(|(definition, action)| (format!("actions.{definition}"), (*action).to_owned()))
+        .collect();
+    changes.extend(
+        command
+            .settings
+            .iter()
+            .map(|(k, v)| (k.clone(), v.to_string())),
+    );
+    let mut applied: Vec<String> = Vec::new();
+    for (key, value) in changes {
+        let request = fgos_config::provider::ConfigRequest {
+            root: root.to_path_buf(),
+            verb: fgos_config::provider::Verb::Set {
+                path: format!("watcher.{key}"),
+                value: value.clone(),
+                reason: format!("watcher tune: {key}={value}"),
+                global: false,
+            },
+        };
+        if let Err(refusal) = fgos_config::provider::answer(&request) {
+            let done = if applied.is_empty() {
+                String::new()
+            } else {
+                format!(" (already set: {})", applied.join(", "))
+            };
+            return Err(validation(format!(
+                "watcher.{key} was refused: {} [{}]{done}",
+                refusal.detail, refusal.reason
+            )));
+        }
+        applied.push(format!("{key}={value}"));
+    }
+    record_coordination(
+        root,
+        payload_root,
+        "tune",
+        SubjectRef {
+            kind: "session".to_owned(),
+            id: writer(),
+        },
+        &applied.join(" "),
+    );
+    Ok(applied)
+}
+
+/// The one live session Identity names by `target` (a role, handle, id or slot key); never a raw pane id.
+fn session_of(target: &str) -> Result<fgos_identity::directory::Listed, CategorisedRefusal> {
+    let (state, _) = fgos_holder_lock::state_root();
+    fgos_identity::directory::resolve(
+        &state,
+        target,
+        &fgos_process::facts::judge_here,
+        None,
+        &fgos_identity::directory::NoTerminal,
+    )
+    .map_err(|r| {
+        let code = if r.reason == "not-found" {
+            "session-not-found"
+        } else {
+            r.reason
+        };
+        refused(code, format!("{target}: {}", r.detail))
+    })
+}
+
+/// What the terminal driver takes to find the session's pane: its slot key when it has one, else its pane id, both
+/// as Identity recorded them.
+fn pane_of(session: &fgos_identity::directory::Listed) -> Result<String, CategorisedRefusal> {
+    session
+        .ids
+        .as_ref()
+        .and_then(|ids| ids.terminal.as_ref())
+        .map(|t| t.key.clone().unwrap_or_else(|| t.pane_id.clone()))
+        .ok_or_else(|| {
+            refused(
+                "session-has-no-pane",
+                format!("{} has no terminal pane in Identity", session.handle),
+            )
+        })
+}
+
+fn terminal_refusal(refusal: fgos_terminal_control::port::Refusal) -> CategorisedRefusal {
+    refused("terminal-refused", refusal)
+}
+
+/// The most screen text one `session read` answers; a reply frame holds 64 KiB.
+const MAX_READ_BYTES: usize = 48 * 1024;
+
+/// `text` cut to its last `max` bytes at a character boundary.
+fn tail_of(text: String, max: usize) -> (String, bool) {
+    if text.len() <= max {
+        return (text, false);
+    }
+    let mut start = text.len() - max;
+    while !text.is_char_boundary(start) {
+        start += 1;
+    }
+    (text[start..].to_owned(), true)
+}
+
+fn read_session(root: &Path, target: &str, lines: u32) -> Result<Value, CategorisedRefusal> {
+    let session = session_of(target)?;
+    let pane = pane_of(&session)?;
+    let backend = fgos_run_supervisor::terminal_slot::Backend::from_env(root);
+    let screen = backend
+        .core()
+        .read_recent(&pane, lines)
+        .map_err(terminal_refusal)?;
+    let (text, truncated) = tail_of(screen, MAX_READ_BYTES);
+    Ok(json!({"session": session.handle, "lines": lines, "truncated": truncated, "text": text}))
+}
+
+/// Whether an open event names `session`: by its id, handle, a role it holds or its slot key.
+fn names_session(subject: &str, session: &fgos_identity::directory::Listed) -> bool {
+    let subject = subject.strip_prefix("session:").unwrap_or(subject);
+    let key = session
+        .ids
+        .as_ref()
+        .and_then(|ids| ids.terminal.as_ref())
+        .and_then(|t| t.key.as_deref());
+    subject == session.id
+        || subject == session.handle
+        || session.roles.iter().any(|r| r == subject)
+        || key == Some(subject)
+}
+
+fn type_into_session(
+    root: &Path,
+    payload_root: PayloadRoot,
+    target: &str,
+    text: &str,
+) -> Result<Value, CategorisedRefusal> {
+    let session = session_of(target)?;
+    let open = open_queue(root)?.unhandled().map_err(queue_refusal)?;
+    if !open.iter().any(|e| names_session(&e.subject, &session)) {
+        return Err(refused(
+            "target-not-stuck",
+            format!(
+                "no open supervision event names {}; typing is for a stuck session only",
+                session.handle
+            ),
+        ));
+    }
+    let pane = pane_of(&session)?;
+    let backend = fgos_run_supervisor::terminal_slot::Backend::from_env(root);
+    backend
+        .core()
+        .type_text(&pane, text)
+        .map_err(terminal_refusal)?;
+    record_coordination(
+        root,
+        payload_root,
+        "type",
+        SubjectRef {
+            kind: "session".to_owned(),
+            id: session.id.clone(),
+        },
+        "typed",
+    );
+    Ok(json!({"session": session.handle, "typed": true}))
+}
+
+// ---------------------------------------------------------------------------------------------
 // A confined caller's door
 
 /// The socket a confined head asks its own supervisor through.
@@ -1348,6 +1744,33 @@ pub const HEAD_SOCKET_ENV: &str = "FGOS_HEAD_REQUEST_SOCKET";
 pub fn is_confined() -> bool {
     fgos_config::session::session_class(|key| std::env::var(key).ok())
         == fgos_config::snapshot::SessionClass::Confined
+}
+
+/// The most stdin a confined `metrics record` reads; the request frame carries a few records only.
+const MAX_RECORD_INPUT_BYTES: u64 = 256 * 1024;
+
+/// The records a confined `metrics record` holds on stdin: one object or an array of them.
+fn records_on_stdin() -> Result<Value, String> {
+    use std::io::Read;
+    let mut bytes = Vec::new();
+    std::io::stdin()
+        .take(MAX_RECORD_INPUT_BYTES + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|e| format!("metrics record: cannot read stdin: {e}"))?;
+    if bytes.is_empty() {
+        return Err("metrics record: no records on stdin".to_owned());
+    }
+    if bytes.len() as u64 > MAX_RECORD_INPUT_BYTES {
+        return Err(format!(
+            "metrics record: input is over {MAX_RECORD_INPUT_BYTES} bytes"
+        ));
+    }
+    match serde_json::from_slice::<Value>(&bytes)
+        .map_err(|e| format!("metrics record: input is not JSON: {e}"))?
+    {
+        Value::Array(items) => Ok(Value::Array(items)),
+        single => Ok(Value::Array(vec![single])),
+    }
 }
 
 /// Sends a confined call through the request socket and prints the reply's data as the verb's JSON line, or the
@@ -1374,6 +1797,13 @@ pub fn send_confined(call: Result<crate::routing::ConfinedCall, String>) -> i32 
             return refuse("bad-args", &detail);
         }
     };
+    let mut call = call;
+    if call.verb == "metrics record" {
+        match records_on_stdin() {
+            Ok(records) => call.args = json!({ "records": records }),
+            Err(detail) => return refuse("bad-args", &detail),
+        }
+    }
     let Some(socket) = std::env::var_os(HEAD_SOCKET_ENV).filter(|s| !s.is_empty()) else {
         return refuse(
             "request-socket-unavailable",
@@ -1521,6 +1951,30 @@ pub fn answer(
                 json!({"handled": closed}),
                 format!("handled {closed}"),
             ))
+        }
+        Verb::Raise(command) => {
+            let (id, raised) = raise_event(root, payload_root, command)?;
+            let raised = matches!(raised, Raised::New);
+            Ok(done(
+                json!({"id": id, "raised": raised}),
+                format!("{} {id}", if raised { "raised" } else { "already raised" }),
+            ))
+        }
+        Verb::Tune(command) => {
+            let applied = tune_watcher(root, payload_root, command)?;
+            Ok(done(
+                json!({"applied": applied}),
+                format!("watcher tune: {}", applied.join(", ")),
+            ))
+        }
+        Verb::SessionRead { target, lines } => {
+            let data = read_session(root, target, *lines)?;
+            let text = data["text"].as_str().unwrap_or_default().to_owned();
+            Ok(done(data, text))
+        }
+        Verb::SessionType { target, text } => {
+            let data = type_into_session(root, payload_root, target, text)?;
+            Ok(done(data, format!("typed into {target}")))
         }
         Verb::Done => {
             let queue = open_queue(root)?;

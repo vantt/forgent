@@ -89,6 +89,9 @@
     "operation_id": "worktree.resync",
     "owner_path": "packages/execution/checkout"
   },
+  "session": {
+    "subcommands": true
+  },
   "slots": {
     "operation_id": "slots.read",
     "owner_path": "apps/fgos"

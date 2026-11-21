@@ -13,9 +13,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { CONFINED_MARKER_ENV } from '../config/facade.mjs';
-import { HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
-import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_QUESTIONS_LIST_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_START_VERB, HEAD_SLOTS_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_SUPERVISOR_HANDLED_VERB, HEAD_SUPERVISOR_PLANS_VERB, HEAD_SUPERVISOR_QUEUE_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
+import { CONFINED_MARKER_ENV, readConfig } from '../config/facade.mjs';
+import { HEAD_PERSONAS, HEAD_REQUEST_SOCKET_ENV } from './head-grants.mjs';
+import { HEAD_ANSWERED_VERB, HEAD_LAND_VERB, HEAD_METRICS_PRUNE_VERB, HEAD_METRICS_RECORD_VERB, HEAD_QUESTIONS_ACK_VERB, HEAD_QUESTIONS_ANSWER_VERB, HEAD_QUESTIONS_ASK_VERB, HEAD_QUESTIONS_CANCEL_VERB, HEAD_QUESTIONS_LIST_VERB, HEAD_REQUEST_RESULT_VERB, HEAD_RESTORE_VERB, HEAD_ROTATE_VERB, HEAD_RUN_VERB, HEAD_SESSION_READ_VERB, HEAD_SESSION_TYPE_VERB, HEAD_START_VERB, HEAD_SLOTS_VERB, HEAD_STOP_VERB, HEAD_SUPERVISOR_DONE_VERB, HEAD_SUPERVISOR_HANDLED_VERB, HEAD_SUPERVISOR_PLANS_VERB, HEAD_SUPERVISOR_QUEUE_VERB, HEAD_SUPERVISOR_RAISE_VERB, HEAD_WATCHER_TUNE_VERB, HEAD_WORKTREE_CREATE_VERB, MAX_REQUEST_BYTES, PROTOCOL, requestHeadRotate, requestHeadStart } from './head-request-client.mjs';
 import { assertHeadArgs, headRoleOf, startHeadSession } from './head-start.mjs';
 import { HeadPlanError, isPlanHeadName, planOfHead } from './head-plan.mjs';
 import { stopHeadSession } from './head-stop.mjs';
@@ -176,11 +176,11 @@ const lastJsonLine = (text) => {
 
 /**
  * Runs one host verb inside the verb limit and returns its JSON `data` (or the whole line). A non-zero exit throws with the
- * line's own `code` (or `host-failed`); `ports.hostCall({ hostBin, cwd, argv })` replaces the process in a test.
+ * line's own `code` (or `host-failed`); `input` is the verb's stdin; `ports.hostCall({ hostBin, cwd, argv, input? })` replaces the process in a test.
  */
-function hostCall({ envelope, projectRoot, argv }, ports) {
-  const call = { hostBin: hostBinOf(envelope), cwd: projectRoot, argv };
-  const run = ports.hostCall ? ports.hostCall(call) : spawnSync(call.hostBin, argv, { cwd: projectRoot, encoding: 'utf8', timeout: HOST_VERB_TIMEOUT_MS, maxBuffer: MAX_REQUEST_BYTES });
+function hostCall({ envelope, projectRoot, argv, input }, ports) {
+  const call = { hostBin: hostBinOf(envelope), cwd: projectRoot, argv, ...(input === undefined ? {} : { input }) };
+  const run = ports.hostCall ? ports.hostCall(call) : spawnSync(call.hostBin, argv, { cwd: projectRoot, encoding: 'utf8', timeout: HOST_VERB_TIMEOUT_MS, maxBuffer: MAX_REQUEST_BYTES, ...(input === undefined ? {} : { input }) });
   const line = lastJsonLine(run.stdout);
   if (run.status === 0) {
     if (line === null) throw Object.assign(new Error('the host verb printed no JSON document'), { code: 'host-output-unreadable' });
@@ -305,9 +305,64 @@ async function landVerb({ args, envelope, projectRoot, id, ports }) {
   return startTicket({ id, verb: HEAD_LAND_VERB, argv, envelope, projectRoot, ports });
 }
 
+const TIERS = Object.freeze(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']);
+const SECRETARY_RUN_DEFAULTS = Object.freeze({ maxMinutes: 15, tier: 'standard' });
+const ceilingErr = (message) => Object.assign(new Error(message), { code: 'run-ceiling-exceeded' });
+
+/** The ceilings of a secretary run: `secretary.run.maxMinutes` and `secretary.run.tier` of the project's effective config. */
+function secretaryCeilings(projectRoot, ports) {
+  if (ports.secretaryRun) return ports.secretaryRun(projectRoot);
+  const run = readConfig({ projectRoot, sections: ['secretary'] }).value.secretary?.run ?? {};
+  return { maxMinutes: run.maxMinutes ?? SECRETARY_RUN_DEFAULTS.maxMinutes, tier: run.tier ?? SECRETARY_RUN_DEFAULTS.tier };
+}
+
+/** Whether `dir` is a linked worktree of this project: absolute, not the project checkout, and its `.git` is the file a linked worktree has. */
+function linkedWorktree(dir, projectRoot, ports) {
+  if (ports.linkedWorktree) return ports.linkedWorktree(dir);
+  if (!path.isAbsolute(dir) || path.resolve(dir) === path.resolve(projectRoot)) return false;
+  try { return fs.statSync(path.join(path.resolve(dir), '.git')).isFile(); } catch { return false; }
+}
+
+/**
+ * The secretary's own run: one unit built from a prompt, read-only unless it writes into a linked worktree, held to the
+ * ceilings of `secretary.run.*` (time and tier; a request may ask for less, never more). Its provider and capability
+ * are the runner's choice, not hers, and a unit file or several units are not hers to run.
+ */
+function secretaryRunArgv({ args, projectRoot, ports }) {
+  if (args.unit !== undefined || args.units !== undefined) throw Object.assign(new Error('a secretary run is one unit built from a prompt'), { code: 'run-one-unit' });
+  exactKeys(args, ['prompt', 'writes', 'worktree', 'maxMinutes', 'tier']);
+  if (typeof args.prompt !== 'string' || args.prompt === '') throw badArgs('prompt must be a non-empty string');
+  noDash('prompt', args.prompt);
+  const ceilings = secretaryCeilings(projectRoot, ports);
+  const minutes = args.maxMinutes ?? ceilings.maxMinutes;
+  if (!Number.isInteger(minutes) || minutes < 1) throw badArgs('maxMinutes must be a whole number of minutes, at least 1');
+  if (minutes > ceilings.maxMinutes) throw ceilingErr(`${minutes} minutes is over secretary.run.maxMinutes (${ceilings.maxMinutes})`);
+  const tier = args.tier ?? ceilings.tier;
+  if (!TIERS.includes(tier)) throw badArgs(`tier must be one of ${TIERS.join(', ')}`);
+  if (TIERS.indexOf(tier) > TIERS.indexOf(ceilings.tier)) throw ceilingErr(`tier ${tier} is above secretary.run.tier (${ceilings.tier})`);
+  if (args.writes !== undefined && !(isStringArray(args.writes) && args.writes.length > 0)) throw badArgs('writes must be a non-empty array of strings');
+  if (args.worktree !== undefined && (typeof args.worktree !== 'string' || args.worktree === '')) throw badArgs('worktree must be a non-empty string');
+  noDash('worktree', args.worktree);
+  for (const p of args.writes ?? []) {
+    noDash('writes', p);
+    if (!plainEntry(p)) throw badArgs(`${JSON.stringify(p)} is not a plain project-relative path`);
+  }
+  if ((args.writes !== undefined || args.worktree !== undefined) && !(typeof args.worktree === 'string' && linkedWorktree(args.worktree, projectRoot, ports))) {
+    throw Object.assign(new Error('a secretary run that writes, or names a worktree, needs worktree to be a linked worktree of this project'), { code: 'writes-need-linked-worktree' });
+  }
+  const argv = ['run', args.prompt, '--timeout', `${minutes}m`, '--override', JSON.stringify({ tier })];
+  if (args.writes) argv.push('--writes', args.writes.join(','));
+  if (args.worktree !== undefined) argv.push('--worktree', args.worktree);
+  argv.push('--json');
+  return argv;
+}
+
 async function runVerb({ args, envelope, projectRoot, id, ports }) {
+  if (personaOf(envelope) === 'secretary') {
+    return startTicket({ id, verb: HEAD_RUN_VERB, argv: secretaryRunArgv({ args, projectRoot, ports }), envelope, projectRoot, ports });
+  }
   exactKeys(args, ['prompt', 'provider', 'capability', 'writes', 'worktree']);
-  if (personaOf(envelope) !== 'lead') throw roleErr('only a lead runs');
+  if (personaOf(envelope) !== 'lead') throw roleErr('only a lead or the secretary runs');
   if (args.prompt === undefined) throw badArgs('prompt is required');
   for (const key of ['prompt', 'provider', 'capability', 'worktree']) {
     if (args[key] !== undefined && (typeof args[key] !== 'string' || args[key] === '')) throw badArgs(`${key} must be a non-empty string`);
@@ -468,6 +523,8 @@ function askerAnswered({ envelope, projectRoot, role, ports }) {
   return Array.isArray(list) && list.some((q) => Array.isArray(q?.asker?.roles) && q.asker.roles.includes(role));
 }
 
+const COORDINATORS = new Set(['secretary', 'supervisor']);
+
 async function stopVerb({ args, envelope, projectRoot, ports }) {
   exactKeys(args, ['persona', 'name', 'reason']);
   if (args.reason !== undefined && (typeof args.reason !== 'string' || args.reason.length > 200)) throw badArgs('reason must be a string of at most 200 characters');
@@ -479,9 +536,93 @@ async function stopVerb({ args, envelope, projectRoot, ports }) {
       throw err;
     }
   };
-  const allowed = role === envelope.session.role || planHead() || askerAnswered({ envelope, projectRoot, role, ports });
+  // The two coordinators may end any head; this door ends heads only, so a persona that holds no head grant is not theirs.
+  const coordinator = COORDINATORS.has(personaOf(envelope));
+  if (coordinator && !HEAD_PERSONAS.includes(args.persona)) {
+    throw Object.assign(new Error(`${role} is not a head: "${args.persona}" is no head persona (${HEAD_PERSONAS.join(', ')}), so this door cannot stop it`), { code: 'stop-target-not-head' });
+  }
+  const allowed = coordinator || role === envelope.session.role || planHead() || askerAnswered({ envelope, projectRoot, role, ports });
   if (!allowed) throw roleErr(`${role} is not a lead or planner of this project, the asker of an answered question, or this session's own role`);
   return stopHeadSession({ persona: args.persona, name: args.name, projectRoot, reason: args.reason ?? null }, ports.stop ?? {});
+}
+
+// -- coordination verbs: raise, tune, read and type on site, record and prune evidence
+
+const TEXT_MAX = { ref: 200, reason: 500, next: 200 };
+const DEFINITION_PATTERN = /^[a-z][a-z0-9-]*$/;
+const SETTING_PATTERN = /^[A-Za-z0-9]+=-?[0-9]+$/;
+const TARGET_PATTERN = /^[A-Za-z0-9][A-Za-z0-9:@._/-]{0,127}$/;
+const SETTLED_PATTERN = /^[a-z][a-z0-9-]*:[A-Za-z0-9][A-Za-z0-9:@._/-]{0,127}$/;
+const COORDINATION_KIND_PREFIX = 'fgos.coordination.';
+const RECORDS_MAX = 10;
+const READ_LINES_MAX = 1000;
+const TYPE_TEXT_MAX = 4096;
+const SETTINGS_MAX = 16;
+
+const boundedText = (key, value, max, { optional = false } = {}) => {
+  if (value === undefined && optional) return;
+  if (typeof value !== 'string' || value === '' || value.length > max || /[\r\n]/.test(value)) throw badArgs(`${key} must be one line of 1 to ${max} characters`);
+  noDash(key, value);
+};
+
+function raiseVerb({ args, envelope, projectRoot, ports }) {
+  exactKeys(args, ['kind', 'ref', 'reason', 'next']);
+  if (typeof args.kind !== 'string' || !/^coordination-[a-z]+$/.test(args.kind)) throw badArgs('kind must be a coordination event kind');
+  boundedText('ref', args.ref, TEXT_MAX.ref);
+  boundedText('reason', args.reason, TEXT_MAX.reason);
+  boundedText('next', args.next, TEXT_MAX.next, { optional: true });
+  const argv = ['supervisor', 'raise', '--kind', args.kind, '--ref', args.ref, '--reason', args.reason, ...(args.next === undefined ? [] : ['--next', args.next]), '--json'];
+  return hostCall({ envelope, projectRoot, argv }, ports);
+}
+
+function tuneVerb({ args, envelope, projectRoot, ports }) {
+  exactKeys(args, ['definition', 'arm', 'disarm', 'set']);
+  if (args.definition !== undefined && !(typeof args.definition === 'string' && DEFINITION_PATTERN.test(args.definition))) throw badArgs('definition must be a definition name (lowercase letters, digits and hyphens)');
+  for (const key of ['arm', 'disarm']) if (args[key] !== undefined && typeof args[key] !== 'boolean') throw badArgs(`${key} must be a boolean`);
+  const settings = args.set ?? [];
+  if (!Array.isArray(settings) || settings.length > SETTINGS_MAX || !settings.every((x) => typeof x === 'string' && SETTING_PATTERN.test(x))) throw badArgs(`set must be at most ${SETTINGS_MAX} key=value entries with a whole number value`);
+  const argv = ['watcher', 'tune', ...(args.definition === undefined ? [] : [args.definition]), ...settings.flatMap((x) => ['--set', x])];
+  if (args.arm) argv.push('--arm');
+  if (args.disarm) argv.push('--disarm');
+  argv.push('--json');
+  return hostCall({ envelope, projectRoot, argv }, ports);
+}
+
+function sessionReadVerb({ args, envelope, projectRoot, ports }) {
+  exactKeys(args, ['target', 'lines']);
+  if (typeof args.target !== 'string' || !TARGET_PATTERN.test(args.target)) throw badArgs('target must be a role, handle or slot key');
+  if (args.lines !== undefined && !(Number.isInteger(args.lines) && args.lines >= 1 && args.lines <= READ_LINES_MAX)) throw badArgs(`lines must be a whole number from 1 to ${READ_LINES_MAX}`);
+  return hostCall({ envelope, projectRoot, argv: ['session', 'read', args.target, ...(args.lines === undefined ? [] : ['--lines', String(args.lines)]), '--json'] }, ports);
+}
+
+function sessionTypeVerb({ args, envelope, projectRoot, ports }) {
+  exactKeys(args, ['target', 'text']);
+  if (typeof args.target !== 'string' || !TARGET_PATTERN.test(args.target)) throw badArgs('target must be a role, handle or slot key');
+  if (typeof args.text !== 'string' || args.text === '' || Buffer.byteLength(args.text) > TYPE_TEXT_MAX) throw badArgs(`text must be 1 to ${TYPE_TEXT_MAX} bytes`);
+  noDash('text', args.text);
+  return hostCall({ envelope, projectRoot, argv: ['session', 'type', args.target, '--text', args.text, '--json'] }, ports);
+}
+
+/** `metrics record` of this door writes coordination evidence only: every record's kind must be `fgos.coordination.*`. */
+function metricsRecordVerb({ args, envelope, projectRoot, ports }) {
+  exactKeys(args, ['records']);
+  if (!Array.isArray(args.records) || args.records.length < 1 || args.records.length > RECORDS_MAX) throw badArgs(`records must be 1 to ${RECORDS_MAX} record objects`);
+  for (const record of args.records) {
+    if (record === null || typeof record !== 'object' || Array.isArray(record)) throw badArgs('every record must be an object');
+    if (typeof record.kind !== 'string' || !record.kind.startsWith(COORDINATION_KIND_PREFIX)) {
+      throw Object.assign(new Error(`this door records ${COORDINATION_KIND_PREFIX}* kinds only, got ${JSON.stringify(record.kind)}`), { code: 'kind-not-allowed' });
+    }
+  }
+  return hostCall({ envelope, projectRoot, argv: ['metrics', 'record', '--json', '-'], input: JSON.stringify(args.records) }, ports);
+}
+
+function metricsPruneVerb({ args, envelope, projectRoot, ports }) {
+  exactKeys(args, ['apply', 'settled']);
+  if (args.apply !== undefined && typeof args.apply !== 'boolean') throw badArgs('apply must be a boolean');
+  const settled = args.settled ?? [];
+  if (!Array.isArray(settled) || settled.length > 50 || !settled.every((x) => typeof x === 'string' && SETTLED_PATTERN.test(x))) throw badArgs('settled must be at most 50 <kind>:<id> subjects');
+  const argv = ['metrics', 'prune', ...settled.flatMap((x) => ['--settled', x]), ...(args.apply ? ['--apply'] : []), '--json'];
+  return hostCall({ envelope, projectRoot, argv }, ports);
 }
 
 /** The detached stop of the caller's own session: waits until the route that started it has exited, so the reply is out first. */
@@ -575,6 +716,24 @@ export async function runHeadRequest({ runDir, request }, ports = {}) {
           throw badArgs(`events must be 1 to ${HANDLED_MAX} event ids`);
         }
         data = hostCall({ envelope, projectRoot, argv: ['supervisor', 'handled', ...args.events, '--json'] }, ports);
+        break;
+      case HEAD_SUPERVISOR_RAISE_VERB:
+        data = raiseVerb({ args, envelope, projectRoot, ports });
+        break;
+      case HEAD_WATCHER_TUNE_VERB:
+        data = tuneVerb({ args, envelope, projectRoot, ports });
+        break;
+      case HEAD_SESSION_READ_VERB:
+        data = sessionReadVerb({ args, envelope, projectRoot, ports });
+        break;
+      case HEAD_SESSION_TYPE_VERB:
+        data = sessionTypeVerb({ args, envelope, projectRoot, ports });
+        break;
+      case HEAD_METRICS_RECORD_VERB:
+        data = metricsRecordVerb({ args, envelope, projectRoot, ports });
+        break;
+      case HEAD_METRICS_PRUNE_VERB:
+        data = metricsPruneVerb({ args, envelope, projectRoot, ports });
         break;
       case HEAD_SUPERVISOR_QUEUE_VERB:
       case HEAD_SUPERVISOR_PLANS_VERB:

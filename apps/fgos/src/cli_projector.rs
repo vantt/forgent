@@ -279,7 +279,9 @@ pub fn native_operation_id(
         let request = project_questions_request(args, std::path::PathBuf::new(), None)?;
         return Ok(request.operation_id().to_string());
     }
-    if route_operation == crate::wiring::supervision::SUPERVISOR_READ_OPERATION_ID {
+    if route_operation == crate::wiring::supervision::SUPERVISOR_READ_OPERATION_ID
+        || route_operation == crate::wiring::supervision::TICK_OPERATION_ID
+    {
         let request = crate::wiring::supervision::project_request(
             route_operation,
             args,

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "635c6de4952675688d46c03e8bddbae309e3e6b1325423a96e191ebf0c8241c2",
+  "payloadDigest": "8959e25c7c30f7043362da4432382ed71f892573dce1cac147eee3eaeaa5b705",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -92,12 +92,12 @@
     "apps/fgos/examples/identity-mint-machine.rs": "e5ae8784739511aa945f936188f9c3720174fa94fed32f56b7841f76a67f355e",
     "apps/fgos/examples/mailbox-ident-cost.rs": "694f216767532946846ecc69dc584fbb8bf28a7183f741a037ba05c7b4793bc9",
     "apps/fgos/src/cli_presenter.rs": "6e50cf7387a4ce98eec1d3705b8bf33150960e6180559f9bbe6cb8c1529e2d15",
-    "apps/fgos/src/cli_projector.rs": "fa0839435170d492f81cf4d6778ac9e22ff3a47ee71805eed8bb97e95e813fee",
+    "apps/fgos/src/cli_projector.rs": "ecebdfab9857a410f9efc37a355c567c016f67548f28435b0722540a2ef5e35e",
     "apps/fgos/src/help.rs": "a7f18814361555860a4f0a44e3bb3c12246f5cb00d124f725e9a506857c2dd8d",
     "apps/fgos/src/invocation_doors.rs": "6b874024689dfc1134dfb89487c744caf1ec784e6dd4313b4ed099026fefce39",
     "apps/fgos/src/legacy_exec.rs": "409d3fd5fc829b7febd7a57b24bf9c6f9bab6c91e1807668cab6bf3d5c1c15c4",
     "apps/fgos/src/main.rs": "f1f630ce6d6c200ee84ceaafacd2577681338e16edf2f8d89bf789922f3cc613",
-    "apps/fgos/src/routing.rs": "7d2d05fa18831cd4b29fffe1174dfda98be0330e827b1cd0a3da9c7701d5fe2f",
+    "apps/fgos/src/routing.rs": "7ea5c5b78af4623bd0305e16dac8ce4224b50af36f9541ebcccb492a9ce6c351",
     "apps/fgos/src/wiring/agents.rs": "d40cd43facea6c5d1e5a7b3363b8e69567f3ad7aa33b628eb269c935a88f06e4",
     "apps/fgos/src/wiring/dispatch_decide.rs": "13b0f3f7f929bc7c297d440a811031aa945feeccb38eee18ebb42fb37dc7abbb",
     "apps/fgos/src/wiring/doctor/bridge.rs": "a6b02429a290007ad641d3fa265eb07fe8de1815e8dc7dde321caf7a8cb8232e",
@@ -156,7 +156,7 @@
     "apps/fgos/src/wiring/session_rotation_hook.rs": "370874fcc61612fe3ad6c1fb8540a2a320ca448e99560915337e0666172380f7",
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
     "apps/fgos/src/wiring/session_write_publish.rs": "0b830327e6ef3925025c2ad0fe9c30a4c87a24dea4fe122371d92b90ba2b5907",
-    "apps/fgos/src/wiring/supervision.rs": "8a3b41559d6ade008e656bd5e8ad0c11990742bdae1291c735cc3cf1577b7c2f",
+    "apps/fgos/src/wiring/supervision.rs": "7f8ff1f09976cd1544e9e6e8f4bbc499b36d62c7536fa7b5f33d70a904703db3",
     "apps/fgos/src/wiring/terminal_tabs.rs": "a519a4903b296a3f6bfd486f41ea93d1ceb1489c28a4e6dc6dcfe03223ce3130",
     "apps/fgos/src/wiring/uninstall.rs": "1fd8cdeef4360bb32ae0dd1452bdc6cb09c57427d95645c030105a24533dceff",
     "apps/fgos/src/wiring/unit_run_host/accounts.rs": "239f75242aa514de40b7c45a75609d24e357cefdacf04b86176d3300f3e62060",
@@ -187,7 +187,7 @@
     "apps/fgos/tests/questions_hook.rs": "1c206c5633a8ec75345fdcc4debd1efe30f8aa996aa48e00e3963c426061f5a2",
     "apps/fgos/tests/questions_verb.rs": "b0ccc8a1c82bbf81b7ad84eecfdcf4a2e3c350eb297cf6749645b4ee1a3296dd",
     "apps/fgos/tests/session_write_publish.rs": "1f2e511e01473684fd12a07905c4d1c040db025d51af22681e035a33fee81fc9",
-    "apps/fgos/tests/supervision_verbs.rs": "926480cc6d07f734bda4c49c2a28fc9765aa8cf6fcc4f3dc2d5e491ff6bb49c7",
+    "apps/fgos/tests/supervision_verbs.rs": "dc1a811583c8091ac91b7b5eda7b7ab53450ea31f538b2d2fcca7e732211305c",
     "apps/fgos/tests/windows_borrow.rs": "4e77453a5386cf512a22db39e6a529e163c7dc930d8795c93ef05e60ba19c7b9",
     "apps/fgos/tests/windows_doctor_lock_rows.rs": "943ba00e7be5382a532ad47bfa38f6fef888428910e5f70ee18518edeb1eeb63",
     "apps/fgos/tests/windows_lock_hold_route.rs": "9cedd72a21ef501d00d37ce8fe1f52bb33cbfa799774470534c96dc59a4959aa",
@@ -978,8 +978,9 @@
     "packages/observe/rust/src/metrics_cli/eval.rs": "3abc7c4c3008b5bde4eb4aa5b7bb7097318aec60a0ba59226d6b4a678f9891e7",
     "packages/observe/rust/src/metrics_cli/faults.rs": "05d443f2824e19fc54d4b8a0b9e90634369a67a70769f6da3927e0f22c707633",
     "packages/observe/rust/src/metrics_cli/harness.rs": "020606d69415fb77760527cb12d8a5e54e93f996ffe75e3eff4bc295279f52fa",
-    "packages/observe/rust/src/metrics_cli/mod.rs": "cd369c5e1bdb3f2780790c550b5a64fe566e015978081ebe31ea5d258bc513ee",
+    "packages/observe/rust/src/metrics_cli/mod.rs": "409e8e0a490df155e45fb795d3436fe96fe5ced7e1d28047bf9c82bd24264bf6",
     "packages/observe/rust/src/metrics_cli/outcomes.rs": "f0ab12b98d5a9820d35d48fb06eb88a43356276709e8c8efd4392fc668a2cb97",
+    "packages/observe/rust/src/metrics_cli/prune.rs": "237e5ccb79d0ae9346b40cb24082c7dd92958751760b1544b9132578bb9c24ca",
     "packages/observe/rust/src/metrics_cli/query.rs": "72b5fc5a343224362fd58dbe6d254cf233b17bf5e9e486200406452b24327763",
     "packages/observe/rust/src/metrics_cli/record.rs": "3e633ab2c10661bdd5f783ffbb459c6e313ba2c8646f9975e2230bae41ac193d",
     "packages/observe/rust/src/metrics_cli/runs.rs": "d492596aa50458170b94a710980e1ede3232fbd61e0c5e208d6c02f412d58d16",
@@ -1151,7 +1152,7 @@
     "packages/run-supervisor/rust/tests/gate_pid1.rs": "73f2e89f16a3a4a76e95aa73c98a3f7fafef8c1d41e5748a87f538c2c82e8478",
     "packages/run-supervisor/rust/tests/gate_portable.rs": "1a97989cd9fbebc519506651eb3a79c7c577e0ffb199abb71bd07a0e133cc0db",
     "packages/run-supervisor/rust/tests/gate_terminal_socket.rs": "cba60e64b6f41309553c78216e66937d164b70bc2f1b37e49d657882daf2ce00",
-    "packages/run-supervisor/rust/tests/head_request.rs": "b408a76e6ee1b187122978e16aae6675a490d625036d081d73606707a7be241a",
+    "packages/run-supervisor/rust/tests/head_request.rs": "073ca869aaf6c59561276d9f96756189227bf3dc7638e176623f22a3771541c8",
     "packages/run-supervisor/rust/tests/head_role_binding.rs": "86928b9c8303a3633b9865081bd195d949b6295c14839f277c1471eb33fab110",
     "packages/run-supervisor/rust/tests/lanes.rs": "982d01cd1ad9217eb89164c3a15286c123268908582fab81a0cd59dbc8926d95",
     "packages/run-supervisor/rust/tests/portable/mod.rs": "6153ea7719f18ef0cc293fde0d603101df1308a4b2980edcc8dff57ad6d37363",
@@ -1399,7 +1400,7 @@
     "scripts/verify-fanout-overlap.mjs": "b74a0ac9f350c5d62a47f3e3bf0896e9d142e5cbba15284527383d1b529ea435",
     "scripts/write-test-marker.mjs": "d1faead7d8efbdcce888100b89f5cd2cc6546ddc3f2647118255f82f6c8e4171",
     "scripts/write-wrapper-script.mjs": "e9e76f2b72329bb4dee9ec980db7a5df7515da3ff339e232466049de259d5c50",
-    "src/cli/command-registry.mjs": "47348a185ebd2da265ccd14653924ff5ce697e4b71b2903538433b51fb9b91b1",
+    "src/cli/command-registry.mjs": "13844556e0701fb3519d55641def362045b8004c628c6397428b62a7ae55601c",
     "src/cli/exit-codes.mjs": "55a68e5a0b03a38adced7ddc9bcfb60964db94b3b868e2c854b6a6a78fdb4964",
     "src/cli/flag-check.mjs": "336a0e94eaec59fa4c1f143b32a14334c1bd5f13d522ef8be4a5b570dc401b62",
     "src/cli/parse-args.mjs": "d4f71dbb91bc8d920995299b78d018efd1643328213a70d6e567a6b462163d66",
@@ -1612,8 +1613,8 @@
     "src/session-host/client.mjs": "e49192345fa315a153ace4c3de0422351b0989bf20b663ae0a77b398767cd0eb",
     "src/session-host/head-grants.mjs": "18d8bf8838e1e7e955d588be8db4dba4708dfeb1ffcffd6f70101a1b60b5edf9",
     "src/session-host/head-plan.mjs": "8ef62d00ffe5394d380cfc2049d9285b231a29b34fe8d66659505989493be099",
-    "src/session-host/head-request-client.mjs": "e6be28978cf5689af691f2ecbe50f4ad1996abd9c7c62276fb7116d69f537960",
-    "src/session-host/head-request.mjs": "e8863a0f579ad973900612d850e7cb961561047e6e63f6ab21141ba0a5a0ad15",
+    "src/session-host/head-request-client.mjs": "5a28c461dc6574d1246ba2898a11ce52e3e149f76da572f8127db2e532f0636d",
+    "src/session-host/head-request.mjs": "8bceffb4d6142231533e0b765ba4ed5c84e545c56f09a1adccc017e44b5fb097",
     "src/session-host/head-start.mjs": "d11a7502ab0dfed683e410042ac9b13c15eb201800ddf27319c5b3904c962932",
     "src/session-host/head-stop.mjs": "4284bc2638e3ac4a71d151763c981d220a017c4f948cefc829115be5a6221ad3",
     "src/session-rotation/handoff-store.mjs": "3d1385774aa7c09573a6e298f82e7bf75d55beb436d9caa7c266cc1735c46128",
@@ -4018,7 +4019,7 @@
       "spawn": "Command::new",
       "binary": "(self)",
       "class": "argv-runner",
-      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:1207"
+      "resolvedAt": "apps/fgos/src/wiring/supervision.rs:1367"
     },
     {
       "path": "packages/supervision/rust/tests/discussion_source.rs",
@@ -4624,49 +4625,91 @@
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 544,
+      "line": 685,
       "spawn": "hostCall -> src/session-host/head-request.mjs:183",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 554,
+      "line": 695,
       "spawn": "callHeadQuestions -> src/session-host/head-request.mjs:94",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 567,
-      "spawn": "worktreeCreate -> src/session-host/head-request.mjs:455",
+      "line": 708,
+      "spawn": "worktreeCreate -> src/session-host/head-request.mjs:510",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 570,
-      "spawn": "stopVerb -> src/session-host/head-request.mjs:482",
+      "line": 711,
+      "spawn": "stopVerb -> src/session-host/head-request.mjs:544",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 577,
+      "line": 718,
       "spawn": "hostCall -> src/session-host/head-request.mjs:183",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 583,
+      "line": 721,
+      "spawn": "raiseVerb -> src/session-host/head-request.mjs:575",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/head-request.mjs",
+      "line": 724,
+      "spawn": "tuneVerb -> src/session-host/head-request.mjs:588",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/head-request.mjs",
+      "line": 727,
+      "spawn": "sessionReadVerb -> src/session-host/head-request.mjs:595",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/head-request.mjs",
+      "line": 730,
+      "spawn": "sessionTypeVerb -> src/session-host/head-request.mjs:603",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/head-request.mjs",
+      "line": 733,
+      "spawn": "metricsRecordVerb -> src/session-host/head-request.mjs:616",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/head-request.mjs",
+      "line": 736,
+      "spawn": "metricsPruneVerb -> src/session-host/head-request.mjs:625",
+      "binary": "(configuration file data)",
+      "class": "configured-binary"
+    },
+    {
+      "path": "src/session-host/head-request.mjs",
+      "line": 742,
       "spawn": "hostCall -> src/session-host/head-request.mjs:183",
       "binary": "(configuration file data)",
       "class": "configured-binary"
     },
     {
       "path": "src/session-host/head-request.mjs",
-      "line": 587,
+      "line": 746,
       "spawn": "hostCall -> src/session-host/head-request.mjs:183",
       "binary": "(configuration file data)",
       "class": "configured-binary"

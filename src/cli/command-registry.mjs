@@ -286,6 +286,18 @@ export const COMMAND_REGISTRY = [
         },
         examples: ['fgos metrics record --json record.json', 'fgos metrics record --json - < records.json'],
       },
+      prune: {
+        description: 'Remove the records of kinds declared prunable that are older than their retention, or whose subject a settled finding names. Dry run by default: it reports what it would remove; --apply rewrites the shards under the observe lock. Records of every other kind are never touched.',
+        parameters: {
+          type: 'object',
+          properties: {
+            apply: { type: 'boolean', description: 'Remove the eligible records; without it nothing changes.' },
+            settled: { type: 'string', description: '<kind>:<id> subjects whose finding is settled: their prunable records are eligible whatever their age. Comma-separated or repeated.' },
+          },
+          required: [],
+        },
+        examples: ['fgos metrics prune', 'fgos metrics prune --settled session:abc123 --apply'],
+      },
       query: {
         description: 'Query records with one grammar: --kind, --where, --ref, --since/--until, --by, --bucket, --latest-per, --agg, --having, --join, --without, --min-sample. Or run named definitions (*.query.json) with --def <file|dir>, repeatable; one call returns every definition\'s rows. A kind nobody declares or serves answers "unmeasured" with the reason.',
         parameters: {
@@ -1391,16 +1403,31 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'watcher',
-    invoke: 'fgos watcher tick',
-    description: 'The project watcher (docs/platform/supervision): `tick` runs one pass, served natively by the Rust host under the `watcher` repo lock. It runs the configured watcher definitions, raises one supervision event per fired row (a duplicate of a still-open row is counted, not raised), sends the notify kinds through the mailbox and wakes the supervisor when a trigger is unhandled. An overrunning tick makes the next one `skipped-busy`, never concurrent.',
+    invoke: 'fgos watcher <tick|tune>',
+    description: 'The project watcher (docs/platform/supervision): `tick` runs one pass, served natively by the Rust host under the `watcher` repo lock. `tune` arms or disarms a definition and changes its thresholds or pace within the config bounds. It runs the configured watcher definitions, raises one supervision event per fired row (a duplicate of a still-open row is counted, not raised), sends the notify kinds through the mailbox and wakes the supervisor when a trigger is unhandled. An overrunning tick makes the next one `skipped-busy`, never concurrent.',
     subcommands: {
       tick: {
         description: 'Run one watcher pass and print what it raised, found as duplicates, notified and woke.',
         parameters: { type: 'object', properties: {}, required: [] },
         examples: ['fgos watcher tick', 'fgos watcher tick --json'],
       },
+      tune: {
+        description: 'Arm or disarm one watcher definition (its row kind) and change its thresholds or the watcher pace in the project config, each value inside the bounds of the config schema, and record the change as a coordination act. From inside a confined head it goes through the request socket.',
+        parameters: {
+          type: 'object',
+          properties: {
+            definition: { type: 'string', description: 'Positional: the definition (row kind) to arm or disarm, e.g. session-idle. Optional when only --set is given.' },
+            arm: { type: 'boolean', description: 'Route the definition\'s rows to the supervisor (watcher.actions.<definition>: wake-supervisor).' },
+            disarm: { type: 'boolean', description: 'Stop acting on the definition\'s rows (watcher.actions.<definition>: none).' },
+            set: { type: 'string', description: 'key=value of a numeric watcher setting (a threshold such as sessionIdleLimit, or the pace: activeIntervalSec, idleIntervalSec, lookbackSec). Repeatable.' },
+          },
+          positional: ['definition'],
+          required: [],
+        },
+        examples: ['fgos watcher tune session-idle --arm', 'fgos watcher tune --set sessionIdleLimit=3 --set activeIntervalSec=30'],
+      },
     },
-    examples: ['fgos watcher tick'],
+    examples: ['fgos watcher tick', 'fgos watcher tune session-idle --disarm'],
     touchesState: true,
     store: 'open',
     mutatesStore: ['tick'],
@@ -1411,19 +1438,33 @@ export const COMMAND_REGISTRY = [
   }),
   withSubcommands({
     name: 'supervisor',
-    invoke: 'fgos supervisor <wake|plans|queue|handled|done>',
-    description: 'The plan supervisor\'s verbs, served natively by the Rust host. `wake` starts the supervisor head when an event is unhandled and none is live (answers nothing-unhandled, starting or started); `plans` lists the ready plans of the trunk tip; `queue` lists the unhandled supervision events; `handled` marks events handled; `done` ends the supervisor\'s run and refuses while an event is unhandled. From inside a confined head `queue`, `plans`, `handled` and `done` (and `fgos slots`) go through its request socket.',
+    invoke: 'fgos supervisor <wake|plans|queue|handled|raise|done>',
+    description: 'The plan supervisor\'s verbs, served natively by the Rust host. `wake` starts the supervisor head when an event is unhandled and none is live (answers nothing-unhandled, starting or started); `plans` lists the ready plans of the trunk tip; `queue` lists the unhandled supervision events; `handled` marks events handled; `raise` puts a coordination event on the queue; `done` ends the supervisor\'s run and refuses while an event is unhandled. From inside a confined head `queue`, `plans`, `handled`, `raise` and `done` (and `fgos slots`) go through its request socket.',
     subcommands: {
       wake: { description: 'Start the supervisor head when an event is unhandled and no supervisor is live; records the wake.', parameters: { type: 'object', properties: {}, required: [] }, examples: ['fgos supervisor wake'] },
       plans: { description: 'Read-only: the plans of the trunk tip with their status, from each plan.md.', parameters: { type: 'object', properties: {}, required: [] }, examples: ['fgos supervisor plans --json'] },
       queue: { description: 'Read-only: the supervision events that are not handled yet.', parameters: { type: 'object', properties: {}, required: [] }, examples: ['fgos supervisor queue --json'] },
       handled: { description: 'Mark one or more supervision events handled (positional event ids).', parameters: { type: 'object', properties: { event: { type: 'string', description: 'Positional: one or more event ids from `fgos supervisor queue`.' } }, positional: ['event'], required: ['event'] }, examples: ['fgos supervisor handled 0a1b2c'] },
+      raise: {
+        description: 'Raise one coordination event (a hand-off, an urgent chore or a request for help) on the supervision queue. The supervisor closes it with `handled`.',
+        parameters: {
+          type: 'object',
+          properties: {
+            kind: { type: 'string', description: 'The event kind.', enum: ['coordination-handoff', 'coordination-chore', 'coordination-help'] },
+            ref: { type: 'string', description: 'What the event is about: a plan, a portfolio file or a session.' },
+            reason: { type: 'string', description: 'Why it is raised, one line.' },
+            next: { type: 'string', description: 'The command the supervisor runs next (optional).' },
+          },
+          required: ['kind', 'ref', 'reason'],
+        },
+        examples: ['fgos supervisor raise --kind coordination-handoff --ref plans/261119-1731-x --reason "ready for a lead" --next "fgos supervisor plans"'],
+      },
       done: { description: 'End the supervisor\'s run: refuses while an event is unhandled.', parameters: { type: 'object', properties: {}, required: [] }, examples: ['fgos supervisor done'] },
     },
     examples: ['fgos supervisor queue', 'fgos supervisor handled <id>', 'fgos supervisor done'],
     touchesState: true,
     store: 'open',
-    mutatesStore: ['wake', 'handled'],
+    mutatesStore: ['wake', 'handled', 'raise'],
     externalEffect: true,
     paginated: false,
     deprecated: null,
@@ -2443,8 +2484,8 @@ export const COMMAND_REGISTRY = [
   },
   withSubcommands({
     name: 'session',
-    invoke: 'fgos session <start|rotate|stop|write>',
-    description: 'Agent head sessions: "start" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; "rotate" asks for its replacement by a successor that reads a redacted handoff; "stop" ends a head on purpose; "write" replaces a file of a confined head\'s grant (the secretary\'s docs/backlog.md) through its supervisor. From inside a confined head all four go through its request socket.',
+    invoke: 'fgos session <start|rotate|stop|write|read|type>',
+    description: 'Agent head sessions: "read" shows the last lines of a session\'s screen and "type" types into a stuck session\'s pane (both served natively by the Rust host); "start" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; "rotate" asks for its replacement by a successor that reads a redacted handoff; "stop" ends a head on purpose; "write" replaces a file of a confined head\'s grant (the secretary\'s docs/backlog.md) through its supervisor. From inside a confined head all six go through its request socket.',
     subcommands: {
       start: {
         description: 'Start head:<persona>-<name> as a confined supervised session, or front the live holder of that role.',
@@ -2500,6 +2541,32 @@ export const COMMAND_REGISTRY = [
         },
         examples: ['fgos session write docs/backlog.md < "$TMPDIR/backlog.md"'],
       },
+      read: {
+        description: 'Read-only: the last lines of a session\'s screen. The target is a role, handle or slot key that Identity resolves to one live session, never a raw pane id; the lines are capped by the terminal-control contract.',
+        parameters: {
+          type: 'object',
+          properties: {
+            target: { type: 'string', description: 'Positional: the role (head:<persona>-<name>), handle or slot key of the session.' },
+            lines: { type: 'string', description: 'How many trailing lines (default 50, at most the contract cap).' },
+          },
+          positional: ['target'],
+          required: ['target'],
+        },
+        examples: ['fgos session read lead:SUPERVISOR --lines 80', 'fgos session read head:lead-demo-p1'],
+      },
+      type: {
+        description: 'Type text into a stuck session\'s pane. Refused target-not-stuck unless an open supervision event names the target session. The target resolves through Identity, never a raw pane id.',
+        parameters: {
+          type: 'object',
+          properties: {
+            target: { type: 'string', description: 'Positional: the role, handle or slot key of the session.' },
+            text: { type: 'string', description: 'The text to type.' },
+          },
+          positional: ['target'],
+          required: ['target', 'text'],
+        },
+        examples: ['fgos session type head:lead-demo-p1 --text "continue"'],
+      },
     },
     examples: ['fgos session start secretary --name miu', 'fgos session rotate secretary --name miu', 'fgos session write docs/backlog.md < "$TMPDIR/backlog.md"'],
     touchesState: true,
@@ -2507,12 +2574,13 @@ export const COMMAND_REGISTRY = [
     externalEffect: true,
     paginated: false,
     deprecated: null,
+    native: ['read', 'type'],
     guide: {
       changes: 'start opens a herdr tab running the persona\'s CLI and records the placement under .fgos/runtime/session-rotation/<persona>-<name>/. rotate writes a rotation request there and starts a detached executor that opens the successor beside the old session. write replaces the named granted file of the project.',
       prerequisites: 'A project, a terminal host (herdr) and a persona definition. A confined head needs the verb in its grant (request socket); a confined caller without a socket is refused. write works only inside a confined head (no socket: no-request-socket).',
       exitCodes: [
         '0 started, fronted, rotation requested, or file written',
-        '2 refused: grant, role or host precondition not met (for write also path-not-granted, path-symlink, not-a-file, path-changed, write-failed), or the start or request failed',
+        '2 refused: grant, role or host precondition not met (for type also target-not-stuck; for write also path-not-granted, path-symlink, not-a-file, path-changed, write-failed), or the start or request failed',
         '3 a rotation of this head is already in progress',
         '4 refused: missing --name or persona, a name that does not match the pattern, or for write a missing or invalid path, content on a terminal instead of stdin, or content over 4 MiB',
       ],
