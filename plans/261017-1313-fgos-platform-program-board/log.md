@@ -1,3 +1,4 @@
+- 2026-11-21 14:30 SUPERVISION: plan 261121-1314-coding-bugfix-guide DONE. Second coding workflow guide `coding/bugfix` (domains/coding/workflows/bugfix.yaml), landed fc063f1b0 while the plan was back in draft; owner kept it and approved the plan (q-rzyim2hm3b). Item tsk-1pv stays in the work store; no CHANGELOG line yet.
 - 2026-11-21 14:22 SUPERVISOR: CORRECTED the 2026-11-14 15:16 MAIL line: mail/live-confined-zombie was reviewed MERGE but never landed; owner approved landing it on a lane after the release hold.
 - 2026-11-21 13:16 WINCUSTODY: STARTED plan 261121-1309-git-windows-custody (owner option (a)); 7 phases, wave 1 = Windows worktree trust + CI job, Windows WAL. S6A 20/21 wait on it.
 - 2026-11-21 13:08 S6A: WAITING: owner chose (a) — Git-lane Windows custody plan first; S6A phases 20 (rest), 21, 22 wait for it. Also IN-MAIN: refresh-ahead token-lifetime cutoff 30e2cacbb + e18d06ebb (p-mpyb43sqfw, OPC reviewed).
