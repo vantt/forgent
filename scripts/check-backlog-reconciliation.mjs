@@ -13,6 +13,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFrontmatter } from '../src/util/yaml.mjs';
+import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
+
+// The YAML door needs the native addon; a missing addon must fail loudly here,
+// never surface as swallowed parse errors that read as zero proposed items.
+ensureAddonForScript();
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DOC = path.join(repoRoot, 'docs/history/backlog-execution-reconciliation/RECONCILIATION.md');
@@ -34,22 +39,30 @@ const fail = (msg) => failures.push(msg);
 // One file per backlog item lives under the backlog item root.
 const ITEMS_DIR = path.join(repoRoot, 'plans/backlog');
 
-/** The ids of the item files whose frontmatter status is `proposed`, and the number of item files that say so. */
+/** The raw frontmatter block: the text between the first two `---` lines, or '' when there is none. */
+function rawFrontmatter(text) {
+  const m = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(text);
+  return m ? m[1] : '';
+}
+
+/**
+ * The ids of the item files whose parsed frontmatter status is `proposed`, and,
+ * counted independently of the YAML door, the number of item files whose raw
+ * frontmatter block has a `status: proposed` line.
+ */
 function proposedIdsFromItems(dir) {
   const ids = [];
   let scanned = 0;
   for (const name of fs.readdirSync(dir).filter((n) => n.endsWith('.md')).sort()) {
     const text = fs.readFileSync(path.join(dir, name), 'utf8');
+    if (/^status:\s*proposed\s*$/m.test(rawFrontmatter(text))) scanned += 1;
     let meta = {};
     try {
       meta = readFrontmatter(text, name).meta;
     } catch {
       // an unparseable block carries no id or status
     }
-    if (meta.status === 'proposed') {
-      scanned += 1;
-      if (typeof meta.id === 'string' && meta.id) ids.push(meta.id);
-    }
+    if (meta.status === 'proposed' && typeof meta.id === 'string' && meta.id) ids.push(meta.id);
   }
   return { ids, scanned };
 }
