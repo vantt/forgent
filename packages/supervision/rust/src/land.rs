@@ -135,7 +135,7 @@ fn from_git(e: OperationError) -> LandRefusal {
     if !e.stderr.is_empty() {
         detail = format!("{detail}: {}", tail(&e.stderr));
     }
-    if e.cause == "land-recovery-required" {
+    if e.cause == "land-recovery-required" || e.cause == "land-abandoned-writer-mismatch" {
         detail = format!("{detail}; run `fgos git recover`");
     }
     LandRefusal {
@@ -810,6 +810,20 @@ impl Lander<'_> {
         Ok((session, id))
     }
 
+    /// Release the candidate worktree of a land that published. The land is delivered whatever this
+    /// returns: a cleanup that is deferred (a lock held, a checkout still reconciling) stays for
+    /// `fgos git recover`, which frees finished chains, so it never fails the land.
+    fn release_delivered(&self, session: fgos_git::LandSession, id: &str) {
+        drop(session);
+        let _ = self.ports.git.acknowledge_land(
+            self.ports.repo,
+            self.ports.writer,
+            id,
+            "supervision-land-delivered",
+            &wal::OsFileSystem,
+        );
+    }
+
     /// Drop a session that published nothing, settle its chain and release its candidate worktree
     /// and pins, so an abandoned attempt leaves no pending operation and keeps no target ref busy.
     fn abandon(&self, session: fgos_git::LandSession, id: &str) -> Result<(), LandRefusal> {
@@ -1049,7 +1063,9 @@ impl Lander<'_> {
         if let Err(e) = published {
             return Err(self.unsettled(live, at("publish")(e)));
         }
-        live.take();
+        if let Some((session, id)) = live.take() {
+            self.release_delivered(session, &id);
+        }
         let main = self.resolve(dest)?.ok_or_else(|| {
             refuse(
                 "land-target-unknown",

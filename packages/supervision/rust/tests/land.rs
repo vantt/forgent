@@ -296,6 +296,21 @@ fn a_clean_merge_lands_pushes_and_local_main_equals_the_remote_tip() {
 }
 
 #[test]
+fn a_delivered_land_releases_its_candidate_checkout() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    let exclude = f.main.join(".git/info/exclude");
+    fs::create_dir_all(exclude.parent().unwrap()).unwrap();
+    fs::write(&exclude, "*.out\n").unwrap();
+    f.land(&branch("topic"), &config(vec![gate("echo built > build.out")]))
+        .unwrap();
+    let candidates = f.main.join(".fgos/runtime/git-candidates");
+    let left = fs::read_dir(&candidates).map(|d| d.count()).unwrap_or(0);
+    assert_eq!(left, 0, "a delivered land leaves no candidate checkout");
+    assert_eq!(git(&f.main, &["worktree", "list"]).lines().count(), 1);
+}
+
+#[test]
 fn a_conflicting_census_lands_regenerated() {
     let f = Fixture::new();
     f.topic(

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fixed: a successful `fgos land <branch>` now releases its candidate worktree (about 5G with its build output) instead of leaving it for `fgos git recover`; a land refused because a dead writer's earlier land is still pending now says to run `fgos git recover`.
 - Changed: a head's tab now reads `role: subject` (for example `lead: head-tab-labels`, `secretary: miu`) with the whole role, and every tab separates its parts with `: ` instead of ` · `. Two plan leads whose plan directories share their first 24 characters now get different head names, so both can start.
 - Changed: `fgos session start` for a `lead`, `planner` or `shaper` head now binds the name to its plan or discussion and puts the exact path and first step in the opening; a name that matches no plan or discussion is refused by name (`plan-not-found`, `discussion-not-found`, `task-ambiguous`) before anything launches.
 - Fixed: a woken supervisor, lead or planner head no longer ends its turn after the start ritual: its opening now ends with an `on_wake` line telling it to continue in the same turn into its skill procedure up to its done step.
