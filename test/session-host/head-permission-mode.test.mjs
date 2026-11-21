@@ -78,8 +78,8 @@ const projectWith = (dirs) => {
 };
 
 test('the secretary head launches bypass in the main checkout it is granted, and a worker seat with the bypass invocation there is still refused', { skip: !fs.existsSync('/usr/bin/bwrap') && 'no bwrap on this machine', timeout: 120_000 }, async () => {
-  const projectRoot = projectWith(['plans', 'docs/discussions']);
-  fs.writeFileSync(path.join(projectRoot, 'docs', 'backlog.md'), '');
+  const projectRoot = projectWith(['plans', 'plans/discussions']);
+  fs.writeFileSync(path.join(projectRoot, 'plans', 'backlog.md'), '');
   try {
     const cfg = standard();
     const key = 'head-secretary-miu-1';

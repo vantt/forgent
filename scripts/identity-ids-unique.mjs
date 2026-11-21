@@ -47,11 +47,7 @@ function markdownFilesUnder(dir, skip = []) {
 /** The id registries of one checkout: backlog rows, `D-ADR` headings, decision file numbers. */
 function readIdRegistries(root) {
   const backlogIds = [];
-  for (const line of (readText(path.join(root, 'docs/backlog.md')) ?? '').split('\n')) {
-    const id = /^\|\s*([^|\s][^|]*?)\s*\|/.exec(line)?.[1];
-    if (id && id !== 'ID' && !/^-+$/.test(id)) backlogIds.push(id);
-  }
-  // A migrated project keeps one file per item; its id is the `id:` of the frontmatter.
+  // The backlog keeps one file per item; its id is the `id:` of the frontmatter.
   const itemsDir = path.join(root, 'plans/backlog');
   for (const file of markdownFilesUnder(itemsDir)) {
     let id;

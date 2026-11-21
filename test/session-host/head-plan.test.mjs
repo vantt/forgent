@@ -90,39 +90,31 @@ function discussionsIn(t, tree) {
   return root;
 }
 
-test('a planner and a shaper name resolve to the feature discussion, with or without the handle prefix', (t) => {
-  const root = discussionsIn(t, { 'docs/discussions/account-lease': true, 'docs/discussions/execution-fanout': true, 'docs/discussions/no-file': false });
-  const ports = { handle: 'proj' };
-  const want = { kind: 'discussion', dir: 'account-lease', path: 'docs/discussions/account-lease/DISCUSSION.md' };
-  assert.deepEqual(discussionOfHead(root, 'planner', 'proj-account-lease', ports), want);
-  assert.deepEqual(discussionOfHead(root, 'shaper', 'account', ports), want);
-  assert.throws(() => discussionOfHead(root, 'shaper', 'no-file', ports), { code: 'discussion-not-found' });
-});
-
-test('a migrated discussion directory resolves by its topic and keeps its id-named path', (t) => {
-  const root = discussionsIn(t, { 'plans/discussions/ds-abcdefghij-account-lease': true, 'plans/discussions/ds-klmnopqrst-execution-fanout': true });
+test('a discussion directory resolves by its topic, with or without the handle prefix, and keeps its id-named path', (t) => {
+  const root = discussionsIn(t, { 'plans/discussions/ds-abcdefghij-account-lease': true, 'plans/discussions/ds-klmnopqrst-execution-fanout': true, 'plans/discussions/ds-uvwxyzabcd-no-file': false });
   const ports = { handle: 'proj' };
   const want = { kind: 'discussion', dir: 'ds-abcdefghij-account-lease', path: 'plans/discussions/ds-abcdefghij-account-lease/DISCUSSION.md' };
   assert.deepEqual(discussionOfHead(root, 'planner', 'proj-account-lease', ports), want);
   assert.deepEqual(discussionOfHead(root, 'shaper', 'account', ports), want);
   assert.deepEqual(discussionOfHead(root, 'shaper', 'ds-abcdefghij', ports), want);
+  assert.throws(() => discussionOfHead(root, 'shaper', 'no-file', ports), { code: 'discussion-not-found' });
 });
 
 test('an unbound discussion name is not found, a prefix of two is ambiguous, an exact name wins over longer ones', (t) => {
-  const root = discussionsIn(t, { 'docs/discussions/dispatch-a': true, 'docs/discussions/dispatch-b': true, 'docs/discussions/fan': true, 'docs/discussions/fan-out': true });
+  const root = discussionsIn(t, { 'plans/discussions/ds-aaaaaaaaaa-dispatch-a': true, 'plans/discussions/ds-bbbbbbbbbb-dispatch-b': true, 'plans/discussions/ds-cccccccccc-fan': true, 'plans/discussions/ds-dddddddddd-fan-out': true });
   const ports = { handle: 'proj' };
   assert.throws(() => discussionOfHead(root, 'planner', 'zzz', ports), (err) => err instanceof HeadPlanError && err.code === 'discussion-not-found');
   assert.throws(() => discussionOfHead(root, 'planner', 'dispatch', ports), { code: 'task-ambiguous' });
-  assert.equal(discussionOfHead(root, 'planner', 'fan', ports).dir, 'fan');
+  assert.equal(discussionOfHead(root, 'planner', 'fan', ports).dir, 'ds-cccccccccc-fan');
 });
 
 test('taskOfHead binds a lead to its plan, a planner to its discussion, and a secretary or supervisor to nothing', async (t) => {
   const root = repoWith(t, { '261118-1045-p': ['running', ['src/a/**']] });
-  fs.mkdirSync(path.join(root, 'docs', 'discussions', 'feat'), { recursive: true });
-  fs.writeFileSync(path.join(root, 'docs', 'discussions', 'feat', 'DISCUSSION.md'), '# d\n');
+  fs.mkdirSync(path.join(root, 'plans', 'discussions', 'ds-aaaaaaaaaa-feat'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'plans', 'discussions', 'ds-aaaaaaaaaa-feat', 'DISCUSSION.md'), '# d\n');
   const ports = { handle: 'proj' };
   assert.deepEqual(await taskOfHead(root, 'lead', 'proj-261118-1045', ports), { kind: 'plan', dir: '261118-1045-p', path: 'plans/261118-1045-p/plan.md', footprint: ['src/a/**'] });
-  assert.equal((await taskOfHead(root, 'planner', 'feat', ports)).path, 'docs/discussions/feat/DISCUSSION.md');
+  assert.equal((await taskOfHead(root, 'planner', 'feat', ports)).path, 'plans/discussions/ds-aaaaaaaaaa-feat/DISCUSSION.md');
   assert.equal(await taskOfHead(root, 'secretary', 'miu', ports), null);
   assert.equal(await taskOfHead(root, 'supervisor', 'sv', ports), null);
   await assert.rejects(taskOfHead(root, 'lead', 'proj-999', ports), { code: 'plan-not-found' });
