@@ -19,3 +19,7 @@ Three leads are live out of a maximum of four, and all four lanes are free. No p
 
 - `fgos questions show <id>` fails from this head with `git-floor-probe-failed: Read-only file system` (`event-store-unavailable`). The answers were read from the event payload and the askers' screens instead.
 - `fgos convention path --kind report` without `--type` fails as `invalid-type` rather than naming the missing flag.
+
+## Late event
+
+- `2dcc37a8c3d9ad7c` `session-idle`: all three running plans have a live lead. `lead:S6A` has been idle since 13:10, waiting on its dependency plan 261121-1309-git-windows-custody. `lead:WINCUSTODY` has been idle since 14:14, waiting on Windows CI runs in two background shells. Neither wait is a lack of progress, so I replaced neither lead. Handled.
