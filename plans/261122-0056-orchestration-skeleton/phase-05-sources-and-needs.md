@@ -1,6 +1,6 @@
 # Phase 5: Record sources and need resolution
 
-Status: blocked on owner question `q-e2bpqz65c2` (depends on phase 4). Decisions: SR-D8 (the keeper never reads domain state),
+Depends on phase 4. Decisions: SR-D8 (the keeper never reads domain state),
 OS-D11 (each need resolves at an existing door), OS-D14 (ask the referee before a start), OS-D16 (`waitingOn:
 person` points at a question), OS-D21 (phases run in guide cases).
 

@@ -1,6 +1,6 @@
 # Phase 7: Handoff as close one record, open the next
 
-Status: blocked on owner question `q-e2bpqz65c2` (OS-D19 is tentative; also depends on phases 5 and 6). Decision: OS-D19 (a
+Owner confirmed OS-D12 and OS-D19 as final on 2026-11-22 (`q-e2bpqz65c2`). Depends on phases 5 and 6. Decision: OS-D19 (a
 handoff between steps closes one record with `outcome: done` and the domain opens the next with `needs`; the payload
 and trust boundary stay per `routing-handoff.md`). The three paths of today converge on this shape.
 

@@ -1,6 +1,6 @@
 # Phase 6: Sleep and wake of players
 
-Status: blocked on owner question `q-e2bpqz65c2` (depends on phase 5). Decision: OS-D18 (sleep ends the session by default; a
+Depends on phase 5. Decision: OS-D18 (sleep ends the session by default; a
 head talking with a person may sit in its pane and be woken by mailbox or wake, up to a configured limit, then falls
 back to the default). The limit is decided in plan.md: `watcher.conversationSleepMaxSec`, default 43200.
 

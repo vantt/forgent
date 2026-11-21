@@ -1,6 +1,6 @@
 # Phase 8: Scheduling records read port and command port
 
-Status: blocked on owner question `q-e2bpqz65c2` (depends on phase 5). Decision: OS-D20 ports 2 and 3 (portfolio read of
+Depends on phase 5. Decision: OS-D20 ports 2 and 3 (portfolio read of
 scheduling records through CLI `--json` and gateway REST; the command port uses existing verbs).
 
 ## Inputs

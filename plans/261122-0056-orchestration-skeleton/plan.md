@@ -177,8 +177,8 @@ Each maps to the discussion's hand-off criteria; the owning proof is named in th
 
 ## Decided here
 
-The discussion left five points open, each blocking part of the plan. The planner decides what the evidence settles
-and asks only what the owner alone can answer.
+The discussion left five points open, each blocking part of the plan. OS-D12 and OS-D19 were confirmed by the owner
+(Owner questions); the planner decided the rest from the evidence.
 
 | Point | Decision | Why |
 |---|---|---|
@@ -230,15 +230,15 @@ and asks only what the owner alone can answer.
 | 11 | [Tool as a player through fgos run](phase-11-tool-player.md) | - | packages/execution/rust/src/tools.rs, packages/execution/rust/src/bind.rs, packages/execution/rust/src/executor_model.rs, packages/execution/rust/src/executor_config.rs, packages/execution/rust/src/unit/, packages/execution/rust/src/loops/, packages/execution/contracts/executor-model.v1.json, packages/execution/contracts/bind.v1.json, packages/execution/rust/tests/tool_job.rs | 1 | ready |
 | 12 | [General plan contract, wave optional](phase-12-plan-contract-wave.md) | - | core/skills/_shared/plan-contract.md, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs | 1 | ready |
 | 2 | [Signal entry: wake reasons and the signed webhook route](phase-02-signal-entry.md) | 1, 3 | apps/fgos/src/wiring/supervision.rs, apps/fgos/src/wiring/questions.rs, apps/fgos-gateway/src/gateway.rs, apps/fgos-gateway/src/webhook.rs, apps/fgos-gateway/src/lib.rs, core/config-standard/gateway.yaml, core/config-schema/gateway.schema.yaml, packages/distribution/contracts/doctor-registry.v1.json, packages/host-runtime/contracts/command-manifest.json | 2 | ready |
-| 4 | [Scheduling record contract and keeper core](phase-04-keeper-core.md) | 1 | packages/supervision/contracts/scheduling-record.v1.json, packages/supervision/contracts/event-streams.v1.json, packages/supervision/rust/src/keeper.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/keeper.rs | 2 | draft |
+| 4 | [Scheduling record contract and keeper core](phase-04-keeper-core.md) | 1 | packages/supervision/contracts/scheduling-record.v1.json, packages/supervision/contracts/event-streams.v1.json, packages/supervision/rust/src/keeper.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/wake.rs, packages/supervision/rust/tests/keeper.rs | 2 | ready |
 | 13 | [Contract check at takeover; frame intent](phase-13-takeover-check-frame-intent.md) | 12 | src/portfolio/plan-contract.mjs, scripts/plan-contract-check.mjs, src/workflow/propose.mjs, src/workflow/propose-validate.mjs, src/workflow/propose-frame.mjs, src/workflow/case-frame.mjs, test/workflow/propose.test.mjs, test/workflow/propose-frame.test.mjs, test/portfolio/plan-contract.test.mjs | 2 | ready |
 | 9 | [Periodic review](phase-09-periodic-review.md) | 1 | core/watcher/definitions/review-due.query.json, core/watcher/briefs/periodic-review.md, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/src/watcher.rs, packages/supervision/rust/tests/watcher.rs, packages/supervision/rust/tests/definitions.rs, apps/fgos/src/wiring/supervision.rs | 3 | ready |
 | 14 | [Lead runs phases inside cases; one harness](phase-14-lead-in-case.md) | 13 | packages/execution/rust/src/run_request/, packages/execution/rust/tests/run_request_case.rs, core/skills/fgos-lead/SKILL.md | 3 | ready |
-| 5 | [Record sources and need resolution](phase-05-sources-and-needs.md) | 4, 10 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/sources.rs, apps/fgos/src/wiring/supervision.rs, src/workflow/records.mjs, src/workflow/case-verbs.mjs, test/workflow/records.test.mjs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml | 4 | draft |
-| 6 | [Sleep and wake of players](phase-06-sleep-and-wake.md) | 5 | packages/supervision/rust/src/keeper.rs, packages/supervision/rust/tests/keeper.rs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, apps/fgos/src/wiring/supervision.rs | 5 | draft |
-| 8 | [Scheduling records read port and command port](phase-08-records-read-port.md) | 5, 2 | apps/fgos/src/wiring/scheduling.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/routing.rs, apps/fgos/src/cli_projector.rs, apps/fgos/tests/scheduling_records.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, apps/fgos-gateway/src/gateway.rs | 5 | draft |
-| 7 | [Handoff as close one record, open the next](phase-07-handoff-records.md) | 5, 6 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/discussion_source.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/tests/sources.rs, packages/supervision/rust/tests/discussion_source.rs, core/watcher/definitions/discussion-settled.query.json, core/skills/fgos-supervisor/SKILL.md, apps/fgos/src/wiring/supervision.rs | 6 | draft |
-| 15 | [Integration](phase-15-integration.md) | 2, 3, 7, 8, 9, 11, 14 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/runner/spec.md, docs/platform/runner/contracts/routing-handoff.md, CHANGELOG.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, plans/261122-0056-orchestration-skeleton/ | 7 | draft |
+| 5 | [Record sources and need resolution](phase-05-sources-and-needs.md) | 4, 10 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/lib.rs, packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/sources.rs, apps/fgos/src/wiring/supervision.rs, src/workflow/records.mjs, src/workflow/case-verbs.mjs, test/workflow/records.test.mjs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml | 4 | ready |
+| 6 | [Sleep and wake of players](phase-06-sleep-and-wake.md) | 5 | packages/supervision/rust/src/keeper.rs, packages/supervision/rust/tests/keeper.rs, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, apps/fgos/src/wiring/supervision.rs | 5 | ready |
+| 8 | [Scheduling records read port and command port](phase-08-records-read-port.md) | 5, 2 | apps/fgos/src/wiring/scheduling.rs, apps/fgos/src/wiring/mod.rs, apps/fgos/src/routing.rs, apps/fgos/src/cli_projector.rs, apps/fgos/tests/scheduling_records.rs, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-route-annotations.json, apps/fgos-gateway/src/gateway.rs | 5 | ready |
+| 7 | [Handoff as close one record, open the next](phase-07-handoff-records.md) | 5, 6 | packages/supervision/rust/src/sources.rs, packages/supervision/rust/src/discussion_source.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/tests/sources.rs, packages/supervision/rust/tests/discussion_source.rs, core/watcher/definitions/discussion-settled.query.json, core/skills/fgos-supervisor/SKILL.md, apps/fgos/src/wiring/supervision.rs | 6 | ready |
+| 15 | [Integration](phase-15-integration.md) | 2, 3, 7, 8, 9, 11, 14 | docs/platform/supervision/spec.md, docs/platform/questions/spec.md, docs/platform/workflow/spec.md, docs/platform/resource-referee/spec.md, docs/platform/runner/spec.md, docs/platform/runner/contracts/routing-handoff.md, CHANGELOG.md, .agents/skills/, plugins/fgOS/skills/, .claude/skills/, plans/261122-0056-orchestration-skeleton/ | 7 | ready |
 
 Phase ids follow the discussion's task order (T1, T7.1 to T7.7); waves, not ids, give the run order.
 
@@ -250,15 +250,16 @@ phases 9, 5, 6), `apps/fgos-gateway/src/gateway.rs` and `command-manifest.json` 
 `plugins/fgOS/skills/`, `.claude/skills/`) are regenerated once, by `npm run build:skills` in phase 15; phases edit
 only skill sources. Specs and `CHANGELOG.md` are written only in phase 15.
 
-Blocked phases: 4, 5, 6, 8 and 7 wait on owner question `q-e2bpqz65c2` (OS-D12 and OS-D19 are recorded as tentative); 15
-waits on them. Phases 1, 2, 3, 9, 10, 11, 12, 13, 14 are untouched by the answer and are `ready`. The whole plan also
-waits on `blockedBy` (both plans are at their last phases and share wiring, execution and plan-check files with this
-one).
+No phase waits on an owner question: the owner confirmed OS-D12 and OS-D19 as final on 2026-11-22
+(`q-e2bpqz65c2`). The whole plan still waits on `blockedBy` (both plans are at their last phases and share wiring,
+execution and plan-check files with this one).
 
 ## Owner questions
 
-- `q-e2bpqz65c2`: confirm OS-D12 (one scheduling record per open step, keyed by `item`, `step`) and OS-D19 (handoff closes
-  one record and opens the next) as final. Blocks phases 4 to 8 and 15 only.
+- `q-e2bpqz65c2` (answered by the owner directly in the planner session, 2026-11-22: "chốt cả hai như em khuyến
+  nghị"): OS-D12 (one scheduling record per open step, keyed by `item`, `step`) and OS-D19 (handoff closes one record
+  and opens the next) are final. The planner head cannot write `questions answer`, so it closed the question with
+  the owner's words as the reason.
 
 ## Risks and rollback
 

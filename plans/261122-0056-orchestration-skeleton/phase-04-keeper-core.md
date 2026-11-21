@@ -1,6 +1,6 @@
 # Phase 4: Scheduling record contract and keeper core
 
-Status: blocked on owner question `q-e2bpqz65c2` (OS-D12 and OS-D19 are tentative). Decisions: OS-D4, OS-D5,
+Owner confirmed OS-D12 and OS-D19 as final on 2026-11-22 (`q-e2bpqz65c2`). Decisions: OS-D4, OS-D5,
 OS-D7, OS-D9 (`waitingOn`, `outcome`), OS-D10 (`until`), OS-D11 (`needs`: `role`, `actor`, `capability`), OS-D12
 (one record per open step, key `item`, `step`), OS-D13 (loop cap belongs to the domain; the keeper counts and
 compares).
