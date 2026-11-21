@@ -37,8 +37,20 @@ const ATTR_FROM: &str = "fgos.discussion.from";
 const ATTR_TO: &str = "fgos.discussion.to";
 const ATTR_PATH: &str = "fgos.discussion.path";
 const NONE_STATE: &str = "none";
-/// The roots a discussion has lived under, current first. History keeps the earlier one for good.
-const DISCUSSION_ROOTS: [&str; 2] = ["plans/discussions", "docs/discussions"];
+/// The root a discussion lived under before the portfolio data model. History keeps it for good.
+const LEGACY_DISCUSSION_ROOT: &str = "docs/discussions";
+
+/// The roots a discussion has lived under, current first: the convention rule's root, then the earlier one.
+fn discussion_roots() -> Vec<String> {
+    let current = fgos_convention::packaged_rules()
+        .by_kind("discussion")
+        .and_then(|rule| rule.roots.first())
+        .map(|root| root.trim_end_matches('/').to_owned());
+    current
+        .into_iter()
+        .chain([LEGACY_DISCUSSION_ROOT.to_owned()])
+        .collect()
+}
 const DISCUSSION_FILE: &str = "DISCUSSION.md";
 const MARKER_LINES: usize = 12;
 const WALK_COMMITS: usize = 1_000_000;
@@ -83,9 +95,10 @@ impl<H: DiscussionHistory> DiscussionSource<H> {
     /// is the state before it, so the window only filters what is returned.
     pub fn records(&self, window: &Window) -> Result<Vec<Record>, String> {
         let window = ParsedWindow::parse(window)?;
-        let commits =
-            self.history
-                .commits(&[DISCUSSION_ROOTS[0], DISCUSSION_ROOTS[1], "plans/reports"])?;
+        let mut prefixes = discussion_roots();
+        prefixes.push("plans/reports".to_owned());
+        let prefixes: Vec<&str> = prefixes.iter().map(String::as_str).collect();
+        let commits = self.history.commits(&prefixes)?;
         let mut states: HashMap<String, String> = HashMap::new();
         let mut out = Vec::new();
         for commit in &commits {
@@ -182,9 +195,9 @@ fn topic_of_dir(name: &str) -> &str {
 /// The discussion a path belongs to: the topic of its directory under a discussion root, or the stem of a shaping
 /// report.
 fn subject_of(path: &str) -> Option<&str> {
-    for root in DISCUSSION_ROOTS {
+    for root in discussion_roots() {
         let Some(rest) = path
-            .strip_prefix(root)
+            .strip_prefix(root.as_str())
             .and_then(|rest| rest.strip_prefix('/'))
         else {
             continue;
