@@ -80,7 +80,11 @@ impl<H: DiscussionHistory> DiscussionSource<H> {
     /// is the state before it, so the window only filters what is returned.
     pub fn records(&self, window: &Window) -> Result<Vec<Record>, String> {
         let window = ParsedWindow::parse(window)?;
-        let prefixes = [fgos_convention::discussion_root(), "plans/reports"];
+        let prefixes = [
+            fgos_convention::discussion_root(),
+            PRE_MIGRATION_DISCUSSION_ROOT,
+            "plans/reports",
+        ];
         let commits = self.history.commits(&prefixes)?;
         let mut states: HashMap<String, String> = HashMap::new();
         let mut out = Vec::new();
@@ -166,6 +170,9 @@ fn record(sha: &str, path: &str, subject: &str, ts: String, from: &str, to: Stri
     }
 }
 
+/// History-only: git history keeps the pre-migration discussion paths for good, so the walk must still read them.
+const PRE_MIGRATION_DISCUSSION_ROOT: &str = "docs/discussions";
+
 /// The topic of a discussion directory: the name after its `ds-<10 characters>-` id, or the whole name for a
 /// directory that has none.
 fn topic_of_dir(name: &str) -> &str {
@@ -178,10 +185,13 @@ fn topic_of_dir(name: &str) -> &str {
 /// The discussion a path belongs to: the topic of its directory under a discussion root, or the stem of a shaping
 /// report.
 fn subject_of(path: &str) -> Option<&str> {
-    if let Some(rest) = path
-        .strip_prefix(fgos_convention::discussion_root())
-        .and_then(|rest| rest.strip_prefix('/'))
-    {
+    let under_root = [
+        fgos_convention::discussion_root(),
+        PRE_MIGRATION_DISCUSSION_ROOT,
+    ]
+    .into_iter()
+    .find_map(|root| path.strip_prefix(root)?.strip_prefix('/'));
+    if let Some(rest) = under_root {
         let (dir, file) = rest.split_once('/')?;
         return (file == DISCUSSION_FILE && !dir.is_empty()).then(|| topic_of_dir(dir));
     }
@@ -406,7 +416,7 @@ mod tests {
             subject_of("plans/discussions/ds-abcdefghij-a/b/DISCUSSION.md"),
             None
         );
-        assert_eq!(subject_of("docs/discussions/a/DISCUSSION.md"), None);
+        assert_eq!(subject_of("docs/discussions/a/DISCUSSION.md"), Some("a"));
         assert_eq!(
             subject_of("plans/discussions/ds-abcdefghij-a/DISCUSSION.md"),
             Some("a")
