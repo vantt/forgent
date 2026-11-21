@@ -174,7 +174,7 @@ test('unrelated hook edits may accompany an already allowlisted root addition', 
   assert.equal(f.git(['show', 'HEAD:README.md']), '# Legitimate addition');
 });
 
-test('Convention hook warns without blocking and forwards only direct added or renamed Markdown paths', (t) => {
+test('Documentation hook warns on a non-blocking placement verdict and asks placement once for the scoped staged paths that exist', (t) => {
   const f = fixture(t);
   f.git(['config', '--unset', 'core.hooksPath']);
   f.put('plans/reports/old.md', '# old report\n');
@@ -188,11 +188,11 @@ test('Convention hook warns without blocking and forwards only direct added or r
   f.put('plans/reports/not-markdown.txt', 'not Markdown\n');
   f.git(['add', 'plans/reports/-đổi-tên.md', 'plans/journals/tạp chí.md', 'plans/example/reports/nested-bad.md', 'plans/reports/not-markdown.txt']);
 
-  const argsLog = path.join(f.temp, 'host-args.json');
+  const argsLog = path.join(f.temp, 'host-args.jsonl');
   const host = path.join(f.temp, 'fake-host.mjs');
   fs.writeFileSync(host, `#!/usr/bin/env node
 import fs from 'node:fs';
-fs.writeFileSync(process.env.ARGS_LOG, JSON.stringify(process.argv.slice(2)));
+fs.appendFileSync(process.env.ARGS_LOG, JSON.stringify(process.argv.slice(2)) + '\\n');
 const separator = process.argv.indexOf('--');
 const paths = separator === -1 ? [] : process.argv.slice(separator + 1);
 const violations = paths.map((path) => ({ path, code: 'pattern-mismatch', message: 'bad fixture name' }));
@@ -201,44 +201,63 @@ process.stdout.write(JSON.stringify({ contract: 'fgos.v1', data: { checked: path
 
   const result = f.commit(f.repo, { FGOS_HOST_BIN: host, ARGS_LOG: argsLog });
   passed(result);
-  assert.match(result.stderr, /warning: convention plans\/reports\/-đổi-tên\.md: pattern-mismatch/);
-  assert.match(result.stderr, /warning: convention plans\/journals\/tạp chí\.md: pattern-mismatch/);
-  const args = JSON.parse(fs.readFileSync(argsLog, 'utf8'));
-  assert.deepEqual(args.slice(args.indexOf('--') + 1), [
+  assert.match(result.stderr, /warning: plans\/reports\/-đổi-tên\.md:1: convention-pattern-mismatch/);
+  assert.match(result.stderr, /warning: plans\/journals\/tạp chí\.md:1: convention-pattern-mismatch/);
+  const calls = fs.readFileSync(argsLog, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
+  assert.equal(calls.length, 1, 'placement is one host call for every staged path');
+  assert.deepEqual(calls[0].slice(calls[0].indexOf('--') + 1), [
     'plans/journals/tạp chí.md',
     'plans/reports/-đổi-tên.md',
   ]);
-  assert.equal(args.includes('plans/example/reports/nested-bad.md'), false);
-  assert.equal(args.includes('plans/reports/not-markdown.txt'), false);
 });
 
-test('Convention hook ignores modifications to pre-existing scoped files', (t) => {
+// Wiring only: the rules are owned by test/scripts/doc-health.test.mjs; this proves the hook hands
+// doc-health the index, so the commit is judged on what it records and not on the working tree.
+test('Documentation hook judges staged content: a modified document is checked, a staged deletion breaks its links and an unstaged fix does not count', (t) => {
   const f = fixture(t);
   f.git(['config', '--unset', 'core.hooksPath']);
-  f.put('plans/reports/old-bad.md', '# old report\n');
-  f.git(['add', 'plans/reports/old-bad.md']);
-  f.git(['commit', '-qm', 'seed old report']);
+  f.put('docs/platform/governance.md', 'Required baseline:\n```txt\nDocument type:\n```\n');
+  f.put('docs/platform/a.md', '# A\n\nNo links yet.\n');
+  f.put('docs/platform/b.md', '# B\n');
+  f.git(['add', 'docs']);
+  f.git(['commit', '-qm', 'seed docs']);
   f.git(['config', 'core.hooksPath', path.join(sourceRoot, '.githooks')]);
-  f.put('plans/reports/old-bad.md', '# modified\\n');
-  f.git(['add', 'plans/reports/old-bad.md']);
+  const host = path.join(f.temp, 'docs-host.mjs');
+  fs.writeFileSync(host, `#!/usr/bin/env node
+const args = process.argv.slice(2);
+const paths = args.slice(args.indexOf('--') + 1);
+const data = args[1] === 'classify'
+  ? { kind: 'spec', cardinality: 'collection', scope: [], canonical: true, metadataExempt: true, generated: false }
+  : { checked: paths.length, violations: [] };
+process.stdout.write(JSON.stringify({ contract: 'fgos.v1', data }));
+`, { mode: 0o755 });
+  const hostEnv = { FGOS_HOST_BIN: host };
 
-  const host = path.join(f.temp, 'must-not-run');
-  fs.writeFileSync(host, '#!/bin/sh\\nexit 99\\n', { mode: 0o755 });
-  const result = f.commit(f.repo, { FGOS_HOST_BIN: host });
-  passed(result);
-  assert.doesNotMatch(result.stderr, /convention/);
+  f.put('docs/platform/a.md', '# A\n\n[b](b.md)\n');
+  f.git(['add', 'docs/platform/a.md']);
+  f.git(['rm', '-q', '--cached', 'docs/platform/b.md']);
+  const deleted = f.commit(f.repo, hostEnv);
+  refused(deleted, 'docs/platform/a.md');
+  assert.match(deleted.stderr, /unresolved-link: link target does not resolve: b\.md/);
+
+  f.put('docs/platform/a.md', '# A\n\nFixed on disk only.\n');
+  refused(f.commit(f.repo, hostEnv), 'docs/platform/a.md');
+
+  f.git(['add', 'docs/platform/a.md']);
+  passed(f.commit(f.repo, hostEnv));
+  assert.equal(f.git(['ls-tree', '--name-only', 'HEAD', 'docs/platform/b.md']), '');
 });
 
-test('Convention hook pass-skips a missing client in a copied hook fixture', (t) => {
+test('Documentation hook pass-skips a missing checker in a copied hook fixture', (t) => {
   const f = fixture(t);
   f.put('plans/reports/bad.md', '# bad report\n');
   f.git(['add', 'plans/reports/bad.md']);
   const result = f.commit();
   passed(result);
-  assert.match(result.stderr, /warning: convention check skipped \(client-load-error\)/);
+  assert.match(result.stderr, /warning: documentation check skipped \(client-load-error\)/);
 });
 
-test('Convention hook pass-skips an old host with one warning', (t) => {
+test('Documentation hook refuses the commit when the host of an activated workspace cannot answer', (t) => {
   const f = fixture(t);
   f.git(['config', 'core.hooksPath', path.join(sourceRoot, '.githooks')]);
   f.put('plans/reports/bad.md', '# bad report\n');
@@ -250,17 +269,18 @@ test('Convention hook pass-skips an old host with one warning', (t) => {
     { mode: 0o755 },
   );
   const result = f.commit(f.repo, { FGOS_HOST_BIN: host });
-  passed(result);
-  assert.match(result.stderr, /warning: convention check skipped \(host-version-mismatch\)/);
-  assert.equal(result.stderr.match(/host-version-mismatch/g)?.length, 1);
+  assert.equal(result.error, undefined);
+  assert.notEqual(result.status, 0, result.stderr);
+  assert.match(result.stderr, /the staged documentation could not be checked \(host-version-mismatch/);
+  assert.equal(f.git(['log', '-1', '--format=%s']), 'fixture baseline');
 });
 
 // Wiring only: the native rule cases are owned by Convention's Rust golden suite.
-test('Convention hook refuses a native block-posture documentation finding', (t) => {
+test('Documentation hook refuses a native block-posture placement finding', (t) => {
   const f = fixture(t);
   f.git(['config', 'core.hooksPath', path.join(sourceRoot, '.githooks')]);
-  f.put('docs/platform/misplaced.md', '# Misplaced\n');
-  f.git(['add', 'docs/platform/misplaced.md']);
+  f.put('docs/misplaced.md', '# Misplaced\n');
+  f.git(['add', 'docs/misplaced.md']);
   const host = path.join(f.temp, 'blocking-host.mjs');
   fs.writeFileSync(host, `#!/usr/bin/env node
 const paths = process.argv.slice(process.argv.indexOf('--') + 1);
@@ -268,6 +288,7 @@ const violations = paths.map(path => ({path, code:'forbidden-placement', message
 process.stdout.write(JSON.stringify({contract:'fgos.v1', data:{checked:paths.length, violations}}));
 `, { mode: 0o755 });
   const result = f.commit(f.repo, { FGOS_HOST_BIN: host });
-  refused(result, 'docs/platform/misplaced.md');
-  assert.match(result.stderr, /documentation placement violates Convention/);
+  refused(result, 'docs/misplaced.md');
+  assert.match(result.stderr, /error: docs\/misplaced\.md:1: convention-forbidden-placement: native fixture refusal/);
+  assert.match(result.stderr, /the documentation check found 1 finding\(s\)/);
 });

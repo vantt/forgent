@@ -19,9 +19,9 @@
 // Installed via `git config core.hooksPath .githooks` (wiring is cell -6's
 // job, out of scope here). Lives at <repoRoot>/.githooks/pre-commit and
 // imports its always-required dependencies with paths relative to ITS OWN
-// location, mirroring the production install layout. Convention checking
-// dynamically imports its client only when a scoped staged path exists; a
-// copied hook without that optional client warns and continues.
+// location, mirroring the production install layout. The documentation gate
+// dynamically imports its checker only when a scoped staged path exists; a
+// copied hook without that optional checker warns and continues.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -525,45 +525,119 @@ function configCheckRefusal(committingToplevel) {
   return `commit refused: "fgos config check" fails on the working-tree config file (${files.join(', ')} is staged; the check reads the file on disk, not the staged blob):\n${rows.join('\n')}\nRun "fgos config check" to see them and fix the file before committing.`;
 }
 
-async function warnOnConventionViolations(committingToplevel) {
-  if (!fs.existsSync(path.join(committingToplevel, 'apps/fgos/Cargo.toml'))) return;
+// The documentation gate (docs/platform/documentation/subcomponents/doc-checks/spec.md section 6.5): every
+// added, copied, modified, renamed or deleted path under docs/ (and a report or journal directly under plans/)
+// goes through the one documentation check, doc-health, judged on the STAGED content: the hook reads the index
+// itself (read verbs only) and hands doc-health a source over it, so an unstaged edit can neither pass nor fail
+// a commit, and a deleted document is gone for every link that still points at it. Findings refuse the commit;
+// placement verdicts without block posture are warnings. Placement is asked once for all paths. Without a host
+// binary the workspace is not activated and the check is skipped with a warning; with one, a host error or
+// timeout refuses the commit, since a documentation change is never committed unchecked there. A copied hook
+// without the checker warns and continues.
+const DOCUMENTATION_SCOPE = (candidate) => candidate.startsWith('docs/') || /^plans\/(?:reports|journals)\/[^/]+\.md$/u.test(candidate);
+
+/** The index as a doc-health source: its paths, its blobs (read in batches) and the directories they imply. */
+function indexDocumentSource(committingToplevel) {
+  const run = { cwd: committingToplevel, stdio: ['pipe', 'pipe', 'pipe'], maxBuffer: 512 * 1024 * 1024 };
+  const listed = execFileSync('git', ['ls-files', '-z', '--cached', '--full-name'], { ...run, encoding: 'utf8' })
+    .split('\0').filter(Boolean);
+  const indexed = new Set(listed);
+  const directories = new Set();
+  for (const file of listed) {
+    for (let at = file.indexOf('/'); at > 0; at = file.indexOf('/', at + 1)) directories.add(file.slice(0, at));
+  }
+  const blobs = new Map();
+  const readBlobs = (files) => {
+    const wanted = files.filter((file) => indexed.has(file) && !blobs.has(file));
+    if (wanted.length === 0) return;
+    const unreadable = wanted.find((file) => file.includes('\n'));
+    if (unreadable) throw new Error(`a staged path contains a newline and cannot be read from the index: ${JSON.stringify(unreadable)}`);
+    const out = execFileSync('git', ['cat-file', '--batch'], { ...run, input: wanted.map((file) => `:${file}\n`).join('') });
+    let offset = 0;
+    for (const file of wanted) {
+      const eol = out.indexOf(0x0a, offset);
+      const header = out.subarray(offset, eol).toString('utf8');
+      const size = /^[0-9a-f]+ blob (\d+)$/.exec(header);
+      if (!size) throw new Error(`the index entry of ${file} is not a readable blob (${header})`);
+      blobs.set(file, out.subarray(eol + 1, eol + 1 + Number(size[1])).toString('utf8'));
+      offset = eol + 1 + Number(size[1]) + 1;
+    }
+  };
+  const files = listed.filter((file) => file.startsWith('docs/platform/') && file.endsWith('.md')).sort();
+  readBlobs(files);
+  return {
+    files,
+    exists: (file) => indexed.has(file) || directories.has(file.replace(/\/+$/, '')),
+    readFile: (file) => {
+      if (directories.has(file.replace(/\/+$/, ''))) return '';
+      readBlobs([file]);
+      if (!blobs.has(file)) throw new Error(`${file} is not in the index`);
+      return blobs.get(file);
+    },
+  };
+}
+
+/** Whether a hex token names a commit of the committing repository; asked once per token. */
+function indexCommitResolver(committingToplevel) {
+  const answers = new Map();
+  return (token) => {
+    if (!answers.has(token)) {
+      const probe = spawnSync('git', ['rev-parse', '--verify', '--quiet', '--end-of-options', `${token}^{commit}`], {
+        cwd: committingToplevel, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      if (probe.error) throw probe.error;
+      answers.set(token, probe.status === 0);
+    }
+    return answers.get(token);
+  };
+}
+
+async function documentationRefusal(committingToplevel) {
+  if (!fs.existsSync(path.join(committingToplevel, 'apps/fgos/Cargo.toml'))) return null;
 
   let staged;
   try {
     staged = execFileSync(
       'git',
-      ['diff', '--cached', '--name-only', '-z', '--diff-filter=ACR'],
+      ['diff', '--cached', '--name-only', '-z', '--no-renames', '--diff-filter=ACMRD'],
       { cwd: committingToplevel, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
     );
   } catch (error) {
-    process.stderr.write(`warning: convention check skipped (staged-path-read-error): ${error.message}\n`);
-    return;
+    return `commit refused: the staged documentation paths could not be read (${error.message}). Repair the index and retry.`;
   }
-  const paths = staged
-    .split('\0')
-    .filter((candidate) => candidate.startsWith('docs/') || /^plans\/(?:reports|journals)\/[^/]+\.md$/u.test(candidate));
-  if (paths.length === 0) return;
+  const paths = staged.split('\0').filter((candidate) => candidate && DOCUMENTATION_SCOPE(candidate));
+  if (paths.length === 0) return null;
 
-  let conventionCheck;
+  let checker;
   try {
-    ({ conventionCheck } = await import('../src/convention/convention-client.mjs'));
+    checker = await import('../scripts/doc-health.mjs');
   } catch (error) {
-    process.stderr.write(`warning: convention check skipped (client-load-error): ${error.message}\n`);
-    return;
+    process.stderr.write(`warning: documentation check skipped (client-load-error): ${error.message}\n`);
+    return null;
+  }
+  if (!resolveActiveHostBin({ cwd: committingToplevel }).bin) {
+    process.stderr.write('warning: documentation check skipped (no fgos host binary found: not an activated workspace); continuing.\n');
+    return null;
   }
 
+  let result;
   try {
-    const result = conventionCheck(paths, { dir: committingToplevel });
-    const blocking = (result.violations ?? []).filter((violation) => violation.posture === 'block');
-    for (const violation of result.violations ?? []) {
-      process.stderr.write(`${violation.posture === 'block' ? 'error' : 'warning'}: convention ${violation.path}: ${violation.code} ${violation.message}\n`);
-    }
-    if (blocking.length) refuse('commit refused: documentation placement violates Convention');
+    result = checker.checkDocuments({
+      source: indexDocumentSource(committingToplevel),
+      paths,
+      classify: checker.hostClassify(committingToplevel),
+      isCommit: indexCommitResolver(committingToplevel),
+      placement: checker.hostPlacement(committingToplevel),
+    });
   } catch (error) {
-    const category = error?.code ?? 'host-exec-error';
-    const detail = error?.timedOut ? 'host timed out' : (error?.message ?? 'unknown error');
-    process.stderr.write(`warning: convention check skipped (${category}): ${detail}\n`);
+    const category = error?.code ?? 'check-error';
+    const detail = error?.timedOut ? 'host timed out' : String(error?.message ?? error).split('\n')[0].slice(0, 300);
+    return `commit refused: the staged documentation could not be checked (${category}: ${detail}). An activated workspace never commits a documentation change unchecked; run "fgos doctor" and retry.`;
   }
+  for (const warning of result.warnings) process.stderr.write(`warning: ${warning.path}:${warning.line}: ${warning.type}: ${warning.message}\n`);
+  if (result.findings.length === 0) return null;
+  for (const finding of result.findings) process.stderr.write(`error: ${finding.path}:${finding.line}: ${finding.type}: ${finding.message}\n`);
+  return `commit refused: the documentation check found ${result.findings.length} finding(s) in the staged content (scripts/doc-health.mjs, docs/platform/documentation/subcomponents/doc-checks/spec.md).`;
 }
 
 async function main() {
@@ -614,7 +688,11 @@ async function main() {
     return;
   }
 
-  await warnOnConventionViolations(committingToplevel);
+  const documentationProblem = await documentationRefusal(committingToplevel);
+  if (documentationProblem) {
+    refuse(documentationProblem);
+    return;
+  }
 
   if (!hookRunsAtHome(repoRoot, committingToplevel)) {
     // A different, unrelated checkout (sharing this repo's core.hooksPath)
