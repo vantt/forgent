@@ -123,6 +123,16 @@ Chủ dự án chấp nhận cả sáu ở round 11 (OS-D5). Đối chiếu vớ
 
 *Đã có:* `docs/architecture-manifest.json` mang 78 row `doors` (mỗi job một cửa: tên hoặc mẫu của job chỉ được xuất hiện trong file `allowed` hoặc `debt` của row), cùng luật tier một chiều; `test/architecture.test.mjs` kiểm cả hai (`checkDoors`). Backlog `p-7nja6ilwkr`: từ 2026-11-01 có 132 commit census và 37 commit one-door; chỉ Git có guard one-door, và guard đó bắn lúc land.
 
+*Authority hiện nằm ở ba chỗ (chủ dự án nhắc round 13):*
+
+| Nơi | Là gì | Trạng thái |
+|---|---|---|
+| `docs/platform/component-boundary.md` | "Platform-wide anchor for component boundaries": component nào tồn tại, ai sở hữu quyết định hay state write nào, phụ thuộc qua contract nào; luật cập nhật §3 bắt mọi discussion ghi `No component-boundary change` nếu không đổi | Canonical, văn xuôi; vài status lạc hậu (4b: Session Host, resource-referee ghi "spec only" dù đã có crate) |
+| `docs/platform/proposals/component-authority-boundary-map.md` | Bản đồ authority nháp (714 dòng: parent-child, authority ownership, contract dependency matrix, draft ports, promotion checklist) | Proposal, `Canonical: No`, "Implementation: Not started", review cuối 2026-09-02; chưa bao giờ được promote |
+| `docs/architecture-manifest.json` | Bản máy đọc: tier, luật import, 78 row `doors` | Có test (`test/architecture.test.mjs`) nhưng chỉ phủ tier và tên job, không phủ "ai sở hữu quyết định nào" |
+
+Ba nơi không đồng bộ với nhau và không nơi nào vừa đầy đủ vừa được máy kiểm. Đây là một nguồn tùm lum đúng nghĩa RUL11, và khớp giả thuyết 1 và 4 bên dưới.
+
 *Bằng chứng code thừa từ lượt dò 4b:* write-scope có hai bản (Rust + Node); worktree có hai module (`src/git/worktree.mjs`, `src/runner/worktree.mjs`); portfolio có hai chủ (Supervision và `packages/portfolio`); handoff có ba đường; ba ngôn ngữ khung; hai vòng lặp thực thi (watcher, `fgos-runner --watch`); `POST /v1/runner/tick` đi vòng cửa `fgos run`; mặc định `maxLeads` gán cứng ngoài `core/config-standard`.
 
 *Giả thuyết nguyên nhân (cần kiểm bằng điều tra `p-7nja6ilwkr`):*
@@ -134,7 +144,7 @@ Chủ dự án chấp nhận cả sáu ở round 11 (OS-D5). Đối chiếu vớ
 6. **Agent song song tự quyết ngầm** (G10).
 7. **Xóa đường cũ chưa bị ép.** L10 "chuyển mọi caller, xóa đường cũ" mới là văn xuôi; twin được ghi vào `allowed` rồi ở lại.
 
-*Đề xuất hướng (chưa chốt; phạm vi sửa round 13: toàn hệ thống, không riêng skeleton):* authority là yếu tố hạng nhất của toàn hệ thống. Một sổ authority duy nhất, máy đọc được, mở rộng ngay trong `docs/architecture-manifest.json` thay vì lập file mới: loại quyết định -> một thành phần chủ -> cửa (contract) -> spec. Sổ này được kiểm ở ba chỗ: **lúc plan** (plan khai báo nó chạm authority nào và cửa nào; chạm quyết định chưa có chủ thì phải hỏi trước khi viết code), **lúc land** (guard `doors` đã có, cộng thêm kiểm twin và đường cũ còn sót), và **trong nhịp rà soát định kỳ** của LLM (OS-D5 ý 6: tìm drift như code mới nằm ngoài chủ, spec lạc hậu).
+*Đề xuất hướng (chưa chốt; phạm vi sửa round 13: toàn hệ thống, không riêng skeleton):* authority là yếu tố hạng nhất của toàn hệ thống. Gom ba nơi trên về một sổ authority duy nhất (không thêm nơi thứ tư): phần máy đọc mở rộng trong `docs/architecture-manifest.json`, `component-boundary.md` thành bản đọc cho người sinh ra hoặc kiểm từ manifest, proposal map được promote phần còn đúng rồi retire: loại quyết định -> một thành phần chủ -> cửa (contract) -> spec. Sổ này được kiểm ở ba chỗ: **lúc plan** (plan khai báo nó chạm authority nào và cửa nào; chạm quyết định chưa có chủ thì phải hỏi trước khi viết code), **lúc land** (guard `doors` đã có, cộng thêm kiểm twin và đường cũ còn sót), và **trong nhịp rà soát định kỳ** của LLM (OS-D5 ý 6: tìm drift như code mới nằm ngoài chủ, spec lạc hậu).
 
 ## 4. Quyết định đã chốt
 
@@ -168,7 +178,7 @@ Kế thừa từ `docs/discussions/supervisor-review/DISCUSSION.md`:
 - 2026-11-21 16:38 round 10: Chủ dự án: "rất tốt, phân như vậy chính xác. anh nhạc trưởng phải sống dai là đúng, nhưng không thể là zoombie vô hồn." Mint OS-D4 (tách giữ nhịp / diễn giải). Shaper đề xuất năm thứ chống zombie (§3 4e), cập nhật §6.
 - 2026-11-21 16:44 round 11: Chủ dự án: "5 ý đều hay và anh nghĩ định kỳ llm nên có một bản rà soát." Mint OS-D5. Scout `core/watcher/definitions`, `core/watcher/pace`, `core/attention/definitions`: mầm của cả sáu ý đã có; ghi bảng đối chiếu ở §3 4e. Mở §3 row 10 (chi tiết rà soát).
 - 2026-11-21 16:52 round 12: Chủ dự án: "lưu ý: component authority/boudary và contracts là rất quan trọng. anh không rõ sao mình vẫn cứ bị sinh thêm code thừa, nên cần quản lý chắc cho anh." Scout `docs/architecture-manifest.json` (78 row `doors`), `test/architecture.test.mjs` `checkDoors`, backlog `p-7nja6ilwkr`. Ghi §3 4f và row 11.
-- 2026-11-21 16:56 round 13: Chủ dự án: "authority/boundary và contract là yếu tố hạng nhất của cả system, chứ sao mỗi orchestra?" Shaper nhận đã đóng khung sai (gắn authority vào skeleton). Sửa §2, §3 row 11, 4f sang phạm vi toàn hệ thống; dẫn design principle 1 và 7 đã có sẵn.
+- 2026-11-21 16:56 round 13: Chủ dự án: "authority/boundary và contract là yếu tố hạng nhất của cả system, chứ sao mỗi orchestra?" Shaper nhận đã đóng khung sai (gắn authority vào skeleton). Sửa §2, §3 row 11, 4f sang phạm vi toàn hệ thống; dẫn design principle 1 và 7 đã có sẵn. Chủ dự án nhắc thêm ledger "component-xxx": tìm ra `docs/platform/component-boundary.md` (canonical) và `docs/platform/proposals/component-authority-boundary-map.md` (nháp, chưa promote); ghi bảng ba nơi chứa authority vào 4f.
 
 ## 6. Thiết kế đã chốt {#design}
 
