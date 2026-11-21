@@ -7,3 +7,7 @@ properties:
   enforce:
     description: When true a stale end-user docs index fails the gate; when false it is only reported.
     type: boolean
+  topicMaxDocs:
+    description: The most documents one knowledge topic holds before `fgos knowledge status` reports it as doc-topic-oversized.
+    type: integer
+    minimum: 1

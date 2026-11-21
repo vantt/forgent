@@ -11,8 +11,9 @@ import { isLiveDocLifecycle } from '../state/knowledge-registry.mjs';
 import { findDuplicateAuthoritativeClaims } from './authoritative-match.mjs';
 import { describeYamlError, readFrontmatter, YamlParseError } from '../util/yaml.mjs';
 
-const PROVISIONAL_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
-const DEFAULT_TOPIC_MAX_DOCS = 10;
+// Policy, not a fix (owner decision 2026-11-12, doc-checks spec 11.1): a provisional doc not touched for
+// 30 days is reported, never refused.
+const PROVISIONAL_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
 // An alias is a doc's OLD path, kept as a historical lookup key (never a live location), so a file missing at
 // the alias path is the expected state after a migration. Broken means ambiguous: two or more non-retired docs
@@ -78,12 +79,15 @@ function scanDocFrontmatter(root) {
   return { duplicates, refused };
 }
 
+// `updatedAt` is the event time the registry folded: an ISO string from the log, or epoch milliseconds when the
+// event carried none. A value that parses to no time cannot be aged and is reported as such, never skipped.
 function provisionalAged(view, now) {
   const aged = [];
   for (const doc of Object.values(view.docs || {})) {
-    if (doc.docLifecycle === 'provisional' && doc.updatedAt && (now - doc.updatedAt > PROVISIONAL_MAX_AGE_MS)) {
-      aged.push(doc.docId);
-    }
+    if (doc.docLifecycle !== 'provisional' || doc.updatedAt === undefined || doc.updatedAt === null) continue;
+    const updated = typeof doc.updatedAt === 'number' ? doc.updatedAt : Date.parse(doc.updatedAt);
+    if (!Number.isFinite(updated)) aged.push(`${doc.docId} (updatedAt ${JSON.stringify(doc.updatedAt)} is not a time)`);
+    else if (now - updated > PROVISIONAL_MAX_AGE_MS) aged.push(doc.docId);
   }
   return aged;
 }
@@ -199,9 +203,11 @@ function sourceConservation(view, root) {
 /**
  * Every lint that has something to say about `view` (the Work view) and the docs tree under `root`:
  * `[{ lint, level: 'fail' | 'warn', items: string[] }]`, in a fixed order. A lint with nothing to report is
- * absent. `role-underused` is information only (`warn`); the others are `fail`.
+ * absent. `role-underused` and `provisional-aged` are reported only (`warn`); the others are `fail`.
+ * `topicMaxDocs` is the config value `docRegistry.topicMaxDocs`; its default lives in the config standard.
  */
-export function knowledgeFindings(view, { root, now = Date.now(), topicMaxDocs = DEFAULT_TOPIC_MAX_DOCS }) {
+export function knowledgeFindings(view, { root, now = Date.now(), topicMaxDocs }) {
+  if (!Number.isInteger(topicMaxDocs) || topicMaxDocs < 1) throw new TypeError(`knowledgeFindings needs topicMaxDocs (docRegistry.topicMaxDocs), a positive integer; got ${JSON.stringify(topicMaxDocs)}`);
   const frontmatter = scanDocFrontmatter(root);
   const lints = [
     ['doc-alias-broken', 'fail', aliasBroken(view)],
@@ -210,7 +216,7 @@ export function knowledgeFindings(view, { root, now = Date.now(), topicMaxDocs =
     ['doc-source-unreachable', 'fail', sourceUnreachable(view)],
     ['doc-near-duplicate', 'fail', frontmatter.duplicates],
     ['doc-frontmatter-refused', 'fail', frontmatter.refused],
-    ['doc-provisional-aged', 'fail', provisionalAged(view, now)],
+    ['doc-provisional-aged', 'warn', provisionalAged(view, now)],
     ['doc-topic-oversized', 'fail', topicsOversized(view, topicMaxDocs)],
     ['doc-role-underused', 'warn', rolesUnderused(view)],
     ['doc-source-conservation', 'fail', sourceConservation(view, root)],

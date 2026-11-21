@@ -22,7 +22,7 @@ function setupGitRepoWithStore() {
   return { tmpDir, fgosDir };
 }
 
-const findingsOf = (tmpDir, fgosDir, options = {}) => knowledgeFindings(listWork(fgosDir), { root: tmpDir, ...options });
+const findingsOf = (tmpDir, fgosDir, options = {}) => knowledgeFindings(listWork(fgosDir), { root: tmpDir, topicMaxDocs: 10, ...options });
 const lint = (findings, id) => findings.find((f) => f.lint === id);
 
 test('knowledge projection - computeKnowledgeProjection generates expected structure', () => {
@@ -273,4 +273,27 @@ test('knowledgeFindings reports a doc whose frontmatter the YAML door refuses, b
   assert.equal(refused.items.length, 1);
   assert.match(refused.items[0], /^docs\/how-to\/bad\.md: /);
   assert.deepEqual(lint(findings, 'doc-near-duplicate').items, ['docs/how-to/a.md ~ docs/how-to/b.md']);
+});
+
+// Owns the aging policy: updatedAt is parsed (an ISO string from the log, or epoch milliseconds) before it is
+// subtracted, the cutoff is 30 days, and the lint reports without refusing.
+test('knowledge lints - doc-provisional-aged parses updatedAt, warns about a provisional doc older than 30 days and names a time it cannot read', () => {
+  const { tmpDir } = setupGitRepoWithStore();
+  try {
+    const now = Date.parse('2026-11-22T00:00:00.000Z');
+    const day = 24 * 60 * 60 * 1000;
+    const doc = (docId, updatedAt, docLifecycle = 'provisional') => ({ docId, topicId: 't1', role: 'guide', currentPath: `docs/${docId}.md`, docLifecycle, updatedAt, sourceCaptureIds: [`docs/${docId}.md`] });
+    const view = { topics: {}, docs: {
+      old: doc('old', new Date(now - 31 * day).toISOString()),
+      recent: doc('recent', new Date(now - 29 * day).toISOString()),
+      epoch: doc('epoch', now - 31 * day),
+      active: doc('active', new Date(now - 300 * day).toISOString(), 'active'),
+      unreadable: doc('unreadable', 'yesterday'),
+    } };
+    const aged = lint(knowledgeFindings(view, { root: tmpDir, now, topicMaxDocs: 10 }), 'doc-provisional-aged');
+    assert.equal(aged.level, 'warn');
+    assert.deepEqual([...aged.items].sort(), ['epoch', 'old', 'unreadable (updatedAt "yesterday" is not a time)']);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
 });

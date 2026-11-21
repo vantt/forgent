@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "bcff4a10490b3c8d66ab6af2e20e9a320786648e1f3d45a80fe028b226be6ecc",
+  "payloadDigest": "c7c177d82d723f3f31673b07a9d6c471e7ee3c629ca987bec51c30ef584ae2ac",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -206,7 +206,7 @@
     "apps/fgos/tests/windows_semantics_probe.rs": "ecb59690bbf1259baa1defb6417c24005138526bb565f216f9db3c2ad784d240",
     "apps/fgos/tests/windows_support/mod.rs": "2b8a17676526c87ea5ecfb2074a70a3511fbf9267f9de78a35dc355f272830fb",
     "bin/fgos-runner.mjs": "24fa9b497547a104912b90ab98b3d53fbbe0068a5977a7a04724789c8e717156",
-    "bin/fgos.mjs": "e5bc6e0d178ca962bcd76036f9fa79b9f4e253b1ad31b753df84fc1179d5fb24",
+    "bin/fgos.mjs": "cd59030eba64ba95ea3623fea60408bc0b216addecae738d750c76d749b7ceb7",
     "core/skills/_shared/capability-catalog.md": "abb355e91c92f728f1a527777945e80b9cc97c57af82e2c1a4e3eac64b928da6",
     "core/skills/_shared/capability-matching.md": "eb67cde05d45c171c1d4803f9d2fbec5fc63565b9fd0a0549c866a7eb262521d",
     "core/skills/_shared/catchup-self-recovery.md": "3b77650c71a0225f00ffa8fe9524d7c0052977204f425c1999225b6f80802c69",
@@ -1478,7 +1478,7 @@
     "src/report/enduser-index-generate.mjs": "b4ef9eb3fef9fa66415945e3b5a55fae670f7df3e234dd44711352b89459e08b",
     "src/report/enduser-index.mjs": "373da334b9cd862b2c3a0fbf4fffb3fe010f244872702dbfceb25eada5c5e650",
     "src/report/item-trace.mjs": "bb91d0d9635d0794ed9a979cc4fa6721d26db18905637d465be8ce6d831e7155",
-    "src/report/knowledge-lints.mjs": "a5e7b235fe2c9fb45cf1378f84cefaa5336100304cdb45eacea37113207442d7",
+    "src/report/knowledge-lints.mjs": "d8209b8fea29b9eacf3417c101407f6dafa04122ce68c3e01e6c4bdc2ded8004",
     "src/report/knowledge-projection.mjs": "f2afac52580e95a7f58c5a3a2562f1021ca5c7ad450f6dd474f185b3e66a020d",
     "src/report/knowledge-resolver.mjs": "75784779a4e11d793cf1fe9307a8db7020f419da05ecc003708dd9ffd324d516",
     "src/run-supervisor/cancel-opt-in.mjs": "79f61ba06b66c699529d3863c0c02c63ed947d8eb0653e856b5f06f29577f45f",

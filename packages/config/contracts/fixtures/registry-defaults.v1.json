@@ -126,6 +126,16 @@
     "value": 900
    },
    "reason": "the bundled workerSlots standard, which the reader takes for an unset key; the registration seeds only the ceiling"
+  },
+  {
+   "path": "docRegistry.topicMaxDocs",
+   "registry": {
+    "absent": true
+   },
+   "standard": {
+    "value": 10
+   },
+   "reason": "the knowledge lints read this limit; setup never seeded it and the lint module carried the default until the standard declared it"
   }
  ],
  "schema-only": [

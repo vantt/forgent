@@ -4,3 +4,5 @@
 docRegistry:
   # @fgos:doc When true a stale end-user docs index fails the gate; when false it is only reported. Default: false.
   enforce: false
+  # @fgos:doc The most documents one knowledge topic holds before `fgos knowledge status` reports it as doc-topic-oversized. Minimum: 1. Default: 10.
+  topicMaxDocs: 10

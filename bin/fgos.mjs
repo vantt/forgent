@@ -1452,7 +1452,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           topics: { active: activeTopics, retired: retiredTopics, total: Object.keys(topics).length },
           docs: docCounts,
           totalDocs: Object.keys(docs).length,
-          findings: knowledgeFindings(view, { root, ...(topicMaxDocs === undefined ? {} : { topicMaxDocs }) }),
+          findings: knowledgeFindings(view, { root, topicMaxDocs }),
         };
       } else if (sub === 'attest') {
         const docPath = requireField(flags['doc-path'] ?? positional[1], 'knowledge attest requires --doc-path');

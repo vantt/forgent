@@ -480,6 +480,10 @@
   [
    "runner",
    "personas"
+  ],
+  [
+   "docRegistry",
+   "topicMaxDocs"
   ]
  ]
 }
