@@ -110,7 +110,7 @@ narrative goes into the Git spec's decision history.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Linked worktree trust and plain paths on Windows, CI job](phase-01-windows-worktree-and-ci-job.md) | - | packages/git/rust/src/driver.rs, packages/git/rust/src/worktree.rs, packages/git/rust/tests/worktree.rs, packages/distribution/rust/src/release_rows.rs, packages/distribution/rust/src/workspace.rs, .github/workflows/release-assets-check.yml | 1 | ready |
+| 1 | [LockFileEx handle evidence, linked worktree trust and plain paths on Windows, CI job](phase-01-windows-worktree-and-ci-job.md) | - | packages/holder-lock/rust/tests/windows_lockfileex.rs, packages/git/rust/src/driver.rs, packages/git/rust/src/worktree.rs, packages/git/rust/tests/worktree.rs, packages/distribution/rust/src/release_rows.rs, packages/distribution/rust/src/workspace.rs, .github/workflows/release-assets-check.yml | 1 | ready |
 | 2 | [WAL opens on Windows](phase-02-windows-wal.md) | - | packages/git/rust/src/wal.rs, packages/git/rust/src/wal/** | 1 | ready |
 | 3 | [Borrowed handle and borrow I/O on Windows](phase-03-holder-lock-windows-borrow.md) | - | packages/holder-lock/rust/src/port.rs, packages/holder-lock/rust/src/borrow_windows.rs, packages/holder-lock/rust/src/driver/windows.rs, packages/holder-lock/rust/tests/**, .github/workflows/release-assets-check.yml | 2 | ready |
 | 4 | [C5 fence and scan on Windows, git-wal-v1 advertised](phase-04-windows-c5.md) | 2 | packages/distribution/rust/src/git_gate.rs, packages/distribution/rust/src/init.rs, packages/distribution/rust/src/verify.rs, packages/distribution/rust/tests/**, docs/platform/packaging-distribution/contracts/activation-binding.md, docs/platform/packaging-distribution/contracts/release-manifest.md | 2 | ready |
@@ -132,8 +132,8 @@ None open. The owner chose option (a) on 2026-11-21. Every mechanism here extend
 is told of each in the plan-landed message and may stop a phase.
 
 ## Risks and rollback
-- A `DuplicateHandle` copy closed while a borrow runs might release the owner's lock. Phase 3 proves on Windows that
-  the owner still holds after the copy closes, before any port uses it; if it does not hold, the Windows borrow keeps a
+- A `DuplicateHandle` copy closed while a borrow runs might release the owner's lock. Phase 1 measures on Windows CI
+  how `LockFileEx` behaves across duplicated and inherited handles before any port uses a copy; if it does not hold, the Windows borrow keeps a
   non-owning reference to the owner's handle instead of a duplicate.
 - The Windows WAL trust rule (owner SID, no world-writable ACE) may refuse runner temp directories; phase 2 measures
   it on CI and records the rule in the Git spec.
@@ -151,3 +151,7 @@ p-nk6xf5laob and p-w4cxqq2sbw are set done through the portfolio owner when phas
 
 ## Log
 - 2026-11-21 lead:WINCUSTODY: plan written against origin/main 3f009686d.
+- 2026-11-21 supervisor: no objection. Land bar set by lead:OPC (forgent-67), who reviews every phase before its land:
+  the branch, sha and a green native windows-latest run id go to OPC; Linux tests unchanged; phases 1, 2 and 5 rest on
+  the measured LockFileEx duplicated/inherited-handle test, which is phase 1's first step. Each land is reported to
+  the supervisor.

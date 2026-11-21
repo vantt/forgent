@@ -13,8 +13,8 @@ packages/holder-lock/rust/src/driver/windows.rs, packages/holder-lock/rust/tests
 .github/workflows/release-assets-check.yml
 
 ## Steps
-1. Probe first (a test in windows_lockfileex.rs): the owner locks, a `try_clone` copy is closed, a second process
-   still sees the lock held. If it holds, `BorrowedHandle::new` on Windows duplicates as on Unix; if not, the Windows
+1. Read the measured answer from phase 1's windows_lockfileex.rs tests and their CI run. If closing a duplicate keeps
+   the owner's lock, `BorrowedHandle::new` on Windows duplicates as on Unix; if not, the Windows
    copy keeps a non-owning reference to the owner's file and never closes it. Either way its Drop never unlocks.
 2. Remove the Windows refusal in `BorrowedHandle::new`; `validate` stays the admission check (same_file identity,
    exclusive, lent child known).
