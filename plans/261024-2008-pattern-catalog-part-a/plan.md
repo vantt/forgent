@@ -1,7 +1,7 @@
 ---
 title: "Collaboration degree, Part A: the pattern catalog in config, params per dispatch, one pinned resolution"
 description: "Implements the owner-approved Part A spec: patterns declared in config over four code-held loops, tunable params and bounds, activity unit inheritance, the request door, the pin, solo verify, the rename and the config conversion."
-status: proposed
+status: draft
 priority: P2
 effort: 72h
 branch: "none yet: drafted in worktree cook-plan-a (detached at 24d8816ba); the fgos-cook case names its own branch"

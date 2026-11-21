@@ -1,7 +1,7 @@
 ---
 title: "Standardize agent CLI invocations and provider account config"
 description: "One generic invocation per CLI and transport, the account chosen only by the lease, one account inventory shape, and the agy pane brief delivery fixed."
-status: pending
+status: draft
 priority: P1
 effort: 35h
 branch: main

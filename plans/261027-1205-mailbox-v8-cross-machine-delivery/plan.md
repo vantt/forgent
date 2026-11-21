@@ -1,6 +1,6 @@
 ---
 title: "Agent mailbox V8: cross-machine delivery"
-status: proposed (revised after red-team 2026-10-27)
+status: draft
 lane: MAIL
 owner-approval: pending (scope and budget, section "Decisions for the owner")
 created: 2026-10-27

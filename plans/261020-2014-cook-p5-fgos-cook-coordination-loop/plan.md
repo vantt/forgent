@@ -1,5 +1,5 @@
 ---
-status: in-progress
+status: running
 created: 2026-10-20
 ---
 

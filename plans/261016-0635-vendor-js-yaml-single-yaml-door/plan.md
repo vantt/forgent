@@ -1,7 +1,7 @@
 ---
 title: "Vendor js-yaml: one YAML door, zero npm runtime dependencies"
 description: "Replace the `yaml` npm dependency with a vendored single-file js-yaml behind src/util/yaml.mjs, and retire the hand-rolled YAML readers and parser-unavailable branches that existed only because the parser might be missing."
-status: completed
+status: done
 priority: P1
 effort: 1.5d
 branch: feat/vendor-js-yaml

@@ -1,6 +1,6 @@
 ---
 title: "Mọi cửa trả lời đều phân biệt đồng thuận và làm rõ (approve on every answer door)"
-status: completed
+status: done
 created: 2026-10-08
 budget: "src: dòng thêm ≤ 180, dòng xoá không giới hạn; test ≤ 250 dòng; ≤ 1,5 ngày. Vượt thì dừng và hỏi theo mẫu."
 paths: [apps/fgos-gateway/src/gateway.rs, apps/fgos-gateway/src/mcp.rs, apps/fgos-gateway/web/src/api/client.ts, docs/contracts/fgos-gateway-api-v1.yaml, src/verbs/state/move.mjs, bin/fgos.mjs, src/cli/command-registry.mjs, src/workflow/runner.mjs, src/workflow/store.mjs, src/workflow/definition.mjs, docs/specs/runner.md, docs/specs/herdr-web-dashboard.md, CHANGELOG.md, test/]

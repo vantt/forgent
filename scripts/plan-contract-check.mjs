@@ -11,7 +11,7 @@
 // Exit codes: 0 clean, 1 contract error, 2 usage or unreadable input.
 import fs from 'node:fs';
 import path from 'node:path';
-import { readFrontmatter } from '../src/util/yaml.mjs';
+import { cutFrontmatter, readFrontmatter } from '../src/util/yaml.mjs';
 import { nativeDoor } from '../src/native/door.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { ensureAddonForScript } from './lib/git-addon-stage.mjs';
@@ -28,7 +28,16 @@ export const STATUSES = VOCABULARY.statuses;
 export const LEGACY_STATUS = {
   pending: 'draft', proposed: 'draft', todo: 'ready', 'in-progress': 'running',
   completed: 'done', complete: 'done', landed: 'done', done: 'done', approved: 'ready', cancelled: 'withdrawn', archived: 'withdrawn',
+  partial: 'draft', deferred: 'withdrawn',
 };
+
+export function resolveLegacyStatus(status) {
+  if (typeof status !== 'string') return undefined;
+  const s = status.trim();
+  if (LEGACY_STATUS[s]) return LEGACY_STATUS[s];
+  const firstWord = s.split(/[\s(]/)[0];
+  return LEGACY_STATUS[firstWord];
+}
 const PRIORITIES = VOCABULARY.priorities;
 const TABLE_COLUMNS = VOCABULARY.tableColumns;
 
@@ -152,6 +161,15 @@ function checkPhaseTable(body, errors, status) {
   }
 }
 
+function legacyStatusErrors(status) {
+  if (!status) return ['status is missing; write "draft"'];
+  if (!STATUSES.includes(status)) {
+    const mapped = resolveLegacyStatus(status);
+    return [`status "${status}" is not one of ${STATUSES.join(', ')}${mapped ? `; write "${mapped}"` : ''}`];
+  }
+  return [];
+}
+
 /**
  * Checks one plan directory against the contract.
  * @param {string} dir plan directory (holds plan.md)
@@ -166,21 +184,33 @@ export function checkPlanDir(dir, { plansRoot = path.dirname(path.resolve(dir)) 
   try { parsed = readFrontmatter(raw, file); } catch (e) {
     // A block the YAML door refuses is a contract error only for a plan that claims the contract.
     const claims = new RegExp(`^contract:\\s*${CONTRACT_MARKER}\\s*$`, 'm').test(raw);
-    return { dir, legacy: !claims, unparseable: true, meta: {}, errors: [`frontmatter is not valid YAML: ${e.message}`] };
+    const { source } = cutFrontmatter(raw);
+    const statusMatch = source.match(/^status:\s*([^\r\n#]+)/m);
+    const status = statusMatch ? statusMatch[1].trim().replace(/^['"]|['"]$/g, '') : undefined;
+    const legacyErrors = claims ? [] : legacyStatusErrors(status);
+    return { dir, legacy: !claims, unparseable: true, meta: { status }, errors: [`frontmatter is not valid YAML: ${e.message}`], legacyErrors };
   }
   const { meta, body } = parsed;
   if (meta.contract !== CONTRACT_MARKER) {
-    return { dir, legacy: true, meta, errors: [`no \`contract: ${CONTRACT_MARKER}\` marker`] };
+    const legacyErrors = legacyStatusErrors(meta.status);
+    return { dir, legacy: true, meta, errors: [`no \`contract: ${CONTRACT_MARKER}\` marker`], legacyErrors };
   }
   if (typeof meta.title !== 'string' || !meta.title.trim()) errors.push('title must be a non-empty string');
   if (!STATUSES.includes(meta.status)) {
-    const mapped = LEGACY_STATUS[meta.status];
+    const mapped = resolveLegacyStatus(meta.status);
     errors.push(`status "${meta.status}" is not one of ${STATUSES.join(', ')}${mapped ? `; write "${mapped}"` : ''}`);
   }
   if (!PRIORITIES.includes(meta.priority)) errors.push(`priority must be one of ${PRIORITIES.join(', ')}`);
   if (!Array.isArray(meta.blockedBy) || !strings(meta.blockedBy)) errors.push('blockedBy must be a list of plan directory names');
   else for (const b of meta.blockedBy) if (!fs.existsSync(path.join(plansRoot, b, 'plan.md'))) errors.push(`blockedBy names unknown plan ${b}`);
-  if (!Array.isArray(meta.source) || !strings(meta.source)) errors.push('source must be a list of paths or backlog ids');
+  if (!Array.isArray(meta.source) || !strings(meta.source)) {
+    errors.push('source must be a list of paths or backlog ids');
+  } else if (typeof meta.created === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(meta.created) && meta.created >= '2026-11-22') {
+    const hasBacklogId = meta.source.some((s) => /^p-[a-z0-9]+$/.test(s));
+    if (!hasBacklogId) {
+      errors.push('source must cite at least one backlog id (p-...)');
+    }
+  }
   if (typeof meta.created !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(meta.created)) errors.push('created must be a YYYY-MM-DD string');
   if (meta.footprint !== undefined && !strings(meta.footprint)) errors.push('footprint must be a list of repo-relative paths or globs');
   if (meta.base !== undefined && !(typeof meta.base === 'string' && /^[0-9a-f]{40}$/.test(meta.base))) errors.push('base must be a full 40-character commit sha');
@@ -250,15 +280,16 @@ export function main(argv, out = console.log) {
     for (const r of failing) for (const e of r.errors) out(`ERROR ${path.basename(r.dir)}: ${e}`);
     for (const r of marked) for (const w of r.warnings ?? []) out(`WARN ${path.basename(r.dir)}: ${w}`);
     for (const [a, b] of clashes) out(`ERROR active plans ${a} and ${b} have overlapping footprints`);
+    const failingLegacy = legacy.filter((r) => r.legacyErrors?.length);
+    for (const r of failingLegacy) for (const e of r.legacyErrors) out(`ERROR ${path.basename(r.dir)}: ${e}`);
     const byStatus = {};
     for (const r of legacy) {
-      const s = r.unparseable ? 'unreadable' : (LEGACY_STATUS[r.meta.status] ?? 'unmapped');
+      const s = r.meta?.status ? (resolveLegacyStatus(r.meta.status) ?? r.meta.status) : (r.unparseable ? 'unreadable' : 'missing');
       byStatus[s] = (byStatus[s] ?? 0) + 1;
     }
     const broken = legacy.filter((r) => r.unparseable).length;
-    out(`plans ${results.length}: under contract ${marked.length} (failing ${failing.length}), legacy ${legacy.length} (${broken} with frontmatter that is not valid YAML; would migrate to ${Object.entries(byStatus).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'})`);
-    if (legacy.length) out('WARN legacy plans are not checked; add `contract: plan-v1` when a plan is next planned');
-    return failing.length || clashes.length ? 1 : 0;
+    out(`plans ${results.length}: under contract ${marked.length} (failing ${failing.length}), legacy ${legacy.length}${failingLegacy.length ? ` (failing ${failingLegacy.length})` : ''} (${broken} with frontmatter that is not valid YAML; ${failingLegacy.length ? 'would migrate to' : 'by status'} ${Object.entries(byStatus).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'})`);
+    return failing.length || clashes.length || failingLegacy.length ? 1 : 0;
   } catch (e) {
     out(`plan-contract-check: ${e.message}`);
     return 2;

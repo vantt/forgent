@@ -1,3 +1,7 @@
+---
+status: withdrawn
+---
+
 # Ranh giới ghi của dispatch: quy trách nhiệm ghi lạc, Doer docs-only confined
 
 Status: superseded by plans/261014-1400-two-doors-one-rununit — [plan mới](../261014-1400-two-doors-one-rununit/plan.md). Trạng thái cũ giữ bên dưới để tra cứu.

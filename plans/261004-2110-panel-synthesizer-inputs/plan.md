@@ -1,6 +1,6 @@
 ---
 title: "Role inputs reach the next role (panel synthesizer fix)"
-status: completed
+status: done
 priority: P1
 created: 2026-10-04
 ---

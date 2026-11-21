@@ -1,7 +1,7 @@
 ---
 title: "Rust verb migration program (F0 through S7)"
 description: "Move the legacy-Node CLI verbs onto the Rust host, foundations first, one layer at a time, retiring each Node path in the same change."
-status: in-progress
+status: running
 priority: P1
 effort: 22d (F0 only; S1-S7 sized when each starts)
 branch: plan/rust-verb-migration-program

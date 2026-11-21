@@ -1,7 +1,7 @@
 ---
 title: "fgctl dev activation: Rust fgos chạy payload Node trực tiếp từ checkout"
 description: "Draft cho phương án C của D1: thêm kiểu kích hoạt dev-source vào distribution để `fgos` trơn thấy code Node đang sửa, kèm guard, doctor và xoá cửa tạm của Plan A."
-status: pending
+status: draft
 priority: P3
 effort: 16h
 branch: main

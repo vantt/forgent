@@ -1,7 +1,7 @@
 ---
 title: "Complete advisory capability on existing runtime — do not restore coordination engine"
 description: "Close architecture-advisory migration gaps with early feasibility proof, retain cognition and human authority, and reject bloat or a second engine. Separate from single-door hygiene."
-status: partial
+status: draft
 priority: P1
 branch: feat/single-door-mechanisms
 tags: [advisory, workflow, collaboration-pattern, migration, human-authority, simplicity]

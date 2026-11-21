@@ -1,7 +1,7 @@
 ---
 title: "P6 Nối thật: herdr làm transport mặc định, posture read-only, fallback quota"
 description: "Đóng phần P1 còn dở sau vòng sửa: bind().transport, resolvePosture, nextCandidate đều đã có nhưng không ai gọi. Nối vào đường chạy thật, một đường confinement duy nhất, rồi nghiệm thu bằng lần chạy thật qua pane herdr."
-status: complete
+status: done
 priority: P1
 effort: "~5–6d"
 tags: [herdr, transport, posture, confinement, quota, acceptance]

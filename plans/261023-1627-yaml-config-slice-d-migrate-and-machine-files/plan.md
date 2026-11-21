@@ -1,7 +1,7 @@
 ---
 title: "YAML Document + Config foundation, Slice D: confinement mask, machine files, native verbs, migration, comment renderer"
 description: "G6 through the Confinement Authority, then ~/.fgos/private with accounts.yaml and gateway-token, the account and token moves, the fgos config verbs, project migration with tombstone, the section 11 findings engine and the comment renderer for existing files. The native-door entries, the Node doctor rows and the account and token readers moved to Slice C."
-status: completed (phases 00-10 and 17 landed 2026-10-24; phases 11-14 moved to Slice C, phase 15 split)
+status: done
 priority: P1
 effort: 85h
 branch: cfg/slice-d (linked worktree; never the shared main checkout)

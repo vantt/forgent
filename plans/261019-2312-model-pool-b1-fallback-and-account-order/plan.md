@@ -1,7 +1,7 @@
 ---
 title: "Pool B1: per-tier family fallback, declared account order, lease/state/quarantine per pool"
 description: "bind() walks a tier's declared family order and its cell entries; the lease keys accounts, state and quarantine by pool and ranks them in declared order; accounts pin as pool/account; a missing tier cell refuses by name. Config changes are proposed as a diff for the owner."
-status: pending
+status: draft
 priority: P1
 effort: 36h
 branch: plan/model-pool-b1-fallback-account-order

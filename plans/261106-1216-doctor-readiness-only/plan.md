@@ -1,7 +1,7 @@
 ---
 title: "HARDEN: doctor answers readiness only"
 description: "Owner decision 65 (1a 2b 3a) on the doctor audit: fgOS-repo rows move to npm test/release check, live incidents move to each component's own read-and-recover door with one read-only pointer row each, Git gets `fgos git status|recover`, dead and duplicate rows go, the three defects found in passing are fixed; ten phases, net size below zero, self-landing on fg-server2."
-status: in-progress
+status: running
 priority: P1
 effort: ~6.5d lead time, serial (P01 0.5d; P02 0.5d; P03 1d; P04 1d; P05 1d; P06 0.5d; P07 1d; P08 0.5d; P09 0.5d HARDEN part; P10 0.5d)
 branch: main (plan only; each phase runs on its own track branch `harden/doctor-pNN-<slug>` in its own linked worktree from origin/main)

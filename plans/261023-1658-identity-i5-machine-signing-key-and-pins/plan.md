@@ -1,6 +1,6 @@
 ---
 title: "Identity I5: machine signing key, sign and verify, pinned machine keys"
-status: landed
+status: done
 lane: IDENT
 spec: docs/platform/identity/spec.md
 created: 2026-10-23

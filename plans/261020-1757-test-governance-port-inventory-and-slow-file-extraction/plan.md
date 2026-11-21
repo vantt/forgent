@@ -1,7 +1,7 @@
 ---
 title: "Test governance phases 2-3: Node-vs-Rust port inventory and use-case extraction for the slowest files"
 description: "Retire Node copies of Rust-owned cases in the five ported areas (one route proof per port stays), then move business cases of the slowest CLI-spawn files into direct use-case tests with one CLI parity test per verb."
-status: in-progress
+status: running
 priority: P2
 effort: 5-8 agent-days
 branch: chore/test-governance-p2-p3

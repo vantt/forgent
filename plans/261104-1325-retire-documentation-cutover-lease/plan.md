@@ -1,3 +1,7 @@
+---
+status: done
+---
+
 # Retire the documentation-cutover lease
 
 Status: closed (landed on main `ad72e3a46`, 2026-11-04; review [report](../reports/review-261104-1355-retire-cutover-lease-branch.md) REWORK fixed in `93c5aabe4`)

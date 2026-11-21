@@ -1,7 +1,7 @@
 ---
 title: "YAML Document + Config foundation, Slice B: crate fgos-config, JSON Schema section schemas, standard files, two locks"
 description: "The Rust crate fgos-config (loading JSON Schema section schemas, x-fgos annotation lint, validation through an existing validator crate, snapshot with provenance and cache, one-file write transaction, comment grammar, redaction), the bundled section schemas (shape) and standard files (values), and the project-config and global-config locks. Rust-only; no Node door, no migration."
-status: completed
+status: done
 priority: P1
 effort: 52h
 branch: cfg/slice-b (linked worktree; never the shared main checkout)

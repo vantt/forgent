@@ -1,7 +1,7 @@
 ---
 title: "Documentation Authority Unification"
 description: "Collapse the competing platform-documentation authorities into one canonical system under docs/platform/**"
-status: completed
+status: done
 priority: P1
 created: 2026-09-25
 revised: 2026-10-06 (resume after main sync: coordination harness retired, Observe blockers completed, dropped-claim register, ordering with Plans A/B/C; Phase 4 authorized and pre-steps 0a/0b done; earlier 2026-09-29 AgentKit format conversion)

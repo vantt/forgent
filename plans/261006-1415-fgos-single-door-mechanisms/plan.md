@@ -1,7 +1,7 @@
 ---
 title: "fgOS single-door mechanisms: binding, render, doctor/dev door and root hygiene"
 description: "H1/H3/H5: one binding source, generated headers, doctor/dev door, gated root cleanup and one doctrine writer. Advisory capability completion is a separate plan."
-status: completed
+status: done
 priority: P2
 branch: feat/single-door-mechanisms
 tags: [harness, skills, distribution, doctor, githooks, agents-md, rul11]

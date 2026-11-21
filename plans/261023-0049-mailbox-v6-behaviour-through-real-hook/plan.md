@@ -1,7 +1,7 @@
 ---
 title: "Mailbox V6: behavioural measurements through the real hook delivery, the stop rule, the real-agent loop test and the starting values"
 description: "Rung V6 of the Agent Mailbox ladder on branch mailbox/v1-v3: run the stop-rule cells (legitimate, untrusted-sender negative and harmful) for Claude Code and Codex through V5's real `fgos hook mailbox` entry, every CLI confined by fgOS's own bwrap driver with a private home holding a copied login and the real login stores masked; the real-agent loop test; the in-flight timeout against measured latency; starting values for spec §5.3 and §12 from the numbers."
-status: pending
+status: draft
 priority: P2
 effort: "~3 d of build (phases 1-3, 7) plus 13-24 h of sequential live runs (phases 4-6); owner approval of the budget required before phase 4"
 branch: main (plan only); all code on branch mailbox/v1-v3 in linked worktree /home/vantt/projects/forgent-mailbox, never merged to main

@@ -1,7 +1,7 @@
 ---
 title: "Event Store fgos-event-store: implement the signed D-ADR0055 spec"
 description: "Build the Rust fgos-event-store crate and its Node facade in the combined addon, publish sealed events through Git's Publication port on per-machine refs, then cut Work and porting over in one stop-everything change on every machine and workspace."
-status: completed
+status: done
 priority: P1
 effort: 272h
 branch: main

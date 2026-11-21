@@ -1,7 +1,7 @@
 ---
 title: "herdr-inline-prompt-delivery"
 description: "Support both inline (default) and file-pointer prompt delivery modes in herdr-spawn across claude, codex, agy, pi, and omp under bwrap confinement."
-status: completed
+status: done
 priority: P1
 effort: "4h"
 tags: [herdr-spawn, dispatch, bwrap, inline, file-pointer]

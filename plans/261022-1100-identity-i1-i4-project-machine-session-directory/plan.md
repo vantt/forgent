@@ -1,6 +1,6 @@
 ---
 title: "Identity: one door for every id (machine, project, session, and every owner's records)"
-status: completed
+status: done
 lane: IDENT
 spec: docs/platform/identity/spec.md
 created: 2026-10-22

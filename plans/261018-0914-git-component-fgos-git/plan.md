@@ -1,7 +1,7 @@
 ---
 title: "Git component fgos-git: implement the signed G0 spec"
 description: "Build the Rust fgos-git component behind one combined N-API addon, starting with the refs/fgos/* Publication port the Event Store consumes, then every typed port, the custody lease, and the one-release switch that deletes the three parallel Node git cores."
-status: in-progress
+status: running
 priority: P1
 effort: 254h
 branch: main

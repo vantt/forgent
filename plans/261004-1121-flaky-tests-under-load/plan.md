@@ -1,7 +1,7 @@
 ---
 title: "Test chập chờn khi máy có tải: chẩn đoán, cô lập, fail nhanh"
 description: "Ba test xanh khi chạy riêng nhưng đỏ hoặc treo trong full suite khi máy có tải: provider-capacity treo ~58 phút, fanout overlapping windows, settleClaim writer identity mismatch. Tìm nguyên nhân thật, sửa cô lập, và chặn mọi file test treo quá lâu."
-status: completed
+status: done
 priority: P2
 effort: "~1d"
 tags: [tests, flaky, isolation, timeout, concurrency]

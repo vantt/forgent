@@ -1,7 +1,7 @@
 ---
 title: "Seat Binding component: Rust crate, host route, one-wave conversion"
 description: "Build the Seat Binding authority (Rust crate, internal route, thin Node facade) and move every agent-seat caller onto it in one wave, deleting rigorToTier, JS model choice, the second walker and the inline-lead escape."
-status: pending
+status: draft
 priority: P1
 effort: 17d
 branch: seat-binding-wave

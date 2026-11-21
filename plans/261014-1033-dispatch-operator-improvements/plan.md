@@ -1,3 +1,7 @@
+---
+status: withdrawn
+---
+
 # Cải tiến cửa dispatch cho người điều phối
 
 Status: superseded by plans/261014-1400-two-doors-one-rununit — [plan mới](../261014-1400-two-doors-one-rununit/plan.md); lanes A–D folded into that plan (2026-10-14 14:00).

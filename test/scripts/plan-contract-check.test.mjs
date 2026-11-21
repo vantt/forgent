@@ -46,6 +46,20 @@ test('a missing key and a missing section are each named', () => {
   assert.ok(errors.some((e) => e === 'missing section: acceptance criteria'));
 });
 
+test('a marked plan created on or after the cutoff requires a backlog source id; an older one is exempt', () => {
+  const olderPlan = planText({ fm: { created: '2026-11-21', source: '["DISCUSSION.md"]' } });
+  const newPlanBad = planText({ fm: { created: '2026-11-22', source: '["DISCUSSION.md"]' } });
+  const newPlanGood = planText({ fm: { created: '2026-11-22', source: '["DISCUSSION.md", "p-abc1234567"]' } });
+  const r = root({ older: olderPlan, bad: newPlanBad, good: newPlanGood });
+
+  assert.deepEqual(checkPlanDir(path.join(r, 'older')).errors, []);
+
+  const badErrors = checkPlanDir(path.join(r, 'bad')).errors;
+  assert.ok(badErrors.some((e) => e.includes('source must cite at least one backlog id')));
+
+  assert.deepEqual(checkPlanDir(path.join(r, 'good')).errors, []);
+});
+
 test('a legacy status is refused with the contract value to write', () => {
   const r = root({ bad: planText({ fm: { status: 'in-progress' } }) });
   const { errors } = checkPlanDir(path.join(r, 'bad'));
@@ -169,12 +183,25 @@ test('a pair scan that stops at its cap is an error, never a clean verdict', () 
   assert.ok(errorsOf(planText({ rows })).some((e) => e.startsWith('footprint overlap scan stopped at its')));
 });
 
-test('--all reports a plan without the marker as legacy and still exits 0', () => {
-  const legacy = '---\ntitle: Old\nstatus: pending\n---\n# Old\n';
-  const r = root({ old: legacy, good: planText() });
-  const out = [];
-  assert.equal(main(['--all', '--root', r], (l) => out.push(l)), 0);
-  assert.ok(out.some((l) => l.includes('legacy 1') && l.includes('draft 1')));
+test('--all fails on a legacy plan with a legacy or missing status and passes once it holds a plan-v1 status', () => {
+  const legacyPending = '---\ntitle: Old\nstatus: pending\n---\n# Old\n';
+  const rPending = root({ old: legacyPending, good: planText() });
+  const outPending = [];
+  assert.equal(main(['--all', '--root', rPending], (l) => outPending.push(l)), 1);
+  assert.ok(outPending.some((l) => l.includes('ERROR old:') && l.includes('"pending"') && l.includes('write "draft"')));
+
+  const legacyNoStatus = '---\ntitle: Old\n---\n# Old\n';
+  const rMissing = root({ old: legacyNoStatus, good: planText() });
+  const outMissing = [];
+  assert.equal(main(['--all', '--root', rMissing], (l) => outMissing.push(l)), 1);
+  assert.ok(outMissing.some((l) => l.includes('ERROR old:') && l.includes('status is missing') && l.includes('write "draft"')));
+
+  const legacyDraft = '---\ntitle: Old\nstatus: draft\n---\n# Old\n';
+  const rDraft = root({ old: legacyDraft, good: planText() });
+  const outDraft = [];
+  assert.equal(main(['--all', '--root', rDraft], (l) => outDraft.push(l)), 0);
+  assert.ok(outDraft.some((l) => l.includes('legacy 1') && l.includes('draft 1')));
+  assert.ok(!outDraft.some((l) => l.startsWith('WARN')));
 });
 
 test('--plan fails hard on a legacy plan and exits 2 on bad usage', () => {

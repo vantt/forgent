@@ -1,7 +1,7 @@
 ---
 title: "Collaboration degree, Part A: patterns declared in config over four loops, params tuned per run"
 description: "BA-grade change spec, Part A approved by the owner 2026-10-24 18:09 (not implemented). Part A: a pattern catalog in config (loop + defaults + invariants + promise) over the four code-held loops, replaceable two-way params over unioned floors, a generic bounds shape per loop, a --pattern/--params/--param door, an expanded fail-closed pin, solo verify with a harness receipt, and the physical rename (patterns/ loops vs catalog, runner.loops). Milestone evidence hardening is Part B."
-status: approved
+status: ready
 created: 2026-10-23
 links:
   - spec-draft.md

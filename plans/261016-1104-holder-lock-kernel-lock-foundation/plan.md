@@ -1,7 +1,7 @@
 ---
 title: "4.2 Holder-lock: cổng lock trung lập OS, kernel lock cho các lock lạnh"
 description: "Crate fgos-process + fgos-holder-lock, route nội bộ, facade Node LockScope, cutover dừng-toàn-bộ cho lock lạnh, doctor báo mức bảo đảm"
-status: pending
+status: draft
 priority: P1
 effort: 52h
 branch: worktree-agent-ab1a2b989b430bd4e

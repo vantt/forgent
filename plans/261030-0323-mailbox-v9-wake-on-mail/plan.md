@@ -1,6 +1,6 @@
 ---
 title: "Agent mailbox V9: wake an idle session on mail"
-status: approved to build by the owner 2026-10-30 03:2x (option A of the board question of 2026-10-29 22:05); each phase lands only after its own gate
+status: ready
 lane: MAIL
 created: 2026-10-30
 ---
