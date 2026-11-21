@@ -1674,9 +1674,8 @@ impl Directory {
         // device, inode and birth time) needs no second fsync.
         if sync {
             let key = durable_key(&child.file);
-            // NTFS has no directory flush that outlives a crash on its own: the
-            // directory entry is made durable by `sync_directory` flushing the
-            // directory handle, and the identity cache below is Unix only.
+            // Where no identity can be read the directory is synced on every
+            // open: the cache below only skips a sync it can prove was done.
             if key.is_none()
                 || !DURABLE_DIRECTORIES
                     .lock()
@@ -1697,34 +1696,81 @@ impl Directory {
     }
 }
 
+/// Identity of a directory that a removal and re-creation cannot reuse:
+/// `(device, inode, birth time)` on Unix.
+#[cfg(unix)]
+type DurableKey = (u64, u64, u128);
+/// `(volume serial, 128-bit file id, creation time)` on Windows.
+#[cfg(not(unix))]
+type DurableKey = (u64, u128, u128);
+
 /// Directories this process has made durable, with their names, by
-/// `(device, inode, birth time)`.
-static DURABLE_DIRECTORIES: std::sync::Mutex<std::collections::BTreeSet<Option<(u64, u64, u128)>>> =
+/// directory identity.
+static DURABLE_DIRECTORIES: std::sync::Mutex<std::collections::BTreeSet<Option<DurableKey>>> =
     std::sync::Mutex::new(std::collections::BTreeSet::new());
 
 /// Identity of a directory that a removal and re-creation cannot reuse;
 /// `None` when the filesystem reports no birth time.
-fn durable_key(dir: &File) -> Option<(u64, u64, u128)> {
+#[cfg(unix)]
+fn durable_key(dir: &File) -> Option<DurableKey> {
     durable_identity(&dir.metadata().ok()?)
 }
 
+/// Read from the open directory handle: the full volume serial and file id
+/// (the 64-bit file index is not unique on ReFS) plus the creation time.
+#[cfg(windows)]
+fn durable_key(dir: &File) -> Option<DurableKey> {
+    use std::os::windows::io::AsRawHandle;
+    use windows_sys::Win32::Storage::FileSystem::{
+        FileBasicInfo, FileIdInfo, GetFileInformationByHandleEx, FILE_BASIC_INFO, FILE_ID_INFO,
+    };
+    let handle = dir.as_raw_handle();
+    // SAFETY: both structs are plain data and the sizes passed match them.
+    let (id, basic) = unsafe {
+        let mut id: FILE_ID_INFO = std::mem::zeroed();
+        if GetFileInformationByHandleEx(
+            handle,
+            FileIdInfo,
+            (&mut id as *mut FILE_ID_INFO).cast(),
+            std::mem::size_of::<FILE_ID_INFO>() as u32,
+        ) == 0
+        {
+            return None;
+        }
+        let mut basic: FILE_BASIC_INFO = std::mem::zeroed();
+        if GetFileInformationByHandleEx(
+            handle,
+            FileBasicInfo,
+            (&mut basic as *mut FILE_BASIC_INFO).cast(),
+            std::mem::size_of::<FILE_BASIC_INFO>() as u32,
+        ) == 0
+        {
+            return None;
+        }
+        (id, basic)
+    };
+    Some((
+        id.VolumeSerialNumber,
+        u128::from_le_bytes(id.FileId.Identifier),
+        u128::try_from(basic.CreationTime).ok()?,
+    ))
+}
+
+#[cfg(not(any(unix, windows)))]
+fn durable_key(_dir: &File) -> Option<DurableKey> {
+    None
+}
+
+#[cfg(unix)]
 pub(crate) fn durable_identity(m: &fs::Metadata) -> Option<(u64, u64, u128)> {
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::MetadataExt;
-        let born = m
-            .created()
-            .ok()?
-            .duration_since(std::time::UNIX_EPOCH)
-            .ok()?
-            .as_nanos();
-        Some((m.dev(), m.ino(), born))
-    }
-    #[cfg(not(unix))]
-    {
-        let _ = m;
-        None
-    }
+    use std::os::unix::fs::MetadataExt;
+    let born = m
+        .created()
+        .ok()?
+        .duration_since(std::time::UNIX_EPOCH)
+        .ok()?
+        .as_nanos();
+    Some((m.dev(), m.ino(), born))
 }
 
 pub struct Wal<F = OsFileSystem> {
