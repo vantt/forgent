@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "f170e8bccf572f6fb31d1ab59a6667cf8f996ccb7e3d9101db718e1613315b44",
+  "payloadDigest": "25c416584288192c1fb8c6e2332c17d46164d10381affbf3d8f6d2a871f25a49",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -1219,7 +1219,7 @@
     "packages/session-host/rust/src/route.rs": "d9c6a83a87c3a04e84f4f03e72a5c5816688290f1d33aa2fcdecefe49edbd632",
     "packages/session-host/rust/src/types.rs": "c11cdb42d69f78fa2b709f45d801a54bdc6b3447e7786e94c816bd5f12464cc4",
     "packages/session-host/rust/tests/host.rs": "cb88dacad840bde304e2dcf593b959a76cb1d65411b3adfa1002d8be70350a85",
-    "packages/supervision/rust/src/discussion_source.rs": "5124f4636e15164563b9abf6d5c32592f767386b1e64524b0220d3e5639712a9",
+    "packages/supervision/rust/src/discussion_source.rs": "e60efca723c2652fca91250292d424864021ff27ddde298698cbf77ee8b8327f",
     "packages/supervision/rust/src/land.rs": "a2585d2674762b1ce5fa291c4a743a905c66e064721746eb4e91a4ecb63b7937",
     "packages/supervision/rust/src/lib.rs": "8070f2ae2159030a71567ae0ce2da103178415a0703b3de3b9b0f8d76b4cdf15",
     "packages/supervision/rust/src/notify.rs": "2a8ce19013396e3a31c915a903c4762889cc3f902137279e6378c3deb84e8edd",
@@ -1229,7 +1229,7 @@
     "packages/supervision/rust/src/wake.rs": "a13206df2d30b25293db75f080d6de26472069a1c47aa72953b03b47efe6576b",
     "packages/supervision/rust/src/watcher.rs": "6c9da881261aaa866e5b89465b2a5c80a14997e8fbf6a96d82aa47a69a34fae1",
     "packages/supervision/rust/tests/definitions.rs": "f464020d91fa602bb22cf710422aa4ae49e07269f253ddd802a5d0d866f93af5",
-    "packages/supervision/rust/tests/discussion_source.rs": "d5700e20102b355776efbe9724ed0a0a85b9807883f74d7f58de18e33e69c689",
+    "packages/supervision/rust/tests/discussion_source.rs": "39e824a0affc36347c8d488b28b9583f30523ff57391d290938b090c62925397",
     "packages/supervision/rust/tests/land.rs": "7e709affbd236ddcaabf47d28a5ee53973ffb9c6a8491b60a64ae02f97f823a2",
     "packages/supervision/rust/tests/portfolio.rs": "df168392ec38214c0e048e1016341ec24725d9c7b81f798798c6fa276681f2f2",
     "packages/supervision/rust/tests/queue.rs": "65ddc71a204003a4e1a62077f6741728cdcaa96d7ee751e31d78bd420d572698",

@@ -357,6 +357,34 @@ fn a_rename_emits_nothing_and_carries_the_state_to_the_new_path() {
 }
 
 #[test]
+fn a_discussion_moved_from_the_pre_migration_root_keeps_its_earlier_flip_and_gains_none() {
+    let f = Fixture::new("portfolio-move");
+    let repo = f.init("repo");
+    let (old, new) = (
+        "docs/discussions/x/DISCUSSION.md",
+        "plans/discussions/ds-aaaaaaaaaa-x/DISCUSSION.md",
+    );
+    commit_file(
+        &repo,
+        old,
+        &format!("discussion: settled\n{BODY}"),
+        "2026-11-02T00:00:00Z",
+    );
+    fs::create_dir_all(repo.join("plans/discussions/ds-aaaaaaaaaa-x")).unwrap();
+    git(&repo, &["mv", old, new], None);
+    git(
+        &repo,
+        &["commit", "-q", "-m", "move"],
+        Some("2026-11-03T00:00:00Z"),
+    );
+    let records = f.source(&repo).records(&Window::default()).unwrap();
+    assert_eq!(
+        flips(&records),
+        [(old.into(), "none".into(), "settled".into())]
+    );
+}
+
+#[test]
 fn a_rename_that_edits_the_marker_emits_no_flip() {
     let f = Fixture::new("rename-edit");
     let repo = f.init("repo");
