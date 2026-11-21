@@ -114,11 +114,19 @@ fn predecessor_scan(workspace: &Path) -> Result<(), InitError> {
 /// whose `-c` text merely mentions fgos runs neither.
 fn runs_fgos(argv: &[&str]) -> bool {
     let base = |arg: &str| {
-        Path::new(arg)
+        let name = Path::new(arg)
             .file_name()
             .and_then(|n| n.to_str())
-            .unwrap_or("")
-            .to_string()
+            .unwrap_or("");
+        // A Windows program name carries its `.exe` and any letter case.
+        #[cfg(windows)]
+        let name = {
+            let lowered = name.to_ascii_lowercase();
+            lowered.strip_suffix(".exe").unwrap_or(&lowered).to_string()
+        };
+        #[cfg(not(windows))]
+        let name = name.to_string();
+        name
     };
     let Some((program, args)) = argv.split_first().map(|(p, a)| (base(p), a)) else {
         return false;
@@ -205,10 +213,10 @@ pub(crate) fn admit(
     lock: &ActivationLockGuard,
 ) -> Result<(), InitError> {
     crate::verify::require_git_addon(manifest).map_err(|e| refusal("git-addon-missing", e))?;
-    if has_wal(manifest) && !cfg!(target_os = "linux") {
+    if has_wal(manifest) && !cfg!(any(target_os = "linux", windows)) {
         return Err(refusal(
             "git-wal-unsupported-platform",
-            "C5/fence support is Linux-only",
+            "C5/fence support exists on Linux and Windows only",
         ));
     }
     // C5 needs the journal, not Publication's Git floor, command policy or
@@ -421,24 +429,104 @@ mod tests {
 #[cfg(all(test, target_os = "windows"))]
 mod windows_tests {
     use super::*;
-    #[test]
-    fn windows_activation_without_wal_claim_needs_no_linux_scan_or_fence() {
-        let root = std::env::temp_dir().join(format!("fgos-windows-no-wal-{}", std::process::id()));
-        std::fs::create_dir_all(&root).unwrap();
+
+    fn scratch(tag: &str) -> PathBuf {
+        let root = std::env::temp_dir().join(format!("fgos-windows-{tag}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(root.join(".fgos/locks")).unwrap();
+        root
+    }
+
+    fn claiming_manifest() -> ReleaseManifest {
         let mut manifest: ReleaseManifest = serde_json::from_str(include_str!(
             "../tests/goldens/release-manifest-minimal.json"
         ))
         .unwrap();
         manifest.target.os = "windows".into();
+        manifest.capabilities.push("git-wal-v1".into());
+        manifest
+    }
+
+    #[test]
+    fn windows_activation_without_wal_claim_needs_no_scan_or_fence() {
+        let root = scratch("no-wal");
+        let mut manifest = claiming_manifest();
+        manifest.capabilities.clear();
         std::fs::create_dir_all(root.join(".git")).unwrap();
         let lock = ActivationLockGuard::acquire(&root).unwrap();
         admit(&root, &root.join("state"), &manifest, &lock).unwrap();
-        manifest.capabilities.push("git-wal-v1".into());
-        assert!(admit(&root, &root.join("state"), &manifest, &lock)
-            .unwrap_err()
-            .to_string()
-            .starts_with("git-wal-unsupported-platform"));
         drop(lock);
         std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn windows_wal_claim_without_the_addon_capability_is_refused_before_any_scan() {
+        let root = scratch("no-addon");
+        let lock = ActivationLockGuard::acquire(&root).unwrap();
+        let error = admit(&root, &root.join("state"), &claiming_manifest(), &lock)
+            .unwrap_err()
+            .to_string();
+        assert!(error.starts_with("git-addon-missing"), "{error}");
+        drop(lock);
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn windows_places_the_fence_over_the_held_legacy_lock_and_a_later_activation_sees_it() {
+        let root = scratch("fence");
+        let old = root.join(".fgos/locks/activation.lock");
+        std::fs::write(&old, b"").unwrap();
+        let lock = ActivationLockGuard::acquire(&root).unwrap();
+        lock.fence_legacy(&root).unwrap();
+        assert!(fgos_holder_lock::tombstone::is_tombstone(
+            &old,
+            "activation",
+            "fgos git"
+        ));
+        drop(lock);
+        let again = ActivationLockGuard::acquire(&root).unwrap();
+        again.fence_legacy(&root).unwrap();
+        drop(again);
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn windows_refuses_a_legacy_path_that_is_not_a_fence() {
+        let root = scratch("missing-fence");
+        // A directory that is not a tombstone: no old controller's lock file,
+        // no fence of ours. Either taking the lock or placing the fence refuses.
+        std::fs::create_dir(root.join(".fgos/locks/activation.lock")).unwrap();
+        let refused = match ActivationLockGuard::acquire(&root) {
+            Err(error) => error.to_string(),
+            Ok(lock) => lock.fence_legacy(&root).unwrap_err().to_string(),
+        };
+        assert!(refused.contains("git-fence-missing"), "{refused}");
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn windows_names_a_live_predecessor_writer_by_its_program_not_its_text() {
+        let scan = |argv: serde_json::Value| {
+            serde_json::to_vec(&serde_json::json!({"v":1,"protocol":1,"result":"processes","unreadable":0,"processes":[{"pid":4242,"cmdline":"x","argv":argv}]})).unwrap()
+        };
+        for argv in [
+            serde_json::json!(["C:\\old\\bin\\fgos.exe", "run", "x"]),
+            serde_json::json!(["C:\\Program Files\\FGOS-RUNNER.EXE"]),
+            serde_json::json!(["C:\\Program Files\\nodejs\\node.exe", "bin\\fgos.mjs"]),
+        ] {
+            let error = validate_predecessor_scan(&scan(argv), Some(10))
+                .unwrap_err()
+                .to_string();
+            assert!(error.starts_with("git-predecessor-writer-live") && error.contains("4242"));
+        }
+        validate_predecessor_scan(
+            &scan(serde_json::json!([
+                "C:\\Windows\\System32\\cmd.exe",
+                "/C",
+                "fgos run x"
+            ])),
+            Some(10),
+        )
+        .unwrap();
     }
 }
