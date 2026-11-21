@@ -47,6 +47,8 @@ pub mod migrate;
 pub mod observe_declarations;
 pub mod observe_query;
 pub mod observe_sources;
+#[allow(dead_code)]
+pub mod portfolio;
 pub mod questions;
 #[cfg(unix)]
 pub mod questions_hook;

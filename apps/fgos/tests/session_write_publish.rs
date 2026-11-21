@@ -5,6 +5,9 @@
 //! composition can: the land's fast-forward, scoped commit and non-forced push.
 #![cfg(target_os = "linux")]
 
+#[allow(dead_code)]
+#[path = "../src/wiring/portfolio.rs"]
+mod portfolio;
 #[path = "../src/wiring/session_write_publish.rs"]
 mod session_write_publish;
 

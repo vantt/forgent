@@ -31,11 +31,7 @@ use std::future::Future;
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
 
-#[allow(dead_code)]
-#[path = "portfolio.rs"]
-mod portfolio;
-
-use portfolio::{
+use super::portfolio::{
     check_portfolio, format_backlog_item, generate_backlog_index, is_valid_backlog_id,
     parse_backlog_item, slugify, split_frontmatter, BacklogItemFields, CheckOptions,
 };

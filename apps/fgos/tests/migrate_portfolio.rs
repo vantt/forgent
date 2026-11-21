@@ -3,6 +3,9 @@
 //! backlog becomes a pointer, and a second run changes nothing. It runs on a project that is not a git checkout,
 //! as an external project would be.
 
+#[allow(dead_code)]
+#[path = "../src/wiring/portfolio.rs"]
+mod portfolio;
 #[path = "../src/wiring/migrate.rs"]
 mod migrate;
 

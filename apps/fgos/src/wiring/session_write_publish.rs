@@ -328,10 +328,8 @@ fn catch_up_once(root: &Path, writer: &str) -> Result<(), CatchUpRefusal> {
     })
 }
 
-/// The item contract and the generated backlog index live in one module of this wiring directory.
-#[allow(dead_code)]
-#[path = "portfolio.rs"]
-mod portfolio;
+/// The item contract and the generated backlog index live in the sibling `portfolio` module.
+use super::portfolio;
 
 /// The index every backlog item write keeps current.
 const BACKLOG_INDEX: &str = "plans/backlog.md";
