@@ -15,8 +15,8 @@ use fgos_execution_engine::assignment_runner::launch::{
     await_binding, cwd_lease_owner_dir, start_and_bind, AwaitInput,
 };
 use fgos_holder_lock::{
-    predecessor, probe, run_borrowed_io, BorrowIo, BorrowSpec, BorrowStdio, Handle, LockScope,
-    Probe, Resource,
+    predecessor, probe, run_borrowed_io, BorrowIo, BorrowSpec, BorrowStdio, Handle, HelperExe,
+    LockScope, Probe, Resource,
 };
 use fgos_run_supervisor::controller::cwd_lock::admit_successor;
 use fgos_run_supervisor::controller::launch::{
@@ -331,7 +331,9 @@ fn a_command_runs_as_a_borrower_of_the_custody_and_reports_its_exit() {
             stderr_limit: 1 << 20,
             deadline: Instant::now() + Duration::from_secs(60),
         };
-        run_borrowed_io(&custody, &spec, &io).expect("the borrowed command runs")
+        // The test harness serves no helper role; the fgos binary keeps the borrow job.
+        let helper = HelperExe(env!("CARGO_BIN_EXE_fgos").into());
+        run_borrowed_io(&custody, &spec, &io, &helper).expect("the borrowed command runs")
     };
     let passed = run("echo verified");
     assert_eq!(passed.outcome.exit, Some(0));
