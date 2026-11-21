@@ -7,6 +7,7 @@ discussion: open
 2026-11-21 18:00 round 1: T0 xong (§3 row 3a, 3c). Phát hiện chính: 14/25 bản sao là **twin Node cố ý giữ khi port sang Rust** mà không có hạn xóa máy kiểm được; 4/25 là code không có caller; khác tên chỉ 3/25. Bảng `doors` và land gate bắt 0/25; trễ trung vị 30 ngày. Lúc lập plan không có bước hỏi chủ sở hữu hay tìm cửa có sẵn.
 
 - **Q1 đã trả lời trong chat (18:25): cấm twin Node.** Port sang Rust là cắt chuyển: bản Node bị xóa cùng đợt, lịch sử nằm trong git, và việc chuyển được ghi note đầy đủ tham chiếu bản cũ (§3 row 3d). Chờ thêm một round không đổi ý rồi mint D-ID. `q-djyjckiygr` đã cancel vì trả lời ngoài store.
+- Chủ dự án (19:35): "ok, hỏi đi", nhưng trước khi hỏi chọn sổ sống sót phải: kiểm từng sổ xem sổ nào tiến bộ và đầy đủ hơn, học cách tiếp cận của tất cả các sổ, và xác định **thành phần nào đang sửa** từng sổ và quan trọng hơn **thành phần nào, ai đang quản lý** nó. Đang chạy **T0d** (đánh giá sổ); Q2 (chọn sổ sống sót) hỏi sau khi T0d xong.
 - Chủ dự án (18:45): "đầu phiên em nói có tới 3 sổ, đây cũng là một việc trùng luôn." Xác nhận: sổ authority chính nó là ca trùng khái niệm, và là ít nhất năm nơi chứ không phải ba (§3 row 1). Lần gom sổ phải là ca đầu tiên tuân luật "đặt tên bên sống sót".
 - Chủ dự án (18:27): "thực chất nó không phải đơn thuần trùng rust và node". **T0c xong (§3 row 3e):** bảy ca trùng khái niệm còn ở HEAD; nguyên nhân lặp lại là không ai đặt tên bên sống sót, cùng việc khác tên (hoặc một tên nhiều việc), bề mặt mới tự làm đường riêng, và plan không trích spec có sẵn.
 - Chưa có câu hỏi mới nào đang mở với chủ dự án.
@@ -51,6 +52,7 @@ Chủ dự án (2026-11-21): "component authority/boundary và contracts là r�
 - 2026-11-21 18:31 round 2: Chủ dự án nhắc: "em từng nói hệ thống tự tạo ra một component similar với tên khác." Shaper xác nhận câu "khác tên là nguyên nhân phụ" mâu thuẫn với chính §3 row 2 và giả thuyết H1; tách hai tầng (hàm chép tên khác; thành phần mới tên khác làm việc tương tự) và nâng tầng thành phần thành giả thuyết chính.
 - 2026-11-21 18:40 round 2: T0c xong, ghi §3 row 3e. Xác nhận tầng "thành phần mới tên khác làm việc tương tự" là nguyên nhân chính ở các ca không phải twin.
 - 2026-11-21 18:45 round 2: Chủ dự án: "đầu phiên em nói có tới 3 sổ, đây cũng là một việc trùng luôn. coi lại xem." Shaper dò lại: thêm system-overview §Area Map/§Shared Entities, governance holder table và §Shared Entities của 10 spec; truy ngày sinh từng sổ; ghi row 1 và sửa row 4.
+- 2026-11-21 19:35 round 3: Chủ dự án: "ok, hỏi đi. nhưng cần kiểm tra các sổ trước xem sổ nào thì tiến bộ hơn đầy đủ hơn. thậm chí nên học cách tiếp cận của tất cả các sổ. cũng cần xác định xem là cái thành phần nào đang sửa sổ thì quan trọng về mặt dữ liệu thôi nhưng mà nó còn quan trọng hơn là thành phần nào đang quản lý nó, ai đang quản lý nó." Mở T0d: đánh giá mọi sổ theo độ phủ, độ tươi, máy kiểm, ý tưởng đáng học, người ghi, người quản lý.
 
 ## 6. Thiết kế đã chốt {#design}
 
