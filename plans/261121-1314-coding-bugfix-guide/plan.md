@@ -77,6 +77,7 @@ A second coding workflow guide, `coding/bugfix`, selected with `--guide coding/b
 
 ## Owner questions
 - `q-rzyim2hm3b` (answered 2026-11-21 by the owner via the secretary): phase 1 landed on main (`fc063f1b0`) after the plan had been set back to `draft` pending owner approval. The owner chose "Giữ và coi là duyệt": keep the landed code, treat this plan as approved, and set it `done`. tsk-1pv is thereby released from hold.
+- `q-o3omqvtsuc` (answered 2026-11-21 by the owner via the secretary, option "You run the patch"): the owner pinned planner heads to Claude Opus from an unconfined shell. `.fgos/config.yaml` now carries `runner.personas.planner.tier: flagship` and `prefer: [{executor: claude, invocation: claude-herdr-bypass-bwrap}]`, the same shape as lead. No planner restart follows: workflow-engine has no planning work left.
 - All other open points were resolved and locked in `docs/discussions/workflow-engine/DISCUSSION.md` decisions D1-D4.
 
 ## Risks and rollback
