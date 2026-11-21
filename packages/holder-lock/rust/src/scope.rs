@@ -57,7 +57,8 @@ pub fn rank(name: &str) -> Result<u64, ScopeError> {
 }
 
 /// Resolve registry lock `name`'s template with `params`: every placeholder
-/// needs a non-empty value without `<` or `>`, and the result is absolute.
+/// needs a non-empty value without `<` or `>`, and the result is absolute. A verbatim drive
+/// prefix in a value is written plainly and Windows separators are the platform's own.
 /// The only place the template is filled; `acquire` and probes share it.
 pub fn lock_path(name: &str, params: &BTreeMap<String, String>) -> Result<PathBuf, ScopeError> {
     let row = entry(name)?;
@@ -75,7 +76,13 @@ pub fn lock_path(name: &str, params: &BTreeMap<String, String>) -> Result<PathBu
             .get(key)
             .filter(|v| !v.is_empty() && !v.contains(['<', '>']))
             .ok_or_else(|| ScopeError::Registry(format!("lock-path-param-missing: {key}")))?;
-        path.replace_range(start..=end, value);
+        let plain = fgos_process::path::plain_path(std::path::Path::new(value));
+        path.replace_range(start..=end, &plain.to_string_lossy());
+    }
+    // A Windows path is joined with the platform separator: a verbatim root turns slash
+    // normalisation off, and one directory must name one lock file whichever way it is spelled.
+    if cfg!(windows) {
+        path = path.replace('/', std::path::MAIN_SEPARATOR_STR);
     }
     let path = PathBuf::from(path);
     if !path.is_absolute() {
