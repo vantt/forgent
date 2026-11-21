@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Supervision powers, part 1: the four Rust cores (raise, drone signals, coordination evidence and prune, on-site read and type)"
-status: running
+status: done
 lead: lead:CORES
 base: 2bc1ed73f3932fc2ecc1bbccf4344019181757c7
 priority: P1
@@ -74,7 +74,7 @@ choice (discussion Non-goals).
 | 2 | [Drone definitions for the four session signals](phase-02-drone-definitions.md) | - | core/watcher/definitions/**, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/** | 1 | done |
 | 3 | [Coordination evidence kinds and the Observe prune door](phase-03-evidence-prune.md) | - | packages/observe/rust/**, packages/supervision/rust/observe-kinds.json | 1 | done |
 | 4 | [Bounded recent read and pane typing in terminal control](phase-04-on-site-core.md) | - | packages/terminal-control/rust/**, packages/terminal-control/contracts/** | 1 | done |
-| 5 | [Merge and full gate](phase-05-integration.md) | 1, 2, 3, 4 | plans/261119-1730-supervision-powers-cores/** | 2 | ready |
+| 5 | [Merge and full gate](phase-05-integration.md) | 1, 2, 3, 4 | plans/261119-1730-supervision-powers-cores/** | 2 | done |
 
 Checked with `node scripts/plan-contract-check.mjs --plan plans/261119-1730-supervision-powers-cores` and
 `fgos resource-check --plan plans/261119-1730-supervision-powers-cores` (results in the plan's landing commit).
@@ -93,3 +93,12 @@ adapter; `fgos supervisor raise`, in part 2).
   the delete test. Revert: land the revert of the phase; deleted records are not restored, which is why dry-run is the
   default mode of the core.
 - Each phase is one revert on `main`; nothing is reachable by a head until part 2 lands.
+
+## Result
+
+Done 2026-11-21. All four phases are on main. `cargo test --workspace` passed 4108 / failed 0 / ignored 13 and
+`cargo clippy --workspace -- -D warnings` is clean. `npm test` 8326 passed / 10 failed, all outside this footprint
+(execution, doctor/init and assignment-tree code owned by other lanes), log
+`/home/vantt/projects/forgent-worktrees/cores-npm-test.log`. `plan-contract-check --all` reports a footprint overlap
+between the doors plan and head-tab-labels: the known checker mismatch (p-pcfbembv6e). The supervisor accepted these
+results before this plan was set to done.
