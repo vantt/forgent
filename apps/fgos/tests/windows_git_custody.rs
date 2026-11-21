@@ -189,6 +189,68 @@ fn a_scoped_commit_of_declared_paths_under_held_custody() {
     f.assert_custody_held();
 }
 
+/// The door a unit run uses: preflight, a sync of the target, the declared-path commit and the checks that
+/// follow it, all through `UnitGit` over one held custody lock.
+#[test]
+fn a_writing_units_declared_paths_are_synced_committed_and_verified_through_the_unit_run_door() {
+    use fgos_execution_engine::unit_run::git_port::{CommitArgs, Preflight, UnitGit};
+
+    let _serial = serial();
+    let f = Fixture::new("unit-run");
+    let unit = UnitGit {
+        driver: &f.driver,
+        repo: &f.repo,
+        custody: Some(f.lease()),
+        writer: "fixture",
+    };
+
+    fs::write(f.main.join("incoming"), "target\n").unwrap();
+    git(&f.main, &["add", "incoming"]);
+    git(&f.main, &["commit", "-qm", "target"]);
+    let target = git(&f.main, &["rev-parse", "HEAD"]);
+    let synced = unit.start_sync_merge("trunk", &target, "unit-sync-one");
+    assert_eq!(synced["status"], "merged", "{synced}");
+    assert_eq!(
+        unit.state().unwrap().head,
+        git(&f.tree, &["rev-parse", "HEAD"])
+    );
+
+    let scope = vec!["selected.txt".to_owned()];
+    let Preflight::Clear { baseline, .. } = unit.preflight(&scope, None).unwrap() else {
+        panic!("a clean linked checkout has a foreign index or merge");
+    };
+    fs::write(f.tree.join("selected.txt"), "selected").unwrap();
+    fs::write(f.tree.join("outside.txt"), "outside").unwrap();
+    let committed = unit.commit_unit_work(
+        &CommitArgs {
+            unit_id: "unit-one",
+            summary: Some("declared paths"),
+            objective: None,
+            scope: &scope,
+            baseline: Some(&baseline),
+            changed_files: None,
+            exclude_paths: &[],
+            needs_writes: None,
+            operation_id: "unit-commit-one",
+            resume: None,
+        },
+        &mut |_| Ok(()),
+    );
+    assert_eq!(committed["status"], "committed", "{committed}");
+    let sha = committed["sha"].as_str().expect("the commit's sha");
+
+    // Verify: the commit is the branch's head, carries only the declared path, and the rest stays uncommitted.
+    assert!(unit.commit_on_branch(sha).unwrap());
+    assert_eq!(unit.state().unwrap().head, sha);
+    assert_eq!(git(&f.tree, &["rev-parse", "HEAD"]), sha);
+    assert_eq!(
+        git(&f.tree, &["show", "--name-only", "--format=", "HEAD"]),
+        "selected.txt"
+    );
+    assert!(git(&f.tree, &["status", "--porcelain"]).contains("outside.txt"));
+    f.assert_custody_held();
+}
+
 #[test]
 fn a_sync_merges_the_target_into_the_linked_checkout_under_held_custody() {
     let _serial = serial();

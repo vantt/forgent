@@ -1478,13 +1478,20 @@ mod windows_extract {
         }
 
         #[test]
-        fn a_held_directory_cannot_be_renamed_so_the_write_lands_where_it_was_checked() {
+        fn a_held_directory_cannot_be_renamed_between_check_and_create_so_the_write_lands_where_it_was_checked(
+        ) {
             let base = scratch("held");
             let (checked, moved) = (base.join("out"), base.join("moved"));
             fs::create_dir(&checked).unwrap();
             let held = open_directory(&checked).unwrap();
-            assert!(fs::rename(&checked, &moved).is_err());
-            create_beneath(&checked, &held, "f".as_ref(), b"data", || {}).unwrap();
+            let rename_refused = std::cell::Cell::new(false);
+            create_beneath(&checked, &held, "f".as_ref(), b"data", || {
+                // The window between the identity check and the create: the held directory cannot be swapped out.
+                rename_refused.set(fs::rename(&checked, &moved).is_err());
+            })
+            .unwrap();
+            assert!(rename_refused.get());
+            assert!(!moved.exists());
             assert_eq!(fs::read(checked.join("f")).unwrap(), b"data");
             drop(held);
             let _ = fs::remove_dir_all(&base);
@@ -1497,7 +1504,10 @@ mod windows_extract {
             fs::create_dir(&held_dir).unwrap();
             fs::create_dir(&other).unwrap();
             let held = open_directory(&held_dir).unwrap();
-            let refused = create_beneath(&other, &held, "f".as_ref(), b"data", || {}).unwrap_err();
+            let refused = create_beneath(&other, &held, "f".as_ref(), b"data", || {
+                panic!("a refused directory must not reach the create step")
+            })
+            .unwrap_err();
             assert!(refused.cause.contains("restore-extract-directory-changed"));
             assert!(!other.join("f").exists());
             drop(held);

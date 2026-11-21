@@ -43,8 +43,58 @@ pub fn replace_held_file(handle: &Handle, lock: &str, by: &str, at: &str) -> io:
     let parent = path
         .parent()
         .ok_or_else(|| io::Error::other("missing fence parent"))?;
+    sweep_fence_leftovers(parent);
     let temporary = prepare_tombstone_dir(parent, lock, by, at)?;
     place(path, parent, &temporary)
+}
+
+const FENCE_PREFIX: &str = ".activation-fence-";
+const FENCE_ASIDE_PREFIX: &str = ".activation-fence-aside-";
+
+/// Whether `name` is one this module creates: the prepared directory
+/// `.activation-fence-<pid>-<nanos>` or the moved-aside file
+/// `.activation-fence-aside-<pid>-<nanos>`, with decimal numbers only.
+fn is_fence_leftover_name(name: &str) -> bool {
+    let numbers = name
+        .strip_prefix(FENCE_ASIDE_PREFIX)
+        .or_else(|| name.strip_prefix(FENCE_PREFIX));
+    let Some((pid, nanos)) = numbers.and_then(|rest| rest.split_once('-')) else {
+        return false;
+    };
+    let decimal = |part: &str| !part.is_empty() && part.bytes().all(|b| b.is_ascii_digit());
+    decimal(pid) && decimal(nanos)
+}
+
+/// Remove what an earlier placement left beside the fence path: a prepared
+/// directory or an aside file (a placement that lost the race to a contender,
+/// or a process that died mid-placement). Placement runs under the caller's
+/// replacement lock, so no live placement owns these names. Only entries this
+/// module names are touched, only as a plain file or a plain directory (never
+/// through a symlink), and never the contender's file at the fence path. A
+/// failure to remove is ignored: the leftover is retried at the next placement.
+/// The `.activation-fence-` names do not carry the lock name: this is sound only
+/// while one fence lives per parent directory; a second fence kind beside it must
+/// put its lock name into these names first.
+fn sweep_fence_leftovers(parent: &Path) {
+    let Ok(entries) = fs::read_dir(parent) else {
+        return;
+    };
+    for entry in entries.flatten() {
+        let name = entry.file_name();
+        if !name.to_str().is_some_and(is_fence_leftover_name) {
+            continue;
+        }
+        let Ok(kind) = fs::symlink_metadata(entry.path()).map(|m| m.file_type()) else {
+            continue;
+        };
+        let _ = if kind.is_dir() {
+            fs::remove_dir_all(entry.path())
+        } else if kind.is_file() {
+            fs::remove_file(entry.path())
+        } else {
+            continue;
+        };
+    }
 }
 
 /// A sibling directory holding the flushed TOMBSTONE record, ready to be
@@ -248,6 +298,73 @@ mod windows_tests {
         assert!(error.to_string().starts_with(FENCE_CONTENDED));
         assert_eq!(fs::read(&old).unwrap(), b"contender");
         assert!(!is_tombstone(&old, "activation", "fgos git"));
+        let leftovers = |dir: &Path| {
+            fs::read_dir(dir)
+                .unwrap()
+                .flatten()
+                .filter(|e| is_fence_leftover_name(&e.file_name().to_string_lossy()))
+                .count()
+        };
+        assert_eq!(
+            leftovers(&dir),
+            2,
+            "the aside file and the prepared directory stay"
+        );
+        sweep_fence_leftovers(&dir);
+        assert_eq!(leftovers(&dir), 0);
+        assert_eq!(
+            fs::read(&old).unwrap(),
+            b"contender",
+            "the contender's file is never swept"
+        );
+        fs::remove_dir_all(dir).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod sweep_tests {
+    use super::*;
+
+    #[test]
+    fn only_the_names_this_module_creates_count_as_fence_leftovers() {
+        assert!(is_fence_leftover_name(".activation-fence-123-456"));
+        assert!(is_fence_leftover_name(".activation-fence-aside-123-456"));
+        for other in [
+            "activation.lock",
+            ".activation-fence-",
+            ".activation-fence-123",
+            ".activation-fence-12a-456",
+            ".activation-fence-123-456-7",
+            ".activation-fence-aside-123",
+            ".activation-fence-other-1-2",
+            "x.activation-fence-1-2",
+        ] {
+            assert!(!is_fence_leftover_name(other), "{other}");
+        }
+    }
+
+    #[test]
+    fn the_sweep_removes_owned_leftovers_and_keeps_every_other_entry() {
+        let dir = std::env::temp_dir().join(format!(
+            "fgos-tombstone-sweep-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&dir).unwrap();
+        let prepared = dir.join(".activation-fence-1-2");
+        fs::create_dir(&prepared).unwrap();
+        fs::write(prepared.join("TOMBSTONE"), b"{}").unwrap();
+        fs::write(dir.join(".activation-fence-aside-3-4"), b"held").unwrap();
+        fs::write(dir.join("activation.lock"), b"contender").unwrap();
+        fs::write(dir.join(".activation-fence-mine"), b"not ours").unwrap();
+        sweep_fence_leftovers(&dir);
+        assert!(!prepared.exists());
+        assert!(!dir.join(".activation-fence-aside-3-4").exists());
+        assert_eq!(fs::read(dir.join("activation.lock")).unwrap(), b"contender");
+        assert!(dir.join(".activation-fence-mine").exists());
         fs::remove_dir_all(dir).unwrap();
     }
 }

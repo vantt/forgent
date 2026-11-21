@@ -633,21 +633,28 @@ mod quiesce {
     /// a fgOS process. Its argv stays readable without ptrace access: a
     /// session helper the user's own service manager runs without ptrace
     /// access (systemd's `(sd-pam)`) names neither node nor a fgOS binary and
-    /// is not counted, or no systemd machine could ever scan clean. An
-    /// unreadable argv says nothing, so it still counts.
-    fn could_be_fgos(argv: Option<&[String]>) -> bool {
-        let Some(argv) = argv else { return true };
-        let Some(first) = argv.first() else {
-            return false;
+    /// is not counted, or no systemd machine could ever scan clean. When the
+    /// argv cannot be read, the image name judges instead (a non-elevated
+    /// Windows user cannot read the command line of System, Registry or
+    /// another user's `svchost.exe`, and those are not fgOS). Only when
+    /// neither is known does it still count.
+    fn could_be_fgos(argv: Option<&[String]>, exe: Option<&Path>) -> bool {
+        let first = match argv {
+            Some(argv) => argv.first().map(String::as_str),
+            None => match exe {
+                Some(exe) => Some(exe.to_str().unwrap_or("")),
+                None => return true,
+            },
         };
+        let Some(first) = first else { return false };
         let base = Path::new(first)
             .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("");
-        // A Windows program name carries its `.exe` and any letter case.
-        #[cfg(windows)]
+        // A Windows program name carries its `.exe` and any letter case; the
+        // image name of a process that could not be opened is judged the same
+        // way on every platform.
         let lowered = base.to_ascii_lowercase();
-        #[cfg(windows)]
         let base = lowered.strip_suffix(".exe").unwrap_or(&lowered);
         crate::origin::is_script_runtime(base) || crate::origin::FGOS_BINARIES.contains(&base)
     }
@@ -665,7 +672,7 @@ mod quiesce {
         dirs: &[PathBuf],
         workspace_only: bool,
     ) -> Option<&'static str> {
-        if !workspace_only && !could_be_fgos(cmdline) {
+        if !workspace_only && !could_be_fgos(cmdline, None) {
             return None;
         }
         if cwd.is_some_and(|cwd| dirs.iter().any(|d| within(cwd, d))) {
@@ -677,25 +684,74 @@ mod quiesce {
         }
     }
 
-    /// Whether the scanned process runs as this process's effective user.
-    /// A non-dumpable process (ssh-agent, gpg-agent) keeps its `/proc/<pid>`
-    /// directory and status uid, so the uid the scan already read answers it.
+    /// Whether the scanned process may run as this process's effective user.
+    /// A user that could not be read is possibly the same one: an unknown
+    /// owner must not look like another user's process. A non-dumpable
+    /// process (ssh-agent, gpg-agent) keeps its `/proc/<pid>` directory and
+    /// status uid, so the uid the scan already read answers it.
     #[cfg(target_os = "linux")]
-    fn same_user(view: &ProcView) -> bool {
+    fn maybe_same_user(view: &ProcView) -> bool {
         // SAFETY: geteuid has no preconditions.
-        view.effective_uid == Some(unsafe { libc::geteuid() })
+        view.effective_uid
+            .is_none_or(|uid| uid == unsafe { libc::geteuid() })
     }
 
     /// On Windows `effective_uid` carries a digest of the token's user SID.
     #[cfg(windows)]
-    fn same_user(view: &ProcView) -> bool {
-        view.effective_uid.is_some()
-            && view.effective_uid == fgos_process::facts::self_effective_uid()
+    fn maybe_same_user(view: &ProcView) -> bool {
+        view.effective_uid
+            .is_none_or(|uid| Some(uid) == fgos_process::facts::self_effective_uid())
     }
 
     #[cfg(not(any(target_os = "linux", windows)))]
-    fn same_user(_view: &ProcView) -> bool {
+    fn maybe_same_user(_view: &ProcView) -> bool {
         false
+    }
+
+    /// Whether a process that did not place itself in the workspace still
+    /// counts as unreadable: something about it could not be read, it may be
+    /// this user's, and its argv could be fgOS. In workspace-only mode the
+    /// unreadable part must be its cwd (a readable cwd outside the workspace
+    /// is a process elsewhere); an elevated or 32-bit Windows process, or a
+    /// root process on Linux, can hide its cwd, and it must not scan clean.
+    fn counts_as_unreadable(view: &ProcView, workspace_only: bool, same_user: bool) -> bool {
+        let hidden = if workspace_only {
+            view.cwd.is_none()
+        } else {
+            !view.unreadable.is_empty()
+        };
+        hidden && same_user && could_be_fgos(view.cmdline.as_deref(), view.exe.as_deref())
+    }
+
+    /// Why a process counts as unreadable, in words a person can act on.
+    fn unreadable_reason(view: &ProcView, workspace_only: bool) -> String {
+        let mut reasons = Vec::new();
+        if view.cmdline.is_none() {
+            reasons.push("argv unreadable".to_string());
+        }
+        if view.cwd.is_none() {
+            reasons.push("cwd unreadable".to_string());
+        }
+        if view.effective_uid.is_none() {
+            reasons.push("user unreadable".to_string());
+        }
+        if !workspace_only {
+            reasons.extend(
+                view.unreadable
+                    .iter()
+                    .map(|part| format!("{part} unreadable")),
+            );
+        }
+        reasons.dedup();
+        reasons.join(", ")
+    }
+
+    fn unreadable_entry(view: &ProcView, workspace_only: bool) -> Value {
+        json!({
+            "pid": view.pid.0,
+            "argv": view.cmdline,
+            "reason": unreadable_reason(view, workspace_only),
+        })
     }
 
     pub(super) fn scan(
@@ -739,7 +795,7 @@ mod quiesce {
             }
         };
         let mut processes = Vec::new();
-        let mut unreadable = 0u32;
+        let mut unreadable = Vec::new();
         for view in views {
             if exclude.contains(&view.pid.0) {
                 continue;
@@ -759,7 +815,7 @@ mod quiesce {
             match hit {
                 Some((matched, root)) => {
                     if workspace_only && view.cmdline.is_none() {
-                        unreadable += 1;
+                        unreadable.push(unreadable_entry(&view, workspace_only));
                     }
                     processes.push(json!({
                         "pid": view.pid.0,
@@ -771,31 +827,39 @@ mod quiesce {
                         "root": root.to_string_lossy(),
                     }));
                 }
-                None if !workspace_only
-                    && !view.unreadable.is_empty()
-                    && same_user(&view)
-                    && could_be_fgos(view.cmdline.as_deref()) =>
-                {
-                    unreadable += 1
+                None if counts_as_unreadable(&view, workspace_only, maybe_same_user(&view)) => {
+                    unreadable.push(unreadable_entry(&view, workspace_only))
                 }
                 None => {}
             }
         }
-        let clean = processes.is_empty() && unreadable == 0;
+        let clean = processes.is_empty() && unreadable.is_empty();
+        let mut fields = json!({
+            "processes": processes,
+            "unreadable": unreadable.len(),
+            "unreadableProcesses": unreadable,
+        });
+        if !unreadable.is_empty() {
+            fields["detail"] = json!(format!(
+                "{} same-user process(es) could not be read and could be fgOS; see unreadableProcesses for pid, argv and why",
+                unreadable.len()
+            ));
+        }
         emit(
             Some(if clean { "clean" } else { "processes" }),
-            json!({ "processes": processes, "unreadable": unreadable }),
+            fields,
             if clean { EXIT_OK } else { EXIT_NEGATIVE },
         )
     }
 
     #[cfg(test)]
     mod tests {
-        use super::could_be_fgos;
         #[cfg(unix)]
         use super::workspace_argument;
+        use super::{could_be_fgos, counts_as_unreadable};
         #[cfg(any(unix, windows))]
         use super::{workspace_dirs, workspace_hit};
+        use fgos_process::{facts::ProcView, ProcId};
         #[cfg(any(unix, windows))]
         use std::path::{Path, PathBuf};
 
@@ -1027,34 +1091,134 @@ mod quiesce {
             std::fs::remove_dir_all(&base).unwrap();
         }
 
+        fn view(cwd: Option<&str>, argv: Option<&[&str]>, unreadable: &[&str]) -> ProcView {
+            ProcView {
+                effective_uid: None,
+                pid: ProcId(4242),
+                tuple: None,
+                exe: None,
+                cmdline: argv.map(|a| a.iter().map(|s| s.to_string()).collect()),
+                cwd: cwd.map(std::path::PathBuf::from),
+                env_subset: Default::default(),
+                unreadable: unreadable.iter().map(|s| s.to_string()).collect(),
+            }
+        }
+
+        #[test]
+        fn a_workspace_scan_counts_a_process_whose_cwd_is_hidden_when_it_could_be_fgos() {
+            let hidden = ["cwd: access denied"];
+            let fgos = view(None, Some(&["fgos", "run", "x"]), &hidden);
+            let node = view(None, Some(&["node", "bin/fgos.mjs"]), &hidden);
+            let other = view(None, Some(&["svchost.exe", "-k", "x"]), &hidden);
+            let blind = view(None, None, &["cwd: denied", "cmdline: denied"]);
+            for only in [true, false] {
+                assert!(
+                    counts_as_unreadable(&fgos, only, true),
+                    "fgos argv, only={only}"
+                );
+                assert!(
+                    counts_as_unreadable(&node, only, true),
+                    "node argv, only={only}"
+                );
+                assert!(
+                    counts_as_unreadable(&blind, only, true),
+                    "no argv, only={only}"
+                );
+                assert!(
+                    !counts_as_unreadable(&other, only, true),
+                    "unrelated argv, only={only}"
+                );
+                assert!(
+                    !counts_as_unreadable(&fgos, only, false),
+                    "another user, only={only}"
+                );
+            }
+        }
+
+        #[test]
+        fn a_workspace_scan_ignores_a_readable_cwd_outside_the_workspace() {
+            let elsewhere = view(
+                Some("/elsewhere"),
+                Some(&["fgos", "run"]),
+                &["environ: denied"],
+            );
+            assert!(!counts_as_unreadable(&elsewhere, true, true));
+            assert!(counts_as_unreadable(&elsewhere, false, true));
+        }
+
         #[test]
         fn an_unreadable_process_counts_only_when_its_argv_could_be_fgos() {
-            assert!(could_be_fgos(None), "no argv at all says nothing");
-            assert!(could_be_fgos(Some(&argv(&["node", "bin/fgos.mjs"]))));
-            assert!(could_be_fgos(Some(&argv(&[
-                "/usr/bin/node",
-                "--test",
-                "x.mjs"
-            ]))));
-            assert!(could_be_fgos(Some(&argv(&["/opt/fgos/bin/fgos", "run"]))));
-            assert!(could_be_fgos(Some(&argv(&["fgos-gateway"]))));
-            assert!(could_be_fgos(Some(&argv(&["nodejs"]))));
-            assert!(could_be_fgos(Some(&argv(&["/usr/bin/node20", "x.mjs"]))));
-            assert!(could_be_fgos(Some(&argv(&["node-22"]))));
-            assert!(could_be_fgos(Some(&argv(&["bun", "run"]))));
-            assert!(could_be_fgos(Some(&argv(&["deno", "run"]))));
+            assert!(could_be_fgos(None, None), "no argv at all says nothing");
+            assert!(could_be_fgos(Some(&argv(&["node", "bin/fgos.mjs"])), None));
+            assert!(could_be_fgos(
+                Some(&argv(&["/usr/bin/node", "--test", "x.mjs"])),
+                None
+            ));
+            assert!(could_be_fgos(
+                Some(&argv(&["/opt/fgos/bin/fgos", "run"])),
+                None
+            ));
+            assert!(could_be_fgos(Some(&argv(&["fgos-gateway"])), None));
+            assert!(could_be_fgos(Some(&argv(&["nodejs"])), None));
+            assert!(could_be_fgos(
+                Some(&argv(&["/usr/bin/node20", "x.mjs"])),
+                None
+            ));
+            assert!(could_be_fgos(Some(&argv(&["node-22"])), None));
+            assert!(could_be_fgos(Some(&argv(&["bun", "run"])), None));
+            assert!(could_be_fgos(Some(&argv(&["deno", "run"])), None));
             assert!(
-                !could_be_fgos(Some(&argv(&["nodemon"]))),
+                !could_be_fgos(Some(&argv(&["nodemon"])), None),
                 "a name that only starts with node is something else"
             );
             assert!(
-                !could_be_fgos(Some(&argv(&["(sd-pam)"]))),
+                !could_be_fgos(Some(&argv(&["(sd-pam)"])), None),
                 "systemd's session helper"
             );
             assert!(
-                !could_be_fgos(Some(&argv(&[]))),
+                !could_be_fgos(Some(&argv(&[])), None),
                 "a zombie or kernel thread has an empty argv"
             );
+        }
+
+        #[test]
+        fn an_unreadable_argv_is_judged_by_the_image_name_and_counts_only_when_nothing_rules_out_fgos(
+        ) {
+            let blind = |image: Option<&str>| {
+                let mut v = view(None, None, &["stat: access denied"]);
+                v.exe = image.map(std::path::PathBuf::from);
+                v
+            };
+            for only in [true, false] {
+                for image in [
+                    "System",
+                    "Registry",
+                    "Memory Compression",
+                    "svchost.exe",
+                    "explorer.exe",
+                ] {
+                    assert!(
+                        !counts_as_unreadable(&blind(Some(image)), only, true),
+                        "{image} with an unreadable user and argv is not fgOS"
+                    );
+                }
+                for image in [
+                    "node.exe",
+                    "NODE.EXE",
+                    "fgos.exe",
+                    "fgos-gateway.exe",
+                    "bun.exe",
+                ] {
+                    assert!(
+                        counts_as_unreadable(&blind(Some(image)), only, true),
+                        "{image} could be fgOS and still counts"
+                    );
+                }
+                assert!(
+                    counts_as_unreadable(&blind(None), only, true),
+                    "no argv and no image name stays fail closed"
+                );
+            }
         }
     }
 }

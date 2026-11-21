@@ -312,9 +312,40 @@ fn controller_publication_and_idempotent_paths_enforce_wal_and_keep_the_fence() 
     directed.wait().unwrap();
     assert!(!rejected.status.success());
     assert!(String::from_utf8_lossy(&rejected.stderr).contains("git-predecessor-writer-live"));
+    // Another same-user process whose cwd cannot be read and whose argv could
+    // be fgOS (a CI runner's own node process) rightly blocks activation. Show
+    // what the scan sees, and when it sees any, assert the refusal names each.
+    let scan = Command::new(env!("CARGO_BIN_EXE_fgctl"))
+        .args(["internal", "quiesce-scan", "--protocol", "1", "--root"])
+        .arg(&ws)
+        .arg("--dir")
+        .arg(&linked)
+        .arg("--workspace-only")
+        .env("FGOS_STATE_ROOT", &state)
+        .output()
+        .unwrap();
+    let scan: serde_json::Value = serde_json::from_slice(&scan.stdout).unwrap();
+    let hidden = scan["unreadableProcesses"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
     let activated = controller(&ws, &state, "upgrade", &new);
     unrelated.kill().unwrap();
     unrelated.wait().unwrap();
+    if !hidden.is_empty() {
+        eprintln!("unreadable same-user processes on this machine: {hidden:#?}");
+        assert!(!activated.status.success());
+        let message = String::from_utf8_lossy(&activated.stderr);
+        assert!(message.contains("git-predecessor-writer-live"), "{message}");
+        for process in &hidden {
+            assert!(
+                message.contains(&format!("pid {}", process["pid"])),
+                "refusal does not name unreadable process {process}: {message}"
+            );
+        }
+        fs::remove_dir_all(root).unwrap();
+        return;
+    }
     success(activated);
     let fence = ws.join(".fgos/locks/activation.lock");
     assert!(fgos_holder_lock::tombstone::is_tombstone(
