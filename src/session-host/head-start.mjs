@@ -15,7 +15,7 @@ import { spawnSync } from 'node:child_process';
 import { replaceDurably } from '../native/door.mjs';
 import { createSessionHost } from './client.mjs';
 import { grantOf, HEAD_PERSONAS } from './head-grants.mjs';
-import { taskOfHead } from './head-plan.mjs';
+import { subjectOfDir, taskOfHead } from './head-plan.mjs';
 import { resolveActiveHostBin, routeEnv } from '../util/host-bin-path.mjs';
 import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 
@@ -38,6 +38,8 @@ export class HeadStartError extends Error {
 }
 
 export const headRoleOf = (persona, name) => `head:${persona}-${name}`;
+/** The subject a head's tab shows after its role: the plan or discussion directory without its date, or the head name when the persona owns no task. */
+export const subjectOfHead = (persona, name, task) => (task?.dir ? subjectOfDir(task.dir) : name);
 export const headKeyOf = (persona, name, gen) => `head-${persona}-${name}-${gen}`;
 
 /** The folder the lineage of one persona-name keeps its runtime files in (handoffs, the live placement). */
@@ -247,7 +249,7 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
     binding, runnerConfig, key, role, grant, opening: text, ceilingMs: HEAD_HARD_CEILING_MS,
     // The sandbox gives every launch a private writable tmpfs at /tmp (bwrap driver `--tmpfs /tmp`), so /tmp is the head's own scratch, not the shared one.
     env: { TMPDIR: '/tmp', FGOS_HEAD_ROLE: role, FGOS_HEAD_PERSONA: persona, FGOS_HEAD_NAME: name, FGOS_HEAD_GEN: String(generation) },
-    projectRoot, beside, display: { id: name, title: persona },
+    projectRoot, beside, display: { role: persona, title: subjectOfHead(persona, name, task) },
   };
   let launched;
   try {

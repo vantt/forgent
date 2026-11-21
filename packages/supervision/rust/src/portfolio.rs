@@ -16,6 +16,7 @@ pub struct Vocabulary {
     pub table_columns: Vec<String>,
     pub head_name_max: usize,
     pub head_name_project_prefix: usize,
+    pub head_name_hash_chars: usize,
 }
 
 /// The vocabulary embedded in this crate.
@@ -47,6 +48,7 @@ pub fn vocabulary() -> &'static Vocabulary {
             table_columns: list("tableColumns"),
             head_name_max: number("max"),
             head_name_project_prefix: number("projectPrefix"),
+            head_name_hash_chars: number("hashChars"),
         }
     })
 }
@@ -273,15 +275,32 @@ fn cut(text: &str, max: usize) -> &str {
     }
 }
 
+/// A short stable tag of `text`: the low `chars` hex digits of its FNV-1a 32-bit hash. The Node resolver
+/// (`head-plan.mjs`) computes the same tag, so a name resolves back to the plan that wrote it.
+pub fn name_tag(text: &str, chars: usize) -> String {
+    let hash = text.bytes().fold(0x811c_9dc5_u32, |h, b| {
+        (h ^ u32::from(b)).wrapping_mul(0x0100_0193)
+    });
+    let hex = format!("{hash:08x}");
+    hex[hex.len() - chars.min(hex.len())..].to_string()
+}
+
 /// The head name of a lead or planner: the project handle cut to the prefix limit (trailing `-`
-/// trimmed), `-`, and the plan or discussion directory cut so the whole fits the name limit.
+/// trimmed), `-`, and the plan or discussion directory. A directory that fits the name limit is
+/// kept whole; a longer one is cut short enough to leave room for `-` and its tag, so two
+/// directories that share their first characters still get different names.
 pub fn head_name(project_handle: &str, dir: &str) -> String {
     let vocab = vocabulary();
     let prefix = cut(project_handle, vocab.head_name_project_prefix).trim_end_matches('-');
     let room = vocab
         .head_name_max
         .saturating_sub(prefix.chars().count() + 1);
-    format!("{prefix}-{}", cut(dir, room))
+    if dir.chars().count() <= room {
+        return format!("{prefix}-{dir}");
+    }
+    let tag = name_tag(dir, vocab.head_name_hash_chars);
+    let keep = room.saturating_sub(tag.chars().count() + 1);
+    format!("{prefix}-{}-{tag}", cut(dir, keep).trim_end_matches('-'))
 }
 
 /// The name of the project's supervisor head: the project handle cut to the name limit.
