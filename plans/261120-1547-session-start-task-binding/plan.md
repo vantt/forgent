@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Session start task binding: resolve head names to discussion or plan in opening brief"
-status: running
+status: done
 lead: lead:BIND
 base: 5cf5d7b36eb71a4242f4e5a74325f9ad3055f9d8
 priority: P1
@@ -48,8 +48,8 @@ created: 2026-11-20
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Task resolver for head names](phase-01-task-resolver.md) | - | src/session-host/head-plan.mjs, test/session-host/head-plan.test.mjs | 1 | ready |
-| 2 | [Brief injection and session start parity](phase-02-brief-injection-and-start-parity.md) | 1 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 2 | ready |
+| 1 | [Task resolver for head names](phase-01-task-resolver.md) | - | src/session-host/head-plan.mjs, test/session-host/head-plan.test.mjs | 1 | done |
+| 2 | [Brief injection and session start parity](phase-02-brief-injection-and-start-parity.md) | 1 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 2 | done |
 
 ## Owner questions
 None. The behavior and requirements are settled in backlog row `p-l22vozecxg` and align with established supervisor start rituals.
