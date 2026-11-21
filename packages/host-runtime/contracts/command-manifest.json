@@ -3174,7 +3174,7 @@
       },
       "examples": [
         "fgos land plan-x",
-        "fgos land --paths plans/backlog.md --message \"docs: backlog\" --test test/x.test.mjs"
+        "fgos land --paths plans/backlog/p-24dxhwq7zr-councils-cost-many-tokens-because-they-are.md --message \"docs: backlog item\" --test test/x.test.mjs"
       ],
       "touchesState": true,
       "externalEffect": true,
@@ -5223,7 +5223,7 @@
     {
       "name": "session",
       "invoke": "fgos session <start|rotate|stop|write|read|type>",
-      "description": "Agent head sessions: \"read\" shows the last lines of a session's screen and \"type\" types into a stuck session's pane (both served natively by the Rust host); \"start\" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; \"rotate\" asks for its replacement by a successor that reads a redacted handoff; \"stop\" ends a head on purpose; \"write\" replaces a file of a confined head's grant (the secretary's docs/backlog.md) through its supervisor. From inside a confined head all six go through its request socket.",
+      "description": "Agent head sessions: \"read\" shows the last lines of a session's screen and \"type\" types into a stuck session's pane (both served natively by the Rust host); \"start\" opens the long-lived interactive head of a persona, or fronts the one that already holds the role; \"rotate\" asks for its replacement by a successor that reads a redacted handoff; \"stop\" ends a head on purpose; \"write\" replaces a file of a confined head's grant (the secretary's backlog items) through its supervisor. From inside a confined head all six go through its request socket.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -5250,7 +5250,7 @@
       "examples": [
         "fgos session start secretary --name miu",
         "fgos session rotate secretary --name miu",
-        "fgos session write docs/backlog.md < \"$TMPDIR/backlog.md\""
+        "fgos session write plans/backlog/p-24dxhwq7zr-councils-cost-many-tokens-because-they-are.md < \"$TMPDIR/item.md\""
       ],
       "subcommands": {
         "start": {
@@ -5348,7 +5348,7 @@
             "properties": {
               "path": {
                 "type": "string",
-                "description": "Positional: the project-relative path of the granted file, e.g. docs/backlog.md."
+                "description": "Positional: the project-relative path of the granted file, e.g. a backlog item under plans/backlog/."
               },
               "base": {
                 "type": "string",
@@ -5363,7 +5363,7 @@
             ]
           },
           "examples": [
-            "fgos session write docs/backlog.md < \"$TMPDIR/backlog.md\""
+            "fgos session write plans/backlog/p-24dxhwq7zr-councils-cost-many-tokens-because-they-are.md < \"$TMPDIR/item.md\""
           ]
         },
         "read": {
