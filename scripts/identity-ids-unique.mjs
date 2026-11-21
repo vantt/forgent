@@ -6,6 +6,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { readFrontmatter } from '../src/util/yaml.mjs';
 
 const MAX_REGISTRY_BYTES = 8 * 1024 * 1024;
 
@@ -53,9 +54,13 @@ function readIdRegistries(root) {
   // A migrated project keeps one file per item; its id is the `id:` of the frontmatter.
   const itemsDir = path.join(root, 'plans/backlog');
   for (const file of markdownFilesUnder(itemsDir)) {
-    const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(readText(file) ?? '')?.[1] ?? '';
-    const id = /^id:\s*(\S+)\s*$/m.exec(front)?.[1];
-    if (id) backlogIds.push(id);
+    let id;
+    try {
+      id = readFrontmatter(readText(file) ?? '', file).meta.id;
+    } catch {
+      // an unparseable block carries no id
+    }
+    if (typeof id === 'string' && id) backlogIds.push(id);
   }
   // One decision may be recorded in several area specs; it is the same decision while every
   // heading gives it the same short title, and two titles under one number are two decisions.

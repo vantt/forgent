@@ -12,6 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readFrontmatter } from '../src/util/yaml.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BACKLOG = path.join(repoRoot, 'docs/backlog.md');
@@ -67,11 +68,15 @@ function proposedIdsFromItems(dir) {
   let scanned = 0;
   for (const name of fs.readdirSync(dir).filter((n) => n.endsWith('.md')).sort()) {
     const text = fs.readFileSync(path.join(dir, name), 'utf8');
-    const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text)?.[1] ?? '';
-    const id = /^id:\s*(\S+)\s*$/m.exec(front)?.[1];
-    if (/^status:\s*proposed\s*$/m.test(front)) {
+    let meta = {};
+    try {
+      meta = readFrontmatter(text, name).meta;
+    } catch {
+      // an unparseable block carries no id or status
+    }
+    if (meta.status === 'proposed') {
       scanned += 1;
-      if (id) ids.push(id);
+      if (typeof meta.id === 'string' && meta.id) ids.push(meta.id);
     }
   }
   return { ids, scanned };
