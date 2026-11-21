@@ -876,7 +876,8 @@ impl<'a> Core<'a> {
         self.need("read.screen")?;
         let pane_id = self.resolve_target(target)?;
         let lines = lines.min(crate::port::MAX_RECENT_LINES);
-        self.driver.read_screen(&pane_id, Some(lines), Some("recent"))
+        self.driver
+            .read_screen(&pane_id, Some(lines), Some("recent"))
     }
 
     pub fn type_text(&self, target: &str, text: &str) -> Result<(), Refusal> {

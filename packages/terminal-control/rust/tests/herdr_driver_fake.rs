@@ -1067,12 +1067,16 @@ fn missing_capability_returns_unsupported_refusal() {
         "type_text on driver without send.text must return Unsupported"
     );
 
-    assert!(is_unsupported(
-        absent_driver.read_screen("wS:p59Y", Some(50), Some("recent"))
-    ));
-    assert!(is_unsupported(
-        absent_driver.send_text("wS:p59Y", "test text", false)
-    ));
+    assert!(is_unsupported(absent_driver.read_screen(
+        "wS:p59Y",
+        Some(50),
+        Some("recent")
+    )));
+    assert!(is_unsupported(absent_driver.send_text(
+        "wS:p59Y",
+        "test text",
+        false
+    )));
 
     struct StrippedDriver<'a> {
         inner: &'a HerdrDriver,
@@ -1109,7 +1113,8 @@ fn missing_capability_returns_unsupported_refusal() {
             cwd: Option<&str>,
             env: &[(String, String)],
         ) -> DriverResult<CreatedPane> {
-            self.inner.pane_split(anchor_pane, direction, ratio, cwd, env)
+            self.inner
+                .pane_split(anchor_pane, direction, ratio, cwd, env)
         }
         fn pane_close(
             &self,
@@ -1206,10 +1211,7 @@ fn type_text_sends_text_exactly_once_via_pane_send_text() {
         1,
         "type_text must send text exactly once via pane send-text, got calls: {calls:?}"
     );
-    assert_eq!(
-        send_calls[0],
-        &format!("pane send-text wS:p59Y {typed}")
-    );
+    assert_eq!(send_calls[0], &format!("pane send-text wS:p59Y {typed}"));
     assert!(
         !calls.iter().any(|c| c.starts_with("agent prompt")),
         "type_text must not call agent prompt: {calls:?}"
