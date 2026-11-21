@@ -123,3 +123,10 @@ job "windows cwd lease owner": the controller serves cwdLeaseOwner, the real sup
 held lease, a stub agent writes, the lease outlives the supervisor; Ctrl-Break gives exit 130 and a cancel request). The
 refusals stay: a writing unit run cannot commit on Windows until the Git door takes custody there (holder-lock
 `BorrowedHandle` is Unix-only). `fgos run` is native on Unix and handed to the Node arm on Windows (`legacyOn`).
+Preconditions for lifting engine `mutating_launch_refusal` (`windows-cwd-lease-holder-missing`), both required:
+(a) the Git-lane Windows custody item above (the Git door takes custody on Windows); (b) the lease channel answers
+for the attempt's whole life, not only until the binding: engine `assignment_runner/launch.rs` `serving_lease_owner`
+wraps only the supervisor start and `wait_for_binding`, so the thread stops once the binding is known, and a
+supervisor that declares its domain again later (one adopted, or restarted after a crash) gets no answer on
+`cwdLeaseOwner`. Unreachable today, because the refusal holds every Windows mutating attempt; it must be fixed and
+proven on native Windows CI (an adopted supervisor re-declares on the held lease) before the refusal is lifted.
