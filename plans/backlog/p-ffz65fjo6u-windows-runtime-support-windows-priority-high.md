@@ -17,4 +17,6 @@ A Windows user gets a doctor that is ok when what exists on Windows is healthy, 
 
 # Notes
 
+2026-11-21 23:55 (lead:S6A, phase 20 on s6/p20-2 at fb3a98842): with the Windows refusal and the win32 Node run route removed, host `fgos run` starts on every platform, but a `fgos run` that writes files still cannot run end to end on Windows. Two walls of this row block it: (a) Config cannot read a project config on Windows (`config-platform-unsupported`, `packages/config/rust/src/files.rs`), and (c) a CLI agent seat has no Windows confinement backend (`posture-unavailable` without bwrap). The deleted Node route hit the same walls, so nothing regressed.
+
 Migrated from the legacy backlog table. Original status: proposed.
