@@ -59,6 +59,7 @@ footprint:
   - apps/fgos/src/main.rs
   - packages/host-runtime/contracts/command-routes.json
   - packages/host-runtime/contracts/command-route-annotations.json
+  - packages/host-runtime/rust/src/catalog.rs
   - packages/questions/rust/Cargo.toml
   - packages/supervision/rust/Cargo.toml
   - Cargo.lock
