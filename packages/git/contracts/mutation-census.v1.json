@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "cf42ba397c13efab55f1bc12068440830a243a171100602ad7e5f4c88094282a",
+  "payloadDigest": "82db2f319945e41cc638198d0e72f9b08fa56a2a3d0d21f131431bb8b69bf3b0",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "764929356f623ea67c3f918c5414cef1541da5c03a23bd9fa0acfae4a31df38b",
     ".agents/skills/_shared/capability-matching.md": "0b3ccc4ee0b78295dc9bf81defc6388fd78d21724efc24bcf2f3816c6bc5082f",
@@ -157,7 +157,7 @@
     "apps/fgos/src/wiring/session_rotation_hook.rs": "20782a7a73725c725531adaf42ab15de1b7f0dcacfb6492567923df55ad72580",
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
     "apps/fgos/src/wiring/session_write_publish.rs": "0b830327e6ef3925025c2ad0fe9c30a4c87a24dea4fe122371d92b90ba2b5907",
-    "apps/fgos/src/wiring/supervision.rs": "7f8ff1f09976cd1544e9e6e8f4bbc499b36d62c7536fa7b5f33d70a904703db3",
+    "apps/fgos/src/wiring/supervision.rs": "93ef2f5a918a9f932b33c7f93a3f7fb6e5942094261bd1c736014241ce801075",
     "apps/fgos/src/wiring/terminal_tabs.rs": "a519a4903b296a3f6bfd486f41ea93d1ceb1489c28a4e6dc6dcfe03223ce3130",
     "apps/fgos/src/wiring/uninstall.rs": "1fd8cdeef4360bb32ae0dd1452bdc6cb09c57427d95645c030105a24533dceff",
     "apps/fgos/src/wiring/unit_run_host/accounts.rs": "239f75242aa514de40b7c45a75609d24e357cefdacf04b86176d3300f3e62060",
@@ -189,7 +189,7 @@
     "apps/fgos/tests/questions_hook.rs": "1c206c5633a8ec75345fdcc4debd1efe30f8aa996aa48e00e3963c426061f5a2",
     "apps/fgos/tests/questions_verb.rs": "b0ccc8a1c82bbf81b7ad84eecfdcf4a2e3c350eb297cf6749645b4ee1a3296dd",
     "apps/fgos/tests/session_write_publish.rs": "1f2e511e01473684fd12a07905c4d1c040db025d51af22681e035a33fee81fc9",
-    "apps/fgos/tests/supervision_verbs.rs": "dc1a811583c8091ac91b7b5eda7b7ab53450ea31f538b2d2fcca7e732211305c",
+    "apps/fgos/tests/supervision_verbs.rs": "80a1e044ac7fd9b6d5bb1b89c91e319debb1241fa76f859c81dc5d57291193a1",
     "apps/fgos/tests/windows_borrow.rs": "4e77453a5386cf512a22db39e6a529e163c7dc930d8795c93ef05e60ba19c7b9",
     "apps/fgos/tests/windows_doctor_lock_rows.rs": "943ba00e7be5382a532ad47bfa38f6fef888428910e5f70ee18518edeb1eeb63",
     "apps/fgos/tests/windows_lock_hold_route.rs": "9cedd72a21ef501d00d37ce8fe1f52bb33cbfa799774470534c96dc59a4959aa",
