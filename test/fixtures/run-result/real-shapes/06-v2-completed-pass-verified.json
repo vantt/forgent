@@ -206,10 +206,10 @@
       "version": 2
     },
     "status": "done",
-    "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+    "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
     "evidenceRefs": [
       "git commit 802a0965",
-      "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+      "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
     ]
   },
   "evidence": {
@@ -217,11 +217,11 @@
     "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
     "gitBeforeSource": "pre-launch",
     "changedFiles": [
-      "herdr-plugin/Cargo.lock",
-      "herdr-plugin/Cargo.toml",
-      "herdr-plugin/src/gateway.rs",
-      "herdr-plugin/src/lib.rs",
-      "herdr-plugin/src/remote_invocation.rs"
+      "herdr-dashboard/Cargo.lock",
+      "herdr-dashboard/Cargo.toml",
+      "herdr-dashboard/src/gateway.rs",
+      "herdr-dashboard/src/lib.rs",
+      "herdr-dashboard/src/remote_invocation.rs"
     ],
     "mutatedDirtyBeforeFiles": [],
     "attribution": [],
@@ -232,7 +232,7 @@
     "tests": [],
     "findingRefs": [
       "git commit 802a0965",
-      "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+      "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
     ]
   }
 }

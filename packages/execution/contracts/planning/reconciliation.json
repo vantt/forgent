@@ -542,10 +542,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -553,11 +553,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -568,7 +568,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 }
               }
@@ -648,9 +648,9 @@
           "result": {
             "ok": {
               "outcome": "planned",
-              "actionKey": "reconcile_b539819139a88dbecb8b51c1bdef11fc5ea18292c05012eb42274b8a1cace5a4",
+              "actionKey": "reconcile_b7df86c8a4633f4fb2c9c7b03a7d447c45e335e7986ebf029250fe5aa948dd14",
               "snapshot": {
-                "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+                "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
                 "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
                 "ownerAuthority": {
                   "kind": "standalone-run",
@@ -896,10 +896,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -907,11 +907,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -922,7 +922,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -1009,9 +1009,9 @@
           "result": {
             "ok": {
               "outcome": "planned",
-              "actionKey": "reconcile_44e583339e0c825dd4f9c9e7c4465f06a042310b5f4ffbe4879b0544178a708b",
+              "actionKey": "reconcile_f3362e748fcead368c2c8b06bd94d74890a0cb3a976053b023fc57eb8f100621",
               "snapshot": {
-                "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+                "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
                 "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
                 "currentStatus": "running",
                 "controlEpoch": 0,
@@ -1254,10 +1254,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -1265,11 +1265,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -1280,7 +1280,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -1368,9 +1368,9 @@
           "result": {
             "ok": {
               "outcome": "planned",
-              "actionKey": "reconcile_4564c72a679aa141a2f955319e5f55f3136ef5b500dc3a7a0c076c5e9fa8dc5d",
+              "actionKey": "reconcile_3cdca3ce3e1531e929cdc4312fa02b61ae97cba20def694c7ee6e8768ca35e54",
               "snapshot": {
-                "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+                "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
                 "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
                 "ownerAuthority": {
                   "kind": "standalone-run",
@@ -1616,10 +1616,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -1627,11 +1627,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -1642,7 +1642,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -1894,10 +1894,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -1905,11 +1905,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -1920,7 +1920,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 }
               }
@@ -2228,10 +2228,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -2239,11 +2239,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -2254,7 +2254,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -2341,9 +2341,9 @@
           "result": {
             "ok": {
               "outcome": "planned",
-              "actionKey": "reconcile_7e16fd4ed9b43d8074bc7a37327d9e65ca4d1a3c2f469074c81cc35f1129747c",
+              "actionKey": "reconcile_266b3081600a5020e75a795801c1a616f92056d7b3a69ddcb2368ea8956394e9",
               "snapshot": {
-                "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+                "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
                 "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
                 "ownerAuthority": {
                   "kind": "standalone-run",
@@ -2589,10 +2589,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -2600,11 +2600,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -2615,7 +2615,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -2867,10 +2867,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -2878,11 +2878,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -2893,7 +2893,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 }
               }
@@ -2993,9 +2993,9 @@
           "result": {
             "ok": {
               "outcome": "planned",
-              "actionKey": "reconcile_8a30d013b238d3ebc5b8020f7cd710f47540d9ec469fc65f9380866f2e88f5b5",
+              "actionKey": "reconcile_4f112949b075a61c4e1c8870f61963a3c9629d400bfc02e12352e2140ba27ea8",
               "snapshot": {
-                "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+                "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
                 "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
                 "ownerAuthority": {
                   "kind": "standalone-run",
@@ -3254,10 +3254,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -3265,11 +3265,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -3280,7 +3280,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -4041,10 +4041,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -4052,11 +4052,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -4067,7 +4067,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 }
               }
@@ -4383,10 +4383,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -4394,11 +4394,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -4409,7 +4409,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -4664,10 +4664,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -4675,11 +4675,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -4690,7 +4690,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 }
               }
@@ -4968,10 +4968,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -4979,11 +4979,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -4994,7 +4994,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -5246,10 +5246,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -5257,11 +5257,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -5272,7 +5272,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 }
               }
@@ -5603,10 +5603,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -5614,11 +5614,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -5629,7 +5629,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -5887,10 +5887,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -5898,11 +5898,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -5913,7 +5913,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 }
               }
@@ -5993,9 +5993,9 @@
           "result": {
             "ok": {
               "outcome": "planned",
-              "actionKey": "reconcile_f4a9e54b484e5ed850fb5d22118e2cbf6379f5faec8ded24599efaed55d1e4f3",
+              "actionKey": "reconcile_208c4b23a24e8bf5f72c64afbae8534b6acafdae507c9a9d6f5bd9b69e3c4e67",
               "snapshot": {
-                "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+                "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
                 "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
                 "ownerAuthority": {
                   "kind": "standalone-run",
@@ -6241,10 +6241,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -6252,11 +6252,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -6267,7 +6267,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -6285,9 +6285,9 @@
           "args": null,
           "plan": {
             "outcome": "planned",
-            "actionKey": "reconcile_f4a9e54b484e5ed850fb5d22118e2cbf6379f5faec8ded24599efaed55d1e4f3",
+            "actionKey": "reconcile_208c4b23a24e8bf5f72c64afbae8534b6acafdae507c9a9d6f5bd9b69e3c4e67",
             "snapshot": {
-              "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+              "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
               "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
               "ownerAuthority": {
                 "kind": "standalone-run",
@@ -6375,7 +6375,7 @@
           "result": {
             "ok": {
               "outcome": "applied",
-              "actionKey": "reconcile_f4a9e54b484e5ed850fb5d22118e2cbf6379f5faec8ded24599efaed55d1e4f3"
+              "actionKey": "reconcile_208c4b23a24e8bf5f72c64afbae8534b6acafdae507c9a9d6f5bd9b69e3c4e67"
             }
           },
           "tree": {
@@ -6603,10 +6603,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -6614,11 +6614,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -6629,7 +6629,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -6640,7 +6640,7 @@
               "resultCollectedAt": "2026-11-19T02:00:00.000Z"
             },
             ".fgos/dispatch/": null,
-            ".fgos/dispatch/reconciliation-actions.jsonl": "{\"actionKey\":\"reconcile_f4a9e54b484e5ed850fb5d22118e2cbf6379f5faec8ded24599efaed55d1e4f3\",\"outcome\":\"applied\",\"at\":\"2026-11-19T02:00:00.000Z\"}\n"
+            ".fgos/dispatch/reconciliation-actions.jsonl": "{\"actionKey\":\"reconcile_208c4b23a24e8bf5f72c64afbae8534b6acafdae507c9a9d6f5bd9b69e3c4e67\",\"outcome\":\"applied\",\"at\":\"2026-11-19T02:00:00.000Z\"}\n"
           }
         },
         {
@@ -6650,9 +6650,9 @@
           "args": null,
           "plan": {
             "outcome": "planned",
-            "actionKey": "reconcile_f4a9e54b484e5ed850fb5d22118e2cbf6379f5faec8ded24599efaed55d1e4f3",
+            "actionKey": "reconcile_208c4b23a24e8bf5f72c64afbae8534b6acafdae507c9a9d6f5bd9b69e3c4e67",
             "snapshot": {
-              "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+              "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
               "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
               "ownerAuthority": {
                 "kind": "standalone-run",
@@ -6741,7 +6741,7 @@
             "ok": {
               "outcome": "already-applied",
               "priorOutcome": "applied",
-              "actionKey": "reconcile_f4a9e54b484e5ed850fb5d22118e2cbf6379f5faec8ded24599efaed55d1e4f3"
+              "actionKey": "reconcile_208c4b23a24e8bf5f72c64afbae8534b6acafdae507c9a9d6f5bd9b69e3c4e67"
             }
           },
           "tree": {
@@ -6969,10 +6969,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -6980,11 +6980,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -6995,7 +6995,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -7006,7 +7006,7 @@
               "resultCollectedAt": "2026-11-19T02:00:00.000Z"
             },
             ".fgos/dispatch/": null,
-            ".fgos/dispatch/reconciliation-actions.jsonl": "{\"actionKey\":\"reconcile_f4a9e54b484e5ed850fb5d22118e2cbf6379f5faec8ded24599efaed55d1e4f3\",\"outcome\":\"applied\",\"at\":\"2026-11-19T02:00:00.000Z\"}\n"
+            ".fgos/dispatch/reconciliation-actions.jsonl": "{\"actionKey\":\"reconcile_208c4b23a24e8bf5f72c64afbae8534b6acafdae507c9a9d6f5bd9b69e3c4e67\",\"outcome\":\"applied\",\"at\":\"2026-11-19T02:00:00.000Z\"}\n"
           }
         }
       ]
@@ -7250,10 +7250,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -7261,11 +7261,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -7276,7 +7276,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 }
               }
@@ -7356,9 +7356,9 @@
           "result": {
             "ok": {
               "outcome": "planned",
-              "actionKey": "reconcile_04e10bf36188af3f71d443cff3479360b9309846c1f0256f85be7b0513e55800",
+              "actionKey": "reconcile_3039f022ed1e2f4c30623a82afd8bd4f66f32ff3d938123e9b5e1bfbde7875d3",
               "snapshot": {
-                "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+                "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
                 "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
                 "currentStatus": "running",
                 "controlEpoch": 0,
@@ -7601,10 +7601,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -7612,11 +7612,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -7627,7 +7627,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -7645,9 +7645,9 @@
           "args": null,
           "plan": {
             "outcome": "planned",
-            "actionKey": "reconcile_04e10bf36188af3f71d443cff3479360b9309846c1f0256f85be7b0513e55800",
+            "actionKey": "reconcile_3039f022ed1e2f4c30623a82afd8bd4f66f32ff3d938123e9b5e1bfbde7875d3",
             "snapshot": {
-              "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+              "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
               "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
               "currentStatus": "running",
               "controlEpoch": 0,
@@ -7732,7 +7732,7 @@
           "result": {
             "ok": {
               "outcome": "applied",
-              "actionKey": "reconcile_04e10bf36188af3f71d443cff3479360b9309846c1f0256f85be7b0513e55800"
+              "actionKey": "reconcile_3039f022ed1e2f4c30623a82afd8bd4f66f32ff3d938123e9b5e1bfbde7875d3"
             }
           },
           "tree": {
@@ -7960,10 +7960,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -7971,11 +7971,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -7986,7 +7986,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -7997,7 +7997,7 @@
               "settledAt": "2026-11-19T02:00:00.000Z"
             },
             ".fgos/dispatch/": null,
-            ".fgos/dispatch/reconciliation-actions.jsonl": "{\"actionKey\":\"reconcile_04e10bf36188af3f71d443cff3479360b9309846c1f0256f85be7b0513e55800\",\"outcome\":\"applied\",\"at\":\"2026-11-19T02:00:00.000Z\"}\n"
+            ".fgos/dispatch/reconciliation-actions.jsonl": "{\"actionKey\":\"reconcile_3039f022ed1e2f4c30623a82afd8bd4f66f32ff3d938123e9b5e1bfbde7875d3\",\"outcome\":\"applied\",\"at\":\"2026-11-19T02:00:00.000Z\"}\n"
           }
         },
         {
@@ -8007,9 +8007,9 @@
           "args": null,
           "plan": {
             "outcome": "planned",
-            "actionKey": "reconcile_04e10bf36188af3f71d443cff3479360b9309846c1f0256f85be7b0513e55800",
+            "actionKey": "reconcile_3039f022ed1e2f4c30623a82afd8bd4f66f32ff3d938123e9b5e1bfbde7875d3",
             "snapshot": {
-              "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+              "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
               "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
               "currentStatus": "running",
               "controlEpoch": 0,
@@ -8095,7 +8095,7 @@
             "ok": {
               "outcome": "already-applied",
               "priorOutcome": "applied",
-              "actionKey": "reconcile_04e10bf36188af3f71d443cff3479360b9309846c1f0256f85be7b0513e55800"
+              "actionKey": "reconcile_3039f022ed1e2f4c30623a82afd8bd4f66f32ff3d938123e9b5e1bfbde7875d3"
             }
           },
           "tree": {
@@ -8323,10 +8323,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -8334,11 +8334,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -8349,7 +8349,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -8360,7 +8360,7 @@
               "settledAt": "2026-11-19T02:00:00.000Z"
             },
             ".fgos/dispatch/": null,
-            ".fgos/dispatch/reconciliation-actions.jsonl": "{\"actionKey\":\"reconcile_04e10bf36188af3f71d443cff3479360b9309846c1f0256f85be7b0513e55800\",\"outcome\":\"applied\",\"at\":\"2026-11-19T02:00:00.000Z\"}\n"
+            ".fgos/dispatch/reconciliation-actions.jsonl": "{\"actionKey\":\"reconcile_3039f022ed1e2f4c30623a82afd8bd4f66f32ff3d938123e9b5e1bfbde7875d3\",\"outcome\":\"applied\",\"at\":\"2026-11-19T02:00:00.000Z\"}\n"
           }
         },
         {
@@ -8667,10 +8667,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -8678,11 +8678,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -8693,7 +8693,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -8704,7 +8704,7 @@
               "settledAt": "2026-11-19T02:00:00.000Z"
             },
             ".fgos/dispatch/": null,
-            ".fgos/dispatch/reconciliation-actions.jsonl": "{\"actionKey\":\"reconcile_04e10bf36188af3f71d443cff3479360b9309846c1f0256f85be7b0513e55800\",\"outcome\":\"applied\",\"at\":\"2026-11-19T02:00:00.000Z\"}\n"
+            ".fgos/dispatch/reconciliation-actions.jsonl": "{\"actionKey\":\"reconcile_3039f022ed1e2f4c30623a82afd8bd4f66f32ff3d938123e9b5e1bfbde7875d3\",\"outcome\":\"applied\",\"at\":\"2026-11-19T02:00:00.000Z\"}\n"
           }
         }
       ]
@@ -8948,10 +8948,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -8959,11 +8959,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -8974,7 +8974,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 }
               }
@@ -9054,9 +9054,9 @@
           "result": {
             "ok": {
               "outcome": "planned",
-              "actionKey": "reconcile_88d2e365a4a43f1ffe3b47d626782f59d35204dc80435c61c27ccfc0a8c6c104",
+              "actionKey": "reconcile_4ac838b76161318ad6198e24b0b36523eb3aed942c757f5a7739cde4f63c2b39",
               "snapshot": {
-                "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+                "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
                 "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
                 "ownerAuthority": {
                   "kind": "standalone-run",
@@ -9302,10 +9302,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -9313,11 +9313,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -9328,7 +9328,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -9346,9 +9346,9 @@
           "args": null,
           "plan": {
             "outcome": "planned",
-            "actionKey": "reconcile_88d2e365a4a43f1ffe3b47d626782f59d35204dc80435c61c27ccfc0a8c6c104",
+            "actionKey": "reconcile_4ac838b76161318ad6198e24b0b36523eb3aed942c757f5a7739cde4f63c2b39",
             "snapshot": {
-              "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+              "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
               "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
               "ownerAuthority": {
                 "kind": "standalone-run",
@@ -9664,10 +9664,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -9675,11 +9675,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -9690,7 +9690,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -9943,10 +9943,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -9954,11 +9954,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -9969,7 +9969,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 }
               }
@@ -10049,9 +10049,9 @@
           "result": {
             "ok": {
               "outcome": "planned",
-              "actionKey": "reconcile_5bf8e54ac84abfd35edea971d77ca252f626efeefc61d10db53d9ca2b93587af",
+              "actionKey": "reconcile_cee76090b16cea3ff34e4a6208bf709853965caa76b2ce1a289f42767f603024",
               "snapshot": {
-                "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+                "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
                 "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
                 "ownerAuthority": {
                   "kind": "standalone-run",
@@ -10297,10 +10297,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -10308,11 +10308,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -10323,7 +10323,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -10546,10 +10546,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -10557,11 +10557,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -10572,7 +10572,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "summary": "changed after planning"
@@ -10584,9 +10584,9 @@
           "args": null,
           "plan": {
             "outcome": "planned",
-            "actionKey": "reconcile_5bf8e54ac84abfd35edea971d77ca252f626efeefc61d10db53d9ca2b93587af",
+            "actionKey": "reconcile_cee76090b16cea3ff34e4a6208bf709853965caa76b2ce1a289f42767f603024",
             "snapshot": {
-              "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+              "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
               "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
               "ownerAuthority": {
                 "kind": "standalone-run",
@@ -10902,10 +10902,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -10913,11 +10913,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -10928,7 +10928,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "summary": "changed after planning"
@@ -11182,10 +11182,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -11193,11 +11193,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -11208,7 +11208,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 }
               }
@@ -11288,9 +11288,9 @@
           "result": {
             "ok": {
               "outcome": "planned",
-              "actionKey": "reconcile_c1dababf8361bc99c11f6b08b8079151c2be9d00cb2281ab2a1d16b8f77795c9",
+              "actionKey": "reconcile_f67c5fe11e169cb920502e499e58079a821f37f6e49f147ba9192c510175260f",
               "snapshot": {
-                "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+                "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
                 "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
                 "currentStatus": "running",
                 "controlEpoch": 0,
@@ -11533,10 +11533,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -11544,11 +11544,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -11559,7 +11559,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -11579,9 +11579,9 @@
           "args": null,
           "plan": {
             "outcome": "planned",
-            "actionKey": "reconcile_c1dababf8361bc99c11f6b08b8079151c2be9d00cb2281ab2a1d16b8f77795c9",
+            "actionKey": "reconcile_f67c5fe11e169cb920502e499e58079a821f37f6e49f147ba9192c510175260f",
             "snapshot": {
-              "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+              "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
               "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
               "currentStatus": "running",
               "controlEpoch": 0,
@@ -11929,10 +11929,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -11940,11 +11940,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -11955,7 +11955,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 }
               }
@@ -12035,9 +12035,9 @@
           "result": {
             "ok": {
               "outcome": "planned",
-              "actionKey": "reconcile_11e5b1f19f6bb96be23f539531ddf470a20989284ef49144988ef5ab4ae0b7ef",
+              "actionKey": "reconcile_a505b0ae6a497e418b936b41bc65cf31e3fa35af2f772c1e8a3ecfde4f78c4b5",
               "snapshot": {
-                "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+                "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
                 "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
                 "ownerAuthority": {
                   "kind": "standalone-run",
@@ -12283,10 +12283,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -12294,11 +12294,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -12309,7 +12309,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -12327,9 +12327,9 @@
           "args": null,
           "plan": {
             "outcome": "planned",
-            "actionKey": "reconcile_11e5b1f19f6bb96be23f539531ddf470a20989284ef49144988ef5ab4ae0b7ef",
+            "actionKey": "reconcile_a505b0ae6a497e418b936b41bc65cf31e3fa35af2f772c1e8a3ecfde4f78c4b5",
             "snapshot": {
-              "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+              "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
               "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
               "ownerAuthority": {
                 "kind": "standalone-run",
@@ -12645,10 +12645,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -12656,11 +12656,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -12671,7 +12671,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -12924,10 +12924,10 @@
                     "version": 2
                   },
                   "status": "done",
-                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                  "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                   "evidenceRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 },
                 "evidence": {
@@ -12935,11 +12935,11 @@
                   "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                   "gitBeforeSource": "pre-launch",
                   "changedFiles": [
-                    "herdr-plugin/Cargo.lock",
-                    "herdr-plugin/Cargo.toml",
-                    "herdr-plugin/src/gateway.rs",
-                    "herdr-plugin/src/lib.rs",
-                    "herdr-plugin/src/remote_invocation.rs"
+                    "herdr-dashboard/Cargo.lock",
+                    "herdr-dashboard/Cargo.toml",
+                    "herdr-dashboard/src/gateway.rs",
+                    "herdr-dashboard/src/lib.rs",
+                    "herdr-dashboard/src/remote_invocation.rs"
                   ],
                   "mutatedDirtyBeforeFiles": [],
                   "attribution": [],
@@ -12950,7 +12950,7 @@
                   "tests": [],
                   "findingRefs": [
                     "git commit 802a0965",
-                    "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                    "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                   ]
                 }
               }
@@ -13030,9 +13030,9 @@
           "result": {
             "ok": {
               "outcome": "planned",
-              "actionKey": "reconcile_55acc2328b85fc4419de5c132d3f8096b6ab30ddbe008f02361d1f0dde35dcd8",
+              "actionKey": "reconcile_20b2f716e43338e1244c598881aa4ffe16945ddcf2fe4e7c10c0f70f527cfe68",
               "snapshot": {
-                "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+                "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
                 "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
                 "ownerAuthority": {
                   "kind": "standalone-run",
@@ -13278,10 +13278,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -13289,11 +13289,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -13304,7 +13304,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
@@ -13324,7 +13324,7 @@
             "outcome": "planned",
             "actionKey": "reconcile_deadbeef",
             "snapshot": {
-              "digest": "sha256:32df61813dc1558061d150a677bab34b802af4e829f0bbecc210d3a5ccaebb92",
+              "digest": "sha256:16546c0e046c4a09846bd99a20f3b702cb18032e13194d3729531c3e3c789dd7",
               "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
               "ownerAuthority": {
                 "kind": "standalone-run",
@@ -13640,10 +13640,10 @@
                   "version": 2
                 },
                 "status": "done",
-                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+                "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-dashboard/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-dashboard/Cargo.toml and registered module in herdr-dashboard/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
                 "evidenceRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               },
               "evidence": {
@@ -13651,11 +13651,11 @@
                 "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
                 "gitBeforeSource": "pre-launch",
                 "changedFiles": [
-                  "herdr-plugin/Cargo.lock",
-                  "herdr-plugin/Cargo.toml",
-                  "herdr-plugin/src/gateway.rs",
-                  "herdr-plugin/src/lib.rs",
-                  "herdr-plugin/src/remote_invocation.rs"
+                  "herdr-dashboard/Cargo.lock",
+                  "herdr-dashboard/Cargo.toml",
+                  "herdr-dashboard/src/gateway.rs",
+                  "herdr-dashboard/src/lib.rs",
+                  "herdr-dashboard/src/remote_invocation.rs"
                 ],
                 "mutatedDirtyBeforeFiles": [],
                 "attribution": [],
@@ -13666,7 +13666,7 @@
                 "tests": [],
                 "findingRefs": [
                   "git commit 802a0965",
-                  "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+                  "cargo test --manifest-path herdr-dashboard/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
                 ]
               }
             },
